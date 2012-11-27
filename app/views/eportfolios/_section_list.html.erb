@@ -2,31 +2,31 @@
   <% @categories.each do |c| %>
     <li id="section_<%= c.id %>" class="section <%= "active" if c == @category %>">
       <span class="section_url">
-        <a href="#" class="edit_section_link"><%= image_tag "edit.png", :class => "editing_image", :title => t('titles.rename_section', "Rename this Section") %></a>
+        <a href="#" class="edit_section_link" title="<%= t('titles.rename_section', "Rename this Section") %>"><i class="icon-edit standalone-icon"></i></a>
         <a class="name" href="<%= eportfolio_named_category_path(c.eportfolio, c.slug) %>"><%= c.name %></a>
-        <a href="<%= eportfolio_category_path(c.eportfolio, c.id) %>" class="remove_section_link">&#215;</a>
+        <a href="<%= eportfolio_category_path(c.eportfolio, c.id) %>" class="remove_section_link"><i class="icon-trash standalone-icon"></i></a>
       </span>
       <a class="rename_section_url" href="<%= eportfolio_category_path(c.eportfolio, c.id) %>" style="display: none;">&nbsp;</a>
     </li>
   <% end %>
   <li id="section_blank" class="section unsaved" style="display: none;">
     <span class="section_url">
-      <a href="#" class="edit_section_link"><%= image_tag "edit.png", :class => "editing_image", :title => t('titles.rename_section', "Rename this Section") %></a>
+      <a href="#" class="edit_section_link" title="<%= t('titles.rename_section', "Rename this Section") %>"><i class="icon-edit standalone-icon"></i></a>
       <a class="name" href="<%= eportfolio_named_category_path(@portfolio, "{{ slug }}") %>"><%= t(:default_section_name, "Section Name") %></a>
-      <a href="<%= eportfolio_category_path(@portfolio.id, "{{ id }}") %>" class="remove_section_link">&#215;</a>
+      <a href="<%= eportfolio_category_path(@portfolio.id, "{{ id }}") %>" class="remove_section_link"><i class="icon-trash standalone-icon"></i></a>
     </span>
     <a class="rename_section_url" href="<%= eportfolio_category_path(@portfolio, "{{ id }}") %>" style="display: none;">&nbsp;</a>
   </li>
 </ul>
 <ul style="font-size: 0.8em;line-height: 1.85em; font-style: italic; margin-left: 10px;" id="section_list_manage">
-  <li style="display: none;" class="add_section">&nbsp;<a href="#" class="add_section_link no-hover add"><%= t('links.add_section', "Add Section") %></a></li>
+  <li style="display: none;" class="add_section"><a href="#" class="add_section_link no-hover icon-add"><%= t('links.add_section', "Add Section") %></a></li>
   <li style="display: none;">
     <a href="<%= eportfolio_categories_path(@portfolio) %>" class="add_section_url">&nbsp;</a>
     <a href="<%= eportfolio_reorder_categories_path(@portfolio.id) %>" class="reorder_sections_url">&nbsp;</a>
   </li>
   <% if can_do(@portfolio, @current_user, :manage) %>
     <li class="displaying_item"><a href="#" class="manage_sections_link" title="<%= t('titles.manage_sections', "Add, remove or rearrange sections for this portfolio") %>"><%= manage_sections_link_text %></a></li>
-    <li class="editing_item" style="padding-bottom: 10px;"><button type="button" class="done_editing_button btn btn-small"><%= t('buttons.done_editing', "Done Editing") %></button></li>
+    <li class="editing_item" style="padding-bottom: 10px;"><button type="button" class="done_editing_button btn btn-primary btn-small"><%= t('buttons.done_editing', "Done Editing") %></button></li>
     <li><a href="#" class="portfolio_settings_link"><%= t('links.settings', "ePortfolio Settings") %></a></li>
   <% end %>
 </ul>

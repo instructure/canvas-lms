@@ -17,30 +17,30 @@
     <ul id="page_list">
       <% @category.eportfolio_entries.each do |e| %>
         <li id="page_<%= e.id %>" class="page <%= "current" if e == @page %>">
-          <a href="#" class="edit_page_link">
-            <%= image_tag "edit.png", :class => "editing_image", :title => t('titles.rename_page', "Rename Page") %>
+          <a href="#" class="edit_page_link" title="<%= t('titles.rename_page', "Rename Page") %>">
+            <i class="icon-edit standalone-icon"></i>
           </a>
           <a class="page_url no-hover" href="<%= eportfolio_named_category_entry_path(@portfolio,@category.slug, e.slug) %>">
             <span class="name"><%= e.name %></span>
           </a>
           <a class="rename_page_url" href="<%= eportfolio_entry_path(@portfolio, e.id) %>" style="display: none;">&nbsp;</a>
-          &nbsp;<a href="#" class="remove_page_link" title="<%= t('titles.delete_page', "Delete this Page") %>">&#215;</a>
+          &nbsp;<a href="#" class="remove_page_link" title="<%= t('titles.delete_page', "Delete this Page") %>"><i class="icon-trash standalone-icon"></i></a>
         </li>
       <% end %>
       <li id="page_blank" class="page unsaved" style="display: none;">
-        <a href="#" class="edit_page_link">
-          <%= image_tag "edit.png", :class => "editing_image", :title => t('titles.rename_page', "Rename Page") %>
+        <a href="#" class="edit_page_link" title="<%= t('titles.rename_page', "Rename Page") %>">
+          <i class="icon-edit standalone-icon"></i>
         </a>
         <a class="page_url no-hover" href="<%= eportfolio_named_category_entry_path(@portfolio, @category.slug, "{{ slug }}") %>">
           <span class="name"><%= t(:default_page_name, "Page Name") %></span>
         </a>
         <a class="rename_page_url" href="<%= eportfolio_entry_path(@portfolio, "{{ id }}") %>" style="display: none;">&nbsp;</a>
-        &nbsp;<a href="#" class="remove_page_link" title="<%= t('titles.delete_page', "Delete this Page") %>">&#215;</a>
+        &nbsp;<a href="#" class="remove_page_link" title="<%= t('titles.delete_page', "Delete this Page") %>"><i class="icon-trash standalone-icon"></i></a>
       </li>
     </ul>
-    <a href="#" class="add_page_link add"><%= t('links.add_page', "Add Another Page") %></a>
+    <a href="#" class="add_page_link icon-add"><%= t('links.add_page', "Add Another Page") %></a>
     <div class="editing_box button-container">
-      <button type="button" class="done_editing_button btn"><%= t('buttons.done_editing', "Done Editing") %></button>
+      <button type="button" class="done_editing_button btn btn-primary"><%= t('buttons.done_editing', "Done Editing") %></button>
     </div>
     <a href="<%= eportfolio_entries_path(@portfolio) %>" class="add_page_url" style="display: none;">&nbsp;</a>
     <a href="<%= eportfolio_reorder_entries_url(@portfolio.id, @category.id) %>" class="reorder_pages_url">&nbsp;</a>

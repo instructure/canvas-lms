@@ -22,7 +22,7 @@ module EportfoliosHelper
   end
 
   def edit_icon
-    image_tag("edit.png")
+    "<i class='icon-edit'></i>".html_safe
   end
 
   def delete_icon(png=false)
@@ -34,7 +34,7 @@ module EportfoliosHelper
   end
 
   def help_icon
-    image_tag("help.png")
+    "<i class='icon-question'></i>".html_safe
   end
 
   def edit_link_text

@@ -32,7 +32,7 @@
     <% if can_do(@portfolio, @current_user, :manage) && !@owner_view %>
     <div class="rs-margin-lr edit_content_link_holder">
       <a href="#" class="edit_content_link btn button-sidebar-wide"><%= edit_link_text %></a>
-      <a href="<%= eportfolio_path(@portfolio.id) %>" class="back"><%= t('links.back', "Back to Portfolio Dashboard") %></a>
+      <a href="<%= eportfolio_path(@portfolio.id) %>" class="icon-arrow-left"><%= t('links.back', "Back to Portfolio Dashboard") %></a>
     </div>
     <div id="edit_page_sidebar">
       <h2 class="header"><%= t('headers.add_content', "Add Content") %></h2>
@@ -71,8 +71,8 @@
     DETAILS
   %></p>
   <ul class="unstyled_list" style="padding-left: 20px; margin-bottom: 20px; line-height: 1.8em; font-size: 1.2em;">
-    <li><a href="#" class="wizard_popup_link help"><%= t('links.wizard', "Getting Started Wizard") %></a></li>
-    <li><a href="?view=preview" class="forward"><%= t('links.portfolio', "Go to the Actual ePortfolio") %></a></li>
+    <li><a href="#" class="wizard_popup_link icon-question"><%= t('links.wizard', "Getting Started Wizard") %></a></li>
+    <li><a href="?view=preview" class="icon-arrow-right"><%= t('links.portfolio', "Go to the Actual ePortfolio") %></a></li>
   </ul>
 
   <% if @portfolio.public %>
@@ -197,7 +197,7 @@
   </form>
 <% else %>
   <% if can_do(@portfolio, @current_user, :manage) %>
-  <div style="float: right; display: none;"><a href="#" class="edit_content_link edit"><%= edit_link_text %></a></div>
+  <div style="float: right; display: none;"><a href="#" class="edit_content_link icon-edit"><%= edit_link_text %></a></div>
   <% end %>
   <h2><%= @page.name %></h2>
   <% idx = 1 %>
@@ -367,7 +367,7 @@
       <% if @current_user %>
         <%= f.text_area :message, :style => "width: 400px; height: 75px;" %>
         <div class="button-container">
-          <button type="submit" class="btn"><%= t('buttons.add_comment', "Add Comment") %></button>
+          <button type="submit" class="btn btn-primary"><i class="icon-discussion"></i> <%= t('buttons.add_comment', "Add Comment") %></button>
         </div>
       <% else %>
         <div style="text-align: center; font-size: 1.2em; margin: 10px;">
@@ -381,7 +381,7 @@
 <% end %>
 <% if @owner_view %>
   <div style="text-align: left; font-size: 1.2em; margin: 30px 10px 0;">
-    <a href="<%= eportfolio_export_portfolio_path(@portfolio.id) %>" class="download_eportfolio_link download"><%= t('links.download_eportfolio', "Download the contents of this ePortfolio as a zip file") %></a>
+    <a href="<%= eportfolio_export_portfolio_path(@portfolio.id) %>" class="download_eportfolio_link icon-zipped"><%= t('links.download_eportfolio', "Download the contents of this ePortfolio as a zip file") %></a>
     <div style="display: none; font-size: 1.2em;" id="downloading_eportfolio_message">
       <span class="message">
         <%= t('headers.export_progress', "Collecting ePortfolio resources. this may take a while if you have a lot of files in your ePortfolio.") %>
@@ -392,7 +392,7 @@
     </div>
   </div>
   <div style="text-align: left; font-size: 1.2em; margin: 30px 10px 0;">
-    <a href="<%= eportfolio_url(@portfolio.id) %>" class="delete_eportfolio_link delete"><%= t('links.delete', "Delete this ePortfolio") %></a>
+    <a href="<%= eportfolio_url(@portfolio.id) %>" class="delete_eportfolio_link icon-trash"><%= t('links.delete', "Delete this ePortfolio") %></a>
   </div>
   <% form_tag eportfolio_url(@portfolio.id), {:method => :delete, :id => "delete_eportfolio_form", :style => "margin-top: 20px; margin-left: 20px; display: none;"} do %>
     <%= t(:delete_confirm, {
