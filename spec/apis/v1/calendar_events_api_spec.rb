@@ -703,6 +703,49 @@ describe CalendarEventsApiController, :type => :integration do
             @course.enroll_student(@student, :enrollment_state => 'active')
           end
 
+          it 'should return an all-day override' do
+            # make the assignment non-all day
+            @default_assignment.due_at = DateTime.parse('2012-01-12 04:42:00')
+            @default_assignment.save!
+            @default_assignment.all_day.should be_false
+            @default_assignment.all_day_date.should == DateTime.parse('2012-01-12 04:42:00').to_date
+
+            assignment_override_model(:assignment => @default_assignment, :set => @course.default_section, 
+              :due_at => DateTime.parse('2012-01-21 23:59:00'))
+            @override.all_day.should be_true
+            @override.all_day_date.should == DateTime.parse('2012-01-21 23:59:00').to_date
+
+            json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-01&end_date=2012-01-31&per_page=25&context_codes[]=course_#{@course.id}", {
+                :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-01', :end_date => '2012-01-31', :per_page => '25'})
+            json.size.should == 1
+            json.first['id'].should == "assignment_#{@default_assignment.id}"
+
+            json.first['all_day'].should be_true
+            json.first['all_day_date'].should == '2012-01-21'
+          end
+
+          it 'should return a non-all-day override' do
+            @default_assignment.due_at = DateTime.parse('2012-01-12 23:59:00')
+            @default_assignment.save!
+            @default_assignment.all_day.should be_true
+            @default_assignment.all_day_date.should == DateTime.parse('2012-01-12 23:59:00').to_date
+
+            assignment_override_model(:assignment => @default_assignment, :set => @course.default_section, 
+              :due_at => DateTime.parse('2012-01-21 04:42:00'))
+            @override.all_day.should be_false
+            @override.all_day_date.should == DateTime.parse('2012-01-21 04:42:00').to_date
+
+            json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-01&end_date=2012-01-31&per_page=25&context_codes[]=course_#{@course.id}", {
+                :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-01', :end_date => '2012-01-31', :per_page => '25'})
+            json.size.should == 1
+            json.first['id'].should == "assignment_#{@default_assignment.id}"
+
+            json.first['all_day'].should be_false
+            json.first['all_day_date'].should == '2012-01-21'
+          end
+
           it 'should return a non-overridden assignment' do
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
                 :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',

@@ -1476,6 +1476,45 @@ describe Assignment do
       ev.description.should == "[Click!](http://localhost/calendar)"
       ev.x_alt_desc.should == %{<a href="http://localhost/calendar">Click!</a>}
     end
+
+    it ".to_ics should populate uid and summary fields" do
+      Time.zone = 'UTC'
+      assignment_model(:due_at => "Sep 3 2008 11:55am", :title => "assignment title")
+      ev = @a.to_ics(false)
+      ev.uid.should == "event-assignment-#{@a.id}"
+      ev.summary.should == "#{@a.title}"
+      # TODO: ev.url.should == ?
+    end
+
+    it ".to_ics should apply due_at override information" do
+      Time.zone = 'UTC'
+      assignment_model(:due_at => "Sep 3 2008 11:55am", :title => "assignment title")
+      @override = @a.assignment_overrides.build
+      @override.set = @c.default_section
+      @override.override_due_at(Time.zone.parse("Sep 28 2008 11:55am"))
+      @override.save!
+
+      assignment = AssignmentOverrideApplicator.assignment_with_overrides(@a, [@override])
+      ev = assignment.to_ics(false)
+      ev.uid.should == "event-assignment-override-#{@override.id}"
+      ev.summary.should == "#{@a.title} (#{@override.title})"
+      #TODO: ev.url.should == ?
+    end
+
+    it ".to_ics should not apply non-due_at override information" do
+      Time.zone = 'UTC'
+      assignment_model(:due_at => "Sep 3 2008 11:55am", :title => "assignment title")
+      @override = @a.assignment_overrides.build
+      @override.set = @c.default_section
+      @override.override_lock_at(Time.zone.parse("Sep 28 2008 11:55am"))
+      @override.save!
+
+      assignment = AssignmentOverrideApplicator.assignment_with_overrides(@a, [@override])
+      ev = assignment.to_ics(false)
+      ev.uid.should == "event-assignment-#{@a.id}"
+      ev.summary.should == "#{@a.title}"
+    end
+
   end
 
   context "quizzes and topics" do

@@ -210,35 +210,7 @@ class CalendarEventsApiController < ApplicationController
     scope  = @type == :assignment ? assignment_scope : calendar_event_scope
     events = Api.paginate(scope, self, api_v1_calendar_events_url)
     CalendarEvent.send(:preload_associations, events, :child_events) if @type == :event
-
-    if @type == :assignment
-      events = events.inject([]) do |assignments, assignment|
-        _, admin_dates = assignment.due_dates_for(@current_user)
-        if admin_dates.present?
-          overridden_dates, original_dates = admin_dates.partition { |date| date[:override] }
-
-          overridden_dates.each do |date|
-            assignments << AssignmentOverrideApplicator.assignment_with_overrides(assignment, [date[:override]])
-          end
-
-          original_dates.each { |date| assignments << assignment }
-        else
-          assignment.due_at = VariedDueDate.due_at_for?(assignment, @current_user)
-          assignments << assignment
-        end
-
-        assignments
-      end
-
-      # Once we've got all of the possible assignments, delete anything
-      # whose overrides put it outside of the current range.
-      events.delete_if do |assignment|
-        due_at = assignment.due_at.try(:to_datetime)
-        events.select { |e|
-          e.due_at == assignment.due_at && e.id == assignment.id
-        }.count > 1 || (due_at && (due_at > @end_date || due_at < @start_date))
-      end
-    end
+    events = apply_assignment_overrides(events) if @type == :assignment
 
     render :json => events.map{ |event| event_json(event, @current_user, session) }
   end
@@ -414,6 +386,7 @@ class CalendarEventsApiController < ApplicationController
 
       ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
         @events.concat assignment_scope.all
+        @events = apply_assignment_overrides(@events)
         @events.concat calendar_event_scope.events_without_child_events.all
       end
     else
@@ -423,6 +396,7 @@ class CalendarEventsApiController < ApplicationController
       ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
         @contexts.each do |context|
           @assignments = context.assignments.active.find(:all) if context.respond_to?("assignments")
+          # no overrides to apply without a current user
           @events.concat context.calendar_events.active.find(:all)
           @events.concat @assignments || []
         end
@@ -551,4 +525,35 @@ class CalendarEventsApiController < ApplicationController
   def search_params
     params.slice(:start_at, :end_at, :undated, :context_codes, :type)
   end
+
+  def apply_assignment_overrides(events)
+    events = events.inject([]) do |assignments, assignment|
+      _, admin_dates = assignment.due_dates_for(@current_user)
+      if admin_dates.present?
+        overridden_dates, original_dates = admin_dates.partition { |date| date[:override] }
+
+        overridden_dates.each do |date|
+          assignments << AssignmentOverrideApplicator.assignment_with_overrides(assignment, [date[:override]])
+        end
+
+        original_dates.each { |date| assignments << assignment }
+      else
+        assignment.due_at = VariedDueDate.due_at_for?(assignment, @current_user)
+        assignment.infer_all_day
+        assignments << assignment
+      end
+
+      assignments
+    end
+
+    # Once we've got all of the possible assignments, delete anything
+    # whose overrides put it outside of the current range.
+    events.delete_if do |assignment|
+      due_at = assignment.due_at.try(:to_datetime)
+      due_at && (due_at > @end_date || due_at < @start_date)
+    end
+
+    events
+  end
+
 end

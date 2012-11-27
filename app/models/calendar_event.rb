@@ -654,8 +654,18 @@ class CalendarEvent < ActiveRecord::Base
       event.url           "http://#{HostUrl.context_host(@event.context)}/calendar?include_contexts=#{@event.context.asset_string}&month=#{start_at.try(:strftime, "%m")}&year=#{start_at.try(:strftime, "%Y")}##{tag_name}_#{@event.id.to_s}"
       event.uid           "event-#{tag_name.gsub('_', '-')}-#{@event.id.to_s}"
       event.sequence      0
-      event = nil unless start_at
 
+      if @event.respond_to?(:applied_overrides)
+        @event.applied_overrides.try(:each) do |override|
+          next unless override.due_at_overridden
+          tag_name = override.class.name.underscore
+          event.uid       = "event-#{tag_name.gsub('_', '-')}-#{override.id}"
+          event.summary   = "#{@event.title} (#{override.title})"
+          #TODO: event.url
+        end
+      end
+
+      event = nil unless start_at
       return event unless in_own_calendar
 
       cal.add_event(event) if event

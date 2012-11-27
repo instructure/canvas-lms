@@ -412,14 +412,7 @@ class Assignment < ActiveRecord::Base
     self.title ||= (self.assignment_group.default_assignment_name rescue nil) || "Assignment"
     self.grading_type = "pass_fail" if self.submission_types == "attendance"
 
-    # make the comparison to "fancy midnight" and the date-part extraction in
-    # the time zone that was active during editing
-    time_zone = (ActiveSupport::TimeZone.new(self.time_zone_edited) rescue nil) || Time.zone
-    self.all_day, self.all_day_date = Assignment.all_day_interpretation(
-      :due_at => self.due_at ? self.due_at.in_time_zone(time_zone) : nil,
-      :due_at_was => self.due_at_was,
-      :all_day_was => self.all_day_was,
-      :all_day_date_was => self.all_day_date_was)
+    self.infer_all_day
 
     if !self.assignment_group || (self.assignment_group.deleted? && !self.deleted?)
       self.assignment_group = self.context.assignment_groups.active.first || self.context.assignment_groups.create!
@@ -834,6 +827,17 @@ class Assignment < ActiveRecord::Base
   def infer_due_at
     # set to 11:59pm if it's 12:00am
     self.due_at += ((60 * 60 * 24) - 60) if self.due_at && self.due_at.hour == 0 && self.due_at.min == 0
+  end
+
+  def infer_all_day
+    # make the comparison to "fancy midnight" and the date-part extraction in
+    # the time zone that was active during editing
+    time_zone = (ActiveSupport::TimeZone.new(self.time_zone_edited) rescue nil) || Time.zone
+    self.all_day, self.all_day_date = Assignment.all_day_interpretation(
+      :due_at => self.due_at ? self.due_at.in_time_zone(time_zone) : nil,
+      :due_at_was => self.due_at_was,
+      :all_day_was => self.all_day_was,
+      :all_day_date_was => self.all_day_date_was)
   end
 
   def to_atom(opts={})
