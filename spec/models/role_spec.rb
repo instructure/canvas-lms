@@ -67,6 +67,72 @@ describe Role do
       role.base_role_type = 'RidiculousEnrollment'
       role.should_not be_valid
     end
+
+    it "should disallow names that match base role types" do
+      role = @account.roles.create
+      role.base_role_type = 'StudentEnrollment'
+
+      role.name = 'StudentEnrollment'
+      role.should_not be_valid
+
+      role.name = 'TeacherEnrollment'
+      role.should_not be_valid
+
+      role.name = 'TaEnrollment'
+      role.should_not be_valid
+
+      role.name = 'DesignerEnrollment'
+      role.should_not be_valid
+
+      role.name = 'ObserverEnrollment'
+      role.should_not be_valid
+
+      role.name = 'RidiculousEnrollment'
+      role.should be_valid
+    end
+
+    it "should infer the root account id" do
+      role = @account.roles.create :name => "1337 Student"
+      role.base_role_type = 'StudentEnrollment'
+      role.save!
+      role.root_account_id.should == @account.id
+    end
+  end
+
+  context "with multiple accounts" do
+    before do
+      @root_account_1 = account_model
+      @sub_account_1a = @root_account_1.sub_accounts.create!
+      @sub_account_1b = @root_account_1.sub_accounts.create!
+      @root_account_2 = account_model
+      @sub_account_2 = @root_account_2.sub_accounts.create!
+
+      @role = @sub_account_1a.roles.create :name => 'TestRole'
+      @role.base_role_type = 'StudentEnrollment'
+      @role.save!
+    end
+
+    it "should infer the root account name" do
+      @role.root_account_id.should == @root_account_1.id
+    end
+
+    it "should allow a role name to be reused with the same base role type within a root account" do
+      new_role = @sub_account_1b.roles.create :name => 'TestRole'
+      new_role.base_role_type = 'StudentEnrollment'
+      new_role.should be_valid
+    end
+
+    it "should not allow a role name to be reused with a different base role type within a root account" do
+      new_role = @sub_account_1b.roles.create :name => 'TestRole'
+      new_role.base_role_type = 'TaEnrollment'
+      new_role.should_not be_valid
+    end
+
+    it "should allow a role name to be reused with a different base role type in a separate root account" do
+      new_role = @sub_account_2.roles.create :name => 'TestRole'
+      new_role.base_role_type = 'TaEnrollment'
+      new_role.should be_valid
+    end
   end
 
   context "with active role" do

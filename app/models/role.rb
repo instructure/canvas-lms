@@ -18,11 +18,27 @@
 
 class Role < ActiveRecord::Base
   belongs_to :account
+  belongs_to :root_account, :class_name => 'Account'
   attr_accessible :name
-  validates_presence_of :account_id
+  before_validation :infer_root_account_id
   validates_presence_of :name
-  validates_inclusion_of :base_role_type, :in =>
-      %w(TeacherEnrollment StudentEnrollment TaEnrollment ObserverEnrollment DesignerEnrollment)
+  validates_inclusion_of :base_role_type, :in => RoleOverride::ENROLLMENT_TYPES.map{ |et| et[:name] }
+  validates_exclusion_of :name, :in => RoleOverride::RESERVED_ROLES
+  validate :ensure_no_name_conflict_with_different_base_role_type
+
+  def infer_root_account_id
+    unless self.account
+      self.errors.add(:account_id)
+      return false
+    end
+    self.root_account_id = self.account.root_account_id || self.account.id
+  end
+
+  def ensure_no_name_conflict_with_different_base_role_type
+    unless self.root_account.all_roles.active.scoped(:conditions => ["name = ? AND base_role_type <> ?", self.name, self.base_role_type]).empty?
+      self.errors.add(:name, 'is already taken by a different type of Role in the same root account')
+    end
+  end
 
   include Workflow
   workflow do
@@ -40,5 +56,4 @@ class Role < ActiveRecord::Base
   named_scope :active, lambda {
     { :conditions => ['roles.workflow_state != ?', 'deleted'] }
   }
-
 end
