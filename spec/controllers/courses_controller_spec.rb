@@ -238,7 +238,7 @@ describe CoursesController do
     end
 
     it "should allow student view student to view unpublished courses" do
-      course_with_teacher_logged_in(:active_user => true)
+      course_with_teacher_logged_in(:active_user => true, :active_enrollment => true)
       @course.should_not be_available
       @fake_student = @course.student_view_student
       session[:become_user_id] = @fake_student.id
@@ -334,6 +334,11 @@ describe CoursesController do
     end
 
     context "invitations" do
+      before do
+        Account.default.settings[:allow_invitation_previews] = true
+        Account.default.save!
+      end
+
       it "should allow an invited user to see the course" do
         course_with_student(:active_course => 1)
         @enrollment.should be_invited
@@ -343,7 +348,7 @@ describe CoursesController do
       end
 
       it "should still show unauthorized if unpublished, regardless of if previews are allowed" do
-        # unpublished course with invited student in default account (disallows previews)
+        # unpublished course with invited student in default account (allows previews)
         course_with_student
         @course.workflow_state = 'claimed'
         @course.save!
@@ -352,7 +357,7 @@ describe CoursesController do
         response.status.should == '401 Unauthorized'
         assigns[:unauthorized_message].should_not be_nil
 
-        # unpublished course with invited student in account that allows previews
+        # unpublished course with invited student in account that disallows previews
         @account = Account.create!
         course_with_student(:account => @account)
         @course.workflow_state = 'claimed'

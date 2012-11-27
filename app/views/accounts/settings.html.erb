@@ -199,6 +199,10 @@ TEXT
                     <%= f.label :allow_sis_import, :en => "SIS imports" %>
                   </div>
                   <div>
+                    <%= settings.check_box :allow_invitation_previews, :checked => @account.settings[:allow_invitation_previews] %>
+                    <%= settings.label :allow_invitation_previews, :en => "Invitation Previews" %>
+                  </div>
+                  <div>
                     <%= settings.check_box :enable_alerts, :checked => @account.settings[:enable_alerts] %>
                     <%= settings.label :enable_alerts, :en => "Alerts (beta)" %>
                   </div>

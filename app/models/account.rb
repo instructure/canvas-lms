@@ -157,6 +157,12 @@ class Account < ActiveRecord::Base
   add_setting :canvas_authentication, :boolean => true, :root_only => true
   add_setting :admins_can_change_passwords, :boolean => true, :root_only => true, :default => false
   add_setting :outgoing_email_default_name
+  # When a user is invited to a course, do we let them see a preview of the
+  # course even without registering?  This is part of the free-for-teacher
+  # account perks, since anyone can invite anyone to join any course, and it'd
+  # be nice to be able to see the course first if you weren't expecting the
+  # invitation.
+  add_setting :allow_invitation_previews, :boolean => true, :root_only => true, :default => false
 
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -720,16 +726,7 @@ class Account < ActiveRecord::Base
       errors.add(:discovery_url, t('errors.invalid_discovery_url', "The discovery URL is not valid" ))
     end
   end
-  
-  # When a user is invited to a course, do we let them see a preview of the
-  # course even without registering?  This is part of the free-for-teacher
-  # account perks, since anyone can invite anyone to join any course, and it'd
-  # be nice to be able to see the course first if you weren't expecting the
-  # invitation.
-  def allow_invitation_previews?
-    self == Account.default
-  end
-  
+
   def find_courses(string)
     self.all_courses.select{|c| c.name.match(string) }
   end
