@@ -31,8 +31,14 @@ module Canvas::Cassandra
         servers = Array(config['servers'])
         raise "No Cassandra servers defined for: #{config_name.inspect}" unless servers.present?
         keyspace = config['keyspace']
+        keyspace = "#{keyspace}#{ENV['TEST_ENV_NUMBER']}" if Rails.env.test?
         raise "No keyspace specified for: #{config_name.inspect}" unless keyspace.present?
-        self.new(servers, keyspace)
+        opts = {:keyspace => keyspace, :cql_version => '3.0.0'}
+        thrift_opts = {}
+        thrift_opts[:retries] = config['retries'] if config['retries']
+        thrift_opts[:connect_timeout] = config['connect_timeout'] if config['connect_timeout']
+        thrift_opts[:timeout] = config['timeout'] if config['timeout']
+        self.new(servers, opts, thrift_opts)
       end
     end
 
@@ -40,9 +46,9 @@ module Canvas::Cassandra
       Setting.from_config('cassandra').try(:keys) || []
     end
 
-    def initialize(servers, keyspace)
+    def initialize(servers, opts, thrift_opts)
       Bundler.require 'cassandra'
-      @db = CassandraCQL::Database.new(servers, :keyspace => keyspace, :cql_version => '3.0.0')
+      @db = CassandraCQL::Database.new(servers, opts, thrift_opts)
     end
 
     attr_reader :db
