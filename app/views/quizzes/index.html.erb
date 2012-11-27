@@ -5,9 +5,9 @@
 <% content_for :right_side do %>
   <% if can_do(@context.quizzes.new, @current_user, :create) %>
     <div class="rs-margin-lr rs-margin-top">
-      <a href="<%= context_url(@context, :new_context_quiz_url, :fresh => 1) %>" class="btn button-sidebar-wide new-quiz-link"><%= image_tag "add.png" %> <%= t('links.create_new_quiz', "Create a New Quiz") %></a>
+      <a href="<%= context_url(@context, :new_context_quiz_url, :fresh => 1) %>" class="btn button-sidebar-wide new-quiz-link"><i class="icon-add"></i> <%= t('links.create_new_quiz', "Create a New Quiz") %></a>
       <% if can_do(@context, @current_user, :manage_assignments) && feature_enabled?(:question_banks) %>
-        <a href="<%= context_url(@context, :context_question_banks_url) %>" class="btn button-sidebar-wide"><%= image_tag "edit.png" %> <%= t('links.manage_question_banks', "Manage Question Banks") %></a>
+        <a href="<%= context_url(@context, :context_question_banks_url) %>" class="btn button-sidebar-wide"><i class="icon-question"></i> <%= t('links.manage_question_banks', "Manage Question Banks") %></a>
       <% end %>
       <% if can_do(@context, @current_user, :manage_assignments) && @unpublished_quizzes.length > 1 %>
         <a href="#" class="btn button-sidebar-wide publish_multiple_quizzes_link"><%= t('links.publish_multiple_quizzes', "Publish Multiple Quizzes") %></a>

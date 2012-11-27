@@ -3,7 +3,7 @@
 <% content_for :right_side do %>
   <div class="rs-margin-lr rs-margin-top">
   <% if @submission && params[:preview] %>
-    <a id="preview_mode_link" href="<%= context_url(@context, :edit_context_quiz_url, @quiz) %>" class="btn button-sidebar-wide"><%= image_tag "edit.png" %> <%= @quiz.survey? ? t('links.keep_editing_survey', "Keep Editing This Survey") : t('links.keep_editing_quiz', "Keep Editing This Quiz") %></a><br/>
+    <a id="preview_mode_link" href="<%= context_url(@context, :edit_context_quiz_url, @quiz) %>" class="btn button-sidebar-wide"><i class="icon-edit"></i> <%= @quiz.survey? ? t('links.keep_editing_survey', "Keep Editing This Survey") : t('links.keep_editing_quiz', "Keep Editing This Quiz") %></a><br/>
   <% end %>
   <h3 style="margin: 0px;"><%= t('headers.questions', "Questions") %></h3>
   <ul id="question_list" style="max-height: 200px; overflow: auto;">
@@ -42,7 +42,7 @@
 <header class="quiz-header">
   <h2><%= @quiz.quiz_title || @quiz.readable_type %></h2>
   <% if @submission.preview? %>
-  <h3><%= image_tag "warning.png" %> <%= t('headers.draft_preview', "This is a preview of the draft version of the quiz") %></h3>
+  <h3><i class="icon-warning"></i> <%= t('headers.draft_preview', "This is a preview of the draft version of the quiz") %></h3>
   <% end %>
   <%= before_label(:started, "Started") %>
   <%= datetime_string(@submission.started_at) %>

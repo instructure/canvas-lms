@@ -27,7 +27,7 @@
           </h2>
         </div>
         <div id="unpublished_changes_message" class="rs-margin-lr rs-margin-bottom" style="<%= hidden unless @quiz.available? && @quiz.unpublished_changes? %>; font-size: 0.9em;">
-          <%= image_tag "warning.png" %> <%= t('warnings.unpublished_changes', "You have made unpublished changes to this quiz.  These changes will not appear for students until you publish or re-publish the quiz.") %>
+          <i class="icon-warning"></i> <%= t('warnings.unpublished_changes', "You have made unpublished changes to this quiz.  These changes will not appear for students until you publish or re-publish the quiz.") %>
         </div>
         <div id="quiz_options" class="rs-margin-lr">
           <table class="stylized" style="margin-bottom: 0;">
@@ -236,15 +236,15 @@
       </div>
     <% end %>
   </div>
-  <div class="rs-margin-lr rs-margin-top">
+  <div class="rs-margin-lr rs-margin-top">    
     <% if @quiz.available? %>
-      <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="no-hover back"><%= t('links.return_to_quiz_page', "Return to Quiz Page") %></a><br/>
+      <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="no-hover icon-arrow-left"><%= t('links.return_to_quiz_page', "Return to Quiz Page") %></a><br/>
     <% end %>
     <% if @assignment %>
-    <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link rubric" style="<%= hidden unless @assignment %>"><%= t('links.show_assignment_rubric', "Show Assignment Rubric") %></a>
+    <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link icon-rubric" style="<%= hidden unless @assignment %>"><%= t('links.show_assignment_rubric', "Show Assignment Rubric") %></a><br/>
     <a href="<%= context_url(@context, :context_rubrics_url) %>" id="add_rubric_url" style="display:none">&nbsp;</a>
     <% end %>
-    <a href="#" class="add_question_link add"><%= t('links.add_new_question', "Add a New Question") %></a><br/>
+    <a href="#" class="add_question_link icon-add"><%= t('links.add_new_question', "Add a New Question") %></a><br/>
   </div>
 <% end %>
 <% js_block do %>
@@ -282,7 +282,7 @@ $(document).ready(function() {
 
 <% if @has_student_submissions %>
 <div style="margin-bottom: 5px;">
-  <%= image_tag "warning.png" %> <%= t('warnings.has_student_submissions', <<-TEXT)
+  <i class="icon-warning"></i> <%= t('warnings.has_student_submissions', <<-TEXT)
   Students have either already taken or started taking this quiz, so be careful
   about editing it.  If you change any quiz questions in a significant way, you
   may want to consider re-grading students who took the old version of the quiz.
@@ -327,10 +327,10 @@ $(document).ready(function() {
 <%= render :partial => "quizzes/question_group", :object => nil %>
 <%= render :partial => "quizzes/find_question_from_bank" %>
 <div style="text-align: center; margin: -1px 1px 1px" class="add_question question_editing">
-  <a href="#" class="add_question_link add"><%= t('links.new_question', "New Question") %></a>
-  <a href="#" class="add_question_group_link add" style="margin-left: 20px; margin-right: 20px;"><%= t('links.new_question_group', "New Question Group") %></a>
+  <a href="#" class="add_question_link icon-add"><%= t('links.new_question', "New Question") %></a>
+  <a href="#" class="add_question_group_link icon-add" style="margin-left: 20px; margin-right: 20px;"><%= t('links.new_question_group', "New Question Group") %></a>
   <% if feature_enabled?(:question_banks) %>
-    <a href="#" class="find_question_link find"><%= t('links.find_questions', "Find Questions") %></a>
+    <a href="#" class="find_question_link icon-search"><%= t('links.find_questions', "Find Questions") %></a>
   <% end %>
 </div>
 <div class="question_generated" style="display: none;">

@@ -12,12 +12,12 @@
     <th colspan="4">
       <div style="float: right; <%= hidden unless editable && edit_view %>" class="links displaying">
         <% hash = rubric_association ? {:rubric_association_id => rubric_association.id} : {} %>
-        <a href="<%= context_url(context, :context_rubric_url, rubric ? rubric.id : "{{ id }}", hash) %>" class="<%= 'copy_edit' if rubric && !can_do(rubric, @current_user, :update) %> edit_rubric_link no-print no-hover" title="<%= t 'links.edit', "Edit Rubric" %>" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :update) %>"><%= image_tag "edit.png" %></a>
-        <a href="<%= search_rubrics_url(:q => "") %>" class="find_rubric_link no-print no-hover" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :update) %>" title="<%= t 'links.find_another_rubric', "Find Another Rubric" %>"><%= image_tag "find.png" %></a>
+        <a href="<%= context_url(context, :context_rubric_url, rubric ? rubric.id : "{{ id }}", hash) %>" class="<%= 'copy_edit' if rubric && !can_do(rubric, @current_user, :update) %> edit_rubric_link no-print no-hover" title="<%= t 'links.edit', "Edit Rubric" %>" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :update) %>"><i class="icon-edit standalone-icon"></i></a>
+        <a href="<%= search_rubrics_url(:q => "") %>" class="find_rubric_link no-print no-hover" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :update) %>" title="<%= t 'links.find_another_rubric', "Find Another Rubric" %>"><i class="icon-search standalone-icon"></i></a>
         <% if for_context %>
-          <a href="<%= context_url(context, :context_rubric_url, rubric ? rubric.id : "{{ id }}") %>" class="delete_rubric_link no-print no-hover" title="<%= t 'links.delete', "Delete Rubric" %>" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :delete) %>"><%= image_tag "delete.png" %></a>
+          <a href="<%= context_url(context, :context_rubric_url, rubric ? rubric.id : "{{ id }}") %>" class="delete_rubric_link no-print no-hover" title="<%= t 'links.delete', "Delete Rubric" %>" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :delete) %>"><i class="icon-trash standalone-icon"></i></a>
         <% else %>
-          <a href="<%= context_url(context, :context_rubric_association_url, rubric_association ? rubric_association.id : "{{ rubric_association_id }}") %>" class="delete_rubric_link no-print no-hover" title="<%= t 'links.delete', "Delete Rubric" %>" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :delete) %>"><%= image_tag "delete.png" %></a>
+          <a href="<%= context_url(context, :context_rubric_association_url, rubric_association ? rubric_association.id : "{{ rubric_association_id }}") %>" class="delete_rubric_link no-print no-hover" title="<%= t 'links.delete', "Delete Rubric" %>" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :delete) %>"><i class="icon-trash standalone-icon"></i></a>
         <% end %>
         <div style="display: none;">
           <div class="use_for_grading"><%= (rubric_association && rubric_association.use_for_grading) ? "true" : nbsp %></div>
@@ -45,7 +45,7 @@
       </div>
       
       <div class="editing" style="float: right;">
-        <a href="<%= search_rubrics_url(:q => "") %>" class="find_rubric_link find" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :update) %>" title="<%= t 'titles.find_existing_rubric', "Find Existing Rubric" %>"><%= t 'links.find_a_rubric', "Find a Rubric" %></a>
+        <a href="<%= search_rubrics_url(:q => "") %>" class="find_rubric_link icon-search" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :update) %>" title="<%= t 'titles.find_existing_rubric', "Find Existing Rubric" %>"><%= t 'links.find_a_rubric', "Find a Rubric" %></a>
       </div>
       <div class="editing">
         <%= before_label :title, "Title" %> <input type="text" name="title" value="<%= rubric.title rescue t('defaults.rubric_title', "Some Rubric") %>" style="width: 200px;" maxlength="255"/>
