@@ -27,9 +27,6 @@ require File.dirname(__FILE__) + '/mocha_extensions'
 
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
 
-# deprecated
-ALL_MODELS = ActiveRecord::Base.all_models
-
 # rspec aliases :describe to :context in a way that it's pretty much defined
 # globally on every object. :context is already heavily used in our application,
 # so we remove rspec's definition.
