@@ -24,6 +24,26 @@ class ActiveRecord::Base
     end
   end
 
+  def self.all_models
+    return @all_models if @all_models.present?
+    @all_models = (ActiveRecord::Base.send(:subclasses) +
+                   ActiveRecord::Base.models_from_files +
+                   [Version]).compact.uniq.reject { |model|
+      model.superclass != ActiveRecord::Base || (model.respond_to?(:tableless?) && model.tableless?)
+    }
+  end
+
+  def self.models_from_files
+    @from_files ||= Dir[
+      "#{RAILS_ROOT}/app/models/*",
+      "#{RAILS_ROOT}/vendor/plugins/*/app/models/*"
+    ].collect { |file|
+      model = File.basename(file, ".*").camelize.constantize
+      next unless model < ActiveRecord::Base
+      model
+    }
+  end
+
   def self.maximum_text_length
     @maximum_text_length ||= 64.kilobytes-1
   end

@@ -21,7 +21,7 @@ if Qti.migration_executable
     end
 
     after(:all) do
-      ALL_MODELS.each { |m| truncate_table(m) }
+      ActiveRecord::Base.all_models.each { |m| truncate_table(m) }
       @converter.delete_unzipped_archive
       if File.exists?(@dir)
         FileUtils::rm_rf(@dir)
