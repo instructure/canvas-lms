@@ -118,10 +118,14 @@ define([
             function() {
             var current_user_id = $("#identity .user_id").text() || "none";
             quizSubmission.currentlyBackingUp = false;
-            $.ajaxJSON(location.protocol + '//' + location.host + "/simple_response.json?user_id=" + current_user_id + "&rnd=" + Math.round(Math.random() * 9999999), 'GET', {}, function() {
-            }, function() {
-              ajaxErrorFlash(I18n.t('errors.connection_lost', "Connection to %{host} was lost.  Please make sure you're connected to the Internet before continuing.", {'host': location.host}), request);
-            }, {skipDefaultError: true});
+            $.ajaxJSON(
+                location.protocol + '//' + location.host + "/simple_response.json?user_id=" + current_user_id + "&rnd=" + Math.round(Math.random() * 9999999),
+                'GET', {},
+                function() {},
+                function() {
+                  $.flashError(I18n.t('errors.connection_lost', "Connection to %{host} was lost.  Please make sure you're connected to the Internet before continuing.", {'host': location.host}));
+                }
+            );
 
             if(repeat) {
               setTimeout(function() {quizSubmission.updateSubmission(true) }, 30000);
@@ -413,14 +417,6 @@ define([
     }, 2000);
 
     setInterval(quizSubmission.updateTime, 400);
-
-    var current_user_id = $("#identity .user_id").text() || "none";
-    setInterval(function() {
-      $.ajaxJSON(location.protocol + '//' + location.host + "/simple_response.json?user_id=" + current_user_id + "&rnd=" + Math.round(Math.random() * 9999999), 'GET', {}, function() {
-      }, function() {
-        ajaxErrorFlash(I18n.t('errors.connection_lost', "Connection to %{host} was lost.  Please make sure you're connected to the Internet before continuing.", {'host': location.host}), request);
-      }, {skipDefaultError: true});
-    }, 30000);
 
     setTimeout(function() { quizSubmission.updateSubmission(true) }, 15000);
   });
