@@ -30,20 +30,20 @@ describe 'FixUserMergeConversations2' do
       # set up borked conversation that is partially merged...
       # conversation deleted, cp's and cmps orphaned,
       # and cm on the target conversation
-      borked = Conversation.initiate([u1.id, u2.id], true)
+      borked = Conversation.initiate([u1, u2], true)
       borked_cps = borked.conversation_participants.all
       borked_cmps = borked_cps.map(&:conversation_message_participants).flatten
       m1 = borked.add_message(u1, "test")
       Conversation.delete_all(:id => borked.id) # bypass callbacks
 
-      correct = Conversation.initiate([u1.id, u2.id], true)
+      correct = Conversation.initiate([u1, u2], true)
       m2 = correct.add_message(u1, "test2")
       correct.conversation_participants.each { |cp| cp.update_attribute :workflow_state, 'archived'}
 
       # put it the message on the correct conversation
       m1.update_attribute :conversation_id, correct.id
 
-      unrelated = Conversation.initiate([u1.id, u3.id], true)
+      unrelated = Conversation.initiate([u1, u3], true)
       unrelated.add_message(u1, "test3")
 
       FixUserMergeConversations2.up

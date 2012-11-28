@@ -236,7 +236,7 @@ describe "conversations recipient finder" do
   it "should allow a non-contactable user in the hash if a shared conversation exists" do
     other = User.create(:name => "other guy")
     # if the users have a conversation in common already, then the recipient can be added
-    c = Conversation.initiate([@user.id, other.id], true)
+    c = Conversation.initiate([@user, other], true)
     get conversations_path(:user_id => other.id, :from_conversation_id => c.id)
     wait_for_ajaximations
     tokens.should == ["other guy"]

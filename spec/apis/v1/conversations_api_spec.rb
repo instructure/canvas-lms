@@ -201,7 +201,7 @@ describe ConversationsController, :type => :integration do
         @c1 = conversation(@bob)
         @c2 = conversation(@bob, @billy)
         @c2.conversation.add_message(@bob, 'ohai')
-        @c2.remove_messages([@message]) # delete my original message
+        @c2.remove_messages(@message) # delete my original message
         @c3 = conversation(@jane, :workflow_state => 'archived')
 
         json = api_call(:get, "/api/v1/conversations.json?scope=sent",
@@ -929,9 +929,9 @@ describe ConversationsController, :type => :integration do
 
   context "batches" do
     it "should return all in-progress batches" do
-      batch1 = ConversationBatch.generate(Conversation.build_message(@me, "hi all"), [@bob.id, @billy.id], :async)
-      batch2 = ConversationBatch.generate(Conversation.build_message(@me, "ohai"), [@bob.id, @billy.id], :sync)
-      batch3 = ConversationBatch.generate(Conversation.build_message(@bob, "sup"), [@me.id, @billy.id], :async)
+      batch1 = ConversationBatch.generate(Conversation.build_message(@me, "hi all"), [@bob, @billy], :async)
+      batch2 = ConversationBatch.generate(Conversation.build_message(@me, "ohai"), [@bob, @billy], :sync)
+      batch3 = ConversationBatch.generate(Conversation.build_message(@bob, "sup"), [@me, @billy], :async)
 
       json = api_call(:get, "/api/v1/conversations/batches",
                       :controller => 'conversations',

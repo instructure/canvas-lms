@@ -24,7 +24,7 @@ class ConversationBatch < ActiveRecord::Base
     ModelCache.with_cache(:conversations => existing_conversations, :users => {:id => user_map}) do
       recipient_ids.each_slice(chunk_size) do |ids|
         ids.each do |id|
-          @conversations << conversation = user.initiate_conversation([id])
+          @conversations << conversation = user.initiate_conversation([user_map[id]])
           message = conversation.add_message(root_conversation_message.clone,
                                              :update_for_sender => false,
                                              :tags => tags)
@@ -66,11 +66,7 @@ class ConversationBatch < ActiveRecord::Base
 
   attr_writer :user_map
   def user_map
-    @user_map ||= Hash[
-      User.find_all_by_id(recipient_ids + [user_id]).map { |u|
-        [u.id, u]
-      }
-    ]
+    @user_map ||= User.find_all_by_id(recipient_ids + [user_id]).index_by(&:id)
   end
 
   def recipient_ids
@@ -108,16 +104,16 @@ class ConversationBatch < ActiveRecord::Base
     state :error
   end
 
-  def self.generate(root_message, recipient_ids, mode = :async, options = {})
+  def self.generate(root_message, recipients, mode = :async, options = {})
     batch = new
     batch.mode = mode
     batch.root_conversation_message = root_message
     batch.user_id = root_message.author_id
-    batch.recipient_ids = recipient_ids
+    batch.recipient_ids = recipients.map(&:id)
     batch.tags = options[:tags]
-    if options[:user_map]
-      batch.user_map = options[:user_map].update(batch.user_id => batch.user)
-    end
+    user_map = recipients.index_by(&:id)
+    user_map[batch.user_id] = batch.user
+    batch.user_map = user_map
     batch.save!
     batch
   end

@@ -185,21 +185,21 @@ describe UserMerge do
     end
 
     it "should move conversations to the new user" do
-      c1 = user1.initiate_conversation([user.id, user.id]) # group conversation
+      c1 = user1.initiate_conversation([user, user]) # group conversation
       c1.add_message("hello")
       c1.update_attribute(:workflow_state, 'unread')
-      c2 = user1.initiate_conversation([user.id]) # private conversation
+      c2 = user1.initiate_conversation([user]) # private conversation
       c2.add_message("hello")
       c2.update_attribute(:workflow_state, 'unread')
       old_private_hash = c2.conversation.private_hash
 
       UserMerge.from(user1).into(user2)
       c1.reload.user_id.should eql user2.id
-      c1.conversation.participant_ids.should_not include(user1.id)
+      c1.conversation.participants.should_not include(user1)
       user1.reload.unread_conversations_count.should eql 0
 
       c2.reload.user_id.should eql user2.id
-      c2.conversation.participant_ids.should_not include(user1.id)
+      c2.conversation.participants.should_not include(user1)
       c2.conversation.private_hash.should_not eql old_private_hash
       user2.reload.unread_conversations_count.should eql 2
     end

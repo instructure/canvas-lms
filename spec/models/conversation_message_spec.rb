@@ -36,7 +36,7 @@ describe ConversationMessage do
         channel.confirm
       end
 
-      @conversation = @teacher.initiate_conversation(@initial_students.map(&:id))
+      @conversation = @teacher.initiate_conversation(@initial_students)
       add_message # need initial message for add_participants to not barf
     end
 
@@ -45,7 +45,7 @@ describe ConversationMessage do
     end
 
     def add_last_student
-      @conversation.add_participants([@last_student.id])
+      @conversation.add_participants([@last_student])
     end
 
     it "should create appropriate notifications on new message" do
@@ -112,7 +112,7 @@ describe ConversationMessage do
       Account.default.update_attribute :enable_user_notes, true
       course_with_teacher
       student = student_in_course.user
-      conversation = @teacher.initiate_conversation([student.id])
+      conversation = @teacher.initiate_conversation([student])
       ConversationMessage.any_instance.stubs(:current_time_from_proper_timezone).returns(Time.at(0))
       conversation.add_message("reprimanded!", :generate_user_note => true)
       student.user_notes.size.should be(1)
@@ -126,7 +126,7 @@ describe ConversationMessage do
       Account.default.update_attribute :enable_user_notes, false
       course_with_teacher
       student = student_in_course.user
-      conversation = @teacher.initiate_conversation([student.id])
+      conversation = @teacher.initiate_conversation([student])
       conversation.add_message("reprimanded!", :generate_user_note => true)
       student.user_notes.size.should be(0)
     end
@@ -136,7 +136,7 @@ describe ConversationMessage do
       course_with_teacher
       student1 = student_in_course.user
       student2 = student_in_course.user
-      conversation = @teacher.initiate_conversation([student1.id, student2.id])
+      conversation = @teacher.initiate_conversation([student1, student2])
       conversation.add_message("reprimanded!", :generate_user_note => true)
       student1.user_notes.size.should be(0)
       student2.user_notes.size.should be(0)
@@ -149,7 +149,7 @@ describe ConversationMessage do
 
       course_with_teacher
       student_in_course
-      conversation = @teacher.initiate_conversation([@user.id])
+      conversation = @teacher.initiate_conversation([@user])
       message = conversation.add_message("initial message")
 
       StreamItem.count.should eql(old_count + 1)
@@ -176,7 +176,7 @@ describe ConversationMessage do
 
       course_with_teacher
       student_in_course
-      conversation = @teacher.initiate_conversation([@user.id])
+      conversation = @teacher.initiate_conversation([@user])
       conversation.add_message("first message")
       stream_item = StreamItem.last
       conversation.add_message("second message")
@@ -191,7 +191,7 @@ describe ConversationMessage do
 
       course_with_teacher
       student_in_course
-      conversation = @teacher.initiate_conversation([@user.id])
+      conversation = @teacher.initiate_conversation([@user])
       conversation.add_message("initial message")
       message = conversation.add_message("second message")
 
@@ -212,7 +212,7 @@ describe ConversationMessage do
 
     it "should set has_attachments if there are attachments" do
       a = attachment_model(:context => @teacher, :folder => @teacher.conversation_attachments_folder)
-      m = @teacher.initiate_conversation([@student.id]).add_message("ohai", :attachment_ids => [a.id])
+      m = @teacher.initiate_conversation([@student]).add_message("ohai", :attachment_ids => [a.id])
       m.read_attribute(:has_attachments).should be_true
       m.conversation.reload.has_attachments.should be_true
       m.conversation.conversation_participants.all?(&:has_attachments?).should be_true
@@ -220,8 +220,8 @@ describe ConversationMessage do
 
     it "should set has_attachments if there are forwareded attachments" do
       a = attachment_model(:context => @teacher, :folder => @teacher.conversation_attachments_folder)
-      m1 = @teacher.initiate_conversation([user.id]).add_message("ohai", :attachment_ids => [a.id])
-      m2 = @teacher.initiate_conversation([@student.id]).add_message("lulz", :forwarded_message_ids => [m1.id])
+      m1 = @teacher.initiate_conversation([user]).add_message("ohai", :attachment_ids => [a.id])
+      m2 = @teacher.initiate_conversation([@student]).add_message("lulz", :forwarded_message_ids => [m1.id])
       m2.read_attribute(:has_attachments).should be_true
       m2.conversation.reload.has_attachments.should be_true
       m2.conversation.conversation_participants.all?(&:has_attachments?).should be_true
@@ -233,7 +233,7 @@ describe ConversationMessage do
       mc.media_id = 'asdf'
       mc.context = mc.user = @teacher
       mc.save
-      m = @teacher.initiate_conversation([@student.id]).add_message("ohai", :media_comment => mc)
+      m = @teacher.initiate_conversation([@student]).add_message("ohai", :media_comment => mc)
       m.read_attribute(:has_media_objects).should be_true
       m.conversation.reload.has_media_objects.should be_true
       m.conversation.conversation_participants.all?(&:has_media_objects?).should be_true
@@ -245,8 +245,8 @@ describe ConversationMessage do
       mc.media_id = 'asdf'
       mc.context = mc.user = @teacher
       mc.save
-      m1 = @teacher.initiate_conversation([user.id]).add_message("ohai", :media_comment => mc)
-      m2 = @teacher.initiate_conversation([@student.id]).add_message("lulz", :forwarded_message_ids => [m1.id])
+      m1 = @teacher.initiate_conversation([user]).add_message("ohai", :media_comment => mc)
+      m2 = @teacher.initiate_conversation([@student]).add_message("lulz", :forwarded_message_ids => [m1.id])
       m2.read_attribute(:has_media_objects).should be_true
       m2.conversation.reload.has_media_objects.should be_true
       m2.conversation.conversation_participants.all?(&:has_media_objects?).should be_true
@@ -257,7 +257,7 @@ describe ConversationMessage do
     it "should ignore replies on deleted accounts" do
       course_with_teacher
       student_in_course
-      conversation = @teacher.initiate_conversation([@user.id])
+      conversation = @teacher.initiate_conversation([@user])
       cm = conversation.add_message("initial message", :root_account_id => Account.default.id)
 
       Account.default.destroy

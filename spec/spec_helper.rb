@@ -617,7 +617,7 @@ Spec::Runner.configure do |config|
 
   def conversation(*users)
     options = users.last.is_a?(Hash) ? users.pop : {}
-    @conversation = (options.delete(:sender) || @me || users.shift).initiate_conversation(users.map(&:id))
+    @conversation = (options.delete(:sender) || @me || users.shift).initiate_conversation(users)
     @message = @conversation.add_message('test')
     @conversation.update_attributes(options)
     @conversation.reload

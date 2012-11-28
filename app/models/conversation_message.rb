@@ -41,42 +41,44 @@ class ConversationMessage < ActiveRecord::Base
     user_or_id = user_or_id.id if user_or_id.is_a?(User)
     {:conditions => {:author_id => user_or_id}}
   }
-  def self.preload_latest(conversation_participants, author_id=nil)
+  def self.preload_latest(conversation_participants, author=nil)
     return unless conversation_participants.present?
-    base_conditions = sanitize_sql([
-      "conversation_id IN (?) AND conversation_participant_id in (?) AND NOT generated",
-      conversation_participants.map(&:conversation_id),
-      conversation_participants.map(&:id)
-    ])
-    base_conditions << sanitize_sql([" AND author_id = ?", author_id]) if author_id
 
-    # limit it for non-postgres so we can reduce the amount of extra data we
-    # crunch in ruby (generally none, unless a conversation has multiple
-    # most-recent messages, i.e. same created_at)
-    unless connection.adapter_name == 'PostgreSQL'
-      base_conditions << <<-SQL
-        AND conversation_messages.created_at = (
-          SELECT MAX(created_at)
-          FROM conversation_messages cm2
-          JOIN conversation_message_participants cmp2 ON cm2.id = conversation_message_id
-          WHERE cm2.conversation_id = conversation_messages.conversation_id
-            AND #{base_conditions}
+    Shard.partition_by_shard(conversation_participants, lambda { |cp| cp.conversation_id }) do |shard_participants|
+      base_conditions = "(#{shard_participants.map { |cp|
+          "(conversation_id=#{cp.conversation_id} AND user_id=#{cp.user_id})" }.join(" OR ")
+        }) AND NOT generated"
+      base_conditions << sanitize_sql([" AND author_id = ?", author.id]) if author
+
+      # limit it for non-postgres so we can reduce the amount of extra data we
+      # crunch in ruby (generally none, unless a conversation has multiple
+      # most-recent messages, i.e. same created_at)
+      unless connection.adapter_name == 'PostgreSQL'
+        base_conditions << <<-SQL
+          AND conversation_messages.created_at = (
+            SELECT MAX(created_at)
+            FROM conversation_messages cm2
+            JOIN conversation_message_participants cmp2 ON cm2.id = conversation_message_id
+            WHERE cm2.conversation_id = conversation_messages.conversation_id
+              AND #{base_conditions}
+          )
+        SQL
+      end
+
+      ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+        ret = distinct_on(['conversation_id', 'user_id'],
+          :select => "conversation_messages.*, conversation_participant_id, conversation_message_participants.user_id, conversation_message_participants.tags",
+          :joins => 'JOIN conversation_message_participants ON conversation_messages.id = conversation_message_id',
+          :conditions => base_conditions,
+          :order => 'conversation_id DESC, user_id DESC, created_at DESC'
         )
-      SQL
-    end
-
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
-      ret = distinct_on('conversation_participant_id',
-        :select => "conversation_messages.*, conversation_participant_id, conversation_message_participants.tags",
-        :joins => 'JOIN conversation_message_participants ON conversation_messages.id = conversation_message_id',
-        :conditions => base_conditions,
-        :order => 'conversation_participant_id, created_at DESC'
-      )
-      map = Hash[ret.map{ |m| [m.conversation_participant_id.to_i, m]}]
-      if author_id
-        conversation_participants.each{ |cp| cp.last_authored_message = map[cp.id] }
-      else
-        conversation_participants.each{ |cp| cp.last_message = map[cp.id] }
+        map = Hash[ret.map{ |m| [[m.conversation_id, m.user_id.to_i], m]}]
+        backmap = Hash[ret.map{ |m| [m.conversation_participant_id.to_i, m]}]
+        if author
+          shard_participants.each{ |cp| cp.last_authored_message = map[[cp.conversation_id, cp.user_id]] || backmap[cp.id] }
+        else
+          shard_participants.each{ |cp| cp.last_message = map[[cp.conversation_id, cp.user_id]] || backmap[cp.id] }
+        end
       end
     end
   end

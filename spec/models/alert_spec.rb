@@ -235,7 +235,7 @@ describe Alert do
         @teacher = @user
         @user = nil
         student_in_course(:active_all => 1)
-        @conversation = @teacher.initiate_conversation([@user.id])
+        @conversation = @teacher.initiate_conversation([@user])
         @conversation.add_message("hello")
 
         alert = @course.alerts.build(:recipients => [:student])
@@ -251,7 +251,7 @@ describe Alert do
         @teacher = @user
         @user = nil
         student_in_course(:active_all => 1)
-        @conversation = @teacher.initiate_conversation([@student.id, user.id])
+        @conversation = @teacher.initiate_conversation([@student, user])
         message = @conversation.add_message("hello")
         message.created_at = Time.now - 30.days
         message.save!
@@ -264,7 +264,7 @@ describe Alert do
         Alert.sent_alerts.should == [ @student.id ]
 
         # create a generated message
-        @conversation.add_participants([user.id])
+        @conversation.add_participants([user])
         @conversation.messages.length.should == 2
 
         # it should still alert, ignoring the new message

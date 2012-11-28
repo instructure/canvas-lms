@@ -25,9 +25,9 @@ describe 'added_to_conversation.twitter' do
     student1 = student_in_course.user
     student2 = student_in_course.user
     student3 = student_in_course.user
-    conversation = @teacher.initiate_conversation([student1.id, student2.id])
+    conversation = @teacher.initiate_conversation([student1, student2])
     conversation.add_message("some message")
-    event = conversation.add_participants([student3.id])
+    event = conversation.add_participants([student3])
     generate_message(:added_to_conversation, :twitter, event)
   end
 end

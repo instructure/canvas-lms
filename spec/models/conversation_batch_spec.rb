@@ -31,13 +31,13 @@ describe ConversationBatch do
 
   context "generate" do
     it "should create an async batch" do
-      batch = ConversationBatch.generate(@message, [@user2.id, @user3.id], :async)
+      batch = ConversationBatch.generate(@message, [@user2, @user3], :async)
       batch.should be_created
       batch.completion.should < 1
     end
 
     it "should create a sync batch and run it" do
-      batch = ConversationBatch.generate(@message, [@user2.id, @user3.id], :sync)
+      batch = ConversationBatch.generate(@message, [@user2, @user3], :sync)
       batch.should be_sent
       batch.completion.should eql 1
       batch.root_conversation_message.reload.conversation.should be_nil
@@ -51,7 +51,7 @@ describe ConversationBatch do
 
   context "deliver" do
     it "should be sent to all recipients" do
-      batch = ConversationBatch.generate(@message, [@user2.id, @user3.id], :async)
+      batch = ConversationBatch.generate(@message, [@user2, @user3], :async)
       batch.deliver
 
       batch.should be_sent
@@ -67,7 +67,7 @@ describe ConversationBatch do
     it "should apply the tags to each conversation" do
       g = @course.groups.create
       g.users << @user1 << @user2
-      batch = ConversationBatch.generate(@message, [@user2.id, @user3.id], :async, :tags => [g.asset_string])
+      batch = ConversationBatch.generate(@message, [@user2, @user3], :async, :tags => [g.asset_string])
       batch.deliver
 
       ConversationMessage.count.should eql 3 # the root message, plus the ones to each recipient
@@ -83,7 +83,7 @@ describe ConversationBatch do
       attachment = attachment_model(:context => @user1, :folder => @user1.conversation_attachments_folder)
       @message = Conversation.build_message @user1, "hi all", :attachment_ids => [attachment.id]
 
-      batch = ConversationBatch.generate(@message, [@user2.id, @user3.id], :async)
+      batch = ConversationBatch.generate(@message, [@user2, @user3], :async)
       batch.deliver
 
       ConversationMessage.count.should eql 3

@@ -108,7 +108,7 @@ describe SearchController, :type => :integration do
               { :controller => 'search', :action => 'recipients', :format => 'json', :user_id => other.id.to_s })
       json.should == []
       # now they have a conversation in common
-      c = Conversation.initiate([@user.id, other.id], true)
+      c = Conversation.initiate([@user, other], true)
       json = api_call(:get, "/api/v1/search/recipients?user_id=#{other.id}",
               { :controller => 'search', :action => 'recipients', :format => 'json', :user_id => other.id.to_s })
       json.should == []

@@ -220,7 +220,7 @@ describe UsersController, :type => :integration do
 
   it "should format Conversation" do
     @sender = User.create!(:name => 'sender')
-    @conversation = Conversation.initiate([@user.id, @sender.id], false)
+    @conversation = Conversation.initiate([@user, @sender], false)
     @conversation.add_message(@sender, "hello")
     @message = @conversation.conversation_messages.last
     json = api_call(:get, "/api/v1/users/activity_stream.json",

@@ -70,6 +70,10 @@ class Shard
 end
 
 ActiveRecord::Base.class_eval do
+  class << self
+    VALID_FIND_OPTIONS << :shard
+  end
+
   def shard
     Shard.default
   end

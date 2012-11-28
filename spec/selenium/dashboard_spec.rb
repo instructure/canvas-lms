@@ -96,9 +96,9 @@ describe "dashboard" do
     it "should remove the stream item category if all items are removed"
 
     it "should show conversation stream items on the dashboard" do
-      c = User.create.initiate_conversation([@user.id, User.create.id])
+      c = User.create.initiate_conversation([@user, User.create])
       c.add_message('test')
-      c.add_participants([User.create.id])
+      c.add_participants([User.create])
 
       items = @user.stream_item_instances
       items.size.should == 1

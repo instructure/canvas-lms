@@ -22,14 +22,14 @@ describe ConversationsController do
   def conversation(opts = {})
     num_other_users = opts[:num_other_users] || 1
     course = opts[:course] || @course
-    user_ids = num_other_users.times.map{
+    users = num_other_users.times.map{
       u = User.create
       enrollment = course.enroll_student(u)
       enrollment.workflow_state = 'active'
       enrollment.save
-      u.id
+      u
     }
-    @conversation = @user.initiate_conversation(user_ids)
+    @conversation = @user.initiate_conversation(users)
     @conversation.add_message(opts[:message] || 'test')
     @conversation
   end
@@ -134,9 +134,9 @@ describe ConversationsController do
         a = Account.default
         @student = user_with_pseudonym(:active_all => true)
         course_with_student(:active_all => true, :account => a, :user => @student)
-        @student.initiate_conversation([user.id]).add_message('test1', :root_account_id => a.id)
-        @student.initiate_conversation([user.id]).add_message('test2') # no root account, so teacher can't see it
-  
+        @student.initiate_conversation([user]).add_message('test1', :root_account_id => a.id)
+        @student.initiate_conversation([user]).add_message('test2') # no root account, so teacher can't see it
+
         course_with_teacher_logged_in(:active_all => true, :account => a)
         a.add_user(@user)
         session[:become_user_id] = @student.id

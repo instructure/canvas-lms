@@ -29,7 +29,7 @@ describe 'PopulateConversationRootAccountIds' do
       u1 = user
       a1a = Account.default
       a1b = Account.create
-      cn1 = Conversation.initiate([u.id, u1.id], true)
+      cn1 = Conversation.initiate([u, u1], true)
       cn1.add_message(u, "test1").update_attribute(:context, a1a)
       cn1.add_message(u, "test2").update_attribute(:context, a1a)
       cn1.add_message(u, "test3").update_attribute(:context, a1b)
@@ -39,7 +39,7 @@ describe 'PopulateConversationRootAccountIds' do
       u2 = user
       a2 = Account.create
       c2 = course(:account => a2)
-      cn2 = Conversation.initiate([u.id, u2.id], true)
+      cn2 = Conversation.initiate([u, u2], true)
       cn2.add_message(u, "test")
       Conversation.connection.execute "INSERT INTO context_messages(context_id, context_type) VALUES(#{c2.id}, 'Course')"
       cn2.conversation_messages.update_all("context_message_id = (SELECT id FROM context_messages ORDER BY id DESC LIMIT 1)")
@@ -50,7 +50,7 @@ describe 'PopulateConversationRootAccountIds' do
       a3 = Account.create
       g3 = group(:group_context => a3)
       
-      cn3 = Conversation.initiate([u.id, u3.id], true)
+      cn3 = Conversation.initiate([u, u3], true)
       cn3.add_message(u, "test")
       Conversation.connection.execute "INSERT INTO context_messages(context_id, context_type) VALUES(#{g3.id}, 'Group')"
       cn3.conversation_messages.update_all("context_message_id = (SELECT id FROM context_messages ORDER BY id DESC LIMIT 1)")
@@ -63,13 +63,13 @@ describe 'PopulateConversationRootAccountIds' do
       student_in_course(:user => u4, :course => c4, :active_all => true)
       as4 = c4.assignments.create
       s4 = as4.submit_homework(u4, :submission_type => "online_text_entry", :body => "")
-      cn4 = Conversation.initiate([u.id, u4.id], true)
+      cn4 = Conversation.initiate([u, u4], true)
       cn4.add_message(u, '').update_attribute(:asset, s4)
       cn4.root_account_ids.should eql []
 
       # no root account info available
       u5 = user
-      cn5 = Conversation.initiate([u.id, u5.id], true)
+      cn5 = Conversation.initiate([u, u5], true)
       cn5.add_message(u, "test")
 
       PopulateConversationRootAccountIds.up
