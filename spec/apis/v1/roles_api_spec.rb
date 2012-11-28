@@ -61,6 +61,7 @@ describe "Roles API", :type => :integration do
         { :controller => 'role_overrides', :action => 'index', :format => 'json', :account_id => @account.id.to_param })
 
       json.collect{|role| role['role']}.sort.should == (["AccountAdmin", "NewRole"] + RoleOverride.base_role_types).sort
+      json.find{|role| role['role'] == "StudentEnrollment"}['workflow_state'].should == 'active'
     end
 
     it "should remove a role" do

@@ -528,7 +528,7 @@ class Account < ActiveRecord::Base
   end
 
   def has_role?(role_name)
-    self.account_membership_types.include?(role_name) || self.active_course_roles.include?(role_name)
+    self.account_membership_types.include?(role_name) || self.active_course_roles.include?(role_name) || RoleOverride::RESERVED_ROLES.include?(role_name)
   end
 
   def account_authorization_config

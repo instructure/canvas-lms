@@ -225,7 +225,7 @@ class RoleOverridesController < ApplicationController
   def add_role
     return unless authorized_action(@context, @current_user, :manage_role_overrides)
 
-    if @context.has_role?(@role) || RoleOverride::RESERVED_ROLES.include?(@role)
+    if @context.has_role?(@role)
       if api_request?
         render :json => {:message => "role already exists"}, :status => :bad_request
       else
