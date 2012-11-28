@@ -551,14 +551,14 @@ class ApplicationController < ActionController::Base
   def requesting_main_assignments_page?
     request.path.match(/\A\/assignments/)
   end
-  
+
   # Calculates the file storage quota for @context
   def get_quota
     quota_params = Attachment.get_quota(@context)
     @quota = quota_params[:quota]
     @quota_used = quota_params[:quota_used]
   end
-  
+
   # Renders a quota exceeded message if the @context's quota is exceeded
   def quota_exceeded(redirect=nil)
     redirect ||= root_url
