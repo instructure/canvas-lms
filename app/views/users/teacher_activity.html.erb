@@ -75,7 +75,7 @@
           </td>
           <% if course.user_has_been_instructor?(@current_user) %>
           <td>
-            <a href="<%= message_user_path(student[:enrollment].user) %>" class="message_student_link" title="<%= t 'message_student', 'Message this student' %>"><%= image_tag "email.png" %></a>
+            <a href="<%= message_user_path(student[:enrollment].user) %>" class="message_student_link" title="<%= t 'message_student', 'Message this student' %>"><i class="icon-email"></i></a>
           </td>
           <% end %>
         </tr>

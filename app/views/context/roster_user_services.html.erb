@@ -4,7 +4,7 @@
   add_crumb(t('#crumbs.registered_services', 'Registered Services'), context_url(@context, :context_user_services_url)) %>
 <% content_for :right_side do %>
   <div class="rs-margin-all rs-margin-lr">
-    <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_users_url) %>"><%= image_tag "back.png" %> <%= t('links.back_to_roster', %{Back to Roster}) %></a>
+    <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_users_url) %>"><i class="icon-arrow-left"></i> <%= t('links.back_to_roster', %{Back to Roster}) %></a>
   </div>
   <h2><%= t('headings.service_types', %{Service Types}) %></h2>
   <div class="rs-margin-lr">
@@ -74,7 +74,7 @@
     <%= t 'help.no_services', %{You haven't linked your user profile to any external services.  You can link your Canvas account to services like Facebook and Twitter.} %>
   </p>
   <p>
-    <a href="<%= settings_profile_path %>#registered_web_services" class="btn"><%= t('links.link_service', %{Link web services to my account}) %></a>
+    <a href="<%= settings_profile_path %>#registered_web_services" class="btn btn-primary"><i class="icon-link"></i> <%= t('links.link_service', %{Link web services to my account}) %></a>
   </p>
 <% elsif @current_user && !@current_user.show_user_services %>
   <p>
