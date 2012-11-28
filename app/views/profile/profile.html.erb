@@ -7,7 +7,7 @@
   <%= render :partial => "ways_to_contact" %>
   <div class="rs-margin-lr">
     <hr />
-    <a href="#" class="edit_settings_link btn button-sidebar-wide"><%= image_tag "edit.png" %> <%= t('links.edit_settings', "Edit Settings") %></a>
+    <a href="#" class="edit_settings_link btn button-sidebar-wide"><i class="icon-edit"></i> <%= t('links.edit_settings', "Edit Settings") %></a>
     <% mfa_settings = @user.mfa_settings %>
     <% if mfa_settings != :disabled %>
       <a href="<%= otp_login_path %>" class="btn button-sidebar-wide"><%= image_tag "lock.png" %> <%= @user.otp_secret_key ? t('links.reconfigure_mfa', "Reconfigure Multi-Factor Authentication") : t('links.configure_mfa', "Set Up Multi-Factor Authentication") %></a>
@@ -453,7 +453,7 @@ TEXT
   </div>
   <% unless @real_current_user %>
     <div style="margin-top: 10px;">
-      <a href="#" class="btn add_access_token_link"><%= image_tag "add.png" %> <%= t('buttons.new_access_token', "New Access Token") %></a>
+      <a href="#" class="btn btn-primary add_access_token_link"><i class="icon-add"></i> <%= t('buttons.new_access_token', "New Access Token") %></a>
     </div>
   <% end %>
   <div id="token_details_dialog" style="display: none;" title="<%= t('titles.access_token_details', "Access Token Details") %>">

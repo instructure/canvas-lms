@@ -22,7 +22,7 @@
   <% unless @just_viewing_one_course %>
     <% if @courses.length == 1 && can_do(@courses.first, @current_user, :manage_assignments) %>
       <div>
-        <a href="<%= course_assignments_path(@courses.first) %>" class="btn"><%= image_tag "edit.png" %> <%= t 'links.manage_assignments', "Manage Assignments" %></a>
+        <a href="<%= course_assignments_path(@courses.first) %>" class="btn"><i class="icon-edit"></i> <%= t 'links.manage_assignments', "Manage Assignments" %></a>
       </div>
     <% elsif @courses.length > 1 %>
       <h2><%= t 'titles.show_only_assignments_from', "Show Only Assignments from" %></h2>
