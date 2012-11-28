@@ -132,6 +132,7 @@ define [
     # Removes all attachments
     removeAttachments: ->
       @form.find('ul.discussion-reply-attachments').empty()
+      @form.find('a.discussion-reply-add-attachment').show()
 
   _.extend Reply.prototype, Backbone.Events
 
