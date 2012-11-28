@@ -114,14 +114,7 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def maybe_render_mobile_login(status = nil)
-    cookies['mobile'] = true if params['mobile']
-    # Our iOS and Android native apps are always going to pass a query string param of ?mobile=1
-    # to this page, so they will be always given the mobile formatted page for the native app login
-    # process.  We do not show the mobile formated page if you come to web canvas on mobile devices
-    # on purpose, because the rest of the site is not mobile formated--with the exception of iPod
-    # and iPhone, which we continue to do because that is what we have done and did not want to
-    # change existing functionalitiy.
-    if cookies['mobile'] || request.user_agent.to_s =~ /ipod|iphone/i
+    if request.user_agent.to_s =~ /ipod|iphone|ipad|Android/i
       @login_handle_name = @domain_root_account.login_handle_name rescue AccountAuthorizationConfig.default_login_handle_name
       @login_handle_is_email = @login_handle_name == AccountAuthorizationConfig.default_login_handle_name
       @shared_js_vars = {
