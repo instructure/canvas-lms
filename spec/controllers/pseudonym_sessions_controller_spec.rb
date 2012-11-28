@@ -98,6 +98,16 @@ describe PseudonymSessionsController do
       response.status.should == '400 Bad Request'
       response.should render_template('new')
     end
+
+    it "should not treat ldap without canvas as delegated for purposes of rendering the login screen" do
+      aac = Account.default.account_authorization_configs.create!(:auth_type => 'ldap', :identifier_format => 'uid')
+      Account.default.settings[:canvas_authentication] = false
+      Account.default.save!
+      get 'new'
+      response.should render_template('new')
+      response.should be_success
+      assigns[:is_delegated].should == false
+    end
   end
 
   context "trusted logins" do
