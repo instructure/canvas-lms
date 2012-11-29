@@ -50,7 +50,13 @@ module Canvas::AccountReports
         :account_id => @account.id, 
         :root_account_id => @domain_root_account.id
       }
-      students = Pseudonym.active.scoped(
+      # believe it or not, we need two scopes here, one before the .active,
+      # in order to exclude the pesky :user that is included by default in
+      # the Account#pseudonyms association, and one after the .active, to
+      # actually perform the query.
+      students = @domain_root_account.pseudonyms.
+        scoped(:include => { :exclude => :user }).active.
+        scoped(
         :select => %{
           u.sortable_name        AS "student name",
           pseudonyms.user_id     AS "student id",
@@ -95,11 +101,10 @@ module Canvas::AccountReports
           LEFT JOIN learning_outcome_results lor ON (lor.user_id = pseudonyms.user_id AND lor.content_tag_id = ct.id)
           LEFT JOIN submissions sub ON sub.assignment_id = a.id
             AND sub.user_id = pseudonyms.user_id", parameters]),
-        :conditions => ["
+        :conditions => "
           c.workflow_state = 'available'
           AND ct.tag_type = 'learning_outcome'
-          AND ct.workflow_state != 'deleted'
-          AND pseudonyms.account_id = :root_account_id", parameters]
+          AND ct.workflow_state != 'deleted'"
       )
 
 
