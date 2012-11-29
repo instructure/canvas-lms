@@ -25,7 +25,7 @@ class RoleOverride < ActiveRecord::Base
 
   def self.account_membership_types(account)
     res = [{:name => "AccountAdmin", :label => t('roles.account_admin', "Account Admin")}]
-    (account.account_membership_types - ['AccountAdmin']).each do |t| 
+    (account.available_account_roles - ['AccountAdmin']).each do |t|
       res << {:name => t, :label => t}
     end
     res

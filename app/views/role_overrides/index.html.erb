@@ -83,7 +83,7 @@
       </tr>
     </thead>
     <tbody>
-      <% @context.account_membership_types.each do |type| %>
+      <% @context.available_account_roles.each do |type| %>
         <tr class="<%= cycle("even", "odd") %>">
           <td style="padding: 1px 3px;"><%= AccountUser.readable_type type %></td>
           <td style="padding: 1px 3px; text-align: right;">

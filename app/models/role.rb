@@ -22,7 +22,7 @@ class Role < ActiveRecord::Base
   attr_accessible :name
   before_validation :infer_root_account_id
   validates_presence_of :name
-  validates_inclusion_of :base_role_type, :in => RoleOverride::ENROLLMENT_TYPES.map{ |et| et[:name] }
+  validates_inclusion_of :base_role_type, :in => RoleOverride::BASE_ROLE_TYPES
   validates_exclusion_of :name, :in => RoleOverride::RESERVED_ROLES
   validate :ensure_no_name_conflict_with_different_base_role_type
 
@@ -42,9 +42,21 @@ class Role < ActiveRecord::Base
 
   include Workflow
   workflow do
-    state :active
-    state :inactive
+    state :active do
+      event :deactivate, :transitions_to => :inactive
+    end
+    state :inactive do
+      event :activate, :transitions_to => :active
+    end
     state :deleted
+  end
+
+  def account_role?
+    base_role_type == AccountUser::BASE_ROLE_NAME
+  end
+
+  def course_role?
+    !account_role?
   end
 
   alias_method :destroy!, :destroy
@@ -54,21 +66,20 @@ class Role < ActiveRecord::Base
     save!
   end
 
-  def activate
-    self.workflow_state = 'active'
-    save!
+  named_scope :not_deleted, :conditions => ['roles.workflow_state != ?', 'deleted']
+  named_scope :deleted, :conditions => ['roles.workflow_state = ?', 'deleted']
+  named_scope :active, :conditions => ['roles.workflow_state = ?', 'active']
+  named_scope :inactive, :conditions => ['roles.workflow_state = ?', 'inactive']
+  named_scope :for_courses, :conditions => ['roles.base_role_type != ?', AccountUser::BASE_ROLE_NAME]
+  named_scope :for_accounts, :conditions => ['roles.base_role_type = ?', AccountUser::BASE_ROLE_NAME]
+
+  def self.get_base_role_and_workflow_state(role_name, account)
+    if RoleOverride.base_role_types.include?(role_name)
+      [ role_name, 'active' ]
+    elsif role = account.find_role(role_name)
+      [ role.base_role_type, role.workflow_state ]
+    else
+      [ 'NoPermissions', 'deleted' ]
+    end
   end
-
-  def inactivate
-    self.workflow_state = 'inactive'
-    save!
-  end
-
-  named_scope :active, lambda {
-    { :conditions => ['roles.workflow_state != ?', 'deleted'] }
-  }
-
-  named_scope :inactive, lambda {
-    { :conditions => ['roles.workflow_state = ?', 'inactive'] }
-  }
 end

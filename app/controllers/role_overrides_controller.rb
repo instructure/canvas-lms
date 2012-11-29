@@ -24,9 +24,9 @@ class RoleOverridesController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :manage_role_overrides)
       if api_request?
-        @role_names = @context.account_membership_types
+        @role_names = @context.available_account_roles
         @role_names += RoleOverride.base_role_types
-        @role_names += @context.active_course_roles
+        @role_names += @context.available_course_roles
 
         render :json => @role_names.collect{|role| role_json(@context, role, @current_user, session)}.to_json
       else
@@ -235,16 +235,13 @@ class RoleOverridesController < ApplicationController
       return
     end
 
-    base_role_type = params[:base_role_type]
-    if base_role_type.blank? || base_role_type == AccountUser::BASE_ROLE_NAME
-      @context.add_account_membership_type(@role)
-    else
-      course_role = @context.roles.build(:name => @role)
-      course_role.base_role_type = base_role_type
-      unless course_role.save
-        render :json => {:message => "invalid base role type"}, :status => :bad_request
-        return
-      end
+    base_role_type = params[:base_role_type] || AccountUser::BASE_ROLE_NAME
+    role = @context.roles.build(:name => @role)
+    role.base_role_type = base_role_type
+    role.workflow_state = 'active'
+    if !role.save
+      render :json => {:message => "invalid base role type"}, :status => :bad_request
+      return
     end
 
     unless api_request?
@@ -260,15 +257,18 @@ class RoleOverridesController < ApplicationController
 
   def remove_role
     if authorized_action(@context, @current_user, :manage_role_overrides)
-      if course_role = @context.roles.active.find_by_name(@role)
-        if @context.enrollments.active.find_by_role_name(@role)
-          course_role.inactivate
-          message = 'This role has been set inactive because there are users currently enrolled with this role.'
+      if role = @context.roles.not_deleted.find_by_name(@role)
+        if role.account_role?
+          has_user = !!@context.account_users.find_by_membership_type(@role)
         else
-          course_role.destroy
+          has_user = !!@context.enrollments.active.find_by_role_name(@role)
         end
-      else
-        @context.remove_account_membership_type(@role)
+        if has_user
+          role.deactivate
+          message = t('course_role_deactivate', "This role is in use and cannot be deleted.  It has been deactivated to prevent it from being assigned to new users.")
+        else
+          role.destroy
+        end
       end
       if api_request?
         json = role_json(@context, @role, @current_user, session)
@@ -289,7 +289,7 @@ class RoleOverridesController < ApplicationController
         course_role.activate
         render :json => role_json(@context, @role, @current_user, session)
       else
-        render :json => {:message => "could not find role"}, :status => :bad_request
+        render :json => {:message => t('no_role_found', "Role not found")}, :status => :bad_request
       end
     end
   end

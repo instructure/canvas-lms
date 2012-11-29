@@ -493,42 +493,31 @@ class Account < ActiveRecord::Base
     self.account_users.find_by_user_id(user && user.id)
   end
 
-  def account_membership_types
-    res = ['AccountAdmin']
-    res += self.parent_account.account_membership_types if self.parent_account
-    res += (self.membership_types || "").split(",").select{|t| !t.empty? }
-    res.uniq
-  end
-  
-  def add_account_membership_type(type)
-    types = account_membership_types
-    types += type.split(",")
-    self.membership_types = types.join(',')
-    self.save
-  end
-  
-  def remove_account_membership_type(type)
-    self.membership_types = self.account_membership_types.select{|t| t != type}.join(',')
-    self.save
+  def available_account_roles
+    account_roles = roles.for_accounts.active.map(&:name)
+    account_roles |= ['AccountAdmin']
+    account_roles = account_roles | self.parent_account.available_account_roles if self.parent_account
+    account_roles
   end
 
-  def active_course_roles
-    if @course_roles.nil?
-      @course_roles = self.roles.active.map(&:name)
-      @course_roles += self.parent_account.active_course_roles if self.parent_account
-    end
-
-    @course_roles
+  def available_course_roles
+    course_roles = roles.for_courses.active.map(&:name)
+    course_roles |= parent_account.available_course_roles if parent_account
+    course_roles
   end
 
   def get_course_role(role_name)
-    course_role = self.roles.active.find_by_name(role_name)
+    course_role = self.roles.for_courses.find_by_name(role_name)
     course_role ||= self.parent_account.get_course_role(role_name) if self.parent_account
     course_role
   end
 
   def has_role?(role_name)
-    self.account_membership_types.include?(role_name) || self.active_course_roles.include?(role_name) || RoleOverride::RESERVED_ROLES.include?(role_name)
+    roles.not_deleted.scoped(:conditions => ["roles.name = ?", role_name]).any?
+  end
+
+  def find_role(role_name)
+    roles.not_deleted.find_by_name(role_name) || (parent_account && parent_account.find_role(role_name))
   end
 
   def account_authorization_config

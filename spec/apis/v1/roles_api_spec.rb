@@ -49,10 +49,10 @@ describe "Roles API", :type => :integration do
     end
 
     it "should add the role to the account" do
-      @account.account_membership_types.should_not include(@role)
+      @account.available_account_roles.should_not include(@role)
       json = api_call_with_settings(:explicit => '1', :enabled => '1')
       @account.reload
-      @account.account_membership_types.should include(@role)
+      @account.available_account_roles.should include(@role)
     end
 
     it "should index roles" do
@@ -67,24 +67,24 @@ describe "Roles API", :type => :integration do
     it "should remove a role" do
       api_call_with_settings(:explicit => '1', :enabled => '1')
       @account.reload
-      @account.account_membership_types.should include(@role)
+      @account.available_account_roles.should include(@role)
 
       json = api_call(:delete, "/api/v1/accounts/#{@account.id}/roles/#{@role}",
          { :controller => 'role_overrides', :action => 'remove_role', :format => 'json', :account_id => @account.id.to_param, :role => @role}, {})
 
       @account.reload
-      @account.account_membership_types.should_not include(@role)
+      @account.available_account_roles.should_not include(@role)
     end
 
     it "should add a course-level role to the account" do
       base_role_type = 'TeacherEnrollment'
 
-      @account.account_membership_types.should_not include(@role)
+      @account.available_account_roles.should_not include(@role)
       @account.roles.should be_empty
       json = api_call_with_settings(:base_role_type => base_role_type, :explicit => '1', :enabled => '1')
       @account.reload
 
-      @account.account_membership_types.should_not include(@role)
+      @account.available_account_roles.should_not include(@role)
       @account.roles.count.should == 1
       new_role = @account.roles.first
       new_role.name.should == @role
@@ -96,7 +96,7 @@ describe "Roles API", :type => :integration do
     it "should delete a course-level role when there are no enrollments" do
       base_role_type = 'TeacherEnrollment'
 
-      @account.account_membership_types.should_not include(@role)
+      @account.available_account_roles.should_not include(@role)
       @account.roles.should be_empty
       api_call_with_settings(:base_role_type => base_role_type, :explicit => '1', :enabled => '1')
       @account.reload
@@ -116,7 +116,7 @@ describe "Roles API", :type => :integration do
       before :each do
         base_role_type = 'TeacherEnrollment'
 
-        @account.account_membership_types.should_not include(@role)
+        @account.available_account_roles.should_not include(@role)
         @account.roles.should be_empty
         api_call_with_settings(:base_role_type => base_role_type, :explicit => '1', :enabled => '1')
         @account.reload
@@ -139,8 +139,8 @@ describe "Roles API", :type => :integration do
           { :controller => 'role_overrides', :action => 'remove_role', :format => 'json', :account_id => @account.id.to_param, :role => @role}, {})
 
         @account.reload
-        @account.roles.active.map(&:name).should include(@role)
-        @account.roles.find_by_name(@role).workflow_state.should == 'inactive'
+        @account.get_course_role(@role).should_not be_nil
+        @account.get_course_role(@role).workflow_state.should == 'inactive'
 
         json['workflow_state'].should == 'inactive'
       end
@@ -169,7 +169,11 @@ describe "Roles API", :type => :integration do
     end
 
     it "should fail when given an existing role" do
-      @account.add_account_membership_type(@role)
+      course_role = @account.roles.build(:name => @role)
+      course_role.base_role_type = AccountUser::BASE_ROLE_NAME
+      course_role.workflow_state = 'active'
+      course_role.save!
+
       raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/roles",
         { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => @admin.account.id.to_s },
         { :role => @role })
@@ -243,7 +247,9 @@ describe "Roles API", :type => :integration do
       override.locked.should be_nil
 
       override.destroy
-      @account.remove_account_membership_type(@role)
+      r = @account.roles.first
+      r.workflow_state = 'deleted'
+      r.save!
 
       api_call_with_settings(:locked => '1')
       override = @account.role_overrides(true).find_by_permission_and_enrollment_type(@permission, @role)

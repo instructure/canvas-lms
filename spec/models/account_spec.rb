@@ -347,7 +347,10 @@ describe Account do
   end
 
   def account_with_admin_and_restricted_user(account)
-    account.add_account_membership_type('Restricted Admin')
+    role = account.roles.build(:name => 'Restricted Admin')
+    role.base_role_type = AccountUser::BASE_ROLE_NAME
+    role.workflow_state = 'active'
+    role.save!
     admin = User.create
     user = User.create
     account.account_users.create(:user => admin, :membership_type => 'AccountAdmin')

@@ -21,13 +21,7 @@ module Api::V1::Role
   include Api::V1::Account
 
   def role_json(account, role, current_user, session)
-    if course_role = account.roles.active.find_by_name(role)
-      base_role_type = course_role.base_role_type
-      workflow_state = course_role.workflow_state
-    end
-
-    base_role_type ||= AccountUser::BASE_ROLE_NAME
-    workflow_state ||= account.has_role?(role) ? 'active' : 'deleted'
+    base_role_type, workflow_state = Role.get_base_role_and_workflow_state(role, account)
     json = {
       :account => account_json(account, current_user, session, []),
       :role => role,

@@ -267,7 +267,7 @@ describe EnrollmentsApiController, :type => :integration do
         end
 
         it "should return an error if role is specified but is inactive" do
-          @course_role.inactivate
+          @course_role.deactivate
           json = api_call :post, @path, @path_options, {
               :enrollment => {
                   :user_id                            => @unenrolled_user.id,
