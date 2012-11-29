@@ -21,9 +21,9 @@ fi
 cd $(dirname $(readlink -f $0))/..
 
 # set up config
-if [ -e "config/GEM_HOME" ]; then
-  export GEM_HOME=$(cat config/GEM_HOME)
-fi
+#if [ -e "config/GEM_HOME" ]; then
+#  export GEM_HOME=$(cat config/GEM_HOME)
+#fi
 #export GEM_HOME=/path/to/gem/home
 export RAILS_ENV=production
 
