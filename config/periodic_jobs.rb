@@ -22,7 +22,7 @@ end
 
 persistence_token_expire_after = (Setting.from_config("session_store") || {})[:expire_remember_me_after]
 persistence_token_expire_after ||= 1.month
-Delayed::Periodic.cron 'SessionPersistenceToken.delete_all', '35 11 * * *' do
+Delayed::Periodic.cron 'SessionPersistenceToken.delete_all', '35 3 * * *' do
   Shard.with_each_shard do
     SessionPersistenceToken.delete_all(['updated_at < ?', persistence_token_expire_after.ago])
   end
@@ -52,11 +52,11 @@ Delayed::Periodic.cron 'CrocodocDocument.update_process_states', '*/5 * * * *' d
   end
 end
 
-Delayed::Periodic.cron 'Reporting::CountsReport.process', '0 11 * * *' do
+Delayed::Periodic.cron 'Reporting::CountsReport.process', '0 3 * * *' do
   Reporting::CountsReport.process
 end
 
-Delayed::Periodic.cron 'StreamItem.destroy_stream_items', '45 11 * * *' do
+Delayed::Periodic.cron 'StreamItem.destroy_stream_items', '45 3 * * *' do
   Shard.with_each_shard do
     StreamItem.destroy_stream_items_using_setting
   end
@@ -89,12 +89,12 @@ Delayed::Periodic.cron 'ErrorReport.destroy_error_reports', '35 */1 * * *' do
 end
 
 if Delayed::Stats.enabled?
-  Delayed::Periodic.cron 'Delayed::Stats.cleanup', '0 11 * * *' do
+  Delayed::Periodic.cron 'Delayed::Stats.cleanup', '0 3 * * *' do
     Delayed::Stats.cleanup
   end
 end
 
-Delayed::Periodic.cron 'Alert.process', '30 11 * * *', :priority => Delayed::LOW_PRIORITY do
+Delayed::Periodic.cron 'Alert.process', '30 3 * * *', :priority => Delayed::LOW_PRIORITY do
   Shard.with_each_shard do
     Alert.process
   end
