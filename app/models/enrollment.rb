@@ -79,7 +79,7 @@ class Enrollment < ActiveRecord::Base
       :sqlite     => default_sql.gsub("{{now}}", "datetime('now')"),
       :mysql => <<-MYSQL }
         IF #{no_other_enrollments_sql} THEN
-          UPDATE assignments, submissions SET needs_grading_count = needs_grading_count + %s, updated_at = utc_timestamp()
+          UPDATE assignments, submissions SET needs_grading_count = needs_grading_count + %s, assignments.updated_at = utc_timestamp()
           WHERE context_id = NEW.course_id
             AND context_type = 'Course'
             AND assignments.id = submissions.assignment_id
