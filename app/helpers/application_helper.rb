@@ -366,6 +366,7 @@ module ApplicationHelper
   def include_css_bundles
     unless jammit_css_bundles.empty?
       bundles = jammit_css_bundles.map{ |(bundle,plugin)| plugin ? "plugins_#{plugin}_#{bundle}" : bundle }
+      bundles << {:media => 'all'}
       include_stylesheets(*bundles)
     end
   end
