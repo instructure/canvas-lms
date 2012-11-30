@@ -53,6 +53,7 @@
   </div>
 <% end %>
 
+<a class="btn btn-small print-grades" href="javascript:window.print()"><i class="icon-printer"></i> Print grades</a>
 <h2>
 <% ot('headers.grades', "Grades For %{student}", :student => capture { %>
  <% if !@observed_students || @observed_students.keys.length <= 1 %>
@@ -69,6 +70,7 @@
   </select>
  <% end %>
 <% }) %>
+
 </h2>
 <% if @courses_with_grades && @courses_with_grades.length > 1 %>
   <div style="margin-left: 10px;">
@@ -205,14 +207,14 @@
         <span class="tooltip_wrap right">
           <span class="tooltip_text"><%= t(:comment_count, "comment", :count => (submission.visible_submission_comments.size rescue 0)) %></span>
         </span>
-        <%= image_tag "word_bubble.png" %>
+        <i class="icon-discussion standalone-icon"></i>
       </a>
       <% has_scoring_details = submission && submission.score && assignment.points_possible && assignment.points_possible > 0 && !assignment.muted? %>
       <a href="#" class="toggle_comments_link tooltip" aria-role="button" aria-controls="grade_info_<%= assignment.id %>" title="<%= t 'titles.view_scoring_details', 'View Scoring Details' %>" style="<%= 'visibility: hidden;' unless has_scoring_details %>">
         <span class="tooltip_wrap right">
           <span class="tooltip_text"><%= t(:see_scoring_details, "See scoring details") %></span>
         </span>
-        <%= image_tag "grading_icon.png", :style => "opacity: 0.5;", :alt => t('titles.view_scoring_details', 'View Scoring Details') %>
+        <i class="icon-check-plus standalone-icon"></i>
       </a>
       <a href="#" class="toggle_rubric_assessments_link tooltip" title="<%= t 'titles.view_rubric_evaluation', 'View Rubric Evaluation' %>" style="<%= 'visibility: hidden;' if visible_rubric_assessments.empty? %>">
         <span class="tooltip_wrap right">
