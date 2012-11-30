@@ -147,16 +147,48 @@ describe "Roles API", :type => :integration do
 
       it "should reactivate an inactive role" do
         api_call(:delete, "/api/v1/accounts/#{@account.id}/roles/#{@role}",
-          { :controller => 'role_overrides', :action => 'remove_role', :format => 'json', :account_id => @account.id.to_param, :role => @role}, {})
+                 { :controller => 'role_overrides', :action => 'remove_role', :format => 'json', :account_id => @account.id.to_param, :role => @role}, {})
         @account.reload
 
         json = api_call(:post, "/api/v1/accounts/#{@account.id}/roles/#{@role}/activate",
-          { :controller => 'role_overrides', :action => 'activate_role', :format => 'json', :account_id => @account.id.to_param, :role => @role}, {})
+                        { :controller => 'role_overrides', :action => 'activate_role', :format => 'json', :account_id => @account.id.to_param, :role => @role}, {})
 
         @account.reload
         @account.roles.active.map(&:name).should include(@role)
         @account.roles.find_by_name(@role).workflow_state.should == 'active'
         json['workflow_state'].should == 'active'
+      end
+
+      it "should recycle a deleted role" do
+        course_role = @account.roles.find_by_name!(@role)
+        course_role.destroy
+        @account.roles.active.map(&:name).should_not be_include @role
+
+        json = api_call(:post, "/api/v1/accounts/#{@account.id}/roles",
+                        { :controller => 'role_overrides', :action => 'add_role',
+                          :format => 'json', :account_id => @account.id.to_param},
+                        { :role => @role, :base_role_type => 'TeacherEnrollment'})
+
+        course_role.reload
+        @account.roles.active.find_by_name!(@role).should == course_role
+        course_role.should be_active
+        course_role.deleted_at.should be_nil
+        course_role.base_role_type.should == 'TeacherEnrollment'
+        json['workflow_state'].should == 'active'
+      end
+
+      it "should discard old role overrides when recycling a deleted role" do
+        course_role = @account.roles.find_by_name!(@role)
+        course_role.destroy
+        @account.roles.active.map(&:name).should_not be_include @role
+        @account.reload.role_overrides.find_all_by_enrollment_type(@role).map(&:permission).should == %w(read_reports)
+
+        api_call(:post, "/api/v1/accounts/#{@account.id}/roles",
+                  { :controller => 'role_overrides', :action => 'add_role',
+                    :format => 'json', :account_id => @account.id.to_param },
+                  { :role => @role, :base_role_type => 'StudentEnrollment',
+                    :permissions => { 'manage_calendar' => { :enabled => '1', :explicit => '1' }} })
+        @account.reload.role_overrides.find_all_by_enrollment_type(@role).map(&:permission).should == %w(manage_calendar)
       end
     end
 
@@ -190,6 +222,17 @@ describe "Roles API", :type => :integration do
         { :role => @role })
       response.status.should == '400 Bad Request'
       JSON.parse(response.body).should == {"message" => "role already exists"}
+    end
+
+    it "should fail when given an existing inactive course role" do
+      course_role = @account.roles.build(:name => @role)
+      course_role.base_role_type = 'StudentEnrollment'
+      course_role.workflow_state = 'inactive'
+      course_role.save!
+      json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/roles",
+                   { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => @admin.account.id.to_s },
+                   { :role => @role }, {}, { :expected_status => 400 })
+      json["message"].should == "role already exists"
     end
 
     it "should fail for course role without a valid base role type" do

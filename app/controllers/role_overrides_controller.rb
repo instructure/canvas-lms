@@ -236,13 +236,17 @@ class RoleOverridesController < ApplicationController
     end
 
     base_role_type = params[:base_role_type] || AccountUser::BASE_ROLE_NAME
-    role = @context.roles.build(:name => @role)
+    role = @context.roles.deleted.find_by_name(@role)
+    role ||= @context.roles.build(:name => @role)
     role.base_role_type = base_role_type
     role.workflow_state = 'active'
+    role.deleted_at = nil
     if !role.save
       render :json => {:message => "invalid base role type"}, :status => :bad_request
       return
     end
+    # remove old role overrides that were associated with this role name
+    @context.role_overrides.scoped(:conditions => {:enrollment_type => @role}).delete_all
 
     unless api_request?
       redirect_to named_context_url(@context, :context_permissions_url, :account_roles => params[:account_roles])

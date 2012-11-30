@@ -144,6 +144,12 @@ describe Role do
       @role.reload
     end
 
+    it "should not allow a duplicate role to be created in the same account" do
+      dup_role = @account.roles.create :name => "1337 Student"
+      dup_role.base_role_type = 'StudentEnrollment'
+      dup_role.should be_invalid
+    end
+
     describe "workflow" do
       it "should default to active state" do
         @role.should be_active

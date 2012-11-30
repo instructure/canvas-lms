@@ -282,7 +282,9 @@ describe RoleOverride do
           end
 
           it "should use permission for role in parent account" do
+            @parent_account = @account
             @sub = account_model(:parent_account => @account)
+            @account = @parent_account
 
             # create in parent
             create_role(@base_role, @role_name)
@@ -301,7 +303,9 @@ describe RoleOverride do
           end
 
           it "should use permission for role in parent account even if sub account doesn't have role" do
+            @parent_account = @account
             @sub = account_model(:parent_account => @account)
+            @account = @parent_account
 
             create_role(@base_role, @role_name)
 
