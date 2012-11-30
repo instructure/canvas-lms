@@ -48,25 +48,26 @@ define [
       @list.append view.el
 
     clearModel: =>
-      @model.set
-        unread: false
-        query: null
+      @model.reset()
 
     render: =>
       super if @collection?
+      @trigger 'render'
       @$el.removeClass 'hidden'
 
     renderOrTeardownResults: =>
       if @model.hasFilter()
         results = (entry for id, entry of @allData.flattened)
         for filter, value of @model.toJSON()
-          results = @["#{filter}Filter"](value, results)
+          filterFn = @["#{filter}Filter"]
+          results = filterFn(value, results) if filterFn
         if results.length
           @resetCollection results
         else
           @renderNoResults()
-      else
-        @$el.addClass 'hidden' unless @model.hasFilter()
+      else if not @model.hasFilter()
+        @$el.addClass 'hidden'
+        @trigger 'hide'
 
     renderNoResults: ->
       @render()

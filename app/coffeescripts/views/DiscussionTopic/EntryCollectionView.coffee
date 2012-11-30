@@ -16,7 +16,7 @@ define [
       displayShowMore: true
 
       # maybe make a sub-class for threaded discussions if the branching gets
-      # out of control
+      # out of control. UPDATE: it is out of control
       threaded: false
 
       # its collection represents the root of the discussion, should probably
@@ -52,6 +52,7 @@ define [
         children: @collection.options.perPage
         showMoreDescendants: @options.showMoreDescendants
         threaded: @options.threaded
+        collapsed: @options.collapsed
       view.render()
       return @addNewView view if entry.get 'new'
       if @options.descendants
@@ -90,7 +91,10 @@ define [
       @nextLink = $ '<div/>'
       showMore = true
       if not @options.threaded
-        moreText = I18n.t('show_all_n_replies', {one: "Show one reply", other: "Show all %{count} replies"}, {count: stats.total})
+        moreText = I18n.t 'show_all_n_replies',
+          one: "Show one reply"
+          other: "Show all %{count} replies"
+          {count: stats.total + @collection.options.perPage}
       @nextLink.html entryStats({stats, moreText, showMore: yes})
       @nextLink.addClass 'showMore loadNext'
       if @options.threaded
