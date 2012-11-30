@@ -125,7 +125,7 @@ shared_examples_for "discussion and announcement individual tests" do
     what_to_create.last.update_attributes(:assignment => @course.assignments.create!(:name => 'graded topic assignment'))
     get url
     expect_new_page_load { f('.discussion-title').click }
-    f("#discussion_topic .al-trigger-inner").click
+    f("#discussion-toolbar .al-trigger-inner").click
     expect_new_page_load { f("#ui-id-2").click }
 
     add_attachment_and_validate
@@ -135,7 +135,7 @@ shared_examples_for "discussion and announcement individual tests" do
     edit_name = 'edited discussion name'
     topic = what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => @topic_title, :user => @user) : announcement_model(:title => @topic_title, :user => @user)
     get url + "#{topic.id}"
-    f("#discussion_topic .al-trigger-inner").click
+    f("#discussion-toolbar .al-trigger-inner").click
     expect_new_page_load { f("#ui-id-2").click }
 
     edit(edit_name, 'edit message')

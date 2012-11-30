@@ -3,8 +3,9 @@ define ['Backbone'], ({Model}) ->
   class DiscussionFilterState extends Model
 
     defaults:
-      unread: null
+      unread: false
       query: null
+      collapsed: false
 
     hasFilter: ->
       {unread, query} = @attributes
@@ -12,4 +13,12 @@ define ['Backbone'], ({Model}) ->
         yes
       else
         no
+
+    reset: ->
+      @set
+        unread: false
+        query: null
+        collapsed: false
+      @trigger 'reset'
+
 

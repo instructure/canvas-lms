@@ -1,4 +1,5 @@
 require [
+  'compiled/views/DiscussionTopic/EntryView'
   'compiled/models/DiscussionFilterState'
   'compiled/views/DiscussionTopic/DiscussionToolbarView'
   'compiled/views/DiscussionTopic/DiscussionFilterResultsView'
@@ -11,7 +12,8 @@ require [
   'compiled/collections/EntryCollection'
   'compiled/views/DiscussionTopic/TopicView'
   'compiled/views/DiscussionTopic/EntriesView'
-], (DiscussionFilterState, DiscussionToolbarView, DiscussionFilterResultsView, MarkAsReadWatcher, $, Backbone, Entry, MaterializedDiscussionTopic, SideCommentDiscussionTopic, EntryCollection, TopicView, EntriesView) ->
+  'compiled/jquery/sticky'
+], (EntryView, DiscussionFilterState, DiscussionToolbarView, DiscussionFilterResultsView, MarkAsReadWatcher, $, Backbone, Entry, MaterializedDiscussionTopic, SideCommentDiscussionTopic, EntryCollection, TopicView, EntriesView) ->
 
   perPage     = 10
   descendants = 3
@@ -52,22 +54,45 @@ require [
                     allData: data
                     model: filterModel
 
+  $container = $ window
+  $subentries = $ '#discussion_subentries'
+
+
+  scrollToTop = ->
+    $container.scrollTo $subentries, offset: -49
+
   ##
   # connect them ...
   data.on 'change', ->
     entries.reset data.get 'entries'
 
   entriesView.on 'scrollAwayFromEntry', ->
-    $window = $ window
     # prevent scroll to top for non-pushstate browsers when hash changes
-    top = $window.scrollTop()
+    top = $container.scrollTop()
     router.navigate '',
       trigger: false
       replace: true
-    $window.scrollTo top
+    $container.scrollTo top
 
   filterView.on 'clickEntry', (entry) ->
     router.navigate "entry-#{entry.get 'id'}", yes
+
+  toolbarView.on 'expandAll', ->
+    EntryView.expandRootEntries()
+    scrollToTop()
+
+  toolbarView.on 'collapseAll', ->
+    EntryView.collapseRootEntries()
+    scrollToTop()
+
+  filterView.on 'render', ->
+    scrollToTop()
+
+  filterView.on 'hide', ->
+    scrollToTop()
+
+  filterModel.on 'reset', -> EntryView.expandRootEntries()
+
 
   ##
   # routes
@@ -76,7 +101,7 @@ require [
   router.route 'page-:page', 'page', (page) ->
     entriesView.render page
     # TODO: can get a little bouncy when the page isn't as tall as the previous
-    $(window).scrollTo '#discussion_subentries'
+    scrollToTop()
   router.route '', 'root', entriesView.render
   initEntries = ->
     data.fetch success: ->

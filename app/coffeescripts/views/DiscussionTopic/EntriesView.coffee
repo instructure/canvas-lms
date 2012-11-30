@@ -15,8 +15,6 @@ define [
       showMoreDescendants: 2
       children: 3
 
-    $body: $ 'body:first'
-
     $window: $ window
 
     initialize: ->
@@ -98,8 +96,8 @@ define [
       @goToEntry entryData
 
     scrollToEl: ($el) ->
-      @$body.scrollTo $el, 200,
-        offset: -100
+      @$window.scrollTo $el, 200,
+        offset: -150
         onAfter: =>
           # pretty blinking
           setTimeout (-> $el.addClass 'highlight' ), 200
@@ -128,6 +126,7 @@ define [
         displayShowMore: no
         threaded: @options.threaded
         root: true
+        collapsed: @model.get 'collapsed'
       @collectionView.render()
       @renderPageNav()
       this
