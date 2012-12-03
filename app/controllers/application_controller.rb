@@ -279,7 +279,8 @@ class ApplicationController < ActionController::Base
           end
         end
 
-        render :template => "shared/unauthorized", :layout => "application", :status => :unauthorized 
+        @is_delegated = @domain_root_account.delegated_authentication? && !@domain_root_account.ldap_authentication? && !request.params[:canvas_login]
+        render :template => "shared/unauthorized", :layout => "application", :status => :unauthorized
       }
       format.zip { redirect_to(url_for(params)) }
       format.json { render :json => { 'status' => 'unauthorized', 'message' => 'You are not authorized to perform that action.' }, :status => :unauthorized }
