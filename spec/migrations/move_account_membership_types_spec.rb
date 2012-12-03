@@ -147,4 +147,10 @@ describe 'MoveAccountMembershipTypes' do
     @account1.roles.find_by_name('NonexistentType').base_role_type.should == 'TeacherEnrollment'
     @account1.roles.find_by_name('NonexistentType').workflow_state.should == 'active'
   end
+
+  it "should not fail when encountering a user with a reserved membership type" do
+    @account1.add_user(user, 'AccountAdmin')
+
+    MoveAccountMembershipTypes.up
+  end
 end
