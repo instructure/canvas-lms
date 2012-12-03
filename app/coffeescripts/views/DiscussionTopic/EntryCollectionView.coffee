@@ -121,7 +121,7 @@ define [
       if @options.threaded
         @collection.add @collection.fullCollection.getPage 'next'
       else
-        @collection.reset @collection.fullCollection.toJSON()
+        @collection.reset @collection.fullCollection.toArray()
       @renderNextLink()
 
     filter: @::afterRender

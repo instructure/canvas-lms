@@ -3,16 +3,20 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 shared_examples_for "discussions selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
-  def create_and_go_to_topic(title = 'new topic', discussion_type = 'side_comment', is_locked = false)
-    topic = @course.discussion_topics.create!(:title => title, :discussion_type => discussion_type)
-    if is_locked
-      topic.workflow_state = 'locked'
-      topic.save!
-      topic.reload
-    end
-    get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
+  def go_to_topic
+    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     wait_for_ajax_requests
-    topic
+  end
+
+  def create_and_go_to_topic(title = 'new topic', discussion_type = 'side_comment', is_locked = false)
+    @topic = @course.discussion_topics.create!(:title => title, :discussion_type => discussion_type)
+    if is_locked
+      @topic.workflow_state = 'locked'
+      @topic.save!
+      @topic.reload
+    end
+    go_to_topic
+    @topic
   end
 
   def create_discussion(discussion_name, discussion_type)

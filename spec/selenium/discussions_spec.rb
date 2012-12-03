@@ -73,6 +73,24 @@ describe "discussions" do
         @last_entry.find_element(:css, '.message').text.should == message
       end
 
+      it "should show attachments after showing hidden replies" do
+        @topic = @course.discussion_topics.create!(:title => 'test', :message => 'attachment test', :user => @user)
+        @entry = @topic.discussion_entries.create!(:user => @user, :message => 'blah')
+        @replies = []
+        5.times do
+          attachment = @course.attachments.create!(:context => @course, :filename => "text.txt", :user => @user, :uploaded_data => StringIO.new("testing"))
+          reply = @entry.discussion_subentries.create!(
+            :user => @user, :message => 'i haz attachments', :discussion_topic => @topic, :attachment => attachment)
+          @replies << reply
+        end
+        @topic.create_materialized_view
+        go_to_topic
+        ffj('.comment_attachments').count.should == 3
+        fj('.showMore').click
+        wait_for_ajaximations
+        ffj('.comment_attachments').count.should == @replies.count
+      end
+
       it "should show only 10 root replies per page"
       it "should paginate root entries"
       it "should show only three levels deep"
