@@ -23,7 +23,7 @@ class Role < ActiveRecord::Base
   before_validation :infer_root_account_id
   validates_presence_of :name
   validates_inclusion_of :base_role_type, :in => RoleOverride::BASE_ROLE_TYPES
-  validates_exclusion_of :name, :in => RoleOverride::RESERVED_ROLES
+  validates_exclusion_of :name, :in => RoleOverride::KNOWN_ROLE_TYPES
   validate :ensure_no_name_conflict_with_different_base_role_type
 
   def infer_root_account_id
@@ -35,7 +35,7 @@ class Role < ActiveRecord::Base
   end
 
   def ensure_no_name_conflict_with_different_base_role_type
-    unless self.root_account.all_roles.active.scoped(:conditions => ["name = ? AND base_role_type <> ?", self.name, self.base_role_type]).empty?
+    if self.root_account.all_roles.not_deleted.scoped(:conditions => ["name = ? AND base_role_type <> ?", self.name, self.base_role_type]).any?
       self.errors.add(:name, 'is already taken by a different type of Role in the same root account')
     end
   end
@@ -79,7 +79,7 @@ class Role < ActiveRecord::Base
     elsif role = account.find_role(role_name)
       [ role.base_role_type, role.workflow_state ]
     else
-      [ 'NoPermissions', 'deleted' ]
+      [ RoleOverride::NO_PERMISSIONS_TYPE, 'deleted' ]
     end
   end
 end

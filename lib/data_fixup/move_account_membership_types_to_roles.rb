@@ -41,7 +41,7 @@ module DataFixup::MoveAccountMembershipTypesToRoles
     # Step 2.
     #   then look for the role overrides that are referencing to a (presumably) deleted membership type
     #   and make 'inactive' roles for each of them, if they don't exist already
-    RoleOverride.all(:conditions => ['context_type = ? AND enrollment_type NOT IN (?)', 'Account', RoleOverride::RESERVED_ROLES],
+    RoleOverride.all(:conditions => ['context_type = ? AND enrollment_type NOT IN (?)', 'Account', RoleOverride::KNOWN_ROLE_TYPES],
                      :group => 'context_id, enrollment_type',
                      :select => 'context_id, enrollment_type').each_slice(500) do |role_overrides|
       roles = Role.all(:conditions => {:account_id => role_overrides.collect(&:context_id).uniq}, :select => "account_id, name")

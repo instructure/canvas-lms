@@ -194,4 +194,129 @@ describe RoleOverride do
       a.grants_right?(@user, :manage_user_notes).should be_false
     end
   end
+
+  describe "#permissions_for" do
+    before :each do
+      @account = account_model(:parent_account => Account.default)
+      @role_name = 'NewRole'
+      @permission = :view_group_pages
+    end
+
+    def check_permission(base_role, role, enabled)
+      hash = RoleOverride.permission_for(@account, @permission, base_role.to_s, role.to_s)
+      hash[:enabled].should == enabled
+    end
+
+    def create_role(base_role, role_name)
+      @role = @account.roles.build(:name => role_name.to_s)
+      @role.base_role_type = base_role.to_s
+      @role.workflow_state = 'active'
+      @role.save!
+    end
+
+    def create_override(role_name, enabled)
+      RoleOverride.create!(:context => @account, :permission => @permission.to_s,
+                         :enrollment_type => role_name.to_s, :enabled => enabled)
+    end
+
+    it "should error with unknown base role" do
+      expect{RoleOverride.permission_for(@account, @permission, "DodoBird")}.to raise_error
+    end
+
+    it "should give no permissions if basetype is no permissions regardless of role" do
+      check_permission(RoleOverride::NO_PERMISSIONS_TYPE, 'TeacherEnrollment', false)
+    end
+
+    context "admin roles" do
+      it "should special case AccountAdmin role to use AccountAdmin as base role" do
+        # the default base role type has no permissions, so this tests it is getting
+        # them from the AccountAdmin type.
+        check_permission(AccountUser::BASE_ROLE_NAME, 'AccountAdmin', true)
+      end
+
+      it "should reject AccountAdmin role with wrong base role" do
+        expect{RoleOverride.permission_for(@account, @permission, "DodoBird", "AccountAdmin")}.to raise_error
+      end
+
+      it "should use role override for role" do
+        create_role(AccountUser::BASE_ROLE_NAME, @role_name)
+        create_override(@role_name, true)
+
+        check_permission(AccountUser::BASE_ROLE_NAME, @role_name, true)
+      end
+
+      it "should fall back to base role permissions" do
+        create_role(AccountUser::BASE_ROLE_NAME, @role_name)
+
+        check_permission(AccountUser::BASE_ROLE_NAME, @role_name, false)
+      end
+    end
+
+    context "course roles" do
+      RoleOverride.enrollment_types.each do |base_role|
+        context "#{base_role[:name]} enrollments" do
+          before do
+            @base_role = base_role[:name]
+            @default_perm = RoleOverride.permissions[@permission][:true_for].include?(@base_role)
+          end
+
+          it "should use default permissions" do
+            create_role(@base_role, @role_name)
+            check_permission(@base_role, @role_name, @default_perm)
+          end
+
+          it "should use permission for role" do
+            create_role(@base_role, @role_name)
+            create_override(@role_name, !@default_perm)
+
+            check_permission(@base_role, @role_name, !@default_perm)
+          end
+
+          it "should not find override for base type of role" do
+            create_role(@base_role, @role_name)
+            create_override(@role_name, @default_perm)
+            create_override(@base_role, !@default_perm)
+
+            check_permission(@base_role, @role_name, @default_perm)
+            check_permission(@base_role, @base_role, !@default_perm)
+          end
+
+          it "should use permission for role in parent account" do
+            @sub = account_model(:parent_account => @account)
+
+            # create in parent
+            create_role(@base_role, @role_name)
+            # create in sub account
+            @role = @sub.roles.build(:name => @role_name.to_s)
+            @role.base_role_type = @base_role.to_s
+            @role.workflow_state = 'active'
+            @role.save!
+
+            #create permission in parent
+            create_override(@role_name, !@default_perm)
+
+            # check based on sub account
+            hash = RoleOverride.permission_for(@sub, @permission, @base_role.to_s, @role_name.to_s)
+            hash[:enabled].should == !@default_perm
+          end
+
+          it "should use permission for role in parent account even if sub account doesn't have role" do
+            @sub = account_model(:parent_account => @account)
+
+            create_role(@base_role, @role_name)
+
+            #create permission in parent
+            create_override(@role_name, !@default_perm)
+
+            # check based on sub account
+            hash = RoleOverride.permission_for(@sub, @permission, @base_role.to_s, @role_name.to_s)
+            hash[:enabled].should == !@default_perm
+          end
+        end
+      end
+    end
+
+
+
+  end
 end

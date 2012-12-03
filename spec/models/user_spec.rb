@@ -925,9 +925,9 @@ describe User do
 
   context "permissions" do
     it "should not allow account admin to modify admin privileges of other account admins" do
-      RoleOverride.readonly_for(Account.default, :manage_role_overrides, 'AccountAdmin').should be_true
-      RoleOverride.readonly_for(Account.default, :manage_account_memberships, 'AccountAdmin').should be_true
-      RoleOverride.readonly_for(Account.default, :manage_account_settings, 'AccountAdmin').should be_true
+      RoleOverride.readonly_for(Account.default, :manage_role_overrides, AccountUser::BASE_ROLE_NAME, 'AccountAdmin').should be_true
+      RoleOverride.readonly_for(Account.default, :manage_account_memberships, AccountUser::BASE_ROLE_NAME, 'AccountAdmin').should be_true
+      RoleOverride.readonly_for(Account.default, :manage_account_settings, AccountUser::BASE_ROLE_NAME, 'AccountAdmin').should be_true
     end
   end
 
