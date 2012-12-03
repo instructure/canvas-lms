@@ -2045,7 +2045,7 @@ describe User do
 
       Account.default.settings[:mfa_settings] = :optional
       Account.default.save!
-      user.reload
+      user = User.find(user)
       user.mfa_settings.should == :optional
     end
 
@@ -2056,20 +2056,23 @@ describe User do
       required_account = Account.create!(:settings => { :mfa_settings => :required })
 
       p1 = user.pseudonyms.create!(:account => disabled_account, :unique_id => 'user')
+      user = User.find(user)
       user.mfa_settings.should == :disabled
 
       p2 = user.pseudonyms.create!(:account => optional_account, :unique_id => 'user')
+      user = User.find(user)
       user.mfa_settings.should == :optional
 
       p3 = user.pseudonyms.create!(:account => required_account, :unique_id => 'user')
+      user = User.find(user)
       user.mfa_settings.should == :required
 
       p1.destroy
-      user.reload
+      user = User.find(user)
       user.mfa_settings.should == :required
 
       p2.destroy
-      user.reload
+      user = User.find(user)
       user.mfa_settings.should == :required
     end
 

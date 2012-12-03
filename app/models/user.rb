@@ -2667,7 +2667,7 @@ class User < ActiveRecord::Base
   # mfa settings for a user are the most restrictive of any pseudonyms the user has
   # a login for
   def mfa_settings
-    result = self.pseudonyms(:include => :account).map(&:account).uniq.map do |account|
+    result = self.all_pseudonyms(:include => :account).map(&:account).uniq.map do |account|
       case account.mfa_settings
         when :disabled
           0
