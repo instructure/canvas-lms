@@ -202,8 +202,14 @@ class ActiveRecord::Base
 
   def touch_user
     if self.respond_to?(:user_id) && self.user_id
+      shard = self.user.shard
       User.update_all({ :updated_at => Time.now.utc }, { :id => self.user_id })
-      User.invalidate_cache(self.user_id)
+      User.connection.after_transaction_commit do
+        shard.activate do
+          User.update_all({ :updated_at => Time.now.utc }, { :id => self.user_id })
+        end if shard != Shard.current
+        User.invalidate_cache(self.user_id)
+      end
     end
     true
   rescue
