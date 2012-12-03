@@ -10,9 +10,9 @@ module DataFixup::MoveAccountMembershipTypesToRoles
       account_users = AccountUser.all(:conditions => {:account_id => accounts}, :select => "account_id, membership_type", :group => "account_id, membership_type")
 
       accounts.each do |account|
-        names = roles.select{|r| r.account_id == account.id}.collect(&:name)
+        names = roles.select{|r| r.account_id == account.id}.collect(&:name) + RoleOverride::KNOWN_ROLE_TYPES
 
-        types_to_add = account.membership_types.split(",").select{|t| !t.empty? && !names.include?(t) && t != 'AccountAdmin' }
+        types_to_add = account.membership_types.split(",").select{|t| !t.empty? && !names.include?(t)}
         types_to_add.each do |type|
           role = Role.new
           role.account_id = account.id
