@@ -52,6 +52,15 @@ a[class*=icon-], a[class^=icon-] {
   &:before { color: #666; }
 }
 
+// change vertical alignment of icons used with common typographic elements to line them up better
+h1, h2, h3, h4, p {
+  
+  i[class*=icon-]:before, i[class^=icon-]:before {
+    vertical-align: baseline;
+  }
+  
+}
+
 
 // define specific icon classes, mapped to the "canvasregular" icon font above
 
