@@ -577,11 +577,14 @@ describe Assignment do
 
   it "should respond to #overridden_for(user)" do
     student_in_course
+
     @assignment = assignment_model(:course => @course, :due_at => 5.days.from_now)
+    @assignment.reload
 
     @override = assignment_override_model(:assignment => @assignment)
     @override.override_due_at(7.days.from_now)
     @override.save!
+    @override.reload
 
     @override_student = @override.assignment_override_students.build
     @override_student.user = @student
@@ -600,7 +603,7 @@ describe Assignment do
     end
 
     it "should delegate to visible_to on the active overrides by default" do
-      @expected_value = Object.new
+      @expected_value = stub("expected value")
       @assignment.active_assignment_overrides.expects(:visible_to).with(@teacher, @course).returns(@expected_value)
       @assignment.overrides_visible_to(@teacher).should == @expected_value
     end
@@ -626,11 +629,15 @@ describe Assignment do
   describe "#due_dates_for(user)" do
     before :each do
       course_with_student(:active_all => true)
+
       @assignment = assignment_model(:course => @course, :due_at => 5.days.ago)
+      @assignment.reload
+
       @override = assignment_override_model(:assignment => @assignment)
       @override.set = @course.default_section
       @override.override_due_at(2.days.ago)
       @override.save!
+      @override.reload
     end
 
     it "should not return the list of due dates for a student" do
@@ -662,9 +669,9 @@ describe Assignment do
 
     it "should use the overridden due date as the applicable due date" do
       as_student, _ = @assignment.due_dates_for(@student)
-      as_student[:due_at] = @override.due_at
-      as_student[:all_day] = @override.all_day
-      as_student[:all_day_date] = @override.all_day_date
+      as_student[:due_at].should == @override.due_at
+      as_student[:all_day].should == @override.all_day
+      as_student[:all_day_date].should == @override.all_day_date
     end
 
     it "should include the base due date in the list of due dates" do
@@ -741,11 +748,15 @@ describe Assignment do
   describe "#unlock_ats_for(user)" do
     before :each do
       course_with_student(:active_all => true)
+
       @assignment = assignment_model(:course => @course, :unlock_at => 2.days.ago)
+      @assignment.reload
+
       @override = assignment_override_model(:assignment => @assignment)
       @override.set = @course.default_section
       @override.override_unlock_at(5.days.ago)
       @override.save!
+      @override.reload
     end
 
     it "should not return the list of unlock dates for a student" do
@@ -821,11 +832,15 @@ describe Assignment do
   describe "#lock_ats_for(user)" do
     before :each do
       course_with_student(:active_all => true)
+
       @assignment = assignment_model(:course => @course, :lock_at => 5.days.ago)
+      @assignment.reload
+
       @override = assignment_override_model(:assignment => @assignment)
       @override.set = @course.default_section
       @override.override_lock_at(2.days.ago)
       @override.save!
+      @override.reload
     end
 
     it "should not return the list of lock dates for a student" do
