@@ -23,6 +23,7 @@ class AccountUser < ActiveRecord::Base
   has_a_broadcast_policy
   before_save :infer_defaults
   after_save :touch_user
+  after_destroy :touch_user
   after_save :update_account_associations_if_changed
   attr_accessible :account, :user, :membership_type
 
