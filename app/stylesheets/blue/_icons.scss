@@ -172,7 +172,8 @@ a[class*=icon-]:before, a[class^=icon-]:before {
 .icon-materials-required:before { content: "\c5" }
 .icon-not-graded:before { content: "\c9" }
 .icon-peer-graded:before { content: "\64" }
-.icon-bookmark:before { content: "\d3" }
+.icon-bookmark:before { content: "\ee" }
+.icon-printer:before { content: "\d4" }
 
 // utility class for when you want a standalone icon, and want its function to be read aloud by
 // screen readers. Should only ever be an issue when an icon- class is used with a link.
