@@ -15,7 +15,7 @@
 
   <% if can_do(@context, @current_user, :read) %>
     <% link_to calendar_url_for(@context), :class => 'btn button-sidebar-wide', :id => 'course_calendar_link' do %>
-      <i class="icon-calendar-days"></i>
+      <i class="icon-calendar-day"></i>
       <%= t('links.calendar', 'Course Calendar') %>
     <% end %>
   <% end %>
