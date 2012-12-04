@@ -808,18 +808,12 @@ class Attachment < ActiveRecord::Base
   # can't handle arbitrary thumbnails for our attachment_fu thumbnails on s3 though, we could handle a couple *predefined* sizes though
   def thumbnail_url(options={})
     return nil if Attachment.skip_thumbnails
-    if self.scribd_doc #handle if it is a scribd doc, get the thumbnail from scribd's api
-      self.scribd_thumbnail(options)
-    elsif self.thumbnail || (options && options[:size].present?)
-      if options && options[:size].present?
-        geometry = options[:size]
-        if self.class.dynamic_thumbnail_sizes.include?(geometry)
-          to_use = thumbnails.loaded? ? thumbnails.detect { |t| t.thumbnail == geometry } : thumbnails.find_by_thumbnail(geometry)
-          to_use ||= create_dynamic_thumbnail(geometry)
-        end
-      end
-      to_use ||= self.thumbnail
 
+    return self.cached_scribd_thumbnail if self.scribd_doc #handle if it is a scribd doc, get the thumbnail from scribd's api
+
+    geometry = options[:size]
+    if self.thumbnail || geometry.present?
+      to_use = thumbnail_for_size(geometry) || self.thumbnail
       to_use.cached_s3_url
     elsif self.media_object && self.media_object.media_id
       Kaltura::ClientV3.new.thumbnail_url(self.media_object.media_id,
@@ -831,6 +825,17 @@ class Attachment < ActiveRecord::Base
     end
   end
   memoize :thumbnail_url
+
+  def thumbnail_for_size(geometry)
+    if self.class.allows_thumbnails_of_size?(geometry)
+      to_use = thumbnails.loaded? ? thumbnails.detect { |t| t.thumbnail == geometry } : thumbnails.find_by_thumbnail(geometry)
+      to_use ||= create_dynamic_thumbnail(geometry)
+    end
+  end
+
+  def self.allows_thumbnails_of_size?(geometry)
+    self.dynamic_thumbnail_sizes.include?(geometry)
+  end
 
   alias_method :original_sanitize_filename, :sanitize_filename
   def sanitize_filename(filename)
