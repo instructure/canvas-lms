@@ -946,6 +946,8 @@ describe Attachment do
   end
 
   context "dynamic thumbnails" do
+    let(:sz) { CollectionItemData::THUMBNAIL_SIZE }
+
     before do
       attachment_model(:uploaded_data => stub_png_data)
     end
@@ -961,7 +963,6 @@ describe Attachment do
       thumb = @attachment.thumbnails.find_by_thumbnail("640x>")
       thumb.should == nil
 
-      sz = CollectionItemData::THUMBNAIL_SIZE
       @attachment.expects(:create_or_update_thumbnail).with(anything, sz, sz).returns { @attachment.thumbnails.create!(:thumbnail => "640x>", :uploaded_data => stub_png_data) }
       url = @attachment.thumbnail_url(:size => "640x>")
       url.should be_present
@@ -971,7 +972,6 @@ describe Attachment do
     end
 
     it "should use the existing thumbnail if present" do
-      sz = CollectionItemData::THUMBNAIL_SIZE
       @attachment.expects(:create_or_update_thumbnail).with(anything, sz, sz).returns { @attachment.thumbnails.create!(:thumbnail => "640x>", :uploaded_data => stub_png_data) }
       url = @attachment.thumbnail_url(:size => "640x>")
       @attachment.expects(:create_dynamic_thumbnail).never
@@ -980,6 +980,36 @@ describe Attachment do
       url.should be_present
       thumb.should be_present
       url.should == thumb.authenticated_s3_url
+    end
+
+    describe 'when its a scribd document' do
+      before do
+        @attachment.scribd_doc = Scribd::Document.new
+        ScribdAPI.expects(:enabled?).times(0)
+      end
+
+      it 'returns the cached thumbnail if present' do
+        @attachment.cached_scribd_thumbnail = "THUMBNAIL_URL"
+        @attachment.thumbnail_url.should == "THUMBNAIL_URL"
+      end
+
+      it 'just returns nil if there is no cached thumbnail' do
+        @attachment.thumbnail_url.should be_nil
+      end
+    end
+  end
+
+  describe '.allows_thumbnails_for_size' do
+    it 'inevitably returns false if there is no size provided' do
+      Attachment.allows_thumbnails_of_size?(nil).should be_false
+    end
+
+    it 'returns true if the provided size is in the configured dynamic sizes' do
+      Attachment.allows_thumbnails_of_size?(Attachment::DYNAMIC_THUMBNAIL_SIZES.first).should be_true
+    end
+
+    it 'returns false if the provided size is not in the configured dynamic sizes' do
+      Attachment.allows_thumbnails_of_size?('nonsense').should be_false
     end
   end
 
