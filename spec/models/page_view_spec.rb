@@ -52,9 +52,34 @@ describe PageView do
 
       it "should always assign the default shard" do
         PageView.new.shard.should == Shard.default
+        pv = nil
         @shard1.activate do
-          PageView.new.shard.should == Shard.default
+          pv = page_view_model
+          pv.shard.should == Shard.default
+          pv.save!
+          pv = PageView.find(pv.request_id)
+          pv.should be_present
+          pv.shard.should == Shard.default
         end
+        pv = PageView.find(pv.request_id)
+        pv.should be_present
+        pv.shard.should == Shard.default
+        pv.interaction_seconds = 25
+        pv.save!
+        pv = PageView.find(pv.request_id)
+        pv.interaction_seconds.should == 25
+        @shard2.settings[:page_view_method] = :cache
+        @shard2.save
+        @shard2.activate do
+          pv = page_view_model
+          pv.shard.should == @shard2
+          pv.save!
+        end
+        @shard2.activate do
+          PageView.find(pv.request_id).should be_present
+        end
+        # can't find in cassandra
+        expect { PageView.find(pv.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
 
