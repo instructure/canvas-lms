@@ -11,40 +11,45 @@
 }
 
 // styles to ensure icons can only be applied through the <i> element, but also allowing
-// to be applied directly to text links 
+// to be applied directly to text links
 
 i[class*=icon-], i[class^=icon-], a[class*=icon-], a[class^=icon-] {
- 
+
   &:before {
     font-family: 'canvasregular';
     display: inline-block;
     vertical-align: middle;
-    
+
     // override any properties in the cascade that might make the font display incorrectly
     text-transform: none !important;
     font-weight: normal !important;
     font-style: normal !important;
   }
-  
+
 }
 
 i[class*=icon-], i[class^=icon-] {
   display: inline-block;
   font-style: normal !important;
   width: 16px; height: 16px; line-height: 16px; font-size: 16px;
-  
+
   // adjust icon sizes to look good with our large-size button class
   .btn-large & { width: 18px; height: 18px; line-height: 18px; font-size: 18px; }
-  
+
   // suppress icons when the smallest buttons are used
   .btn-mini & { display: none; }
-  
+
 }
 
 // when an icon is applied directly to a link, add a little left margin to make
 // things look nicer
-a[class*=icon-]:before, a[class^=icon-]:before {
-  margin-right: 4px;
+a[class*=icon-], a[class^=icon-] {
+  &:before { margin-right: 4px; }
+}
+
+.standalone-icon {
+  // make standalone icons within links display as dark gray, not default link blue
+  &:before { color: #666; }
 }
 
 
