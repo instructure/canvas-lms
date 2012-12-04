@@ -29,14 +29,6 @@ class PageView < ActiveRecord::Base
   before_save :cap_interaction_seconds
   belongs_to :context, :polymorphic => true
 
-  def initialize_with_shard_assignment(*a, &b)
-    initialize_without_shard_assignment(*a, &b)
-    if self.class.cassandra?
-      self.shard = Shard.default
-    end
-  end
-  alias_method_chain :initialize, :shard_assignment
-
   attr_accessor :generated_by_hand
   attr_accessor :is_update
 
@@ -80,6 +72,20 @@ class PageView < ActiveRecord::Base
     enable_page_views.to_sym
   end
 
+  def after_initialize
+    # remember the page view method selected at the time of creation, so that
+    # we use the right method when saving
+    @page_view_method = self.class.page_view_method
+    if @page_view_method == :cassandra
+      self.shard = Shard.default
+    end
+  end
+
+  def page_view_method
+    @page_view_method || self.class.page_view_method
+  end
+  attr_writer :page_view_method
+
   def self.redis_queue?
     %w(cache cassandra).include?(page_view_method.to_s)
   end
@@ -117,13 +123,13 @@ class PageView < ActiveRecord::Base
 
   def self.from_cassandra(attrs)
     @blank_template ||= columns.inject({}) { |h,c| h[c.name] = nil; h }
-    Shard.default.activate { instantiate(@blank_template.merge(attrs)) }
+    Shard.default.activate { instantiate(@blank_template.merge(attrs)) }.tap { |pv| pv.page_view_method = :cassandra }
   end
 
   def store
     self.created_at ||= Time.zone.now
 
-    result = case PageView.page_view_method
+    result = case page_view_method
     when :log
       Rails.logger.info "PAGE VIEW: #{self.attributes.to_json}"
     when :cache, :cassandra
@@ -156,7 +162,7 @@ class PageView < ActiveRecord::Base
   end
 
   def create_without_callbacks
-    return super unless self.class.cassandra?
+    return super unless self.page_view_method == :cassandra
     self.created_at ||= Time.zone.now
     update
     if user
@@ -167,7 +173,7 @@ class PageView < ActiveRecord::Base
   end
 
   def update_without_callbacks
-    return super unless self.class.cassandra?
+    return super unless self.page_view_method == :cassandra
     cassandra.update_record("page_views", { :request_id => request_id }, self.changes)
     true
   end
@@ -332,8 +338,6 @@ class PageView < ActiveRecord::Base
     # if you interrupt and re-start the migrator, start_at cannot be changed,
     # since it's saved in cassandra to persist the migration state
     def initialize(skip_deleted_accounts = true, start_at = nil)
-      raise("Must configure page views to use cassandra first") if !PageView.cassandra?
-
       self.start_at = start_at || 52.weeks.ago
       self.logger = Rails.logger
 
@@ -390,7 +394,10 @@ class PageView < ActiveRecord::Base
           # it's saved to cassandra as if it was just created (though
           # created_at comes from the queried db attributes)
           # we're bypassing the redis queue here, just saving directly to cassandra
-          PageView.create! { |pv| pv.send(:attributes=, attrs, false) }
+          PageView.create! { |pv|
+            pv.page_view_method = :cassandra
+            pv.send(:attributes=, attrs, false)
+          }
           true
         rescue
           logger.error "failed migrating request id to cassandra: #{attrs['request_id']} : #{$!}"
