@@ -161,6 +161,10 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  def has_overrides?
+    assignment_overrides.count > 0
+  end
+
   # returns two values indicating which due dates for this assignment apply
   # and/or are visible to the user.
   #
