@@ -157,6 +157,7 @@ class Account < ActiveRecord::Base
   add_setting :canvas_authentication, :boolean => true, :root_only => true
   add_setting :admins_can_change_passwords, :boolean => true, :root_only => true, :default => false
   add_setting :outgoing_email_default_name
+  add_setting :external_notification_warning, :boolean => true, :default => false
   # When a user is invited to a course, do we let them see a preview of the
   # course even without registering?  This is part of the free-for-teacher
   # account perks, since anyone can invite anyone to join any course, and it'd

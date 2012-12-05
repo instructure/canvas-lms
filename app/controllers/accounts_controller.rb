@@ -159,6 +159,7 @@ class AccountsController < ApplicationController
             :enable_scheduler,
             :show_scheduler,
             :global_includes,
+            :external_notification_warning
           ].each do |key|
             params[:account][:settings].try(:delete, key)
           end

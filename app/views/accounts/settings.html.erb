@@ -461,7 +461,7 @@ TEXT
 
         <% if @account.root_account? && !@account.site_admin? %>
           <h2><%= t(:email_notification_from_settings, 'E-mail Notification "From" Settings') %></h2>
-          <div><%= t(:email_notification_from_description, "This setting allows the Admin to brand or label the 'From' text on all notifications sent from Canvas for this Account.") %></div>
+          <p><%= t(:email_notification_from_description, "This setting allows the Admin to brand or label the 'From' text on all notifications sent from Canvas for this Account.") %></p>
           <% f.fields_for :settings do |settings| %>
             <div>
               <%= settings.radio_button :outgoing_email_default_name_option, 'default',
@@ -536,6 +536,27 @@ TEXT
               </table>
               </blockquote>
             </div>
+
+            <h2><%= t('notifications.external_services', 'Notifications Sent to External Services') %></h2>
+            <table class="formtable">
+              <tr>
+                <td><input type="checkbox" id="account_settings_external_notification_warning_checkbox" <%= 'checked="checked"' if @account.settings[:external_notification_warning] %> /></td>
+                <td>
+                  <label for="account_settings_external_notification_warning_checkbox"><%= t('notifications.external_services_label', 'Display one time pop-up warning on Notification Preferences page.') %></label>
+                  <input type="hidden" name="account[settings][external_notification_warning]" id="account_settings_external_notification_warning" value="<%= @account.settings[:external_notification_warning] ? 1 : 0 %>" />
+                </td>
+              </tr>
+            </table>
+
+            <table style="margin-left: 1.5em;" cellspacing="0" class="formtable">
+              <tr>
+                <td>
+                  <b><%= t('notifications.external_services_warning_label', 'Pop-up Message Content:') %></b>
+                  <blockquote><%= t('notifications.external_services_warning', "Notice: Some Canvas notifications may contain confidential information. Selecting to receive notifications at an email other than your institution provided address may result in sending sensitive information outside of the institutional system.")%></blockquote>
+                </td>
+              </tr>
+            </table>
+
           <% end %>
         <% end %>
 
