@@ -35,7 +35,7 @@ if !ONE_NINE
   gem 'mail', '2.4.4'
 end
 gem 'mailman',        '0.5.3'
-gem 'mime-types',     '1.16',   :require => 'mime/types'
+gem 'mime-types',     '1.17.2',   :require => 'mime/types'
 # attachment_fu (even the current technoweenie one on github) does not work
 # with mini_magick 3.1
 gem 'mini_magick',    '1.3.2'
