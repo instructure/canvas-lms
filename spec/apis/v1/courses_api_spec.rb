@@ -379,19 +379,12 @@ describe CoursesController, :type => :integration do
         @course.workflow_state.should eql 'deleted'
       end
 
-      it "should soft conclude when completing a course" do
-        Course.any_instance.unstub(:start_at, :end_at)
-        state = @course.workflow_state
-        @course.conclude_at.should be_nil
-
+      it "should conclude when completing a course" do
         json = api_call(:delete, @path, @params, { :event => 'conclude' })
         json.should == { 'conclude' => true }
 
         @course.reload
-        @course.workflow_state.should eql state
-        @course.conclude_at.should_not be_nil
-        @course.restrict_enrollments_to_course_dates.should == true
-        @course.should be_soft_concluded
+        @course.workflow_state.should eql 'completed'
       end
 
       it "should return 400 if params[:event] is missing" do

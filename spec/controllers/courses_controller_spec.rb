@@ -667,10 +667,11 @@ describe CoursesController do
 
   describe "POST unconclude" do
     it "should unconclude the course" do
-      course_with_teacher(:active_all => true)
-      account_admin_user
-      user_session(@user)
-      @course.complete
+      course_with_teacher_logged_in(:active_all => true)
+      delete 'destroy', :id => @course.id, :event => 'conclude'
+      response.should be_redirect
+      @course.reload.should be_completed
+      @course.conclude_at.should <= Time.now
 
       post 'unconclude', :course_id => @course.id
       response.should be_redirect
