@@ -19,7 +19,8 @@
     <% end %>
   <% else %>
     <h2><%= t('headings.confirm_conclude', %{Confirm Conclude Course}) %></h2>
-    <%= t 'details.confirm_conclude', %{Are you sure you want to conclude this course? Once concluded, Students and Teachers will need to access the course from the "Past Enrollments" section on their *courses page*. Teachers will retain full access to the course content and have the ability to continue grading while Students will be limited to read-only access, i.e., they can view their grades but no longer submit assignments.}, :wrapper => link_to('\1', courses_path) %>
+    <p><%= t 'details.confirm_conclude', %{Warning: Concluding the course will prevent you from modifying grades and accessing course content.} %></p>
+    <p><%= t 'details.conclude_alt_text', %{If you would like to retain the ability to change grades while limiting student access to the course, please utilize the course dates settings. You can learn about course date settings in our guides *here*}, :wrapper => link_to('\1', "http://guides.instructure.com/m/4152/l/57088-how-do-i-change-the-start-and-end-dates-for-my-course") %></p>
 
     <% form_tag context_url(@context, :context_url), {:method => :delete} do %>
       <input type="hidden" name="event" value="conclude"/>
@@ -28,5 +29,6 @@
         <button class="btn btn-primary" type="submit"><%= t('buttons.conclude_course', %{Conclude Course}) %></button>
       </div>
     <% end %>
+
   <% end %>
 </div>

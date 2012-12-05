@@ -453,7 +453,7 @@ class CoursesController < ApplicationController
     else
       return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
 
-      @context.soft_conclude!
+      @context.complete
       if @context.save
         flash[:notice] = t('notices.concluded', "Course successfully concluded")
       else
