@@ -65,10 +65,10 @@ class AssessmentItemConverter
       # The colons are replaced with dashes in the conversion from QTI 1.2
       @question[:migration_id] = get_node_att(@doc, 'assessmentItem', 'identifier')
       @question[:migration_id] = @question[:migration_id].gsub(/:/, '-') if @question[:migration_id]
-      if @opts[:alternate_ids]
+      if @flavor == Qti::Flavors::D2L
         # In D2L-generated QTI the assessments reference the items by the label instead of the identifier
-        alt_id = get_node_att(@doc, 'assessmentItem', 'label')
-        @opts[:alternate_ids][alt_id] = @question[:migration_id]
+        # also, the identifier is not always unique, so we use the label as the migration id
+        @question[:migration_id] = get_node_att(@doc, 'assessmentItem', 'label')
       end
       if @doc.at_css('itemBody div.html')
         @question[:question_text] = ''

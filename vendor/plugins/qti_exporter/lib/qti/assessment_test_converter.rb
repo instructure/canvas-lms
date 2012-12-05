@@ -183,8 +183,9 @@ class AssessmentTestConverter
     @quiz[:question_count] += 1
     # The colons are replaced with dashes in the conversion from QTI 1.2
     question[:migration_id] = item_ref['identifier'].gsub(/:/, '-')
-    if @opts[:alternate_ids] && @opts[:alternate_ids][question[:migration_id]]
-      question[:migration_id] = @opts[:alternate_ids][question[:migration_id]]
+    # D2L references questions by label instead of ident
+    if @opts[:flavor] == Qti::Flavors::D2L && item_ref['label'].present?
+      question[:migration_id] = item_ref['label']
     end
     if weight = get_node_att(item_ref, 'weight','value')
       question[:points_possible] = convert_weight_to_points(weight)
