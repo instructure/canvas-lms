@@ -23,7 +23,7 @@
 <% end %>
 
 
-<div id="account_settings_tabs" style="display:none;">
+<div id="account_settings_tabs" style="display:none;" class="ui-tabs-minimal">
   <ul>
     <% if can_do(@context, @current_user, :manage_account_settings) %>
     <li><a href="#tab-settings"><%= t(:tab_settings, "Settings") %></a></li>
