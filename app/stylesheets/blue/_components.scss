@@ -239,32 +239,22 @@
 }
 
 .page-action-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  > li {
-    > a {
-      display: block;
-      color: $gray;
-      font-weight: bold;
-      border-bottom: solid 1px lighten($grayLight, 10%);
-      @include box-shadow(0 1px 0px rgba(255, 255, 255, 0.85));
-      padding: 8px 0;
+  @include reset-list;
+  a {
+    display: block;
+    color: $gray;
+    font-weight: bold;
+    border-bottom: solid 1px lighten($grayLight, 10%);
+    @include box-shadow(0 1px 0px rgba(255, 255, 255, 0.85));
+    padding: 8px 0;
 
-      &:hover {
-        text-decoration: none;
-        color: $blue;
-        i {
-          background-image: url(/images/blue/canvas-icons-16x16-blue.png);
-        }
-      }
+    &:hover {
+      text-decoration: none;
+      color: $blue;
+    }
 
-      &:active {
-        color: $grayLight;
-        i {
-          background-image: url(/images/blue/canvas-icons-16x16-ltgrey.png);
-        }
-      }
+    &:active {
+      color: $grayLight;
     }
   }
 }

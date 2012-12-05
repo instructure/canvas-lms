@@ -6,36 +6,39 @@
 <% content_for :page_title do %><%= join_title context_user_name(@context, @user), @context.name %><% end %>
 
 <% content_for :right_side do %>
-  <h2><%= context_user_name(@context, @user) %></h2>
-  <div class="rs-margin-rl" id="right_nav">
+  <h2><%= t 'links.more_about_this_user', "More About This User" %></h2>
+  <div class="page-action-list" id="right_nav">
     <% if can_do(@membership, @current_user, :read_grades) && @membership.is_a?(StudentEnrollment) %>
-      <a class="btn button-sidebar-wide" href="<%= context_url(@context, :controller => :gradebooks, :action => :grade_summary, :id => @user.id) %>"><i class="icon-check-plus"></i> <%= t 'links.user_grades', "Grades for %{user}", :user => context_user_name(@context, @user) %></a>
+      <a href="<%= context_url(@context, :controller => :gradebooks, :action => :grade_summary, :id => @user.id) %>"><i class="icon-check-plus"></i> <%= t 'links.user_grades', "Grades" %></a>
     <% end %>
     <% if can_do(@context, @current_user, :send_messages) %>
-      <a class="btn button-sidebar-wide" href="<%= message_user_path(@user) %>"><i class="icon-email"></i> <%= t 'links.message_user', "Message %{user}", :user => context_user_name(@context, @user) %></a>
+      <a href="<%= message_user_path(@user) %>"><i class="icon-email"></i> <%= t 'links.message_user', "Send Message" %></a>
     <% end %>
     <% if @domain_root_account.enable_user_notes and can_do(@user, @current_user, :read_user_notes) %>
-      <a href="<%= user_user_notes_path(@user) %>" class="btn button-sidebar-wide"> <%= t 'links.faculty_journal', "Faculty Journal for %{user}", :user => context_user_name(@context, @user) %></a>
+      <a href="<%= user_user_notes_path(@user) %>"> <%= t 'links.faculty_journal', "Faculty Journal" %></a>
     <% end %>
     <% if @context.is_a?(Course)%>
       <% if @context.user_is_instructor?(@user) && can_do(@user, @current_user, :view_statistics) %>
-        <%= link_to(t('links.teacher_activity', 'Student Interactions Report for %{user}', :user => context_user_name(@context, @user)), user_course_teacher_activity_url(@user, @context), :class => 'btn button-sidebar-wide') %>
+        <%= link_to(t('links.teacher_activity', 'Student Interactions Report'), user_course_teacher_activity_url(@user, @context)) %>
       <% elsif @context.user_has_been_student?(@user) && @context.user_is_instructor?(@current_user) && can_do(@context, @current_user, :read_reports) %>
-        <%= link_to(t('links.student_teacher_activity', 'Your Interactions Report with %{user}', :user => context_user_name(@context, @user)), user_student_teacher_activity_url(@current_user, @user), :class => 'btn button-sidebar-wide') %>
+        <% link_to(user_student_teacher_activity_url(@current_user, @user)) do %>
+          <i class="icon-peer-review"></i>
+          <%= t('links.student_teacher_activity', 'Interactions with You') %>
+        <% end %>
       <% end %>
     <% end %>
     <% if can_do(@context, @current_user, :read_reports) %>
-      <a href="<%= context_url(@context, :context_user_usage_url, @user) %>" class="btn button-sidebar-wide"><i class="icon-link"></i> <%= t 'links.access_report', "Access Report for %{user}", :user => context_user_name(@context, @user) %></a>
+      <a href="<%= context_url(@context, :context_user_usage_url, @user) %>"><i class="icon-clock"></i> <%= t 'links.access_report', "Access Report" %></a>
     <% end %>
     <% if @context.is_a?(Course) && @context.has_outcomes? && can_do(@context, @current_user, :manage) %>
-      <a href="<%= context_url(@context, :context_user_outcomes_results_url, @user.id) %>" class="btn button-sidebar-wide"><i class="icon-star"></i> <%= t 'links.user_outcomes', "Outcomes for %{user}", :user => @user.short_name %></a>
+      <a href="<%= context_url(@context, :context_user_outcomes_results_url, @user.id) %>"><i class="icon-star"></i> <%= t 'links.user_outcomes', "Outcomes" %></a>
     <% end %>
     <% if can_do(@domain_root_account, @current_user, :manage) %>
-      <a href="<%= user_path(@user.id) %>" class="btn button-sidebar-wide"><i class="icon-user"></i> <%= t('links.user_account_details', %{User Account Details}) %></a>
+      <a href="<%= user_path(@user.id) %>"><i class="icon-user"></i> <%= t('links.user_account_details', %{User Account Details}) %></a>
     <% end %>
   </div>
   <a href="<%= user_profile_path(@current_user) %>" class="profile_url" style="display: none;">&nbsp;</a>
-  <h2><%= t 'headings.user_services', "%{user}'s Services", :user => @user.short_name %></h2>
+  <h2><%= t 'headings.user_services', "Registered Web Services" %></h2>
   <div class="rs-margin-lr">
     <% if can_do(@membership, @current_user, :read_services) && !@membership.user.user_services.empty? %>
       <p>
@@ -75,9 +78,8 @@
 <% js_bundle :user_name %>
 <% jammit_css :roster_user %>
 
-<h2><%= t 'headings.users_details', "%{user}'s Details", :user => @user.short_name %></h2>
+<h1><%= @user.name %></h1>
 <% if can_do(@context, @current_user, :manage_students) && !@context.is_a?(Group)%>
-<h2><%= t('headings.user_details', %{User Details}) %></h2>
 <%= render :partial => 'users/name' %>
 <a href="#" class="more_user_information_link"><%= t('links.more_user_details', %{more user details...}) %></a>
 <div class="more_user_information" style="display: none;">
