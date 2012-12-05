@@ -22,7 +22,12 @@ module AssignmentOverrideApplicator
   # assignment, and return the overridden stand-in.
   def self.assignment_overridden_for(assignment, user)
     overrides = self.overrides_for_assignment_and_user(assignment, user)
-    self.assignment_with_overrides(assignment, overrides)
+    
+    if overrides.empty?
+      assignment
+    else
+      self.assignment_with_overrides(assignment, overrides)
+    end
   end
 
   # determine list of overrides (of appropriate version) that apply to the
@@ -31,6 +36,10 @@ module AssignmentOverrideApplicator
   # value for a particular field is used for that field
   def self.overrides_for_assignment_and_user(assignment, user)
     Rails.cache.fetch([user, assignment, assignment.version_number, 'overrides'].cache_key) do
+
+      # return an empty array to the block if there is nothing to do here
+      next [] unless assignment.has_overrides?
+
       overrides = []
 
       # get list of overrides that might apply. adhoc override is highest

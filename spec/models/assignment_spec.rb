@@ -594,6 +594,19 @@ describe Assignment do
     @overridden.due_at.should == @override.due_at
   end
 
+  describe "has_overrides?" do
+    let(:assignment) { assignment_model(:course => @course, :due_at => 5.days.from_now) }
+
+    it "returns true when it does" do
+      assignment_override_model(:assignment => assignment)
+      assignment.has_overrides?.should be_true
+    end
+
+    it "returns false when it doesn't" do
+      assignment.has_overrides?.should be_false
+    end
+  end
+
   describe "#overrides_visible_to(user)" do
     before :each do
       @assignment = assignment_model
