@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/outcome_specs')
 
@@ -55,7 +57,8 @@ describe "account admin outcomes" do
       it "should import state standards to course groups and all nested outcomes" do
         state_outcome_setup
         goto_state_outcomes
-        outcome = ['NGA Center/CCSSO', 'Common Core State Standards', 'College- and Career-Readiness Standards and K-12 Mathematics', 'First Grade', '1.DD - Something', 'Something else']
+        outcome = ['NGA Center/CCSSO', 'Common Core State Standards', 'College- and Career-Readiness Standards and K-12 Mathematics',
+          'First Grade', '1.DD - zééééééééééééééééééééééééééééééééééééééééééééééééé', 'Something else']
         traverse_nested_outcomes(outcome)
         import_account_level_outcomes
         keep_trying_until do
@@ -68,7 +71,8 @@ describe "account admin outcomes" do
         state_outcome_setup
         goto_state_outcomes
 
-        outcome = ['NGA Center/CCSSO', 'Common Core State Standards', 'College- and Career-Readiness Standards and K-12 Mathematics', 'First Grade', '1.DD - Something', 'Something else']
+        outcome = ['NGA Center/CCSSO', 'Common Core State Standards', 'College- and Career-Readiness Standards and K-12 Mathematics',
+          'First Grade', '1.DD - zééééééééééééééééééééééééééééééééééééééééééééééééé', 'Something else']
         traverse_nested_outcomes(outcome)
 
         import_account_level_outcomes
