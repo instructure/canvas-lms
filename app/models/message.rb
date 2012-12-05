@@ -247,6 +247,28 @@ class Message < ActiveRecord::Base
   def main_link
     content(:link)
   end
+
+  # Public: Load a message template from app/messages. Also sets @i18n_scope.
+  #
+  # filename - The string path to the template (e.g. "/var/web/canvas/app/messages/template.email.erb")
+  #
+  # Returns a template string or false if it can't be found.
+  def get_template(filename)
+    path = Canvas::MessageHelper.find_message_path(filename)
+
+    if !(File.exist?(path) rescue false)
+      filename = self.notification.name.downcase.gsub(/\s/, '_') + ".email.erb" #rescue "not.found"
+      path = Canvas::MessageHelper.find_message_path(filename)
+    end
+
+    @i18n_scope = "messages." + filename.sub(/\.erb\z/, '')
+
+    if (File.exist?(path) rescue false)
+      File.read(path)
+    else
+      false
+    end
+  end
   
   def parse!(path_type=nil)
     raise StandardError, "Cannot parse without a context" unless self.context
@@ -266,15 +288,8 @@ class Message < ActiveRecord::Base
     path_type ||= self.communication_channel.path_type rescue path_type
     path_type = "summary" if self.to == 'dashboard'
     path_type ||= "email"
-    filename = self.notification.name.downcase.gsub(/\s/, '_') + "." + path_type + ".erb" #rescue "not.found"
-    path = Canvas::MessageHelper.find_message_path(filename)
-    if !(File.exist?(path) rescue false)
-      filename = self.notification.name.downcase.gsub(/\s/, '_') + ".email.erb" #rescue "not.found"
-      path = Canvas::MessageHelper.find_message_path(filename)
-    end
-    @i18n_scope = "messages." + filename.sub(/\.erb\z/, '')
-    if (File.exist?(path) rescue false)
-      message = File.read(path)
+    filename = self.notification.name.downcase.gsub(/\s/, '_') + "." + path_type + ".erb"
+    if message = get_template(filename)
       @message_content_link = nil; @message_content_subject = nil
       self.extend TextHelper
       self.extend ERB::Util
@@ -301,7 +316,7 @@ class Message < ActiveRecord::Base
       b = binding
       self.subject = Erubis::Eruby.new(self.subject).result(b)
       self.body = Erubis::Eruby.new(self.body).result(b)
-      self.transmission_errors = "couldn't find #{path}"
+      self.transmission_errors = "couldn't find #{Canvas::MessageHelper.find_message_path(filename)}"
     end
     Time.zone = old_time_zone
     self.body
