@@ -8,8 +8,6 @@
   <% end %>
 <% end %>
 
-<% add_crumb '<i class="icon-question standalone-icon"></i>'.html_safe, '#', :id => 'help_crumb' %>
-
 <% js_bundle :conversations %>
 <% jammit_css :conversations %>
 
@@ -63,6 +61,7 @@
       <a href="#" id="cancel_bulk_message_action"><%= t '#buttons.cancel', 'Cancel' %></a>
     </div>
     <ul id="message_status"></ul>
+     <a id="help_crumb" href="#"><i class="icon-question standalone-icon"></i></a>
     <div id="create_message_form"></div>
     <ul class="messages">
     </ul>
