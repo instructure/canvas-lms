@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -219,7 +219,6 @@ class UsersController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read_roster)
       @root_account = @context.root_account
-      @users = []
       @query = (params[:user] && params[:user][:name]) || params[:term]
       ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
         if @context && @context.is_a?(Account) && @query
@@ -235,10 +234,11 @@ class UsersController < ApplicationController
         end
 
         if api_request?
-          @users = User.of_account(@context).active.order_by_sortable_name
+          @users ||= User.of_account(@context).active.order_by_sortable_name
           @users = Api.paginate(@users, self, api_v1_account_users_url, :order => :sortable_name)
           user_json_preloads(@users)
         else
+          @users ||= []
           @users = @users.paginate(:page => params[:page], :per_page => @per_page, :total_entries => @users.size)
         end
 
