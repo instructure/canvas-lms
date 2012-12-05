@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require File.dirname(__FILE__) + '/spec_helper'
 
 describe AcademicBenchmark::Converter do
@@ -74,8 +76,8 @@ describe AcademicBenchmark::Converter do
     j.high_grade.should == "1"
     k = j.child_outcome_groups.last
     k.migration_id.should == "kkkkkkkkkkk"
-    k.title.should == "1.DD - Something"
-    k.description.should == "Something"
+    k.title.should == "1.DD - zééééééééééééééééééééééééééééééééééééééééééééééééé"
+    k.description.should == "zéééééééééééééééééééééééééééééééééééééééééééééééééééééééééé"
     k.low_grade.should == "1"
     k.high_grade.should == "1"
     l = k.child_outcome_groups.first
@@ -89,6 +91,7 @@ describe AcademicBenchmark::Converter do
     m = LearningOutcome.global.find_by_migration_id("mmmmmmmmmmm")
     m.short_description.should == "1.DD.1"
     m.description.should == "And something else"
+    m.title.should == "1.DD.1"
   end
 
   it "should successfully import the standards" do

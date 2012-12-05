@@ -8,6 +8,28 @@ module AcademicBenchmark
 
   class APIError < StandardError;end
 
+  def self.import(guids)
+    if !AcademicBenchmark.config[:api_key]
+      puts "Not importing academic benchmark data because no API key is set"
+      return
+    end
+
+    # need a user with global outcome management rights
+    user_id = Setting.get("academic_benchmark_migration_user_id", nil)
+    if !user_id
+      puts "Not importing academic benchmark data because no user id set"
+      return
+    end
+
+    if permissionful_user = User.find_by_id(user_id)
+      guids.each do |guid|
+        AcademicBenchmark.queue_migration_for_guid(guid, permissionful_user)
+      end
+    else
+      puts "Not importing academic benchmark data because no user found"
+    end
+  end
+
   def self.queue_migration_for_guid(guid, user)
     if !Account.site_admin.grants_right?(user, :manage_global_outcomes)
       raise Canvas::Migration::Error.new("User isn't allowed to edit global outcomes")
