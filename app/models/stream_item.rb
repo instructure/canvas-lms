@@ -247,29 +247,47 @@ class StreamItem < ActiveRecord::Base
     # set the hidden flag if an assignment and muted
     hidden = object.is_a?(Submission) && object.assignment.muted? ? true : false
 
-    # Then insert a StreamItemInstance for each user in user_ids
-    instance_ids = []
-    Shard.partition_by_shard(user_ids) do |user_ids_subset|
-      StreamItemInstance.transaction do
-        user_ids_subset.each do |user_id|
-          i = StreamItemInstance.create(:stream_item => res) do |sii|
-            sii.user_id = user_id
-            sii.hidden = hidden
-            sii.workflow_state = object_unread_for_user(object, user_id)
-          end
-          instance_ids << i.id
-        end
-      end
-    end
-    smallest_generated_id = instance_ids.min || 0
 
-    # Then delete any old instances from these users' streams.
-    # This won't actually delete StreamItems out of the table, it just deletes
-    # the join table entries.
-    # Old stream items are deleted in a periodic job.
-    StreamItemInstance.delete_all(
-          ["user_id in (?) AND stream_item_id = ? AND id < ?",
-          user_ids, res.id, smallest_generated_id])
+    l_context_type = res.context_type
+    Shard.partition_by_shard(user_ids) do |user_ids_subset|
+      #these need to be determined per shard
+      #hence the local caching inside the partition block
+      l_context_id = res.context_id
+      stream_item_id = res.id
+
+      #find out what the current largest stream item instance is so that we can delete them all once the new ones are created
+      greatest_existing_instance = StreamItemInstance.find(:first,
+                                                 :order => 'id DESC', :limit => 1, :select => 'id',
+                                                 :conditions => ['stream_item_id = ? AND user_id in (?)', stream_item_id, user_ids_subset])
+      greatest_existing_id = greatest_existing_instance.present? ? greatest_existing_instance.id : 0
+
+      inserts = user_ids_subset.map do |user_id|
+        {
+          :stream_item_id => stream_item_id,
+          :user_id => user_id,
+          :hidden => hidden,
+          :workflow_state => object_unread_for_user(object, user_id),
+          :context_type => l_context_type,
+          :context_id => l_context_id,
+        }
+      end
+
+      StreamItemInstance.connection.bulk_insert('stream_item_instances', inserts)
+
+      #reset caches manually because the observer wont trigger off of the above mass inserts
+      user_ids_subset.each do |user_id|
+        StreamItemCache.invalidate_recent_stream_items(user_id, l_context_type, l_context_id)
+      end
+
+      # Then delete any old instances from these users' streams.
+      # This won't actually delete StreamItems out of the table, it just deletes
+      # the join table entries.
+      # Old stream items are deleted in a periodic job.
+      StreamItemInstance.delete_all(
+            ["user_id in (?) AND stream_item_id = ? AND id <= ?",
+            user_ids_subset, stream_item_id, greatest_existing_id])
+    end
+
 
     # Here is where we used to go through and update the stream item for anybody
     # not in user_ids who had the item in their stream, so that the item would
