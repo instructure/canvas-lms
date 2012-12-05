@@ -624,7 +624,7 @@ class UsersController < ApplicationController
       @enrollments = @enrollments.sort_by {|e| [e.state_sortable, e.rank_sortable, e.course.name] }
       # pre-populate the reverse association
       @enrollments.each { |e| e.user = @user }
-      @group_memberships = @user.group_memberships.scoped(:include => :group)
+      @group_memberships = @user.current_group_memberships.scoped(:include => :group)
 
       respond_to do |format|
         format.html
