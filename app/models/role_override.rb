@@ -696,7 +696,7 @@ class RoleOverride < ActiveRecord::Base
     @cached_permissions = {}
   end
   
-  def self.permission_for(context, permission, base_role, custom_role=nil)
+  def self.permission_for(role_context, permission, base_role, custom_role=nil)
     base_role = 'StudentEnrollment' if base_role == 'StudentViewEnrollment'
     custom_role = nil if base_role == NO_PERMISSIONS_TYPE
     if custom_role && custom_role == 'AccountAdmin'
@@ -708,28 +708,37 @@ class RoleOverride < ActiveRecord::Base
     custom_role ||= base_role
 
     @cached_permissions ||= {}
-    key = [context.cache_key, permission.to_s, custom_role.to_s].join
-    permissionless_key = [context.cache_key, custom_role.to_s].join
+    key = [role_context.cache_key, permission.to_s, custom_role.to_s].join
+    permissionless_key = [role_context.cache_key, custom_role.to_s].join
     return @cached_permissions[key] if @cached_permissions[key]
     
     if !self.known_role_types.include?(base_role)
       raise ArgumentError.new("Invalid base_role #{base_role}")
     end
+    default_data = self.permissions[permission]
     generated_permission = {
-      :permission =>  self.permissions[permission],
-      :enabled    =>  self.permissions[permission][:true_for].include?(base_role),
-      :locked     => !self.permissions[permission][:available_to].include?(base_role),
-      :readonly   => !self.permissions[permission][:available_to].include?(base_role),
+      :permission =>  default_data,
+      :enabled    =>  default_data[:true_for].include?(base_role),
+      :locked     => !default_data[:available_to].include?(base_role),
+      :readonly   => !default_data[:available_to].include?(base_role),
       :explicit   => false,
       :base_role_type => base_role,
       :enrollment_type => custom_role
     }
+    if default_data[:account_only]
+      if role_context.is_a? Account
+        generated_permission[:enabled] = false if default_data[:account_only] == :root && !role_context.root_account?
+        generated_permission[:enabled] = false if default_data[:account_only] == :site_admin && !role_context.site_admin?
+      else
+        generated_permission[:enabled] = false
+      end
+    end
 
     @@role_override_chain ||= {}
     overrides = @@role_override_chain[permissionless_key]
     unless overrides
       account_ids = []
-      context_walk = context
+      context_walk = role_context
       while context_walk
         account_ids << context_walk.id if context_walk.is_a? Account
         if context_walk.respond_to?(:course)
@@ -750,7 +759,7 @@ class RoleOverride < ActiveRecord::Base
     @@role_override_chain[permissionless_key] = overrides
     overrides.each do |override|
       if override.permission == permission.to_s
-        generated_permission[:readonly] = true if override.locked && (override.context_id != context.id || !context.is_a?(Account))
+        generated_permission[:readonly] = true if override.locked && (override.context_id != role_context.id || !role_context.is_a?(Account))
         generated_permission.merge!({
           :readonly => generated_permission[:readonly] || generated_permission[:locked],
           :explicit => false
@@ -758,7 +767,7 @@ class RoleOverride < ActiveRecord::Base
 
         if !generated_permission[:locked]
           unless override.enabled.nil?
-            if override.context == context
+            if override.context == role_context
               # if the explicit override is for the target context, the prior default
               # is the parent context's value
               generated_permission[:prior_default] = generated_permission[:enabled]

@@ -320,7 +320,43 @@ describe RoleOverride do
       end
     end
 
+    context "account_only" do
+      before do
+        @site_admin = User.create!
+        Account.site_admin.add_user(@site_admin)
+        @root_admin = User.create!
+        Account.default.add_user(@root_admin)
+        @sub_admin = User.create!
+        @sub_account = Account.default.sub_accounts.create!
+        @sub_account.add_user(@sub_admin)
+      end
 
+      it "should not grant site admin permissions to normal account admins" do
+        Account.default.grants_right?(@root_admin, :manage_site_settings).should be_false
+        # check against the normal root account, but granted rights from Site Admin
+        Account.default.grants_right?(@site_admin, :manage_site_settings).should be_true
+        # check against Site Admin
+        Account.site_admin.grants_right?(@site_admin, :manage_site_settings).should be_true
+      end
+
+      it "should not grant root only permissions to sub account admins" do
+        Account.default.grants_right?(@root_admin, :become_user).should be_true
+        @sub_account.grants_right?(@sub_admin, :become_user).should be_false
+        # check against the sub account, but granted rights from the root account
+        @sub_account.grants_right?(@root_admin, :become_user).should be_true
+      end
+
+      it "should grant root only permissions in courses when the user is a root account admin" do
+        @course = @account.courses.create!
+        @course.grants_right?(@root_admin, :become_user).should be_true
+      end
+
+      it "should not grant account only permissions to malicious course users" do
+        @account = @account.courses.create!
+        @permission = :become_user
+        check_permission(AccountUser::BASE_ROLE_NAME, 'AccountAdmin', false)
+      end
+    end
 
   end
 end

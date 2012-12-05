@@ -597,7 +597,7 @@ class Enrollment < ActiveRecord::Base
   def has_permission_to?(action)
     @permission_lookup ||= {}
     unless @permission_lookup.has_key? action
-      @permission_lookup[action] = RoleOverride.permission_for(self, action, base_role_name, self.role_name)[:enabled]
+      @permission_lookup[action] = RoleOverride.permission_for(course, action, base_role_name, self.role_name)[:enabled]
     end
     @permission_lookup[action]
   end
