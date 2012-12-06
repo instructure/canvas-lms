@@ -83,6 +83,7 @@ module BasicLTI
       hash['resource_link_id'] = link_code
       hash['resource_link_title'] = tool.name
       hash['user_id'] = user.opaque_identifier(:asset_string)
+      hash['user_image'] = user.avatar_url
       hash['roles'] = user.lti_role_types(context).join(',') # AccountAdmin, Student, Faculty or Observer
       if tool.include_name?
         hash['lis_person_name_given'] = user.first_name
