@@ -90,8 +90,13 @@ class PageView < ActiveRecord::Base
     %w(cache cassandra).include?(page_view_method.to_s)
   end
 
+  # checks the class-level page_view_method
   def self.cassandra?
-    %w(cassandra).include?(page_view_method.to_s)
+    self.page_view_method == :cassandra
+  end
+  # checks the instance var page_view_method
+  def cassandra?
+    self.page_view_method == :cassandra
   end
 
   def self.cassandra
@@ -354,11 +359,10 @@ class PageView < ActiveRecord::Base
       self.migration_data = {}
       account_ids.each do |account_id|
         data = self.migration_data[account_id] = {}
-        data.merge!(PageView.cassandra.execute("SELECT last_created_at, last_request_id FROM page_views_migration_metadata_per_account WHERE shard_id = ? AND account_id = ?", Shard.current.id.to_s, account_id).fetch.try(:to_hash) || {})
+        data.merge!(PageView.cassandra.execute("SELECT last_created_at FROM page_views_migration_metadata_per_account WHERE shard_id = ? AND account_id = ?", Shard.current.id.to_s, account_id).fetch.try(:to_hash) || {})
 
         if !(data['last_created_at'])
           data['last_created_at'] = self.start_at
-          data['last_request_id'] = ''
         end
         # cassandra returns Time not TimeWithZone objects
         data['last_created_at'] = data['last_created_at'].in_time_zone
@@ -367,7 +371,7 @@ class PageView < ActiveRecord::Base
 
     # this is the batch size per account, not the overall batch size
     # returns true if any progress was made (if it makes sense to run_once again)
-    def run_once(batch_size = 1000)
+    def run_once(batch_size = 3000)
       self.migration_data.inject(false) do |progress, (account_id,_)|
         run_once_for_account(account_id, batch_size) || progress
       end
@@ -377,10 +381,12 @@ class PageView < ActiveRecord::Base
       data = self.migration_data[account_id]
       raise("not configured for account id: #{account_id}") unless data
 
-      last_created_at, last_request_id = data.values_at('last_created_at', 'last_request_id')
+      last_created_at = data['last_created_at']
 
-      finder_sql = PageView.scoped(:conditions => ["account_id = ? AND (created_at > ? OR (created_at = ? AND request_id > ?))", account_id, last_created_at, last_created_at, last_request_id],
-                                   :order => "created_at asc, request_id",
+      # this could run into problems if one account gets more than
+      # batch_size page views created in the second on this boundary
+      finder_sql = PageView.scoped(:conditions => ["account_id = ? AND created_at >= ?", account_id, last_created_at],
+                                   :order => "created_at asc",
                                    :limit => batch_size).construct_finder_sql({})
 
       # query just the raw attributes, don't instantiate AR objects
@@ -390,28 +396,40 @@ class PageView < ActiveRecord::Base
 
       inserted = rows.count do |attrs|
         begin
+          created_at = Time.zone.parse(attrs['created_at'])
+          # if the created_at is the same as the last_created_at,
+          # we may have already inserted this page view
+          # use to_i here to avoid sub-second precision problems
+          if created_at.to_i == last_created_at.to_i
+            exists = !!PageView.cassandra.select_value("SELECT request_id FROM page_views WHERE request_id = ?", attrs['request_id'])
+          end
+
           # now instantiate the AR object here, as a brand new record, so
           # it's saved to cassandra as if it was just created (though
           # created_at comes from the queried db attributes)
           # we're bypassing the redis queue here, just saving directly to cassandra
-          PageView.create! { |pv|
-            pv.page_view_method = :cassandra
-            pv.send(:attributes=, attrs, false)
-          }
-          true
+          if exists
+            false
+          else
+            PageView.create! { |pv|
+              pv.page_view_method = :cassandra
+              pv.send(:attributes=, attrs, false)
+            }
+            true
+          end
         rescue
           logger.error "failed migrating request id to cassandra: #{attrs['request_id']} : #{$!}"
           false
         end
       end
 
-      logger.info "added #{inserted} page views starting at #{last_created_at} #{last_request_id}"
+      logger.info "account #{Shard.current.id}~#{account_id}: added #{inserted} page views starting at #{last_created_at}"
 
-      last_created_at, last_request_id = rows.last.values_at('created_at', 'request_id')
+      last_created_at = rows.last['created_at']
       last_created_at = Time.zone.parse(last_created_at)
-      PageView.cassandra.execute("UPDATE page_views_migration_metadata_per_account SET last_created_at = ?, last_request_id = ? WHERE shard_id = ? AND account_id = ?", last_created_at, last_request_id, Shard.current.id.to_s, account_id)
-      data.merge!('last_created_at' => last_created_at, 'last_request_id' => last_request_id)
-      true
+      PageView.cassandra.execute("UPDATE page_views_migration_metadata_per_account SET last_created_at = ? WHERE shard_id = ? AND account_id = ?", last_created_at, Shard.current.id.to_s, account_id)
+      data['last_created_at'] = last_created_at
+      return inserted > 0
     end
 
     def run
