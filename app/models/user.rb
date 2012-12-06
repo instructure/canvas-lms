@@ -1134,9 +1134,8 @@ class User < ActiveRecord::Base
         account.grants_right?(masquerader, nil, :become_user) && self.find_pseudonym_for_account(account, true)
     account_users = account.all_account_users_for(self)
     return true if account_users.empty?
-    account_users.map(&:account).uniq.all? do |account|
-      needed_rights = account.check_policy(self)
-      account.grants_rights?(masquerader, nil, *needed_rights).values.all?
+    account_users.all? do |account_user|
+      account_user.is_subset_of?(masquerader)
     end
   end
 

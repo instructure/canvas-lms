@@ -69,4 +69,74 @@ describe AccountUser do
       @user = @shard2.activate { User.create! }
     end
   end
+
+  describe "all_permissions_for" do
+    it "should include granted permissions from multiple roles" do
+      user = User.create!
+      account_admin_user_with_role_changes(:user => user, :membership_type => 'role1', :role_changes => {:manage_sis => true})
+      account_admin_user_with_role_changes(:user => user, :membership_type => 'role2', :role_changes => {:manage_wiki => true})
+
+      permissions = AccountUser.all_permissions_for(user, Account.default)
+      permissions.delete(:manage_sis).should_not be_empty
+      permissions.delete(:manage_wiki).should_not be_empty
+      permissions.values.all?(&:empty?).should be_true
+    end
+  end
+
+  describe "is_subset_of?" do
+    before do
+      @user1 = User.create!
+      @user2 = User.create!
+      @ro1 = Account.default.role_overrides.create!(:enrollment_type => 'role1', :permission => 'manage_sis', :enabled => true)
+      @ro2 = Account.default.role_overrides.create!(:enrollment_type => 'role2', :permission => 'manage_sis', :enabled => true)
+      @au1 = Account.default.add_user(@user1, 'role1')
+      @au2 = Account.default.add_user(@user2, 'role2')
+    end
+
+    it "should be symmetric for applies_to everything" do
+      @au1.is_subset_of?(@user2).should be_true
+      @au2.is_subset_of?(@user1).should be_true
+    end
+
+    it "should be symmetric for applies_to self" do
+      @ro1.applies_to_descendants = false
+      @ro1.save!
+      @ro2.applies_to_descendants = false
+      @ro2.save!
+      @au1.is_subset_of?(@user2).should be_true
+      @au2.is_subset_of?(@user1).should be_true
+    end
+
+    it "should be symmetric for applies_to descendants" do
+      @ro1.applies_to_self = false
+      @ro1.save!
+      @ro2.applies_to_self = false
+      @ro2.save!
+      @au1.is_subset_of?(@user2).should be_true
+      @au2.is_subset_of?(@user1).should be_true
+    end
+
+    it "should properly compute differing applies_to (descendants vs. all)" do
+      @ro1.applies_to_self = false
+      @ro1.save!
+      @au1.is_subset_of?(@user2).should be_true
+      @au2.is_subset_of?(@user1).should be_false
+    end
+
+    it "should properly compute differing applies_to (self vs. all)" do
+      @ro1.applies_to_descendants = false
+      @ro1.save!
+      @au1.is_subset_of?(@user2).should be_true
+      @au2.is_subset_of?(@user1).should be_false
+    end
+
+    it "should properly compute differing applies_to (self vs. descendants)" do
+      @ro1.applies_to_descendants = false
+      @ro1.save!
+      @ro2.applies_to_self = false
+      @ro2.save!
+      @au1.is_subset_of?(@user2).should be_false
+      @au2.is_subset_of?(@user1).should be_false
+    end
+  end
 end

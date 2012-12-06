@@ -438,7 +438,9 @@ describe Account do
     some_access = [:read_reports] + limited_access
     hash.each do |k, v|
       account = v[:account]
-      account.role_overrides.create(:permission => 'read_reports', :enrollment_type => 'Restricted Admin', :enabled => true)
+      account.role_overrides.create!(:permission => 'read_reports', :enrollment_type => 'Restricted Admin', :enabled => true)
+      # clear caches
+      v[:account] = Account.find(account)
     end
     RoleOverride.clear_cached_contexts
     hash.each do |k, v|
