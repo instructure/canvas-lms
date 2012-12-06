@@ -84,40 +84,46 @@ class RoleOverridesController < ApplicationController
   #     manage_sis                       -- Import and manage SIS data
   #     manage_site_settings             -- Manage site-wide and plugin settings
   #     manage_user_logins               -- Modify login details for users
+  #     read_course_content              -- View course content
   #     read_course_list                 -- View the list of courses
   #     read_messages                    -- View notifications sent to users
+  #     site_admin                       -- Use the Site Admin section and admin all other accounts
   #     view_error_reports               -- View error reports
   #     view_statistics                  -- View statistics
   #
   #     [For both Account-Level and Course-Level roles]
-  #     change_course_state              -- Change course state
-  #     comment_on_others_submissions    -- View all students' submissions and make comments on them
-  #     create_collaborations            -- Create student collaborations
-  #     create_conferences               -- Create web conferences
-  #     manage_admin_users               -- Add/remove other teachers, course designers or TAs to the course
-  #     manage_assignments               -- Manage (add / edit / delete) assignments and quizzes
-  #     manage_calendar                  -- Add, edit and delete events on the course calendar
-  #     manage_content                   -- Manage all other course content
-  #     manage_files                     -- Manage (add / edit / delete) course files
-  #     manage_grades                    -- Edit grades (includes assessing rubrics)
-  #     manage_groups                    -- Manage (create / edit / delete) groups
-  #     manage_interaction_alerts        -- Manage alerts
-  #     manage_outcomes                  -- Manage learning outcomes
-  #     manage_sections                  -- Manage (create / edit / delete) course sections
-  #     manage_students                  -- Add/remove students for the course
-  #     manage_user_notes                -- Manage faculty journal entries
-  #     manage_wiki                      -- Manage wiki (add / edit / delete pages)
-  #     moderate_forum                   -- Moderate discussions ( delete / edit other's posts, lock topics)
-  #     post_to_forum                    -- Post to discussions
-  #     read_course_content              -- View course content
-  #     read_question_banks              -- View and link to question banks
-  #     read_reports                     -- View usage reports for the course
-  #     read_roster                      -- See the list of users
-  #     read_sis                         -- Read SIS data
-  #     send_messages                    -- Send messages to course members
-  #     site_admin                       -- Use the Site Admin section and admin all other accounts
-  #     view_all_grades                  -- View all grades
-  #     view_group_pages                 -- View the group pages of all student groups
+  #      Note: Applicable enrollment types for course-level roles are given in brackets:
+  #            S = student, T = teacher, A = TA, D = designer, O = observer.
+  #            Lower-case letters indicate permissions that are off by default.
+  #            A missing letter indicates the permission cannot be enabled for the role
+  #            or any derived custom roles.
+  #     change_course_state              -- [ TaD ] Change course state
+  #     comment_on_others_submissions    -- [sTAD ] View all students' submissions and make comments on them
+  #     create_collaborations            -- [STADo] Create student collaborations
+  #     create_conferences               -- [STADo] Create web conferences
+  #     manage_admin_users               -- [ Tad ] Add/remove other teachers, course designers or TAs to the course
+  #     manage_assignments               -- [ TADo] Manage (add / edit / delete) assignments and quizzes
+  #     manage_calendar                  -- [sTADo] Add, edit and delete events on the course calendar
+  #     manage_content                   -- [ TADo] Manage all other course content
+  #     manage_files                     -- [ TADo] Manage (add / edit / delete) course files
+  #     manage_grades                    -- [ TA  ] Edit grades (includes assessing rubrics)
+  #     manage_groups                    -- [ TAD ] Manage (create / edit / delete) groups
+  #     manage_interaction_alerts        -- [ Ta  ] Manage alerts
+  #     manage_outcomes                  -- [sTaDo] Manage learning outcomes
+  #     manage_sections                  -- [ TaD ] Manage (create / edit / delete) course sections
+  #     manage_students                  -- [ TAD ] Add/remove students for the course
+  #     manage_user_notes                -- [ TA  ] Manage faculty journal entries
+  #     manage_wiki                      -- [ TADo] Manage wiki (add / edit / delete pages)
+  #     read_forum                       -- [STADO] View discussions
+  #     moderate_forum                   -- [sTADo] Moderate discussions (delete/edit others' posts, lock topics)
+  #     post_to_forum                    -- [STADo] Post to discussions
+  #     read_question_banks              -- [ TADo] View and link to question banks
+  #     read_reports                     -- [sTAD ] View usage reports for the course
+  #     read_roster                      -- [STADo] See the list of users
+  #     read_sis                         -- [sTa  ] Read SIS data
+  #     send_messages                    -- [STADo] Send messages to course members
+  #     view_all_grades                  -- [ TAd ] View all grades
+  #     view_group_pages                 -- [sTADo] View the group pages of all student groups
   #
   #   Some of these permissions are applicable only for roles on the site admin
   #   account, on a root account, or for course-level roles with a particular base role type;
