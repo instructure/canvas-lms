@@ -33,7 +33,7 @@ module Twitter
     end
     access_token
   end
-  
+
   def twitter_generate_token(token, secret)
     OAuth::AccessToken.new(twitter_consumer, token, secret)
   end
@@ -44,7 +44,7 @@ module Twitter
     service_user_name = credentials["screen_name"]
     return service_user_id, service_user_name
   end
-  
+
   def twitter_get_access_token(oauth_request, oauth_verifier)
     consumer = twitter_consumer
     request_token = OAuth::RequestToken.new(consumer,
@@ -68,7 +68,7 @@ module Twitter
     end
     access_token
   end
-  
+
   def twitter_request_token_url(return_to)
     consumer = twitter_consumer
     request_token = consumer.get_request_token(:oauth_callback => oauth_success_url(:service => 'twitter'))
@@ -84,14 +84,14 @@ module Twitter
     )
     request_token.authorize_url
   end
-  
+
   def twitter_send(message, access_token=nil)
     access_token ||= twitter_retrieve_access_token
     response = access_token.post("/1/statuses/update.json", {:status => message})
     res = JSON.parse(response.body)
     res
   end
-  
+
   def twitter_self_dm(service, message)
     @twitter_service = service
     access_token = twitter_retrieve_access_token
@@ -99,7 +99,7 @@ module Twitter
     res = JSON.parse(response.body)
     res
   end
-  
+
   def twitter_list(access_token=nil, since_id=nil)
     access_token ||= twitter_retrieve_access_token
     url = "/1/statuses/user_timeline.json"
@@ -126,7 +126,7 @@ module Twitter
     end
     res
   end
-  
+
   def twitter_consumer(key=nil, secret=nil)
     require 'oauth'
     require 'oauth/consumer'
@@ -141,7 +141,7 @@ module Twitter
       :signature_method => "HMAC-SHA1"
     })
   end
-  
+
   def self.config_check(settings)
     o = Object.new
     o.extend(Twitter)
@@ -149,9 +149,9 @@ module Twitter
     token = consumer.get_request_token rescue nil
     token ? nil : "Configuration check failed, please check your settings"
   end
-  
+
   def self.config
     Canvas::Plugin.find(:twitter).try(:settings) || Setting.from_config('twitter')
   end
-  
+
 end
