@@ -1139,7 +1139,7 @@ class Assignment < ActiveRecord::Base
             :only => [:mime_class, :comment_id, :id, :submitter_id ]
           },
         },
-        :methods => [:scribdable?, :scribd_doc, :submission_history],
+        :methods => [:scribdable?, :scribd_doc, :submission_history, :late],
         :only => submission_fields
       )
       if json['submission_history']
@@ -1149,7 +1149,7 @@ class Assignment < ActiveRecord::Base
               :submission_comments => { :only => comment_fields }
             },
             :only => submission_fields,
-            :methods => [:versioned_attachments]
+            :methods => [:versioned_attachments, :late]
           )
         end
       end

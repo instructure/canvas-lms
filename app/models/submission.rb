@@ -1004,8 +1004,10 @@ class Submission < ActiveRecord::Base
   end
 
   def late?
-    self.assignment.due_at && self.submitted_at && self.submitted_at.to_i.divmod(60)[0] > self.assignment.due_at.to_i.divmod(60)[0]
+    a = AssignmentOverrideApplicator.assignment_overridden_for(assignment, user)
+    submitted_at && a.due_at ? (submitted_at - 1.minute) > a.due_at : false
   end
+  alias_method :late, :late?
 
   def graded?
     !!self.score && self.workflow_state == 'graded'

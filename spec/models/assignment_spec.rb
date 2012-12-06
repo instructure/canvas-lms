@@ -2283,6 +2283,43 @@ describe Assignment do
       json = @assignment.speed_grader_json(@user)
       json[:submissions].first[:submission_comments].first[:created_at].to_i.should eql @comment.created_at.to_i
     end
+
+    it "should return submission lateness" do
+      # Set up
+      course_with_teacher(:active_all => true)
+      section_1 = @course.course_sections.create!(:name => 'Section one')
+      section_2 = @course.course_sections.create!(:name => 'Section two')
+
+      assignment = @course.assignments.create!(:title => 'Overridden assignment', :due_at => Time.now - 5.days)
+
+      student_1 = user_with_pseudonym(:active_all => true, :username => 'student1@example.com')
+      student_2 = user_with_pseudonym(:active_all => true, :username => 'student2@example.com')
+
+      @course.enroll_student(student_1, :section => section_1).accept!
+      @course.enroll_student(student_2, :section => section_2).accept!
+
+      o1 = assignment.assignment_overrides.build
+      o1.due_at = Time.now - 2.days
+      o1.due_at_overridden = true
+      o1.set = section_1
+      o1.save!
+
+      o2 = assignment.assignment_overrides.build
+      o2.due_at = Time.now + 2.days
+      o2.due_at_overridden = true
+      o2.set = section_2
+      o2.save!
+
+      submission_1 = assignment.submit_homework(student_1, :submission_type => 'online_text_entry', :body => 'blah')
+      submission_2 = assignment.submit_homework(student_2, :submission_type => 'online_text_entry', :body => 'blah')
+
+      # Test
+      json = assignment.speed_grader_json(@teacher)
+      json[:submissions].each do |submission|
+        user = [student_1, student_2].detect { |s| s.id == submission[:user_id] }
+        submission[:late].should == user.submissions.first.late?
+      end
+    end
   end
 
   describe "update_student_submissions" do

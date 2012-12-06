@@ -1059,7 +1059,6 @@ define([
                           this.currentStudent.submission.submission_history[currentSelectedIndex] &&
                           this.currentStudent.submission.submission_history[currentSelectedIndex].submission
                           || {},
-            dueAt       = jsonData.due_at && $.parseFromISO(jsonData.due_at),
             submittedAt = submission.submitted_at && $.parseFromISO(submission.submitted_at),
             gradedAt    = submission.graded_at && $.parseFromISO(submission.graded_at),
             inlineableAttachments = [],
@@ -1138,7 +1137,7 @@ define([
 
         // if the submission was after the due date, mark it as late
         this.resizeFullHeight();
-        $submission_late_notice.showIf(dueAt && submittedAt && (submittedAt.minute_timestamp > dueAt.minute_timestamp) );
+        $submission_late_notice.showIf(submission['late']);
       } catch(e) {
         INST.log_error({
           'message': "SG_submissions_" + (e.message || e.description || ""),
@@ -1149,8 +1148,6 @@ define([
     },
 
     refreshSubmissionsToView: function(){
-      var dueAt = jsonData.due_at && $.parseFromISO(jsonData.due_at);
-
       var innerHTML = "";
       if (this.currentStudent.submission.submission_history.length > 0) {
         submissionToSelect = this.currentStudent.submission.submission_history[this.currentStudent.submission.submission_history.length - 1].submission;
@@ -1158,7 +1155,7 @@ define([
         $.each(this.currentStudent.submission.submission_history, function(i, s){
           s = s.submission;
           var submittedAt = s.submitted_at && $.parseFromISO(s.submitted_at),
-              late        = dueAt && submittedAt && submittedAt.timestamp > dueAt.timestamp;
+              late        = s['late'];
 
           innerHTML += "<option " + (late ? "class='late'" : "") + " value='" + i + "' " +
                         (s == submissionToSelect ? "selected='selected'" : "") + ">" +
