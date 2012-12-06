@@ -54,7 +54,7 @@ class Message < ActiveRecord::Base
   def move_messages_for_deleted_users
     self.workflow_state = 'closed' if self.context_type != "ErrorReport" && (!self.user || self.user.deleted?)
   end
-    
+
   def transmission_errors=(val)
     if !val || val.length < self.class.maximum_text_length
       write_attribute(:transmission_errors, val)
@@ -62,7 +62,7 @@ class Message < ActiveRecord::Base
       write_attribute(:transmission_errors, val[0,self.class.maximum_text_length])
     end
   end
-  
+
   on_create_send_to_streams do
     if self.to == "dashboard" && Notification.types_to_show_in_feed.include?(self.notification_name)
       self.user_id
@@ -70,15 +70,15 @@ class Message < ActiveRecord::Base
       []
     end
   end
-  
+
   def move_dashboard_messages
     self.workflow_state = 'dashboard' if self.to == 'dashboard' && !self.cancelled? && !self.closed?
   end
-  
+
   def set_asset_context_code
     self.asset_context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
   end
-  
+
   named_scope :for_asset_context_codes, lambda { |context_codes| { 
     :conditions => {:asset_context_code => context_codes} } 
   }
@@ -87,7 +87,7 @@ class Message < ActiveRecord::Base
   def context_code
     self.asset_context_code
   end
-  
+
   def notification_category
     @cat ||= self.notification.category
   end
@@ -95,7 +95,7 @@ class Message < ActiveRecord::Base
   def notification_display_category
     notification.display_category
   end
-  
+
   named_scope :for, lambda { |context| 
     { :conditions => ['messages.context_type = ? and messages.context_id = ?', context.class.base_ar_class.to_s, context.id]}
   }
@@ -123,7 +123,7 @@ class Message < ActiveRecord::Base
   named_scope :before, lambda { |date|
     {:conditions => ['messages.created_at < ?', date] }
   }
-  
+
   def self.old_dashboard
     res = []
     # TODO i18n
@@ -132,11 +132,11 @@ class Message < ActiveRecord::Base
     end
     res
   end
-  
+
   named_scope :for_user, lambda { |user|
     { :conditions => {:user_id => user}}
   }
-  
+
   # For finding a very particular message:
   # Message.for(context).by_name(name).directed_to(to).for_user(user), or
   # messages.for(context).by_name(name).directed_to(to).for_user(user)
@@ -144,7 +144,7 @@ class Message < ActiveRecord::Base
   named_scope :staged, lambda {
     { :conditions => ['messages.workflow_state = ? and messages.dispatch_at > ?', 'staged', DateTime.now.utc.to_s(:db) ]}
   }
-  
+
   named_scope :in_state, lambda { |state| 
     case state
     when Array
@@ -194,11 +194,11 @@ class Message < ActiveRecord::Base
       end
       event :recycle, :transitions_to => :staged
     end
-    
+
     state :bounced do
       event :close, :transitions_to => :closed
     end
-    
+
     state :dashboard do
       event :close, :transitions_to => :closed
       event :cancel, :transitions_to => :closed
@@ -218,9 +218,9 @@ class Message < ActiveRecord::Base
   def stage_without_dispatch!
     @stage_without_dispatch = true
   end
-  
-  # Sets a few defaults and gets it on its way to be dispatched.  
-  # The path: created -> staged -> sending -> sent 
+
+  # Sets a few defaults and gets it on its way to be dispatched.
+  # The path: created -> staged -> sending -> sent
   def stage_message
     self.stage if self.state == :created
     if self.dashboard?
@@ -228,7 +228,7 @@ class Message < ActiveRecord::Base
       (messages - [self]).each{|m| m.close }
     end
   end
-  
+
   def define_content(name, &block)
     old_output, @output_buffer = @output_buffer, ''
     yield
@@ -237,13 +237,13 @@ class Message < ActiveRecord::Base
     @output_buffer = old_output
     ""
   end
-  
+
   attr_writer :delayed_messages
-  
+
   def content(name)
     self.instance_variable_get("@message_content_#{name.to_s}".to_sym)
   end
-  
+
   def main_link
     content(:link)
   end
@@ -269,7 +269,7 @@ class Message < ActiveRecord::Base
       false
     end
   end
-  
+
   def parse!(path_type=nil)
     raise StandardError, "Cannot parse without a context" unless self.context
     @user = self.user
@@ -381,7 +381,7 @@ class Message < ActiveRecord::Base
       body
     end
   end
-  
+
   def context_root_account
     context = self.context
     unbounded_loop_paranoia_counter = 10
@@ -420,63 +420,60 @@ class Message < ActiveRecord::Base
   end
 
   protected
-  
-    def deliver_via_email
-      logger.info "Delivering mail: #{self.inspect}"
-      res = nil
-      begin
-        res = Mailer.deliver_message(self)
-      rescue Net::SMTPServerBusy => e
-        @exception = e
-        logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
-        if e.message && e.message.match(/Bad recipient/)
-          self.cancel
-        end
-      rescue Timeout::Error => e
-        @exception = e
-        logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
-      rescue => e
-        @exception = e
-        logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+
+  def deliver_via_email
+    logger.info "Delivering mail: #{self.inspect}"
+    res = nil
+    begin
+      res = Mailer.deliver_message(self)
+    rescue Net::SMTPServerBusy => e
+      @exception = e
+      logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+      if e.message && e.message.match(/Bad recipient/)
+        self.cancel
       end
-      if res
-        complete_dispatch
-      elsif @exception
-        if !@exception.is_a?(Timeout::Error)
-          ErrorReport.log_exception(:default, @exception, {
-            :message => "Message delivery failed",
-            :to => self.to,
-            :object => self.inspect.to_s,
-          })
-        end
-        self.errored_dispatch
-        raise @exception
+    rescue Timeout::Error => e
+      @exception = e
+      logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+    rescue => e
+      @exception = e
+      logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+    end
+    if res
+      complete_dispatch
+    elsif @exception
+      if !@exception.is_a?(Timeout::Error)
+        ErrorReport.log_exception(:default, @exception, {
+          :message => "Message delivery failed",
+          :to => self.to,
+          :object => self.inspect.to_s,
+        })
       end
-      true
+      self.errored_dispatch
+      raise @exception
     end
-  
-    def deliver_via_chat
-      # record_delivered
-    end
-    
-    def deliver_via_twitter
-      @twitter_service = self.user.user_services.find_by_service('twitter')
-      url = "http://#{HostUrl.short_host(self.asset_context)}/mr/#{self.id}"
-      body = self.body[0, 139 - url.length]
-      twitter_self_dm(@twitter_service, "#{body} #{url}") if @twitter_service
-      complete_dispatch
-    end
-    
-    def deliver_via_facebook
-      facebook_user_id = self.to.to_i.to_s
-      service = self.user.user_services.for_service('facebook').find_by_service_user_id(facebook_user_id)
-      Facebook.dashboard_increment_count(service) if service && service.token
-      complete_dispatch
-    end
-    
-    def deliver_via_sms
-      # for now, this is good.
-      deliver_via_email
-    end
-    
+    true
+  end
+
+  def deliver_via_chat
+    # record_delivered
+  end
+
+  def deliver_via_twitter
+    TwitterMessenger.new(self).deliver
+    complete_dispatch
+  end
+
+  def deliver_via_facebook
+    facebook_user_id = self.to.to_i.to_s
+    service = self.user.user_services.for_service('facebook').find_by_service_user_id(facebook_user_id)
+    Facebook.dashboard_increment_count(service) if service && service.token
+    complete_dispatch
+  end
+
+  def deliver_via_sms
+    # for now, this is good.
+    deliver_via_email
+  end
+
 end
