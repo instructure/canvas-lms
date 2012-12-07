@@ -200,6 +200,21 @@ class Enrollment < ActiveRecord::Base
     READABLE_TYPES[type] || READABLE_TYPES['StudentEnrollment']
   end
 
+  SIS_TYPES = {
+      'TeacherEnrollment' => 'teacher',
+      'TaEnrollment' => 'ta',
+      'DesignerEnrollment' => 'designer',
+      'StudentEnrollment' => 'student',
+      'ObserverEnrollment' => 'observer'
+  }
+  def self.sis_type(type)
+    SIS_TYPES[type] || SIS_TYPES['StudentEnrollment']
+  end
+
+  def sis_role
+    self.role_name || Enrollment.sis_type(self.type)
+  end
+
   TYPES_WITH_INDEFINITE_ARTICLE = {
     'TeacherEnrollment' => t('#enrollment.roles.teacher_with_indefinite_article', "A Teacher"),
     'TaEnrollment' => t('#enrollment.roles.ta_with_indefinite_article', "A TA"),

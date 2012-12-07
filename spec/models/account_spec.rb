@@ -844,4 +844,43 @@ describe Account do
       end
     end
   end
+
+  describe "available_course_roles_by_name" do
+    before do
+      account_model
+      @roleA = @account.roles.create :name => 'A'
+      @roleA.base_role_type = 'StudentEnrollment'
+      @roleA.save!
+      @roleB = @account.roles.create :name => 'B'
+      @roleB.base_role_type = 'StudentEnrollment'
+      @roleB.save!
+      @sub_account = @account.sub_accounts.create!
+      @roleBsub = @sub_account.roles.create :name => 'B'
+      @roleBsub.base_role_type = 'StudentEnrollment'
+      @roleBsub.save!
+    end
+
+    it "should return roles indexed by name" do
+      @account.available_course_roles_by_name.should == { 'A' => @roleA, 'B' => @roleB }
+    end
+
+    it "should not return inactive roles" do
+      @roleB.deactivate!
+      @account.available_course_roles_by_name.should == { 'A' => @roleA }
+    end
+
+    it "should not return deleted roles" do
+      @roleA.destroy
+      @account.available_course_roles_by_name.should == { 'B' => @roleB }
+    end
+
+    it "should find the most derived version of each role" do
+      @sub_account.available_course_roles_by_name.should == { 'A' => @roleA, 'B' => @roleBsub }
+    end
+
+    it "should find a base role if the derived version is inactive" do
+      @roleBsub.deactivate!
+      @sub_account.available_course_roles_by_name.should == { 'A' => @roleA, 'B' => @roleB }
+    end
+  end
 end

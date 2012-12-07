@@ -502,7 +502,7 @@ class Account < ActiveRecord::Base
   def available_account_roles
     account_roles = roles.for_accounts.active.map(&:name)
     account_roles |= ['AccountAdmin']
-    account_roles = account_roles | self.parent_account.available_account_roles if self.parent_account
+    account_roles |= self.parent_account.available_account_roles if self.parent_account
     account_roles
   end
 
@@ -510,6 +510,13 @@ class Account < ActiveRecord::Base
     course_roles = roles.for_courses.active.map(&:name)
     course_roles |= parent_account.available_course_roles if parent_account
     course_roles
+  end
+
+  def available_course_roles_by_name
+    role_map = {}
+    roles.for_courses.active.each { |role| role_map[role.name] = role }
+    role_map.reverse_merge!(parent_account.available_course_roles_by_name) if parent_account
+    role_map
   end
 
   def get_course_role(role_name)
