@@ -38,6 +38,7 @@ module Api::V1::Role
   end
 
   def permission_json(permission, current_user, session)
+    permission.delete(:prior_default) unless permission[:explicit]
     permission.slice(:enabled, :locked, :readonly, :explicit, :prior_default)
   end
 end

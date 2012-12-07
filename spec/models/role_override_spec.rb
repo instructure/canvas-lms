@@ -25,7 +25,7 @@ describe RoleOverride do
                          :enrollment_type => "TeacherEnrollment", :enabled => false)
     permissions = RoleOverride.permission_for(Account.default, :moderate_forum, "TeacherEnrollment")
     permissions[:enabled].should == true
-    permissions.key?(:prior_default).should == false
+    permissions[:prior_default].should == true
     permissions[:explicit].should == false
 
     permissions = RoleOverride.permission_for(@account, :moderate_forum, "TeacherEnrollment")
@@ -57,7 +57,7 @@ describe RoleOverride do
     permissions = RoleOverride.permission_for(a3, :moderate_forum, "TeacherEnrollment")
     permissions[:enabled].should == true
     permissions[:prior_default].should == true
-    permissions[:explicit].should == true
+    permissions[:explicit].should == false
   end
 
   it "should not fail when a context's associated accounts are missing" do
@@ -225,6 +225,22 @@ describe RoleOverride do
 
     it "should give no permissions if basetype is no permissions regardless of role" do
       check_permission(RoleOverride::NO_PERMISSIONS_TYPE, 'TeacherEnrollment', false)
+    end
+
+    it "should not mark a permission as explicit in a sub account when it's explicit in the root" do
+      @sub_account = @account
+      @account = Account.default
+      create_role('AccountMembership', 'somerole')
+      create_override('somerole', true)
+      permission_data = RoleOverride.permission_for(@sub_account, @permission, 'AccountMembership', 'somerole')
+      permission_data[:enabled].should be_true
+      permission_data[:explicit].should be_false
+      permission_data[:prior_default].should be_true
+
+      permission_data = RoleOverride.permission_for(@account, @permission, 'AccountMembership', 'somerole')
+      permission_data[:enabled].should be_true
+      permission_data[:explicit].should be_true
+      permission_data[:prior_default].should be_false
     end
 
     context "admin roles" do
