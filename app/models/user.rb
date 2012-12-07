@@ -488,14 +488,10 @@ class User < ActiveRecord::Base
   }
 
   def group_memberships_for(context)
-    return [] unless context
-    self.group_memberships.select do |m|
-      m.group &&
-      m.group.context_id == context.id &&
-      m.group.context_type == context.class.to_s &&
-      !m.group.deleted? &&
-      m.accepted?
-    end.map(&:group)
+    groups.scoped(:conditions => { 'groups.context_id' => context.id,
+      'groups.context_type' => context.class.to_s,
+      'group_memberships.workflow_state' => 'accepted' }).
+    scoped(:conditions => "groups.workflow_state <> 'deleted'")
   end
 
   def <=>(other)

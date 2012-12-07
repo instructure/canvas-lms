@@ -160,33 +160,53 @@ class GroupsController < ApplicationController
     end
   end
 
+  # @API List the groups available in a context.
+  #
+  # Returns the list of active groups in the given context that are visible to user.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/courses/1/groups \ 
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns [Group]
   def context_index
-    add_crumb (@context.is_a?(Account) ? t('#crumbs.users', "Users") : t('#crumbs.people', "People")), named_context_url(@context, :context_users_url)
-    add_crumb t('#crumbs.groups', "Groups"), named_context_url(@context, :context_groups_url)
-    @active_tab = @context.is_a?(Account) ? "users" : "people"
-    @groups = @context.groups.active
-    @categories = @context.group_categories
-    group_ids = @groups.map(&:id)
+    return unless authorized_action(@context, @current_user, :read_roster)
 
-    @user_groups = @current_user.group_memberships_for(@context).select{|g| group_ids.include?(g.id) } if @current_user
-    @user_groups ||= []
+    @groups      = @context.groups.active.scoped(:order => 'name, created_at')
+    @categories  = @context.group_categories.scoped(:order => "role <> 'student_organized', name")
+    @user_groups = @current_user.group_memberships_for(@context) if @current_user
 
-    @available_groups = (@groups - @user_groups).select{|g| g.grants_right?(@current_user, :join) }
-    if !@context.grants_right?(@current_user, session, :manage_groups)
+    unless api_request?
+      add_crumb (@context.is_a?(Account) ? t('#crumbs.users', "Users") : t('#crumbs.people', "People")), named_context_url(@context, :context_users_url)
+      add_crumb t('#crumbs.groups', "Groups"), named_context_url(@context, :context_groups_url)
+      @active_tab = @context.is_a?(Account) ? "users" : "people"
+
+      @user_groups = @groups & (@user_groups || [])
+
+      @available_groups = (@groups - @user_groups).select do |group|
+        group.grants_right?(@current_user, :join)
+      end
+    end
+
+    unless @context.grants_right?(@current_user, session, :manage_groups)
       @groups = @user_groups
     end
-    # sort by name, but with the student organized category in the back
-    @categories = @categories.sort_by{|c| [ (c.student_organized? ? 1 : 0), c.name ] }
-    @groups = @groups.sort_by{ |g| [(g.name || '').downcase, g.created_at]  }
 
-    if authorized_action(@context, @current_user, :read_roster)
-      respond_to do |format|
+    respond_to do |format|
+      format.html do
         if @context.grants_right?(@current_user, session, :manage_groups)
-          format.html { render :action => 'context_manage_groups' }
+          render :action => 'context_manage_groups'
         else
-          format.html { render :action => 'context_groups' }
+          render :action => 'context_groups'
         end
-        format.atom { render :xml => @groups.to_atom.to_xml }
+      end
+
+      format.atom { render :xml => @groups.to_atom.to_xml }
+
+      format.json do
+        path = send("api_v1_#{@context.class.to_s.downcase}_user_groups_url")
+        paginated_groups = Api.paginate(@groups, self, path)
+        render :json => paginated_groups.map { |g| group_json(g, @current_user, session) }
       end
     end
   end

@@ -72,6 +72,49 @@ describe "Groups API", :type => :integration do
     links.all?{ |l| l =~ /api\/v1\/users\/self\/groups/ }.should be_true
   end
 
+  it "should allow listing all of a course's groups" do
+    course_with_teacher(:active_all => true)
+    @group = @course.groups.create!(:name => 'New group')
+
+    json = api_call(:get, "/api/v1/courses/#{@course.to_param}/groups.json",
+                    @community_path_options.merge(:action => 'context_index',
+                                                  :course_id => @course.to_param))
+    json.count.should == 1
+    json.first['id'].should == @group.id
+  end
+
+  it "should allow listing all of an account's groups for account admins" do
+    @account = Account.default
+    account_admin_user(:account => @account)
+
+    json = api_call(:get, "/api/v1/accounts/#{@account.to_param}/groups.json",
+                    @community_path_options.merge(:action => 'context_index',
+                                                  :account_id => @account.to_param))
+    json.count.should == 1
+    json.first['id'].should == @community.id
+  end
+
+  it "should not allow non-admins to view an account's groups" do
+    @account = Account.default
+    raw_api_call(:get, "/api/v1/accounts/#{@account.to_param}/groups.json",
+                    @community_path_options.merge(:action => 'context_index',
+                                                  :account_id => @account.to_param))
+    response.code.should == '401'
+  end
+
+  it "should limit students to their own groups" do
+    course_with_student(:active_all => true)
+    @group_1 = @course.groups.create!(:name => 'Group 1')
+    @group_2 = @course.groups.create!(:name => 'Group 2')
+    @group_1.add_user(@user, 'accepted', false)
+
+    json = api_call(:get, "/api/v1/courses/#{@course.to_param}/groups.json",
+                    @community_path_options.merge(:action => 'context_index',
+                                                  :course_id => @course.to_param))
+    json.count.should == 1
+    json.first['id'].should == @group_1.id
+  end
+
   it "should allow a member to retrieve the group" do
     @user = @member
     json = api_call(:get, @community_path, @community_path_options.merge(:group_id => @community.to_param, :action => "show"))
