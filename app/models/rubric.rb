@@ -120,11 +120,9 @@ class Rubric < ActiveRecord::Base
     end
   end
 
+  attr_accessor :alignments_changed
   def update_alignments
-    # including @outcomes_changed is a shim for some plugin specs. this is
-    # TEMPORARY, the plugins should update to use the new variable, and, once
-    # they're updated, this shim removed. DO NOT USE in new code.
-    return unless @alignments_changed || @outcomes_changed
+    return unless @alignments_changed
     outcome_ids = (self.data || []).map{|c| c[:learning_outcome_id] }.compact.map(&:to_i).uniq
     LearningOutcome.update_alignments(self, context, outcome_ids)
     true
@@ -291,6 +289,7 @@ class Rubric < ActiveRecord::Base
     item.data = hash[:data]
     item.data.each do |crit|
       if crit[:learning_outcome_migration_id]
+        item.alignments_changed = true
         if migration.respond_to?(:outcome_to_id_map) && id = migration.outcome_to_id_map[crit[:learning_outcome_migration_id]]
           crit[:learning_outcome_id] = id
         elsif lo = context.created_learning_outcomes.find_by_migration_id(crit[:learning_outcome_migration_id])
