@@ -1,7 +1,7 @@
 require "bundler/capistrano"
-# set :stages,        %w(production dev)
-# set :default_stage, "production"
-# require "capistrano/ext/multistage"
+set :stages,        %w(production dev)
+set :default_stage, "production"
+require "capistrano/ext/multistage"
 
 set :application,   "canvas"
 set :repository,    "git://github.com/grahamb/canvas-lms.git"
@@ -18,7 +18,7 @@ ssh_options[:keys] = [File.join(ENV["HOME"], ".ssh", "id_rsa_canvas")]
 namespace :deploy do
   task :start do ; end
   task :stop do ; end
-  task :restart do; end
+  task :restart do ; end
 end
 
 namespace :canvas do
