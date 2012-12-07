@@ -907,12 +907,8 @@ class Submission < ActiveRecord::Base
     case trigger
     when :create
       options[:update_participants] = true
+      options[:update_for_skips] = false
       options[:skip_ids] = overrides[:skip_ids] || [conversation_message_data[:author_id]] # don't mark-as-unread for the author
-      if commenting_instructors.empty?
-        # until the first instructor comments, we don't want the submitter to see
-        # the message in existing conversations with anyone
-        options[:update_for_skips] = false
-      end
       participating_instructors.each do |t|
         # Check their settings and add to :skip_ids if set to suppress.
         options[:skip_ids] << t.id if t.preferences[:no_submission_comments_inbox] == true

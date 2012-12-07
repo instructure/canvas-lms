@@ -251,6 +251,31 @@ This text has a http://www.google.com link in it...
         tconvo.reload.should be_read
       end
 
+      context "teacher makes first submission comment" do
+        it "should only show as sent for the teacher if private converstation does not already exist" do
+          @submission1.add_comment(:author => @teacher1, :comment => "test comment")
+          @teacher1.conversations.should be_empty
+          @teacher1.all_conversations.size.should eql 1
+          @teacher1.all_conversations.sent.size.should eql 1
+        end
+
+        it "should reuse an existing private conversation, but not change its state for teacher" do
+          convo = Conversation.initiate([@teacher1.id, @student1.id], true)
+          convo.add_message(@teacher1, 'direct message')
+          @teacher1.conversations.count.should == 1
+          convo = @teacher1.conversations.first
+          convo.workflow_state = 'archived'
+          convo.save!
+          @teacher1.reload.conversations.default.should be_empty
+
+          @submission1.add_comment(:author => @teacher1, :comment => "test comment")
+          @teacher1.reload
+          @teacher1.all_conversations.size.should eql 1
+          @teacher1.conversations.default.should be_empty
+          @teacher1.all_conversations.archived.size.should eql 1
+        end
+      end
+
       context "with no_submission_comments_inbox" do
         context "when teacher sets after conversation started" do
           before :each do
@@ -332,10 +357,11 @@ This text has a http://www.google.com link in it...
       it "should update conversations when assignments are unmuted" do
         @submission1.add_comment(:author => @teacher1, :comment => "!", :hidden => true)
         @teacher1.conversations.size.should eql 0
+        @teacher1.all_conversations.sent.size.should eql 0
         @student1.conversations.size.should eql 0
         @assignment.unmute!
-        @teacher1.reload.conversations.size.should eql 1
-        @teacher1.conversations.first.should be_read
+        @teacher1.reload.conversations.size.should eql 0
+        @teacher1.all_conversations.sent.size.should eql 1
         @student1.reload.conversations.size.should eql 1
         @student1.conversations.first.should be_unread
       end
@@ -387,20 +413,41 @@ This text has a http://www.google.com link in it...
         c3 = @submission1.add_comment(:author => @teacher2, :comment => "no", :hidden => true)
         @student1.conversations.size.should eql 0
         @teacher1.conversations.size.should eql 0
+        @teacher1.all_conversations.sent.size.should eql 0
         t2convo = @teacher2.conversations.first
         t2convo.workflow_state = :read
         t2convo.save!
 
         @assignment.unmute!
 
-        t1convo = @teacher1.reload.conversations.first
-        t1convo.should_not be_nil
-        t1convo.should be_read
+        # If there is more than one author in the set of submission comments,
+        # then it is treated as a new message for everyone.
+        @teacher1.reload.conversations.should be_empty
+        @teacher1.all_conversations.size.should eql 1
+        @teacher1.all_conversations.sent.size.should eql 0
         t2convo.reload.should be_unread
         @student1.reload.conversations.size.should eql 2
         @student1.conversations.first.should be_unread
         @student1.conversations.last.should be_unread
       end
+
+      it "should reuse an existing private conversation, but not change its state for teacher on unmute" do
+        convo = Conversation.initiate([@teacher1.id, @student1.id], true)
+        convo.add_message(@teacher1, 'direct message')
+        @teacher1.conversations.count.should == 1
+        convo = @teacher1.conversations.first
+        convo.workflow_state = 'archived'
+        convo.save!
+        @submission1.add_comment(:author => @teacher1, :comment => "test comment")
+
+        @assignment.unmute!
+
+        @teacher1.reload.conversations.default.should be_empty
+        @teacher1.all_conversations.size.should eql 1
+        @teacher1.all_conversations.archived.size.should eql 1
+        @teacher1.all_conversations.sent.size.should eql 1
+      end
+
     end
 
     context "deletion" do
