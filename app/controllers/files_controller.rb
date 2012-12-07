@@ -522,7 +522,7 @@ class FilesController < ApplicationController
       @attachment.process_s3_details!(details)
       render_attachment_json(@attachment, deleted_attachments)
     else
-      render :text => ""
+      render :json => {:errors => [{:attribute => 'attachment', :message => 'upload failed'}]}
     end
   end
 
