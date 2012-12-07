@@ -65,7 +65,7 @@
           <span class="score"><%= submission && submission.kept_score %></span>
         </td>
         <td class="links">
-          <span class="unlocked" title="<%= t('titles.manually_unlocked', "Manually Unlocked") %>" style="<%= hidden unless submission && submission.manually_unlocked %>"><%= image_tag "unlock.png" %></span>
+          <span class="unlocked" title="<%= t('titles.manually_unlocked', "Manually Unlocked") %>" style="<%= hidden unless submission && submission.manually_unlocked %>"><i class="icon-unlock standalone-icon"></i></span>
           <span class="extra_attempts" style="display: none;"><%= submission && submission.extra_attempts %></span>
           <a href="#" class="moderate_student_link no-hover" title="<%= t('titles.change_user_extensions', "Change user extensions") %>"><i class="icon-edit standalone-icon"></i></a>
         </td>
