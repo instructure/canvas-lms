@@ -235,7 +235,7 @@ describe AssignmentsApiController, :type => :integration do
              { :assignment => {
                  'name' => 'some assignment',
                  'assignment_overrides' => {
-                     '0' => { 'course_section_id' => [ @course.default_section.id ], 'due_at' => @override_due_at.iso8601 }}}})
+                     '0' => { 'course_section_id' => @course.default_section.id, 'due_at' => @override_due_at.iso8601 }}}})
 
     @student.messages.detect{|m| m.notification_id == notification.id}.body.should be_include 'Jun 22'
     @ta.messages.detect{|m| m.notification_id == notification.id}.body.should be_include 'Multiple Dates'
