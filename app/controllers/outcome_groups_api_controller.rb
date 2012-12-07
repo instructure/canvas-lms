@@ -19,11 +19,13 @@
 # @API Outcome Groups
 #
 # API for accessing learning outcome group information.
+
 class OutcomeGroupsApiController < ApplicationController
   include Api::V1::Outcome
 
   before_filter :require_user
   before_filter :get_context
+
 
   # @API Redirect for global outcomes
   # Convenience redirect to find the root outcome group for global outcomes.
@@ -165,6 +167,8 @@ class OutcomeGroupsApiController < ApplicationController
       begin
         @outcome_link.destroy
         render :json => outcome_link_json(@outcome_link, @current_user, session)
+      rescue ContentTag::LastLinkToOutcomeNotDestroyed => error
+        render :json => { 'message' => error.message }, :status => :bad_request
       rescue ActiveRecord::RecordNotSaved
         render :json => 'error'.to_json, :status => :bad_request
       end

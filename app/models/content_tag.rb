@@ -15,8 +15,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
 class ContentTag < ActiveRecord::Base
+  class LastLinkToOutcomeNotDestroyed < StandardError
+    attr_reader :alignment
+    def initialize( alignment )
+      super( 'Link is the last link to an aligned outcome.' +
+           'Remove the alignment and then try again')
+      @alignment = alignment
+    end 
+  end
   include Workflow
   belongs_to :content, :polymorphic => true
   belongs_to :context, :polymorphic => true
@@ -191,10 +198,8 @@ class ContentTag < ActiveRecord::Base
           alignment_conditions[:context_type] = self.context_type
         end
         alignment = ContentTag.learning_outcome_alignments.scoped(:conditions => alignment_conditions).first
-        if alignment
-          # then don't let them delete the link
-          raise ActiveRecord::RecordNotSaved
-        end
+        # then don't let them delete the link
+        raise LastLinkToOutcomeNotDestroyed.new(alignment) if alignment
       end
     end
 
