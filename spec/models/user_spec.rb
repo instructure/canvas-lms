@@ -2314,4 +2314,14 @@ describe User do
       it { should be_false }
     end
   end
+
+  describe "things excluded from json serialization" do
+    it "excludes collkey" do
+      # Ruby 1.9 does not like html that includes the collkey, so
+      # don't ship it to the page (even as json).
+      user = User.create!
+      users = User.order_by_sortable_name
+      users.first.as_json['user'].keys.should_not include('collkey')
+    end
+  end
 end
