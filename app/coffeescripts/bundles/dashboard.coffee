@@ -3,11 +3,7 @@ require [
   'Backbone',
   'jquery',
   'i18n!dashboard'
-  'compiled/registration/incompleteRegistrationWarning'
-], (_, {View}, $, I18n, incompleteRegistrationWarning) ->
-
-  if ENV.INCOMPLETE_REGISTRATION
-    incompleteRegistrationWarning(ENV.USER_EMAIL)
+], (_, {View}, $, I18n) ->
 
   class DashboardView extends View
 

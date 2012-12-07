@@ -146,8 +146,8 @@ ActionController::Routing::Routes.draw do |map|
   # and the application_helper method :context_url to make retrieving
   # these contexts, and also generating context-specific urls, easier.
   map.resources :courses do |course|
-    course.self_enrollment 'self_enrollment/:self_enrollment', :controller => 'courses', :action => 'self_enrollment'
-    course.self_unenrollment 'self_unenrollment/:self_unenrollment', :controller => 'courses', :action => 'self_unenrollment'
+    course.self_enrollment 'self_enrollment/:self_enrollment', :controller => 'courses', :action => 'self_enrollment', :conditions => {:method => :get}
+    course.self_unenrollment 'self_unenrollment/:self_unenrollment', :controller => 'courses', :action => 'self_unenrollment', :conditions => {:method => :post}
     course.restore 'restore', :controller => 'courses', :action => 'restore'
     course.backup 'backup', :controller => 'courses', :action => 'backup'
     course.unconclude 'unconclude', :controller => 'courses', :action => 'unconclude'
@@ -503,6 +503,8 @@ ActionController::Routing::Routes.draw do |map|
   map.register "register", :controller => "users", :action => "new"
   map.register_from_website "register_from_website", :controller => "users", :action => "new"
   map.registered "registered", :controller => "users", :action => "registered"
+  map.enroll 'enroll/:self_enrollment_code', :controller => 'self_enrollments', :action => 'new', :conditions => {:method => :get}
+  map.enroll_frd 'enroll/:self_enrollment_code', :controller => 'self_enrollments', :action => 'create', :conditions => {:method => :post}
   map.services 'services', :controller => 'users', :action => 'services'
   map.bookmark_search 'search/bookmarks', :controller => 'users', :action => 'bookmark_search'
   map.search_rubrics 'search/rubrics', :controller => "search", :action => "rubrics"

@@ -284,10 +284,7 @@ class UsersController < ApplicationController
   end
 
   def user_dashboard
-    if @current_user && @current_user.registered? && params[:registration_success]
-      # user just joined with a course code
-      return redirect_to @current_user.courses.first if @current_user.courses.size == 1
-    end
+    check_incomplete_registration
     get_context
 
     # dont show crubms on dashboard because it does not make sense to have a breadcrumb
@@ -305,9 +302,6 @@ class UsersController < ApplicationController
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
     @pending_invitations = @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]).select { |e| e.invited? }
     @stream_items = @current_user.try(:cached_recent_stream_items) || []
-
-    incomplete_registration = @current_user && @current_user.pre_registered? && params[:registration_success]
-    js_env({:INCOMPLETE_REGISTRATION => incomplete_registration, :USER_EMAIL => @current_user.email})
   end
 
   def toggle_dashboard
@@ -649,6 +643,14 @@ class UsersController < ApplicationController
 
   def new
     return redirect_to(root_url) if @current_user
+    unless @context == Account.default && @context.no_enrollments_can_create_courses?
+      # TODO: generic/brandable page, so we can up it up to non-default accounts
+      # also more control so we can conditionally enable features (e.g. if
+      # no_enrollments_can_create_courses==false, but open reg is on, students
+      # should still be able to sign up with join codes, etc. ... we should just
+      # not have the teacher button/form)
+      return redirect_to(root_url)
+    end
     render :layout => 'bare'
   end
 
@@ -678,7 +680,10 @@ class UsersController < ApplicationController
 
     manage_user_logins = @context.grants_right?(@current_user, session, :manage_user_logins)
     self_enrollment = params[:self_enrollment].present?
-    allow_password = self_enrollment || manage_user_logins
+    allow_non_email_pseudonyms = manage_user_logins || self_enrollment && params[:pseudonym_type] == 'username'
+    @domain_root_account.email_pseudonyms = !allow_non_email_pseudonyms
+    require_password = self_enrollment && allow_non_email_pseudonyms
+    allow_password = require_password || manage_user_logins
 
     notify = params[:pseudonym].delete(:send_confirmation) == '1'
     notify = :self_registration unless manage_user_logins
@@ -695,7 +700,7 @@ class UsersController < ApplicationController
     end
     @user.name ||= params[:pseudonym][:unique_id]
     unless @user.registered?
-      @user.workflow_state = if self_enrollment
+      @user.workflow_state = if require_password
         # no email confirmation required (self_enrollment_code and password
         # validations will ensure everything is legit)
         'registered'
@@ -727,7 +732,7 @@ class UsersController < ApplicationController
     end
 
     @pseudonym ||= @user.pseudonyms.build(:account => @context)
-    @pseudonym.require_password = self_enrollment
+    @pseudonym.require_password = require_password
     # pre-populate the reverse association
     @pseudonym.user = @user
     # don't require password_confirmation on api calls
@@ -754,7 +759,11 @@ class UsersController < ApplicationController
       # unless the user is registered/pre_registered (if the latter, he still
       # needs to confirm his email and set a password, otherwise he can't get
       # back in once his session expires)
-      @pseudonym.send(:skip_session_maintenance=, true) unless @user.registered? || @user.pre_registered? # automagically logged in
+      if @user.registered? || @user.pre_registered? # automagically logged in
+        PseudonymSession.new(@pseudonym).save unless @pseudonym.new_record?
+      else
+        @pseudonym.send(:skip_session_maintenance=, true)
+      end
       @user.save!
       message_sent = false
       if notify == :self_registration
@@ -762,7 +771,7 @@ class UsersController < ApplicationController
           message_sent = true
           @pseudonym.send_confirmation!
         end
-        @user.new_teacher_registration((params[:user] || {}).merge({:remote_ip  => request.remote_ip}))
+        @user.new_registration((params[:user] || {}).merge({:remote_ip  => request.remote_ip}))
       elsif notify && !@user.registered?
         message_sent = true
         @pseudonym.send_registration_notification!
@@ -770,7 +779,7 @@ class UsersController < ApplicationController
         @cc.send_merge_notification! if @cc.merge_candidates.length != 0
       end
 
-      data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :observee => @observee, :message_sent => message_sent }
+      data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :observee => @observee, :message_sent => message_sent, :course => @user.self_enrollment_course }
       if api_request?
         render(:json => user_json(@user, @current_user, session, %w{locale}))
       else
@@ -1133,7 +1142,7 @@ class UsersController < ApplicationController
     get_context
     @context = @domain_root_account || Account.default unless @context.is_a?(Account)
     @context = @context.root_account
-    if !@context.grants_right?(@current_user, session, :manage_user_logins) && (!@context.open_registration? || !@context.no_enrollments_can_create_courses? || @context != Account.default)
+    unless @context.grants_right?(@current_user, session, :manage_user_logins) || @context.open_registration?
       flash[:error] = t('no_open_registration', "Open registration has not been enabled for this account")
       respond_to do |format|
         format.html { redirect_to root_url }

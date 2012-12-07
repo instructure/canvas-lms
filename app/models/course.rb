@@ -550,10 +550,12 @@ class Course < ActiveRecord::Base
   end
   memoize :user_is_instructor?
 
-  def user_is_student?(user)
+  def user_is_student?(user, opts = {})
     return unless user
-    Rails.cache.fetch([self, user, "course_user_is_student"].cache_key) do
-      user.cached_current_enrollments.any? { |e| e.course_id == self.id && e.participating_student? }
+    Rails.cache.fetch([self, user, "course_user_is_student", opts[:include_future]].cache_key) do
+      user.cached_current_enrollments(:include_future => opts[:include_future]).any? { |e|
+        e.course_id == self.id && (opts[:include_future] ? e.student? : e.participating_student?)
+      }
     end
   end
   memoize :user_is_student?
@@ -740,6 +742,10 @@ class Course < ActiveRecord::Base
       update_attribute :self_enrollment_code, code
     end
     code
+  end
+
+  # can be overridden via plugin
+  def self_enrollment_min_age
   end
 
   def long_self_enrollment_code
@@ -1511,7 +1517,7 @@ class Course < ActiveRecord::Base
   def self_enroll_student(user, opts = {})
     enrollment = enroll_student(user, opts.merge(:no_notify => true))
     enrollment.self_enrolled = true
-    enrollment.accept
+    enrollment.accept(:force)
     unless opts[:skip_pseudonym]
       new_pseudonym = user.find_or_initialize_pseudonym_for_account(root_account)
       new_pseudonym.save if new_pseudonym && new_pseudonym.changed?

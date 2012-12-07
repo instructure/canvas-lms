@@ -46,7 +46,7 @@ class ApplicationController < ActionController::Base
   after_filter :set_user_id_header
   before_filter :fix_xhr_requests
   before_filter :init_body_classes
-  before_filter :set_response_headers
+  after_filter :set_response_headers
 
   add_crumb(proc { %Q{<i title="#{I18n.t('links.dashboard', "My Dashboard")}" class="icon-home standalone-icon"></i>}.html_safe }, :root_path, :class => "home")
 
@@ -153,7 +153,7 @@ class ApplicationController < ActionController::Base
     # we can't block frames on the files domain, since files domain requests
     # are typically embedded in an iframe in canvas, but the hostname is
     # different
-    if !files_domain? && Setting.get_cached('block_html_frames', 'true') == 'true'
+    if !files_domain? && Setting.get_cached('block_html_frames', 'true') == 'true' && !@embeddable
       headers['X-Frame-Options'] = 'SAMEORIGIN'
     end
     true
@@ -1177,6 +1177,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def check_incomplete_registration
+    if @current_user
+      js_env :INCOMPLETE_REGISTRATION => params[:registration_success] && @current_user.pre_registered?, :USER_EMAIL => @current_user.email
+    end
+  end
+
   def page_views_enabled?
     PageView.page_views_enabled?
   end
@@ -1237,7 +1243,21 @@ class ApplicationController < ActionController::Base
     (params[:format].to_s != 'json' || in_app?)
   end
 
+  def reset_session
+    # when doing login/logout via ajax, we need to have the new csrf token
+    # for subsequent requests.
+    @resend_csrf_token_if_json = true
+    super
+  end
+
+  def set_layout_options
+    @embedded_view = params[:embedded]
+    @headers = false if params[:no_headers] || @embedded_view
+    (@body_classes ||= []) << 'embedded' if @embedded_view
+  end
+
   def render(options = nil, extra_options = {}, &block)
+    set_layout_options
     if options && options.key?(:json)
       json = options.delete(:json)
       json = ActiveSupport::JSON.encode(json) unless json.is_a?(String)
@@ -1245,6 +1265,10 @@ class ApplicationController < ActionController::Base
       # call that didn't use session auth, or a non-GET request.
       if prepend_json_csrf?
         json = "while(1);#{json}"
+      end
+
+      if @resend_csrf_token_if_json
+        response.headers['X-CSRF-Token'] = form_authenticity_token
       end
 
       # fix for some browsers not properly handling json responses to multipart

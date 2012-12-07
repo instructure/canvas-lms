@@ -76,6 +76,8 @@ class User < ActiveRecord::Base
   has_many :invited_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:invited), :order => 'enrollments.created_at'
   has_many :current_and_invited_enrollments, :class_name => 'Enrollment', :include => [:course], :order => 'enrollments.created_at',
            :conditions => enrollment_conditions(:current_and_invited)
+  has_many :current_and_future_enrollments, :class_name => 'Enrollment', :include => [:course], :order => 'enrollments.created_at',
+           :conditions => enrollment_conditions(:current_and_invited, false)
   has_many :not_ended_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')", :order => 'enrollments.created_at'
   has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:completed), :order => 'enrollments.created_at'
   has_many :observer_enrollments
@@ -288,8 +290,11 @@ class User < ActiveRecord::Base
     if value.blank?
       record.errors.add(attr, "blank")
     elsif record.validation_root_account
-      record.self_enrollment_course = record.validation_root_account.all_courses.find_by_self_enrollment_code(value)
-      record.errors.add(attr, "invalid") unless record.self_enrollment_course
+      course = record.validation_root_account.self_enrollment_course_for(value)
+      record.self_enrollment_course = course
+      record.errors.add(attr, "invalid") unless course
+      record.errors.add(attr, "already_enrolled") if course && course.user_is_student?(record, :include_future => true)
+      record.errors.add(:birthdate, "too_young") if course && course.self_enrollment_min_age && record.birthdate && record.birthdate > course.self_enrollment_min_age.years.ago
     else
       record.errors.add(attr, "account_required")
     end
@@ -457,9 +462,12 @@ class User < ActiveRecord::Base
     end
   end
 
-  # These two methods can be overridden by a plugin if you want to have an approval process for new teachers
+  # These methods can be overridden by a plugin if you want to have an approval
+  # process or implement additional tracking for new users
   def registration_approval_required?; false; end
-  def new_teacher_registration(form_params = {}); end
+  def new_registration(form_params = {}); end
+  # DEPRECATED, override new_registration instead
+  def new_teacher_registration(form_params = {}); new_registration(form_params); end
 
   set_broadcast_policy do |p|
     p.dispatch :new_teacher_registration
@@ -1737,8 +1745,8 @@ class User < ActiveRecord::Base
   # this method takes an optional {:include_enrollment_uuid => uuid}   so that you can pass it the session[:enrollment_uuid] and it will include it.
   def cached_current_enrollments(opts={})
     self.shard.activate do
-      res = Rails.cache.fetch([self, 'current_enrollments', opts[:include_enrollment_uuid] ].cache_key) do
-        res = self.current_and_invited_enrollments.with_each_shard
+      res = Rails.cache.fetch([self, 'current_enrollments', opts[:include_enrollment_uuid], opts[:include_future] ].cache_key) do
+        res = (opts[:include_future] ? current_and_future_enrollments : current_and_invited_enrollments).with_each_shard
         if opts[:include_enrollment_uuid] && pending_enrollment = Enrollment.find_by_uuid_and_workflow_state(opts[:include_enrollment_uuid], "invited")
           res << pending_enrollment
           res.uniq!

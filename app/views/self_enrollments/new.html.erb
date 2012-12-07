@@ -1,0 +1,34 @@
+<%
+  content_for :page_title, t('titles.course_enrollment', 'Enroll in %{course}', :course => @course.name)
+
+  js_bundle :self_enrollment
+
+  if !@current_user && !@embedded_view
+    jammit_css :login
+    @headers = false
+    @body_classes << "modal"
+  end
+%>
+
+<div id="modal-box">
+  <% if !@embedded_view %>
+    <h2><%= t :course_enrollment, "Course Enrollment" %></h2>
+  <% end %>
+  <% if @current_user %>
+    <% if @course.user_is_student?(@current_user, :include_future => true) %>
+      <% if params[:enrolled] %>
+        <%= render :partial => 'successfully_enrolled' %>
+      <% else %>
+        <%= render :partial => 'already_enrolled' %>
+      <% end %>
+    <% else %>
+      <%= render :partial => 'confirm_enrollments' %>
+    <% end %>
+  <% else %>
+    <% if @domain_root_account.open_registration? %>
+      <%= render :partial => 'authenticate_or_register' %>
+    <% else %>
+      <%= render :partial => 'authenticate' %>
+    <% end %>
+  <% end %>
+</div>

@@ -1,0 +1,61 @@
+<form action="<%= url_for(request.query_parameters) %>" method="post" id="enroll_form" class="form-horizontal bootstrap-form">
+  <%= registration_summary || content_tag(:p, mt(:getting_started, "You are enrolling in **%{course}**.", :course => @course.name)) %>
+  <p><%= t(:enter_email, "Please enter your email address:") %></p>
+  <input type="hidden" name="user[initial_enrollment_type]" value="student">
+  <input type="hidden" name="self_enrollment" value="1">
+  <input type="hidden" name="self_enrollment_mode" value="email">
+  <input type="hidden" name="user[self_enrollment_code]" value="<%= params[:self_enrollment_code] %>">
+  <div class="control-group" id="email_info">
+    <label class="control-label" for="student_email"><%= t "labels.email", "Email" %></label>
+    <div class="controls">
+      <input type="text" id="student_email" name="pseudonym[unique_id]">
+    </div>
+  </div>
+  <div class="control-group" id="user_type">
+    <div class="controls">
+      <label class="radio">
+        <input type="radio" name="user_type" value="new" id="user_type_new">
+        <%= t "new_user", "I am a new user" %>
+      </label>
+      <label class="radio">
+        <input type="radio" name="user_type" value="existing" id="user_type_existing">
+        <%= t "existing_user", "I already have a %{institution_name} login", :institution_name => @domain_root_account.short_name %>
+      </label>
+    </div>
+  </div>
+  <div class="user_info" id="existing_user_info" style="<%= hidden %>">
+    <div class="control-group">
+      <label class="control-label" for="student_password"><%= t "labels.password", "Password" %></label>
+      <div class="controls">
+        <input type="password" id="student_password" name="pseudonym[password]">
+      </div>
+    </div>
+  </div>
+  <div class="user_info" id="new_user_info" style="<%= hidden %>">
+    <div class="control-group">
+      <label class="control-label" for="student_name"><%= t "labels.name", "Full Name" %></label>
+      <div class="controls">
+        <input type="text" id="student_name" name="user[name]">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="student_birthdate"><%= t "labels.birthdate", "Birth Date" %></label>
+      <div class="controls">
+        <%= date_select 'user', 'birthdate', {:start_year => Time.now.year - 1, :end_year => Time.now.year - 125, :include_blank => true}, :class => 'date-select', :id => 'student_birthdate' %>
+      </div>
+    </div>
+    <div class="control-group">
+      <div class="controls">
+        <label class="checkbox">
+          <input type="checkbox" name="user[terms_of_use]" value="1">
+          <%= t "agree_to_terms", "You agree to the *terms of use*.", :wrapper => link_to('\1', "http://www.instructure.com/terms-of-use", :target => "_new") %>
+        </label>
+      </div>
+    </div>
+  </div>
+  <div class="control-group embedded-footer">
+    <div class="controls">
+      <button class="btn btn-primary" style="visibility: hidden" id="submit_button" type="submit"><%= t "buttons.enroll_in_course", "Enroll in Course" %></button>
+    </div>
+  </div>
+</form>

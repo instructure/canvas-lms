@@ -496,13 +496,13 @@ class Enrollment < ActiveRecord::Base
     res
   end
 
-  def accept
-    return false unless invited?
+  def accept(force = false)
+    return false unless force || invited?
     ids = nil
     ids = self.user.dashboard_messages.find_all_by_context_id_and_context_type(self.id, 'Enrollment', :select => "id").map(&:id) if self.user
     Message.delete_all({:id => ids}) if ids && !ids.empty?
     update_attribute(:workflow_state, 'active')
-    user.touch
+    touch_user
   end
 
   workflow do

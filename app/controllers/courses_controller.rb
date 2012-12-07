@@ -778,46 +778,21 @@ class CoursesController < ApplicationController
 
   def self_unenrollment
     get_context
-    unless @context_enrollment && params[:self_unenrollment] && params[:self_unenrollment] == @context_enrollment.uuid && @context_enrollment.self_enrolled?
-      redirect_to course_url(@context)
-      return
+    if @context_enrollment && params[:self_unenrollment] && params[:self_unenrollment] == @context_enrollment.uuid && @context_enrollment.self_enrolled?
+      @context_enrollment.conclude
+      render :json => ""
+    else
+      render :json => "", :status => :bad_request
     end
-    @context_enrollment.complete
-    redirect_to course_url(@context)
   end
 
+  # DEPRECATED
   def self_enrollment
     get_context
     unless @context.self_enrollment && params[:self_enrollment] && @context.self_enrollment_codes.include?(params[:self_enrollment])
       return redirect_to course_url(@context)
     end
-    unless @current_user || @context.root_account.open_registration?
-      store_location
-      flash[:notice] = t('notices.login_required', "Please log in to join this course.")
-      return redirect_to login_url
-    end
-    if @current_user
-      @enrollment = @context.self_enroll_student(@current_user)
-      flash[:notice] = t('notices.enrolled', "You are now enrolled in this course.")
-      return redirect_to course_url(@context)
-    end
-    if params[:email]
-      begin
-        address = TMail::Address::parse(params[:email])
-      rescue
-        flash[:error] = t('errors.invalid_email', "Invalid e-mail address, please try again.")
-        render :action => 'open_enrollment'
-        return
-      end
-      user = User.new(:name => address.name || address.address)
-      user.communication_channels.build(:path => address.address)
-      user.workflow_state = 'creation_pending'
-      user.save!
-      @enrollment = @context.enroll_student(user)
-      @enrollment.update_attribute(:self_enrolled, true)
-      return render :action => 'open_enrollment_confirmed'
-    end
-    render :action => 'open_enrollment'
+    redirect_to enroll_url(@context.self_enrollment_code)
   end
 
   def check_pending_teacher
@@ -900,6 +875,8 @@ class CoursesController < ApplicationController
 
     @context_enrollment ||= @pending_enrollment
     if is_authorized_action?(@context, @current_user, :read)
+      check_incomplete_registration
+
       if @current_user && @context.grants_right?(@current_user, session, :manage_grades)
         @assignments_needing_publishing = @context.assignments.active.need_publishing || []
       end

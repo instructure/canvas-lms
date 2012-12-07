@@ -16,6 +16,7 @@ define [
       self_enrollment_code:
         blank:        I18n.t("errors.required", "Required")
         invalid:      I18n.t("errors.invalid_code", "Invalid code")
+        already_enrolled: I18n.t("errors.already_enrolled", "You are already enrolled in this course")
       terms_of_use:
         accepted:     I18n.t("errors.terms", "You must agree to the terms")
 

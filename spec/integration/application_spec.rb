@@ -37,7 +37,7 @@ describe "site-wide" do
   end
 
   it "should set the x-ua-compatible http header" do
-    get "/"
+    get "/login"
     response['x-ua-compatible'].should == "IE=edge,chrome=1"
   end
 
@@ -60,8 +60,10 @@ describe "site-wide" do
   end
 
   it "should not set x-frame-options when on a files domain" do
+    user_session user(:active_all => true)
+    attachment_model(:context => @user)
     FilesController.any_instance.expects(:files_domain?).returns(true)
-    get "http://files-test.host/files/1/download"
+    get "http://files-test.host/files/#{@attachment.id}/download"
     response['x-frame-options'].should be_nil
   end
 

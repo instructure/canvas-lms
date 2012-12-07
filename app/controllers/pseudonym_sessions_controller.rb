@@ -163,35 +163,25 @@ class PseudonymSessionsController < ApplicationController
     end
 
     if pseudonym == :too_many_attempts || @pseudonym_session.too_many_attempts?
-      flash[:error] = t 'errors.max_attempts', "Too many failed login attempts. Please try again later or contact your system administrator."
-      redirect_to login_url
+      unsuccessful_login t('errors.max_attempts', "Too many failed login attempts. Please try again later or contact your system administrator."), true
       return
     end
 
     @pseudonym = @pseudonym_session && @pseudonym_session.record
     # If the user's account has been deleted, feel free to share that information
     if @pseudonym && (!@pseudonym.user || @pseudonym.user.unavailable?)
-      flash[:error] = t 'errors.user_deleted', "That user account has been deleted.  Please contact your system administrator to have your account re-activated."
-      redirect_to login_url
+      unsuccessful_login t('errors.user_deleted', "That user account has been deleted.  Please contact your system administrator to have your account re-activated."), true
       return
     end
 
-    # Call for some cleanups that should be run when a user logs in
-    @user = @pseudonym.login_assertions_for_user if found
-
     # If the user is registered and logged in, redirect them to their dashboard page
     if found
+      # Call for some cleanups that should be run when a user logs in
+      @user = @pseudonym.login_assertions_for_user
       successful_login(@user, @pseudonym)
     # Otherwise re-render the login page to show the error
     else
-      respond_to do |format|
-        flash[:error] = t 'errors.invalid_credentials', "Incorrect username and/or password"
-        @errored = true
-        @pre_registered = @user if @user && !@user.registered?
-        @headers = false
-        format.html { maybe_render_mobile_login :bad_request }
-        format.json { render :json => @pseudonym_session.errors.to_json, :status => :bad_request }
-      end
+      unsuccessful_login t('errors.invalid_credentials', "Incorrect username and/or password")
     end
   end
 
@@ -550,6 +540,26 @@ class PseudonymSessionsController < ApplicationController
         format.html { redirect_back_or_default(dashboard_url(:login_success => '1')) }
       end
       format.json { render :json => pseudonym.to_json(:methods => :user_code), :status => :ok }
+    end
+  end
+
+  def unsuccessful_login(message, refresh = false)
+    respond_to do |format|
+      flash[:error] = message
+      format.html do
+        if refresh
+          redirect_to login_url
+        else
+          @errored = true
+          @pre_registered = @user if @user && !@user.registered?
+          @headers = false
+          maybe_render_mobile_login :bad_request
+        end
+      end
+      format.json do
+        @pseudonym_session.errors.add('base', message)
+        render :json => @pseudonym_session.errors.to_json, :status => :bad_request
+      end
     end
   end
 

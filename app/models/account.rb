@@ -377,6 +377,12 @@ class Account < ActiveRecord::Base
     @cached_courses_name_like[[query, opts]] ||= self.fast_course_base(opts) {|q| q.name_like(query)}
   end
 
+  def self_enrollment_course_for(code)
+    all_courses.
+      where(:self_enrollment => true, :self_enrollment_code => code).
+      first
+  end
+
   def file_namespace
     Shard.default.activate { "account_#{self.root_account.id}" }
   end
@@ -684,9 +690,8 @@ class Account < ActiveRecord::Base
     name
   end
 
-  def email_pseudonyms
-    false
-  end
+  # can be set/overridden by plugin to enforce email pseudonyms
+  attr_accessor :email_pseudonyms
   
   def password_authentication?
     !!(!self.account_authorization_config || self.account_authorization_config.password_authentication?)

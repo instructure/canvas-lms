@@ -685,59 +685,21 @@ describe CoursesController do
       Account.default.update_attribute(:settings, :self_enrollment => 'any', :open_registration => true)
     end
 
-    it "should enroll the currently logged in user" do
+    it "should redirect to the new self enrollment form" do
       course(:active_all => true)
       @course.update_attribute(:self_enrollment, true)
-      user
-      user_session(@user, @pseudonym)
-
-      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code.dup
-      response.should redirect_to(course_url(@course))
-      flash[:notice].should_not be_empty
-      @user.enrollments.length.should == 1
-      @enrollment = @user.enrollments.first
-      @enrollment.course.should == @course
-      @enrollment.workflow_state.should == 'active'
-      @enrollment.should be_self_enrolled
+      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code
+      response.should redirect_to(enroll_url(@course.self_enrollment_code))
     end
 
-    it "should enroll the currently logged in user using the long code" do
+    it "should redirect to the new self enrollment form if using a long code" do
       course(:active_all => true)
       @course.update_attribute(:self_enrollment, true)
-      user
-      user_session(@user, @pseudonym)
-
-      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.long_self_enrollment_code.dup
-      response.should redirect_to(course_url(@course))
-      flash[:notice].should_not be_empty
-      @user.enrollments.length.should == 1
-      @enrollment = @user.enrollments.first
-      @enrollment.course.should == @course
-      @enrollment.workflow_state.should == 'active'
-      @enrollment.should be_self_enrolled
+      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.long_self_enrollment_code
+      response.should redirect_to(enroll_url(@course.self_enrollment_code))
     end
 
-    it "should create a compatible pseudonym" do
-      @account2 = Account.create!
-      course(:active_all => true, :account => @account2)
-      @course.update_attribute(:self_enrollment, true)
-      user_with_pseudonym(:active_all => 1, :username => 'jt@instructure.com')
-      user_session(@user, @pseudonym)
-      @new_pseudonym = Pseudonym.new(:account => @account2, :unique_id => 'jt@instructure.com', :user => @user)
-      User.any_instance.stubs(:find_or_initialize_pseudonym_for_account).with(@account2).once.returns(@new_pseudonym)
-
-      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code.dup
-      response.should redirect_to(course_url(@course))
-      flash[:notice].should_not be_empty
-      @user.enrollments.length.should == 1
-      @enrollment = @user.enrollments.first
-      @enrollment.course.should == @course
-      @enrollment.workflow_state.should == 'active'
-      @enrollment.should be_self_enrolled
-      @user.reload.pseudonyms.length.should == 2
-    end
-
-    it "should not enroll for incorrect code" do
+    it "should return to the course page for an incorrect code" do
       course(:active_all => true)
       @course.update_attribute(:self_enrollment, true)
       user
@@ -748,59 +710,24 @@ describe CoursesController do
       @user.enrollments.length.should == 0
     end
 
-    it "should not enroll if self_enrollment is disabled" do
+    it "should return to the course page if self_enrollment is disabled" do
       course(:active_all => true)
       user
       user_session(@user)
 
-      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.long_self_enrollment_code.dup
+      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.long_self_enrollment_code
       response.should redirect_to(course_url(@course))
       @user.enrollments.length.should == 0
     end
-
-    it "should redirect to login without open registration" do
-      Account.default.update_attribute(:settings, :open_registration => false)
-      course(:active_all => true)
-      @course.update_attribute(:self_enrollment, true)
-
-      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code.dup
-      response.should redirect_to(login_url)
-    end
-
-    it "should render for non-logged-in user" do
-      course(:active_all => true)
-      @course.update_attribute(:self_enrollment, true)
-
-      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code.dup
-      response.should be_success
-      response.should render_template('open_enrollment')
-    end
-
-    it "should create a creation_pending user" do
-      course(:active_all => true)
-      @course.update_attribute(:self_enrollment, true)
-
-      post 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.self_enrollment_code.dup, :email => 'bracken@instructure.com'
-      response.should be_success
-      response.should render_template('open_enrollment_confirmed')
-      @course.student_enrollments.length.should == 1
-      @enrollment = @course.student_enrollments.first
-      @enrollment.should be_self_enrolled
-      @enrollment.should be_invited
-      @enrollment.user.should be_creation_pending
-      @enrollment.user.email_channel.path.should == 'bracken@instructure.com'
-      @enrollment.user.email_channel.should be_unconfirmed
-      @enrollment.user.pseudonyms.should be_empty
-    end
   end
 
-  describe "GET 'self_unenrollment'" do
+  describe "POST 'self_unenrollment'" do
     it "should unenroll" do
       course_with_student_logged_in(:active_all => true)
       @enrollment.update_attribute(:self_enrolled, true)
 
-      get 'self_unenrollment', :course_id => @course.id, :self_unenrollment => @enrollment.uuid
-      response.should redirect_to(course_url(@course))
+      post 'self_unenrollment', :course_id => @course.id, :self_unenrollment => @enrollment.uuid
+      response.should be_success
       @enrollment.reload
       @enrollment.should be_completed
     end
@@ -809,8 +736,8 @@ describe CoursesController do
       course_with_student_logged_in(:active_all => true)
       @enrollment.update_attribute(:self_enrolled, true)
 
-      get 'self_unenrollment', :course_id => @course.id, :self_unenrollment => 'abc'
-      response.should redirect_to(course_url(@course))
+      post 'self_unenrollment', :course_id => @course.id, :self_unenrollment => 'abc'
+      response.status.should =~ /400 Bad Request/
       @enrollment.reload
       @enrollment.should be_active
     end
@@ -818,8 +745,8 @@ describe CoursesController do
     it "should not unenroll a non-self-enrollment" do
       course_with_student_logged_in(:active_all => true)
 
-      get 'self_unenrollment', :course_id => @course.id, :self_unenrollment => @enrollment.uuid
-      response.should redirect_to(course_url(@course))
+      post 'self_unenrollment', :course_id => @course.id, :self_unenrollment => @enrollment.uuid
+      response.status.should =~ /400 Bad Request/
       @enrollment.reload
       @enrollment.should be_active
     end
