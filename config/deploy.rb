@@ -25,7 +25,7 @@ end
 namespace :canvas do
 
     desc "Create symlink for files folder to mount point"
-    task :symlink_canvasdata do
+    task :symlink_canvasfiles do
         target = "mnt/data"
         run "mkdir -p #{latest_release}/mnt/data && ln -s /mnt/data/canvasfiles #{latest_release}/#{target}/canvasfiles"
     end
