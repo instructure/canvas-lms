@@ -24,7 +24,7 @@ namespace :deploy do
 	desc 'Signal Passenger to restart the application.'
  	task :restart, :roles => :app, :except => { :no_release => true } do
 		# run "touch #{release_path}/tmp/restart.txt"
-    run "#{try_sudo} /etc/init.d/httpd restart"
+    run "sudo /etc/init.d/httpd restart"
 	end
 end
 
@@ -38,7 +38,7 @@ namespace :canvas do
 
     desc "Copy config files from /mnt/data/canvasconfig/config"
     task :copy_config do
-      run "#{try_sudo} /etc/init.d/canvasconfig start"
+      run "sudo /etc/init.d/canvasconfig start"
     end
 
     desc "Compile static assets"
