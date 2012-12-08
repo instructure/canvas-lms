@@ -59,7 +59,7 @@ namespace :canvas do
 end
 
 after(:deploy, "deploy:cleanup")
-before("deploy:restart", "canvas:files_symlink")
+before("deploy:restart", "canvas:symlink_canvasfiles")
 before("deploy:restart", "canvas:compile_assets")
 
 
