@@ -87,9 +87,7 @@ class AssessmentTestConverter
     @quiz[:quiz_name] = @quiz[:title]
     @quiz[:migration_id] = get_node_att(doc, 'assessmentTest', 'identifier')
     if limit = doc.at_css('timeLimits')
-      limit = limit['maxTime'].to_i
-      #instructure uses minutes, QTI uses seconds
-      @quiz[:time_limit] = limit / 60
+      @quiz[:time_limit] = AssessmentTestConverter.parse_time_limit(limit['maxTime'])
     end
     if part = doc.at_css('testPart[identifier=BaseTestPart]')
       if control = part.at_css('itemSessionControl')
@@ -110,6 +108,23 @@ class AssessmentTestConverter
       @quiz[:qti_error] = "Instructure doesn't support QTI importing from this source." 
       @log.error "Attempted to convert QTI from non-supported source. (it wasn't run through the python conversion tool.)"
     end
+  end
+
+  def self.parse_time_limit(time_limit)
+    limit = 0
+    time_indicator = time_limit[0..0].downcase if time_limit.length > 0
+    if time_indicator == 'd'
+      limit = 24 * 60 * time_limit[1..-1].to_i
+    elsif time_indicator == 'h'
+      limit = 60 * time_limit[1..-1].to_i
+    elsif time_indicator == 'm'
+      limit = time_limit[1..-1].to_i
+    else
+      #instructure uses minutes, QTI uses seconds
+      limit = time_limit.to_i / 60
+    end
+
+    limit
   end
 
   def process_section(section)
