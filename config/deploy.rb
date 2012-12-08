@@ -17,9 +17,12 @@ ssh_options[:forward_agent] = true
 ssh_options[:keys] = [File.join(ENV["HOME"], ".ssh", "id_rsa_canvas")]
 
 namespace :deploy do
-  task :start do ; end
-  task :stop do ; end
-  task :restart do ; end
+	task :start do ; end
+	task :stop do ; end
+	desc 'Signal Passenger to restart the application.'
+ 	task :restart, :roles => :app, :except => { :no_release => true } do
+		run "touch #{release_path}/tmp/restart.txt"
+	end
 end
 
 namespace :canvas do
@@ -50,10 +53,9 @@ namespace :canvas do
 
     desc "Post-update commands"
     task :update_remote do
-      # deploy.migrate
-      # load_notifications
+      deploy.migrate
+      load_notifications
       restart_jobs
-      puts "\x1b[42m\x1b[1;37m Deploy complete!  \x1b[0m"
     end
 
 end
