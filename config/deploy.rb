@@ -33,7 +33,7 @@ namespace :canvas do
     desc "Compile static assets"
     task :compile_assets, :on_error => :continue do
       # On remote: bundle exec rake canvas:compile_assets
-      run "cd #{latest_release} && #{rake} RAILS_ENV=#{rails_env} canvas:compile_assets"
+      run "cd #{latest_release} && #{rake} RAILS_ENV=#{rails_env} canvas:compile_assets --quiet"
       run "cd #{latest_release} && chown -R canvasuser:canvasuser ."
     end
 
