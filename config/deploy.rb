@@ -12,7 +12,6 @@ set :deploy_via,    :remote_cache
 set :deploy_to,     "/var/rails/canvas"
 set :use_sudo,      false
 set :deploy_env,    "production"
-set :bundle_flags,   ""
 
 ssh_options[:forward_agent] = true
 ssh_options[:keys] = [File.join(ENV["HOME"], ".ssh", "id_rsa_canvas")]
