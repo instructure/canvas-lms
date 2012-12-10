@@ -59,8 +59,6 @@
       <div class="rs-margin-lr">
         <a href="#" class="submit_assignment_link button-sidebar-wide btn <%= 'late' if @current_user_submission && @current_user_submission.late? %>"><%= image_tag "add.png" %> <%= t 'links.submit', "Submit Assignment" %></a><br/>
       </div>
-    <% elsif can_do(@assignment.context, @current_user, :participate_as_student) %>
-      
     <% end %>
   <% end %>
 </div>
