@@ -344,6 +344,7 @@ class ConversationsController < ApplicationController
     end
 
     @conversation.update_attribute(:workflow_state, "read") if @conversation.unread? && auto_mark_as_read?
+    messages = submissions = nil
     ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
       messages = @conversation.messages
       ConversationMessage.send(:preload_associations, messages, :asset)
@@ -354,13 +355,13 @@ class ConversationsController < ApplicationController
       else
         messages = messages.select{ |message| message.submission.nil? }
       end
-      render :json => conversation_json(@conversation,
-                                        @current_user,
-                                        session,
-                                        :include_indirect_participants => true,
-                                        :messages => messages,
-                                        :submissions => submissions)
     end
+    render :json => conversation_json(@conversation,
+                                      @current_user,
+                                      session,
+                                      :include_indirect_participants => true,
+                                      :messages => messages,
+                                      :submissions => submissions)
   end
 
   # @API Edit a conversation
