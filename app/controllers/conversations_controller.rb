@@ -578,17 +578,19 @@ class ConversationsController < ApplicationController
       f.updated = Time.now
       f.id = conversations_url
     end
-    @entries = []
-    @conversation_contexts = {}
-    @current_user.conversations.each do |conversation|
-      @entries.concat(conversation.messages.human)
-      if @conversation_contexts[conversation.conversation.id].blank?
-        @conversation_contexts[conversation.conversation.id] = feed_context_content(conversation)
+    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+      @entries = []
+      @conversation_contexts = {}
+      @current_user.conversations.each do |conversation|
+        @entries.concat(conversation.messages.human)
+        if @conversation_contexts[conversation.conversation.id].blank?
+          @conversation_contexts[conversation.conversation.id] = feed_context_content(conversation)
+        end
       end
-    end
-    @entries = @entries.sort_by{|e| e.created_at}.reverse
-    @entries.each do |entry|
-      feed.entries << entry.to_atom(:additional_content => @conversation_contexts[entry.conversation.id])
+      @entries = @entries.sort_by{|e| e.created_at}.reverse
+      @entries.each do |entry|
+        feed.entries << entry.to_atom(:additional_content => @conversation_contexts[entry.conversation.id])
+      end
     end
     respond_to do |format|
       format.atom { render :text => feed.to_xml }
