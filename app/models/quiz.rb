@@ -802,14 +802,16 @@ class Quiz < ActiveRecord::Base
   end
 
   def submissions_for_statistics(include_all_versions=true)
-    for_users = self.context.students.map(&:id)
-    self.quiz_submissions.scoped(:include => [:versions], :conditions => { :user_id => for_users }).
-      map { |qs| if include_all_versions then qs.submitted_versions else qs.latest_submitted_version end }.
-      flatten.
-      compact.
-      select{ |s| s.completed? && s.submission_data.is_a?(Array) }.
-      sort_by(&:updated_at).
-      reverse
+    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+      for_users = self.context.students.map(&:id)
+      self.quiz_submissions.scoped(:include => [:versions], :conditions => { :user_id => for_users }).
+        map { |qs| if include_all_versions then qs.submitted_versions else qs.latest_submitted_version end }.
+        flatten.
+        compact.
+        select{ |s| s.completed? && s.submission_data.is_a?(Array) }.
+        sort_by(&:updated_at).
+        reverse
+    end
   end
   
   def statistics_csv(options={})
