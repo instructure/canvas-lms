@@ -240,7 +240,15 @@ describe "Roles API", :type => :integration do
         { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => @admin.account.id.to_s },
         { :role => @role, :base_role_type => "notagoodbaserole" })
       response.status.should == '400 Bad Request'
-      JSON.parse(response.body).should == {"message" => "invalid base role type"}
+      JSON.parse(response.body).should == {"message" => "Base role type is invalid"}
+    end
+
+    it "should fail for a course role with a reserved name" do
+      raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/roles",
+                   { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => @admin.account.id.to_s },
+                   { :role => 'student', :base_role_type => "StudentEnrollment" })
+      response.status.should == '400 Bad Request'
+      JSON.parse(response.body).should == {"message" => "Name is reserved"}
     end
 
     it "should not create an override for course role for account-only permissions" do

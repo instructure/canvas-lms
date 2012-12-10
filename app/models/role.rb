@@ -22,8 +22,8 @@ class Role < ActiveRecord::Base
   attr_accessible :name
   before_validation :infer_root_account_id
   validates_presence_of :name
-  validates_inclusion_of :base_role_type, :in => RoleOverride::BASE_ROLE_TYPES
-  validates_exclusion_of :name, :in => RoleOverride::KNOWN_ROLE_TYPES
+  validates_inclusion_of :base_role_type, :in => RoleOverride::BASE_ROLE_TYPES, :message => 'is invalid'
+  validates_exclusion_of :name, :in => RoleOverride::KNOWN_ROLE_TYPES + Enrollment::SIS_TYPES.values
   validates_uniqueness_of :name, :scope => :account_id
   validate :ensure_no_name_conflict_with_different_base_role_type
 

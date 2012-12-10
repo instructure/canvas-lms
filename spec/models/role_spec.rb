@@ -98,6 +98,29 @@ describe Role do
       role.should be_valid
     end
 
+    it "should disallow names that match base sis enrollment role names" do
+      role = @account.roles.create
+      role.base_role_type = 'StudentEnrollment'
+
+      role.name = 'student'
+      role.should_not be_valid
+
+      role.name = 'teacher'
+      role.should_not be_valid
+
+      role.name = 'ta'
+      role.should_not be_valid
+
+      role.name = 'designer'
+      role.should_not be_valid
+
+      role.name = 'observer'
+      role.should_not be_valid
+
+      role.name = 'cheater'
+      role.should be_valid
+    end
+
     it "should infer the root account id" do
       role = create_role('StudentEnrollment', "1337 Student")
       role.root_account_id.should == @account.id

@@ -242,7 +242,7 @@ class RoleOverridesController < ApplicationController
     role.workflow_state = 'active'
     role.deleted_at = nil
     if !role.save
-      render :json => {:message => "invalid base role type"}, :status => :bad_request
+      render :json => { :message => role.errors.full_messages.to_sentence }, :status => :bad_request
       return
     end
     # remove old role overrides that were associated with this role name
