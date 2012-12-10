@@ -267,6 +267,7 @@ describe "One Question at a Time Quizzes" do
         click_next_button_and_accept_warning
 
         navigate_away_and_resume_quiz
+        accept_cant_go_back_warning
         it_should_be_on_second_question
         
         navigate_directly_to_first_question
@@ -288,6 +289,27 @@ describe "One Question at a Time Quizzes" do
         accept_cant_go_back_warning
         click_next_button_and_accept_warning
         submit_unfinished_quiz
+      end
+
+      it "should warn about resuming from the right sidebar" do
+        take_the_quiz
+
+        it_should_show_cant_go_back_warning
+        accept_cant_go_back_warning
+
+        fj("a:contains('Quizzes')").click
+        driver.switch_to.alert.accept
+
+        wait_for_ajaximations
+
+        fj("a:contains('OQAAT quiz')").click
+        wait_for_ajaximations
+        fj("#right-side a:contains('Resume Quiz')").click
+
+        it_should_show_cant_go_back_warning
+        accept_cant_go_back_warning
+
+        sequential_flow
       end
     end
   end
