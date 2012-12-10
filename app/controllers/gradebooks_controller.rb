@@ -74,13 +74,13 @@ class GradebooksController < ApplicationController
             all_submissions = @context.submissions.all(:select => "submissions.assignment_id, submissions.score, submissions.grade, submissions.quiz_submission_id")
             @submissions_by_assignment = submissions_by_assignment(all_submissions)
             @unread_submission_ids = []
-            if @student == @current_user
-              @courses_with_grades = @student.available_courses.select{|c| c.grants_right?(@student, nil, :participate_as_student)}
-              # remember unread submissions and then mark all as read
-              @unread_submissions = @submissions.select{ |s| s.unread?(@current_user) }
-              @unread_submissions.each{ |s| s.change_read_state("read", @current_user) }
-              @unread_submission_ids = @unread_submissions.map(&:id)
-            end
+          end
+          if @student == @current_user
+            @courses_with_grades = @student.available_courses.select{|c| c.grants_right?(@student, nil, :participate_as_student)}
+            # remember unread submissions and then mark all as read
+            @unread_submissions = @submissions.select{ |s| s.unread?(@current_user) }
+            @unread_submissions.each{ |s| s.change_read_state("read", @current_user) }
+            @unread_submission_ids = @unread_submissions.map(&:id)
           end
           format.html { render :action => 'grade_summary' }
         else
