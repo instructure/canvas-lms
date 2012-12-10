@@ -69,7 +69,7 @@ class QuizzesController < ApplicationController
           add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
           add_crumb(t(:statistics_crumb, "Statistics"), named_context_url(@context, :context_quiz_statistics_url, @quiz))
           @statistics = @quiz.statistics(params[:all_versions] == '1')
-          user_ids = @quiz.quiz_submissions.select{|s| !s.settings_only? }.map(&:user_id)
+          user_ids = @quiz.quiz_submissions.find(:all, :select => 'user_id', :conditions => "workflow_state<>'settings_only'").map(&:user_id)
           @submitted_users = user_ids.empty? ? [] : User.find_all_by_id(user_ids).compact.uniq.sort_by(&:last_name_first)
         }
         format.csv {
@@ -167,7 +167,7 @@ class QuizzesController < ApplicationController
 
   def managed_quiz_data
     students = @context.students_visible_to(@current_user).order_by_sortable_name.to_a
-    @submissions = @quiz.quiz_submissions.for_user_ids(students.map(&:id)).select{|s| !s.settings_only? }
+    @submissions = @quiz.quiz_submissions.for_user_ids(students.map(&:id)).scoped(:conditions => "workflow_state<>'settings_only'").all
     submission_ids = {}
     @submissions.each{|s| submission_ids[s.user_id] = s.id }
     @submitted_students = students.select{|stu| submission_ids[stu.id] }
