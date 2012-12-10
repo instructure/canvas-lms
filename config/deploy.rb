@@ -12,8 +12,8 @@ set :deploy_via,    :remote_cache
 set :deploy_to,     "/var/rails/canvas"
 set :use_sudo,      false
 set :deploy_env,    "production"
-set :bundle_dir,    "/opt/ruby-enterprise-1.8.7-2012.02/lib/ruby/gems/1.8"
-set :bundle_flags,  "--deployment"
+set :bundle_dir,    ""
+set :bundle_without, []
 
 ssh_options[:forward_agent] = true
 ssh_options[:keys] = [File.join(ENV["HOME"], ".ssh", "id_rsa_canvas")]
@@ -61,10 +61,10 @@ namespace :canvas do
 
     desc "Post-update commands"
     task :update_remote do
-      copy_config
-      deploy.migrate
-      load_notifications
-      restart_jobs
+      # copy_config
+      # deploy.migrate
+      # load_notifications
+      #restart_jobs
     end
 
 end
