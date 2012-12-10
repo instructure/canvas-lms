@@ -65,17 +65,19 @@ class ConversationMessage < ActiveRecord::Base
       SQL
     end
 
-    ret = distinct_on('conversation_participant_id',
-      :select => "conversation_messages.*, conversation_participant_id, conversation_message_participants.tags",
-      :joins => 'JOIN conversation_message_participants ON conversation_messages.id = conversation_message_id',
-      :conditions => base_conditions,
-      :order => 'conversation_participant_id, created_at DESC'
-    )
-    map = Hash[ret.map{ |m| [m.conversation_participant_id.to_i, m]}]
-    if author_id
-      conversation_participants.each{ |cp| cp.last_authored_message = map[cp.id] }
-    else
-      conversation_participants.each{ |cp| cp.last_message = map[cp.id] }
+    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+      ret = distinct_on('conversation_participant_id',
+        :select => "conversation_messages.*, conversation_participant_id, conversation_message_participants.tags",
+        :joins => 'JOIN conversation_message_participants ON conversation_messages.id = conversation_message_id',
+        :conditions => base_conditions,
+        :order => 'conversation_participant_id, created_at DESC'
+      )
+      map = Hash[ret.map{ |m| [m.conversation_participant_id.to_i, m]}]
+      if author_id
+        conversation_participants.each{ |cp| cp.last_authored_message = map[cp.id] }
+      else
+        conversation_participants.each{ |cp| cp.last_message = map[cp.id] }
+      end
     end
   end
 
