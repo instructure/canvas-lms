@@ -65,8 +65,8 @@ namespace :canvas do
     desc "Post-update commands"
     task :update_remote do
       copy_config
-      # deploy.migrate
-      # load_notifications
+      deploy.migrate
+      load_notifications
       restart_jobs
     end
 
