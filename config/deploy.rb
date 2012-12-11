@@ -25,7 +25,7 @@ namespace :deploy do
 	task :start do ; end
 	task :stop do ; end
 	desc 'Signal Passenger to restart the application.'
- 	task :restart, :roles => :app, :except => { :no_release => true } do
+ 	task :restart, :except => { :no_release => true } do
 		# run "touch #{release_path}/tmp/restart.txt"
     run "sudo /etc/init.d/httpd restart"
 	end
