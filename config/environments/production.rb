@@ -26,3 +26,7 @@ config.cache_store = Canvas.cache_store_config
 
 # eval <env>-local.rb if it exists
 Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read) }
+
+if ENV['CAP_BUILD'] == 'true'
+    config.active_record.colorize_logging = false
+end
