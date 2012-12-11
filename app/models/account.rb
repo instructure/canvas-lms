@@ -871,7 +871,7 @@ class Account < ActiveRecord::Base
     if self.turnitin_pledge && !self.turnitin_pledge.empty?
       self.turnitin_pledge
     else
-      res = self.account.turnitin_pledge rescue nil
+      res = self.parent_account.turnitin_pledge
       res ||= t('#account.turnitin_pledge', "This assignment submission is my own, original work")
     end
   end

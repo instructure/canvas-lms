@@ -336,6 +336,15 @@ describe Account do
     end
   end
 
+  context "closest_turnitin_pledge" do
+    it "should find a custom pledge in a root account from a sub account" do
+      pledge = "custom yo"
+      root_account = Account.create(:turnitin_pledge => pledge)
+      sub_account = Account.create(:parent_account => root_account)
+      sub_account.closest_turnitin_pledge.should == pledge
+    end
+  end
+
   it "should make a default enrollment term if necessary" do
     a = Account.create!(:name => "nada")
     a.enrollment_terms.size.should == 1

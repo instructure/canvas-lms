@@ -820,7 +820,6 @@ class Submission < ActiveRecord::Base
     end
   }
   
-  
   def processed?
     if submission_type == "online_url"
       return attachment && attachment.content_type.match(/image/)
