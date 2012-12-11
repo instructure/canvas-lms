@@ -83,4 +83,26 @@ class Role < ActiveRecord::Base
       [ RoleOverride::NO_PERMISSIONS_TYPE, 'deleted' ]
     end
   end
+
+  # Returns a list of hashes for each base enrollment type, and each will have a
+  # custom_roles key, each will look like:
+  # [{:base_role_name => "StudentEnrollment",
+  #   :name => "StudentEnrollment",
+  #   :label => "Student",
+  #   :custom_roles =>
+  #           [{:base_role_name => "StudentEnrollment",
+  #             :name => "weirdstudent",
+  #             :label => "weirdstudent"}]},
+  # ]
+  def self.all_enrollment_roles_for_account(account)
+    custom_roles = account.available_course_roles_by_name.values
+    RoleOverride::ENROLLMENT_TYPES.map do |br|
+      new = br.clone
+      new[:label] = br[:label].call
+      new[:custom_roles] = custom_roles.select{|cr|cr.base_role_type == new[:base_role_name]}.map do |cr|
+        {:base_role_name => cr.base_role_type, :name => cr.name, :label => cr.name}
+      end
+      new
+    end
+  end
 end

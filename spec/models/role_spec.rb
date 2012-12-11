@@ -19,6 +19,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Role do
+  def create_role(base, name, account=nil)
+    account ||= @account
+    role = account.roles.create :name => name
+    role.base_role_type = base
+    role.save!
+    role
+  end
   context "without account" do
     it "should require an account" do
       role = Role.create :name => "1337 Student"
@@ -92,9 +99,7 @@ describe Role do
     end
 
     it "should infer the root account id" do
-      role = @account.roles.create :name => "1337 Student"
-      role.base_role_type = 'StudentEnrollment'
-      role.save!
+      role = create_role('StudentEnrollment', "1337 Student")
       role.root_account_id.should == @account.id
     end
   end
@@ -107,9 +112,7 @@ describe Role do
       @root_account_2 = account_model
       @sub_account_2 = @root_account_2.sub_accounts.create!
 
-      @role = @sub_account_1a.roles.create :name => 'TestRole'
-      @role.base_role_type = 'StudentEnrollment'
-      @role.save!
+      @role = create_role('StudentEnrollment', 'TestRole', @sub_account_1a)
     end
 
     it "should infer the root account name" do
@@ -138,9 +141,7 @@ describe Role do
   context "with active role" do
     before do
       account_model
-      @role = @account.roles.create :name => "1337 Student"
-      @role.base_role_type = 'StudentEnrollment'
-      @role.save!
+      @role = create_role('StudentEnrollment', "1337 Student")
       @role.reload
     end
 
@@ -174,9 +175,7 @@ describe Role do
 
     describe "active scope" do
       before do
-        @deleted_role = @account.roles.create :name => 'Stupid Role'
-        @deleted_role.base_role_type = 'TaEnrollment'
-        @deleted_role.save!
+        @deleted_role = create_role('TaEnrollment', "Stupid Role")
         @deleted_role.destroy
       end
 
@@ -186,4 +185,23 @@ describe Role do
       end
     end
   end
+
+  it "should find all custom roles" do
+    account_model
+    create_role('StudentEnrollment', 'silly student')
+    create_role('ObserverEnrollment', 'creepy observer')
+    create_role('TaEnrollment', 'jerk ta')
+    create_role('TeacherEnrollment', 'boring teacher')
+    @sub_account = @account.sub_accounts.create!
+    create_role('DesignerEnrollment', 'keen designer', @sub_account)
+    all = Role.all_enrollment_roles_for_account(@sub_account)
+    all[0][:custom_roles][0][:name].should == 'silly student'
+    all[1][:custom_roles][0][:name].should == 'jerk ta'
+    all[2][:custom_roles][0][:name].should == 'boring teacher'
+    all[3][:custom_roles][0][:name].should == 'keen designer'
+    all[4][:custom_roles][0][:name].should == 'creepy observer'
+
+    expect{Role.all_enrollment_roles_for_account(@sub_account)}.to_not raise_error
+  end
+
 end
