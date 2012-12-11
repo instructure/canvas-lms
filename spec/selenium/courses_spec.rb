@@ -122,27 +122,69 @@ describe "courses" do
       course_with_teacher_logged_in
 
       # Setup the course with > 50 users (to test scrolling)
-      100.times do |n|
-        @course.enroll_student(user).accept!
+      60.times do |n|
+        @course.enroll_student(user)
       end
+
+      @course.enroll_user(user, 'TaEnrollment')
 
       # Test that the page loads properly the first time.
       get "/courses/#{@course.id}/users"
       wait_for_ajaximations
       ff('.ui-state-error').length.should == 0
       ff('.student_roster .user').length.should == 50
-      ff('.teacher_roster .user').length.should == 1
+      ff('.teacher_roster .user').length.should == 2
+      ff('.teacher_roster .user_list').length.should == 2
 
       # Test the infinite scroll.
       driver.execute_script <<-END
-        var $wrapper = $('.student_roster .fill_height_div'),
-            $list    = $('.student_list'),
-            scroll   = $list.height() - $wrapper.height();
-
-        $wrapper.scrollTo(scroll);
+        $list    = $('.student_roster .users-wrapper:first-child .user_list'),
+        $list[0].scrollTop = $list[0].scrollHeight - $list.height();
       END
       wait_for_ajaximations
-      ff('.student_roster li').length.should == 100
+      ff('.student_roster .user').length.should == 60
+    end
+
+    it "should include separate course roles sections on users page" do
+      course_with_teacher_logged_in
+
+      @course.enroll_user(user, 'TaEnrollment')
+      @course.enroll_user(user, 'StudentEnrollment')
+
+      roles = [
+        ['Student', 51, '.student_roster .users-wrapper:nth-child(2)'],
+        ['Teacher', 52, '.teacher_roster .users-wrapper:nth-child(2)'],
+        ['Ta', 53, '.teacher_roster .users-wrapper:nth-child(4)']
+      ]
+      roles.each do |type, num, css|
+        role = @course.account.roles.build :name => "Custom#{type}"
+        role.base_role_type = "#{type}Enrollment"
+        role.save!
+
+        num.times do |n|
+          @course.enroll_user(user, "#{type}Enrollment", :role_name => role.name)
+        end
+      end
+
+      # Test that the page loads properly the first time.
+      get "/courses/#{@course.id}/users"
+      wait_for_ajaximations
+      ff('.ui-state-error').length.should == 0
+
+      roles.each do |type, num, css|
+        ff("#{css} h2").first.text.should == "Custom#{type}"
+        ff("#{css} .user").length.should == 50
+
+        # Test the infinite scroll.
+
+        driver.execute_script <<-END
+          $list    = $('#{css} .user_list'),
+          $list[0].scrollTop = $list[0].scrollHeight - $list.height();
+        END
+        wait_for_ajaximations
+
+        ff("#{css} .user").length.should == num
+      end
     end
 
     it "should only show users that a user has permissions to view" do
@@ -182,6 +224,36 @@ describe "courses" do
       wait_for_ajaximations
       sections = ff('.student_roster .section')
       sections.map(&:text).sort.should == %w{One One Two}
+    end
+
+    it "should display users section name properly when separated by custom roles" do
+      course_with_teacher_logged_in(:active_all => true)
+      user1 = user
+      section1 = @course.course_sections.create!(:name => 'One')
+      section2 = @course.course_sections.create!(:name => 'Two')
+
+      role1 = @course.account.roles.build :name => "CustomStudent1"
+      role1.base_role_type = "StudentEnrollment"
+      role1.save!
+      role2 = @course.account.roles.build :name => "CustomStudent2"
+      role2.base_role_type = "StudentEnrollment"
+      role2.save!
+
+      @course.enroll_user(user1, "StudentEnrollment", :section => section1, :role_name => role1.name).accept!
+      @course.enroll_user(user1, "StudentEnrollment", :section => section2, :role_name => role2.name, :allow_multiple_enrollments => true).accept!
+      roles_to_sections = {'CustomStudent1' => 'One', 'CustomStudent2' => 'Two'}
+
+      get "/courses/#{@course.id}/users"
+
+      wait_for_ajaximations
+
+      role_wrappers = ff('.student_roster .users-wrapper')
+      role_wrappers.each do |rw|
+        role_name = ff('.h3', rw).first.text
+        sections = ff('.section', rw)
+        sections.count.should == 1
+        roles_to_sections[role_name].should == sections.first.text
+      end
     end
   end
 
