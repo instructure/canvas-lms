@@ -112,6 +112,25 @@ describe "Roles API", :type => :integration do
       json['workflow_state'].should == 'deleted'
     end
 
+    it "should accept the usual forms of booleans in addition to 0 / 1" do
+      api_call(:post, "/api/v1/accounts/#{@account.id}/roles",
+              { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => @account.id.to_s },
+              { 'role' => 'WeirdStudent', 'base_role_type' => 'StudentEnrollment',
+                'permissions' => { 'read_forum' => { 'enabled' => 'true', 'explicit' => 'true' },
+                                   'moderate_forum' => { 'explicit' => true, 'enabled' => 'false' },
+                                   'post_to_forum' => { 'explicit' => false },
+                                   'send_messages' => { 'explicit' => 'on', 'locked' => 'yes', 'enabled' => 'off' }} })
+      @account.reload
+      overrides = @account.role_overrides.find_all_by_enrollment_type('WeirdStudent').index_by(&:permission)
+      overrides['read_forum'].enabled.should be_true
+      overrides['read_forum'].locked.should be_false
+      overrides['moderate_forum'].enabled.should be_false
+      overrides['moderate_forum'].locked.should be_false
+      overrides['send_messages'].enabled.should be_false
+      overrides['send_messages'].locked.should be_true
+      overrides['post_to_forum'].should be_nil
+    end
+
     context "when there are enrollments using a course-level role" do
       before :each do
         base_role_type = 'TeacherEnrollment'

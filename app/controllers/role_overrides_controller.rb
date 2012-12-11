@@ -423,10 +423,10 @@ class RoleOverridesController < ApplicationController
 
     manageable_permissions.keys.each do |permission|
       if settings = permissions[permission]
-        if settings[:enabled].present? && settings[:explicit].to_i == 1
-          override = settings[:enabled].to_i == 1
+        if settings[:enabled].present? && value_to_boolean(settings[:explicit])
+          override = value_to_boolean(settings[:enabled])
         end
-        locked = settings[:locked].to_i == 1 if settings[:locked]
+        locked = value_to_boolean(settings[:locked]) if settings[:locked].present?
 
         RoleOverride.manage_role_override(context, role, permission.to_s,
           :override => override, :locked => locked)
