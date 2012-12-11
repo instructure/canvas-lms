@@ -67,7 +67,7 @@ namespace :canvas do
       copy_config
       # deploy.migrate
       # load_notifications
-      #restart_jobs
+      restart_jobs
     end
 
 end
