@@ -58,7 +58,7 @@ namespace :canvas do
     end
 
     desc "Restart delayed jobs workers"
-    task :restart_jobs, :on_error => :continue do
+    task :restart_jobs, :roles => :db, :only => { :primary => true } do
       run "/etc/init.d/canvas_init restart"
     end
 
