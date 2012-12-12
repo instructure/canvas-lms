@@ -77,18 +77,26 @@ module PaginatedCollection
     end
 
     def paginate(options = {})
-      raise(ArgumentError, "per_page required") unless options[:per_page] && options[:per_page] > 0
+      execute_pager(configure_pager(new_pager, options))
+    end
 
-      pager = PaginatedCollection::Collection.new
+    def new_pager
+      PaginatedCollection::Collection.new
+    end
+
+    def configure_pager(pager, options)
+      raise(ArgumentError, "per_page required") unless options[:per_page] && options[:per_page] > 0
       pager.current_page = options[:page]
       pager.per_page = options[:per_page]
       pager.total_entries = options[:total_entries]
+      pager
+    end
 
-      pager = block.call(pager)
+    def execute_pager(pager)
+      pager = @block.call(pager)
       if !pager.respond_to?(:current_page)
         raise(ArgumentError, "The PaginatedCollection block needs to return a WillPaginate-style object")
       end
-
       return pager
     end
   end

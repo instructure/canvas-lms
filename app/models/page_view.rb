@@ -189,13 +189,25 @@ class PageView < ActiveRecord::Base
     { :conditions => {:user_id => users} }
   }
 
+  module CassandraBookmarker
+    def self.bookmark_for(item)
+      [item['bucket'], item['ordered_id']]
+    end
+
+    def self.validate(bookmark)
+      bookmark.is_a?(Array) &&
+      bookmark.size == 2
+    end
+  end
 
   # returns a collection with very limited functionality
   # basically, it responds to #paginate and returns a
   # WillPaginate::Collection-like object
   def self.for_user(user)
     if cassandra?
-      PaginatedCollection.build { |pager| page_view_history(user, pager) }
+      BookmarkedCollection.build(PageView::CassandraBookmarker) do |pager|
+        page_view_history(user, pager)
+      end
     else
       self.scoped(:conditions => { :user_id => user.id }, :order => 'created_at desc')
     end
@@ -205,43 +217,56 @@ class PageView < ActiveRecord::Base
     context_type = context.class.name
     context_id = context.global_id
     scrollback_limit = Setting.get('page_views_scrollback_limit:users', 52.weeks.to_s).to_i.ago
-    results = []
 
-    if pager.current_page.to_s =~ %r{^(\d+):(\d+/\w+)$}
-      row_ts = $1.to_i
-      start_column = $2
+    # get the bucket to start at from the bookmark
+    if pager.current_bookmark
+      bucket, ordered_id = pager.current_bookmark
     else
       # page 1
-      row_ts = PageView.timeline_bucket_for_time(Time.now, context_type)
+      bucket = PageView.timeline_bucket_for_time(Time.now, context_type)
+      ordered_id = nil
     end
 
-    until pager.next_page || Time.at(row_ts) < scrollback_limit
-      limit = pager.per_page + 1 - results.size
+    # pull results from each bucket until the page is full or we hit the
+    # scrollback_limit
+    until pager.next_bookmark || Time.at(bucket) < scrollback_limit
+      # build up the query based on the context, bucket, and ordered_id. fetch
+      # one extra so we can tell if there are more pages
+      limit = pager.per_page + 1 - pager.size
       args = []
-      args << "#{context_type.underscore}_#{context_id}/#{row_ts}"
-      if start_column
-        ordered_id = "AND ordered_id <= ?"
-        args << start_column
+      args << "#{context_type.underscore}_#{context_id}/#{bucket}"
+      if ordered_id
+        ordered_id_clause = (pager.include_bookmark ? "AND ordered_id <= ?" : "AND ordered_id < ?")
+        args << ordered_id
       else
-        ordered_id = nil
+        ordered_id_clause = nil
       end
-      qs = "SELECT ordered_id, request_id FROM page_views_history_by_context where context_and_time_bucket = ? #{ordered_id} ORDER BY ordered_id DESC LIMIT #{limit}"
+      qs = "SELECT ordered_id, request_id FROM page_views_history_by_context where context_and_time_bucket = ? #{ordered_id_clause} ORDER BY ordered_id DESC LIMIT #{limit}"
+
+      # execute the query collecting the results. set the bookmark iff there
+      # was a result after the full page
       PageView.cassandra.execute(qs, *args).fetch do |row|
-        if results.size == pager.per_page
-          pager.next_page = "#{row_ts}:#{row['ordered_id']}"
+        if pager.size == pager.per_page
+          pager.has_more!
         else
-          results << row['request_id']
+          pager << row.to_hash.merge('bucket' => bucket)
         end
       end
 
-      start_column = nil
+      ordered_id = nil
       # possible optimization: query page_views_counters_by_context_and_day ,
       # and use it as a secondary index to skip days where the user didn't
       # have any page views
-      row_ts -= PageView.timeline_bucket_size(context_type)
+      bucket -= PageView.timeline_bucket_size(context_type)
     end
 
-    pager.replace(PageView.find(results).sort_by { |pv| results.index(pv.request_id) })
+    # now that the bookmark's been set, we only need to keep the request
+    # ids per item returned.
+    request_ids = pager.map{ |row| row['request_id'] }
+
+    # before returning, convert those request_ids into actual page views, but
+    # preserve the order
+    pager.replace(PageView.find(request_ids).sort_by { |pv| request_ids.index(pv.request_id) })
   end
 
   def self.cache_queue_name

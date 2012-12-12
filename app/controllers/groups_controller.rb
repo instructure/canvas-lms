@@ -146,11 +146,14 @@ class GroupsController < ApplicationController
   # @returns [Group]
   def index
     return context_index if @context
-    @groups = @current_user.try(:current_groups)
-    # can't use #try, cause it's not defined on the association class,
-    # so it will try to load the association and call it on the resulting array'
-    @groups = @groups.with_each_shard({ :include => :group_category, :order => "groups.id ASC" }) if @groups
-    @groups ||= []
+    if @current_user
+      @groups = BookmarkedCollection.with_each_shard(
+        Group::Bookmarker,
+        @current_user.current_groups,
+        :include => :group_category)
+    else
+      @groups = []
+    end
     respond_to do |format|
       format.html {}
       format.json do

@@ -528,4 +528,22 @@ class Group < ActiveRecord::Base
   def associated_shards
     [Shard.default]
   end
+
+  class Bookmarker
+    def self.bookmark_for(group)
+      group.id
+    end
+
+    def self.validate(bookmark)
+      bookmark.is_a?(Fixnum)
+    end
+
+    def self.restrict_scope(scope, pager)
+      if bookmark = pager.current_bookmark
+        comparison = (pager.include_bookmark ? 'groups.id >= ?' : 'groups.id > ?')
+        scope = scope.scoped(:conditions => [comparison, bookmark])
+      end
+      scope.scoped(:order => "groups.id ASC")
+    end
+  end
 end
