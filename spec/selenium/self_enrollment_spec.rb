@@ -3,6 +3,17 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "self enrollment" do
   it_should_behave_like "in-process server selenium tests"
 
+  context "in a full course" do
+    it "should not be allowed" do
+      course(:active_all => true)
+      @course.self_enrollment = true
+      @course.self_enrollment_limit = 0
+      @course.save!
+      get "/enroll/#{@course.self_enrollment_code}"
+      f("form#enroll_form").should be_nil
+    end
+  end
+
   shared_examples_for "open registration" do
     before do
       Account.default.update_attribute(:settings, :self_enrollment => 'any', :open_registration => true)

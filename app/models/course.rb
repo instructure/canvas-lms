@@ -748,6 +748,10 @@ class Course < ActiveRecord::Base
   def self_enrollment_min_age
   end
 
+  def self_enrollment_limit_met?
+    self_enrollment_limit && students.size >= self_enrollment_limit
+  end
+
   def long_self_enrollment_code
     Digest::MD5.hexdigest("#{uuid}_for_#{id}")
   end

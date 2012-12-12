@@ -292,9 +292,13 @@ class User < ActiveRecord::Base
     elsif record.validation_root_account
       course = record.validation_root_account.self_enrollment_course_for(value)
       record.self_enrollment_course = course
-      record.errors.add(attr, "invalid") unless course
-      record.errors.add(attr, "already_enrolled") if course && course.user_is_student?(record, :include_future => true)
-      record.errors.add(:birthdate, "too_young") if course && course.self_enrollment_min_age && record.birthdate && record.birthdate > course.self_enrollment_min_age.years.ago
+      if course
+        record.errors.add(attr, "full") if course.self_enrollment_limit_met?
+        record.errors.add(attr, "already_enrolled") if course.user_is_student?(record, :include_future => true)
+        record.errors.add(:birthdate, "too_young") if course.self_enrollment_min_age && record.birthdate && record.birthdate > course.self_enrollment_min_age.years.ago
+      else
+        record.errors.add(attr, "invalid")
+      end
     else
       record.errors.add(attr, "account_required")
     end

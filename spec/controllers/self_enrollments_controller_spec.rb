@@ -92,5 +92,16 @@ describe SelfEnrollmentsController do
       }.should raise_exception(ActiveRecord::RecordNotFound)
       @user.enrollments.length.should == 0
     end
+
+    it "should not enroll if the course is full" do
+      @course.update_attribute(:self_enrollment_limit, 0)
+      user
+      user_session(@user)
+
+      post 'create', :self_enrollment_code => @course.self_enrollment_code
+      response.status.should =~ /400 Bad Request/
+      json = JSON.parse(response.body)
+      json["user"]["self_enrollment_code"].should be_present
+    end
   end
 end
