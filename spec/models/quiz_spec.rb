@@ -969,4 +969,83 @@ describe Quiz do
       @quiz.has_student_submissions?.should be_true
     end
   end
+
+  describe "linking overrides with assignments" do
+    let(:course) { course_model }
+    let(:quiz) { quiz_model(:course => course, :due_at => 5.days.from_now).reload }
+    let(:override) { assignment_override_model(:quiz => quiz) }
+    let(:override_student) { override.assignment_override_students.build }
+
+    before do
+      override.override_due_at(7.days.from_now)
+      override.save!
+
+      student_in_course(:course => course)
+      override_student.user = @student
+      override_student.save!
+    end
+
+    context "before the quiz has an assignment" do
+      context "override" do
+        it "has a quiz" do
+          override.quiz.should == quiz
+        end
+
+        it "has a nil assignment" do
+          override.assignment.should be_nil
+        end
+      end
+
+      context "override student" do
+        it "has a quiz" do
+          override_student.quiz.should == quiz
+        end
+
+        it "has a nil assignment" do
+          override_student.assignment.should be_nil
+        end
+      end
+    end
+
+    context "once the quiz is published" do
+      before do
+        # publish the quiz
+        quiz.workflow_state = 'available'
+        quiz.save
+        override.reload
+        override_student.reload
+      end
+
+      context "override" do
+        it "has a quiz" do
+          override.quiz.should == quiz
+        end
+
+        it "has the quiz's assignment" do
+          override.assignment.should == quiz.assignment
+        end
+      end
+
+      context "override student" do
+        it "has a quiz" do
+          override_student.quiz.should == quiz
+        end
+
+        it "has the quiz's assignment" do
+          override_student.assignment.should == quiz.assignment
+        end
+      end
+    end
+
+    context "when the assignment ID doesn't change" do
+      it "doesn't update overrides" do
+        quiz.expects(:link_assignment_overrides).once
+        # publish the quiz
+        quiz.workflow_state = 'available'
+        quiz.save
+        quiz.expects(:link_assignment_overrides).never
+        quiz.save
+      end
+    end
+  end
 end

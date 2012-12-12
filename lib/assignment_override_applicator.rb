@@ -17,39 +17,45 @@
 #
 
 module AssignmentOverrideApplicator
-  # top-level method intended for consumption. given an assignment (of specific
+  # top-level method intended for consumption. given an assignment or quiz(of specific
   # version) and user, determine the list of overrides, apply them to the
-  # assignment, and return the overridden stand-in.
-  def self.assignment_overridden_for(assignment, user)
-    overrides = self.overrides_for_assignment_and_user(assignment, user)
+  # assignment or quiz, and return the overridden stand-in.
+  def self.assignment_overridden_for(assignment_or_quiz, user)
+    overrides = self.overrides_for_assignment_and_user(assignment_or_quiz, user)
     
     if overrides.empty?
-      assignment
+      assignment_or_quiz
     else
-      self.assignment_with_overrides(assignment, overrides)
+      self.assignment_with_overrides(assignment_or_quiz, overrides)
     end
   end
 
+  def self.quiz_overridden_for(quiz, user)
+    assignment_overridden_for(quiz, user)
+  end
+
   # determine list of overrides (of appropriate version) that apply to the
-  # assignment (of specific version) for a particular user. the overrides are
+  # assignment or quiz(of specific version) for a particular user. the overrides are
   # returned in priority order; the first override to contain an overridden
   # value for a particular field is used for that field
-  def self.overrides_for_assignment_and_user(assignment, user)
-    Rails.cache.fetch([user, assignment, assignment.version_number, 'overrides'].cache_key) do
+  def self.overrides_for_assignment_and_user(assignment_or_quiz, user)
+    Rails.cache.fetch([user, assignment_or_quiz, assignment_or_quiz.version_number, 'overrides'].cache_key) do
 
       # return an empty array to the block if there is nothing to do here
-      next [] unless assignment.has_overrides?
+      next [] unless assignment_or_quiz.has_overrides?
 
       overrides = []
 
       # get list of overrides that might apply. adhoc override is highest
       # priority, then group override, then section overrides by position. DO
       # NOT exclude deleted overrides, yet
-      adhoc_membership = AssignmentOverrideStudent.scoped(:conditions => {:assignment_id => assignment.id, :user_id => user.id}).first
+      key = assignment_or_quiz.is_a?(Quiz) ? :quiz_id : :assignment_id
+      adhoc_membership = AssignmentOverrideStudent.scoped(:conditions => {key => assignment_or_quiz.id, :user_id => user.id}).first
+      
       overrides << adhoc_membership.assignment_override if adhoc_membership
 
-      if assignment.group_category && group = user.current_groups.scoped(:conditions => {:group_category_id => assignment.group_category_id}).first
-        group_override = assignment.assignment_overrides.
+      if assignment_or_quiz.is_a?(Assignment) && assignment_or_quiz.group_category && group = user.current_groups.scoped(:conditions => {:group_category_id => assignment_or_quiz.group_category_id}).first
+        group_override = assignment_or_quiz.assignment_overrides.
           scoped(:conditions => {:set_type => 'Group', :set_id => group.id}).
           first
         overrides << group_override if group_override
@@ -57,20 +63,21 @@ module AssignmentOverrideApplicator
 
       section_ids = user.enrollments.active.scoped(:conditions =>
         { :type => ['StudentEnrollment', 'ObserverEnrollment'],
-          :course_id => assignment.context_id}).map(&:course_section_id)
+          :course_id => assignment_or_quiz.context_id}).map(&:course_section_id)
       
-      section_overrides = assignment.assignment_overrides.
+      section_overrides = assignment_or_quiz.assignment_overrides.
         scoped(:conditions => {:set_type => 'CourseSection', :set_id => section_ids})
 
       # TODO add position column to assignment_override, nil for non-section
-      # overrides, (assignment, position) unique for section overrides
+      # overrides, (assignment_or_quiz, position) unique for section overrides
       overrides += section_overrides#.scoped(:order => :position)
 
       # for each potential override discovered, make sure we look at the
       # appropriate version
       overrides = overrides.map do |override|
         override_version = override.versions.detect do |version|
-          version.model.assignment_version <= assignment.version_number
+          model_version = assignment_or_quiz.is_a?(Quiz) ? version.model.quiz_version : version.model.assignment_version
+          model_version <= assignment_or_quiz.version_number
         end
         override_version ? override_version.model : nil
       end
@@ -82,47 +89,53 @@ module AssignmentOverrideApplicator
   end
 
   # apply the overrides calculated by collapsed_overrides to a clone of the
-  # assignment which can then be used in place of the assignment. the clone is
-  # marked readonly to prevent saving
-  def self.assignment_with_overrides(assignment, overrides)
+  # assignment or quiz which can then be used in place of the original object.
+  # the clone is marked readonly to prevent saving
+  def self.assignment_with_overrides(assignment_or_quiz, overrides)
     # ActiveRecord::Base#clone nils out the primary key; put it back
-    cloned_assignment = assignment.clone
-    cloned_assignment.id = assignment.id
+    cloned_assignment_or_quiz = assignment_or_quiz.clone
+    cloned_assignment_or_quiz.id = assignment_or_quiz.id
 
     # update attributes with overrides
-    self.collapsed_overrides(assignment, overrides).each do |field,value|
+    self.collapsed_overrides(assignment_or_quiz, overrides).each do |field,value|
       # for any times in the value set, bring them back from raw UTC into the
       # current Time.zone before placing them in the assignment
       value = value.in_time_zone if value && value.respond_to?(:in_time_zone) && !value.is_a?(Date)
-      cloned_assignment.write_attribute(field, value)
+      cloned_assignment_or_quiz.write_attribute(field, value)
     end
-    cloned_assignment.applied_overrides = overrides
-    cloned_assignment.readonly!
+    cloned_assignment_or_quiz.applied_overrides = overrides
+    cloned_assignment_or_quiz.readonly!
 
     # make new_record? match the original (typically always true on AR clones,
     # at least until saved, which we don't want to do)
-    klass = class << cloned_assignment; self; end
-    klass.send(:define_method, :new_record?) { assignment.new_record? }
+    klass = class << cloned_assignment_or_quiz; self; end
+    klass.send(:define_method, :new_record?) { assignment_or_quiz.new_record? }
 
-    cloned_assignment
+    cloned_assignment_or_quiz
   end
 
-  # given an assignment (of specific version) and an ordered list of overrides
+  def self.quiz_with_overrides(quiz, overrides)
+    assignment_with_overrides(quiz, overrides)
+  end
+
+  # given an assignment or quiz (of specific version) and an ordered list of overrides
   # (see overrides_for_assignment_and_user), return a hash of values for each
   # overrideable field. for caching, the same set of overrides should produce
-  # the same collapsed assignment, regardless of the user that ended up at that
+  # the same collapsed assignment or quiz, regardless of the user that ended up at that
   # set of overrides.
-  def self.collapsed_overrides(assignment, overrides)
-    Rails.cache.fetch([assignment, assignment.version_number, self.overrides_hash(overrides)].cache_key) do
+  def self.collapsed_overrides(assignment_or_quiz, overrides)
+    Rails.cache.fetch([assignment_or_quiz, assignment_or_quiz.version_number, self.overrides_hash(overrides)].cache_key) do
       overridden_data = {}
-      # clone the assignment, apply overrides, and freeze
+      # clone the assignment_or_quiz, apply overrides, and freeze
       [:due_at, :all_day, :all_day_date, :unlock_at, :lock_at].each do |field|
-        value = self.send("overridden_#{field}", assignment, overrides)
-        # force times to un-zoned UTC -- this will be a cached value and should
-        # not care about the TZ of the user that cached it. the user's TZ will
-        # be applied before it's returned.
-        value = value.utc if value && value.respond_to?(:utc) && !value.is_a?(Date)
-        overridden_data[field] = value
+        if assignment_or_quiz.respond_to?(field)
+          value = self.send("overridden_#{field}", assignment_or_quiz, overrides)
+          # force times to un-zoned UTC -- this will be a cached value and should
+          # not care about the TZ of the user that cached it. the user's TZ will
+          # be applied before it's returned.
+          value = value.utc if value && value.respond_to?(:utc) && !value.is_a?(Date)
+          overridden_data[field] = value
+        end
       end
       overridden_data
     end
@@ -135,24 +148,24 @@ module AssignmentOverrideApplicator
   end
 
   # perform overrides of specific fields
-  def self.override_for_due_at(assignment, overrides)
+  def self.override_for_due_at(assignment_or_quiz, overrides)
     applicable_overrides = overrides.select(&:due_at_overridden)
     if applicable_overrides.empty?
-      assignment
+      assignment_or_quiz
     elsif override = applicable_overrides.detect{ |o| o.due_at.nil? }
       override
     else
       override = applicable_overrides.sort_by(&:due_at).last
-      if assignment.due_at && assignment.due_at > override.due_at
-        assignment
+      if assignment_or_quiz.due_at && assignment_or_quiz.due_at > override.due_at
+        assignment_or_quiz
       else
         override
       end
     end
   end
 
-  def self.overridden_due_at(assignment, overrides)
-    override_for_due_at(assignment, overrides).due_at
+  def self.overridden_due_at(assignment_or_quiz, overrides)
+    override_for_due_at(assignment_or_quiz, overrides).due_at
   end
 
   def self.overridden_all_day(assignment, overrides)
@@ -163,13 +176,13 @@ module AssignmentOverrideApplicator
     override_for_due_at(assignment, overrides).all_day_date
   end
 
-  def self.overridden_unlock_at(assignment, overrides)
+  def self.overridden_unlock_at(assignment_or_quiz, overrides)
     unlock_ats = overrides.select(&:unlock_at_overridden).map(&:unlock_at)
-    unlock_ats.any?(&:nil?) ? nil : [assignment.unlock_at, *unlock_ats].compact.min
+    unlock_ats.any?(&:nil?) ? nil : [assignment_or_quiz.unlock_at, *unlock_ats].compact.min
   end
 
-  def self.overridden_lock_at(assignment, overrides)
+  def self.overridden_lock_at(assignment_or_quiz, overrides)
     lock_ats = overrides.select(&:lock_at_overridden).map(&:lock_at)
-    lock_ats.any?(&:nil?) ? nil : [assignment.lock_at, *lock_ats].compact.max
+    lock_ats.any?(&:nil?) ? nil : [assignment_or_quiz.lock_at, *lock_ats].compact.max
   end
 end

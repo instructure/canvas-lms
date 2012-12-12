@@ -25,6 +25,7 @@ class Quiz < ActiveRecord::Base
   include ActionView::Helpers::SanitizeHelper
   extend ActionView::Helpers::SanitizeHelper::ClassMethods
   include ContextModuleItem
+  include DatesOverridable
 
   attr_accessible :title, :description, :points_possible, :assignment_id, :shuffle_answers,
     :show_correct_answers, :time_limit, :allowed_attempts, :scoring_policy, :quiz_type,
@@ -53,6 +54,7 @@ class Quiz < ActiveRecord::Base
   before_save :set_defaults
   after_save :update_assignment
   after_save :touch_context
+  after_save :link_assignment_overrides, :if => :new_assignment_id?
 
   serialize :quiz_data
 
@@ -89,6 +91,19 @@ class Quiz < ActiveRecord::Base
     @stored_questions = nil
   end
   protected :set_defaults
+  
+  def new_assignment_id?
+    last_assignment_id != assignment_id
+  end
+
+  def link_assignment_overrides
+    collections = [assignment_overrides, assignment_override_students]
+    collections += [assignment.assignment_overrides, assignment.assignment_override_students] if assignment
+
+    collections.each do |collection|
+      collection.update_all({ :assignment_id => assignment_id, :quiz_id => id })
+    end
+  end
 
   def build_assignment
     if self.available? && !self.assignment_id && self.graded? && @saved_by != :assignment && @saved_by != :clone

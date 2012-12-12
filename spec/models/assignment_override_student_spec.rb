@@ -78,4 +78,46 @@ describe AssignmentOverrideStudent do
     @override_student.valid? # trigger maintenance
     @override_student.assignment_id.should == @override2.assignment_id
   end
+
+  describe "default_values" do    
+    let(:override_student) { AssignmentOverrideStudent.new }
+    let(:override) { AssignmentOverride.new }
+    let(:quiz_id) { 1 }
+    let(:assignment_id) { 2 }
+
+    before do
+      override_student.assignment_override = override
+    end
+
+    context "when the override has an assignment" do
+      before do
+        override.assignment_id = assignment_id
+        override_student.send(:default_values)
+      end
+
+      it "has the assignment's ID" do
+        override_student.assignment_id.should == assignment_id
+      end
+
+      it "has a nil quiz ID" do
+        override_student.quiz_id.should be_nil
+      end
+    end
+
+    context "when the override has a quiz and assignment" do
+      before do
+        override.assignment_id = assignment_id
+        override.quiz_id = quiz_id
+        override_student.send(:default_values)
+      end
+
+      it "has the assignment's ID" do
+        override_student.assignment_id.should == assignment_id
+      end
+
+      it "has the quiz's ID" do
+        override_student.quiz_id.should == quiz_id
+      end
+    end
+  end
 end
