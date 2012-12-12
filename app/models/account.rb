@@ -378,7 +378,7 @@ class Account < ActiveRecord::Base
   end
 
   def file_namespace
-    "account_#{self.root_account.id}"
+    Shard.default.activate { "account_#{self.root_account.id}" }
   end
   
   def self.account_lookup_cache_key(id)
