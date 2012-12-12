@@ -215,6 +215,10 @@ class Enrollment < ActiveRecord::Base
     self.role_name || Enrollment.sis_type(self.type)
   end
 
+  def self.valid_type?(type)
+    SIS_TYPES.has_key?(type)
+  end
+
   TYPES_WITH_INDEFINITE_ARTICLE = {
     'TeacherEnrollment' => t('#enrollment.roles.teacher_with_indefinite_article', "A Teacher"),
     'TaEnrollment' => t('#enrollment.roles.ta_with_indefinite_article', "A TA"),

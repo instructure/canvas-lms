@@ -31,7 +31,6 @@ class EnrollmentsApiController < ApplicationController
     :concluded_course   => 'Can\'t add an enrollment to a concluded course.'
 
   }
-  @@valid_types = %w{StudentEnrollment TeacherEnrollment TaEnrollment ObserverEnrollment}
 
   include Api::V1::User
   # @API List enrollments
@@ -165,7 +164,7 @@ class EnrollmentsApiController < ApplicationController
   # Create a new user enrollment for a course or section.
   #
   # @argument enrollment[user_id] [String] The ID of the user to be enrolled in the course.
-  # @argument enrollment[type] [String] [StudentEnrollment|TeacherEnrollment|TaEnrollment|ObserverEnrollment] Enroll the user as a student, teacher, TA, or observer. If no value is given, 'StudentEnrollment' will be used.
+  # @argument enrollment[type] [String] [StudentEnrollment|TeacherEnrollment|TaEnrollment|ObserverEnrollment|DesignerEnrollment] Enroll the user as a student, teacher, TA, observer, or designer. If no value is given, the type will be inferred by enrollment[role] if supplied, otherwise 'StudentEnrollment' will be used.
   # @argument enrollment[role] [String] [Optional] Assigns a custom course-level role to the user.
   # @argument enrollment[enrollment_state] [String] [Optional, active|invited] [String] If set to 'active,' student will be immediately enrolled in the course. Otherwise they will be required to accept a course invitation. Default is 'invited.'
   # @argument enrollment[course_section_id] [Integer] [Optional] The ID of the course section to enroll the student in. If the section-specific URL is used, this argument is redundant and will be ignored
@@ -198,7 +197,7 @@ class EnrollmentsApiController < ApplicationController
       end
 
       if type.present?
-        errors << @@errors[:bad_type] unless @@valid_types.include?(type)
+        errors << @@errors[:bad_type] unless Enrollment.valid_type?(type)
       else
         type = 'StudentEnrollment'
       end

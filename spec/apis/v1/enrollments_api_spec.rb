@@ -160,6 +160,12 @@ describe EnrollmentsApiController, :type => :integration do
         JSON.parse(response.body)['message'].should eql 'Invalid type'
       end
 
+      it "should enroll a designer" do
+        json = api_call :post, @path, @path_options, { :enrollment => { :user_id => @unenrolled_user.id, :type => 'DesignerEnrollment' } }
+        json['type'].should eql 'DesignerEnrollment'
+        @unenrolled_user.enrollments.find(json['id']).should be_an_instance_of(DesignerEnrollment)
+      end
+
       it "should return an error if no user_id is given" do
         raw_api_call :post, @path, @path_options, { :enrollment => { :type => 'StudentEnrollment' } }
         response.code.should eql '403'
