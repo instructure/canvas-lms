@@ -906,7 +906,7 @@ class ApplicationController < ActionController::Base
   def session_loaded?
     session.send(:loaded?) rescue false
   end
-  
+
   # Retrieving wiki pages needs to search either using the id or 
   # the page title.
   def get_wiki_page
@@ -931,7 +931,7 @@ class ApplicationController < ActionController::Base
       @page.body = t "#application.wiki_front_page_default_content_group", "Welcome to your new group wiki!" if @context.is_a?(Group)
     end
   end
-  
+
   def context_wiki_page_url
     page_name = @page.url
     named_context_url(@context, :context_wiki_page_url, page_name)
@@ -973,7 +973,7 @@ class ApplicationController < ActionController::Base
       else
         @return_url = named_context_url(@context, :context_external_tool_finished_url, @tool.id, :include_host => true)
         @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @context, :link_code => @opaque_id, :return_url => @return_url)
-        if @assignment && @context.students.include?(@current_user)
+        if @assignment && @context.includes_student?(@current_user)
           @launch.for_assignment!(@tag.context, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool))
         end
         @tool_settings = @launch.generate
@@ -1083,7 +1083,7 @@ class ApplicationController < ActionController::Base
     res
   end
   helper_method :safe_domain_file_url
-  
+
   def feature_enabled?(feature)
     @features_enabled ||= {}
     feature = feature.to_sym

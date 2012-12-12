@@ -137,11 +137,21 @@ class Enrollment < ActiveRecord::Base
 
   named_scope :active,
               :conditions => ['enrollments.workflow_state != ?', 'deleted']
+
   named_scope :admin,
               :select => 'course_id',
               :joins => :course,
               :conditions => "enrollments.type IN ('TeacherEnrollment','TaEnrollment', 'DesignerEnrollment')
                               AND (courses.workflow_state = 'claimed' OR (enrollments.workflow_state = 'active' and  courses.workflow_state = 'available'))"
+
+  named_scope :of_admin_type,
+              :conditions => "enrollments.type IN ('TeacherEnrollment','TaEnrollment', 'DesignerEnrollment')"
+
+  named_scope :of_instructor_type,
+              :conditions => "enrollments.type IN ('TeacherEnrollment','TaEnrollment')"
+
+  named_scope :of_content_admins,
+              :conditions => "enrollments.type IN ('TeacherEnrollment', 'DesignerEnrollment')"
 
   named_scope :student,
               :select => 'course_id',
@@ -776,7 +786,7 @@ class Enrollment < ActiveRecord::Base
   def student?
     false
   end
-  
+
   def fake_student?
     false
   end

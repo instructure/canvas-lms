@@ -36,7 +36,7 @@ class User < ActiveRecord::Base
   # Internal: SQL fragments used to return enrollments in their respective workflow
   # states. Where needed, these consider the state of the course to ensure that
   # students do not see their enrollments on unpublished courses.
-  # 
+  #
   # strict_course_state can be used to bypass the course state checks. This is
   # useful in places like the course settings UI, where we use these conditions
   # to search users in the course (rather than as an association on a

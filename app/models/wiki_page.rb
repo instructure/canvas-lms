@@ -25,18 +25,18 @@ class WikiPage < ActiveRecord::Base
   include HasContentTags
   include CopyAuthorizedLinks
   include ContextModuleItem
-  
+
   belongs_to :wiki, :touch => true
   belongs_to :cloned_item
   belongs_to :user
   has_many :wiki_page_comments, :order => "created_at DESC"
   acts_as_url :title, :scope => [:wiki_id, :not_deleted], :sync_url => true
-  
+
   before_save :set_revised_at
   before_validation :ensure_unique_title
 
   TITLE_LENGTH = WikiPage.columns_hash['title'].limit rescue 255
-  
+
   def ensure_unique_title
     return if deleted?
     self.title ||= (self.url || "page").to_cased_title
@@ -55,11 +55,11 @@ class WikiPage < ActiveRecord::Base
         new_title = real_title[0...(TITLE_LENGTH - mod.length)] + mod
         n = n.succ
       end while self.wiki.wiki_pages.not_deleted.find_by_title(new_title)
-      
+
       self.title = new_title
     end
   end
-  
+
   def ensure_unique_url
     url_attribute = self.class.url_attribute
     base_url = self.send(url_attribute)
@@ -103,7 +103,7 @@ class WikiPage < ActiveRecord::Base
 
   sanitize_field :body, Instructure::SanitizeField::SANITIZE
   copy_authorized_links(:body) { [self.context, self.user] }
-  
+
   validates_each :title do |record, attr, value|
     if value.blank?
       record.errors.add(attr, t('errors.blank_title', "Title can't be blank"))
@@ -113,53 +113,53 @@ class WikiPage < ActiveRecord::Base
       record.errors.add(attr, t('errors.title_characters', "Title must contain at least one letter or number")) # it's a bit more liberal than this, but let's not complicate things
     end
   end
-  
+
   has_a_broadcast_policy
   simply_versioned
   after_save :remove_changed_flag
-  
+
   workflow do
     state :active
     state :post_delayed do
       event :delayed_post, :transitions_to => :active
     end
-    
+
     state :deleted
-    
+
   end
-  
+
   def restore
     self.workflow_state = 'active'
     self.save
   end
-  
+
   def set_revised_at
     self.revised_at ||= Time.now
     self.revised_at = Time.now if self.body_changed?
     @page_changed = self.body_changed? || self.title_changed?
     true
   end
-  
+
   def notify_of_update=(val)
     @wiki_page_changed = (val == '1' || val == true)
   end
-  
+
   def notify_of_update
     false
   end
-  
+
   def remove_changed_flag
     @wiki_page_changed = false
   end
-  
+
   def version_history
     self.versions.map(&:model)
   end
-  
+
   named_scope :active, lambda{
     {:conditions => ['wiki_pages.workflow_state = ?', 'active'] }
   }
-  
+
   named_scope :deleted_last, lambda{
     {:order => "workflow_state = 'deleted'" }
   }
@@ -185,48 +185,48 @@ class WikiPage < ActiveRecord::Base
       locked
     end
   end
-  
+
   def context_module_tag_for(context)
     @tag ||= self.context_module_tags.find_by_context_id_and_context_type(context.id, context.class.to_s)
   end
-  
+
   def context_module_action(user, context, action)
     tag = self.context_module_tags.find_by_context_id_and_context_type(context.id, context.class.to_s)
     tag.context_module_action(user, action) if tag
   end
-  
+
   set_policy do
     given {|user, session| self.wiki.grants_right?(user, session, :read) && can_read_page?(user) }
     can :read
-    
+
     given {|user, session| self.wiki.grants_right?(user, session, :contribute) && can_read_page?(user) }
     can :read
 
     given {|user, session| self.editing_role?(user) && !self.locked_for?(nil, user) }
     can :read and can :update_content and can :create
-    
+
     given {|user, session| self.wiki.grants_right?(user, session, :manage) }
     can :create and can :read and can :update and can :delete and can :update_content
-    
+
     given {|user, session| self.wiki.grants_right?(user, session, :manage_content) }
     can :create and can :read and can :update and can :delete and can :update_content
-    
+
   end
-  
+
   def can_read_page?(user)
     !hide_from_students || (context.respond_to?(:admins) && context.admins.include?(user))
   end
-  
+
   def editing_role?(user)
     context_roles = context.default_wiki_editing_roles rescue nil
-    roles = (self.editing_roles || context_roles || default_roles).split(",")
+    roles = (editing_roles || context_roles || default_roles).split(",")
     return true if roles.include?('teachers') && context.respond_to?(:teachers) && context.teachers.include?(user)
-    return true if !hide_from_students && roles.include?('students') && context.respond_to?(:students) && context.students.include?(user)
+    return true if !hide_from_students && roles.include?('students') && context.respond_to?(:students) && context.includes_student?(user)
     return true if !hide_from_students && roles.include?('members') && context.respond_to?(:users) && context.users.include?(user)
     return true if !hide_from_students && roles.include?('public')
     false
   end
-  
+
   def default_roles
     if context.is_a?(Group)
       'members'
@@ -266,7 +266,7 @@ class WikiPage < ActiveRecord::Base
     end
     res.flatten.uniq
   end
-    
+
   def to_atom(opts={})
     context = opts[:context]
     Atom::Entry.new do |entry|
@@ -280,21 +280,21 @@ class WikiPage < ActiveRecord::Base
       entry.content   = Atom::Content::Html.new(self.body || t('defaults.no_content', "no content"))
     end
   end
-  
+
   def user_name
     (user && user.name) || t('unknown_user_name', "Unknown")
   end
-  
+
   def to_param
     url
   end
-  
+
   def last_revision_at
     res = self.revised_at || self.updated_at
     res = Time.now if res.is_a?(String)
     res
   end
-  
+
   attr_accessor :clone_updated
   def clone_for(context, dup=nil, options={}) #migrate=true)
     options[:migrate] = true if options[:migrate] == nil
@@ -347,7 +347,7 @@ class WikiPage < ActiveRecord::Base
       end
     end
   end
-  
+
   def self.import_from_migration(hash, context, item=nil)
     hash = hash.with_indifferent_access
     item ||= find_by_wiki_id_and_id(context.wiki.id, hash[:id])
@@ -475,7 +475,7 @@ class WikiPage < ActiveRecord::Base
       return item
     end
   end
-  
+
   def self.comments_enabled?
     ENV['RAILS_ENV'] != 'production'
   end

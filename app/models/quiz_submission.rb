@@ -21,7 +21,7 @@ class QuizSubmission < ActiveRecord::Base
   attr_accessible :quiz, :user, :temporary_user_code, :submission_data
   attr_readonly :quiz_id, :user_id
   validates_presence_of :quiz_id
-  
+
   belongs_to :quiz
   belongs_to :user
   belongs_to :submission, :touch => true

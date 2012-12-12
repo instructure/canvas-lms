@@ -336,7 +336,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def update_student_submissions
-    submissions.graded.each do |submission|
+    submissions.graded.find_each do |submission|
       submission.grade = score_to_grade(submission.score)
       submission.with_versioning(:explicit => true) { submission.save! }
     end
@@ -478,7 +478,7 @@ class Assignment < ActiveRecord::Base
 
   def update_submissions(just_published=false)
     @updated_submissions ||= []
-    self.submissions.each do |submission|
+    self.submissions.find_each do |submission|
       @updated_submissions << submission
       if just_published
         submission.assignment_just_published!
@@ -911,7 +911,7 @@ class Assignment < ActiveRecord::Base
   def graded_count
     return read_attribute(:graded_count).to_i if read_attribute(:graded_count)
     Rails.cache.fetch(['graded_count', self].cache_key) do
-      self.submissions.select(&:graded?).length
+      submissions.graded.in_workflow_state('graded').count
     end
   end
 
@@ -922,7 +922,7 @@ class Assignment < ActiveRecord::Base
   def submitted_count
     return read_attribute(:submitted_count).to_i if read_attribute(:submitted_count)
     Rails.cache.fetch(['submitted_count', self].cache_key) do
-      self.submissions.select{|s| s.has_submission? }.length
+      self.submissions.having_submission.count
     end
   end
 
@@ -991,13 +991,14 @@ class Assignment < ActiveRecord::Base
     grade = self.score_to_grade(score)
     submissions_to_save = []
     @students_whose_grade_just_changed = []
-    self.context.students.each do |student|
-      submission = self.find_or_create_submission(student)
-      if !submission.score || options[:overwrite_existing_grades]
-        if submission.score != score
-          submission.score = score
-          submissions_to_save << submission
-          @students_whose_grade_just_changed << student
+    self.context.students.find_each do |student|
+      User.send(:with_exclusive_scope) do
+        submission = self.find_or_create_submission(student)
+        if !submission.score || options[:overwrite_existing_grades]
+          if submission.score != score
+            submissions_to_save << submission
+            @students_whose_grade_just_changed << student
+          end
         end
       end
     end
@@ -1005,8 +1006,9 @@ class Assignment < ActiveRecord::Base
     changed_since_publish = !!self.available?
     Submission.update_all({:score => score, :grade => grade, :published_score => score, :published_grade => grade, :changed_since_publish => changed_since_publish, :workflow_state => 'graded', :graded_at => Time.now.utc}, {:id => submissions_to_save.map(&:id)} ) unless submissions_to_save.empty?
 
-    self.context.recompute_student_scores 
-    send_later_if_production(:multiple_module_actions, context.students.map(&:id), :scored, score)
+    self.context.recompute_student_scores
+    student_ids = context.student_ids
+    send_later_if_production(:multiple_module_actions, student_ids, :scored, score)
   end
 
   def update_user_from_rubric(user, assessment)
@@ -1049,7 +1051,7 @@ class Assignment < ActiveRecord::Base
 
   def grade_student(original_student, opts={})
     raise "Student is required" unless original_student
-    raise "Student must be enrolled in the course as a student to be graded" unless original_student && self.context.students.include?(original_student)
+    raise "Student must be enrolled in the course as a student to be graded" unless context.includes_student?(original_student)
     raise "Grader must be enrolled as a course admin" if opts[:grader] && !self.context.grants_right?(opts[:grader], nil, :manage_grades)
     opts.delete(:id)
     group_comment = opts.delete :group_comment
@@ -1367,7 +1369,7 @@ class Assignment < ActiveRecord::Base
     return [] unless self.peer_review_count && self.peer_review_count > 0
 
     submissions = self.submissions.having_submission.include_assessment_requests
-    student_ids = self.context.students.map(&:id)
+    student_ids = context.student_ids
     submissions = submissions.select{|s| student_ids.include?(s.user_id) }
     submission_ids = Set.new(submissions) { |s| s.id }
 

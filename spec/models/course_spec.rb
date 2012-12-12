@@ -52,13 +52,13 @@ describe Course do
     @course.enrollment_term.update_attribute(:end_at, Time.now + 1.week)
     @course.should_not be_soft_concluded
   end
-  
+
   context "validation" do
     it "should create a new instance given valid attributes" do
       course_model
     end
   end
-  
+
   it "should create a unique course." do
     @course = Course.create_unique
     @course.name.should eql("My Course")
@@ -66,7 +66,7 @@ describe Course do
     @course2 = Course.create_unique(@uuid)
     @course.should eql(@course2)
   end
-  
+
   it "should always have a uuid, if it was created" do
     @course.save!
     @course.uuid.should_not be_nil
@@ -3000,6 +3000,66 @@ describe Course do
     end
   end
 
+  describe 'permission policies' do
+    before do
+      @course = course_model
+      @course.write_attribute(:workflow_state, 'available')
+      @course.write_attribute(:is_public, true)
+    end
+
+    it 'can be read by a nil user if public and available' do
+      @course.check_policy(nil).should == [:read, :read_outcomes]
+    end
+
+    it 'cannot be read by a nil user if public but not available' do
+      @course.write_attribute(:workflow_state, 'created')
+      @course.check_policy(nil).should == []
+    end
+
+    describe 'when course is not public' do
+      before do
+        @course.write_attribute(:is_public, false)
+      end
+
+      let(:user) { user_model }
+
+
+      it 'cannot be read by a nil user' do
+        @course.check_policy(nil).should == []
+      end
+
+      it 'cannot be read by an unaffiliated user' do
+        @course.check_policy(user).should == []
+      end
+
+      it 'can be read by a prior user' do
+        user.enrollments.create!(:workflow_state => 'completed', :course => @course)
+        @course.check_policy(user).should == [:read, :read_outcomes]
+      end
+
+      it 'can have its forum read by an observer' do
+        enrollment = user.observer_enrollments.create!(:workflow_state => 'completed', :course => @course)
+        enrollment.update_attribute(:associated_user_id, user.id)
+        @course.check_policy(user).should include :read_forum
+      end
+
+      describe 'an instructor policy' do
+
+        let(:instructor) do
+          user.teacher_enrollments.create!(:workflow_state => 'completed', :course => @course)
+          user
+        end
+
+        subject{ @course.check_policy(instructor) }
+
+        it{ should include :read_prior_roster }
+        it{ should include :view_all_grades }
+        it{ should include :delete }
+      end
+
+    end
+  end
+
   context "sharding" do
     it_should_behave_like "sharding"
 
@@ -3191,23 +3251,47 @@ describe Course do
       end
     end
   end
+
+  describe '#includes_student' do
+    let(:course) { course_model }
+
+    it 'returns true when the provided user is a student' do
+      student = user_model
+      student.student_enrollments.create!(:course => course)
+      course.includes_student?(student).should be_true
+    end
+
+    it 'returns false when the provided user is not a student' do
+      course.includes_student?(User.create!).should be_false
+    end
+
+    it 'returns false when the user is not yet even in the database' do
+      course.includes_student?(User.new).should be_false
+    end
+
+    it 'returns false when the provided user is nil' do
+      course.includes_student?(nil).should be_false
+    end
+  end
 end
 
 describe Course do
   context "re-enrollments" do
     it "should update concluded enrollment on re-enrollment" do
       @course = course(:active_all => true)
-      
-      @user1 = user_model; @user1.sortable_name = 'jonny'; @user1.save      
+
+      @user1 = user_model
+      @user1.sortable_name = 'jonny'
+      @user1.save
       @course.enroll_user(@user1)
-      
+
       enrollment_count = @course.enrollments.count
-      
+
       @course.complete
       @course.unconclude
-      
+
       @course.enroll_user(@user1)
-      
+
       @course.enrollments.count.should == enrollment_count
     end
   end

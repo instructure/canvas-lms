@@ -804,4 +804,5 @@ describe DiscussionTopic do
     end
 
   end
+
 end

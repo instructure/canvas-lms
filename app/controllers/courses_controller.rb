@@ -472,7 +472,7 @@ class CoursesController < ApplicationController
   def statistics
     get_context
     if authorized_action(@context, @current_user, :read_reports)
-      @student_ids = @context.students.map &:id
+      @student_ids = @context.student_ids
       @range_start = Date.parse("Jan 1 2000")
       @range_end = Date.tomorrow
 

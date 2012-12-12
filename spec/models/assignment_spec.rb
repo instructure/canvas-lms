@@ -71,18 +71,41 @@ describe Assignment do
     @submission.versions.length.should eql(1)
   end
 
-  it "should be able to grade a submission" do
-    setup_assignment_without_submission
-    s = @assignment.grade_student(@user, :grade => "10")
-    s.should be_is_a(Array)
-    @assignment.reload
-    @assignment.submissions.size.should eql(1)
-    @submission = @assignment.submissions.first
-    @submission.state.should eql(:graded)
-    @submission.should eql(s[0])
-    @submission.score.should eql(10.0)
-    @submission.user_id.should eql(@user.id)
-    @submission.versions.length.should eql(1)
+  describe '#grade_student' do
+    before { setup_assignment_without_submission }
+
+    describe 'with a valid student' do
+      before do
+        @result = @assignment.grade_student(@user, :grade => "10")
+        @assignment.reload
+      end
+
+      it 'returns an array' do
+        @result.should be_is_a(Array)
+      end
+
+      it 'now has a submission' do
+        @assignment.submissions.size.should eql(1)
+      end
+
+      describe 'the submission after grading' do
+        subject { @assignment.submissions.first }
+
+        its(:state) { should eql(:graded) }
+        it { should == @result[0] }
+        its(:score) { should == 10.0 }
+        its(:user_id) { should == @user.id }
+        specify { subject.versions.length.should == 1 }
+      end
+    end
+
+    it 'raises an error if there is no student' do
+      lambda { @assignment.grade_student(nil) }.should raise_error(StandardError, 'Student is required')
+    end
+
+    it 'will not continue if the student does not belong here' do
+      lambda { @assignment.grade_student(User.new) }.should raise_error(StandardError, 'Student must be enrolled in the course as a student to be graded')
+    end
   end
 
   it "should update a submission's graded_at when grading it" do
@@ -105,7 +128,7 @@ describe Assignment do
       @assignment.reload
       @assignment.needs_grading_count.should eql(0)
     end
-  
+
     it "should not update when non-student submissions transition state" do
       assignment_model
       s = Assignment.find_or_create_submission(@assignment.id, @teacher.id)
@@ -1748,99 +1771,94 @@ describe Assignment do
     end
 
     context "assignment graded" do
-      it "should notify students when their grade is changed" do
-        setup_unpublished_assignment_with_students
-        @assignment.publish!
-        @assignment.should be_published
-        @sub2 = @assignment.grade_student(@stu2, :grade => 8).first
-        @sub2.messages_sent.should_not be_empty
-        @sub2.messages_sent['Submission Graded'].should_not be_nil
-        @sub2.messages_sent['Submission Grade Changed'].should be_nil
-        @sub2.update_attributes(:graded_at => Time.now - 60*60)
-        @sub2 = @assignment.grade_student(@stu2, :grade => 9).first
-        @sub2.messages_sent.should_not be_empty
-        @sub2.messages_sent['Submission Graded'].should be_nil
-        @sub2.messages_sent['Submission Grade Changed'].should_not be_nil
-      end
+      before { setup_unpublished_assignment_with_students }
 
-      it "should not notify students when their grade is changed if muted" do
-        setup_unpublished_assignment_with_students
-        @assignment.publish!
-        @assignment.mute!
-        @assignment.should be_muted
-        @sub2 = @assignment.grade_student(@stu2, :grade => 8).first
-        @sub2.update_attributes(:graded_at => Time.now - 60*60)
-        @sub2 = @assignment.grade_student(@stu2, :grade => 9).first
-        @sub2.messages_sent.should be_empty
-      end
+      describe 'when its been published' do
+        before { @assignment.publish! }
 
-      it "should not notify students of grade changes if unpublished" do
-        setup_unpublished_assignment_with_students
-        @assignment.publish!
-        @assignment.should be_published
-        @assignment.unpublish!
-        @assignment.should be_available
-        @sub2 = @assignment.grade_student(@stu2, :grade => 8).first
-        @sub2.messages_sent.should be_empty
-        @sub2.update_attributes(:graded_at => Time.now - 60*60)
-        @sub2 = @assignment.grade_student(@stu2, :grade => 9).first
-        @sub2.messages_sent.should be_empty
-      end
+        specify { @assignment.should be_published }
 
-      it "should notify affected students on a mass-grade change" do
-        setup_unpublished_assignment_with_students
-        @assignment.publish!
-        @assignment.set_default_grade(:default_grade => 10)
-        @assignment.messages_sent.should_not be_nil
-        @assignment.messages_sent['Assignment Graded'].should_not be_nil
-      end
+        it "should notify students when their grade is changed" do
+          @sub2 = @assignment.grade_student(@stu2, :grade => 8).first
+          @sub2.messages_sent.should_not be_empty
+          @sub2.messages_sent['Submission Graded'].should_not be_nil
+          @sub2.messages_sent['Submission Grade Changed'].should be_nil
+          @sub2.update_attributes(:graded_at => Time.now - 60*60)
+          @sub2 = @assignment.grade_student(@stu2, :grade => 9).first
+          @sub2.messages_sent.should_not be_empty
+          @sub2.messages_sent['Submission Graded'].should be_nil
+          @sub2.messages_sent['Submission Grade Changed'].should_not be_nil
+        end
 
-      it "should not notify affected students on a mass-grade change if muted" do
-        setup_unpublished_assignment_with_students
-        @assignment.publish!
-        @assignment.mute!
-        @assignment.set_default_grade(:default_grade => 10)
-        @assignment.messages_sent.should be_empty
-      end
 
-      it "should notify affected students of a grade change when the assignment is republished" do
-        setup_unpublished_assignment_with_students
-        @assignment.publish!
-        @assignment.should be_published
-        @assignment.unpublish!
-        @assignment.should be_available
-        @sub2 = @assignment.grade_student(@stu2, :grade => 8).first
-        @sub2.messages_sent.should be_empty
-        @sub2.update_attributes(:graded_at => Time.now - 60*60)
-        @assignment.reload
-        @assignment.publish!
-        @subs = @assignment.updated_submissions
-        @subs.should_not be_nil
-        @subs.should_not be_empty
-        @sub = @subs.detect{|s| s.user_id == @stu2.id }
-        @sub.messages_sent.should_not be_nil
-        @sub.messages_sent['Submission Grade Changed'].should_not be_nil
-        @sub = @subs.detect{|s| s.user_id != @stu2.id }
-        @sub.messages_sent.should_not be_nil
-        @sub.messages_sent['Submission Grade Changed'].should be_nil
-      end
+        it "should notify affected students on a mass-grade change" do
+          @assignment.set_default_grade(:default_grade => 10)
+          @assignment.messages_sent.should_not be_nil
+          @assignment.messages_sent['Assignment Graded'].should_not be_nil
+        end
 
-      it "should not notify unaffected students of a grade change when the assignment is republished" do
-        setup_unpublished_assignment_with_students
-        @assignment.publish!
-        @assignment.should be_published
-        @assignment.unpublish!
-        @assignment.should be_available
-        @assignment.publish!
-        @subs = @assignment.updated_submissions
-        @subs.should_not be_nil
-        @sub = @subs.first
-        @sub.messages_sent.should_not be_nil
-        @sub.messages_sent['Submission Grade Changed'].should be_nil
+
+        describe 'and then muted' do
+          before { @assignment.mute! }
+
+          specify { @assignment.should be_muted }
+
+          it "should not notify affected students on a mass-grade change if muted" do
+            @assignment.set_default_grade(:default_grade => 10)
+            @assignment.messages_sent.should be_empty
+          end
+
+          it "should not notify students when their grade is changed if muted" do
+            @sub2 = @assignment.grade_student(@stu2, :grade => 8).first
+            @sub2.update_attributes(:graded_at => Time.now - 60*60)
+            @sub2 = @assignment.grade_student(@stu2, :grade => 9).first
+            @sub2.messages_sent.should be_empty
+          end
+        end
+
+        describe 'and then unpublished' do
+          before { @assignment.unpublish! }
+
+          specify { @assignment.should be_available }
+
+          it "should not notify students of grade changes if unpublished" do
+            @sub2 = @assignment.grade_student(@stu2, :grade => 8).first
+            @sub2.messages_sent.should be_empty
+            @sub2.update_attributes(:graded_at => Time.now - 60*60)
+            @sub2 = @assignment.grade_student(@stu2, :grade => 9).first
+            @sub2.messages_sent.should be_empty
+          end
+
+          it "should notify affected students of a grade change when the assignment is republished" do
+            @sub2 = @assignment.grade_student(@stu2, :grade => 8).first
+            @sub2.messages_sent.should be_empty
+            @sub2.update_attributes(:graded_at => Time.now - 60*60)
+            @assignment.reload
+            @assignment.publish!
+            @subs = @assignment.updated_submissions
+            @subs.should_not be_nil
+            @subs.should_not be_empty
+            @sub = @subs.detect{|s| s.user_id == @stu2.id }
+            @sub.messages_sent.should_not be_nil
+            @sub.messages_sent['Submission Grade Changed'].should_not be_nil
+            @sub = @subs.detect{|s| s.user_id != @stu2.id }
+            @sub.messages_sent.should_not be_nil
+            @sub.messages_sent['Submission Grade Changed'].should be_nil
+          end
+
+          it "should not notify unaffected students of a grade change when the assignment is republished" do
+            @assignment.publish!
+            @subs = @assignment.updated_submissions
+            @subs.should_not be_nil
+            @sub = @subs.first
+            @sub.messages_sent.should_not be_nil
+            @sub.messages_sent['Submission Grade Changed'].should be_nil
+          end
+        end
+
       end
 
       it "should include re-submitted submissions in the list of submissions needing grading" do
-        setup_unpublished_assignment_with_students
         @enr1.accept!
         @assignment.publish!
         @assignment.should be_published
@@ -2628,6 +2646,39 @@ describe Assignment do
       s.reload.version_number.should == 2
     end
   end
+
+  describe '#graded_count' do
+    before do
+      setup_assignment_without_submission
+      @assignment.grade_student(@user, :grade => 1)
+    end
+
+    it 'counts the submissions that have been graded' do
+      @assignment.graded_count.should == 1
+    end
+
+    it 'returns the cached value if present' do
+      @assignment.write_attribute(:graded_count, 50)
+      @assignment.graded_count.should == 50
+    end
+  end
+
+  describe '#submitted_count' do
+    before do
+      setup_assignment_without_submission
+      @assignment.grade_student(@user, :grade => 1)
+      @assignment.submissions.first.update_attribute(:submission_type, 'online_url')
+    end
+
+    it 'counts the submissions that have submission types' do
+      @assignment.submitted_count.should == 1
+    end
+
+    it 'returns the cached value if present' do
+      @assignment.write_attribute(:submitted_count, 50)
+      @assignment.submitted_count.should == 50
+    end
+  end
 end
 
 def setup_assignment_with_group
@@ -2640,6 +2691,7 @@ def setup_assignment_with_group
   @group.add_user(@u2)
   @assignment.reload
 end
+
 def setup_assignment_without_submission
   # Established course too, as a context
   assignment_model

@@ -321,7 +321,7 @@ class Group < ActiveRecord::Base
     can :delete and
     can :manage and
     can :manage_admin_users and
-    can :manage_students and 
+    can :manage_students and
     can :moderate_forum and
     can :update
 

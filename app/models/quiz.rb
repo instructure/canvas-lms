@@ -35,7 +35,7 @@ class Quiz < ActiveRecord::Base
 
   attr_readonly :context_id, :context_type
   attr_accessor :notify_of_update
-  
+
   has_many :quiz_questions, :dependent => :destroy, :order => 'position'
   has_many :quiz_submissions, :dependent => :destroy
   has_many :quiz_groups, :dependent => :destroy, :order => 'position'
@@ -53,9 +53,9 @@ class Quiz < ActiveRecord::Base
   before_save :set_defaults
   after_save :update_assignment
   after_save :touch_context
-  
+
   serialize :quiz_data
-  
+
   simply_versioned
 
   def infer_times
@@ -89,7 +89,7 @@ class Quiz < ActiveRecord::Base
     @stored_questions = nil
   end
   protected :set_defaults
-  
+
   def build_assignment
     if self.available? && !self.assignment_id && self.graded? && @saved_by != :assignment && @saved_by != :clone
       assignment = self.assignment
@@ -305,21 +305,21 @@ class Quiz < ActiveRecord::Base
     state :created do
       event :did_edit, :transitions_to => :edited
     end
-    
+
     state :edited do
       event :offer, :transitions_to => :available
     end
-    
+
     state :available
     state :deleted
   end
-  
+
   def root_entries_max_position
     question_max = self.quiz_questions.maximum(:position, :conditions => 'quiz_group_id is null')
     group_max = self.quiz_groups.maximum(:position)
     [question_max, group_max, 0].compact.max
   end
-  
+
   # Returns the list of all "root" entries, either questions or question
   # groups for this quiz.  This is PRE-SAVED data.  Once the quiz has 
   # been saved, all the data can be found in Quiz.quiz_data
@@ -803,7 +803,7 @@ class Quiz < ActiveRecord::Base
 
   def submissions_for_statistics(include_all_versions=true)
     ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
-      for_users = self.context.students.map(&:id)
+      for_users = context.student_ids
       self.quiz_submissions.scoped(:include => [:versions], :conditions => { :user_id => for_users }).
         map { |qs| if include_all_versions then qs.submitted_versions else qs.latest_submitted_version end }.
         flatten.
@@ -813,7 +813,7 @@ class Quiz < ActiveRecord::Base
         reverse
     end
   end
-  
+
   def statistics_csv(options={})
     options ||= {}
     columns = []
@@ -985,7 +985,7 @@ class Quiz < ActiveRecord::Base
     stats[:last_submission_at] = submissions.map{|s| s.finished_at }.compact.max || self.created_at
     stats
   end
-  
+
   def stats_for_question(question, submissions)
     res = question
     res[:responses] = 0
@@ -1129,7 +1129,7 @@ class Quiz < ActiveRecord::Base
             end
           end
           if !found
-            
+
             if ['numerical_question', 'short_answer_question'].include?(question[:question_type]) && response_hash_id
               answer = {:id => response_hash_id, :responses => 1, :user_ids => [submission.user_id], :text => response[:text]}
               res[:answers] << answer
@@ -1148,13 +1148,13 @@ class Quiz < ActiveRecord::Base
     res[:answers] << none if none && none[:responses] > 0
     res
   end
-  
+
   def unpublished_changes?
     self.last_edited_at && self.published_at && self.last_edited_at > self.published_at
   end
-  
+
   def has_student_submissions?
-    self.quiz_submissions.any?{|s| !s.settings_only? && self.context.students.include?(s.user) }
+    self.quiz_submissions.any?{|s| !s.settings_only? && context.includes_student?(s.user) }
   end
 
   # clear out all questions so that the quiz can be replaced. this is currently

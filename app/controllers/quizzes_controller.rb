@@ -89,7 +89,7 @@ class QuizzesController < ApplicationController
     @assignment = @quiz.assignment
     if authorized_action(@quiz, @current_user, :update)
       add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
-      student_ids = @context.students.map{|s| s.id }
+      student_ids = @context.student_ids
       @banks_hash = {}
       bank_ids = @quiz.quiz_groups.map(&:assessment_question_bank_id)
       unless bank_ids.empty?

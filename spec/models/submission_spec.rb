@@ -38,7 +38,7 @@ describe Submission do
   it "should create a new instance given valid attributes" do
     Submission.create!(@valid_attributes)
   end
-  
+
   it_should_behave_like "url validation tests"
   it "should check url validity" do
     test_url_validation(Submission.create!(@valid_attributes))
@@ -60,21 +60,21 @@ describe Submission do
     @course = Course.new
     @assignment = Assignment.new(:context => @course)
     @assignment.expects(:context).returns(@course)
-    
+
     @submission = Submission.new
     lambda{@submission.context}.should_not raise_error
     @submission.context.should be_nil
     @submission.assignment = @assignment
     @submission.context.should eql(@course)
   end
-  
+
   it "should have an interesting state machine" do
     submission_spec_model
     @submission.state.should eql(:submitted)
     @submission.grade_it
     @submission.state.should eql(:graded)
   end
-  
+
   it "should be versioned" do
     submission_spec_model
     @submission.should be_respond_to(:versions)

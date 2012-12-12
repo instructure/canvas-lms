@@ -552,18 +552,18 @@ describe QuizzesController do
       response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}")
       flash[:notice].should match(/You cannot view the quiz history while the quiz is muted/)
     end
-    
+
     it "should allow teacher viewing if the assignment is muted" do
       u = user(:active_all => true)
       course_with_teacher_logged_in(:active_all => true)
       @course.enroll_student(u)
-      
+
       course_quiz
       @quiz.generate_quiz_data
       @quiz.workflow_state = 'available'
       @quiz.published_at = Time.now
       @quiz.save
-      
+
       @quiz.assignment.should_not be_nil
       @quiz.assignment.mute!
       s = @quiz.generate_submission(u)

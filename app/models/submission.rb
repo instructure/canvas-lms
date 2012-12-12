@@ -45,7 +45,7 @@ class Submission < ActiveRecord::Base
   validates_length_of :body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   include CustomValidations
   validates_as_url :url
-  
+
   named_scope :with_comments, :include => [:submission_comments ]
   named_scope :after, lambda{|date|
     {:conditions => ['submissions.created_at > ?', date] }
@@ -59,7 +59,7 @@ class Submission < ActiveRecord::Base
   named_scope :submitted_after, lambda{|date|
     {:conditions => ['submitted_at > ?', date] }
   }
-  
+
   named_scope :for_context_codes, lambda { |context_codes|
     { :conditions => {:context_code => context_codes} }
   }
@@ -93,9 +93,9 @@ class Submission < ActiveRecord::Base
     conditions
   end
 
-  
+
   sanitize_field :body, Instructure::SanitizeField::SANITIZE
-  
+
   attr_accessor :saved_by
   before_save :update_if_pending
   before_save :validate_single_submission, :validate_enrollment, :infer_values, :set_context_code
@@ -159,16 +159,16 @@ class Submission < ActiveRecord::Base
     given {|user| self.assignment && self.assignment.context && user && self.user &&
       self.assignment.context.observer_enrollments.find_by_user_id_and_associated_user_id_and_workflow_state(user.id, self.user.id, 'active') }
     can :read and can :read_comments
-    
+
     given {|user, session| self.assignment.cached_context_grants_right?(user, session, :manage_grades) }#admins.include?(user) }
     can :read and can :comment and can :make_group_comment and can :read_grade and can :grade
-    
+
     given {|user, session| self.assignment.cached_context_grants_right?(user, session, :view_all_grades) }
     can :read and can :read_grade
-    
+
     given {|user| user && self.assessment_requests.map{|a| a.assessor_id}.include?(user.id) }
     can :read and can :comment
-    
+
     given { |user, session|
       grants_right?(user, session, :read_grade) &&
       turnitin_data &&
@@ -371,7 +371,7 @@ class Submission < ActiveRecord::Base
     @submit_to_turnitin = true
     submit_to_turnitin_later
   end
-  
+
   def turnitinable?
     if self.submission_type == 'online_upload' || self.submission_type == 'online_text_entry'
       if self.assignment.turnitin_enabled?
@@ -380,7 +380,7 @@ class Submission < ActiveRecord::Base
     end
     false
   end
-  
+
   def update_assignment
     self.send_later(:context_module_action)
     true
@@ -442,11 +442,11 @@ class Submission < ActiveRecord::Base
       end
     end
   end
-  
+
   def set_context_code
     self.context_code = self.assignment.context_code rescue nil
   end
-  
+
   def infer_values
     if self.assignment
       self.score = self.assignment.max_score if self.assignment.max_score && self.score && self.score > self.assignment.max_score
@@ -537,17 +537,17 @@ class Submission < ActiveRecord::Base
     @url_changed = self.url && self.url_changed?
     true
   end
-  
+
   def queue_websnap
     if !self.attachment_id && @url_changed && self.url && self.submission_type == 'online_url'
       self.send_later_enqueue_args(:get_web_snapshot, { :priority => Delayed::LOW_PRIORITY })
     end
   end
-  
+
   def attachment_ids
     read_attribute(:attachment_ids)
   end
-  
+
   def versioned_attachments
     ids = (self.attachment_ids || "").split(",").map{|id| id.to_i}
     ids << self.attachment_id if self.attachment_id
@@ -664,7 +664,7 @@ class Submission < ActiveRecord::Base
   def teacher
     @teacher ||= self.assignment.teacher_enrollment.user
   end
-  
+
   def update_if_pending
     @attachments = nil
     if self.submission_type == 'online_quiz' && self.quiz_submission && self.score && self.score == self.quiz_submission.score
@@ -672,14 +672,14 @@ class Submission < ActiveRecord::Base
     end
     true
   end
-  
+
   def attachment_ids=(ids)
     write_attribute(:attachment_ids, ids)
   end
 #   def attachment_ids=(ids)
     # raise "Cannot set attachment id's directly"
   # end
-  
+
   def attachments=(attachments)
     # Accept attachments that were already approved, those that were just created
     # or those that were part of some outside context.  This is all to prevent
@@ -689,7 +689,7 @@ class Submission < ActiveRecord::Base
     old_ids = (Array(self.attachment_ids || "").join(",")).split(",").map{|id| id.to_i}
     write_attribute(:attachment_ids, attachments.select{|a| a && a.id && old_ids.include?(a.id) || (a.recently_created? && a.context == self.assignment) || a.context != self.assignment }.map{|a| a.id}.join(","))
   end
-  
+
   def validate_single_submission
     @full_url = nil
     if read_attribute(:url) && read_attribute(:url).length > 250
@@ -702,10 +702,10 @@ class Submission < ActiveRecord::Base
     true
   end
   private :validate_single_submission
-  
+
   def validate_enrollment
     begin
-      self.assignment.context.students.include?(self.user) 
+      assignment.context.includes_student?(user)
       true
     rescue => e
       raise ArgumentError, "Cannot submit to an assignment when the student is not properly enrolled."
@@ -714,7 +714,7 @@ class Submission < ActiveRecord::Base
   private :validate_enrollment
 
   include Workflow
-  
+
   workflow do
     state :submitted do
       event :grade_it, :transitions_to => :graded
@@ -723,18 +723,25 @@ class Submission < ActiveRecord::Base
     state :pending_review
     state :graded
   end
-  
+
   named_scope :graded, lambda {
     {:conditions => ['submissions.grade IS NOT NULL']}
   }
-  
+
   named_scope :ungraded, lambda {
     {:conditions => ['submissions.grade IS NULL'], :include => :assignment}
   }
+
+  named_scope :in_workflow_state, lambda { |provided_state|
+    { :conditions => { :workflow_state => provided_state } }
+  }
+
   named_scope :having_submission, :conditions => 'submissions.submission_type IS NOT NULL'
+
   named_scope :include_user, lambda {
     {:include => [:user] }
   }
+
   named_scope :include_teacher, lambda{
     {:include => {:assignment => :teacher_enrollment} }
   }
@@ -760,7 +767,7 @@ class Submission < ActiveRecord::Base
   named_scope :needing_screenshot, lambda {
     {:conditions => ['submissions.submission_type = ? AND submissions.attachment_id IS NULL AND submissions.process_attempts < 3', 'online_url'], :order => :updated_at}
   }
-  
+
   def needs_regrading?
     graded? && !grade_matches_current_submission?
   end
@@ -775,12 +782,12 @@ class Submission < ActiveRecord::Base
       t 'state.graded', 'graded'
     end
   end
-  
+
   def grading_type
     return nil unless self.assignment
     self.assignment.grading_type
   end
-  
+
   # Note 2012-10-12:
   #   Deprecating this method due to view code in the model. The only place
   #   it appears to be used is in the _recent_feedback.html.erb partial.
@@ -794,15 +801,15 @@ class Submission < ActiveRecord::Base
         grade.capitalize
     end
   end
-  
+
   def last_teacher_comment
     submission_comments.reverse.find{|com| com.author_id != user_id}
   end
-  
+
   def has_submission?
     !!self.submission_type
   end
-  
+
   def quiz_submission_version
     return nil unless self.quiz_submission
     self.quiz_submission.versions.each do |version|
@@ -810,7 +817,7 @@ class Submission < ActiveRecord::Base
     end
     nil
   end
-  
+
   named_scope :for, lambda { |obj|
     case obj
     when User
@@ -819,14 +826,14 @@ class Submission < ActiveRecord::Base
       {}
     end
   }
-  
+
   def processed?
     if submission_type == "online_url"
       return attachment && attachment.content_type.match(/image/)
     end
     false
   end
-  
+
   def add_comment(opts={})
     opts.symbolize_keys!
     opts[:author] = opts.delete(:commenter) || opts.delete(:author) || self.user
@@ -951,7 +958,7 @@ class Submission < ActiveRecord::Base
   def assessment_request_count
     @assessment_requests_count ||= self.assessment_requests.length
   end
-  
+
   def assigned_assessment_count
     @assigned_assessment_count ||= self.assigned_assessments.length
   end
@@ -983,27 +990,27 @@ class Submission < ActiveRecord::Base
     end
     res
   end
-  
+
   def students
     self.group ? self.group.users : [self.user]
   end
-  
+
   def save_without_broadcast
     @suppress_broadcast = true
     self.save!
     @suppress_broadcast = false
   end
-  
+
   def broadcast_group_submission
     @group_broadcast_submission = true
     self.save!
     @group_broadcast_submission = false
   end
-  
+
   def late?
     self.assignment.due_at && self.submitted_at && self.submitted_at.to_i.divmod(60)[0] > self.assignment.due_at.to_i.divmod(60)[0]
   end
-  
+
   def graded?
     !!self.score && self.workflow_state == 'graded'
   end

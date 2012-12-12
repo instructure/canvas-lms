@@ -25,7 +25,7 @@ describe CoursesController do
       get 'index'
       response.should be_redirect
     end
-    
+
     it "should assign variables" do
       course_with_student_logged_in(:active_all => true)
       get 'index'
@@ -52,14 +52,14 @@ describe CoursesController do
       end
     end
   end
-  
+
   describe "GET 'settings'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
       get 'settings', :course_id => @course.id
       assert_unauthorized
     end
-    
+
     it "should should not allow students" do
       course_with_student_logged_in(:active_all => true)
       get 'settings', :course_id => @course.id
@@ -93,7 +93,7 @@ describe CoursesController do
       assigns[:unauthorized_message].should_not be_nil
     end
   end
-  
+
   describe "GET 'enrollment_invitation'" do
     it "should successfully reject invitation for logged-in user" do
       course_with_student_logged_in(:active_course => true)
@@ -103,7 +103,7 @@ describe CoursesController do
       assigns[:pending_enrollment].should eql(@enrollment)
       assigns[:pending_enrollment].should be_rejected
     end
-    
+
     it "should successfully reject invitation for not-logged-in user" do
       course_with_student(:active_course => true, :active_user => true)
       post 'enrollment_invitation', :course_id => @course.id, :reject => '1', :invitation => @enrollment.uuid
@@ -152,7 +152,7 @@ describe CoursesController do
       response.should be_redirect
       response.should redirect_to(login_url)
     end
-    
+
     it "should defer to registration_confirmation for pre-registered not-logged-in user" do
       user_with_pseudonym
       course(:active_course => true, :active_user => true)
@@ -195,7 +195,7 @@ describe CoursesController do
       @enrollment.reload.workflow_state.should == 'active'
     end
   end
-  
+
   describe "GET 'show'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -984,6 +984,14 @@ describe CoursesController do
       post 'reset_content', :course_id => @course.id
       response.status.to_i.should == 401
       @course.reload.should be_available
+    end
+  end
+
+  describe 'GET statistics' do
+    it 'does not break using new student_ids method from course' do
+      course_with_teacher_logged_in(:active_all => true)
+      get 'statistics', :format => 'json', :course_id => @course.id
+      response.status.to_i.should == 200
     end
   end
 end
