@@ -29,9 +29,10 @@ class StreamItemInstance < ActiveRecord::Base
 
   before_save :set_context_code
   def set_context_code
-    self.context_type, self.context_id = stream_item.context_type, stream_item.context_id
+    self.context_type ||= stream_item.context_type
+    self.context_id ||= stream_item.context_id
     # backcompat
-    self.context_code = stream_item.context_code
+    self.context_code ||= stream_item.context_code
   end
 
   define_asset_string_backcompat_method :context_code, :context
