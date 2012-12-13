@@ -398,6 +398,33 @@ Spec::Runner.configure do |config|
     user_session(@user)
   end
 
+  def custom_role(base, name, opts={})
+    account = opts[:account] || @account
+    role = account.roles.find_by_name(name)
+    role ||= account.roles.create :name => name
+    role.base_role_type = base
+    role.save!
+    role
+  end
+  def custom_student_role(name, opts={})
+    custom_role('StudentEnrollment', name, opts)
+  end
+  def custom_teacher_role(name, opts={})
+    custom_role('TeacherEnrollment', name, opts)
+  end
+  def custom_ta_role(name, opts={})
+    custom_role('TaEnrollment', name, opts)
+  end
+  def custom_designer_role(name, opts={})
+    custom_role('DesignerEnrollment', name, opts)
+  end
+  def custom_observer_role(name, opts={})
+    custom_role('ObserverEnrollment', name, opts)
+  end
+  def custom_account_role(name, opts={})
+    custom_role(AccountUser::BASE_ROLE_NAME, name, opts)
+  end
+
   def user_session(user, pseudonym=nil)
     unless pseudonym
       pseudonym = stub(:record => user, :user_id => user.id, :user => user, :login_count => 1)

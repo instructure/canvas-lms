@@ -74,23 +74,31 @@ class Role < ActiveRecord::Base
   named_scope :for_courses, :conditions => ['roles.base_role_type != ?', AccountUser::BASE_ROLE_NAME]
   named_scope :for_accounts, :conditions => ['roles.base_role_type = ?', AccountUser::BASE_ROLE_NAME]
 
-    # Returns a list of hashes for each base enrollment type, and each will have a
+  def self.is_base_role?(role_name)
+    RoleOverride.base_role_types.include?(role_name)
+  end
+
+  # Returns a list of hashes for each base enrollment type, and each will have a
   # custom_roles key, each will look like:
   # [{:base_role_name => "StudentEnrollment",
   #   :name => "StudentEnrollment",
   #   :label => "Student",
+  #   :plural_label => "Students",
   #   :custom_roles =>
   #           [{:base_role_name => "StudentEnrollment",
   #             :name => "weirdstudent",
+  #             :asset_string => "role_4"
   #             :label => "weirdstudent"}]},
   # ]
-  def self.all_enrollment_roles_for_account(account)
-    custom_roles = account.available_course_roles_by_name.values
+  def self.all_enrollment_roles_for_account(account, include_inactive=false)
+
+    custom_roles = account.available_course_roles_by_name(include_inactive).values
     RoleOverride::ENROLLMENT_TYPES.map do |br|
       new = br.clone
       new[:label] = br[:label].call
+      new[:plural_label] = br[:plural_label].call
       new[:custom_roles] = custom_roles.select{|cr|cr.base_role_type == new[:base_role_name]}.map do |cr|
-        {:base_role_name => cr.base_role_type, :name => cr.name, :label => cr.name}
+        {:base_role_name => cr.base_role_type, :name => cr.name, :label => cr.name, :asset_string => cr.asset_string, :workflow_state => cr.workflow_state}
       end
       new
     end
@@ -98,11 +106,12 @@ class Role < ActiveRecord::Base
 
   # returns same hash as all_enrollment_roles_for_account but adds enrollment
   # counts for the given course to each item
-  def self.custom_roles_and_counts_for_course(course, user)
+  def self.custom_roles_and_counts_for_course(course, user, include_inactive=false)
     users_scope = course.users_visible_to(user)
     base_counts = users_scope.count(:distinct => true, :group => 'enrollments.type', :select => 'users.id', :conditions => 'enrollments.role_name IS NULL')
     role_counts = users_scope.count(:distinct => true, :group => 'enrollments.role_name', :select => 'users.id', :conditions => 'enrollments.role_name IS NOT NULL')
-    @enrollment_types = Role.all_enrollment_roles_for_account(course.account)
+
+    @enrollment_types = Role.all_enrollment_roles_for_account(course.account, include_inactive)
     @enrollment_types.each do |base_type|
       base_type[:count] = base_counts[base_type[:name]] || 0
       base_type[:custom_roles].each do |custom_role|

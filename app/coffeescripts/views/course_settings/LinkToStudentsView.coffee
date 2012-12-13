@@ -88,6 +88,8 @@ define [
                 associated_user_id: user.id
                 type: enrollment.type
                 limit_privileges_to_course_section: enrollment.limit_priveleges_to_course_section
+            if enrollment.role != enrollment.type
+              data.enrollment.role = enrollment.role
             udfds.push $.ajaxJSON url, 'POST', data
           $.when(udfds...).done ->
             dfdsDone += 1

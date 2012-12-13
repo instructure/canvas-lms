@@ -16,7 +16,8 @@ define [
       @collection.url = options.url
       @collection.on 'add', @renderUser
       @collection.on 'reset', @render
-      @$el.disableWhileLoading @collection.fetch(@fetchOptions)
+      if options.count > 0
+        @$el.disableWhileLoading @collection.fetch(@fetchOptions)
       @paginationScrollContainer = @$el
       super fetchOptions: @fetchOptions
 

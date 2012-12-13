@@ -34,11 +34,11 @@ class RoleOverride < ActiveRecord::Base
   ENROLLMENT_TYPES =
     [
       # StudentViewEnrollment permissions will mirror StudentPermissions
-      {:base_role_name => 'StudentEnrollment', :name => 'StudentEnrollment', :label => lambda { t('roles.student', 'Student') } },
-      {:base_role_name => 'TaEnrollment', :name => 'TaEnrollment', :label => lambda { t('roles.ta', 'TA') } },
-      {:base_role_name => 'TeacherEnrollment', :name => 'TeacherEnrollment', :label => lambda { t('roles.teacher', 'Teacher') } },
-      {:base_role_name => 'DesignerEnrollment', :name => 'DesignerEnrollment', :label => lambda { t('roles.designer', 'Course Designer') } },
-      {:base_role_name => 'ObserverEnrollment', :name => 'ObserverEnrollment', :label => lambda { t('roles.observer', 'Observer') } }
+      {:base_role_name => 'StudentEnrollment', :name => 'StudentEnrollment', :label => lambda { t('roles.student', 'Student') }, :plural_label => lambda { t('roles.students', 'Students') } },
+      {:base_role_name => 'TeacherEnrollment', :name => 'TeacherEnrollment', :label => lambda { t('roles.teacher', 'Teacher') }, :plural_label => lambda { t('roles.teachers', 'Teachers') } },
+      {:base_role_name => 'TaEnrollment', :name => 'TaEnrollment', :label => lambda { t('roles.ta', 'TA') }, :plural_label => lambda { t('roles.tas', 'TAs') } },
+      {:base_role_name => 'DesignerEnrollment', :name => 'DesignerEnrollment', :label => lambda { t('roles.designer', 'Designer') }, :plural_label => lambda { t('roles.designers', 'Designers') } },
+      {:base_role_name => 'ObserverEnrollment', :name => 'ObserverEnrollment', :label => lambda { t('roles.observer', 'Observer') }, :plural_label => lambda { t('roles.observers', 'Observers') } }
     ].freeze
 
   def self.enrollment_types

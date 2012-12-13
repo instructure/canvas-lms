@@ -513,16 +513,15 @@ class Account < ActiveRecord::Base
     account_roles
   end
 
-  def available_course_roles
-    course_roles = roles.for_courses.active.map(&:name)
-    course_roles |= parent_account.available_course_roles if parent_account
-    course_roles
+  def available_course_roles(include_inactive=false)
+    available_course_roles_by_name(include_inactive).keys
   end
 
-  def available_course_roles_by_name
+  def available_course_roles_by_name(include_inactive=false)
+    scope = include_inactive ? roles.for_courses.not_deleted : roles.for_courses.active
     role_map = {}
-    roles.for_courses.active.each { |role| role_map[role.name] = role }
-    role_map.reverse_merge!(parent_account.available_course_roles_by_name) if parent_account
+    scope.each { |role| role_map[role.name] = role }
+    role_map.reverse_merge!(parent_account.available_course_roles_by_name(include_inactive)) if parent_account
     role_map
   end
 
