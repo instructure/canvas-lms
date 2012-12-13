@@ -563,11 +563,13 @@ class UsersController < ApplicationController
     render :json => {:deleted => true}
   end
 
+  ServiceCredentials = Struct.new(:service_user_name,:decrypted_password)
+
   def create_user_service
     begin
       user_name = params[:user_service][:user_name]
       password = params[:user_service][:password]
-      service = OpenObject.new(:service_user_name => user_name, :decrypted_password => password)
+      service = ServiceCredentials.new( user_name, password )
       case params[:user_service][:service]
         when 'delicious'
           delicious_get_last_posted(service)
