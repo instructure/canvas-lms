@@ -166,6 +166,12 @@ class ContentZipper
   def self.zip_eportfolio(*args)
     ContentZipper.new.zip_eportfolio(*args)
   end
+
+  StaticAttachment = Struct.new(:display_name,
+                                :filename,
+                                :content_type,
+                                :uuid,
+                                :attachment)
   
   def zip_eportfolio(zip_attachment, portfolio)
     static_attachments = []
@@ -184,7 +190,7 @@ class ContentZipper
       end
     end
     static_attachments = static_attachments.uniq.map do |a|
-      obj = OpenObject.new
+      obj = StaticAttachment.new
       obj.display_name = a.display_name
       obj.filename = "#{idx}_#{a.filename}"
       obj.content_type = a.content_type
