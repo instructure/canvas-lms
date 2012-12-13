@@ -1,6 +1,6 @@
 require "bundler/capistrano"
 set :stages,        %w(canvasprod canvastest)
-set :default_stage, "production"
+set :default_stage, "canvastest"
 require "capistrano/ext/multistage"
 
 set :application,   "canvas"
@@ -16,10 +16,15 @@ set :bundle_dir,    "/opt/ruby-enterprise-1.8.7-2012.02/lib/ruby/gems/1.8"
 set :bundle_without, []
 default_run_options[:pty] = true
 
+if (ENV.has_key?('gateway') && ENV['gateway'].downcase == "true")
+  set :gateway, "welcome.its.sfu.ca"
+end
+
 disable_log_formatters;
 
 ssh_options[:forward_agent] = true
 ssh_options[:keys] = [File.join(ENV["HOME"], ".ssh", "id_rsa_canvas")]
+
 
 namespace :deploy do
 	task :start do ; end
