@@ -145,14 +145,13 @@ class Course < ActiveRecord::Base
 
   has_many :external_feeds, :as => :context, :dependent => :destroy
   belongs_to :default_grading_standard, :class_name => 'GradingStandard', :foreign_key => 'grading_standard_id'
-  has_many :grading_standards, :as => :context
+  has_many :grading_standards, :as => :context, :conditions => ['workflow_state != ?', 'deleted']
   has_one :gradebook_upload, :as => :context, :dependent => :destroy
   has_many :web_conferences, :as => :context, :order => 'created_at DESC', :dependent => :destroy
   has_many :rubrics, :as => :context
   has_many :rubric_associations, :as => :context, :include => :rubric, :dependent => :destroy
   has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
   has_one :scribd_account, :as => :scribdable
-  has_many :grading_standards, :as => :context
   has_many :context_modules, :as => :context, :order => :position, :dependent => :destroy
   has_many :active_context_modules, :as => :context, :class_name => 'ContextModule', :conditions => {:workflow_state => 'active'}
   has_many :context_module_tags, :class_name => 'ContentTag', :as => 'context', :order => :position, :conditions => ['tag_type = ?', 'context_module'], :dependent => :destroy
@@ -1968,8 +1967,8 @@ class Course < ActiveRecord::Base
         else
           migration.add_warning("Couldn't find copied grading standard for the course.")
         end
-      elsif settings[:grading_standard_id]
-        if gs = GradingStandard.sorted_standards_for(self).find{|s|s.id == settings[:grading_standard_id]}
+      elsif settings[:grading_standard_id].present?
+        if gs = GradingStandard.standards_for(self).find_by_id(settings[:grading_standard_id])
           self.grading_standard = gs
         else
           migration.add_warning("Couldn't find account grading standard for the course.")
