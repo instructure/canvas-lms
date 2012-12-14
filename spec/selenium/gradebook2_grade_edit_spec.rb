@@ -93,7 +93,7 @@ describe "edititing grades" do
     edit_grade(f('#gradebook_grid [row="0"] .l3'), 'A-')
     wait_for_ajax_requests
     f('#gradebook_grid [row="0"] .l3').text.should == 'A-'
-    @assignment.submissions.size.should == 1
+    @assignment.reload.submissions.size.should == 1
     sub = @assignment.submissions.first
     sub.grade.should == 'A-'
     sub.score.should == 0.0

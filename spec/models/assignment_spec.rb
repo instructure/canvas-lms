@@ -2436,6 +2436,21 @@ describe Assignment do
       end
     end
   end
+
+  describe "recompute_submission_lateness" do
+    it "is called in a delayed job when due_at changes" do
+      assignment = assignment_model
+      assignment.due_at = 1.week.from_now
+      assignment.expects(:send_later_if_production).with(:recompute_submission_lateness)
+      assignment.save
+    end
+
+    it "is not called when due_at doesn't change" do
+      assignment = assignment_model
+      assignment.expects(:send_later_if_production).with(:recompute_submission_lateness).never
+      assignment.save
+    end
+  end
 end
 
 def setup_assignment_with_group

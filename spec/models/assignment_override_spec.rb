@@ -538,4 +538,19 @@ describe AssignmentOverride do
       end
     end
   end
+
+  describe "recompute_submission_lateness" do
+    it "is called in a delayed job when due_at changes" do
+      override = assignment_override_model
+      override.override_due_at(5.days.from_now)
+      override.expects(:send_later_if_production).with(:recompute_submission_lateness)
+      override.save
+    end
+
+    it "is not called when due_at doesn't change" do
+      override = assignment_override_model
+      override.expects(:send_later_if_production).with(:recompute_submission_lateness).never
+      override.save
+    end
+  end
 end

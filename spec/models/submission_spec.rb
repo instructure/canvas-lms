@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../lib/validates_as_url.rb')
 describe Submission do
   before(:each) do
     @user = factory_with_protected_attributes(User, :name => "some student", :workflow_state => "registered")
-    @context = factory_with_protected_attributes(Course, :name => "some course", :workflow_state => "available")
+    @course = @context = factory_with_protected_attributes(Course, :name => "some course", :workflow_state => "available")
     @context.enroll_student(@user)
     @assignment = @context.assignments.new(:title => "some assignment")
     @assignment.workflow_state = "published"
@@ -683,7 +683,7 @@ describe Submission do
       @submission.muted_assignment?.should == true
     end
 
-    it "returns false if assignment is muted" do
+    it "returns false if assignment is not muted" do
       assignment = stub(:muted? => false)
       @submission = Submission.new
       @submission.expects(:assignment).returns(assignment)
@@ -713,6 +713,52 @@ describe Submission do
     end
   end
 
+  describe "late" do
+    before do
+      u1 = @user
+      submission_spec_model
+      @submission1 = @submission
+
+      add_section('overridden section')
+      u2 = student_in_section(@course_section, :active_all => true)
+      submission_spec_model(:user => u2)
+      @submission2 = @submission
+
+      @assignment.update_attribute(:due_at, Time.zone.now - 1.day)
+      @submission1.reload
+      @submission2.reload
+    end
+
+    it "should get recomputed when an assignment's due date is changed" do
+      @submission1.should be_late
+      @assignment.reload.update_attribute(:due_at, Time.zone.now + 1.day)
+      @submission1.reload.should_not be_late
+    end
+
+    it "should get recomputed when an applicable override is changed" do
+      @submission1.should be_late
+      @submission2.should be_late
+
+      assignment_override_model :assignment => @assignment,
+                                :due_at => Time.zone.now + 1.day,
+                                :set => @course_section
+      @submission1.reload.should be_late
+      @submission2.reload.should_not be_late
+    end
+
+    it "should only call compute_lateness for relevant submissions" do
+      # this is kind of hacky
+      hasnt_been_updated_flag_time = Time.zone.now - 1.year
+      Submission.update_all(:updated_at => hasnt_been_updated_flag_time)
+
+      assignment_override_model :assignment => @assignment,
+                                :due_at => Time.zone.now + 1.day,
+                                :set => @course_section
+      @submission1.reload.updated_at.should eql hasnt_been_updated_flag_time
+      @submission2.reload.updated_at.should_not eql hasnt_been_updated_flag_time
+    end
+  end
+
 end
 
 def submission_spec_model(opts={})
@@ -720,5 +766,5 @@ def submission_spec_model(opts={})
   @submission.assignment.should eql(@assignment)
   @assignment.context.should eql(@context)
   @submission.assignment.context.should eql(@context)
-  @submission.save
+  @submission.save!
 end

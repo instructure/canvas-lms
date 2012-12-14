@@ -134,7 +134,8 @@ class Assignment < ActiveRecord::Base
                 :clear_unannounced_grading_changes_if_just_unpublished,
                 :schedule_do_auto_peer_review_job_if_automatic_peer_review,
                 :delete_empty_abandoned_children,
-                :validate_assignment_overrides
+                :validate_assignment_overrides,
+                :recompute_submission_lateness_later
 
   has_a_broadcast_policy
 
@@ -1819,5 +1820,22 @@ class Assignment < ActiveRecord::Base
       end
     end
   end
+
+  def recompute_submission_lateness_later
+    if due_at_changed?
+      send_later_if_production :recompute_submission_lateness
+    end
+    true
+  end
+
+  def recompute_submission_lateness
+    submissions.each do |s|
+      s.compute_lateness
+      s.save!
+    end
+    true
+  end
+  private :recompute_submission_lateness
+
 
 end

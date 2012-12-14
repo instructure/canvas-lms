@@ -473,6 +473,7 @@ class Submission < ActiveRecord::Base
       self.attempt ||= 0
       self.attempt += 1 if self.submitted_at_changed?
       self.attempt = 1 if self.attempt < 1
+      compute_lateness if late.nil? || self.submitted_at_changed?
     end
     if self.submission_type == 'media_recording' && !self.media_comment_id
       raise "Can't create media submission without media object"
@@ -564,10 +565,6 @@ class Submission < ActiveRecord::Base
     self.updated_at <=> other.updated_at
   end
 
-  def submitted_late?
-    self.assignment.overridden_for(self.user).due_at <= Time.now.localtime
-  end
-  
   # Submission:
   #   Online submission submitted AFTER the due date (notify the teacher) - "Grade Changes"
   #   Submission graded (or published) - "Grade Changes"
@@ -582,7 +579,7 @@ class Submission < ActiveRecord::Base
       ((record.just_created && record.submitted?) || record.changed_state_to(:submitted) || record.prior_version.try(:submitted_at) != record.submitted_at) and
       record.state == :submitted and
       record.has_submission? and 
-      record.submitted_late?
+      record.late?
     }
 
     p.dispatch :assignment_submitted
@@ -594,7 +591,7 @@ class Submission < ActiveRecord::Base
       record.state == :submitted and
       record.has_submission? and
       # don't send a submitted message because we already sent an :assignment_submitted_late message
-      !record.submitted_late?
+      !record.late?
     }
 
     p.dispatch :assignment_resubmitted
@@ -607,7 +604,7 @@ class Submission < ActiveRecord::Base
       record.prior_version.submitted_at != record.submitted_at and
       record.has_submission? and
       # don't send a resubmitted message because we already sent a :assignment_submitted_late message.
-      !record.submitted_late?
+      !record.late?
     }
 
     p.dispatch :group_assignment_submitted_late
@@ -618,7 +615,7 @@ class Submission < ActiveRecord::Base
       record.assignment.context.state == :available and 
       ((record.just_created && record.submitted?) || record.changed_state_to(:submitted) || record.prior_version.try(:submitted_at) != record.submitted_at) and
       record.state == :submitted and
-      record.submitted_late?
+      record.late?
     }
 
     p.dispatch :submission_graded
@@ -1003,11 +1000,15 @@ class Submission < ActiveRecord::Base
     @group_broadcast_submission = false
   end
 
-  def late?
-    a = AssignmentOverrideApplicator.assignment_overridden_for(assignment, user)
-    submitted_at && a.due_at ? (submitted_at - 1.minute) > a.due_at : false
+  def compute_lateness
+    overridden_assignment = assignment.overridden_for(self.user)
+
+    late = submitted_at &&
+      overridden_assignment.due_at &&
+      overridden_assignment.due_at < submitted_at
+
+    write_attribute :late, !!late
   end
-  alias_method :late, :late?
 
   def graded?
     !!self.score && self.workflow_state == 'graded'
