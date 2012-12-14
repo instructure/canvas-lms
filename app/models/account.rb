@@ -527,7 +527,7 @@ class Account < ActiveRecord::Base
   end
 
   def get_course_role(role_name)
-    course_role = self.roles.for_courses.find_by_name(role_name)
+    course_role = self.roles.for_courses.not_deleted.find_by_name(role_name)
     course_role ||= self.parent_account.get_course_role(role_name) if self.parent_account
     course_role
   end

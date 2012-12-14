@@ -288,6 +288,20 @@ describe EnrollmentsApiController, :type => :integration do
           json['message'].should eql 'Cannot create an enrollment with this role because it is inactive.'
         end
 
+        it "should return a suitable error if role is specified but is deleted" do
+          @course_role.destroy
+          json = api_call :post, @path, @path_options, {
+              :enrollment => {
+                  :user_id                            => @unenrolled_user.id,
+                  :role                               => 'newrole',
+                  :enrollment_state                   => 'active',
+                  :course_section_id                  => @section.id,
+                  :limit_privileges_to_course_section => true
+              }
+          }, {}, :expected_status => 403
+          json['message'].should eql 'Invalid role'
+        end
+
         it "should derive roles from parent accounts" do
           sub_account = Account.create!(:name => 'sub', :parent_account => @course.account)
           course(:account => sub_account)

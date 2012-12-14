@@ -72,8 +72,18 @@ describe "Roles API", :type => :integration do
       json = api_call(:delete, "/api/v1/accounts/#{@account.id}/roles/#{@role}",
          { :controller => 'role_overrides', :action => 'remove_role', :format => 'json', :account_id => @account.id.to_param, :role => @role}, {})
 
+      @account.roles.find_by_name(@role).should be_deleted
       @account.reload
       @account.available_account_roles.should_not include(@role)
+    end
+
+    it "should 404 when attempting to remove a deleted role" do
+      api_call_with_settings(:explicit => '1', :enabled => '1')
+      @account.roles.find_by_name!(@role).destroy
+
+      api_call(:delete, "/api/v1/accounts/#{@account.id}/roles/#{@role}",
+        { :controller => 'role_overrides', :action => 'remove_role', :format => 'json', :account_id => @account.id.to_param, :role => @role},
+        {}, {}, :expected_status => 404)
     end
 
     it "should add a course-level role to the account" do
@@ -153,24 +163,28 @@ describe "Roles API", :type => :integration do
         enrollment1.save!
       end
 
-      it "should set inactive a course-level role" do
+      it "should fail to delete a role that is in use" do
         json = api_call(:delete, "/api/v1/accounts/#{@account.id}/roles/#{@role}",
-          { :controller => 'role_overrides', :action => 'remove_role', :format => 'json', :account_id => @account.id.to_param, :role => @role}, {})
+          { :controller => 'role_overrides', :action => 'remove_role', :format => 'json', :account_id => @account.id.to_param, :role => @role},
+          {}, {}, { :expected_status => 400 })
+        json['message'].should == "Role is in use"
+      end
+
+      it "should deactivate a course-level role" do
+        json = api_call(:post, "/api/v1/accounts/#{@account.id}/roles/#{@role}/deactivate",
+          { :controller => 'role_overrides', :action => 'deactivate_role', :format => 'json', :account_id => @account.id.to_param, :role => @role}, {})
 
         @account.reload
         @account.get_course_role(@role).should_not be_nil
         @account.get_course_role(@role).workflow_state.should == 'inactive'
-
         json['workflow_state'].should == 'inactive'
       end
 
       it "should reactivate an inactive role" do
-        api_call(:delete, "/api/v1/accounts/#{@account.id}/roles/#{@role}",
-                 { :controller => 'role_overrides', :action => 'remove_role', :format => 'json', :account_id => @account.id.to_param, :role => @role}, {})
-        @account.reload
+        @account.get_course_role(@role).update_attribute(:workflow_state, 'inactive')
 
         json = api_call(:post, "/api/v1/accounts/#{@account.id}/roles/#{@role}/activate",
-                        { :controller => 'role_overrides', :action => 'activate_role', :format => 'json', :account_id => @account.id.to_param, :role => @role}, {})
+          { :controller => 'role_overrides', :action => 'activate_role', :format => 'json', :account_id => @account.id.to_param, :role => @role}, {})
 
         @account.reload
         @account.roles.active.map(&:name).should include(@role)

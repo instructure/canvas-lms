@@ -19,7 +19,7 @@
 # @API Roles
 class RoleOverridesController < ApplicationController
   before_filter :require_context
-  before_filter :require_role, :only => [:activate_role, :add_role, :remove_role, :update]
+  before_filter :require_role, :only => [:activate_role, :add_role, :remove_role, :deactivate_role, :update]
 
   def index
     if authorized_action(@context, @current_user, :manage_role_overrides)
@@ -265,38 +265,72 @@ class RoleOverridesController < ApplicationController
     render :json => role_json(@context, @role, @current_user, session)
   end
 
+  # @API Delete a role
+  # Delete a custom role.
+  #
+  # @argument role
+  #   Label and unique identifier for the role.
+  #
+  # Notes:
+  # * Built-in roles cannot be deleted.
+  # * Roles that are in use (i.e., assigned to an active account membership or course enrollment)
+  #   cannot be deleted.  They can, however, be {api:RoleOverridesController#deactivate_role deactivated},
+  #   which will prevent them from being assigned to new users.
   def remove_role
     if authorized_action(@context, @current_user, :manage_role_overrides)
-      if role = @context.roles.not_deleted.find_by_name(@role)
-        if role.account_role?
-          has_user = !!@context.account_users.find_by_membership_type(@role)
-        else
-          has_user = !!@context.enrollments.active.find_by_role_name(@role)
-        end
-        if has_user
-          role.deactivate
-          message = t('course_role_deactivate', "This role is in use and cannot be deleted.  It has been deactivated to prevent it from being assigned to new users.")
-        else
-          role.destroy
-        end
-      end
-      if api_request?
-        json = role_json(@context, @role, @current_user, session)
-        json[:message] = message if message.present?
-        render :json => json
+      role = @context.roles.not_deleted.find_by_name!(@role)
+      if role.account_role?
+        has_user = !!@context.account_users.find_by_membership_type(@role)
       else
+        has_user = !!@context.enrollments.active.find_by_role_name(@role)
+      end
+      if has_user
         respond_to do |format|
-          format.html { redirect_to named_context_url(@context, :context_permissions_url, :account_roles => params[:account_roles]) }
-          format.json { render :json => role_json(@context, @role, @current_user, session) }
+          format.html {
+            flash[:error] = t(:delete_failed_notice, 'Role is in use')
+            redirect_to named_context_url(@context, :context_permissions_url, :account_roles => params[:account_roles])
+          }
+          format.json {
+            render(:json => { :message => "Role is in use" }, :status => :bad_request)
+          }
         end
+        return
+      end
+      role.destroy
+      respond_to do |format|
+        format.html { redirect_to named_context_url(@context, :context_permissions_url, :account_roles => params[:account_roles]) }
+        format.json { render :json => role_json(@context, @role, @current_user, session) }
       end
     end
   end
 
+  # @API Deactivate a role
+  # Prevents a role from being assigned to new account memberships or course enrollments.
+  # Existing users assigned to the role will be unaffected.
+  #
+  # @argument role
+  #   Label and unique identifier for the role.
+  def deactivate_role
+    if authorized_action(@context, @current_user, :manage_role_overrides)
+      if role = @context.roles.not_deleted.find_by_name(@role)
+        role.deactivate!
+      end
+      respond_to do |format|
+        format.html { redirect_to named_context_url(@context, :context_permissions_url, :account_roles => params[:account_roles]) }
+        format.json { render :json => role_json(@context, @role, @current_user, session) }
+      end
+    end
+  end
+
+  # @API Activate a role
+  # Re-activates an inactive role (allowing it to be assigned to new users)
+  #
+  # @argument role
+  #   Label and unique identifier for the role.
   def activate_role
     if authorized_action(@context, @current_user, :manage_role_overrides)
       if course_role = @context.roles.inactive.find_by_name(@role)
-        course_role.activate
+        course_role.activate!
         render :json => role_json(@context, @role, @current_user, session)
       else
         render :json => {:message => t('no_role_found', "Role not found")}, :status => :bad_request
