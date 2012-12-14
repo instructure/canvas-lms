@@ -433,6 +433,26 @@ describe "Groups API", :type => :integration do
     end
   end
 
+  context "users" do
+    it "should return users in a group" do
+      expected_keys = %w{id name sortable_name short_name}
+      json = api_call(:get, "/api/v1/groups/#{@community.id}/users",
+                      { :controller => 'groups', :action => 'users', :group_id => @community.to_param, :format => 'json' })
+      json.count.should == 2
+      json.each do |user|
+        (user.keys & expected_keys).sort.should == expected_keys.sort
+        @community.users.map(&:id).should include(user['id'])
+      end
+    end
+
+    it "should return 401 for users outside the group" do
+      user
+      raw_api_call(:get, "/api/v1/groups/#{@community.id}/users",
+                         { :controller => 'groups', :action => 'users', :group_id => @community.to_param, :format => 'json' })
+      response.code.should == '401'
+    end
+  end
+
   context "group files" do
     it_should_behave_like "file uploads api with folders"
     it_should_behave_like "file uploads api with quotas"

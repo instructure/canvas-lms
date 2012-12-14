@@ -568,6 +568,23 @@ class GroupsController < ApplicationController
     end
   end
 
+  include Api::V1::User
+  # @API List group's users
+  #
+  # Returns a list of users in the group.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/groups/1/users \ 
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns [User]
+  def users
+    return unless authorized_action(@context, @current_user, :read)
+    @users = Api.paginate(@context.users, self, api_v1_group_users_url)
+
+    render :json => @users.map { |u| user_json(u, @current_user, session) }
+  end
+
   def edit
     account = @context.root_account
     raise ActiveRecord::RecordNotFound unless account.canvas_network_enabled?

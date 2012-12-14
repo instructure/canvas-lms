@@ -913,6 +913,7 @@ ActionController::Routing::Routes.draw do |map|
       groups.get 'users/self/groups', :action => :index, :path_name => "current_user_groups"
       groups.get 'accounts/:account_id/groups', :action => :context_index, :path_name => 'account_user_groups'
       groups.get 'courses/:course_id/groups', :action => :context_index, :path_name => 'course_user_groups'
+      groups.get 'groups/:group_id/users', :action => :users, :path_name => 'group_users'
       groups.post 'groups/:group_id/invite', :action => :invite
       groups.post 'groups/:group_id/files', :action => :create_file
       groups.get 'groups/:group_id/activity_stream', :action => :activity_stream, :path_name => 'group_activity_stream'
