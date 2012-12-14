@@ -17,16 +17,16 @@
   <div class="rs-margin-lr rs-margin-top">
     <% if can_do(@assignment, @current_user, :update_content) %>
       <% if @assignment.external_tool? %>
-        <%= link_to(image_tag("back.png") + t('links.view_assignment', "View Assignment"), polymorphic_url([@context, @assignment]), :class => 'view_assignment_link btn button-sidebar-wide') %>
+        <a href="<%= polymorphic_url([@context, @assignment]) %>" class="view_assignment_link btn button-sidebar-wide"><i class="icon-arrow-left"></i> <%= t('links.view_assignment', "View Assignment") %></a>
       <% end %>
-      <a href="#" class="edit_full_assignment_link btn button-sidebar-wide"><%= image_tag "edit.png" %> <%= t 'links.edit_assignment', "Edit Assignment" %></a>
+      <a href="#" class="edit_full_assignment_link btn button-sidebar-wide"><i class="icon-edit"></i> <%= t 'links.edit_assignment', "Edit Assignment" %></a>
     <% end %>
   </div>
   
   <% unless @assignment.new_record? %>
     <% if can_do(@assignment, @current_user, :update) %>
     <div class="rs-margin-lr">
-      <a href="<%= context_url(@context, :context_rubrics_url) %>" class="add_rubric_link btn button-sidebar-wide" style="<%= hidden if @assignment.rubric_association %>"><i class="icon-add"></i> <%= t 'links.add_rubric', "Add Rubric" %></a>
+      <a href="<%= context_url(@context, :context_rubrics_url) %>" class="add_rubric_link btn button-sidebar-wide" style="<%= hidden if @assignment.rubric_association %>"><i class="icon-rubric"></i> <%= t 'links.add_rubric', "Add Rubric" %></a>
     </div>
     <% end %>
     
@@ -57,7 +57,7 @@
       <%= render :partial => "submission_sidebar" %>
     <% elsif @assignment.expects_submission? && can_do(@assignment, @current_user, :submit) %>
       <div class="rs-margin-lr">
-        <a href="#" class="submit_assignment_link button-sidebar-wide btn <%= 'late' if @current_user_submission && @current_user_submission.late? %>"><%= image_tag "add.png" %> <%= t 'links.submit', "Submit Assignment" %></a><br/>
+        <a href="#" class="submit_assignment_link button-sidebar-wide btn <%= 'late' if @current_user_submission && @current_user_submission.late? %>"><i class="icon-add"></i> <%= t 'links.submit', "Submit Assignment" %></a><br/>
       </div>
     <% end %>
   <% end %>
