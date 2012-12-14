@@ -105,4 +105,22 @@ class Role < ActiveRecord::Base
       new
     end
   end
+
+  # returns same hash as all_enrollment_roles_for_account but adds enrollment
+  # counts for the given course to each item
+  def self.custom_roles_and_counts_for_course(course, user)
+    users_scope = course.users_visible_to(user)
+    base_counts = users_scope.count(:distinct => true, :group => 'enrollments.type', :select => 'users.id', :conditions => 'enrollments.role_name IS NULL')
+    role_counts = users_scope.count(:distinct => true, :group => 'enrollments.role_name', :select => 'users.id', :conditions => 'enrollments.role_name IS NOT NULL')
+    @enrollment_types = Role.all_enrollment_roles_for_account(course.account)
+    @enrollment_types.each do |base_type|
+      base_type[:count] = base_counts[base_type[:name]] || 0
+      base_type[:custom_roles].each do |custom_role|
+        custom_role[:count] = role_counts[custom_role[:name]] || 0
+      end
+    end
+
+    @enrollment_types
+  end
+
 end
