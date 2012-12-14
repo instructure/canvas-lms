@@ -116,12 +116,6 @@ describe "profile" do
       row.should have_class("default")
     end
 
-    it "should display file uploader link on files page" do
-      get "/profile/settings"
-      expect_new_page_load { f('#left-side .files').click }
-      f('#file_swf-button').should be_displayed
-    end
-
     it "should edit full name" do
       new_user_name = 'new user name'
       get "/profile/settings"

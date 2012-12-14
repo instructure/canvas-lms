@@ -104,7 +104,7 @@ describe "eportfolios" do
       get "/eportfolios/#{@eportfolio.id}"
       f(".submission").click
       f("#add_submission_form").should be_displayed
-      ff(:css, '#category_select option').map(&:text).should_not include("New Section")
+      ff('#category_select option').map(&:text).should_not include("New Section")
     end
 
 

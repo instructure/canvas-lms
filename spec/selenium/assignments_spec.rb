@@ -315,7 +315,7 @@ describe "assignments" do
       end
     end
 
-    it "should show a \"more errors\" errorBox if any invalid fields are hidden" do
+    it "should show a more errors errorBox if any invalid fields are hidden" do
       assignment_name = 'first test assignment'
       @group = @course.assignment_groups.create!(:name => "default")
       @assignment = @course.assignments.create(

@@ -84,7 +84,7 @@ describe "course copy" do
     end
   end
 
-  describe "course copy (through course 'copying')" do
+  describe "course copy through course copying" do
     it "should copy the course" do
       course_with_admin_logged_in
       @course.syllabus_body = "<p>haha</p>"
@@ -154,7 +154,7 @@ describe "course copy" do
     end
   end
 
-  describe "course copy (through course 'importing')" do
+  describe "course copy through course importing" do
     it "should copy course content" do
       course_copy_helper
       @course.wiki.wiki_pages.count.should == 5

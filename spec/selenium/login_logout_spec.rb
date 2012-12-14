@@ -59,7 +59,7 @@ describe "login logout test" do
     driver.current_url.should == expected_url
   end
 
-  it "should validate i don't know my password functionality for email account" do
+  it "should validate i dont know my password functionality for email account" do
     user_with_pseudonym({:active_user => true})
     go_to_forgot_password
     f('#pseudonym_session_unique_id_forgot').send_keys(@user.primary_pseudonym.unique_id)

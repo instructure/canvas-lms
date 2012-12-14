@@ -47,7 +47,7 @@ describe "edititing grades" do
     f('#after_fudge_points_total').text.should == points.to_s
   end
 
-  it "should treat ungraded as 0's when asked, and ignore when not" do
+  it "should treat ungraded as 0s when asked, and ignore when not" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
 

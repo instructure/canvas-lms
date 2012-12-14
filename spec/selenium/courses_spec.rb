@@ -98,7 +98,7 @@ describe "courses" do
       @course.storage_quota.should == 10.megabytes
     end
 
-    it "should redirect to the gradebook when switching courses when viewing a student's grades" do
+    it "should redirect to the gradebook when switching courses when viewing a students grades" do
       teacher = user_with_pseudonym(:username => 'teacher@example.com', :active_all => 1)
       student = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)
       course1 = course_with_teacher_logged_in(:user => teacher, :active_all => 1).course
@@ -164,7 +164,7 @@ describe "courses" do
       ff('.student_roster .user').length.should == 1
     end
 
-    it "should display users' section name" do
+    it "should display users section name" do
       course_with_teacher_logged_in(:active_all => true)
       user1, user2 = [user, user]
       section1 = @course.course_sections.create!(:name => 'One')

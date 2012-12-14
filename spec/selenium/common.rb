@@ -73,27 +73,42 @@ module SeleniumTestsHelperMethods
         if SELENIUM_CONFIG[:firefox_profile].present?
           profile = Selenium::WebDriver::Firefox::Profile.from_name SELENIUM_CONFIG[:firefox_profile]
         end
-      caps = Selenium::WebDriver::Remote::Capabilities.firefox(:firefox_profile => profile)
-      caps.native_events = native
+        caps = Selenium::WebDriver::Remote::Capabilities.firefox(:firefox_profile => profile)
+        caps.native_events = native
       end
 
       driver = nil
-      [1, 2, 3].each do |times|
+
+      (1..60).each do |times|
+        env_test_number = ENV['TEST_ENV_NUMBER']
+        env_test_number = 1 if ENV['TEST_ENV_NUMBER'].blank?
+
         begin
+          #curbs race conditions on selenium grid nodes
+
+          if times == 1
+            first_run = true
+            stagger_threads(first_run)
+          else
+            stagger_threads
+          end
+
+          port_num = (4440 + env_test_number.to_i)
+          puts "Thread #{env_test_number} connecting to hub over port #{port_num}, try ##{times}"
           driver = Selenium::WebDriver.for(
               :remote,
-              :url => 'http://' + (SELENIUM_CONFIG[:host_and_port] || "localhost:4444") + '/wd/hub',
+              :url => "http://127.0.0.1:#{port_num}/wd/hub",
               :desired_capabilities => caps
           )
           break
         rescue Exception => e
-          puts "Error attempting to start remote webdriver: #{e}"
-          raise e if times == 3
+          puts "Thread #{env_test_number}\n try ##{times}\nError attempting to start remote webdriver: #{e}"
+          sleep 10
+          raise e if times == 60
         end
       end
-
     end
-    driver.manage.timeouts.implicit_wait = 3
+    driver.manage.timeouts.implicit_wait = 10
     driver
   end
 
@@ -137,6 +152,20 @@ module SeleniumTestsHelperMethods
   def t(*a, &b)
     I18n.t(*a, &b)
   end
+
+  def stagger_threads(first_run = true, step_time = 9)
+    env_test_number = ENV['TEST_ENV_NUMBER']
+    env_test_number = 1 if ENV['TEST_ENV_NUMBER'].blank?
+
+    if first_run
+      wait_time = env_test_number.to_i * step_time
+      sleep(wait_time)
+    else
+      wait_time = env_test_number.to_i * 2
+      sleep(wait_time)
+    end
+  end
+
 
   def app_host
     "http://#{$app_host_and_port}"
@@ -302,7 +331,9 @@ shared_examples_for "all selenium tests" do
   # set up so you can use rails urls helpers in your selenium tests
   include ActionController::UrlWriter
 
-  def selenium_driver; $selenium_driver; end
+  def selenium_driver;
+    $selenium_driver;
+  end
 
   alias_method :driver, :selenium_driver
 
@@ -539,7 +570,7 @@ shared_examples_for "all selenium tests" do
 
   #pass full selector ex. "#blah td tr" the attibute ex. "style" type and the value ex. "Red"
   def fba(selector, attrib, value)
-  f("#{selector} [#{attrib}='#{value}']").click
+    f("#{selector} [#{attrib}='#{value}']").click
   end
 
   # pass in an Element pointing to the textarea that is tinified.
@@ -619,17 +650,17 @@ shared_examples_for "all selenium tests" do
 
   def set_value(input, value)
     case input.tag_name
-    when 'select'
-      input.find_element(:css, "option[value='#{value}']").click
-    when 'input'
-      case input.attribute(:type)
-      when 'checkbox'
-        input.click if (!input.selected? && value) || (input.selected? && !value)
+      when 'select'
+        input.find_element(:css, "option[value='#{value}']").click
+      when 'input'
+        case input.attribute(:type)
+          when 'checkbox'
+            input.click if (!input.selected? && value) || (input.selected? && !value)
+          else
+            replace_content(input, value)
+        end
       else
         replace_content(input, value)
-      end
-    else
-      replace_content(input, value)
     end
     driver.execute_script(input['onchange']) if input['onchange']
   end
@@ -677,16 +708,16 @@ shared_examples_for "all selenium tests" do
   def stub_kaltura
     # trick kaltura into being activated
     Kaltura::ClientV3.stubs(:config).returns({
-      'domain' => 'www.instructuremedia.com',
-      'resource_domain' => 'www.instructuremedia.com',
-      'partner_id' => '100',
-      'subpartner_id' => '10000',
-      'secret_key' => 'fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321',
-      'user_secret_key' => '1234821hrj3k21hjk4j3kl21j4kl321j4kl3j21kl4j3k2l1',
-      'player_ui_conf' => '1',
-      'kcw_ui_conf' => '1',
-      'upload_ui_conf' => '1'
-    })
+                                                 'domain' => 'www.instructuremedia.com',
+                                                 'resource_domain' => 'www.instructuremedia.com',
+                                                 'partner_id' => '100',
+                                                 'subpartner_id' => '10000',
+                                                 'secret_key' => 'fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321',
+                                                 'user_secret_key' => '1234821hrj3k21hjk4j3kl21j4kl321j4kl3j21kl4j3k2l1',
+                                                 'player_ui_conf' => '1',
+                                                 'kcw_ui_conf' => '1',
+                                                 'upload_ui_conf' => '1'
+                                             })
     kal = mock('Kaltura::ClientV3')
     kal.stubs(:startSession).returns "new_session_id_here"
     Kaltura::ClientV3.stubs(:new).returns(kal)
@@ -784,7 +815,7 @@ shared_examples_for "all selenium tests" do
   end
 
   def dialog_for(node)
-    node.find_element(:xpath, "ancestor-or-self::div[contains(@class, 'ui-dialog')]")
+    node.find_element(:xpath, "ancestor-or-self::div[contains(@class, 'ui-dialog')]") rescue false
   end
 
   def check_image(element)
@@ -934,7 +965,7 @@ shared_examples_for "all selenium tests" do
   end
 end
 
-  TEST_FILE_UUIDS = {
+TEST_FILE_UUIDS = {
     "testfile1.txt" => "63f46f1c-dd4a-467d-a136-333f262f1366",
     "testfile1copy.txt" => "63f46f1c-dd4a-467d-a136-333f262f1366",
     "testfile2.txt" => "5d714eca-2cff-4737-8604-45ca098165cc",
@@ -952,80 +983,80 @@ end
     "c_file.txt" => File.read(File.dirname(__FILE__) + '/../fixtures/files/c_file.txt'),
     "amazing_file.txt" => File.read(File.dirname(__FILE__) + '/../fixtures/files/amazing_file.txt'),
     "Dog_file.txt" => File.read(File.dirname(__FILE__) + '/../fixtures/files/Dog_file.txt')
-  }
+}
 
-  def get_file(filename, data = nil)
-    data ||= TEST_FILE_UUIDS[filename]
-    @file = Tempfile.new(filename.split(/(?=\.)/))
-    @file.write data
-    @file.close
-    fullpath = @file.path
-    filename = File.basename(@file.path)
-    if SELENIUM_CONFIG[:host_and_port]
-      driver.file_detector = proc do |args|
-        args.first if File.exist?(args.first.to_s)
-      end
-    end
-    [filename, fullpath, data, @file]
-  end
-
-  def validate_link(link_element, breadcrumb_text)
-    expect_new_page_load { link_element.click }
-    if breadcrumb_text != nil
-      breadcrumb = f('#breadcrumbs')
-      breadcrumb.should include_text(breadcrumb_text)
-    end
-    driver.execute_script("return INST.errorCount;").should == 0
-  end
-
-  def skip_if_ie(additional_error_text)
-    pending("skipping test, fails in IE : " + additional_error_text) if driver.browser == :internet_explorer
-  end
-
-  def alert_present?
-    is_present = true
-    begin
-      driver.switch_to.alert
-    rescue Selenium::WebDriver::Error::NoAlertPresentError
-      is_present = false
-    end
-    is_present
-  end
-
-  # for when you have something like a textarea's value and you want to match it's contents
-  # against a css selector.
-  # usage:
-  # find_css_in_string(some_textarea[:value], '.some_selector').should_not be_empty
-  def find_css_in_string(string_of_html, css_selector)
-    driver.execute_script("return $('<div />').append('#{string_of_html}').find('#{css_selector}')")
-  end
-
-  shared_examples_for "in-process server selenium tests" do
-    it_should_behave_like "all selenium tests"
-    prepend_before (:all) do
-      $in_proc_webserver_shutdown ||= SeleniumTestsHelperMethods.start_in_process_webrick_server
-    end
-    before do
-      HostUrl.stubs(:default_host).returns($app_host_and_port)
-      HostUrl.stubs(:file_host).returns($app_host_and_port)
-    end
-    before do
-      conn = ActiveRecord::Base.connection
-      ActiveRecord::ConnectionAdapters::ConnectionPool.any_instance.stubs(:connection).returns(conn)
+def get_file(filename, data = nil)
+  data ||= TEST_FILE_UUIDS[filename]
+  @file = Tempfile.new(filename.split(/(?=\.)/))
+  @file.write data
+  @file.close
+  fullpath = @file.path
+  filename = File.basename(@file.path)
+  if SELENIUM_CONFIG[:host_and_port]
+    driver.file_detector = proc do |args|
+      args.first if File.exist?(args.first.to_s)
     end
   end
+  [filename, fullpath, data, @file]
+end
 
-  shared_examples_for "forked server selenium tests" do
-    it_should_behave_like "all selenium tests"
-    self.use_transactional_fixtures = false
-
-    prepend_before (:all) do
-      $in_proc_webserver_shutdown.try(:call)
-      $in_proc_webserver_shutdown = nil
-      @forked_webserver_shutdown = SeleniumTestsHelperMethods.start_forked_webrick_server
-    end
-
-    append_after(:all) do
-      @forked_webserver_shutdown.call
-    end
+def validate_link(link_element, breadcrumb_text)
+  expect_new_page_load { link_element.click }
+  if breadcrumb_text != nil
+    breadcrumb = f('#breadcrumbs')
+    breadcrumb.should include_text(breadcrumb_text)
   end
+  driver.execute_script("return INST.errorCount;").should == 0
+end
+
+def skip_if_ie(additional_error_text)
+  pending("skipping test, fails in IE : " + additional_error_text) if driver.browser == :internet_explorer
+end
+
+def alert_present?
+  is_present = true
+  begin
+    driver.switch_to.alert
+  rescue Selenium::WebDriver::Error::NoAlertPresentError
+    is_present = false
+  end
+  is_present
+end
+
+# for when you have something like a textarea's value and you want to match it's contents
+# against a css selector.
+# usage:
+# find_css_in_string(some_textarea[:value], '.some_selector').should_not be_empty
+def find_css_in_string(string_of_html, css_selector)
+  driver.execute_script("return $('<div />').append('#{string_of_html}').find('#{css_selector}')")
+end
+
+shared_examples_for "in-process server selenium tests" do
+  it_should_behave_like "all selenium tests"
+  prepend_before (:all) do
+    $in_proc_webserver_shutdown ||= SeleniumTestsHelperMethods.start_in_process_webrick_server
+  end
+  before do
+    HostUrl.stubs(:default_host).returns($app_host_and_port)
+    HostUrl.stubs(:file_host).returns($app_host_and_port)
+  end
+  before do
+    conn = ActiveRecord::Base.connection
+    ActiveRecord::ConnectionAdapters::ConnectionPool.any_instance.stubs(:connection).returns(conn)
+  end
+end
+
+shared_examples_for "forked server selenium tests" do
+  it_should_behave_like "all selenium tests"
+  self.use_transactional_fixtures = false
+
+  prepend_before (:all) do
+    $in_proc_webserver_shutdown.try(:call)
+    $in_proc_webserver_shutdown = nil
+    @forked_webserver_shutdown = SeleniumTestsHelperMethods.start_forked_webrick_server
+  end
+
+  append_after(:all) do
+    @forked_webserver_shutdown.call
+  end
+end

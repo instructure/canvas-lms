@@ -234,13 +234,13 @@ describe "collaborations folder in files menu" do
     message_node.text
   end
 
-  it "should show 'add collaboration' paragraph to teacher of a course group" do
+  it "should show add collaboration paragraph to teacher of a course group" do
     create_session(@pseudonym, false)
     message = load_collab_folder
     message.should include_text("New collaboration")
   end
 
-  it "should show 'add collaboration' paragraph to participating user" do
+  it "should show add collaboration paragraph to participating user" do
     user_with_pseudonym(:active_user => true)
     student_in_course(:user => @user, :active_enrollment => true)
     create_session(@pseudonym, false)

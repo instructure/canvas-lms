@@ -109,7 +109,7 @@ describe "submissions" do
       f('#sidebar_content a.submit_assignment_link').text.should == "Submit Assignment"
     end
 
-    it "should not show as turned in or not turned in when assignment doesn't expect a submission" do
+    it "should not show as turned in or not turned in when assignment doesnt expect a submission" do
       # given
       @assignment.update_attributes(:submission_types => "on_paper")
       @assignment.grade_student(@student, :grade => "0")

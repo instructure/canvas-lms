@@ -244,7 +244,7 @@ describe "One Question at a Time Quizzes" do
         @quiz.update_attribute(:cant_go_back, true)
       end
 
-      it "displays one question at a time but you can't go back" do
+      it "displays one question at a time but you cant go back" do
         take_the_quiz
 
         it_should_show_cant_go_back_warning
@@ -260,7 +260,7 @@ describe "One Question at a Time Quizzes" do
         answers_flow
       end
 
-      it "doesn't allow you to cheat" do
+      it "doesnt allow you to cheat" do
         take_the_quiz
         accept_cant_go_back_warning
 
@@ -283,7 +283,7 @@ describe "One Question at a Time Quizzes" do
         submit_unfinished_quiz("There are still 2 questions you haven't seen")
       end
 
-      it "warns you about moving on when you haven't answered the question" do
+      it "warns you about moving on when you havent answered the question" do
         take_the_quiz
         accept_cant_go_back_warning
         click_next_button_and_accept_warning
@@ -315,7 +315,7 @@ describe "One Question at a Time Quizzes" do
         @quiz.update_attribute(:cant_go_back, true)
       end
 
-      it "displays one question at a time but you can't go back" do
+      it "displays one question at a time but you cant go back" do
         preview_the_quiz
         sequential_flow
       end

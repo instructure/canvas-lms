@@ -9,7 +9,7 @@ describe "manage groups students" do
   end
 
   context "misc" do
-    it "should click on  the self signup help link " do
+    it "should click on the self signup help link " do
       @student = @course.enroll_student(user_model(:name => "John Doe")).user
       get "/courses/#{@course.id}/groups"
       f(".add_category_link").click
@@ -360,12 +360,12 @@ describe "manage groups students" do
       assert_flash_error_message /Nothing to do/
     end
 
-    it "should give 'Students assigned to groups.' success flash otherwise" do
+    it "should give Students assigned to groups. success flash otherwise" do
       assign_students(@category)
       assert_flash_notice_message /Students assigned to groups/
     end
 
-    it "should give 'Assigning Students...' visual feedback" do
+    it "should give Assigning Students... visual feedback" do
       pending "causes whatever spec follows this to fail even in different files"
         assign_students = fj("#category_#{@category.id} .assign_students_link:visible")
         assign_students.should_not be_nil
