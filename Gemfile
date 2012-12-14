@@ -95,7 +95,7 @@ group :test do
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.2'
   gem 'rspec-rails',  '1.3.4'
-  gem 'selenium-webdriver', '2.25.0'
+  gem 'selenium-webdriver', '2.26.0'
   gem 'webrat',       '0.7.3'
   gem 'yard',         '0.8.0'
   if ONE_NINE

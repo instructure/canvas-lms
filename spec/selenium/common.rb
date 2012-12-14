@@ -79,32 +79,48 @@ module SeleniumTestsHelperMethods
 
       driver = nil
 
-      (1..60).each do |times|
-        env_test_number = ENV['TEST_ENV_NUMBER']
-        env_test_number = 1 if ENV['TEST_ENV_NUMBER'].blank?
-
-        begin
-          #curbs race conditions on selenium grid nodes
-
-          if times == 1
-            first_run = true
-            stagger_threads(first_run)
-          else
-            stagger_threads
+      if File.exist?("/tmp/nightly_build.txt")
+        [1, 2, 3].each do |times|
+          begin
+            driver = Selenium::WebDriver.for(
+                :remote,
+                :url => 'http://' + (SELENIUM_CONFIG[:host_and_port] || "localhost:4444") + '/wd/hub',
+                :desired_capabilities => caps
+            )
+            break
+          rescue Exception => e
+            puts "Error attempting to start remote webdriver: #{e}"
+            raise e if times == 3
           end
+        end
+      else
+        (1..60).each do |times|
+          env_test_number = ENV['TEST_ENV_NUMBER']
+          env_test_number = 1 if ENV['TEST_ENV_NUMBER'].blank?
 
-          port_num = (4440 + env_test_number.to_i)
-          puts "Thread #{env_test_number} connecting to hub over port #{port_num}, try ##{times}"
-          driver = Selenium::WebDriver.for(
-              :remote,
-              :url => "http://127.0.0.1:#{port_num}/wd/hub",
-              :desired_capabilities => caps
-          )
-          break
-        rescue Exception => e
-          puts "Thread #{env_test_number}\n try ##{times}\nError attempting to start remote webdriver: #{e}"
-          sleep 10
-          raise e if times == 60
+          begin
+            #curbs race conditions on selenium grid nodes
+
+            if times == 1
+              first_run = true
+              stagger_threads(first_run)
+            else
+              stagger_threads
+            end
+
+            port_num = (4440 + env_test_number.to_i)
+            puts "Thread #{env_test_number} connecting to hub over port #{port_num}, try ##{times}"
+            driver = Selenium::WebDriver.for(
+                :remote,
+                :url => "http://127.0.0.1:#{port_num}/wd/hub",
+                :desired_capabilities => caps
+            )
+            break
+          rescue Exception => e
+            puts "Thread #{env_test_number}\n try ##{times}\nError attempting to start remote webdriver: #{e}"
+            sleep 10
+            raise e if times == 60
+          end
         end
       end
     end
