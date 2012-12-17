@@ -25,7 +25,6 @@ disable_log_formatters;
 ssh_options[:forward_agent] = true
 ssh_options[:keys] = [File.join(ENV["HOME"], ".ssh", "id_rsa_canvas")]
 
-
 namespace :deploy do
 	task :start do ; end
 	task :stop do ; end
@@ -34,6 +33,18 @@ namespace :deploy do
 		# run "touch #{release_path}/tmp/restart.txt"
     run "sudo /etc/init.d/httpd restart"
 	end
+
+  namespace :web do
+    task :disable, :roles => :app do
+      on_rollback { rm "#{shared_path}/system/maintenance.html" }
+
+      run "cp /usr/local/canvas/maintenance.html #{shared_path}/system/maintenance.html && chmod 0644 #{shared_path}/system/maintenance.html"
+    end
+    task :enable, :roles => :app do
+      run "rm #{shared_path}/system/maintenance.html"
+    end
+
+  end
 end
 
 namespace :canvas do
@@ -78,9 +89,10 @@ namespace :canvas do
 
 end
 
-after(:deploy, "deploy:cleanup")
+before(":deploy", "deploy:web:disable")
 before("deploy:restart", "canvas:symlink_canvasfiles")
 before("deploy:restart", "canvas:compile_assets")
 before("deploy:restart", "canvas:update_remote")
 
-
+after(:deploy, "deploy:cleanup")
+after(":deploy:restart", ":deploy:web:enable")
