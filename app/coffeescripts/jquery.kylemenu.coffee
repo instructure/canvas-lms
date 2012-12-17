@@ -24,7 +24,7 @@ define [
 
       # passing an appendMenuTo option when initializing a kylemenu helps get aroud popup being hidden
       # by overflow:scroll on its parents
-      # but by doing so we need to make sure that click events still get propigated up in case we
+      # but by doing so we need to make sure that click events still get propagated up in case we
       # were delegating events to a parent container
       if @opts.appendMenuTo
         popupInstance = @$menu.data('popup')
@@ -38,8 +38,8 @@ define [
         @$placeholder = $('<span style="display:none;">').insertAfter(@$menu)
         @$menu.bind 'click', => @$placeholder.trigger arguments...
 
-      @$menu.bind
-        menuselect: @close
+      @$menu.on
+        menuselect: @select
         popupopen: @onOpen
         popupclose: @onClose
 
@@ -50,7 +50,10 @@ define [
     open: ->
       @$menu.popup 'open'
 
-    close: =>
+    select: (e, ui) =>
+      if e.originalEvent?.type != "click" && $target = $(ui.item).find('a')
+        $target.trigger('click')
+        window.location = $target.attr('href')
       @$menu.popup('close').removeClass "ui-state-open"
 
     onClose: =>
