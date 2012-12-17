@@ -366,7 +366,7 @@ describe "manage groups students" do
     end
 
     it "should give Assigning Students... visual feedback" do
-      pending "causes whatever spec follows this to fail even in different files"
+      #pending "causes whatever spec follows this to fail even in different files"
         assign_students = fj("#category_#{@category.id} .assign_students_link:visible")
         assign_students.should_not be_nil
         assign_students.click
