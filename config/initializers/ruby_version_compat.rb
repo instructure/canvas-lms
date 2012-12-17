@@ -132,7 +132,7 @@ else
   # (which in canvas is utf-8)
   class ActiveSupport::SafeBuffer
     def initialize(*a)
-      super.force_encoding('utf-8')
+      super.force_encoding(Encoding.default_internal)
     end
   end
 end
