@@ -11,6 +11,7 @@ if Gem::Version.new(Bundler::VERSION) <= Gem::Version.new("1.0.0")
 end
 
 begin
+  Encoding.default_external = 'utf-8' if defined?(Encoding)
   # Set up load paths for all bundled gems
   ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../../Gemfile", __FILE__)
   Bundler.setup
