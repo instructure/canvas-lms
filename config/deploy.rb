@@ -94,4 +94,4 @@ before("deploy:restart", "canvas:compile_assets")
 before("deploy:restart", "canvas:update_remote")
 
 after(:deploy, "deploy:cleanup")
-after(:deploy, ":deploy:web:enable")
+after(:deploy, "deploy:web:enable")
