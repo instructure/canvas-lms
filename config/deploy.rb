@@ -1,6 +1,6 @@
 require "bundler/capistrano"
-set :stages,        %w(canvasprod canvastest)
-set :default_stage, "canvastest"
+set :stages,        %w(production stage test)
+set :default_stage, "test"
 require "capistrano/ext/multistage"
 
 set :application,   "canvas"
@@ -78,12 +78,18 @@ namespace :canvas do
       run "sudo /etc/init.d/canvas_init restart"
     end
 
+    desc "Log the deploy to graphite"
+    task :log_deploy do
+      put "CURRENT STAGE IS #{stage}"
+    end
+
     desc "Post-update commands"
     task :update_remote do
       copy_config
       deploy.migrate
       load_notifications
       restart_jobs
+      log_deploy
     end
 
 end
