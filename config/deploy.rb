@@ -1,6 +1,6 @@
 require "bundler/capistrano"
 set :stages,        %w(production staging testing)
-set :default_stage, "test"
+set :default_stage, "testing"
 require "capistrano/ext/multistage"
 
 set :application,   "canvas"
