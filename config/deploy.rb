@@ -53,7 +53,6 @@ namespace :canvas do
     task :symlink_canvasfiles do
         target = "mnt/data"
         run "mkdir -p #{latest_release}/mnt/data && ln -s /mnt/data/canvasfiles #{latest_release}/#{target}/canvasfiles"
-        run "ln -s #{shared_path}/system #{latest_release}/public/system"
     end
 
     desc "Copy config files from /mnt/data/canvasconfig/config"
@@ -89,7 +88,7 @@ namespace :canvas do
 
 end
 
-before(":deploy", "deploy:web:disable")
+before(:deploy, "deploy:web:disable")
 before("deploy:restart", "canvas:symlink_canvasfiles")
 before("deploy:restart", "canvas:compile_assets")
 before("deploy:restart", "canvas:update_remote")
