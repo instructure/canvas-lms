@@ -42,6 +42,7 @@ namespace :canvas do
     task :symlink_canvasfiles do
         target = "mnt/data"
         run "mkdir -p #{latest_release}/mnt/data && ln -s /mnt/data/canvasfiles #{latest_release}/#{target}/canvasfiles"
+        run "ln -s #{shared_path}/system #{latest_release}/public/system"
     end
 
     desc "Copy config files from /mnt/data/canvasconfig/config"
