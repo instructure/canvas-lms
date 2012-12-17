@@ -190,9 +190,9 @@ class Enrollment < ActiveRecord::Base
 
   named_scope :past,
               :joins => :course,
-              :conditions => "courses.workflow_state = 'completed' OR
-                              enrollments.workflow_state IN ('rejected', 'completed')
-                              AND enrollments.workflow_state NOT IN ('invited', 'deleted')"
+              :conditions => "(courses.workflow_state = 'completed'
+                              AND enrollments.workflow_state NOT IN ('invited', 'deleted'))
+                              OR enrollments.workflow_state IN ('rejected', 'completed')"
 
   named_scope :not_fake, :conditions => "enrollments.type != 'StudentViewEnrollment'"
 
