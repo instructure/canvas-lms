@@ -81,7 +81,7 @@ namespace :canvas do
     desc "Log the deploy to graphite"
     task :log_deploy do
       ts = Time.now.to_i
-      cmd = "echo 'stats.canvas.#{stage} 1 #{ts}' | nc stats.tier2.sfu.ca 2003"
+      cmd = "echo 'stats.canvas.#{stage}.deploys 1 #{ts}' | nc stats.tier2.sfu.ca 2003"
       puts cmd
       puts run_locally cmd
     end
