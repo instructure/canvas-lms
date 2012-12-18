@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2012 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -56,7 +56,7 @@ describe "Groups API", :type => :integration do
     @community.add_user(@member, 'accepted', false)
     @community.add_user(@moderator, 'accepted', true)
     @community_path = "/api/v1/groups/#{@community.id}"
-    @community_path_options = { :controller => "groups", :format => "json" }
+    @category_path_options = { :controller => "groups", :format => "json" }
     @context = @community
   end
 
@@ -66,7 +66,7 @@ describe "Groups API", :type => :integration do
     @group.add_user(@member, 'accepted', true)
 
     @user = @member
-    json = api_call(:get, "/api/v1/users/self/groups", @community_path_options.merge(:action => "index"))
+    json = api_call(:get, "/api/v1/users/self/groups", @category_path_options.merge(:action => "index"))
     json.should == [group_json(@community, @user), group_json(@group, @user)]
     links = response.headers['Link'].split(",")
     links.all?{ |l| l =~ /api\/v1\/users\/self\/groups/ }.should be_true
@@ -77,7 +77,7 @@ describe "Groups API", :type => :integration do
     @group = @course.groups.create!(:name => 'New group')
 
     json = api_call(:get, "/api/v1/courses/#{@course.to_param}/groups.json",
-                    @community_path_options.merge(:action => 'context_index',
+                    @category_path_options.merge(:action => 'context_index',
                                                   :course_id => @course.to_param))
     json.count.should == 1
     json.first['id'].should == @group.id
@@ -88,7 +88,7 @@ describe "Groups API", :type => :integration do
     account_admin_user(:account => @account)
 
     json = api_call(:get, "/api/v1/accounts/#{@account.to_param}/groups.json",
-                    @community_path_options.merge(:action => 'context_index',
+                    @category_path_options.merge(:action => 'context_index',
                                                   :account_id => @account.to_param))
     json.count.should == 1
     json.first['id'].should == @community.id
@@ -97,7 +97,7 @@ describe "Groups API", :type => :integration do
   it "should not allow non-admins to view an account's groups" do
     @account = Account.default
     raw_api_call(:get, "/api/v1/accounts/#{@account.to_param}/groups.json",
-                    @community_path_options.merge(:action => 'context_index',
+                    @category_path_options.merge(:action => 'context_index',
                                                   :account_id => @account.to_param))
     response.code.should == '401'
   end
@@ -109,7 +109,7 @@ describe "Groups API", :type => :integration do
     @group_1.add_user(@user, 'accepted', false)
 
     json = api_call(:get, "/api/v1/courses/#{@course.to_param}/groups.json",
-                    @community_path_options.merge(:action => 'context_index',
+                    @category_path_options.merge(:action => 'context_index',
                                                   :course_id => @course.to_param))
     json.count.should == 1
     json.first['id'].should == @group_1.id
@@ -117,13 +117,13 @@ describe "Groups API", :type => :integration do
 
   it "should allow a member to retrieve the group" do
     @user = @member
-    json = api_call(:get, @community_path, @community_path_options.merge(:group_id => @community.to_param, :action => "show"))
+    json = api_call(:get, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "show"))
     json.should == group_json(@community, @user)
   end
 
   it "should allow anyone to create a new community" do
     user_model
-    json = api_call(:post, "/api/v1/groups", @community_path_options.merge(:action => "create"), {
+    json = api_call(:post, "/api/v1/groups", @category_path_options.merge(:action => "create"), {
       'name'=> "History Teachers",
       'description' => "Because history is awesome!",
       'is_public'=> false,
@@ -133,6 +133,46 @@ describe "Groups API", :type => :integration do
     @community2.group_category.should be_communities
     json.should == group_json(@community2, @user)
   end
+
+  it "should allow a teacher to create a group in a course" do
+    course_with_teacher
+    @user = @teacher
+    project_groups = @course.group_categories.build
+    project_groups.name = "Course Project Groups"
+    project_groups.save
+    json = api_call(:post, "/api/v1/group_categories/#{project_groups.id}/groups", @category_path_options.merge(:action => "create", :group_category_id =>project_groups.to_param))
+    project_groups.groups.active.count.should == 1
+  end
+
+  it "should not allow a student to create a group in a course" do
+    course_with_student
+    @user = @student
+    project_groups = @course.group_categories.build
+    project_groups.name = "Course Project Groups"
+    project_groups.save
+    raw_api_call(:post, "/api/v1/group_categories/#{project_groups.id}/groups", @category_path_options.merge(:action => "create", :group_category_id =>project_groups.to_param))
+    response.code.should == '401'
+  end
+
+  it "should allow an admin to create a group in a account" do
+    @account = Account.default
+    account_admin_user(:account => @account)
+    project_groups = @account.group_categories.build
+    project_groups.name = "test group category"
+    project_groups.save
+    api_call(:post, "/api/v1/group_categories/#{project_groups.id}/groups", @category_path_options.merge(:action => "create", :group_category_id =>project_groups.to_param))
+    project_groups.groups.active.count.should == 1
+  end
+
+  it "should not allow a non-admin to create a group in a account" do
+    @account = Account.default
+    project_groups = @account.group_categories.build
+    project_groups.name = "test group category"
+    project_groups.save
+    raw_api_call(:post, "/api/v1/group_categories/#{project_groups.id}/groups", @category_path_options.merge(:action => "create", :group_category_id =>project_groups.to_param))
+    response.code.should == '401'
+  end
+
 
   it "should allow a moderator to edit a group" do
     avatar = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @community)
@@ -144,7 +184,7 @@ describe "Groups API", :type => :integration do
       'join_level' => "parent_context_auto_join",
       'avatar_id' => avatar.id,
     }
-    json = api_call(:put, @community_path, @community_path_options.merge(:group_id => @community.to_param, :action => "update"), new_attrs)
+    json = api_call(:put, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "update"), new_attrs)
     @community.reload
     @community.name.should == "Algebra II Teachers"
     @community.description.should == "Math rocks!"
@@ -159,14 +199,14 @@ describe "Groups API", :type => :integration do
     new_attrs = {
       'is_public' => true,
     }
-    json = api_call(:put, @community_path, @community_path_options.merge(:group_id => @community.to_param, :action => "update"), new_attrs)
+    json = api_call(:put, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "update"), new_attrs)
     @community.reload
     @community.is_public.should == true
 
     new_attrs = {
       'is_public' => false,
     }
-    json = api_call(:put, @community_path, @community_path_options.merge(:group_id => @community.to_param, :action => "update"), new_attrs, {}, :expected_status => 400)
+    json = api_call(:put, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "update"), new_attrs, {}, :expected_status => 400)
     @community.reload
     @community.is_public.should == true
   end
@@ -178,19 +218,19 @@ describe "Groups API", :type => :integration do
       'is_public'=> true,
       'join_level'=> "parent_context_auto_join",
     }
-    json = api_call(:put, @community_path, @community_path_options.merge(:group_id => @community.to_param, :action => "update"), new_attrs, {}, :expected_status => 401)
+    json = api_call(:put, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "update"), new_attrs, {}, :expected_status => 401)
     json['message'].should match /not authorized/
   end
 
   it "should allow a moderator to delete a group" do
     @user = @moderator
-    json = api_call(:delete, @community_path, @community_path_options.merge(:group_id => @community.to_param, :action => "destroy"))
+    json = api_call(:delete, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "destroy"))
     @community.reload.workflow_state.should == 'deleted'
   end
 
   it "should not allow a member to delete a group" do
     @user = @member
-    json = api_call(:delete, @community_path, @community_path_options.merge(:group_id => @community.to_param, :action => "destroy"), {}, {}, :expected_status => 401)
+    json = api_call(:delete, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "destroy"), {}, {}, :expected_status => 401)
     json['message'].should match /not authorized/
   end
 
@@ -198,7 +238,7 @@ describe "Groups API", :type => :integration do
     it "should allow following a public group" do
       user_model
       @community.update_attribute(:is_public, true)
-      json = api_call(:put, @community_path + "/followers/self", @community_path_options.merge(:group_id => @community.to_param, :action => "follow"))
+      json = api_call(:put, @community_path + "/followers/self", @category_path_options.merge(:group_id => @community.to_param, :action => "follow"))
       @user.user_follows.map(&:followed_item).should == [@community]
       uf = @user.user_follows.first
       json.should == { "following_user_id" => @user.id, "followed_group_id" => @community.id, "created_at" => uf.created_at.as_json }
@@ -206,12 +246,12 @@ describe "Groups API", :type => :integration do
 
     it "should not allow following a private group" do
       user_model
-      json = api_call(:put, @community_path + "/followers/self", @community_path_options.merge(:group_id => @community.to_param, :action => "follow"), {}, {}, :expected_status => 401)
+      json = api_call(:put, @community_path + "/followers/self", @category_path_options.merge(:group_id => @community.to_param, :action => "follow"), {}, {}, :expected_status => 401)
     end
 
     it "should allow members to follow a private group" do
       @user = @member
-      api_call(:put, @community_path + "/followers/self", @community_path_options.merge(:group_id => @community.to_param, :action => "follow"))
+      api_call(:put, @community_path + "/followers/self", @category_path_options.merge(:group_id => @community.to_param, :action => "follow"))
       @user.user_follows.map(&:followed_item).should == [@community]
     end
   end
@@ -221,16 +261,16 @@ describe "Groups API", :type => :integration do
       @user = @member
       @user.reload.user_follows.map(&:followed_item).should == [@community]
 
-      json = api_call(:delete, @community_path + "/followers/self", @community_path_options.merge(:group_id => @community.to_param, :action => "unfollow"))
+      json = api_call(:delete, @community_path + "/followers/self", @category_path_options.merge(:group_id => @community.to_param, :action => "unfollow"))
       @user.reload.user_follows.should == []
     end
 
     it "should do nothing if not following" do
       @user = @member
-      json = api_call(:delete, @community_path + "/followers/self", @community_path_options.merge(:group_id => @community.to_param, :action => "unfollow"))
+      json = api_call(:delete, @community_path + "/followers/self", @category_path_options.merge(:group_id => @community.to_param, :action => "unfollow"))
       @user.reload.user_follows.should == []
 
-      json = api_call(:delete, @community_path + "/followers/self", @community_path_options.merge(:group_id => @community.to_param, :action => "unfollow"))
+      json = api_call(:delete, @community_path + "/followers/self", @category_path_options.merge(:group_id => @community.to_param, :action => "unfollow"))
       @user.reload.user_follows.should == []
     end
   end
@@ -378,7 +418,7 @@ describe "Groups API", :type => :integration do
       @user = @moderator
       invitees = { :invitees => ["leonard@example.com", "sheldon@example.com"] }
       expect {
-        @json = api_call(:post, "#{@community_path}/invite", @community_path_options.merge(:group_id => @community.to_param, :action => "invite"), invitees)
+        @json = api_call(:post, "#{@community_path}/invite", @category_path_options.merge(:group_id => @community.to_param, :action => "invite"), invitees)
       }.to change(User, :count).by(2)
       @memberships = @community.reload.group_memberships.scoped(:conditions => { :workflow_state => "invited" }, :order => :id).all
       @memberships.count.should == 2
@@ -388,7 +428,7 @@ describe "Groups API", :type => :integration do
     it "should not allow a member to invite people to a group" do
       @user = @member
       invitees = { :invitees => ["leonard@example.com", "sheldon@example.com"] }
-      api_call(:post, "#{@community_path}/invite", @community_path_options.merge(:group_id => @community.to_param, :action => "invite"), invitees, {}, :expected_status => 401)
+      api_call(:post, "#{@community_path}/invite", @category_path_options.merge(:group_id => @community.to_param, :action => "invite"), invitees, {}, :expected_status => 401)
       @memberships = @community.reload.group_memberships.scoped(:conditions => { :workflow_state => "invited" }, :order => :id).count.should == 0
     end
 

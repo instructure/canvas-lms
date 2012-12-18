@@ -59,7 +59,8 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   def add_groups(context)
-    context.resources :groups, :collection => {:create_category => :post, :update_category => :put, :delete_category => :delete}
+    context.resources :groups
+    context.resources :group_categories, :only => [:create, :update, :destroy]
     context.group_unassigned_members 'group_unassigned_members', :controller => 'groups', :action => 'unassigned_members', :conditions => { :method => :get }
     context.group_unassigned_members 'group_unassigned_members.:format', :controller => 'groups', :action => 'unassigned_members', :conditions => { :method => :get }
     context.group_assign_unassigned_members 'group_assign_unassigned_members', :controller => 'groups', :action => 'assign_unassigned_members', :conditions => { :method => :post }
@@ -926,6 +927,7 @@ ActionController::Routing::Routes.draw do |map|
       groups.get 'groups/:group_id/users', :action => :users, :path_name => 'group_users'
       groups.post 'groups/:group_id/invite', :action => :invite
       groups.post 'groups/:group_id/files', :action => :create_file
+      groups.post 'group_categories/:group_category_id/groups', :action => :create
       groups.get 'groups/:group_id/activity_stream', :action => :activity_stream, :path_name => 'group_activity_stream'
       groups.put "groups/:group_id/followers/self", :action => :follow
       groups.delete "groups/:group_id/followers/self", :action => :unfollow
@@ -1049,6 +1051,16 @@ ActionController::Routing::Routes.draw do |map|
       outcomes.put "outcomes/:id", :action => :update
       outcomes.delete "outcomes/:id", :action => :destroy
     end
+
+    api.with_options(:controller => :group_categories) do |group_categories|
+      group_categories.resources :group_categories, :except => [:index, :create]
+      group_categories.get 'accounts/:account_id/group_categories', :action => :index, :path_name => 'account_group_categories'
+      group_categories.get 'courses/:course_id/group_categories', :action => :index, :path_name => 'course_group_categories'
+      group_categories.post 'accounts/:account_id/group_categories', :action => :create
+      group_categories.post 'courses/:course_id/group_categories', :action => :create
+      group_categories.get 'group_categories/:group_category_id/groups', :action => :groups, :path_name => 'group_category_groups'
+    end
+
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented

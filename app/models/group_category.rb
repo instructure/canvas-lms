@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -148,4 +148,41 @@ class GroupCategory < ActiveRecord::Base
     self.deleted_at = Time.now
     self.save
   end
+
+  def distribute_members_among_groups(members, groups)
+    return [] if groups.empty?
+    new_memberships = []
+    touched_groups = [].to_set
+
+    groups_by_size = {}
+    groups.each do |group|
+      size = group.users.size
+      groups_by_size[size] ||= []
+      groups_by_size[size] << group
+    end
+    smallest_group_size = groups_by_size.keys.min
+
+    members.sort_by{ rand }.each do |member|
+      group = groups_by_size[smallest_group_size].first
+      membership = group.add_user(member)
+      if membership.valid?
+        new_memberships << membership
+        touched_groups << group.id
+
+        # successfully added member to group, move it to the new size bucket
+        groups_by_size[smallest_group_size].shift
+        groups_by_size[smallest_group_size + 1] ||= []
+        groups_by_size[smallest_group_size + 1] << group
+
+        # was that the last group of that size?
+        if groups_by_size[smallest_group_size].empty?
+          groups_by_size.delete(smallest_group_size)
+          smallest_group_size += 1
+        end
+      end
+    end
+    Group.update_all({:updated_at => Time.now.utc}, :id => touched_groups.to_a) unless touched_groups.empty?
+    return new_memberships
+  end
+
 end
