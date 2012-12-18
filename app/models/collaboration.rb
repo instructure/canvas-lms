@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011-2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -23,7 +23,8 @@ class Collaboration < ActiveRecord::Base
   include SendToStream
   belongs_to :user
   has_many :collaborators, :dependent => :destroy
-  has_many :users, :through => :collaborators
+  has_many :groups, :through => :collaborators
+  has_many :users,  :through => :collaborators
   belongs_to :context, :polymorphic => true
   
   before_save :generate_document
@@ -171,7 +172,7 @@ class Collaboration < ActiveRecord::Base
   
   def add_users_to_document(users_to_add)
   end
-  
+
   def collaboration_users=(users)
     self.save
     generate_document
@@ -185,10 +186,128 @@ class Collaboration < ActiveRecord::Base
     new_users.each do |u|
       self.collaborators.create(:user => u, :authorized_service_user_id => u.gmail)
     end
+
     self.save
     self.users
   end
-  
+
+  # Public: Update user and group collaborators for this collaboration.
+  #   Any previous users and groups not included in this 
+  #
+  # users - An array of users to include as collaborators.
+  # group_ids - An array of group ids to include as collaborators.
+  #
+  # Returns nothing.
+  def update_members(users = [], group_ids = [])
+    save if new_record?
+    generate_document
+    update_user_collaborators(users)
+    update_group_collaborators(group_ids)
+    group_users_to_add = User.all(:select => 'DISTINCT users.*',
+      :joins => :group_memberships,
+      :include => :communication_channels,
+      :conditions => { 'group_memberships.group_id' => group_ids })
+    add_users_to_document((users + group_users_to_add).uniq)
+  end
+
+  # Internal: Delete existing collaborating users and add new ones.
+  #
+  # users - The array of users to add. Any duplicates with current users
+  #         will not be removed or re-added.
+  #
+  # Returns nothing.
+  def update_user_collaborators(users)
+    users_to_remove = User.all(:select => 'DISTINCT users.*',
+      :joins => 'LEFT JOIN group_memberships ON users.id = group_memberships.user_id
+                 RIGHT JOIN collaborators ON users.id = collaborators.user_id',
+      :conditions => ['collaborators.collaboration_id = ? OR
+                       group_memberships.group_id IN (?)', self.id, self.groups.map(&:id)])
+    remove_users_from_document(users_to_remove)
+    remove_users_from_collaborators(users)
+    add_users_to_collaborators(users)
+  end
+  protected :update_user_collaborators
+
+  # Internal: Remove old group collaborators and add new ones.
+  #
+  # group_ids - An array of IDs for groups to be added. Any duplicates w/
+  #            existing groups will not be deleted/added.
+  def update_group_collaborators(group_ids)
+    remove_groups_from_collaborators(group_ids)
+    add_groups_to_collaborators(group_ids)
+  end
+  protected :update_group_collaborators
+
+  # Internal: Delete groups no longer being collaborated with.
+  #
+  # group_ids - An array of group IDs that will be used as collaborators.
+  #
+  # Returns nothing.
+  def remove_groups_from_collaborators(group_ids)
+    if group_ids.empty?
+      Collaborator.destroy_all(['group_id IS NOT NULL AND
+                                 collaboration_id = ?', self.id])
+    else
+      Collaborator.destroy_all(['group_id IS NOT NULL AND
+                                 group_id NOT IN (?) AND
+                                 collaboration_id = ?',
+                                 group_ids, self.id])
+    end
+  end
+  protected :remove_groups_from_collaborators
+
+  # Internal: Delete users no longer being collaborated with.
+  #
+  # users - An array of users that will be used as collaborators.
+  #
+  # Returns nothing.
+  def remove_users_from_collaborators(users)
+    if users.empty?
+      Collaborator.destroy_all(['user_id IS NOT NULL AND
+                                 collaboration_id = ?', self.id])
+    else
+      Collaborator.destroy_all(['user_id IS NOT NULL AND
+                                 user_id NOT IN (?) AND
+                                 collaboration_id = ?',
+                                 users.map(&:id), self.id])
+    end
+  end
+  protected :remove_users_from_collaborators
+
+  # Internal: Update collaborators with the given groups.
+  #
+  # group_ids - An array of group IDs to add as collaborators.
+  #
+  # Returns nothing.
+  def add_groups_to_collaborators(group_ids)
+    if group_ids.length > 0
+      existing_groups = collaborators.scoped(:select => 'group_id',
+        :conditions => { :group_id => group_ids }).map(&:group_id)
+      (group_ids - existing_groups).each do |g|
+        collaborator = collaborators.build
+        collaborator.group_id = g
+        collaborator.save
+      end
+    end
+  end
+  protected :add_groups_to_collaborators
+
+  # Internal: Update collaborators with the given groups.
+  #
+  # users - An array of users to add as collaborators.
+  #
+  # Returns nothing.
+  def add_users_to_collaborators(users)
+    if users.length > 0
+      existing_users = collaborators.scoped(:select => 'user_id',
+        :conditions => { :user_id => users.map(&:id) }).map(&:user_id)
+      users.select { |u| !existing_users.include?(u) }.each do |u|
+        collaborators.create(:user => u, :authorized_service_user_id => u.gmail)
+      end
+    end
+  end
+  protected :add_users_to_collaborators
+
   def parse_data
     nil
   end

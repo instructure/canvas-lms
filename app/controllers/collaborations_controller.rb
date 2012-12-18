@@ -16,19 +16,29 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# @API Collaborations
+# API for accessing course and group collaboration information.
+#
+# @object Collaborator
+#   {
+#     // The unique user or group identifier for the collaborator.
+#     id: 12345,
+#
+#     // The type of collaborator (e.g. "user" or "group").
+#     type: "user",
+#
+#     // The name of the collaborator.
+#     name: "Don Draper"
+#   }
+
 class CollaborationsController < ApplicationController
-  before_filter :require_context
+  before_filter :require_context, :except => [:members]
+  before_filter :require_collaboration_and_context, :only => [:members]
   before_filter :require_collaborations_configured
   before_filter :reject_student_view_student
-  include GoogleDocs
 
-  def require_collaborations_configured
-    unless Collaboration.any_collaborations_configured?
-      flash[:error] = t 'errors.not_enabled', "Collaborations have not been enabled for this Canvas site"
-      redirect_to named_context_url(@context, :context_url)
-      return false
-    end
-  end
+  include Api::V1::Collaborator
+  include GoogleDocs
 
   def index
     @collaborations = @context.collaborations.active
@@ -130,6 +140,41 @@ class CollaborationsController < ApplicationController
         format.html { redirect_to named_context_url(@context, :collaborations_url) }
         format.json { render :json => @collaboration.to_json }
       end
+    end
+  end
+
+  # @API List members of a collaboration.
+  #
+  # Examples
+  #
+  #   curl http://<canvas>/api/v1/courses/1/collaborations/1/members
+  #
+  # @returns [Collaborator]
+  def members
+    return unless authorized_action(@collaboration, @current_user, :read)
+    collaborators = @collaboration.collaborators.scoped(:include => [:group, :user])
+    collaborators = Api.paginate(collaborators,
+                                 self,
+                                 api_v1_collaboration_members_url)
+
+    render :json => collaborators.map { |c| collaborator_json(c, @current_user, session) }
+  end
+
+  private
+  def require_collaboration_and_context
+    @collaboration = if defined?(@context)
+                       @context.collaborations.find(params[:id])
+                     else
+                       Collaboration.find(params[:id])
+                     end
+    @context = @collaboration.context
+  end
+
+  def require_collaborations_configured
+    unless Collaboration.any_collaborations_configured?
+      flash[:error] = t 'errors.not_enabled', "Collaborations have not been enabled for this Canvas site"
+      redirect_to named_context_url(@context, :context_url)
+      return false
     end
   end
 end

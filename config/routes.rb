@@ -762,6 +762,10 @@ ActionController::Routing::Routes.draw do |map|
       topic_routes(topics, "collection_item")
     end
 
+    api.with_options(:controller => :collaborations) do |collaborations|
+      collaborations.get 'collaborations/:id/members', :action => :members, :path_name => 'collaboration_members'
+    end
+
     api.with_options(:controller => :external_tools) do |tools|
       def et_routes(route_object, context)
         route_object.get "#{context}s/:#{context}_id/external_tools/:external_tool_id", :action => :show, :path_name => "#{context}_external_tool_show"
