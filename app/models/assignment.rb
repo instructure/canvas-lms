@@ -87,7 +87,6 @@ class Assignment < ActiveRecord::Base
   validate :frozen_atts_not_altered, :if => :frozen?, :on => :update
 
   acts_as_list :scope => :assignment_group_id
-  has_a_broadcast_policy
   simply_versioned :keep => 5
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
   copy_authorized_links( :description) { [self.context, nil] }
@@ -135,8 +134,11 @@ class Assignment < ActiveRecord::Base
                 :clear_unannounced_grading_changes_if_just_unpublished,
                 :schedule_do_auto_peer_review_job_if_automatic_peer_review,
                 :delete_empty_abandoned_children,
-                :remove_assignment_updated_flag,
                 :validate_assignment_overrides
+
+  has_a_broadcast_policy
+
+  after_save :remove_assignment_updated_flag # this needs to be after has_a_broadcast_policy for the message to be sent
 
   def validate_assignment_overrides
     if group_category_id_changed? 
