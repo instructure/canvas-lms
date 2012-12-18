@@ -210,6 +210,21 @@ describe "grades" do
       f("#grade_info_#{@first_assignment.id} .tooltip").should be_nil
     end
 
+    it "should not show assignment statistics on assignments when it is diabled on the course" do
+      # get up to a point where statistics can be shown
+      5.times do
+        s = student_in_course(:active_all => true).user
+        @first_assignment.grade_student(s, :grade => 4)
+      end
+
+      # but then prevent them at the course level
+      @course.settings = { :hide_distribution_graphs => true }
+      @course.save!
+
+      get "/courses/#{@course.id}/grades"
+      f("#grade_info_#{@first_assignment.id} .tooltip").should be_nil
+    end
+
     it "should show rubric even if there are no comments" do
       @third_association = @rubric.associate_with(@third_assignment, @course, :purpose => 'grading')
       @third_submission = @third_assignment.submissions.create!(:user => @student_1) # unsubmitted submission :/

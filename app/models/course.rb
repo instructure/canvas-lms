@@ -1963,7 +1963,9 @@ class Course < ActiveRecord::Base
     if settings[:storage_quota] && ( migration.for_course_copy? || self.account.grants_right?(migration.user, nil, :manage_courses))
       self.storage_quota = settings[:storage_quota]
     end
-    self.settings[:hide_final_grade] = !!settings[:hide_final_grade] unless settings[:hide_final_grade].nil?
+    [:hide_final_grade, :hide_distribution_graph].each do |setting|
+      self.settings[setting] = !!settings[setting] unless settings[setting].nil?
+    end
     atts = Course.clonable_attributes
     atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
     settings.slice(*atts.map(&:to_s)).each do |key, val|
@@ -2791,6 +2793,7 @@ class Course < ActiveRecord::Base
   # these settings either are or could be easily added to
   # the course settings page
   add_setting :hide_final_grade, :boolean => true
+  add_setting :hide_distribution_graphs, :boolean => true
 
   def hide_final_grades
     self.settings[:hide_final_grade]
@@ -2806,7 +2809,6 @@ class Course < ActiveRecord::Base
   end
 
   def settings=(hash)
-
     if hash.is_a?(Hash)
       hash.each do |key, val|
         if settings_options[key.to_sym]

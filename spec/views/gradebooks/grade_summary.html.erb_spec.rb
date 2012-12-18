@@ -49,7 +49,7 @@ describe "/gradebooks/grade_summary" do
     page.css(".final_grade").length.should == 0
   end
 
-  it "should not show what if if not the student" do
+  it "should not show 'what if' if not the student" do
     course_with_teacher
     student_in_course
     @student = @user

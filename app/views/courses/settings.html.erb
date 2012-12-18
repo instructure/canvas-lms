@@ -267,6 +267,8 @@ TEXT
               <%= f.label :allow_student_organized_groups, :en => "Let Students organize their own Groups" %><br/>
               <%= settings.check_box :hide_final_grade, :checked => @context.settings[:hide_final_grade] %>
               <%= settings.label :hide_final_grade, :en => "Hide totals in student grades summary" %><br/>
+              <%= settings.check_box :hide_distribution_graphs, :checked => @context.settings[:hide_distribution_graphs] %>
+              <%= settings.label :hide_distribution_graphs, :en => "Hide grade distribution graphs from students" %><br/>
               <label for="course_default_wiki_editing_roles">
                 <%= f.select :default_wiki_editing_roles, [
                   [t('#course.wiki_permissions.only_teachers', "Only Teachers"), "teachers"],
