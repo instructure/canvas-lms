@@ -23,4 +23,11 @@ module SelfEnrollmentsHelper
       markdown(@registration_summary, :never) rescue nil
     end
   end
+
+  def agree_to_terms
+    @agree_to_terms ||
+    t("#self_enrollments.agree_to_terms",
+      "You agree to the *terms of use*.",
+      :wrapper => link_to('\1', "http://www.instructure.com/terms-of-use", :target => "_new"))
+  end
 end
