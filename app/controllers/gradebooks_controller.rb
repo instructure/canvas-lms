@@ -62,7 +62,8 @@ class GradebooksController < ApplicationController
 
           ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
             @groups = @context.assignment_groups.active.all
-            @assignments = @context.assignments.active.gradeable.find(:all, :order => 'due_at, title')
+            @assignments = @context.assignments.active.gradeable.find(:all, :include => [:assignment_overrides])
+            @assignments.collect!{|a| a.overridden_for(@student)}.sort!
             groups_assignments =
               groups_as_assignments(@groups, :out_of_final => true, :exclude_total => @context.settings[:hide_final_grade])
             @no_calculations = groups_assignments.empty?

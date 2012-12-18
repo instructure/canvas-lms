@@ -189,6 +189,102 @@ describe GradebooksController do
       get 'grade_summary', :course_id => @course.id, :id => @student.id
       assigns[:submissions_by_assignment].values.map(&:count).should == [1,1]
     end
+
+    it "should sort assignments by due date (null last), then title" do
+      course_with_teacher_logged_in(:active_all => true)
+      student_in_course(:active_all => true)
+      assignment1 = @course.assignments.create(:title => "Assignment 1")
+      assignment2 = @course.assignments.create(:title => "Assignment 2", :due_at => 3.days.from_now)
+      assignment3 = @course.assignments.create(:title => "Assignment 3", :due_at => 2.days.from_now)
+
+      get 'grade_summary', :course_id => @course.id, :id => @student.id
+      assigns[:assignments].select{|a| a.class == Assignment}.map(&:id).should == [assignment3, assignment2, assignment1].map(&:id)
+    end
+
+    context "with assignment due date overrides" do
+      before :each do
+        course_with_teacher(:active_all => true)
+        student_in_course(:active_all => true)
+
+        user(:active_all => true)
+        @observer = @user
+        oe = @course.enroll_user(@observer, 'ObserverEnrollment')
+        oe.accept
+        oe.update_attribute(:associated_user_id, @student.id)
+
+        @assignment = @course.assignments.create(:title => "Assignment 1")
+        @due_at = 4.days.from_now
+      end
+
+      def check_grades_page(due_at)
+        [@student, @teacher, @observer].each do |u|
+          user_session(u)
+          get 'grade_summary', :course_id => @course.id, :id => @student.id
+          assigns[:assignments].find{|a| a.class == Assignment}.due_at.should == due_at
+        end
+      end
+
+      it "should reflect section overrides" do
+        section = @course.default_section
+        override = assignment_override_model(:assignment => @assignment)
+        override.set = section
+        override.override_due_at(@due_at)
+        override.save!
+        check_grades_page(@due_at)
+      end
+
+      it "should reflect group overrides when student is a member" do
+        @assignment.group_category = @course.group_categories.create!
+        @assignment.save!
+        group = @assignment.group_category.groups.create!(:context => @course)
+        group.add_user(@student)
+
+        override = assignment_override_model(:assignment => @assignment)
+        override.set = group
+        override.override_due_at(@due_at)
+        override.save!
+        check_grades_page(@due_at)
+      end
+
+      it "should not reflect group overrides when student is not a member" do
+        @assignment.group_category = @course.group_categories.create!
+        @assignment.save!
+        group = @assignment.group_category.groups.create!(:context => @course)
+
+        override = assignment_override_model(:assignment => @assignment)
+        override.set = group
+        override.override_due_at(@due_at)
+        override.save!
+        check_grades_page(nil)
+      end
+
+      it "should reflect ad-hoc overrides" do
+        override = assignment_override_model(:assignment => @assignment)
+        override.override_due_at(@due_at)
+        override.save!
+        override_student = override.assignment_override_students.build
+        override_student.user = @student
+        override_student.save!
+        check_grades_page(@due_at)
+      end
+
+      it "should use the latest override" do
+        section = @course.default_section
+        override = assignment_override_model(:assignment => @assignment)
+        override.set = section
+        override.override_due_at(@due_at)
+        override.save!
+
+        override = assignment_override_model(:assignment => @assignment)
+        override.override_due_at(@due_at + 1.day)
+        override.save!
+        override_student = override.assignment_override_students.build
+        override_student.user = @student
+        override_student.save!
+
+        check_grades_page(@due_at + 1.day)
+      end
+    end
   end
 
   describe "GET 'show'" do
