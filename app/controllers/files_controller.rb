@@ -392,17 +392,16 @@ class FilesController < ApplicationController
     user ||= User.find_by_id(params[:user_id]) if params[:user_id].present?
     attachment.context_module_action(user, :read) if user && !params[:preview]
     log_asset_access(@attachment, "files", "files") unless params[:preview]
+    set_cache_header(attachment)
     if safer_domain_available?
       redirect_to safe_domain_file_url(attachment, @safer_domain_host, params[:verifier], !inline)
     elsif Attachment.local_storage?
       @headers = false if @files_domain
-      cancel_cache_buster
       send_file(attachment.full_filename, :type => attachment.content_type_with_encoding, :disposition => (inline ? 'inline' : 'attachment'))
     elsif redirect_to_s3
       redirect_to(inline ? attachment.cacheable_s3_inline_url : attachment.cacheable_s3_download_url)
     else
       require 'aws/s3'
-      cancel_cache_buster
       send_file_headers!( :length=>AWS::S3::S3Object.about(attachment.full_filename, attachment.bucket_name)["content-length"], :filename=>attachment.filename, :disposition => 'inline', :type => attachment.content_type_with_encoding)
       render :status => 200, :text => Proc.new { |response, output|
         AWS::S3::S3Object.stream(attachment.full_filename, attachment.bucket_name) do |chunk|
@@ -412,6 +411,15 @@ class FilesController < ApplicationController
     end
   end
   protected :send_stored_file
+
+  def set_cache_header(attachment)
+    unless attachment.content_type.match(/\Atext/) || attachment.extension == '.html' || attachment.extension == '.htm'
+      cancel_cache_buster
+      #set cache to expoire in 1 day, max-age take seconds, and Expires takes a date
+      response.headers["Cache-Control"] = "private, max-age=86400"
+      response.headers["Expires"] = 1.day.from_now.httpdate
+    end
+  end
 
   # GET /files/new
   def new
