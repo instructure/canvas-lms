@@ -469,6 +469,15 @@ describe "Roles API", :type => :integration do
           'locked'   => true }
       end
 
+      it "should not be able to create permissions for nonexistent roles" do
+        api_call(:put, "/api/v1/accounts/#{@account.id}/roles/nonexistent",
+          @path_options.merge(:role => "nonexistent"),
+          { :permissions =>
+            { :read_forum => { :explicit => 1, :enabled => 0 }}},
+            {}, { :expected_status => 404 })
+        RoleOverride.find_all_by_enrollment_type('nonexistent').should be_empty
+      end
+
       it "should be able to change permissions for account admins" do
         json = api_call(:put, @path.sub(/TeacherEnrollment/, 'AccountAdmin'),
           @path_options.merge(:role => 'AccountAdmin'), { :permissions => {

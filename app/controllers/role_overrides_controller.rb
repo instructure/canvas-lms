@@ -394,6 +394,7 @@ class RoleOverridesController < ApplicationController
   #   }
   def update
     return unless authorized_action(@context, @current_user, :manage_role_overrides)
+    raise ActiveRecord::RecordNotFound unless @context.find_role(@role) || RoleOverride.known_role_types.include?(@role)
     set_permissions_for(@role, @context, params[:permissions])
     render :json => role_json(@context, @role, @current_user, session)
   end
