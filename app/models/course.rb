@@ -2929,6 +2929,7 @@ class Course < ActiveRecord::Base
   # we want to make sure the student view student is always enrolled in all the
   # sections of the course, so that a section limited teacher can grade them.
   def sync_enrollments(fake_student)
+    self.default_section
     self.course_sections.active.each do |section|
       # enroll fake_student will only create the enrollment if it doesn't already exist
       self.enroll_user(fake_student, 'StudentViewEnrollment',
