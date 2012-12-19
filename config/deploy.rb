@@ -7,7 +7,7 @@ set :application,   "canvas"
 set :repository,    "git://github.com/sfu/canvas-lms.git"
 set :scm,           :git
 set :user,          "canvasuser"
-set :branch,        "dev"
+set :branch,        "deploy"
 set :deploy_via,    :remote_cache
 set :deploy_to,     "/var/rails/canvas"
 set :use_sudo,      false
