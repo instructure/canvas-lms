@@ -117,8 +117,8 @@ describe "Roles API", :type => :integration do
               { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => @account.id.to_s },
               { 'role' => 'WeirdStudent', 'base_role_type' => 'StudentEnrollment',
                 'permissions' => { 'read_forum' => { 'enabled' => 'true', 'explicit' => 'true' },
-                                   'moderate_forum' => { 'explicit' => true, 'enabled' => 'false' },
-                                   'post_to_forum' => { 'explicit' => false },
+                                   'moderate_forum' => { 'explicit' => true, 'enabled' => false },
+                                   'post_to_forum' => { 'explicit' => 'false' },
                                    'send_messages' => { 'explicit' => 'on', 'locked' => 'yes', 'enabled' => 'off' }} })
       @account.reload
       overrides = @account.role_overrides.find_all_by_enrollment_type('WeirdStudent').index_by(&:permission)
