@@ -4,7 +4,7 @@ set :default_stage, "testing"
 require "capistrano/ext/multistage"
 
 set :application,   "canvas"
-set :repository,    "git://github.com/grahamb/canvas-lms.git"
+set :repository,    "git://github.com/sfu/canvas-lms.git"
 set :scm,           :git
 set :user,          "canvasuser"
 set :branch,        "dev"
