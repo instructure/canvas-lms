@@ -2625,6 +2625,11 @@ class Course < ActiveRecord::Base
     ]
   end
 
+  def tab_hidden?(id)
+    tab = self.tab_configuration.find{|t| t[:id] == id}
+    return tab && tab[:hidden]
+  end
+
   def external_tool_tabs(opts)
     tools = self.context_external_tools.active.having_setting('course_navigation')
     account_ids = self.account_chain_ids
