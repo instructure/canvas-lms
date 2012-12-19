@@ -21,13 +21,14 @@ module AssignmentOverrideApplicator
   # version) and user, determine the list of overrides, apply them to the
   # assignment or quiz, and return the overridden stand-in.
   def self.assignment_overridden_for(assignment_or_quiz, user)
+    return assignment_or_quiz if user.nil? or assignment_or_quiz.overridden_for_user_id == user.id
+
     overrides = self.overrides_for_assignment_and_user(assignment_or_quiz, user)
-    
-    if overrides.empty?
-      assignment_or_quiz
-    else
-      self.assignment_with_overrides(assignment_or_quiz, overrides)
-    end
+ 
+    result_assignment_or_quiz = self.assignment_with_overrides(assignment_or_quiz, overrides) unless overrides.empty?
+    result_assignment_or_quiz ||= assignment_or_quiz
+    result_assignment_or_quiz.overridden_for_user_id = user.id
+    result_assignment_or_quiz
   end
 
   def self.quiz_overridden_for(quiz, user)

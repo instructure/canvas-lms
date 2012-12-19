@@ -626,15 +626,16 @@ class Quiz < ActiveRecord::Base
     return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
-      if (self.unlock_at && self.unlock_at > Time.now)
+      quiz_for_user = self.overridden_for(user)
+      if (quiz_for_user.unlock_at && quiz_for_user.unlock_at > Time.now)
         sub = user && quiz_submissions.find_by_user_id(user.id)
         if !sub || !sub.manually_unlocked
-          locked = {:asset_string => self.asset_string, :unlock_at => self.unlock_at}
+          locked = {:asset_string => self.asset_string, :unlock_at => quiz_for_user.unlock_at}
         end
-      elsif (self.lock_at && self.lock_at <= Time.now)
+      elsif (quiz_for_user.lock_at && quiz_for_user.lock_at <= Time.now)
         sub = user && quiz_submissions.find_by_user_id(user.id)
         if !sub || !sub.manually_unlocked
-          locked = {:asset_string => self.asset_string, :lock_at => self.lock_at}
+          locked = {:asset_string => self.asset_string, :lock_at => quiz_for_user.lock_at}
         end
       elsif (self.for_assignment? && l = self.assignment.locked_for?(user, opts))
         sub = user && quiz_submissions.find_by_user_id(user.id)

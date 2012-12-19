@@ -1,6 +1,7 @@
 module DatesOverridable
   attr_accessor :applied_overrides
-  
+  attr_accessor :overridden_for_user_id
+
   def self.included(base)
     base.has_many :assignment_overrides, :dependent => :destroy
     base.has_many :active_assignment_overrides, :class_name => 'AssignmentOverride', :conditions => {:workflow_state => 'active'}
