@@ -138,7 +138,6 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     ["right", "center", "left"].each do |setting|
       it "should align text to the #{setting}" do
-        debugger
         wysiwyg_state_setup(text = "test")
         f(".mce_justify#{setting}").click
         validate_wiki_style_attrib("text-align", setting, "p")

@@ -1570,7 +1570,6 @@ describe Assignment do
       #   assignment_model(:context => @course)
       #   require 'rubygems'
       #   require 'ruby-debug'
-      #   debugger
       #   @a.messages_sent.should be_include('Assignment Created')
       # end
     end
