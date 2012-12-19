@@ -986,4 +986,62 @@ describe PseudonymSessionsController do
       @other_user.otp_communication_channel.should be_nil
     end
   end
+
+  describe 'GET oauth2_auth' do
+    let(:key) { DeveloperKey.create! }
+
+    it 'renders a 400 when there is no client_id' do
+      get :oauth2_auth
+      response.status.should == '400 Bad Request'
+      response.body.should =~ /invalid client_id/
+    end
+
+    it 'renders 400 on a bad redirect_uri' do
+      get :oauth2_auth, :client_id => key.id
+      response.status.should == '400 Bad Request'
+      response.body.should =~ /invalid redirect_uri/
+    end
+
+    it 'redirects to the login url' do
+      get :oauth2_auth, :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI
+      response.should redirect_to(login_url)
+    end
+
+    it 'passes on canvas_login if provided' do
+      get :oauth2_auth, :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI, :canvas_login => 1
+      response.should redirect_to(login_url(:canvas_login => 1))
+    end
+  end
+
+  describe 'GET oauth2_token' do
+    let(:key) { DeveloperKey.create! }
+
+    it 'renders a 400 if theres no client_id' do
+      get :oauth2_token
+      response.status.should == '400 Bad Request'
+      response.body.should =~ /invalid client_id/
+    end
+
+    it 'renders a 400 if the secret is invalid' do
+      get :oauth2_token, :client_id => key.id, :client_secret => key.api_key + "123"
+      response.status.should == '400 Bad Request'
+      response.body.should =~ /invalid client_secret/
+    end
+
+    it 'renders a 400 if the provided code does not match a token' do
+      Canvas.stubs(:redis => stub(:get => nil))
+      get :oauth2_token, :client_id => key.id, :client_secret => key.api_key, :code => "NotALegitCode"
+      response.status.should == '400 Bad Request'
+      response.body.should =~ /invalid code/
+    end
+
+    it 'outputs the token json if everything checks out' do
+      user = User.create!
+      Canvas.stubs(:redis => stub(:get => %Q{{"client_id": #{key.id}, "user": #{user.id}}}))
+      get :oauth2_token, :client_id => key.id, :client_secret => key.api_key, :code => "thecode"
+      response.should be_success
+      JSON.parse(response.body).keys.sort.should == ['access_token', 'user']
+    end
+  end
+
 end

@@ -288,7 +288,7 @@ class ApplicationController < ActionController::Base
     response.headers["Pragma"] = "no-cache"
     response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
   end
-  
+
   # To be used as a before_filter, requires controller or controller actions
   # to have their urls scoped to a context in order to be valid.
   # So /courses/5/assignments or groups/1/assignments would be valid, but
@@ -307,7 +307,7 @@ class ApplicationController < ActionController::Base
     end
     return @context != nil
   end
-  
+
   def clean_return_to(url)
     return nil if url.blank?
     uri = URI.parse(url)
@@ -315,7 +315,7 @@ class ApplicationController < ActionController::Base
     return "#{request.protocol}#{request.host_with_port}#{uri.path}#{uri.query && "?#{uri.query}"}#{uri.fragment && "##{uri.fragment}"}"
   end
   helper_method :clean_return_to
-  
+
   def return_to(url, fallback)
     url = clean_return_to(url) || clean_return_to(fallback)
     redirect_to url
@@ -1119,17 +1119,17 @@ class ApplicationController < ActionController::Base
     end
   end
   helper_method :feature_enabled?
-  
+
   def service_enabled?(service)
     @domain_root_account && @domain_root_account.service_enabled?(service)
   end
   helper_method :service_enabled?
-  
+
   def feature_and_service_enabled?(feature)
     feature_enabled?(feature) && service_enabled?(feature)
   end
   helper_method :feature_and_service_enabled?
-  
+
   def show_new_dashboard?
     @current_user && @current_user.preferences[:new_dashboard]
   end
