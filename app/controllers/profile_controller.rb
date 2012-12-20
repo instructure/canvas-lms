@@ -39,7 +39,7 @@ class ProfileController < ApplicationController
       return
     end
 
-    @user = User.find(params[:id])
+    @user ||= @current_user
     @active_tab = "profile"
     @context = @user.profile if @user == @current_user
 
@@ -289,7 +289,7 @@ class ProfileController < ApplicationController
 
   def require_user_for_private_profile
     if params[:id]
-      @user = User.find(params[:id])
+      @user = api_find(User, params[:id])
       return if @user.public?
     end
     require_user
