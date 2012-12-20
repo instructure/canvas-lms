@@ -128,6 +128,7 @@ class SubmissionsApiController < ApplicationController
         if includes.include?('total_scores') && params[:grouped].present?
           hash.merge!(
             :computed_final_score => enrollment.computed_final_score,
+            :computed_final_score_with_muted => enrollment.computed_final_score_with_muted,
             :computed_current_score => enrollment.computed_current_score)
         end
         hash

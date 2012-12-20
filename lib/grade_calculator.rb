@@ -26,6 +26,7 @@ class GradeCalculator
     @user_ids = Array(user_ids).map(&:to_i)
     @current_updates = []
     @final_updates = []
+    @final_updates_with_muted = []
   end
   
   def self.recompute_final_score(user_ids, course_id)
@@ -40,13 +41,15 @@ class GradeCalculator
       submissions = all_submissions.select { |submission| submission.user_id == user_id }
       calculate_current_score(user_id, submissions)
       calculate_final_score(user_id, submissions)
+      calculate_final_score_with_muted(user_id, submissions)
     end
 
     Course.update_all({:updated_at => Time.now.utc}, {:id => @course.id})
-    if !@current_updates.empty? || !@final_updates.empty?
+    if !@current_updates.empty? || !@final_updates.empty? || !@final_updates_with_muted.empty?
       query = "updated_at=#{Enrollment.sanitize(Time.now.utc)}"
       query += ", computed_current_score=CASE #{@current_updates.join(" ")} ELSE computed_current_score END" unless @current_updates.empty?
       query += ", computed_final_score=CASE #{@final_updates.join(" ")} ELSE computed_final_score END" unless @final_updates.empty?
+      query += ", computed_final_score_with_muted=CASE #{@final_updates_with_muted.join(" ")} ELSE computed_final_score_with_muted END" unless @final_updates_with_muted.empty?
       Enrollment.update_all(query, {:user_id => @user_ids, :course_id => @course.id})
     end
   end
@@ -66,9 +69,15 @@ class GradeCalculator
     score = calculate_total_from_group_scores(group_sums, false)
     @final_updates << "WHEN user_id=#{user_id} THEN #{score || "NULL"}"
   end
+
+  def calculate_final_score_with_muted(user_id, submissions)
+    group_sums = create_group_sums(submissions, false, false)
+    score = calculate_total_from_group_scores(group_sums, false)
+    @final_updates_with_muted << "WHEN user_id=#{user_id} THEN #{score || "NULL"}"
+  end
  
   # Creates a hash for each assignment group with stats and the end score for each group
-  def create_group_sums(submissions, ignore_ungraded=true)
+  def create_group_sums(submissions, ignore_ungraded=true, ignore_muted=true)
     group_sums = {}
     @groups.each do |group|
       group_assignments = @assignments.select { |a| a.assignment_group_id == group.id }
@@ -80,10 +89,10 @@ class GradeCalculator
               :submission_count => 0}
       
       # collect submissions for this user for all the assignments
-      # if an assignment is muted it will be treated as if there is no submission
+      # if an assignment is muted it will be treated as if there is no submission, unless ignore_muted is false
       group_assignments.each do |assignment|
         submission = submissions.detect { |s| s.assignment_id == assignment.id }
-        submission = nil if assignment.muted
+        submission = nil if ignore_muted && assignment.muted
         submission ||= OpenStruct.new(:assignment_id=>assignment.id, :score=>0) unless ignore_ungraded
         assignment_submissions << {:assignment => assignment, :submission => submission}
       end

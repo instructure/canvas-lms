@@ -53,6 +53,7 @@ require 'set'
 #           role: StudentEnrollment,
 #           computed_final_score: 41.5,
 #           computed_current_score: 90,
+#           computed_final_score_with_muted: 90
 #           computed_final_grade: 'A-'
 #         }
 #       ],
