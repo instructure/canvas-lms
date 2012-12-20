@@ -21,17 +21,16 @@ module Api::V1::Role
   include Api::V1::Account
 
   def role_json(account, role, current_user, session)
-    base_role_type, workflow_state = Role.get_base_role_and_workflow_state(role, account)
     json = {
       :account => account_json(account, current_user, session, []),
-      :role => role,
-      :base_role_type => base_role_type,
-      :workflow_state => workflow_state,
+      :role => role.name,
+      :base_role_type => role.base_role_type,
+      :workflow_state => role.workflow_state,
       :permissions => {}
     }
 
     RoleOverride.manageable_permissions(account).keys.each do |permission|
-      json[:permissions][permission] = permission_json(RoleOverride.permission_for(account, permission, base_role_type, role), current_user, session)
+      json[:permissions][permission] = permission_json(RoleOverride.permission_for(account, permission, role.base_role_type, role.name), current_user, session)
     end
 
     json

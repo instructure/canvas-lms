@@ -74,17 +74,7 @@ class Role < ActiveRecord::Base
   named_scope :for_courses, :conditions => ['roles.base_role_type != ?', AccountUser::BASE_ROLE_NAME]
   named_scope :for_accounts, :conditions => ['roles.base_role_type = ?', AccountUser::BASE_ROLE_NAME]
 
-  def self.get_base_role_and_workflow_state(role_name, account)
-    if RoleOverride.base_role_types.include?(role_name)
-      [ role_name, 'active' ]
-    elsif role = account.find_role(role_name)
-      [ role.base_role_type, role.workflow_state ]
-    else
-      [ RoleOverride::NO_PERMISSIONS_TYPE, 'deleted' ]
-    end
-  end
-
-  # Returns a list of hashes for each base enrollment type, and each will have a
+    # Returns a list of hashes for each base enrollment type, and each will have a
   # custom_roles key, each will look like:
   # [{:base_role_name => "StudentEnrollment",
   #   :name => "StudentEnrollment",
@@ -123,4 +113,42 @@ class Role < ActiveRecord::Base
     @enrollment_types
   end
 
+  def self.built_in_role_names
+    @built_in_role_names ||= %w(AccountAdmin) + Enrollment.valid_types
+  end
+
+  # this is designed to be used in place of a Role for the purpose
+  # of displaying built-in roles alongside custom ones.
+  # it implements name, base_role_type, and workflow_state
+  class BuiltInRole
+    attr_accessor :name
+
+    def self.create(name)
+      return nil unless Role.built_in_role_names.include?(name)
+      r = BuiltInRole.new
+      r.name = name
+      r
+    end
+
+    def base_role_type
+      (@name == 'AccountAdmin') ? 'AccountMembership' : @name
+    end
+
+    def workflow_state
+      'active'
+    end
+  end
+
+  # returns a BuiltInRole for the role with the given name, or nil
+  # if the role is not a built-in-role
+  def self.built_in_role(role_name)
+    return nil unless self.built_in_role_names.include?(role_name)
+    @built_in_roles ||= {}
+    @built_in_roles[role_name] ||= BuiltInRole.create(role_name)
+  end
+
+  # returns an array of all built-in Roles
+  def self.built_in_roles
+    @all_built_in_roles ||= self.built_in_role_names.map{ |brt| Role.built_in_role(brt) }
+  end
 end

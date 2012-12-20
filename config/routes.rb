@@ -827,10 +827,10 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :role_overrides) do |roles|
-      roles.get 'accounts/:account_id/roles', :action => :index
+      roles.get 'accounts/:account_id/roles', :action => :api_index, :path_name => 'account_roles'
+      roles.get 'accounts/:account_id/roles/:role', :action => :show
       roles.post 'accounts/:account_id/roles', :action => :add_role
       roles.post 'accounts/:account_id/roles/:role/activate', :action => :activate_role
-      roles.post 'accounts/:account_id/roles/:role/deactivate', :action => :deactivate_role
       roles.put 'accounts/:account_id/roles/:role', :action => :update
       roles.delete 'accounts/:account_id/roles/:role', :action => :remove_role
     end

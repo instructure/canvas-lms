@@ -132,6 +132,7 @@ Spec::Runner.configure do |config|
     Notification.reset_cache!
     ActiveRecord::Base.reset_any_instantiation!
     Attachment.clear_cached_mime_ids
+    RoleOverride.clear_cached_contexts
     Delayed::Job.redis.flushdb if Delayed::Job == Delayed::Backend::Redis::Job
     truncate_all_cassandra_tables
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
@@ -200,6 +201,7 @@ Spec::Runner.configure do |config|
         account.role_overrides.create(:permission => permission.to_s, :enrollment_type => opts[:membership_type] || 'AccountAdmin', :enabled => enabled)
       end
     end
+    RoleOverride.clear_cached_contexts
     account_admin_user(opts)
   end
 

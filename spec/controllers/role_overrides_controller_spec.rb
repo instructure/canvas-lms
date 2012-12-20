@@ -48,25 +48,13 @@ describe RoleOverridesController do
     end
   end
 
-  describe "remove_role" do
-    it "should remove a role" do
-      role = @account.roles.build(:name => 'NewRole')
-      role.base_role_type = AccountUser::BASE_ROLE_NAME
-      role.workflow_state = 'active'
-      role.save!
-      post 'remove_role', :account_id => @account.id, :role => 'NewRole'
-      @account.roles.find_by_name('NewRole').should be_deleted
-    end
-
-    it "should fail when the role is in use" do
-      role = @account.roles.build(:name => 'NewRole')
-      role.base_role_type = AccountUser::BASE_ROLE_NAME
-      role.workflow_state = 'active'
-      role.save!
-      @account.add_user(user, 'NewRole')
-      post 'remove_role', :account_id => @account.id, :role => 'NewRole'
-      flash[:error].should == 'Role is in use'
-    end
+  it "should deactivate a role" do
+    role = @account.roles.build(:name => 'NewRole')
+    role.base_role_type = AccountUser::BASE_ROLE_NAME
+    role.workflow_state = 'active'
+    role.save!
+    delete 'remove_role', :account_id => @account.id, :role => 'NewRole'
+    @account.roles.find_by_name('NewRole').should be_inactive
   end
 
   describe "create" do

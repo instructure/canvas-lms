@@ -17,34 +17,130 @@
 #
 
 # @API Roles
+# API for managing account- and course-level roles, and their associated permissions.
+#
+# @object Role
+#   {
+#     // The label and unique identifier of the role.
+#     "role": "New Role",
+#
+#     // The role type that is being used as a base for this role.
+#     // For account-level roles, this is "AccountMembership".
+#     // For course-level roles, it is an enrollment type.
+#     "base_role_type": "AccountMembership"
+#
+#     // JSON representation of the account the role is in.
+#     "account": {
+#       "id": 1019,
+#       "name": "CGNU",
+#       "parent_account_id": 73,
+#       "root_account_id": 1,
+#       "sis_account_id": "cgnu"
+#     },
+#
+#     // The state of the role: "active" or "inactive"
+#     "workflow_state": "active",
+#
+#     // A dictionary of permissions keyed by name (see permissions input
+#     // parameter in the "Create a role" API). The value for a given permission
+#     // is a dictionary of the following boolean flags:
+#     // - enabled:  Whether the role has the permission.
+#     // - locked: Whether the permission is locked by this role.
+#     // - readonly: Whether the permission can be modified in this role (i.e.
+#     //     whether the permission is locked by an upstream role).
+#     // - explicit: Whether the value of enabled is specified explicitly by
+#     //     this role, or inherited from an upstream role.
+#     // - prior_default: The value that would have been inherited from upstream
+#     //     if the role had not explicitly set a value. Only present if explicit
+#     //     is true.
+#     "permissions": {
+#       "read_course_content": {
+#         "enabled": true,
+#         "locked": false,
+#         "readonly": false,
+#         "explicit": true,
+#         "prior_default": false
+#       },
+#       "read_course_list": {
+#         "enabled": true,
+#         "locked": true,
+#         "readonly": true,
+#         "explicit": false
+#       },
+#       "read_question_banks": {
+#         "enabled": false,
+#         "locked": true,
+#         "readonly": false,
+#         "explicit": true,
+#         "prior_default": false
+#       },
+#       "read_reports": {
+#         "enabled": true,
+#         "locked": false,
+#         "readonly": false,
+#         "explicit": false
+#       },
+#       ...
+#     }
+#   }
+#
 class RoleOverridesController < ApplicationController
   before_filter :require_context
-  before_filter :require_role, :only => [:activate_role, :add_role, :remove_role, :deactivate_role, :update]
+  before_filter :require_role, :only => [:activate_role, :add_role, :remove_role, :update, :show]
+
+  # @API List roles
+  # List the roles available to an account.
+  #
+  # @argument account_id The id of the account to retrieve roles for.
+  # @argument state[] Filter by role state. Accepted values are 'active' and 'inactive'. If this argument
+  #   is omitted, only 'active' roles are returned.
+  #
+  # @returns [Role]
+  def api_index
+    if authorized_action(@context, @current_user, :manage_role_overrides)
+      route = polymorphic_url([:api, :v1, @context, :roles])
+      states = params[:state].to_a.reject{ |s| %w(active inactive).exclude?(s) }
+      states = %w(active) if states.empty?
+      roles = []
+      roles += Role.built_in_roles if states.include?('active')
+      roles += @context.roles.scoped(:conditions => {:workflow_state => states}, :order => :id).all
+      roles = Api.paginate(roles, self, route)
+      render :json => roles.collect{|role| role_json(@context, role, @current_user, session)}
+    end
+  end
 
   def index
     if authorized_action(@context, @current_user, :manage_role_overrides)
-      if api_request?
-        @role_names = @context.available_account_roles
-        @role_names += RoleOverride.base_role_types
-        @role_names += @context.available_course_roles
+      @managing_account_roles = @context.is_a?(Account) && (params[:account_roles] || @context.site_admin?)
 
-        render :json => @role_names.collect{|role| role_json(@context, role, @current_user, session)}.to_json
+      if @managing_account_roles
+        @role_types = RoleOverride.account_membership_types(@context)
       else
-        @managing_account_roles = @context.is_a?(Account) && (params[:account_roles] || @context.site_admin?)
+        @role_types = RoleOverride.enrollment_types
+      end
 
-        if @managing_account_roles
-          @role_types = RoleOverride.account_membership_types(@context)
-        else
-          @role_types = RoleOverride.enrollment_types
-        end
-
-        respond_to do |format|
-          format.html
-        end
+      respond_to do |format|
+        format.html
       end
     end
   end
-  
+
+  # @API Get a single role
+  # Retrieve information about a single role
+  #
+  # @argument account_id The id of the account containing the role
+  # @argument role The name and unique identifier for the role
+  #
+  # @returns Role
+  def show
+    if authorized_action(@context, @current_user, :manage_role_overrides)
+      role = @context.find_role(@role)
+      role ||= Role.built_in_role(@role)
+      raise ActiveRecord::RecordNotFound unless role
+      render :json => role_json(@context, role, @current_user, session)
+    end
+  end
+
   include Api::V1::Role
 
   # @API Create a new role
@@ -137,46 +233,8 @@ class RoleOverridesController < ApplicationController
   #   <X> is left unlocked. Ignored if permission <X> is already locked
   #   upstream. May occur multiple times with unique values for <X>.
   #
-  # @response_field account
-  #   JSON representation of the account the created role is in.
-  #
-  # @response_field role
-  #   The label and unique identifier of the role.
-  #
-  # @response_field base_role_type
-  #   The role type that is being used as a base for this role.
-  #
-  # @response_field permissions
-  #   A dictionary of permissions keyed by name (see permissions input
-  #   parameter). The value for a given permission is a dictionary of the
-  #   following boolean flags:
-  #
-  #   - enabled
-  #
-  #     Whether the role has the permission.
-  #
-  #   - locked
-  #
-  #     Whether the permission is locked by this role or by an upstream role.
-  #
-  #   - readonly
-  #
-  #     Whether the permission can be modified in this role (i.e. whether the
-  #     permission is locked by an upstream role).
-  #
-  #   - explicit
-  #
-  #     Whether the value of enabled is specified explicitly by this role, or
-  #     inherited from an upstream role.
-  #
-  #   - prior_default
-  #
-  #     The value that would have been inherited from upstream if the role had
-  #     not explicitly set a value. Only present if explicit is true.
-  #
   # @example_request
-  #
-  #   curl 'http://<canvas>/api/v1/accounts/<account_id>/roles.json' \ 
+  #   curl 'http://<canvas>/api/v1/accounts/<account_id>/roles.json' \
   #        -H "Authorization: Bearer <token>" \ 
   #        -F 'role=New Role' \ 
   #        -F 'permissions[read_course_content][explicit]=1' \ 
@@ -186,48 +244,7 @@ class RoleOverridesController < ApplicationController
   #        -F 'permissions[read_question_banks][enabled]=0' \ 
   #        -F 'permissions[read_question_banks][locked]=1'
   #
-  # @example_response
-  #
-  #   {
-  #     "role": "New Role",
-  #     "base_role_type": "AccountMembership"
-  #     "account": {
-  #       "id": 1019,
-  #       "name": "CGNU",
-  #       "parent_account_id": 73,
-  #       "root_account_id": 1,
-  #       "sis_account_id": "cgnu"
-  #     },
-  #     "permissions": {
-  #       "read_course_content": {
-  #         "enabled": true,
-  #         "locked": false,
-  #         "readonly": false,
-  #         "explicit": true,
-  #         "prior_default": false
-  #       },
-  #       "read_course_list": {
-  #         "enabled": true,
-  #         "locked": true,
-  #         "readonly": true,
-  #         "explicit": false
-  #       },
-  #       "read_question_banks": {
-  #         "enabled": false,
-  #         "locked": true,
-  #         "readonly": false,
-  #         "explicit": true,
-  #         "prior_default": false
-  #       },
-  #       "read_reports": {
-  #         "enabled": true,
-  #         "locked": false,
-  #         "readonly": false,
-  #         "explicit": false
-  #       },
-  #       ...
-  #     }
-  #   }
+  # @returns Role
   def add_role
     return unless authorized_action(@context, @current_user, :manage_role_overrides)
 
@@ -262,62 +279,26 @@ class RoleOverridesController < ApplicationController
     # allow setting permissions immediately through API
     set_permissions_for(@role, @context, params[:permissions])
 
-    render :json => role_json(@context, @role, @current_user, session)
-  end
-
-  # @API Delete a role
-  # Delete a custom role.
-  #
-  # @argument role
-  #   Label and unique identifier for the role.
-  #
-  # Notes:
-  # * Built-in roles cannot be deleted.
-  # * Roles that are in use (i.e., assigned to an active account membership or course enrollment)
-  #   cannot be deleted.  They can, however, be {api:RoleOverridesController#deactivate_role deactivated},
-  #   which will prevent them from being assigned to new users.
-  def remove_role
-    if authorized_action(@context, @current_user, :manage_role_overrides)
-      role = @context.roles.not_deleted.find_by_name!(@role)
-      if role.account_role?
-        has_user = !!@context.account_users.find_by_membership_type(@role)
-      else
-        has_user = !!@context.enrollments.active.find_by_role_name(@role)
-      end
-      if has_user
-        respond_to do |format|
-          format.html {
-            flash[:error] = t(:delete_failed_notice, 'Role is in use')
-            redirect_to named_context_url(@context, :context_permissions_url, :account_roles => params[:account_roles])
-          }
-          format.json {
-            render(:json => { :message => "Role is in use" }, :status => :bad_request)
-          }
-        end
-        return
-      end
-      role.destroy
-      respond_to do |format|
-        format.html { redirect_to named_context_url(@context, :context_permissions_url, :account_roles => params[:account_roles]) }
-        format.json { render :json => role_json(@context, @role, @current_user, session) }
-      end
-    end
+    render :json => role_json(@context, role, @current_user, session)
   end
 
   # @API Deactivate a role
-  # Prevents a role from being assigned to new account memberships or course enrollments.
-  # Existing users assigned to the role will be unaffected.
+  # Deactivates a custom role.  This hides it in the user interface and prevents it
+  # from being assigned to new users.  Existing users assigned to the role will
+  # continue to function with the same permissions they had previously.
+  # Built-in roles cannot be deactivated.
   #
   # @argument role
   #   Label and unique identifier for the role.
-  def deactivate_role
+  #
+  # @returns Role
+  def remove_role
     if authorized_action(@context, @current_user, :manage_role_overrides)
-      if role = @context.roles.not_deleted.find_by_name(@role)
-        role.deactivate!
-      end
+      role = @context.roles.not_deleted.find_by_name!(@role)
+      role.deactivate!
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_permissions_url, :account_roles => params[:account_roles]) }
-        format.json { render :json => role_json(@context, @role, @current_user, session) }
+        format.json { render :json => role_json(@context, role, @current_user, session) }
       end
     end
   end
@@ -327,18 +308,20 @@ class RoleOverridesController < ApplicationController
   #
   # @argument role
   #   Label and unique identifier for the role.
+  #
+  # @returns Role
   def activate_role
     if authorized_action(@context, @current_user, :manage_role_overrides)
       if course_role = @context.roles.inactive.find_by_name(@role)
         course_role.activate!
-        render :json => role_json(@context, @role, @current_user, session)
+        render :json => role_json(@context, course_role, @current_user, session)
       else
         render :json => {:message => t('no_role_found', "Role not found")}, :status => :bad_request
       end
     end
   end
 
-  # @API Update an admin role
+  # @API Update a role
   # Update permissions for an existing role.
   #
   # Recognized roles are:
@@ -352,7 +335,7 @@ class RoleOverridesController < ApplicationController
   #
   # @argument permissions[<X>][explicit] [Optional]
   # @argument permissions[<X>][enabled] [Optional]
-  #   These arguments are described in the documentation for the add_role method.
+  #   These arguments are described in the documentation for the {api:RoleOverridesController#add_role add_role method}.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/accounts/:account_id/roles/TaEnrollment \ 
@@ -364,39 +347,14 @@ class RoleOverridesController < ApplicationController
   #     -F 'permissions[send_messages][explicit]=1' \ 
   #     -F 'permissions[send_messages][enabled]=0'
   #
-  # @example_response
-  #   {
-  #     "role": "TaEnrollment",
-  #     "account": {
-  #       "id": 252,
-  #       "name": "Greendale Community College",
-  #       "parent_account_id": nil,
-  #       "root_account_id": nil,
-  #       "sis_account_id": "gcc"
-  #     },
-  #     "permissions": {
-  #       "manage_groups": {
-  #         "enabled": true,
-  #         "locked": true,
-  #         "readonly": false,
-  #         "explicit": true,
-  #         "prior_default": false
-  #       },
-  #       "send_messages": {
-  #         "enabled": false,
-  #         "locked": false,
-  #         "readonly": false,
-  #         "explicit": true,
-  #         "prior_default": false
-  #       },
-  #       ...
-  #     }
-  #   }
+  # @returns Role
   def update
     return unless authorized_action(@context, @current_user, :manage_role_overrides)
-    raise ActiveRecord::RecordNotFound unless @context.find_role(@role) || RoleOverride.known_role_types.include?(@role)
+    role = Role.built_in_role(@role) || @context.find_role(@role)
+    raise ActiveRecord::RecordNotFound unless role
     set_permissions_for(@role, @context, params[:permissions])
-    render :json => role_json(@context, @role, @current_user, session)
+    RoleOverride.clear_cached_contexts
+    render :json => role_json(@context, role, @current_user, session)
   end
 
   def create

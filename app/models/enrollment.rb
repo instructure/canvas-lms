@@ -225,6 +225,10 @@ class Enrollment < ActiveRecord::Base
     self.role_name || Enrollment.sis_type(self.type)
   end
 
+  def self.valid_types
+    SIS_TYPES.keys
+  end
+
   def self.valid_type?(type)
     SIS_TYPES.has_key?(type)
   end

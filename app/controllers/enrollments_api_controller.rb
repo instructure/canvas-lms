@@ -179,6 +179,10 @@ class EnrollmentsApiController < ApplicationController
     else
       role_name = params[:enrollment].delete(:role)
       type = params[:enrollment].delete(:type)
+      if Enrollment.valid_type?(role_name)
+        type = role_name
+        role_name = nil
+      end
       
       if role_name.present?
         params[:enrollment][:role_name] = role_name

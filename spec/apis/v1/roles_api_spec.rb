@@ -25,7 +25,7 @@ describe "Roles API", :type => :integration do
     user_with_pseudonym(:user => @admin)
   end
 
-  describe "add_role" do
+  describe "Roles CRUD" do
     before :each do
       @role = 'NewRole'
       @permission = 'read_reports'
@@ -55,35 +55,90 @@ describe "Roles API", :type => :integration do
       @account.available_account_roles.should include(@role)
     end
 
-    it "should index roles" do
-      api_call_with_settings(:explicit => '1', :enabled => '1')
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/roles",
-        { :controller => 'role_overrides', :action => 'index', :format => 'json', :account_id => @account.id.to_param })
+    describe "index" do
+      it "should index roles" do
+        api_call_with_settings(:explicit => '1', :enabled => '1')
+        json = api_call(:get, "/api/v1/accounts/#{@account.id}/roles",
+          { :controller => 'role_overrides', :action => 'api_index', :format => 'json', :account_id => @account.id.to_param })
 
-      json.collect{|role| role['role']}.sort.should == (["AccountAdmin", "NewRole"] + RoleOverride.base_role_types).sort
-      json.find{|role| role['role'] == "StudentEnrollment"}['workflow_state'].should == 'active'
+        json.collect{|role| role['role']}.sort.should == (["NewRole"] + Role.built_in_role_names).sort
+        json.find{|role| role['role'] == "StudentEnrollment"}['workflow_state'].should == 'active'
+      end
+
+      it "should paginate" do
+        api_call_with_settings(:explicit => '1', :enabled => '1')
+        json = api_call(:get, "/api/v1/accounts/#{@account.id}/roles?per_page=5",
+          { :controller => 'role_overrides', :action => 'api_index', :format => 'json', :account_id => @account.id.to_param, :per_page => '5' })
+        response.headers['Link'].should match(%r{<http://www.example.com/api/v1/accounts/#{@account.id}/roles\?.*page=2.*>; rel="next",<http://www.example.com/api/v1/accounts/#{@account.id}/roles\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/accounts/#{@account.id}/roles\?.*page=2.*>; rel="last"})
+        json.size.should == 5
+        json += api_call(:get, "/api/v1/accounts/#{@account.id}/roles?per_page=5&page=2",
+          { :controller => 'role_overrides', :action => 'api_index', :format => 'json', :account_id => @account.id.to_param, :per_page => '5', :page => '2' })
+        response.headers['Link'].should match(%r{<http://www.example.com/api/v1/accounts/#{@account.id}/roles\?.*page=1.*>; rel="prev",<http://www.example.com/api/v1/accounts/#{@account.id}/roles\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/accounts/#{@account.id}/roles\?.*page=2.*>; rel="last"})
+        json.size.should == 7
+        json.collect{|role| role['role']}.sort.should == (["NewRole"] + Role.built_in_role_names).sort
+      end
+
+      context "with state parameter" do
+        before do
+          role = @account.roles.create :name => 'inactive_role'
+          role.base_role_type = 'StudentEnrollment'
+          role.workflow_state = 'inactive'
+          role.save!
+        end
+
+        it "should list inactive roles" do
+          json = api_call(:get, "/api/v1/accounts/#{@account.id}/roles?state[]=inactive",
+                          { :controller => 'role_overrides', :action => 'api_index', :format => 'json', :account_id => @account.id.to_param, :state => %w(inactive) })
+          json.size.should == 1
+          json[0]['role'].should == 'inactive_role'
+        end
+
+        it "should omit inactive roles if unspecified" do
+          json = api_call(:get, "/api/v1/accounts/#{@account.id}/roles",
+                          { :controller => 'role_overrides', :action => 'api_index', :format => 'json', :account_id => @account.id.to_param})
+          json.size.should == 6
+          json.map{|role| role['role']}.should be_exclude 'inactive_role'
+        end
+
+        it "should accept multiple states" do
+          json = api_call(:get, "/api/v1/accounts/#{@account.id}/roles?state[]=inactive&state[]=active",
+                          { :controller => 'role_overrides', :action => 'api_index', :format => 'json', :account_id => @account.id.to_param, :state => %w(inactive active) })
+          json.size.should == 7
+          json.map{|role| role['role']}.should be_include 'inactive_role'
+        end
+      end
     end
 
-    it "should remove a role" do
-      api_call_with_settings(:explicit => '1', :enabled => '1')
-      @account.reload
-      @account.available_account_roles.should include(@role)
+    describe "show" do
+      it "should show a built-in role" do
+        json = api_call(:get, "/api/v1/accounts/#{@account.id}/roles/AccountAdmin",
+          { :controller => 'role_overrides', :action => 'show', :format => 'json', :account_id => @account.id.to_param, :role => 'AccountAdmin' })
+        json['role'].should == 'AccountAdmin'
+        json['base_role_type'].should == 'AccountMembership'
+        json['workflow_state'].should == 'active'
+      end
 
-      json = api_call(:delete, "/api/v1/accounts/#{@account.id}/roles/#{@role}",
-         { :controller => 'role_overrides', :action => 'remove_role', :format => 'json', :account_id => @account.id.to_param, :role => @role}, {})
+      it "should show a custom role" do
+        role = @account.roles.create :name => 'Assistant Grader'
+        role.base_role_type = 'TaEnrollment'
+        role.workflow_state = 'inactive'
+        role.save!
+        json = api_call(:get, "/api/v1/accounts/#{@account.id}/roles/Assistant%20Grader",
+          { :controller => 'role_overrides', :action => 'show', :format => 'json', :account_id => @account.id.to_param, :role => 'Assistant Grader' })
+        json['role'].should == 'Assistant Grader'
+        json['base_role_type'].should == 'TaEnrollment'
+        json['workflow_state'].should == 'inactive'
+      end
 
-      @account.roles.find_by_name(@role).should be_deleted
-      @account.reload
-      @account.available_account_roles.should_not include(@role)
-    end
-
-    it "should 404 when attempting to remove a deleted role" do
-      api_call_with_settings(:explicit => '1', :enabled => '1')
-      @account.roles.find_by_name!(@role).destroy
-
-      api_call(:delete, "/api/v1/accounts/#{@account.id}/roles/#{@role}",
-        { :controller => 'role_overrides', :action => 'remove_role', :format => 'json', :account_id => @account.id.to_param, :role => @role},
-        {}, {}, :expected_status => 404)
+      it "should not show a deleted role" do
+        role = @account.roles.create :name => 'Deleted'
+        role.base_role_type = 'AccountMembership'
+        role.workflow_state = 'deleted'
+        role.save!
+        api_call(:get, "/api/v1/accounts/#{@account.id}/roles/Deleted",
+          { :controller => 'role_overrides', :action => 'show', :format => 'json', :account_id => @account.id.to_param, :role => 'Deleted' },
+          {}, {}, { :expected_status => 404 })
+      end
     end
 
     it "should add a course-level role to the account" do
@@ -101,25 +156,6 @@ describe "Roles API", :type => :integration do
       new_role.base_role_type.should == base_role_type
 
       json['base_role_type'].should == base_role_type
-    end
-
-    it "should delete a course-level role when there are no enrollments" do
-      base_role_type = 'TeacherEnrollment'
-
-      @account.available_account_roles.should_not include(@role)
-      @account.roles.should be_empty
-      api_call_with_settings(:base_role_type => base_role_type, :explicit => '1', :enabled => '1')
-      @account.reload
-
-      @account.roles.active.map(&:name).should include(@role)
-
-      json = api_call(:delete, "/api/v1/accounts/#{@account.id}/roles/#{@role}",
-               { :controller => 'role_overrides', :action => 'remove_role', :format => 'json', :account_id => @account.id.to_param, :role => @role}, {})
-
-      @account.reload
-      @account.roles.active.map(&:name).should_not include(@role)
-      @account.roles.find_by_name(@role).workflow_state.should == 'deleted'
-      json['workflow_state'].should == 'deleted'
     end
 
     it "should accept the usual forms of booleans in addition to 0 / 1" do
@@ -163,16 +199,9 @@ describe "Roles API", :type => :integration do
         enrollment1.save!
       end
 
-      it "should fail to delete a role that is in use" do
-        json = api_call(:delete, "/api/v1/accounts/#{@account.id}/roles/#{@role}",
-          { :controller => 'role_overrides', :action => 'remove_role', :format => 'json', :account_id => @account.id.to_param, :role => @role},
-          {}, {}, { :expected_status => 400 })
-        json['message'].should == "Role is in use"
-      end
-
       it "should deactivate a course-level role" do
-        json = api_call(:post, "/api/v1/accounts/#{@account.id}/roles/#{@role}/deactivate",
-          { :controller => 'role_overrides', :action => 'deactivate_role', :format => 'json', :account_id => @account.id.to_param, :role => @role}, {})
+        json = api_call(:delete, "/api/v1/accounts/#{@account.id}/roles/#{@role}",
+          { :controller => 'role_overrides', :action => 'remove_role', :format => 'json', :account_id => @account.id.to_param, :role => @role}, {})
 
         @account.reload
         @account.get_course_role(@role).should_not be_nil
