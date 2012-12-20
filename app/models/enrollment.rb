@@ -742,6 +742,10 @@ class Enrollment < ActiveRecord::Base
     self.course.score_to_grade(self.computed_final_score)
   end
 
+  def computed_final_grade_with_muted
+    self.course.score_to_grade(self.computed_final_score_with_muted)
+  end
+
   def self.students(opts={})
     with_scope :find => opts do
       find(:all, :conditions => {:type => 'Student'}).map(&:user).compact
@@ -907,7 +911,7 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
-  def self.serialization_excludes; [:uuid,:computed_final_score, :computed_current_score]; end
+  def self.serialization_excludes; [:uuid,:computed_final_score, :computed_current_score, :computed_final_score_with_muted]; end
 
   # enrollment term per-section is deprecated; a section's term is inherited from the
   # course it is currently tied to
