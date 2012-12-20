@@ -111,11 +111,11 @@ describe "Default Account Reports" do
       Notification.find_or_create_by_name("Report Generation Failed")
 
       @account = Account.default
-      term1 = EnrollmentTerm.create(:name => 'Fall', :start_at => '20-08-2012', :end_at => '20-12-2012')
+      term1 = EnrollmentTerm.create(:name => 'Fall', :start_at => '20-08-2012', :end_at => 1.year.from_now)
       term1.root_account = @account
       term1.sis_source_id = 'fall12'
       term1.save!
-      term2 = EnrollmentTerm.create(:name => 'Winter', :start_at => '07-01-2013', :end_at => '28-04-2013')
+      term2 = EnrollmentTerm.create(:name => 'Winter', :start_at => '07-01-2013', :end_at => 2.years.from_now)
       term2.root_account = @account
       term2.sis_source_id = 'winter13'
       term2.save!
@@ -143,14 +143,14 @@ describe "Default Account Reports" do
       parameters["terms"] = true
       parsed = ReportsSpecHelper.run_report(@account,"sis_export_csv", parameters)
       parsed.length.should == 2
-      parsed[0].should == ["fall12", "Fall", "active", "2012-08-20T00:00:00Z", "2012-12-20T00:00:00Z"]
-      parsed[1].should == ["winter13", "Winter", "active", "2013-01-07T00:00:00Z", "2013-04-28T00:00:00Z"]
+      parsed[0].should == ["fall12", "Fall", "active", "2012-08-20T00:00:00Z", term1.end_at.iso8601]
+      parsed[1].should == ["winter13", "Winter", "active", "2013-01-07T00:00:00Z", term2.end_at.iso8601]
 
       parsed = ReportsSpecHelper.run_report(@account,"provisioning_csv", parameters, 2)
       parsed.length.should == 3
       parsed[0].should == [term3.id.to_s, nil, "Default Term", "active", nil, nil]
-      parsed[1].should == [term1.id.to_s, "fall12", "Fall", "active", "2012-08-20T00:00:00Z", "2012-12-20T00:00:00Z"]
-      parsed[2].should == [term2.id.to_s, "winter13", "Winter", "active", "2013-01-07T00:00:00Z", "2013-04-28T00:00:00Z"]
+      parsed[1].should == [term1.id.to_s, "fall12", "Fall", "active", "2012-08-20T00:00:00Z", term1.end_at.iso8601]
+      parsed[2].should == [term2.id.to_s, "winter13", "Winter", "active", "2013-01-07T00:00:00Z", term2.end_at.iso8601]
     end
 
     it "should run the SIS and Provisioning Course reports" do
@@ -162,7 +162,7 @@ describe "Default Account Reports" do
       sub_account.sis_source_id = 'sub1'
       sub_account.save!
 
-      term1 = EnrollmentTerm.create(:name => 'Fall', :start_at => '20-08-2012', :end_at => '20-12-2012')
+      term1 = EnrollmentTerm.create(:name => 'Fall', :start_at => '20-08-2012', :end_at => 1.year.from_now)
       term1.root_account = @account
       term1.sis_source_id = 'fall12'
       term1.save!
@@ -241,7 +241,7 @@ describe "Default Account Reports" do
       sub_account = Account.create(:parent_account => @account, :name => 'English')
       sub_account.sis_source_id = 'sub1'
       sub_account.save!
-      term1 = EnrollmentTerm.create(:name => 'Fall', :start_at => '20-08-2012', :end_at => '20-12-2012')
+      term1 = EnrollmentTerm.create(:name => 'Fall', :start_at => '20-08-2012', :end_at => 1.year.from_now)
       term1.root_account = @account
       term1.sis_source_id = 'fall12'
       term1.save!
@@ -316,7 +316,7 @@ describe "Default Account Reports" do
       role.base_role_type = 'DesignerEnrollment'
       role.save!
 
-      term1 = EnrollmentTerm.create(:name => 'Fall', :start_at => '20-08-2012', :end_at => '20-12-2012')
+      term1 = EnrollmentTerm.create(:name => 'Fall', :start_at => '20-08-2012', :end_at => 1.year.from_now)
       term1.root_account = @account
       term1.sis_source_id = 'fall12'
       term1.save!
@@ -548,7 +548,7 @@ describe "Default Account Reports" do
       Notification.find_or_create_by_name("Report Generation Failed")
 
       @account = Account.default
-      term1 = EnrollmentTerm.create(:name => 'Fall', :start_at => '20-08-2012', :end_at => '20-12-2012')
+      term1 = EnrollmentTerm.create(:name => 'Fall', :start_at => '20-08-2012', :end_at => 1.year.from_now)
       term1.root_account = @account
       term1.sis_source_id = 'fall12'
       term1.save!
@@ -638,11 +638,11 @@ describe "Default Account Reports" do
       sub_account2 = Account.create(:parent_account => @account, :name => 'Math')
       sub_account2.sis_source_id = 'sub2'
       sub_account2.save!
-      term1 = EnrollmentTerm.create(:name => 'Fall', :start_at => '20-08-2012', :end_at => '20-12-2012')
+      term1 = EnrollmentTerm.create(:name => 'Fall', :start_at => '20-08-2012', :end_at => 1.year.from_now)
       term1.root_account = @account
       term1.sis_source_id = 'fall12'
       term1.save!
-      term2 = EnrollmentTerm.create(:name => 'Winter', :start_at => '07-01-2013', :end_at => '28-04-2013')
+      term2 = EnrollmentTerm.create(:name => 'Winter', :start_at => '07-01-2013', :end_at => 2.years.from_now)
       term2.root_account = @account
       term2.sis_source_id = 'winter13'
       term2.save!
