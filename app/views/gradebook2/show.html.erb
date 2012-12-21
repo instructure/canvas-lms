@@ -11,7 +11,7 @@
 <div id="gradebook_wrapper" class="use-css-transitions-for-show-hide" style="display:none;">
   <div id="gradebook-toolbar" class="toolbar">
     <button style="display:none;" id="section_to_show">Showing: <span id="section_being_shown">All Sections</span></button>
-    <button id="gradebook_settings">&nbsp;</button>
+    <button id="gradebook_settings"><i class="icon-settings"></i></button>
     <ul style="display: none;">
       <li><a href="<%= context_url(@context, :context_gradebook_url) %>/history"><%= t('view_grading_history', 'View Grading History') %></a></li>
       <li><a href="<%= context_url(@context, :context_gradebook_url) %>.csv"><%= t('download_scores', 'Download Scores (.csv)') %></a></li>

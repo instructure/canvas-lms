@@ -10,13 +10,15 @@
   </p>
   <% unless params[:return_to] %>
   <div class="content-imports-instructions">
-    <a href="#" class="help zip_from_webct_link"><%= t 'links.zip_from_webct', "How do I get a .zip file from WebCT?" %></a>
-    <ul id="zip_from_webct" class="ui-state-highlight" style="display: none;">
-      <li><%= t 'instructions.webct.1', "Log in to WebCT and go to the File Manager" %></li>
-      <li><%= t 'instructions.webct.2', "Select all the files you want to export" %></li>
-      <li><%= t 'instructions.webct.3', "Click the zip option to archive the files" %></li>
-      <li><%= t 'instructions.webct.4', "Save the file to your local computer" %></li>
-    </ul>
+    <a href="#" class="icon-question element_toggler" aria-controls="zip_from_webct"><%= t 'links.zip_from_webct', "How do I get a .zip file from WebCT?" %></a>
+    <div class="alert" id="zip_from_webct" style="display:none;">
+      <ol>
+        <li><%= t 'instructions.webct.1', "Log in to WebCT and go to the File Manager" %></li>
+        <li><%= t 'instructions.webct.2', "Select all the files you want to export" %></li>
+        <li><%= t 'instructions.webct.3', "Click the zip option to archive the files" %></li>
+        <li><%= t 'instructions.webct.4', "Save the file to your local computer" %></li>
+      </ol>
+    </div>
   </div>
   <% end %>
   <%= render :partial => 'shared/zip_file_import_form' %>
@@ -28,10 +30,6 @@ require([
 ], function($) {
 
   $(function(){
-    $(".zip_from_webct_link").click(function(event) {
-      event.preventDefault();
-      $("#zip_from_webct").slideToggle();
-    });
     $("#zip_file_import_form .cancel_button")
       .attr("href", "<%= qti_or_content_link %>")
       .text(<%= params[:return_to] ? t('#buttons.cancel', "Cancel").to_json.html_safe : t('buttons.skip', "Skip this Step").to_json.html_safe %>);

@@ -1,5 +1,9 @@
 @import environment.sass
 
+body.with-right-side.with-left-side
+  // toolbar needs it to be this wide
+  min-width: 1110px
+
 .hidden
   display: none !important
 
@@ -40,7 +44,7 @@
   .ellipsis
     padding-right: 70px
 
-.showMore .new-and-total-badge
+.new-and-total-badge
   float: right
   margin-top: 10px
 
@@ -191,7 +195,7 @@
       height: 0px
       width: 0px
       border-style: solid
-      border-color: transparent transparent transparent $link_color
+      border-color: transparent transparent transparent $linkColor
       border-width: 5px
       vertical-align: middle
   .new-and-total-badge
@@ -381,6 +385,15 @@
 .bootstrap-form
   margin: 0
 
+.headerBar
+  +clearfix()
+
+.headerBar-left
+  float: left
+
+.headerBar-right
+  float: right
+
 #filterResults
 
   .entry
@@ -400,24 +413,7 @@
   min-height: 50px
 
   .al-trigger
-    background-color: whitesmoke
-    background-image: -moz-linear-gradient(top, white, #e6e6e6)
-    background-image: -ms-linear-gradient(top, white, #e6e6e6)
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(white), to(#e6e6e6))
-    background-image: -webkit-linear-gradient(top, white, #e6e6e6)
-    background-image: -o-linear-gradient(top, white, #e6e6e6)
-    background-image: linear-gradient(top, #ffffff, #e6e6e6)
-    border-color: #ccc
-    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25)
-    border-radius: 4px
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05)
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFFFFFFF', endColorstr='#FFE6E6E6', GradientType=0)
     margin-left: 4px
-    +opacity(1)
-    padding: 6px 10px
-
-  .btn
-    margin-bottom: 5px
 
   .headerBar
     padding: 10px 10px 6px 14px
@@ -434,7 +430,7 @@
     z-index: 3
     background: #fff
     height: 33px
-    min-width: 484px
+    min-width: 623px
     border-color: $menu-border-color
 
   [disabled]

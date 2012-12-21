@@ -20,9 +20,9 @@ shared_examples_for "conversations selenium tests" do
       keep_trying_until { fj("#create_message_form form:visible") }
     else
       f("#action_compose_message").click
+      wait_for_ajaximations
     end
 
-    wait_for_dom_ready
 
     @input = fj("#create_message_form input:visible")
     @browser = fj("#create_message_form .browser:visible")

@@ -38,7 +38,7 @@
   <div class="clear"></div>
   <div class="button-container">
     <button type="submit" class="group_edit submit_button btn btn-small"><%= t('buttons.update', "Update") %></button>
-    <button type="button" class="group_edit cancel_button button-secondary"/><%= t('#buttons.cancel', "Cancel") %></button>
+    <button type="button" class="group_edit cancel_button btn button-secondary"/><%= t('#buttons.cancel', "Cancel") %></button>
   </div>
   <div style="display: none;">
     <a href="<%= context_url(@context, :context_quiz_quiz_group_url, @quiz.id, hash_get(group, :id, "{{ id }}")) %>" class="update_group_url">&nbsp;</a>

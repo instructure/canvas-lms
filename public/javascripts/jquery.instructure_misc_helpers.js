@@ -284,7 +284,7 @@ define([
     $dialog.find("button").attr('disabled', false);
     if( !$dialog.length ) {
       $dialog = $("<div id='instructure_image_search'/>")
-                  .append("<form id='image_search_form' style='margin-bottom: 5px;'>" +
+                  .append("<form id='image_search_form' class='form-inline' style='margin-bottom: 5px;'>" +
                             "<img src='/images/flickr_creative_commons_small_icon.png'/>&nbsp;&nbsp;" + 
                             "<input type='text' class='query' style='width: 250px;' title='" +
                             htmlEscape(I18n.t('tooltips.enter_search_terms', "enter search terms")) + "'/>" + 

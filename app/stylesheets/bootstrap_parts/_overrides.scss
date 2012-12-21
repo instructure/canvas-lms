@@ -1,11 +1,118 @@
 // Instructure's bootstrap mods:
 
+body {
+  font-size: 13px;
+}
+
 // make links in .alert be same color as alert text but bold
 .alert a {
   font-weight: bold;
   color: inherit;
 }
 
-.nav-tabs.nav-stacked {
-  background: $lightBackground;
+// have to make labels inline-block by default,
+// boostrap makes them all block but we have a ton of
+// existing forms that count on them being inline.
+label { display: inline-block; }
+
+// if you are making a bootstrap style form and need to get your labels to look right (be block),
+// add the class .bootstrap-form to the <form>. this is the only need for .bootstrap-form, you
+// dont need to add the .bootstrap-form class if you already have the .form-horizontal class.
+.form-horizontal label, .bootstrap-form label { display: block;}
+
+//remove default bottom margin on a bootstrap form
+.bootstrap-form.no-margin {
+  margin-bottom: 0;
 }
+
+//get rid of bottom margin on any element (needed mostly for text inputs)
+.no-margin-bottom {
+  margin-bottom: 0 !important;
+}
+
+//bootstrap makes all <select>s a certain width. provide a class to enable one to be auto width
+select.un-bootrstrapify {
+  width: auto;
+  border-radius: 0;
+  height: auto;
+}
+
+.form-actions {
+  text-align: right;
+  padding: 10px 10px 11px;
+
+  // when .form-actions is in a modal box, make it look different per Kyle mockup
+  .ui-dialog-content & {
+    margin-bottom: 0;
+    box-shadow: inset 0 1px 0 #fff;
+  }
+  
+  // when you want your non-modal .form-actions footer to not have any whitespace around it
+  &.flush {
+    margin-bottom: -1em;
+    margin-left: -1em;
+    margin-right: -1em;
+  }
+}
+
+// for checkboxes not wrapped in a label.checkbox, make them look decent,
+// should remove this eventually.
+input[type=checkbox] + label,
+input[type=radio] + label {
+  vertical-align: -4px;
+}
+
+// all the browsers render this differently, remove line-height so the text doesn't
+// get ridiculously misaligned.
+input[type=file] {
+  line-height: 1em;
+}
+
+// modify the default bootstrap .table class to have the thead look like our .toolbars
+.table > thead {
+  @include header-bg;
+  @include header-text;
+}
+
+@media (max-width: 767px) {
+  // "bootstrap/responsive-767px-max" expects that the main content of the page will be from
+  // edge to edge, we still have a left and right nav, so need to undo the padding it adds
+  body {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  // if you have a page where the stuff in the #right-side is not needed or relevant on a mobile device,
+  // you can do: '@body_classes << "right-side-optional"' to hide the #right-side on on small screens.
+  // If there is something on the #right-side that is still useful on a small screen but you want to
+  // get rid of the #right-side to make it easier to focus on the #content, copy it to the main page
+  // and give it the class '.visible-phone'
+  .right-side-optional {
+    min-width: auto !important;
+    #right-side-wrapper { display: none !important }
+    #main { margin-right: 0 !important }
+  }
+}
+
+// gets rid of ugly border
+iframe#tool_content {
+  border: none;
+}
+
+// "ui.dialog you are so dumb. you are really dumb, for real"
+// ui.dialog cancels input events for any positioned element w/ a lower
+// z-index, even if the element is inside the dialog (in which case the
+// z-index is not actually lower. so dumb)
+.ui-dialog {
+  .input-append, .input-prepend {
+    input, select, .uneditable-input {
+      &:focus {
+        z-index: 1001;
+      }
+    }
+  }
+}
+
+// fixes bug in Cal1 where not-allowed cursor appears over checkboxes set to readonly
+.calendar_links input[readonly] { cursor: auto; }
+

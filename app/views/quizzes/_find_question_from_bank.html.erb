@@ -2,7 +2,6 @@
   <a href="<%= context_url(@context, :context_question_banks_url, :include_bookmarked => '1', :inherited => '1') %>" class="find_question_banks_url" style="display: none;">&nbsp;</a>
   <a href="/<%= @quiz.context_url_prefix %>/question_banks/{{ question_bank_id }}/questions?inherited=1" class="question_bank_questions_url" style="display: none;">&nbsp;</a>
   <a href="<%= context_url(@context, :context_quiz_quiz_questions_url, @quiz.id) %>" class="add_questions_url" style="display: none;">&nbsp;</a>
-  <h2 style="margin-top: 0; float: left;"><%= t('headers.find_questions_to_add', "Find Quiz Questions to Add") %></h2>
   <div style="float: right; padding-right: 5px; line-height: 2.5em;">
     <a href="<%= context_url(@context, :context_question_banks_url) %>"><%= t('links.manage_question_banks', "Manage Course Question Banks") %></a>
   </div>
@@ -49,7 +48,7 @@
             </div>
             <div class="button-container" style="margin-bottom: 5px;">
               <button type="button" class="btn submit_button"><%= t('buttons.add_questions', "Add Questions") %></button>
-              <button type="button" class="btn button-secondary cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
+              <button type="button" class="btn btn button-secondary cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
             </div>
           </div>
         </div>
@@ -59,7 +58,6 @@
 </div>
 <div id="find_bank_dialog" style="display: none;">
   <a href="<%= context_url(@context, :context_question_banks_url, :include_bookmarked => '1', :inherited => '1') %>" class="find_question_banks_url" style="display: none;">&nbsp;</a>
-  <h2 style="margin-top: 0; float: left;"><%= t('headers.link_to_question_bank', "Link to Question Bank") %></h2>
   <div style="float: right; padding-right: 5px; line-height: 2.5em;">
     <a href="<%= context_url(@context, :context_question_banks_url) %>"><%= t('links.manage_question_banks', "Manage Course Question Banks") %></a>
   </div>
@@ -80,7 +78,7 @@
     </ul>
     <div class="button-container" style="margin-bottom: 5px;">
       <button type="button" class="btn submit_button"><%= t('buttons.select_bank', "Select Bank") %></button>
-      <button type="button" class="btn button-secondary cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
+      <button type="button" class="btn btn button-secondary cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
     </div>
   </div>
 </div>
@@ -104,7 +102,7 @@
       <td colspan="2">
         <div class="button-container">
           <button type="button" class="btn submit_button"><%= t('buttons.create_group', "Create Group") %></button>
-          <button type="button" class="btn button-secondary cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
+          <button type="button" class="btn btn button-secondary cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
         </div>
       </td>
     </tr>

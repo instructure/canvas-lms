@@ -10,7 +10,7 @@
   </div>
 
   <div class="labelled_region">
-    <span class="label"><%= before_label :criteria, "Trigger an alert when" %></span>
+    <span class="alert-label"><%= before_label :criteria, "Trigger an alert when" %></span>
     <ul class="criteria"></ul>
     <div class="add_criteria_line editing">
       <select title="<%= t :criteria, "Trigger an alert when" %>"></select> <a href="#" class="add_criterion_link icon-add"><%= t 'buttons.add_criterion', "Add Trigger" %></a>
@@ -18,7 +18,7 @@
   </div>
 
   <div class="labelled_region">
-	  <span class="label"><%= before_label :recipients, "Send a notification to" %></span>
+	  <span class="alert-label"><%= before_label :recipients, "Send a notification to" %></span>
 	  <ul class="recipients"></ul>
 	  <div class="add_recipients_line editing">
 	    <select title="<%= t :recipients, "Send a notification to" %>"></select> <a href="#" class="add_recipient_link icon-add"><%= t 'buttons.add_recipient', "Add Recipient" %></a>
@@ -26,7 +26,7 @@
   </div>
 
   <div class="labelled_region">
-    <span class="label"><%= before_label :repetition, "Repetition" %></span>
+    <span class="alert-label"><%= before_label :repetition, "Repetition" %></span>
     <div class="repetition_group">
       <input type="radio" class="editing" name="repetition" value="none" checked="checked" id="repetition_none_<%= alert_counter %>" /><label for="repetition_none_<%= alert_counter %>" class="no_repetition"><%= t('no_repetition_description', "Do not re-send alert") %></label><br class="editing"/>
       <input type="radio" class="editing" name="repetition" value="value" id="repetition_repetition_<%= alert_counter %>" /><label for="repetition_repetition_<%= alert_counter %>" class="repetition" style="display:none;"><%= t('repetition_description', "Re-send alert every %{count} days until resolved", :count => "<span class='displaying'></span><input type='text' name='alert[repetition]' class='editing' size='2' />".html_safe) %></label>
@@ -34,5 +34,5 @@
   </div>
 
   <button type="submit" class="editing btn submit_button"><%= t('buttons.save_alert', "Save Alert") %></button>
-  <button type="button" class="editing cancel_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
+  <button type="button" class="editing cancel_button btn button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
 <% end %>

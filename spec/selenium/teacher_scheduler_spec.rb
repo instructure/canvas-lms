@@ -10,6 +10,16 @@ describe "scheduler" do
 
     before (:each) do
       course_with_teacher_logged_in
+      make_full_screen
+    end
+
+    #after(:all) do
+    #  set_native_events("false")
+    #end
+
+    def open_edit_appointment_slot_dialog
+      fj('.fc-event').click
+      driver.execute_script("$('.edit_event_link').trigger('click')")
     end
 
     it "should create a new appointment group" do
@@ -19,11 +29,13 @@ describe "scheduler" do
     end
 
     it "should split time slots" do
-      start_time_text = '01'
-      end_time_text = '05'
+      start_time_text = '02'
+      end_time_text = '06'
+      local_start_time = '01'
+      local_end_time = '05'
+
       get "/calendar2"
       click_scheduler_link
-
       f('.create_link').click
       fj('.ui-datepicker-trigger:visible').click
       datepicker_next
@@ -33,7 +45,7 @@ describe "scheduler" do
       end_time.send_keys(:tab)
       f('.splitter a').click
       start_fields = ff('.time-block-list .start_time')
-      times = %W(1:00 1:30 2:00 2:30 3:00 3:30 4:00 4:30)
+      times = %W(2:00 2:30 3:00 3:30 4:00 4:30 5:00 5:30)
       start_fields.each_with_index do |start_field, i|
         start_field.attribute(:value).should == times[i] + "PM" unless i == 8
       end
@@ -41,9 +53,14 @@ describe "scheduler" do
       f("#option_course_#{@course.id}").click
       f('.ag_contexts_done').click
       submit_appointment_group_form
+      get "/calendar2"
       last_group = AppointmentGroup.last
-      last_group.start_at.strftime("%I").should == start_time_text
-      last_group.end_at.strftime("%I").should == end_time_text
+
+      start_time_correct = true if last_group.end_at.strftime("%I") == end_time_text || local_end_time
+      end_time_correct = true if last_group.start_at.strftime("%I") == start_time_text || local_start_time
+
+      start_time_correct.should == true
+      end_time_correct.should == true
     end
 
     it "should create appointment group and go back and publish it" do
@@ -207,10 +224,10 @@ describe "scheduler" do
       get "/calendar2"
       click_scheduler_link
       click_appointment_link
-      calendar_event = f('.fc-event-bg')
-      calendar_event.click
-      popup = f('.event-details')
-      popup.find_element(:css, '.delete_event_link').click
+      fj('.fc-event:visible').click
+      wait_for_ajaximations
+      driver.execute_script("$('.event-details .delete_event_link').trigger('click')")
+      wait_for_ajaximations
       delete_appointment_group
       keep_trying_until { element_exists('.fc-event-bg').should be_false }
     end
@@ -226,7 +243,8 @@ describe "scheduler" do
       get_value('[name="max_appointments_per_participant"]').to_i.should > 0
     end
 
-    it "should allow removing individual appointments" do
+    it "should allow removing individual appointment users" do
+      #set_native_events("false")
       # user appointment group
       create_appointment_group
       ag = AppointmentGroup.first
@@ -235,6 +253,41 @@ describe "scheduler" do
         ag.appointments.first.reserve_for(@user, @user)
       end
 
+      get "/calendar2"
+      click_scheduler_link
+
+
+      f(".appointment-group-item:nth-child(#{1}) .view_calendar_link").click
+      wait_for_ajaximations
+      sleep 1
+
+      #driver.execute_script("$('.fc-event-title').hover().click()")
+      #
+
+      fj('.fc-event:visible').click
+
+      wait_for_ajaximations
+
+      keep_trying_until { ffj('#attendees li').size.should == 2 }
+
+      # delete the first appointment
+      driver.execute_script("$('.cancel_appointment_link:eq(1)').trigger('click')")
+      wait_for_ajaximations
+      driver.execute_script("$('.ui-dialog-buttonset .btn-primary').trigger('click')")
+      wait_for_ajaximations
+      ff('#attendees li').size.should == 1
+
+      # make sure the user was really deleted
+      f('#refresh_calendar_link').click
+      wait_for_ajaximations
+      fj('.fc-event:visible').click
+
+      keep_trying_until { ff('#attendees li').size.should == 1 }
+      f('.single_item_done_button').click
+    end
+
+    it "should allow removing individual appointment groups" do
+      #set_native_events("false")
       # group appointment group
       gc = @course.group_categories.create!(:name => "Blah Groups")
       title = create_appointment_group :sub_context_codes => [gc.asset_string],
@@ -253,58 +306,25 @@ describe "scheduler" do
       get "/calendar2"
       click_scheduler_link
 
-      2.times do |i|
-        f(".appointment-group-item:nth-child(#{i+1}) .view_calendar_link").click
-        wait_for_ajax_requests
-
-        fj('.fc-event:visible').click
-        ff('#attendees li').size.should == 2
-
-        # delete the first appointment
-        fj('.cancel_appointment_link:visible').click
-        fj('button:visible:contains(Delete)').click
-        wait_for_ajax_requests
-        ff('#attendees li').size.should == 1
-
-        # make sure the appointment was really deleted
-        f('#refresh_calendar_link').click
-        wait_for_ajax_requests
-        fj('.fc-event-time:visible').click
-        ff('#attendees li').size.should == 1
-
-        f('.single_item_done_button').click
-      end
-    end
-
-    def open_edit_appointment_slot_dialog
-      f('.fc-event').click
-      f('.edit_event_link').click
-    end
-
-    it "should allow me to override the participant limit on a slot-by-slot basis" do
-      create_appointment_group :participants_per_appointment => 2
-      get "/calendar2"
+      f(".appointment-group-item:nth-child(#{1}) .view_calendar_link").click
       wait_for_ajaximations
-      click_scheduler_link
+      fj('.fc-event:visible').click
       wait_for_ajaximations
-      click_appointment_link
+      ffj('#attendees li').size.should == 2
 
-      open_edit_event_dialog
-      replace_content f('[name=max_participants]'), "5"
-      fj('.ui-button:contains(Update)').click
+      # delete the first appointment
+      driver.execute_script("$('.cancel_appointment_link:eq(1)').trigger('click')")
       wait_for_ajaximations
-
-      ag = AppointmentGroup.first
-      ag.appointments.first.participants_per_appointment.should == 5
-      ag.participants_per_appointment.should == 2
-
-      open_edit_event_dialog
-      f('[name=max_participants_option]').click
-      fj('.ui-button:contains(Update)').click
+      driver.execute_script("$('.ui-dialog-buttonset .btn-primary').trigger('click')")
       wait_for_ajaximations
+      ff('#attendees li').size.should == 1
 
-      ag.reload
-      ag.appointments.first.participants_per_appointment.should be_nil
+      # make sure the appointment was really deleted
+      f('#refresh_calendar_link').click
+      wait_for_ajaximations
+      fj('.fc-event:visible').click
+      ff('#attendees li').size.should == 1
+      f('.single_item_done_button').click
     end
 
     it "should allow me to create a course with multiple contexts" do
@@ -338,5 +358,30 @@ describe "scheduler" do
       ag.sub_contexts.should == []
     end
 
+    it "should allow me to override the participant limit on a slot-by-slot basis" do
+      create_appointment_group :participants_per_appointment => 2
+      get "/calendar2"
+      wait_for_ajaximations
+      click_scheduler_link
+      wait_for_ajaximations
+      click_appointment_link
+
+      open_edit_event_dialog
+      replace_content f('[name=max_participants]'), "5"
+      fj('.ui-button:contains(Update)').click
+      wait_for_ajaximations
+
+      ag = AppointmentGroup.first
+      ag.appointments.first.participants_per_appointment.should == 5
+      ag.participants_per_appointment.should == 2
+
+      open_edit_event_dialog
+      f('[name=max_participants_option]').click
+      fj('.ui-button:contains(Update)').click
+      wait_for_ajaximations
+
+      ag.reload
+      ag.appointments.first.participants_per_appointment.should be_nil
+    end
   end
 end

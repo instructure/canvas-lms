@@ -46,13 +46,13 @@ describe "discussions" do
         @topic.create_materialized_view
 
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-        wait_for_ajax_requests
+        wait_for_ajaximations
         get_all_replies.first.should include_text @fake_student.name
       end
 
       it "should validate closing the discussion for comments" do
         create_and_go_to_topic
-        f("#discussion-toolbar .al-trigger-inner").click
+        f("#discussion-toolbar .al-trigger").click
         expect_new_page_load { f("#ui-id-3").click }
         f('.discussion-fyi').text.should == 'This topic is closed for comments'
         ff('.discussion-reply-label').should be_empty
@@ -61,7 +61,7 @@ describe "discussions" do
 
       it "should validate reopening the discussion for comments" do
         create_and_go_to_topic('closed discussion', 'side_comment', true)
-        f("#discussion-toolbar .al-trigger-inner").click
+        f("#discussion-toolbar .al-trigger").click
         expect_new_page_load { f("#ui-id-3").click }
         ff('.discussion-reply-label').should_not be_empty
         DiscussionTopic.last.workflow_state.should == 'active'
@@ -272,7 +272,6 @@ describe "discussions" do
           :delayed_post_at => 5.days.from_now,
         })
       end
-
       get "/courses/#{@course.id}/discussion_topics"
       wait_for_ajaximations
       f('.btn-large').should be_nil
@@ -515,7 +514,7 @@ describe "discussions" do
       reply_count.times { @topic.discussion_entries.create!(:message => 'Lorem ipsum dolor sit amet') }
 
       # make sure everything looks unread
-      get("/courses/#{@course.id}/discussion_topics/#{@topic.id}", false)
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       ff('.can_be_marked_as_read.unread').length.should == reply_count + 1
       f('.new-and-total-badge .new-items').text.should == reply_count.to_s
 
@@ -526,7 +525,7 @@ describe "discussions" do
       f('.new-and-total-badge .new-items').text.should == ''
 
       # refresh page and make sure nothing is unread/just_read and everthing is .read
-      get("/courses/#{@course.id}/discussion_topics/#{@topic.id}", false)
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       ['unread', 'just_read'].each do |state|
         ff(".can_be_marked_as_read.#{state}").should be_empty
       end

@@ -48,12 +48,16 @@ $(document).ready(function() {
 
   <div class="row-fluid">
     <div class="span6">
-    <%= text_field :quiz, :title, :style => "font-size:1.8em;font-family:inherit;", :placeholder => "Quiz Title" %>
+    <%= text_field :quiz, :title, :placeholder => "Quiz Title" %>
     </div>
     <div class="span6">
       <div class="admin-link-hover-area">
         <div class="admin-links">
-          <button class="al-trigger ui-button"><span class="al-trigger-inner">Manage</span></button>
+          <a class="al-trigger btn">
+            <span class="screenreader-only">Manage</span>
+            <i class="icon-settings"></i>
+            <i class="icon-mini-arrow-down"></i>
+          </a>
           <ul class="al-options">
 
             <% if @assignment %>
@@ -366,3 +370,4 @@ $(document).ready(function() {
     </tbody>
   </table>
 </div>
+

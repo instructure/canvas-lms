@@ -4,7 +4,7 @@
 
 <% content_for :right_side do %>
   <% if can_do(@context.web_conferences.new, @current_user, :create) %>
-    <div class="rs-margin-lr rs-margin-top"><a href="#" class="add_conference_link btn button-sidebar-wide"><i class="icon-add"></i> <%= t :new_conference_link, "Make a New Conference" %></a></div>
+    <div class="rs-margin-lr rs-margin-top"><a href="#" class="add_conference_link btn button-sidebar-wide"><%= image_tag "add.png" %> <%= t :new_conference_link, "Make a New Conference" %></a></div>
   <% end %>
 <% end %>
 <div id="no_conferences_message" style="<%= hidden unless @conferences.empty? %>">
@@ -78,7 +78,7 @@
       </tr><tr>
         <td class="button-container" colspan="2">
           <button type="submit" class="btn"><%= t 'buttons.create', "Create Conference" %></button>
-          <button type="button" class="cancel_button button-secondary"><%= t '#buttons.cancel', "Cancel" %></button>
+          <button type="button" class="cancel_button btn button-secondary"><%= t '#buttons.cancel', "Cancel" %></button>
         </td>
       </tr>
     </table>

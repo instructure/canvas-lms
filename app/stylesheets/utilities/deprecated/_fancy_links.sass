@@ -1,5 +1,3 @@
-@import environment.sass
-
 =icon_link
   :background-repeat no-repeat  
   :background-position left center
@@ -234,8 +232,6 @@ a
     +attachment_link
     :background-image url('/images/inst_tree/file_types/page_white_flash.png') !important
 
-a.no-hover:hover, a.no-hover:focus
-  background-color: transparent
 a.no-underline,a.no-underline:hover, a.no-underline:focus
   text-decoration: none
 
@@ -243,17 +239,9 @@ a.no-underline,a.no-underline:hover, a.no-underline:focus
 // these classes make it so you can have links like <a class="atr-reply">reply to this topic</a> and have only
 // a reply.png icon show up.
 
-=atr_link
-  +accessible_text_replacement
-  width: 16px
-  height: 16px
-  
 .atr-reply
-  +atr_link
-  background-image: url(/images/reply.png)
+  +replace-text-with-dimensions("reply.png")
 .atr-edit
-  +atr_link
-  background-image: url(/images/edit.png)
+  +replace-text-with-dimensions("edit.png")
 .atr-delete
-  +atr_link
-  background-image: url(/images/delete.png)
+  +replace-text-with-dimensions("delete.png")

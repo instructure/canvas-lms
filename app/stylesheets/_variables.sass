@@ -1,10 +1,14 @@
+$iconSpritePath:      "canvas_does_not_use_boostraps_default_sprit_based_icons_so_this_is_meaningless" !default
+$iconWhiteSpritePath: $iconSpritePath !default
+
+@import 'bootstrap/variables'
+@import 'jqueryui/variables'
+
+
 $right_side_width: 286px
 $left_side_width: 175px
 $min_main_width: 510px
 $max_main_width: 1100px
-$main_background_color: #fff
-
-$link_color: #396eb2
 
 $identity-link-color: #fff
 $menu-border-color: #ccc
@@ -13,8 +17,6 @@ $menu-link-color: #456787
 $menu-background-color: #f3f4f5
 
 $right_side_text_color: #595959
-$right_side_header_color: #fff
-
 $right_side_margin: 13px
 
 // section tabs
@@ -23,24 +25,12 @@ $section_tabs_color: #4b7092
 $section_tabs_hover_background_color: darken(#e4e7e9, 2%)
 $section_tabs_border_top_color: #C6C6C6
 $section_tabs_border_bottom_color: lighten($section_tabs_border_top_color, 4%)
-$section_tabs_hidden_color: #aaa
 $section_tabs_to_be_hidden_color: #888
 
 
-// Buttons
-$button-text-color: #525252
-$buttonset-border-radius: 4px
-
 $ui-state-default-gradient-top: #ededed
 $ui-state-default-gradient-bottom: #c4c4c4
-$ui-state-active-gradient-top: red
-$ui-state-active-gradient-bottom: pink
-$ui-button-border-radius: 30px
 
-
-// gradiants
-$blue-box-background-top: #36bcff
-$blue-box-background-bottom: #238edc
 
 // this is the blue color that we use all over the place when not in a gradiants
 $highlight-color: #06a9ee
@@ -49,9 +39,20 @@ $hover-color: #E5F3FF
 // this is the grey color for when things are disabled, or meant to contrast with $highlight-color
 $diminutive-color: #acacac
 
-$silver-gradient-top: #ededed
-$silver-gradient-bottom: #c4c4c4
+$masquerade-link-color: #ffa500
 
+// canvas stuff
+$lightBackground:               rgb(248, 250, 251)
+$borderColor:                   #a8adb3
+$borderRadius:                  4px
+$toolbarBackground:             #D7E7F5
+$toolbarBackgroundLight:        #E8F1F9
+$listViewHeaderBackground:      rgb(225, 230, 235)
+$listViewHeaderBackgroundLight: lighten($listViewHeaderBackground, 5%)
+$contentBoxPadding:             8px
+$listBorderColor:               lighten($borderColor, 5%)
+$activeBG:                      #d6ecfc
+$dimmedOpacity:                 0.4
 
 $masquerade-link-color: #ffa500
 
@@ -59,3 +60,5 @@ $masquerade-link-color: #ffa500
 $h1-font-size: 23px
 $h2-font-size: 14px
 $h3-font-size: 19px
+
+$spacing-width: 20px

@@ -5,7 +5,7 @@ shared_examples_for "discussions selenium tests" do
 
   def go_to_topic
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-    wait_for_ajax_requests
+    wait_for_ajaximations
   end
 
   def create_and_go_to_topic(title = 'new topic', discussion_type = 'side_comment', is_locked = false)
@@ -56,11 +56,12 @@ shared_examples_for "discussions selenium tests" do
     if attachment.present?
       filename, fullpath, data = get_file(attachment)
       @last_entry.find_element(:css, '.discussion-reply-add-attachment').click
+      wait_for_ajaximations
       @last_entry.find_element(:css, '.discussion-reply-attachments input').send_keys(fullpath)
     end
 
     submit_form('.discussion-reply-form')
-    wait_for_ajax_requests
+    wait_for_ajaximations
     keep_trying_until do
       id = DiscussionEntry.last.id
       @last_entry = f "#entry-#{id}"

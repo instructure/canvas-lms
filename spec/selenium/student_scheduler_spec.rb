@@ -9,12 +9,17 @@ describe "scheduler" do
   context "as a student" do
 
     before (:each) do
+      #set_native_events("false")
       course_with_student_logged_in
     end
 
+    #after(:all) do
+    #  set_native_events("true")
+    #end
+
     def reserve_appointment_manual(n)
-      ff('.fc-event')[n].click
-      f('.event-details .reserve_event_link').click
+      ffj('.fc-event')[n].click
+      driver.execute_script("$('.event-details .reserve_event_link').trigger('click')")
       wait_for_ajax_requests
     end
 
@@ -96,7 +101,5 @@ describe "scheduler" do
       fj('.fc-event:visible').click
       ff('#reservations').size.should be_zero
     end
-
   end
-
 end

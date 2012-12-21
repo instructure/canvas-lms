@@ -49,7 +49,7 @@
     <h2><%= t 'titles.current_quizzes', "Current Quizzes" %></h2>
     <% @quizzes.each do |quiz| %>
     <div style="margin-left: 10px;">
-      <a style="font-size: 1.2em;" href="<%= context_url(@context, :context_quiz_url, quiz.id) %>"><%= quiz.title || t('defaults.unnamed_quiz', "Unnamed Quiz") %></a>
+      <a href="<%= context_url(@context, :context_quiz_url, quiz.id) %>"><%= quiz.title || t('defaults.unnamed_quiz', "Unnamed Quiz") %></a>
       <span style="padding-left: 20px;"><%= t :question_count, "Question", :count => quiz.question_count %></span>
     </div>
     <% end %>

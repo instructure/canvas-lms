@@ -1,5 +1,3 @@
-body, html
-  height: 100%
 body
   background-image: url("/images/blue/bg.jpg")
   min-width: $min_main_width
@@ -64,7 +62,7 @@ body
 #main
   position: relative
   z-index: 10
-  background-color: $main_background_color
+  background-color: $bodyBackground
   border: 1px solid $listBorderColor
   border-top: 0
   margin-bottom: 40px
@@ -155,9 +153,10 @@ body
     .home a
       color: #ccc
       i
-        font-size: 12px
         margin-right: -5px
         vertical-align: text-bottom
+        &:before
+          font-size: 12px
 
   .ellipsis
     display: inline-block

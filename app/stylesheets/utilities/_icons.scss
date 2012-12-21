@@ -21,6 +21,10 @@ i[class*=icon-], i[class^=icon-], a[class*=icon-], a[class^=icon-] {
     vertical-align: middle;
     text-rendering: optimizeLegibility;
 
+    // the specific reason for this being in the :before and not part of the <i> was to get
+    // .input-appends to work with .btns that had an <i> icon in them.
+    font-size: 16px;
+
     // override any properties in the cascade that might make the font display incorrectly
     text-transform: none !important;
     font-weight: normal !important;
@@ -32,13 +36,20 @@ i[class*=icon-], i[class^=icon-], a[class*=icon-], a[class^=icon-] {
 i[class*=icon-], i[class^=icon-] {
   display: inline-block;
   font-style: normal !important;
-  width: 16px; height: 16px; line-height: 16px; font-size: 16px;
+  width: 16px; height: 16px; line-height: 16px;
 
   // adjust icon sizes to look good with our large-size button class
-  .btn-large & { width: 18px; height: 18px; line-height: 18px; font-size: 18px; }
+  .btn-large & {
+    width: 18px; height: 18px; line-height: 18px;
+    &:before{ font-size: 18px }
+  }
 
-  // suppress icons when the smallest buttons are used
-  .btn-mini & { display: none; }
+  // most icons do not look good this small, so use sparingly.
+  // this should only be used for things like: icon-settings and icon-mini-arrow-down
+  .btn-mini & {
+    width: 12px; height: 12px; line-height: 12px;
+    &:before{ font-size: 12px }
+  }
 
 }
 
@@ -48,6 +59,15 @@ a[class*=icon-], a[class^=icon-] {
   &:before { margin-right: 4px; }
 }
 
+
+// icons should be a little lighter than the text in a .btn,
+// we're aware and ok that this wont have any effect in ie8
+.btn:not(.btn-primary, .btn-warning, .btn-danger, .btn-success, .btn-info, .btn-inverse) {
+  i[class*=icon-], i[class^=icon-] {
+    color: lighten( $grayDark, 15% );
+  }
+}
+
 .standalone-icon {
   // use to make standalone icons within links display as dark gray, not default link blue
   &:before { color: #555; }
@@ -55,11 +75,11 @@ a[class*=icon-], a[class^=icon-] {
 
 // change vertical alignment of icons used with common typographic elements to line them up better
 h1, h2, h3, h4, p {
-  
+
   i[class*=icon-]:before, i[class^=icon-]:before {
     vertical-align: baseline;
   }
-  
+
 }
 
 
@@ -79,7 +99,7 @@ h1, h2, h3, h4, p {
 .icon-copy-course:before { content: "\e056" }
 .icon-export-content:before { content: "\e083" }
 .icon-import-content:before { content: "\e084" }
-.icon-discussion:before { content: "\e067" }
+.icon-discussion:before { content: "\e072" }
 .icon-discussion-reply:before { content: "\e068" }
 .icon-peer-review:before { content: "\e034" }
 .icon-discussion-new:before { content: "\e067" }
@@ -199,8 +219,7 @@ h1, h2, h3, h4, p {
 .icon-plus:before { content: "\e078" }
 .icon-zipped:before { content: "\e089" }
 
-// utility class for when you want a standalone icon, and want its function to be read aloud by
-// screen readers. Should only ever be an issue when an icon- class is used with a link.
+// deprecated in favor of .screenreader-only, which is meant to be usable anywhere
 span.screen-reader-text {
   position: absolute;
   top: -9999px;

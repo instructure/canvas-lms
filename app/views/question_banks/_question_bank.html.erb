@@ -1,6 +1,6 @@
 <% context = question_bank ? question_bank.context : @context %>
 <div class="question_bank" id="question_bank_<%= question_bank ? question_bank.id : "blank" %>" style="<%= hidden unless question_bank %>">
-  <div class="header">
+  <div class="header clearfix">
     <div class="header_content">
       <a class="title" href="<%= context_url(context, :context_question_bank_url, question_bank ? question_bank.id : "{{ id }}") %>"><%= question_bank.try_rescue(:title) || t('no_name', "No Name") %></a>
     </div>
@@ -10,8 +10,8 @@
       <a href="<%= context_url(context, :context_question_bank_bookmark_url, question_bank ? question_bank.id : "{{ id }}", :unbookmark => 1) %>" class="bookmark_bank_link no-hover" title="<%= t('unbookmark_bank', 'Unbookmark this Question Bank') %>" style="<%= hidden if not_yet_bookmarked %>"><%= image_tag "bookmark.png" %></a>
       <% if context == @context %>
         <span style="<%= hidden if question_bank && !can_do(question_bank, @current_user, :update) %>">
-          <a href="<%= context_url(context, :context_question_bank_url, question_bank ? question_bank.id : "{{ id }}") %>" class="edit_bank_link no-hover"><i class="icon-edit standalone-icon"></i></a>
-          <a href="<%= context_url(context, :context_question_bank_url, question_bank ? question_bank.id : "{{ id }}") %>" class="delete_bank_link no-hover"><i class="icon-end standalone-icon"></i></a>
+          <a href="<%= context_url(context, :context_question_bank_url, question_bank ? question_bank.id : "{{ id }}") %>" class="edit_bank_link"><i class="icon-edit standalone-icon"></i></a>
+          <a href="<%= context_url(context, :context_question_bank_url, question_bank ? question_bank.id : "{{ id }}") %>" class="delete_bank_link"><i class="icon-end standalone-icon"></i></a>
         </span>
       <% end %>
     </div>

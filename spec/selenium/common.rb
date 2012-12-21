@@ -56,6 +56,7 @@ module SeleniumTestsHelperMethods
       options = {}
       if browser == :firefox
         profile = Selenium::WebDriver::Firefox::Profile.new
+        profile.load_no_focus_lib=(true)
         if SELENIUM_CONFIG[:firefox_profile].present?
           profile = Selenium::WebDriver::Firefox::Profile.from_name(SELENIUM_CONFIG[:firefox_profile])
         end
@@ -70,6 +71,7 @@ module SeleniumTestsHelperMethods
       caps = SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox
       if caps == :firefox
         profile = Selenium::WebDriver::Firefox::Profile.new
+        profile.load_no_focus_lib=(true)
         if SELENIUM_CONFIG[:firefox_profile].present?
           profile = Selenium::WebDriver::Firefox::Profile.from_name SELENIUM_CONFIG[:firefox_profile]
         end
@@ -127,6 +129,11 @@ module SeleniumTestsHelperMethods
     driver.manage.timeouts.implicit_wait = 10
     driver
   end
+
+  def set_native_events(setting)
+    driver.instance_variable_get(:@bridge).instance_variable_get(:@capabilities).instance_variable_set(:@native_events, setting)
+  end
+
 
   # f means "find" this is a shortcut to finding elements
   def f(selector, scope = nil)
@@ -434,14 +441,14 @@ shared_examples_for "all selenium tests" do
     course = opts[:course] || @course || course(opts)
     get "/courses/#{@course.id}/settings"
     f(".student_view_button").click
-    wait_for_dom_ready
+    wait_for_ajaximations
   end
 
   def expect_new_page_load
     driver.execute_script("INST.still_on_old_page = true;")
     yield
     keep_trying_until { driver.execute_script("return INST.still_on_old_page;") == nil }
-    wait_for_dom_ready
+    wait_for_ajaximations
   end
 
   def check_domready
@@ -781,15 +788,14 @@ shared_examples_for "all selenium tests" do
 
   # you can pass an array to use the rails polymorphic_path helper, example:
   # get [@course, @announcement] => "http://10.0.101.75:65137/courses/1/announcements/1"
-  def get(link, wait_for_dom = true)
+  def get(link, waitforajaximations = true)
     link = polymorphic_path(link) if link.is_a? Array
     driver.get(app_host + link)
-    wait_for_dom_ready if wait_for_dom
+    wait_for_ajaximations if waitforajaximations
   end
 
   def refresh_page
-    driver.navigate.refresh
-    wait_for_dom_ready
+    expect_new_page_load { driver.navigate.refresh }
   end
 
   def make_full_screen

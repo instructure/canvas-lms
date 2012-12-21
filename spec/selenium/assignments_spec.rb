@@ -223,7 +223,7 @@ describe "assignments" do
       form.find_element(:css, '#assignment_peer_reviews').click
       form.find_element(:css, '#assignment_automatic_peer_reviews').click
       f('#assignment_peer_review_count').send_keys('2')
-      f('#assignment_peer_reviews_assign_at + img').click
+      driver.execute_script "$('#assignment_peer_reviews_assign_at + .ui-datepicker-trigger').click()"
       datepicker = datepicker_next
       datepicker.find_element(:css, '.ui-datepicker-ok').click
       f('#assignment_name').send_keys(' edit')

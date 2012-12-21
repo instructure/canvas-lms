@@ -232,6 +232,7 @@ div#content
   .answer
     :padding 5px 5px
     :margin 0
+    @include clearfix
 
     &:last-child
       :border-bottom 0
@@ -261,6 +262,7 @@ div#content
     padding: 5px 10px
     overflow: hidden
     background-color: #eee
+    clear: both
     &.question_bank_top
       .local_group_links
         display: none
@@ -393,6 +395,8 @@ div#content
     :clear left
     :padding 5px 20px
     
+    .button-container
+      :clear both
     .question_text
       :margin-top 1.5em
       :margin-bottom 1.5em
@@ -1321,3 +1325,14 @@ ul#quiz_versions
   border: 1px solid #999
   margin: 18px 0 -1px
   @include background-image(linear-gradient(#f3f3f3, #e3e3e3))
+
+#quiz_options_holder
+  select
+    width: auto
+    margin-left: 3px
+  input[type="text"]
+    width: 90%
+    margin-left: 3px
+    &.hasDatepicker
+      width: 45%
+      

@@ -14,33 +14,32 @@
       {{#t "which_course_is_this_question_about"}}Which course is this question about?{{/t}}
       <small>{{#t "message_will_be_sent_to_all_the_teachers_tas_in_the_course"}}Message will be sent to all the Teachers / TA's in the course.{{/t}}</small>
     </label>
-    <select name="recipients[]" id="teacher-feedback-recipients"></select>
+    <select class="input-block-level" name="recipients[]" id="teacher-feedback-recipients"></select>
     <label for="teacher-feedback-body">{{#t "message"}}Message{{/t}}</label>
     <textarea id="teacher-feedback-body" name="body"></textarea>
     <div class="button-container">
       <button type="submit" class="btn" data-text-while-loading="{{#t "sending"}}Sending...{{/t}}">{{#t "send_message"}}Send Message{{/t}}</button>
     </div>
   </form>
-  <form class="help-dialog-pane" id="create_ticket" style="display:none" action="/errors" method="POST">
+  <form class="help-dialog-pane bootstrap-form" id="create_ticket" style="display:none" action="/errors" method="POST">
     <h4>{{#t "file_a_ticket_for_a_personal_response_from_our_support_team"}}File a ticket for a personal response from our support team{{/t}}</h4>
-    <div class="ui-state-highlight">
-      <span class="ui-icon ui-icon-info"></span>
+    <div class="alert">
       <strong>{{#t "for_an_instant_answer"}}For an instant answer:{{/t}}</strong>
       <div>{{#t "see_if_your_issue_is_addressed_in_the_canvas_guides"}}See if your issue is addressed in the <a target="_blank" href="http://guides.instructure.com/">Canvas Guides</a>.{{/t}}</div>
     </div>
     <div>
       <label for="error_subject">{{#t "subject"}}Subject{{/t}}</label>
-      <input id="error_subject" name="error[subject]" />
+      <input type="text" class="input-block-level" id="error_subject" name="error[subject]" />
     </div>
     <div>
       <label for="error-comments">
         {{#t "description"}}Description{{/t}}
         <small>{{#t "include_a_link_to_a_screencast_or_screenshot_using_something_like_jing"}}Include a link to a screencast/screenshot using something like <a target="_blank" href="http://www.techsmith.com/download/jing">Jing</a>.{{/t}}</small>
       </label>
-      <textarea id="error-comments" name="error[comments]"></textarea>
+      <textarea class="input-block-level" id="error-comments" name="error[comments]"></textarea>
     </div>
     <label for="severity">{{#t "how_is_this_affecting_you"}}How is this affecting you?{{/t}}</label>
-    <select name="error[user_perceived_severity]" id="severity">
+    <select class="input-block-level" name="error[user_perceived_severity]" id="severity">
       <option value="">{{#t "please_select_one"}}Please select one...{{/t}}</option>
       <option value="just_a_comment">{{#t "just_a_casual_question_comment_idea_suggestion"}}Just a casual question, comment, idea, suggestion{{/t}}</option>
       <option value="not_urgent">{{#t "i_need_some_help_but_its_not_urgent"}}I need some help but it's not urgent{{/t}}</option>
@@ -50,9 +49,9 @@
     </select>
     <div style="{{hiddenUnless showEmail}}">
       <label for="error-email">{{#t "your_email_address"}}Your email address{{/t}}</label>
-      <input type="email" name="error[email]" id="error-email">
+      <input class="input-block-level" type="email" name="error[email]" id="error-email">
     </div>
-    <input type="hidden" name="error[url]" value="{{url}}">
+    <input class="input-block-level" type="hidden" name="error[url]" value="{{url}}">
     <div class="button-container">
       <button type="submit" data-text-while-loading="{{#t "Submitting_Ticket"}}Submitting Ticket...{{/t}}" class="btn submit_button"><img src="/images/email.png" alt=""/>{{#t "submit_this_support_request"}}Submit Ticket{{/t}}</button>
     </div>

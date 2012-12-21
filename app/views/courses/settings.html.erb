@@ -348,10 +348,10 @@ TEXT
       </li>
       <% if can_do(@context.course_sections.new, @current_user, :create) %>
         <li>
-          <% form_for :course_section, :url => context_url(@context, :context_sections_url), :html => {:id => "add_section_form", :style => "margin-top: 20px;"} do |f| %>
+          <% form_for :course_section, :url => context_url(@context, :context_sections_url), :html => {:id => "add_section_form", :class => "form-inline", :style => "margin-top: 20px;"} do |f| %>
             <h3><%= f.blabel :name, :course_section_name, :en => "Add a New Section" %></h3>
             <%= f.text_field :name %>
-            <button class="btn btn-small" type="submit"><%= t('buttons.add_section', %{Add Section}) %></button>
+            <button class="btn btn-primary" type="submit"><i class="icon-add"></i> <%= t('buttons.add_section', %{Add Section}) %></button>
           <% end %>
         </li>
       <% end %>

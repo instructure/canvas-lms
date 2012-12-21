@@ -2,7 +2,7 @@
   <% form_tag conversations_url, :id => "message_assignment_recipients" do %>
     <%= hidden_field_tag :recipients, "", :class => "recipient_ids" %>
     <h2><%= t('message_students_who', 'Message students who...') %></h2>
-    <div style="margin-bottom: 15px; margin-top: -1.4em;">
+    <div style="margin-bottom: 15px;">
       <%= t('for_title', 'for %{title}', :title => '<span class="asset_title">&nbsp;</span>'.html_safe) %>
     </div>
     <div style="margin-bottom: 10px;">

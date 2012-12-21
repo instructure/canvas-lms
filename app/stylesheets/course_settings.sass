@@ -1,17 +1,17 @@
 @import environment.sass
 @import 'utilities/context_search'
 
-#course_form .course_form 
+#course_form .course_form
   display: none
 
-#course_form.editing 
-  .course_form 
+#course_form.editing
+  .course_form
     display: inline
   .course_info, .edit_course_link, .move_course_link
     display: none
 
 
-#course_form .date_entry 
+#course_form .date_entry
   width: 100px
 
 .users-wrapper
@@ -23,6 +23,7 @@
     padding: 8px
     background-color: #F7F7F7
     border-bottom: 1px solid #CCC
+    line-height: 1em
 
   .pagination-loading
     padding: 8px
@@ -32,7 +33,7 @@
     background-color: #06A9EE
     color: white
 
-ul.user_list 
+ul.user_list
   list-style: none
   padding: 0px
   margin: 0
@@ -43,7 +44,7 @@ ul.user_list
   li.none
     padding: 8px
 
-ul.user_list li.user 
+ul.user_list li.user
   min-height: 30px
   padding-left: 10px
   color: #444
@@ -63,13 +64,13 @@ ul.user_list li.user
     display: block
     position: relative
 
-ul.user_list li.user:hover 
+ul.user_list li.user:hover
   background-color: $hover-color
 
-ul.user_list li.user .email 
+ul.user_list li.user .email
   font-size: 0.8em
   margin-left: 10px
-  
+
 ul.user_list li.user .associated_user
   display: none
   font-size: 0.8em
@@ -77,11 +78,11 @@ ul.user_list li.user .associated_user
 ul.user_list li.user.observer_enrollment .associated_user
   display: block
 
-ul.user_list li.user .section 
+ul.user_list li.user .section
   font-size: 0.8em
   margin-left: 10px
 
-ul.user_list li.user .short_name 
+ul.user_list li.user .short_name
   font-size: 0.8em
   margin-left: 10px
   margin-top: 2px
@@ -89,20 +90,20 @@ ul.user_list li.user .short_name
 ul.user_list li.user .associated_user_name:hover
   text-decoration: underline
 
-ul.user_list li.user .enrollment_type 
+ul.user_list li.user .enrollment_type
   font-size: 0.8em
   margin: -2px 10px 0px
 
-ul.user_list li.user .links 
+ul.user_list li.user .links
   float: right
   padding-right: 20px
   padding-top: 5px
   visibility: hidden
 
-ul.user_list li.user .links a 
+ul.user_list li.user .links a
   text-decoration: none
 
-ul.user_list li.user:hover .links 
+ul.user_list li.user:hover .links
   float: right
   padding-right: 20px
   visibility: visible
@@ -111,10 +112,6 @@ ul.user_list div.enrollment_type.pending
   color: #888
   font-style: italic
 
-h3 .tally  
-  font-family: arial,sans-serif
-  font-size: 12px
-  padding-left: 5px
 
 .add-course-users
   border: 1px solid #CCC
@@ -135,34 +132,34 @@ h3 .tally
       height: auto
       width: 98%
 
-#sections 
+#sections
   +reset-list
   max-width: 500px
   list-style-type: none
 
-#sections .section 
+#sections .section
   padding: 3px 2px
 
-#sections .section .delete_section_link, 
-#sections .section .edit_section_link, 
+#sections .section .delete_section_link,
+#sections .section .edit_section_link,
 #sections .section .cant_delete_section_link
 
   float: right
 
-#sections .section .section_link 
+#sections .section .section_link
   +opacity(0.3)
 
-#sections .section:hover 
+#sections .section:hover
   background-color: #eee
 
-#sections .section:hover .section_link 
+#sections .section:hover .section_link
   +opacity(1)
 
-#sections .section .users_count 
+#sections .section .users_count
   font-size: 0.8em
   padding-left: 5px
 
-#edit_section_form 
+#edit_section_form
   float: left
 
 .nav_list

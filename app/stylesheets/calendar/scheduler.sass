@@ -9,11 +9,15 @@
 
 .scheduler-content
   padding: 1em
-  background-color: $main_background_color
+  background-color: $bodyBackground
   border: 1px solid $listBorderColor
 .scheduler-header
   min-height: 27px
   margin-bottom: 10px
+  
+.scheduler-wrapper
+  /* extra padding stops final dropdown from getting cut off */
+  padding-bottom: 25px
 
 /* the 'button' part is to beat g_util_button's specificity */
 button.single_item_done_button
@@ -63,6 +67,7 @@ button.single_item_done_button
   max-height: 150px
   overflow-x: hidden
   margin-bottom: 10px
+  padding-top: 10px
 
 .time-block-list-header, .time-block-list-body-wrapper
   width: 100%
@@ -96,7 +101,7 @@ button.single_item_done_button
   .date_field
     width: $date_column_width - 5 - 20
   .time_field
-    width: $time_column_width - 10
+    width: $time_column_width - 30
 
   .error
     border: 1px solid #EE5F5B
@@ -161,11 +166,9 @@ button.single_item_done_button
 .ag_contexts_done
   float: right
 
-.hidden
-  display: none
 
 .delete-block-link
-  +accessible_text_replacement
+  +hide-text
   display: block
   float: right
   background: url(/images/jqueryui/icon_sprite.png) 0px -16px no-repeat

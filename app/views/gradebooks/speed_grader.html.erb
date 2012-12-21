@@ -118,7 +118,7 @@
               <% if @assignment.rubric_association && can_do(@assignment.rubric_association, @current_user, :assess) %>
                 <button type="button" class="save_rubric_button btn"><%= t('buttons.save', "Save") %></button>
               <% end %>
-              <button type="button" class="hide_rubric_link button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
+              <button type="button" class="hide_rubric_link btn button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
             </div>
             <a href="<%= context_url(@context, :context_rubric_association_rubric_assessments_url, @assignment.rubric_association) %>" class="update_rubric_assessment_url" style="display: none;">&nbsp;</a>
             <%= render :partial => "shared/rubric_criterion_dialog" %>

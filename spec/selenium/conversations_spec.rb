@@ -29,9 +29,8 @@ describe "conversations" do
       @me = @user
       5.times { conversation(@me, user, :workflow_state => 'unread') }
       get "/conversations/unread"
-      c = get_conversations.first
-      c.click
-      c.should have_class('unread') # not marked immediately
+      get_conversations.first.click
+      get_conversations.first.should have_class('unread') # not marked immediately
       @me.conversations.unread.size.should == 5
       keep_trying_until do
         get_conversations.first.should_not have_class('unread')

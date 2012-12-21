@@ -19,22 +19,23 @@
         <input id="enroll_filter_checkbox" name="hide_enrollmentless_courses" type="checkbox" value="1" <% if params[:hide_enrollmentless_courses] == "1" %>checked="checked"<% end %>/>
         <label for="hide_enrollmentless_courses"><%= t(:hide_enrollmentless_courses, "Hide enrollmentless courses") %></label>
         <br />
-        <button class='button filter_button'><%= t("#buttons.filter", "Filter") %></button>
+        <button class='btn filter_button'><%= t("#buttons.filter", "Filter") %></button>
       </form>
     </div>
 
     <% if @associated_courses_count > 0 %>
-      <h2><label><%= t(:filter_label, "Find a Course") %></label></h2>
+      <h2><%= t(:filter_label, "Find a Course") %></h2>
       <div class="rs-margin-lr rs-margin-bottom">
-        <% form_for :course, :url => account_courses_path(@account), :html => {:id => "new_course", :method => :get} do |f| -%>
-          <fieldset class="textfield-inline-with-button">
+        <% form_for :course, :url => account_courses_path(@account), :html => {:id => "new_course", :class => "form-inline", :method => :get} do |f| -%>
+          <fieldset class="input-append">
             <input id="course_name"
+                   type="text"
                    name="course[name]"
                    value="<%= @query %>"
                    data-behaviors="autocomplete"
                    data-autocomplete-options="<%= { :minLength => 4, :delay => 150, :source => account_courses_path(@account, :format => :json) }.to_json  %>"
                    />
-            <button class='button small-button'><%= t(:go_button, "Go") %></button>
+            <button class='btn'><%= t(:go_button, "Go") %></button>
           </fieldset>
         <%- end -%>
       </div>

@@ -270,12 +270,12 @@ describe "users" do
       user_with_pseudonym(:active_user => true, :name => "The Student")
       get "/users/#{@user.id}/masquerade"
       f('.masquerade_button').click
-      wait_for_dom_ready
+      wait_for_ajaximations
       f("#identity .user_name").should include_text "The Student"
       bar = f("#masquerade_bar")
       bar.should include_text "You are currently masquerading"
       bar.find_element(:css, ".stop_masquerading").click
-      wait_for_dom_ready
+      wait_for_ajaximations
       f("#identity .user_name").should include_text "The Admin"
     end
   end

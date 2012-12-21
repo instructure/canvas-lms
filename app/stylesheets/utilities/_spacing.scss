@@ -1,0 +1,27 @@
+[class*='content-box'] {
+  clear: both;
+  position: relative;
+  @include clearfix;
+}
+
+.content-box { margin: $spacing-width 0; }
+.content-box-mini { margin: $spacing-width/2 0; }
+.content-box-micro { margin: $spacing-width/3 0; }
+
+.pad-box { padding: $spacing-width; }
+.pad-box-mega { padding: $spacing-width*2; }
+.pad-box-mini { padding: $spacing-width/2; }
+.pad-box-micro { padding: $spacing-width/4; }
+
+.pad-box, .pad-box-mega, .pad-box-mini, .pad-box-micro {
+  &.no-sides {
+    padding-left: 0; padding-right: 0;
+  }
+  &.top-only {
+    padding-bottom: 0; padding-right: 0; padding-left: 0;
+  }
+  &.bottom-only {
+    padding-top: 0; padding-right: 0; padding-left: 0;
+  }
+}
+

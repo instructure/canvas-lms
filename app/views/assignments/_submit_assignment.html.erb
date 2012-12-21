@@ -79,8 +79,8 @@
       <% end %>
       <tr>
         <td colspan="2" class='button-container'>
-          <button type="submit" class="btn" id="submit_file_button"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
-          <button type="button" class='cancel_button button-secondary'><%= t '#buttons.cancel', "Cancel" %></button>
+          <button type="button" class='cancel_button btn'><%= t '#buttons.cancel', "Cancel" %></button>
+          <button type="submit" class="btn btn-primary" id="submit_file_button"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
         </td>
       </tr><tr style="display: none;">
         <td colspan="2" style="text-align: center;">
@@ -118,8 +118,8 @@
       <% end %>
       <tr>
         <td class='button-container'>
-          <button type="submit" class="btn"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
-          <button type="button" class='cancel_button button-secondary'><%= t '#buttons.cancel', "Cancel" %></button>
+          <button type="button" class='cancel_button btn'><%= t '#buttons.cancel', "Cancel" %></button>
+          <button type="submit" class="btn btn-primary"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
         </td>
       </tr>
     </table>
@@ -151,8 +151,8 @@
       <%= render :partial => "group_comment" %>
       <tr>
         <td colspan="2" class='button-container'>
-          <button type="submit" class="btn"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
-          <button type="button" class='cancel_button button-secondary'><%= t '#buttons.cancel', "Cancel" %></button>
+          <button type="button" class='cancel_button btn'><%= t '#buttons.cancel', "Cancel" %></button>
+          <button type="submit" class="btn btn-primary"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
         </td>
       </tr>
     </table>
@@ -218,8 +218,8 @@
             <% end %>
             <tr>
               <td colspan="2" class='button-container'>
-                <button type="submit" class="btn"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
-                <button type="button" class='cancel_button button-secondary'><%= t '#buttons.cancel', "Cancel" %></button>
+                <button type="button" class='cancel_button btn'><%= t '#buttons.cancel', "Cancel" %></button>
+                <button type="submit" class="btn btn-primary"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
               </td>
             </tr>
           </table>
@@ -282,8 +282,8 @@
           <%= render :partial => "group_comment" %>
           <tr>
             <td colspan="2" class='button-container'>
-              <button type="submit" class="btn" disabled="disabled" id="media_comment_submit_button"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
-              <button type="button" class='cancel_button button-secondary'><%= t '#buttons.cancel', "Cancel" %></button>
+              <button type="button" class='cancel_button btn'><%= t '#buttons.cancel', "Cancel" %></button>
+              <button type="submit" class="btn btn-primary" disabled="disabled" id="media_comment_submit_button"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
             </td>
           </tr><tr style="display: none;">
             <td colspan="2" style="text-align: center;">
@@ -296,3 +296,4 @@
     <% end %>
   </div>
 </div>
+

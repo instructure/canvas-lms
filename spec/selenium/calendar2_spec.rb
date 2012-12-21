@@ -106,47 +106,15 @@ describe "calendar2" do
       end
 
       describe "contexts list" do
-        it "should have a menu for adding stuff" do
-          get "/calendar2"
-
-          contexts = ff("#context-list > li")
-
-          # first context is the user
-          actions = contexts[0].find_elements(:css, "li > a")
-          actions.size.should == 1
-          actions.first["data-action"].should == "add_event"
-
-          # course context
-          actions = contexts[1].find_elements(:css, "li > a")
-          actions.size.should == 2
-          actions.first["data-action"].should == "add_event"
-          actions.second["data-action"].should == "add_assignment"
-        end
-
-        it "should create an event through the context list drop down" do
+        it "should create an event by hitting the '+' on the context list on the sidebar" do
           event_title = 'new event'
           get "/calendar2"
           wait_for_ajaximations
 
-          driver.execute_script(%{$(".context_list_context:nth-child(2)").trigger('mouseenter')})
-          fj('ul#context-list > li:nth-child(2) button').click
-          fj(".ui-kyle-menu:visible a").click
+          fj('ul#context-list > li:nth-child(2) [data-add-event]').click
           edit_event_dialog = f('#edit_event_tabs')
           edit_event_dialog.should be_displayed
           create_calendar_event(event_title, true)
-        end
-
-        it "should create an assignment through the context list drop down" do
-          assignment_title = 'new assignment'
-          get "/calendar2"
-          wait_for_ajaximations
-
-          driver.execute_script(%{$(".context_list_context:nth-child(2)").trigger('mouseenter')})
-          fj('#context-list > li:nth-child(2) button').click
-          fj(".ui-kyle-menu:visible li:last-child a").click
-          edit_event_dialog = f('#edit_event_tabs')
-          edit_event_dialog.should be_displayed
-          create_assignment_event(assignment_title, true)
         end
 
         it "should toggle event display when context is clicked" do
@@ -210,14 +178,15 @@ describe "calendar2" do
 
       it "should show scheduler button if it is enabled" do
         get "/calendar2"
-        f('input#scheduler').should_not be_nil
+        f("#scheduler").should have_class("ui-helper-hidden-accessible")
       end
 
       it "should not show scheduler button if it is disabled" do
         account = Account.default.tap { |a| a.settings[:show_scheduler] = false; a.save! }
         get "/calendar2"
-        f('input#scheduler').should be_nil
-      end      
+        wait_for_ajaximations
+        ff("#calendar_views .ui-button").length.should == 2
+      end
 
       it "should drag and drop an event" do
         pending('drag and drop not working correctly')
@@ -260,28 +229,28 @@ describe "calendar2" do
 
       it "should delete an event" do
         create_middle_day_event('doomed event')
-        f('.fc-event').click
-        f('.delete_event_link').click
-        f('.ui-dialog .btn-primary').click
+        fj('.fc-event:visible').click
+        fj('.delete_event_link').click
+        fj('.ui-dialog .btn-primary').click
         wait_for_ajaximations
-        f('.fc-event').should be_nil
+        fj('.fc-event:visible').should be_nil
         # make sure it was actually deleted and not just removed from the interface
         get("/calendar2")
         wait_for_ajax_requests
-        f('.fc-event').should be_nil
+        fj('.fc-event:visible').should be_nil
       end
 
       it "should delete an assignment" do
         create_middle_day_assignment
-        f('.fc-event').click
-        f('.delete_event_link').click
-        f('.ui-dialog .btn-primary').click
+        fj('.fc-event').click
+        fj('.delete_event_link').click
+        fj('.ui-dialog .btn-primary').click
         wait_for_ajaximations
-        f('.fc-event').should be_nil
+        fj('.fc-event').should be_nil
         # make sure it was actually deleted and not just removed from the interface
         get("/calendar2")
         wait_for_ajax_requests
-        f('.fc-event').should be_nil
+        fj('.fc-event').should be_nil
       end
 
       it "should let me message students who have signed up for an appointment" do
@@ -300,8 +269,9 @@ describe "calendar2" do
 
         get '/calendar2'
         wait_for_ajaximations
-        f('.fc-event').click
-        f('.message_students').click
+        fj('.fc-event').click
+        wait_for_ajaximations
+        fj('.message_students').click
         wait_for_ajaximations
         ff(".participant_list input").size.should == 1
         set_value f('textarea[name="body"]'), 'hello'
@@ -319,7 +289,7 @@ describe "calendar2" do
         assignment2 = @course.active_assignments.create(:name => "Assignment 2", :assignment_group => group2, :due_at => Time.zone.now)
 
         get "/calendar2"
-
+        wait_for_ajaximations
         events = ff('.fc-event')
         event1 = events.detect { |e| e.text =~ /Assignment 1/ }
         event2 = events.detect { |e| e.text =~ /Assignment 2/ }
@@ -328,18 +298,24 @@ describe "calendar2" do
         event1.should_not == event2
 
         event1.click
+        wait_for_ajaximations
         f('.popover-links-holder .edit_event_link').click
+        wait_for_ajaximations
+
         select = f('#edit_assignment_form .assignment_group')
         first_selected_option(select).attribute(:value).to_i.should == group1.id
         close_visible_dialog
 
         event2.click
+        wait_for_ajaximations
+
         f('.popover-links-holder .edit_event_link').click
+        wait_for_ajaximations
         select = f('#edit_assignment_form .assignment_group')
         first_selected_option(select).attribute(:value).to_i.should == group2.id
         replace_content(f('.ui-dialog #assignment_title'), "Assignment 2!")
         submit_form('#edit_assignment_form')
-        wait_for_ajax_requests
+        wait_for_ajaximations
         assignment2.reload.title.should == "Assignment 2!"
         assignment2.assignment_group.should == group2
       end
@@ -348,18 +324,23 @@ describe "calendar2" do
         assignment = @course.active_assignments.create!(:name => "to edit", :due_at => Time.zone.now)
         get "/calendar2"
         f('.fc-event').click
+        wait_for_ajaximations
         f('.popover-links-holder .edit_event_link').click
+        wait_for_ajaximations
         original_more_options = f('.more_options_link')['href']
         original_more_options.should_not match(/undefined/)
         replace_content(f('.ui-dialog #assignment_title'), "edited title")
         submit_form('#edit_assignment_form')
-        wait_for_ajax_requests
+        wait_for_ajaximations
         assignment.reload
+        wait_for_ajaximations
         assignment.title.should eql("edited title")
 
-        f('.fc-event').click
-        f('.popover-links-holder .edit_event_link').click
-        f('.more_options_link')['href'].should match(original_more_options)
+        fj('.fc-event').click
+        wait_for_ajaximations
+        fj('.popover-links-holder .edit_event_link').click
+        wait_for_ajaximations
+        fj('.more_options_link')['href'].should match(original_more_options)
       end
 
       it "should make an assignment undated if you delete the start date" do
@@ -416,7 +397,7 @@ describe "calendar2" do
 
         get "/calendar2"
         wait_for_ajaximations
-        events = ff('.fc-event')
+        events = ffj('.fc-event:visible')
         events.size.should == 2
         events.first.click
 
@@ -449,6 +430,7 @@ describe "calendar2" do
     end
 
     context "week view" do
+
       it "should render assignments due just before midnight" do
         pending("fails on event count validation")
         assignment_model(:course => @course,
@@ -469,6 +451,7 @@ describe "calendar2" do
           events.size.should == 2
         end
       end
+
 
       it "should change event duration by dragging" do
         noon = Time.now.at_beginning_of_day + 12.hours
@@ -586,15 +569,14 @@ describe "calendar2" do
         create_appointment_group
         ag = AppointmentGroup.first
         ag.appointments.first.reserve_for @student, @me
+
         @user = @me
         get "/calendar2"
-        wait_for_ajaximations
 
-        f('.fc-event-title').click
-        popover = f("#popover-0")
-        popover.should be_displayed
-        expect_new_page_load { popover.find_element(:css, '.view_event_link').click }
-        wait_for_ajaximations
+        fj('.fc-event:visible').click
+        fj("#popover-0").should be_displayed
+        expect_new_page_load  { fj('#popover-0 .view_event_link').click }
+
         is_checked('#scheduler').should be_true
         f('#appointment-group-list').should include_text(ag.title)
       end
@@ -629,11 +611,9 @@ describe "calendar2" do
         wait_for_ajaximations
 
         # click the event in the calendar
-        f('.fc-event-title').click
-        popover = f('#popover-0')
-        popover.should be_displayed
-        expect_new_page_load { popover.find_element(:css, '.view_event_link').click }
-        wait_for_ajaximations
+        fj('.fc-event').click
+        fj("#popover-0").should be_displayed
+        expect_new_page_load  { fj('#popover-0 .view_event_link').click }
 
         page_title = f('.title')
         page_title.should be_displayed

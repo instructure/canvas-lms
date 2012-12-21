@@ -77,7 +77,7 @@
     </div>
     <div class="clear"></div>
   </li>
-  <li id="folder_panel" class="content_panel">
+  <li id="folder_panel" class="content_panel clearfix">
     <div class="header">
       <span class="name">&nbsp;</span>
       <span class="content">&nbsp;</span>
@@ -116,7 +116,7 @@
       </div>
     </div>
   </li>
-  <li class="folder_item folder">
+  <li class="folder_item folder clearfix">
     <div class="header">
       <%= image_tag "blank.png", :alt => '', :class => "item_icon" %>
       <a href="#" class="name">&nbsp;</a>
@@ -209,7 +209,7 @@
     <%= t 'messages.no_preview_avaialble', "No Preview Available" %><br/>
     <a href="#"><%= t 'links.download_with_size', "download the file (%{size})", :size => '<span class="readable_size">&nbsp;</span>'.html_safe %></a>
   </li>
-  <li id="collaborations_panel" class="content_panel">
+  <li id="collaborations_panel" class="clearfix content_panel">
     <div class="header">
       <%= t 'titles.collaborations', "Collaborations for %{name}", :name => '<span class="name">&nbsp;</span>'.html_safe %>
       <div class="breadcrumb">
@@ -269,7 +269,7 @@
     </div>
     <div class="clear"></div>
   </li>
-  <li class="folder_item file add_item" id="add_file_form">
+  <li class="folder_item file add_item clearfix" id="add_file_form">
     <% form_for :attachment, :url => "#", :html => {:class => "add_file_form add_form"} do |f| %>
       <%= f.hidden_field :folder_id %>
       <div class="header">
@@ -282,12 +282,12 @@
       </div>
       <div class="button-container">
         <button type="submit" class="btn btn-small"><%= t 'buttons.add_a_file', 'Add File' %></button>
-        <button type="button" class="btn button-secondary cancel_button"><%= t '#buttons.cancel', 'Cancel' %></button>
+        <button type="button" class="btn btn button-secondary cancel_button"><%= t '#buttons.cancel', 'Cancel' %></button>
       </div>
     <% end %>
   </li>
-  <li class="folder_item folder add_item" id="add_folder_form">
-    <% form_for :folder, :url => "#", :html => {:class => "add_folder_form add_form header"} do |f| %>
+  <li class="folder_item folder add_item clearfix" id="add_folder_form">
+    <% form_for :folder, :url => "#", :html => {:class => "form-inline add_folder_form add_form header"} do |f| %>
       <%= f.hidden_field :parent_folder_id %>
       <%= image_tag "blank.png", :alt => '', :class => "item_icon" %>
       <span class="name" style="display: none;">&nbsp;</span>
@@ -404,7 +404,7 @@ HEREDOC
           </div>
           <div class="button-container">
             <button type="submit" class="btn button-default-action submit_button"><%= t 'buttons.add_collaboration', "Add Collaboration" %></button>
-            <button type="button" class="button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+            <button type="button" class="btn button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
           </div>
         </div>
         <% if @current_user && !@current_user.user_services.map(&:service).include?("google_docs") %>
@@ -413,7 +413,7 @@ HEREDOC
           to access your Google Docs account:" %>
           <div class="button-container">
             <a class="btn button-default-action" href="<%= oauth_url(:service => :google_docs, :return_to => (request.url + "#add_collaboration")) %>"><%= t '#buttons.authorize_google_docs', "Authorize Google Docs Access" %></a>
-            <button type="button" class="button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+            <button type="button" class="btn button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
           </div>
         </div>
         <% end %>
@@ -586,7 +586,7 @@ into a zip file.  This may take some time, depending on the size and number of f
   <span class="duplicate_filename_prompt"></span><br /><br />
   <span class="duplicate_filenames"></span><br /><br />
   <div class="buttons" style="text-align: right; width: 100%">
-    <button type="button" class="btn button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+    <button type="button" class="btn btn button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
     <button type="button" class="btn rename_button"><%= t 'buttons.rename_duplicate_attachment', "Rename New Files" %></button>
     <button type="button" class="btn overwrite_button"><%= t 'buttons.overwrite_duplicate_attachment', "Overwrite" %></button>
   </div>

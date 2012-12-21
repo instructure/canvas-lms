@@ -272,8 +272,8 @@ $cell_height: 33px
     height: 25px
 
 .gradebook-cell-comment-label
-  +accessible_text_replacement
-
+  +hide-text
+  display: inline-block
 
 .gradebook-cell-editable
   height: $cell_height - 1px -8px
@@ -318,7 +318,7 @@ $cell_height: 33px
       display: inline-block
       background: transparent
     .outof
-      +unselectable
+      +user-select(none)
 
       text-align: left
       color: #888
@@ -332,7 +332,7 @@ $cell_height: 33px
 
 $gradebook_checkbox_width: 16px
 .gradebook-checkbox
-  +accessible_text_replacement
+  +hide-text
   display: block
   position: absolute
   left: 50%

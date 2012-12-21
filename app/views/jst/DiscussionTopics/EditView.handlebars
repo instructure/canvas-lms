@@ -7,7 +7,7 @@
            placeholder="{{#t "topic_title"}}Topic Title{{/t}}"
            value="{{title}}"
            maxlength="254"
-           style="font-size: 15px; width: 99%">
+           class="input-block-level">
   </div>
   <div class="control-group">
       <div style="float: right;">
@@ -15,7 +15,8 @@
       </div>
       <div style="clear:both;"></div>
       <textarea name="message"
-              style="width: 100%; min-height: 200px;">{{convertApiUserContent message forEditing=1}}</textarea>
+                class="input-block-level"
+                style="width: 100%; min-height: 200px;">{{convertApiUserContent message forEditing=1}}</textarea>
   </div>
 
 </fieldset>
@@ -154,7 +155,7 @@
   </fieldset>
 {{/if}}
 
-<div class="form-actions">
+<div class="form-actions flush">
   <button type="submit"
           data-text-while-loading="{{#t "saving"}}Saving...{{/t}}"
           class="btn btn-primary">{{#t "save"}}Save{{/t}}</button>

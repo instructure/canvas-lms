@@ -47,8 +47,8 @@
       <div class="editing" style="float: right;">
         <a href="<%= search_rubrics_url(:q => "") %>" class="find_rubric_link icon-search" style="<%= hidden unless !rubric || can_do(rubric_association, @current_user, :update) %>" title="<%= t 'titles.find_existing_rubric', "Find Existing Rubric" %>"><%= t 'links.find_a_rubric', "Find a Rubric" %></a>
       </div>
-      <div class="editing">
-        <%= before_label :title, "Title" %> <input type="text" name="title" value="<%= rubric.title rescue t('defaults.rubric_title', "Some Rubric") %>" style="width: 200px;" maxlength="255"/>
+      <div class="editing" style="text-align: left">
+        <%= before_label :title, "Title" %> <input type="text" class="no-margin-bottom" name="title" value="<%= rubric.title rescue t('defaults.rubric_title', "Some Rubric") %>" style="width: 200px;" maxlength="255"/>
         <a href="<%= search_rubrics_url(:q => "") %>" style="display: none;"><%= image_tag "find.png" %> <%= t 'links.find_rubric', "Find Rubric" %></a>
         <% if rubric_association && !rubric_association.rubric_assessments.empty? %>
           <div class="editing" style="font-size: 0.8em;"><%= t 'messages.rubric_in_use',
@@ -103,7 +103,7 @@
 <table style="display: none;">
   <tr id="edit_rubric">
     <td colspan="4">
-      <form id="edit_rubric_form" class="edit-rubric-form">
+      <form id="edit_rubric_form" class="edit-rubric-form no-margin-bottom">
         <div class="rubric_custom_ratings" style="<%= hidden unless @assignment %>">
           <input type="checkbox" id="rubric_custom_rating" class="rubric_custom_rating" <%= 'checked' if rubric && rubric.free_form_criterion_comments %>/>
           <label for="rubric_custom_rating"><%= t 'labels.custom_rating', "I'll write free-form comments when assessing students" %></label>

@@ -32,9 +32,35 @@ describe "context_modules" do
       number_to_create.times do |i|
         m = @course.context_modules.create!(:name => "module #{i}")
         m.workflow_state = workflow_state
+        m.workflow_state.should == workflow_state
         modules << m
       end
       modules
+    end
+
+    def open_admin_module_menu
+      fj('#context_modules .admin-links .al-trigger').click
+      wait_for_ajaximations
+      sleep 1
+    end
+
+    def change_workflow_state_module
+      fj('#context_modules .change-workflow-state-link').click()
+      wait_for_ajaximations
+    end
+
+    def publish_module
+      fj('#context_modules .admin-links .al-trigger').click
+      keep_trying_until { f("#ui-id-2").should have_class('ui-state-open') }
+      fj('#context_modules .change-workflow-state-link').click
+      wait_for_ajaximations
+    end
+
+    def unpublish_module
+      fj('#context_modules .admin-links .al-trigger').click
+      keep_trying_until { f("#ui-id-1").should have_class('ui-state-open') }
+      fj('#context_modules .change-workflow-state-link').click
+      wait_for_ajaximations
     end
 
     it "should render as course home page" do
@@ -44,36 +70,28 @@ describe "context_modules" do
       get "/courses/#{@course.id}"
 
       keep_trying_until do
-        f('.admin-links button').click
+        f('.admin-links .al-trigger').click
         hover_and_click('#context_modules .change-workflow-state-link')
         wait_for_ajax_requests
         f('.context_module').should have_class('published_module')
       end
     end
 
-    it "publishes an unpublished module" do 
-      create_modules(1, "unpublished")
-      get "/courses/#{@course.id}/modules"
-
-      keep_trying_until do
-        f('.admin-links button').click
-        hover_and_click('#context_modules .change-workflow-state-link')
-        wait_for_ajax_requests
-        f('.context_module').should have_class('published_module')
-      end
+    it "publishes an unpublished module" do
+      add_module('New Module')
+      publish_module
+      open_admin_module_menu
+      keep_trying_until { f('#context_modules .change-workflow-state-link').text.should == "Unpublish" }
     end
 
-    it "unpublishes a published module" do 
-      # Active modules means they are published.
-      create_modules(1, "active")
-      get "/courses/#{@course.id}/modules"
-
-      keep_trying_until do
-        f('.admin-links button').click
-        hover_and_click('#context_modules .change-workflow-state-link')
-        wait_for_ajax_requests
-        f('.context_module').should have_class('unpublished_module')
-      end
+    it "unpublishes a published module" do
+      add_module('New Module')
+      publish_module
+      open_admin_module_menu
+      keep_trying_until { f('#context_modules .change-workflow-state-link').text.should == "Unpublish" }
+      change_workflow_state_module
+      open_admin_module_menu
+      keep_trying_until { f('#context_modules .change-workflow-state-link').text.should == "Publish" }
     end
 
     it "add unpublished_module css class when creating new module" do
@@ -82,13 +100,13 @@ describe "context_modules" do
       @course.context_modules.first.workflow_state.should == "unpublished"
     end
 
-    it "allows you to publish a newly created module without reloading the page" do 
+    it "allows you to publish a newly created module without reloading the page" do
       add_module('New Module')
       f('.context_module').should have_class('unpublished_module')
       @course.context_modules.first.workflow_state.should == "unpublished"
 
       keep_trying_until do
-        f('.admin-links button').click
+        f('.admin-links .al-trigger').click
         hover_and_click('#context_modules .change-workflow-state-link')
         wait_for_ajax_requests
         f('.context_module').should have_class('published_module')
@@ -106,8 +124,7 @@ describe "context_modules" do
 
       get "/courses/#{@course.id}/modules"
 
-      # button appears after ajax requests
-      wait_for_ajaximations
+      wait_for_ajax_requests
       f('.module_progressions_link').click
       wait_for_ajaximations
       f(".student_list").should be_displayed
@@ -164,398 +181,407 @@ describe "context_modules" do
     end
     #student_list.should include_text("module 2") ****Should update to module 2 but doesn't until renavigating to the page****
 
-  it "should allow selecting specific student progression and update module state on screen" do
-    new_student = student_in_course.user
-    new_student2 = student_in_course.user
+    it "should allow selecting specific student progression and update module state on screen" do
+      new_student = student_in_course.user
+      new_student2 = student_in_course.user
 
-    modules = create_modules(2, "active")
+      modules = create_modules(2, "active")
 
-    #attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
-    @tag_1 = modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
-    modules[0].completion_requirements = {@tag_1.id => {:type => 'must_view'}}
+      #attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
+      @tag_1 = modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
+      modules[0].completion_requirements = {@tag_1.id => {:type => 'must_view'}}
 
-    @tag_2 = modules[1].add_item({:id => @assignment2.id, :type => 'assignment'})
-    @tag_3 = modules[1].add_item({:id => @assignment3.id, :type => 'assignment'})
-    modules[1].completion_requirements = {@tag_3.id => {:type => 'must_submit'}}
+      @tag_2 = modules[1].add_item({:id => @assignment2.id, :type => 'assignment'})
+      @tag_3 = modules[1].add_item({:id => @assignment3.id, :type => 'assignment'})
+      modules[1].completion_requirements = {@tag_3.id => {:type => 'must_submit'}}
 
-    modules[0].save!
-    modules[1].save!
+      modules[0].save!
+      modules[1].save!
 
-    #updates new_student module state by completing @assignment
-    modules[0].update_for(new_student2, :read, @tag_1)
+      #updates new_student module state by completing @assignment
+      modules[0].update_for(new_student2, :read, @tag_1)
 
-    get "/courses/#{@course.id}/modules"
+      get "/courses/#{@course.id}/modules"
 
-    f('.module_progressions_link').click
-    wait_for_ajaximations
-    f(".student_list").should be_displayed
+      f('.module_progressions_link').click
+      wait_for_ajaximations
+      f(".student_list").should be_displayed
 
-    #selects the second student
-    ff(".student_list .student")[2].click
+      #selects the second student
+      ff(".student_list .student")[2].click
+      wait_for_ajaximations
 
-    #validates the second student has been selected and that the modules information is displayed as expected
-    f(".module_#{modules[0].id} .progress").should include_text("completed")
-    f(".module_#{modules[1].id} .progress").should include_text("in progress")
-  end
+      #validates the second student has been selected and that the modules information is displayed as expected
+      f(".module_#{modules[0].id} .progress").should include_text("completed")
+      f(".module_#{modules[1].id} .progress").should include_text("in progress")
+    end
 
-  it "should rearrange child objects in same module" do
-    modules = create_modules(1, "active")
+    it "should rearrange child objects in same module" do
+      modules = create_modules(1, "active")
 
-    #attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
-    modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
-    modules[0].add_item({:id => @assignment2.id, :type => 'assignment'})
+      #attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
+      modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
+      modules[0].add_item({:id => @assignment2.id, :type => 'assignment'})
 
-    refresh_page
-    sleep 2 #not sure what we are waiting on but drag and drop will not work, unless we wait
+      refresh_page
+      sleep 2 #not sure what we are waiting on but drag and drop will not work, unless we wait
 
-    #setting gui drag icons to pass to driver.action.drag_and_drop
-    a1_img = fj('.context_module_items .context_module_item:first .move_item_link img')
-    a2_img = fj('.context_module_items .context_module_item:last .move_item_link img')
+      #setting gui drag icons to pass to driver.action.drag_and_drop
+      a1_img = fj('.context_module_items .context_module_item:first .move_item_link img')
+      a2_img = fj('.context_module_items .context_module_item:last .move_item_link img')
 
-    #performs the change position
-    driver.action.drag_and_drop(a2_img, a1_img).perform
-    wait_for_ajax_requests
+      #performs the change position
+      driver.action.drag_and_drop(a2_img, a1_img).perform
+      wait_for_ajaximations
 
-    #validates the assignments switched, the number convention doesn't make sense, should be assignment == 2 and assignment2 == 1 but this is working
-    @assignment.position.should == 2
-    @assignment2.position.should == 3
-  end
+      #validates the assignments switched, the number convention doesn't make sense, should be assignment == 2 and assignment2 == 1 but this is working
+      @assignment.position.should == 2
+      @assignment2.position.should == 3
+    end
 
-  it "should rearrange child object to new module" do
+    it "should rearrange child object to new module" do
       pending('drag and drop selenium not working')
-    modules = create_modules(2, "active")
+      modules = create_modules(2, "active")
 
-    #attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
-    modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
-    modules[1].add_item({:id => @assignment2.id, :type => 'assignment'})
+      #attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
+      modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
+      modules[1].add_item({:id => @assignment2.id, :type => 'assignment'})
 
-    refresh_page
-    sleep 2 #not sure what we are waiting on but drag and drop will not work, unless we wait
+      refresh_page
+      sleep 2 #not sure what we are waiting on but drag and drop will not work, unless we wait
 
-    #setting gui drag icons to pass to driver.action.drag_and_drop
-    a1_img = fj('#context_modules .context_module:first-child .context_module_items .context_module_item:first .move_item_link img')
-    a2_img = fj('#context_modules .context_module:last-child .context_module_items .context_module_item:first .move_item_link img')
+      #setting gui drag icons to pass to driver.action.drag_and_drop
+      a1_img = fj('#context_modules .context_module:first-child .context_module_items .context_module_item:first .move_item_link img')
+      a2_img = fj('#context_modules .context_module:last-child .context_module_items .context_module_item:first .move_item_link img')
 
-    #performs the change position
-    driver.action.drag_and_drop(a2_img, a1_img).perform
-    wait_for_ajax_requests
+      #performs the change position
+      driver.action.drag_and_drop(a2_img, a1_img).perform
+      wait_for_ajaximations
 
-    #validates the module 1 assignments are in the expected places and that module 2 context_module_items isn't present
-    @assignment.position.should == 2
-    @assignment2.position.should == 3
-    fj('#context_modules .context_module:last-child .context_module_items .context_module_item').should be_nil
-  end
+      #validates the module 1 assignments are in the expected places and that module 2 context_module_items isn't present
+      @assignment.position.should == 2
+      @assignment2.position.should == 3
+      fj('#context_modules .context_module:last-child .context_module_items .context_module_item').should be_nil
+    end
 
     it "should only display out-of on an assignment min score restriction when the assignment has a total" do
-    ag = @course.assignment_groups.create!
-    a1 = ag.assignments.create!(:context => @course)
-    a1.points_possible = 10
-    a1.save
-    a2 = ag.assignments.create!(:context => @course)
-    m = @course.context_modules.create!
+      ag = @course.assignment_groups.create!
+      a1 = ag.assignments.create!(:context => @course)
+      a1.points_possible = 10
+      a1.save
+      a2 = ag.assignments.create!(:context => @course)
+      m = @course.context_modules.create!
 
-    make_content_tag = lambda do |assignment|
-      ct = ContentTag.new
-      ct.content_id = assignment.id
-      ct.content_type = 'Assignment'
-      ct.context_id = @course.id
-      ct.context_type = 'Course'
-      ct.title = "Assignment #{assignment.id}"
-      ct.tag_type = "context_module"
-      ct.context_module_id = m.id
-      ct.context_code = "course_#{@course.id}"
-      ct.save!
-      ct
+      make_content_tag = lambda do |assignment|
+        ct = ContentTag.new
+        ct.content_id = assignment.id
+        ct.content_type = 'Assignment'
+        ct.context_id = @course.id
+        ct.context_type = 'Course'
+        ct.title = "Assignment #{assignment.id}"
+        ct.tag_type = "context_module"
+        ct.context_module_id = m.id
+        ct.context_code = "course_#{@course.id}"
+        ct.save!
+        ct
+      end
+      content_tag_1 = make_content_tag.call a1
+      content_tag_2 = make_content_tag.call a2
+
+      refresh_page
+
+      keep_trying_until do
+        f('.admin-links .al-trigger').click
+        hover_and_click('#context_modules .edit_module_link')
+        wait_for_ajax_requests
+        f('#add_context_module_form').should be_displayed
+      end
+      assignment_picker = keep_trying_until do
+        f('.add_completion_criterion_link').click
+        fj('.assignment_picker:visible')
+      end
+
+      assignment_picker.find_element(:css, "option[value='#{content_tag_1.id}']").click
+      requirement_picker = fj('.assignment_requirement_picker:visible')
+      requirement_picker.find_element(:css, 'option[value="min_score"]').click
+      driver.execute_script('return $(".points_possible_parent:visible").length').should > 0
+
+      assignment_picker.find_element(:css, "option[value='#{content_tag_2.id}']").click
+      requirement_picker.find_element(:css, 'option[value="min_score"]').click
+      driver.execute_script('return $(".points_possible_parent:visible").length').should == 0
     end
-    content_tag_1 = make_content_tag.call a1
-    content_tag_2 = make_content_tag.call a2
 
-    refresh_page
+    it "should add a module" do
+      add_module('New Module')
+      # should always show the student progressions button for teachers
+      f('.module_progressions_link').should be_displayed
+    end
 
-    keep_trying_until do
-      f('.admin-links button').click
-      hover_and_click('#context_modules .edit_module_link')
+    it "should delete a module" do
+      add_module('Delete Module')
+      driver.execute_script("$('.context_module').addClass('context_module_hover')")
+      f('.admin-links .al-trigger').click
+      wait_for_ajaximations
+      f('.delete_module_link').click
+      driver.switch_to.alert.should_not be_nil
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+      refresh_page
+      f('#no_context_modules_message').should be_displayed
+    end
+
+    it "should edit a module" do
+      edit_text = 'Module Edited'
+      add_module('Edit Module')
+      context_module = f('.context_module')
+      driver.action.move_to(context_module).perform
+      f('.admin-links .al-trigger').click
+      f('.edit_module_link').click
+      f('.ui-dialog').should be_displayed
+      edit_form = f('#add_context_module_form')
+      edit_form.find_element(:id, 'context_module_name').send_keys(edit_text)
+      submit_form(edit_form)
+      edit_form.should_not be_displayed
+      wait_for_ajaximations
+      f('.context_module > .header').should include_text(edit_text)
+    end
+
+    it "should add and remove completion criteria" do
+      add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+
+      # add completion criterion
+      context_module = f('.context_module')
+      driver.action.move_to(context_module).perform
+      f('.admin-links .al-trigger').click
+      wait_for_ajaximations
+      f('.edit_module_link').click
+      wait_for_ajaximations
+      f('.ui-dialog').should be_displayed
+      edit_form = f('#add_context_module_form')
+      f('.add_completion_criterion_link', edit_form).click
+      wait_for_ajaximations
+      click_option('#add_context_module_form .assignment_picker', @assignment.title, :text)
+      click_option('#add_context_module_form .assignment_requirement_picker', 'must_submit', :value)
+      submit_form(edit_form)
+      edit_form.should_not be_displayed
       wait_for_ajax_requests
-      f('#add_context_module_form').should be_displayed
-    end
-    assignment_picker = keep_trying_until do
-      f('.add_completion_criterion_link').click
-      fj('.assignment_picker:visible')
-    end
 
-    assignment_picker.find_element(:css, "option[value='#{content_tag_1.id}']").click
-    requirement_picker = fj('.assignment_requirement_picker:visible')
-    requirement_picker.find_element(:css, 'option[value="min_score"]').click
-    driver.execute_script('return $(".points_possible_parent:visible").length').should > 0
+      # verify it was added
+      @course.reload
+      smodule = @course.context_modules.first
+      smodule.should_not be_nil
+      smodule.completion_requirements.should_not be_empty
+      smodule.completion_requirements[0][:type].should == 'must_submit'
 
-    assignment_picker.find_element(:css, "option[value='#{content_tag_2.id}']").click
-    requirement_picker.find_element(:css, 'option[value="min_score"]').click
-    driver.execute_script('return $(".points_possible_parent:visible").length').should == 0
-  end
+      # delete the criterion, then cancel the form
+      driver.action.move_to(context_module).perform
+      f('.admin-links .al-trigger').click
+      wait_for_ajaximations
+      f('.edit_module_link').click
+      wait_for_ajaximations
+      f('.ui-dialog').should be_displayed
+      edit_form = f('#add_context_module_form')
+      f('.completion_entry .delete_criterion_link', edit_form).click
+      wait_for_ajaximations
+      ff('.cancel_button', dialog_for(edit_form)).last.click
+      wait_for_ajaximations
 
-  it "should add a module" do
-    add_module('New Module')
-    # should always show the student progressions button for teachers
-    f('.module_progressions_link').should be_displayed
-  end
+      # now delete the criterion frd
+      # (if the previous step did even though it shouldn't have, this will error)
+      driver.action.move_to(context_module).perform
+      f('.admin-links .al-trigger').click
+      wait_for_ajaximations
+      f('.edit_module_link').click
+      wait_for_ajaximations
+      f('.ui-dialog').should be_displayed
+      edit_form = f('#add_context_module_form')
+      f('.completion_entry .delete_criterion_link', edit_form).click
+      wait_for_ajaximations
+      submit_form(edit_form)
+      wait_for_ajax_requests
 
-  it "should delete a module" do
-    add_module('Delete Module')
-    driver.execute_script("$('.context_module').addClass('context_module_hover')")
-    f('.admin-links button').click
-    f('.delete_module_link').click
-    driver.switch_to.alert.should_not be_nil
-    driver.switch_to.alert.accept
-    wait_for_ajaximations
-    refresh_page
-    f('#no_context_modules_message').should be_displayed
-  end
+      # verify it's gone
+      @course.reload
+      @course.context_modules.first.completion_requirements.should == []
 
-  it "should edit a module" do
-    edit_text = 'Module Edited'
-    add_module('Edit Module')
-    context_module = f('.context_module')
-    driver.action.move_to(context_module).perform
-    f('.admin-links button').click
-    f('.edit_module_link').click
-    f('.ui-dialog').should be_displayed
-    edit_form = f('#add_context_module_form')
-    edit_form.find_element(:id, 'context_module_name').send_keys(edit_text)
-    submit_form(edit_form)
-    edit_form.should_not be_displayed
-    wait_for_ajaximations
-    f('.context_module > .header').should include_text(edit_text)
-  end
-
-  it "should add and remove completion criteria" do
-    add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
-
-    # add completion criterion
-    context_module = f('.context_module')
-    driver.action.move_to(context_module).perform
-    f('.admin-links button').click
-    f('.edit_module_link').click
-    f('.ui-dialog').should be_displayed
-    edit_form = f('#add_context_module_form')
-    f('.add_completion_criterion_link', edit_form).click
-    wait_for_ajaximations
-    click_option('#add_context_module_form .assignment_picker', @assignment.title, :text)
-    click_option('#add_context_module_form .assignment_requirement_picker', 'must_submit', :value)
-    submit_form(edit_form)
-    edit_form.should_not be_displayed
-    wait_for_ajax_requests
-
-    # verify it was added
-    @course.reload
-    smodule = @course.context_modules.first
-    smodule.should_not be_nil
-    smodule.completion_requirements.should_not be_empty
-    smodule.completion_requirements[0][:type].should == 'must_submit'
-
-    # delete the criterion, then cancel the form
-    driver.action.move_to(context_module).perform
-    f('.admin-links button').click
-    f('.edit_module_link').click
-    f('.ui-dialog').should be_displayed
-    edit_form = f('#add_context_module_form')
-    f('.completion_entry .delete_criterion_link', edit_form).click
-    wait_for_ajaximations
-    ff('.cancel_button', dialog_for(edit_form)).last.click
-    wait_for_ajaximations
-
-    # now delete the criterion frd
-    # (if the previous step did even though it shouldn't have, this will error)
-    driver.action.move_to(context_module).perform
-    f('.admin-links button').click
-    f('.edit_module_link').click
-    f('.ui-dialog').should be_displayed
-    edit_form = f('#add_context_module_form')
-    f('.completion_entry .delete_criterion_link', edit_form).click
-    wait_for_ajaximations
-    submit_form(edit_form)
-    wait_for_ajax_requests
-
-    # verify it's gone
-    @course.reload
-    @course.context_modules.first.completion_requirements.should == []
-
-    # and also make sure the form remembers that it's gone (#8329)
-    driver.action.move_to(context_module).perform
-    f('.admin-links button').click
-    f('.edit_module_link').click
-    f('.ui-dialog').should be_displayed
-    edit_form = f('#add_context_module_form')
-    ff('.completion_entry .delete_criterion_link', edit_form).should be_empty
-  end
-
-  it "should delete a module item" do
-    add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
-    driver.execute_script("$('.context_module_item').addClass('context_module_item_hover')")
-    f('.delete_item_link').click
-    driver.switch_to.alert.should_not be_nil
-    driver.switch_to.alert.accept
-    wait_for_ajaximations
-    keep_trying_until do
-      f('.context_module_items').should_not include_text(@assignment.title)
-      true
-    end
-  end
-
-  it "should edit a module item and validate the changes stick" do
-    item_edit_text = "Assignment Edit 1"
-    module_item = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
-    tag = ContentTag.last
-    edit_module_item(module_item) do |edit_form|
-      replace_content(edit_form.find_element(:id, 'content_tag_title'), item_edit_text)
-    end
-    module_item = f("#context_module_item_#{tag.id}")
-    module_item.should include_text(item_edit_text)
-
-    get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-    f('h2.title').text.should == item_edit_text
-
-    expect_new_page_load { f('.modules').click }
-    f("#context_module_item_#{tag.id} .title").text.should == item_edit_text
-  end
-
-  it "should add an assignment to a module" do
-    add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
-  end
-
-  it "should allow adding an item twice" do
-    item1 = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
-    item2 = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
-    item1.should_not == item2
-    @assignment.reload.context_module_tags.size.should == 2
-  end
-
-  it "should rename all instances of an item" do
-    item1 = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
-    item2 = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
-    edit_module_item(item2) do |edit_form|
-      replace_content(edit_form.find_element(:id, 'content_tag_title'), "renamed assignment")
-    end
-    all_items = ff(".context_module_item.Assignment_#{@assignment.id}")
-    all_items.size.should == 2
-    all_items.each { |i| i.find_element(:css, '.title').text.should == 'renamed assignment' }
-    @assignment.reload.title.should == 'renamed assignment'
-    run_jobs
-    @assignment.context_module_tags.each { |tag| tag.title.should == 'renamed assignment' }
-
-    # reload the page and renaming should still work on existing items
-    get "/courses/#{@course.id}/modules"
-    wait_for_ajaximations
-    item3 = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
-    edit_module_item(item3) do |edit_form|
-      replace_content(edit_form.find_element(:id, 'content_tag_title'), "again")
-    end
-    all_items = ff(".context_module_item.Assignment_#{@assignment.id}")
-    all_items.size.should == 3
-    all_items.each { |i| i.find_element(:css, '.title').text.should == 'again' }
-    @assignment.reload.title.should == 'again'
-    run_jobs
-    @assignment.context_module_tags.each { |tag| tag.title.should == 'again' }
-  end
-
-  it "should not rename every text header when you rename one" do
-    add_module('TestModule')
-
-    # add a text header
-    f('.admin-links button').click
-    f('.add_module_item_link').click
-    select_module_item('#add_module_item_select', 'Text Header')
-    wait_for_ajaximations
-    title_input = fj('input[name="title"]:visible')
-    replace_content(title_input, 'First text header')
-    fj('.add_item_button:visible').click
-    wait_for_ajaximations
-    tag1 = ContentTag.last
-
-    # and another one
-    f('.admin-links button').click
-    f('.add_module_item_link').click
-    select_module_item('#add_module_item_select', 'Text Header')
-    wait_for_ajaximations
-    title_input = fj('input[name="title"]:visible')
-    replace_content(title_input, 'Second text header')
-    fj('.add_item_button:visible').click
-    wait_for_ajaximations
-    tag2 = ContentTag.last
-
-    # rename the second
-    item2 = f("#context_module_item_#{tag2.id}")
-    edit_module_item(item2) do |edit_form|
-      replace_content(edit_form.find_element(:id, 'content_tag_title'), 'Renamed!')
+      # and also make sure the form remembers that it's gone (#8329)
+      driver.action.move_to(context_module).perform
+      f('.admin-links .al-trigger').click
+      f('.edit_module_link').click
+      f('.ui-dialog').should be_displayed
+      edit_form = f('#add_context_module_form')
+      ff('.completion_entry .delete_criterion_link', edit_form).should be_empty
     end
 
-    # verify the first did not change
-    item1 = f("#context_module_item_#{tag1.id}")
-    item1.should_not include_text('Renamed!')
-  end
-
-  it "should add a quiz to a module" do
-    add_existing_module_item('#quizs_select', 'Quiz', @quiz.title)
-  end
-
-  it "should add a new quiz to a module in a specific assignment group" do
-    add_new_module_item('#quizs_select', 'Quiz', '[ New Quiz ]', "New Quiz") do
-      click_option("select[name='quiz[assignment_group_id]']", @ag2.name)
+    it "should delete a module item" do
+      add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+      driver.execute_script("$('.context_module_item').addClass('context_module_item_hover')")
+      wait_for_ajaximations
+      f('.delete_item_link').click
+      driver.switch_to.alert.should_not be_nil
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+      keep_trying_until do
+        f('.context_module_items').should_not include_text(@assignment.title)
+        true
+      end
     end
-    @ag2.assignments.length.should == 1
-    @ag2.assignments.first.title.should == "New Quiz"
-  end
 
-  it "should add a content page item to a module" do
-    add_new_module_item('#wiki_pages_select', 'Content Page', '[ New Page ]', 'New Page Title')
-  end
+    it "should edit a module item and validate the changes stick" do
+      item_edit_text = "Assignment Edit 1"
+      module_item = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+      tag = ContentTag.last
+      edit_module_item(module_item) do |edit_form|
+        replace_content(edit_form.find_element(:id, 'content_tag_title'), item_edit_text)
+      end
+      module_item = f("#context_module_item_#{tag.id}")
+      module_item.should include_text(item_edit_text)
 
-  it "should add a discussion item to a module" do
-    add_new_module_item('#discussion_topics_select', 'Discussion', '[ New Topic ]', 'New Discussion Title')
-  end
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      f('h2.title').text.should == item_edit_text
 
-  it "should add a text header to a module" do
-    header_text = 'new header text'
-    add_module('Text Header Module')
-    f('.admin-links button').click
-    f('.add_module_item_link').click
-    select_module_item('#add_module_item_select', 'Text Header')
-    keep_trying_until do
-      replace_content(f('#sub_header_title'), header_text)
-      true
+      expect_new_page_load { f('.modules').click }
+      f("#context_module_item_#{tag.id} .title").text.should == item_edit_text
     end
-    fj('.add_item_button:visible').click
-    wait_for_ajaximations
-    tag = ContentTag.last
-    module_item = f("#context_module_item_#{tag.id}")
-    module_item.should include_text(header_text)
-  end
 
-  it "should add an external url item to a module" do
-    add_new_external_item('External URL', 'www.google.com', 'Google')
-  end
+    it "should add an assignment to a module" do
+      add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+    end
 
-  it "should add an external tool item to a module" do
-    add_new_external_item('External Tool', 'www.instructure.com', 'Instructure')
-  end
+    it "should allow adding an item twice" do
+      item1 = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+      item2 = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+      item1.should_not == item2
+      @assignment.reload.context_module_tags.size.should == 2
+    end
 
-  it "should not save an invalid external tool" do
-    add_module 'Test module'
-    f('.admin-links button').click
-    f('.add_module_item_link').click
-    select_module_item('#add_module_item_select', 'External Tool')
-    find_with_jquery('.add_item_button:visible').click
-    ff('.alert.alert-error').length.should == 1
-    find_with_jquery('.alert.alert-error:visible').text.should == "An external tool can't be saved without a URL."
-  end
+    it "should rename all instances of an item" do
+      item1 = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+      item2 = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+      edit_module_item(item2) do |edit_form|
+        replace_content(edit_form.find_element(:id, 'content_tag_title'), "renamed assignment")
+      end
+      all_items = ff(".context_module_item.Assignment_#{@assignment.id}")
+      all_items.size.should == 2
+      all_items.each { |i| i.find_element(:css, '.title').text.should == 'renamed assignment' }
+      @assignment.reload.title.should == 'renamed assignment'
+      run_jobs
+      @assignment.context_module_tags.each { |tag| tag.title.should == 'renamed assignment' }
 
-  it "should hide module contents" do
-    add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
-    f('.collapse_module_link').click
-    wait_for_animations
-    f('.context_module .content').should_not be_displayed
-  end
+      # reload the page and renaming should still work on existing items
+      get "/courses/#{@course.id}/modules"
+      wait_for_ajaximations
+      item3 = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+      edit_module_item(item3) do |edit_form|
+        replace_content(edit_form.find_element(:id, 'content_tag_title'), "again")
+      end
+      all_items = ff(".context_module_item.Assignment_#{@assignment.id}")
+      all_items.size.should == 3
+      all_items.each { |i| i.find_element(:css, '.title').text.should == 'again' }
+      @assignment.reload.title.should == 'again'
+      run_jobs
+      @assignment.context_module_tags.each { |tag| tag.title.should == 'again' }
+    end
 
-  it "should add 2 modules with the first one as a prerequisite" do
+    it "should not rename every text header when you rename one" do
+      add_module('TestModule')
+
+      # add a text header
+      f('.admin-links .al-trigger').click
+      f('.add_module_item_link').click
+      select_module_item('#add_module_item_select', 'Text Header')
+      wait_for_ajaximations
+      title_input = fj('input[name="title"]:visible')
+      replace_content(title_input, 'First text header')
+      fj('.add_item_button:visible').click
+      wait_for_ajaximations
+      tag1 = ContentTag.last
+
+      # and another one
+      f('.admin-links .al-trigger').click
+      f('.add_module_item_link').click
+      select_module_item('#add_module_item_select', 'Text Header')
+      wait_for_ajaximations
+      title_input = fj('input[name="title"]:visible')
+      replace_content(title_input, 'Second text header')
+      fj('.add_item_button:visible').click
+      wait_for_ajaximations
+      tag2 = ContentTag.last
+
+      # rename the second
+      item2 = f("#context_module_item_#{tag2.id}")
+      edit_module_item(item2) do |edit_form|
+        replace_content(edit_form.find_element(:id, 'content_tag_title'), 'Renamed!')
+      end
+
+      # verify the first did not change
+      item1 = f("#context_module_item_#{tag1.id}")
+      item1.should_not include_text('Renamed!')
+    end
+
+    it "should add a quiz to a module" do
+      add_existing_module_item('#quizs_select', 'Quiz', @quiz.title)
+    end
+
+    it "should add a new quiz to a module in a specific assignment group" do
+      add_new_module_item('#quizs_select', 'Quiz', '[ New Quiz ]', "New Quiz") do
+        click_option("select[name='quiz[assignment_group_id]']", @ag2.name)
+      end
+      @ag2.assignments.length.should == 1
+      @ag2.assignments.first.title.should == "New Quiz"
+    end
+
+    it "should add a content page item to a module" do
+      add_new_module_item('#wiki_pages_select', 'Content Page', '[ New Page ]', 'New Page Title')
+    end
+
+    it "should add a discussion item to a module" do
+      add_new_module_item('#discussion_topics_select', 'Discussion', '[ New Topic ]', 'New Discussion Title')
+    end
+
+    it "should add a text header to a module" do
+      header_text = 'new header text'
+      add_module('Text Header Module')
+      f('.admin-links .al-trigger').click
+      f('.add_module_item_link').click
+      select_module_item('#add_module_item_select', 'Text Header')
+      keep_trying_until do
+        replace_content(f('#sub_header_title'), header_text)
+        true
+      end
+      fj('.add_item_button:visible').click
+      wait_for_ajaximations
+      tag = ContentTag.last
+      module_item = f("#context_module_item_#{tag.id}")
+      module_item.should include_text(header_text)
+    end
+
+    it "should add an external url item to a module" do
+      add_new_external_item('External URL', 'www.google.com', 'Google')
+    end
+
+    it "should add an external tool item to a module" do
+      add_new_external_item('External Tool', 'www.instructure.com', 'Instructure')
+    end
+
+    it "should not save an invalid external tool" do
+      add_module 'Test module'
+      f('.admin-links .al-trigger').click
+      f('.add_module_item_link').click
+      select_module_item('#add_module_item_select', 'External Tool')
+      find_with_jquery('.add_item_button:visible').click
+      ff('.alert.alert-error').length.should == 1
+      find_with_jquery('.alert.alert-error:visible').text.should == "An external tool can't be saved without a URL."
+    end
+
+    it "should hide module contents" do
+      add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+      f('.collapse_module_link').click
+      wait_for_animations
+      f('.context_module .content').should_not be_displayed
+    end
+
+    it "should add 2 modules with the first one as a prerequisite" do
       first_module_name = 'First Module'
       second_module_name = 'Second Module'
       add_module(first_module_name)
@@ -571,223 +597,223 @@ describe "context_modules" do
       db_module = ContextModule.last
       context_module = f("#context_module_#{db_module.id}")
       driver.action.move_to(context_module).perform
-      f("#context_module_#{db_module.id} .admin-links button").click
+      f("#context_module_#{db_module.id} .admin-links .al-trigger").click
       f("#context_module_#{db_module.id} .edit_module_link").click
       f('.ui-dialog').should be_displayed
       wait_for_ajaximations
       prereq_select = fj('.criterion select')
       option = first_selected_option(prereq_select)
       option.text.should == 'the module, ' + first_module_name
-  end
-
-  it "should rearrange modules" do
-    m1 = @course.context_modules.create!(:name => 'module 1')
-    m2 = @course.context_modules.create!(:name => 'module 2')
-
-    refresh_page
-    sleep 2 #not sure what we are waiting on but drag and drop will not work, unless we wait
-
-    m1_img = fj('#context_modules .context_module:first-child .reorder_module_link img')
-    m2_img = fj('#context_modules .context_module:last-child .reorder_module_link img')
-    driver.action.drag_and_drop(m2_img, m1_img).perform
-    wait_for_ajax_requests
-
-    m1.reload
-    m1.position.should == 2
-    m2.reload
-    m2.position.should == 1
-  end
-
-  it "should validate locking a module item display functionality" do
-    add_form = new_module_form
-    lock_check = add_form.find_element(:id, 'unlock_module_at')
-    lock_check.click
-    wait_for_ajaximations
-    add_form.find_element(:css, 'tr.unlock_module_at_details').should be_displayed
-    lock_check.click
-    wait_for_ajaximations
-    add_form.find_element(:css, 'tr.unlock_module_at_details').should_not be_displayed
-  end
-
-  it "should properly change indent of an item with arrows" do
-    add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
-    tag = ContentTag.last
-
-    driver.execute_script("$('#context_module_item_#{tag.id} .indent_item_link').hover().click()")
-    wait_for_ajaximations
-    f("#context_module_item_#{tag.id}").should have_class('indent_1')
-
-    tag.reload
-    tag.indent.should == 1
-  end
-
-  it "should properly change indent of an item from edit dialog" do
-    add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
-    tag = ContentTag.last
-
-    driver.execute_script("$('#context_module_item_#{tag.id} .edit_item_link').hover().click()")
-    click_option("#content_tag_indent_select", "Indent 1 Level")
-    submit_form("#edit_item_form")
-    wait_for_ajaximations
-    f("#context_module_item_#{tag.id}").should have_class('indent_1')
-
-    tag.reload
-    tag.indent.should == 1
-  end
-
-  it "should still display due date and points possible after indent change" do
-    module_item = add_existing_module_item('#assignments_select', 'Assignment', @assignment2.title)
-    tag = ContentTag.last
-
-    module_item.find_element(:css, ".due_date_display").text.should_not be_blank
-    module_item.find_element(:css, ".points_possible_display").should include_text "10"
-
-    # change indent with arrows
-    driver.execute_script("$('#context_module_item_#{tag.id} .indent_item_link').hover().click()")
-    wait_for_ajaximations
-
-    module_item = f("#context_module_item_#{tag.id}")
-    module_item.find_element(:css, ".due_date_display").text.should_not be_blank
-    module_item.find_element(:css, ".points_possible_display").should include_text "10"
-
-    # change indent from edit form
-    driver.execute_script("$('#context_module_item_#{tag.id} .edit_item_link').hover().click()")
-    click_option("#content_tag_indent_select", "Don't Indent")
-    submit_form("#edit_item_form")
-    wait_for_ajaximations
-
-    module_item = f("#context_module_item_#{tag.id}")
-    module_item.find_element(:css, ".due_date_display").text.should_not be_blank
-    module_item.find_element(:css, ".points_possible_display").should include_text "10"
-  end
-
-  context "multiple overridden due dates" do
-    def create_section_override(section, due_at)
-      override = assignment_override_model(:assignment => @assignment)
-      override.set = section
-      override.override_due_at(due_at)
-      override.save!
     end
 
-    it "should indicate when course sections have multiple due dates" do
-      modules = create_modules(1, "active")
-      modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
-
-      cs1 = @course.default_section
-      cs2 = @course.course_sections.create!
-
-      create_section_override(cs1, 3.days.from_now)
-      create_section_override(cs2, 4.days.from_now)
+    it "should rearrange modules" do
+      m1 = @course.context_modules.create!(:name => 'module 1')
+      m2 = @course.context_modules.create!(:name => 'module 2')
 
       refresh_page
-      wait_for_ajaximations
+      sleep 2 #not sure what we are waiting on but drag and drop will not work, unless we wait
 
-      f(".due_date_display").text.should == "Multiple Due Dates"
+      m1_img = fj('#context_modules .context_module:first-child .reorder_module_link img')
+      m2_img = fj('#context_modules .context_module:last-child .reorder_module_link img')
+      driver.action.drag_and_drop(m2_img, m1_img).perform
+      wait_for_ajax_requests
+
+      m1.reload
+      m1.position.should == 2
+      m2.reload
+      m2.position.should == 1
     end
 
-    it "should not indicate multiple due dates if the sections' dates are the same" do
-      pending("needs to ignore base if all visible sections are overridden")
-      modules = create_modules(1, "active")
-      modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
-
-      cs1 = @course.default_section
-      cs2 = @course.course_sections.create!
-
-      due_at = 3.days.from_now
-      create_section_override(cs1, due_at)
-      create_section_override(cs2, due_at)
-
-      refresh_page
+    it "should validate locking a module item display functionality" do
+      add_form = new_module_form
+      lock_check = add_form.find_element(:id, 'unlock_module_at')
+      lock_check.click
       wait_for_ajaximations
-
-      f(".due_date_display").text.should_not be_blank
-      f(".due_date_display").text.should_not == "Multiple Due Dates"
+      add_form.find_element(:css, 'tr.unlock_module_at_details').should be_displayed
+      lock_check.click
+      wait_for_ajaximations
+      add_form.find_element(:css, 'tr.unlock_module_at_details').should_not be_displayed
     end
 
-    it "should use assignment due date if there is no section override" do
-      modules = create_modules(1, "active")
-      modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
+    it "should properly change indent of an item with arrows" do
+      add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+      tag = ContentTag.last
 
-      cs1 = @course.default_section
-      cs2 = @course.course_sections.create!
-
-      due_at = 3.days.from_now
-      create_section_override(cs1, due_at)
-      @assignment.due_at = due_at
-      @assignment.save!
-
-      refresh_page
+      driver.execute_script("$('#context_module_item_#{tag.id} .indent_item_link').hover().click()")
       wait_for_ajaximations
+      f("#context_module_item_#{tag.id}").should have_class('indent_1')
 
-      f(".due_date_display").text.should_not be_blank
-      f(".due_date_display").text.should_not == "Multiple Due Dates"
+      tag.reload
+      tag.indent.should == 1
     end
 
-    it "should only use the sections the user is restricted to" do
-      pending("needs to ignore base if all visible sections are overridden")
-      modules = create_modules(1, "active")
-      modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
+    it "should properly change indent of an item from edit dialog" do
+      add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+      tag = ContentTag.last
 
-      cs1 = @course.default_section
-      cs2 = @course.course_sections.create!
-      cs3 = @course.course_sections.create!
+      driver.execute_script("$('#context_module_item_#{tag.id} .edit_item_link').hover().click()")
+      click_option("#content_tag_indent_select", "Indent 1 Level")
+      submit_form("#edit_item_form")
+      wait_for_ajaximations
+      f("#context_module_item_#{tag.id}").should have_class('indent_1')
 
-      user_logged_in
-      @course.enroll_user(@user, 'TaEnrollment', :section => cs1, :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true).accept!
-      @course.enroll_user(@user, 'TaEnrollment', :section => cs2, :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true).accept!
+      tag.reload
+      tag.indent.should == 1
+    end
 
-      due_at = 3.days.from_now
-      create_section_override(cs1, due_at)
-      create_section_override(cs2, due_at)
-      create_section_override(cs3, due_at + 1.day) # This override should not matter
+    it "should still display due date and points possible after indent change" do
+      module_item = add_existing_module_item('#assignments_select', 'Assignment', @assignment2.title)
+      tag = ContentTag.last
 
-      refresh_page
+      module_item.find_element(:css, ".due_date_display").text.should_not be_blank
+      module_item.find_element(:css, ".points_possible_display").should include_text "10"
+
+      # change indent with arrows
+      driver.execute_script("$('#context_module_item_#{tag.id} .indent_item_link').hover().click()")
       wait_for_ajaximations
 
-      f(".due_date_display").text.should_not be_blank
-      f(".due_date_display").text.should_not == "Multiple Due Dates"
+      module_item = f("#context_module_item_#{tag.id}")
+      module_item.find_element(:css, ".due_date_display").text.should_not be_blank
+      module_item.find_element(:css, ".points_possible_display").should include_text "10"
+
+      # change indent from edit form
+      driver.execute_script("$('#context_module_item_#{tag.id} .edit_item_link').hover().click()")
+      click_option("#content_tag_indent_select", "Don't Indent")
+      submit_form("#edit_item_form")
+      wait_for_ajaximations
+
+      module_item = f("#context_module_item_#{tag.id}")
+      module_item.find_element(:css, ".due_date_display").text.should_not be_blank
+      module_item.find_element(:css, ".points_possible_display").should include_text "10"
+    end
+
+    context "multiple overridden due dates" do
+      def create_section_override(section, due_at)
+        override = assignment_override_model(:assignment => @assignment)
+        override.set = section
+        override.override_due_at(due_at)
+        override.save!
+      end
+
+      it "should indicate when course sections have multiple due dates" do
+        modules = create_modules(1, "active")
+        modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
+
+        cs1 = @course.default_section
+        cs2 = @course.course_sections.create!
+
+        create_section_override(cs1, 3.days.from_now)
+        create_section_override(cs2, 4.days.from_now)
+
+        refresh_page
+        wait_for_ajaximations
+
+        f(".due_date_display").text.should == "Multiple Due Dates"
+      end
+
+      it "should not indicate multiple due dates if the sections' dates are the same" do
+        pending("needs to ignore base if all visible sections are overridden")
+        modules = create_modules(1, "active")
+        modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
+
+        cs1 = @course.default_section
+        cs2 = @course.course_sections.create!
+
+        due_at = 3.days.from_now
+        create_section_override(cs1, due_at)
+        create_section_override(cs2, due_at)
+
+        refresh_page
+        wait_for_ajaximations
+
+        f(".due_date_display").text.should_not be_blank
+        f(".due_date_display").text.should_not == "Multiple Due Dates"
+      end
+
+      it "should use assignment due date if there is no section override" do
+        modules = create_modules(1, "active")
+        modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
+
+        cs1 = @course.default_section
+        cs2 = @course.course_sections.create!
+
+        due_at = 3.days.from_now
+        create_section_override(cs1, due_at)
+        @assignment.due_at = due_at
+        @assignment.save!
+
+        refresh_page
+        wait_for_ajaximations
+
+        f(".due_date_display").text.should_not be_blank
+        f(".due_date_display").text.should_not == "Multiple Due Dates"
+      end
+
+      it "should only use the sections the user is restricted to" do
+        pending("needs to ignore base if all visible sections are overridden")
+        modules = create_modules(1, "active")
+        modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
+
+        cs1 = @course.default_section
+        cs2 = @course.course_sections.create!
+        cs3 = @course.course_sections.create!
+
+        user_logged_in
+        @course.enroll_user(@user, 'TaEnrollment', :section => cs1, :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true).accept!
+        @course.enroll_user(@user, 'TaEnrollment', :section => cs2, :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true).accept!
+
+        due_at = 3.days.from_now
+        create_section_override(cs1, due_at)
+        create_section_override(cs2, due_at)
+        create_section_override(cs3, due_at + 1.day) # This override should not matter
+
+        refresh_page
+        wait_for_ajaximations
+
+        f(".due_date_display").text.should_not be_blank
+        f(".due_date_display").text.should_not == "Multiple Due Dates"
+      end
+    end
+
+    it "should preserve completion criteria after indent change" do
+      add_existing_module_item('#assignments_select', 'Assignment', @assignment2.title)
+      tag = ContentTag.last
+
+      # add completion criterion
+      context_module = f('.context_module')
+      driver.action.move_to(context_module).perform
+      f('.admin-links .al-trigger').click
+      f('.edit_module_link').click
+      edit_form = f('#add_context_module_form')
+      f('.add_completion_criterion_link', edit_form).click
+      wait_for_ajaximations
+      click_option('#add_context_module_form .assignment_picker', @assignment2.title, :text)
+      click_option('#add_context_module_form .assignment_requirement_picker', 'must_contribute', :value)
+      submit_form(edit_form)
+      wait_for_ajax_requests
+
+      # verify it shows up (both visually and in the template data)
+      module_item = f("#context_module_item_#{tag.id}")
+      module_item.attribute('class').split.should include 'must_contribute_requirement'
+      f('.criterion', module_item).attribute('class').split.should include 'defined'
+      driver.execute_script("return $('#context_module_item_#{tag.id} .criterion_type').text()").should == "must_contribute"
+
+      # now indent the item
+      driver.execute_script("$('#context_module_item_#{tag.id} .indent_item_link').hover().click()")
+      wait_for_ajaximations
+
+      # make sure the completion criterion was preserved
+      module_item = f("#context_module_item_#{tag.id}")
+      module_item.attribute('class').split.should include 'must_contribute_requirement'
+      f('.criterion', module_item).attribute('class').split.should include 'defined'
+      driver.execute_script("return $('#context_module_item_#{tag.id} .criterion_type').text()").should == "must_contribute"
     end
   end
-
-  it "should preserve completion criteria after indent change" do
-    add_existing_module_item('#assignments_select', 'Assignment', @assignment2.title)
-    tag = ContentTag.last
-
-    # add completion criterion
-    context_module = f('.context_module')
-    driver.action.move_to(context_module).perform
-    f('.admin-links button').click
-    f('.edit_module_link').click
-    edit_form = f('#add_context_module_form')
-    f('.add_completion_criterion_link', edit_form).click
-    wait_for_ajaximations
-    click_option('#add_context_module_form .assignment_picker', @assignment2.title, :text)
-    click_option('#add_context_module_form .assignment_requirement_picker', 'must_contribute', :value)
-    submit_form(edit_form)
-    wait_for_ajax_requests
-
-    # verify it shows up (both visually and in the template data)
-    module_item = f("#context_module_item_#{tag.id}")
-    module_item.attribute('class').split.should include 'must_contribute_requirement'
-    f('.criterion', module_item).attribute('class').split.should include 'defined'
-    driver.execute_script("return $('#context_module_item_#{tag.id} .criterion_type').text()").should == "must_contribute"
-
-    # now indent the item
-    driver.execute_script("$('#context_module_item_#{tag.id} .indent_item_link').hover().click()")
-    wait_for_ajaximations
-
-    # make sure the completion criterion was preserved
-    module_item = f("#context_module_item_#{tag.id}")
-    module_item.attribute('class').split.should include 'must_contribute_requirement'
-    f('.criterion', module_item).attribute('class').split.should include 'defined'
-    driver.execute_script("return $('#context_module_item_#{tag.id} .criterion_type').text()").should == "must_contribute"
-  end
-end
 
   context "as an observer" do
     before (:each) do
-      @course   = course(:active_all => true)
-      @student  = user(:active_all => true, :active_state => 'active')
+      @course = course(:active_all => true)
+      @student = user(:active_all => true, :active_state => 'active')
       @observer = user(:active_all => true, :active_state => 'active')
 
       @student_enrollment = @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
@@ -871,35 +897,35 @@ end
     end
   end
 
-describe "files" do
-  FILE_NAME = 'some test file'
+  describe "files" do
+    FILE_NAME = 'some test file'
 
-  before (:each) do
-    course_with_teacher_logged_in
-    #adding file to course
-    @file = @course.attachments.create!(:display_name => FILE_NAME, :uploaded_data => default_uploaded_data)
-    @file.context = @course
-    @file.save!
+    before (:each) do
+      course_with_teacher_logged_in
+      #adding file to course
+      @file = @course.attachments.create!(:display_name => FILE_NAME, :uploaded_data => default_uploaded_data)
+      @file.context = @course
+      @file.save!
+    end
+
+    it "should add a file item to a module" do
+      get "/courses/#{@course.id}/modules"
+
+      add_existing_module_item('#attachments_select', 'File', FILE_NAME)
+    end
+
+    it "should not remove the file link in a module when file is overwritten" do
+      course_module
+      @module.add_item({:id => @file.id, :type => 'attachment'})
+      get "/courses/#{@course.id}/modules"
+
+      f('.context_module_item').should include_text(FILE_NAME)
+      file = @course.attachments.create!(:display_name => FILE_NAME, :uploaded_data => default_uploaded_data)
+      file.context = @course
+      file.save!
+      Attachment.last.handle_duplicates(:overwrite)
+      refresh_page
+      f('.context_module_item').should include_text(FILE_NAME)
+    end
   end
-
-  it "should add a file item to a module" do
-    get "/courses/#{@course.id}/modules"
-
-    add_existing_module_item('#attachments_select', 'File', FILE_NAME)
-  end
-
-  it "should not remove the file link in a module when file is overwritten" do
-    course_module
-    @module.add_item({:id => @file.id, :type => 'attachment'})
-    get "/courses/#{@course.id}/modules"
-
-    f('.context_module_item').should include_text(FILE_NAME)
-    file = @course.attachments.create!(:display_name => FILE_NAME, :uploaded_data => default_uploaded_data)
-    file.context = @course
-    file.save!
-    Attachment.last.handle_duplicates(:overwrite)
-    refresh_page
-    f('.context_module_item').should include_text(FILE_NAME)
-  end
-end
 end

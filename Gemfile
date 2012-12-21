@@ -18,7 +18,7 @@ gem 'encrypted_cookie_store-instructure', '1.0.2', :require => 'encrypted_cookie
 gem 'erubis',         '2.7.0'
 gem 'ffi',            '1.1.5'
 gem 'hairtrigger',    '0.1.14'
-gem 'sass',           '3.2.1'
+gem 'sass',           '3.2.3'
 if !ONE_NINE
   gem 'fastercsv', '1.5.3'
 end
@@ -71,8 +71,8 @@ gem 'foreigner',      '0.9.2'
 gem 'crocodoc-ruby',  '0.0.1', :require => 'crocodoc'
 
 group :assets do
-  gem 'compass-rails', '1.0.2'
-  gem 'bootstrap-sass', '2.0.3.1'
+  gem 'compass-rails', '1.0.3'
+  gem 'bootstrap-sass', '2.2.1.1'
 end
 
 group :mysql do

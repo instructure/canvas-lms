@@ -40,7 +40,7 @@
   padding: 10px 0 10px 10px
   cursor: pointer
   display: table
-  +unselectable
+  +user-select(none)
   &:hover
     background: $hover-color
     .toggle-details
@@ -110,7 +110,7 @@ $ignore-col-width: 50px
     text-decoration: none
 
 .fake-link
-  color: $link_color
+  color: $linkColor
   &:hover
     text-decoration: underline
 
@@ -132,3 +132,4 @@ $dashboardIconSize: 32px
   line-height: $dashboardIconSize
   &:before
     color: #ccc
+    font-size: $dashboardIconSize

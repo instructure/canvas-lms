@@ -1,5 +1,5 @@
 {{#ifAll atLeastOnePageFetched length}}
-  <div class="headerBar">
+  <div class="headerBar clearfix">
     <div class="headerBar-right">
       {{#if options.atom_feed_url}}
         <a class="btn"
@@ -32,7 +32,7 @@
         {{/if}}</a>
       {{/if}}
     </div>
-    <div class="headerBar-left bootstrap-form form-inline index_view_filter_form">
+    <div class="headerBar-left form-inline index_view_filter_form">
       <label class="hidden-inline-text" for="searchTerm">{{#t "search_title_body_or_author"}}Search title, body, or author{{/t}}</label>
       <input id="searchTerm"
              placeholder="{{#t "search_title_body_or_author"}}Search title, body, or author{{/t}}"

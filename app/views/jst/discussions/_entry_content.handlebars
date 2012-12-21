@@ -2,19 +2,21 @@
   {{>avatar author}}
   <div class="discussion-header-content right-of-avatar">
     <div class="admin-links hide-if-collapsed">
-      <button class="al-trigger ui-button"><span class="al-trigger-inner">{{#t "manage_discussion_entry"}}Manage Discussion Entry{{/t}}</span></button>
+      <a class="al-trigger dim-till-hover" data-kyle-menu-options='{"appendMenuTo": "body"}'>
+        <i class="icon-settings standalone-icon"></i><i class="icon-mini-arrow-down standalone-icon"></i>
+        <span class="screenreader-only">{{#t "manage_discussion_entry"}}Manage Discussion Entry{{/t}}</span></a>
       <ul class="al-options">
         {{#if parent_id}}
           <li><a data-pushstate href="#entry-{{parent_id}}"><span class="ui-icon ui-icon-arrowreturnthick-1-w" />{{#t "go_to_parent"}}Go To Parent{{/t}}</a></li>
         {{else}}
-          <li><a href="#content"><span class="ui-icon ui-icon-arrowreturnthick-1-w" />{{#t "go_to_topic"}}Go To Topic{{/t}}</a></li>
+          <li><a href="#content"><i class="icon-discussion"></i> {{#t "go_to_topic"}}Go To Topic{{/t}}</a></li>
         {{/if}}
         {{#if canModerate}}
-          <li><a data-event="edit" href="#"><span class="ui-icon ui-icon-pencil" />{{#t "edit"}}Edit{{/t}}</a></li>
-          <li><a data-event="remove" href="#"><span class="ui-icon ui-icon-trash" />{{#t "delete"}}Delete{{/t}}</a></li>
+          <li><a data-event="edit" href="#"><i class="icon-edit"></i> {{#t "edit"}}Edit{{/t}}</a></li>
+          <li><a data-event="remove" href="#"><i class="icon-trash"></i> {{#t "delete"}}Delete{{/t}}</a></li>
         {{/if}}
         {{#if speedgraderUrl}}
-          <li><a href="{{speedgraderUrl}}"><span class="ui-icon ui-icon-check" />{{#t "open_in_speedgrader"}}Open in SpeedGrader{{/t}}</a></li>
+          <li><a href="{{speedgraderUrl}}"><i class="icon-check"></i> {{#t "open_in_speedgrader"}}Open in SpeedGrader{{/t}}</a></li>
         {{/if}}
       </ul>
     </div>

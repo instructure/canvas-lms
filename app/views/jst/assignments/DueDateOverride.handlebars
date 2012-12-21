@@ -1,34 +1,33 @@
-<div class="row-fluid">
-  <div class="span12">
-    <div class="due-date-override-headers">
-      <div class="section-header">
-        {{#t "overrides.for"}}
-          For
-        {{/t}}
-      </div>
-      <div class="due-date-header">
-        {{#t "overrides.due_date"}}
-          Due Date
-        {{/t}}
-      </div>
-      <div class="lock-header">
-        {{#t "overrides.available_from"}}
-          Available From
-        {{/t}}
-      </div>
-      <div class="unlock-header">
-        {{#t "until"}}
-          Until
-        {{/t}}
-      </div>
-    </div>
+<hr>
 
-    <ul class="due-date-overrides"></ul>
- 
-    <div class="due-date-override-footer">
-      <button class="btn" id="add_due_date" style="{{hiddenIf shouldHideDueDate}}">
-        <i class="icon-add"></i>{{#t "overrides.due_date"}}Due Date{{/t}}
-      </button>
-    </div>
+<div class="due-date-override-headers">
+  <div class="section-header">
+    {{#t "overrides.for"}}
+      For
+    {{/t}}
+  </div>
+  <div class="due-date-header">
+    {{#t "overrides.due_date"}}
+      Due Date
+    {{/t}}
+  </div>
+  <div class="lock-header">
+    {{#t "overrides.available_from"}}
+      Available From
+    {{/t}}
+  </div>
+  <div class="unlock-header">
+    {{#t "until"}}
+      Until
+    {{/t}}
   </div>
 </div>
+
+<ul class="due-date-overrides"></ul>
+
+<div class="due-date-override-footer">
+  <button class="btn btn-small" id="add_due_date" style="{{hiddenIf shouldHideDueDate}}">
+    <i class="icon-add"></i> {{#t "overrides.due_date"}}Due Date{{/t}}
+  </button>
+</div>
+

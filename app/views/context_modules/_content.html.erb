@@ -35,8 +35,7 @@ TEXT
   <% else %>
     <p><%= t('help.no_modules', %{No modules have been defined for this course.}) %></p>
   <% end %>
-</div><!-- no context modules message -->
-
+</div>
 <div id="context_modules_sortable_container">
   <div id="context_modules" class="<%= 'editable' if can_do(@context, @current_user, :manage_content) %>">
     <% editable = can_do(@context, @current_user, :manage_grades) || can_do(@context, @current_user, :manage_content) %>
@@ -47,88 +46,66 @@ TEXT
       <% end %>
     <% end %>
   </div>  
-</div><!-- context modules sortable container -->
-
+</div>
 <%= render :partial => 'context_modules/context_module', :object => nil %>
 <%= render :partial => 'context_modules/module_item', :object => nil %>
 <% if can_do(@context, @current_user, :manage_content) %>
   <% form_for :context_module, :url => context_url(@context, :context_context_modules_url), :html => {:id => "add_context_module_form", :style => "display: none;"} do |f| %>
     <table class="formtable">
       <tr>
-        <td>
+        <td colspan="2">
           <div class="module_name">
-            <label for="context_module[name]"><%= before_label('module_name', %{Name}) %></label>
-          </div>
-        </td><td>
-          <div class="module_name">
-            <%= f.text_field :name, :"aria-label" => t('#labels.module_name_label', %{Module Name}) %>
+            <%= f.text_field :name, :placeholder => t('module_name', %{Module Name}), :class => 'input-block-level' %>
           </div>
         </td>
-      </tr>
-
-       <tr>
+      </tr><tr>
         <td colspan="2">
           <input type="checkbox" id="unlock_module_at"/>
           <label for="unlock_module_at"><%= t('#labels.lock_module_until', %{lock module until a given date}) %></label>
         </td>
-       </tr>
-        
-       <tr class="unlock_module_at_details">
-         <td><label for="context_module[unlock_at]"><%= before_label('unlock_at', %{Unlock At}) %></label></td>
-         <td><%= f.text_field :unlock_at, :"tab-index" => 0, :class => "datetime_field", :style => "width: 125px;", :"aria-label" => t("#labels.unlock_module_at_label", %{Unlock module at}) %></td>
-       </tr>
-
-        <tr>
+      </tr><tr class="unlock_module_at_details">
+        <td>
+          <%= before_label('unlock_at', %{Unlock At}) %>
+        </td><td>
+          <%= f.text_field :unlock_at, :class => "datetime_field" %>
+        </td>
+      </tr><tr>
         <td colspan="2">
-          <div class="prerequisites_entry">
-            <!-- Jaws requires this comment to work wtf? --> 
-            <label tabindex=0>
-              <strong><%= before_label('modules.before_students_view', %{Before students can view this module}) %></strong>
-            </label>
-
-            <div style="margin: 2px 10px 5px 20px;" class="prerequisites_list">
-              <div class="no_prerequisites_message"><%= t('no_preprequisites', %{No prerequisites defined}) %></div>
-              <div class="criteria_list" style="display: none;">
+        <div class="prerequisites_entry">
+          <b><%= before_label('modules.before_students_view', %{Before students can view this module}) %></b>
+          <div class="prerequisites_list">
+            <div class="no_prerequisites_message"><%= t('no_preprequisites', %{No prerequisites defined}) %></div>
+            <div class="criteria_list" style="display: none;">
             </div>
-
-            <div id="criterion_blank" class="criterion" style="display: none;">
+            <div id="criterion_blank" class="criterion clearfix" style="display: none;">
               <div style="float: left">
                 <span class="prereq_desc"><%= t('must_complete_prerequisites', %{They must complete}) %></span>
                 <span class="option">
                 </span>
               </div>
-
               <div style="float: right;">
-                <a href="#" class="delete_criterion_link"><i class="icon-end standalone-icon"></i><span class="screen-reader-text">Delete</span></a>
+                <a href="#" class="delete_criterion_link dim-till-hover"><i class="icon-end standalone-icon" title="Delete"></i></a>
               </div>
-
               <div class="clear"></div>
             </div>
-
             <div style="font-size: 0.9em;">
               <a href="#" class="add_prerequisite_link icon-add"><%= t('links.add_prerequisite', %{Add prerequisite}) %></a>
             </div>
           </div>
-          </div>
-
-          <div class="completion_entry">
-            <!-- This comment needs to be here for Jaws wtf? -->
-            <label tabindex=0>
-              <strong><%= before_label('module_complete_when', %{This module is complete when}) %></strong>
-            </label>
-
-            <div style="margin: 2px 10px 5px 20px;" class="completion_criteria_list">
-              <div class="no_items_message"><%= t('prerequisites_need_item', %{You'll need to add items before you can specify how a user will complete this module}) %></div>
-              <div class="no_criteria_message" style="display: none;"><%= t('no_requirements', %{No requirements defined}) %></div>
-              <div class="criteria_list" style="display: none;">
-              </div>
-              <div style="font-size: 0.9em;">
-                <a href="#" class="add_completion_criterion_link icon-add"><%= t('links.add_requirement', %{Add requirement}) %></a>
-              </div>
+        </div>
+        <div class="completion_entry">
+          <b><%= before_label('module_complete_when', %{This module is complete when}) %></b>
+          <div class="completion_criteria_list">
+            <div class="no_items_message"><%= t('prerequisites_need_item', %{You'll need to add items before you can specify how a user will complete this module}) %></div>
+            <div class="no_criteria_message" style="display: none;"><%= t('no_requirements', %{No requirements defined}) %></div>
+            <div class="criteria_list" style="display: none;">
+            </div>
+            <div style="font-size: 0.9em;">
+              <a href="#" class="add_completion_criterion_link icon-add"><%= t('links.add_requirement', %{Add requirement}) %></a>
             </div>
           </div>
-
-        </td>
+        </div>
+      </td>
     </tr><tr>
         <td colspan="2">
           <%= f.check_box :require_sequential_progress, :id => "require_sequential_progress" %>
@@ -144,7 +121,6 @@ TEXT
       </td>
     </tr>
   </table>
-
   <% end %>
   <div id="add_module_prerequisite_dialog" style="display: none;">
     <span class="context_module_id" style="display: none;">&nbsp;</span>
@@ -302,7 +278,7 @@ TEXT
 <div style="display: none;">
   <a href="<%= context_url(@context, :progressions_context_context_modules_url) %>" class="progression_list_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_context_modules_assignment_info_url) %>" class="assignment_info_url">&nbsp;</a>
-  <select id="module_list" aria-label="<%= t("labels.module_list", "They must complete")%>" >
+  <select id="module_list">
     <option value="">[ <%= t('select_module.instructions', %{Select Module}) %> ]</option>
     <% @modules.each do |m| %>
       <option value="<%= m.id %>" class="context_module_option context_module_<%= m.id %>"><%= t 'select_module.name', 'the module, %{module}', :module => m.name %></option>
@@ -317,12 +293,12 @@ TEXT
   <div id="completion_criterion_option" class="completion_criterion_option">
     <% ot 'criterion_for_assignment', 'For %{assignment} users must %{select_criterion}', :assignment => capture { %>
     <span style="padding: 0 4px;">
-      <select class="id assignment_picker" aria-label="<%= t("labels.assignment_picker", "For") %>">
+      <select class="id assignment_picker">
       </select>
     </span>
     <% }, :select_criterion => capture { %>
     <span style="padding: 0 4px;">
-      <select class="type assignment_requirement_picker" aria-label="<%= t("labels.assignment_requirement_picker", "users must") %>">
+      <select class="type assignment_requirement_picker">
         <option class="any" value="must_view"><%= t('requirements.must_view', %{view the item}) %></option>
         <option class="assignment wiki_page discussion_topic" value="must_contribute"><%= t('requirements.must_contribute', %{contribute to the page}) %></option>
         <option class="assignment quiz" value="must_submit"><%= t('requirements.must_submit', %{submit the assignment}) %></option>

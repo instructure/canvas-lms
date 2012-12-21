@@ -17,18 +17,10 @@ javascripts:
 
 stylesheets:
   common:
-    - public/stylesheets/compiled/g_reset.css
     - public/stylesheets/compiled/g_base.css
     - public/stylesheets/static/mediaelementplayer.css
     - public/stylesheets/compiled/g_instructure.css
-    - public/stylesheets/compiled/ellipsis.css
-    - public/stylesheets/compiled/g_util_misc.css
-    - public/stylesheets/compiled/g_util_fancy_links.css
-    - public/stylesheets/compiled/g_util_inst_tree.css
-    - public/stylesheets/compiled/g_util_chevron_crumbs.css
-    - public/stylesheets/compiled/g_util_ui_listview.css
     - public/stylesheets/compiled/g_assignments.css
-    - public/stylesheets/compiled/g_content_imports.css
     - public/stylesheets/compiled/g_context_inbox.css
     - public/stylesheets/compiled/g_groups.css
     - public/stylesheets/compiled/g_media_comments.css
@@ -45,11 +37,6 @@ stylesheets:
     - public/stylesheets/compiled/print.css
   context_modules: 
     - public/stylesheets/compiled/context_modules.css
-  collection_item_save:
-    - public/stylesheets/compiled/collection_item_save.css
-  collections_app:
-    - public/stylesheets/compiled/views/KollectionItems/ShowView.css
-    - public/stylesheets/compiled/views/CommentsView.css
   dashboard:
     - public/stylesheets/compiled/dashboard_messages.css
     - public/stylesheets/compiled/dashboard_activity.css
@@ -75,7 +62,6 @@ stylesheets:
     - public/stylesheets/static/calendar.css
   calendar2:
     - public/stylesheets/compiled/fullcalendar.css
-    - public/stylesheets/compiled/Calendar.css
     - public/stylesheets/compiled/mini_calendar.css
     - public/stylesheets/compiled/calendar/sidebar.css
     - public/stylesheets/compiled/calendar/scheduler.css
@@ -97,10 +83,7 @@ stylesheets:
     - public/stylesheets/compiled/message_students.css
   gradebook2:
     - public/stylesheets/compiled/message_students.css
-    - public/stylesheets/compiled/submissionDetailsDialog.css
-    - public/stylesheets/compiled/AssignmentDetailsDialog.css
     - public/stylesheets/compiled/gradebook2.css
-    - public/stylesheets/compiled/assignment_group_weights_dialog.css
   attendance:
     - public/stylesheets/compiled/attendance.css
   quizzes:
@@ -132,9 +115,6 @@ stylesheets:
     - public/stylesheets/compiled/page_views.css
   prior_users:
     - public/stylesheets/compiled/prior_users.css
-  popup:
-    - public/stylesheets/compiled/g_reset.css
-    - public/stylesheets/compiled/popup/main.css
   reports:
     - public/stylesheets/compiled/reports.css
   statistics:

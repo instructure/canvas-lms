@@ -100,7 +100,7 @@
   padding: 1px 6px
 
 #refresh_calendar_link
-  +accessible_text_replacement
+  +hide_text
   width: 20px
   height: 20px
   float: right
@@ -148,6 +148,7 @@
 .event-details-header,
 .event-details-content,
 .event-details-footer
+  +clearfix
   padding: 10px 20px
   border-bottom: 1px solid #eee
   word-wrap: normal
@@ -180,7 +181,7 @@
 
 /*replicate button styles to work for fullcalendar */
 .calendar .fc-button
-  +unselectable
+  +user-select(none)
   padding: $buttonPadding
 
   //these are just ui-state-default colors
@@ -203,16 +204,12 @@
   &.fc-state-disabled
     opacity: 0.7 // purposely not handling ie8 because having transparency makes it  look weird
   .fc-button-content
-    color: $button-text-color
+    color: $textColor
     text-shadow: #fff 0 1px 1px
   &.fc-corner-left
     +border-left-radius(4px)
   &.fc-corner-right
-    +border-right-radius($buttonset-border-radius)
-
-#delete_event_dialog
-  textarea
-    width: 100%
+    +border-right-radius(4px)
 
 #edit_appt_calendar_event_form
   p

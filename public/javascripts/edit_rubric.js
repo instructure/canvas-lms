@@ -30,7 +30,8 @@ define([
  'jquery.loadingImg' /* loadingImage */,
  'jquery.templateData' /* fillTemplateData, getTemplateData */,
  'vendor/jquery.ba-tinypubsub',
- 'vendor/jquery.scrollTo' /* /\.scrollTo/ */
+ 'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+ 'compiled/jquery/fixDialogButtons'
 ], function(I18n, changePointsPossibleToMatchRubricDialog, $, _) {
 
   var rubricEditing = {
@@ -407,6 +408,7 @@ define([
 
     $("#rubrics")
     .delegate(".long_description_link", 'click', function(event) {
+      console.log('fart');
       event.preventDefault();
       var editing    = $(this).parents(".rubric").hasClass('editing'),
           $criterion = $(this).parents(".criterion"),
@@ -422,8 +424,7 @@ define([
         .dialog({
           title: I18n.t('titles.criterion_long_description', "Criterion Long Description"),
           width: 400
-        })
-        .find("textarea:visible:first").focus().select();
+        }).fixDialogButtons().find("textarea:visible:first").focus().select();
 
     })
     .delegate(".find_rubric_link", 'click', function(event) {

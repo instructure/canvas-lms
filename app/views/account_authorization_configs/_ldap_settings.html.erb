@@ -14,8 +14,8 @@
   <table class="formtable" style="margin-left: 20px;">
     <%= render :partial => 'ldap_timeout_error', :locals => { :account_config => @ldap_configs[0] } %>
     <tr>
-      <th><%= before_label(t(:auth_type_label, "Type")) %></th>
-      <th><%= t :setting_type_ldap, 'LDAP' %></th>
+      <th style="text-align: left"><%= before_label(t(:auth_type_label, "Type")) %></th>
+      <th style="text-align: left"><%= t :setting_type_ldap, 'LDAP' %></th>
     </tr>
     <% fields_for @ldap_configs[0], :index => 0 do |f| %>
       <%= f.hidden_field :disabled, :value => '0' %>

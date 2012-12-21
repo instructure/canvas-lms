@@ -63,8 +63,8 @@
           </a>
         </li>
         <li>
-          <input type="checkbox" id="appointment-blocks-participant-visibility-button" name="participant_visibility" value="1" />
-          <label for="appointment-blocks-participant-visibility-button">Allow students to see who has signed up for time slots.</label>
+          
+          <label for="appointment-blocks-participant-visibility-button"><input type="checkbox" id="appointment-blocks-participant-visibility-button" name="participant_visibility" value="1" /> Allow students to see who has signed up for time slots.</label>
         </li>
         <li>
           <input type="checkbox" id="max-per-student-option" name="max_appointments_per_participant_option" value="1">
@@ -80,6 +80,6 @@
   </div>
   <div class="details-wrapper">
     <b>Details:</b><br />
-    <textarea name="description" style="width: 100%">{{appointment_group.description}}</textarea>
+    <textarea name="description" class="input-block-level">{{appointment_group.description}}</textarea>
   </div>
 </form>

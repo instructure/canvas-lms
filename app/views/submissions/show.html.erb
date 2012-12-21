@@ -100,7 +100,7 @@
   <% if @assignment.rubric_association %>
     <% @visible_rubric_assessments ||= [] %>
   <div id="rubric_holder" style="position: absolute; right: 0px; padding: 5px; background-color: #fff; border: 1px solid #aaa; border-right-width: 0; display: none;">
-    <button type="button" class="button-secondary hide_rubric_link" style="float: right; margin-right:0 !important;"><%= image_tag("delete_circle.png") %></button>
+    <button type="button" class="btn button-secondary hide_rubric_link" style="float: right; margin-right:0 !important;"><%= image_tag("delete_circle.png") %></button>
     <div id="rubric_assessments_list" style="text-align: right; margin-bottom: 5px; <%= hidden if @visible_rubric_assessments.empty? %>">
       <%= before_label('show_assessment_by', 'Show Assessment By') %>
       <select id="rubric_assessments_select">
@@ -141,7 +141,7 @@
       <div style="background-color: #fff;">
         <a href="#" class="comments_link" style="display: none; <%= 'font-weight: bold;' unless @submission.submission_comments.empty? %>">Comments <% unless @submission.submission_comments.empty? %>(<%= @submission.submission_comments.length %>)<% end %></a>
         <div class="comments" style="border-left: 2px solid #ccc; height: 300px; overflow: auto; background-color: #f0f0f0;">
-          <button type="button" class="button-secondary cancel_comment_button" style="display: none; float: right; margin-right:0 !important;"><%= image_tag("delete_circle.png") %></button>
+          <button type="button" class="btn button-secondary cancel_comment_button" style="display: none; float: right; margin-right:0 !important;"><%= image_tag("delete_circle.png") %></button>
           <div class="comment_list" aria-live="polite" style="padding: 10px; clear:right;">
             <% unless can_do(@submission, @current_user, :read_grade) %>
               <% if @assignment.muted? %>

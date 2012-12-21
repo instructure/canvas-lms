@@ -520,8 +520,7 @@ define [
         (updateSectionBeingShownText = =>
           $('#section_being_shown').html(if @sectionToShow then @sections[@sectionToShow].name else allSectionsText)
         )()
-        $('#section_to_show').after($sectionToShowMenu).show().kyleMenu
-          buttonOpts: {icons: {primary: "ui-icon-sections", secondary: "ui-icon-droparrow"}}
+        $('#section_to_show').after($sectionToShowMenu).show().kyleMenu()
         $sectionToShowMenu.bind 'menuselect', (event, ui) =>
           @sectionToShow = Number($sectionToShowMenu.find('[aria-checked="true"] input[name="section_to_show_radio"]').val()) || undefined
           userSettings[ if @sectionToShow then 'contextSet' else 'contextRemove']('grading_show_only_section', @sectionToShow)
@@ -551,11 +550,7 @@ define [
         @arrangeColumnsBy(thingToArrangeBy)
       @arrangeColumnsBy('assignment_group')
 
-      $('#gradebook_settings').show().kyleMenu
-        buttonOpts:
-          icons:
-            primary: "ui-icon-cog", secondary: "ui-icon-droparrow"
-          text: false
+      $('#gradebook_settings').show().kyleMenu()
 
       $upload_modal = null
       $settingsMenu.find('.gradebook_upload_link').click (event) =>
@@ -564,7 +559,7 @@ define [
           locals =
             download_gradebook_csv_url: "#{@options.context_url}/gradebook.csv"
             action: "#{@options.context_url}/gradebook_uploads"
-            authenticityToken: $("#ajax_authenticity_token").text()
+            authenticityToken: ENV.AUTHENTICITY_TOKEN
           $upload_modal = $(gradebook_uploads_form(locals))
             .dialog
               bgiframe: true
@@ -573,9 +568,6 @@ define [
               width: 720
               resizable: false
             .fixDialogButtons()
-            .delegate '#gradebook-upload-help-trigger', 'click', ->
-              $(this).hide()
-              $('#gradebook-upload-help').show()
         $upload_modal.dialog('open')
 
       $settingsMenu.find('.student_names_toggle').click (e) ->

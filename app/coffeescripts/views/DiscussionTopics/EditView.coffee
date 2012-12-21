@@ -20,7 +20,7 @@ define [
 
     tagName: 'form'
 
-    className: 'form-horizontal bootstrap-form'
+    className: 'form-horizontal no-margin'
 
     dontRenableAfterSaveSuccess: true
 

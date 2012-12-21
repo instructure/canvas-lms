@@ -1,5 +1,4 @@
 @import "environment.sass";
-@import "blue/mixins";
 
 #groups {
 
@@ -35,14 +34,14 @@
   }
 
   .group_header {
+    @include clearfix;
+    @include buttonBackground($listViewHeaderBackgroundLight, $listViewHeaderBackground, $gray);
     border-bottom: 1px solid $listBorderColor;
-    font-weight: bold;
     padding: 4px 12px;
-
-    $shadow: inset 0 1px 0 rgba(white, 0.75);
-
-    @include bevelText;
-    @include buttonBackground($listViewHeaderBackgroundLight, $listViewHeaderBackground);
+    text-shadow: none;
+    .name {
+      font-weight: bold;
+    }
   }
 
   .assignment_list {
@@ -103,8 +102,11 @@
     .points_uneditable .points    { display: none; }
     .points_uneditable .no_points { display: inline; }
 
-    button        { margin-bottom: 4px; }
     label, select { font-size: 0.8em; }
+    
+    .input-append {
+      display: inline;
+    }
   }
 }
 
@@ -112,6 +114,8 @@
   .group_assignment {
     min-height: 40px;
     border-bottom: 1px solid #cccccc;
+    @include clearfix;
+    padding-bottom: 3px;
     &.last {
       border-bottom-width: 0px;
     }
@@ -345,4 +349,8 @@
     color: $right_side_text_color;
     padding-left: 5px;
   }
+}
+
+table.full_assignment_table {
+  select { width: 140px !important; }
 }

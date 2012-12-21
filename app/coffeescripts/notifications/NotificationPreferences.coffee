@@ -19,22 +19,22 @@ define [
       # Define the buttons for display. The 'code' must match up to the Notification::FREQ_* constants.
       @buttonData = [
         code: 'immediately'
-        image: 'ui-icon-check'
+        icon: 'icon-check'
         text: I18n.t('frequencies.immediately', 'ASAP')
         title: I18n.t('frequencies.title.right_away', 'Notify me right away')
       ,
         code: 'daily'
-        image: 'ui-icon-clock'
+        icon: 'icon-clock'
         text: I18n.t('frequencies.daily', 'Daily')
         title: I18n.t('frequencies.title.daily', 'Send daily summary')
       ,
         code: 'weekly'
-        image: 'ui-icon-calendar'
+        icon: 'icon-calendar-month'
         text: I18n.t('frequencies.weekly', 'Weekly')
         title: I18n.t('frequencies.title.weekly', 'Send weekly summary')
       ,
         code: 'never'
-        image: 'ui-icon-close'
+        icon: 'icon-x'
         text: I18n.t('frequencies.never', 'Never')
         title: I18n.t('frequencies.title.never', 'Do not send me anything')
       ]
@@ -43,7 +43,6 @@ define [
       @channels   = @options.channels || []
       @categories = @options.categories || []
       @policies   = @options.policies || []
-      @touch      = @options.touch == true
 
       # Give each channel a 'name'
       for c in @channels
@@ -148,7 +147,7 @@ define [
     # Build the HTML notifications table.
     buildTable: =>
       $('#notification-preferences').append(notificationPreferencesTemplate(
-        touch: @touch,
+        touch: INST.browser.touch,
         channels: @channels,
         eventGroups: @communicationEventGroups()
         ))
@@ -175,7 +174,7 @@ define [
       selected = @findButtonDataForCode(selectedValue)
       selected['active'] = true
 
-      policyCellTemplate(touch: @touch, category: category.category, channelId: channelId, selected: selected, allButtons: @buttonData)
+      policyCellTemplate(touch: INST.browser.touch, category: category.category, channelId: channelId, selected: selected, allButtons: @buttonData)
 
     # Record and display the value for the cell.
     saveNewCellValue: ($cell, value) =>
@@ -199,33 +198,28 @@ define [
 
     # Setup event bindings.
     setupEventBindings: =>
-      # Setup the individual buttons as a jQueryUI button with text hidden and using the desired image.
-      for data in @buttonData
-        $(".#{data['code']}-button").button
-          text: false
-          icons:
-            primary: data['image']
 
       $notificationPrefs = $('#notification-preferences')
 
       # Setup the buttons as a buttonset
       $notificationPrefs.find('.event-option-buttons').buttonset()
 
-      # Catch mouse over and auto-toggle for faster interactions.
-      $notificationPrefs.find('.notification-prefs-table.no-touch').on
-        mouseenter: (e) =>
-          @cellButtonsShow($(e.currentTarget), false)
-        mouseleave: (e) =>
-          @cellButtonsHide($(e.currentTarget), false)
-        , '.comm-event-option'
+      unless INST.browser.touch
+        # Catch mouse over and auto-toggle for faster interactions.
+        $notificationPrefs.find('.notification-prefs-table').on
+          mouseenter: (e) =>
+            @cellButtonsShow($(e.currentTarget), false)
+          mouseleave: (e) =>
+            @cellButtonsHide($(e.currentTarget), false)
+          , '.comm-event-option'
 
-      # Setup current selection click event to display selection changing buttons
-      $notificationPrefs.find('.notification-prefs-table.no-touch a.change-selection').on 'click', (e) =>
-        # Hide any/all other showing buttons
-        e.preventDefault()
-        cell = $(e.currentTarget).closest('td')
-        @hideButtonsExceptCell(cell)
-        @cellButtonsShow(cell, true)
+        # Setup current selection click event to display selection changing buttons
+        $notificationPrefs.find('.notification-prefs-table a.change-selection').on 'click', (e) =>
+          # Hide any/all other showing buttons
+          e.preventDefault()
+          cell = $(e.currentTarget).closest('td')
+          @hideButtonsExceptCell(cell)
+          @cellButtonsShow(cell, true)
 
       # When selection button is clicked, the hidden radio button is changed. React to that change. Hide the control and focus the selection
       $notificationPrefs.find('.frequency').on 'change', (e) =>

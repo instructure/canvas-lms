@@ -13,11 +13,10 @@
   <span class="count"{{#if hideCount}} style="display:none"{{/if}}>{{message_count}}</span>
   <p>{{lastMessage}}</p>
   <div class="admin-links">
-    <button class="al-trigger ui-button"
-            data-kyle-menu-options='{"appendMenuTo": "#menu-wrapper"}'>
-      <span class="al-trigger-inner">{{#t "inbox_actions_description"}}Actions{{/t}}</span>
+    <button class="al-trigger btn btn-mini" data-kyle-menu-options='{"appendMenuTo": "#menu-wrapper"}'>
+      <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+      <div class="screenreader-only">{{#t "inbox_actions_description"}}Actions{{/t}}</div>
     </button>
-
     <ul class="al-options" data-id="{{id}}">
       <li><a href="/conversations/{{id}}?conversation[workflow_state]=unread"
              class="action_mark_as_unread standard_action">

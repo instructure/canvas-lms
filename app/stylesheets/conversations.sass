@@ -14,6 +14,14 @@ body
   .spinner
     width: 50px
 #actions
+  /* start html5BP clearfix (because Canvas' .clearfix hides the dropdown)
+  *zoom: 1
+  &:before, &:after
+    display: table
+    content: ""
+  &:after
+    clear: both
+  /* end clearfix */
   min-height: 42px
   background: #dddde1 url(/images/messages/actions-bg.png) 0 0 repeat-x
   border-top: 1px solid #eaeaec
@@ -502,6 +510,8 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
       position: absolute
       right: 9999px
       top: 5px
+      min-width: 50px
+      text-align: right
       > a
         display: block
         background: transparent url(/images/messages/actions-dd-sprite.png) 0 0 no-repeat
