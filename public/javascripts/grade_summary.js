@@ -20,13 +20,14 @@ define([
   'INST' /* INST */,
   'i18n!gradebook',
   'jquery' /* $ */,
+  'compiled/grade_calculator',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_forms' /* getFormData */,
   'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar */,
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'media_comments' /* mediaComment, mediaCommentThumbnail */
-], function(INST, I18n, $) {
+], function(INST, I18n, $, GradeCalculator) {
 
   function setGroupData(groups, $group) {
     if($group.length === 0) { return; }
@@ -216,7 +217,7 @@ define([
     $(".student_assignment.final_grade").find(".grade").text(finalGrade);
 
     if(window.grading_scheme) {
-      $(".final_letter_grade .grade").text(INST.GradeCalculator.letter_grade(grading_scheme, finalGrade));
+      $(".final_letter_grade .grade").text(GradeCalculator.letter_grade(grading_scheme, finalGrade));
     }
 
     $(".revert_all_scores").showIf($("#grades_summary .revert_score_link").length > 0);

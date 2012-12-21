@@ -90,7 +90,6 @@ define [
       if assignment.due_at && submission.submitted_at
         classes.push('late') if submission.submission_type isnt 'online_quiz' && (submission.submitted_at.timestamp > assignment.due_at.timestamp)
         classes.push('late') if submission.submission_type is 'online_quiz' && ((submission.submitted_at.timestamp - assignment.due_at.timestamp) > 60)
-      classes.push('dropped') if submission.drop
       classes.push('ungraded') if ''+assignment.submission_types is "not_graded"
       classes.push('muted') if assignment.muted
       classes.push(submission.submission_type) if submission.submission_type

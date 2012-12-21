@@ -19,6 +19,7 @@
 class GradebooksController < ApplicationController
   include ActionView::Helpers::NumberHelper
   include GradebooksHelper
+  include Api::V1::AssignmentGroup
 
   before_filter :require_context, :except => :public_feed
   batch_jobs_in_actions :only => :update_submission, :batch => { :priority => Delayed::LOW_PRIORITY }
@@ -177,6 +178,7 @@ class GradebooksController < ApplicationController
             @enrollments_hash = Hash.new{ |hash,key| hash[key] = [] }
             @context.enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.each{ |e| @enrollments_hash[e.user_id] << e }
             @students = @context.students_visible_to(@current_user).order_by_sortable_name.uniq
+            js_env :assignment_groups => assignment_groups_json
             if params[:view] == "simple"
               @headers = false
               render :action => "show_simple"
@@ -443,4 +445,10 @@ class GradebooksController < ApplicationController
     end
   end
   protected :submissions_by_assignment
+
+  def assignment_groups_json
+    @context.assignment_groups.active.map { |g|
+      assignment_group_json(g, @current_user, session, ['assignments'])
+    }
+  end
 end
