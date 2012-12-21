@@ -60,7 +60,7 @@ describe GradebookImporter do
           'Student,ID,Section,Assignment 1,Final Score',
           '"Blend, Bill",6,My Course,-,',
           'Points Possible,,,10,',
-          'Muted assignments do not impact Current and Final score columns,,,Muted,',
+          ', ,,Muted,',
           '"Farner, Todd",4,My Course,-,')
       @gi.assignments.length.should == 1
       @gi.assignments.first.points_possible.should == 10

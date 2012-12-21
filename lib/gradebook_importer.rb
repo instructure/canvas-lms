@@ -60,9 +60,7 @@ class GradebookImporter
         next
       end
 
-      if row[0] =~ /Muted assignments do not impact Current and Final score columns/
-        next
-      end
+      next if row.compact.all? { |c| c.strip =~ /^(Muted|)$/i }
 
       @students << process_student(row)
       process_submissions(row, @students.last)

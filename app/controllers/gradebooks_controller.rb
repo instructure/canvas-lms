@@ -200,7 +200,6 @@ class GradebooksController < ApplicationController
         }
         format.csv {
           cancel_cache_buster
-          Enrollment.recompute_final_score_if_stale @context
           ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
             send_data(
               @context.gradebook_to_csv(:include_sis_id => @context.grants_rights?(@current_user, session, :read_sis, :manage_sis).values.any?, :user => @current_user),

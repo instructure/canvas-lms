@@ -1398,7 +1398,7 @@ class Course < ActiveRecord::Base
       #Possible muted row
       if assignments.any?(&:muted)
         #This is is not translated since we look for this exact string when we upload to gradebook.
-        row = ['Muted assignments do not impact Current and Final score columns', '', '']
+        row = ['', '', '']
         row.concat(['', '']) if options[:include_sis_id]
         row.concat(assignments.map{|a| single ? [(a.muted ? 'Muted': ''), ''] : (a.muted ? 'Muted' : '')})
         row.concat(['', ''])
@@ -1433,9 +1433,14 @@ class Course < ActiveRecord::Base
         end
         row << student_section
         row.concat(student_submissions)
-        row.concat([student_enrollment.computed_current_score, student_enrollment.computed_final_score])
+
+        calc = GradeCalculator.new([student.id],
+                                   student_enrollment.course_id,
+                                   :ignore_muted => false)
+        current_score, final_score = calc.compute_scores.first
+        row.concat [current_score, final_score]
         if self.grading_standard_enabled?
-          row.concat([score_to_grade(student_enrollment.computed_final_score)])
+          row.concat([score_to_grade(final_score)])
         end
         csv << row.flatten
       end
