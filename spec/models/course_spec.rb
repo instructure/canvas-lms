@@ -787,7 +787,7 @@ describe Course, "gradebook_to_csv" do
       rows[0][2].should == 'SIS User ID'
       rows[0][3].should == 'SIS Login ID'
       rows[0][4].should == 'Section'
-      rows[1][0].should == 'Muted assignments do not impact Current and Final score columns'
+      rows[1][0].should == ''
       rows[1][5].should == 'Muted'
       rows[1][6].should == ''
       rows[2][2].should == ''

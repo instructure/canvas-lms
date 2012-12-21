@@ -18,7 +18,9 @@
 
 class GradeCalculator
   
-  def initialize(user_ids, course_id)
+  def initialize(user_ids, course_id, opts = {})
+    opts = opts.reverse_merge(:ignore_muted => true)
+
     @course_id = course_id
     @course = Course.find(course_id)
     @groups = @course.assignment_groups.active
@@ -26,21 +28,28 @@ class GradeCalculator
     @user_ids = Array(user_ids).map(&:to_i)
     @current_updates = []
     @final_updates = []
+    @ignore_muted = opts[:ignore_muted]
   end
   
   def self.recompute_final_score(user_ids, course_id)
     calc = GradeCalculator.new user_ids, course_id
-    calc.recompute_and_save_scores
+    calc.compute_scores
+    calc.save_scores
   end
-  
+
   # recomputes the scores and saves them to each user's Enrollment
-  def recompute_and_save_scores
+  def compute_scores
     all_submissions = @course.submissions.for_user(@user_ids).to_a
-    @user_ids.each do |user_id|
+    @user_ids.map do |user_id|
       submissions = all_submissions.select { |submission| submission.user_id == user_id }
-      calculate_current_score(user_id, submissions)
-      calculate_final_score(user_id, submissions)
+      current = calculate_current_score(user_id, submissions)
+      final = calculate_final_score(user_id, submissions)
+      [current, final]
     end
+  end
+
+  def save_scores
+    raise "Can't save scores when ignore_muted is set" unless @ignore_muted
 
     Course.update_all({:updated_at => Time.now.utc}, {:id => @course.id})
     if !@current_updates.empty? || !@final_updates.empty?
@@ -58,6 +67,7 @@ class GradeCalculator
     group_sums = create_group_sums(submissions)
     score = calculate_total_from_group_scores(group_sums)
     @current_updates << "WHEN user_id=#{user_id} THEN #{score || "NULL"}"
+    score
   end
 
   # The final score for the class, so unsubmitted assignments count as zeros
@@ -65,6 +75,7 @@ class GradeCalculator
     group_sums = create_group_sums(submissions, false)
     score = calculate_total_from_group_scores(group_sums, false)
     @final_updates << "WHEN user_id=#{user_id} THEN #{score || "NULL"}"
+    score
   end
  
   # returns information about assignments groups in the form:
@@ -92,7 +103,7 @@ class GradeCalculator
         s = submissions_by_assignment_id[a.id]
 
         # ignore submissions for muted assignments
-        s = nil if a.muted?
+        s = nil if @ignore_muted && a.muted?
 
         {
           :assignment => a,
