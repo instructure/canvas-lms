@@ -76,6 +76,7 @@ class Course < ActiveRecord::Base
   has_many :prior_enrollments, :class_name => 'Enrollment', :include => [:user, :course], :conditions => "enrollments.workflow_state = 'completed'"
   has_many :prior_users, :through => :prior_enrollments, :source => :user
   has_many :students, :through => :student_enrollments, :source => :user
+  has_many :self_enrolled_students, :through => :student_enrollments, :source => :user, :conditions => "self_enrolled"
   has_many :all_students, :through => :all_student_enrollments, :source => :user
   has_many :participating_students, :through => :enrollments, :source => :user, :conditions => "enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment') and enrollments.workflow_state = 'active'"
   has_many :student_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')", :include => :user
@@ -749,7 +750,7 @@ class Course < ActiveRecord::Base
   end
 
   def self_enrollment_limit_met?
-    self_enrollment_limit && students.size >= self_enrollment_limit
+    self_enrollment_limit && self_enrolled_students.size >= self_enrollment_limit
   end
 
   def long_self_enrollment_code
