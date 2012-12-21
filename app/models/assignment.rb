@@ -184,6 +184,7 @@ class Assignment < ActiveRecord::Base
   def update_student_submissions
     submissions.graded.find_each do |submission|
       submission.grade = score_to_grade(submission.score)
+      submission.graded_at = Time.zone.now
       submission.with_versioning(:explicit => true) { submission.save! }
     end
   end
@@ -938,7 +939,7 @@ class Assignment < ActiveRecord::Base
         submission_updated = true if submission.changed?
         submission.workflow_state = "graded" if submission.score_changed? || submission.grade_matches_current_submission
         submission.group = group
-        submission.graded_at = Time.now if did_grade
+        submission.graded_at = Time.zone.now if did_grade
         previously_graded ? submission.with_versioning(:explicit => true) { submission.save! } : submission.save!
 
         unless self.rubric_association

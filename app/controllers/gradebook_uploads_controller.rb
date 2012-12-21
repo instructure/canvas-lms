@@ -111,6 +111,7 @@ class GradebookUploadsController < ApplicationController
             submission.grade = sub[:grade].to_s
             submission.score = score
             submission.grader_id = @current_user.id
+            submission.graded_at = Time.zone.now
             submission.with_versioning(:explicit => true) { submission.save! }
             submissions_updated_count += 1
             logger.info "updated #{submission.student.name} with score #{submission.score} for assignment: #{submission.assignment.title} old score was #{old_score}"
