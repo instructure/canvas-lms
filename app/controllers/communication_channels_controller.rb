@@ -258,6 +258,7 @@ class CommunicationChannelsController < ApplicationController
           if Canvas.redis_enabled? && @merge_opportunities.length == 1
             Canvas.redis.rpush('single_user_registered_new_account_stats', {:user_id => @user.id, :registered_at => Time.now.utc }.to_json)
           end
+          @user.require_acceptance_of_terms = require_terms?
           @user.attributes = params[:user]
           @pseudonym.attributes = params[:pseudonym]
           @pseudonym.communication_channel = cc
@@ -266,7 +267,7 @@ class CommunicationChannelsController < ApplicationController
           @pseudonym.require_password = true
           @pseudonym.password_confirmation = @pseudonym.password = params[:pseudonym][:password] if params[:pseudonym]
 
-          return unless @pseudonym.valid?
+          return unless @pseudonym.valid? && @user.valid?
 
           # They may have switched e-mail address when they logged in; create a CC if so
           if @pseudonym.unique_id != cc.path
@@ -362,4 +363,10 @@ class CommunicationChannelsController < ApplicationController
     @user == @current_user ||
       @user.grants_right?(@current_user, session, :manage_user_details)
   end
+
+  def require_terms?
+    # a plugin could potentially set this
+    @require_terms
+  end
+  helper_method :require_terms?
 end
