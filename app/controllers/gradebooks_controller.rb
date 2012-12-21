@@ -20,6 +20,7 @@ class GradebooksController < ApplicationController
   include ActionView::Helpers::NumberHelper
   include GradebooksHelper
   include Api::V1::AssignmentGroup
+  include Api::V1::Submission
 
   before_filter :require_context, :except => :public_feed
   batch_jobs_in_actions :only => :update_submission, :batch => { :priority => Delayed::LOW_PRIORITY }
@@ -66,16 +67,19 @@ class GradebooksController < ApplicationController
               groups_as_assignments(@groups, :out_of_final => true, :exclude_total => @context.settings[:hide_final_grade])
             @no_calculations = groups_assignments.empty?
             @assignments.concat(groups_assignments)
-            @submissions = @context.submissions.find(:all, :conditions => ['user_id = ?', @student.id], :include => [ :submission_comments, :rubric_assessments ])
-            # pre-cache the assignment group for each assignment object, and assignment for each submission object
+            @submissions = @context.submissions.all(
+              :conditions => {:user_id => @student.id},
+              :include => %w(submission_comments rubric_assessments assignment)
+            )
+            # pre-cache the assignment group for each assignment object
             @assignments.each { |a| a.assignment_group = @groups.find { |g| g.id == a.assignment_group_id } }
-            @submissions.each { |s| assignment = @assignments.find { |a| a.id == s.assignment_id }; s.assignment = assignment if assignment.present? }
             # Yes, fetch *all* submissions for this course; otherwise the view will end up doing a query for each
             # assignment in order to calculate grade distributions
             all_submissions = @context.submissions.all(:select => "submissions.assignment_id, submissions.score, submissions.grade, submissions.quiz_submission_id")
             @submissions_by_assignment = submissions_by_assignment(all_submissions)
             @unread_submission_ids = []
           end
+
           if @student == @current_user
             @courses_with_grades = @student.available_courses.select{|c| c.grants_right?(@student, nil, :participate_as_student)}
             # remember unread submissions and then mark all as read
@@ -83,6 +87,13 @@ class GradebooksController < ApplicationController
             @unread_submissions.each{ |s| s.change_read_state("read", @current_user) }
             @unread_submission_ids = @unread_submissions.map(&:id)
           end
+
+          submissions_json = @submissions.map { |s|
+            submission_json(s, s.assignment, @current_user, session)
+          }
+          js_env :submissions => submissions_json,
+                 :assignment_groups => assignment_groups_json,
+                 :group_weighting_scheme => @context.group_weighting_scheme
           format.html { render :action => 'grade_summary' }
         else
           format.html { render :action => 'grade_summary_list' }
