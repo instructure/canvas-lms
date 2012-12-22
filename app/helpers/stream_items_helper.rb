@@ -43,7 +43,7 @@ module StreamItemsHelper
           # this needs to be queried relative to the user
           user.conversation_participant(item.asset_id)
         end
-        next if participant.last_message.nil? || participant.last_author?
+        next if participant.nil? || participant.last_message.nil? || participant.last_author?
         item.data.write_attribute(:last_message, participant.last_message)
         item.data.write_attribute(:last_author, participant.last_message.author)
 
