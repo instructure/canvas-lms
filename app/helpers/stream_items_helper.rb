@@ -45,7 +45,7 @@ module StreamItemsHelper
         end
         next if participant.last_message.nil? || participant.last_author?
         item.data.write_attribute(:last_message, participant.last_message)
-        item.data.write_attribute(:last_author, item.data.last_message.try(:author))
+        item.data.write_attribute(:last_author, participant.last_message.author)
 
         # because we're cheating and just checking unread here instead of using
         # the workflow_state on the stream_item_instance, that workflow_state
