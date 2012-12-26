@@ -584,6 +584,19 @@ describe CalendarEventsApiController, :type => :integration do
         json['end_at'].should be_nil
         json['hidden'].should be_false
       end
+
+      it "should add the section name to a child event's title"  do
+        event = @course.calendar_events.build(:title => 'ohai', :child_event_data => {"0" => {:start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string}})
+        event.updating_user = @user
+        event.save!
+  
+        child_event_id = event.child_event_ids.first
+        json = api_call(:get, "/api/v1/calendar_events/#{child_event_id}",
+                        { :controller => 'calendar_events_api', :action => 'show', :id => child_event_id.to_s, :format => 'json' })
+        json.keys.sort.should eql((expected_fields + ['effective_context_code']).sort)
+        json['title'].should eql "ohai (#{@course.default_section.name})"
+        json['hidden'].should be_false
+      end
     end
   end
 
