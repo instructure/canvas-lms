@@ -21,7 +21,7 @@ class CollaborationsController < ApplicationController
   before_filter :require_collaborations_configured
   before_filter :reject_student_view_student
   include GoogleDocs
-  
+
   def require_collaborations_configured
     unless Collaboration.any_collaborations_configured?
       flash[:error] = t 'errors.not_enabled', "Collaborations have not been enabled for this Canvas site"
@@ -29,7 +29,7 @@ class CollaborationsController < ApplicationController
       return false
     end
   end
-  
+
   def index
     @collaborations = @context.collaborations.active
     if authorized_action(@context, @current_user, :read)
@@ -47,14 +47,14 @@ class CollaborationsController < ApplicationController
       }).all.uniq
     end
   end
-  
+
   def show
     @collaboration = @context.collaborations.find(params[:id])
     if authorized_action(@collaboration, @current_user, :read)
       @collaboration.touch
       if @collaboration.valid_user?(@current_user)
         @collaboration.authorize_user(@current_user)
-        log_asset_access(@collaboration, "collaborations", "other")
+        log_asset_access(@collaboration, "collaborations", "other", 'participate')
         redirect_to @collaboration.url
       elsif @collaboration.is_a?(GoogleDocsCollaboration)
         redirect_to oauth_url(:service => :google_docs, :return_to => request.url)
@@ -64,7 +64,7 @@ class CollaborationsController < ApplicationController
       end
     end
   end
-  
+
   def create
     if authorized_action(@context.collaborations.new, @current_user, :create)
       collaborators = []#[@current_user]
@@ -87,12 +87,12 @@ class CollaborationsController < ApplicationController
         else
           flash[:error] = t 'errors.create_failed', "Collaboration creation failed"
           format.html { redirect_to named_context_url(@context, :context_collaborations_url) }
-          forma.json { render :json => @collaboration.errors.to_json, :status => :bad_request }
+          format.json { render :json => @collaboration.errors.to_json, :status => :bad_request }
         end
       end
     end
   end
-  
+
   def update
     @collaboration = @context.collaborations.find(params[:id])
     if authorized_action(@collaboration, @current_user, :update)
@@ -120,7 +120,7 @@ class CollaborationsController < ApplicationController
       end
     end
   end
-  
+
   def destroy
     @collaboration = @context.collaborations.find(params[:id])
     if authorized_action(@collaboration, @current_user, :delete)

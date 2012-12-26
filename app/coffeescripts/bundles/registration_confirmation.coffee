@@ -13,15 +13,15 @@ require [
       $.each [$disambiguation_box, $registration_form, $where_to_log_in], (i, $pane) ->
         $pane.showIf $pane.is(paneToShow)
 
-    $(".button#back").click (event) ->
+    $(".btn#back").click (event) ->
       showPane($disambiguation_box)
       event.preventDefault()
 
-    $(".button#register").click (event) ->
+    $(".btn#register").click (event) ->
       showPane($registration_form)
       event.preventDefault()
 
-    $merge_link = $(".button#merge").click (event) ->
+    $merge_link = $(".btn#merge").click (event) ->
       if $merge_link.attr('href') == 'new_user_account'
         showPane($registration_form)
         event.preventDefault()

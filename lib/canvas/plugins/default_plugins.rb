@@ -190,6 +190,19 @@ if Attachment.s3_storage?
       :settings => Attachment.s3_config
   })
 end
+
+Canvas::Plugin.register('sessions', nil, {
+  :name => lambda{ t :name, 'Sessions' },
+  :description => lambda{ t :description, 'Manage session timeouts' },
+  :website => 'http://www.instructure.com',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/sessions_timeout',
+  :validator => 'SessionsValidator',
+  :settings => nil
+})
+
 Canvas::Plugin.register('assignment_freezer', nil, {
   :name => lambda{ t :name, 'Assignment Property Freezer' },
   :description => lambda{ t :description, 'Freeze Assignment Properties on Copy' },
@@ -200,6 +213,7 @@ Canvas::Plugin.register('assignment_freezer', nil, {
   :settings_partial => 'plugins/assignment_freezer_settings',
   :settings => nil
 })
+
 Canvas::Plugin.register('embedly', nil, {
   :name => lambda{ t :name, 'Embedly Integration' },
   :description => lambda{ t :description, 'Pull Embedly info for Collections' },

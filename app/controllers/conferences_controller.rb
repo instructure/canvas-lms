@@ -22,13 +22,14 @@ class ConferencesController < ApplicationController
   before_filter { |c| c.active_tab = "conferences" }
   before_filter :require_config
   before_filter :reject_student_view_student
+  before_filter :get_conference, :except => [:index, :create]
 
   def index
     @conferences = @context.web_conferences.select{|c| c.grants_right?(@current_user, session, :read) }
     if authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_CONFERENCES)
       log_asset_access("conferences:#{@context.asset_string}", "conferences", "other")
-      
+
       scope = @context.users
       if @context.respond_to?(:participating_typical_users)
         scope = @context.participating_typical_users
@@ -39,9 +40,8 @@ class ConferencesController < ApplicationController
       }).all.uniq
     end
   end
-  
+
   def show
-    get_conference
     if authorized_action(@conference, @current_user, :read)
       if params[:external_url]
         urls = @conference.external_url_for(params[:external_url], @current_user, params[:url_id])
@@ -54,7 +54,7 @@ class ConferencesController < ApplicationController
       log_asset_access(@conference, "conferences", "conferences")
     end
   end
-  
+
   def create
     if authorized_action(@context.web_conferences.new, @current_user, :create)
       params[:web_conference].try(:delete, :long_running)
@@ -78,9 +78,8 @@ class ConferencesController < ApplicationController
       end
     end
   end
-  
+
   def update
-    get_conference
     if authorized_action(@conference, @current_user, :update)
       @conference.user ||= @current_user
       members = get_new_members
@@ -102,9 +101,8 @@ class ConferencesController < ApplicationController
       end
     end
   end
-  
+
   def join
-    get_conference
     if authorized_action(@conference, @current_user, :join)
       unless @conference.valid_config?
         flash[:error] = t(:type_disabled_error, "This type of conference is no longer enabled for this Canvas site")
@@ -115,6 +113,7 @@ class ConferencesController < ApplicationController
         @conference.add_attendee(@current_user)
         @conference.restart if @conference.ended_at && @conference.grants_right?(@current_user, session, :initiate)
         log_asset_access(@conference, "conferences", "conferences", 'participate')
+        generate_new_page_view
         if url = @conference.craft_url(@current_user, session, named_context_url(@context, :context_url, :include_host => true))
           redirect_to url
         else
@@ -129,7 +128,6 @@ class ConferencesController < ApplicationController
   end
 
   def close
-    get_conference
     if authorized_action(@conference, @current_user, :close)
       if @conference.close
         render :json => @conference.to_json(:permissions => {:user => @current_user, :session => session})
@@ -140,7 +138,6 @@ class ConferencesController < ApplicationController
   end
 
   def settings
-    get_conference
     if authorized_action(@conference, @current_user, :update)
       if @conference.has_advanced_settings?
         redirect_to @conference.admin_settings_url(@current_user)
@@ -152,13 +149,12 @@ class ConferencesController < ApplicationController
   end
 
   def destroy
-    get_conference
     if authorized_action(@conference, @current_user, :delete)
       @conference.destroy
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_conferences_url) }
         format.json { render :json => @conference.to_json }
-      end      
+      end
     end
   end
 

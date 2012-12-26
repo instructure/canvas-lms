@@ -145,7 +145,7 @@ TEXT
         <% unless @account.site_admin? %>
           <fieldset>
             <legend><%= t(:quiz_ip_filters_title, "Quiz IP Address Filters")%>
-              <%= link_to(image_tag('help.png'), '#', :class => 'ip_help_link no-hover', :title => t(:quiz_ip_filters_help_tooltip, "What are Quiz IP Filters?")) %></legend>
+              <%= link_to("<i class='icon-question standalone-icon'></i>".html_safe, '#', :class => 'ip_help_link no-hover', :title => t(:quiz_ip_filters_help_tooltip, "What are Quiz IP Filters?")) %></legend>
 
             <div id="ip_filters_dialog" style="display: none;">
               <h2><%= t(:quiz_ip_filters_help_title, "What are Quiz IP Filters?") %></h2>
@@ -166,13 +166,13 @@ TEXT
                     <td><%= before_label(t(:ip_filter_filter_label, "Filter")) %></td>
                     <td><input class="value" value="<%= filter %>" maxlength="255"/></td>
                     <td>
-                      <a href="#" class="delete_filter_link"><%= image_tag "delete_circle.png" %></a>
+                      <a href="#" class="delete_filter_link"><i class="icon-end standalone-icon"></i></a>
                     </td>
                   </tr>
                 <% end %>
               </tbody>
             </table>
-            <a href="#" class="add-small add_ip_filter_link" style="font-size: 0.9em;"><%= t(:add_ip_filter_link, "Add another filter") %></a>
+            <a href="#" class="icon-add add_ip_filter_link" style="font-size: 0.9em;"><%= t(:add_ip_filter_link, "Add another filter") %></a>
           </fieldset>
         <% end %>
 
@@ -210,6 +210,10 @@ TEXT
                 <div>
                   <%= settings.check_box :enable_scheduler, :checked => @account.settings[:enable_scheduler] %>
                   <%= settings.label :enable_scheduler, :en => "Enable Calendar 2" %>
+                </div>
+                <div id="show_scheduler_checkbox">
+                  <%= settings.check_box :show_scheduler, :checked => @account.settings[:show_scheduler] %>
+                  <%= settings.label :show_scheduler, :en => "Enable Scheduler" %>
                 </div>
                 <div>
                   <%= settings.check_box :enable_profiles, :checked => @account.settings[:enable_profiles] %>
@@ -365,7 +369,7 @@ TEXT
               <tr>
                 <td>&nbsp;</td>
                 <td>
-                  <a href="<%= account_turnitin_confirmation_path(@account.id, "{{ account_id }}", "{{ shared_secret }}") %>" class="confirm_turnitin_settings_link button"><%= t(:confirm_turnitin_settings_link, "confirm Turnitin settings") %></a>
+                  <a href="<%= account_turnitin_confirmation_path(@account.id, "{{ account_id }}", "{{ shared_secret }}") %>" class="confirm_turnitin_settings_link btn"><%= t(:confirm_turnitin_settings_link, "confirm Turnitin settings") %></a>
                 </td>
               </tr>
               <tr>
@@ -441,7 +445,7 @@ TEXT
         <% end %>
 
         <div class="button-container">
-          <button type="submit" class="button btn-primary"><%= t(:update_settings_button, "Update Settings") %></button>
+          <button type="submit" class="btn btn-primary"><%= t(:update_settings_button, "Update Settings") %></button>
         </div>
       <% end %>
     </div>
@@ -532,7 +536,7 @@ TEXT
         <% end %>
 
         <div class="button-container">
-          <button type="submit" class="button btn-primary"><%= t(:update_settings_button, "Update Settings") %></button>
+          <button type="submit" class="btn btn-primary"><%= t(:update_settings_button, "Update Settings") %></button>
         </div>
       <% end %>
     </div>
@@ -546,25 +550,26 @@ TEXT
     </ul>
     <% if can_do(@context, @current_user, :manage_account_memberships) %>
       <% js_bundle :user_lists %>
-      <a href="#" class="add_users_link button"><%= image_tag "add.png" %><%= t('links.add_admins', %{Add Account Admins}) %></a>
+      <a href="#" class="add_users_link btn btn-primary"><i class="icon-add"></i> <%= t('links.add_admins', %{Add Account Admins}) %></a>
       <% form_tag account_add_account_user_url(@account), {:id => "enroll_users_form", :style => "display: none;"} do  %>
         <h2><%= t(:add_admin_title, "Add Account Admins") %></h2>
         <div style="margin-top: 5px;">
           <div>
             <%= label_tag :membership_type, :en => "Add More" %>
             <select name="membership_type" id="admin_membership_type">
-            <% @context.account_membership_types.each do |type| %>
+            <% @context.available_account_roles.each do |type| %>
               <option value="<%= type %>"><%= AccountUser.readable_type(type) %></option>
             <% end %>
             </select>
           </div>
           <%= render :partial => 'shared/user_lists' %>
         </div>
-        <div class="button-container">
-          <button type="button" class="button verify_syntax_button"><%= t('buttons.continue', %{Continue...}) %></button>
-          <button type="submit" class="button add_users_button"><%= t('buttons.add_users', %{OK Looks Good, Add These Users}) %></button>
-          <button type="button" class="go_back_button button-secondary"><%= t('buttons.modify_users', %{Go back and edit the list of users}) %></button>
-          <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', %{Cancel}) %></button>
+        <div class="form-actions">
+          <button type="button" class="btn go_back_button"><%= t('buttons.modify_users', %{Go back and edit the list of users}) %></button>
+          <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
+          <button type="button" class="btn btn-primary verify_syntax_button"><%= t('buttons.continue', %{Continue...}) %></button>
+          <button type="submit" class="btn btn-primary add_users_button"><%= t('buttons.add_users', %{OK Looks Good, Add These Users}) %></button>
+
         </div>
       <% end %>
     <% end %>
@@ -604,7 +609,7 @@ TEXT
         <% end %>
       </ul>
       <% if can_do(@account, @current_user, :manage_alerts) %>
-        <a href="#" class="button element_toggler" role="button" data-hide-while-target-shown="true" aria-controls="add_notification_form"><%= image_tag "add.png" %><%= t(:add_announcement_link, "Add a New Announcement") %></a>
+        <a href="#" class="btn btn-primary element_toggler" role="button" data-hide-while-target-shown="true" aria-controls="add_notification_form"><i class="icon-add"></i> <%= t(:add_announcement_link, "Add a New Announcement") %></a>
         <% form_for :account_notification, :url => account_account_notifications_url(@account), :html => {:id => "add_notification_form", :style => 'display: none;', :class => 'well', :role => "region" } do |f| %>
           <table class="formtable">
             <tr>
@@ -621,10 +626,10 @@ TEXT
               <td>
                 <select id="account_notification_icon" name="account_notification[icon]">
                   <option value="warning" class="warning"><%= t(:alert_icon_warning_option, "warning") %></option>
-                  <option value="calendar_icon" class="calendar"><%= t(:alert_icon_calendar_option, "calendar") %></option>
-                  <option value="group" class="people"><%= t(:alert_icon_people_option, "people") %></option>
-                  <option value="help" class="help"><%= t(:alert_icon_help_option, "help") %></option>
-                  <option value="file" class="file"><%= t(:alert_icon_file_option, "file") %></option>
+                  <option value="error" class="error"><%= t(:alert_icon_error_option, "error") %></option>
+                  <option value="information" class="information"><%= t(:alert_icon_information_option, "information") %></option>
+                  <option value="question" class="question"><%= t(:alert_icon_question_option, "question") %></option>
+                  <option value="calendar" class="calendar"><%= t(:alert_icon_calendar_option, "calendar") %></option>
                 </select>
               </td>
             </tr><tr>
@@ -635,7 +640,7 @@ TEXT
             <%= f.text_area :message, :class => 'alert_message', :style => "height: 100px;" %>
           </div>
           <div class="button-container">
-            <button type="submit" class="button"><%= image_tag "add.png" %> <%= t(:add_announcement_button, "Add Announcement") %></button>
+            <button type="submit" class="btn"><%= image_tag "add.png" %> <%= t(:add_announcement_button, "Add Announcement") %></button>
             <button type="button" class="element_toggler button-secondary" aria-controls="add_notification_form"><%= t('#buttons.cancel', %{Cancel}) %></button>
           </div>
         <% end %>
@@ -667,7 +672,7 @@ TEXT
             <td class="title reports">
               <span class="title"><%= title %></span>
               <% if description || description_partial %>
-                <a href="#" class="open_report_description_link"><%= image_tag "help.png"%></a>
+                <a href="#" class="open_report_description_link"><i class="icon-question standalone-icon"></i></a>
                 <div style="display: none" class="report_description">
                   <%= description_partial ? render(:partial => description_partial) : description %>
                 </div>
@@ -680,7 +685,7 @@ TEXT
                 <% if extra_text %>
                   (<%= extra_text %>)
                 <% end %>
-                <%= link_to image_tag("download.png"), context_url(last_complete.account, :context_file_download_url, last_complete.attachment.id) %>
+                <%= link_to "<i class='icon-download'></i>".html_safe, context_url(last_complete.account, :context_file_download_url, last_complete.attachment.id) %>
               <% else %>
                 <%= t 'report_last_run_never', 'Never' %>
               <% end %>
@@ -695,21 +700,21 @@ TEXT
                       </div>
                       <br />
                       <input type="hidden" name="report_type" value="<%= report %>" />
-                      <a href="#" id="run_<%= report %>" class="button run_report_link"><%= t 'links.run_report', 'Run Report' %></a><br/>
+                        <a href="#" id="run_<%= report %>" class="btn btn-primary btn-small run_report_link"><%= t 'links.run_report', 'Run Report' %></a>
                     </form>
                   </div>
                 </div>
                 <span class="running_report_message" style="<%= hidden unless in_progress %>">
                   <%= t('report_running', 'The report is running.*You\'ll receive an email when it is done.*', :wrapper => '<div>\1</div>') %>
                 </span>
-                <a href="#" id="configure_<%= report %>" style="<%= hidden if in_progress %>" class="button configure_report_link"><%= t 'links.configure_report', 'Configure...' %></a>
+                <a href="#" id="configure_<%= report %>" style="<%= hidden if in_progress %>" class="btn btn-small configure_report_link"><%= t 'links.configure_report', 'Configure...' %></a>
               <% else %>
                 <form id="<%= report %>_form" class="run_report_form" action="<%= account_run_report_path %>">
                   <input type="hidden" name="report_type" value="<%= report %>" />
                   <span class="running_report_message" style="<%= hidden unless in_progress %>">
                     <%= t('report_running', 'The report is running.*You\'ll receive an email when it is done.*', :wrapper => '<div>\1</div>') %>
                   </span>
-                  <a href="#" id="run_<%= report %>" style="<%= hidden if in_progress %>" class="button run_report_link"><%= t 'links.run_report', 'Run Report' %></a>
+                  <a href="#" id="run_<%= report %>" style="<%= hidden if in_progress %>" class="btn btn-small btn-primary run_report_link"><%= t 'links.run_report', 'Run Report' %></a>
                 </form>
               <% end %>
             </td>

@@ -108,7 +108,7 @@ describe Notification do
     end
     
     it "should not dispatch non-immediate message based on default policies" do
-      notification_model(:category => 'TestDaily',:name => "Show In Feed")
+      notification_model(:category => 'TestDaily', :name => "Show In Feed")
       @notification.default_frequency.should eql("daily")
       u1 = user_model(:name => "user 1", :workflow_state => "registered")
       
@@ -165,26 +165,14 @@ describe Notification do
       }.length.should eql(2)
     end
     
-    it "should replace dashboard messages when a similar notification occurs" do
-      notification_set(:notification_opts => {:name => "Show In Feed"})
-      
-      messages = @notification.create_message(@assignment, @user)
-      messages.length.should eql(2)
-      messages.select{|m| m.to == "dashboard"}.length.should eql(1)
-      StreamItem.for_user(@user).count.should eql(1)
-      
-      messages = @notification.create_message(@assignment, @user)
-      messages.length.should eql(2)
-      StreamItem.for_user(@user).count.should eql(2)
-    end
-    
     it "should create stream items" do
       notification_set(:notification_opts => {:name => "Show In Feed"})
-      StreamItem.for_user(@user).count.should eql(0)
+      @user.stream_item_instances.count.should == 0
       messages = @notification.create_message(@assignment, @user)
-      StreamItem.for_user(@user).count.should eql(1)
-      si = StreamItem.for_user(@user).first
-      si.item_asset_string.should eql("message_")
+      @user.stream_item_instances.count.should == 1
+      si = @user.stream_item_instances.first.stream_item
+      si.asset_type.should == 'Message'
+      si.asset_id.should be_nil
     end
     
     it "should translate ERB in the notification" do

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -543,6 +543,14 @@ describe Course, "enroll" do
     @te.course_id.should eql(@course.id)
     @te.should be_invited
     @te.messages_sent.should be_include("Enrollment Registration")
+  end
+
+  it "should scope correctly when including teachers from course" do
+    account = @course.account
+    @course.enroll_student(@user)
+    scope = account.associated_courses.active.scoped(:select=>"id, name", :joins=>:teachers, :include=>:teachers, :conditions => "enrollments.workflow_state = 'active'")
+    sql = scope.construct_finder_sql({})
+    sql.should match(/enrollments.type = 'TeacherEnrollment'/)
   end
 end
 

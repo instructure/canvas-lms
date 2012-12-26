@@ -2,9 +2,10 @@ define [
   'jquery'
   'compiled/calendar/CommonEvent'
   'compiled/calendar/CommonEvent.Assignment',
+  'compiled/calendar/CommonEvent.AssignmentOverride'
   'compiled/calendar/CommonEvent.CalendarEvent'
   'compiled/str/splitAssetString'
-], ($, CommonEvent, Assignment, CalendarEvent, splitAssetString) ->
+], ($, CommonEvent, Assignment, AssignmentOverride, CalendarEvent, splitAssetString) ->
 
   (data, contexts) ->
     if data == null
@@ -15,13 +16,17 @@ define [
     actualContextCode = data.context_code
     contextCode = data.effective_context_code || actualContextCode
 
-    type = null
-    if data.assignment || data.assignment_group_id
-      type = 'assignment'
+    type = if data.assignment_overrides
+      'assignment_override'
+    else if  data.assignment || data.assignment_group_id
+      'assignment'
     else
-      type = 'calendar_event'
+      'calendar_event'
 
-    data = data.assignment || data.calendar_event || data
+    data = if data.assignment_overrides
+      {assignment: data.assignment, assignment_override: data.assignment_overrides[0]}
+    else
+      data.assignment || data.calendar_event || data
     return null if data.hidden # e.g. parent event of section-level events
     actualContextCode ?= data.context_code
     contextCode ?= data.effective_context_code || data.context_code
@@ -43,6 +48,8 @@ define [
 
     if type == 'assignment'
       obj = new Assignment(data, contextInfo)
+    else if type == 'assignment_override'
+      obj = new AssignmentOverride(data, contextInfo)
     else
       obj = new CalendarEvent(data, contextInfo, actualContextInfo)
 

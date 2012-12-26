@@ -45,23 +45,34 @@ module Mutable
 
   def hide_stream_items
     if self.respond_to? :submissions
-      item_asset_strings = submissions.map { |s| "submission_#{s.id}" }
-      stream_item_ids   = StreamItem.all(
-        :select => "id",
-        :conditions => { :item_asset_string => item_asset_strings }
-      ).map(&:id)
-      StreamItemInstance.update_all({ :hidden => true }, { :stream_item_id => stream_item_ids })
+      stream_items = StreamItem.all(:select => "id, context_type, context_id",
+                                    :conditions => { :asset_type => 'Submission', :asset_id => submissions.map(&:id) },
+                                    :include => :context)
+      stream_item_ids = stream_items.map(&:id)
+      stream_item_contexts = stream_items.map { |si| [si.context_type, si.context_id] }
+      associated_shards = stream_items.inject([]) { |result, si| result | si.associated_shards }
+      Shard.with_each_shard(associated_shards) do
+        StreamItemInstance.update_all_with_invalidation(stream_item_contexts,
+                                                        { :hidden => true },
+                                                        { :stream_item_id => stream_item_ids })
+      end
     end
   end
 
   def show_stream_items
     if self.respond_to? :submissions
       submissions        = submissions(:include => {:hidden_submission_comments => :author})
-      stream_item_ids    = StreamItem.all(
-        :select => "id",
-        :conditions => { :item_asset_string => submissions.map(&:asset_string) }
-      ).map(&:id)
-      StreamItemInstance.update_all({ :hidden => false }, { :hidden => true, :stream_item_id => stream_item_ids })
+      stream_items = StreamItem.all(:select => "id, context_type, context_id",
+                                    :conditions => { :asset_type => 'Submission', :asset_id => submissions.map(&:id) },
+                                    :include => :context)
+      stream_item_ids = stream_items.map(&:id)
+      stream_item_contexts = stream_items.map { |si| [si.context_type, si.context_id] }
+      associated_shards = stream_items.inject([]) { |result, si| result | si.associated_shards }
+      Shard.with_each_shard(associated_shards) do
+        StreamItemInstance.update_all_with_invalidation(stream_item_contexts,
+                                                        { :hidden => false },
+                                                        { :hidden => true, :stream_item_id => stream_item_ids })
+      end
 
       outstanding = submissions.map{ |submission|
         comments = submission.hidden_submission_comments.all

@@ -208,6 +208,17 @@ describe "calendar2" do
         create_middle_day_event
       end
 
+      it "should show scheduler button if it is enabled" do
+        get "/calendar2"
+        f('input#scheduler').should_not be_nil
+      end
+
+      it "should not show scheduler button if it is disabled" do
+        account = Account.default.tap { |a| a.settings[:show_scheduler] = false; a.save! }
+        get "/calendar2"
+        f('input#scheduler').should be_nil
+      end      
+
       it "should drag and drop an event" do
         pending('drag and drop not working correctly')
         create_middle_day_event

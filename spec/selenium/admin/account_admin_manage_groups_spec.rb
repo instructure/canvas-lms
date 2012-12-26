@@ -147,7 +147,7 @@ describe "account admin manage groups" do
       driver.find_element(:css, "#group_#{group.id} .edit_group_link").click
       name = "new group 1"
       driver.find_element(:css, "#group_name").send_keys(name)
-      driver.find_element(:css, "#group_#{group.id} .button").click
+      driver.find_element(:css, "#group_#{group.id} .btn").click
       wait_for_ajaximations
       new_group = @admin_account.groups.find_by_name(name)
       group.should_not be_nil

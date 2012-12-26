@@ -428,8 +428,10 @@
     </tr>
     <tr>
       <td colspan="4">
-        <button type="submit" class="button"><%= t 'buttons.update', "Update Assignment" %></button>
-        <button type="button" class="button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+        <div class="form-actions">
+          <button type="button" class="btn cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+          <button type="submit" class="btn btn-primary"><%= t 'buttons.update', "Update Assignment" %></button>
+        </div>
       </td>
     </tr>
   </table>

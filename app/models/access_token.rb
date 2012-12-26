@@ -13,7 +13,7 @@ class AccessToken < ActiveRecord::Base
   before_create :generate_token
 
   def self.authenticate(token_string)
-    token = self.first(:conditions => ["crypted_token = ? OR (token = ? AND crypted_token IS NULL)", hashed_token(token_string), token_string])
+    token = self.first(:conditions => ["crypted_token = ?", hashed_token(token_string)])
     token = nil unless token.try(:usable?)
     token
   end
@@ -48,7 +48,6 @@ class AccessToken < ActiveRecord::Base
   def token=(new_token)
     self.crypted_token = AccessToken.hashed_token(new_token)
     @full_token = new_token
-    write_attribute(:token, new_token)
     self.token_hint = new_token[0,5]
   end
 
@@ -78,9 +77,7 @@ class AccessToken < ActiveRecord::Base
     end
   end
 
-  # Token is a protected attribute, since it's what applications
-  # use when acting in behalf of a user.  If the user knew an app's
-  # access token, they could pretend to be the app making calls 
-  # on their behalf and cause mischief
-  def self.serialization_excludes; [:token]; end
+  # It's encrypted, but end users still shouldn't see this.
+  # The hint is only returned in visible_token, if protected_token is false.
+  def self.serialization_excludes; [:crypted_token, :token_hint]; end
 end

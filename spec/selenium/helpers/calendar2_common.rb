@@ -4,7 +4,11 @@ shared_examples_for "calendar2 selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
   before (:each) do
-    Account.default.tap { |a| a.settings[:enable_scheduler] = true; a.save }
+    Account.default.tap do |a| 
+      a.settings[:enable_scheduler] = true
+      a.settings[:show_scheduler] = true
+      a.save!
+    end
   end
 
   def create_appointment_group(params={})

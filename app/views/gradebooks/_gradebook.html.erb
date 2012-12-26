@@ -10,7 +10,7 @@
   <div id="no_students_message" style="padding: 10px 30px; font-size: 1.2em;">
     <div><%= t(:no_students, "No Students are enrolled in the course.") %></div>
     <% if can_do @context, @current_user, :manage_students %>
-      <a href="<%= context_url(@context, :context_details_url) %>#add_students" class="button"><%= image_tag "add.png" %> <%= t('links.add_students', "Add Students to the Course") %></a>
+      <a href="<%= context_url(@context, :context_details_url) %>#add_students" class="btn"><%= image_tag "add.png" %> <%= t('links.add_students', "Add Students to the Course") %></a>
     <% end %>
   </div>
 <% end %>
@@ -97,7 +97,7 @@
     </tr>
     <tr>
       <td colspan="2">
-        <button type="button" class="button normalize_button"><%= t('buttons.normalize', "Make it Total 100%") %></button>
+        <button type="button" class="btn normalize_button"><%= t('buttons.normalize', "Make it Total 100%") %></button>
         <button type="button" class="cancel_button button-secondary"><%= t('buttons.done', "Done") %></button>
       </td>
     </tr>
@@ -117,7 +117,7 @@
       <label for="submission_overwrite_existing_grades"><%= t(:overwrite, "Overwrite already-entered grades") %></label>
     </div>
     <div class="button-container">
-      <button type="submit" class="button"><%= t('buttons.set_grade', "Set Grade") %></button>
+      <button type="submit" class="btn"><%= t('buttons.set_grade', "Set Grade") %></button>
       <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
     </div>
     <a href="<%= context_url(@context, :context_assignment_url, "{{ id }}") %>" style="display: none;" class="default_grade_url">&nbsp;</a>
@@ -136,7 +136,7 @@
     </p>
     <input type="file" name="submissions_zip"/>
     <div class="button-container">
-      <button type="submit" class="button"><%= t('buttons.upload', "Upload Files") %></button>
+      <button type="submit" class="btn"><%= t('buttons.upload', "Upload Files") %></button>
     </div>
   <% end %>
   <form action="<%= context_url(@context, :update_submission_context_gradebook_url) %>" id="curve_grade_dialog" style="display: none;">
@@ -163,7 +163,7 @@
       <label for="assign_blanks" style="font-size: 0.8em;"><%= t('labels.assign_blanks', "Assign zero's to unsubmitted students") %></label>
     </div>
     <div class="button-container">
-      <button type="submit" class="button"><%= t('buttons.curve_grades', "Curve Grades") %></button>
+      <button type="submit" class="btn"><%= t('buttons.curve_grades', "Curve Grades") %></button>
       <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
     </div>
   </form>
@@ -247,7 +247,7 @@
       <%= t(:out_of_points_possible, "*out of* %{points_possible}", :wrapper => '<span style="font-size: 0.8em;" class="out_of">\1</span>', :points_possible => raw("<span class=\"points_possible\">#{t('#not_applicable', "N/A")}</span>")) %>
     </div>
     <div class="button-container save_buttons">
-      <button type="button" class="button update_button"><%= t('buttons.update', "Update") %></button>
+      <button type="button" class="btn update_button"><%= t('buttons.update', "Update") %></button>
       <button type="button" class="button-secondary cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
     </div>
   </div>
@@ -306,10 +306,10 @@
   <div id="sort_columns_dialog" title="<%= t('labels.sort_columns', "Sort Gradebook Columns") %>">
     <h2><%= before_label(:sort_columns, "Sort Gradebook Columns") %></h2>
     <div style="margin-bottom: 5px;">
-      <button type="button" class="button sort_gradebook sort_columns by_due_date" title="<%= t('buttons.by_due_date', "By Due Date") %>" style="width: 300px;"><%= t('buttons.by_due_date', "By Due Date") %></button>
+      <button type="button" class="btn sort_gradebook sort_columns by_due_date" title="<%= t('buttons.by_due_date', "By Due Date") %>" style="width: 300px;"><%= t('buttons.by_due_date', "By Due Date") %></button>
     </div>
     <div style="margin-bottom: 5px;">
-      <button type="button" class="button sort_gradebook sort_columns by_group" title="<%= t('buttons.by_group', "By Assignment Group") %>" style="width: 300px;"><%= t('buttons.by_group', "By Assignment Group") %></button>
+      <button type="button" class="btn sort_gradebook sort_columns by_group" title="<%= t('buttons.by_group', "By Assignment Group") %>" style="width: 300px;"><%= t('buttons.by_group', "By Assignment Group") %></button>
     </div>
   </div>
   <div id="section_to_show_dialog" title="<%= t('titles.choose_section', "Choose A Section To Show") %>">
@@ -321,20 +321,20 @@
   <div id="sort_rows_dialog" title="<%= t('labels.sort_rows', "Sort Gradebook Rows") %>">
     <h2><%= before_label(:sort_rows, "Sort Gradebook Rows") %></h2>
     <div style="margin-bottom: 5px;">
-      <button type="button" class="button sort_gradebook sort_rows by_display_name" title="<%= t('buttons.by_name', "By Student Name") %>" style="width: 300px;"><%= t('buttons.by_name', "By Student Name") %></button>
+      <button type="button" class="btn sort_gradebook sort_rows by_display_name" title="<%= t('buttons.by_name', "By Student Name") %>" style="width: 300px;"><%= t('buttons.by_name', "By Student Name") %></button>
     </div>
     <div style="margin-bottom: 5px;">
-      <button type="button" class="button sort_gradebook sort_rows by_secondary_identifier" title="<%= t('buttons.by_email', "By Email/ID") %>" style="width: 300px;"><%= t('buttons.by_email', "By Email/ID") %></button>
+      <button type="button" class="btn sort_gradebook sort_rows by_secondary_identifier" title="<%= t('buttons.by_email', "By Email/ID") %>" style="width: 300px;"><%= t('buttons.by_email', "By Email/ID") %></button>
     </div>
     <div style="margin-bottom: 5px;">
-      <button type="button" class="button sort_gradebook sort_rows by_section" title="<%= t('buttons.by_section', "By Section Name") %>" style="width: 300px;"><%= t('buttons.by_section', "By Section Name") %></button>
+      <button type="button" class="btn sort_gradebook sort_rows by_section" title="<%= t('buttons.by_section', "By Section Name") %>" style="width: 300px;"><%= t('buttons.by_section', "By Section Name") %></button>
     </div>
     <div class="grade_sorts" style="display: none;">
       <div style="margin-bottom: 5px;">
-        <button type="button" class="button sort_gradebook sort_rows by_grade by_grade_desc" title="<%= t('buttons.by_total_desc', "By Total (Highest First)") %>" style="width: 300px;"><%= t('buttons.by_total_desc', "By Total (Highest First)") %></button>
+        <button type="button" class="btn sort_gradebook sort_rows by_grade by_grade_desc" title="<%= t('buttons.by_total_desc', "By Total (Highest First)") %>" style="width: 300px;"><%= t('buttons.by_total_desc', "By Total (Highest First)") %></button>
       </div>
       <div style="margin-bottom: 5px;">
-        <button type="button" class="button sort_gradebook sort_rows by_grade by_grade_asc" title="<%= t('buttons.by_total_asc', "By Total (Lowest First)") %>" style="width: 300px;"><%= t('buttons.by_total_asc', "By Total (Lowest First)") %></button>
+        <button type="button" class="btn sort_gradebook sort_rows by_grade by_grade_asc" title="<%= t('buttons.by_total_asc', "By Total (Lowest First)") %>" style="width: 300px;"><%= t('buttons.by_total_asc', "By Total (Lowest First)") %></button>
       </div>
     </div>
   </div>

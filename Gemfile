@@ -7,13 +7,13 @@ gem 'authlogic',      '2.1.3'
 #gem 'aws-s3',         '0.6.2',  :require => 'aws/s3'
 # use custom gem until pull request at https://github.com/marcel/aws-s3/pull/41
 # is merged into mainline. gem built from https://github.com/lukfugl/aws-s3
-gem "aws-s3-instructure", "~> 0.6.2.1319643167",  :require => 'aws/s3'
+gem "aws-s3-instructure", "0.6.2.1352914936",  :require => 'aws/s3'
 gem 'barby',          '0.5.0'
 gem 'bcrypt-ruby',    '3.0.1'
 gem 'builder',        '2.1.2'
 gem 'daemons',        '1.1.0'
 gem 'diff-lcs',       '1.1.2',  :require => 'diff/lcs'
-gem 'encrypted_cookie_store-instructure', '1.0.1', :require => 'encrypted_cookie_store'
+gem 'encrypted_cookie_store-instructure', '1.0.2', :require => 'encrypted_cookie_store'
 gem 'erubis',         '2.7.0'
 gem 'ffi',            '1.1.5'
 gem 'hairtrigger',    '0.1.14'
@@ -30,6 +30,10 @@ gem 'json',           '1.5.2'
 # native xml parsing, diigo
 gem 'libxml-ruby',    '2.3.2',  :require => 'xml/libxml'
 gem 'macaddr',        '1.0.0'  # macaddr 1.2.0 tries to require 'systemu' which isn't a dependency
+if !ONE_NINE
+  # mail gem v2.5.* introduces a failure on 1.8 with bad unicode in headers
+  gem 'mail', '2.4.4'
+end
 gem 'mailman',        '0.5.3'
 gem 'mime-types',     '1.16',   :require => 'mime/types'
 # attachment_fu (even the current technoweenie one on github) does not work
@@ -86,7 +90,7 @@ group :test do
   gem 'coffee-script-source',  '1.3.1' #pinned so everyone's compiled output matches
   gem 'bluecloth',    '2.0.10' # for generating api docs
   gem 'parallel',     '0.5.16'
-  gem 'parallelized_specs', '0.3.38'
+  gem 'parallelized_specs', '0.3.54'
   gem 'mocha',        '0.12.3', :require => 'mocha_standalone'
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.2'

@@ -71,7 +71,7 @@ secret key **%{secret_key}**.
     <div>
       <%= f.blabel :verification_code, :en => "Verification Code", :class => 'control-label' %>
       <%= f.text_field :verification_code, :class => "text", :autocomplete => 'off' %>
-      <button type="submit" class="button btn-primary"><%= t('buttons.verify', 'Verify') %></button>
+      <button type="submit" class="btn btn-primary"><%= t('buttons.verify', 'Verify') %></button>
     </div>
     <div>
       <%= f.check_box :remember_me %> <%= f.label :remember_me, :en => "Remember this computer" %>

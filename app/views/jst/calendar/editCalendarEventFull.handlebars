@@ -34,7 +34,7 @@
   {{/if}}
 
   <div class="button-container">
-    <button type="submit" class="button {{#if url}} button-default {{/if}}">
+    <button type="submit" class="btn {{#if url}} btn-primary {{/if}}">
       {{#if newRecord}}
         {{#t "buttons.create"}}Create Event{{/t}}
       {{else}}
@@ -42,7 +42,7 @@
       {{/if}}
     </button>
     {{#if url}}
-      <button type="button" class="button delete_link">{{#t "delete"}}Delete{{/t}}</button>
+      <button type="button" class="btn delete_link">{{#t "delete"}}Delete{{/t}}</button>
     {{/if}}
     {{#if return_to_url}}
       <a href="{{return_to_url}}" class="button-secondary">{{#t "#buttons.cancel"}}Cancel{{/t}}</button>

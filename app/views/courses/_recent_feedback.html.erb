@@ -40,7 +40,7 @@
           <% end %>
         <% else %>
           <span style="display: block; font-style: italic;"><%= icon_explanation.try(:capitalize) %></span>
-          <span style="display: block;"><%= before_label('due_date', %{Due}) %> <span style="font-size: 0.8em;"><%= datetime_string(assignment.due_at) %></span></span>
+          <span style="display: block; font-size: 0.8em;"><%= translated_due_date(assignment) %></span>
         <% end %>
         <% if assignment.points_possible %>
           <span style="display: block;">

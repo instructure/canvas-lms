@@ -344,14 +344,17 @@ class ConversationsController < ApplicationController
     end
 
     @conversation.update_attribute(:workflow_state, "read") if @conversation.unread? && auto_mark_as_read?
-    messages = @conversation.messages
-    ConversationMessage.send(:preload_associations, messages, :asset)
-    submissions = messages.map(&:submission).compact
-    Submission.send(:preload_associations, submissions, [:assignment, :submission_comments])
-    if interleave_submissions
-      submissions = nil
-    else
-      messages = messages.select{ |message| message.submission.nil? }
+    messages = submissions = nil
+    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+      messages = @conversation.messages
+      ConversationMessage.send(:preload_associations, messages, :asset)
+      submissions = messages.map(&:submission).compact
+      Submission.send(:preload_associations, submissions, [:assignment, :submission_comments])
+      if interleave_submissions
+        submissions = nil
+      else
+        messages = messages.select{ |message| message.submission.nil? }
+      end
     end
     render :json => conversation_json(@conversation,
                                       @current_user,
@@ -575,17 +578,19 @@ class ConversationsController < ApplicationController
       f.updated = Time.now
       f.id = conversations_url
     end
-    @entries = []
-    @conversation_contexts = {}
-    @current_user.conversations.each do |conversation|
-      @entries.concat(conversation.messages.human)
-      if @conversation_contexts[conversation.conversation.id].blank?
-        @conversation_contexts[conversation.conversation.id] = feed_context_content(conversation)
+    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+      @entries = []
+      @conversation_contexts = {}
+      @current_user.conversations.each do |conversation|
+        @entries.concat(conversation.messages.human)
+        if @conversation_contexts[conversation.conversation.id].blank?
+          @conversation_contexts[conversation.conversation.id] = feed_context_content(conversation)
+        end
       end
-    end
-    @entries = @entries.sort_by{|e| e.created_at}.reverse
-    @entries.each do |entry|
-      feed.entries << entry.to_atom(:additional_content => @conversation_contexts[entry.conversation.id])
+      @entries = @entries.sort_by{|e| e.created_at}.reverse
+      @entries.each do |entry|
+        feed.entries << entry.to_atom(:additional_content => @conversation_contexts[entry.conversation.id])
+      end
     end
     respond_to do |format|
       format.atom { render :text => feed.to_xml }

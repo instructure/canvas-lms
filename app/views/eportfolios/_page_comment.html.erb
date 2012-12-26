@@ -4,7 +4,7 @@
   <div style="float: right;">
     <span class="created_at" style="color: #888; font-size: 0.8em;"><%= datetime_string(comment.created_at) rescue nbsp %></span>
     <% if !read_only && can_do(@portfolio, @current_user, :update) %>
-      <a href="<%= eportfolio_entry_page_comment_path(@portfolio.id, @page.id, comment ? comment.id : "{{ id }}") %>" class="delete_comment_link no-hover"><%= image_tag "delete.png" %></a>
+      <a href="<%= eportfolio_entry_page_comment_path(@portfolio.id, @page.id, comment ? comment.id : "{{ id }}") %>" class="delete_comment_link no-hover"><i class="icon-trash standalone-icon"></i></a>
     <% end %>
   </div>     
   <div class="clear" style="border-top: 1px solid #ccc;"></div>

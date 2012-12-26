@@ -17,4 +17,7 @@
 #
 
 module PseudonymSessionsHelper
+  def session_timeout_enabled
+    PluginSetting.settings_for_plugin 'sessions'
+  end
 end

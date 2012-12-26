@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe UsersController do
 
@@ -612,6 +612,27 @@ describe UsersController do
       get 'admin_merge', :user_id => @admin.id, :pending_user_id => @user.id
       response.should be_success
       assigns[:pending_other_user].should be_nil
+    end
+  end
+
+  describe "GET 'show'" do
+    context "sharding" do
+      it_should_behave_like "sharding"
+
+      it "should include enrollments from all shards" do
+        course_with_teacher(:active_all => 1)
+        @shard1.activate do
+          account = Account.create!
+          course = account.courses.create!
+          @e2 = course.enroll_teacher(@teacher)
+        end
+        account_admin_user
+        user_session(@admin)
+
+        get 'show', :id => @teacher.id
+        response.should be_success
+        assigns[:enrollments].sort_by(&:id).should == [@enrollment, @e2]
+      end
     end
   end
 end

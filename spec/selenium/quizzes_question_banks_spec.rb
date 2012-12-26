@@ -30,7 +30,7 @@ describe "quizzes question banks" do
       find_questions_link.click
       f(".select_all_link")
     }.click
-    submit_dialog("div#find_question_dialog")
+    submit_dialog("div#find_question_dialog", '.submit_button')
     keep_trying_until { fj("#quiz_display_points_possible .points_possible").text.should == "17" }
   end
 
@@ -50,7 +50,7 @@ describe "quizzes question banks" do
       f(".select_all_link").should be_displayed
     }
     f(".select_all_link").click
-    submit_dialog("div#find_question_dialog")
+    submit_dialog("div#find_question_dialog", '.submit_button')
     keep_trying_until { fj("#quiz_display_points_possible .points_possible").text.should == "1" }
 
     f(".add_question_group_link").click
@@ -58,7 +58,7 @@ describe "quizzes question banks" do
     keep_trying_until {
       fj("#find_bank_dialog .bank:visible")
     }.click
-    submit_dialog("#find_bank_dialog")
+    submit_dialog("#find_bank_dialog", '.submit_button')
     submit_form(".quiz_group_form")
     keep_trying_until { fj("#quiz_display_points_possible .points_possible").text.should == "2" }
   end
@@ -80,7 +80,7 @@ describe "quizzes question banks" do
       f(".select_all_link").should be_displayed
     }
     f(".select_all_link").click
-    submit_dialog("#find_question_dialog")
+    submit_dialog("#find_question_dialog", '.submit_button')
     keep_trying_until { fj("#quiz_display_points_possible .points_possible").text.should == "1" }
 
     f(".add_question_group_link").click
@@ -88,7 +88,7 @@ describe "quizzes question banks" do
     keep_trying_until {
       fj("#find_bank_dialog .bank:visible")
     }.click
-    submit_dialog("#find_bank_dialog")
+    submit_dialog("#find_bank_dialog", '.submit_button')
     submit_form(".quiz_group_form")
     keep_trying_until { fj("#quiz_display_points_possible .points_possible").text.should == "2" }
   end

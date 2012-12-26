@@ -53,7 +53,7 @@
           <%= render :partial => "collaborators" %>
         </div>
         <div class="button-container">
-          <button type="submit" class="button button-default-action"><%= t 'buttons.start_collaborating', "Start Collaborating" %></button>
+          <button type="submit" class="btn button-default-action"><%= t 'buttons.start_collaborating', "Start Collaborating" %></button>
           <button type="button" class="button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
         </div>
       </div>
@@ -61,7 +61,7 @@
         <%= t '#instructions.authorize_google_docs', "Before you can collaborate on documents, you need to authorize Canvas
           to access your Google Docs account:" %>
         <div class="button-container">
-          <a class="button button-default-action" href="<%= oauth_url(:service => :google_docs, :return_to => (request.url + "#add_collaboration")) %>"><%= t '#buttons.authorize_google_docs', "Authorize Google Docs Access" %></a>
+          <a class="btn button-default-action" href="<%= oauth_url(:service => :google_docs, :return_to => (request.url + "#add_collaboration")) %>"><%= t '#buttons.authorize_google_docs', "Authorize Google Docs Access" %></a>
           <button type="button" class="button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
         </div>
       </div>
@@ -74,8 +74,8 @@
   <%= t 'messages.delete_google_doc_as_well', "This collaboration is being stored as a Google Doc.  Did you want to delete it just
   from Canvas, or remove it from Google Docs as well?" %>
   <div style="margin-top: 15px;">
-  <button type="button" class="button delete_button delete_document_button"><%= mt 'buttons.delete_from_canvas', "Just Delete  \nfrom Canvas" %></button>
-  <button type="button" class="button delete_button"><%= mt 'buttons.delete_from_google_docs', "Also Delete From  \nGoogle Docs" %></button>
+  <button type="button" class="btn delete_button delete_document_button"><%= mt 'buttons.delete_from_canvas', "Just Delete  \nfrom Canvas" %></button>
+  <button type="button" class="btn delete_button"><%= mt 'buttons.delete_from_google_docs', "Also Delete From  \nGoogle Docs" %></button>
   </div>
 </div>
 <% form_tag(context_url(@context, :context_collaboration_url, "{{ id }}"), {:id => "edit_collaboration_form", :method => :put, :style => "display: none; margin-top: 10px;", :class => 'collaboration communication_message'}) do %>
@@ -90,7 +90,7 @@
     <%= render :partial => "collaborators" %>
   </div>
   <div class="button-container">
-    <button type="submit" class="button button-default-action"><%= t 'buttons.update', "Update Collaboration" %></button>
+    <button type="submit" class="btn button-default-action"><%= t 'buttons.update', "Update Collaboration" %></button>
     <button type="button" class="button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
   </div>
 <% end %>

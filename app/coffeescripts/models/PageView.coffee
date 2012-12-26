@@ -26,7 +26,12 @@ define [
 
   class PageView extends Backbone.Model
 
-    computedAttributes: ['summarizedUserAgent', 'readableInteractionTime', 'truncatedURL']
+    computedAttributes: ['summarizedUserAgent', 'readableInteractionTime', 'truncatedURL', 'isLinkable']
+
+    isLinkable: ->
+      method = @get 'http_method'
+      return true unless method?
+      method is 'get'
 
     summarizedUserAgent: ->
       $.parseUserAgentString(@get 'user_agent')

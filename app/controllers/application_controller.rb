@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -48,7 +48,7 @@ class ApplicationController < ActionController::Base
   before_filter :init_body_classes
   before_filter :set_response_headers
 
-  add_crumb(proc { I18n.t('links.dashboard', "My Dashboard") }, :root_path, :class => "home")
+  add_crumb(proc { %Q{<i title="#{I18n.t('links.dashboard', "My Dashboard")}" class="icon-home standalone-icon"></i>}.html_safe }, :root_path, :class => "home")
 
   ##
   # Sends data from rails to JavaScript
@@ -188,7 +188,7 @@ class ApplicationController < ActionController::Base
     end
     self.send name, *opts
   end
-  
+
   def user_url(*opts)
     opts[0] == @current_user && !@current_user.grants_right?(@current_user, session, :view_statistics) ?
       user_profile_url(@current_user) :
@@ -234,7 +234,7 @@ class ApplicationController < ActionController::Base
     render_unauthorized_action(object) unless can_do
     can_do
   end
-  
+
   def is_authorized_action?(object, *opts)
     user = opts.shift
     action_session = nil
@@ -254,7 +254,7 @@ class ApplicationController < ActionController::Base
     end
     can_do
   end
-  
+
   def render_unauthorized_action(object=nil)
     object ||= User.new
     object.errors.add_to_base(t "#application.errors.unauthorized.generic", "You are not authorized to perform this action")
@@ -551,14 +551,14 @@ class ApplicationController < ActionController::Base
   def requesting_main_assignments_page?
     request.path.match(/\A\/assignments/)
   end
-  
+
   # Calculates the file storage quota for @context
   def get_quota
     quota_params = Attachment.get_quota(@context)
     @quota = quota_params[:quota]
     @quota_used = quota_params[:quota_used]
   end
-  
+
   # Renders a quota exceeded message if the @context's quota is exceeded
   def quota_exceeded(redirect=nil)
     redirect ||= root_url
@@ -608,7 +608,7 @@ class ApplicationController < ActionController::Base
       @context = @enrollment.course unless @problem
       @current_user = @enrollment.user unless @problem
     elsif pieces[0] == 'group_membership'
-      @membership = GroupMembership.find_by_uuid(pieces[1]) if pieces[1]
+      @membership = GroupMembership.active.find_by_uuid(pieces[1]) if pieces[1]
       @context_type = "Group"
       if !@membership
         @problem = t "#application.errors.mismatched_verification_code", "The verification code does not match any currently enrolled user."
@@ -669,7 +669,7 @@ class ApplicationController < ActionController::Base
     ActiveRecord::Base.clear_cached_contexts
     RoleOverride.clear_cached_contexts
   end
-  
+
   def set_page_view
     return true if !page_views_enabled?
 
@@ -681,17 +681,14 @@ class ApplicationController < ActionController::Base
       generate_page_view
     end
   end
-  
+
   def generate_page_view
-    @page_view = PageView.new(:url => request.url[0,255], :user => @current_user, :controller => request.path_parameters['controller'], :action => request.path_parameters['action'], :session_id => request.session_options[:id], :developer_key => @developer_key, :user_agent => request.headers['User-Agent'], :real_user => @real_current_user)
-    @page_view.interaction_seconds = 5
+    attributes = { :user => @current_user, :developer_key => @developer_key, :real_user => @real_current_user }
+    @page_view = PageView.generate(request, attributes)
     @page_view.user_request = true if params[:user_request] || (@current_user && !request.xhr? && request.method == :get)
-    @page_view.created_at = Time.now
-    @page_view.updated_at = Time.now
     @page_before_render = Time.now.utc
-    @page_view.id = RequestContextGenerator.request_id
   end
-  
+
   def generate_new_page_view
     return true if !page_views_enabled?
 
@@ -703,7 +700,7 @@ class ApplicationController < ActionController::Base
     @log_page_views = false
     true
   end
-  
+
   # Asset accesses are used for generating usage statistics.  This is how
   # we say, "the user just downloaded this file" or "the user just
   # viewed this wiki page".  We can then after-the-fact build statistics
@@ -719,7 +716,7 @@ class ApplicationController < ActionController::Base
       :level => level
     }
   end
-  
+
   def log_page_view
     return true if !page_views_enabled?
 
@@ -745,34 +742,16 @@ class ApplicationController < ActionController::Base
       # it's not an update because if the page_view already existed, we don't want to 
       # double-count it as multiple views when it's really just a single view.
       if @current_user && @accessed_asset && (@accessed_asset[:level] == 'participate' || !@page_view_update)
-        @access = AssetUserAccess.find_by_user_id_and_asset_code(@current_user.id, @accessed_asset[:code])
-        @access ||= AssetUserAccess.new(:user => @current_user, :asset_code => @accessed_asset[:code])
+        @access = AssetUserAccess.find_or_initialize_by_user_id_and_asset_code(@current_user.id, @accessed_asset[:code])
         @accessed_asset[:level] ||= 'view'
-        if @accessed_asset[:level] == 'view'
-          @access.view_score ||= 0
-          @access.view_score += 1
-          @access.action_level ||= 'view'
-        elsif @accessed_asset[:level] == 'participate'
-          @access.view_score ||= 0
-          @access.view_score += 1
-          @access.participate_score ||= 0
-          @access.participate_score += 1
-          @access.action_level = 'participate'
-          @page_view.participated = true if @page_view
-        elsif @accessed_asset[:level] == 'submit'
-          @access.participate_score ||= 0
-          @access.participate_score += 1
-          @access.action_level = 'participate'
-          @page_view.participated = true if @page_view
+        access_context = @context.is_a?(UserProfile) ? @context.user : @context
+        @access.log access_context, @accessed_asset
+
+        if @page_view
+          @page_view.participated = %w{participate submit}.include?(@accessed_asset[:level])
+          @page_view.asset_user_access = @access
         end
-        @access.asset_category ||= @accessed_asset[:category]
-        @access.asset_group_code ||= @accessed_asset[:group_code]
-        @access.membership_type ||= @accessed_asset[:membership_type]
-        @access.context = @context.is_a?(UserProfile) ? @context.user : @context
-        @access.summarized_at = nil
-        @access.last_access = Time.now.utc
-        @access.save
-        @page_view.asset_user_access = @access if @page_view
+
         @page_view_update = true
       end
       if @page_view && !request.xhr? && request.get? && (response.content_type || "").match(/html/)

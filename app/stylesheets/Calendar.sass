@@ -16,7 +16,10 @@
   position: absolute
   right: 0
   top: 0
-  width: 58%
+  width: 55%
+  &.with-scheduler
+    width: 58%
+
 #change-calendar-version
   float: right
 
@@ -83,7 +86,7 @@
       float: left
       color: #9da5ab
 
-.fc-event.assignment
+.fc-event.assignment, .fc-event.assignment_override
   .fc-event-inner div
     display: inline
   background-color: white
@@ -151,14 +154,23 @@
   max-height: 225px
   &:last-child
     border-bottom: none
+.event-details-header
+  max-width: 460px
+  overflow: auto
+.event-details-content table
+  th[scope=row]
+    width: 55px
+  td
+    max-width: 395px
 .event-details-actual-context
   font-size: 0.8em
   font-style: italic
   color: #666
 .event-detail-overflow
-  height: 30px
+  min-height: 30px
+  max-height: 160px
   margin-bottom: 6px
-  overflow-y: scroll
+  overflow: auto
 
 .x-close-link
   padding-right: 5px

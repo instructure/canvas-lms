@@ -27,7 +27,6 @@ define [
         buttons: [
           {
             text: I18n.t 'update', 'Update'
-            class: "button"
             click: @save
           }
         ]

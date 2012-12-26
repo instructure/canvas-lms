@@ -15,7 +15,7 @@ describe "profile" do
     f('#unregistered_service_skype > a').click
     skype_dialog = f('#unregistered_service_skype_dialog')
     skype_dialog.find_element(:id, 'user_service_user_name').send_keys("jakesorce")
-    submit_dialog(skype_dialog, '.button')
+    submit_dialog(skype_dialog, '.btn')
     wait_for_ajaximations
     f('#registered_services').should include_text("Skype")
   end
@@ -217,7 +217,7 @@ describe "profile" do
       get "/profile/settings"
       f('.add_access_token_link').click
       access_token_form = f('#access_token_form')
-      access_token_form.find_element(:css, '.cancel_button').click
+      access_token_form.find_element(:xpath, '../..').find_element(:css, '.ui-dialog-buttonpane .cancel_button').click
       access_token_form.should_not be_displayed
     end
 

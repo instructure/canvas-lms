@@ -31,7 +31,7 @@ describe "assignment groups" do
 
     #edit group grading rules
     driver.execute_script %{$('.edit_group_link:first').addClass('focus');}
-    f('.edit_group_link img').click
+    f('.edit_group_link').click
     #set number of lowest scores to drop
     f('.add_rule_link').click
     f('input.drop_count').send_keys('2')
@@ -48,7 +48,7 @@ describe "assignment groups" do
     keep_trying_until { f(assignment_css).displayed? }
     click_option(assignment_css, assignment.title)
     #delete second grading rule and save
-    f('.form_rules div:nth-child(2) a img').click
+    f('.form_rules div:nth-child(2) a').click
     submit_form('#add_group_form')
 
     #verify grading rules

@@ -14,8 +14,10 @@
       </span>
       {{#if options.permissions.create}}
         <a href="{{new_topic_url}}" class="btn btn-primary">{{#if showingAnnouncements}}
+          <i class="icon-announcement"></i> 
           {{#t "make_an_announcement"}}Make an announcement{{/t}}
         {{else}}
+          <i class="icon-discussion-new"></i> 
           {{#t "new_discussion"}}Start a discussion{{/t}}
         {{/if}}</a>
       {{/if}}

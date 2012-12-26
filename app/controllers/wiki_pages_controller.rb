@@ -123,6 +123,7 @@ class WikiPagesController < ApplicationController
       @page.workflow_state = 'active' if @page.deleted?
       if @page.update_attributes(params[:wiki_page].merge(:user_id => @current_user.id))
         log_asset_access(@page, "wiki", @wiki, 'participate')
+        generate_new_page_view
         @page.context_module_action(@current_user, @context, :contributed)
         flash[:notice] = t('notices.page_updated', 'Page was successfully updated.')
         respond_to do |format|
@@ -141,11 +142,11 @@ class WikiPagesController < ApplicationController
       end
     end
   end
-  
+
   def create
     update
   end
-  
+
   def destroy
     if authorized_action(@page, @current_user, :delete)
       if @page.url != "front-page"

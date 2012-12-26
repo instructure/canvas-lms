@@ -22,13 +22,13 @@
   content_for :right_side do
 %>
   <div id="sidebar_content" class="rs-margin-all">
-    <a class="button button-sidebar-wide return_url calendar_url" href="<%= return_to_url %>"><%= image_tag "back.png" %> <%= t 'links.back_to_calendar', "Back to Calendar" %></a>
+    <a class="btn button-sidebar-wide return_url calendar_url" href="<%= return_to_url %>"><%= image_tag "back.png" %> <%= t 'links.back_to_calendar', "Back to Calendar" %></a>
     <a class="base_calendar_url" href="<%= calendar_url_for(@context) %>" style="display: none;">&nbsp;</a>
     <% if can_do(@event, @current_user, :update) %>
       <div style="margin-top: 10px;">
-        <a href="#" class="button button-sidebar-wide edit_calendar_event_link"><%= image_tag "edit.png" %> <%= t 'links.edit', "Edit Calendar Event"%></a><br/>
+        <a href="#" class="btn button-sidebar-wide edit_calendar_event_link"><%= image_tag "edit.png" %> <%= t 'links.edit', "Edit Calendar Event"%></a><br/>
         <% unless @event.new_record? %>
-          <a href="<%= context_url(@context, :context_calendar_event_url, @event.id) %>" class="button button-sidebar-wide delete_event_link"><%= image_tag "delete.png" %> <%= t 'links.delete', "Delete the Event" %></a>
+          <a href="<%= context_url(@context, :context_calendar_event_url, @event.id) %>" class="btn button-sidebar-wide delete_event_link"><%= image_tag "delete.png" %> <%= t 'links.delete', "Delete the Event" %></a>
         <% end %>
       </div>
     <% end %>

@@ -256,14 +256,19 @@ ActionController::Routing::Routes.draw do |map|
       quiz.formatted_statistics "statistics.:format", :controller => 'quizzes', :action => 'statistics'
       quiz.read_only "read_only", :controller => 'quizzes', :action => 'read_only'
       quiz.filters 'filters', :controller => 'quizzes', :action => 'filters'
-      quiz.resources :quiz_submissions, :as => "submissions", :collection => {:backup => :put} do |submission|
+      quiz.resources :quiz_submissions, :as => "submissions", :collection => {:backup => :put}, :member => {:record_answer => :post} do |submission|
       end
       quiz.extensions 'extensions/:user_id', :controller => 'quiz_submissions', :action => 'extensions', :conditions => {:method => :post}
       quiz.resources :quiz_questions, :as => "questions", :only => %w(create update destroy show)
       quiz.resources :quiz_groups, :as => "groups", :only => %w(create update destroy) do |group|
         group.reorder "reorder", :controller => "quiz_groups", :action => "reorder"
       end
-      quiz.take "take", :controller => "quizzes", :action => "show", :take => '1'
+
+      quiz.with_options :controller => "quizzes", :action => "show", :take => '1' do |take_quiz|
+        take_quiz.take "take"
+        take_quiz.question "take/questions/:question_id"
+      end
+
       quiz.moderate "moderate", :controller => "quizzes", :action => "moderate"
       quiz.lockdown_browser_required "lockdown_browser_required", :controller => "quizzes", :action => "lockdown_browser_required"
     end
@@ -410,7 +415,6 @@ ActionController::Routing::Routes.draw do |map|
     add_media(group)
     group.resources :collaborations
     group.old_calendar 'calendar', :controller => 'calendars', :action => 'show'
-    group.profile 'profile', :controller => :groups, :action => 'profile', :conditions => {:method => :get}
   end
 
   map.resources :accounts, :member => { :statistics => :get } do |account|
@@ -671,6 +675,11 @@ ActionController::Routing::Routes.draw do |map|
       sections.get 'courses/:course_id/sections', :action => :index, :path_name => 'course_sections'
       sections.get 'courses/:course_id/sections/:id', :action => :show, :path_name => 'course_section'
       sections.get 'sections/:id', :action => :show
+      sections.post 'courses/:course_id/sections', :action => :create
+      sections.put 'sections/:id', :action => :update
+      sections.delete 'sections/:id', :action => :destroy
+      sections.post 'sections/:id/crosslist/:new_course_id', :action => :crosslist
+      sections.delete 'sections/:id/crosslist', :action => :uncrosslist
     end
 
     api.with_options(:controller => :enrollments_api) do |enrollments|
@@ -816,8 +825,11 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :role_overrides) do |roles|
+      roles.get 'accounts/:account_id/roles', :action => :index
       roles.post 'accounts/:account_id/roles', :action => :add_role
+      roles.post 'accounts/:account_id/roles/:role/activate', :action => :activate_role
       roles.put 'accounts/:account_id/roles/:role', :action => :update
+      roles.delete 'accounts/:account_id/roles/:role', :action => :remove_role
     end
 
     api.with_options(:controller => :account_reports) do |reports|

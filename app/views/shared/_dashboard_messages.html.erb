@@ -1,0 +1,8 @@
+<%# These all take care of their own conditions for showing/hiding %>
+<%# TODO: aria roles for these. maybe use list/listitem or region 
+    http://www.w3.org/TR/wai-aria/roles#document_structure_roles %>
+<%= render :partial => 'users/ie7_upgrade' %>
+<%= render :partial => 'shared/account_notification', :collection => @announcements %>
+<%= render :partial => 'users/current_conference', :collection => @current_conferences %>
+<%= render :partial => 'users/welcome' %>
+<%= render :partial => 'users/cc_prefs' %>

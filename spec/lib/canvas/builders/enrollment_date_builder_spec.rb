@@ -77,7 +77,7 @@ describe Canvas::Builders::EnrollmentDateBuilder do
         @term.start_at = nil
         @term.end_at = nil
         @term.save!
-        test_builder @teacher_enrollment, [[@section.start_at, @section.end_at]]
+        test_builder @teacher_enrollment, [[@section.start_at, @section.end_at], [nil,nil]]
       end
 
       it "for student" do
@@ -107,7 +107,7 @@ describe Canvas::Builders::EnrollmentDateBuilder do
         @term.start_at = nil
         @term.end_at = nil
         @term.save!
-        test_builder @teacher_enrollment, [[@course.start_at, @course.end_at]]
+        test_builder @teacher_enrollment, [[@course.start_at, @course.end_at], [nil,nil]]
       end
 
       it "for student" do

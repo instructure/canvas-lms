@@ -3,6 +3,7 @@ define([
   'jquery' /* $ */,
   'jquery.instructure_forms' /* formSubmit, fillFormData */,
   'jqueryui/dialog',
+  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
   'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */
 ], function(I18n, $) {
@@ -29,8 +30,7 @@ $(document).ready(function() {
     $dialog.dialog({
       title: I18n.t('titles.edit_external_tool', "Edit External Tool"),
       width: 600
-    });
-
+    }).fixDialogButtons();
     $dialog.find(".shared_secret_note").hide();
     $dialog.find("form")
       .attr('method', 'POST')

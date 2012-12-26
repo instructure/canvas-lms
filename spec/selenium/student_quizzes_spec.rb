@@ -56,7 +56,7 @@ describe "quizzes" do
         RESUME_TEXT = 'Resume Quiz'
 
         def validate_resume_button_text(text)
-          f('#right-side .button').text.should == text
+          f('#right-side .btn').text.should == text
         end
 
         it "should show the resume quiz button if the quiz is unlocked" do

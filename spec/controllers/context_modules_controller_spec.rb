@@ -259,4 +259,47 @@ describe ContextModulesController do
       mod.reload.content_tags.map(&:id).should == order
     end
   end
+
+  describe "PUT 'update_item'" do
+    before do
+      course_with_teacher_logged_in(:active_all => true)
+      @module = @course.context_modules.create!
+      @assignment = @course.assignments.create! :title => 'An Assignment'
+      @assignment_item = @module.add_item :type => 'assignment', :id => @assignment.id
+      @external_url_item = @module.add_item :type => 'external_url', :title => 'Example URL', :url => 'http://example.org'
+      @external_tool_item = @module.add_item :type => 'context_external_tool', :title => 'Example Tool', :url => 'http://example.com/tool'
+    end
+
+    it "should update the tag title" do
+      put 'update_item', :course_id => @course.id, :id => @assignment_item.id, :content_tag => { :title => 'New Title' }
+      @assignment_item.reload.title.should == 'New Title'
+    end
+
+    it "should update the asset title" do
+      put 'update_item', :course_id => @course.id, :id => @assignment_item.id, :content_tag => { :title => 'New Title' }
+      @assignment.reload.title.should == 'New Title'
+    end
+
+    it "should update indent" do
+      put 'update_item', :course_id => @course.id, :id => @external_url_item.id, :content_tag => { :indent => 2 }
+      @external_url_item.reload.indent.should == 2
+    end
+
+    it "should update the url for an external url item" do
+      new_url = 'http://example.org/new_url'
+      put 'update_item', :course_id => @course.id, :id => @external_url_item.id, :content_tag => { :url => new_url }
+      @external_url_item.reload.url.should == new_url
+    end
+
+    it "should update the url for an external tool item" do
+      new_url = 'http://example.org/new_tool'
+      put 'update_item', :course_id => @course.id, :id => @external_tool_item.id, :content_tag => { :url => new_url }
+      @external_tool_item.reload.url.should == new_url
+    end
+
+    it "should ignore the url for a non-applicable type" do
+      put 'update_item', :course_id => @course.id, :id => @assignment_item.id, :content_tag => { :url => 'http://example.org/new_tool' }
+      @assignment_item.reload.url.should be_nil
+    end
+  end
 end

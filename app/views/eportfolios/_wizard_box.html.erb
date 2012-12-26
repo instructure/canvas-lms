@@ -60,7 +60,7 @@ $(document).ready(function() {
     <% end %>
     <ul class="wizard_options_list">
       <li class="option information_step">
-        <a href="#" class="header"><%= t('headers.introduction', "Introduction") %></a>
+        <a href="#" class="header icon-info"><%= t('headers.introduction', "Introduction") %></a>
         <div class="details" style="display: none;">
           <%= t('introduction.body', <<-DETAILS,
             ePortfolios are a place to demonstrate your work. They are made of
@@ -73,7 +73,7 @@ $(document).ready(function() {
         </div>
       </li>
       <li class="option content_step portfolio_step">
-        <a href="#" class="header"><%= t('headers.sections', "Portfolio Sections") %></a>
+        <a href="#" class="header icon-document"><%= t('headers.sections', "Portfolio Sections") %></a>
         <div class="details" style="display: none;">
           <div style="font-size: 0.8em;">
             <p><%= t('sections.body1', <<-DETAILS,
@@ -91,13 +91,13 @@ $(document).ready(function() {
               that appears, rearrange sections by clicking and dragging them,
               or delete sections by clicking the %{delete_icon} icon.
               DETAILS
-              :edit_icon => edit_icon,
-              :delete_icon => delete_icon) %></p>
+              :edit_icon => '<i class="icon-edit"></i>'.html_safe,
+              :delete_icon => '<i class="icon-end"></i>'.html_safe) %></p>
           </div>
         </div>
       </li>
       <li class="option content_step section_step">
-        <a href="#" class="header"><%= t('headers.pages', "Section Pages") %></a>
+        <a href="#" class="header icon-document"><%= t('headers.pages', "Section Pages") %></a>
         <div class="details" style="display: none;">
           <div style="font-size: 0.8em;">
             <p><%= t('pages.body1', <<-DETAILS,
@@ -167,7 +167,7 @@ $(document).ready(function() {
       <% end %>
       <% if @owner_view %>
         <li class="option add_step adding_submissions">
-          <a href="#" class="header"><%= t('headers.submissions', "Adding Submissions") %></a>
+          <a href="#" class="header icon-add"><%= t('headers.submissions', "Adding Submissions") %></a>
           <div class="details" style="display: none;">
             <%= t('submissions.body1', <<-DETAILS,
               You may have noticed at the bottom of this page is a list of
@@ -180,7 +180,7 @@ $(document).ready(function() {
           </div>
         </li>
         <li class="option adding_submissions_dialog" style="display: none;">
-          <a href="#" class="header"><%= t('headers.submissions', "Adding Submissions") %></a>
+          <a href="#" class="header icon-add"><%= t('headers.submissions', "Adding Submissions") %></a>
           <div class="details" style="display: none;">
             <%= t('submissions.body2', <<-DETAILS)
               Great! Now to finish adding the submission, you need to choose
@@ -193,7 +193,7 @@ $(document).ready(function() {
         </li>
       <% end %>
       <li class="option edit_step">
-        <a href="#" class="header"><%= t('headers.settings', "ePortfolio Settings") %></a>
+        <a href="#" class="header icon-settings"><%= t('headers.settings', "ePortfolio Settings") %></a>
         <div class="details" style="display: none;">
           <%= t('settings.body', <<-DETAILS,
             To change the settings for your ePortfolio, click the "ePortfolio
@@ -206,7 +206,7 @@ $(document).ready(function() {
       </li>
       <% if @owner_view %>
         <li class="option publish_step">
-          <a href="#" class="header"><%= t('headers.finish', "Let's Do It") %></a>
+          <a href="#" class="header icon-arrow-right"><%= t('headers.finish', "Let's Do It") %></a>
           <div class="details" style="display: none;">
             <%= t('finish.body', <<-DETAILS,
               Ready to get started? You can always get back to this wizard from

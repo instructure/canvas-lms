@@ -70,3 +70,4 @@ app/views/jst/plugins/
 app/stylesheets/plugins/
 spec/coffeescripts/plugins/
 branch_tools.rb
+.rbenv-version

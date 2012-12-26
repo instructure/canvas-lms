@@ -22,20 +22,16 @@ describe AccessToken do
   context "hashed tokens" do
     before do
       @at = AccessToken.create!(:user => user_model, :developer_key => DeveloperKey.default)
-      @token_string = @at[:token]
+      @token_string = @at.full_token
     end
 
-    it "should hash tokens into crypted_token" do
-      @at.crypted_token.should == Canvas::Security.hmac_sha1(@token_string)
+    it "should only store the encrypted token" do
+      @token_string.should be_present
+      @token_string.should_not == @at.crypted_token
+      AccessToken.find(@at.id).full_token.should be_nil
     end
 
     it "should authenticate via crypted_token" do
-      AccessToken.update_all({ :token => nil })
-      AccessToken.authenticate(@token_string).should == @at
-    end
-
-    it "should authenticate a token without crypted_token set yet" do
-      AccessToken.update_all({ :crypted_token => nil })
       AccessToken.authenticate(@token_string).should == @at
     end
 

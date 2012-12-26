@@ -92,7 +92,7 @@ describe "assignments" do
           expect_new_page_load { submit_form('#edit_assignment_form') }
         else
           f('#external_tool_create_url').send_keys(lti_url)
-          submit_dialog('.ui-dialog-buttonset', '.add_item_button')
+          submit_dialog('#select_context_content_dialog', ".add_item_button")
           expect_new_page_load { submit_form('#edit_assignment_form') }
         end
         f('.assignment_list').should include_text(assignment_title)
@@ -161,7 +161,7 @@ describe "assignments" do
       f('.more_options_link').click
       f('#assignment_group_assignment').click
       click_option('#assignment_group_category_select', 'new', :value)
-      submit_dialog('div.ui-dialog')
+      submit_dialog('#add_category_form')
       wait_for_ajaximations
       submit_form('#edit_assignment_form')
       wait_for_ajaximations

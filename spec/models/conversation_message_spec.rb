@@ -161,7 +161,7 @@ describe ConversationMessage do
 
       StreamItem.count.should eql(old_count + 1)
       stream_item = StreamItem.last
-      stream_item.item_asset_string.should eql(message.conversation.asset_string)
+      stream_item.asset.should == message.conversation
     end
 
     it "should not create a conversation stream item for a submission comment" do

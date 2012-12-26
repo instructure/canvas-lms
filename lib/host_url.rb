@@ -71,16 +71,17 @@ class HostUrl
       res
     end
     
-    def file_host(account, current_host = nil)
-      return @@file_host if @@file_host
+    def file_host_with_shard(account, current_host = nil)
+      return [@@file_host, Shard.default] if @@file_host
       res = nil
       res = @@file_host = domain_config[:files_domain] if domain_config.has_key?(:files_domain)
       Rails.logger.warn("No separate files host specified for account id #{account.id}.  This is a potential security risk.") unless res || !Rails.env.production?
       res ||= @@file_host = default_host
+      [res, Shard.default]
     end
 
-    def file_host_with_shard(account, current_host = nil)
-      [file_host(account, current_host), Shard.default]
+    def file_host(account, current_host = nil)
+      file_host_with_shard(account, current_host).first
     end
 
     def cdn_host

@@ -150,8 +150,8 @@ This text has a http://www.google.com link in it...
     @comment = @submission.add_comment(:author => se.user, :comment => "some comment")
     @item = StreamItem.last
     @item.should_not be_nil
-    @item.item_asset_string.should eql(@submission.asset_string)
-    @item.data.should be_is_a(OpenObject)
+    @item.asset.should == @submission
+    @item.data.should be_is_a(Submission)
     @item.data.submission_comments.should_not be_nil
     @item.data.id.should eql(@submission.id)
     @item.data.submission_comments[0].id.should eql(@comment.id)

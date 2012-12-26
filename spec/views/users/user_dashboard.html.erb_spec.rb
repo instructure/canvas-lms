@@ -28,6 +28,7 @@ describe "/users/user_dashboard" do
     assigns[:group_memberships] = []
     assigns[:topics] = []
     assigns[:upcoming_events] = []
+    assigns[:stream_items] = []
 
     render "users/user_dashboard"
     response.should_not be_nil
@@ -41,34 +42,9 @@ describe "/users/user_dashboard" do
     assigns[:group_memberships] = []
     assigns[:topics] = []
     assigns[:upcoming_events] = []
+    assigns[:stream_items] = []
     assigns[:announcements] = [AccountNotification.new(:subject => "My Global Announcement", :account => Account.default)]
     render "users/user_dashboard"
     response.body.should match /My Global Announcement/
-  end
-
-  it "should show single course invitation on dashboard" do
-    course_with_student(:active_course => 1)
-    view_context
-    assigns[:courses] = []
-    assigns[:enrollments] = []
-    assigns[:group_memberships] = []
-    assigns[:topics] = []
-    assigns[:upcoming_events] = []
-    render "users/user_dashboard"
-    response.body.should match /You've been invited/
-    response.body.should match /Accept Invitation/
-  end
-
-  it "should link to course page for multiple invitations" do
-    course_with_student(:active_course => 1)
-    course_with_student(:active_course => 1, :user => @student)
-    view_context
-    assigns[:courses] = []
-    assigns[:enrollments] = []
-    assigns[:group_memberships] = []
-    assigns[:topics] = []
-    assigns[:upcoming_events] = []
-    render "users/user_dashboard"
-    response.body.should match /You've been invited to join 2 courses/
   end
 end

@@ -24,9 +24,17 @@ describe "Default Account Reports" do
     Notification.find_or_create_by_name("Report Generated")
     Notification.find_or_create_by_name("Report Generation Failed")
 
+    @course = Course.new(:name => 'English 101', :course_code => 'ENG101', :account => @account)
+    @course.save
+    @course.sis_source_id = "SIS_COURSE_ID_1"
+    @course.save!
+    @course.offer!
     @account = Account.default
-    student_in_course(:course => @course, :active_all => true, :name => 'Luke Skywalker')
-    @student1 = User.create(:name => 'Bilbo Baggins')
+    @student = user_with_pseudonym(:active_all => true, :account => @account, :name => "John St. Clair", :sortable_name => "St. Clair, John", :username => 'john@stclair.com')
+    @user.pseudonym.sis_user_id = "user_sis_id_01"
+    @user.pseudonym.save!
+    @student1 = user_with_pseudonym(:active_all => true, :username => 'micheal@michaelbolton.com', :name => 'Michael Bolton', :account => @account)
+    @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
     @course.enroll_user(@student1, "StudentEnrollment", :enrollment_state => 'active')
     assignment_model(:course => @course, :title => 'Engrish Assignment')
     @outcome = @account.created_learning_outcomes.create!(:short_description => 'Spelling')
@@ -82,31 +90,35 @@ describe "Default Account Reports" do
 
     parsed[0][0].should == @student.sortable_name
     parsed[0][1].should == @student.id.to_s
-    parsed[0][2].should == @assignment.title
-    parsed[0][3].should == @assignment.id.to_s
-    parsed[0][4].should == @submission.submitted_at.iso8601
-    parsed[0][5].should == @submission.grade.to_s
-    parsed[0][6].should == @outcome.short_description
-    parsed[0][7].should == @outcome.id.to_s
-    parsed[0][8].should == '1'
-    parsed[0][9].should == '2'
-    parsed[0][10].should == @course.name
-    parsed[0][11].should == @course.id.to_s
-    parsed[0][12].should == "https://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments/#{@assignment.id}"
+    parsed[0][2].should == "user_sis_id_01"
+    parsed[0][3].should == @assignment.title
+    parsed[0][4].should == @assignment.id.to_s
+    parsed[0][5].should == @submission.submitted_at.iso8601
+    parsed[0][6].should == @submission.grade.to_s
+    parsed[0][7].should == @outcome.short_description
+    parsed[0][8].should == @outcome.id.to_s
+    parsed[0][9].should == '1'
+    parsed[0][10].should == '2'
+    parsed[0][11].should == @course.name
+    parsed[0][12].should == @course.id.to_s
+    parsed[0][13].should == @course.sis_course_id
+    parsed[0][14].should == "https://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments/#{@assignment.id}"
 
     parsed[1][0].should == @student1.sortable_name
     parsed[1][1].should == @student1.id.to_s
-    parsed[1][2].should == @assignment.title
-    parsed[1][3].should == @assignment.id.to_s
-    parsed[1][4].should == nil
+    parsed[1][2].should == nil
+    parsed[1][3].should == @assignment.title
+    parsed[1][4].should == @assignment.id.to_s
     parsed[1][5].should == nil
-    parsed[1][6].should == @outcome.short_description
-    parsed[1][7].should == @outcome.id.to_s
-    parsed[1][8].should == nil
+    parsed[1][6].should == nil
+    parsed[1][7].should == @outcome.short_description
+    parsed[1][8].should == @outcome.id.to_s
     parsed[1][9].should == nil
-    parsed[1][10].should == @course.name
-    parsed[1][11].should == @course.id.to_s
-    parsed[1][12].should == "https://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments/#{@assignment.id}"
+    parsed[1][10].should == nil
+    parsed[1][11].should == @course.name
+    parsed[1][12].should == @course.id.to_s
+    parsed[0][13].should == @course.sis_course_id
+    parsed[1][14].should == "https://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments/#{@assignment.id}"
 
   end
 

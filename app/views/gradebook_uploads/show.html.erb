@@ -63,7 +63,7 @@
     </table>
   </div>
   <div class="button-container">
-    <button type="submit" class="button"><%= t('buttons.continue', "Continue %{icon}", :icon => raw('&rarr;')) %></button>
+    <button type="submit" class="btn"><%= t('buttons.continue', "Continue %{icon}", :icon => raw('&rarr;')) %></button>
   </div>
 </form>
 
@@ -79,8 +79,8 @@
   <div id="gradebook_grid"></div>
   <input type="hidden" name="json_data_to_submit" value="" />
   <div class="button-container" style="padding-left:7px;">
-    <button type="submit" class="button"><%= t('buttons.save_changes', "Save Changes") %></button>
-    <%= link_to t('#buttons.cancel', "Cancel"), :back , :class => "button button-secondary" %>
+    <button type="submit" class="btn"><%= t('buttons.save_changes', "Save Changes") %></button>
+    <%= link_to t('#buttons.cancel', "Cancel"), :back , :class => "btn button-secondary" %>
     <span id="assignments_without_changes_alert" style="display:none; margin-left: 50px;"><%= t('notices.unchanged', "Note: You uploaded some assignments that had no grade changes detected. They have been hidden.") %></span>
   </div>
 <% end -%>

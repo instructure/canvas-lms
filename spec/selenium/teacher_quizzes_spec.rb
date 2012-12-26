@@ -122,10 +122,8 @@ describe "quizzes" do
 
       dialog.find_element(:css, 'textarea#body').send_keys('This is a test message.')
 
-      button = dialog.find_element(:css, "button.send_button")
-      button.click
-      keep_trying_until { button.text != "Sending Message..." }
-      button.text.should == "Message Sent!"
+      submit_dialog(dialog)
+      wait_for_ajax_requests
 
       student.conversations.size.should == 1
     end
@@ -237,14 +235,14 @@ describe "quizzes" do
 
       #click second answer
       f("#question_#{@quest2.id} .answers .answer:first-child input").click
-      submit_form('#submit_quiz_form')
+      f("#submit_quiz_button").click
 
       #dismiss dialog and submit quiz
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.dismiss
       f("#question_#{@quest1.id} .answers .answer:last-child input").click
       expect_new_page_load {
-        submit_form('#submit_quiz_form')
+        f("#submit_quiz_button").click
       }
       f('#quiz_title').text.should == @q.title
     end
@@ -259,7 +257,7 @@ describe "quizzes" do
         #indicator.text.should == 'Saving...'
 
         wait_for_ajax_requests
-        indicator.text.should match(/^Saved at \d+:\d+(pm|am)$/)
+        indicator.text.should match(/^Quiz saved at \d+:\d+(pm|am)$/)
       end
     end
 

@@ -79,7 +79,7 @@ class Enrollment < ActiveRecord::Base
       :sqlite     => default_sql.gsub("{{now}}", "datetime('now')"),
       :mysql => <<-MYSQL }
         IF #{no_other_enrollments_sql} THEN
-          UPDATE assignments, submissions SET needs_grading_count = needs_grading_count + %s, updated_at = utc_timestamp()
+          UPDATE assignments, submissions SET needs_grading_count = needs_grading_count + %s, assignments.updated_at = utc_timestamp()
           WHERE context_id = NEW.course_id
             AND context_type = 'Course'
             AND assignments.id = submissions.assignment_id
@@ -198,6 +198,19 @@ class Enrollment < ActiveRecord::Base
 
   def self.readable_type(type)
     READABLE_TYPES[type] || READABLE_TYPES['StudentEnrollment']
+  end
+
+  TYPES_WITH_INDEFINITE_ARTICLE = {
+    'TeacherEnrollment' => t('#enrollment.roles.teacher_with_indefinite_article', "A Teacher"),
+    'TaEnrollment' => t('#enrollment.roles.ta_with_indefinite_article', "A TA"),
+    'DesignerEnrollment' => t('#enrollment.roles.designer_with_indefinite_article', "A Designer"),
+    'StudentEnrollment' => t('#enrollment.roles.student_with_indefinite_article', "A Student"),
+    'StudentViewEnrollment' => t('#enrollment.roles.student_with_indefinite_article', "A Student"),
+    'ObserverEnrollment' => t('#enrollment.roles.observer_with_indefinite_article', "An Observer")
+  }
+
+  def self.type_with_indefinite_article(type)
+    TYPES_WITH_INDEFINITE_ARTICLE[type] || TYPES_WITH_INDEFINITE_ARTICLE['StudentEnrollment']
   end
 
   def should_update_user_account_association?
@@ -569,9 +582,13 @@ class Enrollment < ActiveRecord::Base
   def has_permission_to?(action)
     @permission_lookup ||= {}
     unless @permission_lookup.has_key? action
-      @permission_lookup[action] = RoleOverride.permission_for(self, action, self.class.to_s)[:enabled]
+      @permission_lookup[action] = RoleOverride.permission_for(course, action, base_role_name, self.role_name)[:enabled]
     end
     @permission_lookup[action]
+  end
+
+  def base_role_name
+    self.class.to_s
   end
 
   # Determine if a user has permissions to conclude this enrollment.
@@ -965,5 +982,9 @@ class Enrollment < ActiveRecord::Base
 
   def self.cross_shard_invitations?
     false
+  end
+
+  def role
+    self.role_name || self.type
   end
 end

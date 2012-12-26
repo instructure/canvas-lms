@@ -141,11 +141,11 @@ describe User do
   it "should populate dashboard_messages" do
     Notification.create(:name => "Assignment Created")
     course_with_teacher(:active_all => true)
-    StreamItem.for_user(@user).should be_empty
+    @user.stream_item_instances.should be_empty
     @a = @course.assignments.new(:title => "some assignment")
     @a.workflow_state = "available"
     @a.save
-    StreamItem.for_user(@user).should_not be_empty
+    @user.stream_item_instances(true).should_not be_empty
   end
 
   it "should ignore orphaned stream item instances" do
@@ -155,6 +155,45 @@ describe User do
     StreamItem.delete_all
     @user.unmemoize_all
     @user.recent_stream_items.size.should == 0
+  end
+
+  describe "#cached_recent_stream_items" do
+    before(:each) do
+      @contexts = []
+      # create stream item 1
+      course_with_teacher(:active_all => true)
+      @contexts << @course
+      discussion_topic_model(:context => @course)
+      # create stream item 2
+      course_with_teacher(:active_all => true, :user => @teacher)
+      @contexts << @course
+      discussion_topic_model(:context => @course)
+
+      @dashboard_key = StreamItemCache.recent_stream_items_key(@teacher)
+      @context_keys = @contexts.map { |context|
+        StreamItemCache.recent_stream_items_key(@teacher, context.class.base_class.name, context.id)
+      }
+    end
+
+    it "creates cache keys for each context" do
+      enable_cache do
+        @teacher.cached_recent_stream_items(:contexts => @contexts)
+        Rails.cache.read(@dashboard_key).should be_blank
+        @context_keys.each do |context_key|
+          Rails.cache.read(context_key).should_not be_blank
+        end
+      end
+    end
+
+    it "creates one cache key when there are no contexts" do
+      enable_cache do
+        @teacher.cached_recent_stream_items # cache the dashboard items
+        Rails.cache.read(@dashboard_key).should_not be_blank
+        @context_keys.each do |context_key|
+          Rails.cache.read(context_key).should be_blank
+        end
+      end
+    end
   end
 
   it "should be able to remove itself from a root account" do
@@ -886,9 +925,9 @@ describe User do
 
   context "permissions" do
     it "should not allow account admin to modify admin privileges of other account admins" do
-      RoleOverride.readonly_for(Account.default, :manage_role_overrides, 'AccountAdmin').should be_true
-      RoleOverride.readonly_for(Account.default, :manage_account_memberships, 'AccountAdmin').should be_true
-      RoleOverride.readonly_for(Account.default, :manage_account_settings, 'AccountAdmin').should be_true
+      RoleOverride.readonly_for(Account.default, :manage_role_overrides, AccountUser::BASE_ROLE_NAME, 'AccountAdmin').should be_true
+      RoleOverride.readonly_for(Account.default, :manage_account_memberships, AccountUser::BASE_ROLE_NAME, 'AccountAdmin').should be_true
+      RoleOverride.readonly_for(Account.default, :manage_account_settings, AccountUser::BASE_ROLE_NAME, 'AccountAdmin').should be_true
     end
   end
 
@@ -1906,6 +1945,12 @@ describe User do
       User.create!(:name => "John John")
       User.order_by_sortable_name.all.map(&:sortable_name).should == ["John, John", "Johnson, John"]
     end
+
+    it "should sort support direction toggle" do
+      User.create!(:name => "John Johnson")
+      User.create!(:name => "John John")
+      User.order_by_sortable_name(:direction => :descending).all.map(&:sortable_name).should == ["Johnson, John", "John, John"]
+    end
   end
 
   describe "quota" do
@@ -2264,6 +2309,16 @@ describe User do
     context "with an explicit preference for gradebook 1" do
       before { user.stubs(:preferences => { :use_gradebook2 => false }) }
       it { should be_false }
+    end
+  end
+
+  describe "things excluded from json serialization" do
+    it "excludes collkey" do
+      # Ruby 1.9 does not like html that includes the collkey, so
+      # don't ship it to the page (even as json).
+      user = User.create!
+      users = User.order_by_sortable_name
+      users.first.as_json['user'].keys.should_not include('collkey')
     end
   end
 end

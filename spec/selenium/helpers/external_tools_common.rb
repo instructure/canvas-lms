@@ -21,7 +21,7 @@ shared_examples_for "external tools tests" do
     else
       add_manual opts
     end
-    f("#external_tools_dialog .save_button").click
+    submit_form("#external_tools_dialog")
     wait_for_ajax_requests
     ContextExternalTool.count > 0
     tool = ContextExternalTool.last

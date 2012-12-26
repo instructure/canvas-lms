@@ -1,5 +1,5 @@
 <div>
-  <div id="calendar-header">
+  <div id="calendar-header" {{#if showScheduler}}class="with-scheduler"{{/if}}>
     <a href="#" id="refresh_calendar_link">{{#t "refresh"}}Refresh{{/t}}</a>
     {{#unless calendar2Only}}
     <a id="change-calendar-version" href="/switch_calendar/1" data-method="post" rel="nofollow" class="btn btn-mini btn-primary">{{#t "use_old_calendar"}}Go back to the old calendar{{/t}}</a>
@@ -9,7 +9,9 @@
     <span id="calendar_views">
       <input type="radio" id="week"      name="calendar_view" /><label for="week">{{#t "links.calendar_week"}}Week{{/t}}</label>
       <input type="radio" id="month"     name="calendar_view" checked="checked" /><label for="month">{{#t "links.calendar_month"}}Month{{/t}}</label>
+      {{#if showScheduler}}
       <input type="radio" id="scheduler" name="calendar_view" /><label for="scheduler">{{#t "links.calendar_scheduler"}}Scheduler{{/t}} <span stye="display: none" class="counter-badge"></span></label>
+      {{/if}}
     </div>
   </span>
 

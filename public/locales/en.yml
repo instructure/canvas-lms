@@ -9,10 +9,9 @@ en:
     context_required: "You need to select a calendar"
     select_calendars: "Select Calendars"
   academic_benchmark: 
+    api_error: "Couldn't update standards for authority %{auth}."
+    bad_ab_file: "The provided Academic Benchmark file has an error."
     bad_response_all: "Couldn't update the standards."
-    bad_response_auth: "Couldn't update standards for authority %{auth}."
-    failed_request: "Error accessing Academic Benchmark API"
-    failed_request_with_code: "Error accessing Academic Benchmark API"
     no_api_key: "An API key is required to use Academic Benchmarks"
     no_authority: "Couldn't find an authority to update"
     no_file: "No outcome file or authority given"
@@ -185,6 +184,7 @@ en:
       requested_authn_context: "Authentication Context"
       saml_debug_instructions: "Once you start debugging all info about the next attempted SAML login attempt will be collected. Click \"Refresh\" to see if more data has been collected or \"Stop Debugging\" to clear the collected data and stop the current debug attempt."
       saml_debugging: Debugging
+      save_button: "Save Authentication Settings"
       start_debugging: "Start Debugging"
       stop_debugging: "Stop Debugging"
     saml_testing: 
@@ -257,10 +257,8 @@ en:
     add_course_or_user: 
       add_course_button: "Add Course"
       add_course_link: "Add a New Course"
-      add_course_title: "Add a New Course"
       add_user_button: "Add User"
       add_user_link: "Add a New User"
-      add_user_title: "Add a New User"
       display_name_help: "People will see this name in discussions, messages and comments."
       full_name_description: "This name will be used by teachers for grading."
       labels: 
@@ -454,6 +452,7 @@ en:
         outgoing_email_default_name_option_default: "Default Canvas Setting"
         prevent_course_renaming_by_teachers: "Don't let teachers rename their courses"
         self_enrollment: "Allow Self-Enrollment"
+        show_scheduler: "Enable Scheduler"
         sis_source_id: "SIS ID"
         start_at: Starts
         students_can_create_courses: Students
@@ -1451,6 +1450,11 @@ en:
       links: 
         more_options: "more options"
       title: "Title:"
+    edit_assignment_override: 
+      calendar: "Calendar:"
+      due: "Due:"
+      links: 
+        more_options: "more options"
     edit_calendar_event: 
       calendar: "Calendar:"
       date: "Date:"
@@ -1512,6 +1516,7 @@ en:
     prompts: 
       delete_assignment: "Are you sure you want to delete this assignment?"
       delete_event: "Are you sure you want to delete this event?"
+      delete_override: "Are you sure you want to delete this assignment override?"
       unreserve_event: "Are you sure you want to delete your reservation to this event?"
     reschedule: Reschedule
     reservation_over_limit_dialog: 
@@ -1709,6 +1714,7 @@ en:
     plugins: 
       errors: 
         all_fields_required: "All fields are required"
+        login_expiration_minimum: "Session expiration must be 20 minutes or greater"
   cc: 
     by: "CC Attribution"
     by_nc: "CC Attribution Non-Commercial"
@@ -1809,11 +1815,6 @@ en:
     new: 
       pin_to_canvas_network: "Pin to Canvas Network"
       saved_successfully: "Saved Successfully"
-  coming_up_item_view: 
-    assignment: 
-      assignment_due: "Assignment due"
-    event: 
-      event: Event
   communication_channel: 
     body: "Your Canvas verification code is %{verification_code}"
     default_facebook_account: "Facebook Account"
@@ -2673,16 +2674,12 @@ en:
       images: 
         alt: 
           complete: done
-          delete: delete
-          edit: edit
           incomplete: incomplete
-          indent: indent
           max_score: "maximum score"
           min_score: "minimum score"
           must_contribute: "must contribute"
           must_submit: "must submit"
           must_view: "must view"
-          outdent: outdent
         title: 
           complete: "Module Item Completed"
           incomplete: "Module Item Incomplete"
@@ -3054,7 +3051,6 @@ en:
     unknown: unknown
   courses: 
     assignments_needing_grading: 
-      due_at: "Due %{date}"
       headings: 
         grade: "Grade %{assignment}"
         to_do: "To Do"
@@ -3069,14 +3065,12 @@ en:
         one: "1 needs grading"
         other: "%{count} need grading"
       points_possible: "out of %{points_possible}"
-      tooltip: 
-        due_at: "due: %{date}"
     confirm_action: 
       buttons: 
         conclude_course: "Conclude Course"
         delete_course: "Delete Course"
       details: 
-        confirm_conclude: "Are you sure you want to conclude this course? Students and teachers will still be able to see the course contents in a read-only format from their \"past courses\" page. If you don't want anyone to see the course, you can *delete the course completely*."
+        confirm_conclude: "Are you sure you want to conclude this course? Once concluded, Students and Teachers will need to access the course from the \"Past Enrollments\" section on their *courses page*. Teachers will retain full access to the course content and have the ability to continue grading while Students will be limited to read-only access, i.e., they can view their grades but no longer submit assignments."
         confirm_delete: "Are you sure you want to delete this course? Once it is deleted students and teachers will no longer have access to it. If you just want to remove it from the course dropdown then you should *conclude the course instead*."
       headings: 
         confirm: "Confirm Action"
@@ -3242,8 +3236,6 @@ en:
       submission_score: "%{score} *out of %{points_possible}*"
     recent_feedback: 
       comments: "Comments: %{count}"
-      labels: 
-        due_date: Due
       not_graded: "not graded"
       submission_points: 
         with_score: "Score: %{score} *out of %{points_possible}*"
@@ -3297,9 +3289,8 @@ en:
         public_course: "(student data will remain private)"
       images: 
         alt: 
-          cant_delete: "can't delete"
-          delete: delete
-          edit: edit
+          delete: Delete
+          edit: Edit
       indexed_course: "Included in public course index"
       invitations_view: 
         accepted_invitation: "%{name} has already received and accepted the invitation to join the course, but you can still re-send the invitation if it is needed."
@@ -3579,18 +3570,12 @@ en:
       assign_blanks: "Assign zeroes to unsubmitted students"
     out_of_points_possible: "out of %{assignment.points_possible}"
   dashboard: 
-    cancel: Cancel
-    coming_up: "Coming Up"
-    create: Create
-    creating_course: "Creating a course..."
-    creating_group: "Creating a group..."
     disable_dashboard: "Go back to the old dashboard"
     enable_dashboard: "Try out the new dashboard"
     event_created: "Event created"
     message_sent: "Message Sent"
     show_less: "Show Less"
     show_more: "Show More"
-    todo: Todo
   date: 
     abbr_day_names: 
       - Sun
@@ -3940,6 +3925,10 @@ en:
       unread: Unread
     uknown_author: "Unknown Author"
     unknown_author: "Unknown Author"
+  due_dates: 
+    due_at: "due: %{assignment_due_date_time}"
+    multiple_due_dates: "due: Multiple Due Dates"
+    no_due_date: "due: No Due Date"
   edit_rubric: 
     errors: 
       load_rubrics_failed: "Loading rubrics failed, please try again"
@@ -3954,6 +3943,8 @@ en:
       find_existing_rubric: "Find Existing Rubric"
   editor: 
     alt_text: "Alternate Text:"
+    button: 
+      insert_equation: "Insert Equation"
     cancel: Cancel
     click_to_embed: "Click to embed the image"
     done: 
@@ -3962,6 +3953,7 @@ en:
     embed_external: "Embed External Image"
     embed_from_external_tool: "\"Embed content from External Tool\""
     embed_image: "Embed Image"
+    equation_editor_title: "Use the toolbars or type/paste in LaTeX format to add an equation"
     image_not_found: "Image not found, please try a new URL"
     instructions: "Paste or type the URL of the image you'd like to embed:"
     loading: Loading...
@@ -4287,6 +4279,9 @@ en:
   external_feeds: 
     index_view: 
       add_a_new_feed: "Add a New Feed"
+      buttons: 
+        add_feed: "Add Feed"
+        adding_feed: "Adding feed..."
       descriptions: 
         add_new_feed: "You can automatically add posts from an RSS or Atom feed as announcements for this course. Just paste the feed URL below and any new entries will be added."
       keyword: "Keyword:"
@@ -5486,30 +5481,23 @@ en:
     your_email_address: "Your email address"
   helpers: 
     dashboard_helper: 
-      activity_category_title_with_contexts: "%{x_new_in_category} in %{contexts_list}"
       announcement_details: "Announcement Details"
       assignment_details: "Assignment Details"
       conversation_details: "Conversation Details"
       discussion_details: "Discussion Details"
-      x_course: 
-        one: "1 Course"
-        other: "%{count} Courses"
-      x_group: 
-        one: "1 Group"
-        other: "%{count} Groups"
       x_more: "%{x} more..."
       x_new_in_announcements: 
-        one: "1 Announcement"
-        other: "%{count} Announcements"
+        one: "*1* Announcement"
+        other: "*%{count}* Announcements"
       x_new_in_assignments: 
-        one: "1 Assignment Notification"
-        other: "%{count} Assignment Notifications"
+        one: "*1* Assignment Notification"
+        other: "*%{count}* Assignment Notifications"
       x_new_in_conversations: 
-        one: "1 Conversation Message"
-        other: "%{count} Conversation Messages"
+        one: "*1* Conversation Message"
+        other: "*%{count}* Conversation Messages"
       x_new_in_discussions: 
-        one: "1 Discussion"
-        other: "%{count} Discussions"
+        one: "*1* Discussion"
+        other: "*%{count}* Discussions"
   info: 
     notices: 
       error_reported: "Thanks for your help!  We'll get right on this"
@@ -5523,6 +5511,7 @@ en:
   instructure: 
     alerts: 
       file_previews_disabled: "File previews have been disabled for this Canvas site"
+      kaltura_disabled: "Kaltura has been disabled for this Canvas site"
     browsers: 
       unrecognized: "Unrecognized Browser"
     buttons: 
@@ -5550,6 +5539,7 @@ en:
       datepicker: 
         time: Time
     links: 
+      minimize_embedded_kaltura_content: "Minimize Embedded Content"
       minimize_file_preview: "Minimize File Preview"
       minimize_youtube_video: "Minimize Video"
       view_equella_content_in_new_window: "view the content in a new window"
@@ -5634,21 +5624,6 @@ en:
     titles: 
       job_handler: "Job Handler"
       last_error: "Last Error"
-  kollection_items: 
-    kollection_item_save_view: 
-      add_to_collection: "Add to Collection"
-      saving: Saving...
-      say_something_about_this: "Say something about this..."
-    link_data_view: 
-      add_a_description_of_this_here: "Add a description of this here."
-      choose_a_thumbnail: "Choose a Thumbnail"
-      loading: Loading...
-      no_data: "Hmm, nothing there..."
-      no_thumbnail: "No Thumbnail"
-  kollections: 
-    select_kollection_view: 
-      add_new_collection: "Add New Collection"
-      choose_a_collection: "Choose A Collection"
   labels: 
     announcements: Announcements
     assignments: Assignments
@@ -5795,12 +5770,8 @@ en:
       operators: Operators
       relationships: Relationships
   media_comments: 
-    alerts: 
-      kaltura_disabled: "Kaltura has been disabled for this Canvas site"
     buttons: 
       submit: "Submit Media File"
-    cancel: Cancel
-    click_to_view: "Click to view"
     errors: 
       file_too_large: "*This file is too large.* The maximum size is %{size}MB."
       load_failed: "Media Comment Application failed to load.  Please try again."
@@ -5810,11 +5781,10 @@ en:
       save_failed_try_again: "Entry failed to save.  Please try again."
       upload_failed: "Upload failed with error:"
     links: 
-      minimize_embedded_kaltura_content: "Minimize embedded content"
-    loading: "Loading media..."
-    media_still_converting: "Media is currently being converted, please try again in a little bit."
+      upgrade_flash: "Click here to upgrade"
     messages: 
       file_failed_to_load: "This media file failed to load"
+      flash_required: "This video requires Flash version 9 or higher (you have %{version} installed)."
       flash_required_record_audio: "Flash required for recording audio."
       flash_required_upload_audio: "Flash required for uploading audio."
       flash_required_upload_video: "Flash required for uploading video."
@@ -5822,12 +5792,10 @@ en:
       submitted: "Submitted Media File!"
       submitting: "Submitting Media File..."
     titles: 
+      click_to_view: "Click to View"
       media_contribution: "Media Contribution"
       play_comment: "Play Media Comment"
       record_upload_media_comment: "Record/Upload Media Comment"
-    track_uploaded_successfully: "Track uploaded successfuly, refresh to see it."
-    upload: Upload
-    uploading: Uploading...
   menu: 
     current_groups: "Current Groups"
     customize: Customize
@@ -6175,24 +6143,29 @@ en:
         due_at: "due: %{assignment_due_date_time}"
         labels: 
           click_to_see_assignment: "Click here to view the assignment"
+        multiple_due_dates: "due: Multiple Dates"
         new_assignment: "A new assignment has been created for your course, %{course_name}"
         no_due_date: "due: No Due Date"
       facebook: 
         due_at: "due: %{assignment_due_date_time}"
+        multiple_due_dates: "due: Multiple Dates"
         new_assignment: "A new assignment has been created for %{course_name}"
         no_due_date: "due: No Due Date"
       sms: 
         due_at: "due: %{assignment_due_date_time}"
         more_info: "More info at %{course_name}"
+        multiple_due_dates: "due: Multiple Dates"
         new_assignment: "New assignment for %{course_name}"
         no_due_date: "due: No Due Date"
       summary: 
         assignment_created: "Assignment Created - %{assignment_name}, %{course_name}"
         due_at: "due: %{assignment_due_date_time}"
+        multiple_due_dates: "due: Multiple Dates"
         no_due_date: "due: No Due Date"
       twitter: 
         assignment_change: "Canvas Alert - Change: %{assignment_name}, %{course_name}"
         due_at: "due: %{assignment_due_date_time}"
+        multiple_due_dates: "due: Multiple Dates"
         no_due_date: "due: No Due Date"
     assignment_due_date_changed: 
       email: 
@@ -6214,6 +6187,28 @@ en:
         no_due_date: "due: No Due Date"
       twitter: 
         assignment_change: "Canvas Alert - Date Change: %{assignment_name}, %{course_name}"
+        due_at: "due: %{assignment_due_date_time}"
+        no_due_date: "due: No Due Date"
+    assignment_due_date_override_changed: 
+      email: 
+        assignment_due_date_changed: "Assignment Due Date Changed: %{assignment_name}, %{course_name} (%{override})"
+        assignment_due_date_changed_sentence: "The due date for the assignment, %{assignment_name}, for the course, %{course_name} (%{override}), has changed to:"
+        labels: 
+          click_to_see_assignment: "Click here to view the assignment"
+        no_due_date: "No Due Date"
+      facebook: 
+        assignment_due_date_changed_sentence: "The due date for the assignment *%{assignment_name}* for %{course_name} (%{override}) has changed to:"
+        no_due_date: "No Due Date"
+      sms: 
+        assignment_due_date_changed: "%{assignment_name}, %{course_name} (%{override}) is now due:"
+        more_info_at_url: "More info at %{web_address}"
+        no_due_date: "No Due Date"
+      summary: 
+        assignment_due_date_changed: "Assignment Due Date Changed: %{assignment_name}, %{course_name} (%{override})"
+        due_at: "due: %{assignment_due_date_time}"
+        no_due_date: "due: No Due Date"
+      twitter: 
+        assignment_change: "Canvas Alert - Date Change: %{assignment_name}, %{course_name} (%{override})"
         due_at: "due: %{assignment_due_date_time}"
         no_due_date: "due: No Due Date"
     assignment_graded: 
@@ -7256,6 +7251,7 @@ en:
       assignment_changed: "Assignment Changed"
       assignment_created: "Assignment Created"
       assignment_due_date_changed: "Assignment Due Date Changed"
+      assignment_due_date_override_changed: "Assignment Due Date Override Changed"
       assignment_graded: "Assignment Graded"
       assignment_resubmitted: "Assignment Resubmitted"
       assignment_submitted: "Assignment Submitted"
@@ -7536,10 +7532,12 @@ en:
           description: "This enables importing Academic Benchmark standards into Canvas."
     academic_benchmark_settings: 
       api_url_description: "(e.g. %{url})"
+      common_core_guid: "(e.g. %{guid})"
       description: "You will need access to an [Academic Benchmark](%{url}) account."
       labels: 
         api_key: "API Key"
         api_url: "Api Url"
+        common_core_guid: "Common Core GUID (optional)"
     account_reports: 
       description: "Select account reports"
       name: "Account Reports"
@@ -7781,6 +7779,12 @@ en:
       labels: 
         api_key: "API key"
         secret_key: "API secret"
+    sessions: 
+      description: "Manage session timeouts"
+      name: Sessions
+    sessions_timeout: 
+      labels: 
+        session_timeout: "Time before session expires in minutes (20 minimum)"
     show: 
       back_to_list: "Return to plugins list"
       labels: 
@@ -8713,6 +8717,13 @@ en:
       message_text: "Message Text"
       other_incorrect_matches: "Other Incorrect Match Options"
       possible_answer: "Possible Answer"
+    links: 
+      resume_quiz: "Resume Quiz"
+      resume_survey: "Resume Survey"
+      take_the_quiz: "Take the Quiz"
+      take_the_quiz_again: "Take the Quiz Again"
+      take_the_survey: "Take the Survey"
+      take_the_survey_again: "Take the Survey Again"
     loading_more_questions: "loading more questions..."
     loading_question: "Loading Question..."
     loading_question_banks: "Loading Question Banks..."
@@ -8792,6 +8803,7 @@ en:
         republish_quiz: "Re-Publish Quiz"
         save_but_dont_publish: "Save Quiz *but don't Publish*"
         save_settings: "Save Settings"
+      cant_go_back: "Lock questions after answering"
       confirms: 
         delete_quiz: "Are you sure you want to delete this quiz?"
       default_page_title: "New Quiz"
@@ -8849,6 +8861,7 @@ en:
         show_assignment_rubric: "Show Assignment Rubric"
         start_over: "Start Over"
         switch_views: "Switch Views"
+      one_question_at_a_time: "Show one question at a time"
       points_possible: "%{n} Points Possible"
       practice_quiz: "Practice Quiz"
       retrieving_filters: "Retrieving Filters..."
@@ -8886,6 +8899,9 @@ en:
         edit_group_details: "Edit Group Details"
         expand_group: "Expand Group"
     question_limit_reached: "You have reached the maximum number of questions allowed for a quiz (%{count}/%{limit}).\\n\\nAs a workaround, consider spreading the material across multiple quizzes."
+    question_list_right_side: 
+      headers: 
+        questions: Questions
     question_statistic: 
       attempts: 
         one: "1 attempt"
@@ -9091,10 +9107,6 @@ en:
         show_student_quiz_results: "Show Student Quiz Results"
         show_student_survey_results: "Show Student Survey Results"
         survey_statistics: "Survey Statistics"
-        take_the_quiz: "Take the Quiz"
-        take_the_quiz_again: "Take the Quiz Again"
-        take_the_survey: "Take the Survey"
-        take_the_survey_again: "Take the Survey Again"
       only_registered_users: "Only registered, enrolled users can take graded quizzes"
       points_possible: 
         one: "1 pt"
@@ -9158,14 +9170,20 @@ en:
     statistics_filename: "%{title} %{type} Report"
     take_quiz: 
       buttons: 
+        next: Next
         out_of_time_submit: "Ok, fine"
-        submit_answer: "Submit Answers"
+        previous: Previous
+        submit_quiz: "Submit Quiz"
       confirms: 
+        cant_go_back_blank: "You can't come back to this question once you hit next. Are you sure you want to leave it blank?"
         navigate_away: "You're about to navigate away from this page.  Continue anyway?"
         unanswered_questions: 
           one: "You have 1 unanswered question (see the right sidebar for details).  Submit anyway?"
           other: "You have %{count} unanswered questions (see the right sidebar for details).  Submit anyway?"
         unfinished_quiz: "You're about to leave the quiz unfinished.  Continue anyway?"
+        unseen_questions: 
+          one: "There is still 1 question you haven't seen yet.  Submit anyway?"
+          other: "There are still %{count} questions you haven't seen yet.  Submit anyway?"
       days_count: 
         one: "1 Day"
         other: "%{count} Days"
@@ -9174,21 +9192,13 @@ en:
         only_numerical_values: "only numerical values are accepted"
       headers: 
         draft_preview: "This is a preview of the draft version of the quiz"
-        questions: Questions
       hide_time_link: Hide
       hours_count: 
         one: "1 Hour"
         other: "%{count} Hours"
       labels: 
-        attempt_due: "Attempt due"
-        score: Score
         started: Started
-        time_running: "Time Running"
         times_up: "Time's Up! Submitting results in"
-      links: 
-        hide_time_running: Hide
-        keep_editing_quiz: "Keep Editing This Quiz"
-        keep_editing_survey: "Keep Editing This Survey"
       minutes_count: 
         one: "1 Minute"
         other: "%{count} Minutes"
@@ -9203,7 +9213,7 @@ en:
         one_minute_left: "One Minute Left"
         thirty_minutes_left: "Thirty Minutes Left"
         twelve_hours_left: "Twelve Hours Left"
-      saved_at: "Saved at %{t}"
+      saved_at: "Quiz saved at %{t}"
       saving: Saving...
       seconds_count: 
         one: "1 Second"
@@ -9222,6 +9232,15 @@ en:
         loading_in_lockdown: "Loading Quiz in Respondus LockDown Browser"
       links: 
         return_to_quiz_page: "[Click here](%{url}) to return to the quiz page."
+    take_quiz_right_side: 
+      labels: 
+        attempt_due: "Attempt due"
+        score: Score
+        time_running: "Time Running"
+      links: 
+        hide_time_running: Hide
+        keep_editing_quiz: "Keep Editing This Quiz"
+        keep_editing_survey: "Keep Editing This Survey"
     timing: 
       labels: 
         time_elapsed: "Time Elapsed"
@@ -9370,6 +9389,7 @@ en:
       readonly: "you do not have permission to change this."
       toogle: "Click to toggle this permission ON or OFF"
   role_overrides: 
+    course_role_deactivate: "This role is in use and cannot be deleted.  It has been deactivated to prevent it from being assigned to new users."
     index: 
       buttons: 
         save: "Save Changes"
@@ -9400,6 +9420,7 @@ en:
       tooltips: 
         lock: "Click to not allow anyone to override what is set here."
         locked: "This permission is locked, no one can override what is set here."
+    no_role_found: "Role not found"
     notices: 
       saved: "Changes Saved Successfully."
     update_failed_notice: "Role creation failed"
@@ -10130,17 +10151,14 @@ en:
         linked_to_learning_outcome: "This criterion is linked to a Learning Outcome"
     select_content_dialog: 
       add_to_module: "Add %{item} to *module*"
-      assignment_alt: Assignment
       assignment_item: Assignment
       assignment_notice: "Select the assignment you want to associate with this *module*, or add an assignment by selecting \"New Assignment\"."
       content_page_item: "Content Page"
       discussion_item: Discussion
       domain_match_notice: "to use this tool the domain must match %{domain}"
       external_tool_item: "External Tool"
-      external_tool_link_alt: "External tool"
       external_tool_notice: "Select a tool from the list below, or enter a URL for an external tool you already know is configured with Basic LTI to add a link to it to this *module*."
       external_url_item: "External URL"
-      external_url_link_alt: "External URL"
       external_url_notice: "Enter a URL and page name to add a link to any website URL to this *module*."
       file_item: File
       file_notice: "Select the file you want to associate with this *module*, or add a file by selecting \"New File\"."
@@ -10168,16 +10186,11 @@ en:
       new_topic_option: "[ New Topic ]"
       options: 
         assignments: Assignments
-      quiz_alt: Quiz
       quiz_item: Quiz
       quiz_notice: "Select the quiz you want to associate with this *module*, or add a new one by selecting \"New Quiz\"."
       sub_header_notice: "Type the text you'd like to add as a *module* sub-header"
       text_header_item: "Text Header"
-      titles: 
-        add_item_to_module: "Add Item to Module"
-      topic_alt: Topic
       topic_notice: "Select the topic you want to associate with this *module*, or add a topic by selecting \"New Topic\"."
-      wiki_page_alt: "Wiki page"
       wiki_page_notice: "Select the wiki page you want to associate with this *module*, or add a new page by selecting \"New Page\"."
     sequence_footer: 
       full_course_sequence: "see full course sequence"
@@ -10333,12 +10346,9 @@ en:
     zip_file_import_form: 
       buttons: 
         upload_file: "Upload File"
-      errors: 
-        uploading: "There were errors uploading the zip file."
       labels: 
         upload_to: "Upload to"
       notices: 
-        uploading_complete: "Uploading complete!"
         uploading_progress_info: "Uploading and processing your zip file, if there are a lot of files in the zip file or it is very large, this may take a while."
       prompts: 
         select_file: "Please select a .zip file for uploading"
@@ -10514,7 +10524,7 @@ en:
       external_url_submission: "This submission was a URL to an external page."
       file_uploads_for_user: "File Uploads for **%{user}**"
       group_discussion_submission_description: "The submissions for this assignment are posts in the assignment's discussion for this group. Below are the discussion posts for %{user}, or you can *view the full group discussion*."
-      media_comment_link: "This submission is a media recording. *click here to view.*"
+      media_comment_link: "This submission is a media recording. *click here to view*."
       no_files: "No files were uploaded for this submission"
       no_preview_available: "No Preview Available"
       no_submission: "No Submission"
@@ -10653,16 +10663,6 @@ en:
     learning_outcomes: "Learning Outcomes"
     messages: Messages
     outcome_artifacts: "Outcome Artifacts"
-  todo_item_view: 
-    grading: 
-      grade: Grade
-      needs_grading: "need grading"
-    submitting: 
-      due: Due
-      submit: Submit
-  todo_view_item: 
-    grade: Grade
-    needs_grading: "needs grading"
   turnitin: 
     error_1007: "The uploaded file is too big."
     error_1009: "Invalid file type. (Valid file types are MS Word, Acrobat PDF, Postscript, Text, HTML, WordPerfect (WPD) and Rich Text Format.)"
@@ -10950,7 +10950,6 @@ en:
         all_users: "All Users"
         choose_term: "Choose Term"
         search_results: "Search results for \"%{search_term}\""
-    invalid_input: "Invalid input. Please enter a valid ID."
     linkedin_added: "LinkedIn account successfully added!"
     linkedin_fail: "LinkedIn authorization failed. Please try again"
     logins: 
@@ -11027,21 +11026,6 @@ en:
       update_instructions: "You can update some of this user's information, but they can change it back if they choose."
     new: 
       create_a_canvas_account: "Create a Canvas Account"
-    new_user_dashboard: 
-      course_code_example: "(something like BIO 100, ENG 315, etc.)"
-      create_collection: "Create a collection"
-      find_people: "Find people on Canvas"
-      group_name: "Group Name"
-      labels: 
-        course_code: "And a shorter reference code"
-        is_public: "Make this course publicly visible"
-        license: "License for course content"
-        name: "Enter a name for your course"
-      new_course: "Add a new course"
-      start_a_group: "Start a group"
-      student_data_privacy: "(student data will remain private)"
-      user_atom_feed: "User Atom Feed (All Courses)"
-      user_dashboard: "User Dashboard"
     no_deleting_sis_user: "You cannot delete a system-generated user"
     no_open_registration: "Open registration has not been enabled for this account"
     oauth_fail: "OAuth Request failed. Couldn't find valid request"
@@ -11135,13 +11119,6 @@ en:
         : "Off"
         ? "true"
         : "On"
-  widget: 
-    upload_media_track_form: 
-      choose_a_language: "--Choose a Language--"
-      error_message: "*Error:* You must choose a language and a valid track file."
-      file: File
-      language: Language
-      upload_media_track_form_description: "Once you have a subtitle track in either the SRT or *WebVTT* format, you can upload it here."
   wiki: 
     default_course_wiki_name: "%{course_name} Wiki"
     default_group_wiki_name: "%{group_name} Wiki"
@@ -11275,9 +11252,6 @@ en:
       wiki_description_for_course: "Think of it as an open-ended place to hold content. You could use it to describe your course, to provide helpful explanations of difficult topics, or even to let students work together on writing projects."
       wiki_description_for_group: "Think of it as an open-ended place to hold content. You could use it to describe your group, to provide helpful explanations of difficult topics, or even to let members work together on writing projects."
       wiki_description_header: "What's a wiki for?"
-  wiki_sidebar: 
-    collection_item: 
-      no_title: "No title"
   wimba_conference: 
     external_urls: 
       archive: Archive
@@ -11289,4 +11263,7 @@ en:
       extracting_file: "There were some errors extracting the zip file.  Please try again"
       server_status: "The server stopped returning a valid status"
       server_stopped_responding: "The server stopped responding to status requests"
+      uploading: "There were errors uploading the zip file."
+    notices: 
+      uploading_complete: "Uploading complete!"
     zip_import_filename: "zip_import_%{id}.zip"

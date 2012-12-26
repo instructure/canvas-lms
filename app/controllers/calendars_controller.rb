@@ -88,6 +88,7 @@ class CalendarsController < ApplicationController
         :new_assignment_url => context.respond_to?("assignments") ? named_context_url(context, :new_context_assignment_url) : '',
         :calendar_event_url => context.respond_to?("calendar_events") ? named_context_url(context, :context_calendar_event_url, '{{ id }}') : '',
         :assignment_url => context.respond_to?("assignments") ? named_context_url(context, :api_v1_context_assignment_url, '{{ id }}') : '',
+        :assignment_override_url => context.respond_to?(:assignments) ? api_v1_assignment_override_url(:course_id => context.id, :assignment_id => '{{ assignment_id }}', :id => '{{ id }}') : '',
         :appointment_group_url => context.respond_to?("appointment_groups") ? api_v1_appointment_groups_url(:id => '{{ id }}') : '',
         :can_create_calendar_events => context.respond_to?("calendar_events") && context.calendar_events.new.grants_right?(@current_user, session, :create),
         :can_create_assignments => context.respond_to?("assignments") && context.assignments.new.grants_right?(@current_user, session, :create),

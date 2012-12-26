@@ -139,12 +139,61 @@ class AssignmentOverride < ActiveRecord::Base
     write_attribute(:all_day_date, new_all_day_date)
   end
 
+
   def as_hash
     { :title => title,
       :due_at => due_at,
       :all_day => all_day,
       :all_day_date => all_day_date,
       :override => self }
+  end
+
+  def applies_to_students
+    # FIXME: exclude students for whom this override does not apply
+    # because a higher-priority override exists
+    case set_type
+    when 'ADHOC'
+      set
+    when 'CourseSection'
+      set.participating_students
+    when 'Group'
+      set.participants
+    end
+  end
+
+  def applies_to_admins
+    case set_type
+    when 'CourseSection'
+      set.participating_admins
+    else
+      assignment.context.participating_admins
+    end
+  end
+
+  def notify_change?
+    self.assignment and
+    self.assignment.context.state == :available and
+    (self.assignment.workflow_state == 'available' || self.assignment.workflow_state == 'published') and
+    self.assignment.created_at < 3.hours.ago and
+    (!self.prior_version ||
+      self.workflow_state != self.prior_version.workflow_state ||
+      self.due_at_overridden != self.prior_version.due_at_overridden ||
+      self.due_at_overridden && !Assignment.due_dates_equal?(self.due_at, self.prior_version.due_at))
+  end
+
+  has_a_broadcast_policy
+  set_broadcast_policy do |p|
+    p.dispatch :assignment_due_date_changed
+    p.to { applies_to_students }
+    p.whenever { |record| record.notify_change? }
+    p.filter_asset_by_recipient { |record, user|
+      # note that our asset for this message is an Assignment, not an AssignmentOverride
+      record.assignment.overridden_for(user)
+    }
+
+    p.dispatch :assignment_due_date_override_changed
+    p.to { applies_to_admins }
+    p.whenever { |record| record.notify_change? }
   end
 
   named_scope :visible_to, lambda{ |admin, course|

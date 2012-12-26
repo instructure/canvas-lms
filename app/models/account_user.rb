@@ -23,12 +23,15 @@ class AccountUser < ActiveRecord::Base
   has_a_broadcast_policy
   before_save :infer_defaults
   after_save :touch_user
+  after_destroy :touch_user
   after_save :update_account_associations_if_changed
   attr_accessible :account, :user, :membership_type
 
   validates_presence_of :account_id, :user_id
 
   alias_method :context, :account
+
+  BASE_ROLE_NAME = 'AccountMembership'
 
   def update_account_associations_if_changed
     if (self.account_id_changed? || self.user_id_changed?)
@@ -80,7 +83,11 @@ class AccountUser < ActiveRecord::Base
   
   def has_permission_to?(action)
     @permission_lookup ||= {}
-    @permission_lookup[action] ||= RoleOverride.permission_for(self, action, self.membership_type)[:enabled]
+    @permission_lookup[action] ||= RoleOverride.permission_for(account, action, base_role_name, self.membership_type)[:enabled]
+  end
+
+  def base_role_name
+    BASE_ROLE_NAME
   end
   
   def self.readable_type(type)

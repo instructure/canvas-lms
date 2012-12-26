@@ -51,11 +51,11 @@
       end 
     %>
     <% if txt %>
-    <a target="_blank" href="<%= context_url(@context, :context_conference_join_url, conference ? conference.id : "{{ id }}") %>" class="button join_conference_link">
+    <a target="_blank" href="<%= context_url(@context, :context_conference_join_url, conference ? conference.id : "{{ id }}") %>" class="btn join_conference_link">
       <%= txt %>
     </a>
     <% end %>
-    <a href="<%= context_url(@context, :context_conference_close_url, conference ? conference.id : "{{ id }}") %>" class="button close_conference_link" style="<%= hidden unless can_do(conference, @current_user, :close) %>"><%= t('#conferences.show.buttons.close', "End it now") %></a>
+    <a href="<%= context_url(@context, :context_conference_close_url, conference ? conference.id : "{{ id }}") %>" class="btn close_conference_link" style="<%= hidden unless can_do(conference, @current_user, :close) %>"><%= t('#conferences.show.buttons.close', "End it now") %></a>
   </div>
   <div class="clear"></div>
 </div>

@@ -345,7 +345,7 @@ define(['vendor/date-js/globalization/en-US'], function() {
     
     /**
      * Get the week number. Week one (1) is the week which contains the first Thursday of the year. Monday is considered the first day of the week.
-     * This algorithm is a JavaScript port of the work presented by Claus Tøndering at http://www.tondering.dk/claus/cal/node8.html#SECTION00880000000000000000
+     * This algorithm is a JavaScript port of the work presented by Claus TÃ¸ndering at http://www.tondering.dk/claus/cal/node8.html#SECTION00880000000000000000
      * .getWeek() Algorithm Copyright (c) 2008 Claus Tondering.
      * The .getWeek() function does NOT convert the date to UTC. The local datetime is used. Please use .getISOWeek() to get the week of the UTC converted date.
      * @return {Number}  1 to 53

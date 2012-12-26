@@ -78,7 +78,7 @@
         total_shown = 0
         if assignment_sets.any?{ |k, v| @current_user.send("assignments_#{k}").length > 0 }
       -%>
-        <a href="/assignments" class="menu-item-title"><%= t('menu.assignments', 'Assignments') %><span class="menu-item-title-icon"></span></a>
+        <a href="/assignments" class="menu-item-title"><%= t('menu.assignments', 'Assignments') %><span class="menu-item-title-icon"></span> <i class="icon-mini-arrow-down"></i></a>
         <div class="menu-item-drop">
           <table cellspacing="0">
             <tr>
@@ -188,7 +188,7 @@
     <div class="shadow shadow_5"></div>
     <div class="wizard_content">
       <div class="links">
-        <a href="#" class="close_wizard_link close_link"><%= t('links.close', 'Close') %></a>
+        <a href="#" class="close_wizard_link"><i class="icon-x"></i><span class="screen-reader-text"><%= t('links.close', 'Close') %></span></a>
       </div>
       <%= wizard %>
     </div>

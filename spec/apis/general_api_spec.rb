@@ -62,7 +62,7 @@ describe "API", :type => :integration do
     it "should use html form encoding by default" do
       html_request = "assignment[name]=test+assignment&assignment[points_possible]=15"
       # no content-type header is sent
-      post "/api/v1/courses/#{@course.id}/assignments", html_request, { "authorization" => "Bearer #{@token.token}" }
+      post "/api/v1/courses/#{@course.id}/assignments", html_request, { "authorization" => "Bearer #{@token.full_token}" }
       response.should be_success
       response.header['content-type'].should == 'application/json; charset=utf-8'
 
@@ -73,7 +73,7 @@ describe "API", :type => :integration do
 
     it "should support json POST request bodies" do
       json_request = { "assignment" => { "name" => "test assignment", "points_possible" => 15 } }
-      post "/api/v1/courses/#{@course.id}/assignments", json_request.to_json, { "content-type" => "application/json", "authorization" => "Bearer #{@token.token}" }
+      post "/api/v1/courses/#{@course.id}/assignments", json_request.to_json, { "content-type" => "application/json", "authorization" => "Bearer #{@token.full_token}" }
       response.should be_success
       response.header['content-type'].should == 'application/json; charset=utf-8'
 
@@ -94,7 +94,7 @@ describe "API", :type => :integration do
                        "submission" => {
                           "submission_type" => "online_upload",
                           "file_ids" => [a1.id, a2.id] } }
-      post "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions", json_request.to_json, { "content-type" => "application/json", "authorization" => "Bearer #{@token.token}" }
+      post "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions", json_request.to_json, { "content-type" => "application/json", "authorization" => "Bearer #{@token.full_token}" }
       response.should be_success
       response.header['content-type'].should == 'application/json; charset=utf-8'
 

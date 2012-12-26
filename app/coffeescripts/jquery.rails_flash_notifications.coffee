@@ -40,7 +40,7 @@ define [
 
   # Pops up a small error box at the top of the screen.
   $.flashError = (content, timeout) ->
-    flashBox("error", content, timeout);
+    flashBox("error", content, timeout)
 
   $.screenReaderFlashMessage = (content, timeout = 3000) ->
     flashBox('success', content, timeout, position: 'absolute', left: -10000)

@@ -37,3 +37,11 @@ def assignment_valid_attributes
     :points_possible => "1.5"
   }
 end
+
+def assignment_with_override(opts={})
+  assignment_model(opts)
+  @override = @a.assignment_overrides.build
+  @override.set = @c.default_section
+  @override.save!
+  @override
+end

@@ -80,7 +80,7 @@ shared_examples_for "permission tests" do
       f("#add_new_role_button").click
       wait_for_ajax_requests
       account.reload
-      account.membership_types.should include(role)
+      account.available_account_roles.should include(role)
       f("#permissions-table tr").should include_text(role)
     end
 
@@ -96,7 +96,7 @@ shared_examples_for "permission tests" do
       driver.switch_to.alert.accept
       wait_for_ajax_requests
       account.reload
-      account.membership_types.should_not include(role)
+      account.roles.active.find_by_name(role).should be_nil
       f("#permissions-table tr").should_not include_text(role)
     end
 

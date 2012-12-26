@@ -112,7 +112,7 @@ $(document).ready(function () {
           var dateString = $(this).find('.datetime_suggest').text();
 
           $link.closest('form')
-            // append this back to the form since it got moved to be a child of body when we called .dialog('open')
+            // append this back to the form since it got moved to be a child of body when we called .dialog('open')           
             .append($(this).dialog('destroy'))
             .find('#quiz_lock_at')
               .val(dateString).end()

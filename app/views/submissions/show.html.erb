@@ -118,7 +118,7 @@
     <%= render :partial => "shared/rubric_criterion_dialog" %>
     <div class="button-container">
       <% if @assignment.rubric_association && can_do(@assignment.rubric_association, @current_user, :assess) %>
-        <button type="button" class="save_rubric_button button small-button"><%= t('buttons.save_comment', 'Save Comment') %></button>
+        <button type="button" class="save_rubric_button btn btn-small"><%= t('buttons.save_comment', 'Save Comment') %></button>
       <% end %>
     </div>
     <a href="<%= context_url(@context, :context_rubric_association_rubric_assessments_url, @assignment.rubric_association) %>" class="update_rubric_assessment_url" style="display: none;">&nbsp;</a>
@@ -225,7 +225,7 @@
               <label for="submission_group_comment"><%= t('sent_to_whole_group', 'Send Comment to the Whole Group') %></label>
             <% end %>
             <div class="button-container">
-              <button type="button" class="button save_comment_button"><%= t('buttons.save', 'Save') %></button>
+              <button type="button" class="btn save_comment_button"><%= t('buttons.save', 'Save') %></button>
             </div>
           </div>
         </div>

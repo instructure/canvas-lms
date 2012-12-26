@@ -24,7 +24,7 @@ class EnrollmentDateBuilder
     @enrollment = enrollment
     @course = @enrollment.course
     @section = @enrollment.course_section
-    @term = @enrollment.course ? @enrollment.course.enrollment_term : nil
+    @term = @course ? @course.enrollment_term : nil
     @enrollment_dates = []
   end
 
@@ -35,13 +35,17 @@ class EnrollmentDateBuilder
   def build
     Rails.cache.fetch([@enrollment, @course, 'enrollment_date_ranges'].cache_key) do
       if enrollment_is_restricted?
-        add_enrollment_dates(@enrollment, false)
+        add_enrollment_dates(@enrollment)
       elsif section_is_restricted?
         add_enrollment_dates(@section)
+        add_term_dates if @enrollment.admin?
       elsif course_is_restricted?
         add_enrollment_dates(@course)
-      else
+        add_term_dates if @enrollment.admin?
+      elsif @term
         add_term_dates
+      else
+        @enrollment_dates << default_dates
       end
 
       @enrollment_dates
@@ -54,23 +58,14 @@ class EnrollmentDateBuilder
     [nil, nil]
   end
 
-  def term_dates
-    @term ? @term.enrollment_dates_for(@enrollment) : default_dates
-  end
-
-  def add_enrollment_dates(context, with_term_dates=true)
+  def add_enrollment_dates(context)
     @enrollment_dates << [context.start_at, context.end_at]
-    @enrollment_dates << term_dates if with_term_dates && is_admin_and_has_term_dates?
-  end
-
-  # Also consider term dates unless no term dates are set so that teacher
-  # enrollments are 'active' past the course dates if there are term dates
-  def is_admin_and_has_term_dates?
-    @enrollment.admin? && term_dates != default_dates
   end
 
   def add_term_dates
-     @enrollment_dates << term_dates
+    if @term
+      @enrollment_dates << @term.enrollment_dates_for(@enrollment)
+    end
   end
 
   def course_is_restricted?

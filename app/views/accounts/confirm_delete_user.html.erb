@@ -9,8 +9,8 @@
   This will remove the user's data (including grades) from all
   courses and groups.  This process cannot be undone.", :account => @account.name) %>
 
-  <div class="button-container">
-    <button type="submit" class="button"><%= t(:delete_button, "Delete %{user}", :user => @user.name) %></button>
-    <a href="<%= account_url(@context) %>" class="button button-secondary"><%= t("#buttons.cancel", "Cancel")%></a>
+  <div class="form-actions">
+    <a href="<%= account_url(@context) %>" class="btn"><%= t("#buttons.cancel", "Cancel")%></a>
+    <button type="submit" class="btn btn-primary"><%= t(:delete_button, "Delete %{user}", :user => @user.name) %></button>
   </div>
 <% end %>

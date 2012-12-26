@@ -17,7 +17,7 @@
 #
 
 def discussion_topic_model(opts={})
-  @context ||= course_model(:reusable => true)
+  @context = opts[:context] || @context || course_model(:reusable => true)
   @topic = @context.discussion_topics.create!(valid_discussion_topic_attributes.merge(opts))
 end
 

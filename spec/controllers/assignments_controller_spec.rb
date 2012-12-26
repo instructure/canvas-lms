@@ -43,7 +43,7 @@ describe AssignmentsController do
       get 'index', :course_id => @course.id
       assert_status(401)
     end
-    
+
     it "should redirect 'disabled', if disabled by the teacher" do
       course_with_student_logged_in(:active_all => true)
       @course.update_attribute(:tab_configuration, [{'id'=>3,'hidden'=>true}])
@@ -180,7 +180,7 @@ describe AssignmentsController do
       response.should be_redirect
       flash[:notice].should match(/That page has been disabled/)
     end
-    
+
     it "should assign variables" do
       course_with_student_logged_in(:active_all => true)
       get 'syllabus', :course_id => @course.id
@@ -253,7 +253,7 @@ describe AssignmentsController do
       assigns[:assignment].should eql(@assignment)
     end
   end
-  
+
   describe "PUT 'update'" do
     it "should require authorization" do
       rescue_action_in_public!
@@ -263,7 +263,7 @@ describe AssignmentsController do
       put 'update', :course_id => @course.id, :id => @assignment.id
       assert_unauthorized
     end
-    
+
     it "should update attributes" do
       course_with_teacher_logged_in(:active_all => true)
       course_assignment
@@ -271,30 +271,66 @@ describe AssignmentsController do
       assigns[:assignment].should eql(@assignment)
       assigns[:assignment].title.should eql("test title")
     end
-    
-    it "should not update description for students (if not allowed)" do
-      course_with_student_logged_in(:active_all => true)
-      @course.allow_student_assignment_edits = false
-      @course.save!
-      course_assignment
-      put 'update', :course_id => @course.id, :id => @assignment.id, :assignment => {:title => "test title", :description => "what up"}
-      assigns[:assignment].should eql(@assignment)
-      assigns[:assignment].title.should eql("some assignment")
-      assigns[:assignment].description.should eql(nil)
-    end
 
-    it "should only update description for students (if allowed)" do
-      course_with_student_logged_in(:active_all => true)
-      @course.allow_student_assignment_edits = true
-      @course.save!
-      course_assignment
-      put 'update', :course_id => @course.id, :id => @assignment.id, :assignment => {:title => "test title", :description => "what up"}
-      assigns[:assignment].should eql(@assignment)
-      assigns[:assignment].title.should eql("some assignment")
-      assigns[:assignment].description.should eql("what up")
+    describe 'updating description' do
+      let(:assignment) { assigns[:assignment] }
+
+      before do
+        Setting.set('enable_page_views', 'db')
+        course_with_student_logged_in(:active_all => true)
+        course_assignment
+      end
+
+      after { Setting.set 'enable_page_views', 'false' }
+
+      def run_update
+        put 'update', :course_id => @course.id, :id => @assignment.id, :assignment => {:title => "test title", :description => "what up"}
+      end
+
+      describe 'when student edits are not allowed' do
+        before do
+          @course.update_attribute(:allow_student_assignment_edits, false)
+          run_update
+        end
+
+        it 'does not update anything' do
+          assignment.should eql(@assignment)
+          assignment.title.should eql("some assignment")
+          assignment.description.should eql(nil)
+        end
+      end
+
+      describe 'when student edits are allowed' do
+        before do
+          @course.update_attribute(:allow_student_assignment_edits, true)
+          run_update
+        end
+
+        it 'only updates the description' do
+          assignment.should eql(@assignment)
+          assignment.title.should eql("some assignment")
+          assignment.description.should eql('what up')
+        end
+
+        it 'logs an asset access record for the assignment' do
+          accessed_asset = assigns[:accessed_asset]
+          accessed_asset[:category].should == 'assignments'
+          accessed_asset[:level].should == 'participate'
+        end
+
+        it 'registers a page view' do
+          page_view = assigns[:page_view]
+          page_view.should_not be_nil
+          page_view.http_method.should == 'put'
+          page_view.url.should =~ %r{^http://test\.host/courses/\d+/assignments}
+          page_view.participated.should be_true
+        end
+
+      end
+
     end
   end
-  
+
   describe "DELETE 'destroy'" do
     it "should require authorization" do
       course_with_student(:active_all => true)
@@ -302,7 +338,7 @@ describe AssignmentsController do
       delete 'destroy', :course_id => @course.id, :id => @assignment.id
       assert_unauthorized
     end
-    
+
     it "should delete assignments if authorized" do
       course_with_teacher_logged_in(:active_all => true)
       course_assignment

@@ -3,7 +3,7 @@
   <td class="criterion_description">
     <div class="container">
       <div class="links editing">
-        <a href="#" class="edit_criterion_link no-hover"><%= image_tag "edit.png" %></a>
+        <a href="#" class="edit_criterion_link no-hover"><i class="icon-edit standalone-icon"></i></a>
       </div>
       <%= image_tag "flagged_question.png", :class => "learning_outcome_flag", :title => t('titles.linked_to_learning_outcome', "This criterion is linked to a Learning Outcome") %>
       <span class="description criterion_description_value"><%= criterion.description rescue t('defaults.description', "Description of criterion") %></span>
@@ -57,8 +57,8 @@
             <span class="nobr"><%= t :points, "%{points} pts", :points => %{<span class="points">#{rating.points}</span>}.html_safe %></span>
             <span class="rating_id" style="display: none;"><%= rating && rating.id %></span>
             <div class="links">
-              <a href="#" class="edit_rating_link no-hover"><%= image_tag "edit.png" %></a>
-              <a href="#" class="delete_rating_link no-hover"><%= image_tag "delete.png" %></a>
+              <a href="#" class="edit_rating_link no-hover"><i class="icon-edit standalone-icon"></i></a>
+              <a href="#" class="delete_rating_link no-hover"><i class="icon-end standalone-icon"></i></a>
             </div>
           </div>
           </td>
@@ -100,7 +100,7 @@
     </div>
   </td>
   <td class="editing">
-    <a href="#" class="delete_criterion_link no-hover"><%= image_tag "delete.png" %></a>
+    <a href="#" class="delete_criterion_link no-hover"><i class="icon-trash standalone-link"></i></a>
   </td>
 </tr>
 

@@ -2,16 +2,18 @@ define [
   'jquery'
   'compiled/calendar/commonEventFactory'
   'jst/calendar/editAssignment'
+  'jst/calendar/editAssignmentOverride'
   'jst/calendar/genericSelect'
   'jquery.instructure_date_and_time'
   'jquery.instructure_forms'
   'jquery.instructure_misc_helpers'
-], ($, commonEventFactory, editAssignmentTemplate, genericSelectTemplate) ->
+], ($, commonEventFactory, editAssignmentTemplate, editAssignmentOverrideTemplate, genericSelectTemplate) ->
 
   class EditAssignmentDetails
     constructor: (selector, @event, @contextChangeCB, @closeCB) ->
       @currentContextInfo = null
-      @form = $(editAssignmentTemplate({
+      tpl = if @event.override then editAssignmentOverrideTemplate else editAssignmentTemplate
+      @form = $(tpl({
         title: @event.title
         contexts: @event.possibleContexts()
       }))
@@ -93,10 +95,14 @@ define [
       else if startDate
         @form.find(".datetime_field").val(startDate.toString('MMM d, yyyy h:mmtt')).change()
 
-    formSubmit: (jsEvent) =>
-      jsEvent.preventDefault()
+    formSubmit: (e) =>
+      e.preventDefault()
+      form = @form.getFormData()
+      if form['assignment[due_at]'] then @submitAssignment(form) else @submitOverride(form)
 
-      dueAtString = @form.getFormData()['assignment[due_at]']
+    submitAssignment: (form) ->
+      dueAtString = form['assignment[due_at]']
+
       if dueAtString == ''
         dueAt = null
       else
@@ -121,3 +127,12 @@ define [
         @event.save(params)
 
       @closeCB()
+
+    submitOverride: (form) ->
+      dueAt  = form['assignment_override[due_at]']
+      dueAt  = if dueAt is '' then null else @form.find('#assignment_override_due_at').data('date')
+      params = 'assignment_override[due_at]': if dueAt then $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(dueAt)) else ''
+      @event.start = dueAt
+      @event.save(params)
+      @closeCB()
+

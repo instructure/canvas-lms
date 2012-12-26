@@ -212,6 +212,35 @@ describe AssignmentsApiController, :type => :integration do
     @section_override.due_at.to_i.should == @section_due_at.to_i
   end
 
+  it "should take overrides into account in the assignment-created notification for assignments created with overrides" do
+    course_with_teacher(:active_all => true)
+    student_in_course(:course => @course, :active_enrollment => true)
+    course_with_ta(:course => @course, :active_enrollment => true)
+
+    notification = Notification.create! :name => "Assignment Created"
+
+    @student.register!
+    @student.communication_channels.create(:path => "student@instructure.com").confirm!
+    @student.email_channel.notification_policies.find_or_create_by_notification_id(notification.id).update_attribute(:frequency, 'immediately')
+
+    @ta.register!
+    @ta.communication_channels.create(:path => "ta@instructure.com").confirm!
+    @ta.email_channel.notification_policies.find_or_create_by_notification_id(notification.id).update_attribute(:frequency, 'immediately')
+
+    @override_due_at = Time.parse('2002 Jun 22 12:00:00')
+
+    @user = @teacher
+    api_call(:post, "/api/v1/courses/#{@course.id}/assignments.json",
+             { :controller => 'assignments_api', :action => 'create', :format => 'json', :course_id => @course.id.to_s },
+             { :assignment => {
+                 'name' => 'some assignment',
+                 'assignment_overrides' => {
+                     '0' => { 'course_section_id' => [ @course.default_section.id ], 'due_at' => @override_due_at.iso8601 }}}})
+
+    @student.messages.detect{|m| m.notification_id == notification.id}.body.should be_include 'Jun 22'
+    @ta.messages.detect{|m| m.notification_id == notification.id}.body.should be_include 'Multiple Dates'
+  end
+
   it "should allow updating an assignment via the API" do
     course_with_teacher(:active_all => true)
     @start_group = @course.assignment_groups.create!({:name => "start group"})

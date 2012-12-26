@@ -52,9 +52,34 @@ describe PageView do
 
       it "should always assign the default shard" do
         PageView.new.shard.should == Shard.default
+        pv = nil
         @shard1.activate do
-          PageView.new.shard.should == Shard.default
+          pv = page_view_model
+          pv.shard.should == Shard.default
+          pv.save!
+          pv = PageView.find(pv.request_id)
+          pv.should be_present
+          pv.shard.should == Shard.default
         end
+        pv = PageView.find(pv.request_id)
+        pv.should be_present
+        pv.shard.should == Shard.default
+        pv.interaction_seconds = 25
+        pv.save!
+        pv = PageView.find(pv.request_id)
+        pv.interaction_seconds.should == 25
+        @shard2.settings[:page_view_method] = :cache
+        @shard2.save
+        @shard2.activate do
+          pv = page_view_model
+          pv.shard.should == @shard2
+          pv.save!
+        end
+        @shard2.activate do
+          PageView.find(pv.request_id).should be_present
+        end
+        # can't find in cassandra
+        expect { PageView.find(pv.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
 
@@ -99,12 +124,14 @@ describe PageView do
       it "should migrate the relevant page views" do
         a1 = account_model
         a2 = account_model
+        a3 = account_model
         Setting.set('enable_page_views', 'db')
-        moved = (0..1).map { page_view_model(:account => a1, :created_at => 2.minutes.ago) }
-        # this one is further back in time and will be processed later
-        moved_later = page_view_model(:account => a1, :created_at => 1.day.ago)
+        moved = (0..1).map { page_view_model(:account => a1, :created_at => 1.day.ago) }
+        moved_a3 = page_view_model(:account => a3, :created_at => 4.hours.ago)
+        # this one is more recent in time and will be processed last
+        moved_later = page_view_model(:account => a1, :created_at => 2.hours.ago)
         # this one is in a deleted account
-        deleted = page_view_model(:account => a2, :created_at => 2.minutes.ago)
+        deleted = page_view_model(:account => a2, :created_at => 2.hours.ago)
         a2.destroy
         # too far back
         old = page_view_model(:account => a1, :created_at => 13.months.ago)
@@ -114,6 +141,8 @@ describe PageView do
         PageView.find(moved.map(&:request_id)).size.should == 0
         migrator.run_once(2)
         PageView.find(moved.map(&:request_id)).size.should == 2
+        # should migrate all active accounts
+        PageView.find(moved_a3.request_id).request_id.should == moved_a3.request_id
         expect { PageView.find(moved_later.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
         # it should resume where the last migrator left off
         migrator = PageView::CassandraMigrator.new
@@ -122,6 +151,18 @@ describe PageView do
 
         expect { PageView.find(deleted.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
         expect { PageView.find(old.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
+
+        # running again should migrate new page views as time advances
+        Setting.set('enable_page_views', 'db')
+        # shouldn't actually happen, but create an older page view to verify
+        # we're not migrating old page views again
+        not_moved = page_view_model(:account => a1, :created_at => 1.day.ago)
+        newly_moved = page_view_model(:account => a1, :created_at => 1.hour.ago)
+        Setting.set('enable_page_views', 'cassandra')
+        migrator = PageView::CassandraMigrator.new
+        migrator.run_once(2)
+        expect { PageView.find(not_moved.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
+        PageView.find(newly_moved.request_id).request_id.should == newly_moved.request_id
       end
     end
   end
@@ -221,5 +262,52 @@ describe PageView do
         Canvas.redis.smembers(PageView.user_count_bucket_for_time(store_time_2)).should == [@user2.global_id.to_s]
       end
     end
+  end
+
+  describe "for_users" do
+    before :each do
+      @page_view.save!
+    end
+
+    it "should work with User objects" do
+      PageView.for_users([@user]).should == [@page_view]
+      PageView.for_users([User.create!]).should == []
+    end
+
+    it "should work with a User ids" do
+      PageView.for_users([@user.id]).should == [@page_view]
+      PageView.for_users([@user.id + 1]).should == []
+    end
+
+    it "should with with an empty list" do
+      PageView.for_users([]).should == []
+    end
+  end
+
+  describe '.generate' do
+    let(:params) { {'action' => 'path', 'controller' => 'some'} }
+    let(:headers) { {'User-Agent' => 'Mozilla'} }
+    let(:session) { {:id => 42} }
+    let(:request) { stub(:url => 'host.com/some/path', :path_parameters => params, :headers => headers, :session_options => session, :method => :get) }
+    let(:user) { User.new }
+    let(:attributes) { {:real_user => user, :user => user } }
+
+    before { RequestContextGenerator.stubs( :request_id => 9 ) }
+    after { RequestContextGenerator.unstub :request_id }
+
+    subject { PageView.generate(request, attributes) }
+
+    its(:url) { should == request.url }
+    its(:user) { should == user }
+    its(:controller) { should == params['controller'] }
+    its(:action) { should == params['action'] }
+    its(:session_id) { should == session[:id] }
+    its(:real_user) { should == user }
+    its(:user_agent) { should == headers['User-Agent'] }
+    its(:interaction_seconds) { should == 5 }
+    its(:created_at) { should_not be_nil }
+    its(:updated_at) { should_not be_nil }
+    its(:http_method) { should == 'get' }
+
   end
 end

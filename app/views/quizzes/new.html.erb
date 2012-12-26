@@ -27,7 +27,7 @@
           </h2>
         </div>
         <div id="unpublished_changes_message" class="rs-margin-lr rs-margin-bottom" style="<%= hidden unless @quiz.available? && @quiz.unpublished_changes? %>; font-size: 0.9em;">
-          <%= image_tag "warning.png" %> <%= t('warnings.unpublished_changes', "You have made unpublished changes to this quiz.  These changes will not appear for students until you publish or re-publish the quiz.") %>
+          <i class="icon-warning"></i> <%= t('warnings.unpublished_changes', "You have made unpublished changes to this quiz.  These changes will not appear for students until you publish or re-publish the quiz.") %>
         </div>
         <div id="quiz_options" class="rs-margin-lr">
           <table class="stylized" style="margin-bottom: 0;">
@@ -129,6 +129,24 @@
               </td>
             </tr>
             <tr>
+              <td colspan=2>
+                <%= hidden_field_tag "quiz[one_question_at_a_time]", "0", :id => nil %>
+                <%= check_box_tag "quiz[one_question_at_a_time]", "1", @quiz.one_question_at_a_time?, :"aria-controls" => "one_question_at_a_time_options", :class => "element_toggler"  %>
+                <%= label_tag :quiz_one_question_at_a_time, t('one_question_at_a_time', 'Show one question at a time') %>
+              </td>
+            </tr>
+            <tr id="one_question_at_a_time_options"
+              <% unless @quiz.one_question_at_a_time? %>style="display:none"<% end %>
+              >
+              <td colspan="2">
+                <div style="padding-left: 20px;">
+                  <%= hidden_field_tag "quiz[cant_go_back]", "0", :id => nil %>
+                  <%= check_box_tag "quiz[cant_go_back]", "1", @quiz.cant_go_back? %>
+                  <%= label_tag "quiz[cant_go_back]", t('cant_go_back', "Lock questions after answering") %>
+                </div>
+              </td>
+            </tr>
+            <tr>
               <td colspan="2">
                 <input type="checkbox" <%= 'checked' if !@quiz.access_code.blank? || !@quiz.ip_filter.blank? ||!@quiz.require_lockdown_browser.blank? %> name="protect_quiz" id="protect_quiz"/>
                 <label for="protect_quiz"><%= t('labels.restrict_quiz', "Restrict this Quiz") %></label>
@@ -222,11 +240,11 @@
           <input type="checkbox" name="quiz[notify_of_update]" id="quiz_notify_of_update" value="1" checked="checked" />
           <label for="quiz_notify_of_update"><%= t('labels.quiz_notify', 'Notify users this quiz has changed') %></label>
         </div>
-        <button type="submit" class="save_quiz_button button"><%= t('buttons.save_settings', "Save Settings") %></button>
-        <button type="submit" class="publish_quiz_button button button-default"><%= @quiz.available? ? t('buttons.republish_quiz', "Re-Publish Quiz") : t('buttons.publish_quiz', "Publish Quiz") %></button>
+        <button type="submit" class="save_quiz_button btn"><%= t('buttons.save_settings', "Save Settings") %></button>
+        <button type="submit" class="publish_quiz_button btn btn-primary"><%= @quiz.available? ? t('buttons.republish_quiz', "Re-Publish Quiz") : t('buttons.publish_quiz', "Publish Quiz") %></button>
         <div style="display: none;">
-        <button type="submit" class="save_quiz_button button" style="height: 50px;"><%= t('buttons.save_but_dont_publish', "Save Quiz *but don't Publish*", :wrapper => '<div style="font-size: 0.7em;">\1</div>') %></button>
-        <button type="submit" class="publish_quiz_button button button-default" style="height: 50px; float: right;"><%= @quiz.available? ? t('buttons.republish_quiz', "Re-Publish Quiz") : t('buttons.publish_quiz', "Publish Quiz") %></button>
+        <button type="submit" class="save_quiz_button btn" style="height: 50px;"><%= t('buttons.save_but_dont_publish', "Save Quiz *but don't Publish*", :wrapper => '<div style="font-size: 0.7em;">\1</div>') %></button>
+        <button type="submit" class="publish_quiz_button btn btn-primary" style="height: 50px; float: right;"><%= @quiz.available? ? t('buttons.republish_quiz', "Re-Publish Quiz") : t('buttons.publish_quiz', "Publish Quiz") %></button>
         </div>
         <% if request.path_parameters['action'] == "new" %>
           <div style="text-align: left;">
@@ -236,15 +254,15 @@
       </div>
     <% end %>
   </div>
-  <div class="rs-margin-lr rs-margin-top">
+  <div class="rs-margin-lr rs-margin-top">    
     <% if @quiz.available? %>
-      <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="no-hover back"><%= t('links.return_to_quiz_page', "Return to Quiz Page") %></a><br/>
+      <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="no-hover icon-arrow-left"><%= t('links.return_to_quiz_page', "Return to Quiz Page") %></a><br/>
     <% end %>
     <% if @assignment %>
-    <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link rubric" style="<%= hidden unless @assignment %>"><%= t('links.show_assignment_rubric', "Show Assignment Rubric") %></a>
+    <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link icon-rubric" style="<%= hidden unless @assignment %>"><%= t('links.show_assignment_rubric', "Show Assignment Rubric") %></a><br/>
     <a href="<%= context_url(@context, :context_rubrics_url) %>" id="add_rubric_url" style="display:none">&nbsp;</a>
     <% end %>
-    <a href="#" class="add_question_link add"><%= t('links.add_new_question', "Add a New Question") %></a><br/>
+    <a href="#" class="add_question_link icon-add"><%= t('links.add_new_question', "Add a New Question") %></a><br/>
   </div>
 <% end %>
 <% js_block do %>
@@ -282,7 +300,7 @@ $(document).ready(function() {
 
 <% if @has_student_submissions %>
 <div style="margin-bottom: 5px;">
-  <%= image_tag "warning.png" %> <%= t('warnings.has_student_submissions', <<-TEXT)
+  <i class="icon-warning"></i> <%= t('warnings.has_student_submissions', <<-TEXT)
   Students have either already taken or started taking this quiz, so be careful
   about editing it.  If you change any quiz questions in a significant way, you
   may want to consider re-grading students who took the old version of the quiz.
@@ -327,10 +345,10 @@ $(document).ready(function() {
 <%= render :partial => "quizzes/question_group", :object => nil %>
 <%= render :partial => "quizzes/find_question_from_bank" %>
 <div style="text-align: center; margin: -1px 1px 1px" class="add_question question_editing">
-  <a href="#" class="add_question_link add"><%= t('links.new_question', "New Question") %></a>
-  <a href="#" class="add_question_group_link add" style="margin-left: 20px; margin-right: 20px;"><%= t('links.new_question_group', "New Question Group") %></a>
+  <a href="#" class="add_question_link icon-add"><%= t('links.new_question', "New Question") %></a>
+  <a href="#" class="add_question_group_link icon-add" style="margin-left: 20px; margin-right: 20px;"><%= t('links.new_question_group', "New Question Group") %></a>
   <% if feature_enabled?(:question_banks) %>
-    <a href="#" class="find_question_link find"><%= t('links.find_questions', "Find Questions") %></a>
+    <a href="#" class="find_question_link icon-search"><%= t('links.find_questions', "Find Questions") %></a>
   <% end %>
 </div>
 <div class="question_generated" style="display: none;">

@@ -2,7 +2,7 @@
   <h3><%= before_label :i_would_like_to, "I would like to" %></h3>
   <ul class="wizard_options_list">
     <li class="option create_calendar_event_option add_step">
-      <a href="#"><%= t 'links.new', "Create a New Event" %></a>
+      <a href="#" class="icon-add"><%= t 'links.new', "Create a New Event" %></a>
       <div class="details" style="display: none;">
         <%= t 'descriptions.create', "To start creating a calendar event, just click the day on the calendar
         where you want the event." %>
@@ -26,7 +26,7 @@
     </li>
     <% if @contexts.any?{|c| c.respond_to?(:assignments) && can_do(c.assignments.new, @current_user, :create)} %>
       <li class="option create_assignment_option add_step">
-        <a href="#"><%= t 'links.create_assignment', "Create a New Assignment" %></a>
+        <a href="#" class="icon-assignment"><%= t 'links.create_assignment', "Create a New Assignment" %></a>
         <div class="details" style="display: none;">
           <%= t 'descriptions.create_assignment', "Just like with a calendar event, click the date you want to add the assignment
           to.  Or you can create an assignment without a due date by clicking in the
@@ -61,14 +61,14 @@
       </li>
     <% end %>
     <li class="option edit_step">
-      <a href="#"><%= t 'links.change_date', "Change the Date of an Event/Assignment" %></a>
+      <a href="#" class="icon-calendar-day"><%= t 'links.change_date', "Change the Date of an Event/Assignment" %></a>
       <div class="details" style="display: none;">
         <%= t 'descriptions.change_date', %{That one's easy.  Just drag the event to a new date and let go.  Or you can
         click the event and then click "Edit" to get a little more specific.} %>
       </div>
     </li>
     <li class="option delete_calendar_event_option delete_step">
-      <a href="#"><%= t 'links.delete', "Delete an Event/Assignment" %></a>
+      <a href="#" class="icon-end"><%= t 'links.delete', "Delete an Event/Assignment" %></a>
       <div class="details" style="display: none;">
         <%= t 'descriptions.delete', "Click the event or assignment on the calendar you want to delete." %>
       </div>

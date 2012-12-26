@@ -2,6 +2,7 @@ define [
   'jquery'
   'jst/AssignmentDetailsDialog'
   'jqueryui/dialog'
+  'compiled/jquery/fixDialogButtons'
 ], ($, assignmentDetailsDialogTemplate) ->
 
   class AssignmentDetailsDialog
@@ -32,5 +33,5 @@ define [
         noneRightLeft: (tally += width) - width
 
       $(assignmentDetailsDialogTemplate(locals)).dialog
-        width: 375
+        width: 500
         close: -> $(this).remove()

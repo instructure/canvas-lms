@@ -515,4 +515,8 @@ class Group < ActiveRecord::Base
   def default_collection_name
     t "#group.default_collection_name", "%{group_name}'s Collection", :group_name => self.name
   end
+
+  def associated_shards
+    [Shard.default]
+  end
 end

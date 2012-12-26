@@ -50,7 +50,8 @@ define [
     ##
     # options.page: 'next', 'prev', 'first', 'last', 'top', 'bottom'
     fetch: (options = {}) ->
-      @["fetching#{capitalize options.page}Page"] = true
+      exclusionFlag = "fetching#{capitalize options.page}Page"
+      @[exclusionFlag] = true
       if options.page?
         options.url = @urls[options.page] if @urls?
         options.add = true unless options.add?
@@ -60,8 +61,7 @@ define [
       @trigger 'beforeFetch', this, options
       @trigger "beforeFetch:#{options.page}", this, options if options.page?
       super(options).done (response, text, xhr) =>
-        @["fetching#{capitalize options.page}Page"] = false
-        @fetchingNextPage = false
+        @[exclusionFlag] = false
         @trigger 'fetch', this, response, options
         @trigger "fetch:#{options.page}", this, response, options if options.page?
         @trigger 'fetched:last', arguments... unless @urls.next

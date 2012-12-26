@@ -19,12 +19,12 @@ require [
       <form style="display:none">
         when this gets turned into a dialog, it should
         turn the buttons in the markup into proper dialog buttons
-        <button class="button">Should NOT be converted</button>
+        <button class="btn">Should NOT be converted</button>
         <div class="button-container">
-          <button class="button" data-text-while-loading="while loading" type="submit">
+          <button class="btn" data-text-while-loading="while loading" type="submit">
             This will Submit the form
           </button>
-          <a class="button dialog_closer">
+          <a class="btn dialog_closer">
             This will cause the dialog to close
           </a>
         </div>
@@ -35,7 +35,7 @@ require [
     equal $dialog.dialog('option', 'buttons').length, 2, 'converts both buttons in .button-pane only'
 
     msg = "hides the original .buttons in the .button-container only"
-    $dialog.find('.button').each ->
+    $dialog.find('.btn').each ->
       equal $(this).is(':hidden'), ($(this).text() isnt 'Should NOT be converted'), msg
 
     msg = "make sure clicking on converted ui-dialog-button causes submit handler to be called on form"

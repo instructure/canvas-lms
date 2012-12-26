@@ -1,7 +1,3 @@
-require 'date'
-require 'active_support'
-require File.expand_path(File.dirname(__FILE__) + '/../../lib/sorts_assignments.rb')
-require 'mocha_standalone'
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe SortsAssignments do
@@ -188,14 +184,21 @@ describe SortsAssignments do
   describe "by_varied_due_date" do
     let(:user) { stub }
     let(:session) { stub }
+    let( :submissions ) { [] }
     let(:sorted_assignments) {
       SortsAssignments.by_varied_due_date({
         :assignments => assignments,
         :user => user,
         :session => session,
-        :upcoming_limit => 1.week.from_now
+        :upcoming_limit => 1.week.from_now,
+        :submissions => []
       })
     }
+
+    it "raises an IndexError if a required field is not passed" do
+      lambda { SortsAssignments.by_varied_due_date({}) }.
+        should raise_error IndexError
+    end
 
     describe "the Struct returned" do
 
@@ -204,7 +207,8 @@ describe SortsAssignments do
         SortsAssignments.stubs(:vdd_map).returns(assignments)
         SortsAssignments.stubs(:ungraded_for_user_and_session).
           returns(ungraded_assignments)
-        SortsAssignments.stubs(:overdue).returns []
+        SortsAssignments.stubs(:overdue).with(assignments,user,session,submissions).
+          returns []
       end
 
       it "stores the past assignments" do
@@ -233,7 +237,7 @@ describe SortsAssignments do
       end
 
       it "returns the overdue assignments" do
-        sorted_assignments.overdue.should == []
+        sorted_assignments.overdue.should == SortsAssignments.overdue(assignments, user, session, submissions)
       end
 
     end

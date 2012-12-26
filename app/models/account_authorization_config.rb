@@ -104,7 +104,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   
   def ldap_filter(login = nil)
     filter = self.auth_filter
-    filter.gsub!(/\{\{login\}\}/, sanitized_ldap_login(login)) if login
+    filter = filter.gsub(/\{\{login\}\}/, sanitized_ldap_login(login)) if login
     filter
   end
   

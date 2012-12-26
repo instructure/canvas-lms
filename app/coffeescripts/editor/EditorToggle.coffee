@@ -91,7 +91,7 @@ define [
       $('<a/>')
         .html(@options.doneText)
         .attr('href', '#')
-        .addClass('button edit-html-done edit_html_done')
+        .addClass('btn edit-html-done edit_html_done')
         .attr('title', I18n.t('done.title', 'Click to finish editing the rich text area'))
         .click => @display()
 

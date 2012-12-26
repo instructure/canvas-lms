@@ -20,7 +20,6 @@ define([
   'i18n!wiki.sidebar',
   'jquery' /* $ */,
   'str/htmlEscape',
-  'jst/wikiSidebar/collectionItem',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.inst_tree' /* instTree */,
   'jquery.instructure_forms' /* formSubmit, handlesHTML5Files, ajaxFileUpload, fileData */,
@@ -34,16 +33,15 @@ define([
   'jqueryui/accordion' /* /\.accordion\(/ */,
   'jqueryui/tabs' /* /\.tabs/ */,
   'vendor/scribd.view' /* scribd */
-], function(I18n, $, htmlEscape, collectionItem) {
+], function(I18n, $, htmlEscape) {
 
   var $editor_tabs,
       $tree1,
       $image_list,
-      $course_show_secondary, 
+      $course_show_secondary,
       $sidebar_upload_image_form,
       $sidebar_upload_file_form,
-      $wiki_sidebar_select_folder_dialog,
-      $collectionItems;
+      $wiki_sidebar_select_folder_dialog;
 
   // unlikely, but there's a chance this domready call will happen after other
   // scripts try to call methods on wikiSidebar, need to re-architect this a bit
@@ -55,7 +53,6 @@ define([
     $sidebar_upload_image_form = $("form#sidebar_upload_image_form");
     $sidebar_upload_file_form = $("form#sidebar_upload_file_form");
     $wiki_sidebar_select_folder_dialog = $("#wiki_sidebar_select_folder_dialog");
-    $collectionItems = $('#wiki_sidebar_collections ul');
   });
 
   var wikiSidebar = {
@@ -251,8 +248,8 @@ define([
         $sidebar_upload_file_form.slideToggle('fast');
       });
       //make the tabs for the right side
-      
-      $editor_tabs.bind( "tabsshow tagselect", function(event, ui) { 
+
+      $editor_tabs.bind( "tabsshow tagselect", function(event, ui) {
         // defer loading everything in the "files" tree until we click on that tab
         if (ui.panel.id === 'editor_tabs_3' && !$tree1.hasClass('initialized')) {
           $tree1.addClass('initialized unstyled_list');
@@ -293,30 +290,6 @@ define([
 
       $editor_tabs.tabs();
 
-      var $collectionsSelect = $('#wiki_sidebar_collections select');
-      if ($collectionsSelect.length) {
-        $collectionsSelect.change(function() {
-          $.ajaxJSON('/api/v1/collections/' + $(this).val() + '/items', 'GET', {}, function(items) {
-            $collectionItems.html();
-            for (var i = 0; i < items.length; i++) {
-              var item = items[i];
-              item.iconClass = "icon-" + ({url: 'link', image: 'analytics'}[item.item_type] || item.item_type); 
-              var $node = $(collectionItem(item));
-              $node.data('item', item);
-              if (i % 2 == 1)
-                $node.addClass('even');
-              if (i == items.length - 1)
-                $node.addClass('last');
-              $collectionItems.append($node);
-            }
-          });
-        }).change();
-      }
-
-      $collectionItems.on('click', 'li', function() {
-        wikiSidebar.itemSelected($(this).data('item'));
-      });
-
       $('.wiki_pages li a').live('click', function(event){
         event.preventDefault();
         wikiSidebar.editor.editorBox('create_link', {title: $(this).text(), url: $(this).attr('href')});
@@ -332,7 +305,7 @@ define([
         event.preventDefault();
         var pageName = $.trim($("#new_page_name").val()).replace(/\s/g, '-').toLowerCase();
         wikiSidebar.editor.editorBox('create_link', {
-          title: $("#new_page_name").val(), 
+          title: $("#new_page_name").val(),
           url: $("#new_page_url_prefix").val()+ "/" + pageName
         });
         $('#new_page_drop_down').slideUp("fast");
@@ -385,7 +358,7 @@ define([
           });
           return false;
         }, false);
-        $wiki_sidebar_select_folder_dialog.find(".select_button").click(function(event) {  
+        $wiki_sidebar_select_folder_dialog.find(".select_button").click(function(event) {
           var folder_id = $wiki_sidebar_select_folder_dialog.find(".folder_id").val();
           if(folder_id) {
             var callback = $wiki_sidebar_select_folder_dialog.data('folder_select');
@@ -445,7 +418,7 @@ define([
       var fileUploadsFileList = [];
       var fileUploadsReady = true;
       $("#wiki_sidebar_file_uploads").bind('files_added', function(event, data) {
-        for(var idx in data.files) { 
+        for(var idx in data.files) {
           fileUploadsFileList.push({
             file: data.files[idx],
             folder_id: data.folder_id
@@ -499,7 +472,7 @@ define([
       var imageUploadsFileList = [];
       var imageUploadsReady = true;
       $("#wiki_sidebar_image_uploads").bind('files_added', function(event, data) {
-        for(var idx in data.files) { 
+        for(var idx in data.files) {
           imageUploadsFileList.push({
             file: data.files[idx],
             folder_id: data.folder_id

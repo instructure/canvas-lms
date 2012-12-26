@@ -188,6 +188,10 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def formatted_body(truncate=nil)
+    # stream items pre-serialize the return value of this method
+    if formatted_body = read_attribute(:formatted_body)
+      return formatted_body
+    end
     self.extend TextHelper
     res = format_message(comment).first
     res = truncate_html(res, :max_length => truncate, :words => true) if truncate

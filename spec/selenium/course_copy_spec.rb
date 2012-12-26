@@ -129,7 +129,7 @@ describe "course copy" do
 
         @new_course = Course.last
         get "/courses/#{@new_course.id}"
-        f("#no_topics_message").should include_text("No Recent Messages")
+        f(".no-recent-messages").should include_text("No Recent Messages")
         @new_course.wiki.wiki_pages.count.should == 5
       end
     end
