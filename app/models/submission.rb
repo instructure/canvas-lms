@@ -1003,9 +1003,12 @@ class Submission < ActiveRecord::Base
   def compute_lateness
     overridden_assignment = assignment.overridden_for(self.user)
 
+    check_time = submitted_at
+    check_time -= 60.seconds if submission_type == 'online_quiz'
+
     late = submitted_at &&
       overridden_assignment.due_at &&
-      overridden_assignment.due_at < submitted_at
+      overridden_assignment.due_at < check_time
 
     write_attribute :late, !!late
   end

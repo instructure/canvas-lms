@@ -295,18 +295,6 @@ describe "gradebook2" do
     end
   end
 
-  it "should give a quiz submission 30 extra seconds before making it late" do
-    submission = Submission.last
-    assignment = submission.assignment
-    assignment.update_attribute(:due_at, Time.now)
-    submission.update_attribute(:submitted_at, assignment.due_at + 30.seconds)
-    submission.update_attribute(:submission_type, 'online_quiz')
-
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
-    ff('.late').count.should == 0
-  end
-
   describe "message students who" do
     it "should send messages" do
       message_text = "This is a message"
@@ -571,4 +559,17 @@ describe "gradebook2" do
       f('#content h3').should include_text 'Attached files to the following user submissions'
     end
   end
+
+  it "should use the late attribute of the submission to determine lateness" do
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    ff('.late').count.should == 0
+
+    @student_3_submission.write_attribute(:late, true)
+    @student_3_submission.save!
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    ff('.late').count.should == 1
+  end
+
 end

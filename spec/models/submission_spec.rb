@@ -757,8 +757,35 @@ describe Submission do
       @submission1.reload.updated_at.should eql hasnt_been_updated_flag_time
       @submission2.reload.updated_at.should_not eql hasnt_been_updated_flag_time
     end
-  end
 
+    it "should give a quiz submission 30 extra seconds before making it late" do
+      quiz_with_graded_submission([{:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question'}}]) do
+        {
+          "text_after_answers"            => "",
+          "question_#{@questions[0].id}"  => "<p>Lorem ipsum answer.</p>",
+          "context_id"                    => "#{@course.id}",
+          "context_type"                  => "Course",
+          "user_id"                       => "#{@user.id}",
+          "quiz_id"                       => "#{@quiz.id}",
+          "course_id"                     => "#{@course.id}",
+          "question_text"                 => "Lorem ipsum question",
+        }
+      end
+      @assignment.due_at = "20130101T23:59Z"
+      @assignment.save!
+
+      submission = @quiz_submission.submission.reload
+      submission.write_attribute(:submitted_at, @assignment.due_at + 3.days)
+      submission.compute_lateness
+      submission.save!
+      submission.should be_late
+
+      submission.write_attribute(:submitted_at, @assignment.due_at + 30.seconds)
+      submission.compute_lateness
+      submission.save!
+      submission.should_not be_late
+    end
+  end
 end
 
 def submission_spec_model(opts={})

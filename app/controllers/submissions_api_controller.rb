@@ -50,6 +50,7 @@ class SubmissionsApiController < ApplicationController
   # preview_url:: Link to the URL in canvas where the submission can be previewed. This will require the user to log in.
   # submitted_at:: Timestamp when the submission was made.
   # url:: If the submission was made as a URL.
+  # late:: Whether the submission was made after the applicable due date.
   def index
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @assignment = @context.assignments.active.find(params[:assignment_id])
