@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,17 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Api::V1::Collaborator
-  include Api::V1::Json
+define [
+  'Backbone'
+], ({Model}) ->
 
-  def collaborator_json(collaborator, current_user, session)
-    api_json(collaborator, current_user, session, :only => %w{id}).tap do |hash|
-      hash['type'] = collaborator.group_id.present? ? 'group' : 'user'
-      hash['name'] = collaborator.user.try(:sortable_name) ||
-        collaborator.group.try(:name)
-      hash['collaborator_id'] = collaborator.user.try(:id) ||
-        collaborator.group.id
-    end
-  end
-end
-
+  class Group extends Model
+    modelType: 'group'
+    resourceName: 'groups'

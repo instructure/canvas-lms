@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011-2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -44,15 +44,6 @@ describe CollaborationsController do
       course_with_student_logged_in(:active_all => true)
       get 'index', :course_id => @course.id
       response.should be_success
-    end
-
-    it "should not include the student view student" do
-      course_with_teacher_logged_in(:active_all => true)
-      student_in_course(:active_user => true)
-      @student_view_student = @course.student_view_student
-      get 'index', :course_id => @course.id
-      assigns[:users].include?(@student).should be_true
-      assigns[:users].include?(@student_view_student).should be_false
     end
 
     it "should not allow the student view student to access collaborations" do

@@ -104,82 +104,91 @@ module GoogleDocs
     end
   end
 
-  def google_doc_list(access_token=nil, only_extensions=nil)
-    access_token ||= google_docs_retrieve_access_token
-    docs = Atom::Feed.load_feed(access_token.get("https://docs.google.com/feeds/documents/private/full").body)
-    folders = []
-    entries = []
+  def google_doc_list(access_token=google_docs_retrieve_access_token, only_extensions=nil)
+    response = access_token.get('https://docs.google.com/feeds/documents/private/full')
+    docs     = Atom::Feed.load_feed(response.body)
+    folders, entries = [[], []]
+
     docs.entries.each do |entry|
       folder = entry.categories.find{|c| c.scheme.match(/\Ahttp:\/\/schemas.google.com\/docs\/2007\/folders/)}
       folders << folder.label if folder
       entries << GoogleDocEntry.new(entry)
     end
-    folders.uniq!
-    folders.sort!
-    res = OpenObject.new
+
+    folders = folders.uniq.sort
+    res     = Struct.new(:files, :folders).new
+
     unless only_extensions.blank?
       entries.reject! { |e| !only_extensions.include?(e.extension) }
     end
-    res.files = entries
+
+    res.files   = entries
     res.folders = folders
+
     res
   end
 
-  def google_consumer(key=nil, secret=nil)
+  def google_consumer(key = GoogleDocs.config['api_key'], secret = GoogleDocs.config['secret_key'])
     require 'oauth'
     require 'oauth/consumer'
-    key ||= GoogleDocs.config['api_key']
-    secret ||= GoogleDocs.config['secret_key']
-    consumer = OAuth::Consumer.new(key, secret, {
-      :site => "https://www.google.com",
-      :request_token_path => "/accounts/OAuthGetRequestToken",
-      :access_token_path => "/accounts/OAuthGetAccessToken",
-      :authorize_path=> "/accounts/OAuthAuthorizeToken",
-      :signature_method => "HMAC-SHA1"
+
+    OAuth::Consumer.new(key, secret, {
+      :site               => 'https://www.google.com',
+      :request_token_path => '/accounts/OAuthGetRequestToken',
+      :access_token_path  => '/accounts/OAuthGetAccessToken',
+      :authorize_path     => '/accounts/OAuthAuthorizeToken',
+      :signature_method   => 'HMAC-SHA1'
     })
   end
 
   class Google
     class Google::Batch
-    class Google::Batch::Operation
-      attr_accessor :type
-      def initialize(operation_type="insert")
-        self.type = operation_type
-      end
-      def to_xml(*opts)
-        n = XML::Node.new("batch:operation")
-        n['type'] = type
-        n
+      class Google::Batch::Operation
+        attr_accessor :type
+        def initialize(operation_type="insert")
+          self.type = operation_type
+        end
+        def to_xml(*opts)
+          n = XML::Node.new("batch:operation")
+          n['type'] = type
+          n
+        end
       end
     end
-    end
+
     class Google::GAcl
-    class Google::GAcl::Role
-      attr_accessor :role
-      def initialize()
-        self.role = "writer"
+      class Google::GAcl::Role
+        attr_accessor :role
+
+        def initialize()
+          self.role = "writer"
+        end
+
+        def to_xml(*opts)
+          n = XML::Node.new("gAcl:role")
+          n['value'] = role
+          n
+        end
       end
-      def to_xml(*opts)
-        n = XML::Node.new("gAcl:role")
-        n['value'] = role
-        n
+
+      class Google::GAcl::Scope
+        attr_accessor :type, :value
+
+        def initialize(email)
+          self.type = "user"
+          self.value = email
+        end
+
+        def to_xml(*opts)
+          n = XML::Node.new("gAcl:scope")
+          n['type'] = type
+          n['value'] = value
+          n
+        end
       end
-    end
-    class Google::GAcl::Scope
-      attr_accessor :type, :value
-      def initialize(email)
-        self.type = "user"
-        self.value = email
-      end
-      def to_xml(*opts)
-        n = XML::Node.new("gAcl:scope")
-        n['type'] = type
-        n['value'] = value
-        n
-      end
-    end
     end
   end
+
   class Entry < Atom::Entry
     namespace Atom::NAMESPACE
     element "id"
@@ -218,15 +227,14 @@ module GoogleDocs
     entry = GoogleDocEntry.new(Atom::Entry.load_entry(response.body))
   end
 
-  def google_docs_delete_doc(entry, access_token=nil)
-    url = entry.edit_url
-    access_token ||= google_docs_retrieve_access_token
-    response = access_token.delete(url, {"GData-Version" => "2", "If-Match" => "*"})
+  def google_docs_delete_doc(entry, access_token = google_docs_retrieve_access_token)
+    access_token.delete(entry.edit_url, { 'GData-Version' => '2', 'If-Match' => '*' })
   end
 
   def google_docs_acl_remove(document_id, users)
     access_token = google_docs_retrieve_access_token
-    url = "https://docs.google.com/feeds/acl/private/full/#{document_id}/batch"
+    url          = "https://docs.google.com/feeds/acl/private/full/#{document_id}/batch"
+
     request_feed = Feed.new do |feed|
       feed.categories << Atom::Category.new{|category|
         category.scheme = "http://schemas.google.com/g/2005#kind"
@@ -234,51 +242,61 @@ module GoogleDocs
       }
       users.each do |user|
         if user.is_a?(String)
-          user = OpenObject.new(:id => user, :gmail => user)
+          user = Struct.new(:id, :gmail, :google_docs_address).new(user, user)
         end
+
+        next unless user_identifier = user.google_docs_address || user.gmail
+
         feed.entries << Entry.new do |entry|
-          user_identifier = user.google_docs_address || user.gmail
-          entry.id = "https://docs.google.com/feeds/acl/private/full/#{CGI.escape(document_id)}/user%3A#{CGI.escape(user_identifier)}"
-          entry.batch_operation = Google::Batch::Operation.new("delete")
-          entry.gAcl_role = Google::GAcl::Role.new
-          entry.gAcl_scope = Google::GAcl::Scope.new(user_identifier)
+          entry.id              = "https://docs.google.com/feeds/acl/private/full/#{CGI.escape(document_id)}/user%3A#{CGI.escape(user_identifier)}"
+          entry.batch_operation = Google::Batch::Operation.new('delete')
+          entry.gAcl_role       = Google::GAcl::Role.new
+          entry.gAcl_scope      = Google::GAcl::Scope.new(user_identifier)
         end
       end
     end
+
     response = access_token.post(url, request_feed.to_xml, {'Content-Type' => 'application/atom+xml'})
-    feed = Atom::Feed.load_feed(response.body)
-    res = []
+    feed     = Atom::Feed.load_feed(response.body)
+    res      = []
+
     feed.entries.each do |entry|
       user = users.to_a.find{|u| u.id == entry['http://schemas.google.com/gdata/batch', 'id'][0].to_i}
       res << user if user
     end
+
     res
   end
 
   def google_docs_acl_add(document_id, users)
     access_token = google_docs_retrieve_access_token
-    url = "https://docs.google.com/feeds/acl/private/full/#{document_id}/batch"
+    url          = "https://docs.google.com/feeds/acl/private/full/#{document_id}/batch"
+
     request_feed = Feed.new do |feed|
-      feed.categories << Atom::Category.new{|category|
+      feed.categories << Atom::Category.new do |category|
         category.scheme = "http://schemas.google.com/g/2005#kind"
-        category.term = "http://schemas.google.com/acl/2007#accessRule"
-      }
-      users.each do |user|
+        category.term   = "http://schemas.google.com/acl/2007#accessRule"
+      end
+
+      users.select { |u| u.google_docs_address || u.gmail }.each do |user|
         feed.entries << Entry.new do |entry|
-          entry.batch_id = user.id
+          entry.batch_id        = user.id
           entry.batch_operation = Google::Batch::Operation.new
-          entry.gAcl_role = Google::GAcl::Role.new
-          entry.gAcl_scope = Google::GAcl::Scope.new(user.google_docs_address || user.gmail)
+          entry.gAcl_role       = Google::GAcl::Role.new
+          entry.gAcl_scope      = Google::GAcl::Scope.new(user.google_docs_address || user.gmail)
         end
       end
     end
+
     response = access_token.post(url, request_feed.to_xml, {'Content-Type' => 'application/atom+xml'})
-    feed = Atom::Feed.load_feed(response.body)
-    res = []
+    feed     = Atom::Feed.load_feed(response.body)
+    res      = []
+
     feed.entries.each do |entry|
       user = users.to_a.find{|u| u.id == entry['http://schemas.google.com/gdata/batch', 'id'][0].to_i}
       res << user if user
     end
+
     res
   end
 

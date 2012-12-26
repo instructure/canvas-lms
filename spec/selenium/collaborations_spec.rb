@@ -3,287 +3,253 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "collaborations" do
   it_should_behave_like "in-process server selenium tests"
 
-  def assert_wizard_visibility(visible)
-    driver.execute_script("return $('div.collaborate_data div.button-container button.button-default-action').is(':visible');").should == visible
+  # Helper methods
+  # ==============
+
+  # Public: Determine if a collaboration form is visible.
+  #
+  # Returns a boolean.
+  def form_visible?
+    ffj('.collaborator-picker:visible').length > 0
   end
 
-  def delete_collaboration(collaboration, collab_type)
+  # Public: Delete the given collaboration.
+  #
+  # collaboration - The collaboration model to delete.
+  # type - The type of collaboration - "etherpad" or "google_docs" (default: etherpad).
+  #
+  # Returns nothing.
+  def delete_collaboration(collaboration, type = 'etherpad')
     f(".collaboration_#{collaboration.id} .delete_collaboration_link").click
+
     wait_for_ajaximations
-    if collab_type == "google_docs"
-      f("#delete_collaboration_dialog .delete_document_button").click
+
+    if type == 'google_docs'
+      f('#delete_collaboration_dialog .delete_button').click
+    else
+      #driver.switch_to.alert.accept
+    end
+    wait_for_ajaximations
+  end
+
+  # Public: Given an array of collaborations, verify their presence.
+  #
+  # urls - An array of collaboration URLs to validate.
+  # form_visible - The expected visibility of the form as a boolean (default: true).
+  # execute_script - Boolean flag to override window.confirm (default: false).
+  #
+  # Returns nothing.
+  def validate_collaborations(urls = %W{/courses/#{@course.id}/collaborations},
+                              form_visible = true,
+                              execute_script = false)
+    Array(urls).each do |url|
+      get url
+
       wait_for_ajaximations
+
+      if execute_script
+        driver.execute_script 'window.confirm = function(msg) { return true; }'
+      end
+
+      form_visible?.should == form_visible
     end
   end
 
-  def go_to_collaboration_and_validate(urls = %W(/courses/#{@course.id}/collaborations), wizard_visible = true, execute_script = false)
-    urls = [urls] unless (urls.is_a? Array)
-    urls.each { |url| get url }
-    wait_for_ajaximations
-    driver.execute_script "window.confirm = function(msg) { return true; }" if execute_script
-    assert_wizard_visibility(wizard_visible)
+  # Public: Determine if the given collaborator has been selected.
+  #
+  # user - The collaborator to check.
+  #
+  # Returns a boolean.
+  def collaborator_is_selected?(user)
+    fj(".members-list li[data-id=#{user.id}]").present?
   end
 
-  def test_checkbox(css_context, user, checked)
-    is_checked("#{css_context} ul.collaborator_list input#user_#{user.id}").should == checked
-  end
+  # Public: Create a new collaboration.
+  #
+  # type - The type of the collaboration (e.g. "etherpad" or "google_docs")
+  # title - The title of the new collaboration (default: "New collaboration").
+  #
+  # Returns a boolean.
+  def create_collaboration!(type, title = 'New collaboration')
+    PluginSetting.create!(:name => type, :settings => {})
 
-  def create_collaboration(collab_type, collab_title)
-    PluginSetting.create!(:name => collab_type, :settings => {})
-    @collaboration = Collaboration.typed_collaboration_instance(collab_title)
+    @collaboration         = Collaboration.typed_collaboration_instance(title)
     @collaboration.context = @course
-    @collaboration.attributes = {:title => "My Collab"}
+    @collaboration.title   = title
     @collaboration.save!
   end
 
-  context "collaborations as a teacher" do
-
-    [["EtherPad", "etherpad"], ["Google Docs", "google_docs"]].each do |collab_title, collab_type|
-
-      context collab_title do
-
-        before (:each) do
+  context "a teacher's" do
+    [['EtherPad', 'etherpad'], ['Google Docs', 'google_docs']].each do |title, type|
+      context "#{title} collaboration" do
+        before(:each) do
           course_with_teacher_logged_in
-          CollaborationsController.any_instance.stubs(:google_docs_verify_access_token).returns(true) if collab_type == "google_docs"
+
+          if type == 'google_docs'
+            CollaborationsController.any_instance.
+              stubs(:google_docs_verify_access_token).
+              returns(true)
+          end
         end
 
-        it 'should automatically start the new collaboration wizard in the absence of collaborations' do
-          PluginSetting.create!(:name => collab_type, :settings => {})
-
-          go_to_collaboration_and_validate
+        it 'should display the new collaboration form if there are no existing collaborations' do
+          PluginSetting.create!(:name => type, :settings => {})
+          validate_collaborations
         end
 
-        it "should edit the collaboration" do
-          title_text = 'edited collaboration'
-          create_collaboration(collab_type, collab_title)
+        it 'should be editable' do
+          create_collaboration!(type, title)
+          validate_collaborations(%W{/courses/#{@course.id}/collaborations}, false)
 
-          go_to_collaboration_and_validate("/courses/#{@course.id}/collaborations/", false)
+          new_title = 'Edited collaboration'
           f('.edit_collaboration_link').click
-          replace_content(f('#collaboration_title'), title_text)
-          expect_new_page_load { submit_form('#edit_collaboration_form') }
-          f('.collaboration .title').text.should == title_text
-          Collaboration.last.title.should == title_text
+          replace_content(fj('input[name="collaboration[title]"]:visible'), new_title)
+          expect_new_page_load do
+            submit_form('.edit_collaboration')
+          end
+
+          f('.collaboration .title').text.should == new_title
+          Collaboration.last(:order => 'id DESC').title.should == new_title
         end
 
-        it "should delete the collaboration" do
-          create_collaboration(collab_type, collab_title)
+        it 'should be delete-able' do
+          create_collaboration!(type, title)
+          validate_collaborations(%W{/courses/#{@course.id}/collaborations}, false)
 
-          go_to_collaboration_and_validate("/courses/#{@course.id}/collaborations/", false)
           f('.delete_collaboration_link').click
-          if collab_type == "google_docs"
-            f("#delete_collaboration_dialog .delete_button").click
-            wait_for_ajaximations
+
+          if type == 'google_docs'
+            f('#delete_collaboration_dialog .delete_button').click
           else
             driver.switch_to.alert.accept
-            wait_for_ajaximations
           end
+          wait_for_ajaximations
+
           f('#no_collaborations_message').should be_displayed
-          Collaboration.last.workflow_state.should == 'deleted'
+          Collaboration.last(:order => 'id DESC').should be_deleted
         end
 
-        it 'should not automatically start the new collaboration wizard in the presence of collaborations' do
-          create_collaboration(collab_type, collab_title)
-
-          go_to_collaboration_and_validate("/courses/#{@course.id}/collaborations", false)
+        it 'should not display the new collaboration form if other collaborations exist' do
+          create_collaboration!(type, title)
+          validate_collaborations(%W{/courses/#{@course.id}/collaborations}, false)
         end
 
-        it 'should leave the collaboration wizard open when someone navigates to the add_collaboration fragment and there is no collaborations' do
-          PluginSetting.create!(:name => collab_type, :settings => {})
+        describe '#add_collaboration fragment' do
+          it 'should display the new collaboration form if no collaborations exist' do
+            PluginSetting.create!(:name => type, :settings => {})
+            validate_collaborations(%W{/courses/#{@course.id}/collaborations
+              /courses/#{@course.id}/collaborations#add_collaboration}, true)
+          end
 
-          go_to_collaboration_and_validate(%W(/courses/#{@course.id}/collaborations/ /courses/#{@course.id}/collaborations/#add_collaboration), true)
+          it 'should hide the new collaboration form if collaborations exist' do
+            create_collaboration!(type, title)
+            validate_collaborations(%W{/courses/#{@course.id}/collaborations
+              /courses/#{@course.id}/collaborations#add_collaboration}, false)
+          end
         end
 
-        it 'should leave the collaboration wizard open when someone navigates to the add_collaboration fragment and there is some collaborations' do
-          create_collaboration(collab_type, collab_title)
-
-          go_to_collaboration_and_validate(%W(/courses/#{@course.id}/collaborations/ /courses/#{@course.id}/collaborations/#add_collaboration), true)
+        it 'should open the new collaboration form if the last collaboration is deleted' do
+          create_collaboration!(type, title)
+          validate_collaborations("/courses/#{@course.id}/collaborations/", false, true)
+          delete_collaboration(@collaboration, type)
+          form_visible?.should be_true
         end
 
-        it 'should leave the collaboration wizard open when a script clicks the add collaboration wizard button twice' do
-          create_collaboration(collab_type, collab_title)
+        it 'should not display the new collaboration form when the penultimate collaboration is deleted' do
+          PluginSetting.create!(:name => type, :settings => {})
 
-          go_to_collaboration_and_validate("/courses/#{@course.id}/collaborations", false)
-          driver.execute_script("$('.add_collaboration_link').click();")
-          assert_wizard_visibility(true)
-          driver.execute_script("$('.add_collaboration_link').click();")
-          assert_wizard_visibility(true)
-        end
-
-        it 'should open the collaboration wizard when the last collaboration is deleted' do
-          create_collaboration(collab_type, collab_title)
-
-          go_to_collaboration_and_validate("/courses/#{@course.id}/collaborations/", false, true)
-          delete_collaboration(@collaboration, collab_type)
-          assert_wizard_visibility(true)
-        end
-
-        it 'should not open the collaboration wizard when the penultimate collaboration is deleted' do
-          PluginSetting.create!(:name => collab_type, :settings => {})
-          @collaboration1 = Collaboration.typed_collaboration_instance(collab_title)
+          @collaboration1 = Collaboration.typed_collaboration_instance(title)
           @collaboration1.context = @course
           @collaboration1.attributes = {:title => "My Collab 1"}
           @collaboration1.save!
-          @collaboration2 = Collaboration.typed_collaboration_instance(collab_title)
+          @collaboration2 = Collaboration.typed_collaboration_instance(title)
           @collaboration2.context = @course
           @collaboration2.attributes = {:title => "My Collab 2"}
           @collaboration2.save!
 
-          go_to_collaboration_and_validate("/courses/#{@course.id}/collaborations/", false, true)
-          delete_collaboration @collaboration1, collab_type
-          assert_wizard_visibility(false)
-          delete_collaboration @collaboration2, collab_type
-          assert_wizard_visibility(true)
+          validate_collaborations("/courses/#{@course.id}/collaborations/", false, true)
+          delete_collaboration(@collaboration1, type)
+          form_visible?.should be_false
+          delete_collaboration(@collaboration2, type)
+          form_visible?.should be_true
         end
 
-        it 'should leave the collaboration wizard open when the last collaboration is deleted' do
-          create_collaboration(collab_type, collab_title)
-
-          go_to_collaboration_and_validate(%W(/courses/#{@course.id}/collaborations/ /courses/#{@course.id}/collaborations/#add_collaboration), true, true)
-          delete_collaboration @collaboration, collab_type
-          assert_wizard_visibility(true)
+        it 'should leave the new collaboration form open when the last collaboration is deleted' do
+          create_collaboration!(type, title)
+          validate_collaborations(%W{/courses/#{@course.id}/collaborations
+                                     /courses/#{@course.id}/collaborations#add_collaboration}, false, true)
+          f('.add_collaboration_link').click
+          delete_collaboration(@collaboration, type)
+          form_visible?.should be_true
         end
 
-        it "should not show collaborator selection menus if there aren't any collaborators" do
-          create_collaboration(collab_type, collab_title)
-          get "/courses/#{@course.id}/collaborations/"
+        it 'should display available collaborators' do
+          PluginSetting.create!(:name => type, :settings => {})
+
+          student_in_course(:course => @course)
+          @student.update_attribute(:name, 'Don Draper')
+
+          get "/courses/#{@course.id}/collaborations"
+
           wait_for_ajaximations
-          f(".collaboration_#{@collaboration.id} .edit_collaboration_link").click
-          wait_for_ajaximations
-          f(".collaboration_#{@collaboration.id} .footer").should_not include_text('Collaborate With')
-          driver.execute_script("$('.add_collaboration_link').click();")
-          f("#add_collaboration_form .collaborator_list").should_not include_text('Collaborate With')
+
+          ffj('.available-users:visible li').length.should == 1
         end
 
-        it "should show collaborator selection menus if there are any collaborators" do
-          create_collaboration(collab_type, collab_title)
-          student_in_course :course => @course
-          @student.name = "test student 1"
-          @student.save!
-          get "/courses/#{@course.id}/collaborations/"
+        it 'should select collaborators' do
+          PluginSetting.create!(:name => type, :settings => {})
+
+          student_in_course(:course => @course)
+          @student.update_attribute(:name, 'Don Draper')
+
+          get "/courses/#{@course.id}/collaborations"
+
           wait_for_ajaximations
-          f(".collaboration_#{@collaboration.id} .edit_collaboration_link").click
-          wait_for_ajaximations
-          f(".collaboration_#{@collaboration.id} .footer").should include_text('Collaborate With')
-          driver.execute_script("$('.add_collaboration_link').click();")
-          wait_for_animations
-          f("#add_collaboration_form .collaborator_list").should include_text('Collaborate With')
+
+          fj('.available-users:visible a').click
+          ffj('.members-list li').length.should == 1
         end
 
-        it "should show collaborator selection menus if there are any collaborators" do
-          create_collaboration(collab_type, collab_title)
-          student_in_course :course => @course, :name => "test student 1"
-          get "/courses/#{@course.id}/collaborations/"
-          wait_for_ajaximations
-          f(".collaboration_#{@collaboration.id} .edit_collaboration_link").click
-          wait_for_ajaximations
-          f(".collaboration_#{@collaboration.id} .footer").should include_text('Collaborate With')
-          driver.execute_script("$('.add_collaboration_link').click();")
-          wait_for_animations
-          f("#add_collaboration_form .collaborator_list").should include_text('Collaborate With')
-        end
+        it 'should deselect collaborators' do
+          PluginSetting.create!(:name => type, :settings => {})
 
+          student_in_course(:course => @course)
+          @student.update_attribute(:name, 'Don Draper')
 
-        it "should distinguish checkbox lists when someone clicks (de)select all" do
-          PluginSetting.create!(:name => collab_type, :settings => {})
-          @students = [student_in_course(:course => @course, :name => "test student 1").user,
-                       student_in_course(:course => @course, :name => "test student 2").user,
-                       student_in_course(:course => @course, :name => "test student 3").user,
-                       student_in_course(:course => @course, :name => "test student 4").user]
-          @collaboration1 = Collaboration.typed_collaboration_instance(collab_title)
-          @collaboration1.context = @course
-          @collaboration1.attributes = {:title => "My Collab 1"}
-          @collaboration1.save!
-          @collaboration2 = Collaboration.typed_collaboration_instance(collab_title)
-          @collaboration2.context = @course
-          @collaboration2.attributes = {:title => "My Collab 2"}
-          @collaboration2.save!
-          @collaboration3 = Collaboration.typed_collaboration_instance(collab_title)
-          @collaboration3.context = @course
-          @collaboration3.attributes = {:title => "My Collab 3"}
-          @collaboration3.save!
-          get "/courses/#{@course.id}/collaborations/"
-          wait_for_ajaximations
-          f(".collaboration_#{@collaboration1.id} .edit_collaboration_link").click
-          f(".collaboration_#{@collaboration2.id} .edit_collaboration_link").click
-          f(".collaboration_#{@collaboration3.id} .edit_collaboration_link").click
-          driver.execute_script("$('.add_collaboration_link').click();")
+          get "/courses/#{@course.id}/collaborations"
+
           wait_for_ajaximations
 
-          forms = %W(#add_collaboration_form .collaboration_#{@collaboration1.id} .collaboration_#{@collaboration2.id} .collaboration_#{@collaboration3.id})
-          @students.each do |student|
-            forms.each do |form|
-              test_checkbox(form, student, false)
-            end
-          end
-
-          forms.each do |form|
-            f("#{form} .select_all_link").click
-            @students.each do |student|
-              forms.each do |other_form|
-                test_checkbox(other_form, student, form == other_form)
-              end
-            end
-            f("#{form} .deselect_all_link").click
-            @students.each do |student|
-              forms.each do |other_form|
-                test_checkbox(other_form, student, false)
-              end
-            end
-          end
-
-          forms.each { |form| f("#{form} .select_all_link").click }
-          @students.each do |student|
-            forms.each do |form|
-              test_checkbox(form, student, true)
-            end
-          end
-
-          forms.each do |form|
-            f("#{form} .deselect_all_link").click
-            @students.each do |student|
-              forms.each do |other_form|
-                test_checkbox(other_form, student, form != other_form)
-              end
-            end
-            f("#{form} .select_all_link").click
-            @students.each do |student|
-              forms.each do |other_form|
-                test_checkbox(other_form, student, true)
-              end
-            end
-          end
+          fj('.available-users:visible a').click
+          fj('.members-list a').click
+          ffj('.members-list li').length.should == 0
         end
       end
     end
   end
 
-  context "etherpad collaborations as a student" do
-
-    before (:each) do
+  context "a student's etherpad collaboration" do
+    before(:each) do
       course_with_teacher(:active_all => true, :name => 'teacher@example.com')
-      student_in_course(:course => @course, :name => "example student").user
+      student_in_course(:course => @course, :name => 'Don Draper')
     end
 
-    it "should create a collaboration and validate that a student can see it" do
-      collaborators = [] #[@current_user]
+    it 'should be visible to the student' do
       PluginSetting.create!(:name => 'etherpad', :settings => {})
+
       @collaboration = Collaboration.typed_collaboration_instance('EtherPad')
       @collaboration.context = @course
-      @collaboration.attributes = {:title => "My Collab", :user => @teacher}
-      collaborators << @student if user
-      @collaboration.collaboration_users = collaborators
+      @collaboration.attributes = { :title => 'My collaboration',
+                                    :user  => @teacher }
+      @collaboration.update_members([@student])
       @collaboration.save!
 
       user_session(@student)
       get "/courses/#{@course.id}/collaborations"
+
       wait_for_ajaximations
-      collaboration = f(".collaboration_#{@collaboration.id}")
-      collaboration.should be_displayed
-      collaboration.find_element(:css, '.toggle_collaborators_link').click
-      wait_for_animations
-      collaboration.find_element(:css, '.collaborators').should include_text(@student.name)
-      collaboration.find_element(:css, '.collaborators').should include_text(@teacher.name)
+
+      ff('#collaborations .collaboration').length == 1
     end
   end
 end
-

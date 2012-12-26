@@ -84,7 +84,7 @@ describe Collaboration do
 
     it "should add new collaborators" do
       @collaboration.update_members(@users[0..-2], @groups.map(&:id))
-      @collaboration.collaborators.map(&:user_id).uniq.count.should == 4
+      @collaboration.reload.collaborators.map(&:user_id).uniq.count.should == 4
       @collaboration.collaborators.map(&:group_id).uniq.count.should == 2
     end
 

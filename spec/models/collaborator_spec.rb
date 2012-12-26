@@ -36,7 +36,7 @@ describe Collaborator do
       NotificationPolicy.create(:notification => @notification,
                                 :communication_channel => user.communication_channel,
                                 :frequency => 'immediately')
-      @collaboration.collaboration_users = [user]
+      @collaboration.update_members([user])
       @collaboration.collaborators.detect { |c| c.user_id == user.id }.
         messages_sent.keys.should == ['Collaboration Invitation']
     end
@@ -45,8 +45,8 @@ describe Collaborator do
       NotificationPolicy.create(:notification => @notification,
                                 :communication_channel => @author.communication_channel,
                                 :frequency => 'immediately')
-      @collaboration.collaboration_users = [@author]
-      @collaboration.collaborators.detect { |c| c.user_id == @author.id }.
+      @collaboration.update_members([@author])
+      @collaboration.reload.collaborators.detect { |c| c.user_id == @author.id }.
         messages_sent.keys.should be_empty
 
     end

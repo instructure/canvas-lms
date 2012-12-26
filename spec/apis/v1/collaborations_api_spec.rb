@@ -32,7 +32,7 @@ describe CollaborationsController, :type => :integration do
     end
     collaboration_model(:user => @teacher, :context => @course)
     @user = @teacher
-    @collaboration.collaboration_users = @members
+    @collaboration.update_members(@members)
   end
 
   after(:all) do
