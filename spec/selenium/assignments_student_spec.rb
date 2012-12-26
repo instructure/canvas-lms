@@ -4,7 +4,6 @@ describe "assignments" do
   it_should_behave_like "in-process server selenium tests"
 
   context "as a student" do
-    DUE_DATE = Time.now.utc + 2.days
 
     def update_assignment_attributes(assignment, attribute, values, click_submit_link = true)
       assignment.update_attributes(attribute => values)
@@ -18,11 +17,12 @@ describe "assignments" do
     end
 
     before (:each) do
+      @due_date = Time.now.utc + 2.days
       course_with_student_logged_in
-      @assignment = @course.assignments.create!(:title => 'assignment 1', :name => 'assignment 1', :due_at => DUE_DATE)
+      @assignment = @course.assignments.create!(:title => 'assignment 1', :name => 'assignment 1', :due_at => @due_date)
       @second_assignment = @course.assignments.create!(:title => 'assignment 2', :name => 'assignment 2', :due_at => nil)
       @third_assignment = @course.assignments.create!(:title => 'assignment 3', :name => 'assignment 3', :due_at => nil)
-      @fourth_assignment = @course.assignments.create!(:title => 'assignment 4', :name => 'assignment 4', :due_at => DUE_DATE - 1.day)
+      @fourth_assignment = @course.assignments.create!(:title => 'assignment 4', :name => 'assignment 4', :due_at => @due_date - 1.day)
     end
 
     it "should not sort undated assignments first and it should order them by title" do
@@ -63,8 +63,7 @@ describe "assignments" do
 
     it "should highlight mini-calendar dates where stuff is due" do
       get "/courses/#{@course.id}/assignments/syllabus"
-
-      f(".mini_calendar_day.date_#{DUE_DATE.strftime("%m_%d_%Y")}").should have_class('has_event')
+      f(".mini_calendar_day.date_#{@due_date.strftime("%m_%d_%Y")}").should have_class('has_event')
     end
 
     it "should not show submission data when muted" do
@@ -258,14 +257,14 @@ describe "assignments" do
   end
 
   context "as observer" do
-    DUE_DATE = Time.now.utc + 12.days
     before :each do
       @course   = course(:active_all => true)
       @student  = user(:active_all => true, :active_state => 'active')
       @observer = user(:active_all => true, :active_state => 'active')
       user_session(@observer)
 
-      @assignment = @course.assignments.create!(:title => 'assignment 1', :name => 'assignment 1', :due_at => DUE_DATE)
+      @due_date = Time.now.utc + 12.days
+      @assignment = @course.assignments.create!(:title => 'assignment 1', :name => 'assignment 1', :due_at => @due_date)
 
       setup_sections_and_overrides_all_future
     end
