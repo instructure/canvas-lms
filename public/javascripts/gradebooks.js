@@ -1451,7 +1451,7 @@ define([
     $submission.css('visibility', '');
     var submission_stamp = submission && $.parseFromISO(submission.submitted_at).minute_timestamp;
     var assignment_stamp = assignment && $.parseFromISO(assignment.due_at).minute_timestamp;
-    $submission.parent().toggleClass('late', !!(assignment && submission && assignment.due_at && submission.submission_type && submission.submitted_at && submission_stamp > assignment_stamp));
+    $submission.parent().toggleClass('late', !!(submission && submission.late));
     if(submission.grade !== "" && submission.grade == 0) {
       submission.grade = "0";
     }
@@ -1659,7 +1659,7 @@ define([
     
     submission.student_id = submission.user_id;
     submission.id = submission.id || "";
-    var late = assignment.due_at && submission.submitted_at && Date.parse(assignment.due_at) < Date.parse(submission.submitted_at);
+    var late = submission.late;
     $submission_information.find(".submitted_at_box").showIf(submission.submitted_at).toggleClass('late_submission', !!late);
     submission.submitted_at_string = $.parseFromISO(submission.submitted_at).datetime_formatted;
     $submission_information.fillTemplateData({
