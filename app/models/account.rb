@@ -506,6 +506,12 @@ class Account < ActiveRecord::Base
     self.account_users.find_by_user_id(user && user.id)
   end
 
+  def available_custom_account_roles
+    account_roles = roles.for_accounts.active
+    account_roles |= self.parent_account.available_custom_account_roles if self.parent_account
+    account_roles
+  end
+
   def available_account_roles
     account_roles = roles.for_accounts.active.map(&:name)
     account_roles |= ['AccountAdmin']

@@ -394,7 +394,7 @@ describe "Roles API", :type => :integration do
     describe "json response" do
       it "should return the expected json format" do
         json = api_call_with_settings
-        json.keys.sort.should == ["account", "base_role_type", "permissions", "role", "workflow_state"]
+        json.keys.sort.should == ["account", "base_role_type", "label", "permissions", "role", "workflow_state"]
         json["account"].should == {
           "name" => @account.name,
           "root_account_id" => @account.root_account_id,

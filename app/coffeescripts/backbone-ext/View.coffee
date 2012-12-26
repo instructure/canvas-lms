@@ -72,7 +72,9 @@ define [
     # in charge of getting variables ready to pass to handlebars during render
     # override with your own logic to do something fancy.
     toJSON: ->
-      (@model ? @collection)?.toJSON arguments...
+      json = ((@model ? @collection)?.toJSON arguments...) || {}
+      json.cid = @cid
+      json
 
     ##
     # Renders all child views
@@ -83,13 +85,15 @@ define [
 
     ##
     # Renders a single child view and appends its designated element
+    # Use ids in your view, not classes. This 
     #
     # @api private
-    renderView: (view, className) =>
-      target = @$('.' + className).first()
+    renderView: (view, selector) =>
+      target = @$("##{selector}")
+      target = @$(".#{selector}") unless target.length
       view.setElement target
       view.render()
-      @[className] ?= view
+      @[selector] ?= view
 
     ##
     # Binds a `@model` data to the element's html. Whenever the data changes

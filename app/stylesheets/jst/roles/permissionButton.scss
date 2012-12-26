@@ -1,0 +1,75 @@
+.table td.permissionButtonView {
+  position: relative;
+
+    .default_permission {
+      opacity: .5;
+    }
+
+    .icon-x {
+      color: #9B0000;
+    }
+    
+    .icon-check {
+      color: green;
+    }
+
+    .btn-group{
+      margin: 0 auto;
+      width: 40px;
+      position: relative;
+
+      .btn.dropdown-toggle{
+        position: relative;
+        min-width: 35px;
+
+        &:disabled, &[disabled] {
+          background: none;
+          border: none;
+
+          & .icon-lock {
+            display: none;
+          }
+        }
+      }
+    }
+
+  .dropdown-menu {
+    text-align: left;
+    /*left: 30%;*/
+
+    input[type=radio] {
+      display: none;
+    }
+
+    label{
+      display: block;
+      padding: 5px;
+    }
+
+    span.text{
+      float: right;
+      text-align: left !important;
+      width: 110px;
+
+      &:last{
+        float: none;
+        text-align: center;
+        display: block;
+      }
+    }
+
+    label:hover, label:focus, input:checked+label {
+      text-decoration: none;
+      color: white;
+      background-color: #08C;
+      background-color: #0081C2;
+      background-image: -moz-linear-gradient(top, #08C, #0077B3);
+      background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#08C), to(#0077B3));
+      background-image: -webkit-linear-gradient(top, #08C, #0077B3);
+      background-image: -o-linear-gradient(top, #08C, #0077B3);
+      background-image: linear-gradient(to bottom, #08C, #0077B3);
+      background-repeat: repeat-x;
+      filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FF0088CC', endColorstr='#FF0077B3', GradientType=0);
+    }
+  }
+}

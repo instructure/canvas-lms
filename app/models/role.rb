@@ -60,6 +60,10 @@ class Role < ActiveRecord::Base
     !account_role?
   end
 
+  def label
+    self.name
+  end
+
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
@@ -132,11 +136,19 @@ class Role < ActiveRecord::Base
   class BuiltInRole
     attr_accessor :name
 
+    def initialize(name)
+      @name = name
+      if @name == 'AccountAdmin'
+        @label = I18n.t('roles.account_admin', "Account Admin")
+      else
+        er = RoleOverride.enrollment_types.find{|er|er[:name] == @name}
+        @label = er[:label].call
+      end
+    end
+
     def self.create(name)
       return nil unless Role.built_in_role_names.include?(name)
-      r = BuiltInRole.new
-      r.name = name
-      r
+      BuiltInRole.new(name)
     end
 
     def base_role_type
@@ -145,6 +157,10 @@ class Role < ActiveRecord::Base
 
     def workflow_state
       'active'
+    end
+
+    def label
+      @label
     end
   end
 

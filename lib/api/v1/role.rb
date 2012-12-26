@@ -20,10 +20,11 @@ module Api::V1::Role
   include Api::V1::Json
   include Api::V1::Account
 
-  def role_json(account, role, current_user, session)
+  def role_json(account, role, current_user, session, opts={})
     json = {
       :account => account_json(account, current_user, session, []),
       :role => role.name,
+      :label => role.label,
       :base_role_type => role.base_role_type,
       :workflow_state => role.workflow_state,
       :permissions => {}

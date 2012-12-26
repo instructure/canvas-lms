@@ -87,6 +87,7 @@
 class RoleOverridesController < ApplicationController
   before_filter :require_context
   before_filter :require_role, :only => [:activate_role, :add_role, :remove_role, :update, :show]
+  before_filter :set_js_env_for_current_account
 
   # @API List roles
   # List the roles available to an account.
@@ -111,17 +112,36 @@ class RoleOverridesController < ApplicationController
 
   def index
     if authorized_action(@context, @current_user, :manage_role_overrides)
-      @managing_account_roles = @context.is_a?(Account) && (params[:account_roles] || @context.site_admin?)
+      account_role_data = []
 
-      if @managing_account_roles
-        @role_types = RoleOverride.account_membership_types(@context)
-      else
-        @role_types = RoleOverride.enrollment_types
+      role = Role.built_in_role("AccountAdmin")
+      account_role_data << role_json(@context, role, @current_user, session)
+      account_role_data[0][:id] = role.name
+      @context.available_custom_account_roles.each do |role|
+        json = role_json(@context, role, @current_user, session)
+        json[:id] = role.name
+        account_role_data << json
       end
 
-      respond_to do |format|
-        format.html
+      course_role_data = []
+      custom_roles = @context.available_course_roles_by_name.values
+      RoleOverride::ENROLLMENT_TYPES.map do |role_hash|
+        role = Role.built_in_role(role_hash[:name])
+        json = role_json(@context, role, @current_user, session)
+        json[:id] = role.name
+        course_role_data << json
+
+        custom_roles.select { |cr| cr.base_role_type == role_hash[:base_role_name] }.map do |cr|
+          json = role_json(@context, cr, @current_user, session)
+          json[:id] = cr.name
+          course_role_data << json
+        end
       end
+
+      js_env :ACCOUNT_ROLES => account_role_data
+      js_env :COURSE_ROLES => course_role_data
+      js_env :ACCOUNT_PERMISSIONS => account_permissions(@context)
+      js_env :COURSE_PERMISSIONS => course_permissions(@context)
     end
   end
 
@@ -380,6 +400,12 @@ class RoleOverridesController < ApplicationController
     end
   end
 
+  # Summary: 
+  #   Adds ENV.CURRENT_ACCOUNT with the account we are working with.
+  def set_js_env_for_current_account
+    js_env :CURRENT_ACCOUNT => @context
+  end 
+
   # Internal: Get role from params or return error. Used as before filter.
   #
   # Returns found role or false (to halt execution).
@@ -422,15 +448,85 @@ class RoleOverridesController < ApplicationController
 
     manageable_permissions.keys.each do |permission|
       if settings = permissions[permission]
-        if settings.has_key?(:enabled) && value_to_boolean(settings[:explicit])
-          override = value_to_boolean(settings[:enabled])
-        end
-        locked = value_to_boolean(settings[:locked]) if settings.has_key?(:locked)
+        if !value_to_boolean(settings[:readonly])
+          if settings.has_key?(:enabled) && value_to_boolean(settings[:explicit])
+            override = value_to_boolean(settings[:enabled])
+          end
+          locked = value_to_boolean(settings[:locked]) if settings.has_key?(:locked)
 
-        RoleOverride.manage_role_override(context, role, permission.to_s,
-          :override => override, :locked => locked)
+          RoleOverride.manage_role_override(context, role, permission.to_s,
+            :override => override, :locked => locked)
+        end
       end
     end
   end
   protected :set_permissions_for
+
+  private
+
+  def course_permissions(context) 
+    site_admin = {:group_name => t('site_admin_permissions', "Site Admin Permissions"), :group_permissions => []}
+    account = {:group_name => t('account_permissions', "Account Permissions"), :group_permissions => []}
+    course = {:group_name => t('course_permissions',  "Course & Account Permissions"), :group_permissions => []}
+ 
+    base_role_names = RoleOverride.enrollment_types.map do |enrollment_type|
+      enrollment_type[:base_role_name]
+    end
+    
+    RoleOverride.manageable_permissions(context).each do |p|
+      hash = {:label => p[1][:label].call, :permission_name => p[0]}
+      
+      # Check to see if the base role name is in the list of other base role names in p[1] 
+      is_course_permission = !(base_role_names & p[1][:available_to]).empty?
+
+      if p[1][:account_only]
+        if p[1][:account_only] == :site_admin
+          site_admin[:group_permissions] << hash if is_course_permission
+        else
+          account[:group_permissions] << hash if is_course_permission
+        end
+      else
+        course[:group_permissions] << hash if is_course_permission
+      end
+    end
+ 
+    res = []
+    res << site_admin if site_admin[:group_permissions].any?
+    res << account if account[:group_permissions].any?
+    res << course if course[:group_permissions].any?
+ 
+    res.each{|pg| pg[:group_permissions] = pg[:group_permissions].sort_by{|p|p[:label]} }
+ 
+    res
+  end
+
+  # Returns a hash with the avalible permissions grouped by groups of permissions.
+  # context - the current context
+  def account_permissions(context)
+    site_admin = {:group_name => t('site_admin_permissions', "Site Admin Permissions"), :group_permissions => []}
+    account = {:group_name => t('account_permissions', "Account Permissions"), :group_permissions => []}
+    course = {:group_name => t('course_permissions',  "Course & Account Permissions"), :group_permissions => []}
+ 
+    RoleOverride.manageable_permissions(context).each do |p|
+      hash = {:label => p[1][:label].call, :permission_name => p[0]}
+      if p[1][:account_only]
+        if p[1][:account_only] == :site_admin
+          site_admin[:group_permissions] << hash
+        else
+          account[:group_permissions] << hash
+        end
+      else
+        course[:group_permissions] << hash
+      end
+    end
+ 
+    res = []
+    res << site_admin if site_admin[:group_permissions].any?
+    res << account if account[:group_permissions].any?
+    res << course if course[:group_permissions].any?
+ 
+    res.each{|pg| pg[:group_permissions] = pg[:group_permissions].sort_by{|p|p[:label]} }
+ 
+    res
+  end
 end
