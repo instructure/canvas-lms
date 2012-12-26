@@ -228,13 +228,19 @@ module AuthenticationMethods
 
   def initiate_delegated_login(current_host=nil)
     is_delegated = @domain_root_account.delegated_authentication? && !params[:canvas_login]
-    is_cas = @domain_root_account.cas_authentication? && is_delegated
-    is_saml = @domain_root_account.saml_authentication? && is_delegated
+    is_cas = is_delegated && @domain_root_account.cas_authentication?
+    is_saml = is_delegated && @domain_root_account.saml_authentication?
     if is_cas
       initiate_cas_login
       return true
     elsif is_saml
-      initiate_saml_login(current_host)
+
+      if @domain_root_account.auth_discovery_url
+        redirect_to @domain_root_account.auth_discovery_url
+      else
+        initiate_saml_login(current_host)
+      end
+
       return true
     end
     false
