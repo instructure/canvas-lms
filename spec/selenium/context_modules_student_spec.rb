@@ -4,10 +4,6 @@ describe "context_modules" do
   it_should_behave_like "in-process server selenium tests"
 
   context "as a student" do
-    LOCKED_TEXT = 'locked'
-    COMPLETED_TEXT = 'completed'
-    IN_PROGRESS_TEXT = 'in progress'
-
     def create_context_module(module_name)
       context_module = @course.context_modules.create!(:name => module_name, :require_sequential_progress => true)
       context_module
@@ -30,6 +26,10 @@ describe "context_modules" do
     end
 
     before (:each) do
+      @locked_text = 'locked'
+      @completed_text = 'completed'
+      @in_progress_text = 'in progress'
+
       course_with_student_logged_in
       #initial module setup
       @module_1 = create_context_module('Module One')
@@ -62,9 +62,9 @@ describe "context_modules" do
 
       context_modules = ff('.context_module')
       #initial check to make sure everything was setup correctly
-      validate_context_module_status_text(0, IN_PROGRESS_TEXT)
-      validate_context_module_status_text(1, LOCKED_TEXT)
-      validate_context_module_status_text(2, LOCKED_TEXT)
+      validate_context_module_status_text(0, @in_progress_text)
+      validate_context_module_status_text(1, @locked_text)
+      validate_context_module_status_text(2, @locked_text)
 
       context_modules[1].find_element(:css, '.context_module_criterion').should include_text(@module_1.name)
       context_modules[2].find_element(:css, '.context_module_criterion').should include_text(@module_2.name)
@@ -75,19 +75,19 @@ describe "context_modules" do
 
       #sequential normal validation
       navigate_to_module_item(0, @assignment_1.title)
-      validate_context_module_status_text(0, COMPLETED_TEXT)
-      validate_context_module_status_text(1, IN_PROGRESS_TEXT)
-      validate_context_module_status_text(2, LOCKED_TEXT)
+      validate_context_module_status_text(0, @completed_text)
+      validate_context_module_status_text(1, @in_progress_text)
+      validate_context_module_status_text(2, @locked_text)
 
       navigate_to_module_item(1, @assignment_2.title)
-      validate_context_module_status_text(0, COMPLETED_TEXT)
-      validate_context_module_status_text(1, COMPLETED_TEXT)
-      validate_context_module_status_text(2, IN_PROGRESS_TEXT)
+      validate_context_module_status_text(0, @completed_text)
+      validate_context_module_status_text(1, @completed_text)
+      validate_context_module_status_text(2, @in_progress_text)
 
       navigate_to_module_item(2, @quiz_1.title)
-      validate_context_module_status_text(0, COMPLETED_TEXT)
-      validate_context_module_status_text(1, COMPLETED_TEXT)
-      validate_context_module_status_text(2, COMPLETED_TEXT)
+      validate_context_module_status_text(0, @completed_text)
+      validate_context_module_status_text(1, @completed_text)
+      validate_context_module_status_text(2, @completed_text)
     end
 
     it "should validate that a student can't get to a locked context module" do
@@ -114,19 +114,19 @@ describe "context_modules" do
 
       #sequential normal validation
       navigate_to_module_item(0, @assignment_1.title)
-      validate_context_module_status_text(0, COMPLETED_TEXT)
-      validate_context_module_status_text(1, IN_PROGRESS_TEXT)
-      validate_context_module_status_text(2, LOCKED_TEXT)
+      validate_context_module_status_text(0, @completed_text)
+      validate_context_module_status_text(1, @in_progress_text)
+      validate_context_module_status_text(2, @locked_text)
 
       navigate_to_module_item(1, @assignment_2.title)
-      validate_context_module_status_text(0, COMPLETED_TEXT)
-      validate_context_module_status_text(1, COMPLETED_TEXT)
-      validate_context_module_status_text(2, IN_PROGRESS_TEXT)
+      validate_context_module_status_text(0, @completed_text)
+      validate_context_module_status_text(1, @completed_text)
+      validate_context_module_status_text(2, @in_progress_text)
 
       navigate_to_module_item(2, @quiz_1.title)
-      validate_context_module_status_text(0, COMPLETED_TEXT)
-      validate_context_module_status_text(1, COMPLETED_TEXT)
-      validate_context_module_status_text(2, COMPLETED_TEXT)
+      validate_context_module_status_text(0, @completed_text)
+      validate_context_module_status_text(1, @completed_text)
+      validate_context_module_status_text(2, @completed_text)
     end
 
     describe "sequence footer" do

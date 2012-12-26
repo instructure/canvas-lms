@@ -82,8 +82,6 @@ end
 shared_examples_for "discussion and announcement individual tests" do
   it_should_behave_like "in-process server selenium tests"
 
-  TOPIC_TITLE = 'new discussion'
-
   def add_attachment_and_validate
     filename, fullpath, data = get_file("testfile5.zip")
     f('input[name=attachment]').send_keys(fullpath)
@@ -101,6 +99,7 @@ shared_examples_for "discussion and announcement individual tests" do
   end
 
   before (:each) do
+    @topic_title = 'new discussion'
     @context = @course
   end
 
@@ -108,7 +107,7 @@ shared_examples_for "discussion and announcement individual tests" do
     get url
 
     expect_new_page_load { f('.btn-primary').click }
-    edit(TOPIC_TITLE, 'new topic')
+    edit(@topic_title, 'new topic')
   end
 
   it "should add an attachment to a new topic" do
@@ -134,7 +133,7 @@ shared_examples_for "discussion and announcement individual tests" do
 
   it "should edit a topic" do
     edit_name = 'edited discussion name'
-    topic = what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => TOPIC_TITLE, :user => @user) : announcement_model(:title => TOPIC_TITLE, :user => @user)
+    topic = what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => @topic_title, :user => @user) : announcement_model(:title => @topic_title, :user => @user)
     get url + "#{topic.id}"
     f("#discussion_topic .al-trigger-inner").click
     expect_new_page_load { f("#ui-id-2").click }
@@ -143,7 +142,7 @@ shared_examples_for "discussion and announcement individual tests" do
   end
 
   it "should delete a topic" do
-    what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => TOPIC_TITLE, :user => @user) : announcement_model(:title => TOPIC_TITLE, :user => @user)
+    what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => @topic_title, :user => @user) : announcement_model(:title => @topic_title, :user => @user)
     get url
 
     f('.toggleSelected').click

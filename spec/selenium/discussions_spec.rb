@@ -10,7 +10,6 @@ describe "discussions" do
   end
 
   context "as a teacher" do
-    DISCUSSION_NAME = 'new discussion'
 
     before (:each) do
       course_with_teacher_logged_in

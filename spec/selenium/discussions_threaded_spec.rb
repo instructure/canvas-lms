@@ -3,11 +3,10 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/discussions_common')
 describe "threaded discussions" do
   it_should_behave_like "discussions selenium tests"
 
-  TOPIC_TITLE = 'threaded discussion topic'
-
   before (:each) do
+    @topic_title = 'threaded discussion topic'
     course_with_teacher_logged_in
-    @topic = create_discussion(TOPIC_TITLE, 'threaded')
+    @topic = create_discussion(@topic_title, 'threaded')
     @student = student_in_course.user
   end
 
@@ -15,7 +14,7 @@ describe "threaded discussions" do
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     wait_for_ajax_requests
 
-    f('.discussion-title').text.should == TOPIC_TITLE
+    f('.discussion-title').text.should == @topic_title
   end
 
   it "should reply to the threaded discussion" do
