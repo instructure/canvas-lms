@@ -116,6 +116,14 @@ define [
       # not using this yet
 
     ##
+    # Use in cases where normal links occur inside elements with events
+    #   events:
+    #     'click .something': 'doStuff'
+    #     'click .something a': 'stopPropagation'
+    stopPropagation: (event) ->
+      event.stopPropagation()
+
+    ##
     # Mixes in objects to a view's definition, being mindful of certain
     # properties (like events) that need to be merged also
     #

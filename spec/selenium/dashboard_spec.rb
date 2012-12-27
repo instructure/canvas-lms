@@ -9,14 +9,26 @@ describe "dashboard" do
       course_with_student_logged_in(:active_all => true)
     end
 
+    def create_announcement
+      factory_with_protected_attributes(Announcement, {
+        :context => @course,
+        :title => "hey all read this k",
+        :message => "announcement"
+      })
+    end
+
+    def click_recent_activity_header
+      f('.stream-announcement .stream_header').click
+    end
+
     def test_hiding(url)
-      factory_with_protected_attributes(Announcement, :context => @course, :title => "hey all read this k", :message => "announcement")
+      create_announcement
       items = @user.stream_item_instances
       items.size.should == 1
       items.first.hidden.should == false
 
       get url
-      f('.stream-announcement .stream_header').click
+      click_recent_activity_header
       item_selector = '#announcement-details tbody tr'
       ff(item_selector).size.should == 1
       f('#announcement-details .ignore-item').click
@@ -36,6 +48,48 @@ describe "dashboard" do
 
     it "should allow hiding a stream item on the course page" do
       test_hiding("/courses/#{@course.to_param}")
+    end
+
+    def click_recent_activity_header(type='announcement')
+      f(".stream-#{type} .stream_header").click
+    end
+
+    def assert_recent_activity_category_closed(type='announcement')
+      f(".stream-#{type} .details_container").should_not be_displayed
+    end
+
+    def assert_recent_activity_category_is_open(type='announcement')
+      f(".stream-#{type} .details_container").should be_displayed
+    end
+
+    def click_recent_activity_course_link(type='announcement')
+      f(".stream-#{type} .links a").click
+    end
+
+    # so we can click the link w/o a page load
+    def disable_recent_activity_header_course_link
+      driver.execute_script <<-JS
+        $('.stream-announcement .links a').attr('href', '#');
+      JS
+    end
+
+    it "should expand/collapse recent activity category" do
+      create_announcement
+      get '/'
+      assert_recent_activity_category_closed
+      click_recent_activity_header
+      assert_recent_activity_category_is_open
+      click_recent_activity_header
+      assert_recent_activity_category_closed
+    end
+
+    it "should not expand category when a course/group link is clicked" do
+      create_announcement
+      get '/'
+      assert_recent_activity_category_closed
+      disable_recent_activity_header_course_link
+      click_recent_activity_course_link
+      assert_recent_activity_category_closed
     end
 
     it "should update the item count on stream item hide"
