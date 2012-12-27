@@ -35,6 +35,12 @@ module AssignmentOverrideApplicator
     assignment_overridden_for(quiz, user)
   end
 
+
+  def self.assignment_overriden_for_section(assignment_or_quiz, section)
+    section_overrides = assignment_or_quiz.assignment_overrides.scoped(:conditions => {:set_type => 'CourseSection', :set_id => section.id})
+    override_for_due_at(assignment_or_quiz, section_overrides)
+  end
+
   # determine list of overrides (of appropriate version) that apply to the
   # assignment or quiz(of specific version) for a particular user. the overrides are
   # returned in priority order; the first override to contain an overridden

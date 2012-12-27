@@ -70,6 +70,19 @@ describe "context_modules" do
       context_modules[2].find_element(:css, '.context_module_criterion').should include_text(@module_2.name)
     end
 
+    it "should show overridden due dates for assignments" do
+      override = assignment_override_model(:assignment => @assignment_2)
+      override.override_due_at(4.days.from_now)
+      override.save!
+      override_student = override.assignment_override_students.build
+      override_student.user = @student
+      override_student.save!
+
+      go_to_modules
+      context_modules = ff('.context_module')
+      context_modules[1].find_element(:css, '.due_date_display').text.should_not be_blank
+    end
+
     it "should move a student through context modules in sequential order" do
       go_to_modules
 

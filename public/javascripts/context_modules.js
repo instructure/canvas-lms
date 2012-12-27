@@ -173,6 +173,8 @@ define([
             }
             if (info["due_date"] != null) {
               data["due_date_display"] = $.parseFromISO(info["due_date"]).date_formatted
+            } else if (info["due_dates"] != null) {
+              data["due_date_display"] = I18n.t('multiple_due_dates', 'Multiple Due Dates');
             }
             $("#context_module_item_" + id).fillTemplateData({data: data, htmlValues: ['points_possible_display']})
           });

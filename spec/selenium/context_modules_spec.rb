@@ -590,6 +590,92 @@ describe "context_modules" do
     module_item.find_element(:css, ".points_possible_display").should include_text "10"
   end
 
+  context "multiple overridden due dates" do
+    def create_section_override(section, due_at)
+      override = assignment_override_model(:assignment => @assignment)
+      override.set = section
+      override.override_due_at(due_at)
+      override.save!
+    end
+
+    it "should indicate when course sections have multiple due dates" do
+      modules = create_modules(1)
+      modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
+
+      cs1 = @course.default_section
+      cs2 = @course.course_sections.create!
+
+      create_section_override(cs1, 3.days.from_now)
+      create_section_override(cs2, 4.days.from_now)
+
+      refresh_page
+      wait_for_ajaximations
+
+      f(".due_date_display").text.should == "Multiple Due Dates"
+    end
+
+    it "should not indicate multiple due dates if the sections' dates are the same" do
+      modules = create_modules(1)
+      modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
+
+      cs1 = @course.default_section
+      cs2 = @course.course_sections.create!
+
+      due_at = 3.days.from_now
+      create_section_override(cs1, due_at)
+      create_section_override(cs2, due_at)
+
+      refresh_page
+      wait_for_ajaximations
+
+      f(".due_date_display").text.should_not be_blank
+      f(".due_date_display").text.should_not == "Multiple Due Dates"
+    end
+
+    it "should use assignment due date if there is no section override" do
+      modules = create_modules(1)
+      modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
+
+      cs1 = @course.default_section
+      cs2 = @course.course_sections.create!
+
+      due_at = 3.days.from_now
+      create_section_override(cs1, due_at)
+      @assignment.due_at = due_at
+      @assignment.save!
+
+      refresh_page
+      wait_for_ajaximations
+
+      f(".due_date_display").text.should_not be_blank
+      f(".due_date_display").text.should_not == "Multiple Due Dates"
+    end
+
+    it "should only use the sections the user is restricted to" do
+      modules = create_modules(1)
+      modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
+
+      cs1 = @course.default_section
+      cs2 = @course.course_sections.create!
+      cs3 = @course.course_sections.create!
+
+      user_logged_in
+      @course.enroll_user(@user, 'TaEnrollment', :section => cs1, :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true).accept!
+      @course.enroll_user(@user, 'TaEnrollment', :section => cs2, :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true).accept!
+
+      due_at = 3.days.from_now
+      create_section_override(cs1, due_at)
+      create_section_override(cs2, due_at)
+      create_section_override(cs3, due_at + 1.day) # This override should not matter
+
+      refresh_page
+      wait_for_ajaximations
+
+      f(".due_date_display").text.should_not be_blank
+      f(".due_date_display").text.should_not == "Multiple Due Dates"
+    end
+  end
+
   it "should preserve completion criteria after indent change" do
     add_existing_module_item('#assignments_select', 'Assignment', @assignment2.title)
     tag = ContentTag.last
