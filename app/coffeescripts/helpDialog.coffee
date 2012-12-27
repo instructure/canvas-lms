@@ -20,27 +20,6 @@ define [
   showEmail = not ENV.current_user_id
 
   helpDialog =
-    defaultLinks: [
-      {
-        available_to: ['student']
-        text: I18n.t 'instructor_question', 'Ask Your Instructor a Question'
-        subtext: I18n.t 'instructor_question_sub', 'Questions are submitted to your instructor'
-        url: '#teacher_feedback'
-      },
-      {
-        available_to: ['user', 'student', 'teacher', 'admin']
-        text: I18n.t 'search_the_canvas_guides', 'Search the Canvas Guides'
-        subtext: I18n.t 'canvas_help_sub', 'Find answers to common questions'
-        url: 'http://guides.instructure.com'
-      },
-      {
-        available_to: ['user', 'student', 'teacher', 'admin']
-        text: I18n.t 'report_problem', 'Report a Problem'
-        subtext: I18n.t 'report_problem_sub', 'If Canvas misbehaves, tell us about it'
-        url: '#create_ticket'
-      }
-    ]
-
     defaultTitle: I18n.t 'Help', "Help"
 
     initDialog: ->
@@ -57,7 +36,7 @@ define [
 
       @helpLinksDfd = $.getJSON('/help_links').done (links) =>
         # only show the links that are available to the roles of this user
-        links = $.grep @defaultLinks.concat(links), (link) ->
+        links = $.grep links, (link) ->
           _.detect link.available_to, (role) ->
             role is 'user' or
             (ENV.current_user_roles and role in ENV.current_user_roles)
