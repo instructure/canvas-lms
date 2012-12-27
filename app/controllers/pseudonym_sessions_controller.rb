@@ -590,7 +590,7 @@ class PseudonymSessionsController < ApplicationController
 
   def oauth2_accept
     # now generate the temporary code, and respond/redirect
-    code = Canvas::Oauth::Token.generate_code_for(@current_user.id, session[:oauth2][:client_id])
+    code = Canvas::Oauth::Token.generate_code_for(@current_user.global_id, session[:oauth2][:client_id])
     final_oauth2_redirect(session[:oauth2][:redirect_uri], :code => code)
     session.delete(:oauth2)
   end
