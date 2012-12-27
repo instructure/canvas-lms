@@ -1474,6 +1474,7 @@ class Course < ActiveRecord::Base
     section = opts[:section]
     limit_privileges_to_course_section = opts[:limit_privileges_to_course_section]
     associated_user_id = opts[:associated_user_id]
+    role_name = opts[:role_name]
     section ||= self.default_section
     enrollment_state ||= self.available? ? "invited" : "creation_pending"
     if type == 'TeacherEnrollment' || type == 'TaEnrollment' || type == 'DesignerEnrollment'
@@ -1482,11 +1483,11 @@ class Course < ActiveRecord::Base
       enrollment_state = 'creation_pending' if enrollment_state == 'invited' && !self.available?
     end
     if opts[:allow_multiple_enrollments] && associated_user_id
-      e = self.enrollments.find_by_user_id_and_type_and_course_section_id_and_associated_user_id(user.id, type, section.id, associated_user_id)
+      e = self.enrollments.find_by_user_id_and_type_and_role_name_and_course_section_id_and_associated_user_id(user.id, type, role_name, section.id, associated_user_id)
     elsif opts[:allow_multiple_enrollments]
-      e = self.enrollments.find_by_user_id_and_type_and_course_section_id(user.id, type, section.id)
+      e = self.enrollments.find_by_user_id_and_type_and_role_name_and_course_section_id(user.id, type, role_name, section.id)
     else
-      e = self.enrollments.find_by_user_id_and_type(user.id, type)
+      e = self.enrollments.find_by_user_id_and_type_and_role_name(user.id, type, role_name)
     end
     e.attributes = { 
       :course_section => section, 
@@ -1505,7 +1506,7 @@ class Course < ActiveRecord::Base
         :limit_privileges_to_course_section => limit_privileges_to_course_section)
     end
     e.associated_user_id = associated_user_id
-    e.role_name = opts[:role_name] if opts[:role_name].present?
+    e.role_name = role_name
     if e.changed?
       if opts[:no_notify]
         e.save_without_broadcasting
