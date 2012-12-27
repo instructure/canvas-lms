@@ -120,26 +120,6 @@
     <input type="checkbox" />
   </li>
 </ul>
-<div id="conversation_actions">
-  <span></span>
-  <div>
-    <ul>
-      <li><%= link_to t('inbox_actions.mark_as_unread', "Mark as Unread"), conversation_url('{{ id }}', :conversation => {:workflow_state => "unread"}), :id => 'action_mark_as_unread', :class => :standard_action, :role => 'menuitem' %></li>
-      <li><%= link_to t('inbox_actions.mark_as_read', "Mark as Read"), conversation_url('{{ id }}', :conversation => {:workflow_state => "read"}), :id => 'action_mark_as_read', :class => :standard_action, :role => 'menuitem' %></li>
-      <li><%= link_to t('inbox_actions.unstar', "Unstar"), conversation_url('{{ id }}', :conversation => {:starred => false}), :id => 'action_unstar', :class => :standard_action, :role => 'menuitem' %></li>
-      <li><%= link_to t('inbox_actions.star', "Star"), conversation_url('{{ id }}', :conversation => {:starred => true}), :id => 'action_star', :class => :standard_action, :role => 'menuitem' %></li>
-    </ul>
-    <ul>
-      <li><%= link_to t('inbox_actions.unsubscribe', "Unsubscribe"), conversation_url('{{ id }}', :conversation => {:subscribed => 0}), :id => :action_unsubscribe, :class => :standard_action, :role => 'menuitem' %></li>
-      <li><%= link_to t('inbox_actions.subscribe', "Subscribe"), conversation_url('{{ id }}', :conversation => {:subscribed => 1}), :id => :action_subscribe, :class => :standard_action, :role => 'menuitem' %></li>
-    </ul>
-    <ul>
-      <li><%= link_to t('inbox_actions.archive', "Archive"), conversation_url('{{ id }}', :conversation => {:workflow_state => "archived"}), :id => :action_archive, :class => :standard_action, :role => 'menuitem' %></li>
-      <li><%= link_to t('inbox_actions.unarchive', "Unarchive"), conversation_url('{{ id }}', :conversation => {:workflow_state => "read"}), :id => :action_unarchive, :class => :standard_action, :role => 'menuitem' %></li>
-      <li><%= link_to t('inbox_actions.delete', "Delete"), conversation_url('{{ id }}'), :id => :action_delete_all, :role => 'menuitem' %></li>
-    </ul>
-  </div>
-</div>
 
 <form id="add_recipients_form" method="post">
   <p>

@@ -74,21 +74,24 @@ describe "conversations" do
 
     it "should delete a conversation" do
       create_conversation
+      wait_for_ajaximations
+      driver.execute_script "$('.admin-link-hover-area').addClass('active')"
 
-      driver.execute_script("$('.actions').addClass('selected')")
-      f('.actions a').click
-      f('#action_delete_all').click
+      f('.admin-links button').click
+      f('.al-options .action_delete_all').click
       driver.switch_to.alert.accept
       wait_for_ajaximations
+
       f('#no_messages').should be_displayed
     end
 
     it "should archive a conversation" do
       create_conversation
 
-      driver.execute_script("$('.actions').addClass('selected')")
-      f('.actions a').click
-      f('#action_archive').click
+      wait_for_ajaximations
+      driver.execute_script("$('.admin-link-hover-area').addClass('active')")
+      f('.admin-links button').click
+      f('.al-options .action_archive').click
       wait_for_ajaximations
       f('#no_messages').should be_displayed
       expect_new_page_load { get '/conversations/archived' }

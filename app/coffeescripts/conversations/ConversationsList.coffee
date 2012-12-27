@@ -22,21 +22,13 @@ define [
         baseUrl: '/conversations?include_all_conversation_ids=1'
         noAutoLoad: true
 
-      @$list.delegate '.action_mark_as_read, .action_mark_as_unread, .action_unstar, .action_star', 'click', (e) =>
-        @pane.action $(e.currentTarget), method: 'PUT'
-        return false
+      @$list.on 'click', 'a.standard_action', (e) =>
+        e.preventDefault()
+        @pane.action($(e.currentTarget), method: 'PUT')
 
-      @$list.delegate '.actions a', 'blur', (e) =>
-        $(window).one 'keyup', (e) =>
-          @app.closeMenus() if e.shiftKey
+      @$list.on('click', 'button.al-trigger', @pane.filterMenu.bind(@pane))
 
-      @$list.delegate '.actions a', 'click', (e) =>
-        @pane.openConversationMenu($(e.currentTarget))
-        return false
-      .focus (e) =>
-        @pane.openConversationMenu($(e.currentTarget))
-
-      $(window).unload => clearTimeout @markAsUnread
+      $(window).unload(=> clearTimeout(@markAsUnread))
 
     baseData: ->
       {scope: @scope, filter: @filters}
