@@ -218,6 +218,7 @@ describe GradebooksController do
 
       def check_grades_page(due_at)
         [@student, @teacher, @observer].each do |u|
+          controller.js_env.clear
           user_session(u)
           get 'grade_summary', :course_id => @course.id, :id => @student.id
           assigns[:assignments].find{|a| a.class == Assignment}.due_at.should == due_at
