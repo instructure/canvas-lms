@@ -968,7 +968,7 @@ class Account < ActiveRecord::Base
   end
   
   def help_links
-    settings[:custom_help_links] || []
+    Canvas::Help.default_links + (settings[:custom_help_links] || [])
   end
 
   def self.allowable_services
