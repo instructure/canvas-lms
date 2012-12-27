@@ -140,28 +140,6 @@ describe "calendar" do
       f("##{date_holder_id} #event_assignment_#{second_assignment.id}").should_not be_displayed
     end
 
-    it "should allow editing event details repeatedly" do
-      calendar_event_model(:title => "ev", :start_at => "2012-04-02")
-      @event.all_day.should be_true
-
-      get "/courses/#{@course.id}/calendar_events/#{@event.id}"
-      f(".edit_calendar_event_link").click
-      replace_content(f("#calendar_event_title"), "edit1")
-      submit_form("#edit_calendar_event_form")
-      wait_for_ajax_requests
-
-      keep_trying_until { fj(".edit_calendar_event_link").should be_displayed } #using fj to bypass selenium cache
-      fj(".edit_calendar_event_link").click
-      replace_content(f("input[name=start_date]"), "2012-04-05")
-      replace_content(f("#calendar_event_title"), "edit2")
-      submit_form("#edit_calendar_event_form")
-      wait_for_ajax_requests
-
-      @event.reload
-      @event.title.should == "edit2"
-      @event.all_day.should be_true
-      @event.start_at.should == Time.zone.parse("2012-04-05")
-    end
   end
 
   context "student view" do

@@ -1,6 +1,6 @@
 <%
   content_for :page_title,  @event.title || t(:page_title, "New Calendar Event")
-  return_to_url = clean_return_to(params[:return_to] && params[:return_to].match(/calendar/) && params[:return_to]) || calendar_url_for(@context, :anchor => {:month => (@event.try_rescue(:start_at).try_rescue(:month)), :year => (@event.try_rescue(:start_at).try_rescue(:year))}.to_json)
+  return_to_url = return_to_calendar(:context => @context, :event => @event)
 
   if @domain_root_account.enable_scheduler?
     event_attrs = {
