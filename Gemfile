@@ -86,10 +86,7 @@ group :sqlite do
 end
 
 group :test do
-  gem 'coffee-script'
-  gem 'coffee-script-source',  '1.3.1' #pinned so everyone's compiled output matches
   gem 'bluecloth',    '2.0.10' # for generating api docs
-  gem 'parallel',     '0.5.16'
   gem 'parallelized_specs', '0.3.86'
   gem 'mocha',        '0.12.3', :require => 'mocha_standalone'
   gem 'rcov',         '0.9.9'
@@ -104,15 +101,22 @@ group :test do
 end
 
 group :development do
-  gem 'coffee-script'
-  gem 'coffee-script-source',  '1.3.1' #pinned so everyone's compiled output matches
-  gem 'parallel',     '0.5.16'
+  gem 'guard', '1.6.0'
+  gem 'rb-inotify', :require => false
+  gem 'rb-fsevent', :require => false
+  gem 'rb-fchange', :require => false
+
   if ONE_NINE
     gem 'debugger',     '1.1.3'
   else
     gem 'ruby-debug',   '0.10.4'
   end
-  gem 'guard', '1.0.3'
+end
+
+group :development, :test do
+  gem 'coffee-script'
+  gem 'coffee-script-source',  '1.4.0' #pinned so everyone's compiled output matches
+  gem 'parallel',     '0.5.16'
 end
 
 group :i18n_tools do
