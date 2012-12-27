@@ -20,6 +20,7 @@ class Course < ActiveRecord::Base
 
   include Context
   include Workflow
+  include TextHelper
 
   attr_accessible :name,
                   :section,
@@ -793,6 +794,10 @@ class Course < ActiveRecord::Base
 
   def short_name=(val)
     write_attribute(:course_code, val)
+  end
+
+  def short_name_slug
+    truncate_text(short_name, :ellipsis => '')
   end
 
   # Allows the account to be set directly

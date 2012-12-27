@@ -2451,6 +2451,31 @@ describe Assignment do
       assignment.save
     end
   end
+
+  describe "#title_slug" do
+    before :each do
+      @assignment = assignment_model
+    end
+
+    it "should hard truncate at 30 characters" do
+      @assignment.title = "a" * 31
+      @assignment.title.length.should == 31
+      @assignment.title_slug.length.should == 30
+      @assignment.title.should =~ /^#{@assignment.title_slug}/
+    end
+
+    it "should not change the title" do
+      title = "a" * 31
+      @assignment.title = title
+      @assignment.title_slug.should_not == @assignment.title
+      @assignment.title.should == title
+    end
+
+    it "should leave short titles alone" do
+      @assignment.title = 'short title'
+      @assignment.title_slug.should == @assignment.title
+    end
+  end
 end
 
 def setup_assignment_with_group

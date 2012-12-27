@@ -868,6 +868,10 @@ class Assignment < ActiveRecord::Base
     "#{title} (#{id})"
   end
 
+  def title_slug
+    truncate_text(title, :ellipsis => '')
+  end
+
   def self.title_and_id(str)
     if str =~ /\A(.*)\s\((\d+)\)\z/
       [$1, $2]

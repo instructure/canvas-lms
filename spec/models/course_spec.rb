@@ -3342,4 +3342,29 @@ describe Course do
       end
     end
   end
+
+  describe "short_name_slug" do
+    before :each do
+      @course = course(:active_all => true)
+    end
+
+    it "should hard truncate at 30 characters" do
+      @course.short_name = "a" * 31
+      @course.short_name.length.should == 31
+      @course.short_name_slug.length.should == 30
+      @course.short_name.should =~ /^#{@course.short_name_slug}/
+    end
+
+    it "should not change the short_name" do
+      short_name = "a" * 31
+      @course.short_name = short_name
+      @course.short_name_slug.should_not == @course.short_name
+      @course.short_name.should == short_name
+    end
+
+    it "should leave short short_names alone" do
+      @course.short_name = 'short short_name'
+      @course.short_name_slug.should == @course.short_name
+    end
+  end
 end
