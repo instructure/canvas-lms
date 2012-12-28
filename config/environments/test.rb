@@ -37,6 +37,9 @@ Canvas.protected_attribute_error = :raise
 # these bugs before they hit.
 Canvas.dynamic_finder_nil_arguments_error = :raise
 
+#hairtrigger parallelized runtime race conditions
+config.active_record.schema_format = :sql
+
 # eval <env>-local.rb if it exists
 Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read) }
 
