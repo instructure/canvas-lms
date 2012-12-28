@@ -14,20 +14,18 @@
   <% if !@embedded_view %>
     <h2><%= t :course_enrollment, "Course Enrollment" %></h2>
   <% end %>
-  <% if @course.self_enrollment_limit_met? %>
-    <%= render :partial => 'course_full' %>
-  <% elsif @current_user %>
-    <% if @course.user_is_student?(@current_user, :include_future => true) %>
-      <% if params[:enrolled] %>
-        <%= render :partial => 'successfully_enrolled' %>
-      <% else %>
-        <%= render :partial => 'already_enrolled' %>
-      <% end %>
+  <% if @current_user && @course.user_is_student?(@current_user, :include_future => true) %>
+    <% if params[:enrolled] %>
+      <%= render :partial => 'successfully_enrolled' %>
     <% else %>
-      <%= render :partial => 'confirm_enrollments' %>
+      <%= render :partial => 'already_enrolled' %>
     <% end %>
+  <% elsif @course.self_enrollment_limit_met? %>
+    <%= render :partial => 'course_full' %>
   <% else %>
-    <% if @domain_root_account.open_registration? %>
+    <% if @current_user %>
+      <%= render :partial => 'confirm_enrollments' %>
+    <% elsif @domain_root_account.open_registration? %>
       <%= render :partial => 'authenticate_or_register' %>
     <% else %>
       <%= render :partial => 'authenticate' %>
