@@ -321,17 +321,8 @@ class CoursesController < ApplicationController
   def users
     get_context
     if authorized_action(@context, @current_user, :read_roster)
-      enrollment_role = Array(params[:enrollment_role]) if params[:enrollment_role]
-      enrollment_type = Array(params[:enrollment_type]).map { |e| "#{e.capitalize}Enrollment" } if params[:enrollment_type]
-      users = @context.users_visible_to(@current_user)
-      # TODO: convert this to the good user sorting stuff
-      users = users.scoped(:order => "users.sortable_name")
-      if enrollment_role
-        users = users.scoped(:conditions => ["COALESCE(enrollments.role_name, enrollments.type) IN (?) ", enrollment_role])
-      elsif enrollment_type
-        users = users.scoped(:conditions => ["enrollments.type IN (?) ", enrollment_type])
-      end
-
+      enrollment_params = params.slice(:enrollment_role, :enrollment_type)
+      users = UserSearch.scope_for(@context, @current_user, enrollment_params)
       # If a user_id is passed in, modify the page parameter so that the page
       # that contains that user is returned.
       # We delete it from params so that it is not maintained in pagination links.

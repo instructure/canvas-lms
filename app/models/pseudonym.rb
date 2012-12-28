@@ -43,7 +43,7 @@ class Pseudonym < ActiveRecord::Base
   has_a_broadcast_policy
 
   alias_method :context, :account
-  
+
   include StickySisFields
   are_sis_sticky :unique_id
 
@@ -66,14 +66,14 @@ class Pseudonym < ActiveRecord::Base
   end
 
   acts_as_list :scope => :user_id
-  
+
   set_broadcast_policy do |p|
     p.dispatch :confirm_registration
     p.to { self.communication_channel || self.user.communication_channel }
     p.whenever { |record|
       @send_confirmation
     }
-    
+
     p.dispatch :pseudonym_registration
     p.to { self.communication_channel || self.user.communication_channel }
     p.whenever { |record|

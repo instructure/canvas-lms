@@ -30,7 +30,7 @@ class CommunicationChannel < ActiveRecord::Base
   belongs_to :user
   has_many :notification_policies, :dependent => :destroy
   has_many :messages
-  
+
   before_save :consider_retiring, :assert_path_type, :set_confirmation_code
   before_save :consider_building_pseudonym
   validates_presence_of :path
@@ -38,9 +38,9 @@ class CommunicationChannel < ActiveRecord::Base
   validate :not_otp_communication_channel, :if => lambda { |cc| cc.path_type == TYPE_SMS && cc.retired? && !cc.new_record? }
 
   acts_as_list :scope => :user_id
-  
+
   has_a_broadcast_policy
-  
+
   attr_reader :request_password
   attr_reader :send_confirmation
 
@@ -77,7 +77,7 @@ class CommunicationChannel < ActiveRecord::Base
     p.whenever { |record|
       @request_password
     }
-    
+
     p.dispatch :confirm_registration
     p.to { self }
     p.whenever { |record|
@@ -95,14 +95,14 @@ class CommunicationChannel < ActiveRecord::Base
       self.path_type == TYPE_EMAIL
     }
     p.context { @root_account }
-    
+
     p.dispatch :merge_email_communication_channel
     p.to { self }
     p.whenever {|record|
       @send_merge_notification and
       self.path_type == TYPE_EMAIL
     }
-    
+
     p.dispatch :confirm_sms_communication_channel
     p.to { self }
     p.whenever { |record|

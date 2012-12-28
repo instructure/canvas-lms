@@ -300,14 +300,18 @@ class ActiveRecord::Base
       args = args.map{ |a| column_str % a.to_s }
     end
 
+    value = wildcard_pattern(value, options)
+    cols = args.map{ |col| like_condition(col, '?', !options[:case_sensitive]) }
+    sanitize_sql_array ["(" + cols.join(" OR ") + ")", *([value] * cols.size)]
+  end
+
+  def self.wildcard_pattern(value, options = {})
     value = value.to_s
     value = value.downcase unless options[:case_sensitive]
     value = value.gsub('\\', '\\\\\\\\').gsub('%', '\\%').gsub('_', '\\_')
     value = '%' + value unless options[:type] == :right
     value += '%' unless options[:type] == :left
-
-    cols = args.map{ |col| like_condition(col, '?', !options[:case_sensitive]) }
-    sanitize_sql_array ["(" + cols.join(" OR ") + ")", *([value] * cols.size)]
+    value
   end
 
   def self.like_condition(value, pattern = '?', downcase = true)
@@ -1008,6 +1012,15 @@ class ActiveRecord::Migration
     def tags
       @tags ||= []
     end
+
+    def is_postgres?
+      connection.adapter_name == 'PostgreSQL'
+    end
+
+    def has_postgres_proc?(procname)
+      connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='#{procname}'").to_i != 0
+    end
+
   end
 
   def transactional?
