@@ -103,11 +103,17 @@ require [
     # TODO: can get a little bouncy when the page isn't as tall as the previous
     scrollToTop()
   router.route '', 'root', entriesView.render
-  initEntries = ->
+  initEntries = (initial_entry) ->
     data.fetch success: ->
       Backbone.history.start
         pushState: yes
         root: ENV.DISCUSSION.APP_URL + '/'
+      if initial_entry
+        fetched_model = entries.get(initial_entry.id)
+        entries.remove(fetched_model) if fetched_model
+        entries.add(initial_entry)
+        entriesView.render()
+        router.navigate "entry-#{initial_entry.get 'id'}", yes
     topicView.on 'addReply', (entry) ->
       entries.add entry
       router.navigate "entry-#{entry.get 'id'}", yes
@@ -119,8 +125,8 @@ require [
   ##
   # Get the party started
   if ENV.DISCUSSION.INITIAL_POST_REQUIRED
-    once = ->
-      initEntries()
+    once = (entry) ->
+      initEntries(entry)
       topicView.off 'addReply', once
     topicView.on 'addReply', once
   else
