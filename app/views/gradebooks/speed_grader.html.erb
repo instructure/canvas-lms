@@ -46,9 +46,7 @@
     <div class='center'>
       <a id="assignment_url" href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>"><%= @assignment.title %></a>
       (<span id="context_title" ><%= @context.short_name %></span>)
-      <% if @assignment.due_at %>
-        <div class="due_at"><%= t(:due_at, "due %{datetime}", :datetime => datetime_string(@assignment.due_at)) %></div>
-      <% end %>
+      <div class="due_at"><%= translated_due_date(@assignment) %></div>
     </div>
   <% end %>
 </div>
