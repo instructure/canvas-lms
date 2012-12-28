@@ -638,6 +638,14 @@ shared_examples_for "all selenium tests" do
     end
   end
 
+  def accept_alert
+    keep_trying_until do
+      alert = driver.switch_to.alert
+      alert.accept
+      true
+    end
+  end
+
   def in_frame(id, &block)
     saved_window_handle = driver.window_handle
     driver.switch_to.frame(id)

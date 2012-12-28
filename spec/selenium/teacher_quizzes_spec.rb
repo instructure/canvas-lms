@@ -473,6 +473,19 @@ describe "quizzes" do
 
       f('#content .question_name').should include_text("Question 1")
     end
+
+    it "should delete a quiz" do
+      quiz_with_submission
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+
+      expect_new_page_load do
+        f('.delete_quiz_link').click
+        accept_alert
+      end
+
+      # Confirm that we make it back to the quizzes index page
+      f('#content').should include_text("Course Quizzes")
+    end
   end
 end
 
