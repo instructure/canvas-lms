@@ -190,6 +190,25 @@ describe GradebooksController do
       assigns[:submissions_by_assignment].values.map(&:count).should == [1,1]
     end
 
+    it "should assign values for grade calculator to ENV" do
+      course_with_teacher_logged_in(:active_all => true)
+      student_in_course(:active_all => true)
+      get 'grade_summary', :course_id => @course.id, :id => @student.id
+      assigns[:js_env][:submissions].should_not be_nil
+      assigns[:js_env][:assignment_groups].should_not be_nil
+    end
+
+    it "should not include assignment discussion information in grade calculator ENV data" do
+      course_with_teacher_logged_in(:active_all => true)
+      student_in_course(:active_all => true)
+      assignment1 = @course.assignments.create(:title => "Assignment 1")
+      assignment1.submission_types = "discussion_topic"
+      assignment1.save!
+
+      get 'grade_summary', :course_id => @course.id, :id => @student.id
+      assigns[:js_env][:assignment_groups].first["assignments"].first["discussion_topic"].should be_nil
+    end
+
     it "should sort assignments by due date (null last), then title" do
       course_with_teacher_logged_in(:active_all => true)
       student_in_course(:active_all => true)

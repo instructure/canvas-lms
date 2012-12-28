@@ -1836,6 +1836,4 @@ class Assignment < ActiveRecord::Base
     true
   end
   private :recompute_submission_lateness
-
-
 end
