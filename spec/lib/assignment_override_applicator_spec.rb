@@ -517,11 +517,12 @@ describe AssignmentOverrideApplicator do
       due_at.should == @override.due_at
     end
 
-    it "should include a non-empty original due date when finding most lenient due date" do
+    it "prefers overrides even when earlier when determining most lenient due date" do
+      earlier = 6.days.from_now
       @assignment.due_at = 7.days.from_now
-      @override.override_due_at(6.days.from_now)
+      @override.override_due_at(earlier)
       due_at = AssignmentOverrideApplicator.overridden_due_at(@assignment, [@override])
-      due_at.should == @assignment.due_at
+      due_at.should == earlier
     end
 
     it "should fallback on the assignment's due_at" do
@@ -675,18 +676,18 @@ describe AssignmentOverrideApplicator do
       @adhoc_override.override_due_at(7.days.from_now)
       @adhoc_override.save!
       @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
-      @overridden_assignment.overridden_for_user_id.should == @student.id
+      @overridden_assignment.overridden_for_user.id.should == @student.id
     end
 
     it "should note the user id for whom overrides were not found" do
       @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
-      @overridden_assignment.overridden_for_user_id.should == @student.id
+      @overridden_assignment.overridden_for_user.id.should == @student.id
     end
 
     it "should apply new overrides if an overridden assignment is overridden for a new user" do
       @student1 = @student
       @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student1)
-      @overridden_assignment.overridden_for_user_id.should == @student1.id
+      @overridden_assignment.overridden_for_user.id.should == @student1.id
       student_in_course
       @student2 = @student
       AssignmentOverrideApplicator.expects(:overrides_for_assignment_and_user).with(@overridden_assignment, @student2).returns([])
@@ -695,7 +696,7 @@ describe AssignmentOverrideApplicator do
 
     it "should not attempt to apply overrides if an overridden assignment is overridden for the same user" do
       @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
-      @overridden_assignment.overridden_for_user_id.should == @student.id
+      @overridden_assignment.overridden_for_user.id.should == @student.id
       AssignmentOverrideApplicator.expects(:overrides_for_assignment_and_user).never
       @reoverridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@overridden_assignment, @student)
     end

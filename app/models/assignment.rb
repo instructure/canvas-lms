@@ -154,15 +154,6 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def self.due_date_compare_value(date)
-    # due dates are considered equal if they're the same up to the minute
-    date.to_i / 60
-  end
-
-  def self.due_dates_equal?(date1, date2)
-    due_date_compare_value(date1) == due_date_compare_value(date2)
-  end
-
   def schedule_do_auto_peer_review_job_if_automatic_peer_review
     if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned
       # handle if it has already come due, but has not yet been auto_peer_reviewed

@@ -1,6 +1,5 @@
 module DatesOverridable
-  attr_accessor :applied_overrides
-  attr_accessor :overridden_for_user_id
+  attr_accessor :applied_overrides, :overridden_for_user
 
   def self.included(base)
     base.has_many :assignment_overrides, :dependent => :destroy
@@ -8,6 +7,8 @@ module DatesOverridable
     base.has_many :assignment_override_students, :dependent => :destroy
     
     base.validates_associated :assignment_overrides
+
+    base.extend(ClassMethods)
   end
 
   def overridden_for(user)
@@ -114,10 +115,36 @@ module DatesOverridable
     hash
   end
 
-  def multiple_due_dates_apply_to(user)
+  def multiple_due_dates_apply_to?(user)
     as_instructor = self.due_dates_for(user).second
     as_instructor && as_instructor.map{ |hash|
       self.class.due_date_compare_value(hash[:due_at]) }.uniq.size > 1
+  end
+
+  # deprecated alias method - can be removed once all plugins are updated
+  def multiple_due_dates_apply_to(user)
+    multiple_due_dates_apply_to?(user)
+  end
+
+  def multiple_due_dates?
+    if overridden_for_user
+      !!multiple_due_dates_apply_to?(overridden_for_user)
+    else
+      raise "#{self.class.name} has not been overridden"
+    end
+  end
+
+  def due_dates
+    if overridden_for_user
+      as_student, as_teacher = due_dates_for(overridden_for_user)
+      as_teacher || [as_student]
+    else
+      raise "#{self.class.name} has not been overridden"
+    end
+  end
+
+  def overridden_for?(user)
+    overridden_for_user && overridden_for_user.id == user.id
   end
 
   # like due_dates_for, but for unlock_at values instead. for consistency, each
@@ -178,5 +205,16 @@ module DatesOverridable
     end
 
     return as_student, as_instructor
+  end
+
+  module ClassMethods
+    def due_date_compare_value(date)
+      # due dates are considered equal if they're the same up to the minute
+      date.to_i / 60
+    end
+
+    def due_dates_equal?(date1, date2)
+      due_date_compare_value(date1) == due_date_compare_value(date2)
+    end
   end
 end

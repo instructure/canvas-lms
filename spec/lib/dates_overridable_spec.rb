@@ -405,6 +405,64 @@ shared_examples_for "an object whose dates are overridable" do
       as_instructor.first[:base].should be_true
     end
   end
+
+  describe "multiple_due_dates?" do
+    before do
+      course_with_student(:course => course)
+      override.set = course.default_section
+      override.override_due_at(2.days.ago)
+      override.save!
+    end
+
+    context "when the object has been overridden" do
+      context "and it has multiple due dates" do
+        it "returns true" do
+          overridable.overridden_for(@teacher).multiple_due_dates?.should == true
+        end
+      end
+
+      context "and it has one due date" do
+        it "returns false" do
+          overridable.overridden_for(@student).multiple_due_dates?.should == false
+        end
+      end
+    end
+
+    context "when the object hasn't been overridden" do
+      it "raises an exception because it doesn't have any context" do
+        expect { overridden.multiple_due_dates? }.to raise_exception
+      end
+    end
+  end
+
+  describe "due_dates" do
+    before do
+      course_with_student(:course => course)
+      override.set = course.default_section
+      override.override_due_at(2.days.ago)
+      override.save!
+    end
+
+    context "when the object has been overridden" do
+      context "for a teacher" do
+        it "returns all relevant dates" do
+          overridable.overridden_for(@teacher).due_dates.size.should == 2
+        end
+      end
+
+      context "for a student" do
+        it "returns one date" do
+          overridable.overridden_for(@student).due_dates.size.should == 1
+        end
+      end
+    end
+
+    context "when the object hasn't been overridden" do
+      it "raises an exception because it doesn't have any context" do
+        expect { overridden.due_dates }.to raise_exception
+      end
+    end    
+  end
 end
 
 describe Assignment do

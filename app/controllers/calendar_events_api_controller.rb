@@ -538,7 +538,7 @@ class CalendarEventsApiController < ApplicationController
 
         original_dates.each { |date| assignments << assignment }
       else
-        assignment.due_at = VariedDueDate.due_at_for?(assignment, @current_user)
+        assignment = assignment.overridden_for(@current_user)
         assignment.infer_all_day
         assignments << assignment
       end
