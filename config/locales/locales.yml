@@ -9,4 +9,10 @@ ru:
     ru: pу́сский
 fr:
   locales:
-    fr: Français [bêta]
+    fr: Français
+zh:
+  locales:
+    zh: 中文
+ar:
+  locales:
+    ar: العربية
