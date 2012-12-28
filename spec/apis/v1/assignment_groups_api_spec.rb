@@ -79,6 +79,10 @@ describe AssignmentGroupsController, :type => :integration do
 
     a3.create_rubric_association(:rubric => @rubric, :purpose => 'grading', :use_for_grading => true)
 
+    a4.submission_types = 'discussion_topic'
+    a4.save!
+    a4.reload
+
     @course.update_attribute(:group_weighting_scheme, 'percent')
 
     json = api_call(:get,
@@ -145,9 +149,32 @@ describe AssignmentGroupsController, :type => :integration do
             'position' => 2,
             'points_possible' => 9,
             'needs_grading_count' => 0,
-            "submission_types" => [
-              "none",
-            ],
+            'submission_types' => ["discussion_topic"],
+            'discussion_topic' => {
+              "assignment_id" => a4.id,
+              "delayed_post_at" => nil,
+              "id" => a4.discussion_topic.id,
+              "last_reply_at" => a4.discussion_topic.last_reply_at.iso8601,
+              "podcast_has_student_posts" => nil,
+              "posted_at" => a4.discussion_topic.posted_at.iso8601,
+              "root_topic_id" => nil,
+              "title" => "test4",
+              "user_name" => nil,
+              "discussion_subentry_count" => 0,
+              "permissions" => {"attach" => true, "update" => true, "delete" => true},
+              "message" => nil,
+              "discussion_type" => "side_comment",
+              "require_initial_post" => nil,
+              "podcast_url" => nil,
+              "read_state" => "unread",
+              "unread_count" => 0,
+              "topic_children" => [],
+              "attachments" => [],
+              "locked" => false,
+              "author" => {},
+              "html_url" => course_discussion_topic_url(@course, a4.discussion_topic),
+              "url" => course_discussion_topic_url(@course, a4.discussion_topic)
+            },
             'grading_type' => 'points',
             'group_category_id' => nil,
             'html_url' => course_assignment_url(@course, a4),

@@ -28,9 +28,10 @@ module Api::V1::AssignmentGroup
     hash['group_weight'] = nil unless group.context.apply_group_weights?
     hash['rules'] = group.rules_hash
 
-    if includes.include? 'assignments'
+    include_discussion_topic = includes.include?('discussion_topic')
+    if includes.include?('assignments')
       hash['assignments'] = group.assignments.active.map { |a|
-        assignment_json(a, user, session)
+        assignment_json(a, user, session, include_discussion_topic)
       }
     end
 
