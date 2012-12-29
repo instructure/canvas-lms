@@ -78,7 +78,7 @@ module Instructure #:nodoc:
         'a', 'b', 'blockquote', 'br', 'caption', 'cite', 'code', 'col',
         'hr', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7', 'h8',
         'del', 'ins', 'iframe',
-        'colgroup', 'dd', 'div', 'dl', 'dt', 'em', 'i', 'img', 'li', 'ol', 'p', 'pre',
+        'colgroup', 'dd', 'div', 'dl', 'dt', 'em', 'figure', 'figcaption', 'i', 'img', 'li', 'ol', 'p', 'pre',
         'q', 'small', 'span', 'strike', 'strong', 'sub', 'sup', 'table', 'tbody', 'td',
         'tfoot', 'th', 'thead', 'tr', 'u', 'ul', 'object', 'embed', 'param'],
 
