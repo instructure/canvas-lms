@@ -49,6 +49,31 @@ define ['compiled/grade_calculator', 'underscore'], (GradeCalculator, _) ->
     assertGrade result, 'current', 0, 0
     assertGrade result, 'final', 0, 1284
 
+  test "should work with submissions that have 0 points possible", ->
+    @group.rules = {}
+    @setup_grades [[10,0], [10,10], [10, 10], [null,10]]
+    result = GradeCalculator.calculate @submissions, [@group]
+    assertGrade result, 'current', 30, 20
+    assertGrade result, 'final', 30, 30
+
+    @group.rules = drop_lowest: 1
+    result = GradeCalculator.calculate @submissions, [@group]
+    assertGrade result, 'current', 20, 10
+    assertGrade result, 'final', 30, 20
+
+  test "no submissions have points possible", ->
+    # FIX THIS TEST FOR RUBY
+    @setup_grades [[10,0], [5,0], [20,0], [0,0]]
+    @group.rules = drop_lowest: 1
+    result = GradeCalculator.calculate @submissions, [@group]
+    assertGrade result, 'current', 35, 0
+    assertDropped result.group_sums[0]['current'].submissions, [0,0]
+
+    @group.rules = drop_lowest: 2, drop_highest: 1
+    result = GradeCalculator.calculate @submissions, [@group]
+    assertGrade result, 'current', 10, 0
+    assertDropped result.group_sums[0]['current'].submissions, [0,0], [5,0], [20,0]
+
   test "no drop rules", ->
     @group.rules = {}
 
@@ -73,6 +98,16 @@ define ['compiled/grade_calculator', 'underscore'], (GradeCalculator, _) ->
     assertDropped result.group_sums[0].current.submissions, [42, 91], [14, 55]
     assertGrade result, 'final', 156, 246
     assertDropped result.group_sums[0]['final'].submissions, [0, 1000], [3, 38]
+
+  test "drop lowest (again)", ->
+    @setup_grades [[30, null], [30, null], [30, null], [31, 31], [21, 21],
+                  [30, 30], [30, 30], [30, 30], [30, 30], [30, 30], [30, 30],
+                  [30, 30], [30, 30], [30, 30], [30, 30], [29.3, 30], [30, 30],
+                  [30, 30], [30, 30], [12, 0], [30, null]]
+    @group.rules = drop_lowest: 2
+    result = GradeCalculator.calculate @submissions, [@group]
+    assertGrade result, 'final',  543, 411
+    assertDropped result.group_sums[0]['final'].submissions, [31, 31], [29.3, 30]
 
   test "drop highest", ->
     @group.rules = drop_highest: 1
@@ -113,6 +148,15 @@ define ['compiled/grade_calculator', 'underscore'], (GradeCalculator, _) ->
     result = GradeCalculator.calculate @submissions, [@group]
     assertGrade result, 'current', 0, 10
     assertDropped result.group_sums[0].current.submissions, [10, 20], [28, 50], [91, 100]
+
+  test "unreasonable drop rules", ->
+    @setup_grades [[10,10],[9,10],[8,10]]
+    @group.rules =
+      drop_lowest: 1000
+      drop_highest: 1000
+    result = GradeCalculator.calculate @submissions, [@group]
+    assertGrade result, 'current', 10, 10
+    assertDropped result.group_sums[0].current.submissions, [9,10], [8,10]
 
   test "never drop", ->
     @group.rules =

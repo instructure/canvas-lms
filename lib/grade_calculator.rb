@@ -109,11 +109,10 @@ class GradeCalculator
           :assignment => a,
           :submission => s,
           :score => s && s.score,
-          :total => a.points_possible
+          :total => a.points_possible || 0,
         }
       end
       group_submissions.reject! { |s| s[:score].nil? } if ignore_ungraded
-      group_submissions.reject! { |s| s[:total].to_i.zero? }
       group_submissions.each { |s| s[:score] ||= 0 }
 
       kept = drop_assignments(group_submissions, group.rules_hash)
@@ -144,9 +143,8 @@ class GradeCalculator
     never_drop_ids = rules[:never_drop] || []
     return submissions if drop_lowest.zero? && drop_highest.zero?
 
-    if never_drop_ids.empty?
-      cant_drop = []
-    else
+    cant_drop = []
+    if never_drop_ids.present?
       cant_drop, submissions = submissions.partition { |s|
         never_drop_ids.include? s[:assignment].id
       }
@@ -157,12 +155,28 @@ class GradeCalculator
     drop_lowest = submissions.size - 1 if drop_lowest >= submissions.size
     drop_highest = 0 if drop_lowest + drop_highest >= submissions.size
 
-    totals = submissions.map { |s| s[:total] }
-    max_total = totals.max
+    keep_highest = submissions.size - drop_lowest
+    keep_lowest  = keep_highest - drop_highest
 
-    kept = keep_highest(submissions, submissions.size - drop_lowest, max_total)
-    kept = keep_lowest(kept, kept.size - drop_highest, max_total)
-    kept += cant_drop
+    # assignment groups that have no points possible have to be dropped
+    # differently (it's a simpler case, but not one that fits in with our
+    # usual bisection approach)
+    kept = (cant_drop + submissions).any? { |s| s[:total] > 0 } ?
+      drop_pointed(submissions, keep_highest, keep_lowest) :
+      drop_unpointed(submissions, keep_highest, keep_lowest)
+
+    kept + cant_drop
+  end
+
+  def drop_unpointed(submissions, keep_highest, keep_lowest)
+    sorted_submissions = submissions.sort_by { |s| s[:score] }
+    sorted_submissions.last(keep_highest).first(keep_lowest)
+  end
+
+  def drop_pointed(submissions, n_highest, n_lowest)
+    max_total = submissions.map { |s| s[:total] }.max
+    kept = keep_highest(submissions, n_highest, max_total)
+    kept = keep_lowest(kept, n_lowest, max_total)
   end
 
   def keep_highest(submissions, keep, max_total)
@@ -174,12 +188,13 @@ class GradeCalculator
   end
 
   def keep_helper(submissions, keep, max_total, &big_f_blk)
-    keep = 1 if keep <= 0
     return submissions if submissions.size <= keep
 
-    grades = submissions.map { |s| s[:score].to_f / s[:total] }.sort
+    unpointed, pointed = submissions.partition { |s| s[:total].zero? }
+    grades = pointed.map { |s| s[:score].to_f / s[:total] }.sort
+
+    q_high = estimate_q_high(pointed, unpointed, grades)
     q_low  = grades.first
-    q_high = grades.last
     q_mid  = (q_low + q_high) / 2
 
     x, kept = big_f_blk.call(q_mid, submissions, keep)
@@ -203,6 +218,24 @@ class GradeCalculator
 
     q_kept = kept.reduce(0) { |sum,(rated_score,_)| sum + rated_score }
     [q_kept, kept.map(&:last)]
+  end
+
+  # we can't use the student's highest grade as an upper-bound for bisection
+  # when 0-points-possible assignments are present, so guess the best possible
+  # grade the student could have earned in that case
+  def estimate_q_high(pointed, unpointed, grades)
+    if unpointed.present?
+      points_possible = pointed.reduce(0) { |sum,s| sum + s[:total] }
+      best_pointed_score = [
+        points_possible,                              # 100%
+        pointed.reduce(0) { |sum,s| sum + s[:score] } # ... or extra credit
+      ].max
+      unpointed_score = unpointed.reduce(0) { |sum,s| sum + s[:score] }
+      max_score = best_pointed_score + unpointed_score
+      max_score.to_f / points_possible
+    else
+      grades.last
+    end
   end
 
   # determines the best +keep+ assignments from submissions for the given q

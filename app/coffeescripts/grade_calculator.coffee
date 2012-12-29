@@ -2,6 +2,13 @@ define [
   'underscore'
 ], (_) ->
 
+  partition = (list, f) ->
+    trueList  = []
+    falseList = []
+    _(list).each (x) ->
+      (if f(x) then trueList else falseList).push(x)
+    [trueList, falseList]
+
   class GradeCalculator
     # each submission needs fields: score, points_possible, assignment_id, assignment_group_id
     #   to represent assignments that the student hasn't submitted, pass a
@@ -98,9 +105,8 @@ define [
       return submissions unless dropLowest or dropHighest
 
       if neverDropIds.length > 0
-        cantDrop = _(submissions).filter (s) ->
-          _.indexOf(neverDropIds, parseInt s.submission.assignment_id) >= 0
-        submissions = _.difference submissions, cantDrop
+        [cantDrop, submissions] = partition(submissions, (s) ->
+          _.indexOf(neverDropIds, parseInt s.submission.assignment_id) >= 0)
       else
         cantDrop = []
 
@@ -108,16 +114,39 @@ define [
       dropLowest = submissions.length - 1 if dropLowest >= submissions.length
       dropHighest = 0 if dropLowest + dropHighest >= submissions.length
 
+      keepHighest = submissions.length - dropLowest
+      keepLowest  = keepHighest - dropHighest
+
+      hasPointed = (s.total for s in submissions when s.total > 0).length > 0
+      kept = if hasPointed
+        @dropPointed submissions, keepHighest, keepLowest
+      else
+        @dropUnpointed submissions, keepHighest, keepLowest
+
+      kept.push cantDrop...
+
+      dropped = _.difference(submissions, kept)
+      s.drop = true for s in dropped
+
+      kept
+
+    @dropUnpointed: (submissions, keepHighest, keepLowest) ->
+      sortedSubmissions = submissions.sort (a,b) -> a.score - b.score
+      _.chain(sortedSubmissions).last(keepHighest).first(keepLowest).value()
+
+    @dropPointed: (submissions, keepHighest, keepLowest) ->
       totals = (s.total for s in submissions)
       maxTotal = Math.max(totals...)
 
-      keepHelper = (submissions, keep, bigFSort) ->
+      keepHelper = (submissions, keep, bigFSort) =>
         keep = 1 if keep <= 0
         return submissions if submissions.length <= keep
 
-        grades = (s.score / s.total for s in submissions).sort (a,b) -> a - b
+        [unpointed, pointed] = partition submissions, (s) -> s.total == 0
+
+        grades = (s.score / s.total for s in pointed).sort (a,b) -> a - b
+        qHigh = @estimateQHigh(pointed, unpointed, grades)
         qLow  = grades[0]
-        qHigh = grades[grades.length - 1]
         qMid  = (qLow + qHigh) / 2
 
         bigF = (q, submissions) ->
@@ -145,18 +174,21 @@ define [
 
         kept
 
-      kept = keepHelper(submissions,
-                        submissions.length - dropLowest,
-                        ([a,az], [b,bz]) -> b - a)
-      kept = keepHelper(kept,
-                        kept.length - dropHighest,
-                        ([a,az], [b,bz]) -> a - b)
-      kept.push cantDrop...
+      kept = keepHelper(submissions, keepHighest, ([a,xx], [b,yy]) -> b - a)
+      kept = keepHelper(kept, keepLowest, ([a,az], [b,bz]) -> a - b)
 
-      dropped = _.difference(submissions, kept)
-      s.drop = true for s in dropped
-
-      kept
+    @estimateQHigh: (pointed, unpointed, grades) ->
+      if unpointed.length > 0
+        pointsPossible = _(pointed).reduce(((sum, s) -> sum + s.total), 0)
+        bestPointedScore = Math.max(
+          pointsPossible,
+          _(pointed).reduce(((sum, s) -> sum + s.score), 0)
+        )
+        unpointedScore = _(unpointed).reduce(((sum, s) -> sum + s.score), 0)
+        maxScore = bestPointedScore + unpointedScore
+        maxScore / pointsPossible
+      else
+        qHigh = grades[grades.length - 1]
 
     @calculate_total: (group_sums, ignore_ungraded, weighting_scheme) ->
       data_idx = if ignore_ungraded then 'current' else 'final'

@@ -393,8 +393,7 @@ describe GradeCalculator do
   context "GradeCalculatorSpec.coffee examples" do
     before do
       course_with_student
-
-      @group = @course.assignment_groups.create! :name => 'group 1'
+      @group = @course.assignment_groups.create!(:name => 'group 1')
     end
 
     def set_default_grades
@@ -435,6 +434,20 @@ describe GradeCalculator do
       check_grades(nil, 0)
     end
 
+    it "should work with submissions that have 0 points possible" do
+      set_grades [[10,0], [10,10], [10, 10], [nil,10]]
+      check_grades(150.0, 100.0)
+
+      @group.update_attribute(:rules, 'drop_lowest:1')
+      check_grades(200.0, 150.0)
+    end
+
+    it 'should "work" when no submissions have points possible' do
+      set_grades [[10,0], [5,0], [20,0], [0,0]]
+      @group.update_attribute(:rules, 'drop_lowest:1')
+      check_grades(nil, nil)
+    end
+
     it "should work with no drop rules" do
       set_default_grades
       check_grades(56.0, 12.4)
@@ -447,6 +460,15 @@ describe GradeCalculator do
 
       @group.update_attribute(:rules, 'drop_lowest:2')
       check_grades(74.6, 63.4)
+    end
+
+    it "should really support drop_lowest" do
+      set_grades [[30, nil], [30, nil], [30, nil], [31, 31], [21, 21],
+                  [30, 30], [30, 30], [30, 30], [30, 30], [30, 30], [30, 30],
+                  [30, 30], [30, 30], [30, 30], [30, 30], [29.3, 30], [30, 30],
+                  [30, 30], [30, 30], [12, 0], [30, nil]]
+      @group.update_attribute(:rules, 'drop_lowest:2')
+      check_grades(132.1, 132.1)
     end
 
     it "should support drop_highest" do
@@ -473,6 +495,12 @@ describe GradeCalculator do
 
       @group.update_attribute(:rules, 'drop_highest:3')
       check_grades(0, 0)
+    end
+
+    it "should work with unreasonable drop rules" do
+      set_grades([[10,10],[9,10],[8,10]])
+      @group.update_attribute :rules, "drop_lowest:1000\ndrop_highest:1000"
+      check_grades(100, 100)
     end
 
     it "should support never_drop" do
