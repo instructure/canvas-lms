@@ -1,10 +1,11 @@
 require File.expand_path(File.dirname(__FILE__) + "/common")
 
-describe "gradebooks" do
+describe "gradebook1" do
   it_should_behave_like "in-process server selenium tests"
 
   before(:each) do
     course_with_teacher_logged_in(:active_all => true)
+    @course.update_attribute(:group_weighting_scheme, 'percent')
     @section1 = @course.default_section
     @section2 = @course.course_sections.create!(:name => "Other Section")
 
@@ -16,14 +17,29 @@ describe "gradebooks" do
     e.save!
     @student2 = @student
 
+    @assignments_group = @course.assignment_groups.create!(
+      :name => 'Assignments',
+      :group_weight => 25
+    )
+    @projects_group = @course.assignment_groups.create!(
+      :name => 'Projects',
+      :group_weight => 75,
+    )
+    @project = assignment_model(
+      :course => @course,
+      :name => 'project',
+      :due_at => nil,
+      :points_possible => 20,
+      :submission_types => 'online_text_entry,online_upload',
+      :assignment_group => @projects_group
+    )
     @assignment = assignment_model(
-        {
-            :course => @course,
-            :name => 'first assignment',
-            :due_at => nil,
-            :points_possible => 10,
-            :submission_types => 'online_text_entry,online_upload'
-        }
+      :course => @course,
+      :name => 'first assignment',
+      :due_at => nil,
+      :points_possible => 10,
+      :submission_types => 'online_text_entry,online_upload',
+      :assignment_group => @assignments_group
     )
   end
 
@@ -117,5 +133,49 @@ describe "gradebooks" do
     }
     link_el = f('#submission_information .submission_details .view_submission_link')
     URI.decode(URI.parse(link_el.attribute(:href)).fragment).should == "{\"student_id\":#{@student2.id}}"
+  end
+
+  def wait_for_grades
+    keep_trying_until {
+      f("[id^=submission][id$=final-grade]").text =~ /%/
+    }
+  end
+
+  def grade_student(student, assignment, score)
+    f("#submission_#{student.id}_#{assignment.id}").click
+    grade_input_box = fj("[id=student_grading_#{assignment.id}]:visible")
+    grade_input_box.send_keys(score)
+    grade_input_box.send_keys(:tab)
+  end
+
+  def final_grade_for(student)
+    f("#submission_#{student.id}_final-grade").text
+  end
+
+  def toggle_group_weighting_scheme
+    fj('#gradebook_options:visible').click
+    ff('#instructure_dropdown_list .option').find { |o|
+      o.text =~ /Set Group Weights/
+    }.click
+
+    f('#class_weighting_policy').click
+    fj('button:contains(Done):visible').click
+  end
+
+  it "allows you to toggle the group_weighting_scheme" do
+    get "/courses/#{@course.id}/gradebook"
+    wait_for_grades
+
+    grade_student(@student1, @assignment, 2)
+    grade_student(@student1, @project, 20)
+
+    wait_for_ajaximations
+
+    final_grade_for(@student1).to_f.should == 80 # (2/10*.25) + (20/20*.75)
+
+    toggle_group_weighting_scheme
+
+    keep_trying_until { final_grade_for(@student1).to_f != 80 }
+    final_grade_for(@student1).to_f.should == 73.3 # (2+20)/(10+20)
   end
 end

@@ -1937,10 +1937,14 @@ define([
       return objectData($(s).parent());
     }).value();
 
+
+    var weightingScheme = $("#class_weighting_policy").attr('checked') ?
+      "percent" :
+      "equal";
     var groupSums = GradeCalculator.calculate(
         submissionObjects,
         ENV.assignment_groups,
-        $("#class_weighting_policy").attr('checked'));
+        weightingScheme);
 
     var currentOrFinal = ignoreUngradedSubmissions ? 'current' : 'final';
 
