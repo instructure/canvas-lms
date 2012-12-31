@@ -108,9 +108,11 @@
           <a href="<%= assignment_url %>/edit" rel="nofollow" class="edit_assignment_link no-hover">
             <i class="icon-edit standalone-icon"></i><span class="screen-reader-text"><%= t('links.edit_assignment', "Edit") %></span>
           </a>
+          <% unless assignment.att_frozen?(:assignment_group_id, @current_user) %>
           <a href="<%= assignment_url %>" rel="nofollow" class="delete_assignment_link no-hover">
             <i class="icon-end standalone-icon"></i><span class="screen-reader-text"><%= t('links.delete_assignment', "Delete") %></span>
           </a>
+          <% end %>
         <% end %>
       </div>
     </div>

@@ -34,7 +34,8 @@ class Assignment < ActiveRecord::Base
     :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
     :notify_of_update, :time_zone_edited, :turnitin_enabled, :turnitin_settings,
     :set_custom_field_values, :context, :position, :allowed_extensions,
-    :external_tool_tag_attributes, :freeze_on_copy
+    :external_tool_tag_attributes, :freeze_on_copy, :assignment_group_id
+    
   attr_accessor :original_id, :updating_user, :copying
 
   has_many :submissions, :class_name => 'Submission', :dependent => :destroy
@@ -95,6 +96,10 @@ class Assignment < ActiveRecord::Base
 
   def root_account
     context && context.root_account
+  end
+
+  def name
+    self.title
   end
 
   def name=(val)
@@ -1780,11 +1785,23 @@ class Assignment < ActiveRecord::Base
                             submission_types assignment_group_id allowed_extensions
                             group_category_id notify_of_update peer_reviews workflow_state}
   def frozen?
-    !!(self.freeze_on_copy && self.copied && PluginSetting.settings_for_plugin(:assignment_freezer))
+    !!(self.freeze_on_copy && self.copied &&
+       PluginSetting.settings_for_plugin(:assignment_freezer))
   end
 
+  # indicates complete frozenness for an assignment.
+  # if the user can edit at least one of the attributes, it is not frozen to
+  # them
   def frozen_for_user?(user)
-    frozen? && !self.context.grants_right?(user, :manage_frozen_assignments)
+    return true if user.blank?
+    (frozen? && !self.context.grants_right?(user, :manage_frozen_assignments))&&
+    (frozen_attributes_for_user(user).length == FREEZABLE_ATTRIBUTES.length)
+  end
+
+  def frozen_attributes_for_user(user)
+    FREEZABLE_ATTRIBUTES.select do |freezable_attribute|
+      att_frozen? freezable_attribute, user
+    end
   end
 
   def att_frozen?(att, user=nil)
@@ -1810,7 +1827,10 @@ class Assignment < ActiveRecord::Base
     return if self.copying
     FREEZABLE_ATTRIBUTES.each do |att|
       if self.changes[att] && att_frozen?(att, @updating_user)
-        self.errors.add(att, t('errors.cannot_save_att', "You don't have permission to edit the locked attribute %{att_name}", :att_name => att))
+        self.errors.add(att,
+          t('errors.cannot_save_att',
+            "You don't have permission to edit the locked attribute %{att_name}",
+            :att_name => att))
       end
     end
   end

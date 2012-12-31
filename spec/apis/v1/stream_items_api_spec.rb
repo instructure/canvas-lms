@@ -19,7 +19,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe UsersController, :type => :integration do
-
+  include Api
+  include Api::V1::Assignment
 
   before do
     course_with_student(:active_all => true)
@@ -270,7 +271,9 @@ describe UsersController, :type => :integration do
     @sub.save!
     json = api_call(:get, "/api/v1/users/activity_stream.json",
                     { :controller => "users", :action => "activity_stream", :format => 'json' })
-
+    @assignment.reload
+    assign_json = assignment_json(@assignment,@user,session,false)
+    assign_json['title'] = @assignment.title
     json.should == [{
       'id' => StreamItem.last.id,
       'title' => "assignment 1",
@@ -283,24 +286,7 @@ describe UsersController, :type => :integration do
       'score' => 12,
       'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}",
       'workflow_state' => 'graded',
-
-      'assignment' => {
-        'title' => 'assignment 1',
-        'id' => @assignment.id,
-        'points_possible' => 14.2,
-        'assignment_group_id' => @assignment.assignment_group.id,
-        'course_id' => @course.id,
-        'description' => @assignment.description,
-        'due_at' => @assignment.due_at,
-        'grading_type' => @assignment.grading_type,
-        'group_category_id' => nil,
-        'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}",
-        'muted' => @assignment.muted,
-        'name' => @assignment.title,
-        'position' => @assignment.position,
-        'submission_types' => ['online_text_entry']
-      },
-
+      'assignment' => assign_json,
       'assignment_id' => @assignment.id,
       'attempt' => nil,
       'body' => nil,
@@ -359,6 +345,9 @@ describe UsersController, :type => :integration do
     @sub.save!
     json = api_call(:get, "/api/v1/users/activity_stream.json",
                     { :controller => "users", :action => "activity_stream", :format => 'json' })
+    @assignment.reload
+    assign_json = assignment_json(@assignment,@user,session,false)
+    assign_json['title'] = @assignment.title
     json.should == [{
       'id' => StreamItem.last.id,
       'title' => "assignment 1",
@@ -372,23 +361,7 @@ describe UsersController, :type => :integration do
       'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}",
       'workflow_state' => 'unsubmitted',
 
-      'assignment' => {
-        'title' => 'assignment 1',
-        'id' => @assignment.id,
-        'points_possible' => 14.2,
-        'assignment_group_id' => @assignment.assignment_group.id,
-        'course_id' => @course.id,
-        'description' => @assignment.description,
-        'due_at' => @assignment.due_at,
-        'grading_type' => @assignment.grading_type,
-        'group_category_id' => nil,
-        'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}",
-        'muted' => @assignment.muted,
-        'name' => @assignment.title,
-        'position' => @assignment.position,
-        'submission_types' => ['online_text_entry']
-      },
-
+      'assignment' => assign_json,
       'assignment_id' => @assignment.id,
       'attempt' => nil,
       'body' => nil,

@@ -116,7 +116,6 @@ class Course < ActiveRecord::Base
   has_many :all_group_categories, :class_name => 'GroupCategory', :as => :context
   has_many :groups, :as => :context
   has_many :active_groups, :as => :context, :class_name => 'Group', :conditions => ['groups.workflow_state != ?', 'deleted']
-  has_many :group_categories, :as => :context, :conditions => ['deleted_at IS NULL']
   has_many :assignment_groups, :as => :context, :dependent => :destroy, :order => 'assignment_groups.position, assignment_groups.name'
   has_many :assignments, :as => :context, :dependent => :destroy, :order => 'assignments.created_at'
   has_many :calendar_events, :as => :context, :conditions => ['calendar_events.workflow_state != ?', 'cancelled'], :dependent => :destroy

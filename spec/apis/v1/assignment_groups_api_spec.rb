@@ -19,6 +19,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe AssignmentGroupsController, :type => :integration do
+  include Api
+  include Api::V1::Assignment
+
   it "should sort the returned list of assignment groups" do
     # the API returns the assignments sorted by
     # assignment_groups.position
@@ -81,6 +84,9 @@ describe AssignmentGroupsController, :type => :integration do
 
     a4.submission_types = 'discussion_topic'
     a4.save!
+    a1.reload
+    a2.reload
+    a3.reload
     a4.reload
 
     @course.update_attribute(:group_weighting_scheme, 'percent')
@@ -91,142 +97,32 @@ describe AssignmentGroupsController, :type => :integration do
             :format => 'json', :course_id => @course.id.to_s,
             :include => ['assignments'] })
 
-    json.should == [
+    expected = [
       {
+        'group_weight' => 60,
         'id' => group2.id,
         'name' => 'group2',
         'position' => 7,
         'rules' => {},
-        'group_weight' => 60,
         'assignments' => [
-          {
-            'id' => a3.id,
-            'assignment_group_id' => group2.id,
-            'course_id' => @course.id,
-            'due_at' => nil,
-            'muted' => false,
-            'name' => 'test3',
-            'description' => nil,
-            'position' => 1,
-            'points_possible' => 12,
-            'needs_grading_count' => 0,
-            "submission_types" => [
-              "none",
-            ],
-            'grading_type' => 'points',
-            'use_rubric_for_grading' => true,
-            'free_form_criterion_comments' => false,
-            'html_url' => course_assignment_url(@course, a3),
-            'rubric_settings' => {
-              'points_possible' => 12,
-              'free_form_criterion_comments' => false,
-            },
-            'rubric' => [
-              {'id' => 'crit1', 'points' => 10, 'description' => 'Crit1',
-                'ratings' => [
-                  {'id' => 'rat1', 'points' => 10, 'description' => 'A'},
-                  {'id' => 'rat2', 'points' => 7, 'description' => 'B'},
-                  {'id' => 'rat3', 'points' => 0, 'description' => 'F'},
-                ],
-              },
-              {'id' => 'crit2', 'points' => 2, 'description' => 'Crit2',
-                'ratings' => [
-                  {'id' => 'rat1', 'points' => 2, 'description' => 'Pass'},
-                  {'id' => 'rat2', 'points' => 0, 'description' => 'Fail'},
-                ],
-              },
-            ],
-            'group_category_id' => nil
-          },
-          {
-            'id' => a4.id,
-            'assignment_group_id' => group2.id,
-            'course_id' => @course.id,
-            'due_at' => nil,
-            'muted' => false,
-            'name' => 'test4',
-            'description' => nil,
-            'position' => 2,
-            'points_possible' => 9,
-            'needs_grading_count' => 0,
-            'submission_types' => ["discussion_topic"],
-            'discussion_topic' => {
-              "assignment_id" => a4.id,
-              "delayed_post_at" => nil,
-              "id" => a4.discussion_topic.id,
-              "last_reply_at" => a4.discussion_topic.last_reply_at.iso8601,
-              "podcast_has_student_posts" => nil,
-              "posted_at" => a4.discussion_topic.posted_at.iso8601,
-              "root_topic_id" => nil,
-              "title" => "test4",
-              "user_name" => nil,
-              "discussion_subentry_count" => 0,
-              "permissions" => {"attach" => true, "update" => true, "delete" => true},
-              "message" => nil,
-              "discussion_type" => "side_comment",
-              "require_initial_post" => nil,
-              "podcast_url" => nil,
-              "read_state" => "unread",
-              "unread_count" => 0,
-              "topic_children" => [],
-              "attachments" => [],
-              "locked" => false,
-              "author" => {},
-              "html_url" => course_discussion_topic_url(@course, a4.discussion_topic),
-              "url" => course_discussion_topic_url(@course, a4.discussion_topic)
-            },
-            'grading_type' => 'points',
-            'group_category_id' => nil,
-            'html_url' => course_assignment_url(@course, a4),
-          },
+          controller.assignment_json(a3,@user,session),
+          controller.assignment_json(a4,@user,session,true)
         ],
       },
       {
+        'group_weight' => 40,
         'id' => group1.id,
         'name' => 'group1',
         'position' => 10,
         'rules' => {},
-        'group_weight' => 40,
         'assignments' => [
-          {
-            'id' => a1.id,
-            'assignment_group_id' => group1.id,
-            'course_id' => @course.id,
-            'due_at' => nil,
-            'muted' => false,
-            'name' => 'test1',
-            'description' => nil,
-            'position' => 1,
-            'points_possible' => 10,
-            'needs_grading_count' => 0,
-            "submission_types" => [
-              "none",
-            ],
-            'grading_type' => 'points',
-            'group_category_id' => nil,
-            'html_url' => course_assignment_url(@course, a1),
-          },
-          {
-            'id' => a2.id,
-            'assignment_group_id' => group1.id,
-            'course_id' => @course.id,
-            'due_at' => nil,
-            'muted' => false,
-            'name' => 'test2',
-            'description' => nil,
-            'position' => 2,
-            'points_possible' => 12,
-            'needs_grading_count' => 0,
-            "submission_types" => [
-              "none",
-            ],
-            'grading_type' => 'points',
-            'group_category_id' => nil,
-            'html_url' => course_assignment_url(@course, a2),
-          },
+          controller.assignment_json(a1,@user,session),
+          controller.assignment_json(a2,@user,session)
         ],
-      },
+      }
     ]
+
+    compare_json(json, expected)
   end
 
   it "should exclude deleted assignments" do

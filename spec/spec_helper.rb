@@ -880,6 +880,21 @@ Spec::Runner.configure do |config|
       expected_post_lines[expected_post_lines.index(""),-1]
   end
 
+  def compare_json(actual, expected)
+    if actual.is_a?(Hash)
+      actual.each do |k,v|
+        expected_v = expected[k]
+        compare_json(v, expected_v)
+      end
+    elsif actual.is_a?(Array)
+      actual.zip(expected).each do |a,e|
+        compare_json(a,e)
+      end
+    else
+      actual.to_json.should == expected.to_json
+    end
+  end
+
   class FakeHttpResponse
     def initialize(code, body = nil, headers={})
       @code = code
