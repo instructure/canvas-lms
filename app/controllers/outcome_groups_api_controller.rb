@@ -19,16 +19,113 @@
 # @API Outcome Groups
 #
 # API for accessing learning outcome group information.
-
+#
+# Learning outcome groups organize outcomes within a context (or in the global
+# "context" for global outcomes). Every outcome is created in a particular
+# context (that context then becomes its "owning context") but may be linked
+# multiple times in one or more related contexts. This allows different
+# accounts or courses to organize commonly defined outcomes in ways appropriate
+# to their pedagogy, including having the same outcome discoverable at
+# different locations in the organizational hierarchy.
+#
+# While an outcome can be linked into a context (such as a course) multiple
+# times, it may only be linked into a particular group once.
+#
+# @object OutcomeGroup
+#
+#     {
+#       // the ID of the outcome group
+#       "id": 1,
+#
+#       // the URL for fetching/updating the outcome group. should be treated
+#       // as opaque
+#       "url": "/api/v1/accounts/1/outcome_groups/1",
+#
+#       // an abbreviated OutcomeGroup object representing the parent group of
+#       // this outcome group, if any. omitted in the abbreviated form.
+#       "parent_outcome_group": {
+#         "id": ...,
+#         "url": ...,
+#         "title": ...,
+#         "subgroups_url": ...,
+#         "outcomes_url": ...,
+#         "can_edit": ...
+#       },
+#
+#       // the context owning the outcome group. may be null for global outcome
+#       // groups. omitted in the abbreviated form.
+#       "context_id": 1,
+#       "context_type": "Account",
+#
+#       // title of the outcome group
+#       "title": "Outcome group title",
+#
+#       // description of the outcome group. omitted in the abbreviated form.
+#       "description": "Outcome group description",
+#
+#       // the URL for listing/creating subgroups under the outcome group.
+#       // should be treated as opaque
+#       "subgroups_url": "/api/v1/accounts/1/outcome_groups/1/subgroups",
+#
+#       // the URL for listing/creating outcome links under the outcome group.
+#       // should be treated as opaque
+#       "outcomes_url": "/api/v1/accounts/1/outcome_groups/1/outcomes",
+#
+#       // the URL for importing another group into this outcome group. should
+#       // be treated as opaque. omitted in the abbreviated form.
+#       "import_url": "/api/v1/accounts/1/outcome_groups/1/import",
+#
+#       // whether the current user can update the outcome group
+#       "can_edit": true
+#     }
+#
+# @object OutcomeLink
+#
+#     {
+#       // the URL for fetching/updating the outcome link. should be treated as
+#       // opaque
+#       "url": "/api/v1/account/1/outcome_groups/1/outcomes/1",
+#
+#       // the context owning the outcome link. will match the context owning
+#       // the outcome group containing the outcome link; included for
+#       // convenience. may be null for links in global outcome groups.
+#       "context_id": 1,
+#       "context_type": "Account",
+#
+#       // an abbreviated OutcomeGroup object representing the group containing
+#       // the outcome link.
+#       "outcome_group": {
+#         "id": 1,
+#         "url": ...,
+#         "title": ...,
+#         "subgroups_url": ...,
+#         "outcomes_url": ...,
+#         "can_edit": ...
+#       },
+#
+#       // an abbreviated Outcome object representing the outcome linked into
+#       // the containing outcome group.
+#       "outcome": {
+#         "id": 1,
+#         "url": ...,
+#         "context_id": ...,
+#         "context_type": ...,
+#         "title": ...,
+#         "can_edit": ...
+#       }
+#     }
+#
 class OutcomeGroupsApiController < ApplicationController
   include Api::V1::Outcome
 
   before_filter :require_user
   before_filter :get_context
 
-
-  # @API Redirect for global outcomes
-  # Convenience redirect to find the root outcome group for global outcomes.
+  # @API Redirect to root outcome group for context
+  #
+  # Convenience redirect to find the root outcome group for a particular
+  # context. Will redirect to the appropriate outcome group's URL.
+  #
   def redirect
     if can_read_outcomes
       @outcome_group = @context ?
@@ -38,7 +135,10 @@ class OutcomeGroupsApiController < ApplicationController
     end
   end
 
-  # @API Retrieve an outcome group's details.
+  # @API Show an outcome group
+  #
+  # @returns OutcomeGroup
+  #
   def show
     if can_read_outcomes
       @outcome_group = context_outcome_groups.find(params[:id])
@@ -46,7 +146,42 @@ class OutcomeGroupsApiController < ApplicationController
     end
   end
 
-  # @API Update an outcome group.
+  # @API Update an outcome group
+  #
+  # Modify an existing outcome group. Fields not provided are left as is;
+  # unrecognized fields are ignored.
+  #
+  # When changing the parent outcome group, the new parent group must belong to
+  # the same context as this outcome group, and must not be a descendant of
+  # this outcome group (i.e. no cycles allowed).
+  #
+  # @argument title [Optional] The new outcome group title.
+  # @argument description [Optional] The new outcome group description.
+  # @argument parent_outcome_group_id [Optional, Integer] The id of the new parent outcome group.
+  #
+  # @returns OutcomeGroup
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/accounts/1/outcome_groups/2.json' \ 
+  #        -X PUT \ 
+  #        -F 'title=Outcome Group Title' \ 
+  #        -F 'description=Outcome group description' \ 
+  #        -F 'parent_outcome_group_id=1' \ 
+  #        -H "Authorization: Bearer <token>"
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/accounts/1/outcome_groups/2.json' \ 
+  #        -X PUT \ 
+  #        --data-binary '{
+  #              "title": "Outcome Group Title",
+  #              "description": "Outcome group description",
+  #              "parent_outcome_group_id": 1
+  #            }' \ 
+  #        -H "Content-Type: application/json" \ 
+  #        -H "Authorization: Bearer <token>"
+  #
   def update
     if can_manage_outcomes
       @outcome_group = context_outcome_groups.find(params[:id])
@@ -70,7 +205,24 @@ class OutcomeGroupsApiController < ApplicationController
     end
   end
 
-  # @API Delete an outcome group.
+  # @API Delete an outcome group
+  #
+  # Deleting an outcome group deletes descendant outcome groups and outcome
+  # links. The linked outcomes themselves are only deleted if all links to the
+  # outcome were deleted.
+  #
+  # Aligned outcomes cannot be deleted; as such, if all remaining links to an
+  # aligned outcome are included in this group's descendants, the group
+  # deletion will fail.
+  #
+  # @returns OutcomeGroup
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/accounts/1/outcome_groups/2.json' \ 
+  #        -X DELETE \ 
+  #        -H "Authorization: Bearer <token>"
+  #
   def destroy
     if can_manage_outcomes
       @outcome_group = context_outcome_groups.find(params[:id])
@@ -87,7 +239,12 @@ class OutcomeGroupsApiController < ApplicationController
     end
   end
 
-  # @API List the outcomes in a group.
+  # @API List linked outcomes
+  #
+  # List the immediate OutcomeLink children of the outcome group. Paginated.
+  #
+  # @returns [OutcomeLink]
+  #
   def outcomes
     if can_read_outcomes
       @outcome_group = context_outcome_groups.find(params[:id])
@@ -112,6 +269,8 @@ class OutcomeGroupsApiController < ApplicationController
     end
   end
 
+  # Intentionally undocumented in the API. Used by the UI to show a list of
+  # accounts' root outcome groups for the account(s) above the context.
   def account_chain
     if authorized_action(@context, @current_user, :manage_outcomes)
       account_chain =
@@ -136,7 +295,78 @@ class OutcomeGroupsApiController < ApplicationController
     end
   end
 
-  # @API Link an outcome into a group.
+  # @API Create/link an outcome
+  #
+  # Link an outcome into the outcome group. The outcome to link can either be
+  # specified by a PUT to the link URL for a specific outcome (the outcome_id
+  # in the PUT URLs) or by supplying the information for a new outcome (title,
+  # description, ratings, mastery_points) in a POST to the collection.
+  #
+  # If linking an existing outcome, the outcome_id must identify an outcome
+  # available to this context; i.e. an outcome owned by this group's context,
+  # an outcome owned by an associated account, or a global outcome. With
+  # outcome_id present, any other parameters are ignored.
+  #
+  # If defining a new outcome, the outcome is created in the outcome group's
+  # context using the provided title, description, ratings, and mastery points;
+  # the title is required but all other fields are optional. The new outcome is
+  # then linked into the outcome group.
+  #
+  # If ratings are provided when creating a new outcome, an embedded rubric
+  # criterion is included in the new outcome. This criterion's mastery_points
+  # default to the maximum points in the highest rating if not specified in the
+  # mastery_points parameter. Any ratings lacking a description are given a
+  # default of "No description". Any ratings lacking a point value are given a
+  # default of 0. If no ratings are provided, the mastery_points parameter is
+  # ignored.
+  #
+  # @argument outcome_id [Optional, Integer] The ID of the existing outcome to link.
+  # @argument title [Optional] The title of the new outcome. Required if outcome_id is absent.
+  # @argument description [Optional] The description of the new outcome.
+  # @argument mastery_points [Optional, Integer] The mastery threshold for the embedded rubric criterion.
+  # @argument ratings[][description] [Optional] The description of a rating level for the embedded rubric criterion.
+  # @argument ratings[][points] [Optional, Integer] The points corresponding to a rating level for the embedded rubric criterion.
+  #
+  # @returns OutcomeLink
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/accounts/1/outcome_groups/1/outcomes/1.json' \ 
+  #        -X PUT \ 
+  #        -H "Authorization: Bearer <token>"
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/accounts/1/outcome_groups/1/outcomes.json' \ 
+  #        -X POST \ 
+  #        -F 'title=Outcome Title' \ 
+  #        -F 'description=Outcome description' \ 
+  #        -F 'mastery_points=3' \ 
+  #        -F 'ratings[][description]=Exceeds Expectations' \ 
+  #        -F 'ratings[][points]=5' \ 
+  #        -F 'ratings[][description]=Meets Expectations' \ 
+  #        -F 'ratings[][points]=3' \ 
+  #        -F 'ratings[][description]=Does Not Meet Expectations' \ 
+  #        -F 'ratings[][points]=0' \ 
+  #        -H "Authorization: Bearer <token>"
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/accounts/1/outcome_groups/1/outcomes.json' \ 
+  #        -X POST \ 
+  #        --data-binary '{
+  #              "title": "Outcome Title",
+  #              "description": "Outcome description",
+  #              "mastery_points": 3,
+  #              "ratings": [
+  #                { "description": "Exceeds Expectations", "points": 5 },
+  #                { "description": "Meets Expectations", "points": 3 },
+  #                { "description": "Does Not Meet Expectations", "points": 0 }
+  #              ]
+  #            }' \ 
+  #        -H "Content-Type: application/json" \ 
+  #        -H "Authorization: Bearer <token>"
+  #
   def link
     if can_manage_outcomes
       @outcome_group = context_outcome_groups.find(params[:id])
@@ -158,7 +388,21 @@ class OutcomeGroupsApiController < ApplicationController
     end
   end
 
-  # @API Unlink an outcome link in a group.
+  # @API Unlink an outcome
+  #
+  # Unlinking an outcome only deletes the outcome itself if this was the last
+  # link to the outcome in any group in any context. Aligned outcomes cannot be
+  # deleted; as such, if this is the last link to an aligned outcome, the
+  # unlinking will fail.
+  #
+  # @returns OutcomeLink
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/accounts/1/outcome_groups/1/outcomes/1.json' \ 
+  #        -X DELETE \ 
+  #        -H "Authorization: Bearer <token>"
+  #
   def unlink
     if can_manage_outcomes
       @outcome_group = context_outcome_groups.find(params[:id])
@@ -175,7 +419,12 @@ class OutcomeGroupsApiController < ApplicationController
     end
   end
 
-  # @API List the outcomes in a group.
+  # @API List subgroups
+  #
+  # List the immediate OutcomeGroup children of the outcome group. Paginated.
+  #
+  # @returns [OutcomeGroup]
+  #
   def subgroups
     if can_read_outcomes
       @outcome_group = context_outcome_groups.find(params[:id])
@@ -194,7 +443,35 @@ class OutcomeGroupsApiController < ApplicationController
     end
   end
 
-  # @API Create a new subgroup of a group.
+  # @API Create a subgroup
+  #
+  # Creates a new empty subgroup under the outcome group with the given title
+  # and description.
+  #
+  # @argument title [Required] The title of the new outcome group.
+  # @argument description [Optional] The description of the new outcome group.
+  #
+  # @returns OutcomeGroup
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/accounts/1/outcome_groups/1/subgroups.json' \ 
+  #        -X POST \ 
+  #        -F 'title=Outcome Group Title' \ 
+  #        -F 'description=Outcome group description' \ 
+  #        -H "Authorization: Bearer <token>"
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/accounts/1/outcome_groups/1/subgroups.json' \ 
+  #        -X POST \ 
+  #        --data-binary '{
+  #              "title": "Outcome Group Title",
+  #              "description": "Outcome group description"
+  #            }' \ 
+  #        -H "Content-Type: application/json" \ 
+  #        -H "Authorization: Bearer <token>"
+  #
   def create
     if can_manage_outcomes
       @outcome_group = context_outcome_groups.find(params[:id])
@@ -207,7 +484,32 @@ class OutcomeGroupsApiController < ApplicationController
     end
   end
 
-  # @API Import an existing non-root outcome group into a group.
+  # @API Import an outcome group
+  #
+  # Creates a new subgroup of the outcome group with the same title and
+  # description as the source group, then creates links in that new subgroup to
+  # the same outcomes that are linked in the source group. Recurses on the
+  # subgroups of the source group, importing them each in turn into the new
+  # subgroup.
+  #
+  # Allows you to copy organizational structure, but does not create copies of
+  # the outcomes themselves, only new links.
+  #
+  # The source group must be either global, from the same context as this
+  # outcome group, or from an associated account. The source group cannot be
+  # the root outcome group of its context.
+  #
+  # @argument source_outcome_group_id [Required, Integer] The ID of the source outcome group.
+  #
+  # @returns OutcomeGroup
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/accounts/2/outcome_groups/3/import.json' \ 
+  #        -X POST \ 
+  #        -F 'source_outcome_group_id=2' \ 
+  #        -H "Authorization: Bearer <token>"
+  #
   def import
     if can_manage_outcomes
       @outcome_group = context_outcome_groups.find(params[:id])
