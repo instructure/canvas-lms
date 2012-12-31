@@ -53,12 +53,14 @@
     <p id="no_messages" style="display:none"></p>
   </div>
   <div id="messages">
-    <div id="message_actions">
-      <ul>
-        <li><%= link_to t('inbox_actions.forward', "Forward"), {}, :id => :action_forward %></li>
-        <li><%= link_to t('inbox_actions.delete', "Delete"), conversation_remove_messages_url('{{ id }}'), :id => :action_delete %></li>
-      </ul>
-      <a href="#" id="cancel_bulk_message_action"><%= t '#buttons.cancel', 'Cancel' %></a>
+    <div aria-live="polite">
+      <div id="message_actions">
+        <ul>
+          <li><%= link_to t('inbox_actions.forward', "Forward"), {}, :id => :action_forward %></li>
+          <li><%= link_to t('inbox_actions.delete', "Delete"), conversation_remove_messages_url('{{ id }}'), :id => :action_delete %></li>
+        </ul>
+        <a href="#" id="cancel_bulk_message_action"><%= t '#buttons.cancel', 'Cancel' %></a>
+      </div>
     </div>
     <ul id="message_status"></ul>
      <a id="help_crumb" href="#"><i class="icon-question standalone-icon"></i></a>
