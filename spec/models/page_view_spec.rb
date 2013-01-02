@@ -223,9 +223,9 @@ describe PageView do
 
     describe "active user counts" do
       it "should generate bucket names" do
-        PageView.user_count_bucket_for_time(Time.zone.parse('2012-01-20T13:41:17Z')).should == 'active_users:2012-01-20T13:40:00Z'
-        PageView.user_count_bucket_for_time(Time.zone.parse('2012-01-20T03:25:00Z')).should == 'active_users:2012-01-20T03:25:00Z'
-        PageView.user_count_bucket_for_time(Time.zone.parse('2012-01-20T03:29:59Z')).should == 'active_users:2012-01-20T03:25:00Z'
+        PageView.user_count_bucket_for_time(Time.zone.parse('2012-01-20T13:41:17Z')).should be_starts_with 'active_users:2012-01-20T13:40:00Z'
+        PageView.user_count_bucket_for_time(Time.zone.parse('2012-01-20T03:25:00Z')).should be_starts_with 'active_users:2012-01-20T03:25:00Z'
+        PageView.user_count_bucket_for_time(Time.zone.parse('2012-01-20T03:29:59Z')).should be_starts_with 'active_users:2012-01-20T03:25:00Z'
       end
 
       it "should do nothing if not enabled" do
