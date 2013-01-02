@@ -22,6 +22,7 @@ define [
       'submit form': 'submit'
       'change [name="use_section_dates"]': 'toggleUseSectionDates'
       'click .delete_link': 'destroyModel'
+      'click .switch_event_description_view': 'toggleHtmlView'
 
     initialize: ->
       @model.fetch().done =>
@@ -56,6 +57,9 @@ define [
       @$('#editCalendarEventFull').toggleClass 'use_section_dates', @model.get('use_section_dates')
     toggleUseSectionDates: =>
       @model.set 'use_section_dates', !@model.get('use_section_dates')
+    toggleHtmlView: (event) ->
+      event?.preventDefault()
+      $("textarea[name=description]").editorBox('toggle')
 
     redirectWithMessage: (message) ->
       $.flashMessage message
