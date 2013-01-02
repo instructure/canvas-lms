@@ -195,4 +195,156 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       wiki_page_body[:value].should be_empty
     end
   end
+
+  context "wiki sidebar files and locking/hiding" do
+    before (:each) do
+      course_with_teacher_logged_in(:active_all => true, :name => 'wiki course')
+      @root_folder = Folder.root_folders(@course).first
+      @sub_folder = @root_folder.sub_folders.create!(:name => "visible subfolder", :context => @course)
+    end
+
+    it "should show root folder in the sidebar if it is locked" do
+      @root_folder.locked = true
+      @root_folder.save!
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
+      ff('li.folder').count.should == 1
+    end
+
+    it "should show root folder in the sidebar if it is hidden" do
+      @root_folder.workflow_state = 'hidden'
+      @root_folder.save!
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
+      ff('li.folder').count.should == 1
+    end
+
+    it "should show root folder in the sidebar if the files navigation tab is hidden" do
+      @course.tab_configuration = [{:id => Course::TAB_FILES, :hidden => true}]
+      @course.save!
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
+      ff('li.folder').count.should == 1
+    end
+
+    it "should show sub-folder in the sidebar if it is locked" do
+      @root_folder.sub_folders.create!(:name => "subfolder", :context => @course, :locked => true)
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
+      f('li.folder').should_not be_nil
+      f('li.folder span').click
+      wait_for_ajaximations
+      ff('li.folder li.folder').count.should == 2
+      f('li.folder li.folder .name').text.should == "visible subfolder"
+    end
+
+    it "should show sub-folder in the sidebar if it is hidden" do
+      @root_folder.sub_folders.create!(:name => "subfolder", :context => @course, :workflow_state => 'hidden')
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
+      f('li.folder').should_not be_nil
+      f('li.folder span').click
+      wait_for_ajaximations
+      ff('li.folder li.folder').count.should == 2
+    end
+
+    it "should show file in the sidebar if it is hidden" do
+      visible_attachment = attachment_model(:uploaded_data => stub_file_data('foo.txt', nil, 'text/html'), :content_type => 'text/html')
+      attachment = attachment_model(:uploaded_data => stub_file_data('foo2.txt', nil, 'text/html'), :content_type => 'text/html')
+
+      attachment.file_state = 'hidden'
+      attachment.save!
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
+      f('li.folder span').click
+      wait_for_ajaximations
+      ff('li.folder li.file').count.should == 2
+    end
+
+    it "should show file in the sidebar if it is locked" do
+      visible_attachment = attachment_model(:uploaded_data => stub_file_data('foo.txt', nil, 'text/html'), :content_type => 'text/html')
+      attachment = attachment_model(:uploaded_data => stub_file_data('foo2.txt', nil, 'text/html'), :content_type => 'text/html')
+
+      attachment.locked = true
+      attachment.save!
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
+      f('li.folder span').click
+      wait_for_ajaximations
+      ff('li.folder li.file').count.should == 2
+    end
+  end
+
+  context "wiki sidebar images and locking/hiding" do
+    before (:each) do
+      course_with_teacher_logged_in(:active_all => true, :name => 'wiki course')
+      @root_folder = Folder.root_folders(@course).first
+      @sub_folder = @root_folder.sub_folders.create!(:name => "subfolder", :context => @course)
+
+      @visible_attachment = @course.attachments.build(:filename => 'foo.png', :folder => @root_folder)
+      @visible_attachment.content_type = 'image/png'
+      @visible_attachment.save!
+
+      @attachment = @course.attachments.build(:filename => 'foo2.png', :folder => @sub_folder)
+      @attachment.content_type = 'image/png'
+      @attachment.save!
+    end
+
+    it "should show image files if their containing folder is locked" do
+      @sub_folder.locked = true
+      @sub_folder.save!
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
+      wait_for_ajaximations
+      ff('.image_list img.img').count.should == 2
+    end
+
+    it "should show image files if their containing folder is hidden" do
+      @sub_folder.workflow_state = 'hidden'
+      @sub_folder.save!
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
+      wait_for_ajaximations
+      ff('.image_list img.img').count.should == 2
+    end
+
+    it "should show image files if the files navigation tab is hidden" do
+      @course.tab_configuration = [{:id => Course::TAB_FILES, :hidden => true}]
+      @course.save!
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
+      wait_for_ajaximations
+      ff('.image_list img.img').count.should == 2
+    end
+
+    it "should show image files if they are hidden" do
+      @attachment.file_state = 'hidden'
+      @attachment.save!
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
+      wait_for_ajaximations
+      ff('.image_list img.img').count.should == 2
+    end
+
+    it "should show image files if they are locked" do
+      @attachment.locked = true
+      @attachment.save!
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
+      wait_for_ajaximations
+      ff('.image_list img.img').count.should == 2
+    end
+  end
 end

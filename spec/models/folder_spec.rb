@@ -97,5 +97,20 @@ describe Folder do
     f.active_file_attachments.should be_include(a)
     f.active_file_attachments.should_not be_include(nil_a)
   end
-  
+
+  it "should implement the not_locked scope correctly" do
+    not_locked = [
+      @course.folders.create!(:name => "not locked 1"),
+      @course.folders.create!(:name => "not locked 2", :locked => false),
+      @course.folders.create!(:name => "not locked 3", :lock_at => 1.days.from_now),
+      @course.folders.create!(:name => "not locked 4", :lock_at => 2.days.ago, :unlock_at => 1.days.ago)
+    ]
+    locked = [
+      @course.folders.create!(:name => "locked 1", :locked => true),
+      @course.folders.create!(:name => "locked 2", :lock_at => 1.days.ago),
+      @course.folders.create!(:name => "locked 3", :lock_at => 1.days.ago, :unlock_at => 1.days.from_now)
+    ]
+    @course.folders.map(&:id).sort.should == (not_locked + locked).map(&:id).sort
+    @course.folders.not_locked.map(&:id).sort.should == (not_locked).map(&:id).sort
+  end
 end
