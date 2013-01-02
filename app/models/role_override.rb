@@ -605,6 +605,12 @@ class RoleOverride < ActiveRecord::Base
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
       },
+      :view_jobs => {
+          :label => lambda { t('permissions.view_jobs', "View background jobs") },
+          :account_only => :site_admin,
+          :true_for => %w(AccountAdmin),
+          :available_to => %w(AccountAdmin AccountMembership),
+      },
       :view_error_reports => {
         :label => lambda { t('permissions.view_error_reports', "View error reports") },
         :account_only => :site_admin,
