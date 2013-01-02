@@ -162,9 +162,10 @@ define [
                 # If there is not a reserve_url set, then it is an
                 # actual, scheduled event and not just a placeholder.
                 keep = true
-              else if event.calendarEvent.child_events_count > 0 && !event.calendarEvent.reserved
+              else if event.calendarEvent.child_events_count > 0 && !event.calendarEvent.reserved && event.can_edit
                 # If this *is* a placeholder, and it has child events, and it's not reserved by me,
-                # that means people have signed up for it, so we want to display it.
+                # that means people have signed up for it, so we want to display it if I am able to
+                #  manage it (as a teacher or TA might)
                 keep = true
               else
                 keep = false
