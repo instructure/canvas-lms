@@ -362,6 +362,7 @@ define([
         var $question = $(this).parents(".question");
         $question.toggleClass('marked');
         $("#list_" + $question.attr('id')).toggleClass('marked');
+        quizSubmission.updateSubmission();
       })
       .delegate(".question_input", 'change', function(event, update, changedMap) {
         var $this = $(this),
