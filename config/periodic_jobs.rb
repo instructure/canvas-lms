@@ -105,3 +105,7 @@ Delayed::Periodic.cron 'Attachment.do_notifications', '*/10 * * * *', :priority 
     Attachment.do_notifications
   end
 end
+
+Dir[Rails.root.join('vendor', 'plugins', '*', 'config', 'periodic_jobs.rb')].each do |plugin_periodic_jobs|
+  require plugin_periodic_jobs
+end
