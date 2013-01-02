@@ -1,7 +1,6 @@
 module AcademicBenchmark
 
 class Standard
-  TITLE_MAX_LENGTH = 50
   def initialize(data, parent=nil)
     @data = data
     @parent = parent
@@ -89,9 +88,9 @@ class Standard
 
   def build_title
     if num
-      build_num_title + " - " + (title || (description && (description[0..TITLE_MAX_LENGTH])))
+      build_num_title + " - " + (title || cropped_description)
     else
-      title || (description && (description[0..50]))
+      title || cropped_description
     end
   end
 
@@ -101,6 +100,11 @@ class Standard
 
   def description
     get_meta_field("descr")
+  end
+
+  def cropped_description
+    # get the first 50 chars of description in a utf-8 friendly way
+    description && description[/.{0,50}/u]
   end
 
   def name

@@ -450,34 +450,33 @@ class AssessmentQuestion < ActiveRecord::Base
       next unless assmnt['questions']
       assmnt['questions'].each do |q|
         if q["question_type"] == "question_reference"
-          bank_map[q['migration_id']] = assmnt['title'] if q['migration_id']
+          bank_map[q['migration_id']] = [assmnt['title'], assmnt['migration_id']] if q['migration_id']
         elsif q["question_type"] == "question_group"
           q['questions'].each do |ref|
-            bank_map[ref['migration_id']] = assmnt['title'] if ref['migration_id']
+            bank_map[ref['migration_id']] = [assmnt['title'], assmnt['migration_id']] if ref['migration_id']
           end
         end
       end
     end
-
     if migration.to_import('assessment_questions') != false || (to_import && !to_import.empty?)
-      if check = questions.first
-        # we don't re-migrate questions
-        if migration.context.assessment_questions.scoped(:conditions => {:migration_id => check['migration_id']}).size > 0
-          return question_data
-        end
+
+      questions_to_update = migration.context.assessment_questions.scoped(:conditions => {:migration_id => questions.collect{|q| q['migration_id']}})
+      questions_to_update.each do |question_to_update|
+        questions.find{|q| q['migration_id'].eql?(question_to_update.migration_id)}['assessment_question_id'] = question_to_update.id
       end
+
       logger.debug "adding #{total} assessment questions"
 
       banks = {}
       questions.each do |question|
+        question[:question_bank_name] = nil if question[:question_bank_name] == ''
+        question[:question_bank_name], question[:question_bank_migration_id] = bank_map[question[:migration_id]] if question[:question_bank_name].blank?
+        question[:question_bank_name] ||= migration.question_bank_name
+        question[:question_bank_name] ||= AssessmentQuestionBank.default_imported_title
         if question[:assessment_question_migration_id]
           question_data[:qq_data][question['migration_id']] = question
           next
         end
-        question[:question_bank_name] = nil if question[:question_bank_name] == ''
-        question[:question_bank_name] ||= bank_map[question[:migration_id]]
-        question[:question_bank_name] ||= migration.question_bank_name
-        question[:question_bank_name] ||= AssessmentQuestionBank.default_imported_title
         hash_id = "#{question[:question_bank_id]}_#{question[:question_bank_name]}"
         if !banks[hash_id]
           unless bank = migration.context.assessment_question_banks.find_by_title_and_migration_id(question[:question_bank_name], question[:question_bank_id])
@@ -491,7 +490,7 @@ class AssessmentQuestion < ActiveRecord::Base
         
         begin
           question = AssessmentQuestion.import_from_migration(question, migration.context, banks[hash_id])
-          
+
           # If the question appears to have links, we need to translate them so that file links point
           # to the AssessmentQuestion. Ideally we would just do this before saving the question, but
           # the link needs to include the id of the AQ, which we don't have until it's saved. This will
@@ -516,21 +515,31 @@ class AssessmentQuestion < ActiveRecord::Base
     if !bank
       hash[:question_bank_name] = nil if hash[:question_bank_name] == ''
       hash[:question_bank_name] ||= AssessmentQuestionBank::default_imported_title
-      unless bank = AssessmentQuestionBank.find_by_context_type_and_context_id_and_title_and_migration_id(context.class.to_s, context.id, hash[:question_bank_name], hash[:question_bank_id])
+      migration_id = hash[:question_bank_id] || hash[:question_bank_migration_id]
+      unless bank = AssessmentQuestionBank.find_by_context_type_and_context_id_and_title_and_migration_id(context.class.to_s, context.id, hash[:question_bank_name], migration_id)
         bank ||= context.assessment_question_banks.new
         bank.title = hash[:question_bank_name]
-        bank.migration_id = hash[:question_bank_id]
+        bank.migration_id = migration_id
         bank.save!
       end
     end
+    hash.delete(:question_bank_migration_id) if hash.has_key?(:question_bank_migration_id)
     context.imported_migration_items << bank if context.imported_migration_items && !context.imported_migration_items.include?(bank)
     prep_for_import(hash, context)
     question_data = AssessmentQuestion.connection.quote hash.to_yaml
     question_name = AssessmentQuestion.connection.quote hash[:question_name]
-    query = "INSERT INTO assessment_questions (name, question_data, workflow_state, created_at, updated_at, assessment_question_bank_id, migration_id)"
-    query += " VALUES (#{question_name},#{question_data},'active', '#{Time.now.to_s(:db)}', '#{Time.now.to_s(:db)}', #{bank.id}, '#{hash[:migration_id]}')"
-    id = AssessmentQuestion.connection.insert(query)
-    hash['assessment_question_id'] = id
+    if id = hash['assessment_question_id']
+      query = "UPDATE assessment_questions"
+      query += " SET name = #{question_name}, question_data = #{question_data}, workflow_state = 'active', created_at = '#{Time.now.to_s(:db)}',"
+      query += " updated_at = '#{Time.now.to_s(:db)}', assessment_question_bank_id = #{bank.id}"
+      query += " WHERE id = #{id}"
+      AssessmentQuestion.connection.execute(query)
+    else
+      query = "INSERT INTO assessment_questions (name, question_data, workflow_state, created_at, updated_at, assessment_question_bank_id, migration_id)"
+      query += " VALUES (#{question_name},#{question_data},'active', '#{Time.now.to_s(:db)}', '#{Time.now.to_s(:db)}', #{bank.id}, '#{hash[:migration_id]}')"
+      id = AssessmentQuestion.connection.insert(query)
+      hash['assessment_question_id'] = id
+    end
     hash
   end
   

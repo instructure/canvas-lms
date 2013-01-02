@@ -282,7 +282,7 @@ describe "account" do
 
     def submit_input(form_element, input_field_css, input_text, expect_new_page_load = true)
       form_element.find_element(:css, input_field_css).send_keys(input_text)
-      go_button = form_element.find_element(:css, '.button')
+      go_button = form_element.find_element(:css, 'button')
       if expect_new_page_load
         expect_new_page_load { go_button.click }
       else

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 Instructure, Inc.
+ * Copyright (C) 2011 - 2012 Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -18,117 +18,15 @@
 /*jshint evil:true*/
 
 define([
-  'jquery' /* $ */,
-  'jquery.instructure_forms' /* formSubmit, defaultAjaxError */
-], function($) {
+  'INST' /* INST */,
+  'jquery' /* $ */
+], function(INST, $) {
 
   $.originalGetJSON = $.getJSON;
   $.getJSON = function(url, data, callback) {
     var xhr = $.originalGetJSON(url, data, callback);
     $.ajaxJSON.storeRequest(xhr, url, 'GET', data);
     return xhr;
-  };
-  var assert_option = function(data, arg) {
-    if(!data[arg]) {
-      throw arg + " option is required";
-    }
-  };
-  $.ajaxJSONPreparedFiles = function(options) {
-    assert_option(options, 'context_code');
-    var list = [];
-    var $this = this;
-    var pre_list = options.files || options.file_elements || [];
-    for(var idx = 0; idx < pre_list.length; idx++) {
-      var item = pre_list[idx];
-      item.name = (item.value || item.name).split(/(\/|\\)/).pop();
-      list.push(item);
-    }
-    var attachments = [];
-    var ready = function() {
-      var data = options.formDataTarget == 'url' ? options.formData : {};
-      if(options.handle_files) {
-        var result = attachments;
-        if(options.single_file) {
-          result = attachments[0];
-        }
-        data = options.handle_files.call(this, result, data);
-      }
-      if(options.url && options.success && data !== false) {
-        $.ajaxJSON(options.url, options.method, data, options.success, options.error);
-      }
-    };
-    var uploadFile = function(parameters, file) {
-      $.ajaxJSON(options.uploadDataUrl || "/files/pending", 'POST', parameters, function(data) {
-        try {
-        if(data && data.upload_url) {
-          var post_params = data.upload_params;
-          var old_name = $(file).attr('name');
-          $(file).attr('name', data.file_param);
-          $.ajaxJSONFiles(data.upload_url, 'POST', post_params, $(file), function(data) {
-            attachments.push(data);
-            $(file).attr('name', old_name);
-            next.call($this);
-          }, function(data) {
-            $(file).attr('name', old_name);
-            (options.upload_error || options.error).call($this, data);
-          }, {onlyGivenParameters: data.remote_url});
-        } else {
-          (options.upload_error || options.error).call($this, data);
-        }
-        } catch(e) {
-          var ex = e;
-        }
-      }, function() { 
-        return (options.upload_error || options.error).apply(this, arguments);
-      });
-    };
-    var next = function() {
-      var item = list.shift();
-      if(item) {
-        uploadFile.call($this, $.extend({
-          'attachment[folder_id]': options.folder_id,
-          'attachment[intent]': options.intent,
-          'attachment[asset_string]': options.asset_string,
-          'attachment[filename]': item.name,
-          'attachment[context_code]': options.context_code
-        }, options.formDataTarget == 'uploadDataUrl' ? options.formData : {}), item);
-      } else {
-        ready.call($this);
-      }
-    };
-    next.call($this);
-  };
-  $.ajaxJSONFiles = function(url, submit_type, formData, files, success, error, options) {
-    var $newForm = $(document.createElement("form"));
-    $newForm.attr('action', url).attr('method', submit_type);
-    if(!formData.authenticity_token) {
-      formData.authenticity_token = $("#ajax_authenticity_token").text();
-    }
-    var fileNames = {};
-    files.each(function() {
-      fileNames[$(this).attr('name')] = true;
-    });
-    for(var idx in formData) {
-      if(!fileNames[idx]) {
-        var $input = $(document.createElement('input'));
-        $input.attr('type', 'hidden').attr('name', idx).attr('value', formData[idx]);
-        $newForm.append($input);
-      }
-    }
-    files.each(function() {
-      var $newFile = $(this).clone(true);
-      $(this).after($newFile);
-      $newForm.append($(this));
-      $(this).removeAttr('id');
-    });
-    $("body").append($newForm.hide());
-    $newForm.formSubmit({
-      fileUpload: true,
-      success: success,
-      onlyGivenParameters: options ? options.onlyGivenParameters : false,
-      error: error
-    });
-    $newForm.submit();
   };
   // Wrapper for default $.ajax behavior.  On error will call
   // the default error method if no error method is provided.
@@ -222,5 +120,27 @@ define([
     }
     return null;
   };
-  
+
+  // Defines a default error for all ajax requests.  Will always be called
+  // in the development environment, and as a last-ditch error catching
+  // otherwise.  See "ajax_errors.js"
+  $.fn.defaultAjaxError = function(func) {
+    $.fn.defaultAjaxError.object = this;
+    $.fn.defaultAjaxError.func = function(event, request, settings, error) {
+      var inProduction = (INST.environment == "production");
+      var unhandled = ($.inArray(request, $.ajaxJSON.unhandledXHRs) != -1);
+      var ignore = ($.inArray(request, $.ajaxJSON.ignoredXHRs) != -1);
+      if((!inProduction || unhandled) && !ignore) {
+        $.ajaxJSON.unhandledXHRs = $.grep($.ajaxJSON.unhandledXHRs, function(xhr, i) {
+          return xhr != request;
+        });
+        var debugOnly = false;
+        if(!unhandled) {
+          debugOnly = true;
+        }
+        func.call(this, event, request, settings, error, debugOnly);
+      }
+    };
+    this.ajaxError($.fn.defaultAjaxError.func);
+  };
 });

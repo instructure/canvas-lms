@@ -24,8 +24,8 @@
         </label>
 
         <div class="button-container">
-          <button type="submit" class="button"><%= t 'buttons.update', 'Update Group' %></button>
-          <a href="<%= context_url(@context, :context_url) %>" class="button button-secondary"><%= t '#buttons.cancel', 'Cancel' %></a>
+          <button type="submit" class="btn"><%= t 'buttons.update', 'Update Group' %></button>
+          <a href="<%= context_url(@context, :context_url) %>" class="btn button-secondary"><%= t '#buttons.cancel', 'Cancel' %></a>
         </div>
       <% end %>
     </div>
@@ -37,7 +37,7 @@
       </p>
       <% form_tag api_v1_group_url(@group), :method => 'PUT', :class => 'group_avatar_form' do %>
         <p><input type="file" name="avatar" class="avatar_file"></p>
-        <p><button type="submit" class="button small-button">Change</button>
+        <p><button type="submit" class="btn btn-small">Change</button>
         <%= link_to "Cancel", "#", :class => "cancel_avatar" %></p>
       <% end %>
 
@@ -45,7 +45,7 @@
         <label for=invite_email>Invite someone to canvas to join this group
           <input type=text name=email type=email id=invite_email placeholder="E-Mail Address">
         </label>
-        <button type=submit class="button small-button">Invite</button>
+        <button type=submit class="btn btn-small">Invite</button>
       <% end %>
     </div>
   </div>

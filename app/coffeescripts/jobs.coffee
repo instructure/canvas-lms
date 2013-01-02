@@ -198,7 +198,7 @@ define [
       if !selected_job || selected_job.handler
         cb()
       else
-        $.ajaxJSON "#{@options.job_url}/#{selected_job.id}", "GET", {}, (data) =>
+        $.ajaxJSON "#{@options.job_url}/#{selected_job.id}", "GET", {flavor: @options.flavor}, (data) =>
           selected_job.handler = data.handler
           selected_job.last_error = data.last_error
           fillin_job_data(selected_job)

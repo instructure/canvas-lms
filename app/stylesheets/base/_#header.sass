@@ -101,10 +101,7 @@
         text-decoration: underline
 
     .unread-messages-count
-      text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25)
-      +border-radius(8px)
-      background-color: $highlight-color
-      padding: 1px 6px
+      +count-bubble
   #identity-help-container a
     padding: 1px 8px
 
@@ -133,12 +130,8 @@
 
   .menu-item-no-drop:hover
     text-decoration: underline
-  .menu-item-title
-    background: url("/images/canvas/menu_arrow_white.png") no-repeat right 17px
-    padding-right: 27px
   &.hover
     .menu-item-title
-      background-image: url("/images/canvas/menu_arrow.png")
       text-shadow: none
       color: $menu-text-color
       border-top-color: $menu-border-color

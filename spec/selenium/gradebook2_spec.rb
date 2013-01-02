@@ -219,7 +219,7 @@ describe "gradebook2" do
 
     dialog = open_comment_dialog
     set_value(dialog.find_element(:id, "add_a_comment"), comment_text)
-    f("form.submission_details_add_comment_form.clearfix > button.button").click
+    f("form.submission_details_add_comment_form.clearfix > button.btn").click
     wait_for_ajaximations
 
     #make sure it is still there if you reload the page
@@ -252,7 +252,7 @@ describe "gradebook2" do
     dialog = open_comment_dialog(3)
     set_value(dialog.find_element(:id, "add_a_comment"), comment_text)
     dialog.find_element(:id, "group_comment").click
-    f("form.submission_details_add_comment_form.clearfix > button.button").click
+    f("form.submission_details_add_comment_form.clearfix > button.btn").click
     wait_for_ajaximations
 
     #make sure it's on the other student's submission
@@ -561,13 +561,14 @@ describe "gradebook2" do
       f('input[name=submissions_zip]').send_keys(fixtureFile)
 
       # And I upload it
-      fj('button:contains("Upload Files")').click
-
-      # And I wait for the upload
-      sleep 1
+      expect_new_page_load do
+        fj('button:contains("Upload Files")').click
+        # And I wait for the upload
+        wait_for_ajax_requests
+      end
 
       # Then I should see a message indicating the file was processed
-      f('body').should include_text 'Attached files to the following user submissions'
+      f('#content h3').should include_text 'Attached files to the following user submissions'
     end
   end
 end

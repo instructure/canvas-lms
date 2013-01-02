@@ -1095,11 +1095,13 @@ describe DiscussionTopicsController, :type => :integration do
       student_in_course(:active_all => true)
       call_mark_topic_read(@course, @topic)
       response.status.should == '204 No Content'
+      @topic.reload
       @topic.read?(@user).should be_true
       @topic.unread_count(@user).should == 2
 
       call_mark_topic_unread(@course, @topic)
       response.status.should == '204 No Content'
+      @topic.reload
       @topic.read?(@user).should be_false
       @topic.unread_count(@user).should == 2
     end
@@ -1108,11 +1110,13 @@ describe DiscussionTopicsController, :type => :integration do
       student_in_course(:active_all => true)
       call_mark_topic_read(@course, @topic)
       response.status.should == '204 No Content'
+      @topic.reload
       @topic.read?(@user).should be_true
       @topic.unread_count(@user).should == 2
 
       call_mark_topic_read(@course, @topic)
       response.status.should == '204 No Content'
+      @topic.reload
       @topic.read?(@user).should be_true
       @topic.unread_count(@user).should == 2
     end
@@ -1161,6 +1165,7 @@ describe DiscussionTopicsController, :type => :integration do
                       { :controller => 'discussion_topics_api', :action => 'mark_all_read', :format => 'json',
                         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
       response.status.should == '204 No Content'
+      @topic.reload
       @topic.read?(@user).should be_true
       @entry.read?(@user).should be_true
       @topic.unread_count(@user).should == 0
@@ -1169,6 +1174,7 @@ describe DiscussionTopicsController, :type => :integration do
                       { :controller => 'discussion_topics_api', :action => 'mark_all_unread', :format => 'json',
                         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
       response.status.should == '204 No Content'
+      @topic.reload
       @topic.read?(@user).should be_false
       @entry.read?(@user).should be_false
       @topic.unread_count(@user).should == 2

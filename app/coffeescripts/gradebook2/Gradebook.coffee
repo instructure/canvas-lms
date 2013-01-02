@@ -37,10 +37,12 @@ define [
     columnWidths =
       assignment:
         min: 10
-        max: 200
+        default_max: 200
+        max: 400
       assignmentGroup:
         min: 35
-        max: 200
+        default_max: 200
+        max: 400
       total:
         min: 85
         max: 100
@@ -652,7 +654,7 @@ define [
                   SubmissionCell
           minWidth: columnWidths.assignment.min,
           maxWidth: columnWidths.assignment.max,
-          width: testWidth(assignment.name, minWidth, columnWidths.assignment.max),
+          width: testWidth(assignment.name, minWidth, columnWidths.assignment.default_max),
           sortable: true
           toolTip: assignment.name
           type: 'assignment'
@@ -684,7 +686,7 @@ define [
           object: group
           minWidth: columnWidths.assignmentGroup.min,
           maxWidth: columnWidths.assignmentGroup.max,
-          width: testWidth(group.name, columnWidths.assignmentGroup.min, columnWidths.assignmentGroup.max)
+          width: testWidth(group.name, columnWidths.assignmentGroup.min, columnWidths.assignmentGroup.default_max)
           cssClass: "meta-cell assignment-group-cell",
           sortable: true
           type: 'assignment_group'

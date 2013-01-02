@@ -27,16 +27,8 @@ require File.dirname(__FILE__) + '/mocha_extensions'
 
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
 
-ALL_MODELS = (ActiveRecord::Base.send(:subclasses) +
-    Dir["#{RAILS_ROOT}/app/models/*", "#{RAILS_ROOT}/vendor/plugins/*/app/models/*"].collect { |file|
-      model = File.basename(file, ".*").camelize.constantize
-      next unless model < ActiveRecord::Base
-      model
-    }).compact.uniq.reject { |model| model.superclass != ActiveRecord::Base || (model.respond_to?(:tableless?) && model.tableless?) }
-ALL_MODELS << Version
-ALL_MODELS << Delayed::Backend::ActiveRecord::Job::Failed
-ALL_MODELS << Delayed::Backend::ActiveRecord::Job
-
+# deprecated
+ALL_MODELS = ActiveRecord::Base.all_models
 
 # rspec aliases :describe to :context in a way that it's pretty much defined
 # globally on every object. :context is already heavily used in our application,
@@ -69,7 +61,7 @@ def truncate_table(model)
 end
 
 def truncate_all_tables
-  models_by_connection = ALL_MODELS.group_by { |m| m.connection }
+  models_by_connection = ActiveRecord::Base.all_models.group_by { |m| m.connection }
   models_by_connection.each do |connection, models|
     if connection.adapter_name == "PostgreSQL"
       connection.execute("TRUNCATE TABLE #{models.map(&:table_name).map { |t| connection.quote_table_name(t) }.join(',')}")

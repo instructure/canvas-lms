@@ -21,12 +21,10 @@
 class UnzipAttachment
   THINGS_TO_IGNORE_REGEX  = /^(__MACOSX|thumbs\.db|\.DS_Store)$/
 
-  class << self
-    def process(opts={})
-      @ua = new(opts)
-      @ua.process
-      @ua
-    end
+  def self.process(opts={})
+    @ua = new(opts)
+    @ua.process
+    @ua
   end
 
   attr_reader :context, :filename, :root_folders, :context_files_folder
@@ -36,6 +34,7 @@ class UnzipAttachment
   def course
     self.context
   end
+
   def course_files_folder
     self.context_files_folder
   end
@@ -88,119 +87,203 @@ class UnzipAttachment
   # added to the root_folder/some_entry folder in the database
   # Tempfile will unlink its new file as soon as f is garbage collected.
   def process
-    cnt = 0
-    Attachment.skip_touch_context(true)
-    Attachment.skip_3rd_party_submits(true)
-    FileInContext.queue_files_to_delete(true)
-    paths = []
-    Zip::ZipFile.open(self.filename).each do |entry|
-      cnt += 1
-      paths << entry.name
-    end
-    cnt = 1 if cnt == 0
-    idx = 0
-    @attachments = []
-    last_position = @context.attachments.active.map(&:position).compact.last || 0
-    path_positions = {}
-    id_positions = {}
-    paths.sort.each_with_index{|p, idx| path_positions[p] = idx + last_position }
-    Zip::ZipFile.open(self.filename).each do |entry|
-      idx += 1
-      next if entry.directory?
-      next if entry.name =~ THINGS_TO_IGNORE_REGEX
-      next if @valid_paths && !@valid_paths.include?(entry.name)
 
-      list = File.split(@context_files_folder.full_name) rescue []
-      list.shift if list[0] == '.'
-      zip_list = File.split(entry.name)
-      zip_list.shift if zip_list[0] == '.'
-      filename = zip_list.pop
-      list += zip_list
-      folder_name = list.join('/')
-      folder = Folder.assert_path(folder_name, @context)
-      pct = idx.to_f / cnt.to_f
-      update_progress(pct)
-      # Hyphenate the path.  So, /some/file/path becomes some-file-path
-      # Since Tempfile guarantees that the names are unique, we don't
-      # have to worry about what this name actually is.
-      f = Tempfile.new(filename)
-      path = f.path
-      
-      begin
-        entry.extract(path) { true }
-        # This is where the attachment actually happens.  See file_in_context.rb
-        attachment = nil
-        begin
-          attachment = FileInContext.attach(self.context, path, display_name(entry.name), folder, File.split(entry.name).last, @rename_files)
-        rescue
-          attachment = FileInContext.attach(self.context, path, display_name(entry.name), folder, File.split(entry.name).last, @rename_files)
+    with_unzip_configuration do
+      zip_stats.validate_against(context)
+
+      @attachments = []
+      id_positions = {}
+      path_positions = zip_stats.paths_with_positions(last_position)
+      Zip::ZipFile.open(self.filename).each_with_index do |entry, index|
+        next if should_skip?(entry)
+
+        folder_path_array = path_elements_for(@context_files_folder.full_name)
+        entry_path_array = path_elements_for(entry.name)
+        filename = entry_path_array.pop
+
+        folder_path_array += entry_path_array
+        folder_name = folder_path_array.join('/')
+        folder = Folder.assert_path(folder_name, @context)
+
+        update_progress(zip_stats.percent_complete(index))
+
+        # Hyphenate the path.  So, /some/file/path becomes some-file-path
+        # Since Tempfile guarantees that the names are unique, we don't
+        # have to worry about what this name actually is.
+        Tempfile.open(filename) do |f|
+          begin
+            entry.extract(f.path) { true }
+            # This is where the attachment actually happens.  See file_in_context.rb
+            attachment = attach(f.path, entry, folder)
+            id_positions[attachment.id] = path_positions[entry.name]
+            if migration_id = @migration_id_map[entry.name]
+              attachment.update_attribute(:migration_id, migration_id)
+            end
+            @attachments << attachment if attachment
+          rescue => e
+            @logger.warn "Couldn't unzip archived file #{f.path}: #{e.message}" if @logger
+          end
         end
-        id_positions[attachment.id] = path_positions[entry.name]
-        if migration_id = @migration_id_map[entry.name]
-          attachment.update_attribute(:migration_id, migration_id)
-        end
-        @attachments << attachment if attachment
-      rescue => e
-        @logger.warn "Couldn't unzip archived file #{path}: #{e.message}" if @logger
-      ensure
-        f.close
+
       end
+      update_attachment_positions(id_positions)
     end
-    updates = []
-    id_positions.each do |id, position|
-      updates << "WHEN id=#{id} THEN #{position}" if id && position
-    end
-    Attachment.connection.execute("UPDATE attachments SET position=CASE #{updates.join(" ")} ELSE position END WHERE id IN (#{id_positions.keys.join(",")})") unless updates.empty?
-    Attachment.skip_touch_context(false)
-    Attachment.skip_3rd_party_submits(false)
-    FileInContext.queue_files_to_delete(false)
-    FileInContext.destroy_queued_files
-    scribdable_attachments = @attachments.select {|a| a.scribdable? }
-    unless scribdable_attachments.blank?
-      Attachment.send_later_enqueue_args(:submit_to_scribd, { :strand => 'scribd', :max_attempts => 1 }, scribdable_attachments.map(&:id))
-    end
+
+    queue_scribd_submissions(@attachments)
     @context.touch
     update_progress(1.0)
   end
 
+
+  def zip_stats
+    @zip_stats ||= ZipFileStats.new(filename)
+  end
+
+  def update_attachment_positions(id_positions)
+    updates = id_positions.inject([]) do |memo, (id, position)|
+      returning(memo){ |m| m << "WHEN id=#{id} THEN #{position}" if id && position }
+    end
+
+    if updates.any?
+      sql = "UPDATE attachments SET position=CASE #{updates.join(" ")} ELSE position END WHERE id IN (#{id_positions.keys.join(",")})"
+      Attachment.connection.execute(sql)
+    end
+  end
+
+  def queue_scribd_submissions(attachments)
+    scribdable_ids = attachments.select(&:scribdable?).map(&:id)
+    if scribdable_ids.any?
+      Attachment.send_later_enqueue_args(:submit_to_scribd, { :strand => 'scribd', :max_attempts => 1 }, scribdable_ids)
+    end
+  end
+
+  def attach(path, entry, folder)
+    begin
+      FileInContext.attach(self.context, path, display_name(entry.name), folder, File.split(entry.name).last, @rename_files)
+    rescue
+      FileInContext.attach(self.context, path, display_name(entry.name), folder, File.split(entry.name).last, @rename_files)
+    end
+  end
+
+  def with_unzip_configuration
+    Attachment.skip_touch_context(true)
+    Attachment.skip_3rd_party_submits(true)
+    FileInContext.queue_files_to_delete(true)
+    begin
+      yield
+    ensure
+      Attachment.skip_touch_context(false)
+      Attachment.skip_3rd_party_submits(false)
+      FileInContext.queue_files_to_delete(false)
+      FileInContext.destroy_queued_files
+    end
+  end
+
+  def last_position
+    @last_position ||= (@context.attachments.active.map(&:position).compact.last || 0)
+  end
+
+  def should_skip?(entry)
+    entry.directory? ||
+    entry.name =~ THINGS_TO_IGNORE_REGEX ||
+    (@valid_paths && !@valid_paths.include?(entry.name))
+  end
+
+  def path_elements_for(path)
+    list = File.split(path) rescue []
+    list.shift if list[0] == '.'
+    list
+  end
+
   protected
 
-    # Creates a title-ized name from a path.
-    # So, display_name(/tmp/foo/bar_baz) generates 'Bar baz'
-    def display_name(path)
-      display_name = File.split(path).last
-    end
+  # Creates a title-ized name from a path.
+  # So, display_name(/tmp/foo/bar_baz) generates 'Bar baz'
+  def display_name(path)
+    display_name = File.split(path).last
+  end
 
-    # Finds the folder in the database, creating the path if necessary
-    def infer_folder(path)
-      list = path.split('/')
-      current = (@root_directory ||= folders.root_directory)
-      # For every directory in the path...
-      # (-2 means all entries but the last, which should be a filename)
-      list[0..-2].each do |dir|
-        if new_dir = current.sub_folders.find_by_name(dir)
-          current = new_dir
-        else
-          current = assert_folder(current, dir)
-        end
+  # Finds the folder in the database, creating the path if necessary
+  def infer_folder(path)
+    list = path.split('/')
+    current = (@root_directory ||= folders.root_directory)
+    # For every directory in the path...
+    # (-2 means all entries but the last, which should be a filename)
+    list[0..-2].each do |dir|
+      if new_dir = current.sub_folders.find_by_name(dir)
+        current = new_dir
+      else
+        current = assert_folder(current, dir)
       end
-      current
+    end
+    current
+  end
+
+  # Actually creates the folder in the database.
+  def assert_folder(root, dir)
+    folder = Folder.new(:parent_folder_id => root.id, :name => dir)
+    folder.context = self.context
+    folder.save!
+    folder
+  end
+
+  # A cached list of folders that we know about.
+  # Used by infer_folder to know whether to create a folder or not.
+  def folders(reset=false)
+    @folders = nil if reset
+    return @folders if @folders
+    root_folders = Folder.root_folders(self.context)
+    @folders = OpenStruct.new(:root_directory => self.context_files_folder)
+  end
+end
+
+
+#this is just a helper class that wraps an archive
+#for just the duration of this operation; it doesn't
+#quite seem appropriate to move it to it's own file
+#since it's such an integral part of the unzipping 
+#process
+class ZipFileStats
+  attr_reader :file_count, :total_size, :paths, :filename
+
+  def initialize(filename)
+    @filename = filename
+    @paths = []
+    @file_count = 0
+    @total_size = 0
+    process!
+  end
+
+  def validate_against(context)
+    max = Setting.get_cached('max_zip_file_count', '100000').to_i
+    if file_count > max
+      raise ArgumentError, "Zip File cannot have more than #{max} entries"
     end
 
-    # Actually creates the folder in the database.
-    def assert_folder(root, dir)
-      folder = Folder.new(:parent_folder_id => root.id, :name => dir)
-      folder.context = self.context
-      folder.save!
-      folder
+    quota_hash = Attachment.get_quota(context)
+    if quota_hash[:quota] > 0 && (quota_hash[:quota_used] + total_size) > quota_hash[:quota]
+      raise Attachment::OverQuotaError, "Zip file would exceed quota limit"
     end
+  end
 
-    # A cached list of folders that we know about.
-    # Used by infer_folder to know whether to create a folder or not.
-    def folders(reset=false)
-      @folders = nil if reset
-      return @folders if @folders
-      root_folders = Folder.root_folders(self.context)
-      @folders = OpenStruct.new(:root_directory => self.context_files_folder)
+  def paths_with_positions(base)
+    positions_hash = {}
+    paths.sort.each_with_index{|p, idx| positions_hash[p] = idx + base }
+    positions_hash
+  end
+
+  def percent_complete(current_index)
+    (current_index + 1).to_f / file_count.to_f
+  end
+
+  private
+  def process!
+    Zip::ZipFile.open(filename).each do |entry|
+      @file_count += 1
+      @total_size += [entry.size, Attachment.minimum_size_for_quota].max
+      @paths << entry.name
     end
+    @file_count = 1 if @file_count == 0
+  end
+
 end

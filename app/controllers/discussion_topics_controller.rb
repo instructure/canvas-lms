@@ -396,6 +396,7 @@ class DiscussionTopicsController < ApplicationController
 
       if @topic.update_attributes(discussion_topic_hash)
         log_asset_access(@topic, 'topics', 'topics', 'participate')
+        generate_new_page_view
 
         # handle sort positioning
         if params[:position_after] && @context.grants_right?(@current_user, session, :moderate_forum)
@@ -432,7 +433,7 @@ class DiscussionTopicsController < ApplicationController
               @topic.save!
               assignment.destroy
             end
-          
+
           elsif (@assignment = @topic.assignment || @topic.restore_old_assignment || (@topic.assignment = @context.assignments.build)) &&
                  @assignment.grants_right?(@current_user, session, :update)
             update_api_assignment(@assignment, params[:assignment].merge(@topic.attributes.slice('title')))

@@ -10,8 +10,8 @@
     <div style="float: right; font-size: 0.6em; font-weight: normal;">
       <% if can_do(q, @current_user, :update) %>
         <div>
-          <a href="<%= context_url(@context, :edit_context_quiz_url, q) %>" title="<%= q.survey? ? t('titles.edit_survey', "Edit Survey") : t('titles.edit_quiz', "Edit Quiz") %>" class="edit_quiz_link no-hover"><%= image_tag "edit.png" %></a>
-          <a href="<%= context_url(@context, :context_quiz_url, q) %>" title="<%= q.survey? ? t('titles.delete_survey', "Delete Survey") : t('titles.delete_quiz', "Delete Quiz") %>" class="delete_quiz_link no-hover"><%= image_tag "delete.png" %></a>
+          <a href="<%= context_url(@context, :edit_context_quiz_url, q) %>" title="<%= q.survey? ? t('titles.edit_survey', "Edit Survey") : t('titles.edit_quiz', "Edit Quiz") %>" class="edit_quiz_link no-hover"><i class="icon-edit standalone-icon"></i></a>
+          <a href="<%= context_url(@context, :context_quiz_url, q) %>" title="<%= q.survey? ? t('titles.delete_survey', "Delete Survey") : t('titles.delete_quiz', "Delete Quiz") %>" class="delete_quiz_link no-hover"><i class="icon-trash standalone-icon"></i></a>
         </div>
       <% end %>
     </div>

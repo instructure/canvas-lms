@@ -30,7 +30,8 @@ class Quiz < ActiveRecord::Base
     :show_correct_answers, :time_limit, :allowed_attempts, :scoring_policy, :quiz_type,
     :lock_at, :unlock_at, :due_at, :access_code, :anonymous_submissions, :assignment_group_id,
     :hide_results, :locked, :ip_filter, :require_lockdown_browser,
-    :require_lockdown_browser_for_results, :context, :notify_of_update
+    :require_lockdown_browser_for_results, :context, :notify_of_update,
+    :one_question_at_a_time, :cant_go_back
 
   attr_readonly :context_id, :context_type
   attr_accessor :notify_of_update
@@ -45,7 +46,7 @@ class Quiz < ActiveRecord::Base
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   validates_presence_of :context_id
   validates_presence_of :context_type
-  
+
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
   copy_authorized_links(:description) { [self.context, nil] }
   before_save :build_assignment
@@ -64,6 +65,8 @@ class Quiz < ActiveRecord::Base
   end
 
   def set_defaults
+    self.one_question_at_a_time = false if self.one_question_at_a_time == nil
+    self.cant_go_back = false if self.cant_go_back == nil || self.one_question_at_a_time == false
     self.shuffle_answers = false if self.shuffle_answers == nil
     self.show_correct_answers = true if self.show_correct_answers == nil
     self.allowed_attempts = 1 if self.allowed_attempts == nil
@@ -799,14 +802,16 @@ class Quiz < ActiveRecord::Base
   end
 
   def submissions_for_statistics(include_all_versions=true)
-    for_users = self.context.students.map(&:id)
-    self.quiz_submissions.scoped(:include => [:versions], :conditions => { :user_id => for_users }).
-      map { |qs| if include_all_versions then qs.submitted_versions else qs.latest_submitted_version end }.
-      flatten.
-      compact.
-      select{ |s| s.completed? && s.submission_data.is_a?(Array) }.
-      sort_by(&:updated_at).
-      reverse
+    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+      for_users = self.context.students.map(&:id)
+      self.quiz_submissions.scoped(:include => [:versions], :conditions => { :user_id => for_users }).
+        map { |qs| if include_all_versions then qs.submitted_versions else qs.latest_submitted_version end }.
+        flatten.
+        compact.
+        select{ |s| s.completed? && s.submission_data.is_a?(Array) }.
+        sort_by(&:updated_at).
+        reverse
+    end
   end
   
   def statistics_csv(options={})
@@ -1202,7 +1207,6 @@ class Quiz < ActiveRecord::Base
         item.workflow_state = hash[:available] ? 'available' : 'created'
         item.save
       end
-      return
     end
     item ||= context.quizzes.new
 
@@ -1217,14 +1221,22 @@ class Quiz < ActiveRecord::Base
      :shuffle_answers, :show_correct_answers, :points_possible, :hide_results,
      :access_code, :ip_filter, :scoring_policy, :require_lockdown_browser,
      :require_lockdown_browser_for_results, :anonymous_submissions, 
-     :could_be_locked, :quiz_type].each do |attr|
+     :could_be_locked, :quiz_type, :one_question_at_a_time,
+     :cant_go_back].each do |attr|
       item.send("#{attr}=", hash[attr]) if hash.key?(attr)
     end
     
     item.save!
-
-    if item.quiz_questions.count == 0 && question_data
+    if question_data
       hash[:questions] ||= []
+
+      if question_data[:qq_data]
+        questions_to_update = item.quiz_questions.scoped(:conditions => {:migration_id => question_data[:qq_data].keys})
+        questions_to_update.each do |question_to_update|
+          question_data[:qq_data].values.find{|q| q['migration_id'].eql?(question_to_update.migration_id)}['quiz_question_id'] = question_to_update.id
+        end
+      end
+
       hash[:questions].each_with_index do |question, i|
         case question[:question_type]
           when "question_reference"

@@ -104,12 +104,14 @@ class GradebookUploadsController < ApplicationController
           submission = all_submissions[[assignment.id, sub[:user_id]]]
           submission ||= Submission.new(:assignment => assignment) { |s| s.user_id = sub[:user_id] }
           # grade_to_score expects a string so call to_s here, otherwise things that have a score of zero will return nil
+          # we should really be using Assignment#grade_student here
           score = assignment.grade_to_score(sub[:grade].to_s)
           unless score == submission.score
             old_score = submission.score
             submission.grade = sub[:grade].to_s
             submission.score = score
-            submission.save!
+            submission.grader_id = @current_user.id
+            submission.with_versioning(:explicit => true) { submission.save! }
             submissions_updated_count += 1
             logger.info "updated #{submission.student.name} with score #{submission.score} for assignment: #{submission.assignment.title} old score was #{old_score}"
           end

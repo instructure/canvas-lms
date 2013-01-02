@@ -23,6 +23,7 @@ class Conversation < ActiveRecord::Base
 
   has_many :conversation_participants, :dependent => :destroy
   has_many :conversation_messages, :order => "created_at DESC, id DESC", :dependent => :delete_all
+  has_one :stream_item, :as => :asset
 
   # see also User#messageable_users
   has_many :participants,

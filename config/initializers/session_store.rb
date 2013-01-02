@@ -29,7 +29,12 @@ when :mem_cache_store
 when :redis_session_store
   Bundler.require 'redis'
   config[:key_prefix] ||= config[:key]
-  config[:servers] ||= config[:redis_servers] || Setting.from_config("redis")
+  config[:servers] ||= config[:redis_servers] if config[:redis_servers]
+  redis_config = Setting.from_config("redis")
+  if redis_config
+    config.reverse_merge!(redis_config.symbolize_keys)
+  end
+  config[:db] ||= config[:database]
 end
 
 ActionController::Base.session = config

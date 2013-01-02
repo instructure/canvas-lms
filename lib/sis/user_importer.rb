@@ -154,10 +154,12 @@ module SIS
             end
             pseudo.sis_ssha = ssha_password if !ssha_password.blank?
             pseudo.reset_persistence_token if pseudo.sis_ssha_changed? && pseudo.password_auto_generated
+            user_touched = false
 
             begin
               User.transaction(:requires_new => true) do
                 if user.changed?
+                  user_touched = true
                   raise user.errors.first.join(" ") if !user.save_without_broadcasting && user.errors.size > 0
                 elsif @batch_id
                   @users_to_set_sis_batch_ids << user.id
@@ -207,7 +209,10 @@ module SIS
               cc.path = email
               cc.workflow_state = status_is_active ? 'active' : 'retired'
               newly_active = cc.path_changed? || (cc.active? && cc.workflow_state_changed?)
-              cc.save_without_broadcasting if cc.changed?
+              if cc.changed?
+                cc.save_without_broadcasting
+                user.touch unless user_touched
+              end
               pseudo.sis_communication_channel_id = pseudo.communication_channel_id = cc.id
 
               if newly_active

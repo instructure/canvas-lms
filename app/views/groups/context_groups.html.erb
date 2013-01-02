@@ -4,12 +4,12 @@
   <div class="rs-margin-lr rs-margin-top">
     <% if @context.allow_student_organized_groups %>
       <% if can_do(@context.groups.new, @current_user, :create) %>
-        <a href="#" class="button button-sidebar-wide add_group_link"><%= image_tag "add.png" %> <%= t 'actions.add', 'Start a New Group' %></a>
+        <a href="#" class="btn button-sidebar-wide add_group_link"><%= image_tag "add.png" %> <%= t 'actions.add', 'Start a New Group' %></a>
       <% end %>
     <% else %>
       <%= t :groups_disabled, 'Student-organized groups have been disabled for this course, so you\'ll have to be content with the groups the teacher makes for you.' %>
     <% end %>
-    <a href="<%= context_url(@context, :context_users_url) %>" class="button button-sidebar-wide"><%= image_tag "group.png" %> <%= @context.is_a?(Account) ? t('#buttons.view_account_roster', 'View Account Roster') : t('#buttons.view_course_roster', 'View Course Roster') %></a>
+    <a href="<%= context_url(@context, :context_users_url) %>" class="btn button-sidebar-wide"><%= image_tag "group.png" %> <%= @context.is_a?(Account) ? t('#buttons.view_account_roster', 'View Account Roster') : t('#buttons.view_course_roster', 'View Course Roster') %></a>
   </div>
 <% end %>
 
@@ -83,7 +83,7 @@ TEXT
     </td>
   </tr><tr>
     <td colspan="2">
-      <button type="submit" class="button submit_button"><%= t 'buttons.create', 'Create Group' %></button>
+      <button type="submit" class="btn submit_button"><%= t 'buttons.create', 'Create Group' %></button>
       <button type="button" class="cancel_button button-secondary"><%= t '#buttons.cancel', 'Cancel' %></button>
     </td>
 </table>

@@ -19,11 +19,14 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe CollectionItemsController do
-  before(:all) { Bundler.require :embedly }
+  before(:all) {Bundler.require :embedly}
 
   context "#link_data" do
+    before do 
+      PluginSetting.expects(:settings_for_plugin)
+    end
+
     it "should error if the user isn't logged in" do
-      PluginSetting.expects(:settings_for_plugin).never
       post "/collection_items/link_data", :url => "http://www.example.com/"
       response.status.to_i.should == 401
     end
@@ -45,14 +48,18 @@ describe CollectionItemsController do
     it "should return basic data for free embedly accounts" do
       user_session(user)
       data = OpenObject.new(:title => "t1", :description => "d1", :thumbnail_url => "/1.jpg")
+
       PluginSetting.expects(:settings_for_plugin).with(:embedly).returns({ :api_key => 'test', :plan_type => 'free'})
+
       Embedly::API.any_instance.expects(:oembed).with(
         :url => "http://www.example.com/",
         :autoplay => true,
         :maxwidth => Canvas::Embedly::MAXWIDTH
       ).returns([data])
+
       post "/collection_items/link_data", :url => "http://www.example.com/"
       response.should be_success
+
       json_parse.should == {
         'title' => data.title,
         'description' => data.description,
@@ -65,6 +72,7 @@ describe CollectionItemsController do
     it "should return extended data for paid embedly accounts" do
       user_session(user)
       data = OpenObject.new(:title => "t1", :description => "d1", :images => [{'url' => 'u1'},{'url' => 'u2'}], :object => OpenObject.new(:html => "<iframe src='test'></iframe>"))
+
       PluginSetting.expects(:settings_for_plugin).with(:embedly).returns({ :api_key => 'test', :plan_type => 'paid'})
       Embedly::API.any_instance.expects(:preview).with(
         :url => "http://www.example.com/",

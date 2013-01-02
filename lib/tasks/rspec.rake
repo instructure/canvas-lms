@@ -3,7 +3,7 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
 
   begin
     require 'spec/rake/spectask'
-  rescue MissingSourceFile
+  rescue MissingSourceFile, LoadError
     module Spec
       module Rake
         class SpecTask

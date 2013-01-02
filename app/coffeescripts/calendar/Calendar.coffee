@@ -45,6 +45,7 @@ define [
         "EventDataSource/ajaxStarted" : @ajaxStarted
         "EventDataSource/ajaxEnded" : @ajaxEnded
         "Calendar/refetchEvents" : @refetchEvents
+        'CommonEvent/assignmentSaved' : @updateOverrides
 
       weekColumnFormatter = """
         '<span class="agenda-col-wrapper">
@@ -96,7 +97,9 @@ define [
           fullCalendarParams.month = date.getMonth()
           fullCalendarParams.date = date.getDate()
 
-      @el = $(selector).html calendarAppTemplate(calendar2Only: @options.calendar2Only)
+      @el = $(selector).html calendarAppTemplate(
+        calendar2Only: @options.calendar2Only,
+        showScheduler: @options.showScheduler)
 
       if data.view_name == 'month' || data.view_name == 'agendaWeek'
         radioId = if data.view_name == 'agendaWeek' then 'week' else 'month'
@@ -118,14 +121,15 @@ define [
 
       @scheduler = new Scheduler(".scheduler-wrapper", this)
 
-      # Pre-load the appointment group list, for the badge
-      @dataSource.getAppointmentGroups false, (data) =>
-        required = 0
-        for group in data
-          required += 1 if group.requiring_action
-        @el.find("#calendar-header .counter-badge")
-          .toggle(required > 0)
-          .text(required)
+      if @options.showScheduler
+        # Pre-load the appointment group list, for the badge
+        @dataSource.getAppointmentGroups false, (data) =>
+          required = 0
+          for group in data
+            required += 1 if group.requiring_action
+          @el.find("#calendar-header .counter-badge")
+            .toggle(required > 0)
+            .text(required)
 
       window.setTimeout =>
         if data.view_name == 'scheduler'
@@ -217,10 +221,10 @@ define [
       if event.isDueAtMidnight()
         # show the actual time instead of the midnight fudged time
         element.find('.fc-event-time').html @calendar.fullCalendar('formatDate', event.startDate(), 'h(:mm)t')
-      if event.eventType == 'assignment' && view.name == "agendaWeek"
+      if event.eventType.match(/assignment/) && view.name == "agendaWeek"
         element.height('') # this fixes it so it can wrap and not be forced onto 1 line
           .find('.ui-resizable-handle').remove()
-      if event.eventType == 'assignment'
+      if event.eventType.match(/assignment/)
         element.find('.fc-event-time').html I18n.t('labels.due', 'due')
       if event.eventType == 'calendar_event' && @options?.activateEvent && event.id == "calendar_event_#{@options?.activateEvent}"
         @options.activateEvent = null
@@ -323,6 +327,7 @@ define [
 
     eventSaved: (event) =>
       event.removeClass 'event_pending'
+
       # If we just saved a new event then the id field has changed from what it
       # was in eventSaving. So we need to clear out the old _id that
       # fullcalendar stores for itself because the id has changed.
@@ -341,6 +346,12 @@ define [
         @calendar.fullCalendar('removeEvents', event.id)
       else
         @calendar.fullCalendar('updateEvent', event)
+
+    # When an assignment event is updated, update its related overrides.
+    updateOverrides: (event) =>
+      _.each @dataSource.cache.contexts[event.contextCode()].events, (override, key) ->
+        if key.match(/override/) and event.assignment.id == override.assignment.id
+          override.updateAssignmentTitle(event.title)
 
     visibleContextListChanged: (newList) =>
       @visibleContextList = newList

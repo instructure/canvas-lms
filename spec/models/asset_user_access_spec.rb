@@ -19,15 +19,155 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe AssetUserAccess do
+  before :each do
+    @course = Account.default.courses.create!(:name => 'My Course')
+    @assignment = @course.assignments.create!(:title => 'My Assignment')
+    @user = User.create!
+
+    @asset = factory_with_protected_attributes(AssetUserAccess, :user => @user, :context => @course, :asset_code => @assignment.asset_string)
+    @asset.display_name = @assignment.asset_string
+    @asset.save!
+  end
+
   it "should update existing records that have bad display names" do
-    course = Account.default.courses.create!(:name => 'My Course')
-    assignment = course.assignments.create!(:title => 'My Assignment')
-    u = User.create!
-    
-    asset = factory_with_protected_attributes(AssetUserAccess, :user => u, :context => course, :asset_code => assignment.asset_string)
-    asset.display_name = assignment.asset_string
-    asset.save!
-    
-    asset.display_name.should == "My Assignment"
+    @asset.display_name.should == "My Assignment"
+  end
+
+  describe "for_user" do
+    it "should work with a User object" do
+      AssetUserAccess.for_user(@user).should == [@asset]
+    end
+
+    it "should work with a list of User objects" do
+      AssetUserAccess.for_user([@user]).should == [@asset]
+    end
+
+    it "should work with a User id" do
+      AssetUserAccess.for_user(@user.id).should == [@asset]
+    end
+
+    it "should work with a list of User ids" do
+      AssetUserAccess.for_user([@user.id]).should == [@asset]
+    end
+
+    it "should with with an empty list" do
+      AssetUserAccess.for_user([]).should == []
+    end
+
+    it "should not find unrelated accesses" do
+      AssetUserAccess.for_user(User.create!).should == []
+      AssetUserAccess.for_user(@user.id + 1).should == []
+    end
+  end
+
+  describe '#log_action' do
+    let(:scores) { Hash.new }
+    let(:asset) { AssetUserAccess.new(scores) }
+
+    subject { asset }
+
+    describe 'when action level is nil' do
+      describe 'with nil scores' do
+        describe 'view level' do
+          before { asset.log_action 'view' }
+          its(:view_score) { should == 1 }
+          its(:participate_score) { should be_nil }
+          its(:action_level) { should == 'view' }
+        end
+
+        describe 'participate level' do
+          before { asset.log_action 'participate' }
+          its(:view_score) { should == 1 }
+          its(:participate_score) { should == 1 }
+          its(:action_level) { should == 'participate' }
+        end
+
+        describe 'submit level' do
+          before { asset.log_action 'submit' }
+          its(:view_score) { should be_nil }
+          its(:participate_score) { should == 1 }
+          its(:action_level) { should == 'participate' }
+        end
+      end
+
+      describe 'with existing scores' do
+        before { asset.view_score = asset.participate_score = 3 }
+
+        describe 'view level' do
+          before { asset.log_action 'view' }
+          its(:view_score) { should == 4 }
+          its(:participate_score) { should == 3 }
+          its(:action_level) { should == 'view' }
+        end
+
+        describe 'participate level' do
+          before { asset.log_action 'participate' }
+          its(:view_score) { should == 4 }
+          its(:participate_score) { should == 4 }
+          its(:action_level) { should == 'participate' }
+        end
+
+        describe 'submit level' do
+          before { asset.log_action 'submit' }
+          its(:view_score) { should == 3 }
+          its(:participate_score) { should == 4 }
+          its(:action_level) { should == 'participate' }
+        end
+      end
+    end
+
+    describe 'when action level is view' do
+      before { asset.action_level = 'view' }
+
+      it 'gets overridden by participate' do
+        asset.log_action 'participate'
+        asset.action_level.should == 'participate'
+      end
+
+      it 'gets overridden by submit' do
+        asset.log_action 'submit'
+        asset.action_level.should == 'participate'
+      end
+    end
+
+    it 'does not overwrite the participate level with view' do
+      asset.action_level = 'participate'
+      asset.log_action 'view'
+      asset.action_level.should == 'participate'
+    end
+  end
+
+  describe '#log' do
+    let(:access) { AssetUserAccess.new }
+    let(:context) { User.new }
+    subject { access }
+
+    before { access.stubs :save }
+
+    describe 'attribute values directly from hash' do
+      def it_sets_if_nil( attribute, hash_key = nil)
+        hash_key ||= attribute
+        access.log(context, { hash_key => 'value' })
+        access.send(attribute).should == 'value'
+        access.send("#{attribute}=", 'other')
+        access.log(context, { hash_key => 'value' })
+        access.send(attribute).should == 'other'
+      end
+
+      specify { it_sets_if_nil( :asset_category, :category ) }
+      specify { it_sets_if_nil( :asset_group_code, :group_code ) }
+      specify { it_sets_if_nil( :membership_type ) }
+    end
+
+    describe 'interally set or calculated attribute values' do
+      before { access.log context, { :level => 'view' } }
+      its(:context) { should == context }
+      its(:summarized_at) { should be_nil }
+      its(:last_access) { should_not be_nil }
+      its(:view_score) { should == 1 }
+      its(:participate_score) { should be_nil }
+      its(:action_level) { should == 'view' }
+    end
+
   end
 end

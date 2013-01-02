@@ -324,8 +324,9 @@ module Delayed
           attrs['failed_at'] ||= self.class.db_time_now
           attrs.delete('next_in_strand')
           self.class.transaction do
-            Failed.create(attrs)
+            failed_job = Failed.create(attrs)
             self.destroy
+            failed_job
           end
         rescue
           # we got an error while failing the job -- we need to at least get

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -34,7 +34,7 @@ class GroupMembership < ActiveRecord::Base
 
   after_save :touch_groups
   after_save :check_auto_follow_group
-  before_destroy :touch_groups
+  after_destroy :touch_groups
   after_destroy :check_auto_follow_group
   
   has_a_broadcast_policy
@@ -91,7 +91,7 @@ class GroupMembership < ActiveRecord::Base
   def ensure_mutually_exclusive_membership
     return unless self.group
     peer_groups = self.group.peer_groups.map(&:id)
-    GroupMembership.find(:all, :conditions => { :group_id => peer_groups, :user_id => self.user_id }).each {|gm| gm.destroy }
+    GroupMembership.active.find(:all, :conditions => { :group_id => peer_groups, :user_id => self.user_id }).each {|gm| gm.destroy }
   end
   protected :ensure_mutually_exclusive_membership
   
@@ -145,6 +145,12 @@ class GroupMembership < ActiveRecord::Base
   def active_given_enrollments?(enrollments)
     accepted? && (!self.group.context.is_a?(Course) ||
      enrollments.any?{ |e| e.user == self.user && e.course == self.group.context })
+  end
+
+  alias_method :destroy!, :destroy
+  def destroy
+    self.workflow_state = 'deleted'
+    self.save!
   end
 
   set_policy do

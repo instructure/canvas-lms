@@ -37,7 +37,7 @@ describe Message do
       m2 = message_model(:workflow_state => 'sent', :user => user)
       m3 = message_model(:workflow_state => 'sending', :user => user)
       Message.in_state(:bounced).should eql([m1])
-      Message.in_state([:bounced, :sent]).should eql([m1, m2])
+      Message.in_state([:bounced, :sent]).sort_by(&:id).should eql([m1, m2].sort_by(&:id))
       Message.in_state([:bounced, :sent]).should_not be_include(m3)
     end
     

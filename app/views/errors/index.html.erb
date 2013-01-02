@@ -11,7 +11,7 @@
   <select name="category">
     <%= options_for_select([[t(:all_categories, " - All Categories -"), nil]] + ErrorReport.categories, params[:category]) %>
   </select>
-  <button type="submit" class="button"><%= t "#buttons.search", "Search" %></button>
+  <button type="submit" class="btn"><%= t "#buttons.search", "Search" %></button>
 <% end %>
 
 <% content_for :pagination do %>

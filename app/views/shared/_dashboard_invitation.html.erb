@@ -1,0 +1,27 @@
+<% invitation = dashboard_invitation %>
+<div class="global-message image-block">
+  <div class="image-block-image">
+    <i class="invitation-icon"></i>
+    <span class="hidden-inline-text">
+      <%= accessible_message_icon_text("invitation") %>
+    </span>
+  </div>
+  <div class="image-block-content">
+    <div class="message">
+      <p><%=
+        mt(:invitation_text, "You have been invited to join **[%{course}](%{link_to_course})** as %{enrollment_type_with_indefinite_article}", {
+          :course => invitation.long_name,
+          :link_to_course => course_path(invitation.course_id, :invitation => invitation.uuid),
+          :enrollment_type_with_indefinite_article => Enrollment.type_with_indefinite_article(invitation.type).downcase
+        })
+        %></p>
+    </div>
+    <div class="buttons">
+      <% form_tag course_enrollment_invitation_path(invitation.course_id) do %>
+        <input type="hidden" name="invitation" value="<%= invitation.uuid %>" />
+        <button type="submit" name="reject" class="btn btn-small"><%= t('buttons.decline', 'Decline') %></button>
+        <button type="submit" name="accept" class="btn btn-small btn-primary"><%= t('buttons.accept', 'Accept') %></button>
+      <% end %>
+    </div>
+  </div>
+</div>

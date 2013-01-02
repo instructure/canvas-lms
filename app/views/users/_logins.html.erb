@@ -48,8 +48,8 @@
           </td>
           <% if !pseudonym || can_do(pseudonym.account, @current_user, :manage_user_logins) %>
             <td class='links <%= 'passwordable' if can_change_pseudonym_password %>'>
-              <a href="#" rel="<%= user_pseudonym_url(@user.id, pseudonym ? pseudonym.id : "{{ id }}") %>" class="edit_pseudonym_link"><%= image_tag "edit.png" %></a>
-              <a href="#" rel="<%= user_pseudonym_url(@user.id, pseudonym ? pseudonym.id : "{{ id }}") %>" class="delete_pseudonym_link" style="<%= hidden if pseudonyms.length <= 2 || (pseudonym && pseudonym.sis_user_id && !can_do(pseudonym.account, @current_user, :manage_sis)) %>"><%= image_tag "delete.png" %></a>
+              <a href="#" rel="<%= user_pseudonym_url(@user.id, pseudonym ? pseudonym.id : "{{ id }}") %>" class="edit_pseudonym_link"><i class="icon-edit standalone-icon"></i></a>
+              <a href="#" rel="<%= user_pseudonym_url(@user.id, pseudonym ? pseudonym.id : "{{ id }}") %>" class="delete_pseudonym_link" style="<%= hidden if pseudonyms.length <= 2 || (pseudonym && pseudonym.sis_user_id && !can_do(pseudonym.account, @current_user, :manage_sis)) %>"><i class="icon-end standalone-icon"></i></a>
             </td>
           <% else %>
             <td>&nbsp;</td>
@@ -104,8 +104,8 @@
       <tr>
         <td colspan="2">
           <div class="button-container">
-            <button type="submit" class="button submit_button"><%= t('buttons.update_login', 'Update Login') %></button>
-            <button type="button" class="button button-secondary cancel_button"><%= t('#buttons.cancel', 'Cancel') %></button>
+            <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', 'Cancel') %></button>
+            <button type="submit" class="btn btn-primary submit_button"><%= t('buttons.update_login', 'Update Login') %></button>
           </div>
         </td>
       </tr>

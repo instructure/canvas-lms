@@ -50,15 +50,18 @@
          answer[:correct] == "undefined" && submission_questions_hash[answer[:question_id]]
        end %>
     <% if questions_needing_review.present? %>
-      <%= image_tag "pending_review.png" %> <%= before_label(:questions_need_review, "The following questions need review") %>
-      <ul id="questions_needing_review" style="margin-top: 0;">
-        <% questions_needing_review.each do |answer| %>
-          <% question = submission_questions_hash[answer[:question_id]] %>
-          <li>
-            <a href="#question_<%= answer[:question_id] %>"><%= h(question[:name]) %></a>
-          </li>
-        <% end %>
-      </ul>
+      <div class="alert">
+        <i class="icon-warning"></i>
+        <%= before_label(:questions_need_review, "The following questions need review") %>
+        <ul id="questions_needing_review" style="margin-top: 0;">
+          <% questions_needing_review.each do |answer| %>
+            <% question = submission_questions_hash[answer[:question_id]] %>
+            <li>
+              <a href="#question_<%= answer[:question_id] %>"><%= h(question[:name]) %></a>
+            </li>
+          <% end %>
+        </ul>
+      </div>
     <% end %>
   <% end %>
 <% end %>

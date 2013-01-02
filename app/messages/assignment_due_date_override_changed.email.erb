@@ -1,0 +1,19 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.assignment.context) %>/<%= asset.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.assignment.context_id %>/assignments/<%= asset.assignment.id %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t('assignment_due_date_changed', 'Assignment Due Date Changed: %{assignment_name}, %{course_name} (%{override})', :assignment_name => asset.assignment.title, :course_name => asset.assignment.context.name, :override => asset.title) %>
+<% end %>
+      
+<%= t('assignment_due_date_changed_sentence', 'The due date for the assignment, %{assignment_name}, for the course, %{course_name} (%{override}), has changed to:', :assignment_name => asset.assignment.title, :course_name => asset.assignment.context.name, :override => asset.title) %>
+
+<% if asset.due_at %>
+  <%= datetime_string(force_zone(asset.due_at)) %>
+<% else %>
+  <%= t('no_due_date', 'No Due Date') %>
+<% end %>
+
+
+<%= before_label('click_to_see_assignment', 'Click here to view the assignment') %> 
+<%= content :link %>

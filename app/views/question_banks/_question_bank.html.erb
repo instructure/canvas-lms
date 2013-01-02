@@ -10,8 +10,8 @@
       <a href="<%= context_url(context, :context_question_bank_bookmark_url, question_bank ? question_bank.id : "{{ id }}", :unbookmark => 1) %>" class="bookmark_bank_link no-hover" title="<%= t('unbookmark_bank', 'Unbookmark this Question Bank') %>" style="<%= hidden if not_yet_bookmarked %>"><%= image_tag "bookmark.png" %></a>
       <% if context == @context %>
         <span style="<%= hidden if question_bank && !can_do(question_bank, @current_user, :update) %>">
-          <a href="<%= context_url(context, :context_question_bank_url, question_bank ? question_bank.id : "{{ id }}") %>" class="edit_bank_link no-hover"><%= image_tag "edit.png" %></a>
-          <a href="<%= context_url(context, :context_question_bank_url, question_bank ? question_bank.id : "{{ id }}") %>" class="delete_bank_link no-hover"><%= image_tag "delete.png" %></a>
+          <a href="<%= context_url(context, :context_question_bank_url, question_bank ? question_bank.id : "{{ id }}") %>" class="edit_bank_link no-hover"><i class="icon-edit standalone-icon"></i></a>
+          <a href="<%= context_url(context, :context_question_bank_url, question_bank ? question_bank.id : "{{ id }}") %>" class="delete_bank_link no-hover"><i class="icon-end standalone-icon"></i></a>
         </span>
       <% end %>
     </div>

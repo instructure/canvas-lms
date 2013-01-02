@@ -13,9 +13,9 @@
 <% content_for :right_side do %>
     <div class="rs-margin-lr rs-margin-top">
         <%  has_auth = @account_configs.any? %>
-        <a href="#" class="edit_auth_link button button-sidebar-wide" style="<%= hidden if !has_auth || @account.saml_authentication? %>"><%= image_tag "edit.png" %><%= t(:edit_auth_link, "Edit Details")%></a>
-        <a href="#" class="test_ldap_link button button-sidebar-wide" style="<%= hidden unless @account_configs.map {|c| c.auth_type}.include?("ldap") %>"><%= image_tag "pending_review.png" %><%= t(:test_ldap_link, "Test Authentication")%></a>
-        <%= link_to image_tag("delete.png") + t(:delete_auth_link, "Remove Authentication"), context_url(@account, :context_remove_all_authorization_configs_url), :confirm => t(:delete_auth_confirmation, "Are you sure? Users may not be able to log in if this is removed."), :method => :delete, :class=>"delete_auth_link button button-sidebar-wide", :style => "#{ hidden unless has_auth}" %>
+        <a href="#" class="edit_auth_link btn button-sidebar-wide" style="<%= hidden if !has_auth || @account.saml_authentication? %>"><%= image_tag "edit.png" %><%= t(:edit_auth_link, "Edit Details")%></a>
+        <a href="#" class="test_ldap_link btn button-sidebar-wide" style="<%= hidden unless @account_configs.map {|c| c.auth_type}.include?("ldap") %>"><%= image_tag "pending_review.png" %><%= t(:test_ldap_link, "Test Authentication")%></a>
+        <%= link_to image_tag("delete.png") + t(:delete_auth_link, "Remove Authentication"), context_url(@account, :context_remove_all_authorization_configs_url), :confirm => t(:delete_auth_confirmation, "Are you sure? Users may not be able to log in if this is removed."), :method => :delete, :class=>"delete_auth_link btn button-sidebar-wide", :style => "#{ hidden unless has_auth}" %>
         <div class="add_auth_div" style="<%= hidden if has_auth %>">
           <span class="add"><%= t(:add_auth_desc, "Add an identity provider to this account:")%></span><br/>
           <%= select("", "", [[:CAS, 'cas'], [:LDAP, 'ldap'], [:SAML, 'saml']],{:include_blank=>t(:choose_auth_type_option, "Choose an authentication service")}, :id => "add_auth_select") %>

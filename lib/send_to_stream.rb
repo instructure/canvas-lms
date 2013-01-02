@@ -21,8 +21,9 @@ module SendToStream
     def self.extended(klass)
       klass.send(:class_inheritable_accessor, :send_to_stream_block)
       klass.send(:class_inheritable_accessor, :send_to_stream_update_block)
+      klass.has_one :stream_item, :as => :asset
     end
- 
+
     def on_create_send_to_streams(&block)
       self.send_to_stream_block = block
       after_create :queue_create_stream_items
@@ -105,7 +106,8 @@ module SendToStream
     
     def clear_stream_items
       # We need to pass the asset_string, not the asset itself, since we're about to delete the asset
-      StreamItem.send_later_if_production(:delete_all_for, StreamItem.root_object(self).asset_string, self.asset_string)
+      root_object = StreamItem.root_object(self)
+      StreamItem.send_later_if_production(:delete_all_for, [root_object.class.base_class.name, root_object.id], [self.class.base_class.name, self.id])
     end
   end
  

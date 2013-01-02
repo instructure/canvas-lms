@@ -22,40 +22,38 @@ module Api::V1::StreamItem
   include Api::V1::Submission
 
   def stream_item_json(stream_item, current_user, session)
-    data = stream_item.stream_data(current_user.id)
+    data = stream_item.data(current_user.id)
     {}.tap do |hash|
 
       # generic attributes common to all stream item types
       hash['created_at'] = stream_item.created_at
       hash['updated_at'] = stream_item.updated_at
       hash['id'] = stream_item.id
-      hash['title'] = data.title
-      hash['message'] = data.body
-      hash['type'] = data.type
-      hash.merge!(context_data(data))
-      if stream_item.context_code
-        context_type, context_id = ::StreamItem.asset_string_components(stream_item.context_code)
-      end
+      hash['title'] = data.respond_to?(:title) ? data.title : nil
+      hash['message'] = data.respond_to?(:body) ? data.body : nil
+      hash['type'] = stream_item.data.class.name
+      hash.merge!(context_data(stream_item))
+      context_type, context_id = stream_item.context_type.try(:underscore), stream_item.context_id
 
-      case data.type
+      case stream_item.asset_type
       when 'DiscussionTopic', 'Announcement'
         hash['message'] = data.message
-        if data.type == 'DiscussionTopic'
+        if stream_item.data.class.name == 'DiscussionTopic'
           if context_type == "collection_item"
             # TODO: build the html_url for the collection item (we want to send them
             # there instead of directly to the discussion.)
             # These html routes aren't enabled yet, so we can't build them here yet.
           else
-            hash['discussion_topic_id'] = data.id
-            hash['html_url'] = send("#{context_type}_discussion_topic_url", context_id, data.id.to_i)
+            hash['discussion_topic_id'] = stream_item.asset_id
+            hash['html_url'] = send("#{context_type}_discussion_topic_url", context_id, stream_item.asset_id)
           end
         else
-          hash['announcement_id'] = data.id
-          hash['html_url'] = send("#{context_type}_announcement_url", context_id, data.id.to_i)
+          hash['announcement_id'] = stream_item.asset_id
+          hash['html_url'] = send("#{context_type}_announcement_url", context_id, stream_item.asset_id)
         end
         hash['total_root_discussion_entries'] = data.total_root_discussion_entries
         hash['require_initial_post'] = data.require_initial_post
-        hash['user_has_posted'] = data.user_has_posted
+        hash['user_has_posted'] = data.respond_to?(:user_has_posted) ? data.user_has_posted : nil
         hash['root_discussion_entries'] = (data.root_discussion_entries || [])[0,3].map do |entry|
           {
             'user' => {
@@ -69,19 +67,19 @@ module Api::V1::StreamItem
         # pass, these were converted to Conversations but may still show up in
         # the stream for a few weeks
       when 'Conversation'
-        hash['conversation_id'] = data.id
+        hash['conversation_id'] = stream_item.asset_id
         hash['private'] = data.private
         hash['participant_count'] = data.participant_count
-        hash['html_url'] = conversation_url(data.id.to_i)
+        hash['html_url'] = conversation_url(stream_item.asset_id)
       when 'Message'
-        hash['message_id'] = data.id
+        hash['message_id'] = stream_item.asset_id
         # this type encompasses a huge number of different types of messages,
         # anything that gets send to communication channels
         hash['title'] = data.subject
         hash['notification_category'] = data.notification_category
         hash['html_url'] = hash['url'] = data.url
       when 'Submission'
-        json = submission_json(Submission.find(data.id), Assignment.find(data.assignment.id), current_user, session, nil, ['submission_comments', 'assignment', 'course', 'html_url', 'user'])
+        json = submission_json(stream_item.asset, stream_item.asset.assignment, current_user, session, nil, ['submission_comments', 'assignment', 'course', 'html_url', 'user'])
         json.delete('id')
         hash.merge! json
 
@@ -90,22 +88,22 @@ module Api::V1::StreamItem
         hash['title'] = hash['assignment']['name']
         hash['submission_comments'].each {|c| c['body'] = c['comment']}
       when /Conference/
-        hash['web_conference_id'] = data.id
+        hash['web_conference_id'] = stream_item.asset_id
         hash['type'] = 'WebConference'
         hash['message'] = data.description
-        hash['html_url'] = send("#{context_type}_conference_url", context_id, data.id.to_i) if context_type
+        hash['html_url'] = send("#{context_type}_conference_url", context_id, stream_item.asset_id) if context_type
       when /Collaboration/
-        hash['collaboration_id'] = data.id
+        hash['collaboration_id'] = stream_item.asset_id
         # TODO: this type isn't even shown on the web activity stream yet
         hash['type'] = 'Collaboration'
-        hash['html_url'] = send("#{context_type}_collaboration_url", context_id, data.id.to_i) if context_type
+        hash['html_url'] = send("#{context_type}_collaboration_url", context_id, stream_item.asset_id) if context_type
       when "CollectionItem"
-        item = ::CollectionItem.find(data.id, :include => { :collection_item_data => :image_attachment })
+        item = stream_item.asset
         hash['title'] = item.data.title
         hash['message'] = item.data.description
         hash['collection_item'] = collection_items_json([item], current_user, session).first
       else
-        raise("Unexpected stream item type: #{data.type}")
+        raise("Unexpected stream item type: #{stream_item.asset_type}")
       end
     end
   end

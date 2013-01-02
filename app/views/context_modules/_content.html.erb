@@ -69,12 +69,12 @@ TEXT
                 </span>
               </div>
               <div style="float: right;">
-                <a href="#" class="delete_criterion_link no-hover"><%= image_tag "delete_circle.png" %></a>
+                <a href="#" class="delete_criterion_link no-hover"><i class="icon-end"></i><span class="screen-reader-text">Delete</span></a>
               </div>
               <div class="clear"></div>
             </div>
             <div style="font-size: 0.9em;">
-              <a href="#" class="add_prerequisite_link add-small"><%= t('links.add_prerequisite', %{Add prerequisite}) %></a>
+              <a href="#" class="add_prerequisite_link icon-add"><%= t('links.add_prerequisite', %{Add prerequisite}) %></a>
             </div>
           </div>
         </div>
@@ -86,7 +86,7 @@ TEXT
             <div class="criteria_list" style="display: none;">
             </div>
             <div style="font-size: 0.9em;">
-              <a href="#" class="add_completion_criterion_link add-small"><%= t('links.add_requirement', %{Add requirement}) %></a>
+              <a href="#" class="add_completion_criterion_link icon-add"><%= t('links.add_requirement', %{Add requirement}) %></a>
             </div>
           </div>
         </div>
@@ -98,9 +98,9 @@ TEXT
         </td>
     </tr><tr>
       <td colspan="2">
-        <div class="button-container" style="margin-top: 10px;">
-          <button type="submit" class="button submit_button"><%= t('buttons.add_module', %{Add Module}) %></button>
-          <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', %{Cancel}) %></button>
+        <div class="button-container">
+          <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
+          <button type="submit" class="btn btn-primary submit_button"><%= t('buttons.add_module', %{Add Module}) %></button>
         </div>
         <a href="<%= context_url(@context, :context_context_modules_url) %>" style="display: none;" class="add_context_module_url">&nbsp;</a>
       </td>
@@ -115,8 +115,8 @@ TEXT
     <div style="text-align: center;" class="prerequisite_module_select">
     </div>
     <div class="button-container">
-      <button type="button" class="button submit_button"><%= t('buttons.add_prerequisite', %{Add Prerequisite}) %></button>
-      <button type="button" class="button button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
+      <button type="button" class="btn submit_button"><%= t('buttons.add_prerequisite', %{Add Prerequisite}) %></button>
+      <button type="button" class="btn button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
     </div>
   </div>
   <%= render :partial => "shared/select_content_dialog", :locals => {:for_modules => true} %>
@@ -149,8 +149,10 @@ TEXT
         </tr>
         <tr>
           <td colspan="2">
-            <button type="submit" class="button"><%= t('#buttons.update', %{Update}) %></button>
-            <button type="button" class="button button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
+            <div class="button-container">
+              <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
+              <button type="submit" class="btn btn-primary"><%= t('#buttons.update', %{Update}) %></button>
+            </div>
           </td>
         </tr>
       </table>
@@ -211,7 +213,10 @@ TEXT
               </thead>
               <tbody>
                 <tr class="module blank" style="display: none;">
-                  <td class="icon">&nbsp;</td>
+                  <td class="icon">
+                    <i class="icon-check"></i>
+                    <i class="icon-lock"></i>
+                  </td>
                   <td class="details">
                     <span class="name">&nbsp;</span>
                     <span class="id" style="display: none;">&nbsp;</span>

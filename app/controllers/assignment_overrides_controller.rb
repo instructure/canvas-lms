@@ -29,14 +29,14 @@
 #       assignment_id: 123,
 #
 #       // the IDs of the override's target students (present iff the override
-#       // targets and adhoc set of students)
+#       // targets an adhoc set of students)
 #       student_ids: [1, 2, 3],
 #
 #       // the ID of the override's target group (present iff the override
 #       // targets a group)
 #       group_id: 2,
 #
-#       // the ID of the overrides’s target section (present iff the override
+#       // the ID of the overrides's target section (present iff the override
 #       // targets a section)
 #       course_section_id: 1
 #
@@ -132,9 +132,10 @@ class AssignmentOverridesController < ApplicationController
   #   assignment and the ID must identify an active group in the assignment's
   #   group category not already targetted by a different override.
   #
-  # @argument assignment_override[section_id] [Optional, Integer] The ID of the
-  #   override's target section. If present, must identify an active section of
-  #   the assignment's course not already targetted by a different override.
+  # @argument assignment_override[course_section_id] [Optional, Integer] The ID
+  #   of the override's target section. If present, must identify an active
+  #   section of the assignment's course not already targetted by a different
+  #   override.
   #
   # @argument assignment_override[due_at] [Timestamp, Optional] The day/time
   #   the overridden assignment is due. Accepts times in ISO 8601 format, e.g.
@@ -154,10 +155,10 @@ class AssignmentOverridesController < ApplicationController
   #   the lock date. May be present but null to indicate the override removes
   #   any previous lock date.
   #
-  # One of student_ids, group_id, or section_id must be present. At most one
-  # should be present; if multiple are present only the most specific
-  # (student_ids first, then group_id, then section_id) is used and any others
-  # are ignored.
+  # One of student_ids, group_id, or course_section_id must be present. At most
+  # one should be present; if multiple are present only the most specific
+  # (student_ids first, then group_id, then course_section_id) is used and any
+  # others are ignored.
   #
   # @returns AssignmentOverride
   #

@@ -26,7 +26,7 @@ describe SubmissionsController do
       post 'create', :course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_url", :url => "url"}
       assert_unauthorized
     end
-    
+
     it "should allow submitting homework" do
       course_with_student_logged_in(:active_all => true)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
@@ -63,7 +63,7 @@ describe SubmissionsController do
       response.should be_redirect
       assigns[:group].should be_nil
     end
-    
+
     it "should allow attaching multiple files to the submission" do
       course_with_student_logged_in(:active_all => true)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
@@ -99,6 +99,51 @@ describe SubmissionsController do
       response.should be_redirect
       assigns[:submission].should_not be_nil
       assigns[:submission].url.should eql("http://www.google.com")
+    end
+
+    describe 'when submitting a text response for the answer' do
+      let(:assignment) { @course.assignments.create!(:title => "some assignment", :submission_types => "online_text_entry") }
+      let(:submission_params) { {:submission_type => "online_url", :body => "My Answer"} }
+
+      before do
+        Setting.set('enable_page_views', 'db')
+        course_with_student_logged_in :active_all => true
+        post 'create', :course_id => @course.id, :assignment_id => assignment.id, :submission => submission_params
+      end
+
+      after do
+        Setting.set('enable_page_views', 'false')
+      end
+
+      it 'should redirect me to the course assignment' do
+        response.should be_redirect
+      end
+
+      it 'saves a submission object' do
+        submission = assigns[:submission]
+        submission.id.should_not be_nil
+        submission.user_id.should == @user.id
+        submission.body.should == submission_params[:body]
+      end
+
+      it 'logs an asset access for the assignment' do
+        accessed_asset = assigns[:accessed_asset]
+        accessed_asset[:level].should == 'submit'
+      end
+
+      it 'registers a page view' do
+        page_view = assigns[:page_view]
+        page_view.should_not be_nil
+        page_view.http_method.should == 'post'
+        page_view.url.should =~ %r{^http://test\.host/courses/\d+/assignments/\d+/submissions}
+        page_view.participated.should be_true
+      end
+
+    end
+
+    it 'should build a pageview thats marked as participating' do
+      course_with_student_logged_in(:active_all => true)
+      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url")
     end
 
     context "group comments" do

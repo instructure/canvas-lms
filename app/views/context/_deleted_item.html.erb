@@ -1,7 +1,7 @@
 <% item = deleted_item %>
 <li class="item">
   <div class="links">
-    <a class="restore_link button" href="<%= context_url(@context, :context_undelete_item_url, item.asset_string) %>"><%= t('links.restore', %{restore}) %></a>
+    <a class="restore_link btn" href="<%= context_url(@context, :context_undelete_item_url, item.asset_string) %>"><%= t('links.restore', %{restore}) %></a>
   </div>
   <div class="name">
     <% if item.is_a?(Enrollment) %>

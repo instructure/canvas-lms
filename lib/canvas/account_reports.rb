@@ -23,7 +23,7 @@ module Canvas::AccountReports
 
   # account id is ignored; use PluginSetting to enable a subset of reports
   def self.add_account_reports(account_id, module_name, reports)
-    reports.each do |(report_type, details)|
+    reports.each do |report_type, details|
       details = { :title => details } if details.is_a? String
       details[:module] ||= module_name
       details[:proc] ||= "Canvas::AccountReports::#{module_name}".constantize.method(report_type)
@@ -35,8 +35,8 @@ module Canvas::AccountReports
   def self.for_account(id)
     settings = Canvas::Plugin.find(:account_reports).settings
     return REPORTS.dup unless settings
-    enabled_reports = settings.select { |(report, enabled)| enabled }.map(&:first)
-    Hash[*REPORTS.select { |(report, details)| enabled_reports.include?(report) }.flatten]
+    enabled_reports = settings.select { |report, enabled| enabled }.map(&:first)
+    Hash[*REPORTS.select { |report, details| enabled_reports.include?(report) }.flatten]
   end
 
   def self.generate_report(account_report)
@@ -66,7 +66,7 @@ module Canvas::AccountReports
       FileUtils::rm temp.path
 
       Zip::ZipFile.open(filepath, Zip::ZipFile::CREATE) do |zipfile|
-        csv.each do |(report_name, contents)|
+        csv.each do |report_name, contents|
           zipfile.get_output_stream(report_name + ".csv") { |f| f << contents }
         end
         zipfile

@@ -21,6 +21,7 @@ class ActiveRecord::Base
     'abstract_courses' => %w(sis_name sis_course_code),
     'accounts' => %w(type sis_name account_code authentication_type ldap_host ldap_domain),
     'account_authorization_configs' => %w(auth_uid),
+    'access_tokens' => %w(token),
     'asset_user_accesses' => %w(asset_access_stat_id),
     'assignments' => %w(sequence_position minimum_required_blog_posts minimum_required_blog_comments reminders_created_for_due_at publishing_reminder_sent),
     'attachments' => %w(enrollment_id cached_s3_url s3_url_cached_at),

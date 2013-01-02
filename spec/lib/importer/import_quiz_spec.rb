@@ -105,5 +105,20 @@ describe "Quiz Import" do
     question = AssessmentQuestion.find_by_migration_id('URN-X-WEBCT-VISTA_V2-790EA1350E1A681DE0440003BA07D9B4')
     question.data[:answers].last[:html].should == "Chance can't; this is a big problem for evolution. BTW, rockets are cool: <img src=\"/courses/#{context.id}/file_contents/course%20files/rocket.png\">"
   end
-    
+
+  it "should update quiz question on re-import" do
+    context = get_import_context
+    question_data = import_example_questions context
+    data = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
+    Quiz.import_from_migration(data, context, question_data)
+    quiz = Quiz.find_by_migration_id data[:migration_id]
+
+    quiz.quiz_questions.first.question_data[:question_name].should == "Rocket Bee!"
+
+    question_data[:aq_data][data['questions'].first[:migration_id]]['question_name'] = "Not Rocket Bee?"
+    Quiz.import_from_migration(data, context, question_data)
+
+    quiz.quiz_questions.first.question_data[:question_name].should == "Not Rocket Bee?"
+  end
+
 end

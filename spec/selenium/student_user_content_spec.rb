@@ -21,7 +21,7 @@ describe "user_content" do
 
     it "should serve embed tags from a safefiles iframe" do
       factory_with_protected_attributes(Announcement, :context => @course, :title => "hey all read this k", :message => message_body)
-      get "/"
+      get "/courses/#{@course.to_param}/discussion_topics/#{Announcement.first.to_param}"
       wait_for_ajaximations
       name = ff(".user_content_iframe").first.attribute('name')
       in_frame(name) do

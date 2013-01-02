@@ -8,7 +8,7 @@
 <% content_for :right_side do %>
   <div class="rs-margin-all">
     <% if @domain_root_account.try_rescue(:enable_user_notes) and can_do(@user, @current_user, :read_user_notes) %>
-      <a href="<%= user_user_notes_path(@user) %>" class="button button-sidebar-wide"><%= t(:faculty_journal, "Faculty Journal for %{user}", :user => context_user_name(@context, @user)) %></a>
+      <a href="<%= user_user_notes_path(@user) %>" class="btn button-sidebar-wide"><%= t(:faculty_journal, "Faculty Journal for %{user}", :user => context_user_name(@context, @user)) %></a>
     <% end %>
     <% if @context.settings[:hide_final_grade] %>
       <div class="student_assignment final_grade" style="font-size: 1.2em;">
@@ -26,15 +26,15 @@
     <% end %>
     <% if editable %>
         <div class="show_guess_grades" style="display: none; margin-bottom: 10px; font-size: 0.8em;">
-          <button type="button" class="button button-sidebar-wide show_guess_grades_link"><%= image_tag "grading_icon.png" %> <%= t('buttons.show_what_if', "Show Saved \"What-If\" Scores") %></button>
+          <button type="button" class="btn button-sidebar-wide show_guess_grades_link"><%= image_tag "grading_icon.png" %> <%= t('buttons.show_what_if', "Show Saved \"What-If\" Scores") %></button>
         </div>
         <div class="revert_all_scores" style="font-size: 0.8em; padding-left: 10px; display: none;">
           <%= t(:not_official, "*NOTE*: This is NOT your official score.") %><br/>
-          <a href="#" class="button revert_all_scores_link"><%= image_tag "back.png" %> <%= t('links.revert_score', "Revert to Actual Score") %></a>
+          <a href="#" class="btn revert_all_scores_link"><%= image_tag "back.png" %> <%= t('links.revert_score', "Revert to Actual Score") %></a>
         </div>
     <% end %>
     <div class="show_all_details" style="font-size: 0.8em; margin-top: 10px;">
-      <a href="#" class="button" id="show_all_details_link"><%= t('links.show_details', "Show All Details") %></a>
+      <a href="#" class="btn" id="show_all_details_link"><%= t('links.show_details', "Show All Details") %></a>
     </div>
     <div style="margin-top: 10px;">
       <%= render :partial => "courses/sidebar_weighting", :object => @groups %>

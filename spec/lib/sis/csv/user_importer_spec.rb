@@ -321,19 +321,24 @@ describe SIS::CSV::UserImporter do
   end
 
   it "should allow a user to update emails specifically" do
-    process_csv_data_cleanly(
-      "user_id,login_id,first_name,last_name,email,status",
-      "user_1,user1,User,Uno,user1@example.com,active"
-    )
+    enable_cache do
+      now = Time.now
+      Time.stubs(:now).returns(now - 2)
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,active"
+      )
 
-    Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.email.should == "user1@example.com"
+      Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.email.should == "user1@example.com"
 
-    process_csv_data_cleanly(
-      "user_id,login_id,first_name,last_name,email,status",
-      "user_1,user1,User,Uno,user2@example.com,active"
-    )
+      Time.stubs(:now).returns(now)
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user2@example.com,active"
+      )
 
-    Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.email.should == "user2@example.com"
+      Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.email.should == "user2@example.com"
+    end
   end
 
   it "should add two users with different user_ids, login_ids, but the same email" do

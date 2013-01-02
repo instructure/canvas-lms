@@ -292,11 +292,24 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
   
-  def matches_url?(url)
+  def matches_url?(url, match_queries_exactly=true)
     if !defined?(@standard_url)
       @standard_url = !self.url.blank? && ContextExternalTool.standardize_url(self.url)
     end
-    return true if url == @standard_url
+    if match_queries_exactly
+      url = ContextExternalTool.standardize_url(url)
+      return true if url == @standard_url
+    elsif @standard_url.present?
+      if !defined?(@url_params)
+        res = URI.parse(@standard_url)
+        @url_params = res.query.present? ? res.query.split(/&/) : []
+      end
+      res = URI.parse(url).normalize
+      res.query = res.query.split(/&/).select{|p| @url_params.include?(p)}.sort.join('&') if res.query.present?
+      res.query = nil if res.query.blank?
+      res.normalize!
+      return true if res.to_s == @standard_url
+    end
     host = URI.parse(url).host rescue nil
     !!(host && ('.' + host).match(/\.#{domain}\z/))
   end
@@ -338,7 +351,6 @@ class ContextExternalTool < ActiveRecord::Base
   # then check for a match on the current context (configured by
   # the teacher).
   def self.find_external_tool(url, context, preferred_tool_id=nil)
-    url = ContextExternalTool.standardize_url(url)
     contexts = []
     while context
       if context.is_a?(Group)
@@ -361,15 +373,19 @@ class ContextExternalTool < ActiveRecord::Base
     # insertion, there's a stronger chance that a different URL was intended.
     preferred_tool = ContextExternalTool.active.find_by_id(preferred_tool_id)
     return preferred_tool if preferred_tool && preferred_tool.settings[:resource_selection]
-    
-    contexts.each do |context|
-      res = context.context_external_tools.active.sort_by{|t| [t.precedence, t.id == preferred_tool_id ? 0 : 1] }.detect{|tool| tool.url && tool.matches_url?(url) }
-      return res if res
-    end
-    contexts.each do |context|
-      res = context.context_external_tools.active.sort_by{|t| [t.precedence, t.id == preferred_tool_id ? 0 : 1] }.detect{|tool| tool.domain && tool.matches_url?(url) }
-      return res if res
-    end
+
+    sorted_external_tools = contexts.collect{|context| context.context_external_tools.active.sort_by{|t| [t.precedence, t.id == preferred_tool_id ? 0 : 1] }}.flatten(1)
+
+    res = sorted_external_tools.detect{|tool| tool.url && tool.matches_url?(url) }
+    return res if res
+
+    # If exactly match doesn't work, try to match by ignoring extra query parameters
+    res = sorted_external_tools.detect{|tool| tool.url && tool.matches_url?(url, false) }
+    return res if res
+
+    res = sorted_external_tools.detect{|tool| tool.domain && tool.matches_url?(url) }
+    return res if res
+
     nil
   end
   

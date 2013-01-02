@@ -411,6 +411,48 @@ describe QuizzesController do
       assigns[:submission].should_not be_nil
       assigns[:submission].user.should eql(@user)
     end
+
+    context "when the ID of a question is passed in" do
+      before do
+        course_with_student_logged_in(:active_all => true)
+        course_quiz(true)
+        @quiz.generate_submission(@user)
+      end
+      
+      context "a valid question" do
+        it "renders take_quiz" do
+          QuizzesController.any_instance.stubs(:valid_question?).returns(true)
+          get 'show', :course_id => @course, :quiz_id => @quiz.id, :question_id => '1', :take => '1'
+          response.should render_template('take_quiz')
+        end
+      end
+
+      context "a question not in this quiz" do
+        it "redirects to the main quiz page" do
+          QuizzesController.any_instance.stubs(:valid_question?).returns(false)
+          get 'show', :course_id => @course, :quiz_id => @quiz.id, :question_id => '1', :take => '1'
+          response.should redirect_to course_quiz_url(@course, @quiz)
+        end
+      end
+    end
+
+    describe "valid_question?" do
+      let(:submission) { mock }
+
+      context "when the passed in question ID is in the submission" do
+        it "returns true" do
+          submission.stubs(:has_question?).with(1).returns(true)
+          controller.send(:valid_question?, submission, 1).should be_true
+        end
+      end
+
+      context "when the question ID isn't part of the submission" do
+        it "returns false" do
+          submission.stubs(:has_question?).with(1).returns(false)
+          controller.send(:valid_question?, submission, 1).should be_false
+        end
+      end
+    end
   end
 
   describe "GET 'history'" do

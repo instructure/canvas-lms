@@ -52,7 +52,7 @@
               <label for="new_page_name"><%= t('new_page_name', %{What would you like to call the new page?}) %></label><br />
               <input type="text" name="new_page_name" id="new_page_name">
               <input type="hidden" name="new_page_url_prefix" value="<%= context_url(@context, :context_wiki_pages_url) %>" id="new_page_url_prefix" />
-              <button id="new_page_submit" class="button small-button" type="submit"><%= t('buttons.insert_link', %{Insert Link}) %></button>
+              <button id="new_page_submit" class="btn btn-small" type="submit"><%= t('buttons.insert_link', %{Insert Link}) %></button>
             </form>
         </div>
       </div>
@@ -223,7 +223,7 @@
           <%= image_tag "ajax-loader-bar.gif", :alt => t('images.alt.loading', "Loading...") %>
         </div>
         <div class="button-container">
-          <button class="button " type="submit"><%= t('buttons.upload', %{Upload}) %></button>
+          <button class="btn " type="submit"><%= t('buttons.upload', %{Upload}) %></button>
         </div>
         <a href="<%= context_url(@context, :context_files_url, :format => :json) %>" class="json_upload_url" style="display: none;">&nbsp;</a>
         <a href="<%= context_url(@context, :context_file_download_url, "{{ id }}", :wrap => 1) %>" class="file_url" style="display: none;">&nbsp;</a>
@@ -255,7 +255,7 @@
           </select>
         </div>
         <div class="button-container">
-          <button class="button " type="submit"><%= t('buttons.upload', %{Upload}) %></button>
+          <button class="btn " type="submit"><%= t('buttons.upload', %{Upload}) %></button>
         </div>
         <a href="<%= context_url(@context, :context_files_url, :format => :json) %>" class="json_upload_url" style="display: none;">&nbsp;</a>
         <a href="<%= context_url(@context, :context_file_preview_url, "{{ id }}") %>" class="file_url" style="display: none;">&nbsp;</a>
@@ -293,8 +293,8 @@
         </select>
       </div>
       <div class="button-container">
-        <button type="button" class="button select_button"><%= t('buttons.upload_files', %{Upload Files to Folder}) %></button>
-        <button type="button" class="button cancel_button button-secondary"><%= t('#buttons.cancel', %{Cancel}) %></button>
+        <button type="button" class="btn select_button"><%= t('buttons.upload_files', %{Upload Files to Folder}) %></button>
+        <button type="button" class="btn cancel_button button-secondary"><%= t('#buttons.cancel', %{Cancel}) %></button>
       </div>
     </div>
   </div>

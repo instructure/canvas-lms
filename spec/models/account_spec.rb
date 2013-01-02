@@ -347,7 +347,10 @@ describe Account do
   end
 
   def account_with_admin_and_restricted_user(account)
-    account.add_account_membership_type('Restricted Admin')
+    role = account.roles.build(:name => 'Restricted Admin')
+    role.base_role_type = AccountUser::BASE_ROLE_NAME
+    role.workflow_state = 'active'
+    role.save!
     admin = User.create
     user = User.create
     account.account_users.create(:user => admin, :membership_type => 'AccountAdmin')
@@ -385,9 +388,11 @@ describe Account do
     end
 
     limited_access = [ :read, :manage, :update, :delete, :read_outcomes ]
-    full_access = RoleOverride.permissions.map { |k, v| k } + limited_access
+    full_access = RoleOverride.permissions.keys + limited_access
     index = full_access.index(:manage_courses)
     full_access = full_access[0..index] + [:create_courses] + full_access[index+1..-1]
+    full_root_access = full_access - RoleOverride.permissions.select { |k, v| v[:account_only] == :site_admin }.map(&:first)
+    full_sub_access = full_root_access - RoleOverride.permissions.select { |k, v| v[:account_only] == :root }.map(&:first)
     # site admin has access to everything everywhere
     hash.each do |k, v|
       account = v[:account]
@@ -402,7 +407,7 @@ describe Account do
     hash.each do |k, v|
       next if k == :site_admin
       account = v[:account]
-      account.check_policy(hash[:root][:admin]).should == full_access
+      account.check_policy(hash[:root][:admin]).should == full_root_access
       account.check_policy(hash[:root][:user]).should == limited_access
     end
 
@@ -416,7 +421,7 @@ describe Account do
     hash.each do |k, v|
       next if k == :site_admin || k == :root
       account = v[:account]
-      account.check_policy(hash[:sub][:admin]).should == full_access
+      account.check_policy(hash[:sub][:admin]).should == full_sub_access
       account.check_policy(hash[:sub][:user]).should == limited_access
     end
 
@@ -439,7 +444,7 @@ describe Account do
     hash.each do |k, v|
       next if k == :site_admin
       account = v[:account]
-      account.check_policy(hash[:root][:admin]).should == full_access
+      account.check_policy(hash[:root][:admin]).should == full_root_access
       account.check_policy(hash[:root][:user]).should == some_access
     end
 
@@ -453,7 +458,7 @@ describe Account do
     hash.each do |k, v|
       next if k == :site_admin || k == :root
       account = v[:account]
-      account.check_policy(hash[:sub][:admin]).should == full_access
+      account.check_policy(hash[:sub][:admin]).should == full_sub_access
       account.check_policy(hash[:sub][:user]).should == some_access
     end
   end

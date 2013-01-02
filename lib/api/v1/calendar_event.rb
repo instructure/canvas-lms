@@ -19,6 +19,7 @@
 module Api::V1::CalendarEvent
   include Api::V1::Json
   include Api::V1::Assignment
+  include Api::V1::AssignmentOverride
   include Api::V1::User
   include Api::V1::Course
   include Api::V1::Group
@@ -108,6 +109,9 @@ module Api::V1::CalendarEvent
     hash['context_code'] = assignment.context_code
     hash['start_at'] = hash['end_at'] = assignment.due_at
     hash['url'] = api_v1_calendar_event_url("assignment_#{assignment.id}")
+    if assignment.applied_overrides.present?
+      hash['assignment_overrides'] = assignment.applied_overrides.map { |o| assignment_override_json(o) }
+    end
     hash
   end
 

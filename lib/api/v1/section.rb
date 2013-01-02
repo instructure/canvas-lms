@@ -21,7 +21,7 @@ module Api::V1::Section
 
   def section_json(section, user, session, includes)
     res = section.as_json(:include_root => false,
-                          :only => %w(id name course_id nonxlist_course_id))
+                          :only => %w(id name course_id nonxlist_course_id start_at end_at))
     res['sis_section_id'] = section.sis_source_id
     if includes.include?('students')
       proxy = section.enrollments

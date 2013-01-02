@@ -353,6 +353,7 @@ class Job < ActiveRecord::Base
     save!
     redis.rename Keys::JOB[id], Keys::FAILED_JOB[id]
     tickle_strand
+    self
   end
 
   protected

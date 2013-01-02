@@ -205,7 +205,7 @@ describe "courses" do
 
       login_as(@student.name)
       get "/courses/#{@course.id}"
-      f(".reminder .button[name='accept'] ").click
+      f(".global-message .btn[name='accept'] ").click
       assert_flash_notice_message /Invitation accepted!/
     end
 
@@ -214,8 +214,7 @@ describe "courses" do
 
       login_as(@student.name)
       get "/courses/#{@course.id}"
-      f(".reminder .reject_button").click
-      driver.switch_to.alert.accept
+      f(".global-message .btn[name=reject]").click
       assert_flash_notice_message /Invitation canceled./
     end
 

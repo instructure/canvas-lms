@@ -35,7 +35,12 @@ class JobsController < ApplicationController
   end
 
   def show
-    render :json => Delayed::Job.find(params[:id]).to_json(:include_root => false)
+    if params[:flavor] == 'failed'
+      job = Delayed::Job::Failed.find(params[:id])
+    else
+      job = Delayed::Job.find(params[:id])
+    end
+    render :json => job.to_json(:include_root => false)
   end
 
   def batch_update

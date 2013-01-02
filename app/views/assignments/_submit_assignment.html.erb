@@ -78,7 +78,7 @@
       <% end %>
       <tr>
         <td colspan="2" class='button-container'>
-          <button type="submit" class="button" id="submit_file_button"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
+          <button type="submit" class="btn" id="submit_file_button"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
           <button type="button" class='cancel_button button-secondary'><%= t '#buttons.cancel', "Cancel" %></button>
         </td>
       </tr><tr style="display: none;">
@@ -117,7 +117,7 @@
       <% end %>
       <tr>
         <td class='button-container'>
-          <button type="submit" class="button"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
+          <button type="submit" class="btn"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
           <button type="button" class='cancel_button button-secondary'><%= t '#buttons.cancel', "Cancel" %></button>
         </td>
       </tr>
@@ -150,7 +150,7 @@
       <%= render :partial => "group_comment" %>
       <tr>
         <td colspan="2" class='button-container'>
-          <button type="submit" class="button"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
+          <button type="submit" class="btn"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
           <button type="button" class='cancel_button button-secondary'><%= t '#buttons.cancel', "Cancel" %></button>
         </td>
       </tr>
@@ -236,7 +236,7 @@
           <% end %>
           <tr>
             <td colspan="2" class='button-container'>
-              <button type="submit" class="button"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
+              <button type="submit" class="btn"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
               <button type="button" class='cancel_button button-secondary'><%= t '#buttons.cancel', "Cancel" %></button>
             </td>
           </tr>
@@ -252,7 +252,7 @@
         <div id="submit_google_doc_form">
           <%= t 'messages.google_docs_auth_required', "Before you can submit assignments directly from Google Docs you need to authorize Canvas to access your Google Docs account:" %>
           <div style="font-size: 1.1em; text-align: center; margin: 10px;">
-            <a class="button" href="<%= oauth_url(:service => :google_docs, :return_to => (request.url + "#submit_google_doc_form")) %>"><%= t 'links.authorize_google_docs', "Authorize Google Docs Access" %></a>
+            <a class="btn" href="<%= oauth_url(:service => :google_docs, :return_to => (request.url + "#submit_google_doc_form")) %>"><%= t 'links.authorize_google_docs', "Authorize Google Docs Access" %></a>
           </div>
         </div>
       <% end %>
@@ -283,7 +283,7 @@
                     <%= image_tag "media_comment.png" %>
                   </div>
                 </div>
-                <a href="#" class="record_media_comment_link button" style="font-size: 1.1em;"><%= image_tag "record.gif" %> <%= t 'buttons.record_media', "Record / Upload Media" %></a>
+                <a href="#" class="record_media_comment_link btn" style="font-size: 1.1em;"><%= image_tag "record.gif" %> <%= t 'buttons.record_media', "Record / Upload Media" %></a>
                 <div id="media_media_recording_submission" style="display: none; float: left; width: auto; border: 2px solid #444;">
                 </div>
                 <div class="clear"></div>
@@ -300,7 +300,7 @@
           <%= render :partial => "group_comment" %>
           <tr>
             <td colspan="2" class='button-container'>
-              <button type="submit" class="button" disabled="disabled" id="media_comment_submit_button"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
+              <button type="submit" class="btn" disabled="disabled" id="media_comment_submit_button"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
               <button type="button" class='cancel_button button-secondary'><%= t '#buttons.cancel', "Cancel" %></button>
             </td>
           </tr><tr style="display: none;">

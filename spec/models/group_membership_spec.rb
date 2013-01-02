@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -86,6 +86,18 @@ describe GroupMembership do
       @account_group = Account.default.groups.create!
       @membership = @account_group.add_user(@student)
       @membership.active_given_enrollments?([]).should be_true
+    end
+
+    it 'should not be deleted when the enrollment is destroyed' do
+      @enrollment.destroy
+      @membership.reload
+      @membership.workflow_state.should == 'deleted'
+    end
+
+    it 'should soft delete when membership destroyed' do
+      @membership.destroy
+      @membership.reload
+      @membership.workflow_state.should == 'deleted'
     end
   end
 

@@ -125,7 +125,7 @@ describe "eportfolios" do
         @assignment.submit_homework(@student)
         attachment_model(:context => @student)
         get "/eportfolios/#{@eportfolio.id}"
-        expect_new_page_load { f(".forward").click }
+        expect_new_page_load { f(".icon-arrow-right").click }
         f(".edit_content_link").click
       end
 
@@ -271,7 +271,7 @@ describe "eportfolios file upload" do
     login_as(@student.email, @password)
     get "/eportfolios/#{@eportfolio.id}"
     filename, fullpath, data = get_file("testfile5.zip")
-    expect_new_page_load { f(".forward").click }
+    expect_new_page_load { f(".icon-arrow-right").click }
     f(".edit_content_link").click
     f(".add_file_link").click
     fj(".file_upload:visible").send_keys(fullpath)

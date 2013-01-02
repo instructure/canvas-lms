@@ -22,7 +22,7 @@ class InfoController < ApplicationController
   skip_before_filter :load_user, :only => [:health_check, :help_links]
 
   def message_redirect
-    m = Message.find_by_id(params[:id])
+    m = AssetSignature.find_by_signature(Message, params[:id])
     if m && m.url
       redirect_to m.url
     else

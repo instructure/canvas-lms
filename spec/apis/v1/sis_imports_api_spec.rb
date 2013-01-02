@@ -401,12 +401,11 @@ describe SisImportsApiController, :type => :integration do
   end
 
   it "should allow raw post without charset" do
-    token = @user.access_tokens.create!(:purpose => 'test')
     json = api_call(:post,
-          "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv&access_token=#{token.token}",
+          "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
           { :controller => 'sis_imports_api', :action => 'create',
             :format => 'json', :account_id => @account.id.to_s,
-            :import_type => 'instructure_csv', :access_token => token.token },
+            :import_type => 'instructure_csv' },
           {},
           { 'content-type' => 'text/csv' })
     batch = SisBatch.last
@@ -415,12 +414,11 @@ describe SisImportsApiController, :type => :integration do
   end
 
   it "should handle raw post content-types with attributes" do
-    token = @user.access_tokens.create!(:purpose => 'test')
     json = api_call(:post,
-          "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv&access_token=#{token.token}",
+          "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
           { :controller => 'sis_imports_api', :action => 'create',
             :format => 'json', :account_id => @account.id.to_s,
-            :import_type => 'instructure_csv', :access_token => token.token },
+            :import_type => 'instructure_csv' },
           {},
           { 'content-type' => 'text/csv; charset=utf-8' })
     batch = SisBatch.last
@@ -429,12 +427,11 @@ describe SisImportsApiController, :type => :integration do
   end
 
   it "should reject non-utf-8 encodings on content-type" do
-    token = @user.access_tokens.create!(:purpose => 'test')
     json = raw_api_call(:post,
-          "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv&access_token=#{token.token}",
+          "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
           { :controller => 'sis_imports_api', :action => 'create',
             :format => 'json', :account_id => @account.id.to_s,
-            :import_type => 'instructure_csv', :access_token => token.token },
+            :import_type => 'instructure_csv' },
           {},
           { 'content-type' => 'text/csv; charset=ISO-8859-1-Windows-3.0-Latin-1' })
     response.status.should match(/400/)

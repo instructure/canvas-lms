@@ -44,7 +44,7 @@ class PseudonymSessionsController < ApplicationController
 
     @pseudonym_session = PseudonymSession.new
     @headers = false
-    @is_delegated = @domain_root_account.delegated_authentication? && !params[:canvas_login]
+    @is_delegated = @domain_root_account.delegated_authentication? && !@domain_root_account.ldap_authentication? && !params[:canvas_login]
     @is_cas = @domain_root_account.cas_authentication? && @is_delegated
     @is_saml = @domain_root_account.saml_authentication? && @is_delegated
     if @is_cas && !params[:no_auto]
@@ -114,7 +114,7 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def maybe_render_mobile_login(status = nil)
-    if request.user_agent.to_s =~ /ipod|iphone|Android/i
+    if params[:mobile] || request.user_agent.to_s =~ /ipod|iphone|ipad|Android/i
       @login_handle_name = @domain_root_account.login_handle_name rescue AccountAuthorizationConfig.default_login_handle_name
       @login_handle_is_email = @login_handle_name == AccountAuthorizationConfig.default_login_handle_name
       @shared_js_vars = {
@@ -236,7 +236,7 @@ class PseudonymSessionsController < ApplicationController
     flash[:logged_out] = true
     respond_to do |format|
       session.delete(:return_to)
-      if @domain_root_account.delegated_authentication?
+      if @domain_root_account.delegated_authentication? && !@domain_root_account.ldap_authentication?
         format.html { redirect_to login_url(:no_auto=>'true') }
       else
         format.html { redirect_to login_url }
@@ -312,7 +312,7 @@ class PseudonymSessionsController < ApplicationController
 
       if response.is_valid?
         aac.debug_set(:is_valid_login_response, 'true') if debugging
-        
+
         if response.success_status?
           @pseudonym = @domain_root_account.pseudonyms.custom_find_by_unique_id(unique_id)
 
@@ -324,7 +324,7 @@ class PseudonymSessionsController < ApplicationController
             #Successful login and we have a user
             @domain_root_account.pseudonym_sessions.create!(@pseudonym, false)
             @user = @pseudonym.login_assertions_for_user
-            
+
             if debugging
               aac.debug_set(:login_to_canvas_success, 'true')
               aac.debug_set(:logged_in_user_id, @user.id)

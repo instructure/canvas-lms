@@ -21,7 +21,7 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   belongs_to :assignment_override
   belongs_to :user
 
-  attr_accessible
+  attr_accessible :user
 
   validates_presence_of :assignment, :assignment_override, :user
   validates_uniqueness_of :user_id, :scope => :assignment_id

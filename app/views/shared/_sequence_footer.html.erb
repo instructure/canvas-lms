@@ -1,12 +1,12 @@
 <% context ||= @context; asset ||= nil %>
 <% if context && context.is_a?(Course) && asset && @headers != false %>
   <div id="sequence_footer" style="display: none;">
-    <a class="prev button" href="#">
-      <%= image_tag "back.png" %> <span class="text"><%= t(:previous, "Previous") %></span>
+    <a class="prev btn" href="#">
+      <i class="icon-arrow-left"></i> <span class="text"><%= t(:previous, "Previous") %></span>
       <span class="title ellipsis"></span>
     </a>
-    <a class="next button" href="#">
-      <%= image_tag "forward.png" %> <span class="text"><%= t(:next, "Next") %></span>
+    <a class="next btn" href="#">
+      <span class="text"><%= t(:next, "Next") %></span> <i class="icon-arrow-right"></i>
       <span class="title ellipsis"></span>
     </a>
     <a href="<%= context_url(context, :context_context_modules_item_details_url, asset.asset_string, :module_item_id => params[:module_item_id]) %>" style="display: none;" class="sequence_details_url">&nbsp;</a>

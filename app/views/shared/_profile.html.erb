@@ -119,15 +119,15 @@
             </thead>
             <tbody id="profile_link_fields"></tbody>
           </table>
-          <button data-event="addLinkField" class="button small-button"><%= t :add_link_field, "Add another link" %></button>
+          <button data-event="addLinkField" class="btn btn-small"><%= t :add_link_field, "Add another link" %></button>
         </div>
       <% end %>
     </div>
 
     <% if @user_data[:can_edit] %>
       <div class="form-actions show-if-editing">
-        <button class="button btn-primary"><%= t('save_profile', 'Save Profile') %></button>
-        <button data-event="cancelEditProfile" class="button"><%= t('cancel', 'Cancel') %></button>
+        <button class="btn btn-primary"><%= t('save_profile', 'Save Profile') %></button>
+        <button data-event="cancelEditProfile" class="btn"><%= t('cancel', 'Cancel') %></button>
       </div>
     <% end %>
   </div>

@@ -5,7 +5,7 @@
   add_crumb(t('#crumbs.access_report', "Access Report")) %>
 <% content_for :right_side do %>
   <div class="rs-margin-all rs-margin-lr">
-    <a class="button button-sidebar-wide" href="<%= context_url(@context, :context_user_url, @user) %>"><%= image_tag "back.png" %> <%= t('links.back_to_user', %{Back to User Page}) %></a>
+    <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_user_url, @user) %>"><%= image_tag "back.png" %> <%= t('links.back_to_user', %{Back to User Page}) %></a>
   </div>
 <% end %>
 <h2><%= t 'headings.user_access_report', '%{user} Access Report', :user => @user.name %></h2>

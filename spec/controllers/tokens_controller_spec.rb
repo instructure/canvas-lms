@@ -54,8 +54,8 @@ describe TokensController do
       response.should be_success
       response.body.should_not match(/mytoken/)
       assigns[:token].should_not be_nil
-      assigns[:token].token.should_not == "mytoken"
-      response.body.should match(/#{assigns[:token].token}/)
+      assigns[:token].full_token.should_not match(/mytoken/)
+      response.body.should match(/#{assigns[:token].full_token}/)
       assigns[:token].developer_key.should == DeveloperKey.default
       assigns[:token].purpose.should == "test"
       assigns[:token].expires_at.to_date.should == Time.parse("jun 1 2011").to_date
@@ -115,8 +115,7 @@ describe TokensController do
       get 'show', :id => token.id
       response.should be_success
       assigns[:token].should == token
-      response.body.should_not match(/#{assigns[:token].token}/)
-      response.body.should match(/#{assigns[:token].token[0,5]}/)
+      response.body.should match(/#{assigns[:token].token_hint}/)
     end
     
     it "should not include token for protected tokens" do
@@ -128,7 +127,7 @@ describe TokensController do
       get 'show', :id => token.id
       response.should be_success
       assigns[:token].should == token
-      response.body.should_not match(/#{assigns[:token].token}/)
+      response.body.should_not match(/#{assigns[:token].token_hint}/)
     end
     
     it "should not allow retrieving someone else's access token" do
@@ -154,7 +153,7 @@ describe TokensController do
       response.should be_success
       assigns[:token].should == token
       assigns[:token].purpose.should == "new purpose"
-      response.body.should_not match(/#{assigns[:token].token}/)
+      response.body.should match(/#{assigns[:token].token_hint}/)
     end
 
     it "should allow regenerating an unprotected token" do
@@ -168,8 +167,8 @@ describe TokensController do
       put 'update', :id => token.id, :access_token => {:regenerate => '1'}
       response.should be_success
       assigns[:token].should == token
-      assigns[:token].token.should_not == token.token
-      response.body.should match(/#{assigns[:token].token}/)
+      assigns[:token].crypted_token.should_not == token.crypted_token
+      response.body.should match(/#{assigns[:token].full_token}/)
     end
 
     it "should not allow regenerating a token while masquerading" do
@@ -196,8 +195,8 @@ describe TokensController do
       put 'update', :id => token.id, :access_token => {:regenerate => '1'}
       response.should be_success
       assigns[:token].should == token
-      assigns[:token].token.should == token.token
-      response.body.should_not match(/#{assigns[:token].token}/)
+      assigns[:token].crypted_token.should == token.crypted_token
+      response.body.should_not match(/#{assigns[:token].token_hint}/)
     end
     
     it "should not allow updating someone else's token" do

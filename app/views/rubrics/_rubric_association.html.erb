@@ -50,7 +50,7 @@
               <% form_for :rubric_assessment, :url => ".", :html => {:class => "add_rubric_assessment_form", :style => "display: none;"} do |f| %>
                 <%= text_field :rubric_assessment, :assessor_email, :style => "width: 150px;" %>
                 <div class="button-container">
-                  <button type="submit" class="button"><%= t('buttons.invite', 'Invite') %></button>
+                  <button type="submit" class="btn"><%= t('buttons.invite', 'Invite') %></button>
                 </div>
               <% end %>
             </div>
@@ -124,7 +124,7 @@
       <%= render :partial => "shared/rubric", :object => (association.rubric rescue nil), :locals => {:editable => true, :rubric_association => association} %>
     </div>
     <div class="association_buttons association_edit button-container">
-      <button type="button" class="save_button button"><%= t('buttons.save_assessment', 'Save Assessment') %></button>
+      <button type="button" class="save_button btn"><%= t('buttons.save_assessment', 'Save Assessment') %></button>
       <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', 'Cancel') %></button>
     </div>
     <a href="<%= context_url(@context, :context_rubric_association_url, association ? association.id : "{{ id }}") %>" style="display: none;" class="update_rubric_association_url">&nbsp;</a>

@@ -1263,4 +1263,135 @@ describe QuizSubmission do
       qs.grants_right?(@observer, nil, :read).should be_true
     end
   end
+
+  describe "question" do
+    let(:submission) { QuizSubmission.new }
+    let(:question1) { {:id => 1} }
+    let(:question2) { {:id => 2} }
+    let(:questions) { [question1, question2] }
+
+    before do
+      submission.stubs(:questions).returns(questions)
+    end
+
+    it "returns the question matching the passed in ID" do
+      submission.question(1).should == question1
+    end
+
+    it "casts the ID to an integer" do
+      submission.question('2').should == question2
+    end
+
+    it "returns nil when not found" do
+      submission.question(3).should be_nil
+    end
+
+    describe "has_question?" do
+      it "returns true when it has a question identified by the ID" do
+        submission.has_question?(1).should be_true
+      end
+
+      it "returns false when the question cannot be found" do
+        submission.has_question?(3).should be_false
+      end
+    end
+  end
+
+  describe "question_answered?" do
+    let(:submission) { QuizSubmission.new }
+
+    before do
+      submission.stubs(:temporary_data).returns \
+        'question_1' => 'A',
+        'question_2' => '',
+        'question_3_123456abcdefghijklmnopqrstuvwxyz' => 'A',
+        'question_3_654321abcdefghijklmnopqrstuvwxyz' => 'B',
+        'question_4_123456abcdefghijklmnopqrstuvwxyz' => 'A',
+        'question_4_654321abcdefghijklmnopqrstuvwxyz' => '',
+        'question_5_123456abcdefghijklmnopqrstuvwxyz' => '',
+        'question_5_654321abcdefghijklmnopqrstuvwxyz' => '',
+        'question_6_answer_5231'=>'7700',
+        'question_6_answer_3055'=>'3037',
+        'question_6_answer_7094'=>'9976',
+        'question_6_answer_6346'=>'6392',
+        'question_7_answer_5231'=>'7700',
+        'question_7_answer_3055'=>'',
+        'question_7_answer_7094'=>'9976',
+        'question_7_answer_6346'=>'',
+        'question_8_answer_123' => '0',
+        'question_8_answer_234' => '0',
+        'question_8_answer_345' => '0',
+        'question_9_answer_123' => '0',
+        'question_9_answer_234' => '1',
+        'question_9_answer_345' => '1'
+    end
+
+    context "on a single answer question" do
+      context "when answered" do
+        it "returns true" do
+          submission.question_answered?(1).should be_true
+        end
+      end
+
+      context "when not answered" do
+        it "returns false" do
+          submission.question_answered?(2).should be_false
+        end
+      end
+    end
+
+    context "on a fill in multiple blanks question" do
+      context "when all answered" do
+        it "returns true" do
+          submission.question_answered?(3).should be_true
+        end
+      end
+
+      context "when some answered" do
+        it "returns false" do
+          submission.question_answered?(4).should be_false
+        end
+      end
+
+      context "when none answered" do
+        it "returns false" do
+          submission.question_answered?(5).should be_false
+        end
+      end
+    end
+
+    context "on a matching question" do
+      context "when all answered" do
+        it "returns true" do
+          submission.question_answered?(6).should be_true
+        end
+      end
+
+      context "when some answered" do
+        it "returns false" do
+          submission.question_answered?(7).should be_false
+        end
+      end
+    end
+
+    context "on a multiple answers question" do
+      context "when none answered" do
+        it "returns false" do
+          submission.question_answered?(8).should be_false
+        end
+      end
+
+      context "when answers selected" do
+        it "returns true" do
+          submission.question_answered?(9).should be_true
+        end
+      end
+    end
+
+    context "with no response recorded yet" do
+      it "returns false" do
+        submission.question_answered?(100).should be_false
+      end
+    end
+  end
 end

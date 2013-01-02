@@ -469,6 +469,7 @@ class DiscussionTopicsApiController < ApplicationController
     if @entry.save
       @entry.update_topic
       log_asset_access(@topic, 'topics', 'topics', 'participate')
+      generate_new_page_view
       @entry.context_module_action
       if has_attachment
         @attachment = @context.attachments.create(:uploaded_data => params[:attachment])

@@ -12,7 +12,7 @@
       reviews assigned by clicking the button below." %></p>
       <%= t :reviews_per_user, "%{count} reviews per user", :count => %{<input type="text" name="peer_review_count" value="#{@assignment.peer_review_count || 1}" style="width: 25px;"/>}.html_safe %>
       <div class='button-container button-container-right-aligned'>
-        <button type="submit" class="button big-button"><%= t 'buttons.assign_peer_reviews', "Assign Peer Reviews" %></button>
+        <button type="submit" class="btn btn-large"><%= t 'buttons.assign_peer_reviews', "Assign Peer Reviews" %></button>
       </div>
     <% end %>
   <% end %>
@@ -190,7 +190,7 @@ require([
       <option value="<%= student.id %>" class="student_<%= student.id %>"><%= student.last_name_first %></option>
     <% end %>
   </select>
-  <button type="submit" class="button small-button"><%= t 'buttons.add', 'Add' %></button>
+  <button type="submit" class="btn btn-small"><%= t 'buttons.add', 'Add' %></button>
 <% end %>
 <a href="<%= context_url(@context, :context_assignment_assign_peer_review_url, @assignment.id, '{{ reviewer_id }}') %>" style="display: none;" class="assign_peer_review_url">&nbsp;</a>
 <ul style="display: none;">

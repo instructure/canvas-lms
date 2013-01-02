@@ -62,6 +62,8 @@ class Account < ActiveRecord::Base
   has_many :grading_standards, :as => :context
   has_many :assessment_questions, :through => :assessment_question_banks
   has_many :assessment_question_banks, :as => :context, :include => [:assessment_questions, :assessment_question_bank_users]
+  has_many :roles
+  has_many :all_roles, :class_name => 'Role', :foreign_key => 'root_account_id'
   def inherited_assessment_question_banks(include_self = false, *additional_contexts)
     sql = []
     conds = []
@@ -149,6 +151,7 @@ class Account < ActiveRecord::Base
   add_setting :open_registration, :boolean => true, :root_only => true
   add_setting :enable_scheduler, :boolean => true, :root_only => true, :default => false
   add_setting :calendar2_only, :boolean => true, :root_only => true, :default => false
+  add_setting :show_scheduler, :boolean => true, :root_only => true, :default => false
   add_setting :enable_profiles, :boolean => true, :root_only => true, :default => false
   add_setting :mfa_settings, :root_only => true
   add_setting :canvas_authentication, :boolean => true, :root_only => true
@@ -490,23 +493,31 @@ class Account < ActiveRecord::Base
     self.account_users.find_by_user_id(user && user.id)
   end
 
-  def account_membership_types
-    res = ['AccountAdmin']
-    res += self.parent_account.account_membership_types if self.parent_account
-    res += (self.membership_types || "").split(",").select{|t| !t.empty? }
-    res.uniq
+  def available_account_roles
+    account_roles = roles.for_accounts.active.map(&:name)
+    account_roles |= ['AccountAdmin']
+    account_roles = account_roles | self.parent_account.available_account_roles if self.parent_account
+    account_roles
   end
-  
-  def add_account_membership_type(type)
-    types = account_membership_types
-    types += type.split(",")
-    self.membership_types = types.join(',')
-    self.save
+
+  def available_course_roles
+    course_roles = roles.for_courses.active.map(&:name)
+    course_roles |= parent_account.available_course_roles if parent_account
+    course_roles
   end
-  
-  def remove_account_membership_type(type)
-    self.membership_types = self.account_membership_types.select{|t| t != type}.join(',')
-    self.save
+
+  def get_course_role(role_name)
+    course_role = self.roles.for_courses.find_by_name(role_name)
+    course_role ||= self.parent_account.get_course_role(role_name) if self.parent_account
+    course_role
+  end
+
+  def has_role?(role_name)
+    roles.not_deleted.scoped(:conditions => ["roles.name = ?", role_name]).any?
+  end
+
+  def find_role(role_name)
+    roles.not_deleted.find_by_name(role_name) || (parent_account && parent_account.find_role(role_name))
   end
 
   def account_authorization_config

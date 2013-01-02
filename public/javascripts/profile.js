@@ -24,6 +24,7 @@ define([
   'jquery.instructure_date_and_time' /* parseFromISO, time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, formErrors, errorBox */,
   'jqueryui/dialog',
+  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
   'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */,
   'jquery.loadingImg' /* loadingImage */,
   'jquery.templateData' /* fillTemplateData */,
@@ -328,7 +329,7 @@ define([
     $("#add_access_token_dialog").find(":input").val("").end()
     .dialog({
       width: 500
-    });
+    }).fixDialogButtons();
   });
   $(document).fragmentChange(function(event, hash) {
     var type = hash.substring(1);

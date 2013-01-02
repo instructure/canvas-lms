@@ -25,6 +25,10 @@ describe "/quizzes/take_quiz" do
     view_context
     assigns[:quiz] = @course.quizzes.create!
     assigns[:submission] = assigns[:quiz].generate_submission(@user)
+    assigns[:quiz_presenter] = TakeQuizPresenter.new(assigns[:quiz],
+                                                     assigns[:submission],
+                                                     params
+                                                    )
     render "quizzes/take_quiz"
     response.should_not be_nil
   end

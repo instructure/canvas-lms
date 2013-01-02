@@ -62,7 +62,7 @@ shared_examples_for "file uploads api" do
     response.should redirect_to("http://www.example.com/api/v1/files/#{attachment.id}/create_success?#{exemption_string}uuid=#{attachment.uuid}")
 
     # step 3, confirmation
-    post response['Location'], {}, { 'Authorization' => "Bearer #{@user.access_tokens.first.token}" }
+    post response['Location'], {}, { 'Authorization' => "Bearer #{access_token_for_user @user}" }
     response.should be_success
     attachment.reload
     json = json_parse(response.body)
@@ -112,7 +112,7 @@ shared_examples_for "file uploads api" do
     })
 
     # step 3, confirmation
-    post redir, {}, { 'Authorization' => "Bearer #{@user.access_tokens.first.token}" }
+    post redir, {}, { 'Authorization' => "Bearer #{access_token_for_user @user}" }
     response.should be_success
     attachment.reload
     json = json_parse(response.body)
@@ -294,7 +294,7 @@ shared_examples_for "file uploads api with folders" do
     tmpfile.rewind
     post_params = json["upload_params"].merge({"file" => tmpfile})
     send_multipart(json["upload_url"], post_params)
-    post response['Location'], {}, { 'Authorization' => "Bearer #{@user.access_tokens.first.token}" }
+    post response['Location'], {}, { 'Authorization' => "Bearer #{access_token_for_user @user}" }
     response.should be_success
     attachment = Attachment.last(:order => :id)
     a1.reload.should be_deleted
@@ -331,7 +331,7 @@ shared_examples_for "file uploads api with folders" do
     tmpfile.rewind
     post_params = json["upload_params"].merge({"file" => tmpfile})
     send_multipart(json["upload_url"], post_params)
-    post response['Location'], {}, { 'Authorization' => "Bearer #{@user.access_tokens.first.token}" }
+    post response['Location'], {}, { 'Authorization' => "Bearer #{access_token_for_user @user}" }
     response.should be_success
     attachment = Attachment.last(:order => :id)
     a1.reload.should be_available
@@ -370,7 +370,7 @@ shared_examples_for "file uploads api with folders" do
       'content-length' => 1234,
     })
 
-    post redir, {}, { 'Authorization' => "Bearer #{@user.access_tokens.first.token}" }
+    post redir, {}, { 'Authorization' => "Bearer #{access_token_for_user @user}" }
     response.should be_success
     a1.reload.should be_available
     attachment.reload.should be_available

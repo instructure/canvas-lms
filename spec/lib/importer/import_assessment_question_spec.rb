@@ -46,7 +46,26 @@ describe "Assessment Question import from hash" do
 
     context.assessment_questions.count.should == 1
   end
-  
+
+  it "should update assessment question on re-import" do
+    context = get_import_context
+    context.imported_migration_items ||= []
+    data = get_import_data '', 'single_question'
+    data = {'assessment_questions'=>{'assessment_questions'=>data}}
+
+    migration = ContentMigration.create!(:context => context)
+    migration.migration_ids_to_import = {:copy => {:assessment_questions => true}}.with_indifferent_access
+
+    context.assessment_questions.count.should == 0
+
+    AssessmentQuestion.process_migration(data, migration)
+    data['assessment_questions']['assessment_questions'].first['question_name'] = "Bee2"
+    AssessmentQuestion.process_migration(data, migration)
+
+    context.assessment_questions.count.should == 1
+    context.assessment_questions.first.name.should == "Bee2"
+  end
+
   it "should use the question bank settings" do
     q = get_import_data 'cengage', 'question'
     context = get_import_context('cengage')
