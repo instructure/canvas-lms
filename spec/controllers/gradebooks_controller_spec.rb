@@ -42,10 +42,6 @@ describe GradebooksController do
       course_with_student_logged_in(:active_all => true)
       get 'grade_summary', :course_id => @course.id
       response.should render_template('grade_summary')
-    end
-
-    it "should render with specified user_id" do
-      course_with_student_logged_in(:active_all => true)
       get 'grade_summary', :course_id => @course.id, :id => @user.id
       response.should render_template('grade_summary')
       assigns[:courses_with_grades].should_not be_nil
