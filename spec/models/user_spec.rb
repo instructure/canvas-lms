@@ -157,6 +157,20 @@ describe User do
     @user.recent_stream_items.size.should == 0
   end
 
+  describe "#recent_stream_items" do
+    it "should skip submission stream items" do
+      course_with_teacher(:active_all => true)
+      course_with_student(:active_all => true, :course => @course)
+      assignment = @course.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
+      sub = assignment.submit_homework @student, :submission_type => "online_text_entry", :body => "submission"
+      sub.add_comment :author => @teacher, :comment => "lol"
+      item = StreamItem.last
+      item.asset.should == sub
+      @student.visible_stream_item_instances.map(&:stream_item).should include item
+      @student.recent_stream_items.should_not include item
+    end
+  end
+
   describe "#cached_recent_stream_items" do
     before(:each) do
       @contexts = []

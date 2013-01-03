@@ -36,7 +36,8 @@ class StreamItemCache < ActiveRecord::Observer
 
   # Generate a cache key for User#recent_stream_items
   def self.recent_stream_items_key(user, context_type = nil, context_id = nil)
-    ['recent_stream_items2', user.id, context_stream_item_key(context_type, context_id)].cache_key
+    user_id = (user.is_a?(User) ? user.id : user)
+    ['recent_stream_items3', user_id, context_stream_item_key(context_type, context_id)].cache_key
   end
 
   # Returns a cached cache key for the context with the time so all
