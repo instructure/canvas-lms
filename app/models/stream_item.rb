@@ -47,9 +47,6 @@ class StreamItem < ActiveRecord::Base
       res.root_discussion_entries.target = root_discussion_entries
       res.attachment = reconstitute_ar_object('Attachment', data.delete(:attachment))
     when 'Submission'
-      submission_comments = data.delete(:submission_comments)
-      submission_comments = submission_comments.map { |comment| reconstitute_ar_object('SubmissionComment', comment) }
-      res.submission_comments.target = submission_comments
       data['body'] = nil
     end
     ['users', 'participants'].each do |key|
@@ -123,6 +120,7 @@ class StreamItem < ActiveRecord::Base
     item.try(:destroy)
   end
 
+  ROOT_DISCUSSION_ENTRY_LIMIT = 3
   def generate_data(object)
     self.context ||= object.context rescue nil
 
@@ -131,7 +129,7 @@ class StreamItem < ActiveRecord::Base
       res = object.attributes
       res['user_ids_that_can_see_responses'] = object.user_ids_who_have_posted_and_admins if object.require_initial_post?
       res['total_root_discussion_entries'] = object.root_discussion_entries.active.count
-      res[:root_discussion_entries] = object.root_discussion_entries.active.reverse[0,10].reverse.map do |entry|
+      res[:root_discussion_entries] = object.root_discussion_entries.active.reverse[0,ROOT_DISCUSSION_ENTRY_LIMIT].reverse.map do |entry|
         hash = entry.attributes
         hash['user_short_name'] = entry.user.short_name if entry.user
         hash['message'] = hash['message'][0, 4.kilobytes] if hash['message'].present?
@@ -156,13 +154,6 @@ class StreamItem < ActiveRecord::Base
       res = object.attributes
       res.delete 'body' # this can be pretty large, and we don't display it
       res['assignment'] = object.assignment.attributes.slice('id', 'title', 'due_at', 'points_possible', 'submission_types', 'group_category_id')
-      res[:submission_comments] = object.submission_comments.map do |comment|
-        hash = comment.attributes
-        hash['formatted_body'] = comment.formatted_body(250)
-        hash['context_code'] = comment.context_code
-        hash['user_short_name'] = comment.author.short_name if comment.author
-        hash
-      end
       res[:course_id] = object.context.id
     when Collaboration
       res = object.attributes
