@@ -58,6 +58,7 @@ module Canvas::AccountReports
         scoped(:include => { :exclude => :user }).active.
         scoped(
         :select => %{
+          pseudonyms.id,
           u.sortable_name        AS "student name",
           pseudonyms.user_id     AS "student id",
           pseudonyms.sis_user_id AS "student sis id",
