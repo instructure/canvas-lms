@@ -55,7 +55,7 @@ module Api::V1::StreamItem
         hash['total_root_discussion_entries'] = data.total_root_discussion_entries
         hash['require_initial_post'] = data.require_initial_post
         hash['user_has_posted'] = data.respond_to?(:user_has_posted) ? data.user_has_posted : nil
-        hash['root_discussion_entries'] = (data.root_discussion_entries || [])[0,3].map do |entry|
+        hash['root_discussion_entries'] = (data.root_discussion_entries || [])[0,StreamItem::ROOT_DISCUSSION_ENTRY_LIMIT].map do |entry|
           {
             'user' => {
               'user_id' => entry.user_id,
