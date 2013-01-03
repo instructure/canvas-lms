@@ -1875,6 +1875,7 @@ class User < ActiveRecord::Base
     instances
   end
 
+  # NOTE: excludes submission stream items
   def cached_recent_stream_items(opts={})
     expires_in = 1.day
 
@@ -1896,6 +1897,7 @@ class User < ActiveRecord::Base
     end
   end
 
+  # NOTE: excludes submission stream items
   def recent_stream_items(opts={})
     self.shard.activate do
       ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
@@ -1905,7 +1907,9 @@ class User < ActiveRecord::Base
         })
         visible_instances.map do |sii|
           si = sii.stream_item
-          si.data.write_attribute(:unread, sii.unread?) if si.present?
+          next unless si.present?
+          next if si.asset_type == 'Submission'
+          si.data.write_attribute(:unread, sii.unread?)
           si
         end.compact
       end
