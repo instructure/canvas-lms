@@ -66,14 +66,11 @@ module Turnitin
         null_email
       end
     end
+
+    TurnitinUser = Struct.new(:asset_string,:first_name,:last_name,:name)
     
     def testSettings
-      user = OpenObject.new({
-        :asset_string => "admin_test",
-        :first_name => "Admin",
-        :last_name => "Test",
-        :name => "Admin Test"
-      })
+      user = TurnitinUser.new("admin_test","Admin","Test","Admin Test")
       res = createTeacher(user)
       !!res
     end
