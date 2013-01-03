@@ -37,12 +37,12 @@ shared_examples_for "outcome tests" do
   end
 
   def state_outcome_setup
-  @cm.export_content
-  run_jobs
-  @cm.reload
-  @cm.migration_settings[:warnings].should be_nil
-  @cm.migration_settings[:last_error].should be_nil
-  @cm.workflow_state.should == 'imported'
+    @cm.export_content
+    run_jobs
+    @cm.reload
+    @cm.migration_settings[:warnings].should be_nil
+    @cm.migration_settings[:last_error].should be_nil
+    @cm.workflow_state.should == 'imported'
   end
 
   def context_outcome(context, num_of_outcomes)
@@ -70,11 +70,11 @@ shared_examples_for "outcome tests" do
 
   def valid_outcome_data
     {
-        :mastery_points => 3,
-        :ratings => [
-            {:points => 3, :description => "Rockin"},
-            {:points => 0, :description => "Lame"}
-        ]
+      :mastery_points => 3,
+      :ratings => [
+        {:points => 3, :description => "Rockin"},
+        {:points => 0, :description => "Lame"}
+    ]
     }
   end
 
