@@ -92,5 +92,33 @@ describe "account admin outcomes" do
         f('.outcomes-content .title').text.should == 'Setting up Outcomes'
       end
     end
+
+    describe "state standard pagination" do
+      it "should not fail while filtering the common core group" do
+        # setup fake state data, so that it has to paginate
+        root_group = LearningOutcomeGroup.global_root_outcome_group
+        fake_cc = root_group.child_outcome_groups.create!(:title => "Fake Common Core")
+        11.times { root_group.child_outcome_groups.create!(:title => "G is after F") }
+        last_group = root_group.child_outcome_groups.create!(:title => "Z is last")
+        Setting.set(AcademicBenchmark.common_core_setting_key, fake_cc.id.to_s)
+
+        # go to the find panel
+        get outcome_url
+        wait_for_ajaximations
+        f('.find_outcome').click
+        wait_for_ajaximations
+
+        # click on state standards
+        top_level_groups = ff(".outcome-level .outcome-group")
+        top_level_groups.count.should == 3
+        top_level_groups[1].click
+        wait_for_ajaximations
+
+        # make sure the last one is the Z guy
+        keep_trying_until do
+          ffj(".outcome-level:last .outcome-group .ellipsis").last.should have_attribute("title", 'Z is last')
+        end
+      end  
+    end
   end
 end
