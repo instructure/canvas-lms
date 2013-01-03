@@ -35,22 +35,40 @@ define [
 
     server.restore()
 
-  test "keeps roles in order based on sort order", 3, -> 
+  test "keeps roles in order based on sort order then alphabetically", -> 
     RolesCollection.sortOrder = [
       "AccountMembership"
       "StudentEnrollment"
       "TaEnrollment"
     ]
 
-    roleFirst = new Role base_role_type : "AccountMembership"
-    roleSecond = new Role base_role_type : "StudentEnrollment"
-    roleThird = new Role base_role_type : "TaEnrollment"
+    roleFirst = new Role 
+      base_role_type : "AccountMembership"
+      role: 'AccountAdmin'
 
-    roleCollection = new RolesCollection([roleThird, roleFirst, roleSecond])
+    roleSecond = new Role 
+      base_role_type : "AccountMembership"
+      role: 'Another account membership'
+
+    roleThird = new Role 
+      base_role_type : "StudentEnrollment"
+      role: 'A student Role'
+
+    roleFourth = new Role 
+      base_role_type : "StudentEnrollment"
+      role: 'B student Role'
+
+    roleFith = new Role 
+      base_role_type : "TaEnrollment"
+      role: 'A TA role'
+
+    roleCollection = new RolesCollection([roleThird, roleSecond, roleFirst, roleFourth, roleFith])
 
     equal roleCollection.models[0], roleFirst, "First role is in order"
     equal roleCollection.models[1], roleSecond, "Second role is in order"
     equal roleCollection.models[2], roleThird, "Third role is in order"
+    equal roleCollection.models[3], roleFourth, "Forth role is in order"
+    equal roleCollection.models[4], roleFith, "Fith role is in order"
 
 
 

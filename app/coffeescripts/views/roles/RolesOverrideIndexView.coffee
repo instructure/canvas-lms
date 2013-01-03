@@ -6,7 +6,7 @@ define [
 ], ($, _, Backbone, template) -> 
   class RolesOverrideIndexView extends Backbone.View
     template: template
-    els: 
+    els:
       "#role_tabs": "$roleTabs"
 
     # Method Summary
@@ -14,3 +14,6 @@ define [
     # @api custom backbone override
     afterRender: ->
       @$roleTabs.tabs()
+
+    toJSON: ->
+      @options

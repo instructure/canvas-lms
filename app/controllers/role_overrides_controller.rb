@@ -134,6 +134,7 @@ class RoleOverridesController < ApplicationController
         custom_roles.select { |cr| cr.base_role_type == role_hash[:base_role_name] }.map do |cr|
           json = role_json(@context, cr, @current_user, session)
           json[:id] = cr.name
+          json[:base_role_type_label] = role.label
           course_role_data << json
         end
       end
@@ -142,6 +143,7 @@ class RoleOverridesController < ApplicationController
       js_env :COURSE_ROLES => course_role_data
       js_env :ACCOUNT_PERMISSIONS => account_permissions(@context)
       js_env :COURSE_PERMISSIONS => course_permissions(@context)
+      js_env :IS_SITE_ADMIN => @context.site_admin?
     end
   end
 
@@ -299,7 +301,14 @@ class RoleOverridesController < ApplicationController
     # allow setting permissions immediately through API
     set_permissions_for(@role, @context, params[:permissions])
 
-    render :json => role_json(@context, role, @current_user, session)
+    # Add base_role_type_label for this role
+    json = role_json(@context, role, @current_user, session)
+
+    if base_role = RoleOverride.enrollment_types.find{|br| br[:base_role_name] == base_role_type}
+      json["base_role_type_label"] = base_role[:label].call
+    end
+
+    render :json => json
   end
 
   # @API Deactivate a role

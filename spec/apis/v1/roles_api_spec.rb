@@ -48,11 +48,18 @@ describe "Roles API", :type => :integration do
         parameters)
     end
 
-    it "should add the role to the account" do
-      @account.available_account_roles.should_not include(@role)
-      json = api_call_with_settings(:explicit => '1', :enabled => '1')
-      @account.reload
-      @account.available_account_roles.should include(@role)
+    describe "add_role" do 
+      it "includes base_role_type_label" do 
+        json = api_call_with_settings(:base_role_type => "StudentEnrollment")
+        json.should include("base_role_type_label" => "Student")
+      end
+
+      it "adds the role to the account" do
+        @account.available_account_roles.should_not include(@role)
+        json = api_call_with_settings(:explicit => '1', :enabled => '1')
+        @account.reload
+        @account.available_account_roles.should include(@role)
+      end
     end
 
     describe "index" do

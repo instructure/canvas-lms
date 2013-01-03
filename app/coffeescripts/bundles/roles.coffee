@@ -1,5 +1,5 @@
 require [
-  'jquery',
+  'jquery'
   'underscore'
   'compiled/models/Role'
   'compiled/models/Account'
@@ -15,6 +15,7 @@ require [
 
   course_permissions = ENV.COURSE_PERMISSIONS
   account_permissions = ENV.ACCOUNT_PERMISSIONS
+
   course_role_types = []
   _.each ENV.COURSE_ROLES, (role) ->
     if role.role == role.base_role_type
@@ -25,7 +26,8 @@ require [
   # They will both use the same collection.
   rolesOverrideIndexView = new RolesOverrideIndexView 
     el: '#content'
-    views: 
+    showCourseRoles: !ENV.IS_SITE_ADMIN
+    views:
       'account-roles': new AccountRolesView
         views: 
           '#account_roles' : new ManageRolesView

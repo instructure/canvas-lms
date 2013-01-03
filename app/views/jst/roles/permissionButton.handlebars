@@ -1,4 +1,4 @@
-<div class="btn-group">
+<div class="btn-group" {{#if addDefaultTitle }}title="Default"{{/if}}>
   <a class="btn btn-small dropdown-toggle {{#if default }}default_permission{{/if}}" href="#" data-toggle="dropdown" {{#if readOnly }}disabled="disabled" data-tooltip title="You do not have permission to change this" {{/if}}><i class="icon-check"></i><i class="icon-lock"></i></a>
 
   <div class="dropdown-menu" role="radiogroup">

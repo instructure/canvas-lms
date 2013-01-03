@@ -26,19 +26,19 @@ describe RoleOverridesController do
   end
 
   describe "add_role" do
-    it "should add the role type to the account" do
+    it "adds the role type to the account" do
       @account.available_account_roles.should_not include('NewRole')
       post 'add_role', :account_id => @account.id, :role_type => 'NewRole'
       @account.reload
       @account.available_account_roles.should include('NewRole')
     end
 
-    it "should check require a role type" do
+    it "requires a role type" do
       post 'add_role', :account_id => @account.id
       flash[:error].should == 'Role creation failed'
     end
 
-    it "should fail when given an existing role type" do
+    it "fails when given an existing role type" do
       role = @account.roles.build(:name => 'NewRole')
       role.base_role_type = AccountUser::BASE_ROLE_NAME
       role.workflow_state = 'active'

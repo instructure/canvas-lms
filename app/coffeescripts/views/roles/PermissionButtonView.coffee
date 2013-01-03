@@ -50,6 +50,7 @@ define [
       json['systemDefaultLockedChecked'] = @isDefaultAndLocked()
       json['readOnly'] = @isReadOnly()
       json['default'] = @isDefault() || @isDefaultAndLocked() # Any kind of default. Used for setting a css class
+      json['addDefaultTitle'] = @isDefault() || @isDefaultAndLocked() && !@isReadOnly()
 
       json
 
@@ -59,11 +60,31 @@ define [
     #   list. :) I'm a smarty pants. Also, add accessibility attributes.
     #   Each button has data about it's role and permission name. This 
     #   makes testing easier.
+    #   TODO Refactor adding data attributes and titles into their own functions.
     # @api custom backbone override 
     afterRender: ->
       @setPreviewIcons()
+      @setDataAttributes()
+      @setTooltips()
+
+    # Method Summary
+    #   After the button loads, this adds data attribute to each button
+    #   so you know what role and permission each button is associated
+    #   with
+    # @api private
+    setDataAttributes: -> 
       @$el.attr 'data-role_name', @model.id
       @$el.attr 'data-permission_name', @permission_name
+
+    # Method Summary
+    #   After the button loads, this adds tooltips to each of the icons 
+    #   so when you hover over the icons it will tell you what it's set 
+    #   to.
+    # @api private
+    setTooltips: -> 
+      @$el.find('.icon-check').attr('title', 'Enabled').attr('data-tooltip', "") if !@isReadOnly()
+      @$el.find('.icon-x').attr('title', 'Disabled').attr('data-tooltip', "") if !@isReadOnly()
+      @$el.find('.icon-lock').attr('title', 'Locked').attr('data-tooltip', "") if !@isReadOnly()
 
     # Method Summary
     #   Preview Icons are set based on the model attributes, not what is 
