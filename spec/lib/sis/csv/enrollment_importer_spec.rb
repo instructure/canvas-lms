@@ -461,9 +461,8 @@ describe SIS::CSV::EnrollmentImporter do
         @course = course_model(:account => @account, :sis_source_id => 'TehCourse')
         @user1 = user_with_managed_pseudonym(:account => @account, :sis_user_id => 'user1')
         @user2 = user_with_managed_pseudonym(:account => @account, :sis_user_id => 'user2')
-        @role = @account.roles.build :name => 'cheater'
-        @role.base_role_type = 'StudentEnrollment'
-        @role.save!
+        @role = custom_role('StudentEnrollment', 'cheater')
+        @role2 = custom_role('StudentEnrollment', 'insufferable know-it-all')
       end
 
       it "should enroll with a custom role" do
@@ -493,6 +492,15 @@ describe SIS::CSV::EnrollmentImporter do
         )
         @user1.enrollments.size.should == 0
         importer.warnings.map(&:last).should == ["Improper role \"basketweaver\" for an enrollment"]
+      end
+
+      it "should create multiple enrollments with different roles having the same base type" do
+        process_csv_data_cleanly(
+            "course_id,user_id,role,section_id,status,associated_user_id",
+            "TehCourse,user1,cheater,,active,",
+            "TehCourse,user1,insufferable know-it-all,,active,"
+        )
+        @user1.enrollments.sort_by(&:id).map(&:role_name).should == ['cheater', 'insufferable know-it-all']
       end
     end
 
