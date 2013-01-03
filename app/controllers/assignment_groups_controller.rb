@@ -67,8 +67,7 @@ class AssignmentGroupsController < ApplicationController
 
     params[:include] = Array(params[:include])
     if params[:include].include? 'assignments'
-      params[:include] << "discussion_topic"
-      @groups = @groups.scoped(:include => { :assignments => [:rubric, :discussion_topic] })
+      @groups = @groups.scoped(:include => { :assignments => :rubric })
     end
 
     if authorized_action(@context.assignment_groups.new, @current_user, :read)
