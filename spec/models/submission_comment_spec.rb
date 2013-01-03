@@ -152,10 +152,8 @@ This text has a http://www.google.com link in it...
     @item.should_not be_nil
     @item.asset.should == @submission
     @item.data.should be_is_a(Submission)
-    @item.data.submission_comments.should_not be_nil
-    @item.data.id.should eql(@submission.id)
-    @item.data.submission_comments[0].id.should eql(@comment.id)
-    @item.data.submission_comments[0].formatted_body.should eql(@comment.formatted_body(250))
+    @item.data.submission_comments.target.should == [] # not stored on the stream item
+    @item.data.submission_comments.should == [@comment] # but we can still get them
   end
 
   it "should ensure the media object exists" do
