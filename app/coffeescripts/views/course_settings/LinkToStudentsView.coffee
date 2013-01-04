@@ -44,7 +44,7 @@ define [
       input = @$('#student_input').data('token_input')
       input.$fakeInput.css('width', '100%')
 
-      for e in @model.get('enrollments') when e.associated_user_id
+      for e in @model.allEnrollmentsWithRole(@role) when e.associated_user_id
         dfds.push @getUserData(e.associated_user_id).done (user) ->
           input.addToken
             value: user.id
@@ -63,7 +63,7 @@ define [
       e.preventDefault()
 
       dfds = []
-      enrollments = @model.get('enrollments')
+      enrollments = @model.allEnrollmentsWithRole(@role)
       enrollment = enrollments[0]
       unlinkedEnrolls = _.filter enrollments, (en) -> !en.associated_user_id # keep the original observer enrollment around
       currentLinks = _.compact _.pluck(enrollments, 'associated_user_id')

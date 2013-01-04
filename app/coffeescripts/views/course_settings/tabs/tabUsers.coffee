@@ -16,16 +16,17 @@ define [
   # override adding to the users lists to work with UserCollectionView
   UL.addUserToList = (enrollment) ->
     alreadyExisted = false
+    user_list_id = null
     if enrollment.custom_role_asset_string
-      enrollmentType = $.underscore(enrollment.custom_role_asset_string)
-      $(".user_list." + enrollmentType + "s").find(".none").remove()
-      viewName = enrollmentType + 'sView'
+      user_list_id = enrollment.custom_role_asset_string
+      viewName = user_list_id + 'sView'
     else
-      enrollmentType = $.underscore(enrollment.type)
-      $(".user_list." + enrollmentType + "s").find(".none").remove()
-      viewName = enrollmentType.split('_')[0] + 'sView'
+      user_list_id = $.underscore(enrollment.type) + "s"
+      viewName = user_list_id.split('_')[0] + 'sView'
+    $("#" + user_list_id).find(".none").remove()
     users = app.usersTab[viewName].collection
-    if ($userEl = $("#user_" + enrollment.user_id)).length
+    # see if the user is already enrolled _with this role_
+    if ($userEl = $("#" + user_list_id + " #user_" + enrollment.user_id)).length
       $userEl.remove()
       users.remove users.get(enrollment.user_id)
       alreadyExisted = true

@@ -35,7 +35,7 @@ define [
           baseData:
             type: 'section'
             context: "course_#{ENV.COURSE_ID}_sections"
-            exclude: _.map(@model.get('enrollments'), (e) -> "section_#{e.course_section_id}")
+            exclude: _.map(@model.allEnrollmentsWithRole(@role), (e) -> "section_#{e.course_section_id}")
           preparer: (postData, data, parent) ->
             row.noExpand = true for row in data
           browser:
@@ -49,7 +49,7 @@ define [
         input.value for input in @$('#user_sections input')
 
       $sections = @$('#user_sections')
-      for e in @model.get('enrollments')
+      for e in @model.allEnrollmentsWithRole(@role)
         if section = ENV.CONTEXTS['sections'][e.course_section_id]
           sectionName = h section.name
           $sections.append $ """<li>
@@ -62,8 +62,8 @@ define [
     update: (e) =>
       e.preventDefault()
 
-      enrollment = @model.get('enrollments')[0]
-      currentIds = _.map @model.get('enrollments'), (en) -> en.course_section_id
+      enrollment = @model.findEnrollmentWithRole(@role)
+      currentIds = _.map @model.allEnrollmentsWithRole(@role), (en) -> en.course_section_id
       sectionIds = _.map $('#user_sections').find('input'), (i) -> parseInt($(i).val().split('_')[1])
       newSections = _.reject sectionIds, (i) => _.include currentIds, i
       deferreds = []
@@ -81,7 +81,7 @@ define [
 
       # delete old section enrollments
       sectionsToRemove = _.difference currentIds, sectionIds
-      unenrolls = _.filter @model.get('enrollments'), (en) -> _.include sectionsToRemove, en.course_section_id
+      unenrolls = _.filter @model.allEnrollmentsWithRole(@role), (en) -> _.include sectionsToRemove, en.course_section_id
       for en in unenrolls
         url = "#{ENV.COURSE_ROOT_URL}/unenroll/#{en.id}"
         deferreds.push $.ajaxJSON url, 'DELETE'

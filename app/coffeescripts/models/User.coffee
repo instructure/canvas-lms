@@ -21,8 +21,14 @@ define [
       terms_of_use:
         accepted:     I18n.t("errors.terms", "You must agree to the terms")
 
-    pending: ->
-      _.any @get('enrollments'), (e) -> e.enrollment_state in ['creation_pending', 'invited']
+    pending: (role) ->
+      _.any @get('enrollments'), (e) -> e.role == role && e.enrollment_state in ['creation_pending', 'invited']
 
-    hasEnrollmentType: (type) ->
-      _.any @get('enrollments'), (e) -> e.type == type
+    hasEnrollmentType: (type, role) ->
+      _.any @get('enrollments'), (e) -> e.role == role && e.type == type
+
+    findEnrollmentWithRole: (role) ->
+      _.find @get('enrollments'), (e) -> e.role == role
+
+    allEnrollmentsWithRole: (role) ->
+      _.select @get('enrollments'), (e) -> e.role == role

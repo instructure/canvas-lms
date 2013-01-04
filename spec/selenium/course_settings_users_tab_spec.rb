@@ -43,8 +43,19 @@ describe "course settings" do
       wait_for_ajaximations
     end
 
-    def open_kyle_menu(user)
-      cog = f("#user_#{user.id} .admin-links")
+    def open_kyle_menu(user, role = nil)
+      cog = if role
+        role_el_id = if role.is_a?(Role)
+          "role_#{role.id}"
+        elsif role.respond_to?(:name)
+          role.name.tableize
+        else
+          role.to_s.tableize
+        end
+        f("##{role_el_id} #user_#{user.id} .admin-links")
+      else
+        f("#user_#{user.id} .admin-links")
+      end
       f('button', cog).click
       cog
     end
@@ -86,13 +97,10 @@ describe "course settings" do
       go_to_users_tab
       f("#user_#{@student.id} .section").should_not include_text(section_name)
       # open dialog
-      cog = open_kyle_menu(@student)
-      f('a[data-event="editSections"]', cog).click
-      wait_for_ajaximations
-      # choose section
-      select_from_auto_complete(section_name, 'section_input')
-      f('.ui-dialog-buttonpane .btn-primary').click
-      wait_for_ajaximations
+      use_edit_sections_dialog(@student) do
+        # choose section
+        select_from_auto_complete(section_name, 'section_input')
+      end
       # expect
       f("#user_#{@student.id} .sections").should include_text(section_name)
       ff("#user_#{@student.id} .section").length.should == 2
@@ -121,9 +129,18 @@ describe "course settings" do
       driver.current_url.should include(href)
     end
 
-    def use_link_dialog(observer)
-      cog = open_kyle_menu(observer)
+    def use_link_dialog(observer, role = nil)
+      cog = open_kyle_menu(observer, role)
       f('a[data-event="linkToStudents"]', cog).click
+      wait_for_ajaximations
+      yield
+      f('.ui-dialog-buttonpane .btn-primary').click
+      wait_for_ajaximations
+    end
+
+    def use_edit_sections_dialog(user, role = nil)
+      cog = open_kyle_menu(user, role)
+      f('a[data-event="editSections"]', cog).click
       wait_for_ajaximations
       yield
       f('.ui-dialog-buttonpane .btn-primary').click
@@ -203,10 +220,10 @@ describe "course settings" do
 
         # should NOT see remove link for teacher
         cog = open_kyle_menu @teacher
-        f('a[data-event="removeFromCourse"]', cog).should be_nil
+        fj('a[data-event="removeFromCourse"]', cog).should be_nil
         # should see remove link for student
         cog = open_kyle_menu @student
-        f('a[data-event="removeFromCourse"]', cog).should_not be_nil
+        fj('a[data-event="removeFromCourse"]', cog).should_not be_nil
       end
     end
 
@@ -216,8 +233,75 @@ describe "course settings" do
       ff(".student_enrollments #user_#{@fake_student.id}").should be_empty
     end
 
-    context "custom roles" do
+    context "multiple enrollments" do
+      it "should link an observer enrollment when other enrollment types exist" do
+        course_with_student :course => @course, :active_all => true, :name => 'teh student'
+        course_with_ta :course => @course, :active_all => true
+        course_with_observer :course => @course, :active_all => true, :user => @ta
 
+        go_to_users_tab
+        use_link_dialog(@observer, 'ObserverEnrollment') do
+          select_from_auto_complete(@student.name, 'student_input')
+        end
+
+        @observer.enrollments.find_by_associated_user_id(@student.id).should_not be_nil
+        f("#observer_enrollments #user_#{@observer.id} .sections").text.should == "Observing: #{@student.name}, #{@course.name}"
+      end
+
+      it "should link the correct custom observer role to a student" do
+        @student1 = course_with_student(:course => @course, :active_all => true, :name => 'student 1').user
+        @student2 = course_with_student(:course => @course, :active_all => true, :name => 'student 2').user
+        course_with_observer :course => @course, :active_all => true
+        @role = custom_observer_role('CreepyObserver')
+        @course.enroll_user @observer, 'ObserverEnrollment', { :role_name => 'CreepyObserver', :enrollment_state => 'active' }
+
+        go_to_users_tab
+        use_link_dialog(@observer, 'ObserverEnrollment') do
+          select_from_auto_complete(@student1.name, 'student_input')
+        end
+        use_link_dialog(@observer, @role) do
+          select_from_auto_complete(@student2.name, 'student_input')
+        end
+
+        @observer.enrollments.find_by_associated_user_id_and_role_name(@student1.id, nil).should_not be_nil
+        f("#observer_enrollments #user_#{@observer.id} .sections").text.should == "Observing: #{@student1.name}, #{@course.default_section.name}"
+
+        @observer.enrollments.find_by_associated_user_id_and_role_name(@student2.id, 'CreepyObserver').should_not be_nil
+        f("#role_#{@role.id} #user_#{@observer.id} .sections").text.should == "Observing: #{@student2.name}, #{@course.default_section.name}"
+      end
+
+      it "should add a section in the correct enrollment type" do
+        course_with_ta(:course => @course, :user => @teacher, :active_all => true)
+        @section2 = @course.course_sections.create! :name => 'section2'
+        @section3 = @course.course_sections.create! :name => 'section3'
+
+        go_to_users_tab
+        use_edit_sections_dialog(@teacher, 'TeacherEnrollment') do
+          select_from_auto_complete(@section2.name, 'section_input')
+        end
+        use_edit_sections_dialog(@teacher, 'TaEnrollment') do
+          select_from_auto_complete(@section3.name, 'section_input')
+        end
+
+        @teacher.enrollments.find_all_by_course_section_id(@section2.id).map(&:type).should == %w(TeacherEnrollment)
+        f("#teacher_enrollments #user_#{@teacher.id} .sections").text.split("\n").should == [@course.default_section.name, @section2.name]
+        @teacher.enrollments.find_all_by_course_section_id(@section3.id).map(&:type).should == %w(TaEnrollment)
+        f("#ta_enrollments #user_#{@teacher.id} .sections").text.split("\n").should == [@course.default_section.name, @section3.name]
+      end
+
+      it "should list only the sections that apply to the enrollment role" do
+        @role = custom_teacher_role('CustomTeacher')
+        @section2 = @course.course_sections.create! :name => 'section2'
+        @course.enroll_user(@teacher, 'TeacherEnrollment', { :role_name => 'CustomTeacher', :enrollment_state => 'active', :section => @section2 })
+
+        go_to_users_tab
+
+        f("#teacher_enrollments #user_#{@teacher.id} .sections").text.should == @course.default_section.name
+        f("#role_#{@role.id} #user_#{@teacher.id} .sections").text.should == @section2.name
+      end
+    end
+
+    context "custom roles" do
       it "should create new observer enrollments as custom type when adding observees" do
         custom_observer_role("custom observer")
         student_in_course :course => @course
@@ -267,7 +351,22 @@ describe "course settings" do
           end
         end
       end
+    end
 
+    it "should not remove a base enrollment when adding a custom enrollment of the same base type" do
+      @role = custom_teacher_role "Mentor"
+      add_user(@teacher.name, "Mentor")
+      fj("#teacher_enrollments #user_#{@teacher.id}").should be_displayed
+      fj("#role_#{@role.id} #user_#{@teacher.id}").should be_displayed
+    end
+
+    it "should recognize when adding a duplicate custom enrollment" do
+      @role = custom_teacher_role "Mentor"
+      @course.enroll_user(@teacher, 'TeacherEnrollment', { :role_name => 'Mentor', :enrollment_state => 'active' })
+      add_user(@teacher.name, "Mentor")
+      assert_flash_notice_message /already existed/
+      fj("#teacher_enrollments #user_#{@teacher.id}").should be_displayed
+      fj("#role_#{@role.id} #user_#{@teacher.id}").should be_displayed
     end
   end
 

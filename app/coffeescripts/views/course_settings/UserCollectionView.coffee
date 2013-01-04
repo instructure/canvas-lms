@@ -11,6 +11,7 @@ define [
 
     # options.requestParams are merged with UserCollection#fetch request params
     initialize: (options) ->
+      @role = options.requestParams['enrollment_role']
       @fetchOptions = data: $.extend {}, ENV.USER_PARAMS, options.requestParams
       @collection = new UserCollection()
       @collection.url = options.url
@@ -26,4 +27,4 @@ define [
       super
 
     renderUser: (user) =>
-      @$el.append (new UserView model: user).render().el
+      @$el.append (new UserView model: user, role: @role).render().el
