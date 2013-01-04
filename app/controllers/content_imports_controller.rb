@@ -152,7 +152,7 @@ class ContentImportsController < ApplicationController
         @content_migration.migration_settings[:migration_ids_to_import] = params
         @content_migration.save
         @content_migration.import_content
-        render :json => {:success => true}.to_json
+        render :text => {:success => true}.to_json
       else
         render :json => @content_migration.to_json
       end

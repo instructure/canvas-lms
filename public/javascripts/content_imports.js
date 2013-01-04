@@ -246,9 +246,6 @@ define([
       });
     });
 
-    var $frame = $("<iframe id='copy_course_target' name='copy_course_target' src='about:blank'/>");
-    $("body").append($frame.hide());
-    $("#copy_context_form").attr('target', 'copy_course_target');
     $(".copy_progress").progressbar();
     // todo change to formsubmit
     $("#copy_context_form").formSubmit({
