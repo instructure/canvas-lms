@@ -39,7 +39,15 @@
         <td class="description" style="font-size: 0.8em;">
           <%= tool.try(:description) %>
         </td>
-      </tr><tr class="extras">
+      </tr>
+      <tr class="tool_vendor_help_link" style="<%= hidden if tool.try(:vendor_help_link).blank? %>">
+        <td><%= before_label :vendor_help_link, "Vendor Help Link" %></td>
+        <td>
+          <% url = tool.try(:vendor_help_link) %>
+          <a href="<%= url %>" class="vendor_help_link"><%= url %></a>
+        </td>
+      </tr>
+      <tr class="extras">
         <td><%= before_label :extras, "Extras" %></td>
         <td>
           <div class="editor_button"><%= t :editor_button_configured, "Editor button configured" %></div>

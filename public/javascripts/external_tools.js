@@ -71,7 +71,7 @@ $(document).ready(function() {
       $tool.fillTemplateData({
         data: tool,
         dataValues: ['id', 'workflow_state'],
-        hrefValues: ['id'],
+        hrefValues: ['id', 'vendor_help_link'],
         id: 'external_tool_' + tool.id
       });
 
@@ -91,6 +91,9 @@ $(document).ready(function() {
            .showIf(tool.url).end()
            .find(".tool_domain")
            .showIf(tool.domain);
+
+      $tool.find(".tool_vendor_help_link")
+          .showIf(tool.vendor_help_link);
 
       $tool.show();
     },
