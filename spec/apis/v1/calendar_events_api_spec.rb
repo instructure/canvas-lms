@@ -1251,4 +1251,58 @@ describe CalendarEventsApiController, :type => :integration do
       end
     end
   end
+
+  context "calendar feed" do
+    before :each do
+      now = Time.now
+      @student = user(:active_all => true, :active_state => 'active')
+      @course.enroll_student(@student, :enrollment_state => 'active')
+      @student2 = user(:active_all => true, :active_state => 'active')
+      @course.enroll_student(@student2, :enrollment_state => 'active')
+
+
+      @event = @course.calendar_events.create(:title => 'course event', :start_at => now + 1.day)
+      @assignment = @course.assignments.create(:title => 'original assignment', :due_at => now + 2.days)
+      @override = assignment_override_model(
+        :assignment => @assignment, :due_at => @assignment.due_at + 3.days, :set => @course.default_section)
+
+      @appointment_group = AppointmentGroup.create!(
+        :title => "appointment group", :participants_per_appointment => 4, 
+        :new_appointments => [
+          [now + 3.days, now + 3.days + 1.hour],
+          [now + 3.days + 1.hour, now + 3.days + 2.hours],
+          [now + 3.days + 2.hours, now + 3.days + 3.hours]],
+        :contexts => [@course])
+
+      @appointment_event = @appointment_group.appointments[0]
+      @appointment = @appointment_event.reserve_for(@student, @student)
+
+      @appointment_event2 = @appointment_group.appointments[1]
+      @appointment2 = @appointment_event2.reserve_for(@student2, @student2)
+    end
+
+    it "should have events for the teacher" do
+      raw_api_call(:get, "/feeds/calendars/#{@teacher.feed_code}.ics", {
+        :controller => 'calendar_events_api', :action => 'public_feed', :format => 'ics', :feed_code => @teacher.feed_code})
+      response.should be_success
+
+      response.body.scan(/UID:\s*event-([^\n]*)/).flatten.map(&:strip).sort.should eql [
+        "assignment-#{@assignment.id}", "assignment-override-#{@override.id}", "calendar-event-#{@event.id}",
+        "calendar-event-#{@appointment_event.id}", "calendar-event-#{@appointment_event2.id}"].sort
+    end
+
+    it "should have events for the student" do
+      raw_api_call(:get, "/feeds/calendars/#{@student.feed_code}.ics", {
+        :controller => 'calendar_events_api', :action => 'public_feed', :format => 'ics', :feed_code => @student.feed_code})
+      response.should be_success
+
+      response.body.scan(/UID:\s*event-([^\n]*)/).flatten.map(&:strip).sort.should eql [
+        "assignment-#{@assignment.id}", "calendar-event-#{@event.id}", "calendar-event-#{@appointment.id}"].sort
+
+      # make sure the assignment actually has the override date
+      expected_override_date_output = @override.due_at.utc.iso8601.gsub(/[-:]/, '').gsub(/\d\dZ$/, '00Z')
+      response.body.match(/DTSTART:\s*#{expected_override_date_output}/).should_not be_nil
+    end
+  end
+
 end

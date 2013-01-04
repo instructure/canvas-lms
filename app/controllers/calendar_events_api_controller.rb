@@ -388,6 +388,14 @@ class CalendarEventsApiController < ApplicationController
         @events.concat assignment_scope.all
         @events = apply_assignment_overrides(@events)
         @events.concat calendar_event_scope.events_without_child_events.all
+
+        # Add in any appointment groups this user can manage and someone has reserved
+        appointment_codes = manageable_appointment_group_codes
+        @events.concat CalendarEvent.active.
+          for_user_and_context_codes(@current_user, appointment_codes).
+          send(*date_scope_and_args).
+          events_with_child_events.
+          all
       end
     else
       # if the feed url doesn't give us the requesting user,
@@ -503,10 +511,7 @@ class CalendarEventsApiController < ApplicationController
       end
       # include manageable appointment group events for the specified contexts
       # and dates
-      @context_codes += AppointmentGroup.
-                          manageable_by(@current_user, @context_codes).
-                          intersecting(@start_date, @end_date).
-                          map(&:asset_string)
+      @context_codes += manageable_appointment_group_codes
     end
   end
 
@@ -554,6 +559,13 @@ class CalendarEventsApiController < ApplicationController
     end
 
     events
+  end
+
+  def manageable_appointment_group_codes
+    AppointmentGroup.
+      manageable_by(@current_user, @context_codes).
+      intersecting(@start_date, @end_date).
+      map(&:asset_string)
   end
 
 end
