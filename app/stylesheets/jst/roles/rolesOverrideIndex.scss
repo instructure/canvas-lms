@@ -16,7 +16,7 @@ table {
     line-height: 20px;
     text-align: left;
     vertical-align: top;
-    border-top: 1px solid #dddddd; }
+  }
   /* line 31, ../../../../../../../.rbenv/versions/1.9.3-p286/lib/ruby/gems/1.9.1/gems/bootstrap-sass-2.2.1.1/vendor/assets/stylesheets/bootstrap/_tables.scss */
   .table th {
     font-weight: bold; }
@@ -831,13 +831,9 @@ table th[class*="span"],
 
 
 
-
-
-
-
-
-
-
+.table th, .table td{
+  border: none !important;
+}
 
 .role-tab {
   padding-bottom: 200px !important;

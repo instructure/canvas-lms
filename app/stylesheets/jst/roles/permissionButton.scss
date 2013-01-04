@@ -38,7 +38,9 @@
     /*left: 30%;*/
 
     input[type=radio] {
-      display: none;
+      /* Display none breaks ie so we position it off the page */
+      position: absolute;
+      left: -9999px;
     }
 
     label{
