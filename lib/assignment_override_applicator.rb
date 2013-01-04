@@ -76,9 +76,9 @@ module AssignmentOverrideApplicator
       overrides += observed_student_overrides.flatten.uniq
 
       section_ids = user.enrollments.active.scoped(:conditions =>
-        { :type => ['StudentEnrollment', 'ObserverEnrollment'],
+        { :type => ['StudentEnrollment', 'ObserverEnrollment', 'StudentViewEnrollment'],
           :course_id => assignment_or_quiz.context_id}).map(&:course_section_id)
-      
+
       section_overrides = assignment_or_quiz.assignment_overrides.
         scoped(:conditions => {:set_type => 'CourseSection', :set_id => section_ids})
 

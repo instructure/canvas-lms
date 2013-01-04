@@ -253,6 +253,27 @@ describe GradebooksController do
         check_grades_page(@due_at)
       end
 
+      it "should show the latest section override in student view" do
+        section = @course.default_section
+        override = assignment_override_model(:assignment => @assignment)
+        override.set = section
+        override.override_due_at(@due_at)
+        override.save!
+
+        section2 = @course.course_sections.create!
+        override2 = assignment_override_model(:assignment => @assignment)
+        override2.set = section2
+        override2.override_due_at(@due_at - 1.day)
+        override2.save!
+
+        user_session(@teacher)
+        @fake_student = @course.student_view_student
+        session[:become_user_id] = @fake_student.id
+
+        get 'grade_summary', :course_id => @course.id, :id => @fake_student.id
+        assigns[:assignments].find{|a| a.class == Assignment}.due_at.should == @due_at
+      end
+
       it "should reflect group overrides when student is a member" do
         @assignment.group_category = @course.group_categories.create!
         @assignment.save!

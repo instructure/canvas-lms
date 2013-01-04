@@ -173,6 +173,25 @@ describe AssignmentOverrideApplicator do
         overrides.should include(@override)
         overrides.should include(@override2)
       end
+
+      it "should only use the latest due_date for student_view_student" do
+        due_at = 3.days.from_now
+
+        override1 = @override
+        override1.override_due_at(due_at)
+        override1.save!
+
+        cs = @course.course_sections.create!
+        override2 = assignment_override_model(:assignment => @assignment)
+        override2.set = cs
+        override2.override_due_at(due_at - 1.day)
+        override2.save!
+
+        @fake_student = @course.student_view_student
+        overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @fake_student)
+        overrides.should == [override1, override2]
+        AssignmentOverrideApplicator.collapsed_overrides(@assignment, overrides)[:due_at].should == due_at
+      end
     end
 
     it "should order adhoc override before group override" do
