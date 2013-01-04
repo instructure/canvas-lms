@@ -1036,12 +1036,13 @@ end
 
 class ActiveRecord::Migrator
   def self.migrations_paths
-    @@migration_paths ||= [migrations_path]
+    @@migration_paths ||= []
   end
 
   def migrations
     @@migrations ||= begin
-      files = self.class.migrations_paths.map { |p| Dir["#{p}/[0-9]*_*.rb"] }.flatten
+      files = ([@migrations_path].compact + self.class.migrations_paths).uniq.
+        map { |p| Dir["#{p}/[0-9]*_*.rb"] }.flatten
 
       migrations = files.inject([]) do |klasses, file|
         version, name = file.scan(/([0-9]+)_([_a-z0-9]*).rb/).first
