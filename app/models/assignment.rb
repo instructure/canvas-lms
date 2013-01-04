@@ -312,10 +312,6 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def turnitin_enabled?
-    self.turnitin_enabled
-  end
-
   attr_accessor :updated_submissions
   def update_submissions_later
     if @old_assignment_group_id != self.assignment_group_id

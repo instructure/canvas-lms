@@ -195,10 +195,19 @@ describe AssignmentsApiController, :type => :integration do
       @json['position'].should == 1
       @json['group_category_id'].should == @group_category.id
       @json['turnitin_enabled'].should == true
+      @json['turnitin_settings'].should == {
+        'originality_report_visibility' => 'immediate',
+        's_paper_check' => true,
+        'internet_check' => true,
+        'journal_check' => true,
+        'exclude_biblio' => true,
+        'exclude_quoted' => true,
+        'exclude_small_matches_type' => nil,
+        'exclude_small_matches_value' => nil
+      }
       @json['allowed_extensions'].should =~ [
         'docx','ppt'
       ]
-      @json['turnitin_enabled'].should == true
       @json['points_possible'].should == 12
       @json['grading_type'].should == 'points'
       @json['due_at'].should == @assignment.due_at.iso8601
@@ -341,10 +350,10 @@ describe AssignmentsApiController, :type => :integration do
           'points_possible' => '12',
           'assignment_group_id' => @group.id,
           'set_custom_field_values' => {
-          'test_custom' => {
-          'value' => '1'
-        }
-        },
+            'test_custom' => {
+              'value' => '1'
+            }
+          },
           'group_category_id' => nil,
           'description' => 'assignment description',
           'grading_type' => 'points',
@@ -428,7 +437,6 @@ describe AssignmentsApiController, :type => :integration do
       it "updates custom fields" do
         @assignment.get_custom_field_value('test_custom').true?.should == true
       end
-
     end
 
     context "when updating assignment overrides on the assignment" do
@@ -477,6 +485,78 @@ describe AssignmentsApiController, :type => :integration do
         @section_override.set.should == @course.default_section
         @section_override.due_at_overridden.should be_true
         @section_override.due_at.to_i.should == @section_due_at.to_i
+      end
+    end
+
+    context "when turnitin is enabled on the context" do
+      before do
+        course_with_teacher(:active_all => true)
+        @assignment = @course.assignments.create!
+        acct = @course.account
+        acct.turnitin_account_id = 0
+        acct.turnitin_shared_secret = "blah"
+        acct.save!
+      end
+
+      it "should allow setting turnitin_enabled" do
+        @assignment.should_not be_turnitin_enabled
+        api_update_assignment_call(@course,@assignment,{
+          'turnitin_enabled' => '1',
+        })
+        @assignment.reload.should be_turnitin_enabled
+        api_update_assignment_call(@course,@assignment,{
+          'turnitin_enabled' => '0',
+        })
+        @assignment.reload.should_not be_turnitin_enabled
+      end
+
+      it "should allow setting valid turnitin_settings" do
+        update_settings = {
+          :originality_report_visibility => 'after_grading',
+          :s_paper_check => '0',
+          :internet_check => false,
+          :journal_check => '1',
+          :exclude_biblio => true,
+          :exclude_quoted => '0',
+          :exclude_small_matches_type => 'percent',
+          :exclude_small_matches_value => 50
+        }
+
+        json = api_update_assignment_call(@course, @assignment, {
+          :turnitin_settings => update_settings
+        })
+        json["turnitin_settings"].should == {
+          'originality_report_visibility' => 'after_grading',
+          's_paper_check' => false,
+          'internet_check' => false,
+          'journal_check' => true,
+          'exclude_biblio' => true,
+          'exclude_quoted' => false,
+          'exclude_small_matches_type' => 'percent',
+          'exclude_small_matches_value' => 50
+        }
+
+        @assignment.reload.turnitin_settings.should == {
+          'originality_report_visibility' => 'after_grading',
+          's_paper_check' => '0',
+          'internet_check' => '0',
+          'journal_check' => '1',
+          'exclude_biblio' => '1',
+          'exclude_quoted' => '0',
+          'exclude_type' => '2',
+          'exclude_value' => '50'
+        }
+      end
+
+      it "should not allow setting invalid turnitin_settings" do
+        update_settings = {
+          :blah => '1'
+        }.with_indifferent_access
+
+        api_update_assignment_call(@course, @assignment, {
+          :turnitin_settings => update_settings
+        })
+        @assignment.reload.turnitin_settings["blah"].should be_nil
       end
     end
 

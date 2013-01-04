@@ -61,6 +61,29 @@
 #       // Turnitin plugin available
 #       turnitin_enabled: true,
 #
+#       // Settings to pass along to turnitin to control what kinds of matches
+#       // should be considered.
+#       // originality_report_visibility can be 'immediate', 'after_grading', or 'after_due_date'
+#       // exclude_small_matches_type can be null, 'percent', 'words'
+#       // exclude_small_matches_value:
+#       // - if type is null, this will be null also
+#       // - if type is 'percent', this will be a number between 0 and 100
+#       //   representing match size to exclude as a percentage of the document size.
+#       // - if type is 'words', this will be number > 0 representing how many
+#       //   words a match must contain for it to be considered
+#       // NOTE: This flag will not appear unless your account has the
+#       // Turnitin plugin available
+#       turnitin_settings: {
+#         originality_report_visibility => 'after_grading',
+#         s_paper_check => false,
+#         internet_check => false,
+#         journal_check => false,
+#         exclude_biblio => false,
+#         exclude_quoted => false,
+#         exclude_small_matches_type => 'percent',
+#         exclude_small_matches_value => 50,
+#       },
+#
 #       // If this is a group assignment, boolean flag indicating whether or
 #       // not students will be graded individually.
 #       grade_group_students_individually: false,
@@ -71,9 +94,9 @@
 #       // Use the "External Tools" API if you need more information about
 #       // an external tool.
 #       external_tool_tag_attributes: {
-#         // URL to the external tool \ 
+#         // URL to the external tool
 #         url: "http://instructure.com",
-#         // Whether or not there is a new tab for the external tool\ 
+#         // Whether or not there is a new tab for the external tool
 #         new_tab: false
 #       },
 #       
@@ -268,6 +291,10 @@ class AssignmentsApiController < ApplicationController
   #   the submission_types array includes "online_upload".
   #   Toggles Turnitin submissions for the assignment.
   #   Will be ignored if Turnitin is not available for the course.
+  #
+  # @argument assignment[turnitin_settings] [Optional]
+  #   Settings to send along to turnitin. See Assignment object definition for
+  #   format.
   #
   # @argument assignment[peer_reviews] [Optional,Boolean]
   #   If submission_types does not include external_tool,discussion_topic,

@@ -871,7 +871,7 @@ class Account < ActiveRecord::Base
   end
   
   def turnitin_settings
-    if self.turnitin_account_id && self.turnitin_shared_secret && !self.turnitin_account_id.empty? && !self.turnitin_shared_secret.empty?
+    if self.turnitin_account_id.present? && self.turnitin_shared_secret.present?
       [self.turnitin_account_id, self.turnitin_shared_secret]
     else
       self.parent_account.turnitin_settings rescue nil

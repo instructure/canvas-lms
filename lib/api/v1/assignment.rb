@@ -71,6 +71,7 @@ module Api::V1::Assignment
 
     if assignment.context && assignment.context.turnitin_enabled?
       hash['turnitin_enabled'] = assignment.turnitin_enabled
+      hash['turnitin_settings'] = turnitin_settings_json(assignment)
     end
 
     if assignment.rubric_association
@@ -108,6 +109,25 @@ module Api::V1::Assignment
     hash
   end
 
+  def turnitin_settings_json(assignment)
+    settings = assignment.turnitin_settings.with_indifferent_access
+    [:s_paper_check, :internet_check, :journal_check, :exclude_biblio, :exclude_quoted].each do |key|
+      settings[key] = value_to_boolean(settings[key])
+    end
+
+    ex_type = settings.delete(:exclude_type)
+    settings[:exclude_small_matches_type] = case ex_type
+      when '0'; nil
+      when '1'; 'words'
+      when '2'; 'percent'
+    end
+
+    ex_value = settings.delete(:exclude_value)
+    settings[:exclude_small_matches_value] = ex_value.present? ? ex_value.to_i : nil
+
+    settings.slice(*API_ALLOWED_TURNITIN_SETTINGS)
+  end
+
   API_ALLOWED_ASSIGNMENT_INPUT_FIELDS = %w(
     name
     description
@@ -127,6 +147,18 @@ module Api::V1::Assignment
     grade_group_students_individually
     set_custom_field_values
     turnitin_enabled
+    turnitin_settings
+  )
+
+  API_ALLOWED_TURNITIN_SETTINGS = %w(
+    originality_report_visibility
+    s_paper_check
+    internet_check
+    journal_check
+    exclude_biblio
+    exclude_quoted
+    exclude_small_matches_type
+    exclude_small_matches_value
   )
 
   def update_api_assignment(assignment, assignment_params, save = true)
@@ -137,24 +169,44 @@ module Api::V1::Assignment
       update_params["submission_types"] = update_params["submission_types"].join(',')
     end
 
-    if assignment_params.has_key?("assignment_group_id")
-      ag_id = assignment_params["assignment_group_id"]
-      if ag_id.nil? || ag_id.is_a?( Numeric )
-        assignment.assignment_group = assignment.context.assignment_groups.find_by_id(ag_id)
-      end
+    # validate and add to update_params
+    if update_params.has_key?("assignment_group_id")
+      ag_id = update_params.delete("assignment_group_id").presence
+      ag = assignment.context.assignment_groups.find_by_id(ag_id)
+      update_params["assignment_group_id"] = ag.try(:id)
     end
 
-    if assignment_params.has_key?("group_category_id")
-      gc_id = assignment_params["group_category_id"]
-      if gc_id.nil? || gc_id.is_a?( Numeric )
-        assignment.group_category = assignment.context.group_categories.find_by_id(gc_id)
-      end
+    # validate and add to update_params
+    if update_params.has_key?("group_category_id")
+      gc_id = update_params["group_category_id"].presence
+      gc = assignment.context.group_categories.find_by_id(gc_id)
+      update_params["group_category_id"] = gc.try(:id)
     end
 
+    # do some fiddling with due_at for fancy midnight and add to update_params
     if update_params.has_key?("due_at")
       update_params["time_zone_edited"] = Time.zone.name
-      # do some fiddling with due_at for fancy midnight
       assignment.due_at = update_params["due_at"]
+      update_params["due_at"] = assignment.due_at
+    end
+
+    if !assignment.context.try(:turnitin_enabled?)
+      update_params.delete("turnitin_enabled")
+      update_params.delete("turnitin_settings")
+    end
+
+    # use Assignment#turnitin_settings= to normalize, but then assign back to
+    # hash so that it is written with update_params
+    if update_params.has_key?("turnitin_settings")
+      turnitin_settings = update_params["turnitin_settings"].slice(*API_ALLOWED_TURNITIN_SETTINGS)
+      turnitin_settings['exclude_type'] = case turnitin_settings['exclude_small_matches_type']
+        when nil; '0'
+        when 'words'; '1'
+        when 'percent'; '2'
+      end
+      turnitin_settings['exclude_value'] = turnitin_settings['exclude_small_matches_value']
+      assignment.turnitin_settings = turnitin_settings
+      update_params["turnitin_settings"] = assignment.turnitin_settings
     end
 
     # TODO: allow rubric creation

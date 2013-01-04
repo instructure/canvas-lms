@@ -1960,20 +1960,20 @@ describe Assignment do
       assignment.turnitin_settings = {
         :originality_report_visibility => 'invalid',
         :s_paper_check => '2',
-        :internet_check => '2',
-        :journal_check => '2',
-        :exclude_biblio => '2',
-        :exclude_quoted => '2',
+        :internet_check => 1,
+        :journal_check => 0,
+        :exclude_biblio => true,
+        :exclude_quoted => false,
         :exclude_type => '3',
         :exclude_value => 'asdf',
         :bogus => 'haha'
       }
       assignment.turnitin_settings.should eql({
         :originality_report_visibility => 'immediate',
-        :s_paper_check => '0',
-        :internet_check => '0',
+        :s_paper_check => '1',
+        :internet_check => '1',
         :journal_check => '0',
-        :exclude_biblio => '0',
+        :exclude_biblio => '1',
         :exclude_quoted => '0',
         :exclude_type => '0',
         :exclude_value => ''
