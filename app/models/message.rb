@@ -442,7 +442,9 @@ class Message < ActiveRecord::Base
     if res
       complete_dispatch
     elsif @exception
-      if !@exception.is_a?(Timeout::Error)
+      raise_error = @exception.to_s !~ /^450/
+      log_error = raise_error && !@exception.is_a?(Timeout::Error)
+      if log_error
         ErrorReport.log_exception(:default, @exception, {
           :message => "Message delivery failed",
           :to => self.to,
@@ -450,7 +452,11 @@ class Message < ActiveRecord::Base
         })
       end
       self.errored_dispatch
-      raise @exception
+      if raise_error
+        raise @exception
+      else
+        return false
+      end
     end
     true
   end

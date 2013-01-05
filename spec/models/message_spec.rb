@@ -86,6 +86,23 @@ describe Message do
         @message.deliver.should be_nil
         @message.reload.state.should == :cancelled
       end
+
+      it "should log errors and raise based on error type" do
+        message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
+        Mailer.expects(:deliver_message).raises("something went wrong")
+        ErrorReport.expects(:log_exception)
+        expect { @message.deliver }.to raise_exception("something went wrong")
+
+        message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
+        Mailer.expects(:deliver_message).raises(Timeout::Error.new)
+        ErrorReport.expects(:log_exception).never
+        expect { @message.deliver }.to raise_exception(Timeout::Error)
+
+        message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
+        Mailer.expects(:deliver_message).raises("450 recipient address rejected")
+        ErrorReport.expects(:log_exception).never
+        @message.deliver.should == false
+      end
     end
   end
 end
