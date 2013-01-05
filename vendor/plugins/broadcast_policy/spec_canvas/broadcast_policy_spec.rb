@@ -16,13 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'rubygems'
-require 'spec'
-require File.join(File.dirname(__FILE__), "/../lib/broadcast_policy")
+require File.expand_path(File.dirname(__FILE__) + '/../../../../spec/spec_helper')
 
-include ::Instructure
-
-describe BroadcastPolicy, "set_broadcast_policy" do
+describe Instructure::BroadcastPolicy, "set_broadcast_policy" do
   before(:each) do
     class AnotherModel
       class << self
@@ -33,7 +29,7 @@ describe BroadcastPolicy, "set_broadcast_policy" do
           true
         end
       end
-      extend BroadcastPolicy::ClassMethods
+      extend Instructure::BroadcastPolicy::ClassMethods
     end
   end
 
@@ -42,6 +38,31 @@ describe BroadcastPolicy, "set_broadcast_policy" do
     a.should_not be_respond_to(:just_created)
     AnotherModel.send(:has_a_broadcast_policy)
     a.should be_respond_to(:just_created)
+  end
+
+  it "should allow multiple blocks" do
+    foo = Canvas::MessageHelper.create_notification('Foo', 'Foo', 0, '', 'Foo')
+    bar = Canvas::MessageHelper.create_notification('Bar', 'Bar', 0, '', 'Bar')
+
+    class AnotherModel
+      has_a_broadcast_policy
+
+      set_broadcast_policy do
+        dispatch :foo
+        to       {}
+        whenever {}
+      end
+
+      set_broadcast_policy do
+        dispatch :bar
+        to       {}
+        whenever {}
+      end
+    end
+
+    list = AnotherModel.broadcast_policy_list
+    list.find_policy_for(foo).should be_present
+    list.find_policy_for(bar).should be_present
   end
   # it "should require a block" do
   #   lambda{
