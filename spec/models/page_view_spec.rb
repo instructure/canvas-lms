@@ -174,6 +174,13 @@ describe PageView do
     PageView.find(@page_view.id).should == @page_view
   end
 
+  it "should not store if the page view has no user" do
+    Setting.set('enable_page_views', 'db')
+    @page_view.user = nil
+    @page_view.store.should be_false
+    PageView.count.should == 0
+  end
+
   if Canvas.redis_enabled?
     before do
       Setting.set('enable_page_views', 'cache')
@@ -189,8 +196,8 @@ describe PageView do
 
     it "should store into redis in transactional batches" do
       @page_view.store.should be_true
-      PageView.new { |p| p.send(:attributes=, { :user_id => 7, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcdef", :interaction_seconds => 5 }, false) }.store
-      PageView.new { |p| p.send(:attributes=, { :user_id => 7, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcdefg", :interaction_seconds => 5 }, false) }.store
+      PageView.new { |p| p.send(:attributes=, { :user => @user, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcdef", :interaction_seconds => 5 }, false) }.store
+      PageView.new { |p| p.send(:attributes=, { :user => @user, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcdefg", :interaction_seconds => 5 }, false) }.store
       PageView.count.should == 0
       Setting.set('page_view_queue_batch_size', '2')
       PageView.expects(:transaction).at_least(5).yields # 5 times, because 2 outermost transactions, then rails starts a "transaction" for each save (which runs as a no-op, since we're already in a transaction)
