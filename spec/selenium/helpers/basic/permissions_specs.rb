@@ -42,14 +42,14 @@ shared_examples_for "permission tests" do
   end
 
   def add_new_account_role(role_name)
-    role = account.roles.build name: role_name
+    role = account.roles.build({:name => role_name})
     role.base_role_type = "AccountMembership"
     role.save!
     role
   end
 
   def add_new_course_role(role_name, role_type = "StudentEnrollment")
-    role = account.roles.build name: role_name
+    role = account.roles.build({:name => role_name})
     role.base_role_type = role_type
     role.save!
     role
