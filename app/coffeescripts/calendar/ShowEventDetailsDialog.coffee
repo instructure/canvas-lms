@@ -153,6 +153,7 @@ define [
       params.showEventLink   = params.fullDetailsURL()
       params.showEventLink or= params.isAppointmentGroupEvent()
       @popover = new Popover(jsEvent, eventDetailsTemplate(params))
+      @popover.el.data('showEventDetailsDialog', @)
 
       @popover.el.find(".edit_event_link").click preventDefault @showEditDialog
 
@@ -170,3 +171,10 @@ define [
         new MessageParticipantsDialog(timeslot: @event.calendarEvent).show()
 
       publish('userContent/change')
+
+    close: =>
+      if @popover
+        @popover.el.removeData('showEventDetailsDialog')
+        @popover.hide()
+
+

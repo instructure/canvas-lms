@@ -76,13 +76,16 @@ define [
         events: @getEvents
         eventRender: @eventRender
         eventAfterRender: @eventAfterRender
+        eventDragStart: @eventDragStart
         eventDrop: @eventDrop
         eventClick: @eventClick
         eventResize: @eventResize
+        eventResizeStart: @eventResizeStart
         dayClick: @dayClick
         titleFormat:
           week: "MMM d[ yyyy]{ '&ndash;'[ MMM] d, yyyy}"
         viewDisplay: @viewDisplay
+        windowResize: @windowResize
         drop: @drop
         , calendarDefaults)
 
@@ -197,6 +200,17 @@ define [
         else
           cb(filterEvents(events))
 
+    # Close all event details popup on the page and have them cleaned up.
+    closeEventPopups: ->
+      # Close any open popup as it gets detached when rendered
+      $('.event-details').each ->
+        existingDialog = $(this).data('showEventDetailsDialog')
+        if existingDialog
+          existingDialog.close()
+
+    windowResize: (view) =>
+      @closeEventPopups()
+
     eventRender: (event, element, view) =>
       $element = $(element)
       if event.isAppointmentGroupEvent() && @displayAppointmentEvents &&
@@ -235,6 +249,9 @@ define [
           pageX: element.offset().left + parseInt(element.width() / 2)
           view
 
+    eventDragStart: (event, jsEvent, ui, view) =>
+      @closeEventPopups()
+
     eventDrop: (event, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view) =>
       # isDueAtMidnight() will read cached midnightFudged property
       if event.eventType == "assignment" && event.isDueAtMidnight() && minuteDelta == 0
@@ -242,7 +259,11 @@ define [
       event.saveDates null, revertFunc
 
     eventClick: (event, jsEvent, view) =>
-      (new ShowEventDetailsDialog(event)).show(jsEvent)
+      $event = $(jsEvent.currentTarget)
+      if !$event.hasClass('event_pending')
+        detailsDialog = new ShowEventDetailsDialog(event)
+        $event.data('showEventDetailsDialog', detailsDialog)
+        detailsDialog.show jsEvent
 
     dayClick: (date, allDay, jsEvent, view) =>
       if @displayAppointmentEvents
@@ -260,6 +281,9 @@ define [
 
     eventResize: (event, dayDelta, minuteDelta, revertFunc, jsEvent, ui, view) =>
       event.saveDates null, revertFunc
+
+    eventResizeStart: (event, jsEvent, ui, view) =>
+      @closeEventPopups()
 
     updateFragment: (opts) ->
       data = @dataFromDocumentHash()
@@ -340,6 +364,7 @@ define [
       # to dated, and in that case we don't know whether to just update it or
       # add it. Some new state would need to be kept to track that.
       # @calendar.fullCalendar('updateEvent', event)
+      @closeEventPopups()
 
     eventSaveFailed: (event) =>
       event.removeClass 'event_pending'
