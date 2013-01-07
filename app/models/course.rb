@@ -2557,16 +2557,13 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def enrollment_visibility_level_for(user, visibilities = section_visibilities_for(user))
-    if visibilities.empty? # i.e. not enrolled
-      if self.grants_rights?(user, nil, :manage_grades, :manage_students, :manage_admin_users, :read_roster)
-        :full
-      else
-        :none
-      end
-    elsif visibilities.all?{ |e| e[:type] == 'ObserverEnrollment' }
-      :restricted # e.g. observers shouldn't see anyone but the observed
-    elsif visibility_limited_to_course_sections?(user, visibilities)
+  def enrollment_visibility_level_for(user, visibilities = section_visibilities_for(user), require_message_permission = false)
+    permissions = require_message_permission ?
+      [:send_messages] :
+      [:manage_grades, :manage_students, :manage_admin_users, :read_roster, :view_all_grades]
+    if !self.grants_rights?(user, nil, *permissions).values.any?
+      :restricted # e.g. observer, can only see admins in the course
+    elsif visibilities.present? && visibility_limited_to_course_sections?(user, visibilities)
       :sections
     else
       :full
