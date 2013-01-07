@@ -122,7 +122,9 @@ shared_examples_for "discussion and announcement individual tests" do
 
   it "should add an attachment to a graded topic" do
     what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => 'graded attachment topic', :user => @user) : announcement_model(:title => 'graded attachment topic', :user => @user)
-    what_to_create.last.update_attributes(:assignment => @course.assignments.create!(:name => 'graded topic assignment'))
+    if what_to_create == DiscussionTopic
+      what_to_create.last.update_attributes(:assignment => @course.assignments.create!(:name => 'graded topic assignment'))
+    end
     get url
     expect_new_page_load { f('.discussion-title').click }
     f("#discussion-toolbar .al-trigger-inner").click

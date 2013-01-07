@@ -136,6 +136,7 @@ Spec::Runner.configure do |config|
     Delayed::Job.redis.flushdb if Delayed::Job == Delayed::Backend::Redis::Job
     truncate_all_cassandra_tables
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
+    Attachment.domain_namespace = nil
   end
 
   # flush redis before the first spec, and before each spec that comes after
