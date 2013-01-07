@@ -1068,6 +1068,25 @@ describe User do
       messageable_users.should be_empty
     end
 
+    it "should let students message the entire class by default" do
+      set_up_course_with_users
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+
+      @student.messageable_users(:context => "course_#{@course.id}").map(&:id).sort.
+        should eql [@student, @this_section_user, @this_section_teacher, @other_section_user, @other_section_teacher].map(&:id).sort
+    end
+
+    it "should not let users message the entire class if they cannot send_messages" do
+      set_up_course_with_users
+      RoleOverride.create!(:context => @course.account, :permission => 'send_messages',
+                           :enrollment_type => "StudentEnrollment", :enabled => false)
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+
+      # can only message self or the admins
+      @student.messageable_users(:context => "course_#{@course.id}").map(&:id).sort.
+        should eql [@student, @this_section_teacher, @other_section_teacher].map(&:id).sort
+    end
+
     it "should not include deleted users" do
       set_up_course_with_users
       @student.messageable_users.map(&:id).should_not include(@deleted_user.id)

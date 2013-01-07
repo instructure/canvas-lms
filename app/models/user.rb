@@ -2180,8 +2180,8 @@ class User < ActiveRecord::Base
     SQL
   end
 
-  def enrollment_visibility
-    Rails.cache.fetch([self, 'enrollment_visibility_with_sections_2'].cache_key, :expires_in => 1.day) do
+  def enrollment_visibility(require_message_permission = true)
+    Rails.cache.fetch([self, 'enrollment_visibility', require_message_permission].cache_key, :expires_in => 1.day) do
       full_course_ids = []
       section_id_hash = {}
       restricted_course_hash = {}
@@ -2192,7 +2192,7 @@ class User < ActiveRecord::Base
       courses_with_primary_enrollment(:current_and_concluded_courses, nil, :include_completed_courses => true).each do |course|
         section_visibilities = course.section_visibilities_for(self)
         conditions = nil
-        case course.enrollment_visibility_level_for(self, section_visibilities)
+        case course.enrollment_visibility_level_for(self, section_visibilities, require_message_permission)
           when :full
             full_course_ids << course.id
           when :sections
@@ -2249,9 +2249,9 @@ class User < ActiveRecord::Base
   end
   memoize :visible_group_ids
 
-  def group_membership_visibility
-    Rails.cache.fetch([self, 'group_membership_visibility'].cache_key, :expires_in => 1.day) do
-      course_visibility = enrollment_visibility
+  def group_membership_visibility(require_message_permission = true)
+    Rails.cache.fetch([self, 'group_membership_visibility', require_message_permission].cache_key, :expires_in => 1.day) do
+      course_visibility = enrollment_visibility(require_message_permission)
       own_group_ids = current_groups.map(&:id)
 
       full_group_ids = []
