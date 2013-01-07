@@ -87,7 +87,7 @@ end
 
 group :test do
   gem 'bluecloth',    '2.0.10' # for generating api docs
-  gem 'parallelized_specs', '0.3.86'
+  gem 'parallelized_specs', '0.3.88'
   gem 'mocha',        '0.12.3', :require => 'mocha_standalone'
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.2'
