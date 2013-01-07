@@ -394,7 +394,7 @@ enrollments.csv
 <td>role</td>
 <td>text</td>
 <td>required</td>
-<td>student, teacher, ta, observer, designer</td>
+<td>student, teacher, ta, observer, designer, or a custom role defined by the account</td>
 </tr>
 <tr>
 <td>section_id</td>

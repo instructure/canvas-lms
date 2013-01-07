@@ -17,7 +17,6 @@
 #
 
 class QuizSubmissionsController < ApplicationController
-  protect_from_forgery :except => [:create, :backup]
   before_filter :require_context
   batch_jobs_in_actions :only => [:update, :create], :batch => { :priority => Delayed::LOW_PRIORITY }
 

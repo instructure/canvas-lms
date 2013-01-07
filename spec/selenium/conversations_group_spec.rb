@@ -52,7 +52,7 @@ describe "conversations group" do
     @checkbox.should_not be_displayed
   end
 
-  it "should be an option, default false, for a single 'bulk' recipient" do
+  it "should be an option, default false, for a single bulk recipient" do
     choose_recipient("the course", "Everyone", "Select All")
     @checkbox.should be_displayed
     is_checked(".group_conversation").should be_false

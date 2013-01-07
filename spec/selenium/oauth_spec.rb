@@ -61,7 +61,7 @@ describe "oauth2 flow" do
       f('.icon_url').should be_nil
     end
     
-    it "should show the developer key's icon if icon_url is set" do
+    it "should show the developer keys icon if icon_url is set" do
       @key.icon_url = "/images/delete.png"
       @key.save!
       get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=urn:ietf:wg:oauth:2.0:oob"

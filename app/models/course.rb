@@ -76,6 +76,7 @@ class Course < ActiveRecord::Base
   has_many :prior_enrollments, :class_name => 'Enrollment', :include => [:user, :course], :conditions => "enrollments.workflow_state = 'completed'"
   has_many :prior_users, :through => :prior_enrollments, :source => :user
   has_many :students, :through => :student_enrollments, :source => :user
+  has_many :self_enrolled_students, :through => :student_enrollments, :source => :user, :conditions => "self_enrolled"
   has_many :all_students, :through => :all_student_enrollments, :source => :user
   has_many :participating_students, :through => :enrollments, :source => :user, :conditions => "enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment') and enrollments.workflow_state = 'active'"
   has_many :student_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')", :include => :user
@@ -145,14 +146,13 @@ class Course < ActiveRecord::Base
 
   has_many :external_feeds, :as => :context, :dependent => :destroy
   belongs_to :default_grading_standard, :class_name => 'GradingStandard', :foreign_key => 'grading_standard_id'
-  has_many :grading_standards, :as => :context
+  has_many :grading_standards, :as => :context, :conditions => ['workflow_state != ?', 'deleted']
   has_one :gradebook_upload, :as => :context, :dependent => :destroy
   has_many :web_conferences, :as => :context, :order => 'created_at DESC', :dependent => :destroy
   has_many :rubrics, :as => :context
   has_many :rubric_associations, :as => :context, :include => :rubric, :dependent => :destroy
   has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
   has_one :scribd_account, :as => :scribdable
-  has_many :grading_standards, :as => :context
   has_many :context_modules, :as => :context, :order => :position, :dependent => :destroy
   has_many :active_context_modules, :as => :context, :class_name => 'ContextModule', :conditions => {:workflow_state => 'active'}
   has_many :context_module_tags, :class_name => 'ContentTag', :as => 'context', :order => :position, :conditions => ['tag_type = ?', 'context_module'], :dependent => :destroy
@@ -551,10 +551,12 @@ class Course < ActiveRecord::Base
   end
   memoize :user_is_instructor?
 
-  def user_is_student?(user)
+  def user_is_student?(user, opts = {})
     return unless user
-    Rails.cache.fetch([self, user, "course_user_is_student"].cache_key) do
-      user.cached_current_enrollments.any? { |e| e.course_id == self.id && e.participating_student? }
+    Rails.cache.fetch([self, user, "course_user_is_student", opts[:include_future]].cache_key) do
+      user.cached_current_enrollments(:include_future => opts[:include_future]).any? { |e|
+        e.course_id == self.id && (opts[:include_future] ? e.student? : e.participating_student?)
+      }
     end
   end
   memoize :user_is_student?
@@ -743,6 +745,14 @@ class Course < ActiveRecord::Base
     code
   end
 
+  # can be overridden via plugin
+  def self_enrollment_min_age
+  end
+
+  def self_enrollment_limit_met?
+    self_enrollment_limit && self_enrolled_students.size >= self_enrollment_limit
+  end
+
   def long_self_enrollment_code
     Digest::MD5.hexdigest("#{uuid}_for_#{id}")
   end
@@ -760,7 +770,7 @@ class Course < ActiveRecord::Base
   end
 
   def recompute_student_scores
-    Enrollment.recompute_final_score(self.students.map(&:id), self.id)
+    Enrollment.recompute_final_score(student_ids, self.id)
   end
   handle_asynchronously_if_production :recompute_student_scores,
     :singleton => proc { |c| "recompute_student_scores:#{ c.global_id }" }
@@ -947,7 +957,7 @@ class Course < ActiveRecord::Base
       given {|user, session| (self.enrollment_allows(user, session, permission) || self.account_membership_allows(user, session, permission)) && (!details[:if] || send(details[:if])) }
       can permission
     end
-    
+
     given { |user, session| session && session[:enrollment_uuid] && (hash = Enrollment.course_user_state(self, session[:enrollment_uuid]) || {}) && (hash[:enrollment_state] == "invited" || hash[:enrollment_state] == "active" && hash[:user_state] == "pre_registered") && (self.available? || self.completed? || self.claimed? && hash[:is_admin]) }
     can :read and can :read_outcomes
 
@@ -957,7 +967,7 @@ class Course < ActiveRecord::Base
     # Active students
     given { |user| self.available? && user && user.cached_current_enrollments.any?{|e| e.course_id == self.id && e.participating_student? } }
     can :read and can :participate_as_student and can :read_grades and can :read_outcomes
-    
+
     given { |user| (self.available? || self.completed?) && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_observer? && e.associated_user_id} }
     can :read_grades
 
@@ -979,23 +989,54 @@ class Course < ActiveRecord::Base
     can :read and can :participate_as_student and can :read_grades and can :read_outcomes
 
     # Prior users
-    given { |user| (self.available? || self.completed?) && user && self.prior_enrollments.map(&:user_id).include?(user.id) }
-    can :read and can :read_outcomes
+    given do |user|
+      (available? || completed?) && user &&
+        prior_enrollments.for_user(user).count > 0
+    end
+    can :read, :read_outcomes
 
     # Admin (Teacher/TA/Designer) of a concluded course
-    given { |user| !self.deleted? && user && (self.prior_enrollments.select{|e| e.admin? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.admin? && e.completed? }) }
-    can :read and can :read_as_admin and can :read_roster and can :read_prior_roster and can :read_forum and can :use_student_view and can :read_outcomes
+    given do |user|
+      !self.deleted? && user &&
+        (prior_enrollments.for_user(user).any?{|e| e.admin? } ||
+         user.cached_not_ended_enrollments.any? do |e|
+           e.course_id == self.id && e.admin? && e.completed?
+         end
+        )
+    end
+    can [:read, :read_as_admin, :read_roster, :read_prior_roster, :read_forum, :use_student_view, :read_outcomes]
 
-    given { |user| !self.deleted? && user && (self.prior_enrollments.select{|e| e.instructor? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.instructor? && e.completed? }) }
-    can :read_user_notes and can :view_all_grades
+    given do |user|
+      !self.deleted? && user &&
+        (prior_enrollments.for_user(user).any?{|e| e.instructor? } ||
+          user.cached_not_ended_enrollments.any? do |e|
+            e.course_id == self.id && e.instructor? && e.completed?
+          end
+        )
+    end
+    can :read_user_notes, :view_all_grades
 
     # Teacher or Designer of a concluded course
-    given { |user| !self.deleted? && !self.sis_source_id && user && (self.prior_enrollments.select{|e| e.content_admin? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && e.content_admin? && e.state_based_on_date == :completed })}
+    given do |user|
+      !self.deleted? && !self.sis_source_id && user &&
+        (prior_enrollments.for_user(user).any?{|e| e.content_admin? } ||
+          user.cached_not_ended_enrollments.any? do |e|
+            e.course_id == self.id && e.content_admin? && e.state_based_on_date == :completed
+          end
+        )
+    end
     can :delete
 
     # Student of a concluded course
-    given { |user| (self.available? || self.completed?) && user && (self.prior_enrollments.select{|e| e.student? || e.assigned_observer? }.map(&:user_id).include?(user.id) || user.cached_not_ended_enrollments.any? { |e| e.course_id == self.id && (e.student? || e.assigned_observer?) && e.state_based_on_date == :completed }) }
-    can :read and can :read_grades and can :read_forum and can :read_outcomes
+    given do |user|
+      (self.available? || self.completed?) && user &&
+        (prior_enrollments.for_user(user).any?{|e| e.student? || e.assigned_observer? } ||
+         user.cached_not_ended_enrollments.any? do |e|
+          e.course_id == self.id && (e.student? || e.assigned_observer?) && e.state_based_on_date == :completed
+         end
+        )
+    end
+    can :read, :read_grades, :read_forum, :read_outcomes
 
     # Viewing as different role type
     given { |user, session| session && session["role_course_#{self.id}"] }
@@ -1357,7 +1398,7 @@ class Course < ActiveRecord::Base
       #Possible muted row
       if assignments.any?(&:muted)
         #This is is not translated since we look for this exact string when we upload to gradebook.
-        row = ['Muted assignments do not impact Current and Final score columns', '', '']
+        row = ['', '', '']
         row.concat(['', '']) if options[:include_sis_id]
         row.concat(assignments.map{|a| single ? [(a.muted ? 'Muted': ''), ''] : (a.muted ? 'Muted' : '')})
         row.concat(['', ''])
@@ -1392,9 +1433,14 @@ class Course < ActiveRecord::Base
         end
         row << student_section
         row.concat(student_submissions)
-        row.concat([student_enrollment.computed_current_score, student_enrollment.computed_final_score])
+
+        calc = GradeCalculator.new([student.id],
+                                   student_enrollment.course_id,
+                                   :ignore_muted => false)
+        current_score, final_score = calc.compute_scores.first
+        row.concat [current_score, final_score]
         if self.grading_standard_enabled?
-          row.concat([score_to_grade(student_enrollment.computed_final_score)])
+          row.concat([score_to_grade(final_score)])
         end
         csv << row.flatten
       end
@@ -1481,7 +1527,7 @@ class Course < ActiveRecord::Base
   def self_enroll_student(user, opts = {})
     enrollment = enroll_student(user, opts.merge(:no_notify => true))
     enrollment.self_enrolled = true
-    enrollment.accept
+    enrollment.accept(:force)
     unless opts[:skip_pseudonym]
       new_pseudonym = user.find_or_initialize_pseudonym_for_account(root_account)
       new_pseudonym.save if new_pseudonym && new_pseudonym.changed?
@@ -1923,7 +1969,9 @@ class Course < ActiveRecord::Base
     if settings[:storage_quota] && ( migration.for_course_copy? || self.account.grants_right?(migration.user, nil, :manage_courses))
       self.storage_quota = settings[:storage_quota]
     end
-    self.settings[:hide_final_grade] = !!settings[:hide_final_grade] unless settings[:hide_final_grade].nil?
+    [:hide_final_grade, :hide_distribution_graph].each do |setting|
+      self.settings[setting] = !!settings[setting] unless settings[setting].nil?
+    end
     atts = Course.clonable_attributes
     atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
     settings.slice(*atts.map(&:to_s)).each do |key, val|
@@ -1937,8 +1985,8 @@ class Course < ActiveRecord::Base
         else
           migration.add_warning("Couldn't find copied grading standard for the course.")
         end
-      elsif settings[:grading_standard_id]
-        if gs = GradingStandard.sorted_standards_for(self).find{|s|s.id == settings[:grading_standard_id]}
+      elsif settings[:grading_standard_id].present?
+        if gs = GradingStandard.standards_for(self).find_by_id(settings[:grading_standard_id])
           self.grading_standard = gs
         else
           migration.add_warning("Couldn't find account grading standard for the course.")
@@ -2421,6 +2469,7 @@ class Course < ActiveRecord::Base
   def students_visible_to(user, include_priors=false)
     enrollments_visible_to(user, :include_priors => include_priors, :return_users => true)
   end
+
   def enrollments_visible_to(user, opts = {})
     visibilities = section_visibilities_for(user)
     relation = []
@@ -2750,6 +2799,7 @@ class Course < ActiveRecord::Base
   # these settings either are or could be easily added to
   # the course settings page
   add_setting :hide_final_grade, :boolean => true
+  add_setting :hide_distribution_graphs, :boolean => true
 
   def hide_final_grades
     self.settings[:hide_final_grade]
@@ -2765,7 +2815,6 @@ class Course < ActiveRecord::Base
   end
 
   def settings=(hash)
-
     if hash.is_a?(Hash)
       hash.each do |key, val|
         if settings_options[key.to_sym]
@@ -2854,7 +2903,7 @@ class Course < ActiveRecord::Base
     )
     enrollments.select { |e| e.active? }.map(&:user).uniq
   end
-  
+
   def student_view_student
     fake_student = find_or_create_student_view_student
     fake_student = sync_enrollments(fake_student)
@@ -2884,17 +2933,18 @@ class Course < ActiveRecord::Base
     end
   end
   private :find_or_create_student_view_student
-  
+
   # we want to make sure the student view student is always enrolled in all the
   # sections of the course, so that a section limited teacher can grade them.
   def sync_enrollments(fake_student)
+    self.default_section
     self.course_sections.active.each do |section|
       # enroll fake_student will only create the enrollment if it doesn't already exist
-      self.enroll_user(fake_student, 'StudentViewEnrollment', 
-                       :allow_multiple_enrollments => true, 
+      self.enroll_user(fake_student, 'StudentViewEnrollment',
+                       :allow_multiple_enrollments => true,
                        :section => section,
-                       :enrollment_state => 'active', 
-                       :no_notify => true, 
+                       :enrollment_state => 'active',
+                       :no_notify => true,
                        :skip_touch_user => true)
     end
     fake_student
@@ -2904,4 +2954,10 @@ class Course < ActiveRecord::Base
   def associated_shards
     [Shard.default]
   end
+
+  def includes_student?(user)
+    return false if user.nil? || user.id.nil?
+    student_enrollments.find_by_user_id(user.id).present?
+  end
+
 end

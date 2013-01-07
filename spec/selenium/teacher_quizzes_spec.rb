@@ -310,6 +310,7 @@ describe "quizzes" do
     end
 
     it "should mark dropdown questions as answered" do
+      pending("xvfb issues")
       @quiz = quiz_with_new_questions do |bank, quiz|
         aq1 = AssessmentQuestion.create!
         aq2 = AssessmentQuestion.create!
@@ -324,13 +325,15 @@ describe "quizzes" do
       end
 
       take_quiz do
-        dropdowns = ff('a.ui-selectmenu.question_input')
+        dropdowns = ffj('a.ui-selectmenu.question_input')
         dropdowns.size.should == 6
 
         # partially answer each question
         [dropdowns.first, dropdowns.last].each do |d|
           d.click
+          wait_for_ajaximations
           f('.ui-selectmenu-open li:nth-child(2)').click
+          wait_for_ajaximations
         end
         # not marked as answered
         ff('#question_list .answered').should be_empty
@@ -338,7 +341,9 @@ describe "quizzes" do
         # fully answer each question
         dropdowns.each do |d|
           d.click
+          wait_for_ajaximations
           f('.ui-selectmenu-open li:nth-child(2)').click
+          wait_for_ajaximations
         end
 
         # marked as answer
@@ -346,19 +351,21 @@ describe "quizzes" do
         wait_for_ajaximations
 
         driver.find_element(:link, 'Quizzes').click
+        wait_for_ajaximations
+
         driver.switch_to.alert.accept
         wait_for_ajaximations
 
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-        driver.find_element(:link, "Resume Quiz").click
+        f(:link, "Resume Quiz").click
+
         # there's some initial setTimeout stuff that happens, so things won't
         # be ready right when the page loads
         keep_trying_until {
           dropdowns = ff('a.ui-selectmenu.question_input')
           dropdowns.size.should == 6
+          dropdowns.map(&:text).should == %w{orange green east east east east}
         }
-
-        dropdowns.map(&:text).should == %w{orange green east east east east}
         ff('#question_list .answered').size.should == 2
       end
     end

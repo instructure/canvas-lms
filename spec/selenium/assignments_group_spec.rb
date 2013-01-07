@@ -57,7 +57,7 @@ describe "assignment groups" do
     f('.assignment_group .rule_details').should include_text('assignment with rubric')
   end
 
-  it "should edit assignment group's grade weights" do
+  it "should edit assignment groups grade weights" do
     @course.assignment_groups.create!(:name => "first group")
     @course.assignment_groups.create!(:name => "second group")
     get "/courses/#{@course.id}/assignments"

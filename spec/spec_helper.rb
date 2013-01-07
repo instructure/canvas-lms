@@ -132,6 +132,7 @@ Spec::Runner.configure do |config|
     Notification.reset_cache!
     ActiveRecord::Base.reset_any_instantiation!
     Attachment.clear_cached_mime_ids
+    RoleOverride.clear_cached_contexts
     Delayed::Job.redis.flushdb if Delayed::Job == Delayed::Backend::Redis::Job
     truncate_all_cassandra_tables
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
@@ -200,6 +201,7 @@ Spec::Runner.configure do |config|
         account.role_overrides.create(:permission => permission.to_s, :enrollment_type => opts[:membership_type] || 'AccountAdmin', :enabled => enabled)
       end
     end
+    RoleOverride.clear_cached_contexts
     account_admin_user(opts)
   end
 
@@ -563,8 +565,10 @@ Spec::Runner.configure do |config|
     @rubric.update_alignments
   end
 
-  def grading_standard_for(context)
-    @standard = context.grading_standards.create!(:title => "My Grading Standard", :standard_data => {
+  def grading_standard_for(context, opts={})
+    @standard = context.grading_standards.create!(
+      :title => opts[:title] || "My Grading Standard",
+      :standard_data => {
         "scheme_0" => {:name => "A", :value => "0.9"},
         "scheme_1" => {:name => "B", :value => "0.8"},
         "scheme_2" => {:name => "C", :value => "0.7"}

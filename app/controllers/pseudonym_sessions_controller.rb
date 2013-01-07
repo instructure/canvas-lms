@@ -163,35 +163,25 @@ class PseudonymSessionsController < ApplicationController
     end
 
     if pseudonym == :too_many_attempts || @pseudonym_session.too_many_attempts?
-      flash[:error] = t 'errors.max_attempts', "Too many failed login attempts. Please try again later or contact your system administrator."
-      redirect_to login_url
+      unsuccessful_login t('errors.max_attempts', "Too many failed login attempts. Please try again later or contact your system administrator."), true
       return
     end
 
     @pseudonym = @pseudonym_session && @pseudonym_session.record
     # If the user's account has been deleted, feel free to share that information
     if @pseudonym && (!@pseudonym.user || @pseudonym.user.unavailable?)
-      flash[:error] = t 'errors.user_deleted', "That user account has been deleted.  Please contact your system administrator to have your account re-activated."
-      redirect_to login_url
+      unsuccessful_login t('errors.user_deleted', "That user account has been deleted.  Please contact your system administrator to have your account re-activated."), true
       return
     end
 
-    # Call for some cleanups that should be run when a user logs in
-    @user = @pseudonym.login_assertions_for_user if found
-
     # If the user is registered and logged in, redirect them to their dashboard page
     if found
+      # Call for some cleanups that should be run when a user logs in
+      @user = @pseudonym.login_assertions_for_user
       successful_login(@user, @pseudonym)
     # Otherwise re-render the login page to show the error
     else
-      respond_to do |format|
-        flash[:error] = t 'errors.invalid_credentials', "Incorrect username and/or password"
-        @errored = true
-        @pre_registered = @user if @user && !@user.registered?
-        @headers = false
-        format.html { maybe_render_mobile_login :bad_request }
-        format.json { render :json => @pseudonym_session.errors.to_json, :status => :bad_request }
-      end
+      unsuccessful_login t('errors.invalid_credentials', "Incorrect username and/or password")
     end
   end
 
@@ -553,7 +543,25 @@ class PseudonymSessionsController < ApplicationController
     end
   end
 
-  OAUTH2_OOB_URI = 'urn:ietf:wg:oauth:2.0:oob'
+  def unsuccessful_login(message, refresh = false)
+    respond_to do |format|
+      flash[:error] = message
+      format.html do
+        if refresh
+          redirect_to login_url
+        else
+          @errored = true
+          @pre_registered = @user if @user && !@user.registered?
+          @headers = false
+          maybe_render_mobile_login :bad_request
+        end
+      end
+      format.json do
+        @pseudonym_session.errors.add('base', message)
+        render :json => @pseudonym_session.errors.to_json, :status => :bad_request
+      end
+    end
+  end
 
   def oauth2_auth
     if params[:code] || params[:error]
@@ -563,34 +571,26 @@ class PseudonymSessionsController < ApplicationController
       return render()
     end
 
-    @key = DeveloperKey.find_by_id(params[:client_id]) if params[:client_id].present?
-    unless @key
-      return render(:status => 400, :json => { :message => "invalid client_id" })
-    end
+    provider = Canvas::Oauth::Provider.new(params[:client_id], params[:redirect_uri])
 
-    redirect_uri = params[:redirect_uri].presence || ""
-    unless redirect_uri == OAUTH2_OOB_URI || @key.redirect_domain_matches?(redirect_uri)
-      return render(:status => 400, :json => { :message => "invalid redirect_uri" })
-    end
+    return render(:status => 400, :json => { :message => "invalid client_id" }) unless provider.has_valid_key?
+    return render(:status => 400, :json => { :message => "invalid redirect_uri" }) unless provider.has_valid_redirect?
+    session[:oauth2] = provider.session_hash
 
-    session[:oauth2] = { :client_id => @key.id, :redirect_uri => redirect_uri }
     if @current_pseudonym
       redirect_to oauth2_auth_confirm_url
     else
-      redirect_to login_url
+      redirect_to login_url(:canvas_login => params[:canvas_login])
     end
   end
 
   def oauth2_confirm
-    @key = DeveloperKey.find(session[:oauth2][:client_id])
-    @app_name = @key.name.presence || @key.user_name.presence || @key.email.presence || t(:default_app_name, "Third-Party Application")
+    @provider = Canvas::Oauth::Provider.new(session[:oauth2][:client_id])
   end
 
   def oauth2_accept
     # now generate the temporary code, and respond/redirect
-    code = ActiveSupport::SecureRandom.hex(64)
-    code_data = { 'user' => @current_user.id, 'client_id' => session[:oauth2][:client_id] }
-    Canvas.redis.setex("oauth2:#{code}", 1.day, code_data.to_json)
+    code = Canvas::Oauth::Token.generate_code_for(@current_user.id, session[:oauth2][:client_id])
     final_oauth2_redirect(session[:oauth2][:redirect_uri], :code => code)
     session.delete(:oauth2)
   end
@@ -604,28 +604,16 @@ class PseudonymSessionsController < ApplicationController
     basic_user, basic_pass = ActionController::HttpAuthentication::Basic.user_name_and_password(request) if ActionController::HttpAuthentication::Basic.authorization(request)
 
     client_id = params[:client_id].presence || basic_user
-    key = DeveloperKey.find_by_id(client_id) if client_id.present?
-    unless key
-      return render(:status => 400, :json => { :message => "invalid client_id" })
-    end
-
     secret = params[:client_secret].presence || basic_pass
-    unless secret == key.api_key
-      return render(:status => 400, :json => { :message => "invalid client_secret" })
-    end
 
-    code = params[:code]
-    code_data = JSON.parse(Canvas.redis.get("oauth2:#{code}").presence || "{}")
-    unless code_data.present? && code_data['client_id'] == key.id
-      return render(:status => 400, :json => { :message => "invalid code" })
-    end
+    provider = Canvas::Oauth::Provider.new(client_id)
+    return render(:status => 400, :json => { :message => "invalid client_id" }) unless provider.has_valid_key?
+    return render(:status => 400, :json => { :message => "invalid client_secret" }) unless provider.is_authorized_by?(secret)
 
-    user = User.find(code_data['user'])
-    token = user.access_tokens.create!(:developer_key => key)
-    render :json => {
-      'access_token' => token.full_token,
-      'user' => user.as_json(:only => [:id, :name], :include_root => false),
-    }
+    token = provider.token_for(params[:code])
+    return render(:status => 400, :json => { :message => "invalid code" }) unless token.is_for_valid_code?
+
+    render :json => token.to_json
   end
 
   def oauth2_logout
@@ -635,7 +623,7 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def final_oauth2_redirect(redirect_uri, opts = {})
-    if redirect_uri == OAUTH2_OOB_URI
+    if Canvas::Oauth::Provider.is_oob?(redirect_uri)
       redirect_to oauth2_auth_url(opts)
     else
       has_params = redirect_uri =~ %r{\?}

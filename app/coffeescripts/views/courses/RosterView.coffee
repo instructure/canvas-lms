@@ -83,7 +83,11 @@ define [
     #
     # Return an array of section names.
     getSections: (user) ->
-      sections = _.map user.get('enrollments'), (enrollment) =>
+      enrollments = _.filter(user.get('enrollments'), ((enrollment) ->
+        _.contains(@roles, enrollment.role))
+      , @collection)
+
+      sections = _.map enrollments, (enrollment) =>
         @collection.sections.find (section) -> enrollment.course_section_id == section.id
 
       _.uniq(_.map(sections, (section) -> section.get('name')))

@@ -53,7 +53,7 @@ describe "profile communication settings" do
     f('#content > h2').text.should == 'Notification Preferences'
   end
 
-  it "should display the user's email address as channel" do
+  it "should display the users email address as channel" do
     get "/profile/communication"
     wait_for_ajaximations
     fj('th.comm-channel:first').should include_text('Email Address')

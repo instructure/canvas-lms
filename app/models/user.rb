@@ -36,7 +36,7 @@ class User < ActiveRecord::Base
   # Internal: SQL fragments used to return enrollments in their respective workflow
   # states. Where needed, these consider the state of the course to ensure that
   # students do not see their enrollments on unpublished courses.
-  # 
+  #
   # strict_course_state can be used to bypass the course state checks. This is
   # useful in places like the course settings UI, where we use these conditions
   # to search users in the course (rather than as an association on a
@@ -76,6 +76,8 @@ class User < ActiveRecord::Base
   has_many :invited_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:invited), :order => 'enrollments.created_at'
   has_many :current_and_invited_enrollments, :class_name => 'Enrollment', :include => [:course], :order => 'enrollments.created_at',
            :conditions => enrollment_conditions(:current_and_invited)
+  has_many :current_and_future_enrollments, :class_name => 'Enrollment', :include => [:course], :order => 'enrollments.created_at',
+           :conditions => enrollment_conditions(:current_and_invited, false)
   has_many :not_ended_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')", :order => 'enrollments.created_at'
   has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:completed), :order => 'enrollments.created_at'
   has_many :observer_enrollments
@@ -129,7 +131,7 @@ class User < ActiveRecord::Base
   has_many :rubric_associations, :as => :context, :include => :rubric, :order => 'rubric_associations.created_at DESC'
   has_many :rubrics
   has_many :context_rubrics, :as => :context, :class_name => 'Rubric'
-  has_many :grading_standards
+  has_many :grading_standards, :conditions => ['workflow_state != ?', 'deleted']
   has_many :context_module_progressions
   has_many :assessment_question_bank_users
   has_many :assessment_question_banks, :through => :assessment_question_bank_users
@@ -288,8 +290,15 @@ class User < ActiveRecord::Base
     if value.blank?
       record.errors.add(attr, "blank")
     elsif record.validation_root_account
-      record.self_enrollment_course = record.validation_root_account.all_courses.find_by_self_enrollment_code(value)
-      record.errors.add(attr, "invalid") unless record.self_enrollment_course
+      course = record.validation_root_account.self_enrollment_course_for(value)
+      record.self_enrollment_course = course
+      if course
+        record.errors.add(attr, "full") if course.self_enrollment_limit_met?
+        record.errors.add(attr, "already_enrolled") if course.user_is_student?(record, :include_future => true)
+        record.errors.add(:birthdate, "too_young") if course.self_enrollment_min_age && record.birthdate && record.birthdate > course.self_enrollment_min_age.years.ago
+      else
+        record.errors.add(attr, "invalid")
+      end
     else
       record.errors.add(attr, "account_required")
     end
@@ -457,9 +466,12 @@ class User < ActiveRecord::Base
     end
   end
 
-  # These two methods can be overridden by a plugin if you want to have an approval process for new teachers
+  # These methods can be overridden by a plugin if you want to have an approval
+  # process or implement additional tracking for new users
   def registration_approval_required?; false; end
-  def new_teacher_registration(form_params = {}); end
+  def new_registration(form_params = {}); end
+  # DEPRECATED, override new_registration instead
+  def new_teacher_registration(form_params = {}); new_registration(form_params); end
 
   set_broadcast_policy do |p|
     p.dispatch :new_teacher_registration
@@ -488,14 +500,10 @@ class User < ActiveRecord::Base
   }
 
   def group_memberships_for(context)
-    return [] unless context
-    self.group_memberships.select do |m|
-      m.group &&
-      m.group.context_id == context.id &&
-      m.group.context_type == context.class.to_s &&
-      !m.group.deleted? &&
-      m.accepted?
-    end.map(&:group)
+    groups.scoped(:conditions => { 'groups.context_id' => context.id,
+      'groups.context_type' => context.class.to_s,
+      'group_memberships.workflow_state' => 'accepted' }).
+    scoped(:conditions => "groups.workflow_state <> 'deleted'")
   end
 
   def <=>(other)
@@ -1741,8 +1749,8 @@ class User < ActiveRecord::Base
   # this method takes an optional {:include_enrollment_uuid => uuid}   so that you can pass it the session[:enrollment_uuid] and it will include it.
   def cached_current_enrollments(opts={})
     self.shard.activate do
-      res = Rails.cache.fetch([self, 'current_enrollments2', opts[:include_enrollment_uuid] ].cache_key) do
-        res = self.current_and_invited_enrollments.with_each_shard
+      res = Rails.cache.fetch([self, 'current_enrollments2', opts[:include_enrollment_uuid], opts[:include_future] ].cache_key) do
+        res = (opts[:include_future] ? current_and_future_enrollments : current_and_invited_enrollments).with_each_shard
         if opts[:include_enrollment_uuid] && pending_enrollment = Enrollment.find_by_uuid_and_workflow_state(opts[:include_enrollment_uuid], "invited")
           res << pending_enrollment
           res.uniq!
@@ -1858,20 +1866,16 @@ class User < ActiveRecord::Base
       # still need to optimize the query to use a root_context_code.  that way a
       # users course dashboard even if they have groups does a query with
       # "context_code=..." instead of "context_code IN ..."
-      conditions = setup_context_association_lookups("stream_item_instances.context", opts[:contexts], :backcompat => true)
+      conditions = setup_context_association_lookups("stream_item_instances.context", opts[:contexts])
       instances = instances.scoped(:conditions => conditions) unless conditions.first.empty?
     elsif opts[:context]
-      # backcompat searching on context_code
-      instances = instances.scoped(:conditions =>
-                                       ["(stream_item_instances.context_type=? AND stream_item_instances.context_id=?) OR (stream_item_instances.context_code=? AND stream_item_instances.context_type IS NULL)",
-                                        opts[:context].class.base_class.name,
-                                        opts[:context].id,
-                                        opts[:context].asset_string])
+      instances = instances.scoped(:conditions => {:context_type => opts[:context].class.base_class.name, :context_id => opts[:context].id})
     end
 
     instances
   end
 
+  # NOTE: excludes submission stream items
   def cached_recent_stream_items(opts={})
     expires_in = 1.day
 
@@ -1893,6 +1897,7 @@ class User < ActiveRecord::Base
     end
   end
 
+  # NOTE: excludes submission stream items
   def recent_stream_items(opts={})
     self.shard.activate do
       ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
@@ -1902,7 +1907,9 @@ class User < ActiveRecord::Base
         })
         visible_instances.map do |sii|
           si = sii.stream_item
-          si.data.write_attribute(:unread, sii.unread?) if si.present?
+          next unless si.present?
+          next if si.asset_type == 'Submission'
+          si.data.write_attribute(:unread, sii.unread?)
           si
         end.compact
       end
@@ -2687,7 +2694,7 @@ class User < ActiveRecord::Base
   # mfa settings for a user are the most restrictive of any pseudonyms the user has
   # a login for
   def mfa_settings
-    result = self.pseudonyms(:include => :account).map(&:account).uniq.map do |account|
+    result = self.all_pseudonyms(:include => :account).map(&:account).uniq.map do |account|
       case account.mfa_settings
         when :disabled
           0

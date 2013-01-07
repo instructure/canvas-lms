@@ -37,7 +37,8 @@ module Api::V1::StreamItem
 
       case stream_item.asset_type
       when 'DiscussionTopic', 'Announcement'
-        hash['message'] = data.message
+        context = stream_item.asset.context
+        hash['message'] = api_user_content(data.message, context)
         if stream_item.data.class.name == 'DiscussionTopic'
           if context_type == "collection_item"
             # TODO: build the html_url for the collection item (we want to send them
@@ -54,13 +55,13 @@ module Api::V1::StreamItem
         hash['total_root_discussion_entries'] = data.total_root_discussion_entries
         hash['require_initial_post'] = data.require_initial_post
         hash['user_has_posted'] = data.respond_to?(:user_has_posted) ? data.user_has_posted : nil
-        hash['root_discussion_entries'] = (data.root_discussion_entries || [])[0,3].map do |entry|
+        hash['root_discussion_entries'] = (data.root_discussion_entries || [])[0,StreamItem::ROOT_DISCUSSION_ENTRY_LIMIT].map do |entry|
           {
             'user' => {
               'user_id' => entry.user_id,
               'user_name' => entry.user_short_name,
             },
-            'message' => entry.message,
+            'message' => api_user_content(entry.message, context),
           }
         end
       when 'ContextMessage'

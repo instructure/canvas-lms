@@ -63,6 +63,7 @@ class AssignmentsController < ApplicationController
       return
     end
     if authorized_action(@assignment, @current_user, :read)
+      @assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @current_user)
       @context.require_assignment_group
       js_env :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session)
       @assignment_groups = @context.assignment_groups.active

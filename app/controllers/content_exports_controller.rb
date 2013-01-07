@@ -19,7 +19,7 @@
 class ContentExportsController < ApplicationController
   before_filter :require_context, :except => :xml_schema
   before_filter { |c| c.active_tab = "settings" }
-  
+
   def index
     return render_unauthorized_action unless @context.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
 
@@ -29,7 +29,7 @@ class ContentExportsController < ApplicationController
       @current_export_id = export.id
     end
   end
-  
+
   def show
     return render_unauthorized_action unless @context.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
 
@@ -39,7 +39,7 @@ class ContentExportsController < ApplicationController
       render :json => {:errors => {:base => t('errors.not_found', "Export does not exist")}}.to_json, :status => :bad_request
     end
   end
-  
+
   def create
     return render_unauthorized_action unless @context.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
 
@@ -68,7 +68,7 @@ class ContentExportsController < ApplicationController
       render_export(export)
     end
   end
-  
+
   def destroy
     return render_unauthorized_action unless @context.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
 
@@ -79,16 +79,11 @@ class ContentExportsController < ApplicationController
       render :json => {:errors => {:base => t('errors.not_found', "Export does not exist")}}.to_json, :status => :bad_request
     end
   end
-  
+
   def xml_schema
-    file = nil
-    if params[:version]
-      file = Rails.root + "lib/cc/xsd/#{params[:version]}.xsd"
-    end
-    
-    if File.exists?(file)
+    if filename = CC::Schema.for_version(params[:version])
       cancel_cache_buster
-      send_file(file, :type => 'text/xml', :disposition => 'inline')
+      send_file(filename, :type => 'text/xml', :disposition => 'inline')
     else
       render :template => 'shared/errors/404_message', :status => :bad_request
     end

@@ -17,9 +17,15 @@
 #
 
 define [
+  'underscore'
   'compiled/collections/PaginatedCollection'
   'compiled/models/OutcomeGroup'
-], (PaginatedCollection, OutcomeGroup) ->
+], (_, PaginatedCollection, OutcomeGroup) ->
 
   class OutcomeGroupCollection extends PaginatedCollection
     model: OutcomeGroup
+
+    parse: (response, xhr) ->
+      super response, xhr
+      _.reject response, (groupObj) ->
+        groupObj.id is ENV.COMMON_CORE_GROUP_ID

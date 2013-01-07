@@ -35,7 +35,8 @@ class StreamItem < ActiveRecord::Base
 
   def self.reconstitute_ar_object(type, data)
     return nil unless data
-    data = data.instance_variable_get(:@table).with_indifferent_access if data.is_a?(OpenObject)
+    data = data.instance_variable_get(:@table) if data.is_a?(OpenObject)
+    data = data.with_indifferent_access
     type = data['type'] || type
     res = type.constantize.new
 
@@ -46,9 +47,6 @@ class StreamItem < ActiveRecord::Base
       res.root_discussion_entries.target = root_discussion_entries
       res.attachment = reconstitute_ar_object('Attachment', data.delete(:attachment))
     when 'Submission'
-      submission_comments = data.delete(:submission_comments)
-      submission_comments = submission_comments.map { |comment| reconstitute_ar_object('SubmissionComment', comment) }
-      res.submission_comments.target = submission_comments
       data['body'] = nil
     end
     ['users', 'participants'].each do |key|
@@ -77,9 +75,6 @@ class StreamItem < ActiveRecord::Base
       res
     end
   end
-
-  define_asset_string_backcompat_method :context_code, :context
-  define_asset_string_backcompat_method :item_asset_string, :asset
 
   def prepare_user(user)
     res = user.attributes.slice('id', 'name', 'short_name')
@@ -114,10 +109,7 @@ class StreamItem < ActiveRecord::Base
   end
 
   def self.delete_all_for(root_asset, asset)
-    asset_string = "#{root_asset.first.underscore}_#{root_asset.last}"
-    # backcompat searching on item_asset_string
-    item = StreamItem.find(:first, :conditions =>
-        ["(asset_type=? AND asset_id=?) OR (item_asset_string=? AND asset_type IS NULL)", root_asset.first, root_asset.last, asset_string])
+    item = StreamItem.find(:first, :conditions => { :asset_type => root_asset.first, :asset_id => root_asset.last })
     # if this is a sub-message, regenerate instead of deleting
     if root_asset != asset
       item.try(:regenerate!)
@@ -128,9 +120,8 @@ class StreamItem < ActiveRecord::Base
     item.try(:destroy)
   end
 
+  ROOT_DISCUSSION_ENTRY_LIMIT = 3
   def generate_data(object)
-    res = {}
-
     self.context ||= object.context rescue nil
 
     case object
@@ -138,11 +129,9 @@ class StreamItem < ActiveRecord::Base
       res = object.attributes
       res['user_ids_that_can_see_responses'] = object.user_ids_who_have_posted_and_admins if object.require_initial_post?
       res['total_root_discussion_entries'] = object.root_discussion_entries.active.count
-      res[:root_discussion_entries] = object.root_discussion_entries.active.reverse[0,10].reverse.map do |entry|
+      res[:root_discussion_entries] = object.root_discussion_entries.active.reverse[0,ROOT_DISCUSSION_ENTRY_LIMIT].reverse.map do |entry|
         hash = entry.attributes
         hash['user_short_name'] = entry.user.short_name if entry.user
-        # backcompat
-        hash['truncated_message'] = entry.truncated_message(250)
         hash['message'] = hash['message'][0, 4.kilobytes] if hash['message'].present?
         hash
       end
@@ -165,13 +154,6 @@ class StreamItem < ActiveRecord::Base
       res = object.attributes
       res.delete 'body' # this can be pretty large, and we don't display it
       res['assignment'] = object.assignment.attributes.slice('id', 'title', 'due_at', 'points_possible', 'submission_types', 'group_category_id')
-      res[:submission_comments] = object.submission_comments.map do |comment|
-        hash = comment.attributes
-        hash['formatted_body'] = comment.formatted_body(250)
-        hash['context_code'] = comment.context_code
-        hash['user_short_name'] = comment.author.short_name if comment.author
-        hash
-      end
       res[:course_id] = object.context.id
     when Collaboration
       res = object.attributes
@@ -191,10 +173,6 @@ class StreamItem < ActiveRecord::Base
     end
     res['type'] = object.class.to_s
     res['user_short_name'] = object.user.short_name rescue nil
-    res['context_code'] = self.context_code
-    # technically we should be able to not use OpenObject at all anymore -
-    # the reconstitution process just grabs the internal hash anyway
-    res = OpenObject.process(res)
 
     if self.class.new_message?(object)
       self.asset_type = 'Message'
@@ -202,9 +180,6 @@ class StreamItem < ActiveRecord::Base
     else
       self.asset = object
     end
-    # backcompat
-    self.item_asset_string = object.asset_string
-    self.context_code = "#{self.context_type.underscore}_#{self.context_id}" if self.context_type
     self.data = res
   end
 
@@ -214,8 +189,6 @@ class StreamItem < ActiveRecord::Base
       # we can't coalesce messages that weren't ever saved to the DB
       if !new_message?(object)
         item = object.stream_item
-        # backcompat
-        item ||= StreamItem.find(:first, :conditions => {:item_asset_string => object.asset_string, :asset_type => nil})
       end
       if item
         item.regenerate!(object)
@@ -247,29 +220,47 @@ class StreamItem < ActiveRecord::Base
     # set the hidden flag if an assignment and muted
     hidden = object.is_a?(Submission) && object.assignment.muted? ? true : false
 
-    # Then insert a StreamItemInstance for each user in user_ids
-    instance_ids = []
-    Shard.partition_by_shard(user_ids) do |user_ids_subset|
-      StreamItemInstance.transaction do
-        user_ids_subset.each do |user_id|
-          i = StreamItemInstance.create(:stream_item => res) do |sii|
-            sii.user_id = user_id
-            sii.hidden = hidden
-            sii.workflow_state = object_unread_for_user(object, user_id)
-          end
-          instance_ids << i.id
-        end
-      end
-    end
-    smallest_generated_id = instance_ids.min || 0
 
-    # Then delete any old instances from these users' streams.
-    # This won't actually delete StreamItems out of the table, it just deletes
-    # the join table entries.
-    # Old stream items are deleted in a periodic job.
-    StreamItemInstance.delete_all(
-          ["user_id in (?) AND stream_item_id = ? AND id < ?",
-          user_ids, res.id, smallest_generated_id])
+    l_context_type = res.context_type
+    Shard.partition_by_shard(user_ids) do |user_ids_subset|
+      #these need to be determined per shard
+      #hence the local caching inside the partition block
+      l_context_id = res.context_id
+      stream_item_id = res.id
+
+      #find out what the current largest stream item instance is so that we can delete them all once the new ones are created
+      greatest_existing_instance = StreamItemInstance.find(:first,
+                                                 :order => 'id DESC', :limit => 1, :select => 'id',
+                                                 :conditions => ['stream_item_id = ? AND user_id in (?)', stream_item_id, user_ids_subset])
+      greatest_existing_id = greatest_existing_instance.present? ? greatest_existing_instance.id : 0
+
+      inserts = user_ids_subset.map do |user_id|
+        {
+          :stream_item_id => stream_item_id,
+          :user_id => user_id,
+          :hidden => hidden,
+          :workflow_state => object_unread_for_user(object, user_id),
+          :context_type => l_context_type,
+          :context_id => l_context_id,
+        }
+      end
+
+      StreamItemInstance.connection.bulk_insert('stream_item_instances', inserts)
+
+      #reset caches manually because the observer wont trigger off of the above mass inserts
+      user_ids_subset.each do |user_id|
+        StreamItemCache.invalidate_recent_stream_items(user_id, l_context_type, l_context_id)
+      end
+
+      # Then delete any old instances from these users' streams.
+      # This won't actually delete StreamItems out of the table, it just deletes
+      # the join table entries.
+      # Old stream items are deleted in a periodic job.
+      StreamItemInstance.delete_all(
+            ["user_id in (?) AND stream_item_id = ? AND id <= ?",
+            user_ids_subset, stream_item_id, greatest_existing_id])
+    end
+
 
     # Here is where we used to go through and update the stream item for anybody
     # not in user_ids who had the item in their stream, so that the item would
@@ -317,8 +308,7 @@ class StreamItem < ActiveRecord::Base
   end
 
   def self.update_read_state_for_asset(asset, new_state, user_id)
-    # backcompat
-    if item = StreamItem.find(:first, :conditions => ["(asset_type=? AND asset_id=?) OR (item_asset_string=? AND asset_type IS NULL)", asset.class.base_class.name, asset.id, asset.asset_string])
+    if item = asset.stream_item
       StreamItemInstance.find_by_user_id_and_stream_item_id(user_id, item.id).try(:update_attribute, :workflow_state, new_state)
     end
   end

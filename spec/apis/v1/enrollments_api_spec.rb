@@ -160,6 +160,12 @@ describe EnrollmentsApiController, :type => :integration do
         JSON.parse(response.body)['message'].should eql 'Invalid type'
       end
 
+      it "should enroll a designer" do
+        json = api_call :post, @path, @path_options, { :enrollment => { :user_id => @unenrolled_user.id, :type => 'DesignerEnrollment' } }
+        json['type'].should eql 'DesignerEnrollment'
+        @unenrolled_user.enrollments.find(json['id']).should be_an_instance_of(DesignerEnrollment)
+      end
+
       it "should return an error if no user_id is given" do
         raw_api_call :post, @path, @path_options, { :enrollment => { :type => 'StudentEnrollment' } }
         response.code.should eql '403'
@@ -280,6 +286,34 @@ describe EnrollmentsApiController, :type => :integration do
               }
           }, {}, :expected_status => 403
           json['message'].should eql 'Cannot create an enrollment with this role because it is inactive.'
+        end
+
+        it "should return a suitable error if role is specified but is deleted" do
+          @course_role.destroy
+          json = api_call :post, @path, @path_options, {
+              :enrollment => {
+                  :user_id                            => @unenrolled_user.id,
+                  :role                               => 'newrole',
+                  :enrollment_state                   => 'active',
+                  :course_section_id                  => @section.id,
+                  :limit_privileges_to_course_section => true
+              }
+          }, {}, :expected_status => 403
+          json['message'].should eql 'Invalid role'
+        end
+
+        it "should accept base roles in the role parameter" do
+          json = api_call :post, @path, @path_options,
+              {
+                  :enrollment => {
+                      :user_id => @unenrolled_user.id,
+                      :role => 'ObserverEnrollment',
+                      :enrollment_state => 'active',
+                      :course_section_id => @section.id,
+                      :limit_privileges_to_course_section => true
+                  }
+              }
+          Enrollment.find(json['id']).should be_an_instance_of ObserverEnrollment
         end
 
         it "should derive roles from parent accounts" do

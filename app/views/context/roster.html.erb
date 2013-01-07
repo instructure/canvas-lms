@@ -10,23 +10,20 @@
 
 <% if @context.is_a?(Course) %>
   <div class="roster">
-    <div class="users-wrapper student_roster">
-      <h2 class="h3"><%= t('roster.students', 'Students') %></h2>
-      <ul class="user_list student_list">
-        <!-- This list is populated w/ JavaScript -->
-      </ul>
+    <div class="users-column-wrapper student_roster">
     </div>
-
-    <div class="users-wrapper teacher_roster">
-      <h2 class="h3"><%= t('roster.teachers', 'Teachers & TAs') %></h2>
-      <ul class="user_list teachers_list">
-        <!-- This list is populated w/ JavaScript -->
-      </ul>
+    <div class="users-column-wrapper teacher_roster">
     </div>
   </div>
 
-  <% jammit_css :roster %>
-  <% js_bundle  :roster %>
+  <% if @display_rosters.any? %>
+    <% jammit_css :roster %>
+    <% js_env :COURSE_ROSTERS => @display_rosters %>
+    <% js_bundle :roster %>
+  <% else %>
+    <%= t('roster.empty', 'No one is currently enrolled in this course.') %>
+  <% end %>
+
 <% else %>
   <% content_for :stylesheets do %>
     <style>

@@ -19,20 +19,121 @@
 # @API Outcomes
 #
 # API for accessing learning outcome information.
+#
+# @object Outcome
+#
+#     {
+#       // the ID of the outcome
+#       "id": 1,
+#
+#       // the URL for fetching/updating the outcome. should be treated as
+#       // opaque
+#       "url": "/api/v1/outcomes/1",
+#
+#       // the context owning the outcome. may be null for global outcomes
+#       "context_id": 1,
+#       "context_type": "Account",
+#
+#       // title of the outcome
+#       "title": "Outcome title",
+#
+#       // description of the outcome. omitted in the abbreviated form.
+#       "description": "Outcome description",
+#
+#       // maximum points possible. included only if the outcome embeds a
+#       // rubric criterion. omitted in the abbreviated form.
+#       "points_possible": 5,
+#
+#       // points necessary to demonstrate mastery outcomes. included only if
+#       // the outcome embeds a rubric criterion. omitted in the abbreviated
+#       // form.
+#       "mastery_points": 3,
+#
+#       // possible ratings for this outcome. included only if the outcome
+#       // embeds a rubric criterion. omitted in the abbreviated form.
+#       "ratings": [
+#         { "description": "Exceeds Expectations", "points": 5 },
+#         { "description": "Meets Expectations", "points": 3 },
+#         { "description": "Does Not Meet Expectations", "points": 0 }
+#       ],
+#
+#       // whether the current user can update the outcome
+#       "can_edit": true
+#     }
+#
 class OutcomesApiController < ApplicationController
   include Api::V1::Outcome
 
   before_filter :require_user
   before_filter :get_outcome
 
-  # @API Retrieve an outcome's details.
+  # @API Show an outcome
+  #
+  # Returns the details of the outcome with the given id.
+  #
+  # @returns Outcome
+  #
   def show
     if authorized_action(@outcome, @current_user, :read)
       render :json => outcome_json(@outcome, @current_user, session)
     end
   end
 
-  # @API Update an outcome.
+  # @API Update an outcome
+  #
+  # Modify an existing outcome. Fields not provided are left as is;
+  # unrecognized fields are ignored.
+  #
+  # If any new ratings are provided, the combination of all new ratings
+  # provided completely replace any existing embedded rubric criterion; it is
+  # not possible to tweak the ratings of the embedded rubric criterion.
+  #
+  # A new embedded rubric criterion's mastery_points default to the maximum
+  # points in the highest rating if not specified in the mastery_points
+  # parameter. Any new ratings lacking a description are given a default of "No
+  # description". Any new ratings lacking a point value are given a default of
+  # 0.
+  #
+  # @argument title [Optional] The new outcome title.
+  # @argument description [Optional] The new outcome description.
+  # @argument mastery_points [Optional, Integer] The new mastery threshold for the embedded rubric criterion.
+  # @argument ratings[][description] [Optional] The description of a new rating level for the embedded rubric criterion.
+  # @argument ratings[][points] [Optional, Integer] The points corresponding to a new rating level for the embedded rubric criterion.
+  #
+  # @returns Outcome
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/outcomes/1.json' \ 
+  #        -X PUT \ 
+  #        -F 'title=Outcome Title' \ 
+  #        -F 'description=Outcome description' \ 
+  #        -F 'mastery_points=3' \ 
+  #        -F 'ratings[][description]=Exceeds Expectations' \ 
+  #        -F 'ratings[][points]=5' \ 
+  #        -F 'ratings[][description]=Meets Expectations' \ 
+  #        -F 'ratings[][points]=3' \ 
+  #        -F 'ratings[][description]=Does Not Meet Expectations' \ 
+  #        -F 'ratings[][points]=0' \ 
+  #        -H "Authorization: Bearer <token>"
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/outcomes/1.json' \ 
+  #        -X PUT \ 
+  #        --data-binary '{
+  #              "title": "Outcome Title",
+  #              "description": "Outcome description",
+  #              "mastery_points": 3,
+  #              "ratings": [
+  #                { "description": "Exceeds Expectations", "points": 5 },
+  #                { "description": "Meets Expectations", "points": 3 },
+  #                { "description": "Does Not Meet Expectations", "points": 0 }
+  #              ]
+  #            }' \ 
+  #        -H "Content-Type: application/json" \ 
+  #        -H "Authorization: Bearer <token>"
+  #
   def update
     if authorized_action(@outcome, @current_user, :update)
       @outcome.update_attributes(params.slice(:title, :description))

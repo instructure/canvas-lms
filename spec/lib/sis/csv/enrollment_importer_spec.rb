@@ -23,6 +23,9 @@ describe SIS::CSV::EnrollmentImporter do
   before { account_model }
 
   it 'should skip bad content' do
+    course_model(:account => @account, :sis_source_id => 'C001')
+    @course.course_sections.create.update_attribute(:sis_source_id, '1B')
+    user_with_managed_pseudonym(:account => @account, :sis_user_id => 'U001')
     before_count = Enrollment.count
     importer = process_csv_data(
       "course_id,user_id,role,section_id,status",
@@ -35,10 +38,13 @@ describe SIS::CSV::EnrollmentImporter do
 
     importer.errors.should == []
     warnings = importer.warnings.map { |r| r.last }
+    # since accounts can define course roles, the "cheater" row can't be
+    # rejected immediately on parse like the others; that's why the warning
+    # comes out of order with the source data
     warnings.should == ["No course_id or section_id given for an enrollment",
                       "No user_id given for an enrollment",
-                      "Improper role \"cheater\" for an enrollment",
-                      "Improper status \"semi-active\" for an enrollment"]
+                      "Improper status \"semi-active\" for an enrollment",
+                      "Improper role \"cheater\" for an enrollment"]
   end
 
   it 'should warn about inconsistent data' do
@@ -447,6 +453,112 @@ describe SIS::CSV::EnrollmentImporter do
     @observer.reload
     @observer.enrollments.count.should == 1
     @observer.enrollments.first.workflow_state.should == 'completed'
+  end
+
+  describe "custom roles" do
+    context "in an account" do
+      before do
+        @course = course_model(:account => @account, :sis_source_id => 'TehCourse')
+        @user1 = user_with_managed_pseudonym(:account => @account, :sis_user_id => 'user1')
+        @user2 = user_with_managed_pseudonym(:account => @account, :sis_user_id => 'user2')
+        @role = @account.roles.build :name => 'cheater'
+        @role.base_role_type = 'StudentEnrollment'
+        @role.save!
+      end
+
+      it "should enroll with a custom role" do
+        process_csv_data_cleanly(
+            "course_id,user_id,role,section_id,status,associated_user_id",
+            "TehCourse,user1,student,,active,",
+            "TehCourse,user2,cheater,,active,"
+        )
+        @user1.enrollments.map{|e|[e.type, e.role_name]}.should == [['StudentEnrollment', nil]]
+        @user2.enrollments.map{|e|[e.type, e.role_name]}.should == [['StudentEnrollment', 'cheater']]
+      end
+
+      it "should not enroll with an inactive role" do
+        @role.deactivate!
+        importer = process_csv_data(
+            "course_id,user_id,role,section_id,status,associated_user_id",
+            "TehCourse,user1,cheater,,active,"
+        )
+        @user1.enrollments.size.should == 0
+        importer.warnings.map(&:last).should == ["Improper role \"cheater\" for an enrollment"]
+      end
+
+      it "should not enroll with a nonexistent role" do
+        importer = process_csv_data(
+            "course_id,user_id,role,section_id,status,associated_user_id",
+            "TehCourse,user1,basketweaver,,active,"
+        )
+        @user1.enrollments.size.should == 0
+        importer.warnings.map(&:last).should == ["Improper role \"basketweaver\" for an enrollment"]
+      end
+    end
+
+    context "in a sub-account" do
+      before do
+        @role = @account.roles.build :name => 'instruc-TOR'
+        @role.base_role_type = 'TeacherEnrollment'
+        @role.save!
+        @user1 = user_with_managed_pseudonym(:name => 'Dolph Hauldhagen', :account => @account, :sis_user_id => 'user1')
+        @user2 = user_with_managed_pseudonym(:name => 'Strong Bad', :account => @account, :sis_user_id => 'user2')
+        @sub_account = @account.sub_accounts.create!(:name => "The Rec Center")
+        @course = course_model(:account => @sub_account, :name => 'Battle Axe Lessons', :sis_source_id => 'TehCourse')
+      end
+
+      it "should enroll with an inherited custom role" do
+        process_csv_data_cleanly(
+            "course_id,user_id,role,section_id,status,associated_user_id",
+            "TehCourse,user1,instruc-TOR,,active,",
+            "TehCourse,user2,student,,active,"
+        )
+        @user1.enrollments.map{|e|[e.type, e.role_name]}.should == [['TeacherEnrollment', 'instruc-TOR']]
+        @user2.enrollments.map{|e|[e.type, e.role_name]}.should == [['StudentEnrollment', nil]]
+      end
+
+      it "should not enroll with an inactive inherited role" do
+        @role.deactivate!
+        importer = process_csv_data(
+            "course_id,user_id,role,section_id,status,associated_user_id",
+            "TehCourse,user1,instruc-TOR,,active,",
+            "TehCourse,user2,student,,active,"
+        )
+        @user1.enrollments.size.should == 0
+        @user2.enrollments.map{|e|[e.type, e.role_name]}.should == [['StudentEnrollment', nil]]
+        importer.warnings.map(&:last).should == ["Improper role \"instruc-TOR\" for an enrollment"]
+      end
+
+      it "should enroll with a custom role that overrides an inactive inherited role" do
+        @role.deactivate!
+        sub_role = @sub_account.roles.build :name => 'instruc-TOR'
+        sub_role.base_role_type = 'TeacherEnrollment'
+        sub_role.save!
+        process_csv_data_cleanly(
+            "course_id,user_id,role,section_id,status,associated_user_id",
+            "TehCourse,user1,instruc-TOR,,active,",
+            "TehCourse,user2,student,,active,"
+        )
+        @user1.enrollments.map{|e|[e.type, e.role_name]}.should == [['TeacherEnrollment', 'instruc-TOR']]
+        @user2.enrollments.map{|e|[e.type, e.role_name]}.should == [['StudentEnrollment', nil]]
+      end
+
+      it "should not enroll with a custom role defined in a sibling account" do
+        other_account = @account.sub_accounts.create!
+        other_role = other_account.roles.build :name => 'Pixel Pusher'
+        other_role.base_role_type = 'DesignerEnrollment'
+        other_role.save!
+        course_model(:account => other_account, :sis_source_id => 'OtherCourse')
+        importer = process_csv_data(
+            "course_id,user_id,role,section_id,status,associated_user_id",
+            "TehCourse,user1,Pixel Pusher,,active,",
+            "OtherCourse,user2,Pixel Pusher,,active,"
+        )
+        importer.warnings.map(&:last).should == ["Improper role \"Pixel Pusher\" for an enrollment"]
+        @user1.enrollments.size.should == 0
+        @user2.enrollments.map{|e|[e.type, e.role_name]}.should == [['DesignerEnrollment', 'Pixel Pusher']]
+      end
+    end
   end
 
 end

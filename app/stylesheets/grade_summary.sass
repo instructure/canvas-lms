@@ -1,6 +1,20 @@
+// print button for grades summary page
+.print-grades
+  float: right
+  
+  @media print
+    display: none
+
+// styles for grade summary tables
 #grades_summary
   border-collapse: collapse
   border-bottom: 1px solid #eee
+  
+  @media print
+    border-bottom: none
+    a
+      text-decoration: none !important
+      color: black
 
 #grades_summary th
   font-size: 1.0em
@@ -9,17 +23,37 @@
   background-color: #444
   color: #fff
   text-align: left
+  
+  @media print
+    :text-transform uppercase
+    :color black
+    :font-size 1.2em
+    :font-weight bold
+    :border-bottom 2px solid black
+    :padding-left 0
 
-#grades_summary tr td
-  padding: 5px 5px
-  text-align: left
-  border-top: 1px solid #ccc
-  background-color: #fff
+#grades_summary tr
+  
+  td
+    padding: 5px
+    text-align: left
+    border-top: 2px solid black
+    background-color: #fff
+  
+    @media print
+      border-top: 1px solid black
+      color: black !important
+      background-color: transparent !important
 
 #grades_summary tr.comments td
   border-width: 0
   font-size: 0.8em
   padding-left: 30px
+  
+  @media print
+    padding-left: 0
+    font-style: italic
+    font-size: 0.9em
 
 #grades_summary tr.rubric_assessments>td
   border-width: 0
@@ -37,6 +71,10 @@
 #grades_summary tr.student_assignment.dropped td
   color: #ccc
   border-top-color: #eee
+  
+  @media print
+    color: black
+    border-top-color: black
 
 #grades_summary tr.student_assignment.dropped td.points_possible
   background-image: url(/images/earmark.png)
@@ -45,6 +83,10 @@
 
 #grades_summary tr.student_assignment.dropped td a
   color: #aaa
+  
+  @media print
+    color: black
+    font-weight: normal
 
 #grades_summary td.assignment_score
   cursor: pointer
@@ -65,6 +107,11 @@
 #grades_summary td.title
   font-size: 1.1em
   padding-left: 20px
+  
+  @media print
+    padding-left: 0
+    font-size: 1.0em
+    font-weight: normal
 
 #grades_summary td.title .context
   visibility: hidden
@@ -72,6 +119,11 @@
   color: #999
   padding-left: 10px
   line-height: 0.5em
+  
+  @media print
+    visibility: visible
+    margin: 5px 0
+    padding: 0
 
 #grades_summary td.title .context.context_hover
   visibility: visible
@@ -79,20 +131,44 @@
 #grades_summary td.due
   font-size: 0.8em
   white-space: nowrap
+  
+  @media print
+    font-size: 1em
 
 #grades_summary tr.assignment_graded td
   background-color: #eee
+  
+  @media print
+    background-color: transparent
+  
+    &.title
+      font-weight: bold
 
 #grades_summary tr.final_grade td
   background-color: #666
   color: #eee
   font-size: 1.5em
   font-weight: bold
+  
+  @media print
+    background-color: transparent
+    text-transform: uppercase
+    border-top: 2px solid black
+    font-size: 1.2em
 
-#grades_summary tr.group_total td
-  background-color: #ccc
-  border-top-width: 0
-  font-weight: bold
+#grades_summary tr.group_total 
+  td
+    background-color: #ccc
+    border-top-width: 0
+    font-weight: bold
+  
+    @media print
+      background-color: transparent
+      border-top-width: 1px
+      text-transform: uppercase
+    
+      &.title .context
+        display: none
 
 #grades_summary tr.group_total td.possible
   font-weight: normal
@@ -153,3 +229,5 @@
 #observer_user_url
   :font-size 0.8em
   :border 1px solid #aaa
+
+  

@@ -209,6 +209,17 @@ describe ContentMigration do
       @copy_to.grading_standard.should == nil
     end
 
+    it "should not copy deleted grading standards" do
+      gs = make_grading_standard(@copy_from)
+      @copy_from.grading_standard_enabled = true
+      @copy_from.save!
+
+      gs.destroy
+      run_course_copy
+
+      @copy_to.grading_standards.should be_empty
+    end
+
 
     def mig_id(obj)
       CC::CCHelper.create_key(obj)

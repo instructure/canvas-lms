@@ -19,15 +19,7 @@
     <% end %>
     <% if @context.available? && @context.self_enrollment && @context.open_enrollment && (!@context_enrollment || !@context_enrollment.active?) && !session["role_course_#{@context.id}"] %>
       <div class="rs-margin-lr rs-margin-top">
-        <a href="#" class="btn button-sidebar-wide self_enrollment_link"><i class="icon-user-add"></i>  <%= t('links.join_course', %{Join this Course}) %></a>
-      </div>
-      <div id="self_enrollment_dialog" style="display: none;">
-        <h2><%= image_tag "group.png", :style => "vertical-align: middle;" %> <%= t('headings.joining_a_course', %{Joining a Course}) %></h2>
-        <%= t('details.joining_a_course', %{Once you join a course you will see it show up in your course list.  You'll be able to participate in graded portions of the course and communicate directly with the teachers and other students.  You'll also see conversations and events from this course show up in your stream and as notifications.}) %>
-        <div class="button-container">
-          <a href="<%= course_self_enrollment_path(@context, @context.self_enrollment_code) %>" class="btn action"><i class="icon-user-add"></i> <span><%= t('links.join_course', %{Join this Course}) %></span></a>
-          <a href="#" class="btn button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></a>
-        </div>
+        <a href="<%= enroll_url(@context.self_enrollment_code) %>" title="<%= t('links.join_course', %{Join this Course}) %>" class="btn button-sidebar-wide self_enrollment_link" data-open-as-dialog><i class="icon-user-add"></i>  <%= t('links.join_course', %{Join this Course}) %></a>
       </div>
     <% elsif @context_enrollment && @context_enrollment.self_enrolled && @context_enrollment.active? && (!session["role_course_#{@context.id}"]) %>
       <div class="rs-margin-lr rs-margin-top">
@@ -37,8 +29,8 @@
         <h2><i class="icon-warning"></i> <%= t('headings.confirm_unenroll', %{Confirm Unenrollment}) %></h2>
         <%= t('details.confirm_unenroll', %{Are you sure you want to unenroll in this course?  You will no longer be able to see the course roster or communicate directly with the teachers, and you will no longer see course events in your stream and as notifications.}) %>
         <div class="button-container">
-          <a href="<%= course_self_unenrollment_path(@context, @context_enrollment.uuid) %>" class="btn action"><i class="icon-end"></i> <span><%= t('links.drop_course', %{Drop this Course}) %></span></a>
-          <a href="#" class="btn button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></a>
+          <a href="<%= course_self_unenrollment_path(@context, @context_enrollment.uuid) %>" class="btn btn-primary action"><i class="icon-end"></i> <span><%= t('links.drop_course', %{Drop this Course}) %></span></a>
+          <a href="#" class="btn dialog_closer"><%= t('#buttons.cancel', %{Cancel}) %></a>
         </div>
       </div>
     <% elsif temp_type = session["role_course_#{@context.id}"] %>
@@ -101,33 +93,22 @@ require([
   'jqueryui/dialog',
   'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
   'jquery.loadingImg' /* loadingImg, loadingImage */,
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
+  'compiled/behaviors/openAsDialog'
 ], function($) {
 
 $(document).ready(function() {
+  var $selfUnenrollmentDialog = $("#self_unenrollment_dialog");
   $(".self_unenrollment_link").click(function(event) {
-    $("#self_unenrollment_dialog").dialog({
-      title: <%= raw t('titles.drop_course', "Drop this Course").to_json %>
+    $selfUnenrollmentDialog.dialog({
+      title: <%= raw t('titles.drop_course', "Drop this Course").to_json %>,
     }).fixDialogButtons();
   });
-  $("#self_unenrollment_dialog .action").click(function() {
-    $("#self_unenrollment_dialog  a.btn").attr('disabled', true);
-    $(this).find("span").text(<%= raw t('dropping_course', "Dropping Course...").to_json %>);
-  });
-  $("#self_unenrollment_dialog .cancel_button").click(function() {
-    $("#self_enrollment_dialog").dialog('close');
-  });
-  $(".self_enrollment_link").click(function(event) {
-    $("#self_enrollment_dialog").dialog({
-      title: <%= raw t('titles.join_course', "Join this Course").to_json %>
+  $selfUnenrollmentDialog.on('click', '.action', function() {
+    $selfUnenrollmentDialog.disableWhileLoading($.Deferred());
+    $.ajaxJSON($(this).attr('href'), 'POST', {}, function() {
+      window.location.reload();
     });
-  });
-  $("#self_enrollment_dialog .action").click(function() {
-    $("#self_enrollment_dialog  a.btn").attr('disabled', true);
-    $(this).find("span").text(<%= raw t('joining_course', "Joining Course...").to_json %>);
-  });
-  $("#self_enrollment_dialog .cancel_button").click(function() {
-    $("#self_enrollment_dialog").dialog('close');
   });
   $(".re_send_confirmation_link").click(function(event) {
     event.preventDefault();

@@ -46,7 +46,7 @@ class ApplicationController < ActionController::Base
   after_filter :set_user_id_header
   before_filter :fix_xhr_requests
   before_filter :init_body_classes
-  before_filter :set_response_headers
+  after_filter :set_response_headers
 
   add_crumb(proc { %Q{<i title="#{I18n.t('links.dashboard', "My Dashboard")}" class="icon-home standalone-icon"></i>}.html_safe }, :root_path, :class => "home")
 
@@ -153,7 +153,7 @@ class ApplicationController < ActionController::Base
     # we can't block frames on the files domain, since files domain requests
     # are typically embedded in an iframe in canvas, but the hostname is
     # different
-    if !files_domain? && Setting.get_cached('block_html_frames', 'true') == 'true'
+    if !files_domain? && Setting.get_cached('block_html_frames', 'true') == 'true' && !@embeddable
       headers['X-Frame-Options'] = 'SAMEORIGIN'
     end
     true
@@ -279,7 +279,8 @@ class ApplicationController < ActionController::Base
           end
         end
 
-        render :template => "shared/unauthorized", :layout => "application", :status => :unauthorized 
+        @is_delegated = @domain_root_account.delegated_authentication? && !@domain_root_account.ldap_authentication? && !request.params[:canvas_login]
+        render :template => "shared/unauthorized", :layout => "application", :status => :unauthorized
       }
       format.zip { redirect_to(url_for(params)) }
       format.json { render :json => { 'status' => 'unauthorized', 'message' => 'You are not authorized to perform that action.' }, :status => :unauthorized }
@@ -287,7 +288,7 @@ class ApplicationController < ActionController::Base
     response.headers["Pragma"] = "no-cache"
     response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
   end
-  
+
   # To be used as a before_filter, requires controller or controller actions
   # to have their urls scoped to a context in order to be valid.
   # So /courses/5/assignments or groups/1/assignments would be valid, but
@@ -306,7 +307,7 @@ class ApplicationController < ActionController::Base
     end
     return @context != nil
   end
-  
+
   def clean_return_to(url)
     return nil if url.blank?
     uri = URI.parse(url)
@@ -314,7 +315,7 @@ class ApplicationController < ActionController::Base
     return "#{request.protocol}#{request.host_with_port}#{uri.path}#{uri.query && "?#{uri.query}"}#{uri.fragment && "##{uri.fragment}"}"
   end
   helper_method :clean_return_to
-  
+
   def return_to(url, fallback)
     url = clean_return_to(url) || clean_return_to(fallback)
     redirect_to url
@@ -905,7 +906,7 @@ class ApplicationController < ActionController::Base
   def session_loaded?
     session.send(:loaded?) rescue false
   end
-  
+
   # Retrieving wiki pages needs to search either using the id or 
   # the page title.
   def get_wiki_page
@@ -930,7 +931,7 @@ class ApplicationController < ActionController::Base
       @page.body = t "#application.wiki_front_page_default_content_group", "Welcome to your new group wiki!" if @context.is_a?(Group)
     end
   end
-  
+
   def context_wiki_page_url
     page_name = @page.url
     named_context_url(@context, :context_wiki_page_url, page_name)
@@ -972,7 +973,7 @@ class ApplicationController < ActionController::Base
       else
         @return_url = named_context_url(@context, :context_external_tool_finished_url, @tool.id, :include_host => true)
         @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @context, :link_code => @opaque_id, :return_url => @return_url)
-        if @assignment && @context.students.include?(@current_user)
+        if @assignment && @context.includes_student?(@current_user)
           @launch.for_assignment!(@tag.context, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool))
         end
         @tool_settings = @launch.generate
@@ -1082,7 +1083,7 @@ class ApplicationController < ActionController::Base
     res
   end
   helper_method :safe_domain_file_url
-  
+
   def feature_enabled?(feature)
     @features_enabled ||= {}
     feature = feature.to_sym
@@ -1118,17 +1119,17 @@ class ApplicationController < ActionController::Base
     end
   end
   helper_method :feature_enabled?
-  
+
   def service_enabled?(service)
     @domain_root_account && @domain_root_account.service_enabled?(service)
   end
   helper_method :service_enabled?
-  
+
   def feature_and_service_enabled?(feature)
     feature_enabled?(feature) && service_enabled?(feature)
   end
   helper_method :feature_and_service_enabled?
-  
+
   def show_new_dashboard?
     @current_user && @current_user.preferences[:new_dashboard]
   end
@@ -1173,6 +1174,12 @@ class ApplicationController < ActionController::Base
         format.json { render :json => { 'status' => 'unauthorized', 'message' => t('#errors.registration_incomplete', 'You need to confirm your email address before you can view this page') }, :status => :unauthorized }
       end
       return false
+    end
+  end
+
+  def check_incomplete_registration
+    if @current_user
+      js_env :INCOMPLETE_REGISTRATION => params[:registration_success] && @current_user.pre_registered?, :USER_EMAIL => @current_user.email
     end
   end
 
@@ -1236,7 +1243,21 @@ class ApplicationController < ActionController::Base
     (params[:format].to_s != 'json' || in_app?)
   end
 
+  def reset_session
+    # when doing login/logout via ajax, we need to have the new csrf token
+    # for subsequent requests.
+    @resend_csrf_token_if_json = true
+    super
+  end
+
+  def set_layout_options
+    @embedded_view = params[:embedded]
+    @headers = false if params[:no_headers] || @embedded_view
+    (@body_classes ||= []) << 'embedded' if @embedded_view
+  end
+
   def render(options = nil, extra_options = {}, &block)
+    set_layout_options
     if options && options.key?(:json)
       json = options.delete(:json)
       json = ActiveSupport::JSON.encode(json) unless json.is_a?(String)
@@ -1244,6 +1265,10 @@ class ApplicationController < ActionController::Base
       # call that didn't use session auth, or a non-GET request.
       if prepend_json_csrf?
         json = "while(1);#{json}"
+      end
+
+      if @resend_csrf_token_if_json
+        response.headers['X-CSRF-Token'] = form_authenticity_token
       end
 
       # fix for some browsers not properly handling json responses to multipart

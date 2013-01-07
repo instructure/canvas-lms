@@ -58,7 +58,7 @@ describe Quiz do
     quiz.due_at.hour.should eql 23
     quiz.due_at.min.should eql 59
   end
-  
+
   it "should set the due date time correctly" do
     time_string = "Dec 30, 2011 12:00 pm"
     expected = "2011-12-30 19:00:00 #{Time.now.utc.strftime("%Z")}"
@@ -77,7 +77,7 @@ describe Quiz do
     q.allowed_attempts.should eql(1)
     q.scoring_policy.should eql('keep_highest')
   end
-  
+
   it "should update the assignment it is associated with" do
     a = @course.assignments.create!(:title => "some assignment", :points_possible => 5)
     a.points_possible.should eql(5.0)
@@ -93,7 +93,7 @@ describe Quiz do
     q.points_possible.should eql(10.0)
     q.assignment.submission_types.should eql("online_quiz")
     q.assignment.points_possible.should eql(10.0)
-    
+
     g = @course.assignment_groups.create!(:name => "new group")
     q.assignment_group_id = g.id
     q.save
@@ -101,7 +101,7 @@ describe Quiz do
     a.reload
     a.assignment_group.should eql(g)
     q.assignment_group_id.should eql(g.id)
-    
+
     g2 = @course.assignment_groups.create!(:name => "new group2")
     a.assignment_group = g2
     a.save
@@ -110,7 +110,7 @@ describe Quiz do
     q.assignment_group_id.should eql(g2.id)
     a.assignment_group.should eql(g2)
   end
-  
+
   it "shouldn't create a new assignment on every edit" do
     a_count = Assignment.count
     a = @course.assignments.create!(:title => "some assignment", :points_possible => 5)
@@ -841,7 +841,7 @@ describe Quiz do
     end
 
   end
-  
+
   it "should ignore lockdown-browser setting if that plugin is not enabled" do
     q = @course.quizzes.build(:title => "some quiz")
     q1 = @course.quizzes.build(:title => "some quiz", :require_lockdown_browser => true, :require_lockdown_browser_for_results => false)
@@ -908,7 +908,7 @@ describe Quiz do
 
       context "on a shuffleable question type" do
         before { Quiz.stubs(:shuffleable_question_type?).returns(true) }
-        
+
         it "returns the same answers, not necessarily in the same order" do
           quiz.prepare_answers(question).sort.should == answers.sort
         end
@@ -930,5 +930,122 @@ describe Quiz do
   describe "shuffleable_question_type?" do
     specify { Quiz.shuffleable_question_type?("true_false_question").should be_false }
     specify { Quiz.shuffleable_question_type?("multiple_choice_question").should be_true }
+  end
+
+  describe '#has_student_submissions?' do
+    before do
+      course = Course.create!
+      @quiz = Quiz.create!(:context => course)
+      @user = User.create!
+      @enrollment = @user.student_enrollments.create!(:course => course)
+      @enrollment.update_attribute(:workflow_state, 'active')
+      @submission = QuizSubmission.create!(:quiz => @quiz, :user => @user)
+      @submission.update_attribute(:workflow_state, 'untaken')
+    end
+
+    it 'returns true if the submission is not settings_only and its user is part of this course' do
+      @submission.settings_only?.should be_false
+      @quiz.context.students.include?(@user).should be_true
+      @quiz.has_student_submissions?.should be_true
+    end
+
+    it 'is false if the submission is settings_only' do
+      @submission.update_attribute(:workflow_state, 'settings_only')
+      @quiz.has_student_submissions?.should be_false
+    end
+
+    it 'is false if the user is not part of this course' do
+      @user.student_enrollments.delete_all
+      @quiz.has_student_submissions?.should be_false
+    end
+
+    it 'is false if there are no submissions' do
+      @quiz.quiz_submissions.delete_all
+      @quiz.has_student_submissions?.should be_false
+    end
+
+    it 'is true if only one submission of many matches the conditions' do
+      QuizSubmission.create!(:quiz => @quiz, :user => User.create!)
+      @quiz.has_student_submissions?.should be_true
+    end
+  end
+
+  describe "linking overrides with assignments" do
+    let(:course) { course_model }
+    let(:quiz) { quiz_model(:course => course, :due_at => 5.days.from_now).reload }
+    let(:override) { assignment_override_model(:quiz => quiz) }
+    let(:override_student) { override.assignment_override_students.build }
+
+    before do
+      override.override_due_at(7.days.from_now)
+      override.save!
+
+      student_in_course(:course => course)
+      override_student.user = @student
+      override_student.save!
+    end
+
+    context "before the quiz has an assignment" do
+      context "override" do
+        it "has a quiz" do
+          override.quiz.should == quiz
+        end
+
+        it "has a nil assignment" do
+          override.assignment.should be_nil
+        end
+      end
+
+      context "override student" do
+        it "has a quiz" do
+          override_student.quiz.should == quiz
+        end
+
+        it "has a nil assignment" do
+          override_student.assignment.should be_nil
+        end
+      end
+    end
+
+    context "once the quiz is published" do
+      before do
+        # publish the quiz
+        quiz.workflow_state = 'available'
+        quiz.save
+        override.reload
+        override_student.reload
+      end
+
+      context "override" do
+        it "has a quiz" do
+          override.quiz.should == quiz
+        end
+
+        it "has the quiz's assignment" do
+          override.assignment.should == quiz.assignment
+        end
+      end
+
+      context "override student" do
+        it "has a quiz" do
+          override_student.quiz.should == quiz
+        end
+
+        it "has the quiz's assignment" do
+          override_student.assignment.should == quiz.assignment
+        end
+      end
+    end
+
+    context "when the assignment ID doesn't change" do
+      it "doesn't update overrides" do
+        quiz.expects(:link_assignment_overrides).once
+        # publish the quiz
+        quiz.workflow_state = 'available'
+        quiz.save
+        quiz.expects(:link_assignment_overrides).never
+        quiz.save
+      end
+    end
   end
 end

@@ -80,9 +80,9 @@ describe "context_modules" do
       #opens the student progression link and validates all modules have no information"
       f('.module_progressions_link').click
       wait_for_ajaximations
-      f(".student_list").should be_displayed
 
       student_list = f(".student_list")
+      student_list.should be_displayed
       student_list.should include_text(new_student.name)
       student_list.should include_text("none in progress")
       f(".module_#{modules[0].id} .progress").should include_text("no information")
@@ -93,10 +93,11 @@ describe "context_modules" do
 
       f('.refresh_progressions_link').click
       wait_for_ajaximations
-      f(".student_list").should be_displayed
+      # fj for last 3 lines to avoid selenium caching
+      fj(".student_list").should be_displayed
 
-      f(".module_#{modules[0].id} .progress").should include_text("completed")
-      f(".module_#{modules[1].id} .progress").should include_text("in progress")
+      fj(".module_#{modules[0].id} .progress").should include_text("completed")
+      fj(".module_#{modules[1].id} .progress").should include_text("in progress")
       student_list.should include_text(new_student.name)
     end
     #student_list.should include_text("module 2") ****Should update to module 2 but doesn't until renavigating to the page****
@@ -159,6 +160,7 @@ describe "context_modules" do
   end
 
   it "should rearrange child object to new module" do
+      pending('drag and drop selenium not working')
     modules = create_modules(2)
 
     #attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
@@ -182,7 +184,7 @@ describe "context_modules" do
     fj('#context_modules .context_module:last-child .context_module_items .context_module_item').should be_nil
   end
 
-  it "should only display 'out-of' on an assignment min score restriction when the assignment has a total" do
+    it "should only display out-of on an assignment min score restriction when the assignment has a total" do
     ag = @course.assignment_groups.create!
     a1 = ag.assignments.create!(:context => @course)
     a1.points_possible = 10

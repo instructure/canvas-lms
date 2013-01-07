@@ -33,7 +33,6 @@ class ConversationsController < ApplicationController
   # whether it's a bulk private message, or a big group conversation,
   # batch up all delayed jobs to make this more responsive to the user
   batch_jobs_in_actions :only => :create
-  add_crumb(proc { I18n.t 'crumbs.messages', "Conversations" }) { |c| c.send :conversations_url }
 
   # @API List conversations
   # Returns the list of conversations for the current user, most recent ones first.

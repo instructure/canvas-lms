@@ -420,8 +420,12 @@ def self.date_component(start_date, style=:normal)
       end
     end
     translated = t(*args)
-    translated = ERB::Util.h(translated) unless translated.html_safe?
-    result = RDiscount.new(translated).to_html.strip
+    markdown(translated, inlinify)
+  end
+
+  def markdown(string, inlinify = :auto)
+    string = ERB::Util.h(string) unless string.html_safe?
+    result = RDiscount.new(string).to_html.strip
     # Strip wrapping <p></p> if inlinify == :auto && they completely wrap the result && there are not multiple <p>'s
     result.gsub!(/<\/?p>/, '') if inlinify == :auto && result =~ /\A<p>.*<\/p>\z/m && !(result =~ /.*<p>.*<p>.*/m)
     result.html_safe.strip

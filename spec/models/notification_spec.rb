@@ -301,11 +301,11 @@ describe Notification do
         :asset => @assignment
       }
     end
-    
+
     it "should only work when a user is passed to it" do
       lambda{@notification.record_delayed_messages}.should raise_error(ArgumentError, "Must provide a user")
     end
-    
+
     it "should only work when a communication_channel is passed to it" do
       # One without a communication_channel, gets cc explicitly through 
       # :to => cc or implicitly through the user. 
@@ -313,16 +313,28 @@ describe Notification do
       lambda{@notification.record_delayed_messages(:user => @user)}.should raise_error(ArgumentError, 
         "Must provide an asset")
     end
-    
+
     it "should only work when a context is passed to it" do
       lambda{@notification.record_delayed_messages(:user => @user, :to => @communication_channel)}.should raise_error(ArgumentError, 
         "Must provide an asset")
     end
-    
+
     it "should work with a user, communication_channel, and context" do
       lambda{@notification.record_delayed_messages(@valid_record_delayed_messages_opts)}.should_not raise_error
     end
-    
+
+    it "should receive data passed to create_message" do
+      @notification.stubs(:summarizable?).returns(true)
+      Message.any_instance.stubs(:get_template).returns('Hello, <%= data.user.name %>!')
+      notification_policy_model(:frequency => 'weekly',
+                                :notification => @notification,
+                                :communication_channel => @communication_channel)
+
+      @notification.create_message(@assignment, [@user,{:data => {:user => @user}}])
+      message = @notification.instance_variable_get(:@delayed_messages_to_save).first
+      message.summary.should == "Hello, #{@user.name}!"
+    end
+
     context "testing that the applicable daily or weekly policies exist" do
       before do
         NotificationPolicy.delete_all
@@ -395,7 +407,6 @@ describe Notification do
                                               :communication_channel => @communication_channel,
                                               :asset => @assignment).should be_false
       end
-        
     end # testing that the applicable daily or weekly policies exist
   end # delay message
 end

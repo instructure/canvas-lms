@@ -575,7 +575,7 @@ class DiscussionTopic < ActiveRecord::Base
     tags_to_update = self.context_module_tags.to_a
     if self.for_assignment?
       tags_to_update += self.assignment.context_module_tags
-      self.ensure_submission(user) if self.assignment.context.students.include?(user) && action == :contributed
+      self.ensure_submission(user) if self.assignment.context.includes_student?(user) && action == :contributed
     end
     tags_to_update.each { |tag| tag.context_module_action(user, action, points) }
   end

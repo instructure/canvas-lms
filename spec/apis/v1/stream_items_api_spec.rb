@@ -145,6 +145,27 @@ describe UsersController, :type => :integration do
           ]
   end
 
+  it "should translate user content in discussion topic" do
+    should_translate_user_content(@course) do |user_content|
+      @context = @course
+      discussion_topic_model(:message => user_content)
+      json = api_call(:get, "/api/v1/users/activity_stream.json",
+                      { :controller => "users", :action => "activity_stream", :format => 'json' })
+      json.first['message']
+    end
+  end
+
+  it "should translate user content in discussion entry" do
+    should_translate_user_content(@course) do |user_content|
+      @context = @course
+      discussion_topic_model
+      @topic.reply_from(:user => @user, :html => user_content)
+      json = api_call(:get, "/api/v1/users/activity_stream.json",
+                      { :controller => "users", :action => "activity_stream", :format => 'json' })
+      json.first['root_discussion_entries'].first['message']
+    end
+  end
+
   it "should format Announcement" do
     @context = @course
     announcement_model
@@ -173,6 +194,27 @@ describe UsersController, :type => :integration do
       ],
       'course_id' => @course.id,
     }]
+  end
+
+  it "should translate user content in announcement messages" do
+    should_translate_user_content(@course) do |user_content|
+      @context = @course
+      announcement_model(:message => user_content)
+      json = api_call(:get, "/api/v1/users/activity_stream.json",
+                      { :controller => "users", :action => "activity_stream", :format => 'json' })
+      json.first['message']
+    end
+  end
+
+  it "should translate user content in announcement discussion entries" do
+    should_translate_user_content(@course) do |user_content|
+      @context = @course
+      announcement_model
+      @a.reply_from(:user => @user, :html => user_content)
+      json = api_call(:get, "/api/v1/users/activity_stream.json",
+                      { :controller => "users", :action => "activity_stream", :format => 'json' })
+      json.first['root_discussion_entries'].first['message']
+    end
   end
 
   it "should format Conversation" do

@@ -22,7 +22,8 @@ require [
   'compiled/collections/UserCollection'
   'compiled/collections/SectionCollection'
   'compiled/views/courses/RosterView'
-], ($, _, UserCollection, SectionCollection, RosterView) ->
+  'jst/courses/Roster'
+], ($, _, UserCollection, SectionCollection, RosterView, roster) ->
 
   # Load environment
   course       = ENV.context_asset_string.split('_')[1]
@@ -31,36 +32,29 @@ require [
     include: ['avatar_url', 'enrollments', 'email']
     per_page: 50
 
-  # Cache elements
-  $studentList = $('.student_roster .user_list')
-  $teacherList = $('.teacher_roster .user_list')
+  sections     = new SectionCollection(ENV.SECTIONS)
+  columns =
+    students: $('.roster .student_roster')
+    teachers: $('.roster .teacher_roster')
 
-  # Create views
-  sections = new SectionCollection(ENV.SECTIONS)
-  students = new UserCollection
-  teachers = new UserCollection
+  for roster_data in ENV.COURSE_ROSTERS
+    users = new UserCollection
+    users.url = url
+    users.sections = sections
+    users.roles = roster_data['roles']
 
-  _.each [students, teachers], (c) ->
-    c.url      = url
-    c.sections = sections
+    usersOptions = add: false, data: _.extend({}, fetchOptions, enrollment_role: roster_data['roles'])
 
-  studentOptions = add: false, data: _.extend({}, fetchOptions, enrollment_type: 'student')
-  teacherOptions = add: false, data: _.extend({}, fetchOptions, enrollment_type: ['teacher', 'ta'])
+    column = columns[roster_data['column']]
+    html = roster
+      title: roster_data['title']
+    column.append(html)
+    list = column.find('.user_list').last()
 
-  studentView = new RosterView
-    collection: students
-    el: $studentList
-    fetchOptions: studentOptions
-  teacherView = new RosterView
-    collection: teachers
-    el: $teacherList
-    fetchOptions: teacherOptions
+    usersView = new RosterView
+      collection: users
+      el: list
+      fetchOptions: usersOptions
 
-  # Add events
-  students.on('reset', studentView.render, studentView)
-  teachers.on('reset', teacherView.render, teacherView)
-
-  # Fetch roster
-  studentView.$el.disableWhileLoading(students.fetch(studentOptions))
-  teacherView.$el.disableWhileLoading(teachers.fetch(teacherOptions))
-
+    users.on('reset', usersView.render, usersView)
+    usersView.$el.disableWhileLoading(users.fetch(usersOptions))

@@ -20,6 +20,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe ProfileController do
   describe "show" do
+    it "should not require an id for yourself" do
+      user
+      user_session(@user)
+
+      get 'show'
+      response.should render_template('profile')
+    end
+
     it "should chain to settings when it's the same user" do
       user
       user_session(@user)

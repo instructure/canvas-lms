@@ -94,6 +94,19 @@ describe Enrollment do
     e.readable_type.should eql('Student')
   end
 
+  describe "sis_role" do
+    it "should return role_name if present" do
+      e = TaEnrollment.new
+      e.role_name = 'Assistant Grader'
+      e.sis_role.should == 'Assistant Grader'
+    end
+
+    it "should return the sis enrollment type otherwise" do
+      e = TaEnrollment.new
+      e.sis_role.should == 'ta'
+    end
+  end
+
   it "should not allow an associated_user_id on a non-observer enrollment" do
     observed = User.create!
 

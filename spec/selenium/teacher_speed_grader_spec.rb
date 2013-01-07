@@ -291,7 +291,7 @@ describe "speed grader" do
     ff("#comments > .comment .avatar")[0].should have_attribute('style', "display: none\;")
   end
 
-  it "should hide student names and avatar images if \"Hide student names\" is checked" do
+  it "should hide student names and avatar images if Hide student names is checked" do
     # enable avatars
     @account = Account.default
     @account.enable_service(:avatars)

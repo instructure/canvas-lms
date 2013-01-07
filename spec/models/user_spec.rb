@@ -157,6 +157,20 @@ describe User do
     @user.recent_stream_items.size.should == 0
   end
 
+  describe "#recent_stream_items" do
+    it "should skip submission stream items" do
+      course_with_teacher(:active_all => true)
+      course_with_student(:active_all => true, :course => @course)
+      assignment = @course.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
+      sub = assignment.submit_homework @student, :submission_type => "online_text_entry", :body => "submission"
+      sub.add_comment :author => @teacher, :comment => "lol"
+      item = StreamItem.last
+      item.asset.should == sub
+      @student.visible_stream_item_instances.map(&:stream_item).should include item
+      @student.recent_stream_items.should_not include item
+    end
+  end
+
   describe "#cached_recent_stream_items" do
     before(:each) do
       @contexts = []
@@ -2045,7 +2059,7 @@ describe User do
 
       Account.default.settings[:mfa_settings] = :optional
       Account.default.save!
-      user.reload
+      user = User.find(user)
       user.mfa_settings.should == :optional
     end
 
@@ -2056,20 +2070,23 @@ describe User do
       required_account = Account.create!(:settings => { :mfa_settings => :required })
 
       p1 = user.pseudonyms.create!(:account => disabled_account, :unique_id => 'user')
+      user = User.find(user)
       user.mfa_settings.should == :disabled
 
       p2 = user.pseudonyms.create!(:account => optional_account, :unique_id => 'user')
+      user = User.find(user)
       user.mfa_settings.should == :optional
 
       p3 = user.pseudonyms.create!(:account => required_account, :unique_id => 'user')
+      user = User.find(user)
       user.mfa_settings.should == :required
 
       p1.destroy
-      user.reload
+      user = User.find(user)
       user.mfa_settings.should == :required
 
       p2.destroy
-      user.reload
+      user = User.find(user)
       user.mfa_settings.should == :required
     end
 

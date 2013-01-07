@@ -39,7 +39,7 @@ class ProfileController < ApplicationController
       return
     end
 
-    @user = User.find(params[:id])
+    @user ||= @current_user
     @active_tab = "profile"
     @context = @user.profile if @user == @current_user
 
@@ -123,8 +123,10 @@ class ProfileController < ApplicationController
       :channels => @user.communication_channels.all_ordered_for_display(@user).map { |c| communication_channel_json(c, @user, session) },
       :policies => NotificationPolicy.setup_with_default_policies(@user, full_category_list).map{ |p| notification_policy_json(p, @user, session) },
       :categories => full_category_list.map{ |c| notification_category_json(c, @user, session) },
-      :update_url => communication_update_profile_path
-    }
+      :update_url => communication_update_profile_path,
+      },
+      :READ_PRIVACY_INFO => @user.preferences[:read_notification_privacy_info],
+      :ACCOUNT_PRIVACY_NOTICE => @domain_root_account.settings[:external_notification_warning]
   end
 
   def communication_update
@@ -184,6 +186,14 @@ class ProfileController < ApplicationController
   
   def update
     @user = @current_user
+
+    if params[:privacy_notice].present?
+      @user.preferences[:read_notification_privacy_info] = Time.now.utc.to_s
+      @user.save
+
+      return render(:nothing => true, :status => 208)
+    end
+
     respond_to do |format|
       if !@user.user_can_edit_name? && params[:user]
         params[:user].delete(:name)
@@ -279,7 +289,7 @@ class ProfileController < ApplicationController
 
   def require_user_for_private_profile
     if params[:id]
-      @user = User.find(params[:id])
+      @user = api_find(User, params[:id])
       return if @user.public?
     end
     require_user

@@ -185,7 +185,7 @@
         <td><%= before_label :calendar, "Calendar" %></td>
         <td>
           <select class="context_id">
-            <% @contexts.select{|c| c.respond_to?("calendar_events") && c.calendar_events.new.grants_right?(@current_user, session, :create)}.each do |context| %>
+            <% @contexts.select{|c| c.respond_to?("calendar_events") && c.calendar_events.build.grants_right?(@current_user, session, :create)}.each do |context| %>
               <option value="<%= context.class.to_s.downcase %>_<%= context.id %>"><%= context.name %></option>
             <% end %>
           </select>
@@ -214,7 +214,7 @@
         <td><%= before_label :calendar, "Calendar" %></td>
         <td>
           <select class="context_id">
-            <% @contexts.select{|c| c.respond_to?("assignments") && c.assignments.new.grants_right?(@current_user, session, :create)}.each do |context| %>
+            <% @contexts.select{|c| c.respond_to?("assignments") && c.assignments.build.grants_right?(@current_user, session, :create)}.each do |context| %>
               <option value="<%= context.class.to_s.downcase %>_<%= context.id %>"><%= context.name %></option>
             <% end %>
           </select>

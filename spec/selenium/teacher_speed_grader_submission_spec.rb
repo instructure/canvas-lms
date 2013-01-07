@@ -86,6 +86,21 @@ describe "speed grader submissions" do
     f('#submission_late_notice').should be_displayed
   end
 
+  it "should not display a late message if an assignment has been overridden" do
+    @assignment.update_attribute(:due_at, Time.now - 2.days)
+    override = @assignment.assignment_overrides.build
+    override.due_at = Time.now + 2.days
+    override.due_at_overridden = true
+    override.set = @course.course_sections.first
+    override.save!
+    student_submission
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    keep_trying_until { f('#speedgrader_iframe') }
+
+    f('#submission_late_notice').should_not be_displayed
+  end
+
 
   it "should display no submission message if student does not make a submission" do
     @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')

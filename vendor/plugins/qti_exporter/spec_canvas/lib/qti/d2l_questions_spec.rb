@@ -1,33 +1,37 @@
 require File.dirname(__FILE__) + '/../../qti_helper'
 if Qti.migration_executable
 describe "Converting D2L QTI" do
+  before do
+    @opts = { :flavor => Qti::Flavors::D2L }
+  end
+
   it "should convert multiple choice" do
-    get_question_hash(d2l_question_dir, 'multiple_choice').should == D2LExpected::MULTIPLE_CHOICE
+    get_question_hash(d2l_question_dir, 'multiple_choice', true, @opts).should == D2LExpected::MULTIPLE_CHOICE
   end
 
   it "should convert true false" do
-    get_question_hash(d2l_question_dir, 'true_false').should == D2LExpected::TRUE_FALSE
+    get_question_hash(d2l_question_dir, 'true_false', true, @opts).should == D2LExpected::TRUE_FALSE
   end
 
   it "should convert short answer" do
-    get_question_hash(d2l_question_dir, 'short_answer').should == D2LExpected::SHORT_ANSWER
+    get_question_hash(d2l_question_dir, 'short_answer', true, @opts).should == D2LExpected::SHORT_ANSWER
   end
 
   it "should convert multi select" do
-    get_question_hash(d2l_question_dir, 'multi_select').should == D2LExpected::MULTI_SELECT
+    get_question_hash(d2l_question_dir, 'multi_select', true, @opts).should == D2LExpected::MULTI_SELECT
   end
   
   it "should convert multiple short" do
-    get_question_hash(d2l_question_dir, 'multiple_short').should == D2LExpected::MULTIPLE_SHORT
+    get_question_hash(d2l_question_dir, 'multiple_short', true, @opts).should == D2LExpected::MULTIPLE_SHORT
   end
   
   it "should convert fill in the blank with multiple blanks" do
-    get_question_hash(d2l_question_dir, 'fib').should == D2LExpected::FIB
+    get_question_hash(d2l_question_dir, 'fib', true, @opts).should == D2LExpected::FIB
   end
   
   it "should convert matching" do
     #pp get_question_hash(d2l_question_dir, 'matching', false)
-    hash = get_question_hash(d2l_question_dir, 'matching', false, :flavor => 'd2l')
+    hash = get_question_hash(d2l_question_dir, 'matching', false, @opts)
     matches = {}
     hash[:matches].each {|m| matches[m[:match_id]] = m[:text]}
     hash[:answers].each do |a|
@@ -40,27 +44,27 @@ describe "Converting D2L QTI" do
   end
   
   it "should flag ordering question as an error" do
-    get_question_hash(d2l_question_dir, 'ordering').should == D2LExpected::ORDERING
+    get_question_hash(d2l_question_dir, 'ordering', true, @opts).should == D2LExpected::ORDERING
   end
   
   it "should convert math question" do
-    get_question_hash(d2l_question_dir, 'math').should == D2LExpected::MATH
+    get_question_hash(d2l_question_dir, 'math', true, @opts).should == D2LExpected::MATH
   end
 
   it "should convert long answer" do
-    get_question_hash(d2l_question_dir, 'long_answer').should == D2LExpected::LONG_ANSWER
+    get_question_hash(d2l_question_dir, 'long_answer', true, @opts).should == D2LExpected::LONG_ANSWER
   end
 
   it "should convert an item with a response condition with no condition" do
-    get_question_hash(d2l_question_dir, 'no_condition').should == D2LExpected::NO_CONDITION
+    get_question_hash(d2l_question_dir, 'no_condition', true, @opts).should == D2LExpected::NO_CONDITION
   end
 
   it "should convert the assessment into a quiz" do
-    get_quiz_data(d2l_question_dir, 'assessment').last.first.should == D2LExpected::ASSESSMENT
+    get_quiz_data(d2l_question_dir, 'assessment', @opts).last.first.should == D2LExpected::ASSESSMENT
   end
 
   it "should convert the assessment into a quiz" do
-    get_quiz_data(d2l_question_dir, 'assessment_references').last.first.should == D2LExpected::ASSESSMENT_REFS
+    get_quiz_data(d2l_question_dir, 'assessment_references', @opts).last.first.should == D2LExpected::ASSESSMENT_REFS
   end
 
 end
@@ -90,7 +94,7 @@ module D2LExpected
                           ],
                   :question_bank_id=>"SECT_3981973",
                   :points_possible=>1,
-                  :migration_id=>"OBJ_1519236",
+                  :migration_id=>"QUES_516156_630296",
                   :question_text=>"The first letter of the Greek alphabet is?",
                   :question_name=>"",
                   :correct_comments=>"",
@@ -114,15 +118,16 @@ module D2LExpected
            :question_text=>
                    "<p>Is this <strong>true</strong> or false?</p><img src=\"quizzing/bunny_consumer.png\" alt=\"\">",
            :question_name=>"true false questions",
-           :migration_id=>"OBJ_3503037",
+           :migration_id=>"QUES_968903_1181388",
            :correct_comments=>""}
 
   ASSESSMENT = {:migration_id=>"res_quiz_90521",
-                :question_count=>1,
+                :question_count=>2,
                 :title=>"01 Early Bird Storybook Week 2",
                 :quiz_name=>"01 Early Bird Storybook Week 2",
                 :quiz_type=>nil,
-                :questions=>[{:migration_id=>"OBJ_3983699", :question_type=>"question_reference"}],
+                :questions=>[{:migration_id=>"QUES_443669_562987", :question_type=>"question_reference"},
+                             {:migration_id=>"QUES_443669_123456", :question_type=>"question_reference"}],
                 :time_limit => 15,
                 :allowed_attempts=>-1,
                 :assignment_migration_id=>'435646'
@@ -153,7 +158,7 @@ module D2LExpected
                  :answers=>[],
                  :question_text=>"Write an essay on writing essays",
                  :question_name=>"",
-                 :migration_id=>"OBJ_1519344",
+                 :migration_id=>"QUES_516158_630298",
                  :correct_comments=>"",
                  :question_type=>"essay_question",
                  :incorrect_comments=>"",
@@ -167,7 +172,7 @@ module D2LExpected
                   :answers=>[{:weight=>100, :text=>"Nydam", :comments=>""}],
                   :question_text=>"Who is winning the Tour of California today?",
                   :question_name=>"",
-                  :migration_id=>"OBJ_1545059",
+                  :migration_id=>"QUES_522317_638596",
                   :correct_comments=>""}
   
   MULTI_SELECT = {:correct_comments=>"",
@@ -183,10 +188,10 @@ module D2LExpected
                            {:text=>"4", :weight=>100, :migration_id=>"QUES_968905_1181391_A4710356"}],
                   :question_text=>"<p>how about the even numbers?</p>",
                   :question_name=>"multi select",
-                  :migration_id=>"OBJ_3503039"}
+                  :migration_id=>"QUES_968905_1181391"}
 
   MULTIPLE_SHORT = {:question_name=>"multiple short answer",
-                    :migration_id=>"OBJ_3503044",
+                    :migration_id=>"QUES_968910_1181396",
                     :correct_comments=>"",
                     :question_type=>"short_answer_question",
                     :incorrect_comments=>"",
@@ -201,7 +206,7 @@ module D2LExpected
 
   MATCHING = {:question_text=>"<p>letter to number</p>",
               :question_name=>"matching",
-              :migration_id=>"OBJ_3503046",
+              :migration_id=>"QUES_968912_1181398",
               :matches=>
                       [{:html=>"<strong>1</strong>", :text=>'1'},
                        {:html=>"<span style=\"text-decoration: underline;\">2</span>", :text=>'2'}],
@@ -231,7 +236,7 @@ module D2LExpected
               :question_bank_name=>"02gilback",
               :question_text=>"<p>the alphabet, heard of it?</p>",
               :question_name=>"ordering question",
-              :migration_id=>"OBJ_3503048",
+              :migration_id=>"QUES_968913_1181399",
               :correct_comments=>"",
               :question_type=>"Error"}
 
@@ -245,14 +250,14 @@ module D2LExpected
           :question_bank_name=>"02gilback",
           :question_text=>"<p>Solve the formula:</p>",
           :question_name=>"multi variable math",
-          :migration_id=>"OBJ_3563546",
+          :migration_id=>"QUES_979792_1194510",
           :variables=>
                   [{:scale=>3, :min=>10, :max=>15, :name=>"x"},
                    {:scale=>1, :min=>0.1, :max=>0.9, :name=>"y"},
                    {:scale=>0, :min=>100, :max=>150, :name=>"z"}],
           :correct_comments=>""}
 
-  FIB = {:migration_id=>"OBJ_3561822",
+  FIB = {:migration_id=>"QUES_979782_1194494",
          :answers=>
                  [{:blank_id=>"QUES_979782_1194494_A4749142", :text=>"fill", :weight=>100},
                   {:blank_id=>"QUES_979782_1194494_A4749142", :text=>"guess", :weight=>100},
@@ -267,7 +272,7 @@ module D2LExpected
          :question_name=>""}
 
   NO_CONDITION = {:question_name => "",
-                  :migration_id => "OBJ_3506477",
+                  :migration_id => "QUES_969100_1181698",
                   :answers =>
                           [{:text => "Avoid pseudo-forgetting",
                             :migration_id => "QUES_969100_1181698_A4711381",

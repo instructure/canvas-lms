@@ -64,7 +64,7 @@ shared_examples_for "wiki and tiny selenium tests" do
 
   def validate_link(text)
     in_frame "wiki_page_body_ifr" do
-      link = f('#tinymce a')
+      link = keep_trying_until { f('#tinymce a') }
       link.attribute('href').should == text
     end
   end

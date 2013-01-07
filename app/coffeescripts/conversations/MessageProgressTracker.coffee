@@ -50,6 +50,8 @@ define [
           else
             error = if data[0]?.attribute is 'recipients' and data[0].message is 'invalid'
               I18n.t('recipient_error', 'The course or group you have selected has no valid recipients')
+            else if data[0]?.attribute is 'attachment' and data[0].message is 'upload failed'
+              I18n.t('attachment_error', 'Attachment failed to upload, please try again.')
             else
               I18n.t('unspecified_error', 'An unexpected error occurred, please try again')
             item.error(error)

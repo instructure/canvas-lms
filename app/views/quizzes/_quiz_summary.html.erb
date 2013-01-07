@@ -47,9 +47,11 @@
           <% end %>
         <% elsif submission %>
           <%= datetime_string(submission.started_at) %><br/>
-            <% if !q.locked? %>
-                <% link_to context_url(@context, :context_quiz_take_url, q.id, :user_id => @current_user && @current_user.id), :method => :post do %><%= q.survey? ? t('links.resume_survey', "Resume Survey") : t('links.resume_quiz', "Resume Quiz")%><% end %>
-            <% end %>
+          <% if q.cant_go_back? %>
+            <%= link_to(resume_poll_message(q), polymorphic_url([@context, q])) %>
+          <% elsif !q.locked? %>
+            <%= link_to(resume_poll_message(q), context_url(@context, :context_quiz_take_url, q.id, :user_id => @current_user && @current_user.id), :method => :post) %>
+          <% end %>
         <% else %>
           <% unless q.ungraded? %>
             <%= q.points_possible ? t(:quiz_points_possible, "Point", :count => q.points_possible) : t(:quiz_no_points, "No Points") %><br/>

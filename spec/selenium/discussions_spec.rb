@@ -53,7 +53,8 @@ describe "discussions" do
 
       it "should validate closing the discussion for comments" do
         create_and_go_to_topic
-        expect_new_page_load { f('.discussion_locked_toggler').click }
+        f("#discussion-toolbar .al-trigger-inner").click
+        expect_new_page_load { f("#ui-id-4").click }
         f('.discussion-fyi').text.should == 'This topic is closed for comments'
         ff('.discussion-reply-label').should be_empty
         DiscussionTopic.last.workflow_state.should == 'locked'
@@ -61,7 +62,8 @@ describe "discussions" do
 
       it "should validate reopening the discussion for comments" do
         create_and_go_to_topic('closed discussion', 'side_comment', true)
-        expect_new_page_load { f('.discussion_locked_toggler').click }
+        f("#discussion-toolbar .al-trigger-inner").click
+        expect_new_page_load { f("#ui-id-4").click }
         ff('.discussion-reply-label').should_not be_empty
         DiscussionTopic.last.workflow_state.should == 'active'
       end
@@ -71,6 +73,24 @@ describe "discussions" do
         message = "message that needs escaping ' \" & !@#^&*()$%{}[];: blah"
         add_reply(message, 'graded.png')
         @last_entry.find_element(:css, '.message').text.should == message
+      end
+
+      it "should show attachments after showing hidden replies" do
+        @topic = @course.discussion_topics.create!(:title => 'test', :message => 'attachment test', :user => @user)
+        @entry = @topic.discussion_entries.create!(:user => @user, :message => 'blah')
+        @replies = []
+        5.times do
+          attachment = @course.attachments.create!(:context => @course, :filename => "text.txt", :user => @user, :uploaded_data => StringIO.new("testing"))
+          reply = @entry.discussion_subentries.create!(
+            :user => @user, :message => 'i haz attachments', :discussion_topic => @topic, :attachment => attachment)
+          @replies << reply
+        end
+        @topic.create_materialized_view
+        go_to_topic
+        ffj('.comment_attachments').count.should == 3
+        fj('.showMore').click
+        wait_for_ajaximations
+        ffj('.comment_attachments').count.should == @replies.count
       end
 
       it "should show only 10 root replies per page"

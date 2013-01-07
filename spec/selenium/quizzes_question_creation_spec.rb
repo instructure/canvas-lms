@@ -293,6 +293,45 @@ describe "quizzes question creation" do
     questions[2].should have_class("short_answer_question")
   end
 
+  it "should not create an extra, blank, correct answer when you use [answer] as a placeholder" do
+    quiz = @last_quiz
+
+    # be a multiple dropdown question
+    question = fj(".question_form:visible")
+    click_option('.question_form:visible .question_type', 'Multiple Dropdowns')
+
+    # set up a placeholder (this is the bug)
+    type_in_tiny '.question:visible textarea.question_content', 'What is the [answer]'
+
+    # check answer select
+    select_box = question.find_element(:css, '.blank_id_select')
+    select_box.click
+    options = select_box.find_elements(:css, 'option')
+    options[0].text.should == 'answer'
+
+    # input answers for the blank input
+    answers = question.find_elements(:css, ".form_answers > .answer")
+    answers[0].find_element(:css, ".select_answer_link").click
+
+    # make up some answers
+    replace_content(answers[0].find_element(:css, '.select_answer input'), 'a')
+    replace_content(answers[1].find_element(:css, '.select_answer input'), 'b')
+
+    # save the question
+    submit_form(question)
+    wait_for_ajax_requests
+
+    # check to see if the questions displays correctly
+    f('#show_question_details').click
+    quiz.reload
+    finished_question = f("#question_#{quiz.quiz_questions[0].id}")
+    finished_question.should be_displayed
+
+    # check to make sure extra answers were not generated
+    quiz.quiz_questions.first.question_data["answers"].count.should == 2
+    quiz.quiz_questions.first.question_data["answers"].detect{|a| a["text"] == ""}.should be_nil
+  end
+
   context "drag and drop reordering" do
 
     before(:each) do

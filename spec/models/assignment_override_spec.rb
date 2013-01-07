@@ -233,6 +233,12 @@ describe AssignmentOverride do
       @override.set = @course.default_section
       @override.should be_valid
     end
+
+    it "is valid when the assignment is nil if it has a quiz" do
+      @override.assignment = nil
+      @override.quiz = quiz_model
+      @override.should be_valid
+    end
   end
 
   describe "title" do
@@ -480,6 +486,56 @@ describe AssignmentOverride do
       visible_overrides.size.should == 2
       visible_overrides.should include @override1
       visible_overrides.should include @override2
+    end
+  end
+
+  describe "default_values" do
+    subject { override }
+    
+    let(:override) { AssignmentOverride.new }
+    let(:quiz) { Quiz.new }
+    let(:assignment) { Assignment.new }
+
+    context "when the override belongs to a quiz" do
+      before do
+        override.quiz = quiz
+      end
+
+      context "that has an assignment" do
+        it "uses the quiz's assignment" do
+          override.quiz.assignment = assignment
+          override.send(:default_values)
+          override.assignment.should == assignment
+        end
+      end
+
+      context "that has no assignment" do
+        it "has a nil assignment" do
+          override.send(:default_values)
+          override.assignment.should be_nil
+        end
+      end
+    end
+
+    context "when the override belongs to an assignment" do
+      before do
+        override.assignment = assignment
+      end
+
+      context "that has a quiz" do
+        it "uses the assignment's quiz" do
+          override.assignment.quiz = quiz
+          override.send(:default_values)
+          override.quiz.should == quiz
+        end
+      end
+
+      context "that has no quiz" do
+        it "has a nil quiz" do
+          override.send(:default_values)
+          override.quiz.should be_nil
+        end
+      end
     end
   end
 end

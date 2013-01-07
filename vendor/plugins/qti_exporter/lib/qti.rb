@@ -76,7 +76,7 @@ module Qti
       if $?.exitstatus == 0
         manifest = File.join(dest_dir_2_1, "imsmanifest.xml")
         questions = convert_questions(manifest, opts)
-        assessments = convert_assessments(manifest)
+        assessments = convert_assessments(manifest, opts)
       else
         raise "Error running python qti converter"
       end

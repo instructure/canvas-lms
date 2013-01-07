@@ -35,7 +35,7 @@ if !ONE_NINE
   gem 'mail', '2.4.4'
 end
 gem 'mailman',        '0.5.3'
-gem 'mime-types',     '1.16',   :require => 'mime/types'
+gem 'mime-types',     '1.17.2',   :require => 'mime/types'
 # attachment_fu (even the current technoweenie one on github) does not work
 # with mini_magick 3.1
 gem 'mini_magick',    '1.3.2'
@@ -90,12 +90,12 @@ group :test do
   gem 'coffee-script-source',  '1.3.1' #pinned so everyone's compiled output matches
   gem 'bluecloth',    '2.0.10' # for generating api docs
   gem 'parallel',     '0.5.16'
-  gem 'parallelized_specs', '0.3.54'
+  gem 'parallelized_specs', '0.3.86'
   gem 'mocha',        '0.12.3', :require => 'mocha_standalone'
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.2'
   gem 'rspec-rails',  '1.3.4'
-  gem 'selenium-webdriver', '2.25.0'
+  gem 'selenium-webdriver', '2.26.0'
   gem 'webrat',       '0.7.3'
   gem 'yard',         '0.8.0'
   if ONE_NINE

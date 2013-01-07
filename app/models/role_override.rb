@@ -734,61 +734,47 @@ class RoleOverride < ActiveRecord::Base
       end
     end
 
+    # cannot be overridden; don't bother looking for overrides
+    return generated_permission if generated_permission[:locked]
+
     @@role_override_chain ||= {}
-    overrides = @@role_override_chain[permissionless_key]
-    unless overrides
-      account_ids = []
-      context_walk = role_context
-      while context_walk
-        account_ids << context_walk.id if context_walk.is_a? Account
-        if context_walk.respond_to?(:course)
-          context_walk = context_walk.course
-        elsif context_walk.respond_to?(:account)
-          context_walk = context_walk.account
-        elsif context_walk.respond_to?(:parent_account)
-          context_walk = context_walk.parent_account
-        else
-          context_walk = nil
-        end
-      end
+    overrides = @@role_override_chain[permissionless_key] ||= begin
+      account_ids = role_context.account_chain_ids
       case_string = ""
       account_ids.each_with_index{|account_id, idx| case_string += " WHEN context_id='#{account_id}' THEN #{idx} " }
-      overrides = RoleOverride.find(:all, :conditions => {:context_id => account_ids, :enrollment_type => generated_permission[:enrollment_type].to_s}, :order => (case_string.empty? ? nil : "CASE #{case_string} ELSE 9999 END DESC"))
+      overrides = RoleOverride.find(:all, :conditions => {:context_id => account_ids, :enrollment_type => generated_permission[:enrollment_type].to_s}, :order => "CASE #{case_string} ELSE 9999 END DESC")
+      overrides.group_by(&:permission)
     end
 
-    @@role_override_chain[permissionless_key] = overrides
-    overrides.each do |override|
-      if override.permission == permission.to_s
-        generated_permission[:readonly] = true if override.locked && (override.context_id != role_context.id || !role_context.is_a?(Account))
-        generated_permission.merge!({
-          :readonly => generated_permission[:readonly] || generated_permission[:locked],
-          :explicit => false
-        })
+    # walk the overrides from most general (root account) to most specific (the role's account)
+    # and apply them; short-circuit once someone has locked it
+    last_override = false
+    (overrides[permission.to_s] || []).each do |override|
+      # set the flag that we have an override for the context we're on
+      last_override = override.context_id == role_context.id && override.context_type == role_context.class.base_class.name
 
-        if !generated_permission[:locked]
-          unless override.enabled.nil?
-            if override.context == role_context
-              # if the explicit override is for the target context, the prior default
-              # is the parent context's value
-              generated_permission[:prior_default] = generated_permission[:enabled]
-            else
-              # otherwise, the prior default is the same as the new override,
-              # since changing it in the target context will create a new
-              # override
-              generated_permission[:prior_default] = override.enabled?
-            end
-            generated_permission.merge!({
-              :enabled => override.enabled?,
-              :explicit => !override.enabled.nil?
-            })
-          end
-          generated_permission[:locked] = override.locked?
-        end
+      generated_permission[:locked] = override.locked?
+      # keep track of the value for the parent
+      generated_permission[:prior_default] = generated_permission[:enabled]
+
+      unless override.enabled.nil?
+        generated_permission[:explicit] = true if last_override
+        generated_permission[:enabled] = override.enabled?
       end
+
+      break if override.locked?
     end
+
+    # there was not an override matching this context, so do a half loop
+    # to set the inherited values
+    if !last_override
+      generated_permission[:prior_default] = generated_permission[:enabled]
+      generated_permission[:readonly] = true if generated_permission[:locked]
+    end
+
     @cached_permissions[key] = generated_permission
   end
-  
+
   # settings is a hash with recognized keys :override and :locked. each key
   # differentiates nil, false, and truthy as possible values
   def self.manage_role_override(context, role, permission, settings)

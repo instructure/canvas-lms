@@ -242,6 +242,7 @@ describe "people" do
 
       get "/courses/#{@course.id}/users/#{@obs.id}"
       f('.more_user_information_link').click
+      wait_for_animations
       enrollments = ff(".enrollment")
       enrollments.length.should == 2
 

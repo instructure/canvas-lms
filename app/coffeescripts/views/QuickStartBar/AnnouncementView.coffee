@@ -31,7 +31,6 @@ define [
 
       # map the context_ids into deferreds, saving a copy for each context
       dfds = _.map json.context_ids, (id) =>
-        debugger
         model = new Announcement json
         model.contextCode = id
         model.save()

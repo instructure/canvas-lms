@@ -287,6 +287,20 @@ describe UsersController do
         response.should be_success
       end
 
+      it "should require email pseudonyms by default" do
+        post 'create', :pseudonym => { :unique_id => 'jacob' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' }
+        response.status.should =~ /400 Bad Request/
+        json = JSON.parse(response.body)
+        json["errors"]["pseudonym"]["unique_id"].should be_present
+      end
+
+      it "should require email pseudonyms if not self enrolling" do
+        post 'create', :pseudonym => { :unique_id => 'jacob' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' }, :pseudonym_type => 'username'
+        response.status.should =~ /400 Bad Request/
+        json = JSON.parse(response.body)
+        json["errors"]["pseudonym"]["unique_id"].should be_present
+      end
+
       it "should validate the self enrollment code" do
         post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :birthdate => 20.years.ago.strftime('%Y-%m-%d'), :self_enrollment_code => 'omg ... not valid', :initial_enrollment_type => 'student' }, :self_enrollment => '1'
         response.status.should =~ /400 Bad Request/
@@ -302,11 +316,22 @@ describe UsersController do
         u.pseudonym.should be_password_auto_generated
       end
 
-      it "should require a password if self enrolling" do
+      it "should ignore the password if self enrolling with an email pseudonym" do
         course(:active_all => true)
         @course.update_attribute(:self_enrollment, true)
 
-        post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :birthdate => 20.years.ago.strftime('%Y-%m-%d'), :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :self_enrollment => '1'
+        post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :birthdate => 20.years.ago.strftime('%Y-%m-%d'), :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'email', :self_enrollment => '1'
+        response.should be_success
+        u = User.find_by_name 'Jacob Fugal'
+        u.should be_pre_registered
+        u.pseudonym.should be_password_auto_generated
+      end
+
+      it "should require a password if self enrolling with a non-email pseudonym" do
+        course(:active_all => true)
+        @course.update_attribute(:self_enrollment, true)
+
+        post 'create', :pseudonym => { :unique_id => 'jacob' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :birthdate => 20.years.ago.strftime('%Y-%m-%d'), :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'username', :self_enrollment => '1'
         response.status.should =~ /400 Bad Request/
         json = JSON.parse(response.body)
         json["errors"]["pseudonym"]["password"].should be_present
@@ -317,7 +342,7 @@ describe UsersController do
         course(:active_all => true)
         @course.update_attribute(:self_enrollment, true)
 
-        post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :birthdate => 20.years.ago.strftime('%Y-%m-%d'), :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :self_enrollment => '1'
+        post 'create', :pseudonym => { :unique_id => 'jacob', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :birthdate => 20.years.ago.strftime('%Y-%m-%d'), :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'username', :self_enrollment => '1'
         response.should be_success
         u = User.find_by_name 'Jacob Fugal'
         @course.students.should include(u)
@@ -355,6 +380,20 @@ describe UsersController do
         post 'create', :format => 'json', :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :sis_user_id => 'testsisid' }, :user => { :name => 'Jacob Fugal' }
         response.should be_success
         p = Pseudonym.find_by_unique_id('jacob@instructure.com')
+        p.account_id.should == account.id
+        p.should be_active
+        p.sis_user_id.should == 'testsisid'
+        p.user.should be_pre_registered
+      end
+
+      it "should create users with non-email pseudonyms" do
+        account = Account.create!
+        user_with_pseudonym(:account => account)
+        account.add_user(@user)
+        user_session(@user, @pseudonym)
+        post 'create', :format => 'json', :account_id => account.id, :pseudonym => { :unique_id => 'jacob', :sis_user_id => 'testsisid' }, :user => { :name => 'Jacob Fugal' }
+        response.should be_success
+        p = Pseudonym.find_by_unique_id('jacob')
         p.account_id.should == account.id
         p.should be_active
         p.sis_user_id.should == 'testsisid'

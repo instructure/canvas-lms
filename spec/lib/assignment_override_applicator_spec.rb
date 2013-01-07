@@ -661,6 +661,46 @@ describe AssignmentOverrideApplicator do
     end
   end
 
+  describe "assignment_overridden_for" do
+    before :each do
+      student_in_course
+      @assignment = assignment_model(:course => @course)
+    end
+
+    it "should note the user id for whom overrides were applied" do
+      @adhoc_override = assignment_override_model(:assignment => @assignment)
+      @override_student = @adhoc_override.assignment_override_students.build
+      @override_student.user = @student
+      @override_student.save!
+      @adhoc_override.override_due_at(7.days.from_now)
+      @adhoc_override.save!
+      @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
+      @overridden_assignment.overridden_for_user_id.should == @student.id
+    end
+
+    it "should note the user id for whom overrides were not found" do
+      @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
+      @overridden_assignment.overridden_for_user_id.should == @student.id
+    end
+
+    it "should apply new overrides if an overridden assignment is overridden for a new user" do
+      @student1 = @student
+      @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student1)
+      @overridden_assignment.overridden_for_user_id.should == @student1.id
+      student_in_course
+      @student2 = @student
+      AssignmentOverrideApplicator.expects(:overrides_for_assignment_and_user).with(@overridden_assignment, @student2).returns([])
+      @reoverridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@overridden_assignment, @student2)
+    end
+
+    it "should not attempt to apply overrides if an overridden assignment is overridden for the same user" do
+      @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
+      @overridden_assignment.overridden_for_user_id.should == @student.id
+      AssignmentOverrideApplicator.expects(:overrides_for_assignment_and_user).never
+      @reoverridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@overridden_assignment, @student)
+    end
+  end
+
   it "should use the full stack" do
     student_in_course
     original_due_at = 3.days.from_now

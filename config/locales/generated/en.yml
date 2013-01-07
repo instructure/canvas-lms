@@ -419,6 +419,7 @@ en:
       labels: 
         account_notification_icon: Icon
         admins_can_change_passwords: "Password setting by admins"
+        allow_invitation_previews: "Invitation Previews"
         allow_sending_scores_in_emails: "Students can opt-in to receiving scores in email notifications"
         allow_sis_import: "SIS imports"
         canvas_authentication: "Canvas Authentication"
@@ -479,6 +480,10 @@ en:
         email_reply_to: Reply-To
         email_to: To
         example: "Example:"
+        external_services: "Notifications Sent to External Services"
+        external_services_label: "Display one time pop-up warning on Notification Preferences page."
+        external_services_warning: "Notice: Some Canvas notifications may contain confidential information. Selecting to receive notifications at an email other than your institution provided address may result in sending sensitive information outside of the institutional system."
+        external_services_warning_label: "Pop-up Message Content:"
         from: From
         sample_subject: "Grade Changed: Check In Survey, Testing Course"
         subject: Subject
@@ -898,6 +903,7 @@ en:
         group_name: "Group Name"
       links: 
         add_grading_rule: "add grading rule"
+        delete_assignment: Delete
       options: 
         drop_highest: "Drop the Highest"
         drop_lowest: "Drop the Lowest"
@@ -2114,6 +2120,7 @@ en:
       crumbs: 
         migrations: Migrations
       failed_migration: "%{plugin_type} migration - There was an error with this migration. Please let support know through the help button at the top of the page."
+      failed_migration_with_error: "%{plugin_type} migration - %{error_message}"
       migration_in_progress: "%{plugin_type} migration - This migration is being processed."
       migration_needing_action: "%{plugin_type} migration - *Click here to choose the content to import.*"
       page_title: "Active Migrations"
@@ -2411,9 +2418,11 @@ en:
     roster: 
       group_members: "Group Members"
       roster: 
-        students: Students
-        teachers: "Teachers & TAs"
-      teachers: "Teachers & TAs"
+        empty: "No one is currently enrolled in this course."
+      students: Students
+      tas: TAs
+      teachers: Teachers
+      teachers_and_tas: "Teachers & TAs"
       titles: 
         course_roster: "Course Roster"
         group_roster: "Group Roster"
@@ -2434,9 +2443,7 @@ en:
       enrollment_linked_to: "linked to *%{linked_user}*"
       headings: 
         recent_messages: "Recent Messages"
-        user_details: "User Details"
-        user_services: "%{user}'s Services"
-        users_details: "%{user}'s Details"
+        user_services: "Registered Web Services"
       help: 
         list_services: "You haven't enabled your list of registered services. Enabling this list will let fellow course and group members more easily link up with you outside of class."
         services: "You haven't linked your user profile to any external services. You can link your Canvas account to services like Facebook and Twitter. This will make it easier for fellow course and group members to link up with you outside of class."
@@ -2446,26 +2453,27 @@ en:
       legends: 
         memberships: Membership(s)
       links: 
-        access_report: "Access Report for %{user}"
+        access_report: "Access Report"
         cant_delete: "Can't Delete"
         conclude_enrollment: "Conclude this Enrollment"
         delete_enrollment: "Delete this Enrollment"
-        faculty_journal: "Faculty Journal for %{user}"
+        faculty_journal: "Faculty Journal"
         link_enrollment: "Link this Enrollment"
         link_services: "Link web services to my account"
-        message_user: "Message %{user}"
+        message_user: "Send Message"
+        more_about_this_user: "More About This User"
         more_user_details: "more user details..."
         remove_avatar: "Remove avatar picture"
         report_avatar: "Report inappropriate picture"
         restore_enrollment: "Restore this Enrollment"
-        student_teacher_activity: "Your Interactions Report with %{user}"
-        teacher_activity: "Student Interactions Report for %{user}"
+        student_teacher_activity: "Interactions with You"
+        teacher_activity: "Student Interactions Report"
         title: 
           enrollment_sis_defined: "This enrollment was defined by the university, and can't be deleted"
         user_account_details: "User Account Details"
-        user_grades: "Grades for %{user}"
+        user_grades: Grades
         user_only_view_section: "limit this user to only see fellow section users"
-        user_outcomes: "Outcomes for %{user}"
+        user_outcomes: Outcomes
         user_view_all_sections: "let this user see all course users"
       no_messages: "No Messages"
       no_services: "%{user} hasn't linked any external services to their account yet."
@@ -2737,6 +2745,7 @@ en:
       titles: 
         attachment: "File to attach"
         remove_attachment: "Remove attachment"
+    attachment_error: "Attachment failed to upload, please try again."
     buttons: 
       add_people: "Add People"
       send_message: Send
@@ -2763,8 +2772,6 @@ en:
     conversations_pane: 
       confirm: 
         delete_conversation: "Are you sure you want to delete your copy of this conversation? This action cannot be undone."
-    crumbs: 
-      messages: Conversations
     enrollments_everyone: Everyone
     errors: 
       field_is_required: "This field is required"
@@ -3070,7 +3077,8 @@ en:
         conclude_course: "Conclude Course"
         delete_course: "Delete Course"
       details: 
-        confirm_conclude: "Are you sure you want to conclude this course? Once concluded, Students and Teachers will need to access the course from the \"Past Enrollments\" section on their *courses page*. Teachers will retain full access to the course content and have the ability to continue grading while Students will be limited to read-only access, i.e., they can view their grades but no longer submit assignments."
+        conclude_alt_text: "If you would like to retain the ability to change grades while limiting student access to the course, please utilize the course dates settings. You can learn about course date settings in our guides *here*"
+        confirm_conclude: "Warning: Concluding the course will prevent you from modifying grades and accessing course content."
         confirm_delete: "Are you sure you want to delete this course? Once it is deleted students and teachers will no longer have access to it. If you just want to remove it from the course dropdown then you should *conclude the course instead*."
       headings: 
         confirm: "Confirm Action"
@@ -3163,7 +3171,6 @@ en:
         look_around: "Feel free to wander around and look over the course. When you're ready, you can either accept or reject the invitation."
     errors: 
       create_failed: "Course creation failed"
-      invalid_email: "Invalid e-mail address, please try again."
       invalid_role: "Invalid role type"
       unauthorized: 
         switch_roles: "You do not have permission to switch roles"
@@ -3195,12 +3202,10 @@ en:
       backup_restored: "Backup Successfully Restored!"
       concluded: "Course successfully concluded"
       deleted: "Course successfully deleted"
-      enrolled: "You are now enrolled in this course."
       enrollment_not_active: "Your membership in the course, %{course}, is not yet activated"
       failed_conclude: "Course failed to conclude"
       invitation_accepted: "Invitation accepted!  Welcome to %{course}!"
       invitation_cancelled: "Invitation canceled."
-      login_required: "Please log in to join this course."
       login_to_accept: "You'll need to log in before you can accept the enrollment."
       preview_course: "You've been invited to join this course.  You can look around, but you'll need to accept the enrollment invitation before you can participate."
       reset_test_student: "The test student has been reset successfully."
@@ -3208,24 +3213,6 @@ en:
       role_switched: "You have switched roles for this course.  You will now see the course in this new role: %{enrollment_type}"
       unconcluded: "Course un-concluded"
       updated: "Course was successfully updated."
-    open_enrollment: 
-      buttons: 
-        enroll: "Enroll in Course"
-      details: "You've been invited to participate in this course, %{course}. To continue the enrollment process, please provide us with your current email address."
-      headings: 
-        accept_invitation: "Accept Enrollment Invitation"
-        invitation: "Course Invitation"
-      labels: 
-        email: "Email Address"
-      titles: 
-        invitation: "Invitation to %{course}"
-    open_enrollment_confirmed: 
-      details: "You should get an email at %{email} in the next few minutes. That email will have a link that you can use to finish the registration process. Once you've set up your account you'll be able to access content from %{course}. Welcome to Canvas!"
-      headings: 
-        invitation: "Course Invitation"
-        received: "Invitation Received!"
-      titles: 
-        invitation: "Invitation to %{course}"
     recent_event: 
       all_graded: "all graded"
       due: due
@@ -3314,6 +3301,7 @@ en:
         enrollment_type: "Add More"
         grading_scheme: "Grading Scheme"
         grading_standard_enabled: "Enable course grading scheme"
+        hide_distribution_graphs: "Hide grade distribution graphs from students"
         hide_final_grade: "Hide totals in student grades summary"
         indexed: "Include this course in the public course index"
         is_public: "Make this course publicly visible"
@@ -3421,23 +3409,19 @@ en:
         assignments: "This view shows the **list of assignments** for this course, with upcoming and recent assignments at the top."
         confirm_unenroll: "Are you sure you want to unenroll in this course? You will no longer be able to see the course roster or communicate directly with the teachers, and you will no longer see course events in your stream and as notifications."
         custom_page: "You can **design your own course home page** and include whatever links, images or rich media you like."
-        joining_a_course: "Once you join a course you will see it show up in your course list. You'll be able to participate in graded portions of the course and communicate directly with the teachers and other students. You'll also see conversations and events from this course show up in your stream and as notifications."
         modules: |-
             You can organize your course into **modules or sections**, where each section contains a related set of files, assignments, pages, etc.  If you want, you can also sequence modules by defining criteria and prerequisites that need to be completed before each module is unlocked.
             
             This layout is probably best for courses that aren't based on a specific schedule like a term or semester.
         recent_activity_dashboard: "The **recent activity dashboard** lets participants see the most recent conversations, announcements, discussions, and interactions for this course.  It's very similar to the dashboard page users see when they first log in, but only shows content for this specific course."
         syllabus: "The **syllabus view** lets you write up a description of course expectations or introduce the course with links, images, etc. and then also shows a calendar view of all assignments and course events."
-      dropping_course: "Dropping Course..."
       empty_body: "No Content"
       headings: 
         confirm_unenroll: "Confirm Unenrollment"
         importing: "This course is being imported"
-        joining_a_course: "Joining a Course"
         set_layout: "Set Home Page Layout"
         unpublished: "This Course is Unpublished"
       importing: "Course copy/migration in progress. This means some content may be temporarily unavailable."
-      joining_course: "Joining Course..."
       labels: 
         set_layout: "When people visit the course page, show them"
       license_notice: "This course content is offered under a %{license_type} license. Content in this course can be considered under this license unless otherwise noted."
@@ -3462,7 +3446,6 @@ en:
       teachers_only: "Only teachers can see this course until it is *published*"
       titles: 
         drop_course: "Drop this Course"
-        join_course: "Join this Course"
         recent_feedback: "Recent Feedback"
     sidebar_weighting: 
       default_name: Group
@@ -4712,7 +4695,6 @@ en:
     new_assessment: "[New Assessment]"
     no_submission_time: "no submission time"
     nth_student: "Student %{n}"
-    percent: Percent
     publish_to_sis: "Publish grades to SIS"
     reupload_submission_files: "Re-Upload Submission Files"
     reupload_submissions: "Re-Upload Submissions"
@@ -8137,12 +8119,17 @@ en:
     notification_preferences: 
       captions: 
         notification_preferences: "List of notification events and your settings for frequency and delivery method."
+    notifications: 
+      privacy_notice: 
+        ok: Ok
+        privacy_notice: "Notice: Some Canvas notifications may contain confidential information. Selecting to receive notifications at an email other than your institution provided address may result in sending sensitive information outside of the institutional system."
+        privacy_notice_title: "Privacy Notice"
   pseudonym: 
     errors: 
       bad_credentials: "Invalid username or password"
       invalid: "May only contain letters, numbers, or the following: %{characters}"
-      invalid_email_address: "\"%{email}\" is not a valid email address"
       mismatch: "Doesn't match"
+      not_email: "Not a valid email address"
       required: Required
       taken: "Email already in use"
       too_long: "Can't exceed %{max} characters"
@@ -8724,6 +8711,8 @@ en:
       take_the_quiz_again: "Take the Quiz Again"
       take_the_survey: "Take the Survey"
       take_the_survey_again: "Take the Survey Again"
+      will_keep_highest_score: "Will keep the highest of all your scores"
+      will_keep_latest_score: "Will keep the latest of all your scores"
     loading_more_questions: "loading more questions..."
     loading_question: "Loading Question..."
     loading_question_banks: "Loading Question Banks..."
@@ -8965,15 +8954,11 @@ en:
       links: 
         preview_quiz_again: "Preview the Quiz Again"
         preview_survey_again: "Preview the Survey Again"
-        take_quiz_again: "Take the Quiz Again"
-        take_survey_again: "Take the Survey Again"
       no_more_attempts: "No More Attempts available"
       questions_not_graded: "Some questions not yet graded"
       score_set_manually: "This score was set by the teacher"
       unlimited_attempts: "Unlimited Attempts"
       view_previous_attempts: "View Previous Attempts"
-      will_keep_highest_score: "Will keep the highest of all your scores"
-      will_keep_latest_score: "Will keep the latest of all your scores"
     quiz_submission: 
       attempt_duration: "This attempt took %{duration}."
       labels: 
@@ -9019,9 +9004,6 @@ en:
         quiz_due: Due
         quiz_time_limit: "Time Limit"
         survey_details: "Survey Details"
-      links: 
-        resume_quiz: "Resume Quiz"
-        resume_survey: "Resume Survey"
       no_details: "No Details"
       points_possible: "%{points_possible} points possible"
       question_count: 
@@ -9100,8 +9082,6 @@ en:
         moderate_this_quiz: "Moderate This Quiz"
         moderate_this_survey: "Moderate This Survey"
         quiz_statistics: "Quiz Statistics"
-        resume_quiz: "Resume Quiz"
-        resume_survey: "Resume Survey"
         see_full_quiz: "See Full Quiz"
         show_assignment_rubric: "Show Assignment Rubric"
         show_student_quiz_results: "Show Student Quiz Results"
@@ -9327,7 +9307,8 @@ en:
       labels: 
         email: Email
         name: Name
-    too_young_error: "You must be at least %{min_years} years of age to use Canvas without a course join code."
+    too_young_error: "You must be at least %{min_years} years of age to enroll in this course."
+    too_young_error_join_code: "You must be at least %{min_years} years of age to use Canvas without a course join code."
     welcome_to_canvas: "Welcome to Canvas!"
   retrieve_timeout: "could not retrieve configuration, the server response timed out"
   role_override: 
@@ -9389,7 +9370,6 @@ en:
       readonly: "you do not have permission to change this."
       toogle: "Click to toggle this permission ON or OFF"
   role_overrides: 
-    course_role_deactivate: "This role is in use and cannot be deleted.  It has been deactivated to prevent it from being assigned to new users."
     index: 
       buttons: 
         save: "Save Changes"
@@ -9606,6 +9586,47 @@ en:
     titles: 
       add_item_to_module: "Add Item to Module"
       find_links_using_service: "Find links using %{service}"
+  self_enrollments: 
+    already_enrolled: 
+      already_enrolled: "You are already enrolled in **%{course}**."
+      switch_users: "You are currently signed in as *%{user}*. **Sign in as another user**."
+    authenticate: 
+      buttons: 
+        enroll_in_course: "Enroll in Course"
+      getting_started: "You are enrolling in **%{course}**."
+      labels: 
+        email: Email
+        password: Password
+      log_in: "Please enter your email and password:"
+    authenticate_or_register: 
+      buttons: 
+        enroll_in_course: "Enroll in Course"
+      enter_email: "Please enter your email address:"
+      existing_user: "I already have a %{institution_name} login"
+      getting_started: "You are enrolling in **%{course}**."
+      labels: 
+        birthdate: "Birth Date"
+        email: Email
+        name: "Full Name"
+        password: Password
+      new_user: "I am a new user"
+    confirm_enrollments: 
+      buttons: 
+        enroll_in_course: "Enroll in Course"
+      getting_started: "You are enrolling in **%{course}**"
+      switch_users: "You are currently signed in as *%{user}*. **Sign in as another user**."
+    course_full: 
+      class_full: "Enrollment has filled up for **%{course}**. We apologize for the inconvenience."
+    new: 
+      course_enrollment: "Course Enrollment"
+      titles: 
+        course_enrollment: "Enroll in %{course}"
+    successfully_enrolled: 
+      already_enrolled: "You have successfully enrolled in **%{course}**."
+      buttons: 
+        go_to_course: "Go to the Course"
+        go_to_dashboard: "Go to your Dashboard"
+      not_available_yet: "We'll send you an email shortly before the course begins."
   services_api: 
     must_be_logged_in: "You must be logged in to use Kaltura"
   set_default_grade_dialog: 
@@ -9661,8 +9682,8 @@ en:
       due_at: "%{date} at %{time}"
       graded_count: "%{graded_count} Graded"
       links: 
-        delete_assignment: "Delete Assignment"
-        edit_assignment: "Edit Assignment"
+        delete_assignment: Delete
+        edit_assignment: Edit
         preview_assignment: "Preview Assignment"
         submission_comments: "Submission Comments"
         view_rubric_evaluation: "View Rubric Evaluation"
@@ -9675,7 +9696,7 @@ en:
     assignment_group: 
       alts: 
         add_assignment: "Add Assignment"
-        delete_assignment_group: Delete
+        delete_assignment_group: "Delete Assignment Group"
         edit_group_details: Edit
         move: Move
       defaults: 
@@ -9683,14 +9704,12 @@ en:
       group_weight: "*%{percent}% of total grade"
       links: 
         add_an_assignment: "Add an Assignment"
-        add_assignment: "Add Assignment"
         edit_group_details: "Edit Group Details"
         hide_info: "hide info"
         more_info: "more info..."
         reorder_groups: "Reorder Groups"
       no_assignments: "No assignments yet"
       titles: 
-        delete_assignment_group: "Delete Assignment Group"
         percent_of_final_grade: "Percent of Final Grade"
     assignment_rubric_dialog: 
       links: 
@@ -10685,11 +10704,15 @@ en:
     default_collection_name: "%{user_name}'s Collection"
     default_user_name: User
     errors: 
+      already_enrolled: "You are already enrolled in this course"
+      course_full: "This course is full"
       invalid_code: "Invalid code"
       required: Required
       terms: "You must agree to the terms"
       too_long: "Can't exceed %{max} characters"
       too_young: "Too young"
+    registration: 
+      agree_to_terms: "You agree to the *terms of use*."
   user_follow: 
     errors: 
       follow_own_collection: "You cannot follow your own collection"
@@ -11106,7 +11129,15 @@ en:
     user_not_found: "No active user with that ID was found."
     user_updated: "User was successfully updated."
     welcome: 
-      no_courses_message: "You don't have any courses, so this page won't be very exciting for now. Once you've created or signed up for courses, you'll start to see conversations from all of your classes."
+      no_courses_message: |-
+          You don't have any courses, so this page won't be very exciting for now.
+                  Once you've created or signed up for courses, you'll start to see
+                  conversations from all of your classes.
+      unpublished_courses_message: |-
+          You've enrolled in one or more courses that have not started yet. Once
+                  those courses are available, you will see information about them here
+                  and in the top navigation. In the meantime, feel free to sign up for
+                  more courses or set up your profile.
       welcome_to_happiness: "Welcome to Canvas!"
   validate: 
     is_required: "This field is required"

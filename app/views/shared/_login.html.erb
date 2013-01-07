@@ -70,7 +70,6 @@ $(document).ready(function() {
 </script>
 <% end %>
 <% login_handle_name = @domain_root_account.login_handle_name rescue AccountAuthorizationConfig.default_login_handle_name %>
-<% @is_delegated = @domain_root_account.delegated_authentication? if @domain_root_account and @is_delegated.nil? %>
 <div id="modal-box" class="login-box">
     <div id="modal-box-inner">
     <h1>Canvas</h1>

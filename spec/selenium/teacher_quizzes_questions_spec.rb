@@ -68,7 +68,7 @@ describe "quizzes questions" do
       ffj(".question_form:visible .form_answers .answer").size.should == 2
     end
 
-    it "should not show 'Missing Word' option in question types dropdown" do
+    it "should not show Missing Word option in question types dropdown" do
       get "/courses/#{@course.id}/quizzes/new"
 
       ff("#question_form_template option.missing_word").length.should == 1

@@ -92,23 +92,6 @@ describe GradeCalculator do
         @submission[0].score.should eql(5.0)
       end
       
-      it "should ignore no grade for current grade but not final grade" do
-        run_transaction_commit_callbacks
-        @user.reload
-        @user.enrollments.first.computed_current_score.should eql(50.0)
-        @user.enrollments.first.computed_final_score.should eql(25.0)
-      end
-
-      it "should ignore muted grade for current grade but not final grade" do
-        # should have same scores as previous spec despite having a grade
-        @assignment2.mute!
-        @assignment2.grade_student(@user, :grade => "500")
-        run_transaction_commit_callbacks
-        @user.reload
-        @user.enrollments.first.computed_current_score.should eql(50.0)
-        @user.enrollments.first.computed_final_score.should eql(25.0)
-      end
-      
       it "should ignore no grade for current grade calculation, even when weighted" do
         @course.group_weighting_scheme = "percent"
         @course.save!
@@ -118,16 +101,56 @@ describe GradeCalculator do
         @user.enrollments.first.computed_final_score.should eql(25.0)
       end
       
-      it "should ignore muted grade for current grade calculation, even when weighted" do
-        # should have same scores as previous spec despite having a grade
-        @assignment2.mute!
-        @assignment2.grade_student(@user, :grade => "500")
-        @course.group_weighting_scheme = "percent"
-        @course.save!
+      it "should ignore no grade for current grade but not final grade" do
         run_transaction_commit_callbacks
         @user.reload
         @user.enrollments.first.computed_current_score.should eql(50.0)
         @user.enrollments.first.computed_final_score.should eql(25.0)
+      end
+
+      context "muted assignments" do
+        before do
+          @assignment2.mute!
+        end
+
+        it "should ignore muted assignments by default" do
+          # should have same scores as previous spec despite having a grade
+          @assignment2.grade_student(@user, :grade => "500")
+          run_transaction_commit_callbacks
+          @user.reload
+          @user.enrollments.first.computed_current_score.should eql(50.0)
+          @user.enrollments.first.computed_final_score.should eql(25.0)
+        end
+
+        it "should ignore muted grade for current grade calculation, even when weighted" do
+          # should have same scores as previous spec despite having a grade
+          @assignment2.grade_student(@user, :grade => "500")
+          @course.group_weighting_scheme = "percent"
+          @course.save!
+          run_transaction_commit_callbacks
+          @user.reload
+          @user.enrollments.first.computed_current_score.should eql(50.0)
+          @user.enrollments.first.computed_final_score.should eql(25.0)
+        end
+
+        it "should be possible to compute grades with muted assignments" do
+          @assignment2.unmute!
+          @assignment.mute!
+
+          @course.update_attribute(:group_weighting_scheme, "percent")
+          calc = GradeCalculator.new [@user.id],
+                                     @course.id,
+                                     :ignore_muted => false
+          calc.compute_scores.should eql [[50.0, 25.0]]
+        end
+
+        it "should be impossible to save grades that considered muted assignments" do
+          @course.update_attribute(:group_weighting_scheme, "percent")
+          calc = GradeCalculator.new [@user.id],
+                                     @course.id,
+                                     :ignore_muted => false
+          lambda { calc.save_scores }.should raise_error
+        end
       end
     end
     

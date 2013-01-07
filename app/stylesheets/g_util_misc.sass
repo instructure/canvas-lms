@@ -231,3 +231,16 @@ a.x-close-link
     color: black
     text-decoration: none
     +opacity(.60)
+
+.loading.after:after
+  width: image-width('ajax-loader-linear.gif')
+  height: image-height('ajax-loader-linear.gif')
+  background: url(/images/ajax-loader-linear.gif)
+  content: ''
+  display: inline-block
+  margin-left: 7px
+
+.loading.center
+  background-image: url(/images/ajax-loader-linear.gif)
+  background-position: center
+  background-repeat: no-repeat

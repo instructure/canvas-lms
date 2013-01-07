@@ -239,7 +239,7 @@ define([
             xhrSuccess.call(this, request.response, request);
           } else {
             xhrError.call(this, request.response, request);
-            $.fn.defaultAjaxError.func.call($.fn.defaultAjaxError.object, null, request, "0", exception);
+            $.fn.defaultAjaxError.func.call($.fn.defaultAjaxError.object, null, request, "0", null);
           }
           setTimeout(function() {
             $form.attr({

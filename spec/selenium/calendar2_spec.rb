@@ -94,7 +94,7 @@ describe "calendar2" do
           events.first.text.strip.should == c.start_at.day.to_s
         end
 
-        it "should change the main calendar's month on click" do
+        it "should change the main calendars month on click" do
           title_selector = "#calendar-app .fc-header-title"
           get "/calendar2"
 

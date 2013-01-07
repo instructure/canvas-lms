@@ -59,7 +59,7 @@ class Account < ActiveRecord::Base
   has_many :active_folders_detailed, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders, :active_file_attachments], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :account_authorization_configs, :order => "position"
   has_many :account_reports
-  has_many :grading_standards, :as => :context
+  has_many :grading_standards, :as => :context, :conditions => ['workflow_state != ?', 'deleted']
   has_many :assessment_questions, :through => :assessment_question_banks
   has_many :assessment_question_banks, :as => :context, :include => [:assessment_questions, :assessment_question_bank_users]
   has_many :roles
@@ -157,6 +157,13 @@ class Account < ActiveRecord::Base
   add_setting :canvas_authentication, :boolean => true, :root_only => true
   add_setting :admins_can_change_passwords, :boolean => true, :root_only => true, :default => false
   add_setting :outgoing_email_default_name
+  add_setting :external_notification_warning, :boolean => true, :default => false
+  # When a user is invited to a course, do we let them see a preview of the
+  # course even without registering?  This is part of the free-for-teacher
+  # account perks, since anyone can invite anyone to join any course, and it'd
+  # be nice to be able to see the course first if you weren't expecting the
+  # invitation.
+  add_setting :allow_invitation_previews, :boolean => true, :root_only => true, :default => false
 
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -370,8 +377,14 @@ class Account < ActiveRecord::Base
     @cached_courses_name_like[[query, opts]] ||= self.fast_course_base(opts) {|q| q.name_like(query)}
   end
 
+  def self_enrollment_course_for(code)
+    all_courses.
+      where(:self_enrollment => true, :self_enrollment_code => code).
+      first
+  end
+
   def file_namespace
-    "account_#{self.root_account.id}"
+    Shard.default.activate { "account_#{self.root_account.id}" }
   end
   
   def self.account_lookup_cache_key(id)
@@ -496,7 +509,7 @@ class Account < ActiveRecord::Base
   def available_account_roles
     account_roles = roles.for_accounts.active.map(&:name)
     account_roles |= ['AccountAdmin']
-    account_roles = account_roles | self.parent_account.available_account_roles if self.parent_account
+    account_roles |= self.parent_account.available_account_roles if self.parent_account
     account_roles
   end
 
@@ -506,8 +519,15 @@ class Account < ActiveRecord::Base
     course_roles
   end
 
+  def available_course_roles_by_name
+    role_map = {}
+    roles.for_courses.active.each { |role| role_map[role.name] = role }
+    role_map.reverse_merge!(parent_account.available_course_roles_by_name) if parent_account
+    role_map
+  end
+
   def get_course_role(role_name)
-    course_role = self.roles.for_courses.find_by_name(role_name)
+    course_role = self.roles.for_courses.not_deleted.find_by_name(role_name)
     course_role ||= self.parent_account.get_course_role(role_name) if self.parent_account
     course_role
   end
@@ -670,9 +690,8 @@ class Account < ActiveRecord::Base
     name
   end
 
-  def email_pseudonyms
-    false
-  end
+  # can be set/overridden by plugin to enforce email pseudonyms
+  attr_accessor :email_pseudonyms
   
   def password_authentication?
     !!(!self.account_authorization_config || self.account_authorization_config.password_authentication?)
@@ -720,16 +739,7 @@ class Account < ActiveRecord::Base
       errors.add(:discovery_url, t('errors.invalid_discovery_url', "The discovery URL is not valid" ))
     end
   end
-  
-  # When a user is invited to a course, do we let them see a preview of the
-  # course even without registering?  This is part of the free-for-teacher
-  # account perks, since anyone can invite anyone to join any course, and it'd
-  # be nice to be able to see the course first if you weren't expecting the
-  # invitation.
-  def allow_invitation_previews?
-    self == Account.default
-  end
-  
+
   def find_courses(string)
     self.all_courses.select{|c| c.name.match(string) }
   end
@@ -867,7 +877,7 @@ class Account < ActiveRecord::Base
     if self.turnitin_pledge && !self.turnitin_pledge.empty?
       self.turnitin_pledge
     else
-      res = self.account.turnitin_pledge rescue nil
+      res = self.parent_account.turnitin_pledge
       res ||= t('#account.turnitin_pledge', "This assignment submission is my own, original work")
     end
   end
@@ -930,7 +940,7 @@ class Account < ActiveRecord::Base
       tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :css_class => 'authentication', :href => :account_account_authorization_configs_path } if manage_settings
       tabs << { :id => TAB_PLUGINS, :label => t("#account.tab_plugins", "Plugins"), :css_class => "plugins", :href => :plugins_path, :no_args => true } if self.grants_right?(user, nil, :manage_site_settings)
       tabs << { :id => TAB_JOBS, :label => t("#account.tab_jobs", "Jobs"), :css_class => "jobs", :href => :jobs_path, :no_args => true } if self.grants_right?(user, nil, :manage_jobs)
-      tabs << { :id => TAB_DEVELOPER_KEYS, :label => t("#account.tab_developer_keys", "Developer Keys"), :css_class => "developer_keys", :href => :developer_keys_path, :no_args => true } if self.grants_right?(user, nil, :manage_site_settings)
+      tabs << { :id => TAB_DEVELOPER_KEYS, :label => t("#account.tab_developer_keys", "Developer Keys"), :css_class => "developer_keys", :href => :developer_keys_path, :no_args => true } if self.grants_right?(user, nil, :manage_developer_keys)
     else
       tabs = []
       tabs << { :id => TAB_COURSES, :label => t('#account.tab_courses', "Courses"), :css_class => 'courses', :href => :account_path } if user && self.grants_right?(user, nil, :read_course_list)
@@ -959,7 +969,7 @@ class Account < ActiveRecord::Base
   end
   
   def help_links
-    settings[:custom_help_links] || []
+    Canvas::Help.default_links + (settings[:custom_help_links] || [])
   end
 
   def self.allowable_services

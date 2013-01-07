@@ -198,6 +198,34 @@ describe FilesController do
       get 'show', :course_id => @course.id, :id => @file.id, :download => 1, :verifier => @file.uuid, :download_frd => 1
     end
 
+    it "should set cache headers for non text files" do
+      course_with_teacher(:active_all => true)
+      course_file
+      get 'show', :course_id => @course.id, :id => @file.id, :download => 1, :verifier => @file.uuid, :download_frd => 1
+      response.header["Cache-Control"].should include "private, max-age"
+      response.header["Cache-Control"].should_not include "no-cache"
+      response.header["Cache-Control"].should_not include "no-store"
+      response.header["Cache-Control"].should_not include "max-age=0"
+      response.header["Cache-Control"].should_not include "must-revalidate"
+      response.header.should include("Expires")
+      response.header.should_not include("Pragma")
+    end
+
+    it "should not set cache headers for text files" do
+      course_with_teacher(:active_all => true)
+      course_file
+      @file.content_type = "text/html"
+      @file.save
+      get 'show', :course_id => @course.id, :id => @file.id, :download => 1, :verifier => @file.uuid, :download_frd => 1
+      response.header["Cache-Control"].should_not include "private, max-age"
+      response.header["Cache-Control"].should include "no-cache"
+      response.header["Cache-Control"].should include "no-store"
+      response.header["Cache-Control"].should include "max-age=0"
+      response.header["Cache-Control"].should include "must-revalidate"
+      response.header.should_not include("Expires")
+      response.header.should include("Pragma")
+    end
+
     it "should allow concluded teachers to read and download files" do
       course_with_teacher_logged_in(:active_all => true)
       course_file

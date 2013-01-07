@@ -66,10 +66,12 @@ class ErrorReport < ActiveRecord::Base
     end
 
     def create_error_report(opts)
-      report = ErrorReport.new
-      report.assign_data(opts)
-      report.save
-      report
+      ActiveRecord::Base::ConnectionSpecification.with_environment(nil) do
+        report = ErrorReport.new
+        report.assign_data(opts)
+        report.save
+        report
+      end
     end
   end
 

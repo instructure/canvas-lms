@@ -2,16 +2,14 @@ define [
   'underscore'
   'i18n!registration'
   'compiled/fn/preventDefault'
-  'compiled/models/User'
-  'compiled/models/Pseudonym'
+  'compiled/registration/registrationErrors'
   'jst/registration/teacherDialog'
   'jst/registration/studentDialog'
   'jst/registration/studentHigherEdDialog'
   'jst/registration/parentDialog'
-  'compiled/object/flatten'
   'jquery.instructure_forms'
   'jquery.instructure_date_and_time'
-], (_, I18n, preventDefault, User, Pseudonym, teacherDialog, studentDialog, studentHigherEdDialog, parentDialog, flatten) ->
+], (_, I18n, preventDefault, registrationErrors, teacherDialog, studentDialog, studentHigherEdDialog, parentDialog) ->
 
   $nodes = {}
   templates = {teacherDialog, studentDialog, studentHigherEdDialog, parentDialog}
@@ -36,27 +34,22 @@ define [
         $form.disableWhileLoading(promise)
       success: (data) =>
         # they should now be authenticated (either registered or pre_registered)
-        window.location = "/?login_success=1&registration_success=1"
+        if data.course
+          window.location = "/courses/#{data.course.course.id}?registration_success=1"
+        else
+          window.location = "/?registration_success=1"
       formErrors: false
       error: (errors) ->
         promise.reject()
         if _.any(errors.user.birthdate ? [], (e) -> e.type is 'too_young')
-          $node.find('.registration-dialog').html I18n.t('too_young_error', 'You must be at least %{min_years} years of age to use Canvas without a course join code.', min_years: ENV.USER.MIN_AGE)
+          $node.find('.registration-dialog').text I18n.t('too_young_error_join_code', 'You must be at least %{min_years} years of age to use Canvas without a course join code.', min_years: ENV.USER.MIN_AGE)
           $node.dialog buttons: [
             text: I18n.t('ok', "OK")
             click: -> $node.dialog('close')
             class: 'btn-primary'
           ]
           return
-        errors = flatten
-          user: User::normalizeErrors(errors.user)
-          pseudonym: Pseudonym::normalizeErrors(errors.pseudonym)
-          observee: Pseudonym::normalizeErrors(errors.observee)
-        , arrays: false
-        if errors['user[birthdate]']
-          errors['user[birthdate(1)]'] = errors['user[birthdate]']
-          delete errors['user[birthdate]']
-        $form.formErrors errors
+        $form.formErrors registrationErrors(errors)
 
     $node.dialog
       resizable: false

@@ -48,6 +48,15 @@ describe RoleOverridesController do
     end
   end
 
+  it "should deactivate a role" do
+    role = @account.roles.build(:name => 'NewRole')
+    role.base_role_type = AccountUser::BASE_ROLE_NAME
+    role.workflow_state = 'active'
+    role.save!
+    delete 'remove_role', :account_id => @account.id, :role => 'NewRole'
+    @account.roles.find_by_name('NewRole').should be_inactive
+  end
+
   describe "create" do
     before :each do
       @role = 'NewRole'

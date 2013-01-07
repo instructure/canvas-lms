@@ -13,6 +13,5 @@ define [
       @filter()
     
     filter: ->
-      debugger
       @$('.dateField').datetime_field()
 
