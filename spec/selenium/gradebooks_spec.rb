@@ -23,7 +23,7 @@ describe "gradebook1" do
     )
     @projects_group = @course.assignment_groups.create!(
       :name => 'Projects',
-      :group_weight => 75,
+      :group_weight => 75
     )
     @project = assignment_model(
       :course => @course,
