@@ -487,6 +487,13 @@ describe "Roles API", :type => :integration do
       end
 
       it "should not be able to edit read-only permissions" do
+        sub = @account.sub_accounts.create!
+        @path = "/api/v1/accounts/#{sub.id}/roles/TeacherEnrollment"
+        @path_options[:account_id] = sub.id.to_param
+        o = @account.role_overrides.create(:permission => 'read_forum', :enrollment_type => 'TeacherEnrollment', :enabled => true)
+        o.locked = true
+        o.save!
+
         json = api_call(:put, @path, @path_options, { :permission => {
           :read_forum => { :explicit => 1, :enabled => 0 }}})
 
