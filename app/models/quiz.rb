@@ -1201,6 +1201,11 @@ class Quiz < ActiveRecord::Base
             assessment[:assignment][:id] = Quiz.find(item_id.to_i).try(:assignment_id)
           end
         end
+        if assessment['assignment_migration_id']
+          if assignment = data['assignments'].find{|a| a['migration_id'] == assessment['assignment_migration_id']}
+            assignment['quiz_migration_id'] = migration_id
+          end
+        end
         begin
           assessment[:migration] = migration
           Quiz.import_from_migration(assessment, migration.context, question_data, nil, allow_update)

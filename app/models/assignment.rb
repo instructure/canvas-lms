@@ -1649,6 +1649,8 @@ class Assignment < ActiveRecord::Base
         quiz.workflow_state = 'available'
         quiz.save
       end
+      item.submission_types = 'online_quiz'
+      item.saved_by = :quiz
     end
     if hash[:assignment_group_migration_id]
       item.assignment_group = context.assignment_groups.find_by_migration_id(hash[:assignment_group_migration_id])
