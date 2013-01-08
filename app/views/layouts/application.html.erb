@@ -197,6 +197,9 @@
 <% if keyboard_navigation %>
   <div id="keyboard_navigation">
     <%= keyboard_navigation %>
+    <div class='hidden-readable' tabindex='0'>
+      <%= t('keyboard_navigation.close', 'Press comma to close this dialog') %>
+    </div>
   </div>
 <% end %>
   <div style="display:none;"><!-- Everything inside of this should always stay hidden -->

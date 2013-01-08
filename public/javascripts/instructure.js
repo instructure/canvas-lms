@@ -202,13 +202,33 @@ define([
       }
     });
 
+    var activeElement;
+    $(document).keypress(function(e) {
+      var commaOrQuestionMark = e.which == '44' || e.which == '63';
 
-    $(document).keycodes("shift+/", function(event) {
-      $("#keyboard_navigation").dialog({
-        title: I18n.t('titles.keyboard_shortcuts', "Keyboard Shortcuts"),
-        width: 400,
-        height: "auto"
-      });
+      if(commaOrQuestionMark && !$(e.target).is(":input")) {
+        if($("#keyboard_navigation").is(":visible")) {
+          $("#keyboard_navigation").dialog("close");
+          if(activeElement) { $(activeElement).focus(); }
+        }
+        else {
+          activeElement = document.activeElement;
+
+          $("#keyboard_navigation").dialog({
+            title: I18n.t('titles.keyboard_shortcuts', "Keyboard Shortcuts"),
+            width: 400,
+            height: "auto",
+            open: function() {
+              $("li", this).attr("tabindex", "0");
+              $(".ui-dialog").focus();
+            },
+            close: function() {
+              $("li", this).attr("tabindex", ""); // prevents chrome bsod
+              if(activeElement) { $(activeElement).focus(); }
+            }
+          });
+        }        
+      }
     });
 
     $("#switched_role_type").ifExists(function(){
