@@ -1,3 +1,5 @@
+ActionController::Base.param_parsers.delete(Mime::XML)
+
 if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR >= 1
   raise "This patch has been merged into rails 3.1, remove it from our repo"
 else
