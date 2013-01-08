@@ -882,7 +882,7 @@ class Account < ActiveRecord::Base
     if self.turnitin_pledge && !self.turnitin_pledge.empty?
       self.turnitin_pledge
     else
-      res = self.parent_account.turnitin_pledge
+      res = self.parent_account.try(:closest_turnitin_pledge)
       res ||= t('#account.turnitin_pledge', "This assignment submission is my own, original work")
     end
   end
