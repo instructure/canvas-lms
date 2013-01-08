@@ -1117,12 +1117,21 @@ class User < ActiveRecord::Base
 
     given do |user|
       user && (
-        # or, if the user we are given is an admin in one of this user's accounts
         Account.site_admin.grants_right?(user, :manage_user_logins) ||
-        self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_user_logins) }
+        self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_user_logins)  }
       )
     end
-    can :manage_user_details and can :manage_logins and can :rename and can :view_statistics and can :read
+    can :view_statistics and can :read
+
+    given do |user|
+      user && (
+        # or, if the user we are given is an admin in one of this user's accounts
+        Account.site_admin.grants_right?(user, :manage_user_logins) ||
+        (self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_user_logins) } &&
+         self.accounts.all? {|a| has_subset_of_account_permissions?(user, a) } )
+      )
+    end
+    can :manage_user_details and can :manage_logins and can :rename
   end
 
   def can_masquerade?(masquerader, account)
@@ -1131,10 +1140,15 @@ class User < ActiveRecord::Base
     return true if self.fake_student? && self.courses.any?{ |c| c.grants_right?(masquerader, nil, :use_student_view) }
     return false unless
         account.grants_right?(masquerader, nil, :become_user) && self.find_pseudonym_for_account(account, true)
+    has_subset_of_account_permissions?(masquerader, account)
+  end
+
+  def has_subset_of_account_permissions?(user, account)
+    return true if user == self
     account_users = account.all_account_users_for(self)
     return true if account_users.empty?
     account_users.all? do |account_user|
-      account_user.is_subset_of?(masquerader)
+      account_user.is_subset_of?(user)
     end
   end
 
