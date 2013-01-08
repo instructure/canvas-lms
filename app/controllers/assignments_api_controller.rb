@@ -357,6 +357,7 @@ class AssignmentsApiController < ApplicationController
   #
   # @argument assignment[assignment_overrides] [Optional, [AssignmentOverride]]
   #   List of overrides for the assignment.
+  #   NOTE: The assignment overrides feature is in beta.
   #
   # @returns Assignment
   def create
@@ -375,6 +376,8 @@ class AssignmentsApiController < ApplicationController
   # overrides are kept as is. If the assignment[assignment_overrides] key is
   # present, existing overrides are updated or deleted (and new ones created,
   # as necessary) to match the provided list.
+  #
+  # NOTE: The assignment overrides feature is in beta.
   #
   # @returns Assignment
   def update
