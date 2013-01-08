@@ -444,4 +444,17 @@ def self.date_component(start_date, style=:normal)
     # option will still fail on incomplete byte sequences at the end of the input
     Iconv.conv('UTF-8//IGNORE', 'UTF-8', string + '    ')[0...-4]
   end
+
+  def self.recursively_strip_invalid_utf8(object)
+    case object
+    when Hash
+      object.each_value { |o| self.recursively_strip_invalid_utf8(o) }
+    when Array
+      object.each { |o| self.recursively_strip_invalid_utf8(o) }
+    when String
+      if !object.valid_encoding?
+        object.replace(self.strip_invalid_utf8(object))
+      end
+    end
+  end
 end
