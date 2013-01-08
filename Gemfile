@@ -2,7 +2,7 @@ source :rubygems
 
 ONE_NINE = RUBY_VERSION >= "1.9."
 
-gem 'rails',          '2.3.14'
+gem 'rails',          '2.3.15'
 gem 'authlogic',      '2.1.3'
 #gem 'aws-s3',         '0.6.2',  :require => 'aws/s3'
 # use custom gem until pull request at https://github.com/marcel/aws-s3/pull/41
