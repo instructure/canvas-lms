@@ -695,7 +695,7 @@ describe CoursesController do
     it "should redirect to the new self enrollment form if using a long code" do
       course(:active_all => true)
       @course.update_attribute(:self_enrollment, true)
-      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.long_self_enrollment_code
+      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.long_self_enrollment_code.dup
       response.should redirect_to(enroll_url(@course.self_enrollment_code))
     end
 
@@ -715,7 +715,7 @@ describe CoursesController do
       user
       user_session(@user)
 
-      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.long_self_enrollment_code
+      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.long_self_enrollment_code.dup
       response.should redirect_to(course_url(@course))
       @user.enrollments.length.should == 0
     end
