@@ -80,6 +80,30 @@ describe "course rubrics" do
       ff('.rubric .button-container').length.should == 1
     end
 
+    it "should import a rubric outcome row" do
+      course_with_teacher_logged_in
+      rubric_association_model(:user => @user, :context => @course, :purpose => "grading")
+      outcome_model(:context => @course)
+
+      get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
+      f('.edit_rubric_link').click
+      f('.rubric.editing tr.criterion .delete_criterion_link').click
+      f('.rubric.editing .find_outcome_link').click
+      f('.outcome-link').click
+      wait_for_ajax_requests
+      f('.ui-dialog .btn-primary').click
+      accept_alert
+      wait_for_ajaximations
+      f('tr.learning_outcome_criterion .criterion_description .description').text.should == @outcome.title
+      ff('tr.learning_outcome_criterion td.rating .description').map(&:text).should == @outcome.data[:rubric_criterion][:ratings].map { |c| c[:description] }
+      ff('tr.learning_outcome_criterion td.rating .points').map(&:text).should == @outcome.data[:rubric_criterion][:ratings].map { |c| c[:points].to_s }
+      submit_form('#edit_rubric_form')
+      wait_for_ajax_requests
+      rubric = Rubric.last(:order => :id)
+      rubric.data.first[:ratings].map { |r| r[:description] }.should == @outcome.data[:rubric_criterion][:ratings].map { |c| c[:description] }
+      rubric.data.first[:ratings].map { |r| r[:points] }.should == @outcome.data[:rubric_criterion][:ratings].map { |c| c[:points] }
+    end
+
     context "importing" do
 
       it "should create a allow immediate editing when adding an imported rubric to a new assignment" do

@@ -17,7 +17,7 @@
 #
 
 def outcome_model(opts={})
-  @context ||= course_model(:reusable => true)
+  @context ||= opts.delete(:context) || course_model(:reusable => true)
   @outcome_group ||= @context.root_outcome_group
   @outcome = @context.created_learning_outcomes.build(valid_outcome_attributes.merge(opts))
   @outcome.rubric_criterion = valid_outcome_data
