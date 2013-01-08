@@ -521,10 +521,7 @@ class Course < ActiveRecord::Base
         FROM users u
        INNER JOIN enrollments e ON e.user_id = u.id
        WHERE e.course_id = ? AND e.workflow_state NOT IN ('rejected', 'completed', 'deleted') AND e.type = 'StudentEnrollment'
-             #{"AND NOT EXISTS (SELECT *
-                                  FROM group_memberships gm
-                                 WHERE gm.user_id = u.id AND
-                                       gm.group_id IN (#{groups.map(&:id).join ','}))" unless groups.empty?}
+       #{Group.not_in_group_sql_fragment(groups)}
        #{"ORDER BY #{opts[:order_by]}" if opts[:order_by].present?}
        #{"#{opts[:order_by_dir]}" if opts[:order_by_dir]}", self.id]
   end

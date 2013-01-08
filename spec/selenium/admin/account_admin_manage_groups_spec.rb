@@ -201,6 +201,9 @@ describe "account admin manage groups" do
       unassigned_div = driver.find_element(:css, "#category_#{@courses_group_category.id} .group_blank")
       simulate_group_drag(student.id, groups[1].id, "blank")
       unassigned_div.find_elements(:css, ".user_id_#{student.id}").should_not be_empty
+      get "/accounts/#{@admin_account.id}/groups"
+      unassigned_div = driver.find_element(:css, "#category_#{@courses_group_category.id} .group_blank")
+      unassigned_div.find_elements(:css, ".user_id_#{student.id}").should_not be_empty
     end
 
     it "should create a category and should be able to edit it" do
