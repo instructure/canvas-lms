@@ -2135,7 +2135,8 @@ class User < ActiveRecord::Base
   end
 
   def initiate_conversation(user_ids, private = nil)
-    user_ids = ([self.id] + user_ids).uniq
+    this = user_ids.first.is_a?(User) ? self : self.id
+    user_ids = ([this] + user_ids).uniq
     private = user_ids.size <= 2 if private.nil?
     Conversation.initiate(user_ids, private).conversation_participants.find_by_user_id(self.id)
   end
