@@ -1698,18 +1698,22 @@ class User < ActiveRecord::Base
   def courses_with_primary_enrollment(association = :current_and_invited_courses, enrollment_uuid = nil, options = {})
     res = self.shard.activate do
       Rails.cache.fetch([self, 'courses_with_primary_enrollment', association, options].cache_key, :expires_in => 15.minutes) do
-        courses = send(association).with_each_shard do |scope|
-          scope.distinct_on(["courses.id"],
+        send(association).with_each_shard do |scope|
+          courses = scope.distinct_on(["courses.id"],
             :select => "courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
             :order => "courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}")
+
+          unless options[:include_completed_courses]
+            enrollments = Enrollment.find(:all, :conditions => { :id => courses.map(&:primary_enrollment_id) })
+            date_restricted_ids = enrollments.select{ |e| e.completed? || e.inactive? }.map(&:id)
+            courses.reject! { |course| date_restricted_ids.include?(course.primary_enrollment_id.to_i) }
+          end
+
+          courses
         end
-        unless options[:include_completed_courses]
-          date_restricted = Enrollment.find(:all, :conditions => { :id => courses.map(&:primary_enrollment_id) }).select{ |e| e.completed? || e.inactive? }.map(&:id)
-          courses.reject! { |course| date_restricted.include?(course.primary_enrollment_id.to_i) }
-        end
-        courses
       end.dup
     end
+
     if association == :current_and_invited_courses
       if enrollment_uuid && pending_course = Course.find(:first,
         :select => "courses.*, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
@@ -1724,6 +1728,7 @@ class User < ActiveRecord::Base
         res.uniq!
       end
     end
+
     res.sort_by{ |c| [c.primary_enrollment_rank, c.name.downcase] }
   end
   memoize :courses_with_primary_enrollment

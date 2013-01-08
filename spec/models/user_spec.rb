@@ -402,46 +402,94 @@ describe User do
     @user.recent_feedback(:contexts => [@course]).should_not be_empty
   end
 
-  it "should return appropriate courses with primary enrollment" do
-    user
-    @course1 = course(:course_name => "course", :active_course => true)
-    @course1.enroll_user(@user, 'StudentEnrollment', :enrollment_state => 'active')
 
-    @course2 = course(:course_name => "other course", :active_course => true)
-    @course2.enroll_user(@user, 'TeacherEnrollment', :enrollment_state => 'active')
+  describe '#courses_with_primary_enrollment' do
 
-    @course3 = course(:course_name => "yet another course", :active_course => true)
-    @course3.enroll_user(@user, 'StudentEnrollment', :enrollment_state => 'active')
-    @course3.enroll_user(@user, 'TeacherEnrollment', :enrollment_state => 'active')
+    it "should return appropriate courses with primary enrollment" do
+      user
+      @course1 = course(:course_name => "course", :active_course => true)
+      @course1.enroll_user(@user, 'StudentEnrollment', :enrollment_state => 'active')
 
-    @course4 = course(:course_name => "not yet active")
-    @course4.enroll_user(@user, 'StudentEnrollment')
+      @course2 = course(:course_name => "other course", :active_course => true)
+      @course2.enroll_user(@user, 'TeacherEnrollment', :enrollment_state => 'active')
 
-    @course5 = course(:course_name => "invited")
-    @course5.enroll_user(@user, 'TeacherEnrollment')
+      @course3 = course(:course_name => "yet another course", :active_course => true)
+      @course3.enroll_user(@user, 'StudentEnrollment', :enrollment_state => 'active')
+      @course3.enroll_user(@user, 'TeacherEnrollment', :enrollment_state => 'active')
 
-    @course6 = course(:course_name => "active but date restricted", :active_course => true)
-    e = @course6.enroll_user(@user, 'StudentEnrollment')
-    e.accept!
-    e.start_at = 1.day.from_now
-    e.end_at = 2.days.from_now
-    e.save!
+      @course4 = course(:course_name => "not yet active")
+      @course4.enroll_user(@user, 'StudentEnrollment')
 
-    @course7 = course(:course_name => "soft concluded", :active_course => true)
-    e = @course7.enroll_user(@user, 'StudentEnrollment')
-    e.accept!
-    e.start_at = 2.days.ago
-    e.end_at = 1.day.ago
-    e.save!
+      @course5 = course(:course_name => "invited")
+      @course5.enroll_user(@user, 'TeacherEnrollment')
+
+      @course6 = course(:course_name => "active but date restricted", :active_course => true)
+      e = @course6.enroll_user(@user, 'StudentEnrollment')
+      e.accept!
+      e.start_at = 1.day.from_now
+      e.end_at = 2.days.from_now
+      e.save!
+
+      @course7 = course(:course_name => "soft concluded", :active_course => true)
+      e = @course7.enroll_user(@user, 'StudentEnrollment')
+      e.accept!
+      e.start_at = 2.days.ago
+      e.end_at = 1.day.ago
+      e.save!
 
 
-    # only four, in the right order (type, then name), and with the top type per course
-    @user.courses_with_primary_enrollment.map{|c| [c.id, c.primary_enrollment]}.should eql [
-      [@course5.id, 'TeacherEnrollment'],
-      [@course2.id, 'TeacherEnrollment'],
-      [@course3.id, 'TeacherEnrollment'],
-      [@course1.id, 'StudentEnrollment']
-    ]
+      # only four, in the right order (type, then name), and with the top type per course
+      @user.courses_with_primary_enrollment.map{|c| [c.id, c.primary_enrollment]}.should eql [
+        [@course5.id, 'TeacherEnrollment'],
+        [@course2.id, 'TeacherEnrollment'],
+        [@course3.id, 'TeacherEnrollment'],
+        [@course1.id, 'StudentEnrollment']
+      ]
+    end
+
+    describe 'with cross sharding' do
+      it_should_behave_like 'sharding'
+
+      it 'pulls the enrollments that are completed with global ids' do
+        alice = bob = bobs_enrollment = alices_enrollment = nil
+
+        duped_enrollment_id = 0
+
+        @shard1.activate do
+          alice = User.create!(:name => 'alice')
+          bob = User.create!(:name => 'bob')
+          courseX = Course.new
+          courseX.workflow_state = 'available'
+          courseX.save!
+          bobs_enrollment = StudentEnrollment.create!(:course => courseX, :user => bob, :workflow_state => 'completed')
+          duped_enrollment_id = bobs_enrollment.id
+        end
+
+        @shard2.activate do
+          courseY = Course.new
+          courseY.workflow_state = 'available'
+          courseY.save!
+          alices_enrollment = StudentEnrollment.new(:course => courseY, :user => alice, :workflow_state => 'active')
+          alices_enrollment.id = duped_enrollment_id
+          alices_enrollment.save!
+        end
+
+        alice.courses_with_primary_enrollment.size.should == 1
+      end
+
+      it 'still filters out completed enrollments for the correct user' do
+        alice = nil
+        @shard1.activate do
+          alice = User.create!(:name => 'alice')
+          courseX = Course.new
+          courseX.workflow_state = 'available'
+          courseX.save!
+          StudentEnrollment.create!(:course => courseX, :user => alice, :workflow_state => 'completed')
+        end
+        alice.courses_with_primary_enrollment.size.should == 0
+      end
+
+    end
   end
 
   it "should delete the user transactionally in case the pseudonym removal fails" do
