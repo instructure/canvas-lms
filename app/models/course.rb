@@ -2819,6 +2819,19 @@ class Course < ActiveRecord::Base
     self.settings[:hide_final_grade] = hide_final_grade
   end
 
+  def allow_student_discussion_topics
+    allow = self.settings[:allow_student_discussion_topics]
+    if allow.nil?
+      true
+    else
+      allow
+    end
+  end
+
+  def allow_student_discussion_topics=(allow)
+    self.settings[:allow_student_discussion_topics] = allow
+  end
+
   def filter_attributes_for_user(hash, user, session)
     hash.delete(:hide_final_grade) unless grants_right? user, :update
     hash

@@ -216,6 +216,25 @@ describe "discussions" do
       user_session(@student)
     end
 
+    it "should not allow students to create discussions according to setting" do
+      @course.allow_student_discussion_topics = false
+      @course.save!
+      get "/courses/#{@course.id}/discussion_topics/"
+      wait_for_ajax_requests
+      f('#new-discussion-button').should be_nil
+    end
+
+    it "should allow students to reply to a discussion even if they cannot create a topic" do
+      @course.allow_student_discussion_topics = false
+      @course.save!
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/"
+      wait_for_ajax_requests
+      new_student_entry_text = "'ello there"
+      f('#content').should_not include_text(new_student_entry_text)
+      add_reply new_student_entry_text
+      f('#content').should include_text(new_student_entry_text)
+    end
+
     it "should validate a group assignment discussion" do
       group_assignment = @course.assignments.create!({
                                               :name => 'group assignment',
