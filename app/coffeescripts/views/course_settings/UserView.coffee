@@ -23,6 +23,7 @@ define [
     initialize: (attributes, options) ->
       super
       @role = attributes['role']
+      @role_tag = attributes['role_tag']
 
     tagName: 'li'
 
@@ -114,9 +115,7 @@ define [
       return unless confirm I18n.t('delete_confirm', 'Are you sure you want to remove this user?')
       @$el.hide()
       success = =>
-        for e in @model.allEnrollmentsWithRole(@role)
-          e_type = e.typeClass.split('_')[0]
-          c.innerText = parseInt(c.innerText) - 1 for c in $(".#{e_type}_count")
+        $(c).text(parseInt($(c).text()) - 1) for c in $(".#{@role_tag}_count")
         $.flashMessage I18n.t('flash.removed', 'User successfully removed.')
       failure = =>
         @$el.show()

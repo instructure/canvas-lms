@@ -20,11 +20,20 @@ define [
       if options.count > 0
         @$el.disableWhileLoading @collection.fetch(@fetchOptions)
       @paginationScrollContainer = @$el
+      et = @el.id.split('_')[0]
+      if et == 'role'
+        @role_tag = @el.id
+      else
+        @role_tag = et
+      @collection.on 'add', @incrementCount
       super fetchOptions: @fetchOptions
 
     render: ->
       @collection.each @renderUser
       super
 
+    incrementCount: (user) =>
+      $(c).text(parseInt($(c).text()) + 1) for c in $(".#{@role_tag}_count")
+
     renderUser: (user) =>
-      @$el.append (new UserView model: user, role: @role).render().el
+      @$el.append (new UserView model: user, role: @role, role_tag: @role_tag).render().el

@@ -60,6 +60,13 @@ describe "course settings" do
       cog
     end
 
+    def remove_user(user, role = nil)
+      cog = open_kyle_menu(user, role)
+      f('a[data-event="removeFromCourse"]', cog).click
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+    end
+
     it "should add a user to a section" do
       user = user_with_pseudonym(:active_user => true, :username => 'user@example.com', :name => 'user@example.com')
       section_name = 'Add User Section'
@@ -82,10 +89,7 @@ describe "course settings" do
       go_to_users_tab
       f('#tab-users').should include_text(username)
 
-      cog = open_kyle_menu(@student)
-      f('a[data-event="removeFromCourse"]', cog).click
-      driver.switch_to.alert.accept
-      wait_for_ajaximations
+      remove_user(@student)
       f('#tab-users').should_not include_text(username)
     end
 
@@ -367,6 +371,89 @@ describe "course settings" do
       assert_flash_notice_message /already existed/
       fj("#teacher_enrollments #user_#{@teacher.id}").should be_displayed
       fj("#role_#{@role.id} #user_#{@teacher.id}").should be_displayed
+    end
+
+    describe "counts" do
+      context "in base role" do
+        before do
+          @login = "cstuntman"
+          @new_user = user_with_pseudonym :username => @login
+        end
+
+        it "should increment the count when adding a user" do
+          add_user(@login, "Teachers")
+          @course.enrollments.find_by_user_id_and_type_and_role_name(@new_user.id, 'TeacherEnrollment', nil).should_not be_nil
+          f(".teacher_count").text.to_i.should == 2
+        end
+
+        it "should decrement the count when removing a user" do
+          @course.enroll_user(@new_user, 'TeacherEnrollment', { :enrollment_state => 'active' })
+          go_to_users_tab
+          f(".teacher_count").text.to_i.should == 2
+          remove_user(@new_user, "TeacherEnrollment")
+          @course.enrollments.find_by_user_id_and_type_and_role_name(@new_user.id, 'TeacherEnrollment', nil).should be_nil
+          f(".teacher_count").text.to_i.should == 1
+        end
+      end
+
+      context "in custom role" do
+        before do
+          @role = custom_teacher_role "Instruc-TOR"
+          @count_class = ".#{@role.asset_string}_count"
+          @login = "dhauldhagen"
+          @new_user = user_with_pseudonym :username => @login
+        end
+
+        it "should increment the count when adding a user" do
+          add_user(@login, @role.name)
+          @course.enrollments.find_by_user_id_and_role_name(@new_user.id, @role.name).should_not be_nil
+          f(@count_class).text.to_i.should == 1
+        end
+
+        it "should decrement the count when removing a user" do
+          @course.enroll_user(@new_user, 'TeacherEnrollment', { :role_name => @role.name, :enrollment_state => 'active' })
+          go_to_users_tab
+          f(@count_class).text.to_i.should == 1
+          remove_user(@new_user, @role)
+          @course.enrollments.find_by_user_id_and_role_name(@new_user.id, @role.name).should be_nil
+          f(@count_class).text.to_i.should == 0
+        end
+      end
+
+      context "in custom role and base role" do
+        before do
+          @role = custom_ta_role "Assistant Coach"
+          @count_class = ".#{@role.asset_string}_count"
+          @login = "djmankiewicz"
+          @new_user = user_with_pseudonym :username => @login
+          @course.enroll_user(@new_user, 'TaEnrollment', { :enrollment_state => 'active' })
+        end
+
+        it "should increment the count when adding a user" do
+          add_user(@new_user.name, @role.name)
+          @course.enrollments.find_by_user_id_and_role_name(@new_user.id, @role.name).should_not be_nil
+          f(@count_class).text.to_i.should == 1
+
+          # sanity check: the base TA enrollment should not have been affected
+          @course.enrollments.find_by_user_id_and_type_and_role_name(@new_user.id, 'TaEnrollment', nil).should_not be_nil
+          f(".ta_count").text.to_i.should == 1
+        end
+
+        it "should decrement the count when removing a user" do
+          @course.enroll_user(@new_user, 'TaEnrollment', { :role_name => @role.name, :enrollment_state => 'active' })
+          go_to_users_tab
+          f(@count_class).text.to_i.should == 1
+          f(".ta_count").text.to_i.should == 1
+
+          remove_user(@new_user, @role)
+          @course.enrollments.find_by_user_id_and_role_name(@new_user.id, @role.name).should be_nil
+          f(@count_class).text.to_i.should == 0
+
+          # sanity check: make sure we didn't unenroll the base type too
+          @course.enrollments.find_by_user_id_and_type_and_role_name(@new_user.id, 'TaEnrollment', nil).should_not be_nil
+          f(".ta_count").text.to_i.should == 1
+       end
+      end
     end
   end
 
