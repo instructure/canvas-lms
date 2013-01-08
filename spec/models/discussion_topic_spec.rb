@@ -102,6 +102,29 @@ describe DiscussionTopic do
     (@entry.check_policy(@student) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply'].sort
   end
 
+  describe "allow_student_discussion_topics setting" do
+
+    before(:each) do
+      course_with_teacher(:active_all => 1)
+      student_in_course(:active_all => 1)
+      @topic = @course.discussion_topics.create!(:user => @teacher)
+    end
+
+    it "should allow students to create topics by default" do
+      @topic.check_policy(@teacher).should include :create
+      @topic.check_policy(@student).should include :create
+    end
+
+    it "should disallow students from creating topics" do
+      @course.allow_student_discussion_topics = false
+      @course.save!
+      @topic.reload
+      @topic.check_policy(@teacher).should include :create
+      @topic.check_policy(@student).should_not include :create
+    end
+
+  end
+
   it "should grant observers read permission by default" do
     course_with_teacher(:active_all => true)
     course_with_observer(:course => @course, :active_all => true)

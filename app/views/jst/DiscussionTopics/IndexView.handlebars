@@ -13,7 +13,7 @@
         <button id="delete">{{#t "delete"}}Delete{{/t}}</button>
       </span>
       {{#if options.permissions.create}}
-        <a href="{{new_topic_url}}" class="btn btn-primary">{{#if showingAnnouncements}}
+        <a href="{{new_topic_url}}" class="btn btn-primary" id="new-discussion-btn">{{#if showingAnnouncements}}
           <i class="icon-announcement"></i> 
           {{#t "make_an_announcement"}}Make an announcement{{/t}}
         {{else}}

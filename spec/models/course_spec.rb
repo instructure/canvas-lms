@@ -53,6 +53,19 @@ describe Course do
     @course.should_not be_soft_concluded
   end
 
+  describe "allow_student_discussion_topics" do
+
+    it "should default true" do
+      @course.allow_student_discussion_topics.should == true
+    end
+
+    it "should set and get" do
+      @course.allow_student_discussion_topics = false
+      @course.save!
+      @course.allow_student_discussion_topics.should == false
+    end
+  end
+
   context "validation" do
     it "should create a new instance given valid attributes" do
       course_model
