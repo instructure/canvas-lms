@@ -659,6 +659,7 @@ ActionController::Routing::Routes.draw do |map|
       courses.get 'courses/:course_id/recent_students', :action => :recent_students, :path_name => 'course_recent_students'
       courses.get 'courses/:course_id/users', :action => :users, :path_name => 'course_users'
       courses.get 'courses/:course_id/users/:id', :action => :user, :path_name => 'course_user'
+      courses.get 'courses/:course_id/search_users', :action => :search_users, :path_name => 'course_search_users'
       courses.get 'courses/:course_id/activity_stream', :action => :activity_stream, :path_name => 'course_activity_stream'
       courses.get 'courses/:course_id/todo', :action => :todo_items
       courses.delete 'courses/:id', :action => :destroy

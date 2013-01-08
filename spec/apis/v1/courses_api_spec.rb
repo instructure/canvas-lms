@@ -655,278 +655,334 @@ describe CoursesController, :type => :integration do
     end
   end
 
-  describe "/users" do
+  describe "users" do
     before(:each) do
-      section1 = @course1.default_section
-      section2 = @course1.course_sections.create!(:name => 'Section B')
-      @ta = user(:name => 'TA')
-      @ta_enroll1 = @course1.enroll_user(@ta, 'TaEnrollment', :section => section1)
-      @ta_enroll2 = @course1.enroll_user(@ta, 'TaEnrollment', :section => section2, :allow_multiple_enrollments => true)
+      @section1 = @course1.default_section
+      @section2 = @course1.course_sections.create!(:name => 'Section B')
+      @ta = user(:name => 'TAPerson')
+      @ta_enroll1 = @course1.enroll_user(@ta, 'TaEnrollment', :section => @section1)
+      @ta_enroll2 = @course1.enroll_user(@ta, 'TaEnrollment', :section => @section2, :allow_multiple_enrollments => true)
 
-      @student1 = user(:name => 'S1')
-      @student2 = user(:name => 'S2')
-      @student1_enroll = @course1.enroll_user(@student1, 'StudentEnrollment', :section => section1)
-      @student2_enroll = @course1.enroll_user(@student2, 'StudentEnrollment', :section => section2)
+      @student1 = user(:name => 'SSS1')
+      @student2 = user(:name => 'SSS2')
+      @student1_enroll = @course1.enroll_user(@student1, 'StudentEnrollment', :section => @section1)
+      @student2_enroll = @course1.enroll_user(@student2, 'StudentEnrollment', :section => @section2)
     end
 
-    it "returns a list of users" do
-      # when
-      json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
-                      { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' })
-      # expect
-      json.sort_by{|x| x["id"]}.should == api_json_response(@course1.users.uniq,
-                                                            :only => USER_API_FIELDS).sort_by{|x| x["id"]}
-    end
-
-    it "returns a list of users with emails" do
-      @user = @course1.teachers.first
-      # when
-      json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
-                      { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
-                      :include => ['email'])
-      # expect
-      json.each { |u| u.keys.should include('email') }
-    end
-
-    it "returns a list of users and enrollments with enrollments option" do
-      # when
-      json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
-                      { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
-                      :include => ['enrollments'])
-      # helper
-      check_json = lambda { |user, *enrollments|
-        j = json.find { |x| x['id'] == user.id }
-        j.delete('enrollments').map { |e| e['id'] }.sort.
-          should == enrollments.map(&:id)
-        j.should == api_json_response(user, :only => USER_API_FIELDS)
-      }
-      # expect
-      check_json.call(@ta, @ta_enroll1, @ta_enroll2)
-      check_json.call(@student1, @student1_enroll)
-      check_json.call(@student2, @student2_enroll)
-    end
-
-    it "doesn't return enrollments from another course" do
-      # given
-      other_enroll = @course2.enroll_user(@student1, 'StudentEnrollment')
-      # when
-      json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
-                      { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
-                      :include => ['enrollments'])
-      # expect
-      enroll_ids = json.find { |x| x['id'] == @student1.id }['enrollments'].map { |e| e['id'] }.sort
-      enroll_ids.should == [@student1_enroll.id]
-    end
-
-    it "optionally filters users by enrollment_type" do
-      # when
-      json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
-                      { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
-                      :enrollment_type => 'student')
-      # expect
-      json.map {|x| x["id"]}.sort.should == api_json_response([@student1, @student2],
-                                                              :only => USER_API_FIELDS).map {|x| x["id"]}.sort
-    end
-
-    it "should accept an array of enrollment_types" do
-      json = api_call(:get, "/api/v1/courses/#{@course1.id}/users",
-                      {:controller => 'courses', :action => 'users', :course_id => @course1.to_param, :format => 'json' },
-                      :enrollment_type => ['student', 'teacher'], :include => ['enrollments'])
-
-      json.map { |u| u['enrollments'].map { |e| e['type'] } }.flatten.uniq.sort.should == %w{StudentEnrollment TeacherEnrollment}
-    end
-
-    describe "enrollment_role" do
-      before do
-        role = Account.default.roles.build :name => 'EliteStudent'
-        role.base_role_type = 'StudentEnrollment'
-        role.save!
-        @student3 = user(:name => 'S3')
-        @student3_enroll = @course1.enroll_user(@student3, 'StudentEnrollment', { :role_name => 'EliteStudent' })
+    describe "/search_users" do
+      let(:api_url) { "/api/v1/courses/#{@course1.id}/search_users.json" }
+      let(:api_route) do
+        {
+          :controller => 'courses',
+          :action => 'search_users',
+          :course_id => @course1.id.to_s,
+          :format => 'json'
+        }
       end
 
-      it "should return all student types with ?enrollment_type=student" do
+      it "returns an error when search_term not present" do
+        json = api_call(:get, api_url, api_route, {}, {}, :expected_status => 400)
+        json["status"].should == "argument_error"
+        json["message"].should == "search_term of 3 or more characters is required"
+      end
+
+      it "returns an error when search_term is fewer than 3 characters" do
+        json = api_call(:get, api_url, api_route, {:search_term => '12'}, {}, :expected_status => 400)
+        json["status"].should == "argument_error"
+        json["message"].should == "search_term of 3 or more characters is required"
+      end
+
+      it "returns a list of users" do
+        json = api_call(:get, api_url, api_route, :search_term => "TAP")
+
+        sorted_users = json.sort_by{ |x| x["id"] }
+        expected_users =
+          api_json_response(
+            @course1.users.select{ |u| u.name == 'TAPerson' },
+            :only => USER_API_FIELDS)
+
+        sorted_users.should == expected_users
+      end
+
+      it "accepts a list of enrollment_types" do
+        ta2 = user(:name => 'SSS Helper')
+        ta2_enroll1 = @course1.enroll_user(ta2, 'TaEnrollment', :section => @section1)
+
+        student3 = user(:name => 'T1')
+        student3_enroll = @course1.enroll_user(student3, 'StudentEnrollment', :section => @section2)
+
+        json = api_call(:get, api_url, api_route, :search_term => "SSS", :enrollment_type => ["student","ta"])
+ 
+        sorted_users = json.sort_by{ |x| x["id"] }
+        expected_users =
+          api_json_response(
+            @course1.users.select{ |u| ['SSS Helper', 'SSS1', 'SSS2'].include? u.name },
+            :only => USER_API_FIELDS)
+
+        sorted_users.should == expected_users.sort_by{ |x| x["id"] }
+      end
+    end
+
+    describe "/users" do
+      it "returns a list of users" do
+        # when
+        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+                        { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' })
+        # expect
+        json.sort_by{|x| x["id"]}.should == api_json_response(@course1.users.uniq,
+                                                              :only => USER_API_FIELDS).sort_by{|x| x["id"]}
+      end
+
+      it "returns a list of users with emails" do
+        @user = @course1.teachers.first
+        # when
+        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+                        { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
+                        :include => ['email'])
+        # expect
+        json.each { |u| u.keys.should include('email') }
+      end
+
+      it "returns a list of users and enrollments with enrollments option" do
+        # when
+        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+                        { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
+                        :include => ['enrollments'])
+        # helper
+        check_json = lambda { |user, *enrollments|
+          j = json.find { |x| x['id'] == user.id }
+          j.delete('enrollments').map { |e| e['id'] }.sort.
+            should == enrollments.map(&:id)
+          j.should == api_json_response(user, :only => USER_API_FIELDS)
+        }
+        # expect
+        check_json.call(@ta, @ta_enroll1, @ta_enroll2)
+        check_json.call(@student1, @student1_enroll)
+        check_json.call(@student2, @student2_enroll)
+      end
+
+      it "doesn't return enrollments from another course" do
+        # given
+        other_enroll = @course2.enroll_user(@student1, 'StudentEnrollment')
+        # when
+        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+                        { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
+                        :include => ['enrollments'])
+        # expect
+        enroll_ids = json.find { |x| x['id'] == @student1.id }['enrollments'].map { |e| e['id'] }.sort
+        enroll_ids.should == [@student1_enroll.id]
+      end
+
+      it "optionally filters users by enrollment_type" do
+        # when
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                         { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
                         :enrollment_type => 'student')
-
-        json.map {|x| x["id"].to_i}.sort.should == [@student1, @student2, @student3].map(&:id).sort
+        # expect
+        json.map {|x| x["id"]}.sort.should == api_json_response([@student1, @student2],
+                                                                :only => USER_API_FIELDS).map {|x| x["id"]}.sort
       end
 
-      it "should return only base student types with ?enrollment_role=StudentEnrollment" do
-        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
-                        { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
-                        :enrollment_role => 'StudentEnrollment')
+      it "should accept an array of enrollment_types" do
+        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users",
+                        {:controller => 'courses', :action => 'users', :course_id => @course1.to_param, :format => 'json' },
+                        :enrollment_type => ['student', 'teacher'], :include => ['enrollments'])
 
-        json.map {|x| x["id"].to_i}.sort.should == [@student1, @student2].map(&:id).sort
+        json.map { |u| u['enrollments'].map { |e| e['type'] } }.flatten.uniq.sort.should == %w{StudentEnrollment TeacherEnrollment}
       end
 
-      it "should return users with a custom role type" do
-        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
-                        { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
-                        :enrollment_role => 'EliteStudent')
+      describe "enrollment_role" do
+        before do
+          role = Account.default.roles.build :name => 'EliteStudent'
+          role.base_role_type = 'StudentEnrollment'
+          role.save!
+          @student3 = user(:name => 'S3')
+          @student3_enroll = @course1.enroll_user(@student3, 'StudentEnrollment', { :role_name => 'EliteStudent' })
+        end
 
-        json.map {|x| x["id"].to_i}.should == [@student3.id]
-      end
+        it "should return all student types with ?enrollment_type=student" do
+          json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+                          { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
+                          :enrollment_type => 'student')
 
-      it "should accept an array of enrollment roles" do
-        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
-                        { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
-                        :enrollment_role => %w{StudentEnrollment EliteStudent})
+          json.map {|x| x["id"].to_i}.sort.should == [@student1, @student2, @student3].map(&:id).sort
+        end
 
-        json.map {|x| x["id"].to_i}.sort.should == [@student1, @student2, @student3].map(&:id).sort
-      end
-    end
+        it "should return only base student types with ?enrollment_role=StudentEnrollment" do
+          json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+                          { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
+                          :enrollment_role => 'StudentEnrollment')
 
-    it "maintains query parameters in link headers" do
-      json = api_call(
-        :get,
-        "/api/v1/courses/#{@course1.id}/users.json",
-        { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
-        { :enrollment_type => 'student', :maintain_params => '1', :per_page => 1 })
-      links = response['Link'].split(",")
-      links.should_not be_empty
-      links.all?{ |l| l =~ /enrollment_type=student/ }.should be_true
-      links.first.scan(/per_page/).length.should == 1
-    end
+          json.map {|x| x["id"].to_i}.sort.should == [@student1, @student2].map(&:id).sort
+        end
 
-    it "should not include sis user id or login id for non-admins" do
-      RoleOverride.create!(:context => Account.default, :permission => 'read_sis', :enrollment_type => 'TeacherEnrollment', :enabled => false)
-      student_in_course(:course => @course2, :active_all => true, :name => 'Zombo')
+        it "should return users with a custom role type" do
+          json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+                          { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
+                          :enrollment_role => 'EliteStudent')
 
-      @user = @me # @me is a student in course 2
-      json = api_call(:get, "/api/v1/courses/#{@course2.id}/users.json",
-                      { :controller => 'courses', :action => 'users', :course_id => @course2.id.to_s, :format => 'json' },
-                      :enrollment_type => 'student')
-      json.length.should == 2
-      %w{sis_user_id sis_login_id unique_id}.each do |attribute|
-        json.map { |u| u[attribute] }.should == [nil, nil]
-      end
-    end
+          json.map {|x| x["id"].to_i}.should == [@student3.id]
+        end
 
-    it "should include user sis id and login id if account admin" do
-      @course2.account.add_user(@me)
-      first_user = @user
-      new_user = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
-      @course2.enroll_student(new_user).accept!
-      new_user.pseudonym.update_attribute(:sis_user_id, 'user2')
+        it "should accept an array of enrollment roles" do
+          json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+                          { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
+                          :enrollment_role => %w{StudentEnrollment EliteStudent})
 
-      @user = @me
-      json = api_call(:get, "/api/v1/courses/#{@course2.id}/users.json",
-                      { :controller => 'courses', :action => 'users', :course_id => @course2.id.to_s, :format => 'json' },
-                      :enrollment_type => 'student')
-      json.map { |u| u['sis_user_id'] }.sort.should == ['user1', 'user2'].sort
-      json.map { |u| u['sis_login_id'] }.sort.should == ["nobody@example.com", "nobody2@example.com"].sort
-      json.map { |u| u['login_id'] }.sort.should == ["nobody@example.com", "nobody2@example.com"].sort
-    end
-
-    it "should include user sis id and login id if can manage_students in the course" do
-      @course1.grants_right?(@me, :manage_students).should be_true
-      first_student = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
-      @course1.enroll_student(first_student).accept!
-      first_student.pseudonym.update_attribute(:sis_user_id, 'user2')
-      second_student = user_with_pseudonym(:name => 'second student', :username => 'nobody3@example.com')
-      @course1.enroll_student(second_student).accept!
-      second_student.pseudonym.update_attribute(:sis_user_id, 'user3')
-
-      @user = @me
-      json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
-                      { :controller => 'courses', :action => 'users', :course_id => @course1.to_param, :format => 'json' },
-                      :enrollment_type => 'student')
-      json.map { |u| u['sis_user_id'] }.compact.sort.should == ['user2', 'user3'].sort
-      json.map { |u| u['sis_login_id'] }.compact.sort.should == ['nobody2@example.com', 'nobody3@example.com'].sort
-      json.map { |u| u['login_id'] }.compact.sort.should == ['nobody2@example.com', 'nobody3@example.com'].sort
-    end
-
-    it "should include user sis id and login id if site admin" do
-      Account.site_admin.add_user(@me)
-      first_user = @user
-      new_user = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
-      @course2.enroll_student(new_user).accept!
-      new_user.pseudonym.update_attribute(:sis_user_id, 'user2')
-
-      @user = @me
-      json = api_call(:get, "/api/v1/courses/#{@course2.id}/users.json",
-                      { :controller => 'courses', :action => 'users', :course_id => @course2.id.to_s, :format => 'json' },
-                      :enrollment_type => 'student')
-      json.map { |u| u['sis_user_id'] }.sort.should == ['user1', 'user2'].sort
-      json.map { |u| u['sis_login_id'] }.sort.should == ["nobody@example.com", "nobody2@example.com"].sort
-      json.map { |u| u['login_id'] }.sort.should == ["nobody@example.com", "nobody2@example.com"].sort
-    end
-
-    it "should not return email addresses if the requestor is a student" do
-      user
-      @course1.enroll_student(user).accept!
-      json = api_call(:get, "/api/v1/courses/#{@course1.to_param}/users",
-                      { :controller => 'courses', :action => 'users',
-                      :course_id => @course1.to_param, :format => 'json' },
-                      { :include => %w{email} })
-      json.each do |u|
-        if u['id'] == @user.id
-          u['email'].should == @user.email
-        else
-          u.keys.should_not include(:email)
+          json.map {|x| x["id"].to_i}.sort.should == [@student1, @student2, @student3].map(&:id).sort
         end
       end
-    end
 
-    it "should allow specifying course sis id" do
-      @user = @me
-      first_user = @user
-      new_user = User.create!(:name => 'Zombo')
-      @course2.update_attribute(:sis_source_id, 'TEST-SIS-ONE.2011')
-      @course2.enroll_student(new_user).accept!
-      ro = RoleOverride.create!(:context => Account.default, :permission => 'read_sis', :enrollment_type => 'TeacherEnrollment', :enabled => false)
-
-      json = api_call(:get, "/api/v1/courses/sis_course_id:TEST-SIS-ONE.2011/users.json",
-                      { :controller => 'courses', :action => 'users', :course_id => 'sis_course_id:TEST-SIS-ONE.2011', :format => 'json' },
-                      :enrollment_type => 'student')
-      json.sort_by{|x| x["id"]}.should == api_json_response([first_user, new_user],
-                                                            :only => USER_API_FIELDS).sort_by{|x| x["id"]}
-
-      ro.destroy
-      json = api_call(:get, "/api/v1/courses/sis_course_id:TEST-SIS-ONE.2011.json",
-                      { :controller => 'courses', :action => 'show', :id => 'sis_course_id:TEST-SIS-ONE.2011', :format => 'json' },
-                      :enrollment_type => 'student')
-      json['id'].should == @course2.id
-      json['sis_course_id'].should == 'TEST-SIS-ONE.2011'
-    end
-
-    it "should paginate unique users correctly" do
-      students = [@student1, @student2]
-      section2 = @course1.course_sections.create!(:name => 'Section B')
-      8.times do |i|
-        s = student_in_course(:course => @course1, :active_all => true).user
-        @course1.enroll_student(s, :section => section2, :allow_multiple_enrollments => true).accept!
+      it "maintains query parameters in link headers" do
+        json = api_call(
+          :get,
+          "/api/v1/courses/#{@course1.id}/users.json",
+          { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
+          { :enrollment_type => 'student', :maintain_params => '1', :per_page => 1 })
+        links = response['Link'].split(",")
+        links.should_not be_empty
+        links.all?{ |l| l =~ /enrollment_type=student/ }.should be_true
+        links.first.scan(/per_page/).length.should == 1
       end
 
-      @user = @me
-      json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
-                      { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' }, 
-                      { :enrollment_type => 'student', :page => 1, :per_page => 5 })
-      json.map{|x| x['id']}.uniq.length.should == 5
+      it "should not include sis user id or login id for non-admins" do
+        RoleOverride.create!(:context => Account.default, :permission => 'read_sis', :enrollment_type => 'TeacherEnrollment', :enabled => false)
+        student_in_course(:course => @course2, :active_all => true, :name => 'Zombo')
 
-      link_header = response.headers['Link'].split(',')
-      link_header[0].should match /page=2&per_page=5/ # next page
-      link_header[1].should match /page=1&per_page=5/ # first page
-      link_header[2].should match /page=2&per_page=5/ # last page
-    end
-
-    it "should allow jumping to a user's page based on id" do
-      @other_section = @course1.course_sections.create!
-      students = []
-      5.times do |i|
-        s = student_in_course(:course => @course1, :name => "User #{i+1}", :active_all => true).user
-        @course1.enroll_student(s, :section => @other_section, :allow_multiple_enrollments => true)
-        students << s
+        @user = @me # @me is a student in course 2
+        json = api_call(:get, "/api/v1/courses/#{@course2.id}/users.json",
+                        { :controller => 'courses', :action => 'users', :course_id => @course2.id.to_s, :format => 'json' },
+                        :enrollment_type => 'student')
+        json.length.should == 2
+        %w{sis_user_id sis_login_id unique_id}.each do |attribute|
+          json.map { |u| u[attribute] }.should == [nil, nil]
+        end
       end
-      @target = students[4]
-      @user = @me
-      json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
-                      { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' }, 
-                      { :enrollment_type => 'student', :user_id => @target.id, :page => 1, :per_page => 1 })
-      json.map{|x| x['id']}.length.should == 1
-      json.map{|x| x['id']}.should == [@target.id]
+
+      it "should include user sis id and login id if account admin" do
+        @course2.account.add_user(@me)
+        first_user = @user
+        new_user = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
+        @course2.enroll_student(new_user).accept!
+        new_user.pseudonym.update_attribute(:sis_user_id, 'user2')
+
+        @user = @me
+        json = api_call(:get, "/api/v1/courses/#{@course2.id}/users.json",
+                        { :controller => 'courses', :action => 'users', :course_id => @course2.id.to_s, :format => 'json' },
+                        :enrollment_type => 'student')
+        json.map { |u| u['sis_user_id'] }.sort.should == ['user1', 'user2'].sort
+        json.map { |u| u['sis_login_id'] }.sort.should == ["nobody@example.com", "nobody2@example.com"].sort
+        json.map { |u| u['login_id'] }.sort.should == ["nobody@example.com", "nobody2@example.com"].sort
+      end
+
+      it "should include user sis id and login id if can manage_students in the course" do
+        @course1.grants_right?(@me, :manage_students).should be_true
+        first_student = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
+        @course1.enroll_student(first_student).accept!
+        first_student.pseudonym.update_attribute(:sis_user_id, 'user2')
+        second_student = user_with_pseudonym(:name => 'second student', :username => 'nobody3@example.com')
+        @course1.enroll_student(second_student).accept!
+        second_student.pseudonym.update_attribute(:sis_user_id, 'user3')
+
+        @user = @me
+        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+                        { :controller => 'courses', :action => 'users', :course_id => @course1.to_param, :format => 'json' },
+                        :enrollment_type => 'student')
+        json.map { |u| u['sis_user_id'] }.compact.sort.should == ['user2', 'user3'].sort
+        json.map { |u| u['sis_login_id'] }.compact.sort.should == ['nobody2@example.com', 'nobody3@example.com'].sort
+        json.map { |u| u['login_id'] }.compact.sort.should == ['nobody2@example.com', 'nobody3@example.com'].sort
+      end
+
+      it "should include user sis id and login id if site admin" do
+        Account.site_admin.add_user(@me)
+        first_user = @user
+        new_user = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
+        @course2.enroll_student(new_user).accept!
+        new_user.pseudonym.update_attribute(:sis_user_id, 'user2')
+
+        @user = @me
+        json = api_call(:get, "/api/v1/courses/#{@course2.id}/users.json",
+                        { :controller => 'courses', :action => 'users', :course_id => @course2.id.to_s, :format => 'json' },
+                        :enrollment_type => 'student')
+        json.map { |u| u['sis_user_id'] }.sort.should == ['user1', 'user2'].sort
+        json.map { |u| u['sis_login_id'] }.sort.should == ["nobody@example.com", "nobody2@example.com"].sort
+        json.map { |u| u['login_id'] }.sort.should == ["nobody@example.com", "nobody2@example.com"].sort
+      end
+
+      it "should not return email addresses if the requestor is a student" do
+        user
+        @course1.enroll_student(user).accept!
+        json = api_call(:get, "/api/v1/courses/#{@course1.to_param}/users",
+                        { :controller => 'courses', :action => 'users',
+                        :course_id => @course1.to_param, :format => 'json' },
+                        { :include => %w{email} })
+        json.each do |u|
+          if u['id'] == @user.id
+            u['email'].should == @user.email
+          else
+            u.keys.should_not include(:email)
+          end
+        end
+      end
+
+      it "should allow specifying course sis id" do
+        @user = @me
+        first_user = @user
+        new_user = User.create!(:name => 'Zombo')
+        @course2.update_attribute(:sis_source_id, 'TEST-SIS-ONE.2011')
+        @course2.enroll_student(new_user).accept!
+        ro = RoleOverride.create!(:context => Account.default, :permission => 'read_sis', :enrollment_type => 'TeacherEnrollment', :enabled => false)
+
+        json = api_call(:get, "/api/v1/courses/sis_course_id:TEST-SIS-ONE.2011/users.json",
+                        { :controller => 'courses', :action => 'users', :course_id => 'sis_course_id:TEST-SIS-ONE.2011', :format => 'json' },
+                        :enrollment_type => 'student')
+        json.sort_by{|x| x["id"]}.should == api_json_response([first_user, new_user],
+                                                              :only => USER_API_FIELDS).sort_by{|x| x["id"]}
+
+        ro.destroy
+        json = api_call(:get, "/api/v1/courses/sis_course_id:TEST-SIS-ONE.2011.json",
+                        { :controller => 'courses', :action => 'show', :id => 'sis_course_id:TEST-SIS-ONE.2011', :format => 'json' },
+                        :enrollment_type => 'student')
+        json['id'].should == @course2.id
+        json['sis_course_id'].should == 'TEST-SIS-ONE.2011'
+      end
+
+      it "should paginate unique users correctly" do
+        students = [@student1, @student2]
+        section2 = @course1.course_sections.create!(:name => 'Section B')
+        8.times do |i|
+          s = student_in_course(:course => @course1, :active_all => true).user
+          @course1.enroll_student(s, :section => section2, :allow_multiple_enrollments => true).accept!
+        end
+
+        @user = @me
+        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+                        { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' }, 
+                        { :enrollment_type => 'student', :page => 1, :per_page => 5 })
+        json.map{|x| x['id']}.uniq.length.should == 5
+
+        link_header = response.headers['Link'].split(',')
+        link_header[0].should match /page=2&per_page=5/ # next page
+        link_header[1].should match /page=1&per_page=5/ # first page
+        link_header[2].should match /page=2&per_page=5/ # last page
+      end
+
+      it "should allow jumping to a user's page based on id" do
+        @other_section = @course1.course_sections.create!
+        students = []
+        5.times do |i|
+          s = student_in_course(:course => @course1, :name => "User #{i+1}", :active_all => true).user
+          @course1.enroll_student(s, :section => @other_section, :allow_multiple_enrollments => true)
+          students << s
+        end
+        @target = students[4]
+        @user = @me
+        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+                        { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' }, 
+                        { :enrollment_type => 'student', :user_id => @target.id, :page => 1, :per_page => 1 })
+        json.map{|x| x['id']}.length.should == 1
+        json.map{|x| x['id']}.should == [@target.id]
+      end
     end
 
     it "should include observed users in the enrollments if requested" do

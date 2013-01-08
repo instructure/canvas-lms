@@ -90,8 +90,8 @@ class CoursesController < ApplicationController
   #   When set, only return courses where the user is enrolled with the specified
   #   course-level role.  This can be a role created with the
   #   {api:RoleOverridesController#add_role Add Role API} or a base role type of
-  #   ‘StudentEnrollment’, ‘TeacherEnrollment’, ‘TaEnrollment’, ‘ObserverEnrollment’,
-  #   or ‘DesignerEnrollment’.
+  #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
+  #   or 'DesignerEnrollment'.
   #
   # @argument include[] ["needs_grading_count"] Optional information to include with each Course.
   #   When needs_grading_count is given, and the current user has grading
@@ -304,8 +304,8 @@ class CoursesController < ApplicationController
   # @argument enrollment_role [optional]
   #   When set, only return users enrolled with the specified course-level role.  This can be
   #   a role created with the {api:RoleOverridesController#add_role Add Role API} or a
-  #   base role type of ‘StudentEnrollment’, ‘TeacherEnrollment’, ‘TaEnrollment’,
-  #   ‘ObserverEnrollment’, or ‘DesignerEnrollment’.
+  #   base role type of 'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment',
+  #   'ObserverEnrollment', or 'DesignerEnrollment'.
   #
   # @argument include[] ["email"] Optional user email.
   # @argument include[] ["enrollments"] Optionally include with each Course the
@@ -347,6 +347,43 @@ class CoursesController < ApplicationController
         enrollments = u.not_ended_enrollments if includes.include?('enrollments')
         user_json(u, @current_user, session, includes, @context, enrollments)
       }
+    end
+  end
+
+  # @API Search users
+  # Returns a list of users in this course that match a search term. No pagination.
+  #
+  # @argument search_term
+  #   The partial name or full ID of the users to match and return in the results list.
+  # @argument limit [optional]
+  #   The number of search results to return. Maximum 20.
+  # @argument enrollment_type [optional, "teacher"|"student"|"ta"|"observer"|"designer"]
+  #   When set, only return users where the user is enrolled as this type.
+  #   This argument is ignored if enrollment_role is given.
+  # @argument enrollment_role [optional]
+  #   When set, only return users enrolled with the specified course-level role.  This can be
+  #   a role created with the {api:RoleOverridesController#add_role Add Role API} or a
+  #   base role type of 'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment',
+  #   'ObserverEnrollment', or 'DesignerEnrollment'.
+  #
+  # @returns [User]
+  def search_users
+    get_context
+    if authorized_action(@context, @current_user, :read_roster)
+      search_params = params.slice(:search_term, :enrollment_type, :enrollment_role, :limit)
+      if (search_term = search_params[:search_term]) && search_term.size >= 3
+        search_params[:limit] = 20 if search_params[:limit].to_i > 20 if search_params[:limit]
+        users = UserSearch.for_user_in_course(search_term, @context, @current_user, search_params)
+        render :json => users.map { |u|
+          user_json(u, @current_user, session, [], @context)
+        }
+      else
+        render \
+          :json => {
+            "status" => "argument_error", 
+            "message" => "search_term of 3 or more characters is required" },
+          :status => :bad_request
+      end
     end
   end
 
