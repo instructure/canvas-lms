@@ -133,6 +133,7 @@ class PageView < ActiveRecord::Base
 
   def store
     self.created_at ||= Time.zone.now
+    return false unless user
 
     result = case page_view_method
     when :log
