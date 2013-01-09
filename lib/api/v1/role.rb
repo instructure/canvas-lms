@@ -38,6 +38,7 @@ module Api::V1::Role
   end
 
   def permission_json(permission, current_user, session)
+    permission = permission.dup
     permission[:enabled] = !!permission[:enabled]
     permission[:prior_default] = !!permission[:prior_default]
     permission.delete(:prior_default) unless permission[:explicit]

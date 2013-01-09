@@ -764,7 +764,7 @@ class RoleOverride < ActiveRecord::Base
       case_string = ""
       account_ids.each_with_index{|account_id, idx| case_string += " WHEN context_id='#{account_id}' THEN #{idx} " }
       overrides = RoleOverride.find(:all, :conditions => {:context_id => account_ids, :enrollment_type => generated_permission[:enrollment_type].to_s}, :order => "CASE #{case_string} ELSE 9999 END DESC")
-      overrides.group_by(&:permission)
+      overrides.group_by(&:permission).freeze
     end
 
     # walk the overrides from most general (root account) to most specific (the role's account)
@@ -794,7 +794,7 @@ class RoleOverride < ActiveRecord::Base
       generated_permission[:readonly] = true if generated_permission[:locked]
     end
 
-    @cached_permissions[key] = generated_permission
+    @cached_permissions[key] = generated_permission.freeze
   end
 
   # returns just the :enabled key of permission_for, adjusted for applying it to a certain
