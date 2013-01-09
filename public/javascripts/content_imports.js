@@ -16,17 +16,19 @@ define([
     var populateItem = function ($item, id, name, param_name) {
       pendingPopulates += 1;
       setTimeout(function () {
-        var full_param_name = param_name + "[" + id + "]";
-        $item.find(":checkbox:first")
-                .attr('name', full_param_name)
-                .attr('id', full_param_name.replace(/[\[\]]+/g, "_"));
-        if (name != null) {
+        if ($item != null) {
+          var full_param_name = param_name + "[" + id + "]";
+          $item.find(":checkbox:first")
+            .attr('name', full_param_name)
+            .attr('id', full_param_name.replace(/[\[\]]+/g, "_"));
+          if (name != null) {
+            $item.find("label:first")
+              .text(name);
+          }
           $item.find("label:first")
-                  .text(name);
+            .attr('for', full_param_name.replace(/[\[\]]+/g, "_"));
+          $item.show();
         }
-        $item.find("label:first")
-                .attr('for', full_param_name.replace(/[\[\]]+/g, "_"));
-        $item.show();
         pendingPopulates -= 1;
         if (pendingPopulates <= 0) {
           $("#copy_context_form_loading").hide();
@@ -193,6 +195,7 @@ define([
           $("#copy_files_list").append(folders[folderNames[idx]]);
         }
       }
+      populateItem(null, null, null, null);
       $("#copy_files_list").showIf(file_count > 0);
       $("#copy_context_form .course_name").text(data.name);
       $("#copy_everything").prop('checked', true).change();
