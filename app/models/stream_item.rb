@@ -373,17 +373,28 @@ class StreamItem < ActiveRecord::Base
     object.is_a?(Message) && object.new_record?
   end
 
+  # Internal: Format the stream item's asset to avoid showing hidden data.
+  #
+  # res - The stream item asset.
+  # viewing_user_id - The ID of the user to prepare the stream item for.
+  #
+  # Returns the stream item asset minus any hidden data.
   def post_process(res, viewing_user_id)
     case res
     when DiscussionTopic, Announcement
       if res.require_initial_post
         res.write_attribute(:user_has_posted, true)
         if res.user_ids_that_can_see_responses && !res.user_ids_that_can_see_responses.member?(viewing_user_id)
+          original_res = res
+          res = original_res.clone
+          res.id = original_res.id
           res.root_discussion_entries = []
           res.user_has_posted = false
+          res.readonly!
         end
       end
     end
+
     res
   end
 
