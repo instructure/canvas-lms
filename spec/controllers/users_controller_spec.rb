@@ -372,32 +372,49 @@ describe UsersController do
     end
 
     context 'account admin creating users' do
-      it "should create a pre_registered user (in the correct account)" do
-        account = Account.create!
-        user_with_pseudonym(:account => account)
-        account.add_user(@user)
-        user_session(@user, @pseudonym)
-        post 'create', :format => 'json', :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :sis_user_id => 'testsisid' }, :user => { :name => 'Jacob Fugal' }
-        response.should be_success
-        p = Pseudonym.find_by_unique_id('jacob@instructure.com')
-        p.account_id.should == account.id
-        p.should be_active
-        p.sis_user_id.should == 'testsisid'
-        p.user.should be_pre_registered
-      end
 
-      it "should create users with non-email pseudonyms" do
-        account = Account.create!
-        user_with_pseudonym(:account => account)
-        account.add_user(@user)
-        user_session(@user, @pseudonym)
-        post 'create', :format => 'json', :account_id => account.id, :pseudonym => { :unique_id => 'jacob', :sis_user_id => 'testsisid' }, :user => { :name => 'Jacob Fugal' }
-        response.should be_success
-        p = Pseudonym.find_by_unique_id('jacob')
-        p.account_id.should == account.id
-        p.should be_active
-        p.sis_user_id.should == 'testsisid'
-        p.user.should be_pre_registered
+      describe 'successfully' do
+        let!(:account) { Account.create! }
+
+        before do
+          user_with_pseudonym(:account => account)
+          account.add_user(@user)
+          user_session(@user, @pseudonym)
+        end
+
+        it "should create a pre_registered user (in the correct account)" do
+          post 'create', :format => 'json', :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :sis_user_id => 'testsisid' }, :user => { :name => 'Jacob Fugal' }
+          response.should be_success
+          p = Pseudonym.find_by_unique_id('jacob@instructure.com')
+          p.account_id.should == account.id
+          p.should be_active
+          p.sis_user_id.should == 'testsisid'
+          p.user.should be_pre_registered
+        end
+
+        it "should create users with non-email pseudonyms" do
+          post 'create', :format => 'json', :account_id => account.id, :pseudonym => { :unique_id => 'jacob', :sis_user_id => 'testsisid' }, :user => { :name => 'Jacob Fugal' }
+          response.should be_success
+          p = Pseudonym.find_by_unique_id('jacob')
+          p.account_id.should == account.id
+          p.should be_active
+          p.sis_user_id.should == 'testsisid'
+          p.user.should be_pre_registered
+        end
+
+
+        it "should not require acceptance of the terms or birthdate" do
+          post 'create', :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }
+          response.should be_success
+        end
+
+        it "should allow setting a password" do
+          post 'create', :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal' }
+          u = User.find_by_name 'Jacob Fugal'
+          u.should be_present
+          u.pseudonym.should_not be_password_auto_generated
+        end
+
       end
 
       it "should not allow an admin to set the sis id when creating a user if they don't have privileges to manage sis" do
@@ -446,36 +463,6 @@ describe UsersController do
         response.should be_success
         p = Pseudonym.find_by_unique_id('jacob@instructure.com')
         Message.find(:first, :conditions => { :communication_channel_id => p.user.email_channel.id, :notification_id => notification.id }).should be_nil
-      end
-
-      it "should not require acceptance of the terms" do
-        account = Account.create!
-        user_with_pseudonym(:account => account)
-        account.add_user(@user)
-        user_session(@user, @pseudonym)
-        post 'create', :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }
-        response.should be_success
-      end
-
-      it "should not require the birthdate" do
-        account = Account.create!
-        user_with_pseudonym(:account => account)
-        account.add_user(@user)
-        user_session(@user, @pseudonym)
-        post 'create', :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }
-        response.should be_success
-      end
-
-      it "should allow setting a password" do
-        account = Account.create!
-        user_with_pseudonym(:account => account)
-        account.add_user(@user)
-        user_session(@user, @pseudonym)
-        post 'create', :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'lolwtf', :password_confirmation => 'lolwtf' }, :user => { :name => 'Jacob Fugal' }
-        response.should be_success
-        u = User.find_by_name 'Jacob Fugal'
-        u.should be_present
-        u.pseudonym.should_not be_password_auto_generated
       end
     end
   end
@@ -643,11 +630,32 @@ describe UsersController do
   end
 
   describe "GET 'admin_merge'" do
-    it "should not allow you to view any user by id" do
+    let(:account) { Account.create! }
+
+    before do
       account_admin_user
       user_session(@admin)
-      user_with_pseudonym(:account => Account.create!)
+    end
 
+    describe 'as site admin' do
+      before { Account.site_admin.add_user(@admin) }
+
+      it 'warns about merging a user with itself' do
+        user = User.create!
+        get 'admin_merge', :user_id => user.id, :pending_user_id => user.id
+        flash[:error].should == 'You can\'t merge an account with itself.'
+      end
+
+      it 'does not issue warning if the users are different' do
+        user = User.create!
+        other_user = User.create!
+        get 'admin_merge', :user_id => user.id, :pending_user_id => other_user.id
+        flash[:error].should be_nil
+      end
+    end
+
+    it "should not allow you to view any user by id" do
+      user_with_pseudonym(:account => account)
       get 'admin_merge', :user_id => @admin.id, :pending_user_id => @user.id
       response.should be_success
       assigns[:pending_other_user].should be_nil

@@ -529,7 +529,6 @@ ActionController::Routing::Routes.draw do |map|
     user.assignments_needing_grading 'assignments_needing_grading', :controller => 'users', :action => 'assignments_needing_grading'
     user.assignments_needing_submitting 'assignments_needing_submitting', :controller => 'users', :action => 'assignments_needing_submitting'
     user.admin_merge 'admin_merge', :controller => 'users', :action => 'admin_merge', :conditions => {:method => :get}
-    user.confirm_merge 'merge', :controller => 'users', :action => 'confirm_merge', :conditions => {:method => :get}
     user.merge 'merge', :controller => 'users', :action => 'merge', :conditions => {:method => :post}
     user.grades 'grades', :controller => 'users', :action => 'grades'
     user.resources :user_notes

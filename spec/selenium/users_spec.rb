@@ -79,8 +79,10 @@ describe "users" do
   end
 
   context "admin merge" do
-    def setup_user_merge(users)
-      2.times { |i| get "/users/#{users[i].id}/admin_merge" }
+    def setup_user_merge(from_user, into_user)
+      get "/users/#{from_user.id}/admin_merge"
+      f('#manual_user_id').send_keys(into_user.id)
+      expect_new_page_load { f('button[type="submit"]').click }
     end
 
     def reload_users(users)
@@ -113,8 +115,8 @@ describe "users" do
       @users = [@student_1, @student_2]
     end
 
-    it "should merge user a with user b with navigate to another user function" do
-      setup_user_merge(@users)
+    it "should merge user a with user b" do
+      setup_user_merge(@student_2, @student_1)
       submit_merge
       reload_users(@users)
       @student_1.workflow_state.should == 'registered'
@@ -122,10 +124,8 @@ describe "users" do
       validate_login_info(@student_1_id)
     end
 
-    it "should merge user b with user a with enter user id function" do
-      get "/users/#{@student_1.id}/admin_merge"
-      f('#manual_user_id').send_keys(@student_2.id)
-      expect_new_page_load { f('button[type="submit"]').click }
+    it "should merge user b with user a" do
+      setup_user_merge(@student_1, @student_2)
       submit_merge
       reload_users(@users)
       @student_1.workflow_state.should == 'deleted'
@@ -134,7 +134,7 @@ describe "users" do
     end
 
     it "should validate switching the users to merge" do
-      setup_user_merge(@users)
+      setup_user_merge(@student_2, @student_1)
       user_names = ff('.result td')
       user_names[0].should include_text(@student_2.name)
       user_names[1].should include_text(@student_1.name)
@@ -151,7 +151,7 @@ describe "users" do
     end
 
     it "should cancel a merge and validate both users still exist" do
-      setup_user_merge(@users)
+      setup_user_merge(@student_2, @student_1)
       expect_new_page_load { f('#prepare_to_merge').click }
       expect_new_page_load { f('.button-secondary').click }
       f('#courses_menu_item').should be_displayed

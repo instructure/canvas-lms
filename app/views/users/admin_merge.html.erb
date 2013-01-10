@@ -65,9 +65,7 @@
       </span>
     <% else %>
       <p><%= t('merge_user_initial_instructions', "You've selected to merge the user, %{user_name} (%{user_email}) with another account.
-      You can search for the user you'd like to merge with this user using the form below, or 
-      just navigate to that user's page and click \"Merge User\" again to merge someone else with this
-      user.", :user_name => @user.name, :user_email => @user.email) %></p>
+      You can search for the user you'd like to merge with this user using the form below.", :user_name => @user.name, :user_email => @user.email) %></p>
       <table>
         <tr>
           <td style="vertical-align: top; padding: 10px 30px 10px;">
