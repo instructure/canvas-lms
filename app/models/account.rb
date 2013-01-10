@@ -794,7 +794,7 @@ class Account < ActiveRecord::Base
           account = @special_accounts[special_account_type] = Account.find_by_id(special_account_id)
         end
       end
-      unless account
+      if !account && default_account_name
         # TODO i18n
         t '#account.default_site_administrator_account_name', 'Site Admin'
         t '#account.default_account_name', 'Default Account'
