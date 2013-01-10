@@ -132,6 +132,37 @@ describe CalendarEventsApiController, :type => :integration do
       json.first['start_at'].should be_nil
     end
 
+    context 'all events' do
+      before do
+        @course.calendar_events.create(:title => 'undated')
+        @course.calendar_events.create(:title => 'dated', :start_at => '2012-01-08 12:00:00')
+      end
+
+      it 'should return all events' do
+        json = api_call(:get, "/api/v1/calendar_events?all_events=1&context_codes[]=course_#{@course.id}", {
+                          :controller => 'calendar_events_api', :action => 'index', :format => 'json',
+                          :context_codes => ["course_#{@course.id}"],
+                          :all_events => '1'})
+        json.size.should eql 2
+      end
+
+      it 'should return all events, ignoring the undated flag' do
+        json = api_call(:get, "/api/v1/calendar_events?all_events=1&undated=1&context_codes[]=course_#{@course.id}", {
+                          :controller => 'calendar_events_api', :action => 'index', :format => 'json',
+                          :context_codes => ["course_#{@course.id}"],
+                          :all_events => '1', :undated => '1'})
+        json.size.should eql 2
+      end
+
+      it 'should return all events, ignoring the start_date and end_date' do
+        json = api_call(:get, "/api/v1/calendar_events?all_events=1&start_date=2012-02-01&end_date=2012-02-01&context_codes[]=course_#{@course.id}", {
+                          :controller => 'calendar_events_api', :action => 'index', :format => 'json',
+                          :context_codes => ["course_#{@course.id}"],
+                          :all_events => '1', :start_date => '2012-02-01', :end_date => '2012-02-01'})
+        json.size.should eql 2
+      end
+    end
+
     context 'appointments' do
       it 'should include appointments for teachers (with participant info)' do
         ag1 = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 4, :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
@@ -664,6 +695,37 @@ describe CalendarEventsApiController, :type => :integration do
                         :context_codes => ["course_#{@course.id}"], :undated => '1'})
       json.size.should eql 1
       json.first['due_at'].should be_nil
+    end
+
+    context 'all assignments' do
+      before do
+        @course.assignments.create(:title => 'undated')
+        @course.assignments.create(:title => 'dated', :due_at => '2012-01-08 12:00:00')
+      end
+
+      it 'should return all assignments' do
+        json = api_call(:get, "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course.id}", {
+                          :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                          :context_codes => ["course_#{@course.id}"],
+                          :all_events => '1'})
+        json.size.should eql 2
+      end
+
+      it 'should return all assignments, ignoring the undated flag' do
+        json = api_call(:get, "/api/v1/calendar_events?type=assignment&all_events=1&undated=1&context_codes[]=course_#{@course.id}", {
+                          :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                          :context_codes => ["course_#{@course.id}"],
+                          :all_events => '1', :undated => '1'})
+        json.size.should eql 2
+      end
+
+      it 'should return all assignments, ignoring the start_date and end_date' do
+        json = api_call(:get, "/api/v1/calendar_events?type=assignment&all_events=1&start_date=2012-02-01&end_date=2012-02-01&context_codes[]=course_#{@course.id}", {
+                          :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                          :context_codes => ["course_#{@course.id}"],
+                          :all_events => '1', :start_date => '2012-02-01', :end_date => '2012-02-01'})
+        json.size.should eql 2
+      end
     end
 
     it 'should get a single assignment' do
