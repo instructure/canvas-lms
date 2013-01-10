@@ -1297,7 +1297,7 @@ describe CalendarEventsApiController, :type => :integration do
       response.should be_success
 
       response.body.scan(/UID:\s*event-([^\n]*)/).flatten.map(&:strip).sort.should eql [
-        "assignment-#{@assignment.id}", "calendar-event-#{@event.id}", "calendar-event-#{@appointment.id}"].sort
+        "assignment-override-#{@override.id}", "calendar-event-#{@event.id}", "calendar-event-#{@appointment.id}"].sort
 
       # make sure the assignment actually has the override date
       expected_override_date_output = @override.due_at.utc.iso8601.gsub(/[-:]/, '').gsub(/\d\dZ$/, '00Z')
