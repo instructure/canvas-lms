@@ -2059,52 +2059,57 @@ class Course < ActiveRecord::Base
 
     attachments.each_with_index do |file, i|
       cm.fast_update_progress((i.to_f/total) * 18.0) if cm && (i % 10 == 0)
-      if !ce || ce.export_object?(file)
-        new_file = file.clone_for(self, nil, :overwrite => true)
-        self.attachment_path_id_lookup[file.full_display_path.gsub(/\A#{root_folder_name}/, '')] = new_file.migration_id
-        new_folder_id = merge_mapped_id(file.folder)
 
-        if file.folder && file.folder.parent_folder_id.nil?
-          new_folder_id = root_folder.id
-        end
-        # make sure the file has somewhere to go
-        if !new_folder_id
-          # gather mapping of needed folders from old course to new course
-          old_folders = []
-          old_folders << file.folder
-          new_folders = []
-          new_folders << old_folders.last.clone_for(self, nil, options.merge({:include_subcontent => false}))
-          while old_folders.last.parent_folder && old_folders.last.parent_folder.parent_folder_id && !merge_mapped_id(old_folders.last.parent_folder)
-            old_folders << old_folders.last.parent_folder
-            new_folders << old_folders.last.clone_for(self, nil, options.merge({:include_subcontent => false}))
-          end
-          old_folders.reverse!
-          new_folders.reverse!
-          # try to use folders that already match if possible
-          final_new_folders = []
-          parent_folder = Folder.root_folders(self).first
-          old_folders.each_with_index do |folder, idx|
-            if f = parent_folder.active_sub_folders.find_by_name(folder.name)
-              final_new_folders << f
-            else
-              final_new_folders << new_folders[idx]
-            end
-            parent_folder = final_new_folders.last
-          end
-          # add or update the folder structure needed for the file
-          final_new_folders.first.parent_folder_id ||=
-            merge_mapped_id(old_folders.first.parent_folder) ||
-            Folder.root_folders(self).first.id
-          old_folders.each_with_index do |folder, idx|
-            final_new_folders[idx].save!
-            map_merge(folder, final_new_folders[idx])
-            final_new_folders[idx + 1].parent_folder_id ||= final_new_folders[idx].id if final_new_folders[idx + 1]
-          end
+      if !ce || ce.export_object?(file)
+        begin
+          new_file = file.clone_for(self, nil, :overwrite => true)
+          self.attachment_path_id_lookup[file.full_display_path.gsub(/\A#{root_folder_name}/, '')] = new_file.migration_id
           new_folder_id = merge_mapped_id(file.folder)
+
+          if file.folder && file.folder.parent_folder_id.nil?
+            new_folder_id = root_folder.id
+          end
+          # make sure the file has somewhere to go
+          if !new_folder_id
+            # gather mapping of needed folders from old course to new course
+            old_folders = []
+            old_folders << file.folder
+            new_folders = []
+            new_folders << old_folders.last.clone_for(self, nil, options.merge({:include_subcontent => false}))
+            while old_folders.last.parent_folder && old_folders.last.parent_folder.parent_folder_id && !merge_mapped_id(old_folders.last.parent_folder)
+              old_folders << old_folders.last.parent_folder
+              new_folders << old_folders.last.clone_for(self, nil, options.merge({:include_subcontent => false}))
+            end
+            old_folders.reverse!
+            new_folders.reverse!
+            # try to use folders that already match if possible
+            final_new_folders = []
+            parent_folder = Folder.root_folders(self).first
+            old_folders.each_with_index do |folder, idx|
+              if f = parent_folder.active_sub_folders.find_by_name(folder.name)
+                final_new_folders << f
+              else
+                final_new_folders << new_folders[idx]
+              end
+              parent_folder = final_new_folders.last
+            end
+            # add or update the folder structure needed for the file
+            final_new_folders.first.parent_folder_id ||=
+              merge_mapped_id(old_folders.first.parent_folder) ||
+              Folder.root_folders(self).first.id
+            old_folders.each_with_index do |folder, idx|
+              final_new_folders[idx].save!
+              map_merge(folder, final_new_folders[idx])
+              final_new_folders[idx + 1].parent_folder_id ||= final_new_folders[idx].id if final_new_folders[idx + 1]
+            end
+            new_folder_id = merge_mapped_id(file.folder)
+          end
+          new_file.folder_id = new_folder_id
+          new_file.save_without_broadcasting!
+          map_merge(file, new_file)
+        rescue
+          cm.add_warning(t(:file_copy_error, "Couldn't copy file \"%{name}\"", :name => file.display_name || file.path_name), $!)
         end
-        new_file.folder_id = new_folder_id
-        new_file.save_without_broadcasting!
-        map_merge(file, new_file)
       end
     end
   end

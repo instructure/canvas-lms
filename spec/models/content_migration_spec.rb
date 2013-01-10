@@ -887,6 +887,16 @@ describe ContentMigration do
       @copy_to.syllabus_body.should == %{<a href="/courses/#{@copy_to.id}/files/#{new_attachment.id}/download?wrap=1">link</a>}
     end
 
+    it "should add a warning instead of failing when trying to copy an invalid file" do
+      att = Attachment.create!(:filename => 'dummy.txt', :uploaded_data => StringIO.new('fakety'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      Attachment.update_all({:filename => nil}, {:id => att.id})
+
+      att.reload
+      att.should_not be_valid
+
+      run_course_copy(["Couldn't copy file \"dummy.txt\""])
+    end
+
     it "should preserve media comment links" do
       pending unless Qti.qti_enabled?
 
