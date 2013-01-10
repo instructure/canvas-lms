@@ -1,4 +1,3 @@
---- 
 ar: 
   EditAppointmentGroupDetails: 
     affect_reservations: "كيف سيؤثر هذا على الحجوزات؟"
@@ -12109,3 +12108,4 @@ ar:
     notices: 
       uploading_complete: "اكتمل التحميل!"
     zip_import_filename: "zip_import_%{id}.zip"
+
