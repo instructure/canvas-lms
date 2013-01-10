@@ -360,6 +360,7 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
   task :import => :environment do
     require 'ya2yaml'
     Hash.send :include, HashExtensions
+    YAML.send :include, I18nExtraction::SafeYAML
 
     def placeholders(str)
       str.scan(/%h?\{[^\}]+\}/).sort
