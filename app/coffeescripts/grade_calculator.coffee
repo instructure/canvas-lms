@@ -119,7 +119,7 @@ define [
 
       hasPointed = (s.total for s in submissions when s.total > 0).length > 0
       kept = if hasPointed
-        @dropPointed submissions, keepHighest, keepLowest
+        @dropPointed submissions, cantDrop, keepHighest, keepLowest
       else
         @dropUnpointed submissions, keepHighest, keepLowest
 
@@ -134,7 +134,7 @@ define [
       sortedSubmissions = submissions.sort (a,b) -> a.score - b.score
       _.chain(sortedSubmissions).last(keepHighest).first(keepLowest).value()
 
-    @dropPointed: (submissions, keepHighest, keepLowest) ->
+    @dropPointed: (submissions, cantDrop, keepHighest, keepLowest) ->
       totals = (s.total for s in submissions)
       maxTotal = Math.max(totals...)
 
@@ -142,7 +142,8 @@ define [
         keep = 1 if keep <= 0
         return submissions if submissions.length <= keep
 
-        [unpointed, pointed] = partition submissions, (s) -> s.total == 0
+        allSubmissions = submissions.concat(cantDrop)
+        [unpointed, pointed] = partition allSubmissions, (s) -> s.total == 0
 
         grades = (s.score / s.total for s in pointed).sort (a,b) -> a - b
         qHigh = @estimateQHigh(pointed, unpointed, grades)
@@ -160,7 +161,8 @@ define [
             sum + ratedScore
           , 0
           keptSubmissions = (s for [ratedScore, s] in keptScores)
-          [qKept, keptSubmissions]
+          qCantDrop = _.reduce(cantDrop, ((sum, s) -> sum + s.score - q * s.total), 0)
+          [qKept + qCantDrop, keptSubmissions]
 
         [x, kept] = bigF(qMid, submissions)
         threshold = 1 /(2 * keep * Math.pow(maxTotal, 2))

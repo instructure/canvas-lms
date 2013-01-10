@@ -401,6 +401,9 @@ describe GradeCalculator do
     end
 
     def set_grades(grades)
+      Assignment.destroy_all
+      Submission.destroy_all
+
       @grades = grades
       # FIXME: cleanup
       @assignments = @grades.map do |score,possible|
@@ -508,6 +511,21 @@ describe GradeCalculator do
       rules = "drop_lowest:1\nnever_drop:#{@assignments[3].id}" # 3/38
       @group.update_attribute(:rules, rules)
       check_grades(63.3, 56.0)
+
+      set_grades [[10,20], [5,10], [20,40], [0,100]]
+      rules = "drop_lowest:1\nnever_drop:#{@assignments[3].id}" # 0/100
+      @group.update_attribute(:rules, rules)
+      check_grades(18.8, 18.8)
+
+      set_grades [[10,20], [5,10], [20,40], [100,100]]
+      rules = "drop_lowest:1\nnever_drop:#{@assignments[3].id}" # 100/100
+      @group.update_attribute(:rules, rules)
+      check_grades(88.5, 88.5)
+
+      set_grades [[101.9,100], [105.65,100], [103.8,100], [0,0]]
+      rules = "drop_lowest:1\nnever_drop:#{@assignments[2].id}" # 103.8/100
+      @group.update_attribute(:rules, rules)
+      check_grades(104.7, 104.7)
     end
   end
   

@@ -117,7 +117,7 @@ class GradeCalculator
 
       kept = drop_assignments(group_submissions, group.rules_hash)
 
-      score, possible = kept.inject([0, 0]) { |(s_sum,p_sum),s|
+      score, possible = kept.reduce([0, 0]) { |(s_sum,p_sum),s|
         [s_sum + s[:score], p_sum + s[:total]]
       }
       grade = score.to_f / possible
@@ -162,7 +162,7 @@ class GradeCalculator
     # differently (it's a simpler case, but not one that fits in with our
     # usual bisection approach)
     kept = (cant_drop + submissions).any? { |s| s[:total] > 0 } ?
-      drop_pointed(submissions, keep_highest, keep_lowest) :
+      drop_pointed(submissions, cant_drop, keep_highest, keep_lowest) :
       drop_unpointed(submissions, keep_highest, keep_lowest)
 
     kept + cant_drop
@@ -173,51 +173,62 @@ class GradeCalculator
     sorted_submissions.last(keep_highest).first(keep_lowest)
   end
 
-  def drop_pointed(submissions, n_highest, n_lowest)
-    max_total = submissions.map { |s| s[:total] }.max
-    kept = keep_highest(submissions, n_highest, max_total)
-    kept = keep_lowest(kept, n_lowest, max_total)
+  def drop_pointed(submissions, cant_drop, n_highest, n_lowest)
+    max_total = (submissions + cant_drop).map { |s| s[:total] }.max
+
+    kept = keep_highest(submissions, cant_drop, n_highest, max_total)
+    kept = keep_lowest(kept, cant_drop, n_lowest, max_total)
   end
 
-  def keep_highest(submissions, keep, max_total)
-    keep_helper(submissions, keep, max_total) { |*args| big_f_best(*args) }
+  def keep_highest(submissions, cant_drop, keep, max_total)
+    keep_helper(submissions, cant_drop, keep, max_total) { |*args| big_f_best(*args) }
   end
 
-  def keep_lowest(submissions, keep, max_total)
-    keep_helper(submissions, keep, max_total) { |*args| big_f_worst(*args) }
+  def keep_lowest(submissions, cant_drop, keep, max_total)
+    keep_helper(submissions, cant_drop, keep, max_total) { |*args| big_f_worst(*args) }
   end
 
-  def keep_helper(submissions, keep, max_total, &big_f_blk)
+  # @submissions: set of droppable submissions
+  # @cant_drop: submissions that are not eligible for dropping
+  # @keep: number of submissions to keep from +submissions+
+  # @max_total: the highest number of points possible
+  # @big_f_blk: sorting block for the big_f function
+  # returns +keep+ +submissions+
+  def keep_helper(submissions, cant_drop, keep, max_total, &big_f_blk)
     return submissions if submissions.size <= keep
 
-    unpointed, pointed = submissions.partition { |s| s[:total].zero? }
+    unpointed, pointed = (submissions + cant_drop).partition { |s|
+      s[:total].zero?
+    }
     grades = pointed.map { |s| s[:score].to_f / s[:total] }.sort
 
     q_high = estimate_q_high(pointed, unpointed, grades)
     q_low  = grades.first
     q_mid  = (q_low + q_high) / 2
 
-    x, kept = big_f_blk.call(q_mid, submissions, keep)
+    x, kept = big_f_blk.call(q_mid, submissions, cant_drop, keep)
     threshold = 1 / (2 * keep * max_total**2)
     until q_high - q_low < threshold
       x < 0 ?
         q_high = q_mid :
         q_low  = q_mid
       q_mid = (q_low + q_high) / 2
-      x, kept = big_f_blk.call(q_mid, submissions, keep)
+      x, kept = big_f_blk.call(q_mid, submissions, cant_drop, keep)
     end
 
     kept
   end
 
-  def big_f(q, submissions, keep, &sort_blk)
+  def big_f(q, submissions, cant_drop, keep, &sort_blk)
     kept = submissions.map { |s|
       rated_score = s[:score] - q * s[:total]
       [rated_score, s]
     }.sort(&sort_blk).first(keep)
 
     q_kept = kept.reduce(0) { |sum,(rated_score,_)| sum + rated_score }
-    [q_kept, kept.map(&:last)]
+    q_cant_drop = cant_drop.reduce(0) { |sum,s| sum + (s[:score] - q * s[:total]) }
+
+    [q_kept + q_cant_drop, kept.map(&:last)]
   end
 
   # we can't use the student's highest grade as an upper-bound for bisection
@@ -240,14 +251,14 @@ class GradeCalculator
 
   # determines the best +keep+ assignments from submissions for the given q
   # (suitable for use with drop_lowest)
-  def big_f_best(q, submissions, keep)
-    big_f(q, submissions, keep) { |(a,_),(b,_)| b <=> a }
+  def big_f_best(q, submissions, cant_drop, keep)
+    big_f(q, submissions, cant_drop, keep) { |(a,_),(b,_)| b <=> a }
   end
 
   # determines the worst +keep+ assignments from submissions for the given q
   # (suitable for use with drop_highest)
-  def big_f_worst(q, submissions, keep)
-    big_f(q, submissions, keep) { |(a,_),(b,_)| a <=> b }
+  def big_f_worst(q, submissions, cant_drop, keep)
+    big_f(q, submissions, cant_drop, keep) { |(a,_),(b,_)| a <=> b }
   end
   
   # Calculates the final score from the sums of all the assignment groups

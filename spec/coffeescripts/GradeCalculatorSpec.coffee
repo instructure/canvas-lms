@@ -167,3 +167,21 @@ define ['compiled/grade_calculator', 'underscore'], (GradeCalculator, _) ->
     assertDropped result.group_sums[0].current.submissions, [14, 55]
     assertGrade result, 'final', 159, 284
     assertDropped result.group_sums[0]['final'].submissions, [0, 1000]
+
+    @setup_grades [[10,20], [5,10], [20,40], [0,100]]
+    @group.rules = drop_lowest: 1, never_drop: [3]
+    result = GradeCalculator.calculate @submissions, [@group]
+    assertGrade result, 'current', 30, 160
+    assertDropped result.group_sums[0].current.submissions, [5,10]
+
+    @setup_grades [[10,20], [5,10], [20,40], [100,100]]
+    @group.rules = drop_lowest: 1, never_drop: [3]
+    result = GradeCalculator.calculate @submissions, [@group]
+    assertGrade result, 'current', 115, 130
+    assertDropped result.group_sums[0].current.submissions, [20,40]
+
+    @setup_grades [[101.9,100], [105.65,100], [103.8,100], [0,0]]
+    @group.rules = drop_lowest: 1, never_drop: [2]
+    result = GradeCalculator.calculate @submissions, [@group]
+    assertGrade result, 'current', 209.45, 200
+    assertDropped result.group_sums[0].current.submissions, [101.9,100]
