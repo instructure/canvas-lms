@@ -187,7 +187,7 @@ describe "users" do
   context "registration" do
     before :each do
       a = Account.default
-      a.settings = {:open_registration => true, :no_enrollments_can_create_courses => true}
+      a.settings = {:self_registration => true}
       a.save!
     end
 

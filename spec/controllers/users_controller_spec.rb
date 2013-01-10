@@ -166,15 +166,15 @@ describe UsersController do
   end
 
   context "POST 'create'" do
-    it "should not allow creating when open_registration is disabled and you're not an admin'" do
+    it "should not allow creating when self_registration is disabled and you're not an admin'" do
       post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }
       response.should_not be_success
     end
 
-    context 'open registration' do
+    context 'self registration' do
       before :each do
         a = Account.default
-        a.settings = { :open_registration => true, :no_enrollments_can_create_courses => true }
+        a.settings = { :self_registration => true }
         a.save!
       end
 

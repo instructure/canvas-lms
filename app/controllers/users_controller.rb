@@ -88,7 +88,7 @@ class UsersController < ApplicationController
   before_filter :require_user, :only => [:grades, :confirm_merge, :merge, :kaltura_session, :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image, :user_dashboard, :toggle_dashboard, :masquerade, :external_tool]
   before_filter :require_registered_user, :only => [:delete_user_service, :create_user_service]
   before_filter :reject_student_view_student, :only => [:delete_user_service, :create_user_service, :confirm_merge, :merge, :user_dashboard, :masquerade]
-  before_filter :require_open_registration, :only => [:new, :create]
+  before_filter :require_self_registration, :only => [:new, :create]
 
   def grades
     @user = User.find_by_id(params[:user_id]) if params[:user_id].present?
@@ -645,14 +645,6 @@ class UsersController < ApplicationController
 
   def new
     return redirect_to(root_url) if @current_user
-    unless @context == Account.default && @context.no_enrollments_can_create_courses?
-      # TODO: generic/brandable page, so we can up it up to non-default accounts
-      # also more control so we can conditionally enable features (e.g. if
-      # no_enrollments_can_create_courses==false, but open reg is on, students
-      # should still be able to sign up with join codes, etc. ... we should just
-      # not have the teacher button/form)
-      return redirect_to(root_url)
-    end
     render :layout => 'bare'
   end
 
@@ -1140,12 +1132,12 @@ class UsersController < ApplicationController
     end
   end
 
-  def require_open_registration
+  def require_self_registration
     get_context
     @context = @domain_root_account || Account.default unless @context.is_a?(Account)
     @context = @context.root_account
-    unless @context.grants_right?(@current_user, session, :manage_user_logins) || @context.open_registration?
-      flash[:error] = t('no_open_registration', "Open registration has not been enabled for this account")
+    unless @context.grants_right?(@current_user, session, :manage_user_logins) || @context.self_registration?
+      flash[:error] = t('no_self_registration', "Self registration has not been enabled for this account")
       respond_to do |format|
         format.html { redirect_to root_url }
         format.json { render :json => {}, :status => 403 }
@@ -1160,7 +1152,7 @@ class UsersController < ApplicationController
     }
   end
 
-  protected :require_open_registration
+  protected :require_self_registration
 
   def teacher_activity
     @teacher = User.find(params[:user_id])

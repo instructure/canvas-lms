@@ -164,6 +164,7 @@ class Account < ActiveRecord::Base
   # be nice to be able to see the course first if you weren't expecting the
   # invitation.
   add_setting :allow_invitation_previews, :boolean => true, :root_only => true, :default => false
+  add_setting :self_registration, :boolean => true, :root_only => true, :default => false
 
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -217,6 +218,10 @@ class Account < ActiveRecord::Base
 
   def open_registration?
     !!settings[:open_registration] && canvas_authentication?
+  end
+
+  def self_registration?
+    !!settings[:self_registration] && canvas_authentication?
   end
 
   def ip_filters=(params)

@@ -25,7 +25,7 @@
   <% else %>
     <% if @current_user %>
       <%= render :partial => 'confirm_enrollments' %>
-    <% elsif @domain_root_account.open_registration? %>
+    <% elsif @domain_root_account.self_registration? %>
       <%= render :partial => 'authenticate_or_register' %>
     <% else %>
       <%= render :partial => 'authenticate' %>
