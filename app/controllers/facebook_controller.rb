@@ -103,6 +103,7 @@ class FacebookController < ApplicationController
 
   def get_facebook_user
     return false if facebook_disabled?
+    @embeddable = true
 
     if params[:signed_request]
       data, sig = Facebook.parse_signed_request(params[:signed_request])
