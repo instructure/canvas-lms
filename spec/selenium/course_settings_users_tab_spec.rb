@@ -373,6 +373,15 @@ describe "course settings" do
       fj("#role_#{@role.id} #user_#{@teacher.id}").should be_displayed
     end
 
+    it "should recognize when adding an enrollment that duplicates one that's not paged in" do
+      30.times do |x|
+        @course.enroll_user(user :name => "user#{x}")
+      end
+      @course.enroll_user(user_with_pseudonym(:name => "testuser", :username => "testuser"))
+      add_user("testuser", "Students")
+      assert_flash_notice_message /already existed/
+    end
+
     describe "counts" do
       context "in base role" do
         before do
@@ -383,6 +392,12 @@ describe "course settings" do
         it "should increment the count when adding a user" do
           add_user(@login, "Teachers")
           @course.enrollments.find_by_user_id_and_type_and_role_name(@new_user.id, 'TeacherEnrollment', nil).should_not be_nil
+          f(".teacher_count").text.to_i.should == 2
+        end
+
+        it "should not increment when adding a duplicate user" do
+          @course.enroll_user(@new_user, 'TeacherEnrollment', { :enrollment_state => 'active' })
+          add_user(@login, "Teachers")
           f(".teacher_count").text.to_i.should == 2
         end
 
@@ -407,6 +422,12 @@ describe "course settings" do
         it "should increment the count when adding a user" do
           add_user(@login, @role.name)
           @course.enrollments.find_by_user_id_and_role_name(@new_user.id, @role.name).should_not be_nil
+          f(@count_class).text.to_i.should == 1
+        end
+
+        it "should not increment when adding a duplicate user" do
+          @course.enroll_user(@new_user, 'TeacherEnrollment', { :role_name => @role.name, :enrollment_state => 'active' })
+          add_user(@login, @role.name)
           f(@count_class).text.to_i.should == 1
         end
 
@@ -436,6 +457,13 @@ describe "course settings" do
 
           # sanity check: the base TA enrollment should not have been affected
           @course.enrollments.find_by_user_id_and_type_and_role_name(@new_user.id, 'TaEnrollment', nil).should_not be_nil
+          f(".ta_count").text.to_i.should == 1
+        end
+
+        it "should not increment when adding a duplicate user" do
+          @course.enroll_user(@new_user, 'TaEnrollment', { :role_name => @role.name, :enrollment_state => 'active' })
+          add_user(@new_user.name, @role.name)
+          f(@count_class).text.to_i.should == 1
           f(".ta_count").text.to_i.should == 1
         end
 

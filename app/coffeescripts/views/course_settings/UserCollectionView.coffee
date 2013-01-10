@@ -25,7 +25,6 @@ define [
         @role_tag = @el.id
       else
         @role_tag = et
-      @collection.on 'add', @incrementCount
       super fetchOptions: @fetchOptions
 
     render: ->

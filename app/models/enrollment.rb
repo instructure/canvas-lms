@@ -45,7 +45,8 @@ class Enrollment < ActiveRecord::Base
   after_save :cancel_future_appointments
   after_save :update_linked_enrollments
 
-  attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section
+  attr_accessor :already_enrolled
+  attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section, :already_enrolled
 
   def self.active_student_conditions(prefix = 'enrollments')
     "(#{prefix}.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND #{prefix}.workflow_state = 'active')"

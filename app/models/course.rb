@@ -1490,10 +1490,13 @@ class Course < ActiveRecord::Base
     else
       e = self.enrollments.find_by_user_id_and_type_and_role_name(user.id, type, role_name)
     end
-    e.attributes = { 
-      :course_section => section, 
-      :workflow_state => 'invited', 
-      :limit_privileges_to_course_section => limit_privileges_to_course_section } if e && (e.completed? || e.rejected?)
+    if e
+      e.already_enrolled = true
+      e.attributes = {
+        :course_section => section,
+        :workflow_state => 'invited',
+        :limit_privileges_to_course_section => limit_privileges_to_course_section } if e.completed? || e.rejected?
+    end
     # if we're creating a new enrollment, we want to return it as the correct
     # subclass, but without using associations, we need to manually activate
     # sharding. We should probably find a way to go back to using the

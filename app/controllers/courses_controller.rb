@@ -1066,7 +1066,8 @@ class CoursesController < ApplicationController
                   'type' => e.type,
                   'user_id' => e.user_id,
                   'workflow_state' => e.workflow_state,
-                  'custom_role_asset_string' => custom_role ? custom_role.asset_string : nil
+                  'custom_role_asset_string' => custom_role ? custom_role.asset_string : nil,
+                  'already_enrolled' => e.already_enrolled
                 }
               }
             }

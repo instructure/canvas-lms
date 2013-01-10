@@ -3304,6 +3304,22 @@ describe Course do
       @course.enrollments.count.should == enrollment_count
     end
 
+    describe "already_enrolled" do
+      before do
+        course
+        user
+      end
+
+      it "should not be set for a new enrollment" do
+        @course.enroll_user(@user).already_enrolled.should_not be_true
+      end
+
+      it "should be set for an updated enrollment" do
+        @course.enroll_user(@user)
+        @course.enroll_user(@user).already_enrolled.should be_true
+      end
+    end
+
     context "custom roles" do
       before do
         @account = Account.default
