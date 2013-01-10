@@ -186,6 +186,7 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[assignment_group_id] [Integer] The assignment group id to put the assignment in. Defaults to the top assignment group in the course.
   # @argument assignment[assignment_overrides] [Optional, [AssignmentOverride]]
   #   List of overrides for the assignment.
+  #   NOTE: The Assignment Overrides feature is in beta.
   # @returns Assignment
   def create
     @assignment = @context.assignments.build
@@ -208,6 +209,8 @@ class AssignmentsApiController < ApplicationController
   # overrides are kept as is. If the assignment[assignment_overrides] key is
   # present, existing overrides are updated or deleted (and new ones created,
   # as necessary) to match the provided list.
+  #
+  # NOTE: The Assignment Override feature is in beta.
   #
   # @returns Assignment
   def update
