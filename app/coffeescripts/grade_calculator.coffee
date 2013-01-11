@@ -177,7 +177,7 @@ define [
         kept
 
       kept = keepHelper(submissions, keepHighest, ([a,xx], [b,yy]) -> b - a)
-      kept = keepHelper(kept, keepLowest, ([a,az], [b,bz]) -> a - b)
+      kept = keepHelper(kept, keepLowest, ([a,xx], [b,yy]) -> a - b)
 
     @estimateQHigh: (pointed, unpointed, grades) ->
       if unpointed.length > 0
@@ -192,36 +192,33 @@ define [
       else
         qHigh = grades[grades.length - 1]
 
-    @calculate_total: (group_sums, ignore_ungraded, weighting_scheme) ->
-      data_idx = if ignore_ungraded then 'current' else 'final'
-      if weighting_scheme == 'percent'
-        score = 0.0
-        possible_weight_from_submissions = 0.0
-        total_possible_weight = 0.0
-        for data in group_sums when data.group.group_weight > 0
-          if data[data_idx].submission_count > 0 and data[data_idx].possible > 0
-            tally = data[data_idx].score / data[data_idx].possible
-            score += data.group.group_weight * tally
-            possible_weight_from_submissions += data.group.group_weight
-          total_possible_weight += data.group.group_weight
+    @calculate_total: (groupSums, ignoreUngraded, weightingScheme) ->
 
-        if ignore_ungraded and possible_weight_from_submissions < 100.0
-          possible = if total_possible_weight < 100.0 then total_possible_weight else 100.0
-          score = score * possible / possible_weight_from_submissions
-        {
-          score: score
-          possible: 100.0
-        }
+      currentOrFinal = if ignoreUngraded then 'current' else 'final'
+      groupSums = _(groupSums).map (gs) ->
+        gs[currentOrFinal].weight = gs.group.group_weight
+        gs[currentOrFinal]
+
+      if weightingScheme == 'percent'
+        relevantGroupSums = _(groupSums).filter (gs) -> gs.possible
+        finalGrade = _.reduce relevantGroupSums
+        , (grade,gs) ->
+          grade + (gs.score / gs.possible) * gs.weight
+        , 0
+        fullWeight = _.reduce relevantGroupSums, ((w,{weight}) -> w + weight), 0
+        if fullWeight == 0
+          finalGrade = null
+        else if fullWeight < 100
+          finalGrade *= 100 / fullWeight
+        ret =
+          score: finalGrade && Math.round(finalGrade * 10) / 10
+          possible: 100
       else
-        {
-          score: @sum(data[data_idx].score for data in group_sums)
-          possible: @sum(data[data_idx].possible for data in group_sums)
-        }
-
-    @sum: (values) ->
-      result = 0
-      result += value for value in values
-      result
+        [score, possible] = _.reduce groupSums
+        , ([m,n],{score,possible}) ->
+          [m + score, n + possible]
+        , [0,0]
+        ret = {score, possible}
 
     @parse: (score) ->
       result = parseFloat score

@@ -73,21 +73,19 @@ class GradeCalculator
   # The final score for the class, so unsubmitted assignments count as zeros
   def calculate_final_score(user_id, submissions)
     group_sums = create_group_sums(submissions, false)
-    score = calculate_total_from_group_scores(group_sums, false)
+    score = calculate_total_from_group_scores(group_sums)
     @final_updates << "WHEN user_id=#{user_id} THEN #{score || "NULL"}"
     score
   end
  
   # returns information about assignments groups in the form:
-  # {1=>
-  #   {:tally=>0.818181818181818,
-  #    :submission_count=>2,
-  #    :total_points=>110,
-  #    :user_points=>90,
-  #    :name=>"Assignments",
-  #    :weighted_tally=>0,
-  #    :group_weight=>0},
-  #  5=> {...}}
+  # [
+  #   {
+  #    :id       => 1
+  #    :score    => 5,
+  #    :possible => 7,
+  #    :weight   => 50},
+  #   ...]
   # each group
   def create_group_sums(submissions, ignore_ungraded=true)
     assignments_by_group_id = @assignments.group_by(&:assignment_group_id)
@@ -95,8 +93,7 @@ class GradeCalculator
       submissions.map { |s| [s.assignment_id, s] }
     ]
 
-    group_sums = {}
-    @groups.each do |group|
+    @groups.map do |group|
       assignments = assignments_by_group_id[group.id] || []
       
       group_submissions = assignments.map do |a|
@@ -120,20 +117,14 @@ class GradeCalculator
       score, possible = kept.reduce([0, 0]) { |(s_sum,p_sum),s|
         [s_sum + s[:score], p_sum + s[:total]]
       }
-      grade = score.to_f / possible
-      weight = group.group_weight.to_f
 
-      group_sums[group.id] = {
-        :name             => group.name,
-        :tally            => grade,
-        :submission_count => kept.size,
-        :total_points     => possible,
-        :user_points      => score,
-        :group_weight     => weight,
-        :weighted_tally   => grade * weight,
+      {
+        :id       => group.id,
+        :score    => score,
+        :possible => possible,
+        :weight   => group.group_weight,
       }
     end
-    group_sums
   end
 
   # see comments for dropAssignments in grade_calculator.coffee
@@ -262,33 +253,34 @@ class GradeCalculator
   end
   
   # Calculates the final score from the sums of all the assignment groups
-  def calculate_total_from_group_scores(group_sums, ignore_ungraded=true)
+  def calculate_total_from_group_scores(group_sums)
     if @course.group_weighting_scheme == 'percent'
-      score = 0
-      possible_weight_from_submissions = 0
-      total_possible_weight = 0
-      group_sums.select { |id, hash| hash[:group_weight] > 0 }.each do |id, hash|
-        if hash[:submission_count] > 0
-          score += hash[:weighted_tally].to_f
-          possible_weight_from_submissions += hash[:group_weight].to_f
-        end
-        total_possible_weight += hash[:group_weight].to_f
+      relevant_group_sums = group_sums.reject { |gs|
+        gs[:possible].zero? || gs[:possible].nil?
+      }
+      final_grade = relevant_group_sums.reduce(0) { |grade,gs|
+        grade + (gs[:score].to_f / gs[:possible]) * gs[:weight]
+      }
+
+      # scale the grade up if total weights don't add up to 100%
+      full_weight = relevant_group_sums.reduce(0) { |w,gs| w + gs[:weight] }
+      if full_weight.zero?
+        final_grade = nil
+      elsif full_weight < 100
+        final_grade *= 100.0 / full_weight
       end
-      if ignore_ungraded && score && possible_weight_from_submissions < 100.0
-        possible = total_possible_weight < 100 ? total_possible_weight : 100 
-        score = score.to_f * possible / possible_weight_from_submissions.to_f rescue nil
-      end
-      score = (score * 10.0).round / 10.0 rescue nil
+
+      final_grade ? final_grade.round(1) : nil
     else
-      total_points = 0
-      user_points = 0
-      group_sums.select { |id, hash| hash[:submission_count] > 0 }.each do |id, hash|
-        total_points += hash[:total_points] || 0
-        user_points += hash[:user_points] || 0
+      total, possible = group_sums.reduce([0,0]) { |(m,n),gs|
+        [m + gs[:score], n + gs[:possible]]
+      }
+      if possible > 0
+        final_grade = (total.to_f / possible) * 100
+        final_grade.round(1)
+      else
+        nil
       end
-      score = (user_points.to_f / total_points.to_f * 1000.0).round / 10.0 rescue nil
-      score = 0 if score && score.nan?
     end
-    score
   end
 end

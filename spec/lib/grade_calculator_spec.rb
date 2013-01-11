@@ -56,6 +56,8 @@ describe GradeCalculator do
       @group2 = @course.assignment_groups.create!(:name => "some group2", :group_weight => 50)
       @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
       @assignment.grade_student(@user, :grade => "10")
+      @course.assignments.create! :points_possible => 1,
+                                  :assignment_group => @group2
       run_transaction_commit_callbacks
       @user.enrollments.first.computed_current_score.should eql(100.0)
       @user.enrollments.first.computed_final_score.should eql(50.0)
@@ -255,14 +257,14 @@ describe GradeCalculator do
       @course.save!
       run_transaction_commit_callbacks
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(90.0)
-      @user.enrollments.first.computed_final_score.should eql(50.0)
+      @user.enrollments.first.computed_current_score.should eql(100.0)
+      @user.enrollments.first.computed_final_score.should eql(55.6)
       
       @submission2 = @assignment2.grade_student(@user, :grade => "40")
       run_transaction_commit_callbacks
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(90.0)
-      @user.enrollments.first.computed_final_score.should eql(90.0)
+      @user.enrollments.first.computed_current_score.should eql(100.0)
+      @user.enrollments.first.computed_final_score.should eql(100.0)
     end
 
     it "should properly calculate the grade when there are 'not graded' assignments with scores" do
@@ -363,8 +365,8 @@ describe GradeCalculator do
 
       run_transaction_commit_callbacks
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(52.5)
-      @user.enrollments.first.computed_final_score.should eql(43.6)
+      @user.enrollments.first.computed_current_score.should eql(58.3)
+      @user.enrollments.first.computed_final_score.should eql(48.4)
     end
 
     it "should treat muted assignments as if there is no submission" do
@@ -384,8 +386,8 @@ describe GradeCalculator do
 
       run_transaction_commit_callbacks
       @user.reload
-      @user.enrollments.first.computed_current_score.should eql(52.5)
-      @user.enrollments.first.computed_final_score.should eql(43.6)
+      @user.enrollments.first.computed_current_score.should eql(58.3)
+      @user.enrollments.first.computed_final_score.should eql(48.4)
     end
   end
 
@@ -393,23 +395,19 @@ describe GradeCalculator do
   context "GradeCalculatorSpec.coffee examples" do
     before do
       course_with_student
-      @group = @course.assignment_groups.create!(:name => 'group 1')
+      @group = @group1 = @course.assignment_groups.create!(:name => 'group 1')
     end
 
     def set_default_grades
       set_grades [[100,100], [42,91], [14,55], [3,38], [nil,1000]]
     end
 
-    def set_grades(grades)
-      Assignment.destroy_all
-      Submission.destroy_all
-
+    def set_grades(grades, group=@group1)
       @grades = grades
-      # FIXME: cleanup
       @assignments = @grades.map do |score,possible|
         @course.assignments.create! :title => 'homework',
                                     :points_possible => possible,
-                                    :assignment_group => @group
+                                    :assignment_group => group
       end
       @assignments.each_with_index do |a,i|
         score = @grades[i].first
@@ -512,21 +510,60 @@ describe GradeCalculator do
       @group.update_attribute(:rules, rules)
       check_grades(63.3, 56.0)
 
+      Assignment.destroy_all
+      Submission.destroy_all
+
       set_grades [[10,20], [5,10], [20,40], [0,100]]
       rules = "drop_lowest:1\nnever_drop:#{@assignments[3].id}" # 0/100
       @group.update_attribute(:rules, rules)
       check_grades(18.8, 18.8)
+
+      Assignment.destroy_all
+      Submission.destroy_all
 
       set_grades [[10,20], [5,10], [20,40], [100,100]]
       rules = "drop_lowest:1\nnever_drop:#{@assignments[3].id}" # 100/100
       @group.update_attribute(:rules, rules)
       check_grades(88.5, 88.5)
 
+      Assignment.destroy_all
+      Submission.destroy_all
+
       set_grades [[101.9,100], [105.65,100], [103.8,100], [0,0]]
       rules = "drop_lowest:1\nnever_drop:#{@assignments[2].id}" # 103.8/100
       @group.update_attribute(:rules, rules)
       check_grades(104.7, 104.7)
     end
+
+    context "assignment groups with 0 points possible" do
+      before do
+        @group1.update_attribute :group_weight, 50
+        @group2 = @course.assignment_groups.create! :name => 'group 2',
+                                                    :group_weight => 25
+        @group3 = @course.assignment_groups.create! :name => 'empty group',
+                                                    :group_weight => 25
+        @group4 = @course.assignment_groups.create! :name => 'extra credit',
+                                                    :group_weight => 10
+
+        set_grades [[9, 10]], @group1
+        set_grades [[5, 10]], @group2
+        # @group3 is emtpy
+        set_grades [[10, 0], [5, 0]], @group3
+      end
+
+      it "ignores them if the group_weighting_scheme is percent" do
+        # NOTE: in addition to ignoring invalid assignment groups, we also
+        # have to scale up the valid ones
+        @course.update_attribute :group_weighting_scheme, 'percent'
+        grade = 76.7 # ((9/10)*50 + (5/10)*25) * (1/75)
+        check_grades(grade, grade)
+      end
+
+      it "doesn't ignore them if the group_weighting_scheme is equal" do
+        @course.update_attribute :group_weighting_scheme, 'equal'
+        grade = 145.0 # ((9 + 5 + 10 + 5) / (10 + 10)) * 100
+        check_grades(grade, grade)
+      end
+    end
   end
-  
 end
