@@ -194,6 +194,8 @@ module Api::V1::Assignment
       update_params["group_category_id"] = gc.try(:id)
     end
 
+    assignment.muted = value_to_boolean(assignment_params["muted"]) if assignment_params.key? "muted"
+
     # do some fiddling with due_at for fancy midnight and add to update_params
     if update_params.has_key?("due_at")
       update_params["time_zone_edited"] = Time.zone.name

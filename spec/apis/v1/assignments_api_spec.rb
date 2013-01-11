@@ -178,7 +178,8 @@ describe AssignmentsApiController, :type => :integration do
                 'test_custom' => {
                   'value' => '1'
                 }
-              }
+              },
+              'muted' => 'true'
             }
        )
       @group_category.reload
@@ -189,7 +190,7 @@ describe AssignmentsApiController, :type => :integration do
       @json['name'].should == 'some assignment'
       @json['course_id'].should == @course.id
       @json['description'].should == 'assignment description'
-      @json['muted'].should == false
+      @json['muted'].should == true
       @json['lock_at'].should == @assignment.lock_at.iso8601
       @json['unlock_at'].should == @assignment.unlock_at.iso8601
       @json['automatic_peer_reviews'].should == true 
@@ -401,9 +402,9 @@ describe AssignmentsApiController, :type => :integration do
         @json['description'].should == 'assignment description'
       end
 
-      it "does not update the assignment's muted property" do
-        @assignment.muted?.should == false
-        @json['muted'].should == false
+      it "updates the assignment's muted property" do
+        @assignment.muted?.should == true
+        @json['muted'].should == true
       end
 
       it "updates the assignment's position" do
