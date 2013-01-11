@@ -534,7 +534,7 @@ describe CalendarEventsApiController, :type => :integration do
                         :controller => 'courses', :action => 'show', :format => 'json', :id => @course.id.to_s)
         get json['calendar']['ics']
         response.should be_success
-        cal = Icalendar.parse(response.body)[0]
+        cal = Icalendar.parse(response.body.dup)[0]
         cal.events[0].x_alt_desc
       end
     end
