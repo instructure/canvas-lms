@@ -175,9 +175,13 @@ module SeleniumTestsHelperMethods
 
     if first_run
       wait_time = env_test_number.to_i * step_time
+      #thread 5 currently gets the most specs and lags behind the others this will decrease total build time by releasing it early
+      wait_time = 1 if env_test_number.to_i == 5
       sleep(wait_time)
     else
       wait_time = env_test_number.to_i * 2
+      #thread 5 currently gets the most specs and lags behind the others this will decrease total build time by releasing it early
+      wait_time = 1 if env_test_number.to_i == 5
       sleep(wait_time)
     end
   end
