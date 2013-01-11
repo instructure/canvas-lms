@@ -22,6 +22,10 @@
 #
 # @object AssignmentOverride
 #     {
+#       // NOTE: The Assignment Override feature is in beta! This API is not
+#       // finalized and there could be breaking changes before its final
+#       // release.
+#
 #       // the ID of the assignment override
 #       id: 4,
 #
@@ -70,6 +74,7 @@ class AssignmentOverridesController < ApplicationController
   include Api::V1::AssignmentOverride
 
   # @API List assignment overrides
+  # @beta
   #
   # Returns the list of overrides for this assignment that target
   # sections/groups/students visible to the current user.
@@ -81,6 +86,7 @@ class AssignmentOverridesController < ApplicationController
   end
 
   # @API Get a single assignment override
+  # @beta
   #
   # Returns details of the the override with the given id.
   #
@@ -90,6 +96,7 @@ class AssignmentOverridesController < ApplicationController
   end
 
   # @API Redirect to the assignment override for a group
+  # @beta
   #
   # Responds with a redirect to the override for the given group, if any
   # (404 otherwise).
@@ -103,6 +110,7 @@ class AssignmentOverridesController < ApplicationController
   end
 
   # @API Redirect to the assignment override for a section
+  # @beta
   #
   # Responds with a redirect to the override for the given section, if any
   # (404 otherwise).
@@ -116,6 +124,7 @@ class AssignmentOverridesController < ApplicationController
   end
 
   # @API Create an assignment override
+  # @beta
   #
   # @argument assignment_override[student_ids][] [Optional, Integer] The IDs of
   #   the override's target students. If present, the IDs must each identify a
@@ -185,6 +194,7 @@ class AssignmentOverridesController < ApplicationController
   end
 
   # @API Update an assignment override
+  # @beta
   #
   # @argument assignment_override[student_ids] [[Integer], Optional] The IDs of the
   #   override's target students. If present, the IDs must each identify a
@@ -241,6 +251,7 @@ class AssignmentOverridesController < ApplicationController
   end
 
   # @API Delete an assignment override
+  # @beta
   #
   # Deletes an override and returns its former details.
   #
