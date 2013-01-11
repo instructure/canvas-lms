@@ -107,8 +107,22 @@
 #       // If false, the teacher is expected to manually assign peer reviews.
 #       automatic_peer_reviews: false,
 #
+#       // Integer representing the amount of reviews each user is assigned.
+#       // NOTE: This key is NOT present unless you have automatic_peer_reviews
+#       // set to true.
+#       peer_review_count: 0,
+#
+#       // String representing a date the reviews are due by. Must be a date
+#       // that occurs after the default due date. If blank, or date is not
+#       // after the assignment's due date, the assignment's due date will
+#       // be used.
+#       // NOTE: This key is NOT present unless you have automatic_peer_reviews
+#       // set to true.
+#       peer_reviews_assign_at: "2012-07-01T23:59:00-06:00",
+#
+#
 #       // the ID of the assignment’s group set (if this is a group assignment)
-#       group_category_id: 1
+#       group_category_id: 1,
 #
 #       // if the requesting user has grading rights, the number of submissions that need grading.
 #       needs_grading_count: 17,

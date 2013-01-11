@@ -167,8 +167,10 @@ describe AssignmentsApiController, :type => :integration do
                 'docx','ppt'
               ],
               'grade_group_students_individually' => true,
-              'automatic_peer_reviews' => false,
-              'peer_reviews' => false,
+              'automatic_peer_reviews' => true,
+              'peer_reviews' => true,
+              'peer_reviews_assign_at' => '2011-01-01',
+              'peer_review_count' => 2,
               'group_category_id' => @group_category.id,
               'turnitin_enabled' => true,
               'grading_type' => 'points',
@@ -190,8 +192,11 @@ describe AssignmentsApiController, :type => :integration do
       @json['muted'].should == false
       @json['lock_at'].should == @assignment.lock_at.iso8601
       @json['unlock_at'].should == @assignment.unlock_at.iso8601
-      @json['automatic_peer_reviews'].should == false
-      @json['peer_reviews'].should == false
+      @json['automatic_peer_reviews'].should == true 
+      @json['peer_reviews'].should == true
+      @json['peer_review_count'].should == 2
+      @json['peer_reviews_assign_at'].should ==
+        @assignment.peer_reviews_assign_at.iso8601
       @json['position'].should == 1
       @json['group_category_id'].should == @group_category.id
       @json['turnitin_enabled'].should == true
@@ -333,6 +338,9 @@ describe AssignmentsApiController, :type => :integration do
                                                   :points_possible => 15,
                                                   :description => "blah",
                                                   :position => 2,
+                                                  :peer_review_count => 2,
+                                                  :peer_reviews => true,
+                                                  :peer_reviews_due_at => Time.now,
                                                   :grading_type => 'percent',
                                                   :due_at => nil)
         @assignment.update_attribute(:muted, false)
@@ -354,6 +362,7 @@ describe AssignmentsApiController, :type => :integration do
               'value' => '1'
             }
           },
+          'peer_reviews' => false,
           'group_category_id' => nil,
           'description' => 'assignment description',
           'grading_type' => 'points',
@@ -432,6 +441,12 @@ describe AssignmentsApiController, :type => :integration do
 
       it "returns the html_url, which is a URL to the assignment" do
         @json['html_url'].should == course_assignment_url(@course,@assignment)
+      end
+
+      it "updates the peer reviews info" do
+        @assignment.peer_reviews.should == false
+        @json.has_key?( 'peer_review_count' ).should == false
+        @json.has_key?( 'peer_reviews_assign_at' ).should == false
       end
 
       it "updates custom fields" do

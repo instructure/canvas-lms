@@ -48,6 +48,11 @@ module Api::V1::Assignment
     hash['muted'] = assignment.muted?
     hash['submission_types'] = assignment.submission_types_array
 
+    if assignment.automatic_peer_reviews? && assignment.peer_reviews?
+      hash[ 'peer_review_count' ] = assignment.peer_review_count
+      hash['peer_reviews_assign_at'] = assignment.peer_reviews_assign_at
+    end
+
     if hash['lock_info']
       hash['lock_explanation'] = lock_explanation(hash['lock_info'], 'assignment', assignment.context)
     end
@@ -142,6 +147,8 @@ module Api::V1::Assignment
     assignment_group_id
     group_category_id
     peer_reviews
+    peer_reviews_assign_at
+    peer_review_count
     automatic_peer_reviews
     external_tool_tag_attributes
     grade_group_students_individually
@@ -164,6 +171,10 @@ module Api::V1::Assignment
   def update_api_assignment(assignment, assignment_params, save = true)
     return nil unless assignment_params.is_a?(Hash)
     update_params = assignment_params.slice(*API_ALLOWED_ASSIGNMENT_INPUT_FIELDS)
+
+    if update_params.has_key?( 'peer_reviews_assign_at' )
+      update_params['peer_reviews_due_at'] = update_params['peer_reviews_assign_at']
+    end
 
     if update_params["submission_types"].is_a? Array
       update_params["submission_types"] = update_params["submission_types"].join(',')
