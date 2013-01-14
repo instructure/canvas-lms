@@ -117,6 +117,10 @@ define [
       keepHighest = submissions.length - dropLowest
       keepLowest  = keepHighest - dropHighest
 
+      # make sure we drop the same submission regardless of order
+      submissions.sort (a, b) ->
+        a.submission.assignment_id - b.submission.assignment_id
+
       hasPointed = (s.total for s in submissions when s.total > 0).length > 0
       kept = if hasPointed
         @dropPointed submissions, cantDrop, keepHighest, keepLowest
