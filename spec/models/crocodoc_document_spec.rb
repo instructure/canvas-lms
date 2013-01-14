@@ -21,6 +21,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe 'CrocodocDocument' do
   before do
     Setting.set 'crocodoc_counter', 0
+    PluginSetting.create! :name => 'crocodoc',
+                          :settings => { :api_key => "blahblahblahblahblah" }
+    Crocodoc::API.any_instance.stubs(:upload).returns 'uuid' => '1234567890'
   end
 
   context 'permissions_for_user' do
@@ -78,6 +81,15 @@ describe 'CrocodocDocument' do
         :admin => false,
         :editable => false,
       }
+    end
+  end
+
+  context 'update_process_states' do
+    it "should honor the batch size setting" do
+      Setting.set('crocodoc_status_check_batch_size', 2)
+      4.times { CrocodocDocument.create!(:process_state => "QUEUED") }
+      Crocodoc::API.any_instance.expects(:status).times(2).returns []
+      CrocodocDocument.update_process_states
     end
   end
 end
