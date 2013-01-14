@@ -112,10 +112,37 @@ class AccountsController < ApplicationController
     render :json => @courses.map { |c| course_json(c, @current_user, session, [], nil) }
   end
 
+  # @API Update an account
+  # Update an existing account.
+  #
+  # @argument account[name] [optional] Updates the account name
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/accounts/<account_id> \ 
+  #     -X PUT \ 
+  #     -H 'Authorization: Bearer <token>' \ 
+  #     -d 'account[name]=New account name'
+  #
+  # @example_response
+  #   {
+  #     "id": "1",
+  #     "name": "New account name",
+  #     "parent_account_id": null,
+  #     "root_account_id": null
+  #   }
   def update
     if authorized_action(@account, @current_user, :manage_account_settings)
       if api_request?
-        render :json => account_json(@account, @current_user, session, params[:includes] || [])
+        account_params = params[:account] || {}
+        account_params.reject{|k, v| ![:name].include?(k.to_sym)}
+
+        @account.errors.add(:name, "The account name cannot be blank") if account_params.has_key?(:name) && account_params[:name].blank?
+
+        if @account.errors.empty? && @account.update_attributes(account_params)
+          render :json => account_json(@account, @current_user, session, params[:includes] || [])
+        else
+          render :json => @account.errors, :status => :bad_request
+        end
         return
       end
 

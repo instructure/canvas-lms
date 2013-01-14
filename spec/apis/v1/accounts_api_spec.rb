@@ -64,6 +64,58 @@ describe "Accounts API", :type => :integration do
       }
   end
 
+  it "should update the name for an account" do
+    new_name = 'root2'
+    json = api_call(:put, "/api/v1/accounts/#{@a1.id}",
+                    { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' },
+                    { :account => {:name => new_name} })
+    expected =
+        {
+            'id' => @a1.id,
+            'name' => new_name
+        }
+
+    (expected.to_a - json.to_a).should be_empty
+
+    @a1.reload
+    @a1.name.should == new_name
+  end
+
+  it "should not update with a blank name" do
+    @a1.name = "blah"
+    @a1.save!
+    json = api_call(:put, "/api/v1/accounts/#{@a1.id}",
+      { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' },
+      { :account => {:name => ""} }, {}, :expected_status => 400)
+
+    json["errors"]["name"].first["message"].should == "The account name cannot be blank"
+
+    json = api_call(:put, "/api/v1/accounts/#{@a1.id}",
+      { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' },
+      { :account => {:name => nil} }, {}, :expected_status => 400)
+
+    json["errors"]["name"].first["message"].should == "The account name cannot be blank"
+
+    @a1.reload
+    @a1.name.should == "blah"
+  end
+
+  it "should not update other attributes (yet)" do
+    json = api_call(:put, "/api/v1/accounts/#{@a1.id}",
+                    { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' },
+                    { :account => {:settings => {:setting => 'set'}}} )
+
+    expected =
+      {
+        'id' => @a1.id,
+        'name' => @a1.name
+      }
+
+    (expected.to_a - json.to_a).should be_empty
+    @a1.reload
+    @a1.settings.should be_empty
+  end
+
   it "should find accounts by sis in only this root account" do
     Account.default.add_user(@user)
     other_sub = account_model(:name => 'other_sub', :parent_account => Account.default, :root_account => Account.default, :sis_source_id => 'sis1')
