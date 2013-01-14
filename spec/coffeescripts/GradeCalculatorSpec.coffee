@@ -220,3 +220,19 @@ define ['compiled/grade_calculator', 'underscore'], (GradeCalculator, _) ->
     result = GradeCalculator.calculate @submissions, groups, 'equal'
     assertGrade result, 'current', 29, 20
     assertGrade result, 'final', 29, 20
+
+  test "grade should always drop assignments consistently", ->
+    # NOTE: this test doesn't get reproduced in ruby because the drop set is
+    # discarded after calculation
+    @submissions = []
+    @setup_grades @group, [[9,10],[9,10],[9,10],[9,10]]
+    @group.rules = drop_lowest: 1
+
+    result = GradeCalculator.calculate @submissions, [@group]
+    dropped = _(result.group_sums[0].current.submissions).find (s) -> s.drop
+    firstDroppedAssignment = dropped.submission.assignment_id
+
+    @submissions.reverse()
+    result = GradeCalculator.calculate @submissions, [@group]
+    dropped2 = _(result.group_sums[0].current.submissions).find (s) -> s.drop
+    equal firstDroppedAssignment, dropped2.submission.assignment_id

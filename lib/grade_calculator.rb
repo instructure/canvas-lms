@@ -149,6 +149,8 @@ class GradeCalculator
     keep_highest = submissions.size - drop_lowest
     keep_lowest  = keep_highest - drop_highest
 
+    submissions.sort! { |a,b| a[:assignment].id - b[:assignment].id }
+
     # assignment groups that have no points possible have to be dropped
     # differently (it's a simpler case, but not one that fits in with our
     # usual bisection approach)
