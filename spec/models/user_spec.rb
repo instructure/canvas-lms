@@ -764,6 +764,14 @@ describe User do
       @user2.reload.unread_conversations_count.should eql 2
     end
 
+    it "should reset its conversation counter when told to" do
+      user = user_model
+      user.stubs(:conversations).returns Struct.new(:unread).new(Array.new(5))
+      user.reset_unread_conversations_counter
+
+      user.reload.unread_conversations_count.should == 5
+    end
+
     it "should point other user's observers to the new user" do
       @user1 = user_model
       @user2 = user_model

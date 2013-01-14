@@ -2499,6 +2499,15 @@ class User < ActiveRecord::Base
     all_conversations.find_by_conversation_id(conversation_id)
   end
 
+  # Public: Reset the user's cached unread conversations count.
+  #
+  # Returns nothing.
+  def reset_unread_conversations_counter
+    self.class.update_all(
+      ['unread_conversations_count = ?', conversations.unread.count],
+      :id => id)
+  end
+
   # association with dynamic, filtered join condition for submissions.
   # This is messy, but in ActiveRecord 2 this is the only way to do an eager
   # loading :include condition that has dynamic join conditions. It looks like
