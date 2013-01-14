@@ -75,6 +75,10 @@ class AccountReport < ActiveRecord::Base
   end
   handle_asynchronously :run_report
 
+  def has_parameter?(key)
+    self.parameters.is_a?(Hash) && self.parameters.has_key?(key)
+  end
+
   def self.available_reports(account)
     # check if there is a reports plugin for this account
     Canvas::AccountReports.for_account(account.root_account.id)
