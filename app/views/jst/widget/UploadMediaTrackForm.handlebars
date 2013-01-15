@@ -1,0 +1,77 @@
+<div title="Create/Add Subtitles" class="uploadMediaTrackForm bootstrap-form form-horizontal">
+  
+  {{#if is_amazon_url}}
+    <p class="alert alert-info">{{#t "upload_media_track_info"}}<strong>Instructions:</strong>
+        Follow these three steps to create a subtitle file for your video, then upload it here.
+        If you all ready have a srf subtitle file you can skip to step 3.{{/t}}
+    </p>
+  {{/if}}
+
+  <div class="content-box border border-trbl border-round">
+    {{#if is_amazon_url}}
+      <div class="media-track-step">
+        <p class="uploadMediaTrackFormDescription">
+        <strong>{{#t "upload_media_track_form_step1_label"}}Step 1:{{/t}}</strong>
+          {{#t "upload_media_track_form_description_1"}}Copy this video url{{/t}}
+        </p>
+        <div class="content-callout media-track-video-url">{{video_url}}</div>
+      </div><!-- media track step -->
+
+      <div class="media-track-step">
+        <p class="uploadMediaTrackFormDescription">
+        <strong>{{#t "upload_media_track_form_step2_label"}}Step 2:{{/t}}</strong>
+          {{#t "upload_media_track_form_description_2"}}Create a subtitle file by clicking linking this link and following its instructions.{{/t}}
+        </p>
+
+        <div class="content-box media-track-content-box">
+          <form action="http://www.universalsubtitles.org/en/videos/create/" method="POST" target="_blank" >
+            <input type="hidden" name="video_url" value="{{video_url}}">
+            <button class="btn btn-small media-track-form-button" type="submit" value="Begin">{{#t "media_track_form_button"}}Go to subtitle creation tool{{/t}}</button>
+          </form>
+        </div>
+      </div><!-- media track step -->
+    {{/if}}
+
+    <div class="media-track-step">
+
+      <p class="uploadMediaTrackFormDescription">
+        {{#if is_amazon_url}}
+          <strong>{{#t "upload_media_track_form_step3_label"}}Step 3:{{/t}}</strong>
+          {{#t "upload_media_track_form_description"}}
+            Once you have a subtitle track in either the SRT or <a target="_blank" href="http://dev.w3.org/html5/webvtt/">WebVTT</a> format,
+            you can upload it here.
+          {{/t}}
+        {{ else }}
+          {{#t "upload_media_track_form_description_3"}}
+            Upload a subtitle track in either the SRT or <a target="_blank" href="http://dev.w3.org/html5/webvtt/">WebVTT</a> format.
+          {{/t}}
+        {{/if}}
+      </p>
+
+      <div class="content-box media-track-content-box">
+        <div class="invalidInputMsg alert alert-error" style="display:none;">
+          {{#t "error_message"}}<strong>Error:</strong> You must choose a language and a valid track file.{{/t}}
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="umtf_locale">{{#t "language"}}Language{{/t}}</label>
+          <div class="controls">
+            <select name="locale" id="umtf_locale">
+              <option value=''>{{#t "choose_a_language"}}--Choose a Language--{{/t}}</option>
+              {{#each languages}}
+                <option value="{{code}}">{{name}}</option>
+              {{/each}}
+            </select>
+          </div>
+        </div><!-- control group end -->
+
+        <div class="control-group">
+          <label class="control-label" for="umtf_content">{{#t "file"}}File{{/t}}</label>
+          <div class="controls">
+            <input class="input-file" id="umtf_content" name="content" type="file">
+          </div>
+        </div><!-- control group end -->
+      </div><!-- content-box end -->
+    </div><!-- media track step -->
+   </div><!-- end border border-tbl -->
+</div>

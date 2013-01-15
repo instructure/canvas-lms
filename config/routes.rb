@@ -343,6 +343,10 @@ ActionController::Routing::Routes.draw do |map|
   map.media_object_thumbnail 'media_objects/:id/thumbnail', :controller => 'context', :action => 'media_object_thumbnail'
   map.media_object_info 'media_objects/:media_object_id/info', :controller => 'media_objects', :action => 'show'
 
+  map.show_media_tracks "media_objects/:media_object_id/media_tracks/:id", :controller => :media_tracks, :action => :show, :conditions => {:method => :get}
+  map.create_media_tracks 'media_objects/:media_object_id/media_tracks', :controller => :media_tracks, :action => :create, :conditions => {:method => :post}
+  map.delete_media_tracks "media_objects/:media_object_id/media_tracks/:media_track_id", :controller => :media_tracks, :action => :destroy, :conditions => {:method => :delete}
+
   map.external_content_success 'external_content/success/:service', :controller => 'external_content', :action => 'success'
   map.external_content_oembed_retrieve 'external_content/retrieve/oembed', :controller => 'external_content', :action => 'oembed_retrieve'
   map.external_content_cancel 'external_content/cancel/:service', :controller => 'external_content', :action => 'cancel'

@@ -32,6 +32,8 @@ describe MediaObjectsController do
 
       get 'show', :media_object_id => missing_media_id
       json_parse(response.body).should == {
+              'can_add_captions' => false,
+              'media_tracks' => [],
               'media_sources' => []
       }
       MediaObject.by_media_id(missing_media_id).first.media_id.should == missing_media_id

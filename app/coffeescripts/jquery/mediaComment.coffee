@@ -1,3 +1,4 @@
+#mediaComment.coffee
 define [
   'i18n!media_comments'
   'underscore'
@@ -20,11 +21,14 @@ define [
   # track events in google analytics
   mejs.MepDefaults.features.push('googleanalytics')
 
-  getSources = (id) ->
+  getSourcesAndTracks = (id) ->
     dfd = new $.Deferred
     $.getJSON "/media_objects/#{id}/info", (data) ->
       sources = _.map data.media_sources, (source) -> "<source type='#{source.content_type}' src='#{source.url}' />"
-      dfd.resolve {sources, can_add_captions: false}
+      tracks = _.map data.media_tracks, (track) ->
+          languageName = mejs.language.codes[track.locale] || track.locale
+          "<track kind='#{track.kind}' label='#{languageName}' src='#{track.url}' srclang='#{track.locale}' />"
+      dfd.resolve {sources, tracks, can_add_captions: data.can_add_captions}
     dfd
 
   mediaCommentActions =
@@ -49,13 +53,13 @@ define [
       showInline = (id) ->
         width = Math.min ($holder.closest("div,p,table").width() || VIDEO_WIDTH), VIDEO_WIDTH
         height = Math.round width / 336 * 240
-        getSources(id).done (sources) ->
-          if sources.sources.length
+        getSourcesAndTracks(id).done (sourcesAndTracks) ->
+          if sourcesAndTracks.sources.length
             $("#{if mediaType is 'video' then "<video width='#{width}' height='#{height}'" else '<audio'} controls preload autoplay />")
-            .append(sources.sources.join(''))
+              .append(sourcesAndTracks.sources.concat(sourcesAndTracks.tracks).join(''))
               .appendTo($holder.html(''))
               .mediaelementplayer
-                can_add_captions: false
+                can_add_captions: sourcesAndTracks.can_add_captions
                 mediaCommendId: id
                 googleAnalyticsTitle: id
           else
@@ -95,14 +99,15 @@ define [
           resizable: false
           close: -> $this.data('mediaelementplayer').pause()
 
-        $dialog.disableWhileLoading getSources(id).done (sources) ->
-          if sources.sources.length
+        $dialog.disableWhileLoading getSourcesAndTracks(id).done (sourcesAndTracks) ->
+          if sourcesAndTracks.sources.length
             $mediaElement = $("#{if mediaType is 'video' then "<video width='#{width}' height='#{height - spaceNeededForControls}'" else '<audio'} controls preload autoplay />")
+              .append(sourcesAndTracks.sources.concat(sourcesAndTracks.tracks).join(''))
               .appendTo($dialog)
 
             $this.data
               mediaelementplayer: new MediaElementPlayer $mediaElement,
-                can_add_captions: sources.can_add_captions
+                can_add_captions: sourcesAndTracks.can_add_captions
                 mediaCommendId: id
                 googleAnalyticsTitle: id
               media_comment_dialog: $dialog

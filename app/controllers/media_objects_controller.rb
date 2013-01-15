@@ -23,6 +23,24 @@
 #
 # @object Media Object
 #   {
+#     // whether or not the current user can upload media_tracks (subtitles) to this Media Object
+#     "can_add_captions": true,
+#     // an array of all the media_tracks uploaded to this Media Object
+#     "media_tracks": [{
+#       "kind": "captions",
+#       "created_at": "2012-09-27T16:46:50-06:00",
+#       "updated_at": "2012-09-27T16:46:50-06:00",
+#       "url": "http://<canvas>/media_objects/0_r949z9lk/media_tracks/1",
+#       "id": 1,
+#       "locale": "af"
+#     }, {
+#       "kind": "subtitles",
+#       "created_at": "2012-09-27T20:29:17-06:00",
+#       "updated_at": "2012-09-27T20:29:17-06:00",
+#       "url": "http://<canvas>/media_objects/0_r949z9lk/media_tracks/14",
+#       "id": 14,
+#       "locale": "cs"
+#     }],
 #     // an array of all the transcoded files (flavors) available for this Media Object
 #     "media_sources": [{
 #       "height": "240",
@@ -55,7 +73,7 @@ class MediaObjectsController < ApplicationController
   # Returns the Details of the given Media Object.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/media_objects/<media_object_id> \
+  #     curl https://<canvas>/media_objects/<media_object_id> \
   #          -H 'Authorization: Bearer <token>'
   #
   # @returns Media Object
