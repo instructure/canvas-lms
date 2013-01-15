@@ -19,6 +19,13 @@
 module Api::V1::Course
   include Api::V1::Json
 
+  def course_settings_json(course)
+    settings = {}
+    settings[:allow_student_discussion_topics] = course.allow_student_discussion_topics
+    settings[:allow_student_forum_attachments] = course.allow_student_forum_attachments
+    settings
+  end
+
   def course_json(course, user, session, includes, enrollments)
     Api::V1::CourseJson.to_hash(course, user, includes, enrollments) do |builder, allowed_attributes, methods|
       hash = api_json(course, user, session, :only => allowed_attributes, :methods => methods)
