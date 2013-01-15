@@ -355,10 +355,7 @@ class Account < ActiveRecord::Base
         FROM users u
        INNER JOIN user_account_associations uaa on uaa.user_id = u.id
        WHERE uaa.account_id = ? AND u.workflow_state != 'deleted'
-             #{"AND NOT EXISTS (SELECT *
-                                  FROM group_memberships gm
-                                 WHERE gm.user_id = u.id AND
-                                       gm.group_id IN (#{groups.map(&:id).join ','}))" unless groups.empty?}
+       #{Group.not_in_group_sql_fragment(groups)}
        #{"ORDER BY #{opts[:order_by]}" if opts[:order_by].present?}", self.id]
   end
 

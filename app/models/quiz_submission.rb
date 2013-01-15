@@ -272,6 +272,11 @@ class QuizSubmission < ActiveRecord::Base
   end
 
   def sanitize_params(params)
+    # if the submission has already been graded
+    if !self.submission_data.is_a?(Hash)
+      return params.merge({:_already_graded => true})
+    end
+
     if quiz.cant_go_back?
       params.reject! { |p,_|
         p =~ /\Aquestion_(\d)+/ && submission_data[:"_question_#{$1}_read"]

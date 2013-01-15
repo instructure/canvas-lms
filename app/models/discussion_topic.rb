@@ -514,7 +514,11 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user, session| (self.active? || self.locked?) && self.cached_context_grants_right?(user, session, :post_to_forum) }#students.include?(user) }
     can :read
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) and not self.is_announcement }
+    given { |user, session|
+      !is_announcement &&
+      cached_context_grants_right?(user, session, :post_to_forum) &&
+      context_allows_user_to_create?(user)
+    }
     can :create
 
     given { |user, session| context.respond_to?(:allow_student_forum_attachments) && context.allow_student_forum_attachments && cached_context_grants_right?(user, session, :post_to_forum) }
@@ -541,6 +545,12 @@ class DiscussionTopic < ActiveRecord::Base
 
     given { |user, session| self.context.respond_to?(:collection) && user == self.context.user }
     can :read and can :update and can :delete and can :reply
+  end
+
+  def context_allows_user_to_create?(user)
+    return true unless context.respond_to?(:allow_student_discussion_topics)
+    return true unless context.user_is_student?(user)
+    context.allow_student_discussion_topics
   end
 
   def discussion_topic_id
