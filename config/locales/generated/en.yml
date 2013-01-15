@@ -9898,7 +9898,7 @@ en:
       originality_report_visibility: "Students can see the originality report: %{when}"
       originality_report_visible_after_due_date: "after the due date"
       originality_report_visible_after_grading: "after the assignment is graded"
-      originality_report_visible_immediately: immediately
+      originality_report_visible_immediately: "immediately"
       settings_exclude_fewer_than_count: "fewer than %{count} words"
       settings_exclude_less_than_percent: "less than %{percent} percent of the document"
       titles: 

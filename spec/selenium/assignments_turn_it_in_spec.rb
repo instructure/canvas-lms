@@ -8,34 +8,36 @@ describe "assignments turn it in" do
     account = Account.default
     account.turnitin_account_id = 'asdf'
     account.turnitin_shared_secret = 'asdf'
-    account.save
-    @course.account = account
-    @course.save
+    account.save!
   end
 
   def change_turnitin_settings
-    keep_trying_until { f('.submission_type_option').should be_displayed }
-    f('.submission_type_option > option[value="online"]').click
-    f('#assignment_online_text_entry').click
-    f('#assignment_turnitin_settings').should_not be_displayed
+    keep_trying_until {
+      f('#assignment_toggle_advanced_options').click
+      f('#assignment_submission_type').should be_displayed
+    }
+    click_option('#assignment_submission_type', 'Online')
+    f('#assignment_text_entry').click
+    f('#advanced_turnitin_settings_link').should_not be_displayed
     f('#assignment_turnitin_enabled').click
+    f('#advanced_turnitin_settings_link').should be_displayed
+    f('#advanced_turnitin_settings_link').click
     f('#assignment_turnitin_settings').should be_displayed
-    f('.show_turnitin_settings').click
-    wait_for_animations
-    f('#turnitin_settings_form').should be_displayed
 
-    f('#settings_originality_report_visibility > option[value="after_due_date"]').click # immediate -> after_due_date
-    f('#settings_student_paper_check').click # 1 -> 0
-    f('#settings_internet_check').click # 1 -> 0
-    f('#settings_journal_check').click # 1 -> 0
-    f('#settings_exclude_biblio').click # 1 -> 0
-    f('#settings_exclude_quoted').click # 1 -> 0
-    f('#settings_exclude_small_matches').click # 0 -> 1
-    f('#settings_exclude_fewer_than_count').click # 0 -> 1
-    f('#settings_exclude_value_count').send_keys("5") # '' -> 5
-    submit_form('#turnitin_settings_form')
+    click_option('#settings_originality_report_visibility', 'After the Due Date')
+    f('#s_paper_check').click # 1 -> 0
+    f('#internet_check').click # 1 -> 0
+    f('#journal_check').click # 1 -> 0
+    f('#exclude_biblio').click # 1 -> 0
+    f('#exclude_quoted').click # 1 -> 0
+    f('#exclude_small_matches').click # 0 -> 1
+    f('#exclude_small_matches_words_value').click # 0 -> 1
+    f('#exclude_small_matches_words_value').send_keys([:backspace, "5"]) # '0' -> 5
+    submit_form('#assignment_turnitin_settings')
     wait_for_ajaximations
-    f('#turnitin_settings_form').should_not be_displayed
+
+    # dialog is closed and removed from the page
+    f('#assignment_turnitin_settings').should be_nil
   end
 
   def expected_settings
@@ -54,17 +56,12 @@ describe "assignments turn it in" do
   it "should create turnitin settings" do
     expect {
       get "/courses/#{@course.id}/assignments/new"
-
-      f('#assignment_title').send_keys('test assignment')
+      f('#assignment_name').send_keys('test assignment')
       change_turnitin_settings
     }.to_not change { Assignment.count } # although we "saved" the dialog, we haven't actually posted anything yet
 
-    submit_form('#edit_assignment_form')
-    wait_for_ajaximations
-    keep_trying_until do
-      assignment = Assignment.last
-      assignment.turnitin_settings.should == expected_settings
-    end
+    expect_new_page_load { submit_form('#edit_assignment_form') }
+    Assignment.last.turnitin_settings.should == expected_settings
   end
 
   it "should edit turnitin settings" do
@@ -77,8 +74,9 @@ describe "assignments turn it in" do
     get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
 
     change_turnitin_settings
+    expect_new_page_load { submit_form('#edit_assignment_form') }
 
     assignment.reload
-    assignment.turnitin_settings.should ==(expected_settings)
+    assignment.turnitin_settings.should == expected_settings
   end
 end

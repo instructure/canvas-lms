@@ -255,7 +255,7 @@ describe "calendar2" do
         f('.fc-event.assignment').click
         f('.edit_event_link').click
         expect_new_page_load { f('.more_options_link').click }
-        f('h2.title').text.should include(name)
+        f('#assignment_name').attribute(:value).should include(name)
       end
 
       it "should delete an event" do

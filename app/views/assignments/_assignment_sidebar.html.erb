@@ -1,64 +1,32 @@
 <div id="sidebar_content">
   <%= render :partial => "assignment_locked" if @assignment.locked_for?(@current_user) %>
   
-  <% unless @assignment.new_record? %>
-    <% if can_do(@assignment, @current_user, :update) && @assignment.needs_publishing? %>
-      <h2><%= t 'titles.unpublished', "Unpublished" %></h2>
-      <div class="rs-margin-lr">
-      <%= image_tag "warning.png" %> <%= t 'warnings.unpublished', 'You should publish assignments that you are finished grading so students can consider their grades "official."' %>
-      <% form_for :assignment, :url => context_url(@context, :context_assignment_url, @assignment.id), :html => {:method => :put, :id => "publish_assignment_form", :style => "margin-bottom: 10px;"} do |f| %>
-        <input type="hidden" name="publish" value="1"/>
-        <button type="submit" class="btn button-sidebar-wide"><%= t 'buttons.publish', "Publish this Assignment" %></button>
-      <% end %>
-      </div>
+  <% if can_do(@assignment, @current_user, :update) && @assignment.needs_publishing? %>
+    <h2><%= t 'titles.unpublished', "Unpublished" %></h2>
+    <div class="rs-margin-lr">
+    <%= image_tag "warning.png" %> <%= t 'warnings.unpublished', 'You should publish assignments that you are finished grading so students can consider their grades "official."' %>
+    <% form_for :assignment, :url => context_url(@context, :context_assignment_url, @assignment.id), :html => {:method => :put, :id => "publish_assignment_form", :style => "margin-bottom: 10px;"} do |f| %>
+      <input type="hidden" name="publish" value="1"/>
+      <button type="submit" class="btn button-sidebar-wide"><%= t 'buttons.publish', "Publish this Assignment" %></button>
     <% end %>
+    </div>
   <% end %>
 
-  <div class="rs-margin-lr rs-margin-top">
-    <% if can_do(@assignment, @current_user, :update) %>
-      <% if @assignment.external_tool? %>
-        <a href="<%= polymorphic_url([@context, @assignment]) %>" class="view_assignment_link btn button-sidebar-wide"><i class="icon-arrow-left"></i> <%= t('links.view_assignment', "View Assignment") %></a>
-      <% end %>
-      <a href="#" class="edit_full_assignment_link btn button-sidebar-wide"><i class="icon-edit"></i> <%= t 'links.edit_assignment', "Edit Assignment" %></a>
-    <% end %>
-  </div>
-  
-  <% unless @assignment.new_record? %>
-    <% if can_do(@assignment, @current_user, :update) %>
-    <div class="rs-margin-lr">
-      <a href="<%= context_url(@context, :context_rubrics_url) %>" class="add_rubric_link btn button-sidebar-wide" style="<%= hidden if @assignment.rubric_association %>"><i class="icon-rubric"></i> <%= t 'links.add_rubric', "Add Rubric" %></a>
-    </div>
-    <% end %>
-    
-    <% if can_do(@assignment, @current_user, :grade) %>
-      <div class="rs-margin-lr" style="margin-left: 10px; margin-bottom: 10px; <%= hidden unless @assignment.expects_submission? %>">
-        <%= mt :submission_types_for_graders, "Students can submit this assignment as *%{submission_types}*",
-            :submission_types => @assignment.readable_submission_types,
-            :wrapped => '<span class="readable_submission_types">\1</span>' %>
-      </div>
-      <%= render :partial => "grade_assignment" if can_do(@assignment, @current_user, :grade) %>
-    <% else %>
-      <div class="rs-margin-lr" style="<%= hidden unless @assignment.expects_submission? %>">
-        <%= mt :submission_types_for_student, "This assignment can be submitted as *%{submission_types}*",
-            :submission_types => @assignment.readable_submission_types,
-            :wrapped => '<span class="readable_submission_types">\1</span>' %>
-        <% if @assignment.submission_types =~ /online_upload/ && !@assignment.allowed_extensions.blank? -%>
-          <%= t :allowed_file_types, "The permitted file upload types are: %{extensions_list}.",
-                  :extensions_list => @assignment.allowed_extensions.to_sentence %>
-        <% end -%>
-      </div>
-    <% end %>
-    <div class="rs-margin-lr" style="<%= hidden unless @assignment.turnitin_enabled %>" id="turnitin_enabled">
-      <%= t :turnitin_enabled, "Turnitin has been enabled for this assignment." %>
-    </div>
-    
-    
-    <% if @current_user_submission %>
-      <%= render :partial => "submission_sidebar" %>
-    <% elsif @assignment.expects_submission? && can_do(@assignment, @current_user, :submit) %>
-      <div class="rs-margin-lr">
-        <a href="#" class="submit_assignment_link button-sidebar-wide btn <%= 'late' if @current_user_submission && @current_user_submission.late? %>"><i class="icon-add"></i> <%= t 'links.submit', "Submit Assignment" %></a><br/>
-      </div>
-    <% end %>
+  <% if can_do(@assignment, @current_user, :grade) %>
+    <%= render :partial => "grade_assignment" if can_do(@assignment, @current_user, :grade) %>
   <% end %>
+
+  <% if @current_user_submission %>
+    <%= render :partial => "submission_sidebar" %>
+  <% elsif @assignment.expects_submission? && can_do(@assignment, @current_user, :submit) %>
+    <ul class="page-action-list">
+      <li>
+        <% late = @current_user_submission.try(:late?) ? "late" : "" %>
+        <a href="#" class="submit_assignment_link button-sidebar-wide <%= late %>">
+          <i class='icon-add'></i> <%= t 'links.submit', "Submit Assignment" %>
+        </a>
+      </li>
+    </ul>
+  <% end %>
+
 </div>

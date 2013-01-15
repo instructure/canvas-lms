@@ -295,7 +295,7 @@ class Assignment < ActiveRecord::Base
     self.infer_all_day
 
     if !self.assignment_group || (self.assignment_group.deleted? && !self.deleted?)
-      self.assignment_group = self.context.assignment_groups.active.first || self.context.assignment_groups.create!
+      ensure_assignment_group(false)
     end
     self.mastery_score = [self.mastery_score, self.points_possible].min if self.mastery_score && self.points_possible
     self.submission_types ||= "none"
@@ -308,6 +308,15 @@ class Assignment < ActiveRecord::Base
     self.points_possible = nil if self.submission_types == 'not_graded'
   end
   protected :default_values
+
+  def ensure_assignment_group(do_save = true)
+    self.context.require_assignment_group
+    assignment_groups = self.context.assignment_groups.active
+    if !assignment_groups.map(&:id).include?(self.assignment_group_id)
+      self.assignment_group = assignment_groups.first
+      save! if do_save
+    end
+  end
 
   def attendance?
     submission_types == 'attendance'
@@ -422,9 +431,13 @@ class Assignment < ActiveRecord::Base
 
   # call this to perform notifications on an Assignment that is not being saved
   # (useful when a batch of overrides associated with a new assignment have been saved)
-  def do_notifications!
+  def do_notifications!(prior_version=nil)
+    self.prior_version = prior_version
     @broadcasted = false
-    self.prior_version = self.versions.previous(self.current_version.number).try(:model)
+    # TODO: this will blow up if the group_category string is set on the
+    # previous version, because it gets confused between the db string field
+    # and the association.  one more reason to drop the db column
+    self.prior_version ||= self.versions.previous(self.current_version.number).try(:model)
     self.just_created = self.prior_version.nil?
     broadcast_notifications
   end

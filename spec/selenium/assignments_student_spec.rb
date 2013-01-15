@@ -106,7 +106,7 @@ describe "assignments" do
       get "/courses/#{new_course.id}/assignments/#{assignment.id}"
 
       f('.ui-state-error').should be_displayed
-      f('#full_assignment_holder').should be_nil
+      f('#assignment_show').should be_nil
     end
 
     it "should verify student creatable group creation" do

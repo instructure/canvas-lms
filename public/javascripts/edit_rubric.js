@@ -294,8 +294,8 @@ define([
       var $form = $tr.find("#edit_rubric_form");
       $rubric.append($tr);
       $form.attr('method', 'POST').attr('action', $("#add_rubric_url").attr('href'));
-      var assignment_points = parseFloat($("#full_assignment .points_possible,#rubrics.rubric_dialog .assignment_points_possible").filter(":first").text());
-      $form.find(".rubric_grading").showIf(assignment_points || $("#full_assignment").length > 0);
+      var assignment_points = parseFloat($("#assignment_show .points_possible,#rubrics.rubric_dialog .assignment_points_possible").filter(":first").text());
+      $form.find(".rubric_grading").showIf(assignment_points != null && assignment_points != undefined);
       return $rubric;
     },
     editRubric: function($original_rubric, url) {
@@ -658,9 +658,9 @@ define([
         if (!$rubric.find(".criterion:not(.blank)").length) return false;
         var data = rubricEditing.rubricData($rubric);
         if (data['rubric_association[use_for_grading]'] == '1') {
-          var assignmentPoints = parseFloat($("#full_assignment .points_possible").text());
+          var assignmentPoints = parseFloat($("#assignment_show .points_possible").text());
           var rubricPoints = parseFloat(data.points_possible);
-          if (assignmentPoints && rubricPoints != assignmentPoints && !forceSubmit) {
+          if (assignmentPoints != null && assignmentPoints != undefined && rubricPoints != assignmentPoints && !forceSubmit) {
             var $confirmDialog = $(changePointsPossibleToMatchRubricDialog({
               assignmentPoints: assignmentPoints,
               rubricPoints: rubricPoints
@@ -713,8 +713,7 @@ define([
         }
         rubricEditing.updateRubric($rubric, rubric);
         if (data.rubric_association && data.rubric_association.use_for_grading && !data.rubric_association.skip_updating_points_possible) {
-          $("#full_assignment .points_possible").text(rubric.points_possible);
-          $("#full_assignment input.points_possible").val(rubric.points_possible);
+          $("#assignment_show .points_possible").text(rubric.points_possible);
         }
         $rubric.find(".rubric_title .links:not(.locked)").show();
       }

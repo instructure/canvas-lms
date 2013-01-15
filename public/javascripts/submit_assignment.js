@@ -27,6 +27,7 @@ define([
   'jquery.instructure_misc_plugins' /* fragmentChange, showIf, /\.log\(/ */,
   'jquery.templateData' /* getTemplateData */,
   'media_comments' /* mediaComment */,
+  'compiled/tinymce',
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/tabs' /* /\.tabs/ */
@@ -134,7 +135,6 @@ define([
         }
         if(!result) { return; }
       }
-      hideFullAssignmentForm();
       $("#submit_assignment").show();
       $(".submit_assignment_link").hide();
       $("html,body").scrollTo($("#submit_assignment"));

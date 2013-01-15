@@ -73,6 +73,8 @@ define [
     newlinesToBreak : (string) ->
       new Handlebars.SafeString htmlEscape(string).replace(/\n/g, "<br />")
 
+    not: (arg) -> !arg
+
     # runs block if all arguments are === to each other
     # usage:
     # {{#ifEqual argument1 argument2 'a string argument' argument4}}
@@ -221,5 +223,44 @@ define [
 
     toPercentage: (number) ->
       parseInt(100 * number) + "%"
+
+    checkedIf: ( thing, thingToCompare, hash ) ->
+      if arguments.length == 3
+        if thing == thingToCompare
+          'checked'
+        else
+          ''
+      else
+        if thing then 'checked' else ''
+
+    selectedIf: ( thing, thingToCompare, hash ) ->
+      if arguments.length == 3
+        if thing == thingToCompare
+          'selected'
+        else
+          ''
+      else
+        if thing then 'selected' else ''
+
+    checkedUnless: ( thing ) ->
+      if thing then '' else 'checked'
+
+    join: ( array, separator = ',', hash ) ->
+      return '' unless array
+      array.join(separator)
+
+    ifIncludes: ( array, thing, options ) ->
+      return false unless array
+      if thing in array
+        options.fn( this )
+      else
+        options.inverse( this )
+
+    disabledIfIncludes: ( array, thing ) ->
+      return '' unless array
+      if thing in array
+        'disabled'
+      else
+        ''
   }
   return Handlebars

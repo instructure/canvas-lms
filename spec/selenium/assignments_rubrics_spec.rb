@@ -91,14 +91,13 @@ describe "assignment rubrics" do
       f('#rubric_dialog_'+@rubric.id.to_s+' .select_rubric_link').click
       wait_for_ajaximations
       f('#rubric_'+@rubric.id.to_s+' > thead .title').should include_text(@rubric.title)
-
     end
 
     it "should not adjust assignment points possible for grading rubric" do
       create_assignment_with_points(2)
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      f("#full_assignment .points_possible").text.should == '2'
+      f("#assignment_show .points_possible").text.should == '2'
 
       f('.add_rubric_link').click
       f('#grading_rubric').click
@@ -106,14 +105,14 @@ describe "assignment rubrics" do
       fj('.ui-dialog-buttonset .ui-button:contains("Leave different")').click
       wait_for_ajaximations
       f('#rubrics span .rubric_total').text.should == '5'
-      f("#full_assignment .points_possible").text.should == '2'
+      f("#assignment_show .points_possible").text.should == '2'
     end
 
     it "should adjust assignment points possible for grading rubric" do
       create_assignment_with_points(2)
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      f("#full_assignment .points_possible").text.should == '2'
+      f("#assignment_show .points_possible").text.should == '2'
 
       f('.add_rubric_link').click
       f('#grading_rubric').click
@@ -122,7 +121,7 @@ describe "assignment rubrics" do
       wait_for_ajaximations
 
       f('#rubrics span .rubric_total').text.should == '5'
-      f("#full_assignment .points_possible").text.should == '5'
+      f("#assignment_show .points_possible").text.should == '5'
     end
 
     it "should not allow XSS attacks through rubric descriptions" do

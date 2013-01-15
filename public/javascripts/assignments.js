@@ -911,39 +911,6 @@ define([
       var $assignment = $("#assignment_" + data.assignment.id); //$("#edit_assignment_form").data('current_assignment');
       updateAssignment($assignment, data);
     });
-    $(".preview_assignment_link").click(function(event) {
-      event.preventDefault();
-      var $assignment = $(this).parents(".group_assignment");
-      var data = $assignment.getTemplateData({
-        textValues: ['title', 'id', 'points_possible', 'due_date', 'due_time', 'due_date_string', 'due_time_string', 'submission_types', 'assignment_group_id', 'grading_type', 'min_score', 'max_score', 'mastery_score', 'unlock_at']
-      });
-      data.description = $assignment.find(".description").val() || I18n.t('assignment.default_content', "No Content");
-      data.due_at = $.trim(data.due_date + " " + data.due_time);
-      $("#full_assignment").fillTemplateData({
-        data: data,
-        htmlValues: ['description']
-      }).find(".date_text").showIf(data.due_date && data.due_date.length > 0).end()
-        .find(".points_text").showIf(data.points_possible && data.points_possible.length > 0);
-      $("#edit_assignment_form").fillFormData({
-        data: data,
-        object_name: "assignment"
-      }).attr('action', $assignment.find(".assignment_url").attr('href'));
-      var height = Math.max(Math.round($(window).height() * 0.8), 400);
-      $("#full_assignment_holder").dialog({
-        title: I18n.t('titles.assignment_details', "Assignment Details"),
-        width: 630,
-        height: height,
-        modal: true,
-        close: function() {
-          $("#full_assignment_holder #edit_assignment_form .cancel_button").click();
-        },
-        overlay: {
-          backgroundColor: "#000",
-          opacity: 0.7
-        }
-      });
-      $("#full_assignment").show();
-    });
     $(document).keycodes('j k', function(event) {
       event.preventDefault();
       if(event.keyString == 'j') {

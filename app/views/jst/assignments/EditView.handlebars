@@ -1,0 +1,191 @@
+{{#if frozen}}
+  <div class="content-callout border border-trbl" style="padding:10px; margin-bottom:18px;">
+    <i class="icon-warning"></i> {{#t "warnings.assignment_is_frozen"}}Some settings have been administratively locked.{{/t}}
+  </div>
+{{/if}}
+
+<div class="control-group">
+  <div>
+    <input id="assignment_name"
+      name="name"
+      placeholder="{{#t "assignment_name"}}Assignment Name{{/t}}"
+      aria-label="{{#t "assignment_name"}}Assignment Name{{/t}}"
+      value="{{name}}"
+      type="text"
+      maxlength="254"
+      style="font-size: 15px; width: 99%;"
+      {{disabledIfIncludes frozenAttributes "title"}}/>
+  </div>
+</div>
+
+<div class="control-group">
+  {{#ifIncludes frozenAttributes "description"}}
+    <div class="frozen-description user_content">
+      {{convertApiUserContent description}}
+    </div>
+  {{else}}
+    <div style="float: right;">
+      <a href="#" class="rte_switch_views_link">
+        {{#t "#editor.switch_views"}}Switch Views{{/t}}
+      </a>
+    </div>
+    <div style="clear:both;"></div>
+    <textarea id="assignment_description"
+      name="description"
+      aria-label="{{#t "description"}}Description{{/t}}"
+      style="width: 100%; min-height: 300px;"
+      {{disabledIfIncludes frozenAttributes "description"}}>
+      {{convertApiUserContent description forEditing=1}}
+    </textarea>
+  {{/ifIncludes}}
+
+</div>
+
+<div class="control-group">
+  <label for="assignments_points_possible" class="control-label">
+    {{#t "points_possible"}}Points{{/t}}
+  </label>
+  <div class="controls">
+    <input id="assignments_points_possible"
+      name="points_possible"
+      value="{{pointsPossible}}"
+      type="text"
+      {{disabledIfIncludes frozenAttributes "points_possible"}}/>
+  </div>
+</div>
+
+<div id="assignment_due_date_controls" class="control-group">
+  <label for="assignment_due_date" class="control-label">
+    {{#t "due_date"}}Due Date{{/t}}
+  </label>
+  <div class="controls">
+    <input id="assignment_due_date"
+      name="due_at"
+      value="{{datetimeFormatted dueAt}}"
+      type="text"
+      {{#if isSimple}}
+        class="date_field datetime_field hasDatePicker"
+      {{else}}
+        disabled
+      {{/if}}
+      {{disabledIfIncludes frozenAttributes "due_at"}}/>
+  </div>
+</div>
+
+<fieldset id="assignment_group_selector" class="control-group">
+</fieldset>
+
+{{#if isSimple}}
+<div class="form-controls">
+  <div class="controls">
+    <a href="#"
+      id="assignment_toggle_advanced_options"
+      aria-controls="advanced_assignment_options">
+      {{#t "show_advanced_options"}}Show Advanced Options{{/t}} ▼
+    </a>
+  </div>
+</div>
+{{/if}}
+
+<div id="advanced_assignment_options"
+  aria-expanded="{{not isSimple}}"
+  class="advanced-togglable-{{isSimple}}"
+  style="{{hiddenIf isSimple}}">
+
+  <div class="control-group">
+    <label for="assignment_grading_type" class="control-label">
+      {{#t "grading_type"}}Grading Type{{/t}}
+    </label>
+    <div class="controls">
+      <select id="assignment_grading_type" 
+        name="grading_type"
+        aria-controls="graded_assignment_fields view-grading-levels"
+        {{disabledIfIncludes frozenAttributes "grading_type"}}>
+        <option value="percent" {{selectedIf gradingType "percent"}}>
+          {{#t "grading_type_options.percent"}}Percentage{{/t}}
+        </option>
+        <option value="pass_fail" {{selectedIf gradingType "pass_fail" }}>
+          {{#t "grading_type_options.pass_fail"}}Complete/Incomplete{{/t}}
+        </option>
+        <option value="points" {{selectedIf gradingType "points"}}>
+          {{#t "grading_type_options.points"}}Points{{/t}}
+        </option>
+        <option value="letter_grade" {{selectedIf gradingType "letter_grade"}}>
+          {{#t "grading_type_options.letter_grade"}}Letter Grade{{/t}}
+        </option>
+        <option value="not_graded" {{selectedIf isNotGraded}}>
+          {{#t "grading_type_options.not_graded"}}Not Graded{{/t}}
+        </option>
+      </select>
+
+      <p id=view-grading-levels
+        class="help-block"
+        style="{{hiddenUnless isLetterGraded}}"
+        aria-expanded={{isLetterGraded}}>
+        <a href="#" class=edit_letter_grades_link>
+          {{#t "view_grading_levels"}}View Grading Levels{{/t}}
+        </a>
+      </p>
+
+      <input name=grading_standard_id
+        class=grading_standard_id
+        value="{{grading_standard_id}}"
+        type="hidden">
+    </div>
+  </div>
+
+
+  <div id="graded_assignment_fields"
+    aria-expanded="{{not isNotGraded}}"
+    style="{{hiddenIf isNotGraded}}">
+
+    {{>[assignments/submission_types_form]}}
+
+    <fieldset id="group_category_selector"
+      class="control-group"
+      style="{{hiddenIf isExternalTool}}">
+    </fieldset>
+
+    <fieldset id="assignment_peer_reviews_fields"
+      class="control-group"
+      style="{{hiddenIf isExternalTool}}">
+    </fieldset>
+
+  </div>
+
+  {{#if canFreeze}}
+    <fieldset>
+      <div class="control-group controls" style="text-align:left;">
+        <label class="checkbox">
+          <input id="assignment_freeze_on_copy"
+            name="freeze_on_copy"
+            {{checkedIf freezeOnCopy}}
+            type="checkbox"/>
+          {{#t "freeze_properties"}}Lock assignment properties when copied{{/t}}
+        </label>
+      </div>
+    </fieldset>
+  {{/if}}
+
+</div>
+
+<div class="form-actions">
+
+  <div style="float: left; min-width: 300px;">
+    <label class="checkbox" style="text-align:left;">
+      <input id="assignment_notify_of_update"
+        name="notify_of_update"
+        {{checkedIf notifyOfUpdate}}
+        type="checkbox"/>
+      {{#t "notify_content_change"}}Notify users that this content has changed{{/t}}
+    </label>
+  </div>
+
+  <button type="button" class="btn cancel_button">
+    {{#t "#buttons.cancel"}}Cancel{{/t}}
+  </button>
+  <button type="submit" class="btn btn-primary">
+    {{#t "buttons.update"}}Update Assignment{{/t}}
+  </button>
+
+</div>

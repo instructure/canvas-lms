@@ -99,11 +99,6 @@
           <span class="assignment_group_id"><%= assignment.assignment_group_id %></span>
         </div>
 
-        <a href="<%= assignment_url %>" class="preview_assignment_link no-hover" style="<%= hidden unless false %>">
-          <%= image_tag 'preview.png', :alt => t('links.preview_assignment', 'Preview Assignment'),
-                                       :title => t('links.preview_assignment', 'Preview Assignment'),
-                                       :style => 'display: none;' %>
-        </a>
         <% if assignment.new_record? || (assignment && !assignment.frozen_for_user?(@current_user)) %>
           <a href="<%= assignment_url %>/edit" rel="nofollow" class="edit_assignment_link no-hover">
             <i class="icon-edit standalone-icon"></i><span class="screen-reader-text"><%= t('links.edit_assignment', "Edit") %></span>

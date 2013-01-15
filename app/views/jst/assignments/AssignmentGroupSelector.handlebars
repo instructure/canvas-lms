@@ -1,0 +1,15 @@
+<label for="assignment_group_id" class="control-label">
+  {{#t "assignment_group"}}Assignment Group{{/t}}
+</label>
+<div class="controls">
+  <select id="assignment_group_id"
+    name="assignment_group_id"
+    {{disabledIfIncludes frozenAttributes "assignment_group_id"}}>
+    {{#each assignmentGroups}}
+      <option value="{{id}}" {{selected}}>{{name}}</option>
+    {{/each}}
+    <option value="new">
+      [ {{#t "assignment_group_options.new_group"}}New Group{{/t}} ]
+    </option>
+  </select>
+</div>

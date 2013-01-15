@@ -120,7 +120,6 @@
 #       // set to true.
 #       peer_reviews_assign_at: "2012-07-01T23:59:00-06:00",
 #
-#
 #       // the ID of the assignment’s group set (if this is a group assignment)
 #       group_category_id: 1,
 #
@@ -173,6 +172,9 @@
 #       // Only account administrators currently have permission to
 #       // change an attribute in this list. Will be empty if no attributes
 #       // are frozen for this assignment.
+#       // Possible frozen attributes are: title, description, lock_at,
+#       // points_possible, grading_type, submission_types, assignment_group_id,
+#       // allowed_extensions, group_category_id, notify_of_update, peer_reviews
 #       // NOTE: This field will only be present if the AssignmentFreezer
 #       // plugin is available for your account.
 #       frozen_attributes: [ "title" ],
@@ -428,6 +430,9 @@ class AssignmentsApiController < ApplicationController
   def update_and_save_assignment(assignment, assignment_params)
     return if assignment_params.nil?
 
+    old_assignment = assignment.new_record? ? nil : assignment.clone
+    old_assignment.id = assignment.id if old_assignment.present?
+
     # convert hashes like {0 => x, 1 => y} into arrays like [x, y]
     overrides = assignment_params[:assignment_overrides]
     if overrides.is_a?(Hash)
@@ -447,7 +452,7 @@ class AssignmentsApiController < ApplicationController
         assignment.save_without_broadcasting!
         batch_update_assignment_overrides(assignment, overrides)
       end
-      assignment.do_notifications!
+      assignment.do_notifications!(old_assignment)
     else
       assignment.save!
     end

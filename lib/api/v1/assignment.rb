@@ -24,32 +24,53 @@ module Api::V1::Assignment
     :only => %w(
       id
       position
+      description
       points_possible
       grading_type
       due_at
-      description
       lock_at
       unlock_at
       assignment_group_id
       peer_reviews
       automatic_peer_reviews
-      external_tool_tag_attributes
       grade_group_students_individually
       group_category_id
     )
   }
 
-  def assignment_json(assignment, user, session,include_discussion_topic = true)
-    hash = api_json(assignment, user, session, API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS)
-
-    hash.merge!(
-      'course_id' => assignment.context_id,
-      'name' => assignment.title,
-      'description' => api_user_content(hash['description'], @context || assignment.context),
-      'html_url' => course_assignment_url(assignment.context_id, assignment),
-      'muted' => assignment.muted?,
-      'submission_types' => assignment.submission_types_array
+  API_ASSIGNMENT_NEW_RECORD_FIELDS = {
+    :only => %w(
+      points_possible
+      due_at
+      assignment_group_id
     )
+  }
+
+  def assignment_json(assignment, user, session,include_discussion_topic = true)
+    fields = assignment.new_record? ? API_ASSIGNMENT_NEW_RECORD_FIELDS : API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS
+    hash = api_json(assignment, user, session, fields)
+    hash['course_id'] = assignment.context_id
+    hash['name'] = assignment.title
+    hash['submission_types'] = assignment.submission_types_array
+
+    if assignment.context && assignment.context.turnitin_enabled?
+      hash['turnitin_enabled'] = assignment.turnitin_enabled
+      hash['turnitin_settings'] = turnitin_settings_json(assignment)
+    end
+
+    if PluginSetting.settings_for_plugin(:assignment_freezer)
+      hash['freeze_on_copy'] = assignment.freeze_on_copy?
+      hash['frozen'] = assignment.frozen_for_user?(user)
+      hash['frozen_attributes'] = assignment.frozen_attributes_for_user(user)
+    end
+
+    return hash if assignment.new_record?
+
+    # use already generated hash['description'] because it is filtered by
+    # Assignment#filter_attributes_for_user when the assignment is locked
+    hash['description'] = api_user_content(hash['description'], @context || assignment.context)
+    hash['muted'] = assignment.muted?
+    hash['html_url'] = course_assignment_url(assignment.context_id, assignment)
 
     if assignment.external_tool? && assignment.external_tool_tag.present?
       external_tool_tag = assignment.external_tool_tag
@@ -57,7 +78,7 @@ module Api::V1::Assignment
     end
 
     if assignment.automatic_peer_reviews? && assignment.peer_reviews?
-      hash[ 'peer_review_count' ] = assignment.peer_review_count
+      hash['peer_review_count'] = assignment.peer_review_count
       hash['peer_reviews_assign_at'] = assignment.peer_reviews_assign_at
     end
 
@@ -75,17 +96,6 @@ module Api::V1::Assignment
 
     if assignment.allowed_extensions.present?
       hash['allowed_extensions'] = assignment.allowed_extensions
-    end
-
-    if PluginSetting.settings_for_plugin(:assignment_freezer)
-      hash['freeze_on_copy'] = assignment.freeze_on_copy?
-      hash['frozen'] = assignment.frozen_for_user?(user)
-      hash['frozen_attributes'] = assignment.frozen_attributes_for_user(user)
-    end
-
-    if assignment.context && assignment.context.turnitin_enabled?
-      hash['turnitin_enabled'] = assignment.turnitin_enabled
-      hash['turnitin_settings'] = turnitin_settings_json(assignment)
     end
 
     if assignment.rubric_association
@@ -164,6 +174,7 @@ module Api::V1::Assignment
     set_custom_field_values
     turnitin_enabled
     turnitin_settings
+    grading_standard_id
     freeze_on_copy
   )
 
@@ -190,17 +201,17 @@ module Api::V1::Assignment
       update_params["submission_types"] = update_params["submission_types"].join(',')
     end
 
-    # validate and add to update_params
     if update_params.has_key?("assignment_group_id")
       ag_id = update_params.delete("assignment_group_id").presence
       assignment.assignment_group = assignment.context.assignment_groups.find_by_id(ag_id)
     end
 
-    # validate and add to update_params
     if update_params.has_key?("group_category_id")
       gc_id = update_params.delete("group_category_id").presence
       assignment.group_category = assignment.context.group_categories.find_by_id(gc_id)
     end
+
+    #TODO: validate grading_standard_id (it's permissions are currently useless)
 
     if assignment_params.key? "muted"
       assignment.muted = value_to_boolean(assignment_params.delete("muted"))

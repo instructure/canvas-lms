@@ -37,13 +37,12 @@ describe "grading standards" do
     @assignment = @course.assignments.create!(:title => "new assignment")
     @standard = @course.grading_standards.create!(:title => "some standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
 
-    get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-    f(".edit_full_assignment_link").click
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
     form = f("#edit_assignment_form")
-    form.find_element(:css, ".more_options_link").click
-    form.find_element(:css, ".grading_type option[value='letter_grade']").click
-    form.find_element(:css, ".edit_letter_grades_link").should be_displayed
-    form.find_element(:css, ".edit_letter_grades_link").click
+    f('#assignment_toggle_advanced_options').click
+    click_option('#assignment_grading_type', "Letter Grade")
+    f('.edit_letter_grades_link').should be_displayed
+    f('.edit_letter_grades_link').click
 
     dialog = f("#edit_letter_grades_form")
     dialog.find_elements(:css, ".grading_standard_row").select(&:displayed?).length.should == 12
@@ -65,6 +64,11 @@ describe "grading standards" do
     dialog.find_element(:css, "#grading_standard_brief_#{@standard.id}").should_not be_displayed
     dialog.find_element(:css, ".display_grading_standard").should be_displayed
     dialog.find_element(:css, ".standard_title .title").text.should == @standard.title
+
+    dialog.find_element(:css, ".done_button").click
+    expect_new_page_load { submit_form('#edit_assignment_form') }
+
+    @assignment.reload.grading_standard_id.should == @standard.id
   end
 
   it "should allow setting a grading standard for a course" do

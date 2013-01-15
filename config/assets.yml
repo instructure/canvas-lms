@@ -107,8 +107,8 @@ stylesheets:
     - public/stylesheets/compiled/ui.selectmenu.css
   moderate_quiz:
     - public/stylesheets/compiled/moderate_quiz.css
-  full_assignment:
-    - public/stylesheets/compiled/full_assignment.css
+  assignments:
+    - public/stylesheets/compiled/assignments.css
     - public/stylesheets/compiled/grading_standards.css
     - public/stylesheets/static/embed_content.css
   grading_standards:

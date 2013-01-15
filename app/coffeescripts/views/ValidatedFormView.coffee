@@ -1,11 +1,12 @@
 define [
   'Backbone'
   'jquery'
+  'underscore'
   'compiled/fn/preventDefault'
   'jquery.toJSON'
   'jquery.disableWhileLoading'
   'jquery.instructure_forms'
-], (Backbone, $, preventDefault) ->
+], (Backbone, $, _, preventDefault) ->
 
   ##
   # Sets model data from a form, saves it, and displays errors returned in a
@@ -39,26 +40,38 @@ define [
     # @api public
     # @returns jqXHR
     submit: preventDefault ->
+      @$el.hideErrors()
+
       data = @getFormData()
+      errors = @validateBeforeSave data, {}
 
-      disablingDfd = new $.Deferred()
-      saveDfd = @model
-        .save(data, @saveOpts)
-        .then(@onSaveSuccess, @onSaveFail)
-        .fail -> disablingDfd.reject()
+      if _.keys(errors).length == 0
+        disablingDfd = new $.Deferred()
+        saveDfd = @model
+          .save(data, @saveOpts)
+          .then(@onSaveSuccess, @onSaveFail)
+          .fail -> disablingDfd.reject()
 
-      unless @dontRenableAfterSaveSuccess
-        saveDfd.done -> disablingDfd.resolve()
+        unless @dontRenableAfterSaveSuccess
+          saveDfd.done -> disablingDfd.resolve()
 
-      @$el.disableWhileLoading disablingDfd
-      @trigger 'submit'
-      saveDfd
+        @$el.disableWhileLoading disablingDfd
+        @trigger 'submit'
+        saveDfd
+      else
+        @showErrors errors
+        null
 
     ##
     # Converts the form to an object. Override this if the form's input names
     # don't match the model/API fields
     getFormData: ->
       @$el.toJSON()
+
+    ##
+    # Override this to perform pre-save validations.  Return errors that can
+    # show with the showErrors format below
+    validateBeforeSave: -> {}
 
     onSaveSuccess: =>
       @trigger 'success', arguments...

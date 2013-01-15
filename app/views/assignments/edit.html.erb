@@ -1,0 +1,34 @@
+<% content_for :page_title, t(:edit_assignment, "Edit Assignment") %>
+<% content_for :right_side do %>
+  <%= render "shared/wiki_sidebar" %>
+  <% if can_do(@assignment, @current_user, :update) %>
+    <ul class="page-action-list">
+      <li>
+        <% link_to new_course_discussion_topic_url(@context) do %>
+          <i class="icon-discussion-new"></i> <%= t('new_discussion', "New Discussion") %>
+        <% end %>
+      </li>
+      <li>
+        <% link_to new_course_quiz_url(@context) do %>
+          <i class="icon-quiz"></i> <%= t('new_quiz', "New Quiz") %>
+        <% end %>
+      </li>
+    </ul>
+  <% end %>
+<% end %>
+
+<%
+  jammit_css :assignments, :tinymce
+  js_bundle :assignment_edit
+%>
+
+<form id="edit_assignment_form" class="form-horizontal bootstrap-form">
+</form>
+
+<%= render "groups/add_group_category" %>
+<%= render "shared/select_content_dialog", :only => [:external_tools] %>
+<div id="edit_letter_grades_form" style="display: none;">
+  <%= render "shared/grading_standard", :object => @assignment.try(:grading_standard) %>
+  <a href="<%= context_url(@context, :context_grading_standards_url) %>" style="display: none;" class="create_grading_standard_url">&nbsp;</a>
+  <a href="<%= context_url(@context, :context_grading_standard_url, "{{ id }}") %>" style="display: none;" id="update_grading_standard_url">&nbsp;</a>
+</div>

@@ -1,105 +1,194 @@
-<% content_for :page_title do %><%= @assignment.new_record? ? t(:new_assignment, "New Assignment") : @assignment.title %>: <%= @context.name %><% end %>
-<% content_for :right_side do %>
-    <%= render :partial => "assignment_sidebar" %>
-    <%= render :partial => "shared/wiki_sidebar" %>
-<% end %>
-<% js_block do %>
-<script>
-require([
-  'INST' /* INST */,
-  'jquery' /* $ */,
-  'jquery.instructure_forms' /* getFormData, formErrors */
-], function(INST, $) {
+<% 
+  content_for :page_title, @assignment.new_record? ? t(:new_assignment, "New Assignment") : @assignment.title
+  content_for :right_side, render(:partial => "assignment_sidebar")
+%>
 
-window.limitToOneRubric = true;
-
-$(document).ready(function() {
-  $(".upload_submissions_link").click(function(event) {
-    event.preventDefault();
-    $("#re_upload_submissions_form").slideToggle();
-  });
-  $(".download_submissions_link").click(function(event) {
-    event.preventDefault();
-    INST.downloadSubmissions($(this).attr('href'));
-    $(".upload_submissions_link").slideDown();
-  });
-  $("#re_upload_submissions_form").submit(function(event) {
-    var data = $(this).getFormData();
-    if(!data.submissions_zip) {
-      event.preventDefault();
-      event.stopPropagation();
-    } else if(!data.submissions_zip.match(/\.zip$/)) {
-      event.preventDefault();
-      event.stopPropagation();
-      $(this).formErrors({
-        submissions_zip: <%= t('errors.upload_as_zip', "Please upload files as a .zip").to_json.html_safe %>
-      });
-    }
-  });
-  $("#edit_assignment_form").bind('assignment_updated', function(event, data) {
-    if(data.assignment && data.assignment.peer_reviews) {
-      $(".assignment_peer_reviews_link").slideDown();
-    } else {
-      $(".assignment_peer_reviews_link").slideUp();
-    }
-  });
-});
-});
-</script>
-<% end %>
-<% content_for :stylesheets do %>
-<style>
-.time_slot {
-  float: left;
-  font-family: courier,monospace;
-  padding: 0px 0.2em;
-  margin-right: 1px;
-  margin-top: 1px;
-  cursor: pointer;
-}
-</style>
-<% end %>
-<% unless @assignment.new_record? %>
-  <% if can_do(@assignment, @current_user, :update) %>
-    <a href="<%= context_url(@context, :context_rubrics_url) %>" id="add_rubric_url" style="display: none;">&nbsp;</a>
-  <% end %>
-<% end %>
 <% if @locked && !@locked[:due_at] %>
+
   <h2><%= @assignment.title %></h2>
   <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'assignment', @context) : t(:assignment_locked, "This assignment is currently locked.") %>
+
 <% else %>
-  <%= render :partial => "shared/full_assignment", :object => @assignment %>
+
+<% 
+  jammit_css :assignments
+  js_bundle :assignment_show
+%>
+
+<div id="assignment_show" class="assignment content_underline_links">
+  <% if can_do(@assignment, @current_user, :update) %>
+    <div class='assignment-title'>
+      <div class='title-content'>
+        <h2 class="title">
+          <%= @assignment.title %>
+        </h2>
+      </div>
+      <div class='edit-content'>
+        <a href="<%= edit_polymorphic_path([@context, @assignment]) %>" class='btn edit_assignment_link'>
+          <i class='icon-edit'></i> <%= t('links.edit', 'Edit') %>
+        </a>
+      </div>
+    </div>
+  <% else %>
+    <!--Student View-->
+    <h2 class="title">
+      <%= @assignment.title %>
+    </h2>
+    <ul class='student-assignment-overview'>
+      <li>
+        <span class='label'><%= t :due_at, 'Due' %></span>
+        <span class='value'>
+          <% if @assignment.due_at %>
+            <% ot(:date_time_by, "%{date} by %{time}", :date => capture { %>
+              <span class="display_date"><%= date_string(@assignment.due_at) rescue '' %></span><% }, :time => capture { %>
+              <span class="display_time"><%= time_string(@assignment.due_at) rescue '' %></span><% }) %>
+          <% else %>
+            <%= t :no_due_date, 'No Due Date' %>
+          <% end %>
+        </span>
+      </li>
+      <li>
+        <span class='label'><%= t :points, 'Points' %></span>
+        <span class='value'><%= @assignment.points_possible || t(:no_points, 'None') %></span>
+      </li>
+      <% if @assignment.expects_submission? %>
+        <% turnitin_text = @assignment.turnitin_enabled? ? ' ' + t(:turnitin_enabled_short, '(Turnitin enabled)') : '' %>
+        <li>
+          <span class='label'><%= t :submitting, 'Submitting' %></span>
+          <span class='value'><%= @assignment.readable_submission_types + turnitin_text %></span>
+        </li>
+        <% if @assignment.submission_types =~ /online_upload/ && !@assignment.allowed_extensions.blank? -%>
+          <li>
+            <span class='label'><%= t :submission_types, 'File Types' %></span>
+            <span class='value'><%= @assignment.allowed_extensions.to_sentence %></span>
+          </li>
+        <% end %>
+      <% end %>
+      <div class="clear"></div>
+    </ul>
+  <% end %>
+
+  <div class="clear"></div>
+
+  <% if @locked %>
+    <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'assignment', @context) : t('messages.locked', "This assignment is currently locked.") %>
+  <% end %>
+
+  <div class="clear"></div>
+
+  <% description = !@assignment.description.blank? ? user_content(@assignment.description) : t('defaults.no_content', "No Content") %>
+  <div class="description user_content <%= can_do(@assignment, @current_user, :update) ? "teacher-version" : "student-version" %>"><%= description %></div>
+
+  <% if can_do(@assignment, @current_user, :update) %>
+    <!--Teacher view-->
+
+    <form class="form-horizontal bootstrap-form display-only" style="margin-top:18px;">
+      <fieldset>
+        <div class="control-group">
+          <label class="control-label"><%= t(:points, 'Points') %></label>
+          <div class="controls">
+            <span class="value points_possible"><%= @assignment.points_possible || t(:no_points, 'None') %></span>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label"><%= t :submitting, 'Submitting' %></label>
+          <div class="controls">
+            <span class="value"><%= @assignment.readable_submission_types || t(:no_submission, 'Nothing') %></span>
+          </div>
+        </div>
+        <% if @assignment.submission_types =~ /online_upload/ && !@assignment.allowed_extensions.blank? -%>
+          <div class="control-group">
+            <label class="control-label"><%= t :submission_types, 'File Types' %></label>
+            <div class="controls">
+              <span class="value"><%= @assignment.allowed_extensions.to_sentence %></span>
+            </div>
+          </div>
+        <% end -%>
+        <% if @assignment.turnitin_enabled %>
+          <div class="control-group">
+            <label class="control-label"><%= t :turnitin, 'Turnitin' %></label>
+            <div class="controls">
+              <span class="value"><%= t :turnitin_enabled, 'Turnitin has been enabled for this assignment.' %></span>
+            </div>
+          </div>
+        <% end %>
+      </fieldset>
+    </form>
+
+    <table class="table assignment_dates">
+      <thead>
+        <tr>
+          <th scope="col"><%= t(:due, 'Due') %></th>
+          <th scope="col"><%= t(:for, 'For') %></th>
+          <th scope="col"><%= t(:available_from, 'Available from') %></th>
+          <th scope="col"><%= t(:until, 'Until') %></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% presenter = OverrideListPresenter.new(@assignment, @current_user) %>
+        <% presenter.visible_due_dates.each do |due_date| %>
+          <tr>
+            <td><%= presenter.due_at(due_date) %></td>
+            <td><%= due_date[:title] || t(:everyone, 'Everyone else') %></td>
+            <td><%= presenter.unlock_at(due_date) %></td>
+            <td><%= presenter.lock_at(due_date) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <% if can_do(@assignment, @current_user, :update) %>
+      <a href="<%= context_url(@context, :context_rubrics_url) %>" class="add_rubric_link btn button-sidebar-wide"
+         style="<%= hidden if @assignment.rubric_association %>">
+        <i class="icon-add"></i> <%= t 'links.add_rubric', "Add Rubric" %>
+      </a>
+    <% end %>
+
+    <div class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></div>
+
+  <% end %>
+
+  <div style="display: none;">
+    <span class="timestamp"><%= @assignment.due_at.to_i %></span>
+    <span class="due_date_string"><%= @assignment.due_at.strftime("%m/%d/%Y") rescue "" %></span>
+    <span class="due_time_string"><%= @assignment.due_at.strftime("%I:%M%p").downcase rescue "" %></span>
+  </div>
+</div>
+
 <% end %>
+
 <% if can_do(@assignment, @current_user, :submit) && !@locked %>
   <%= render :partial => "submit_assignment" %>
 <% end %>
 
+<% js_bundle :edit_rubric %>
+<% jammit_css :learning_outcomes %>
+
 <% if can_do(@assignment, @current_user, :update) %>
-  <% js_bundle :edit_rubric %>
-  <% jammit_css :learning_outcomes %>
+  <%# HACK! this is here because edit_rubric.js expects there to be a #add_rubric_url on the page and sets it's <form action="..."> to it %>
+  <a href="<%= context_url(@context, :context_rubrics_url) %>" id="add_rubric_url" style="display: none;"></a>
 <% end %>
 
-<% unless @assignment.new_record? %>
-  <div id="rubrics" style="margin-bottom: 10px;">
-    <% if @assignment.rubric_association && @assignment.rubric_association.rubric %>
-      <%= render :partial => "shared/rubric", :object => @assignment.rubric_association.rubric, :locals => {:association => @assignment, :rubric_association => @assignment.rubric_association, :editable => can_do(@assignment, @current_user, :update), :has_assessments => !@assignment.rubric_association.rubric_assessments.empty?, :edit_view => can_do(@assignment, @current_user, :update) } %>
-    <% end %>
-    <div style="display: none;" id="rubric_parameters">
-      <input type="hidden" name="rubric_association[association_type]" value="Assignment"/>
-      <input type="hidden" name="rubric_association[association_id]" value="<%= @assignment.id %>"/>
-      <input type="hidden" name="rubric_association[purpose]" value="grading"/>
-    </div>
-    <% if can_do(@assignment, @current_user, :update) %>
-      <%= render :partial => "shared/rubric_dialog", :locals => {:assignment => @assignment, :rubric => @assignment.rubric_association && @assignment.rubric_association.rubric} %>
-    <% end %>
-    <%= render :partial => "shared/rubric_criterion_dialog" %>
-  </div>
-  <%= render :partial => "shared/rubric", :object => nil, :locals => {:association => @assignment, :editable => can_do(@assignment, @current_user, :update), :has_assessments => false, :edit_view => true} %>
-  <% if can_do(@assignment, @current_user, :update) %>
-    <div style="text-align: center; font-size: 1.2em; margin-top: 10px; display: none;">
-      <a href="<%= context_url(@context, :context_rubrics_url) %>" class="add_rubric_link rubric" style="<%= hidden if @assignment.rubric_association %>"><%= t 'links.assign_rubric', 'Assign Rubric' %></a>
-    </div>
-    <%= render :partial => "shared/rubric_forms" %>
+<div id="rubrics" style="margin-bottom: 10px;">
+  <% if @assignment.rubric_association && @assignment.rubric_association.rubric %>
+    <%= render :partial => "shared/rubric", :object => @assignment.rubric_association.rubric, :locals => {:association => @assignment, :rubric_association => @assignment.rubric_association, :editable => can_do(@assignment, @current_user, :update), :has_assessments => !@assignment.rubric_association.rubric_assessments.empty?, :edit_view => can_do(@assignment, @current_user, :update) } %>
   <% end %>
-  <%= render :partial => "shared/sequence_footer", :locals => {:asset => @assignment} if !@assignment.context_module_tags.empty? %>
+  <div style="display: none;" id="rubric_parameters">
+    <input type="hidden" name="rubric_association[association_type]" value="Assignment"/>
+    <input type="hidden" name="rubric_association[association_id]" value="<%= @assignment.id %>"/>
+    <input type="hidden" name="rubric_association[purpose]" value="grading"/>
+  </div>
+  <% if can_do(@assignment, @current_user, :update) %>
+    <%= render :partial => "shared/rubric_dialog", :locals => {:assignment => @assignment, :rubric => @assignment.rubric_association && @assignment.rubric_association.rubric} %>
+  <% end %>
+  <%= render :partial => "shared/rubric_criterion_dialog" %>
+</div>
+<%= render :partial => "shared/rubric", :object => nil, :locals => {:association => @assignment, :editable => can_do(@assignment, @current_user, :update), :has_assessments => false, :edit_view => true} %>
+<% if can_do(@assignment, @current_user, :update) %>
+  <div style="text-align: center; font-size: 1.2em; margin-top: 10px; display: none;">
+    <a href="<%= context_url(@context, :context_rubrics_url) %>" class="add_rubric_link rubric" style="<%= hidden if @assignment.rubric_association %>"><%= t 'links.assign_rubric', 'Assign Rubric' %></a>
+  </div>
+  <%= render :partial => "shared/rubric_forms" %>
 <% end %>
+<%= render :partial => "shared/sequence_footer", :locals => {:asset => @assignment} if !@assignment.context_module_tags.empty? %>

@@ -40,8 +40,7 @@ describe "assignments" do
       details_dialog = f('#edit_event').find_element(:xpath, '..')
       details_dialog.find_element(:name, 'assignment[title]').should be_displayed
       details_dialog.find_element(:css, '#edit_assignment_form .more_options_link').click
-      #make sure user is taken to assignment details
-      f('h2.title').should include_text(assignment_name)
+      f('#assignment_name')['value'].should include_text(assignment_name)
     end
 
     it "should create an assignment" do
@@ -75,44 +74,25 @@ describe "assignments" do
       it "should create assignment with #{grading_option} grading option" do
         assignment_title = 'grading options assignment'
         manually_create_assignment(assignment_title)
+        f('#assignment_toggle_advanced_options').click
         click_option('#assignment_grading_type', grading_option, :value)
-        expect_new_page_load { submit_form('#edit_assignment_form') }
-        f('.assignment_list').should include_text(assignment_title)
+        submit_assignment_form
+        f('.title').should include_text(assignment_title)
         Assignment.find_by_title(assignment_title).grading_type.should == grading_option
       end
     end
 
-    %w(discussion_topic quiz external_tool not_graded).each do |assignment_type|
-      it "should create an assignment with the type of #{assignment_type}" do
-        assignment_title = 'assignment type assignment'
-        lti_url = 'http://www.example.com/ims/lti'
-        manually_create_assignment(assignment_title)
-        click_option('.assignment_type', assignment_type, :value)
-        if assignment_type != 'external_tool'
-          expect_new_page_load { submit_form('#edit_assignment_form') }
-        else
-          f('#external_tool_create_url').send_keys(lti_url)
-          submit_dialog('#select_context_content_dialog', ".add_item_button")
-          expect_new_page_load { submit_form('#edit_assignment_form') }
-        end
-        f('.assignment_list').should include_text(assignment_title)
-        assignment = Assignment.find_by_title(assignment_title)
-        assignment_type == 'quiz' ? assignment.submission_types.should == 'online_quiz' : assignment.submission_types.should == assignment_type
-      end
-    end
-
-    it "should validate lock submits after functionality" do
+    it "should submit a due date successfully" do
       middle_number = '15'
       expected_date = (Time.now - 1.month).strftime("%b #{middle_number}")
       manually_create_assignment
-      f('.submission_content .ui-datepicker-trigger').click
+      f('#assignment_due_date_controls .ui-datepicker-trigger').click
       f('.ui-datepicker-prev').click
       fj("#ui-datepicker-div a:contains(#{middle_number})").click
       expect_new_page_load { submit_form('#edit_assignment_form') }
-      assignment = Assignment.find_by_title('new assignment')
-      expect_new_page_load { f("#assignment_#{assignment.id} .title").click }
-      f('.lock_date').should include_text(expected_date)
-      assignment.lock_at.strftime('%b %d').should == expected_date
+      expect_new_page_load { f(".edit_assignment_link").click }
+      f('#assignment_due_date').attribute(:value).should include_text(expected_date)
+      Assignment.find_by_title('new assignment').due_at.strftime('%b %d').should == expected_date
     end
 
     it "should create an assignment with more options" do
@@ -125,8 +105,9 @@ describe "assignments" do
         first_stamp = group.reload.updated_at.to_i
         f('.add_assignment_link').click
         expect_new_page_load { f('.more_options_link').click }
-        expect_new_page_load { submit_form('#edit_assignment_form') }
+        submit_assignment_form
         @course.assignments.count.should == 1
+        get "/courses/#{@course.id}/assignments"
         f('.no_assignments_message').should_not be_displayed
         f('#groups').should include_text(expected_text)
         group.reload
@@ -138,8 +119,9 @@ describe "assignments" do
       get "/courses/#{@course.id}/assignments"
       f('.add_assignment_link').click
       expect_new_page_load { f('.more_options_link').click }
-      f('#assignment_group_assignment').click
-      click_option('#assignment_group_category_select', 'new', :value)
+      f('#assignment_toggle_advanced_options').click
+      f('#assignment_has_group_category').click
+      click_option('#assignment_group_category_id', 'new', :value)
       fj('.ui-dialog:visible .self_signup_help_link img').click
       f('#self_signup_help_dialog').should be_displayed
     end
@@ -155,47 +137,22 @@ describe "assignments" do
           :unlock_at => due_date - 1.day
       )
       @assignment = @course.assignments.last
-      get "/courses/#{@course.id}/assignments"
-      expect_new_page_load { f("#assignment_#{@assignment.id} .title").click }
-      f('.edit_full_assignment_link').click
-      f('.more_options_link').click
-      f('#assignment_group_assignment').click
-      click_option('#assignment_group_category_select', 'new', :value)
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+      f('#assignment_toggle_advanced_options').click
+      f('#assignment_has_group_category').click
       submit_dialog('#add_category_form')
       wait_for_ajaximations
-      submit_form('#edit_assignment_form')
-      wait_for_ajaximations
+      submit_assignment_form
       @assignment.reload
       @assignment.group_category_id.should_not be_nil
       @assignment.group_category.should_not be_nil
 
-      get "/courses/#{@course.id}/assignments"
-      expect_new_page_load { f("#assignment_#{@assignment.id} .title").click }
-      f('.edit_full_assignment_link').click
-      f('.more_options_link').click
-      f('#assignment_group_assignment').click
-      submit_form('#edit_assignment_form')
-      wait_for_ajaximations
+      edit_assignment
+      f('#assignment_has_group_category').click
+      submit_assignment_form
       @assignment.reload
       @assignment.group_category_id.should be_nil
       @assignment.group_category.should be_nil
-    end
-
-    it "should allow creating a quiz assignment from 'more options'" do
-      get "/courses/#{@course.id}/assignments"
-
-      driver.execute_script %{$('.assignment_group .add_assignment_link:first').addClass('focus');}
-      f(".assignment_group .add_assignment_link").click
-      form = f("#add_assignment_form")
-      form.find_element(:css, ".assignment_submission_types option[value='online_quiz']").click
-      expect_new_page_load { form.find_element(:css, ".more_options_link").click }
-
-      f(".submission_type_option option[value='none']").should be_selected
-      f(".assignment_type option[value='assignment']").click
-      f(".submission_type_option option[value='online']").click
-      f(".assignment_type option[value='quiz']").click
-
-      expect_new_page_load { submit_form('#edit_assignment_form') }
     end
 
     it "should edit an assignment" do
@@ -213,16 +170,14 @@ describe "assignments" do
       get "/courses/#{@course.id}/assignments"
 
       expect_new_page_load { f("#assignment_#{@assignment.id} .title").click }
-      f('.edit_full_assignment_link').click
-      f('.more_options_link').click
-      f('#assignment_assignment_group_id').should be_displayed
-      click_option('#assignment_assignment_group_id', second_group.name)
+      edit_assignment
+      f('#assignment_toggle_advanced_options').click
+      f('#assignment_group_id').should be_displayed
+      click_option('#assignment_group_id', second_group.name)
       click_option('#assignment_grading_type', 'Letter Grade')
 
       #check grading levels dialog
-      wait_for_animations
-      keep_trying_until { f('a.edit_letter_grades_link').should be_displayed }
-      f('a.edit_letter_grades_link').click
+      f('.edit_letter_grades_link').click
       wait_for_animations
       f('#edit_letter_grades_form').should be_displayed
       close_visible_dialog
@@ -230,18 +185,16 @@ describe "assignments" do
       #check peer reviews option
       form = f("#edit_assignment_form")
       form.find_element(:css, '#assignment_peer_reviews').click
-      form.find_element(:css, '#auto_peer_reviews').click
+      form.find_element(:css, '#assignment_automatic_peer_reviews').click
       f('#assignment_peer_review_count').send_keys('2')
       f('#assignment_peer_reviews_assign_at + img').click
       datepicker = datepicker_next
       datepicker.find_element(:css, '.ui-datepicker-ok').click
-      f('#assignment_title').send_keys(' edit')
+      f('#assignment_name').send_keys(' edit')
 
       #save changes
-      submit_form(form)
-      wait_for_ajaximations
-      ff('.loading_image_holder').length.should == 0
-      f('h2.title').should include_text(assignment_name + ' edit')
+      submit_assignment_form
+      f('title').should include_text(assignment_name + ' edit')
     end
 
     context "frozen assignments" do
@@ -260,6 +213,8 @@ describe "assignments" do
         )
         @asmnt.copied = true
         @asmnt.save!
+
+        @course.assignment_groups.create!(:name => "other")
       end
 
       def run_assignment_edit
@@ -268,37 +223,39 @@ describe "assignments" do
         get "/courses/#{@course.id}/assignments"
 
         expect_new_page_load { f("#assignment_#{@asmnt.id} .title").click }
-        f('.edit_full_assignment_link').click
-        f('.more_options_link').click
+        edit_assignment
+        f('#assignment_toggle_advanced_options').try(:click)
 
         yield
 
         # title isn't locked, should allow editing
-        f('#assignment_title').send_keys(' edit')
+        f('#assignment_name').send_keys(' edit')
 
         #save changes
-        submit_form('#edit_assignment_form')
-        wait_for_ajaximations
-        ff('.loading_image_holder').length.should == 0
+        submit_assignment_form
         f('h2.title').should include_text(orig_title + ' edit')
       end
 
       it "should respect frozen attributes for teacher" do
         run_assignment_edit do
-          fj('#assignment_assignment_group_id').should be_nil
-          fj('#edit_assignment_form #assignment_peer_reviews').should_not be_nil
-          fj('#edit_assignment_form #assignment_description').should_not be_nil
+          f('#assignment_group_id').should have_attribute('disabled', 'true')
+          f('#assignment_peer_reviews').attribute('disabled').should be_nil
+          f('#assignment_description').attribute('disabled').should be_nil
+          click_option('#assignment_group_id', "other")
         end
+        @asmnt.reload.assignment_group.name.should == "default"
       end
 
       it "should not be locked for admin" do
         course_with_admin_logged_in(:course => @course, :name => "admin user")
 
         run_assignment_edit do
-          f('#assignment_assignment_group_id').should_not be_nil
-          f('#edit_assignment_form #assignment_peer_reviews').should_not be_nil
-          f('#edit_assignment_form #assignment_description').should_not be_nil
+          f('#assignment_group_id').attribute('disabled').should be_nil
+          f('#assignment_peer_reviews').attribute('disabled').should be_nil
+          f('#assignment_description').attribute('disabled').should be_nil
+          click_option('#assignment_group_id', "other")
         end
+        @asmnt.reload.assignment_group.name.should == "other"
       end
 
       it "should not allow assignment group to be deleted by teacher if "+
@@ -311,32 +268,37 @@ describe "assignments" do
 
     it "should show a more errors errorBox if any invalid fields are hidden" do
       assignment_name = 'first test assignment'
-      @group = @course.assignment_groups.create!(:name => "default")
-      @assignment = @course.assignments.create(
-          :name => assignment_name,
-          :assignment_group => @group,
-          :points_possible => 2,
-          :due_at => Time.now,
-          :lock_at => 1.month.ago # this will trigger the client-side validation error
-      )
+      @assignment = @course.assignments.create({
+        :name => assignment_name,
+        :assignment_group => @course.assignment_groups.create!(:name => "default")
+      })
 
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      f("a.edit_full_assignment_link").click
-      submit_form('#edit_assignment_form')
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+      f('#assignment_toggle_advanced_options').click # show advanced options
+      click_option('#assignment_submission_type', "Online") # setup an error state (online with no types)
+      f('#assignment_toggle_advanced_options').click # hide advanced options
+      f('.btn-primary[type=submit]').click
+      wait_for_ajaximations
 
-      wait_for_animations
       errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
-      errorBoxes.size.should == 2
-      errorBoxes.first.should_not be_displayed # .text just gives us an empty string since it's hidden
-      errorBoxes.last.text.should == "There were errors on one or more advanced options"
-      errorBoxes.last.should be_displayed
+      errorBoxes.size.should == 2 # the inivisible one and the 'advanced options' one
+      visBoxes, hidBoxes = errorBoxes.partition{ |eb| eb.displayed? }
+      visBoxes.first.text.should == "There were errors on one or more advanced options"
 
-      f('a.more_options_link').click
+      f('#assignment_toggle_advanced_options').click
       wait_for_animations
       errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
       errorBoxes.size.should == 1 # the more_options_link one has now been removed from the DOM
-      errorBoxes.first.text.should == "The assignment shouldn't be locked again until after the due date"
+      errorBoxes.first.text.should == 'Please choose at least one submission type'
       errorBoxes.first.should be_displayed
+    end
+
+    def submit_assignment_form
+      expect_new_page_load { f('.btn-primary[type=submit]').click }
+    end
+
+    def edit_assignment
+      expect_new_page_load { f('.edit_assignment_link').click }
     end
   end
 end

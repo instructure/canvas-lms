@@ -29,19 +29,8 @@ describe "discussion assignments" do
     driver.current_url.should match %r{/courses/\d+/discussion_topics/\d+}
   end
 
-  it "should create a discussion topic when edited from a regular assignment" do
-    build_assignment_with_type("Assignment")
-    expect_new_page_load { f(".assignment_list .group_assignment .assignment_title a").click }
-    f(".edit_full_assignment_link").click
-    wait_for_animations
-    click_option(".assignment_type", "Discussion")
-    submit_form("#edit_assignment_form")
-    wait_for_ajaximations
-    expect_new_page_load { f(".assignment_topic_link").click }
-    driver.current_url.should match %r{/courses/\d+/discussion_topics/\d+}
-  end
-
   it "should create a discussion topic with requires peer reviews" do
+    pending "needs peer review form in discussion edit page"
     assignment_title = 'discussion assignment peer reviews'
     get "/courses/#{@course.id}/assignments"
     driver.execute_script %{$('.header_content .add_assignment_link:first').addClass('focus');}

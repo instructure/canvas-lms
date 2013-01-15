@@ -1,0 +1,35 @@
+<div class="row-fluid">
+  <div class="span12">
+    <form title='{{#t "links.add_assignment_group"}}Add Assignment Group"{{/t}}'
+      class="form-inline bootstrap-form">
+
+      <div class="control-group">
+        <label class="control-label">
+          <div class="controls">
+            <input name="assignment_group[name]"
+            type="text"
+            placeholder="New Group Name"
+            />
+            {{#t "assignment_group.labels.name"}}
+              Name
+            {{/t}}
+          </div>
+        </label>
+      </div>
+
+      <div class="button-container">
+        <button type="submit" class="btn btn-primary">
+          {{#t "buttons.add_group"}}
+            Add Group
+          {{/t}}
+        </button>
+        <button type="button" class="btn btn-secondary cancel-button">
+          {{#t "buttons.cancel"}}
+            Cancel
+          {{/t}}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

@@ -18,7 +18,6 @@
 
 module Api::V1::AssignmentGroup
   include Api::V1::Json
-  include Api::V1::Assignment
 
   def assignment_group_json(group, user, session, includes = [])
     includes ||= []
@@ -30,6 +29,7 @@ module Api::V1::AssignmentGroup
 
     include_discussion_topic = includes.include?('discussion_topic')
     if includes.include?('assignments')
+      extend Api::V1::Assignment
       hash['assignments'] = group.assignments.active.map { |a|
         assignment_json(a, user, session, include_discussion_topic)
       }

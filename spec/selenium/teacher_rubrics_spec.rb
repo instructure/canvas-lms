@@ -118,7 +118,7 @@ describe "course rubrics" do
         @assignment = @course.assignments.create!(assignment_valid_attributes.merge({:title => "New Course Assignment"}))
 
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        f("#right-side-wrapper .add_rubric_link").click
+        f(".add_rubric_link").click
         fj(".find_rubric_link:visible").click
         wait_for_ajaximations
         fj(".select_rubric_link:visible").click
