@@ -22,7 +22,7 @@ class MediaObject < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   belongs_to :attachment
   belongs_to :root_account, :class_name => 'Account'
-  validates_presence_of :media_id, :context_id, :context_type
+  validates_presence_of :media_id
   after_create :retrieve_details_later
   after_save :update_title_on_kaltura_later
   serialize :data
@@ -189,6 +189,10 @@ class MediaObject < ActiveRecord::Base
   
   def retrieve_details_later
     send_later(:retrieve_details_ensure_codecs)
+  end
+
+  def media_sources
+    Kaltura::ClientV3.new.media_sources(self.media_id)
   end
   
   def retrieve_details_ensure_codecs(attempt=0)

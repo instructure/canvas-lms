@@ -412,7 +412,7 @@ module ApplicationHelper
           hide = tab[:hidden] || tab[:hidden_unused]
           class_name = tab[:css_class].to_css_class
           class_name += ' active' if @active_tab == tab[:css_class]
-          html << "<li class='section #{"hidden" if hide }'>" + link_to(content_tag(:span, tab[:label]), path, :class => class_name) + "</li>" if tab[:href]
+          html << "<li class='section #{"hidden" if hide }'>" + link_to(tab[:label], path, :class => class_name) + "</li>" if tab[:href]
         end
         html << "</ul></nav>"
         html.join("")
@@ -531,6 +531,25 @@ module ApplicationHelper
 
   def nbsp
     raw("&nbsp;")
+  end
+
+  def dataify(obj, *attributes)
+    hash = obj.respond_to?(:to_hash) && obj.to_hash
+    res = ""
+    if !attributes.empty?
+      attributes.each do |attribute|
+        res << %Q{ data-#{h attribute}="#{h(hash ? hash[attribute] : obj.send(attribute))}"}
+      end
+    elsif hash
+      res << hash.map { |key, value| %Q{data-#{h key}="#{h value}"} }.join(" ")
+    end
+    raw(" #{res} ")
+  end
+
+  def inline_media_comment_link(comment=nil)
+    if comment && comment.media_comment_id
+      raw %Q{<a href="#" class="instructure_inline_media_comment no-underline" #{dataify(comment, :media_comment_id, :media_comment_type)} >&nbsp;</a>}
+    end
   end
 
   # translate a URL intended for an iframe into an alternative URL, if one is

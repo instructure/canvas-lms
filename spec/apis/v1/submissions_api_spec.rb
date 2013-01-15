@@ -500,9 +500,9 @@ describe 'Submissions API', :type => :integration do
     media_object(:media_id => "54321", :context => student1, :user => student1)
     mock_kaltura = mock('Kaltura::ClientV3')
     Kaltura::ClientV3.stubs(:new).returns(mock_kaltura)
-    mock_kaltura.expects :startSession
-    mock_kaltura.expects(:flavorAssetGetByEntryId).returns([{:fileExt => 'mp4', :id => 'fake'}])
-    mock_kaltura.expects(:flavorAssetGetDownloadUrl).returns("https://kaltura.example.com/some/url")
+    mock_kaltura.expects(:media_sources).returns([{"height"=>"240","bitrate"=>"382","isOriginal"=>"0","width"=>"336","content_type"=>"video/mp4",
+                                                   "containerFormat"=>"isom","url"=>"https://kaltura.example.com/some/url","size"=>"204","fileExt"=>"mp4"}])
+
     submit_homework(a1, student1, :media_comment_id => "54321", :media_comment_type => "video")
     stub_kaltura
     json = api_call(:get,

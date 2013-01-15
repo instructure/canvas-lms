@@ -391,10 +391,11 @@ define [
 
 
       @$messageList.click (e) =>
-        if $(e.target).closest('a.instructure_inline_media_comment').length
+        if $(e.target).closest('a.instructure_inline_media_comment, .mejs-container').length
           # a.instructure_inline_media_comment clicks have to propagate to the
           # top due to "live" handling; if it's one of those, it's not really
           # intended for us, just let it go
+          # also, dont catch clicks on mediaelementjs videos.  that is for play/pause
         else
           $message = $(e.target).closest('#messages > ul > li')
           unless $message.hasClass('generated')
