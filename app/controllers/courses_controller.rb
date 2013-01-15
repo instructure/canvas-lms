@@ -508,9 +508,28 @@ class CoursesController < ApplicationController
     end
   end
 
+  # @API Get course settings
+  # Returns some of a course's settings.
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/<course_id>/settings \ 
+  #     -X GET \ 
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #   {
+  #     "allow_student_discussion_topics": true,
+  #     "allow_student_forum_attachments": false,
+  #   }
+  include Api::V1::Course
   def settings
     get_context
     if authorized_action(@context, @current_user, :read_as_admin)
+      if api_request?
+        render :json => course_settings_json(@context)
+        return
+      end
+
       load_all_contexts(:context => @context)
 
       @all_roles = Role.custom_roles_and_counts_for_course(@context, @current_user, true)
@@ -535,6 +554,32 @@ class CoursesController < ApplicationController
       @role_types = []
       add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
     end
+  end
+
+  # @API Update course settings
+  # Can update the following course settings:
+  #
+  # - `allow_student_discussion_topics` (true|false)
+  # - `allow_student_forum_attachments` (true|false)
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/<course_id>/settings \ 
+  #     -X PUT \ 
+  #     -H 'Authorization: Bearer <token>' \ 
+  #     -d 'allow_student_discussion_topics=false'
+  def update_settings
+    return unless api_request?
+    @course = api_find(Course, params[:course_id])
+    return unless authorized_action(@course, @current_user, :update)
+    bool_settings = [ :allow_student_discussion_topics,
+                      :allow_student_forum_attachments ]
+    bool_settings.each do |setting|
+      if params[setting]
+        @course.send("#{setting}=", value_to_boolean(params[setting]))
+      end
+    end
+    @course.save
+    render :json => course_settings_json(@course)
   end
 
   def update_nav
