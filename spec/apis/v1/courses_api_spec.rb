@@ -928,6 +928,33 @@ describe CoursesController, :type => :integration do
       json.map{|x| x['id']}.length.should == 1
       json.map{|x| x['id']}.should == [@target.id]
     end
+
+    it "should include observed users in the enrollments if requested" do
+      @student1.name = "student 1"
+      @student2.save!
+      @student2.name = "student 2"
+      @student2.save!
+
+      observer1 = user
+      observer2 = user
+
+      @course1.enroll_user(observer1, "ObserverEnrollment", :associated_user_id => @student1.id).accept!
+      @course1.enroll_user(observer2, "ObserverEnrollment", :associated_user_id => @student2.id).accept!
+      @course1.enroll_user(observer1, "ObserverEnrollment", :allow_multiple_enrollments => true, :associated_user_id => @student2.id).accept!
+
+      @user = @me
+      json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+          { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
+          :include => ['email', 'enrollments', 'observed_users'])
+
+      enrollments1 = json.find{|u| u['id'] == observer1.id}['enrollments']
+      enrollments1.map{|e| e['observed_user']['id']}.sort.should == [@student1.id, @student2.id]
+
+      enrollments2 = json.find{|u| u['id'] == observer2.id}['enrollments']
+      enrollments2.map{|e| e['observed_user']['id']}.sort.should == [@student2.id]
+
+      enrollments2.first['observed_user']['enrollments'].map{|e| e['id']}.should == [@student2.enrollments.first.id]
+    end
   end
 
   it "should allow sis id in hex packed format" do
