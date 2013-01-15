@@ -1,5 +1,5 @@
 module DatesOverridable
-  attr_accessor :applied_overrides, :overridden_for_user
+  attr_accessor :applied_overrides, :overridden_for_user, :overridden
 
   def self.included(base)
     base.has_many :assignment_overrides, :dependent => :destroy
@@ -48,6 +48,10 @@ module DatesOverridable
   def due_dates_for(user, opts={})
     as_student, as_admin = nil, nil
     return nil, nil if context.nil?
+
+    if user.nil?
+      return self.due_date_hash, nil
+    end
 
     if context.user_has_been_student?(user)
       as_student = self.overridden_for(user).due_date_hash
@@ -127,7 +131,7 @@ module DatesOverridable
   end
 
   def multiple_due_dates?
-    if overridden_for_user
+    if overridden
       !!multiple_due_dates_apply_to?(overridden_for_user)
     else
       raise "#{self.class.name} has not been overridden"
@@ -135,7 +139,7 @@ module DatesOverridable
   end
 
   def due_dates
-    if overridden_for_user
+    if overridden
       as_student, as_teacher = due_dates_for(overridden_for_user)
       as_teacher || [as_student]
     else
@@ -144,7 +148,7 @@ module DatesOverridable
   end
 
   def overridden_for?(user)
-    overridden_for_user && overridden_for_user.id == user.id
+    overridden && (overridden_for_user == user)
   end
 
   # like due_dates_for, but for unlock_at values instead. for consistency, each

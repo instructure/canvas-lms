@@ -21,12 +21,13 @@ module AssignmentOverrideApplicator
   # version) and user, determine the list of overrides, apply them to the
   # assignment or quiz, and return the overridden stand-in.
   def self.assignment_overridden_for(assignment_or_quiz, user)
-    return assignment_or_quiz if user.nil? or assignment_or_quiz.overridden_for?(user)
+    return assignment_or_quiz if assignment_or_quiz.overridden_for?(user)
 
     overrides = self.overrides_for_assignment_and_user(assignment_or_quiz, user)
  
     result_assignment_or_quiz = self.assignment_with_overrides(assignment_or_quiz, overrides) unless overrides.empty?
     result_assignment_or_quiz ||= assignment_or_quiz
+    result_assignment_or_quiz.overridden = true
     result_assignment_or_quiz.overridden_for_user = user
     result_assignment_or_quiz
   end
@@ -49,7 +50,7 @@ module AssignmentOverrideApplicator
     Rails.cache.fetch([user, assignment_or_quiz, assignment_or_quiz.version_number, 'overrides'].cache_key) do
 
       # return an empty array to the block if there is nothing to do here
-      next [] unless assignment_or_quiz.has_overrides?
+      next [] if user.nil? || !assignment_or_quiz.has_overrides?
 
       overrides = []
 
