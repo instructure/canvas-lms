@@ -85,7 +85,7 @@ class FilesController < ApplicationController
 
   def index
     if request.format == :json
-      if authorized_action(@context.attachments.new, @current_user, :read)
+      if authorized_action(@context.attachments.build, @current_user, :read)
         @current_folder = Folder.find_folder(@context, params[:folder_id])
         if !@current_folder || authorized_action(@current_folder, @current_user, :read)
           if params[:folder_id]
@@ -153,9 +153,10 @@ class FilesController < ApplicationController
     end
     @too_many_contexts = @contexts.length > 15
     @contexts = @contexts[0,15]
-    if @contexts.length <= 1 && !authorized_action(@context.attachments.new, @current_user, :read)
+    if @contexts.length <= 1 && !authorized_action(@context.attachments.build, @current_user, :read)
       return
     end
+
     return unless tab_enabled?(@context.class::TAB_FILES)
     log_asset_access("files:#{@context.asset_string}", "files", 'other') if @context
     respond_to do |format|
