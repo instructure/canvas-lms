@@ -160,7 +160,7 @@ class Worker
   end
 
   def handle_failed_job(job, error)
-    job.last_error = error.message + "\n" + error.backtrace.join("\n")
+    job.last_error = "#{error.message}\n#{error.backtrace.join("\n")}"
     say("Failed with #{error.class} [#{error.message}] (#{job.attempts} attempts)", :error)
     job.reschedule(error)
   end
