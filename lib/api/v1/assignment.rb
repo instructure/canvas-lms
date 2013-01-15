@@ -172,7 +172,7 @@ module Api::V1::Assignment
     return nil unless assignment_params.is_a?(Hash)
     update_params = assignment_params.slice(*API_ALLOWED_ASSIGNMENT_INPUT_FIELDS)
 
-    if update_params.has_key?( 'peer_reviews_assign_at' )
+    if update_params.has_key?('peer_reviews_assign_at')
       update_params['peer_reviews_due_at'] = update_params['peer_reviews_assign_at']
     end
 
@@ -183,24 +183,22 @@ module Api::V1::Assignment
     # validate and add to update_params
     if update_params.has_key?("assignment_group_id")
       ag_id = update_params.delete("assignment_group_id").presence
-      ag = assignment.context.assignment_groups.find_by_id(ag_id)
-      update_params["assignment_group_id"] = ag.try(:id)
+      assignment.assignment_group = assignment.context.assignment_groups.find_by_id(ag_id)
     end
 
     # validate and add to update_params
     if update_params.has_key?("group_category_id")
-      gc_id = update_params["group_category_id"].presence
-      gc = assignment.context.group_categories.find_by_id(gc_id)
-      update_params["group_category_id"] = gc.try(:id)
+      gc_id = update_params.delete("group_category_id").presence
+      assignment.group_category = assignment.context.group_categories.find_by_id(gc_id)
     end
 
-    assignment.muted = value_to_boolean(assignment_params["muted"]) if assignment_params.key? "muted"
+    if assignment_params.key? "muted"
+      assignment.muted = value_to_boolean(assignment_params.delete("muted"))
+    end
 
     # do some fiddling with due_at for fancy midnight and add to update_params
     if update_params.has_key?("due_at")
       update_params["time_zone_edited"] = Time.zone.name
-      assignment.due_at = update_params["due_at"]
-      update_params["due_at"] = assignment.due_at
     end
 
     if !assignment.context.try(:turnitin_enabled?)
@@ -211,7 +209,7 @@ module Api::V1::Assignment
     # use Assignment#turnitin_settings= to normalize, but then assign back to
     # hash so that it is written with update_params
     if update_params.has_key?("turnitin_settings")
-      turnitin_settings = update_params["turnitin_settings"].slice(*API_ALLOWED_TURNITIN_SETTINGS)
+      turnitin_settings = update_params.delete("turnitin_settings").slice(*API_ALLOWED_TURNITIN_SETTINGS)
       turnitin_settings['exclude_type'] = case turnitin_settings['exclude_small_matches_type']
         when nil; '0'
         when 'words'; '1'
@@ -219,7 +217,6 @@ module Api::V1::Assignment
       end
       turnitin_settings['exclude_value'] = turnitin_settings['exclude_small_matches_value']
       assignment.turnitin_settings = turnitin_settings
-      update_params["turnitin_settings"] = assignment.turnitin_settings
     end
 
     # TODO: allow rubric creation
