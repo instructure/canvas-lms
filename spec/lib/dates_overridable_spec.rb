@@ -45,6 +45,10 @@ shared_examples_for "an object whose dates are overridable" do
         overridden = overridable.overridden_for(@student)
         overridden.due_at.should == override.due_at
       end
+
+      it "returns the same object when the user is nil (e.g. a guest)" do
+        overridable.overridden_for(nil).should == overridable
+      end
     end
 
     context "with no overrides" do
@@ -433,6 +437,12 @@ shared_examples_for "an object whose dates are overridable" do
         expect { overridden.multiple_due_dates? }.to raise_exception
       end
     end
+
+    context "when the object has been overridden for a guest" do
+      it "returns false" do
+        overridable.overridden_for(nil).multiple_due_dates?.should == false
+      end
+    end
   end
 
   describe "due_dates" do
@@ -462,6 +472,36 @@ shared_examples_for "an object whose dates are overridable" do
         expect { overridden.due_dates }.to raise_exception
       end
     end    
+  end
+
+  describe "overridden_for?" do
+    before do
+      course_with_student(:course => course)
+    end
+
+    context "when overridden for the user" do
+      it "returns true" do
+        overridable.overridden_for(@teacher).overridden_for?(@teacher).should be_true
+      end
+    end
+
+    context "when overridden for a different user" do
+      it "returns false" do
+        overridable.overridden_for(@teacher).overridden_for?(@student).should be_false
+      end
+    end
+
+    context "when overridden for a nil user" do
+      it "returns true" do
+        overridable.overridden_for(nil).overridden_for?(nil).should be_true
+      end
+    end
+
+    context "when not overridden" do
+      it "returns false" do
+        overridable.overridden_for?(nil).should be_false
+      end
+    end
   end
 end
 
