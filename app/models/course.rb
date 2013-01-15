@@ -1504,10 +1504,10 @@ class Course < ActiveRecord::Base
     # association here -- just ran out of time.
     self.shard.activate do
       e ||= Enrollment.typed_enrollment(type).new(
-        :user => user, 
+        :user => user,
         :course => self,
-        :course_section => section, 
-        :workflow_state => enrollment_state, 
+        :course_section => section,
+        :workflow_state => enrollment_state,
         :limit_privileges_to_course_section => limit_privileges_to_course_section)
     end
     e.associated_user_id = associated_user_id
@@ -1963,7 +1963,7 @@ class Course < ActiveRecord::Base
   attr_accessor :folder_name_lookups, :attachment_path_id_lookup, :attachment_path_id_lookup_lower, :assignment_group_no_drop_assignments
 
   def import_syllabus_from_migration(syllabus_body)
-    self.syllabus_body = ImportedHtmlConverter.convert(syllabus_body, self) 
+    self.syllabus_body = ImportedHtmlConverter.convert(syllabus_body, self)
   end
 
   def import_settings_from_migration(data, migration)
@@ -2986,4 +2986,74 @@ class Course < ActiveRecord::Base
     student_enrollments.find_by_user_id(user.id).present?
   end
 
+  def update_one(update_params)
+    case update_params[:event]
+      when 'offer'
+        if self.completed?
+          self.unconclude!
+        else
+          self.offer! unless self.available?
+        end
+      when 'conclude'
+        self.complete! unless self.completed?
+      when 'delete'
+        self.sis_source_id = nil
+        self.workflow_state = 'deleted'
+        self.save!
+    end
+  end
+
+  def self.do_batch_update(progress, user, course_ids, update_params)
+    begin
+      account = progress.context
+      progress.start!
+      update_every = [course_ids.size / 20, 4].max
+      completed_count = failed_count = 0
+      errors = {}
+      course_ids.each_slice(update_every) do |batch|
+        batch.each do |course_id|
+          course = account.associated_courses.find_by_id(course_id)
+          begin
+            raise t('course_not_found', "The course was not found") unless course
+            raise t('access_denied', "Access was denied") unless course.grants_right? user, :update
+            course.update_one(update_params)
+            completed_count += 1
+          rescue Exception => e
+            message = e.message
+            (errors[message] ||= []) << course_id
+            failed_count += 1
+          end
+        end
+        progress.update_completion! (completed_count + failed_count).to_f / course_ids.size
+      end
+      progress.completion = 100.0
+      progress.message = t('batch_update_message', {
+          :one => "1 course processed",
+          :other => "%{count} courses processed"
+        },
+        :count => completed_count)
+      errors.each do |message, ids|
+        progress.message += t('batch_update_error', "\n%{error}: %{ids}", :error => message, :ids => ids.join(', '))
+      end
+      if completed_count > 0
+        progress.complete!
+      else
+        progress.fail!
+      end
+      progress.save
+    rescue Exception => e
+      progress.message = e.message
+      progress.fail!
+      progress.save
+    end
+  end
+
+  def self.batch_update(account, user, course_ids, update_params)
+    progress = account.progresses.create! :tag => "course_batch_update", :completion => 0.0
+    job = Course.send_later(:do_batch_update, progress, user, course_ids, update_params)
+    progress.user_id = user.id
+    progress.delayed_job_id = job.id
+    progress.save!
+    progress
+  end
 end

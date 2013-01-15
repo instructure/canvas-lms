@@ -413,6 +413,166 @@ describe CoursesController, :type => :integration do
     end
   end
 
+  describe "batch edit" do
+    before do
+      @account = Account.default
+      account_admin_user
+      theuser = @user
+      @path = "/api/v1/accounts/#{@account.id}/courses"
+      @params = { :controller => 'courses', :action => 'batch_update', :format => 'json', :account_id => @account.to_param }
+      @course1 = course_model :sis_source_id => 'course1', :account => @account, :workflow_state => 'created'
+      @course2 = course_model :sis_source_id => 'course2', :account => @account, :workflow_state => 'created'
+      @course3 = course_model :sis_source_id => 'course3', :account => @account, :workflow_state => 'created'
+      @user = theuser
+    end
+
+    context "an authorized user" do
+      it "should delete multiple courses" do
+        api_call(:put, @path, @params, { :event => 'delete', :course_ids => [@course1.id, @course2.id, @course3.id] })
+        run_jobs
+        [@course1, @course2, @course3].each { |c| c.reload.should be_deleted }
+      end
+
+      it "should conclude multiple courses" do
+        api_call(:put, @path, @params, { :event => 'conclude', :course_ids => [@course1.id, @course2.id, @course3.id] })
+        run_jobs
+        [@course1, @course2, @course3].each { |c| c.reload.should be_completed }
+      end
+
+      it "should publish multiple courses" do
+        api_call(:put, @path, @params, { :event => 'offer', :course_ids => [@course1.id, @course2.id, @course3.id] })
+        run_jobs
+        [@course1, @course2, @course3].each { |c| c.reload.should be_available }
+      end
+
+      it "should accept sis ids" do
+        api_call(:put, @path, @params, { :event => 'offer', :course_ids => ['sis_course_id:course1', 'sis_course_id:course2', 'sis_course_id:course3'] })
+        run_jobs
+        [@course1, @course2, @course3].each { |c| c.reload.should be_available }
+      end
+
+      it "should update progress" do
+        json = api_call(:put, @path, @params, { :event => 'conclude', :course_ids => ['sis_course_id:course1', 'sis_course_id:course2', 'sis_course_id:course3']})
+        progress = Progress.find(json['id'])
+        progress.should be_queued
+        progress.completion.should == 0
+        progress.user_id.should == @user.id
+        progress.delayed_job_id.should_not be_nil
+        run_jobs
+        progress.reload
+        progress.should be_completed
+        progress.completion.should == 100.0
+        progress.message.should == "3 courses processed"
+        [@course1, @course2, @course3].each { |c| c.reload.should be_completed }
+      end
+
+      it "should return 400 if :course_ids is missing" do
+        api_call(:put, @path, @params, {}, {}, {:expected_status => 400})
+      end
+
+      it "should return 400 if :event is missing" do
+        api_call(:put, @path, @params, { :course_ids => [@course1.id, @course2.id, @course3.id] },
+                 {}, {:expected_status => 400})
+      end
+
+      it "should return 400 if :event is invalid" do
+        api_call(:put, @path, @params, { :event => 'assimilate', :course_ids => [@course1.id, @course2.id, @course3.id] },
+                 {}, {:expected_status => 400})
+      end
+      
+      it "should return 403 if the list of courses is too long" do
+        api_call(:put, @path, @params, { :event => 'offer', :course_ids => (1..501).to_a },
+                 {}, {:expected_status => 403})
+      end
+
+      it "should deal gracefully with an invalid course id" do
+        @course2.destroy!
+        json = api_call(:put, @path + "?event=offer&course_ids[]=#{@course1.id}&course_ids[]=#{@course2.id}",
+                        @params.merge(:event => 'offer', :course_ids => [@course1.id.to_s, @course2.id.to_s]))
+        run_jobs
+        @course1.reload.should be_available
+        progress = Progress.find(json['id'])
+        progress.should be_completed
+        progress.message.should be_include "1 course processed"
+        progress.message.should be_include "The course was not found: #{@course2.id}"
+      end
+
+      it "should not update courses in another account" do
+        theUser = @user
+        otherAccount = account_model :root_account_id => nil
+        otherCourse = course_model :account => otherAccount
+        @user = theUser
+        json = api_call(:put, @path + "?event=offer&course_ids[]=#{@course1.id}&course_ids[]=#{otherCourse.id}",
+                        @params.merge(:event => 'offer', :course_ids => [@course1.id.to_s, otherCourse.id.to_s]))
+        run_jobs
+        @course1.reload.should be_available
+        progress = Progress.find(json['id'])
+        progress.should be_completed
+        progress.message.should be_include "1 course processed"
+        progress.message.should be_include "The course was not found: #{otherCourse.id}"
+      end
+
+      it "should succeed when publishing already published courses" do
+        @course1.offer!
+        json = api_call(:put, @path, @params, { :event => 'offer', :course_ids => [@course1.id, @course2.id, @course3.id] })
+        run_jobs
+        progress = Progress.find(json['id'])
+        progress.message.should be_include "3 courses processed"
+        [@course1, @course2, @course3].each { |c| c.reload.should be_available }
+      end
+      
+      it "should succeed when concluding already concluded courses" do
+        @course1.complete!
+        @course2.complete!
+        json = api_call(:put, @path, @params, { :event => 'conclude', :course_ids => [@course1.id, @course2.id, @course3.id] })
+        run_jobs
+        progress = Progress.find(json['id'])
+        progress.message.should be_include "3 courses processed"
+        [@course1, @course2, @course3].each { |c| c.reload.should be_completed }
+      end
+      
+      it "should be able to unconclude courses" do
+        @course1.complete!
+        @course2.complete!
+        json = api_call(:put, @path, @params, { :event => 'offer', :course_ids => [@course1.id, @course2.id, @course3.id] })
+        run_jobs
+        progress = Progress.find(json['id'])
+        progress.message.should be_include "3 courses processed"
+        [@course1, @course2, @course3].each { |c| c.reload.should be_available }
+      end
+      
+      it "should report a failure if no updates succeeded" do
+        @course2.destroy!
+        json = api_call(:put, @path + "?event=offer&course_ids[]=#{@course2.id}",
+                        @params.merge(:event => 'offer', :course_ids => [@course2.id.to_s]))
+        run_jobs
+        progress = Progress.find(json['id'])
+        progress.should be_failed
+        progress.message.should be_include "0 courses processed"
+        progress.message.should be_include "The course was not found: #{@course2.id}"
+      end
+      
+      it "should report a failure if an exception is raised outside course update" do
+        Progress.any_instance.stubs(:complete!).raises "crazy exception"
+        json = api_call(:put, @path + "?event=offer&course_ids[]=#{@course2.id}",
+                        @params.merge(:event => 'offer', :course_ids => [@course2.id.to_s]))
+        run_jobs
+        progress = Progress.find(json['id'])
+        progress.should be_failed
+        progress.message.should be_include "crazy exception"
+        Progress.any_instance.unstub(:complete!)
+      end
+    end
+
+    context "an unauthorized user" do
+      it "should return 401" do
+        user_model
+        api_call(:put, @path, @params, { :event => 'offer', :course_ids => [@course1.id] },
+                 {}, {:expected_status => 401})
+      end
+    end
+  end
+
   it "should include scores in course list if requested" do
     @course2.grading_standard_enabled = true
     @course2.save

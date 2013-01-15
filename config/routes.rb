@@ -669,6 +669,7 @@ ActionController::Routing::Routes.draw do |map|
       courses.post 'courses/:course_id/files', :action => :create_file
       courses.post 'courses/:course_id/folders', :controller => :folders, :action => :create
       courses.get  'courses/:course_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'course_folder'
+      courses.put  'accounts/:account_id/courses', :action => :batch_update
     end
 
     api.with_options(:controller => :tabs) do |tabs|
@@ -1061,6 +1062,9 @@ ActionController::Routing::Routes.draw do |map|
       group_categories.get 'group_categories/:group_category_id/groups', :action => :groups, :path_name => 'group_category_groups'
     end
 
+    api.with_options(:controller => :progress) do |progress|
+      progress.get "progress/:id", :action => :show, :path_name => "progress"
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented
