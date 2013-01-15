@@ -4,11 +4,12 @@ define [
   'i18n!calendar.edit'
   'Backbone'
   'jst/calendar/editCalendarEventFull'
+  'compiled/views/calendar/MissingDateDialogView'
   'wikiSidebar'
   'compiled/object/unflatten'
   'tinymce.editor_box'
   'compiled/tinymce'
-], ($, _, I18n, Backbone, editCalendarEventFullTemplate, wikiSidebar, unflatten) ->
+], ($, _, I18n, Backbone, editCalendarEventFullTemplate, MissingDateDialogView, wikiSidebar, unflatten) ->
 
   ##
   # View for editing a calendar event on it's own page
@@ -79,6 +80,20 @@ define [
       _.each [eventData].concat(eventData.child_event_data), @setStartEnd
       delete eventData.child_event_data if eventData.remove_child_events == '1'
 
+      if $('[name=use_section_dates]').prop('checked')
+        dialog = new MissingDateDialogView
+          dateFields: $('[name*=start_date]:visible')
+          labelFn   : (input) -> $(input).parents('td:first').prev().find('label').text()
+          success   : ($dialog) =>
+            $dialog.dialog('close')
+            @$el.disableWhileLoading @model.save eventData, success: =>
+              @redirectWithMessage I18n.t 'event_saved', 'Event Saved Successfully'
+            $dialog.remove()
+        return if dialog.render()
+
+      @saveEvent(eventData)
+
+    saveEvent: (eventData) ->
       @$el.disableWhileLoading @model.save eventData, success: =>
         @redirectWithMessage I18n.t 'event_saved', 'Event Saved Successfully'
 

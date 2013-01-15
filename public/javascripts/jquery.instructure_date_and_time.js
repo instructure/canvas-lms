@@ -166,7 +166,7 @@ define([
   $.fudgeDateForProfileTimezone = function(date, unfudge) {
     var today, user_offset, minutes_shift, time, newDate;
 
-    if (!date) return;
+    if (!date) return null;
     today = new Date();
     user_offset = parseInt($("#time_zone_offset").text(), 10) * -1; // in minutes
     if (date.getTimezoneOffset() != today.getTimezoneOffset()) {

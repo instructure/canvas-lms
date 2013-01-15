@@ -51,7 +51,7 @@ define [
       combinedSuccess = (syncArgs=[], sectionArgs=[]) ->
         [syncResp, syncStatus, syncXhr] = syncArgs
         [sectionsResp] = sectionArgs
-        calEventData = CalendarEvent.mergeSectionsIntoCalendarEvent(syncResp, sectionsResp)
+        calEventData = CalendarEvent.mergeSectionsIntoCalendarEvent(syncResp, _.sortBy(sectionsResp, 'id'))
         return false unless model.set(model.parse(calEventData, syncXhr), options)
         success?(model, calEventData)
 
