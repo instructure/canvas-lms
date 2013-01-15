@@ -17,7 +17,8 @@ describe "self enrollment" do
   shared_examples_for "open registration" do
     before do
       Account.default.update_attribute(:settings, :self_enrollment => 'any', :open_registration => true, :self_registration => true)
-      course(:active_all => active_course) 
+      course(:active_all => active_course)
+      set_up_course
       @course.update_attribute(:self_enrollment, true)
     end
 
@@ -69,6 +70,7 @@ describe "self enrollment" do
   shared_examples_for "closed registration" do
     before do
       course(:active_all => active_course)
+      set_up_course
       @course.update_attribute(:self_enrollment, true)
     end
 
@@ -107,6 +109,7 @@ describe "self enrollment" do
 
   context "in a published course" do
     let(:active_course){ true }
+    let(:set_up_course){ }
     let(:primary_action){ "Go to the Course" }
     let(:assert_valid_dashboard) {
       f('#courses_menu_item').should include_text("Courses")
@@ -120,8 +123,29 @@ describe "self enrollment" do
     end
   end
 
+  context "in a not-yet-started course" do
+    let(:active_course){ true }
+    let(:set_up_course) {
+      @course.start_at = 1.week.from_now
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+    }
+    let(:primary_action){ "Go to your Dashboard" }
+    let(:assert_valid_dashboard) {
+      f('#courses_menu_item').should include_text("Home")
+      f('#dashboard').should include_text("You've enrolled in one or more courses that have not started yet")
+    }
+    context "with open registration" do
+      it_should_behave_like "open registration"
+    end
+    context "without open registration" do
+      it_should_behave_like "closed registration"
+    end
+  end
+
   context "in an unpublished course" do
     let(:active_course){ false }
+    let(:set_up_course){ }
     let(:primary_action){ "Go to your Dashboard" }
     let(:assert_valid_dashboard) {
       f('#courses_menu_item').should include_text("Home")
