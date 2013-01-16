@@ -1,4 +1,5 @@
 require [
+  'compiled/views/course_settings/NavigationView'
   'compiled/views/course_settings/UserCollectionView'
   'compiled/collections/UserCollection'
   'compiled/views/course_settings/tabs/tabUsers'
@@ -6,7 +7,10 @@ require [
   'course_settings'
   'external_tools'
   'grading_standards'
-], (UserCollectionView, UserCollection) ->
+], (NavigationView, UserCollectionView, UserCollection) ->
+
+  nav_view = new NavigationView
+    el: $('#tab-navigation')
 
   loadUsersTab = ->
     window.app = usersTab: {}
@@ -29,6 +33,8 @@ require [
             enrollment_role: customRole.name
 
   $ ->
+    nav_view.render()
+
     if $("#tab-users").is(":visible")
       loadUsersTab()
 

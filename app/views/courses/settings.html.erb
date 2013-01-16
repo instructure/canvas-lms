@@ -363,7 +363,28 @@ TEXT
     <%= render :partial => 'user_tab' %></div>
   <% end %>
   <% if can_do @context, @current_user, :update %>
+
   <div id="tab-navigation">
+
+    <div class="hidden-readable" tabindex="0" aria-label="keyboard instructions">
+
+      
+      <%= t('navigation_keyboard_hint',
+        'To change the order of the course navigation links,
+        first turn the cursor off on your screen reader. Insert-z in JAWS.
+        Press tab to select first link.
+        Press up and down to select a link.
+        Press space to select a link to start dragging.
+        Then press up and down to select a destination.
+        Then press space a second time to drop link after destination.') %>
+    </div>
+
+    <% keyboard_navigation([
+         {:key => t('keycodes.next_navigation_link', 'Up'), :description => t('keycode_descriptions.next_navigation_link', 'Select next navigation link')},
+         {:key => t('keycodes.previous_navigation_link', 'Down'), :description => t('keycode_descriptions.previous_navigation_link', 'Select previous navigation link')},
+         {:key => t('keycodes.toggle_navigation_dragging', 'Space'), :description => t('keycode_descriptions.toggle_navigation_dragging', 'Select link to begin dragging, or drop previously selected link')}
+     ]) %>
+
     <% form_tag context_url(@context, :context_update_nav_url), {:id => "nav_form", :title => t('titles.edit_navigation', "Edit Course Navigation") } do %>
       <input type="hidden" name="tabs_json" id="tabs_json" value="[]" />
       <% tabs = sortable_tabs %>
@@ -374,13 +395,13 @@ TEXT
         tab[:disabled_message] = [Course::TAB_GRADES, Course::TAB_PEOPLE, Course::TAB_DISCUSSIONS].include?(tab[:id]) ? t('tab_cant_disable', "This page can't be disabled, only hidden") : t('tab_disabled', "Page disabled, will redirect to course home page")
         tab[:disabled_message] = t("tab_hidden_if_disabled", "Page disabled, won't appear in navigation") if tab[:external]
       end %>
-      <ul id="nav_enabled_list" class="nav_list connectedSortable">
+      <ul id="nav_enabled_list" aria-label="Enabled Links" class="nav_list connectedSortable">
         <% tabs.select {|t| !t[:hidden] }.each do |tab|  %>
-          <li class="navitem <%= 'enabled' if tab[:id] != Course::TAB_HOME %> <%= tab[:label].downcase %>" id="nav_edit_tab_id_<%= tab[:id] %>"><%= tab[:label] %><span class="disabled_message"><%= tab[:disabled_message] %></span></li>
+          <li aria-label="<%= tab[:label] %>" class="navitem <%= 'enabled' if tab[:id] != Course::TAB_HOME %> <%= tab[:label].downcase %>" id="nav_edit_tab_id_<%= tab[:id] %>" tabindex="0"><%= tab[:label] %><span class="disabled_message"><%= tab[:disabled_message] %></span></li>
         <% end %>
       </ul>
 
-      <ul id="nav_disabled_list" class="nav_list connectedSortable">
+      <ul id="nav_disabled_list" aria-label="Disabled Links" class="nav_list connectedSortable">
         <li class="disabled">
           <%= t('drag_to_hide', %{Drag items here to hide them from students.}) %>
           <div style="font-size: 0.8em;">
@@ -388,7 +409,7 @@ TEXT
           </div>
         </li>
         <% tabs.select {|t| t[:hidden] }.each do |tab|  %>
-          <li class="navitem enabled" id="nav_edit_tab_id_<%= tab[:id] %>"><%= tab[:label] %><span class="disabled_message"><%= tab[:disabled_message] %></span></li>
+          <li aria-label="<%= tab[:label] %>" class="navitem enabled" id="nav_edit_tab_id_<%= tab[:id] %>" tabindex="0"><%= tab[:label] %><span class="disabled_message"><%= tab[:disabled_message] %></span></li>
         <% end %>
       </ul>
 
@@ -397,6 +418,7 @@ TEXT
       </p>
     <% end %>
   </div>
+
   <% end %>
 
   <% if can_do @context, @current_user, :update %>
