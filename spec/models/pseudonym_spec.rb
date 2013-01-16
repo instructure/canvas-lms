@@ -189,6 +189,7 @@ describe Pseudonym do
       @aac.reload.update_attributes(:auth_port => 637)
       @aac.last_timeout_failure.should be_nil
       Net::LDAP.any_instance.expects(:bind_as).returns(true)
+      @pseudonym.reload
       @pseudonym.ldap_bind_result('test').should be_true
     end
 
