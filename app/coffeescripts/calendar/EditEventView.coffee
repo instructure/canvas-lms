@@ -55,11 +55,17 @@ define [
     # boilerplate that could be replaced with data bindings
     toggleUsingSectionClass: =>
       @$('#editCalendarEventFull').toggleClass 'use_section_dates', @model.get('use_section_dates')
-    toggleUseSectionDates: =>
+      $('.show_if_using_sections input').prop('disabled', !@model.get('use_section_dates'))
+    toggleUseSectionDates: (e) =>
       @model.set 'use_section_dates', !@model.get('use_section_dates')
+      @updateRemoveChildEvents(e)
     toggleHtmlView: (event) ->
       event?.preventDefault()
       $("textarea[name=description]").editorBox('toggle')
+
+    updateRemoveChildEvents: (e) ->
+      value = if $(e.target).prop('checked') then '' else '1'
+      $('input[name=remove_child_events]').val(value)
 
     redirectWithMessage: (message) ->
       $.flashMessage message
@@ -71,6 +77,7 @@ define [
       # force use_section_dates to boolean, so it doesnt cause 'change' if it is '1'
       eventData.use_section_dates = !!eventData.use_section_dates
       _.each [eventData].concat(eventData.child_event_data), @setStartEnd
+      delete eventData.child_event_data if eventData.remove_child_events == '1'
 
       @$el.disableWhileLoading @model.save eventData, success: =>
         @redirectWithMessage I18n.t 'event_saved', 'Event Saved Successfully'

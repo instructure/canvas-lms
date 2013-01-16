@@ -12,8 +12,8 @@ define [
     dateAttributes: ['created_at', 'end_at', 'start_at', 'updated_at']
 
     _filterAttributes: (obj) ->
-      filtered = _(obj).pick 'start_at', 'end_at', 'title',
-                             'description', 'context_code'
+      filtered = _(obj).pick 'start_at', 'end_at', 'title', 'description',
+        'context_code', 'remove_child_events'
       if obj.use_section_dates && obj.child_event_data
         filtered.child_event_data = _.chain(obj.child_event_data)
           .compact()

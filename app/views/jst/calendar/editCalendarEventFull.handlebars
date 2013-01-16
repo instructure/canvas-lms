@@ -7,6 +7,7 @@
 
   {{#if course_sections}}
     <label><input type="checkbox" name="use_section_dates" value="1" {{#if use_section_dates}}checked{{/if}}>{{#t "different_date_for_each_section"}}Use a different date for each section{{/t}}</label>
+    <input type="hidden" name="remove_child_events" value="{{#unless use_section_dates}}1{{/unless}}" />
   {{/if}}
 
   <div class="hide_if_using_sections date_start_end_row">

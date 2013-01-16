@@ -611,8 +611,8 @@ describe CalendarEventsApiController, :type => :integration do
         json.keys.sort.should eql expected_fields
         json['title'].should eql 'ohai'
         json['child_events'].should be_empty
-        json['start_at'].should be_nil
-        json['end_at'].should be_nil
+        json['start_at'].should == '2012-01-01T12:00:00Z'
+        json['end_at'].should == '2012-01-01T13:00:00Z'
         json['hidden'].should be_false
       end
 

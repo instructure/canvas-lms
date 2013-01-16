@@ -91,6 +91,7 @@ class CalendarEvent < ActiveRecord::Base
         event.save
       end
     end
+
     current_events.values.flatten.each(&:destroy)
     cache_child_event_ranges!
     @child_event_data = nil
@@ -241,15 +242,18 @@ class CalendarEvent < ActiveRecord::Base
     return if appointment_group
     return unless start_at_changed? || end_at_changed? || workflow_state_changed?
     return if @skip_sync_parent_event
-    parent_event.cache_child_event_ranges!
+    parent_event.cache_child_event_ranges! unless workflow_state == 'deleted'
   end
 
   def cache_child_event_ranges!
     events = child_events(true)
-    CalendarEvent.update_all({:start_at => events.map(&:start_at).min,
-                              :end_at => events.map(&:end_at).max
-                             }, ["id = ?", id])
-    reload
+
+    if events.present?
+      CalendarEvent.update_all({:start_at => events.map(&:start_at).min,
+                                :end_at => events.map(&:end_at).max
+                               }, ["id = ?", id])
+      reload
+    end
   end
 
   workflow do
