@@ -111,24 +111,6 @@ user_id,login_id,password,first_name,last_name,email,status
 13aa3,psue01,,Peggy,Sue,peggy.sue@myschool.edu,active
 </pre>
 
-A column to be added in the future:
-
-<table class="sis_csv">
-<tr>
-<th>Field Name</th>
-<th>Data Type</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-<tr>
-<td>local_account</td>
-<td>boolean</td>
-<td>false</td>
-<td>If true, and if the account (as found by the login_id) is not found, this user will be sent an invitation
-via their email address. They will choose their password when the click the invitation link.</td>
-</tr>
-</table>
-
 accounts.csv
 ------------
 
@@ -430,24 +412,6 @@ E411208,01103,student,1B,active
 E411208,13834,student,2A,active
 E411208,13aa3,teacher,2A,active
 </pre>
-
-This new column will be implemented some time in the future:
-
-<table class="sis_csv">
-<tr>
-<th>Field Name</th>
-<th>Data Type</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-<tr>
-<td>exclusive_section</td>
-<td>boolean</td>
-<td>false</td>
-<td>If true, then any enrollments for
-this user in this course NOT in the section specified in section_name will be deleted.</td>
-</tr>
-</table>
 
 groups.csv
 ------------
