@@ -22,12 +22,20 @@ define [
 
     ##
     # Define default options, options passed in to the view will overwrite these
-    defaults: {}
+    defaults:
+
+      # can hand a view a template option to avoid subclasses that only add a
+      # different template
+      template: null
 
     initialize: (options) ->
       @options = _.extend {}, @defaults, @options, options
+      @setTemplate()
       @$el.data 'view', this
       this
+
+    setTemplate: ->
+      @template = @options.template if @options.template
 
     ##
     # Extends render to add support for chid views and element filtering
