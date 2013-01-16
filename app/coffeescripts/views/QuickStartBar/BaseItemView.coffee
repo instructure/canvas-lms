@@ -54,7 +54,7 @@ define [
 
     ##
     # Creates date pickers and context search instances after render
-    filter: ->
+    afterRender: ->
       @$('.dateField').datetime_field()
       @contextSearch = new ContextSearch @$('.contextSearch'), @contextSearchOptions
 

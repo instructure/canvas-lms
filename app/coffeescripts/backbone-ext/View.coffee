@@ -32,16 +32,12 @@ define [
     ##
     # Extends render to add support for chid views and element filtering
     render: (opts = {}) =>
-      @$el.html @template(@toJSON()) if @template
-
-      # cacheEls before filter so we have access to elements in filter
-      @cacheEls() if @els
-      @filter() unless opts.noFilter is true
-
-      # its important for renderViews to come last so we don't filter
-      # and cache all the child views elements
-      @renderViews() if @options.views
+      @renderEl()
+      @_afterRender()
       this
+
+    renderEl: ->
+      @$el.html @template(@toJSON()) if @template
 
     ##
     # Caches elements from `els` config
@@ -56,17 +52,19 @@ define [
       @[name] = @$(selector) for selector, name of @els if @els
 
     ##
-    # Add behavior and bindings to elements. Can be called automatically in
-    # `render`, so be careful not to call it twice
-    #
-    # @api public
-    afterRender: ->
+    # Internal afterRender
+    # @api private
+    _afterRender: ->
+      @cacheEls() if @els
       @$('[data-bind]').each @createBinding
-      #@$('[data-behavior]').each => @_createBehavior.apply this, arguments
+      @afterRender()
+      # its important for renderViews to come last so we don't filter
+      # and cache all the child views elements
+      @renderViews() if @options.views
 
     ##
-    # backwards compat for old afterRender name
-    filter: @::afterRender
+    # Add behavior and bindings to elements.
+    afterRender: ->
 
     ##
     # in charge of getting variables ready to pass to handlebars during render

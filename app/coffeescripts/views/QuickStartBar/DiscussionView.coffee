@@ -47,7 +47,7 @@ define [
 
       $.when dfds...
 
-    filter: ->
+    afterRender: ->
       super
       @$('.ui-datepicker-trigger').addClass('disabled')
 

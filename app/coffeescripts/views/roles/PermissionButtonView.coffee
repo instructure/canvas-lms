@@ -60,7 +60,7 @@ define [
     #   Each button has data about it's role and permission name. This 
     #   makes testing easier.
     # @api custom backbone override 
-    filter: -> 
+    afterRender: ->
       @setPreviewIcons()
       @$el.attr 'data-role_name', @model.id
       @$el.attr 'data-permission_name', @permission_name

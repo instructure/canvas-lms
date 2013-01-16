@@ -12,6 +12,6 @@ define [
       @$el.html html
       @filter()
     
-    filter: ->
+    afterRender: ->
       @$('.dateField').datetime_field()
 
