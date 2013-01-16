@@ -120,7 +120,16 @@
     input::-webkit-input-placeholder {
       color: #898989;
     }
-
+    .error {
+      background: #faa;
+      color: #a00;
+      font-size: 20px;
+      text-shadow: 0px 1px 1px rgba(255,255,255,0.4);
+      margin: 15px;
+      padding: 10px 5px;
+      border-radius: 10px;
+      text-align: center;
+    }
   </style>
 </head>
 
@@ -130,6 +139,9 @@
       <% form_for :pseudonym_session, :url => login_path, :html => {:id => "login_form", :class => "front face", :novalidate => 'novalidate'} do |f| %>
         <input <%= 'type=email' if @login_handle_is_email %> name="pseudonym_session[unique_id]" value="<%= params[:pseudonym_session].try(:[], :unique_id) %>" placeholder="<%= @login_handle_name %>">
         <input type="password" name="pseudonym_session[password]" placeholder="<%= t :password, "Password" %>">
+        <% if request.post? && flash[:error] %>
+          <div class="error"><%= flash[:error] %></div>
+        <% end %>
         <button type="submit"><%= t('login', 'Login') %></button>
         <% if url = params[:canvas_login].blank? && @domain_root_account.try(:forgot_password_external_url) %>
           <%= link_to t('dont_know_password', "I don't know my password"), url, :class => 'btn forgot-password' %>
