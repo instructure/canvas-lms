@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe ContextController do
   describe "GET 'roster'" do
@@ -49,12 +49,37 @@ describe ContextController do
       @enrollment.accept!
       @student = @enrollment.user
       get 'roster_user', :course_id => @course.id, :id => @student.id
-      assigns[:enrollment].should_not be_nil
-      assigns[:enrollment].should eql(@enrollment)
+      assigns[:membership].should_not be_nil
+      assigns[:membership].should eql(@enrollment)
       assigns[:user].should_not be_nil
       assigns[:user].should eql(@student)
       assigns[:topics].should_not be_nil
       assigns[:entries].should_not be_nil
+    end
+
+    describe 'across shards' do
+      it_should_behave_like "sharding"
+
+      it 'allows merged users from other shards to be referenced' do
+        user1 = user_model
+        course1 = course(:active_all => 1)
+        course1.enroll_user(user1)
+
+        @shard2.activate do
+          @user2 = user_model
+          @course2 = course(:active_all => 1)
+          @course2.enroll_user(@user2)
+        end
+
+        user1.move_to_user(@user2)
+
+        admin = user_model
+        Account.site_admin.add_user(admin)
+        user_session(admin)
+
+        get 'roster_user', :course_id => course1.id, :id => @user2.id
+        response.should be_success
+      end
     end
   end
 
