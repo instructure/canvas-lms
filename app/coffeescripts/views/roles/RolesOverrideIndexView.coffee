@@ -12,5 +12,5 @@ define [
     # Method Summary
     #   Enable tabs for account/course roles.
     # @api custom backbone override
-    filter: -> 
+    afterRender: ->
       @$roleTabs.tabs()

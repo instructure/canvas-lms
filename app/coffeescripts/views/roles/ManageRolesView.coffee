@@ -27,7 +27,7 @@ define [
     #   whole table row by row since html doesn't
     #   support drawing column by column. 
     # @api custom backbone
-    filter: -> 
+    afterRender: ->
       @renderTable()
 
     # Method Summary

@@ -71,7 +71,7 @@ define [
     # Method Summary
     #   This is called after render to ensure column header is set for accessiblity.
     # @api custom backbone override
-    filter: -> 
+    afterRender: ->
       @$el.attr('role', 'columnheader')
 
 
