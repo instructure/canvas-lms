@@ -53,6 +53,7 @@ define [
       @trigger 'find'
 
     resetBackButton: (model, directories) =>
+      return unless ENV.PERMISSIONS.manage_outcomes
       if model || directories.length > 1
         @$('.go_back').show 200
       else
