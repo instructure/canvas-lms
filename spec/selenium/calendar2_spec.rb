@@ -362,6 +362,18 @@ describe "calendar2" do
         f('.more_options_link')['href'].should match(original_more_options)
       end
 
+      it "should make an assignment undated if you delete the start date" do
+        create_middle_day_assignment("undate me")
+        f(".undated-events-link").click
+        f('.fc-event').click
+        f('.popover-links-holder .edit_event_link').click
+        replace_content(f('.ui-dialog #assignment_due_at'), "")
+        submit_form('#edit_assignment_form')
+        wait_for_ajax_requests
+        f('.fc-event').should be_nil
+        f('.undated_event_title').text.should == "undate me"
+      end
+
       it "should change the month" do
         get "/calendar2"
         old_header_title = get_header_text

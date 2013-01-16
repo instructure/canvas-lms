@@ -72,7 +72,7 @@ define [
       $.ajaxJSON url, method, params, onSuccess, onError
 
     isDueAtMidnight: () ->
-      @midnightFudged || @start && @start.getHours() == 23 && @start.getMinutes() == 59
+      @start && (@midnightFudged || (@start.getHours() == 23 && @start.getMinutes() == 59))
 
     copyDataFromObject: (data) ->
       if @isDueAtMidnight()

@@ -98,7 +98,7 @@ define [
     formSubmit: (e) =>
       e.preventDefault()
       form = @form.getFormData()
-      if form['assignment[due_at]'] then @submitAssignment(form) else @submitOverride(form)
+      if form['assignment[due_at]']? then @submitAssignment(form) else @submitOverride(form)
 
     submitAssignment: (form) ->
       dueAtString = form['assignment[due_at]']
