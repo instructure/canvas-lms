@@ -10,6 +10,7 @@ class Pool
   def initialize(args = ARGV)
     @args = args
     @workers = {}
+    @config = { :workers => [] }
     @options = {
       :config_file => expand_rails_path("config/delayed_jobs.yml"),
       :pid_folder => expand_rails_path("tmp/pids"),
@@ -112,7 +113,7 @@ class Pool
     Dir.chdir(Rails.root)
   end
 
-  def unlock_orphaned_jobs(pid = nil)
+  def unlock_orphaned_jobs(worker = nil, pid = nil)
     # don't bother trying to unlock jobs by process name if the name is overridden
     return if @config.key?(:name)
     return if @config[:disable_automatic_orphan_unlocking]
@@ -188,7 +189,7 @@ class Pool
           say "ran auditor: #{worker}"
         else
           say "child exited: #{child}, restarting", :info
-          unlock_orphaned_jobs(child)
+          unlock_orphaned_jobs(worker, child)
           spawn_worker(worker.config)
         end
       end
