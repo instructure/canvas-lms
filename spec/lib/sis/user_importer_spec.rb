@@ -44,4 +44,11 @@ describe SIS::UserImporter do
       @before_save_callbacks.delete :_stub_sleep
     end
   end
+
+  it 'should handle user_ids as integers just in case' do
+    SIS::UserImporter.new(account_model, {}).process(2, []) do |importer|
+      importer.add_user(12345, 'user1', 'active', 'User', 'One', 'user1@example.com')
+    end
+    Pseudonym.last.sis_user_id.should == '12345'
+  end
 end

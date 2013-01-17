@@ -24,13 +24,13 @@ describe Account do
     @account = Account.new
     lambda{@account.courses}.should_not raise_error
   end
-  
+
   context "equella_settings" do
     it "should respond to :equella_settings" do
       Account.new.should respond_to(:equella_settings)
       Account.new.equella_settings.should be_nil
     end
-    
+
     it "should return the equella_settings data if defined" do
       a = Account.new
       a.equella_endpoint = "http://oer.equella.com/signon.do"
@@ -39,7 +39,7 @@ describe Account do
       a.equella_settings.default_action.should_not be_nil
     end
   end
-  
+
   # it "should have an atom feed" do
     # account_model
     # @a.to_atom.should be_is_a(Atom::Entry)
@@ -110,6 +110,7 @@ describe Account do
         "S008S,C001S,Sec8,,,deleted",
         "S009S,C008S,Sec9,,,active"
       ])
+
       process_csv_data_cleanly([
         "course_id,user_id,role,section_id,status,associated_user_id",
         ",U001,student,S001,active,",
@@ -131,22 +132,21 @@ describe Account do
         ",U008,student,S008S,active,",
         ",U009,student,S005S,deleted,"
       ])
-      
     end
-    
+
     context "fast list" do
       it "should list associated courses" do
         @account.fast_all_courses.map(&:sis_source_id).sort.should == [
           "C001", "C005", "C006", "C007", "C008", "C009",
           "C001S", "C005S", "C006S", "C007S", "C008S", "C009S", ].sort
       end
-    
+
       it "should list associated courses by term" do
         @account.fast_all_courses({:term => EnrollmentTerm.find_by_sis_source_id("T001")}).map(&:sis_source_id).sort.should == ["C001", "C001S"]
         @account.fast_all_courses({:term => EnrollmentTerm.find_by_sis_source_id("T002")}).map(&:sis_source_id).sort.should == []
         @account.fast_all_courses({:term => EnrollmentTerm.find_by_sis_source_id("T003")}).map(&:sis_source_id).sort.should == ["C005", "C006", "C007", "C008", "C009", "C005S", "C006S", "C007S", "C008S", "C009S"].sort
       end
-    
+
       it "should list associated nonenrollmentless courses" do
         @account.fast_all_courses({:hide_enrollmentless_courses => true}).map(&:sis_source_id).sort.should == ["C001", "C005", "C007", "C001S", "C005S", "C007S"].sort #C007 probably shouldn't be here, cause the enrollment section is deleted, but we kinda want to minimize database traffic
       end

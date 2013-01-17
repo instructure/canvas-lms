@@ -79,7 +79,8 @@ module SIS
         raise ImportError, "No course_id or section_id given for an enrollment" if course_id.blank? && section_id.blank?
         raise ImportError, "No user_id given for an enrollment" if user_id.blank?
         raise ImportError, "Improper status \"#{status}\" for an enrollment" unless status =~ /\Aactive|\Adeleted|\Acompleted|\Ainactive/i
-        @enrollment_batch << [course_id, section_id, user_id, role, status, start_date, end_date, associated_user_id]
+
+        @enrollment_batch << [course_id.to_s, section_id.to_s, user_id.to_s, role, status, start_date, end_date, associated_user_id]
         process_batch if @enrollment_batch.size >= @updates_every
       end
 
@@ -122,11 +123,11 @@ module SIS
               next
             end
 
-            if section_id && !@section
+            if section_id.present? && !@section
               @messages << "An enrollment referenced a non-existent section #{section_id}"
               next
             end
-            if course_id && !@course
+            if course_id.present? && !@course
               @messages << "An enrollment referenced a non-existent course #{course_id}"
               next
             end

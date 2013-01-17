@@ -116,13 +116,13 @@ describe Pseudonym do
     @user.reload
     @user.user_account_associations.should == []
   end
-  
+
   it "should allow deleting pseudonyms" do
     user_with_pseudonym(:active_all => true)
     @pseudonym.destroy(true).should eql(true)
     @pseudonym.should be_deleted
   end
-  
+
   it "should not allow deleting system-generated pseudonyms by default" do
     user_with_pseudonym(:active_all => true)
     @pseudonym.sis_user_id = 'something_cool'
@@ -131,7 +131,7 @@ describe Pseudonym do
     lambda{ @pseudonym.destroy}.should raise_error("Cannot delete system-generated pseudonyms")
     @pseudonym.should_not be_deleted
   end
-  
+
   it "should not allow deleting system-generated pseudonyms by default" do
     user_with_pseudonym(:active_all => true)
     @pseudonym.sis_user_id = 'something_cool'
@@ -238,7 +238,7 @@ describe Pseudonym do
       @pseudonym.reload
       @pseudonym.user.email_channel.path.should eql('admin@example.com')
     end
-    
+
     it "should offer the user sms if there is one" do
       communication_channel_model(:path_type => 'sms', :user_id => @user.id)
       @user.communication_channels << @cc
@@ -254,7 +254,7 @@ describe Pseudonym do
       @pseudonym.user.sms.should eql('admin@example.com')
     end
   end
-  
+
   it "should determine if the password is managed" do
     u = User.create!
     p = Pseudonym.create!(:unique_id => 'jt@instructure.com', :user => u)
@@ -332,5 +332,35 @@ describe Pseudonym do
     end
   end
 
+  describe '#verify_unique_sis_user_id' do
+
+    it 'is true if there is no sis_user_id' do
+      Pseudonym.new.verify_unique_sis_user_id.should be_true
+    end
+
+    describe 'when a pseudonym already exists' do
+
+      let(:sis_user_id) { "1234554321" }
+
+      before do
+        user_with_pseudonym
+        @pseudonym.sis_user_id = sis_user_id
+        @pseudonym.save!
+      end
+
+      it 'returns false if the sis_user_id is already taken' do
+        new_pseudonym = Pseudonym.new(:account => @pseudonym.account)
+        new_pseudonym.sis_user_id = sis_user_id
+        new_pseudonym.verify_unique_sis_user_id.should be_false
+      end
+
+      it 'also can validate if the new sis_user_id is an integer' do
+        new_pseudonym = Pseudonym.new(:account => @pseudonym.account)
+        new_pseudonym.sis_user_id = sis_user_id.to_i
+        new_pseudonym.verify_unique_sis_user_id.should be_false
+      end
+
+    end
+  end
 end
 
