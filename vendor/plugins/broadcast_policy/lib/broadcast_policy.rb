@@ -237,6 +237,11 @@ module Instructure #:nodoc:
         self.broadcast_policy_list.populate(&block)
       end
 
+      def set_broadcast_policy!(&block)
+        self.broadcast_policy_list = PolicyList.new
+        self.broadcast_policy_list.populate(&block)
+      end
+
     end # SingletonMethods
 
     module InstanceMethods
