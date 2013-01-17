@@ -114,6 +114,11 @@ class AccountsController < ApplicationController
 
   def update
     if authorized_action(@account, @current_user, :manage_account_settings)
+      if api_request?
+        render :json => account_json(@account, @current_user, session, params[:includes] || [])
+        return
+      end
+
       respond_to do |format|
 
         custom_help_links = params[:account].delete :custom_help_links

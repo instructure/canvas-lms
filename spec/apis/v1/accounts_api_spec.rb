@@ -324,5 +324,27 @@ describe "Accounts API", :type => :integration do
     Setting.set('api_max_per_page', '5')
     api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?per_page=12", :controller => "accounts", :action => "courses_api", :account_id => @a1.to_param, :format => 'json', :per_page => '12').size.should == 5
   end
+
+  context "account api extension" do
+    module MockPlugin
+      def self.extend_account_json(hash, account, user, session, includes)
+        hash[:extra_thing] = "something"
+      end
+    end
+
+    module BadMockPlugin
+      def self.not_the_right_method
+      end
+    end
+
+    include Api::V1::Account
+
+    it "should allow a plugin to extend the account_json method" do
+      Api::V1::Account.register_extension(MockPlugin).should be_true
+      Api::V1::Account.register_extension(BadMockPlugin).should be_false
+
+      account_json(@a1, @me, @session, [])[:extra_thing].should == "something"
+    end
+  end
 end
 
