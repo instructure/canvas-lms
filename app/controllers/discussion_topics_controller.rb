@@ -121,8 +121,12 @@ class DiscussionTopicsController < ApplicationController
           add_crumb t('#crumbs.discussions', "Discussions"), named_context_url(@context, :context_discussion_topics_url)
           js_env :permissions => {
             :create => @context.discussion_topics.new.grants_right?(@current_user, session, :create),
-            :moderate => @context.grants_right?(@current_user, session, :moderate_forum)
+            :moderate => @context.grants_right?(@current_user, session, :moderate_forum),
+            :change_settings => user_can_edit_course_settings?
           }
+          if user_can_edit_course_settings?
+            js_env :SETTINGS_URL => named_context_url(@context, :api_v1_context_settings_url) #named_context_url( "/api/v1/courses/#{@context.id}/settings"
+          end
         end
         format.json do
           # you can pass ?only_announcements=true to get announcements instead of discussions TODO: document
@@ -461,6 +465,10 @@ class DiscussionTopicsController < ApplicationController
     @topic.user_id = @root_topic.user_id
     @topic.save
     redirect_to named_context_url(@context, :context_discussion_topic_url, @topic.id, extra_params)
+  end
+
+  def user_can_edit_course_settings?
+    @context.is_a?(Course) && @context.grants_right?(@current_user, session, :update)
   end
 
 end

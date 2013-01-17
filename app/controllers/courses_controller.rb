@@ -574,7 +574,7 @@ class CoursesController < ApplicationController
     bool_settings = [ :allow_student_discussion_topics,
                       :allow_student_forum_attachments ]
     bool_settings.each do |setting|
-      if params[setting]
+      unless params[setting].nil?
         @course.send("#{setting}=", value_to_boolean(params[setting]))
       end
     end

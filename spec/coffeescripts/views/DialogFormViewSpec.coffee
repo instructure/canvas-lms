@@ -63,12 +63,29 @@ define [
     assert.isHidden view.$el,
       'when form submission is complete'
 
-  test 'dialog title', ->
-    openDialog()
+  assertDialogTitle = (expected, message) ->
     dialogTitle = $('.ui-dialog-title:last').html()
-    triggerTitle = trigger.attr 'title'
-    equal dialogTitle, triggerTitle,
+    equal dialogTitle, expected, message
+
+  test 'gets dialog title from tigger title', ->
+    openDialog()
+    assertDialogTitle trigger.attr('title'),
       "dialog title is taken from triggers title attribute"
+
+  test 'gets dialog title from option', ->
+    view.options.title = 'different title'
+    openDialog()
+    assertDialogTitle view.options.title,
+      "dialog title is taken from triggers title attribute"
+
+  test 'gets dialog title from trigger aria-describedby', ->
+    trigger.removeAttr 'title'
+    describer = $('<div/>', html: 'aria title', id: 'aria-describer').appendTo $('#fixtures')
+    trigger.attr 'aria-describedby', 'aria-describer'
+    openDialog()
+    assertDialogTitle 'aria title',
+      "dialog title is taken from triggers title attribute"
+    describer.remove()
 
   test 'rendering', ->
     view.wrapperTemplate = -> 'wrapper:<div class="outlet"></div>'
@@ -81,4 +98,5 @@ define [
       "renders wrapper"
     equal view.$el.find('.outlet').html(), 'hello',
       "renders template into outlet"
+
 
