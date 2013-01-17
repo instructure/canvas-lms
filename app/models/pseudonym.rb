@@ -296,13 +296,13 @@ class Pseudonym < ActiveRecord::Base
     end
     res
   end
-  
+
   def generate_temporary_password
     self.reset_password
     self.password_auto_generated = true
     self.password
   end
-  
+
   def move_to_user(user, migrate=true)
     return unless user
     return true if self.user_id == user.id
@@ -318,10 +318,10 @@ class Pseudonym < ActiveRecord::Base
       User.update_all({:updated_at => Time.now.utc}, {:id => [old_user_id, user.id]})
     end
     if User.find(old_user_id).pseudonyms.empty? && migrate
-      old_user.move_to_user(user)
+      UserMerge.from(old_user).into(user)
     end
   end
-  
+
   def valid_ssha?(plaintext_password)
     return false unless plaintext_password && self.sis_ssha
     decoded = Base64::decode64(self.sis_ssha.sub(/\A\{SSHA\}/, ""))

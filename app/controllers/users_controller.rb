@@ -948,7 +948,7 @@ class UsersController < ApplicationController
     end
 
     if @user_about_to_go_away && @user_that_will_still_be_around
-      @user_about_to_go_away.move_to_user(@user_that_will_still_be_around)
+      UserMerge.from(@user_about_to_go_away).into(@user_that_will_still_be_around)
       @user_that_will_still_be_around.touch
       flash[:notice] = t('user_merge_success', "User merge succeeded! %{first_user} and %{second_user} are now one and the same.", :first_user => @user_that_will_still_be_around.name, :second_user => @user_about_to_go_away.name)
     else

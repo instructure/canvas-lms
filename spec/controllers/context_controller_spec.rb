@@ -71,7 +71,7 @@ describe ContextController do
           @course2.enroll_user(@user2)
         end
 
-        user1.move_to_user(@user2)
+        UserMerge.from(user1).into(@user2)
 
         admin = user_model
         Account.site_admin.add_user(admin)
