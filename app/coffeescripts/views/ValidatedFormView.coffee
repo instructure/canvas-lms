@@ -30,12 +30,6 @@ define [
       submit: 'submit'
 
     ##
-    # When the form submits, the model's attributes are set from the form
-    # and saved to the server. Make sure to pass in `model` to the options on
-    # initialize
-    model: Backbone.Model.extend()
-
-    ##
     # Sets the model data from the form and saves it. Called when the form
     # submits, or can be called programatically.
     # set @saveOpts in your vew to to pass opts to Backbone.sync (like multipart: true if you have

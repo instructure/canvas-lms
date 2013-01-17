@@ -1,10 +1,9 @@
 define [
   'jquery'
   'compiled/views/ValidatedFormView'
-  'i18n!contextual_settings'
   'jst/DialogFormWrapper'
   'jqueryui/dialog'
-], ($, ValidatedFormView, I18n, wrapper) ->
+], ($, ValidatedFormView, wrapper) ->
 
   ##
   # Creates a form dialog.
@@ -32,22 +31,26 @@ define [
     defaults:
 
       ##
-      # the element selector that opens the dialog
-      trigger: '.dialogFormTrigger'
+      # the element selector that opens the dialog, if false, no trigger logic
+      # will be established
+      trigger: false
+
+      ##
+      # will figure out the title from the trigger if null
+      title: null
 
     $dialogAppendTarget: $ 'body'
 
     className: 'dialogFormView'
 
     ##
-    # creates the form wrapper, with generic “save” and “cancel” buttons,
+    # creates the form wrapper, with button controls
     # override in subclasses at will
     wrapperTemplate: wrapper
 
     initialize: ->
       super
       @setTrigger()
-      @attachTrigger()
 
     ##
     # @api public
@@ -64,13 +67,16 @@ define [
     ##
     # @api public
     toggle: =>
-      if @dialog?.isOpen() then @close() else @open()
+      if @dialog?.isOpen()
+        @close()
+      else
+        @open()
 
     ##
     # @api public
     remove: ->
       super
-      @$trigger.off '.dialogFormView'
+      @$trigger?.off '.dialogFormView'
 
     ##
     # lazy init on first open
@@ -84,6 +90,7 @@ define [
     # @api private
     openAgain: ->
       @dialog.open()
+      @dialog.uiDialog.focus()
 
     ##
     # @api private
@@ -93,7 +100,9 @@ define [
     ##
     # @api private
     setTrigger: ->
+      return unless @options.trigger
       @$trigger = $ @options.trigger
+      @attachTrigger()
 
     ##
     # @api private
@@ -105,7 +114,7 @@ define [
     renderEl: =>
       @$el.html @wrapperTemplate()
       @renderOutlet()
-      # reassign: only render the outlout to subsequent calls to render
+      # reassign: only render the outlout now
       @renderEl = @renderOutlet
 
     ##
@@ -117,7 +126,13 @@ define [
     ##
     # @api private
     getDialogTitle: ->
-      @$trigger.attr 'title'
+      @options.title or
+      @$trigger.attr('title') or
+      @getAriaTitle()
+
+    getAriaTitle: ->
+      ariaID = @$trigger.attr 'aria-describedby'
+      $("##{ariaID}").text()
 
     ##
     # @api private
@@ -125,6 +140,7 @@ define [
       @$el.dialog
         autoOpen: false
         title: @getDialogTitle()
+      .fixDialogButtons()
       @dialog = @$el.data 'dialog'
 
     ##

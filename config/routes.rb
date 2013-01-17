@@ -654,7 +654,7 @@ ActionController::Routing::Routes.draw do |map|
       courses.put 'courses/:id', :action => :update
       courses.get 'courses/:id', :action => :show
       courses.get 'courses/:course_id/students', :action => :students
-      courses.get 'courses/:course_id/settings', :action => :settings
+      courses.get 'courses/:course_id/settings', :action => :settings, :path_name => 'course_settings'
       courses.put 'courses/:course_id/settings', :action => :update_settings
       courses.get 'courses/:course_id/recent_students', :action => :recent_students, :path_name => 'course_recent_students'
       courses.get 'courses/:course_id/users', :action => :users, :path_name => 'course_users'

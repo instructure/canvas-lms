@@ -1,11 +1,12 @@
 define [
+  'compiled/views/DiscussionTopics/DiscussionsSettingsView'
   'i18n!discussion_topics'
   'underscore'
   'jst/DiscussionTopics/IndexView'
   'compiled/views/PaginatedView'
   'compiled/views/DiscussionTopics/SummaryView'
   'compiled/collections/AnnouncementsCollection'
-], (I18n, _, template, PaginatedView, DiscussionTopicSummaryView, AnnouncementsCollection) ->
+], (DiscussionsSettingsView, I18n, _, template, PaginatedView, DiscussionTopicSummaryView, AnnouncementsCollection) ->
 
   class IndexView extends PaginatedView
 
@@ -21,12 +22,15 @@ define [
       @collection.on 'change:selected', @toggleActionsForSelectedDiscussions
       @render()
 
-    render: =>
-      super
+    afterRender: ->
       @$('#discussionsFilter').buttonset()
       @renderList()
       @toggleActionsForSelectedDiscussions()
       this
+
+    toggleSettingsView: ->
+      @settingsView or= new DiscussionsSettingsView()
+      @settingsView.toggle()
 
     renderList: =>
       $list = @$('.discussionTopicIndexList').empty()
@@ -109,6 +113,7 @@ define [
       'sortupdate' : 'handleSortUpdate'
       'change #lock' : 'toggleLockingSelectedTopics'
       'click #delete' : 'destroySelectedTopics'
+      'click #edit_discussions_settings': 'toggleSettingsView'
 
     modelMeetsFilterRequirements: (model) =>
       _.all @activeFilters(), (fn, key) =>
