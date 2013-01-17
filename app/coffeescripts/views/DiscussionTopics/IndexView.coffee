@@ -80,13 +80,13 @@ define [
 
       message = if @isShowingAnnouncements()
         I18n.t 'confirm_delete_announcement',
-          one: 'Are you sure you wan to delete this announcement?'
+          one: 'Are you sure you want to delete this announcement?'
           other: 'Are you sure you want to delete these %{count} announcements?'
         ,
           count: selectedTopics.length
       else
         I18n.t 'confirm_delete_discussion_topic',
-          one: 'Are you sure you wan to delete this discussion topic?'
+          one: 'Are you sure you want to delete this discussion topic?'
           other: 'Are you sure you want to delete these %{count} discussion topics?'
         ,
           count: selectedTopics.length
