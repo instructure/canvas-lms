@@ -190,6 +190,7 @@ class UsersController < ApplicationController
           google_docs_get_access_token(oauth_request, params[:oauth_verifier])
           flash[:notice] = t('google_docs_added', "Google Docs access authorized!")
         rescue => e
+          ErrorReport.log_exception(:oauth, e)
           flash[:error] = t('google_docs_fail', "Google Docs authorization failed. Please try again")
         end
       elsif params[:service] == "linked_in"
@@ -197,6 +198,7 @@ class UsersController < ApplicationController
           linked_in_get_access_token(oauth_request, params[:oauth_verifier])
           flash[:notice] = t('linkedin_added', "LinkedIn account successfully added!")
         rescue => e
+          ErrorReport.log_exception(:oauth, e)
           flash[:error] = t('linkedin_fail', "LinkedIn authorization failed. Please try again")
         end
       else
@@ -204,6 +206,7 @@ class UsersController < ApplicationController
           token = twitter_get_access_token(oauth_request, params[:oauth_verifier])
           flash[:notice] = t('twitter_added', "Twitter access authorized!")
         rescue => e
+          ErrorReport.log_exception(:oauth, e)
           flash[:error] = t('twitter_fail_whale', "Twitter authorization failed. Please try again")
         end
       end
