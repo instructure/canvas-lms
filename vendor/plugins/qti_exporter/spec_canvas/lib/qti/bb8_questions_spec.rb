@@ -231,8 +231,8 @@ module BB8Expected
               :matches=>
                       [{:text=>"right 1"},
                        {:text=>"right 2"},
-                       {:text=>"right 3"},
-                       {:text=>"right 4"}]}
+                       {:text=>"right 4"},
+                       {:text=>"right 3"}]}
 
   LIKERT = {:answers=>
           [{:text=>"Strongly Agree",
