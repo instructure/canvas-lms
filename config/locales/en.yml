@@ -18,3 +18,10 @@ en:
       or:
         two_words_connector: ' or '
         last_word_connector: ', or '
+    help_menu:
+      community_support_forums: 'Community Support Forums'
+      networking_academy_faqs: 'Networking Academy FAQs'
+      curriculum_assessment_errata: 'Curriculum/Assessment Errata'
+      community_support_description: 'Interact with and get assistance from your peers.'
+      networking_academy_description: 'View Cisco answers to the most commonly asked questions.'
+      curriculum_assessment_errata_description: 'View already reported assessment and curricula errors. Search for "errata."'
