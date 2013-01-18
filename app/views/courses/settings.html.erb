@@ -263,6 +263,8 @@ TEXT
               <%= f.label :allow_student_assignment_edits, :en => "Let Students edit Assignment Descriptions" %><br/>
               <%= f.check_box :allow_student_forum_attachments %>
               <%= f.label :allow_student_forum_attachments, :en => "Let Students attach files to Discussion Posts" %><br/>
+              <%= f.check_box :allow_student_discussion_topics, :checked => @context.allow_student_discussion_topics %>
+              <%= f.label :allow_student_discussion_topics, :en => "Let Students create Discussion Topics" %><br/>
               <%= f.check_box :allow_student_organized_groups %>
               <%= f.label :allow_student_organized_groups, :en => "Let Students organize their own Groups" %><br/>
               <%= settings.check_box :hide_final_grade, :checked => @context.settings[:hide_final_grade] %>

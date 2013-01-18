@@ -120,7 +120,6 @@ describe "discussions" do
       end
 
       it "should allow teachers to edit discussions settings" do
-        get "/courses/#{@course.id}/discussion_topics"
         assignment_name = 'topic assignment'
         title = 'assignment topic title'
         @course.allow_student_discussion_topics.should == true
