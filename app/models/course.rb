@@ -37,6 +37,7 @@ class Course < ActiveRecord::Base
                   :syllabus_body,
                   :public_description,
                   :allow_student_forum_attachments,
+                  :allow_student_discussion_topics,
                   :default_wiki_editing_roles,
                   :allow_student_organized_groups,
                   :course_code,
@@ -2831,7 +2832,7 @@ class Course < ActiveRecord::Base
   end
 
   def allow_student_discussion_topics=(allow)
-    self.settings[:allow_student_discussion_topics] = allow
+    self.settings[:allow_student_discussion_topics] = Canvas::Plugin.value_to_boolean(allow)
   end
 
   def filter_attributes_for_user(hash, user, session)
