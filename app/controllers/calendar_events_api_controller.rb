@@ -80,6 +80,9 @@
 #       // URL for this calendar event (to update, delete, etc.)
 #       url: "https://example.com/api/v1/calendar_events/234",
 #
+#       // URL for a user to view this event
+#       html_url: "https://example.com/calendar?event_id=234&include_contexts=course_123",
+#
 #       // The date of this event
 #       all_day_date: "2012-07-19",
 #
@@ -161,6 +164,9 @@
 #       // URL for this assignment (note that updating/deleting should be done
 #       // via the Assignments API)
 #       url: "https://example.com/api/v1/calendar_events/assignment_987",
+#
+#       // URL for a user to view this assignment
+#       html_url: "http://example.com/courses/123/assignments/987",
 #
 #       // The due date of this assignment
 #       all_day_date: "2012-07-19",

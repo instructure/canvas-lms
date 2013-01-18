@@ -61,7 +61,27 @@ define [
 
     # convert a date to a string, using the given i18n format in the date.formats namespace
     tDateToString : (date = '', i18n_format) ->
-      I18n.l("date.formats.#{i18n_format}", date)
+      I18n.l "date.formats.#{i18n_format}", date
+
+    # convert a date to a time string, using the given i18n format in the time.formats namespace
+    tTimeToString : (date = '', i18n_format) ->
+      I18n.l "time.formats.#{i18n_format}", date
+
+    tTimeHours : (date = '') ->
+      if date.getMinutes() == 0 and date.getSeconds() == 0
+        I18n.l "time.formats.tiny_on_the_hour", date
+      else
+        I18n.l "time.formats.tiny", date
+
+    # convert an event date and time to a string using the given date and time format specifiers
+    tEventToString : (date = '', i18n_date_format = 'short', i18n_time_format = 'tiny') ->
+      I18n.t 'time.event',
+        date: I18n.l "date.formats.#{i18n_date_format}", date
+        time: I18n.l "time.formats.#{i18n_time_format}", date
+
+    # formats a date as a string, using the given i18n format string
+    strftime : (date = '', fmtstr) ->
+      I18n.strftime date, fmtstr
 
     mimeClass: mimeClass
 

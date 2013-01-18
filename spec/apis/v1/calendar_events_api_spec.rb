@@ -27,8 +27,8 @@ describe CalendarEventsApiController, :type => :integration do
   context 'events' do
     expected_fields = [
       'all_day', 'all_day_date', 'child_events', 'child_events_count',
-      'context_code', 'created_at', 'description', 'end_at', 'hidden', 'id',
-      'location_address', 'location_name', 'parent_event_id', 'start_at',
+      'context_code', 'created_at', 'description', 'end_at', 'hidden', 'html_url',
+      'id', 'location_address', 'location_name', 'parent_event_id', 'start_at',
       'title', 'updated_at', 'url', 'workflow_state'
     ]
     expected_slot_fields = (expected_fields + ['appointment_group_id', 'appointment_group_url', 'available_slots', 'participants_per_appointment', 'reserve_url', 'effective_context_code']).sort
@@ -700,8 +700,8 @@ describe CalendarEventsApiController, :type => :integration do
   context 'assignments' do
     expected_fields = [
       'all_day', 'all_day_date', 'assignment', 'context_code', 'created_at',
-      'description', 'end_at', 'id', 'start_at', 'title', 'updated_at', 'url',
-      'workflow_state'
+      'description', 'end_at', 'html_url', 'id', 'start_at', 'title', 'updated_at',
+      'url', 'workflow_state'
     ]
 
     it 'should return assignments within the given date range' do

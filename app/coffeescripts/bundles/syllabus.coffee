@@ -18,11 +18,65 @@
 
 require [
   'jquery'
+  'underscore'
   'compiled/behaviors/SyllabusBehaviors'
-], ($, SyllabusBehaviors) ->
+  'compiled/collections/SyllabusCollection'
+  'compiled/collections/SyllabusCalendarEventsCollection'
+  'compiled/collections/SyllabusAppointmentGroupsCollection'
+  'compiled/views/courses/SyllabusView'
+], ($, _, SyllabusBehaviors, SyllabusCollection, SyllabusCalendarEventsCollection, SyllabusAppointmentGroupsCollection, SyllabusView) ->
 
+  # Setup the collections
+  collections = [
+    new SyllabusCalendarEventsCollection [ENV.context_asset_string], 'event'
+    new SyllabusCalendarEventsCollection [ENV.context_asset_string], 'assignment'
+    new SyllabusAppointmentGroupsCollection [ENV.context_asset_string], 'reservable'
+    new SyllabusAppointmentGroupsCollection [ENV.context_asset_string], 'manageable'
+  ]
+
+  # Perform a fetch on each collection
+  #   The fetch continues fetching until no next link is returned
+  deferreds = _.map collections, (collection) ->
+    deferred = $.Deferred()
+
+    error = ->
+      deferred.reject()
+
+    success = ->
+      if collection.canFetch 'next'
+        collection.fetch
+          page: 'next'
+          success: success
+          error: error
+      else
+        deferred.resolve()
+
+    collection.fetch
+      data:
+        per_page: ENV.SYLLABUS_PER_PAGE ? 50
+      success: success
+      error: error
+
+    deferred
+
+  # Create the aggregation collection and view
+  acollection = new SyllabusCollection collections
+  view = new SyllabusView
+    el: '#syllabusContainer'
+    collection: acollection
+
+  # When all of the fetches have completed, render the view and bind behaviors
+  $.when.apply(this, deferreds).then ->
+    view.render()
+    SyllabusBehaviors.bindToSyllabus()
+
+  # Add the loading indicator now that the collections are fetching
+  $('#loading_indicator').replaceWith '<img src="/images/ajax-reload-animated.gif">'
+
+  # Binding to the mini calendar must take place after wikiSidebar initializes,
+  # so this must be done on dom ready
   $ ->
     SyllabusBehaviors.bindToEditSyllabus()
     SyllabusBehaviors.bindToMiniCalendar()
-    SyllabusBehaviors.bindToSyllabus()
+
     $.scrollSidebar()

@@ -63,6 +63,7 @@ describe "assignments" do
 
     it "should highlight mini-calendar dates where stuff is due" do
       get "/courses/#{@course.id}/assignments/syllabus"
+      wait_for_ajaximations
       f(".mini_calendar_day.date_#{@due_date.strftime("%m_%d_%Y")}").should have_class('has_event')
     end
 

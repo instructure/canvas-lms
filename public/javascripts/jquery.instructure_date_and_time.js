@@ -159,6 +159,13 @@ define([
       return $.parseFromISO.defaults;
     }
   };
+
+  // getUserOffset is used to query the user's timezone offset setting, which is usually
+  // communicated from the server through the #time_zone_offset element
+  $.getUserOffset = function() {
+    return user_offset = parseInt($("#time_zone_offset").text(), 10) * -1; // in minutes
+  }
+
   // fudgeDateForProfileTimezone is used to apply an offset to the date which represents the
   // difference between the user's configured timezone in their profile, and the timezone
   // of the browser. We want to display times in the timezone of their profile. Use
@@ -168,7 +175,7 @@ define([
 
     if (!date) return null;
     today = new Date();
-    user_offset = parseInt($("#time_zone_offset").text(), 10) * -1; // in minutes
+    user_offset = $.getUserOffset();
     if (date.getTimezoneOffset() != today.getTimezoneOffset()) {
       user_offset = user_offset - (date.getTimezoneOffset() - today.getTimezoneOffset());
     }

@@ -2,6 +2,7 @@ en:
   date:
     formats:
       weekday: "%A"
+      short_weekday: "%a"
       medium: "%b %-d, %Y"
       short: "%b %-d"
       short_month: "%b"

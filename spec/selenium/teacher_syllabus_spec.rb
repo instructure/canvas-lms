@@ -28,6 +28,7 @@ describe "course syllabus" do
       @assignment_2 = add_assignment('second assignment title', 100)
 
       get "/courses/#{@course.id}/assignments/syllabus"
+      wait_for_ajaximations
     end
 
     it "should confirm existing assignments and dates are correct" do
@@ -48,7 +49,6 @@ describe "course syllabus" do
     end
 
     it "should validate Jump to Today works on the mini calendar" do
-      get "/courses/#{@course.id}/assignments/syllabus"
       2.times { f('.next_month_link').click }
       f('.jump_to_today_link').click
       f('.mini_month .today').should have_attribute('id', "mini_day_#{Time.now.strftime('%Y_%m_%d')}")
