@@ -76,12 +76,15 @@ define [
           @render()
       super()
 
+    _cleanUpTiny: => @$el.find( '#description' ).editorBox 'destroy'
+
     submit: (e) =>
       e.preventDefault()
       @setModelUrl()
       @getTinyMceCode()
       if @isValid()
         super e
+        @_cleanUpTiny()
         $('.edit_button').focus()
       else
         @showErrors @errors
@@ -122,6 +125,7 @@ define [
     cancel: (e) =>
       e.preventDefault()
       @resetModel()
+      @_cleanUpTiny()
       @$el.hideErrors()
       if @state is 'add'
         @$el.empty()
