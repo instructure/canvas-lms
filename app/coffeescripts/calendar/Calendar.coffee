@@ -104,6 +104,7 @@ define [
         calendar2Only: @options.calendar2Only,
         showScheduler: @options.showScheduler)
 
+      data.view_name = 'agendaWeek' if data.view_name == 'week'
       if data.view_name == 'month' || data.view_name == 'agendaWeek'
         radioId = if data.view_name == 'agendaWeek' then 'week' else 'month'
         $("##{radioId}").click()

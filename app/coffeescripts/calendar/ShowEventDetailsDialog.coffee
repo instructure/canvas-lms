@@ -155,6 +155,8 @@ define [
       @popover = new Popover(jsEvent, eventDetailsTemplate(params))
       @popover.el.data('showEventDetailsDialog', @)
 
+      @popover.el.find(".view_event_link").click preventDefault @openShowPage
+
       @popover.el.find(".edit_event_link").click preventDefault @showEditDialog
 
       @popover.el.find(".delete_event_link").click preventDefault destroyArguments @deleteEvent
@@ -177,4 +179,7 @@ define [
         @popover.el.removeData('showEventDetailsDialog')
         @popover.hide()
 
-
+    openShowPage: (jsEvent) =>
+      pieces = $(jsEvent.target).attr('href').split("#")
+      pieces[0] += "?" + $.param({'return_to': window.location.href})
+      window.location.href = pieces.join("#")
