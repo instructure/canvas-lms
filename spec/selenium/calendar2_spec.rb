@@ -483,6 +483,80 @@ describe "calendar2" do
         event.reload
         event.end_at.should == noon + 2.hours
       end
+
+      it "should show short events at full height" do
+        noon = Time.now.at_beginning_of_day + 12.hours
+        event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
+
+        get "/calendar2"
+        wait_for_ajax_requests
+        f('label[for=week]').click
+
+        elt = fj('.fc-event:visible')
+        elt.size.height.should >= 18
+      end
+
+      it "should stagger pseudo-overlapping short events" do
+        noon = Time.now.at_beginning_of_day + 12.hours
+        first_event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
+        second_start = first_event.start_at + 6.minutes
+        second_event = @course.calendar_events.create!(:title => "ohai", :start_at => second_start, :end_at => second_start + 5.minutes)
+
+        get "/calendar2"
+        wait_for_ajaximations
+        f('label[for=week]').click
+        wait_for_ajaximations
+
+        elts = ffj('.fc-event:visible')
+        elts.size.should eql(2)
+
+        elt_lefts = elts.map { |elt| elt.location.x }.uniq
+        elt_lefts.size.should eql(elts.size)
+      end
+
+      it "should not change duration when dragging a short event" do
+        pending("dragging events doesn't seem to work")
+        noon = Time.zone.now.at_beginning_of_day + 12.hours
+        event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
+        get "/calendar2"
+        wait_for_ajaximations
+        f('label[for=week]').click
+        wait_for_ajaximations
+
+        elt = fj('.fc-event:visible')
+        driver.action.drag_and_drop_by(elt, 0, 50)
+        wait_for_ajax_requests
+        event.reload.start_at.should eql(noon + 1.hour)
+        event.reload.end_at.should eql(noon + 1.hour + 5.minutes)
+      end
+
+      it "should change duration of a short event when dragging resize handle" do
+        noon = Time.zone.now.at_beginning_of_day + 12.hours
+        event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
+        get "/calendar2"
+        wait_for_ajaximations
+        f('label[for=week]').click
+        wait_for_ajaximations
+
+        resize_handle = fj('.fc-event:visible .ui-resizable-handle')
+        driver.action.drag_and_drop_by(resize_handle, 0, 50).perform
+        wait_for_ajaximations
+
+        event.reload.start_at.should eql(noon)
+        event.end_at.should eql(noon + 1.hours + 30.minutes)
+      end
+
+      it "should show the right times in the tool tips for short events" do
+        noon = Time.zone.now.at_beginning_of_day + 12.hours
+        event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
+        get "/calendar2"
+        wait_for_ajaximations
+        f('label[for=week]').click
+        wait_for_ajaximations
+
+        elt = fj('.fc-event:visible')
+        elt.attribute('title').should match(/12:00.*12:05/)
+      end
     end
   end
 

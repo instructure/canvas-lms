@@ -230,7 +230,13 @@ define [
         if event.calendarEvent.reserved == true
           status = "Reserved" # TODO: i18n
         $element.find('.fc-event-title').text(status)
-      $element.attr('title', $.trim("#{$element.find('.fc-event-time').text()}\n#{$element.find('.fc-event-title').text()}"))
+      
+      # TODO: i18n
+      timeString = if !event.endDate() || event.startDate().getTime() == event.endDate().getTime()
+          @calendar.fullCalendar('formatDate', event.startDate(), 'h:mmtt')
+        else
+          @calendar.fullCalendar('formatDates', event.startDate(), event.endDate(), 'h:mmtt{ – h:mmtt}')
+      $element.attr('title', $.trim("#{timeString}\n#{$element.find('.fc-event-title').text()}"))
       true
 
     eventAfterRender: (event, element, view) =>
@@ -253,10 +259,23 @@ define [
     eventDragStart: (event, jsEvent, ui, view) =>
       @closeEventPopups()
 
+    eventResizeStart: (event, jsEvent, ui, view) =>
+      @closeEventPopups()
+      
     eventDrop: (event, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view) =>
       # isDueAtMidnight() will read cached midnightFudged property
       if event.eventType == "assignment" && event.isDueAtMidnight() && minuteDelta == 0
         event.start.setMinutes(59)
+
+      # if a short event gets dragged, we don't want to change its duration
+      if event.end && event.endDate()
+        originalDuration = event.endDate().getTime() - event.startDate().getTime()
+        event.end = new Date(event.start.getTime() + originalDuration)
+      event.saveDates null, revertFunc
+
+    eventResize: (event, dayDelta, minuteDelta, revertFunc, jsEvent, ui, view) =>
+      # assignments can't be resized
+      # if short events are being resized, assume the user knows what they're doing
       event.saveDates null, revertFunc
 
     eventClick: (event, jsEvent, view) =>
@@ -279,12 +298,6 @@ define [
       event.date = date
 
       (new EditEventDetailsDialog(event)).show()
-
-    eventResize: (event, dayDelta, minuteDelta, revertFunc, jsEvent, ui, view) =>
-      event.saveDates null, revertFunc
-
-    eventResizeStart: (event, jsEvent, ui, view) =>
-      @closeEventPopups()
 
     updateFragment: (opts) ->
       data = @dataFromDocumentHash()

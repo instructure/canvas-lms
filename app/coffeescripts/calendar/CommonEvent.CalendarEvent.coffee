@@ -20,8 +20,10 @@ define [
       @object = @calendarEvent = data
       @id = "calendar_event_#{data.id}" if data.id
       @title = data.title || "Untitled"
-      @start = if data.start_at then $.parseFromISO(data.start_at).time else null
-      @end = if data.end_at then $.parseFromISO(data.end_at).time else null
+      @start = @parseStartDate()
+      @originalStartDate = new Date(@start) if @start
+      @end = @parseEndDate()
+      @originalEndDate = new Date(@end) if @end
       @allDay = data.all_day
       @editable = true
       @lockedTitle = @object.parent_event_id?
@@ -39,10 +41,13 @@ define [
 
       super
 
-    startDate: () ->
+    startDate: () -> @originalStartDate
+    endDate: () -> @originalEndDate
+
+    parseStartDate: () ->
       if @calendarEvent.start_at then $.parseFromISO(@calendarEvent.start_at).time else null
 
-    endDate: () ->
+    parseEndDate: () ->
       if @calendarEvent.end_at then $.parseFromISO(@calendarEvent.end_at).time else null
 
     fullDetailsURL: () ->
