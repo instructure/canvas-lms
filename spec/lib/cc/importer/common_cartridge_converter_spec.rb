@@ -1,3 +1,4 @@
+# coding: utf-8
 require File.dirname(__FILE__) + '/../cc_spec_helper'
 
 describe "Standard Common Cartridge importing" do
@@ -385,5 +386,19 @@ describe "More Standard Common Cartridge importing" do
     @converter.resources['w1'][:files].first[:href].should == 'w1/w1.html'
     @converter.resources['w1'][:files][1][:href].should == 'w1/w2.html'
     @converter.resources['q1'][:files].first[:href].should == 'q1/q1.xml'
+  end
+end
+
+describe "non-ASCII attachment names" do
+  it "should not fail to create all_files.zip" do
+    archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/unicode-filename-test-export.imscc")
+    @converter = CC::Importer::Standard::Converter.new(:export_archive_path=>archive_file_path)
+    lambda { @converter.export }.should_not raise_error
+    zf = Zip::ZipFile.open File.join(@converter.base_export_dir, "all_files.zip")
+    zf.entries.should be_any do |e|
+      name = e.name
+      name.force_encoding 'utf-8' if RUBY_VERSION >= '1.9'
+      name.include? "molé.txt"
+    end
   end
 end
