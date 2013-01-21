@@ -223,8 +223,19 @@ module GoogleDocs
         category.label = "document"
       end
     end
-    response = access_token.post(url, entry.to_xml, {'Content-Type' => 'application/atom+xml'})
-    entry = GoogleDocEntry.new(Atom::Entry.load_entry(response.body))
+    xml = entry.to_xml
+    begin
+      response = access_token.post(url, xml, {'Content-Type' => 'application/atom+xml'})
+    rescue => e
+      raise "Unable to post to Google API #{url}:\n#{xml}" +
+            "\n\n(" + e.to_s + ")\n"
+    end
+    begin
+      entry = GoogleDocEntry.new(Atom::Entry.load_entry(response.body))
+    rescue => e
+      raise "Unable to load GoogleDocEntry from response: \n" + response.body + 
+            "\n\n(" + e.to_s + ")\n"
+    end
   end
 
   def google_docs_delete_doc(entry, access_token = google_docs_retrieve_access_token)
