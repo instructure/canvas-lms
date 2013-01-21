@@ -1,73 +1,42 @@
-.rvmrc
-.rdebug_hist
-.DS_Store
-.powrc
-Gemfile.lock
-log/*.log
-log/*.pid
-log/**/*
-lib/tasks/deploy.rake
-tmp/**/*
-tmp/*
-db/*.sqlite3
-db/*.sqlite3-journal
-db/*.sqlite
-db/demo
-config/GEM_HOME
-config/*.yml
-config/build.js
-config/environments/*-local.rb
-models.dot
-db/*sql
-db/development_structure.sql
-db/schema.rb
-noodle*
-tmp_*
-public/files/**/*
-public/javascripts/cached/*
-public/javascripts/translations/*
-public/javascripts/compiled/*
-public/javascripts/jst/*
-public/stylesheets/compiled/*
-public/stylesheets/compiled/**/*
-public/stylesheets/cached/*
-*.pid
-vendor/cache/*mswin*.gem
-vendor/cache
-coverage
-instructure_content
-.idea/*
-exports/*
-.sass-cache
-.bundle
-public/*.gz
-public/*/*.gz
-public/*/*/*.gz
-public/*/*/*/*.gz
-public/*/*/*/*/*.gz
-public/*/*/*/*/*/*.gz
-public/*/*/*/*/*/*/*.gz
-public/*/*/*/*/*/*/*/*.gz
-public/*/*/*/*/*/*/*/*/*.gz
-.*.sw?
-public/assets/*
-doc/plugins/*
-public/doc/api/*
-.yardoc/*
-spec/javascripts/*Spec.js
-spec/javascripts/*/*Spec.js
-spec/javascripts/*/*/*Spec.js
-spec/javascripts/helpers/
-spec/javascripts/plugins/
-spec/javascripts/runner.html
-public/optimized
-!node_modules
-chromedriver.log
-public/plugins/
-public/javascripts/plugins/
-app/coffeescripts/plugins/
-app/views/jst/plugins/
-app/stylesheets/plugins/
-spec/coffeescripts/plugins/
-branch_tools.rb
-.rbenv-version
+# What goes in this file:
+# * local canvas configuration (db, ymls, overrides, etc.)
+# * generated/cached stuff (docs, css, js, uploads, etc.)
+#
+# What does NOT go in this file
+# * editor-related stuff
+# * random scripts only used by you
+# * env-specific stuff (e.g. .DS_Store)
+# * pretty much any dotfile not already covered (e.g. .rvmrc)
+#
+# That's what .git/info/exclude and core.excludesfile are for :)
+
+/.bundle/
+/.yardoc/
+/config/*.yml
+/config/build.js
+/config/environments/*-local.rb
+/db/schema.rb
+/db/*.sqlite*
+/db/*sql
+/exports/
+/Gemfile.lock
+/log/
+/public/assets/
+/public/doc/api/
+/public/javascripts/compiled/
+/public/javascripts/jst/
+/public/javascripts/translations/
+/public/optimized/
+/public/stylesheets/compiled/
+/public/**/*.gz
+/spec/javascripts/
+/tmp/
+
+# generated plugin stuff
+/app/coffeescripts/plugins/
+/app/stylesheets/plugins/
+/app/views/jst/plugins/
+/doc/plugins/
+/public/javascripts/plugins/
+/public/plugins/
+/spec/coffeescripts/plugins/
