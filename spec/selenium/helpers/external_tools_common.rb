@@ -23,7 +23,7 @@ shared_examples_for "external tools tests" do
     end
     submit_form("#external_tools_dialog")
     wait_for_ajax_requests
-    ContextExternalTool.count > 0
+   # ContextExternalTool.count.should != 0
     tool = ContextExternalTool.last
     tool.name.should == name
     tool.consumer_key.should == key
@@ -125,7 +125,7 @@ shared_examples_for "external tools tests" do
   end
 
   def add_url
-    url = "https://lti-examples.heroku.com/config/editor_button2.xml"
+    url = 'http://localhost:4567/lti_url'
     f("#external_tool_config_type option[value='by_url']").click
     f("#external_tool_form .config_type.manual").should_not be_displayed
     f("#external_tool_config_xml").should_not be_displayed
