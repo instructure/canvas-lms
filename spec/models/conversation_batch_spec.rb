@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe ConversationBatch do
   before do
@@ -89,6 +89,25 @@ describe ConversationBatch do
       ConversationMessage.count.should eql 3
       ConversationMessage.all.each do |message|
         message.attachments.should == @message.attachments
+      end
+    end
+
+    context "sharding" do
+      it_should_behave_like "sharding"
+
+      it "should reuse existing private conversations" do
+        @shard1.activate { @user4 = user }
+        conversation = @user1.initiate_conversation([@user4]).conversation
+        conversation.add_message(@user1, "hello")
+        batch = ConversationBatch.generate(@message, [@user3, @user4], :sync)
+        batch.should be_sent
+        batch.completion.should eql 1
+        batch.root_conversation_message.reload.conversation.should be_nil
+        ConversationMessage.count.should eql 4 # the root message, plus the ones to each recipient
+        @user1.reload.unread_conversations_count.should eql 0
+        @user1.all_conversations.size.should eql 2
+        @user3.reload.unread_conversations_count.should eql 1
+        @user4.reload.unread_conversations_count.should eql 1
       end
     end
   end

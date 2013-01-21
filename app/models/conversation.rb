@@ -39,11 +39,19 @@ class Conversation < ActiveRecord::Base
     private_hash.present?
   end
 
-  def self.find_all_private_conversations(user_id, other_user_ids)
-    find_all_by_private_hash(other_user_ids.map{ |id| private_hash_for([user_id, id])})
+  def self.find_all_private_conversations(user, other_users)
+    user.all_conversations.find(:all,
+                                        :include => :conversation,
+                                        :conditions => {:private_hash => other_users.map { |u| private_hash_for([user, u])}}
+    ).map(&:conversation)
   end
 
-  def self.private_hash_for(user_ids)
+  def self.private_hash_for(users_or_user_ids)
+    if (users_or_user_ids.first.is_a?(User))
+      user_ids = Shard.default.activate { users_or_user_ids.map(&:id) }
+    else
+      user_ids = users_or_user_ids
+    end
     Digest::SHA1.hexdigest(user_ids.uniq.sort.join(','))
   end
 
@@ -60,10 +68,14 @@ class Conversation < ActiveRecord::Base
   end
 
   def self.initiate(users, private)
-    user_ids = users.uniq.map(&:id)
-    private_hash = private ? private_hash_for(user_ids) : nil
+    users = users.uniq
+    user_ids = users.map(&:id)
+    private_hash = private ? private_hash_for(users) : nil
     transaction do
-      unless private_hash && conversation = find_by_private_hash(private_hash)
+      if private
+        conversation = users.first.all_conversations.find_by_private_hash(private_hash).try(:conversation)
+      end
+      unless conversation
         conversation = new
         conversation.private_hash = private_hash
         conversation.has_attachments = false
@@ -72,12 +84,16 @@ class Conversation < ActiveRecord::Base
         conversation.save!
 
         # TODO: transaction on these shards as well?
+        bulk_insert_options = {
+            :tags => '',
+            :private_hash => private_hash
+          }
         Shard.partition_by_shard(user_ids) do |shard_user_ids|
           next if Shard.current == conversation.shard
-          conversation.bulk_insert_participants(shard_user_ids, :tags => '')
+          conversation.bulk_insert_participants(shard_user_ids, bulk_insert_options)
         end
         # the conversation's shard gets a full copy
-        conversation.bulk_insert_participants(user_ids, :tags => '')
+        conversation.bulk_insert_participants(user_ids, bulk_insert_options)
       end
       conversation
     end
@@ -109,7 +125,16 @@ class Conversation < ActiveRecord::Base
       conversations = if groups.empty?
         []
       elsif options[:only_existing]
-        find_all_by_private_hash(groups.map{ |g| private_hash_for(g.map(&:id)) }, :lock => true)
+        groups.first.first.shard.activate do
+          conversation_ids = ConversationParticipant.find(:all, :select => 'DISTINCT conversation_id',
+            :conditions => { :private_hash => groups.map { |g|
+              private_hash_for(g)}}).map(&:conversation_id)
+          if conversation_ids.empty?
+            []
+          else
+            find_all_by_id(conversation_ids, :lock => true)
+          end
+        end
       else
         groups.map{ |g| initiate(g, true) }.each(&:lock!)
       end
@@ -168,7 +193,8 @@ class Conversation < ActiveRecord::Base
         bulk_insert_options = {
             :workflow_state => 'unread',
             :last_message_at => last_message_at,
-            :message_count => num_messages
+            :message_count => num_messages,
+            :private_hash => self.private_hash
           }
 
         Shard.partition_by_shard(user_ids) do |shard_user_ids|
@@ -460,12 +486,19 @@ class Conversation < ActiveRecord::Base
   # if the participant list has changed, e.g. we merged user accounts
   def regenerate_private_hash!(user_ids = nil)
     return unless private?
-    self.private_hash = Conversation.private_hash_for(user_ids || self.conversation_participants.map(&:user_id))
+    self.private_hash = Conversation.private_hash_for(user_ids ||
+      Shard.default.activate { self.conversation_participants.map(&:user_id) } )
     return unless private_hash_changed?
-    if existing = Conversation.find_by_private_hash(private_hash)
+    existing = self.shard.activate do
+      ConversationParticipant.find_by_private_hash(private_hash).try(:conversation)
+    end
+    if existing
       merge_into(existing)
     else
       save!
+      Shard.with_each_shard(self.associated_shards) do
+        ConversationParticipant.update_all({:private_hash => self.private_hash}, :conversation_id => self.id)
+      end
     end
   end
 

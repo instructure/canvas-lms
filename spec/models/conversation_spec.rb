@@ -32,8 +32,10 @@ describe Conversation do
 
     it "should reuse private conversations" do
       users = 2.times.map{ user }
-      Conversation.initiate(users, true).should ==
-      Conversation.initiate(users, true)
+      c1 = Conversation.initiate(users, true)
+      c2 = Conversation.initiate(users, true)
+      c1.should == c2
+      ActiveRecord::Base
     end
 
     it "should not reuse group conversations" do
@@ -62,6 +64,33 @@ describe Conversation do
           cp.shard.should == @shard1
           cp = users[2].all_conversations.last
           cp.shard.should == @shard2
+        end
+      end
+
+      it "should re-use a private conversation from any shard" do
+        users = [user]
+        @shard1.activate { users << user }
+        conversation = Conversation.initiate(users, true)
+        Conversation.initiate(users, true).should == conversation
+        @shard1.activate do
+          Conversation.initiate(users, true).should == conversation
+        end
+        @shard2.activate do
+          Conversation.initiate(users, true).should == conversation
+        end
+      end
+
+      it "should re-use a private conversation from an unrelated shard" do
+        users = []
+        @shard1.activate { users << user }
+        @shard2.activate { users << user }
+        conversation = Conversation.initiate(users, true)
+        Conversation.initiate(users, true).should == conversation
+        @shard1.activate do
+          Conversation.initiate(users, true).should == conversation
+        end
+        @shard2.activate do
+          Conversation.initiate(users, true).should == conversation
         end
       end
     end
@@ -450,6 +479,23 @@ describe Conversation do
       asset.expects(:conversation_message_data).returns({:created_at => Time.now.utc, :author => u1, :body => "asdf"})
       Conversation.update_all_for_asset asset, :update_message => true, :only_existing => true
       conversation.conversation_messages.size.should eql 1
+    end
+
+    context "sharding" do
+      it_should_behave_like "sharding"
+
+      it "should re-use conversations from another shard" do
+        u1 = @shard1.activate { user }
+        u2 = user
+        conversation = @shard2.activate { Conversation.initiate([u1, u2], true) }
+        asset = Submission.new(:user => u1)
+        asset.expects(:conversation_groups).returns([[u1, u2]])
+        asset.expects(:lock!).returns(true)
+        asset.expects(:conversation_messages).at_least_once.returns([])
+        asset.expects(:conversation_message_data).returns({:created_at => Time.now.utc, :author => u1, :body => "asdf"})
+        Conversation.update_all_for_asset asset, :update_message => true, :only_existing => true
+        conversation.conversation_messages.size.should eql 1
+      end
     end
 
     it "should create conversations by default" do
