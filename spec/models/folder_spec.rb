@@ -28,30 +28,28 @@ describe Folder do
   end
   
   it "should infer its full name if it has a parent folder" do
-    f = @course.folders.create!(:name => "root")
-    f.full_name.should eql("root")
+    f = Folder.root_folders(@course).first
+    f.full_name.should eql("course files")
     child = f.active_sub_folders.build(:name => "child")
     child.context = @course
     child.save!
     child.parent_folder.should eql(f)
-    child.full_name.should eql("root/child")
+    child.full_name.should eql("course files/child")
     grandchild = child.sub_folders.build(:name => "grandchild")
     grandchild.context = @course
     grandchild.save!
-    grandchild.full_name.should eql("root/child/grandchild")
+    grandchild.full_name.should eql("course files/child/grandchild")
     great_grandchild = grandchild.sub_folders.build(:name => "great_grandchild")
     great_grandchild.context = @course
     great_grandchild.save!
-    great_grandchild.full_name.should eql("root/child/grandchild/great_grandchild")
-    child.parent_folder = nil
-    child.save!
-    child.reload
-    child.parent_folder.should be_nil
-    child.full_name.should eql("child")
+    great_grandchild.full_name.should eql("course files/child/grandchild/great_grandchild")
+
+    grandchild.parent_folder = f
+    grandchild.save!
     grandchild.reload
-    grandchild.full_name.should eql("child/grandchild")
+    grandchild.full_name.should eql("course files/grandchild")
     great_grandchild.reload
-    great_grandchild.full_name.should eql("child/grandchild/great_grandchild")
+    great_grandchild.full_name.should eql("course files/grandchild/great_grandchild")
   end
 
   it "should not allow recursive folder structures" do
@@ -100,10 +98,10 @@ describe Folder do
 
   it "should implement the not_locked scope correctly" do
     not_locked = [
-      @course.folders.create!(:name => "not locked 1"),
-      @course.folders.create!(:name => "not locked 2", :locked => false),
-      @course.folders.create!(:name => "not locked 3", :lock_at => 1.days.from_now),
-      @course.folders.create!(:name => "not locked 4", :lock_at => 2.days.ago, :unlock_at => 1.days.ago)
+      Folder.root_folders(@course).first,
+      @course.folders.create!(:name => "not locked 1", :locked => false),
+      @course.folders.create!(:name => "not locked 2", :lock_at => 1.days.from_now),
+      @course.folders.create!(:name => "not locked 3", :lock_at => 2.days.ago, :unlock_at => 1.days.ago)
     ]
     locked = [
       @course.folders.create!(:name => "locked 1", :locked => true),
@@ -112,5 +110,15 @@ describe Folder do
     ]
     @course.folders.map(&:id).sort.should == (not_locked + locked).map(&:id).sort
     @course.folders.not_locked.map(&:id).sort.should == (not_locked).map(&:id).sort
+  end
+
+  it "should not create multiple root folders for a course" do
+    pending('spec requires postgres index') unless Folder.connection.adapter_name == 'PostgreSQL'
+
+    @course.folders.create!(:name => Folder::ROOT_FOLDER_NAME, :full_name => Folder::ROOT_FOLDER_NAME, :workflow_state => 'visible')
+    lambda { @course.folders.create!(:name => Folder::ROOT_FOLDER_NAME, :full_name => Folder::ROOT_FOLDER_NAME, :workflow_state => 'visible') }.should raise_error
+
+    @course.reload
+    @course.folders.count.should == 1
   end
 end
