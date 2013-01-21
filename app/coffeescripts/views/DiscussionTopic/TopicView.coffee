@@ -23,10 +23,12 @@ define [
       'click #discussion_topic .discussion-reply-form [data-event]': 'handleEvent'
       'click .add_root_reply': 'addRootReply'
       'click .discussion_locked_toggler': 'toggleLocked'
+      'click .toggle_due_dates': 'toggleDueDates'
 
     els:
       '.add_root_reply': '$addRootReply'
       '#discussion_topic': '$topic'
+      '.due_date_wrapper': '$dueDates'
 
     initialize: ->
       @model.set 'id', ENV.DISCUSSION.TOPIC.ID
@@ -57,6 +59,14 @@ define [
       # get rid of the /view on /api/vl/courses/x/discusison_topics/x/view
       topic.url = ENV.DISCUSSION.ROOT_URL.replace /\/view/m, ''
       topic.save({locked: locked}).done -> window.location.reload()
+
+    toggleDueDates: (event) ->
+      event.preventDefault()
+      @$dueDates.toggleClass('hidden')
+      $(event.currentTarget).text if @$dueDates.hasClass('hidden')
+        I18n.t('show_due_dates', 'Show Due Dates')
+      else
+        I18n.t('hide_due_dates', 'Hide Due Dates')
 
     ##
     # Adds a root level reply to the main topic

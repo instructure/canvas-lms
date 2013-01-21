@@ -46,7 +46,7 @@ describe "/discussion_topics/show" do
     assigns[:grouped_entries] = @topic.discussion_entries.group_by(&:parent_id)
     assigns[:entries] = @topic.discussion_entries
     assigns[:all_entries] = @topic.discussion_entries
-    assigns[:assignment] = @assignment
+    assigns[:assignment] = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @user)
     @topic.for_assignment?.should be_true
     @topic.assignment.rubric_association.rubric.should_not be_nil
     render "discussion_topics/show"

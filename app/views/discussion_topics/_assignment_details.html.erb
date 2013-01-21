@@ -1,0 +1,72 @@
+<div class="discussion-section discussion-assignment-section alert alert-info">
+  <div class="row-fluid">
+    <div class="span6">
+      <p class="discussion-title">
+        <%= t(:topic_for_assignment, 'This is a graded discussion') %>
+      </p>
+      <!-- <small class="discussion-subtitle">
+        <%= t(:points_possible,
+              { :one => '1 point possible', :other => '%{count} points possible' },
+              :count => @topic.assignment.points_possible) %>
+      </small> -->
+    </div>
+
+    <div class="span6 right-align">
+      <% if @assignment.try(:due_at).present? %>
+        <div class="discussion-pubdate">
+          <% if @assignment.multiple_due_dates? %>
+            <a href="#" class="toggle_due_dates"><%= t(:show_due_dates, 'Show Due Dates') %></a>
+
+          <% else %>
+            <b><%= t(:due_date, 'due %{date}',
+                     :date => @presenter.due_at) %></b>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <% if @topic.for_group_assignment? %>
+    <p>
+      <%= t :separated_conversation_notice, "Since this is a group assignment, each group has its own conversation for this topic. Here are the ones you have access to:" %>
+      <ul>
+        <% @group_topics.each do |group_and_topic| %>
+          <li>
+            <a href="<%= context_url(group_and_topic[:group], :context_discussion_topics_url, :root_discussion_topic_id => @topic.id) %>"><%= group_and_topic[:group].name %></a>
+            <%= render :partial => 'new_and_total_badge', :locals => {
+                       :unread_count => group_and_topic[:topic].unread_count(@current_user),
+                       :reply_count => group_and_topic[:topic].discussion_entries.active.size } if group_and_topic[:topic] %>
+          </li>
+        <% end %>
+      </ul>
+    </p>
+  <% end %>
+
+  <% if @assignment.present? %>
+    <div class="row-fluid">
+      <div class="span12 hidden due_date_wrapper">
+        <table class="discussion-topic-due-dates">
+          <thead>
+            <tr>
+              <th scope="col"><%= t(:due, 'Due') %></th>
+              <th scope="col"><%= t(:for, 'For') %></th>
+              <th scope="col"><%= t(:available_from, 'Available from') %></th>
+              <th scope="col"><%= t(:until, 'Until') %></th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <% @presenter.visible_due_dates.each do |due_date| %>
+              <tr>
+                <td><%= @presenter.due_at(due_date) %></td>
+                <td><%= due_date[:title] || t(:everyone, 'Everyone else') %></td>
+                <td><%= @presenter.unlock_at(due_date) %></td>
+                <td><%= @presenter.lock_at(due_date) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% end %>
+</div>

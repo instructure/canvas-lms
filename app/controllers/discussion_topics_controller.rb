@@ -179,6 +179,11 @@ class DiscussionTopicsController < ApplicationController
   def show
     parent_id = params[:parent_id]
     @topic = @context.all_discussion_topics.find(params[:id])
+    @assignment = if @topic.for_assignment?
+      AssignmentOverrideApplicator.assignment_overridden_for(@topic.assignment, @current_user)
+    else
+      nil
+    end
     @context.assert_assignment_group rescue nil
     add_discussion_or_announcement_crumb
     add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))

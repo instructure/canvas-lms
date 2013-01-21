@@ -53,7 +53,7 @@ describe "discussions" do
       it "should validate closing the discussion for comments" do
         create_and_go_to_topic
         f("#discussion-toolbar .al-trigger-inner").click
-        expect_new_page_load { f("#ui-id-4").click }
+        expect_new_page_load { f("#ui-id-3").click }
         f('.discussion-fyi').text.should == 'This topic is closed for comments'
         ff('.discussion-reply-label').should be_empty
         DiscussionTopic.last.workflow_state.should == 'locked'
@@ -62,7 +62,7 @@ describe "discussions" do
       it "should validate reopening the discussion for comments" do
         create_and_go_to_topic('closed discussion', 'side_comment', true)
         f("#discussion-toolbar .al-trigger-inner").click
-        expect_new_page_load { f("#ui-id-4").click }
+        expect_new_page_load { f("#ui-id-3").click }
         ff('.discussion-reply-label').should_not be_empty
         DiscussionTopic.last.workflow_state.should == 'active'
       end
