@@ -1015,6 +1015,9 @@ ActionController::Routing::Routes.draw do |map|
 
     api.with_options(:controller => :quizzes_api) do |quizzes|
       quizzes.get "courses/:course_id/quizzes", :action => :index, :path_name => 'course_quizzes'
+      quizzes.post "courses/:course_id/quizzes", :action => :create, :path_name => 'course_quiz_create'
+      quizzes.get "courses/:course_id/quizzes/:id", :action => :show, :path_name => 'course_quiz'
+      quizzes.put "courses/:course_id/quizzes/:id", :action => :update, :path_name => 'course_quiz_update'
     end
 
     api.with_options(:controller => :outcome_groups_api) do |outcome_groups|

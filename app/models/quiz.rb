@@ -47,6 +47,9 @@ class Quiz < ActiveRecord::Base
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   validates_presence_of :context_id
   validates_presence_of :context_type
+  validate :validate_quiz_type, :if => :quiz_type_changed?
+  validate :validate_ip_filter, :if => :ip_filter_changed?
+  validate :validate_hide_results, :if => :hide_results_changed?
 
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
   copy_authorized_links(:description) { [self.context, nil] }
@@ -735,6 +738,38 @@ class Quiz < ActiveRecord::Base
       end
     end
     self.quiz_data = data
+  end
+
+  def validate_quiz_type
+    return if self.quiz_type.blank?
+    unless valid_quiz_type_values.include?(self.quiz_type)
+      errors.add(:invalid_quiz_type, t('errors.invalid_quiz_type', "Quiz type is not valid" ))
+    end
+  end
+
+  def valid_quiz_type_values
+    %w[practice_quiz assignment graded_survey survey]
+  end
+
+  def validate_ip_filter
+    return if self.ip_filter.blank?
+    require 'ipaddr'
+    begin
+      self.ip_filter.split(/,/).each { |filter| IPAddr.new(filter) }
+    rescue
+      errors.add(:invalid_ip_filter, t('errors.invalid_ip_filter', "IP filter is not valid"))
+    end
+  end
+
+  def validate_hide_results
+    return if self.hide_results.blank?
+    unless valid_hide_results_values.include?(self.hide_results)
+      errors.add(:invalid_hide_results, t('errors.invalid_hide_results', "Hide results is not valid" ))
+    end
+  end
+
+  def valid_hide_results_values
+    %w[always until_after_last_attempt]
   end
   
   attr_accessor :clone_updated
