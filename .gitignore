@@ -28,7 +28,6 @@
 /public/javascripts/translations/
 /public/optimized/
 /public/stylesheets/compiled/
-/public/**/*.gz
 /spec/javascripts/
 /tmp/
 
