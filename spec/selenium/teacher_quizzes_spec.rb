@@ -15,9 +15,8 @@ describe "quizzes" do
     it "should allow a teacher to create a quiz from the quizzes tab directly" do
       get "/courses/#{@course.id}/quizzes"
       expect_new_page_load { f(".new-quiz-link").click }
-      submit_form("#quiz_options_form")
-      wait_for_ajax_requests
-      assert_flash_notice_message /Quiz data saved/
+      expect_new_page_load { click_save_settings_button }
+      f('#quiz_title').should include_text "Unnamed Quiz"
     end
 
     it "should create and preview a new quiz" do
@@ -32,7 +31,7 @@ describe "quizzes" do
       quiz_id.should be > 0
 
       #input name and description then save quiz
-      replace_content(ff('#quiz_title')[1], 'new quiz')
+      replace_content(f('#quiz_title'), 'new quiz')
       test_text = "new description"
       keep_trying_until { f('#quiz_description_ifr').should be_displayed }
       type_in_tiny '#quiz_description', test_text
@@ -41,15 +40,17 @@ describe "quizzes" do
       end
 
       #add a question
-      f('.add_question_link').click
+      click_questions_tab
+      click_new_question_button
       submit_form('.question_form')
       wait_for_ajax_requests
 
       #save the quiz
-      submit_form("#quiz_options_form")
+      click_save_settings_button
       wait_for_ajax_requests
 
       #check quiz preview
+      pending "[elyngved] skip until we add the quiz preview button to the quiz show page"
       driver.find_element(:link, 'Preview the Quiz').click
       f('#questions').should be_present
     end
@@ -58,13 +59,15 @@ describe "quizzes" do
       get "/courses/#{@course.id}/quizzes/new"
 
       wait_for_tiny f('#quiz_description')
-      f(".add_question .add_question_link").click
+      click_questions_tab
+      click_new_question_button
       ff(".question_holder .question_form").length.should == 1
       f(".question_holder .question_form .cancel_link").click
       ff(".question_holder .question_form").length.should == 0
     end
 
     it "should pop up calendar on top of #main" do
+      pending "[elyngved] skip until we add vdd to the quiz edit page"
       get "/courses/#{@course.id}/quizzes/new"
       f('#quiz_lock_at + .ui-datepicker-trigger').click
       cal = f('#ui-datepicker-div')
@@ -87,7 +90,7 @@ describe "quizzes" do
       in_frame "quiz_description_ifr" do
         f('#tinymce').text.include?(test_text).should be_true
       end
-      submit_form("#quiz_options_form")
+      click_save_settings_button
       wait_for_ajax_requests
 
       get "/courses/#{@course.id}/quizzes/#{q.id}"
@@ -144,6 +147,7 @@ describe "quizzes" do
     it "should create a new question group" do
       get "/courses/#{@course.id}/quizzes/new"
 
+      click_questions_tab
       f('.add_question_group_link').click
       group_form = f('#questions .quiz_group_form')
       group_form.find_element(:name, 'quiz_group[name]').send_keys('new group')
@@ -156,26 +160,31 @@ describe "quizzes" do
     it "should update a question group" do
       get "/courses/#{@course.id}/quizzes/new"
 
+      click_questions_tab
       f('.add_question_group_link').click
       group_form = f('#questions .quiz_group_form')
       group_form.find_element(:name, 'quiz_group[name]').send_keys('new group')
       replace_content(group_form.find_element(:name, 'quiz_group[question_points]'), '3')
       submit_form(group_form)
       group_form.find_element(:css, '.group_display.name').should include_text('new group')
+      click_settings_tab
       keep_trying_until { f("#quiz_display_points_possible .points_possible").text.should == "3" }
 
+      click_questions_tab
       group_form.find_element(:css, '.edit_group_link').click
 
       group_form.find_element(:name, 'quiz_group[name]').send_keys('renamed')
       replace_content(group_form.find_element(:name, 'quiz_group[question_points]'), '2')
       submit_form(group_form)
       group_form.find_element(:css, '.group_display.name').should include_text('renamed')
+      click_settings_tab
       keep_trying_until { f("#quiz_display_points_possible .points_possible").text.should == "2" }
     end
 
     it "should not let you exceed the question limit" do
       get "/courses/#{@course.id}/quizzes/new"
 
+      click_questions_tab
       f('.add_question_group_link').click
       group_form = f('#questions .quiz_group_form')
       pick_count_field = group_form.find_element(:name, 'quiz_group[pick_count]')
@@ -192,11 +201,11 @@ describe "quizzes" do
       dismiss_alert
       pick_count_field.should have_attribute(:value, "1")
 
-      f('.add_question_link').click # 1 total, ok
+      click_new_question_button # 1 total, ok
       group_form.find_element(:css, '.edit_group_link').click
       pick_count.call('999') # 1000 total, ok
 
-      f('.add_question_link').click # 1001 total, bad
+      click_new_question_button # 1001 total, bad
       dismiss_alert
 
       pick_count.call('1000') # 1001 total, bad
@@ -225,6 +234,7 @@ describe "quizzes" do
     it "should flag a quiz question while taking a quiz as a teacher" do
       quiz_with_new_questions
 
+      pending "[elyngved] skip until we add quiz publish button to the quiz edit page"
       expect_new_page_load { f('.publish_quiz_button').click }
       wait_for_ajax_requests
 
