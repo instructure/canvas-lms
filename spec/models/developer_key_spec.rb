@@ -28,6 +28,18 @@ describe DeveloperKey do
           DeveloperKey.default.shard.should be_default
         end
       end
+
+      it 'uses integer special keys properly because the query does not like strings' do
+        # this test mirrors what happens in production when retrieving keys, but does not test it
+        # directly because there's a short circuit clause in 'get_special_key' that pops out with a
+        # different finder because of the transactions-in-test issue. this confirms that setting
+        # a key id does not translate it to a string and therefore can be used with 'find_by_id'
+        # safely
+        key = DeveloperKey.create!
+        Setting.set('rspec_developer_key_id', key.id)
+        key_id = Setting.get('rspec_developer_key_id', nil)
+        DeveloperKey.find_by_id(key_id).should == key
+      end
     end
   end
 
