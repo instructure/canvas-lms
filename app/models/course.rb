@@ -171,6 +171,8 @@ class Course < ActiveRecord::Base
   has_many :zip_file_imports, :as => :context
   has_many :content_participation_counts, :as => :context, :dependent => :destroy
 
+  include Profile::Association
+
   before_save :assign_uuid
   before_save :assert_defaults
   before_save :set_update_account_associations_if_changed
