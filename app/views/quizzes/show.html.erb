@@ -13,7 +13,7 @@
           <a href="<%= context_url(@context, :context_quiz_statistics_url, @quiz.id) %>" class="btn button-sidebar-wide"><i class="icon-stats"></i> <%= @quiz.survey? ? t('links.survey_statistics', "Survey Statistics") : t('links.quiz_statistics', "Quiz Statistics") %></a>
         <% end %>
         <% if can_do(@quiz, @current_user, :update) %>
-          <a href="<%= context_url(@context, :edit_context_quiz_url, @quiz) %>" class="btn button-sidebar-wide"><i class="icon-edit"></i> <%= @quiz.survey? ? t('links.edit_this_survey', "Edit This Survey") : t('links.edit_this_quiz', "Edit This Quiz") %></a>
+          <a href="<%= context_url(@context, :edit_context_quiz_url, @quiz) %>" class="btn button-sidebar-wide quiz-edit-button"><i class="icon-edit"></i> <%= @quiz.survey? ? t('links.edit_this_survey', "Edit This Survey") : t('links.edit_this_quiz', "Edit This Quiz") %></a>
           <% if can_do(@quiz, @current_user, :manage) %>
             <a href="<%= context_url(@context, :context_quiz_moderate_url, @quiz.id) %>" class="btn button-sidebar-wide"><i class="icon-settings"></i> <%= @quiz.survey? ? t('links.moderate_this_survey', "Moderate This Survey") : t('links.moderate_this_quiz', "Moderate This Quiz") %></a>
           <% end %>

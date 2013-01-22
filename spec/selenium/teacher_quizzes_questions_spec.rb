@@ -18,6 +18,7 @@ describe "quizzes questions" do
       get "/courses/#{@course.id}/quizzes/#{q.id}/edit"
       wait_for_ajax_requests
 
+      click_questions_tab
       hover_and_click(".edit_question_link")
       wait_for_animations
       question = fj(".question_form:visible")
@@ -35,10 +36,8 @@ describe "quizzes questions" do
       answers = question.find_elements(:css, ".form_answers > div.answer")
       answers.length.should == 3
 
-      # check that the wiki sidebar shows up
-      f('#quiz_options_holder .link_to_content_link').click
+      # check that the wiki sidebar is visible
       f('#editor_tabs .wiki-sidebar-header').should include_text("Insert Content into the Page")
-      f('#quiz_content_links .quiz_options_link').click
 
       submit_form(question)
       question = f("#question_#{quest1.id}")
@@ -73,6 +72,7 @@ describe "quizzes questions" do
 
       ff("#question_form_template option.missing_word").length.should == 1
 
+      click_questions_tab
       keep_trying_until {
         f(".add_question .add_question_link").click
         ff("#questions .question_holder").length > 0
@@ -82,6 +82,7 @@ describe "quizzes questions" do
 
     it "should reorder questions with drag and drop" do
       quiz_with_new_questions
+      click_questions_tab
 
       # ensure they are in the right order
       names = ff('.question_name')
@@ -155,7 +156,7 @@ describe "quizzes questions" do
       add_quiz_question('3')
       add_quiz_question('4')
 
-      submit_form('#quiz_options_form')
+      click_save_settings_button
       wait_for_ajax_requests
       quiz = Quiz.last
       quiz.reload
@@ -195,9 +196,11 @@ describe "quizzes questions" do
       wait_for_ajax_requests
 
       expect_new_page_load {
-        f('.publish_quiz_button').click
+        f('.save_quiz_button').click
       }
 
+      pending '[elyngved] skip until we add the publish button to the quiz show page'
+      
       expect_new_page_load {
         driver.find_element(:link, 'Take the Quiz').click
       }

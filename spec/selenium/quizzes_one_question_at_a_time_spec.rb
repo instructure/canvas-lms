@@ -38,8 +38,9 @@ describe "One Question at a Time Quizzes" do
   end
   
   def preview_the_quiz
-    get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
-    fj("#quiz_options_form a:contains('Preview the Quiz')").click
+    pending "[elyngved] skip until we move the quiz preview to the quiz show page"
+    get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+    fj(".form-actions a:contains('Preview the Quiz')").click
     wait_for_ajaximations
   end
 
