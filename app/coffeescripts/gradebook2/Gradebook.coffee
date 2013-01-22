@@ -303,12 +303,16 @@ define [
       if val.possible and @options.grading_standard and columnDef.type is 'total_grade'
         letterGrade = GradeCalculator.letter_grade(@options.grading_standard, percentage)
 
-      groupTotalCellTemplate({
+      templateOpts =
         score: val.score
         possible: val.possible
-        letterGrade
-        percentage
-      })
+        letterGrade: letterGrade
+        percentage: percentage
+      if columnDef.type == 'total_grade'
+        templateOpts.warning = @totalGradeWarning
+        templateOpts.lastColumn = true
+
+      groupTotalCellTemplate templateOpts
 
     calculateStudentGrade: (student) =>
       if student.loaded
@@ -629,6 +633,8 @@ define [
         width = Math.max($widthTester.text(text).outerWidth(), minWidth)
         Math.min width, maxWidth
 
+      @setAssignmentWarnings()
+
       # I would like to make this width a little larger, but there's a dependency somewhere else that
       # I can't find and if I change it, the layout gets messed up.
       @parentColumns = [{
@@ -777,3 +783,37 @@ define [
         false
       @onGridInit()
 
+    # show warnings for bad grading setups
+    setAssignmentWarnings: =>
+      if @options.group_weighting_scheme == "percent"
+        # assignment group has 0 points possible
+        invalidAssignmentGroups = _.filter @assignmentGroups, (ag) ->
+          pointsPossible = _.inject ag.assignments
+          , ((sum, a) -> sum + (a.points_possible || 0))
+          , 0
+          pointsPossible == 0
+
+        for ag in invalidAssignmentGroups
+          for a in ag.assignments
+            a.invalid = true
+
+        if invalidAssignmentGroups.length > 0
+          groupNames = (ag.name for ag in invalidAssignmentGroups)
+          @totalGradeWarning = I18n.t 'invalid_assignment_groups_warning'
+          , "Score does not include %{groups} because %{pronoun_has} no
+             points possible"
+          , groups: $.toSentence(groupNames)
+          , pronoun_has: if invalidAssignmentGroups.length == 1
+                       I18n.t('it_has', 'it has')
+                     else
+                       I18n.t('they_have', 'they have')
+
+      else
+        # no assignments have points possible
+        pointsPossible = _.inject @assignments
+        , ((sum, a) -> sum + (a.points_possible || 0))
+        , 0
+
+        if pointsPossible == 0
+          @totalGradeWarning = I18n.t 'no_assignments_have_points_warning'
+          , "Can't compute score until an assignment has points possible"
