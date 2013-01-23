@@ -592,7 +592,7 @@ class ConversationsController < ApplicationController
     content = ""
     audience = conversation.other_participants
     audience_names = audience.map(&:name)
-    audience_contexts = contexts_for(audience, conversation.context_tags) # will be 0, 1, or 2 contexts
+    audience_contexts = contexts_for(audience, conversation.local_context_tags) # will be 0, 1, or 2 contexts
     audience_context_names = [:courses, :groups].inject([]) { |ary, context_key|
       ary + audience_contexts[context_key].keys.map { |k| @contexts[context_key][k] && @contexts[context_key][k][:name] }
     }.reject(&:blank?)
@@ -659,10 +659,12 @@ class ConversationsController < ApplicationController
 
   def infer_visibility(*conversations)
     result = Hash.new(false)
-    visible_conversations = @conversations_scope.find(:all,
-      :select => "conversation_id",
-      :conditions => {:conversation_id => conversations.map(&:conversation_id)}
-    )
+    visible_conversations = @current_user.shard.activate do
+        @conversations_scope.find(:all,
+          :select => "conversation_id",
+          :conditions => {:conversation_id => conversations.map(&:conversation_id)}
+        )
+      end
     visible_conversations.each { |c| result[c.conversation_id] = true }
     if conversations.size == 1
       result[conversations.first.conversation_id]

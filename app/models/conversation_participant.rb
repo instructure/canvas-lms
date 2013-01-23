@@ -313,6 +313,10 @@ class ConversationParticipant < ActiveRecord::Base
     save!
   end
 
+  def local_context_tags
+    context_tags
+  end
+
   def context_tags
     read_attribute(:tags) ? tags.grep(/\A(course|group)_\d+\z/) : infer_tags
   end
@@ -353,7 +357,7 @@ class ConversationParticipant < ActiveRecord::Base
 
   attr_writer :last_authored_message
   def last_authored_message
-    @last_authored_message ||= messages.human.by_user(user_id).first if visible_last_authored_at
+    @last_authored_message ||= self.conversation.shard.activate { messages.human.by_user(user_id).first } if visible_last_authored_at
   end
 
   def self.preload_latest_messages(conversations, author)

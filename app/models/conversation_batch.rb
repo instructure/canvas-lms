@@ -105,6 +105,10 @@ class ConversationBatch < ActiveRecord::Base
     state :error
   end
 
+  def local_tags
+    tags
+  end
+
   def self.generate(root_message, recipients, mode = :async, options = {})
     batch = new
     batch.mode = mode

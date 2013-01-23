@@ -1904,11 +1904,13 @@ class User < ActiveRecord::Base
   memoize :manageable_appointment_context_codes
 
   def conversation_context_codes
-    Rails.cache.fetch([self, 'conversation_context_codes2'].cache_key, :expires_in => 1.day) do
-      ( courses.map{ |c| "course_#{c.id}" } +
-        concluded_courses.map{ |c| "course_#{c.id}" } +
-        current_groups.map{ |g| "group_#{g.id}"}
-      ).uniq
+    Rails.cache.fetch([self, 'conversation_context_codes3'].cache_key, :expires_in => 1.day) do
+      Shard.default.activate {
+        ( courses.map{ |c| "course_#{c.id}" } +
+          concluded_courses.map{ |c| "course_#{c.id}" } +
+          current_groups.map{ |g| "group_#{g.id}"}
+        ).uniq
+      }
     end
   end
   memoize :conversation_context_codes

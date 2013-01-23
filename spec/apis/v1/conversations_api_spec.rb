@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe ConversationsController, :type => :integration do
   before do
@@ -577,6 +578,60 @@ describe ConversationsController, :type => :integration do
         ],
         "submissions" => []
       })
+    end
+
+    context "sharding" do
+      it_should_behave_like "sharding"
+
+      def check_conversation
+        json = api_call(:get, "/api/v1/conversations/#{@conversation.conversation_id}",
+                        { :controller => 'conversations', :action => 'show', :id => @conversation.conversation_id.to_s, :format => 'json' })
+        json.delete("avatar_url")
+        json["participants"].each{ |p|
+          p.delete("avatar_url")
+        }
+        expected = {
+          "id" => @conversation.conversation_id,
+          "workflow_state" => "read",
+          "last_message" => "test",
+          "last_message_at" => @conversation.last_message_at.to_json[1, 20],
+          "last_authored_message" => "test",
+          "last_authored_message_at" => @conversation.last_message_at.to_json[1, 20],
+          "message_count" => 1,
+          "subscribed" => true,
+          "private" => true,
+          "starred" => false,
+          "properties" => ["last_author"],
+          "visible" => true,
+          "audience" => [@bob.id],
+          "audience_contexts" => {
+              "groups" => {},
+              "courses" => {@course.id.to_s => ["StudentEnrollment"]}
+          },
+          "participants" => [
+              {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {}},
+              {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+          ],
+          "messages" => [
+              {"id" => @conversation.messages.last.id, "created_at" => @conversation.messages.last.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => []}
+          ],
+          "submissions" => []
+        }
+        # TODO: remove this when messageable_users works correctly
+        if Shard.current != @bob.shard
+          expected['participants'][1]['common_courses'] = {}
+          expected['audience_contexts']['courses'][@course.id.to_s] = []
+        end
+        json.should == expected
+      end
+
+      it "should show ids relative to the current shard" do
+        Setting.set('conversations_sharding_migration_still_running', '0')
+        @conversation = @shard1.activate { conversation(@bob) }
+        check_conversation
+        @shard1.activate { check_conversation }
+        @shard2.activate { check_conversation }
+      end
     end
 
     it "should auto-mark-as-read if unread" do
