@@ -1249,6 +1249,15 @@ class ApplicationController < ActionController::Base
     (params[:format].to_s != 'json' || in_app?)
   end
 
+  def params_are_integers?(*check_params)
+    begin
+      check_params.each{ |p| Integer(params[p]) }
+    rescue ArgumentError
+      return false
+    end
+    true
+  end
+
   def reset_session
     # when doing login/logout via ajax, we need to have the new csrf token
     # for subsequent requests.
