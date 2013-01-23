@@ -340,11 +340,14 @@ describe "Accounts API", :type => :integration do
     include Api::V1::Account
 
     it "should allow a plugin to extend the account_json method" do
-      Api::V1::Account.register_extension(MockPlugin).should be_true
       Api::V1::Account.register_extension(BadMockPlugin).should be_false
+      Api::V1::Account.register_extension(MockPlugin).should be_true
 
-      account_json(@a1, @me, @session, [])[:extra_thing].should == "something"
+      begin
+        account_json(@a1, @me, @session, [])[:extra_thing].should == "something"
+      ensure
+        Api::V1::Account.deregister_extension(MockPlugin)
+      end
     end
   end
 end
-
