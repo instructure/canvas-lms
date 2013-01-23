@@ -404,20 +404,20 @@ class Assignment < ActiveRecord::Base
 
   def context_module_tag_info(user)
     tag_info = {:points_possible => self.points_possible}
-    as_student, as_instructor = self.due_dates_for(user, {:exclude_base_if_all_sections_overridden => true})
 
-    if as_instructor
-      if as_instructor.map{ |hash| self.class.due_date_compare_value(hash[:due_at]) }.uniq.size > 1
-        tag_info[:due_dates] = as_instructor.map{|hash| {:title => hash[:title], :due_date => hash[:due_at].utc.iso8601}}
-      else
-        tag_info[:due_date] = as_instructor.first[:due_at]
-      end
+    if self.multiple_due_dates_apply_to?(user)
+      as_student, as_instructor = self.due_dates_for(user)
+      tag_info[:due_dates] = as_instructor.map{|hash| {
+          :title => hash[:title],
+          :due_date => (hash[:due_at].utc.iso8601 rescue nil)}
+      }
     else
-      tag_info[:due_date] = as_student[:due_at]
+      tag_info[:due_date] = self.overridden_for(user).due_at.utc.iso8601 rescue nil
     end
-    tag_info[:due_date] = tag_info[:due_date].utc.iso8601 if tag_info[:due_date]
+
     tag_info
   end
+
 
   # call this to perform notifications on an Assignment that is not being saved
   # (useful when a batch of overrides associated with a new assignment have been saved)
