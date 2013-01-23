@@ -394,11 +394,16 @@ describe "non-ASCII attachment names" do
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/unicode-filename-test-export.imscc")
     @converter = CC::Importer::Standard::Converter.new(:export_archive_path=>archive_file_path)
     lambda { @converter.export }.should_not raise_error
-    zf = Zip::ZipFile.open File.join(@converter.base_export_dir, "all_files.zip")
-    zf.entries.should be_any do |e|
-      name = e.name
-      name.force_encoding 'utf-8' if RUBY_VERSION >= '1.9'
-      name.include? "molé.txt"
+    contents = ["course_settings/syllabus.html",
+                "course_settings/course_settings.xml",
+                "web_resources/xyz.txt",
+                "web_resources/molé.txt",
+                "web_resources/abc.txt"]
+    @converter.resources.values.map { |v| v[:files][0][:href] }.sort.should == contents.sort
+
+    Zip::ZipFile.open File.join(@converter.base_export_dir, "all_files.zip") do |zipfile|
+      zipcontents = zipfile.entries.map(&:name)
+      (contents - zipcontents).should eql []
     end
   end
 end
