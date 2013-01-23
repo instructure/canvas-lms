@@ -75,7 +75,7 @@
       <span class="group_id"><%= (assignment_exists && !assignment.group_name.empty? ? assignment.group_name : t('defaults.other_group', "other")) rescue t('defaults.other_group', "other") %></span>
     </div>
   </div>
-  <% if can_do(assignment, @current_user, :update_content) %>
+  <% if can_do(assignment, @current_user, :update) %>
   <% url = assignment && !assignment.new_record? ? context_url(@context, :context_assignment_url, assignment.id) : context_url(@context, :context_assignments_url) %>
   <% form_for assignment, :url => url, :html => {:method => (assignment && !assignment.new_record? ? 'PUT' : 'POST'), :id => 'edit_assignment_form', :style => 'display: none;'} do |f| %>
   <% show_more_grading_options = (assignment.min_score || assignment.max_score || assignment.mastery_score || !assignment.droppable?) rescue false %>
@@ -102,7 +102,6 @@
         <% end %>
       </td>
     </tr>
-    <% if can_do(assignment, @current_user, :update) %>
     <% if assignment.frozen_for_user?(@current_user)%>
       <tr>
         <td colspan="4">
@@ -405,7 +404,6 @@
         </div>
       </td>
     </tr>
-    <% end %>
     <tr>
       <td colspan="2">
         <% if assignment.att_frozen?(:notify_of_update, @current_user) %>

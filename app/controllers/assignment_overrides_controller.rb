@@ -295,7 +295,7 @@ class AssignmentOverridesController < ApplicationController
   end
 
   def require_assignment_edit
-    authorized_action(@assignment, @current_user, :update_content)
+    authorized_action(@assignment, @current_user, :update)
   end
 
   def require_override

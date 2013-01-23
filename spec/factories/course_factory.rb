@@ -46,7 +46,6 @@ def course_valid_attributes
     :publish_grades_immediately => true,
     :allow_student_wiki_edits => true,
     :sis_batch_id => 1,
-    :allow_student_assignment_edits => true
   }
 end
 

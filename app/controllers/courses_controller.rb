@@ -161,7 +161,6 @@ class CoursesController < ApplicationController
   # @argument course[is_public] [Boolean] [optional] Set to true if course if public.
   # @argument course[public_description] [String] [optional] A publicly visible description of the course.
   # @argument course[allow_student_wiki_edits] [Boolean] [optional] If true, students will be able to modify the course wiki.
-  # @argument course[allow_student_assignment_edits] [optional] Set to true if students should be allowed to make modifications to assignments.
   # @argument course[allow_wiki_comments] [Boolean] [optional] If true, course members will be able to comment on wiki pages.
   # @argument course[allow_student_forum_attachments] [Boolean] [optional] If true, students can attach files to forum posts.
   # @argument course[open_enrollment] [Boolean] [optional] Set to true if the course is open enrollment.

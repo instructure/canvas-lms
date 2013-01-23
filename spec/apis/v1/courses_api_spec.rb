@@ -171,7 +171,6 @@ describe CoursesController, :type => :integration do
             'end_at'                               => '2011-05-01T00:00:00-0700',
             'publish_grades_immediately'           => true,
             'is_public'                            => true,
-            'allow_student_assignment_edits'       => true,
             'allow_wiki_comments'                  => true,
             'allow_student_forum_attachments'      => true,
             'open_enrollment'                      => true,
@@ -194,7 +193,7 @@ describe CoursesController, :type => :integration do
         json = api_call(:post, @resource_path, @resource_params, post_params)
         new_course = Course.find(json['id'])
         [:name, :course_code, :start_at, :end_at, :publish_grades_immediately,
-        :is_public, :allow_student_assignment_edits, :allow_wiki_comments,
+        :is_public, :allow_wiki_comments,
         :open_enrollment, :self_enrollment, :license, :sis_course_id,
         :allow_student_forum_attachments, :public_description,
         :restrict_enrollments_to_course_dates].each do |attr|
@@ -263,7 +262,6 @@ describe CoursesController, :type => :integration do
         'license' => 'public_domain',
         'is_public' => true,
         'public_description' => 'new description',
-        'allow_student_assignment_edits' => true,
         'allow_wiki_comments' => true,
         'allow_student_forum_attachments' => true,
         'open_enrollment' => true,
@@ -294,7 +292,6 @@ describe CoursesController, :type => :integration do
         @course.license.should == 'public_domain'
         @course.is_public.should be_true
         @course.public_description.should == 'new description'
-        @course.allow_student_assignment_edits.should be_true
         @course.allow_wiki_comments.should be_true
         @course.allow_student_forum_attachments.should be_true
         @course.open_enrollment.should be_true

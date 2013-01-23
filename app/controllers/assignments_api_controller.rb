@@ -403,7 +403,7 @@ class AssignmentsApiController < ApplicationController
   def update
     @assignment = @context.assignments.find(params[:id])
 
-    if authorized_action(@assignment, @current_user, :update_content)
+    if authorized_action(@assignment, @current_user, :update)
       save_and_render_response
     end
   end

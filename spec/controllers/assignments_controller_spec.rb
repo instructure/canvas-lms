@@ -271,64 +271,6 @@ describe AssignmentsController do
       assigns[:assignment].should eql(@assignment)
       assigns[:assignment].title.should eql("test title")
     end
-
-    describe 'updating description' do
-      let(:assignment) { assigns[:assignment] }
-
-      before do
-        Setting.set('enable_page_views', 'db')
-        course_with_student_logged_in(:active_all => true)
-        course_assignment
-      end
-
-      after { Setting.set 'enable_page_views', 'false' }
-
-      def run_update
-        put 'update', :course_id => @course.id, :id => @assignment.id, :assignment => {:title => "test title", :description => "what up"}
-      end
-
-      describe 'when student edits are not allowed' do
-        before do
-          @course.update_attribute(:allow_student_assignment_edits, false)
-          run_update
-        end
-
-        it 'does not update anything' do
-          assignment.should eql(@assignment)
-          assignment.title.should eql("some assignment")
-          assignment.description.should eql(nil)
-        end
-      end
-
-      describe 'when student edits are allowed' do
-        before do
-          @course.update_attribute(:allow_student_assignment_edits, true)
-          run_update
-        end
-
-        it 'only updates the description' do
-          assignment.should eql(@assignment)
-          assignment.title.should eql("some assignment")
-          assignment.description.should eql('what up')
-        end
-
-        it 'logs an asset access record for the assignment' do
-          accessed_asset = assigns[:accessed_asset]
-          accessed_asset[:category].should == 'assignments'
-          accessed_asset[:level].should == 'participate'
-        end
-
-        it 'registers a page view' do
-          page_view = assigns[:page_view]
-          page_view.should_not be_nil
-          page_view.http_method.should == 'put'
-          page_view.url.should =~ %r{^http://test\.host/courses/\d+/assignments}
-          page_view.participated.should be_true
-        end
-
-      end
-
-    end
   end
 
   describe "DELETE 'destroy'" do
@@ -348,31 +290,4 @@ describe AssignmentsController do
       assigns[:assignment].should be_deleted
     end
   end
-  # describe "GET 'show'" do
-  #   it "should be successful" do
-  #     get 'show'
-  #     response.should be_success
-  #   end
-  # end
-  # 
-  # describe "GET 'new'" do
-  #   it "should be successful" do
-  #     get 'new'
-  #     response.should be_success
-  #   end
-  # end
-  # 
-  # describe "GET 'edit'" do
-  #   it "should be successful" do
-  #     get 'edit'
-  #     response.should be_success
-  #   end
-  # end
-  # 
-  # describe "GET 'destroy'" do
-  #   it "should be successful" do
-  #     get 'destroy'
-  #     response.should be_success
-  #   end
-  # end
 end

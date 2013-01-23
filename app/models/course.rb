@@ -32,7 +32,6 @@ class Course < ActiveRecord::Base
                   :is_public,
                   :publish_grades_immediately,
                   :allow_student_wiki_edits,
-                  :allow_student_assignment_edits,
                   :show_public_context_messages,
                   :syllabus_body,
                   :public_description,
@@ -2362,7 +2361,7 @@ class Course < ActiveRecord::Base
   def self.clonable_attributes
     [ :group_weighting_scheme, :grading_standard_id, :is_public,
       :publish_grades_immediately, :allow_student_wiki_edits,
-      :allow_student_assignment_edits, :show_public_context_messages,
+      :show_public_context_messages,
       :syllabus_body, :allow_student_forum_attachments,
       :default_wiki_editing_roles, :allow_student_organized_groups,
       :default_view, :show_all_discussion_entries, :open_enrollment,

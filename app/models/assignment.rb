@@ -824,17 +824,11 @@ class Assignment < ActiveRecord::Base
     }
     can :submit and can :attach_submission_comment_files
 
-    given { |user, session| !self.locked_for?(user) &&
-      (self.context.allow_student_assignment_edits rescue false) &&
-      self.cached_context_grants_right?(user, session, :participate_as_student)
-    }
-    can :update_content
-
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_grades) }
-    can :update and can :update_content and can :grade and can :delete and can :create and can :read and can :attach_submission_comment_files
+    can :update and can :grade and can :delete and can :create and can :read and can :attach_submission_comment_files
 
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_assignments) }
-    can :update and can :update_content and can :delete and can :create and can :read and can :attach_submission_comment_files
+    can :update and can :delete and can :create and can :read and can :attach_submission_comment_files
   end
 
   def filter_attributes_for_user(hash, user, session)

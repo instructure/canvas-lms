@@ -15,7 +15,7 @@
   <% end %>
 
   <div class="rs-margin-lr rs-margin-top">
-    <% if can_do(@assignment, @current_user, :update_content) %>
+    <% if can_do(@assignment, @current_user, :update) %>
       <% if @assignment.external_tool? %>
         <a href="<%= polymorphic_url([@context, @assignment]) %>" class="view_assignment_link btn button-sidebar-wide"><i class="icon-arrow-left"></i> <%= t('links.view_assignment', "View Assignment") %></a>
       <% end %>
