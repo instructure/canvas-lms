@@ -1811,7 +1811,14 @@ class User < ActiveRecord::Base
     opts[:limit] ||= 20
 
     events = CalendarEvent.active.for_user_and_context_codes(self, context_codes).between(Time.now.utc, opts[:end_at]).scoped(:limit => opts[:limit]).reject(&:hidden?)
-    events += Assignment.active.for_context_codes(context_codes).due_between(Time.now.utc, opts[:end_at]).scoped(:limit => opts[:limit]).include_submitted_count
+    events += Assignment.
+      active.
+      for_context_codes(context_codes).
+      due_between_with_overrides(Time.now.utc, opts[:end_at]).
+      include_submitted_count.
+      map {|a| a.overridden_for(self)}.
+      select {|a| a.due_at >= Time.now.utc && a.due_at <= opts[:end_at]}.
+      first(opts[:limit])
     appointment_groups = AppointmentGroup.manageable_by(self, context_codes).intersecting(Time.now.utc, opts[:end_at]).scoped(:limit => opts[:limit])
     appointment_groups.each { |ag| ag.context = ag.contexts_for_user(self).first }
     events += appointment_groups

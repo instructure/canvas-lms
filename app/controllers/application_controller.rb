@@ -511,7 +511,8 @@ class ApplicationController < ActionController::Base
     @submissions = @current_user.try(:submissions).to_a
     @submissions.each{ |s| s.mute if s.muted_assignment? }
 
-    sorted_by_vdd = SortsAssignments.by_varied_due_date({
+    @assignments.map! {|a| a.overridden_for(@current_user)}
+    sorted = SortsAssignments.by_due_date({
       :assignments => @assignments,
       :user => @current_user,
       :session => session,
@@ -519,12 +520,12 @@ class ApplicationController < ActionController::Base
       :submissions => @submissions
     })
 
-    @past_assignments = sorted_by_vdd.past
-    @undated_assignments = sorted_by_vdd.undated
-    @ungraded_assignments = sorted_by_vdd.ungraded
-    @upcoming_assignments = sorted_by_vdd.upcoming
-    @future_assignments = sorted_by_vdd.future
-    @overdue_assignments = sorted_by_vdd.overdue
+    @past_assignments = sorted.past
+    @undated_assignments = sorted.undated
+    @ungraded_assignments = sorted.ungraded
+    @upcoming_assignments = sorted.upcoming
+    @future_assignments = sorted.future
+    @overdue_assignments = sorted.overdue
 
     condense_assignments if requesting_main_assignments_page?
 

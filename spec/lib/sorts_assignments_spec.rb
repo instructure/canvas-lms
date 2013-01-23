@@ -68,41 +68,6 @@ describe SortsAssignments do
     end
   end
 
-  describe "vdd_map" do
-
-    it "returns a new array of overridden assignments" do
-      user = stub
-      varied_due_date = 2.days.from_now
-      assignment_ids = assignments.map(&:id)
-      assignments.each do |assignment|
-        assignment.expects(:due_at).returns(varied_due_date)
-        assignment.expects(:overridden_for).returns(assignment)
-      end
-
-      SortsAssignments.vdd_map(assignments,user).reject{ |assignment|
-        assignment_ids.include?(assignment.id) &&
-          assignment.due_at == varied_due_date
-      }.size.should == 0
-    end
-  end
-
-  describe "select_originals" do
-
-    it "returns the assignments where the id matches the id in vdd_map" do
-      vdd_map =
-        [
-          stub( :id => due_yesterday.id ),
-          stub( :id => due_today.id )
-        ]
-      SortsAssignments.select_originals(assignments,vdd_map).should =~
-        [
-          due_yesterday,
-          due_today
-        ]
-    end
-
-  end
-
   describe "up_to" do
 
     it "gives all the assignments due before the given time" do
@@ -183,12 +148,12 @@ describe SortsAssignments do
 
   end
 
-  describe "by_varied_due_date" do
+  describe "by_due_date" do
     let(:user) { stub }
     let(:session) { stub }
     let( :submissions ) { [] }
     let(:sorted_assignments) {
-      SortsAssignments.by_varied_due_date({
+      SortsAssignments.by_due_date({
         :assignments => assignments,
         :user => user,
         :session => session,
@@ -198,7 +163,7 @@ describe SortsAssignments do
     }
 
     it "raises an IndexError if a required field is not passed" do
-      lambda { SortsAssignments.by_varied_due_date({}) }.
+      lambda { SortsAssignments.by_due_date({}) }.
         should raise_error IndexError
     end
 
