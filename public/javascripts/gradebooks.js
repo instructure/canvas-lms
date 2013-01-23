@@ -1164,6 +1164,16 @@ define([
       }).find(".cancel_button").click(function() {
         $curve_grade_dialog.dialog('close');
       });
+
+      if (ENV.total_grade_warning) {
+        $('.assignment_final-grade').not('.assignment_header').each(function() {
+          $('<i/>', {
+            'class': 'icon-warning',
+            title: ENV.total_grade_warning
+          }).prependTo(this);
+        });
+      }
+
     }, 1500);
     
     $('#gradebook_options').live('click', function(event) {

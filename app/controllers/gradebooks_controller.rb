@@ -191,6 +191,7 @@ class GradebooksController < ApplicationController
             @context.enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.each{ |e| @enrollments_hash[e.user_id] << e }
             @students = @context.students_visible_to(@current_user).order_by_sortable_name.uniq
             js_env :assignment_groups => assignment_groups_json
+            set_gradebook_warnings(@groups, @just_assignments)
             if params[:view] == "simple"
               @headers = false
               render :action => "show_simple"
@@ -425,7 +426,7 @@ class GradebooksController < ApplicationController
           lambda{ |group| percentage[group.group_weight] }) :
         lambda{ |group| nil }
 
-    groups = groups.map{ |group|
+    groups = groups.map { |group|
       OpenObject.build('assignment',
         :id => 'group-' + group.id.to_s,
         :rules => group.rules,
@@ -437,6 +438,7 @@ class GradebooksController < ApplicationController
         :group_weight => group.group_weight,
         :asset_string => "group_total_#{group.id}")
     }
+
     groups << OpenObject.build('assignment',
         :id => 'final-grade',
         :title => t('titles.total', 'Total'),
@@ -447,6 +449,44 @@ class GradebooksController < ApplicationController
     groups = [] if options[:exclude_total] && groups.length == 1
     groups
   end
+
+  def set_gradebook_warnings(groups, assignments)
+    @assignments_in_bad_groups = Set.new
+
+    if @context.group_weighting_scheme == "percent"
+      assignments_by_group = assignments.group_by(&:assignment_group_id)
+      bad_groups = groups.select do |group|
+        group_assignments = assignments_by_group[group.id] || []
+        points_in_group = group_assignments.map(&:points_possible).compact.sum
+        points_in_group.zero?
+      end
+
+      bad_group_ids = bad_groups.map(&:id)
+      bad_assignment_ids = assignments_by_group.
+        slice(*bad_group_ids).
+        values.
+        flatten
+
+      @assignments_in_bad_groups.replace bad_assignment_ids
+
+      warning = t('invalid_assignment_groups_warning',
+                  {:one => "Score does not include %{groups} because " \
+                           "it has no points possible",
+                   :other => "Score does not include %{groups} because " \
+                           "they have no points possible"},
+                  :groups => bad_groups.map(&:name).to_sentence,
+                  :count  => bad_groups.size)
+    else
+      if assignments.all? { |a| (a.points_possible || 0).zero? }
+        warning = t(:no_assignments_have_points_warning,
+                    "Can't compute score until an assignment " \
+                    "has points possible")
+      end
+    end
+
+    js_env :total_grade_warning => warning if warning
+  end
+  private :set_gradebook_warnings
 
   def submissions_by_assignment(submissions)
     submissions.inject({}) do |hash, sub|

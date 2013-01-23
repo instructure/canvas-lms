@@ -799,14 +799,14 @@ define [
 
         if invalidAssignmentGroups.length > 0
           groupNames = (ag.name for ag in invalidAssignmentGroups)
-          @totalGradeWarning = I18n.t 'invalid_assignment_groups_warning'
-          , "Score does not include %{groups} because %{pronoun_has} no
-             points possible"
-          , groups: $.toSentence(groupNames)
-          , pronoun_has: if invalidAssignmentGroups.length == 1
-                       I18n.t('it_has', 'it has')
-                     else
-                       I18n.t('they_have', 'they have')
+          @totalGradeWarning = I18n.t 'invalid_assignment_groups_warning',
+            one: "Score does not include %{groups} because it has
+                  no points possible"
+            other: "Score does not include %{groups} because they have
+                    no points possible"
+          ,
+            groups: $.toSentence(groupNames)
+            count: groupNames.length
 
       else
         # no assignments have points possible

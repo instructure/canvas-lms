@@ -72,8 +72,7 @@
             <%= @renders[student.asset_string] ||= render(:partial => 'student', :object => student, :locals => { :course => @context }) %>
           </div>
         </td>
-        <% @assignments.each_with_index do |assignment, idx| 
-        %>
+        <% @assignments.each_with_index do |assignment, idx| %>
           <td class="student_assignment  <%= assignment.special_class %>">
             -
           </td>
