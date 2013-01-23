@@ -71,7 +71,9 @@ define [
       @activate(null) if @isActive(data.id)
 
     clicked: (e) =>
-      @select $(e.currentTarget).data('id')
+      # ignore clicks that come from the gear menu
+      unless $(e.target).closest('.admin-links').length
+        @select $(e.currentTarget).data('id')
 
     lastMessageKey: ->
       if @scope is 'sent'

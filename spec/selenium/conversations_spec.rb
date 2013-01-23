@@ -43,6 +43,17 @@ describe "conversations" do
       get_conversations.size.should == 4 # removed once deselected
     end
 
+    it "should not open the conversation when the gear menu is clicked" do
+      create_conversation
+      wait_for_ajaximations
+      f('.al-options').should_not be_displayed
+      driver.execute_script "$('.admin-link-hover-area').addClass('active')"
+      f('.admin-links button').click
+      wait_for_ajaximations
+      f('.al-options').should be_displayed
+      f('.messages').should_not be_displayed
+    end
+
     it "should star a conversation" do
       create_conversation
 
