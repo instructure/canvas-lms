@@ -31,7 +31,7 @@ class Thumbnail < ActiveRecord::Base
                    :keep_profile => true
 
     def authenticated_s3_url(*args)
-      "http://#{HostUrl.context_host(attachment.context)}/images/thumbnails/show/#{id}/#{uuid}"
+      "#{HostUrl.protocol}://#{HostUrl.context_host(attachment.context)}/images/thumbnails/show/#{id}/#{uuid}"
     end
   else
     has_attachment :content_type => :image,
