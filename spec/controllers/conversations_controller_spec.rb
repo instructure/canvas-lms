@@ -27,7 +27,6 @@ describe ConversationsController do
       enrollment = course.enroll_student(u)
       enrollment.workflow_state = 'active'
       enrollment.save
-      u.associated_accounts << Account.default
       u.id
     }
     @conversation = @user.initiate_conversation(user_ids)
@@ -135,7 +134,6 @@ describe ConversationsController do
         a = Account.default
         @student = user_with_pseudonym(:active_all => true)
         course_with_student(:active_all => true, :account => a, :user => @student)
-        @student.associated_accounts << a
         @student.initiate_conversation([user.id]).add_message('test1', :root_account_id => a.id)
         @student.initiate_conversation([user.id]).add_message('test2') # no root account, so teacher can't see it
   
@@ -303,7 +301,6 @@ describe ConversationsController do
     it "should generate a user note when requested" do
       Account.default.update_attribute :enable_user_notes, true
       course_with_teacher_logged_in(:active_all => true)
-      @teacher.associated_accounts << Account.default
       conversation
 
       post 'add_message', :conversation_id => @conversation.conversation_id, :body => "hello world"

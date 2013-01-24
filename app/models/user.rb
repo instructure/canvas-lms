@@ -415,7 +415,8 @@ class User < ActiveRecord::Base
       to_delete = []
       UserAccountAssociation.find(:all, :conditions => { :user_id => user_ids }).each do |aa|
         key = [aa.user_id, aa.account_id]
-        # duplicates
+        # duplicates. the unique index prevents these now, but this code
+        # needs to hang around for the migration itself
         if current_associations.has_key?(key)
           to_delete << aa.id
           next

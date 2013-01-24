@@ -39,7 +39,6 @@ describe ConversationsController, :type => :integration do
     enrollment = @course.enroll_user(u, 'StudentEnrollment', :section => section)
     enrollment.workflow_state = 'active'
     enrollment.save
-    u.associated_accounts << Account.default
     u
   end
 

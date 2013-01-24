@@ -161,7 +161,7 @@ describe ConversationParticipant do
       @admin_user = user
       @a1.add_user(@admin_user)
       @a2.add_user(@admin_user)
-      @admin_user.associated_accounts << @a3 # in the account, but not an admin
+      @a3.pseudonyms.create!(:user => @admin_user, :unique_id => 'a3') # in the account, but not an admin
 
       @target_user = user
       # visible to @user

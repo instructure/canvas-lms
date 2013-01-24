@@ -111,9 +111,7 @@ describe ConversationMessage do
     it "should add a user note under nominal circumstances" do
       Account.default.update_attribute :enable_user_notes, true
       course_with_teacher
-      @teacher.associated_accounts << Account.default
       student = student_in_course.user
-      student.associated_accounts << Account.default
       conversation = @teacher.initiate_conversation([student.id])
       ConversationMessage.any_instance.stubs(:current_time_from_proper_timezone).returns(Time.at(0))
       conversation.add_message("reprimanded!", :generate_user_note => true)
@@ -127,9 +125,7 @@ describe ConversationMessage do
     it "should fail if notes are disabled on the account" do
       Account.default.update_attribute :enable_user_notes, false
       course_with_teacher
-      @teacher.associated_accounts << Account.default
       student = student_in_course.user
-      student.associated_accounts << Account.default
       conversation = @teacher.initiate_conversation([student.id])
       conversation.add_message("reprimanded!", :generate_user_note => true)
       student.user_notes.size.should be(0)
@@ -138,11 +134,8 @@ describe ConversationMessage do
     it "should fail if there's more than one recipient" do
       Account.default.update_attribute :enable_user_notes, true
       course_with_teacher
-      @teacher.associated_accounts << Account.default
       student1 = student_in_course.user
-      student1.associated_accounts << Account.default
       student2 = student_in_course.user
-      student2.associated_accounts << Account.default
       conversation = @teacher.initiate_conversation([student1.id, student2.id])
       conversation.add_message("reprimanded!", :generate_user_note => true)
       student1.user_notes.size.should be(0)
