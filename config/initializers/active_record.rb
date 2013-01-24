@@ -427,7 +427,7 @@ class ActiveRecord::Base
     native = (connection.adapter_name == 'PostgreSQL')
     options[:select] = "DISTINCT ON (#{Array(columns).join(', ')}) " + (options[:select] || '*') if native
     raise "can't use limit with distinct on" if options[:limit] # while it's possible, it would be gross for non-native, so we don't allow it
-    raise "distinct on columns must match the leftmost part of the order-by clause" unless options[:order] && options[:order] =~ /\A#{Array(columns).map{ |c| Regexp.escape(c) }.join(' (asc|desc)?,')}/i
+    raise "distinct on columns must match the leftmost part of the order-by clause" unless options[:order] && options[:order] =~ /\A#{Array(columns).map{ |c| Regexp.escape(c) }.join(' *(?:asc|desc)?, *')}/i
 
     result = find(:all, options)
 
@@ -613,6 +613,106 @@ class ActiveRecord::Base
       last_value = ids.last
       ids = connection.select_rows("select min(id), max(id) from (#{self.send(:construct_finder_sql, :select => "#{quoted_table_name}.#{primary_key} as id", :conditions => ["#{quoted_table_name}.#{primary_key}>?", last_value], :order => primary_key, :limit => batch_size)}) as subquery").first
     end
+  end
+
+  class << self
+    def deconstruct_joins
+      joins_sql = ''
+      add_joins!(joins_sql, nil)
+      tables = []
+      join_conditions = []
+      joins_sql.strip.split('INNER JOIN')[1..-1].each do |join|
+        # this could probably be improved
+        raise "PostgreSQL update_all/delete_all only supports INNER JOIN" unless join.strip =~ /([a-zA-Z'"_]+)\s+ON\s+(.*)/
+        tables << $1
+        join_conditions << $2
+      end
+      [tables, join_conditions]
+    end
+
+    def update_all_with_joins(updates, conditions = nil, options = {})
+      scope = scope(:find)
+      if scope && scope[:joins]
+        case connection.adapter_name
+        when 'PostgreSQL'
+          sql  = "UPDATE #{quoted_table_name} SET #{sanitize_sql_for_assignment(updates)} "
+
+          tables, join_conditions = deconstruct_joins
+
+          unless tables.empty?
+            sql.concat('FROM ')
+            sql.concat(tables.join(', '))
+            sql.concat(' ')
+          end
+
+          conditions = merge_conditions(conditions, *join_conditions)
+        when 'MySQL'
+          sql  = "UPDATE #{quoted_table_name}"
+          add_joins!(sql, nil, scope)
+          sql << " SET "
+          # can't just use sanitize_sql_for_assignment cause MySQL supports
+          # updating multiple tables in a single statement, so we have to
+          # qualify the column names
+          sql << case updates
+             when Array
+               sanitize_sql_array(updates)
+             when Hash;
+               updates.map do |attr, value|
+                 "#{quoted_table_name}.#{connection.quote_column_name(attr)} = #{quote_bound_value(value)}"
+               end.join(', ')
+             else
+               updates
+             end
+        else
+          raise "Joins in update not supported!"
+        end
+        select_sql = ""
+        add_conditions!(select_sql, conditions, scope)
+
+        if options.has_key?(:limit) || (scope && scope[:limit])
+          # Only take order from scope if limit is also provided by scope, this
+          # is useful for updating a has_many association with a limit.
+          add_order!(select_sql, options[:order], scope)
+
+          add_limit!(select_sql, options, scope)
+          sql.concat(connection.limited_update_conditions(select_sql, quoted_table_name, connection.quote_column_name(primary_key)))
+        else
+          add_order!(select_sql, options[:order], nil)
+          sql.concat(select_sql)
+        end
+
+        return connection.update(sql, "#{name} Update")
+      end
+      update_all_without_joins(updates, conditions, options)
+    end
+    alias_method_chain :update_all, :joins
+
+    def delete_all_with_joins(conditions = nil)
+      scope = scope(:find)
+      if scope && scope[:joins]
+        case connection.adapter_name
+        when 'PostgreSQL'
+          sql = "DELETE FROM #{quoted_table_name} "
+
+          tables, join_conditions = deconstruct_joins
+
+          sql.concat('USING ')
+          sql.concat(tables.join(', '))
+          sql.concat(' ')
+
+          conditions = merge_conditions(conditions, *join_conditions)
+        when 'MySQL'
+          sql = "DELETE #{quoted_table_name} FROM #{quoted_table_name}"
+          add_joins!(sql, nil, scope)
+        else
+          raise "Joins in delete not supported!"
+        end
+        add_conditions!(sql, conditions, scope)
+        return connection.delete(sql, "#{name} Delete all")
+      end
+      delete_all_without_joins(conditions)
+    end
+    alias_method_chain :delete_all, :joins
   end
 end
 

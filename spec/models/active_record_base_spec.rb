@@ -478,4 +478,32 @@ describe ActiveRecord::Base do
         should eql @enrollments.map(&:id).reverse
     end
   end
+
+  describe "update_all/delete_all with_joins" do
+    before do
+      pending "MySQL and Postgres only" unless %w{PostgreSQL MySQL}.include?(ActiveRecord::Base.connection.adapter_name)
+
+      @u1 = User.create!(:name => 'a')
+      @u2 = User.create!(:name => 'b')
+      @p1 = @u1.pseudonyms.create!(:unique_id => 'pa', :account => Account.default)
+      @p1_2 = @u1.pseudonyms.create!(:unique_id => 'pa2', :account => Account.default)
+      @p2 = @u2.pseudonyms.create!(:unique_id => 'pb', :account => Account.default)
+      @p1_2.destroy
+    end
+
+    it "should do an update all with a join" do
+      Pseudonym.scoped(:joins => :user).active.update_all({:unique_id => 'pa3'}, {:users => {:name => 'a'}})
+      @p1.reload.unique_id.should == 'pa3'
+      @p1_2.reload.unique_id.should == 'pa2'
+      @p2.reload.unique_id.should == 'pb'
+    end
+
+    it "should do a delete all with a join" do
+      Pseudonym.scoped(:joins => :user).active.delete_all({:users => {:name => 'a'}})
+      lambda { @p1.reload }.should raise_error(ActiveRecord::RecordNotFound)
+      @u1.reload.should_not be_deleted
+      @p1_2.reload.unique_id.should == 'pa2'
+      @p2.reload.unique_id.should == 'pb'
+    end
+  end
 end
