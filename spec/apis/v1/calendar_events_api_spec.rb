@@ -355,9 +355,15 @@ describe CalendarEventsApiController, :type => :integration do
           e['child_events_count'].should eql 2
           e['child_events'].size.should eql 1 # can't see otherguy's stuff
           e['available_slots'].should eql 2
+          case e['id']
+          when event1.id
+            e['child_events'].first.keys.sort.should eql((expected_reservation_fields + ['own_reservation', 'user']).sort)
+          when event2.id
+            e['child_events'].first.keys.sort.should eql((expected_reservation_fields + ['own_reservation', 'group'] - ['effective_context_code']).sort)
+          else
+            fail "unexpected event id"
+          end
         end
-        json.first['child_events'].first.keys.sort.should eql((expected_reservation_fields + ['own_reservation', 'user']).sort)
-        json.last['child_events'].first.keys.sort.should eql((expected_reservation_fields + ['own_reservation', 'group'] - ['effective_context_code']).sort)
       end
 
       context "reservations" do
