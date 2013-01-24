@@ -3,8 +3,8 @@
   date ||= nil
   date_passed ||= false
 %>
-<tr class="date <%= "date_passed" if date_passed %> <%= date.strftime("events_%m_%d_%Y") if date %>">
-  <th scope='row' title="<%= date_string(date) if date %>" data-date="<%= date.strftime("%m/%d/%Y") if date %>" class="day_date"><%= date_string(date, :no_words) if date %></th>
+<tr class="date <%= "date_passed" if date_passed %> <%= date.strftime("events_%Y_%m_%d") if date %>">
+  <th scope='row' title="<%= date_string(date) if date %>" data-date="<%= date.strftime("%Y_%m_%d") if date %>" class="day_date"><%= date_string(date, :no_words) if date %></th>
   <td><%= date ? date.strftime("%a") : t('syllabus.other_day', "Other") %></td>
   <td class="details">
     <table class="detail_list">
