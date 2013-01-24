@@ -11,7 +11,7 @@ require [
 
     events:
       'click .stream_header': 'expandDetails'
-      'click .stream_header .links': 'stopPropagation'
+      'click .stream_header .links a': 'stopPropagation'
       'click .stream-details': 'handleDetailsClick'
       'beforeremove': 'updateCategoryCounts' # ujsLinks event
 
