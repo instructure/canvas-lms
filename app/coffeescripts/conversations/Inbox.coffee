@@ -657,7 +657,8 @@ define [
         selector:
           messages: {noResults: noResultsText}
           populator: buildPopulator(prefixUserIds: true)
-          limiter: (options) => 5
+          limiter: (options) =>
+            if options.level > 0 then -1 else 5
           preparer: (postData, data, parent) =>
             context = postData.context
             if not postData.search and context and data.length > 0 and context.match(/^(course|group)_\d+$/)
