@@ -168,20 +168,37 @@ class PageView < ActiveRecord::Base
   end
 
   def create_without_callbacks
-    return super unless self.page_view_method == :cassandra
-    self.created_at ||= Time.zone.now
-    update
-    if user
-      cassandra.execute("INSERT INTO page_views_history_by_context (context_and_time_bucket, ordered_id, request_id) VALUES (?, ?, ?)", "#{user.global_asset_string}/#{PageView.timeline_bucket_for_time(created_at, "User")}", "#{created_at.to_i}/#{request_id[0,8]}", request_id)
+    if self.page_view_method == :cassandra
+      cassandra.batch do
+        update_cassandra
+      end
+      @new_record = false
+      self.id
+    else
+      super
     end
-    @new_record = false
-    self.id
   end
 
   def update_without_callbacks
-    return super unless self.page_view_method == :cassandra
+    if self.page_view_method == :cassandra
+      cassandra.batch do
+        update_cassandra
+      end
+      true
+    else
+      super
+    end
+  end
+
+  def update_cassandra
+    self.created_at ||= Time.zone.now
     cassandra.update_record("page_views", { :request_id => request_id }, self.changes)
-    true
+
+    if new_record?
+      if user
+        cassandra.update("INSERT INTO page_views_history_by_context (context_and_time_bucket, ordered_id, request_id) VALUES (?, ?, ?)", "#{user.global_asset_string}/#{PageView.timeline_bucket_for_time(created_at, "User")}", "#{created_at.to_i}/#{request_id[0,8]}", request_id)
+      end
+    end
   end
 
   named_scope :for_context, proc { |ctx| { :conditions => { :context_type => ctx.class.name, :context_id => ctx.id } } }

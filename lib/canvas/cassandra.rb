@@ -66,6 +66,76 @@ module Canvas::Cassandra
       result
     end
 
+    # private Struct used to store batch information
+    class Batch < Struct.new(:statements, :args)
+      def initialize
+        self.statements = []
+        self.args = []
+      end
+      delegate :empty?, :present?, :blank?, :to => :statements
+
+      def to_cql_ary
+        case statements.size
+        when 0
+          raise "Cannot execute an empty batch"
+        when 1
+          statements + args
+        else
+          # http://www.datastax.com/docs/1.1/references/cql/BATCH
+          # note there's no semicolons between statements in the batch
+          cql = []
+          cql << "BEGIN BATCH"
+          cql.concat statements
+          cql << "APPLY BATCH"
+          # join with spaces rather than newlines, because cassandra doesn't care
+          # and syslog doesn't like newlines
+          [cql.join(" ")] + args
+        end
+      end
+    end
+
+    # Update, insert or delete from cassandra. The only difference between this
+    # and execute above is that this doesn't return a result set, so it can be
+    # batched up.
+    def update(query, *args)
+      if in_batch?
+        @batch.statements << query
+        @batch.args.concat args
+      else
+        execute(query, *args)
+      end
+      nil
+    end
+
+    # Batch up all execute statements inside the given block, executing when
+    # the block returns successfully.
+    # Note that this only batches up update calls, not execute calls, since
+    # execute expects to return results immediately.
+    # If this method is called again while already in a batch, the same batch
+    # will be re-used and changes won't be executed until the outer batch
+    # returns.
+    # (It may be useful to add a force_new option later)
+    def batch
+      if in_batch?
+        yield
+      else
+        begin
+          @batch = Batch.new
+          yield
+          unless @batch.empty?
+            execute(*@batch.to_cql_ary)
+          end
+        ensure
+          @batch = nil
+        end
+      end
+      nil
+    end
+
+    def in_batch?
+      !!@batch
+    end
+
     # update an AR-style record in cassandra
     # table_name is the cassandra table name
     # primary_key_attrs is a hash of { key => value } attributes to uniquely identify the record
@@ -74,9 +144,9 @@ module Canvas::Cassandra
     #   { "colname" => newvalue }
     #   { "colname" => [oldvalue, newvalue] }
     def update_record(table_name, primary_key_attrs, changes)
-      statement, args = self.class.build_update_record_cql(table_name, primary_key_attrs, changes)
-      return unless statement
-      execute(statement, *args)
+      batch do
+        do_update_record(table_name, primary_key_attrs, changes)
+      end
     end
 
     def select_value(query, *args)
@@ -90,7 +160,7 @@ module Canvas::Cassandra
 
     protected
 
-    def self.build_update_record_cql(table_name, primary_key_attrs, changes)
+    def do_update_record(table_name, primary_key_attrs, changes)
       where_args = []
       primary_key_attrs = primary_key_attrs.with_indifferent_access
       changes = changes.with_indifferent_access
@@ -112,31 +182,23 @@ module Canvas::Cassandra
         # split changes into updates and deletes
         partition { |key,val| val.nil? }
 
-      args = []
-
       # inserts and updates in cassandra are equivalent,
       # so no need to differentiate here
       if updates.present?
+        args = []
         update_cql = updates.map { |key,val| args << val; "#{key} = ?" }.join(", ")
-        update_statement = "UPDATE #{table_name} SET #{update_cql} WHERE #{where_clause}"
+        statement = "UPDATE #{table_name} SET #{update_cql} WHERE #{where_clause}"
         args.concat where_args
+        update(statement, *args)
       end
 
       if deletes.present?
+        args = []
         delete_cql = deletes.map(&:first).join(", ")
-        delete_statement = "DELETE #{delete_cql} FROM #{table_name} WHERE #{where_clause}"
+        statement = "DELETE #{delete_cql} FROM #{table_name} WHERE #{where_clause}"
         args.concat where_args
+        update(statement, *args)
       end
-
-      if update_statement && delete_statement
-        # http://www.datastax.com/docs/1.1/references/cql/BATCH
-        # note there's no semicolons between statements in the batch
-        statement = "BEGIN BATCH #{update_statement} #{delete_statement} APPLY BATCH"
-      else
-        statement = update_statement || delete_statement
-      end
-
-      return statement, args
     end
   end
 
