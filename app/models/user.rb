@@ -326,8 +326,11 @@ class User < ActiveRecord::Base
     update_account_associations if !self.class.skip_updating_account_associations? && self.workflow_state_changed? && self.id_was
   end
 
-  def update_account_associations(opts = {})
-    User.update_account_associations([self], opts)
+  def update_account_associations(opts = nil)
+    opts ||= {:all_shards => true}
+    self.shard.activate do
+      User.update_account_associations([self], opts)
+    end
   end
 
   def self.add_to_account_chain_cache(account_id, account_chain_cache)
@@ -412,49 +415,69 @@ class User < ActiveRecord::Base
 
     user_ids = users_or_user_ids
     user_ids = user_ids.map(&:id) if user_ids.first.is_a?(User)
+    shards = [Shard.current]
     if !precalculated_associations
       if !users_or_user_ids.first.is_a?(User)
-        users_or_user_ids = User.find(:all, :select => 'id, preferences, workflow_state', :conditions => {:id => user_ids})
+        users = users_or_user_ids = User.find(:all, :select => 'id, preferences, workflow_state', :conditions => {:id => user_ids})
+      else
+        users = users_or_user_ids
+      end
+
+      if opts[:all_shards]
+        shards = Set.new
+        users.each { |u| shards += u.associated_shards }
+        shards = shards.to_a
       end
 
       # basically we're going to do a huge preload here, but custom sql to only load the columns we need
-      data = {}
-      data[:enrollments] = Enrollment.scoped(:conditions => "workflow_state<>'deleted' AND type<>'StudentViewEnrollment'").
-          find(:all, :select => 'DISTINCT user_id, course_id, course_section_id', :conditions => {:user_id => user_ids})
+      data = {:enrollments => [], :sections => [], :courses => [], :pseudonyms => [], :account_users => []}
+      Shard.with_each_shard(shards) do
+        shard_user_ids = users.map(&:id)
 
-      # probably a lot of dups, so more efficient to use a set then uniq an array
-      course_section_ids = Set.new
-      data[:enrollments].each { |e| course_section_ids << e.course_section_id }
-      # now make it easy to get the enrollments by user id
-      data[:enrollments] = data[:enrollments].group_by(&:user_id)
-      data[:sections] = CourseSection.
-          find(:all, :select => 'id, course_id, nonxlist_course_id',
-               :conditions => {:id => course_section_ids.to_a}) unless course_section_ids.empty?
-      data[:sections] ||= []
-      course_ids = Set.new
-      data[:sections].each do |s|
-        course_ids << s.course_id
-        course_ids << s.nonxlist_course_id if s.nonxlist_course_id
+        data[:enrollments] += shard_enrollments =
+            Enrollment.scoped(:conditions => "workflow_state<>'deleted' AND type<>'StudentViewEnrollment'").
+            find(:all, :select => 'DISTINCT user_id, course_id, course_section_id', :conditions => {:user_id => shard_user_ids})
+
+        # probably a lot of dups, so more efficient to use a set than uniq an array
+        course_section_ids = Set.new
+        shard_enrollments.each { |e| course_section_ids << e.course_section_id }
+        data[:sections] += shard_sections = CourseSection.
+            find(:all, :select => 'id, course_id, nonxlist_course_id',
+                 :conditions => {:id => course_section_ids.to_a}) unless course_section_ids.empty?
+        shard_sections ||= []
+        course_ids = Set.new
+        shard_sections.each do |s|
+          course_ids << s.course_id
+          course_ids << s.nonxlist_course_id if s.nonxlist_course_id
+        end
+
+        data[:courses] += Course.
+            find(:all, :select => 'id, account_id',
+                 :conditions => {:id => course_ids.to_a}) unless course_ids.empty?
+
+        data[:pseudonyms] += Pseudonym.active.
+            find(:all, :select => 'DISTINCT user_id, account_id', :conditions => {:user_id => shard_user_ids})
+        data[:account_users] += AccountUser.
+            find(:all, :select => 'DISTINCT user_id, account_id', :conditions => {:user_id => shard_user_ids})
       end
+      # now make it easy to get the data by user id
+      data[:enrollments] = data[:enrollments].group_by(&:user_id)
       data[:sections] = data[:sections].index_by(&:id)
-      data[:courses] = Course.
-          find(:all, :select => 'id, account_id',
-               :conditions => {:id => course_ids.to_a}).
-           index_by(&:id) unless course_ids.empty?
-      data[:courses] ||= {}
-
-      data[:pseudonyms] = Pseudonym.active.
-          find(:all, :select => 'DISTINCT user_id, account_id', :conditions => {:user_id => user_ids}).
-          group_by(&:user_id)
-      data[:account_users] = AccountUser.
-          find(:all, :select => 'DISTINCT user_id, account_id', :conditions => {:user_id => user_ids}).
-          group_by(&:user_id)
+      data[:courses] = data[:courses].index_by(&:id)
+      data[:pseudonyms] = data[:pseudonyms].group_by(&:user_id)
+      data[:account_users] = data[:account_users].group_by(&:user_id)
     end
 
+    # TODO: transaction on each shard?
     UserAccountAssociation.transaction do
       current_associations = {}
       to_delete = []
-      UserAccountAssociation.find(:all, :conditions => { :user_id => user_ids }).each do |aa|
+      Shard.with_each_shard(shards) do
+        # if shards is more than just the current shard, users will be set; otherwise
+        # we never loaded users, but it doesn't matter, cause it's all the current shard
+        shard_user_ids = users ? users.map(&:id) : user_ids
+        UserAccountAssociation.find(:all, :conditions => { :user_id => shard_user_ids })
+      end.each do |aa|
         key = [aa.user_id, aa.account_id]
         # duplicates. the unique index prevents these now, but this code
         # needs to hang around for the migration itself
@@ -486,6 +509,7 @@ class User < ActiveRecord::Base
               aa.user_id = user_id
               aa.account_id = account_id
               aa.depth = depth
+              aa.shard = Shard.shard_for(account_id)
             end
           else
             # for incremental, only update the old association if it is deeper than the new one

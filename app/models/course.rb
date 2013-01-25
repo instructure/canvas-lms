@@ -407,7 +407,9 @@ class Course < ActiveRecord::Base
   end
 
   def update_account_associations
-    Course.update_account_associations([self])
+    self.shard.activate do
+      Course.update_account_associations([self])
+    end
   end
 
   def associated_accounts

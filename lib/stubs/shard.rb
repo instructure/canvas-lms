@@ -38,6 +38,10 @@ class Shard
     Array(yield)
   end
 
+  def self.shard_for(object)
+    default
+  end
+
   def activate
     yield
   end

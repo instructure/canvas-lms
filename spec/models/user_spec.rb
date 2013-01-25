@@ -318,67 +318,109 @@ describe User do
     user.associated_root_accounts.should eql [account2]
   end
 
-  it "should support incrementally adding to account associations" do
-    user = User.create!
-    user.user_account_associations.should == []
-    account1, account2, account3 = Account.create!, Account.create!, Account.create!
+  describe "update_account_associations" do
+    it "should support incrementally adding to account associations" do
+      user = User.create!
+      user.user_account_associations.should == []
+      account1, account2, account3 = Account.create!, Account.create!, Account.create!
 
-    sort_account_associations = lambda { |a, b| a.keys.first <=> b.keys.first }
+      sort_account_associations = lambda { |a, b| a.keys.first <=> b.keys.first }
 
-    User.update_account_associations([user], :incremental => true, :precalculated_associations => {account1.id => 0})
-    user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.should == [{account1.id => 0}]
+      User.update_account_associations([user], :incremental => true, :precalculated_associations => {account1.id => 0})
+      user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.should == [{account1.id => 0}]
 
-    User.update_account_associations([user], :incremental => true, :precalculated_associations => {account2.id => 1})
-    user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.sort(&sort_account_associations).should == [{account1.id => 0}, {account2.id => 1}].sort(&sort_account_associations)
+      User.update_account_associations([user], :incremental => true, :precalculated_associations => {account2.id => 1})
+      user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.sort(&sort_account_associations).should == [{account1.id => 0}, {account2.id => 1}].sort(&sort_account_associations)
 
-    User.update_account_associations([user], :incremental => true, :precalculated_associations => {account3.id => 1, account1.id => 2, account2.id => 0})
-    user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.sort(&sort_account_associations).should == [{account1.id => 0}, {account2.id => 0}, {account3.id => 1}].sort(&sort_account_associations)
-  end
+      User.update_account_associations([user], :incremental => true, :precalculated_associations => {account3.id => 1, account1.id => 2, account2.id => 0})
+      user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.sort(&sort_account_associations).should == [{account1.id => 0}, {account2.id => 0}, {account3.id => 1}].sort(&sort_account_associations)
+    end
 
-  it "should not have account associations for creation_pending or deleted" do
-    user = User.create! { |u| u.workflow_state = 'creation_pending' }
-    user.should be_creation_pending
-    course = Course.create!
-    course.offer!
-    enrollment = course.enroll_student(user)
-    enrollment.should be_invited
-    user.user_account_associations.should == []
-    Account.default.add_user(user)
-    user.user_account_associations(true).should == []
-    user.pseudonyms.create!(:unique_id => 'test@example.com')
-    user.user_account_associations(true).should == []
-    user.update_account_associations
-    user.user_account_associations(true).should == []
-    user.register!
-    user.user_account_associations(true).map(&:account).should == [Account.default]
-    user.destroy
-    user.user_account_associations(true).should == []
-  end
+    it "should not have account associations for creation_pending or deleted" do
+      user = User.create! { |u| u.workflow_state = 'creation_pending' }
+      user.should be_creation_pending
+      course = Course.create!
+      course.offer!
+      enrollment = course.enroll_student(user)
+      enrollment.should be_invited
+      user.user_account_associations.should == []
+      Account.default.add_user(user)
+      user.user_account_associations(true).should == []
+      user.pseudonyms.create!(:unique_id => 'test@example.com')
+      user.user_account_associations(true).should == []
+      user.update_account_associations
+      user.user_account_associations(true).should == []
+      user.register!
+      user.user_account_associations(true).map(&:account).should == [Account.default]
+      user.destroy
+      user.user_account_associations(true).should == []
+    end
 
-  it "should not create/update account associations for student view student" do
-    account1 = account_model
-    account2 = account_model
-    course_with_teacher(:active_all => true)
-    @fake_student = @course.student_view_student
-    @fake_student.reload.user_account_associations.should be_empty
+    it "should not create/update account associations for student view student" do
+      account1 = account_model
+      account2 = account_model
+      course_with_teacher(:active_all => true)
+      @fake_student = @course.student_view_student
+      @fake_student.reload.user_account_associations.should be_empty
 
-    @course.account_id = account1.id
-    @course.save!
-    @fake_student.reload.user_account_associations.should be_empty
+      @course.account_id = account1.id
+      @course.save!
+      @fake_student.reload.user_account_associations.should be_empty
 
-    account1.parent_account = account2
-    account1.save!
-    @fake_student.reload.user_account_associations.should be_empty
+      account1.parent_account = account2
+      account1.save!
+      @fake_student.reload.user_account_associations.should be_empty
 
-    @course.complete!
-    @fake_student.reload.user_account_associations.should be_empty
+      @course.complete!
+      @fake_student.reload.user_account_associations.should be_empty
 
-    @fake_student = @course.reload.student_view_student
-    @fake_student.reload.user_account_associations.should be_empty
+      @fake_student = @course.reload.student_view_student
+      @fake_student.reload.user_account_associations.should be_empty
 
-    @section2 = @course.course_sections.create!(:name => "Other Section")
-    @fake_student = @course.reload.student_view_student
-    @fake_student.reload.user_account_associations.should be_empty
+      @section2 = @course.course_sections.create!(:name => "Other Section")
+      @fake_student = @course.reload.student_view_student
+      @fake_student.reload.user_account_associations.should be_empty
+    end
+
+    context "sharding" do
+      it_should_behave_like "sharding"
+
+      it "should create associations for a user in multiple shards" do
+        user
+        Account.site_admin.add_user(@user)
+        @user.user_account_associations.map(&:account).should == [Account.site_admin]
+
+        @shard1.activate do
+          @account = Account.create!
+          au = @account.add_user(@user)
+          @user.user_account_associations.with_each_shard.map(&:account).sort_by(&:id).should ==
+              [Account.site_admin, @account].sort_by(&:id)
+          @account.user_account_associations.map(&:user).should == [@user]
+
+          au.destroy
+
+          @user.user_account_associations.with_each_shard.map(&:account).should == [Account.site_admin]
+          @account.reload.user_account_associations.map(&:user).should == []
+
+          @account.add_user(@user)
+
+          @user.user_account_associations.with_each_shard.map(&:account).sort_by(&:id).should ==
+              [Account.site_admin, @account].sort_by(&:id)
+          @account.reload.user_account_associations.map(&:user).should == [@user]
+
+          UserAccountAssociation.delete_all
+        end
+        UserAccountAssociation.delete_all
+
+        @shard2.activate do
+          @user.update_account_associations
+
+          @user.user_account_associations.with_each_shard.map(&:account).sort_by(&:id).should ==
+              [Account.site_admin, @account].sort_by(&:id)
+          @account.reload.user_account_associations.map(&:user).should == [@user]
+        end
+      end
+    end
   end
 
   def create_course_with_student_and_assignment
