@@ -195,7 +195,9 @@ class SisBatch < ActiveRecord::Base
       scope = Enrollment.active.scoped(:include => :course, :select => "enrollments.*", :conditions => ["courses.root_account_id = ? and enrollments.sis_batch_id is not null and enrollments.sis_batch_id <> ?", self.account.id, self.id])
       scope = scope.scoped(:conditions => ["courses.enrollment_term_id = ?", self.batch_mode_term.id])
       scope.find_each do |enrollment|
-        enrollment.destroy
+        Enrollment.send(:with_exclusive_scope) do
+          enrollment.destroy
+        end
       end
     end
   end

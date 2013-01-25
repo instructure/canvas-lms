@@ -323,7 +323,7 @@ class User < ActiveRecord::Base
   end
 
   def update_account_associations_if_necessary
-    update_account_associations if !self.class.skip_updating_account_associations? && self.workflow_state_changed?
+    update_account_associations if !self.class.skip_updating_account_associations? && self.workflow_state_changed? && self.id_was
   end
 
   def update_account_associations(opts = {})
@@ -377,16 +377,19 @@ class User < ActiveRecord::Base
   #      User -> Pseudonym -> Account
   #   Through account_users
   #      User -> AccountUser -> Account
-  def calculate_account_associations(account_chain_cache = {})
-    return [] if %w{creation_pending deleted}.include?(self.workflow_state)
+  def self.calculate_account_associations(user, data, account_chain_cache)
+    return [] if %w{creation_pending deleted}.include?(user.workflow_state) || user.fake_student?
 
-    # Hopefully these have all been pre-loaded
-    starting_account_ids = self.enrollments.map { |e| e.workflow_state != 'deleted' ? [e.course_section.course.account_id, e.course_section.nonxlist_course.try(:account_id)] : nil }.flatten.compact
-    starting_account_ids += self.pseudonyms.map { |p| p.active? ? p.account_id : nil }.compact
-    starting_account_ids += self.account_users.map(&:account_id)
+    enrollments = data[:enrollments][user.id] || []
+    sections = enrollments.map { |e| data[:sections][e.course_section_id] }
+    courses = sections.map { |s| data[:courses][s.course_id] }
+    courses += sections.select(&:nonxlist_course_id).map { |s| data[:courses][s.nonxlist_course_id] }
+    starting_account_ids = courses.map(&:account_id)
+    starting_account_ids += (data[:pseudonyms][user.id] || []).map(&:account_id)
+    starting_account_ids += (data[:account_users][user.id] || []).map(&:account_id)
     starting_account_ids.uniq!
 
-    result = User.calculate_account_associations_from_accounts(starting_account_ids, account_chain_cache)
+    result = calculate_account_associations_from_accounts(starting_account_ids, account_chain_cache)
     result
   end
 
@@ -409,7 +412,45 @@ class User < ActiveRecord::Base
 
     user_ids = users_or_user_ids
     user_ids = user_ids.map(&:id) if user_ids.first.is_a?(User)
-    users_or_user_ids = User.find(:all, :conditions => {:id => user_ids}, :include => [:pseudonyms, :account_users, { :enrollments => { :course_section => [ :course, :nonxlist_course ] }}]) if !user_ids.first.is_a?(User) && !precalculated_associations
+    if !precalculated_associations
+      if !users_or_user_ids.first.is_a?(User)
+        users_or_user_ids = User.find(:all, :select => 'id, preferences, workflow_state', :conditions => {:id => user_ids})
+      end
+
+      # basically we're going to do a huge preload here, but custom sql to only load the columns we need
+      data = {}
+      data[:enrollments] = Enrollment.scoped(:conditions => "workflow_state<>'deleted' AND type<>'StudentViewEnrollment'").
+          find(:all, :select => 'DISTINCT user_id, course_id, course_section_id', :conditions => {:user_id => user_ids})
+
+      # probably a lot of dups, so more efficient to use a set then uniq an array
+      course_section_ids = Set.new
+      data[:enrollments].each { |e| course_section_ids << e.course_section_id }
+      # now make it easy to get the enrollments by user id
+      data[:enrollments] = data[:enrollments].group_by(&:user_id)
+      data[:sections] = CourseSection.
+          find(:all, :select => 'id, course_id, nonxlist_course_id',
+               :conditions => {:id => course_section_ids.to_a}) unless course_section_ids.empty?
+      data[:sections] ||= []
+      course_ids = Set.new
+      data[:sections].each do |s|
+        course_ids << s.course_id
+        course_ids << s.nonxlist_course_id if s.nonxlist_course_id
+      end
+      data[:sections] = data[:sections].index_by(&:id)
+      data[:courses] = Course.
+          find(:all, :select => 'id, account_id',
+               :conditions => {:id => course_ids.to_a}).
+           index_by(&:id) unless course_ids.empty?
+      data[:courses] ||= {}
+
+      data[:pseudonyms] = Pseudonym.active.
+          find(:all, :select => 'DISTINCT user_id, account_id', :conditions => {:user_id => user_ids}).
+          group_by(&:user_id)
+      data[:account_users] = AccountUser.
+          find(:all, :select => 'DISTINCT user_id, account_id', :conditions => {:user_id => user_ids}).
+          group_by(&:user_id)
+    end
+
     UserAccountAssociation.transaction do
       current_associations = {}
       to_delete = []
@@ -427,17 +468,14 @@ class User < ActiveRecord::Base
       users_or_user_ids.each do |user_id|
         if user_id.is_a? User
           user = user_id
-          user_id = user_id.id
+          user_id = user.id
         end
 
         account_ids_with_depth = precalculated_associations
         if account_ids_with_depth.nil?
           user ||= User.find(user_id)
-          account_ids_with_depth = user.calculate_account_associations(account_chain_cache)
+          account_ids_with_depth = calculate_account_associations(user, data, account_chain_cache)
         end
-
-        # we don't want student view students to have account associations.
-        next if user && user.fake_student?
 
         account_ids_with_depth.each do |account_id, depth|
           key = [user_id, account_id]
