@@ -114,14 +114,13 @@ class DelayedMessage < ActiveRecord::Base
     return nil unless context # the context for this message has already been deleted
     notification = Notification.by_name('Summaries')
     path = HostUrl.outgoing_email_address
-    message = notification.messages.build(
+    message = to.messages.build(
       :subject => notification.subject,
       :to => to.path,
       :body => notification.body,
       :notification_name => notification.name,
       :notification => notification,
       :from => path,
-      :communication_channel => to,
       :user => user
     )
     message.delayed_messages = delayed_messages

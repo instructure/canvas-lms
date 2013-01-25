@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe DelayedMessage do
   it "should create a new instance given valid attributes" do
@@ -123,7 +123,6 @@ describe DelayedMessage do
     Canvas::MessageHelper.create_notification('Summary', 'Summaries', 0, '', 'Summaries')
     account = Account.create!(:name => 'new acct')
     user = user_with_pseudonym(:account => account)
-    user.pseudonym.update_attribute(:account, account)
     user.pseudonym.account.should == account
     HostUrl.expects(:context_host).with(user.pseudonym.account).at_least(1).returns("dm.dummy.test.host")
     HostUrl.stubs(:default_host).returns("test.host")
@@ -132,6 +131,26 @@ describe DelayedMessage do
     message = Message.last
     message.body.to_s.should_not match(%r{http://test.host/})
     message.body.to_s.should match(%r{http://dm.dummy.test.host/})
+  end
+
+  context "sharding" do
+    it_should_behave_like "sharding"
+
+    it "should create messages on the user's shard" do
+      Canvas::MessageHelper.create_notification('Summary', 'Summaries', 0, '', 'Summaries')
+
+      @shard1.activate do
+        account = Account.create!(:name => 'new acct')
+        user = user_with_pseudonym(:account => account)
+        user.pseudonym.account.should == account
+        HostUrl.expects(:context_host).with(user.pseudonym.account).at_least(1).returns("dm.dummy.test.host")
+        HostUrl.stubs(:default_host).returns("test.host")
+        dm = DelayedMessage.create!(:summary => "This is a notification", :context => Account.default, :communication_channel => user.communication_channel, :notification => notification_model)
+        DelayedMessage.summarize([dm])
+      end
+      @cc.messages.last.should_not be_nil
+      @cc.messages.last.shard.should == @shard1
+    end
   end
 
   describe "set_send_at" do
