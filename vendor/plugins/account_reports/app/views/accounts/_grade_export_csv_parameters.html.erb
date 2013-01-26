@@ -1,17 +1,4 @@
 <table>
-  <tr>
-    <!--Select the term to run the grade export report on, or default to all terms-->
-    <td><%= t('account_reports.default.parameters.header', %{Term}) %></td>
-    <td>
-      <select name="parameters[enrollment_term]">
-      <option value="" <%= 'selected' unless @term %>><%= t(:all_terms, "All Terms") %></option>
-      <% @root_account.enrollment_terms.active.each do |term| %>
-        <option value="<%= term.id %>" <%= 'selected' if term == @term %>><%= term.name %></option>
-      <% end %>
-    </select>
-    </td>
-  </tr>
-  <tr>
-    <td><%= t('account_reports.default.parameters.note', %{Courses with muted assignments may not accurately reflect scores in this report.}) %></td>
-  </tr>
+  <%=  render :partial => 'terms_parameters', :locals => { :all_terms_option => true } %>
+  <%=  render :partial => 'include_deleted_parameter' %>
 </table>

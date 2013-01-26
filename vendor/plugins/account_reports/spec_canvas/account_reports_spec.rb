@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2012 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,316 +19,352 @@
 require File.expand_path(File.dirname(__FILE__) + '/reports_helper')
 
 describe "Default Account Reports" do
-
-  it "should run the Student Competency report" do
+  before(:each) do
     Notification.find_or_create_by_name("Report Generated")
     Notification.find_or_create_by_name("Report Generation Failed")
-
-    @course = Course.new(:name => 'English 101', :course_code => 'ENG101', :account => @account)
-    @course.save
-    @course.sis_source_id = "SIS_COURSE_ID_1"
-    @course.save!
-    @course.offer!
     @account = Account.default
-    @student = user_with_pseudonym(:active_all => true, :account => @account, :name => "John St. Clair", :sortable_name => "St. Clair, John", :username => 'john@stclair.com')
-    @user.pseudonym.sis_user_id = "user_sis_id_01"
-    @user.pseudonym.save!
-    @student1 = user_with_pseudonym(:active_all => true, :username => 'micheal@michaelbolton.com', :name => 'Michael Bolton', :account => @account)
-    @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
-    @course.enroll_user(@student1, "StudentEnrollment", :enrollment_state => 'active')
-    assignment_model(:course => @course, :title => 'Engrish Assignment')
-    @outcome = @account.created_learning_outcomes.create!(:short_description => 'Spelling')
-    @rubric = Rubric.create!(:context => @course)
-    @rubric.data = [
-      {
-        :points => 3,
-        :description => "Outcome row",
-        :id => 1,
-        :ratings => [
-          {
-            :points => 3,
-            :description => "Rockin'",
-            :criterion_id => 1,
-            :id => 2
-          },
-          {
-            :points => 0,
-            :description => "Lame",
-            :criterion_id => 1,
-            :id => 3
-          }
-        ],
-        :learning_outcome_id => @outcome.id
+    @default_term = @account.enrollment_terms.active.find_or_create_by_name(EnrollmentTerm::DEFAULT_TERM_NAME)
+  end
 
-      }
-    ]
-    @rubric.instance_variable_set('@alignments_changed', true)
-    @rubric.save!
-    @a = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
-    @assignment.reload
-    @submission = @assignment.grade_student(@student, :grade => "10").first
-    @submission.submission_type = 'online_url'
-    @submission.submitted_at = 1.week.ago
-    submission = @submission
-    @submission.save!
-    @assessment = @a.assess({
-                              :user => @student,
-                              :assessor => @user,
-                              :artifact => @submission,
-                              :assessment => {
-                                :assessment_type => 'grading',
-                                :criterion_1 => {
-                                  :points => 2,
-                                  :comments => "cool, yo"
+  describe "Student Competency report" do
+    before(:each) do
+      @term1 = EnrollmentTerm.create(:name => 'Fall', :start_at => 6.months.ago, :end_at => 1.year.from_now)
+      @term1.root_account = @account
+      @term1.sis_source_id = 'fall12'
+      @term1.save!
+      @course = Course.new(:name => 'English 101', :course_code => 'ENG101', :account => @account)
+      @course.save
+      @course.sis_source_id = "SIS_COURSE_ID_1"
+      @course.save!
+      @course.offer!
+      @account = Account.default
+      @student = user_with_pseudonym(:active_all => true, :account => @account, :name => "John St. Clair", :sortable_name => "St. Clair, John", :username => 'john@stclair.com')
+      @user.pseudonym.sis_user_id = "user_sis_id_01"
+      @user.pseudonym.save!
+      @student1 = user_with_pseudonym(:active_all => true, :username => 'micheal@michaelbolton.com', :name => 'Michael Bolton', :account => @account)
+      @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
+      @enrollment2 = @course.enroll_user(@student1, "StudentEnrollment", :enrollment_state => 'active')
+      assignment_model(:course => @course, :title => 'Engrish Assignment')
+      @outcome = @account.created_learning_outcomes.create!(:short_description => 'Spelling')
+      @rubric = Rubric.create!(:context => @course)
+      @rubric.data = [
+        {
+          :points => 3,
+          :description => "Outcome row",
+          :id => 1,
+          :ratings => [
+            {
+              :points => 3,
+              :description => "Rockin'",
+              :criterion_id => 1,
+              :id => 2
+            },
+            {
+              :points => 0,
+              :description => "Lame",
+              :criterion_id => 1,
+              :id => 3
+            }
+          ],
+          :learning_outcome_id => @outcome.id
+
+        }
+      ]
+      @rubric.instance_variable_set('@alignments_changed', true)
+      @rubric.save!
+      @a = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
+      @assignment.reload
+      @submission = @assignment.grade_student(@student, :grade => "10").first
+      @submission.submission_type = 'online_url'
+      @submission.submitted_at = 1.week.ago
+      submission = @submission
+      @submission.save!
+      @assessment = @a.assess({
+                                :user => @student,
+                                :assessor => @user,
+                                :artifact => @submission,
+                                :assessment => {
+                                  :assessment_type => 'grading',
+                                  :criterion_1 => {
+                                    :points => 2,
+                                    :comments => "cool, yo"
+                                  }
                                 }
-                              }
-                            })
-    @outcome.reload
+                              })
+      @outcome.reload
 
-    parsed = ReportsSpecHelper.run_report(@account,'student_assignment_outcome_map_csv',{},1)
-    parsed.length.should == 2
+    end
 
-    parsed[0][0].should == @student.sortable_name
-    parsed[0][1].should == @student.id.to_s
-    parsed[0][2].should == "user_sis_id_01"
-    parsed[0][3].should == @assignment.title
-    parsed[0][4].should == @assignment.id.to_s
-    parsed[0][5].should == @submission.submitted_at.iso8601
-    parsed[0][6].should == @submission.grade.to_s
-    parsed[0][7].should == @outcome.short_description
-    parsed[0][8].should == @outcome.id.to_s
-    parsed[0][9].should == '1'
-    parsed[0][10].should == '2'
-    parsed[0][11].should == @course.name
-    parsed[0][12].should == @course.id.to_s
-    parsed[0][13].should == @course.sis_course_id
-    parsed[0][14].should == "https://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments/#{@assignment.id}"
+    it "should run the Student Competency report" do
 
-    parsed[1][0].should == @student1.sortable_name
-    parsed[1][1].should == @student1.id.to_s
-    parsed[1][2].should == nil
-    parsed[1][3].should == @assignment.title
-    parsed[1][4].should == @assignment.id.to_s
-    parsed[1][5].should == nil
-    parsed[1][6].should == nil
-    parsed[1][7].should == @outcome.short_description
-    parsed[1][8].should == @outcome.id.to_s
-    parsed[1][9].should == nil
-    parsed[1][10].should == nil
-    parsed[1][11].should == @course.name
-    parsed[1][12].should == @course.id.to_s
-    parsed[0][13].should == @course.sis_course_id
-    parsed[1][14].should == "https://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments/#{@assignment.id}"
+      parsed = ReportsSpecHelper.run_report(@account,'student_assignment_outcome_map_csv',{},1)
+      parsed.length.should == 2
 
+      parsed[0][0].should == @student.sortable_name
+      parsed[0][1].should == @student.id.to_s
+      parsed[0][2].should == "user_sis_id_01"
+      parsed[0][3].should == @assignment.title
+      parsed[0][4].should == @assignment.id.to_s
+      parsed[0][5].should == @submission.submitted_at.iso8601
+      parsed[0][6].should == @submission.grade.to_s
+      parsed[0][7].should == @outcome.short_description
+      parsed[0][8].should == @outcome.id.to_s
+      parsed[0][9].should == '1'
+      parsed[0][10].should == '2'
+      parsed[0][11].should == @course.name
+      parsed[0][12].should == @course.id.to_s
+      parsed[0][13].should == @course.sis_course_id
+      parsed[0][14].should == "https://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      parsed[1][0].should == @student1.sortable_name
+      parsed[1][1].should == @student1.id.to_s
+      parsed[1][2].should == nil
+      parsed[1][3].should == @assignment.title
+      parsed[1][4].should == @assignment.id.to_s
+      parsed[1][5].should == nil
+      parsed[1][6].should == nil
+      parsed[1][7].should == @outcome.short_description
+      parsed[1][8].should == @outcome.id.to_s
+      parsed[1][9].should == nil
+      parsed[1][10].should == nil
+      parsed[1][11].should == @course.name
+      parsed[1][12].should == @course.id.to_s
+      parsed[1][13].should == @course.sis_course_id
+      parsed[1][14].should == "https://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+    end
+
+    it "should run the Student Competency report on a term" do
+
+      parameters = {}
+      parameters["enrollment_term"] = @term1.id
+      parsed = ReportsSpecHelper.run_report(@account,'student_assignment_outcome_map_csv',parameters)
+      parsed.length.should == 1
+      parsed[0].should == ["No outcomes found"]
+
+    end
+
+    it "should run the Student Competency report on a sub account" do
+      sub_account = Account.create(:parent_account => @account, :name => 'English')
+
+      parameters = {}
+      parsed = ReportsSpecHelper.run_report(sub_account,'student_assignment_outcome_map_csv',parameters)
+      parsed.length.should == 1
+      parsed[0].should == ["No outcomes found"]
+
+    end
+
+    it "should run the Student Competency report on a sub account with courses" do
+      sub_account = Account.create(:parent_account => @account, :name => 'English')
+      @course.account = sub_account
+      @course.save!
+      @outcome.context_id = sub_account.id
+      @outcome.save!
+
+      param = {}
+      parsed = ReportsSpecHelper.run_report(sub_account,'student_assignment_outcome_map_csv',param,1)
+      parsed.length.should == 2
+      parsed[0].should == [@student.sortable_name, @student.id.to_s, "user_sis_id_01", @assignment.title, @assignment.id.to_s,
+                           @submission.submitted_at.iso8601, @submission.grade.to_s, @outcome.short_description,
+                           @outcome.id.to_s, '1', '2', @course.name, @course.id.to_s, @course.sis_course_id,
+                           "https://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments/#{@assignment.id}"]
+
+      parsed[1].should == [@student1.sortable_name, @student1.id.to_s, nil, @assignment.title, @assignment.id.to_s, nil, nil,
+                           @outcome.short_description, @outcome.id.to_s, nil, nil, @course.name, @course.id.to_s, @course.sis_course_id,
+                           "https://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments/#{@assignment.id}"]
+
+    end
+
+    it "should run the Student Competency report with deleted enrollments" do
+      @enrollment2.destroy
+
+      param = {}
+      param["include_deleted"] = true
+      parsed = ReportsSpecHelper.run_report(@account,'student_assignment_outcome_map_csv',param,1)
+      parsed.length.should == 2
+
+      parsed[0].should == [@student.sortable_name, @student.id.to_s, "user_sis_id_01", @assignment.title, @assignment.id.to_s,
+                           @submission.submitted_at.iso8601, @submission.grade.to_s, @outcome.short_description,
+                           @outcome.id.to_s, '1', '2', @course.name, @course.id.to_s, @course.sis_course_id,
+                           "https://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments/#{@assignment.id}"]
+
+      parsed[1].should == [@student1.sortable_name, @student1.id.to_s, nil, @assignment.title, @assignment.id.to_s, nil, nil,
+                           @outcome.short_description, @outcome.id.to_s, nil, nil, @course.name, @course.id.to_s, @course.sis_course_id,
+                           "https://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments/#{@assignment.id}"]
+
+    end
   end
 
   # The report should get all the grades for the term provided
   # create 2 courses each with students
   # have a student in both courses
   # have sis id's and not sis ids
+  describe "Grade Export report" do
+    before(:each) do
+      @term1 = EnrollmentTerm.create(:name => 'Fall', :start_at => 6.months.ago, :end_at => 1.year.from_now)
+      @term1.root_account = @account
+      @term1.sis_source_id = 'fall12'
+      @term1.save!
+      @user1 = user_with_managed_pseudonym(:active_all => true, :account => @account, :name => "John St. Clair",
+                                           :sortable_name => "St. Clair, John", :username => 'john@stclair.com',
+                                           :sis_user_id => "user_sis_id_01")
+      @user2 = user_with_managed_pseudonym(:active_all => true, :username => 'micheal@michaelbolton.com',
+                                           :name => 'Michael Bolton', :account => @account,
+                                           :sis_user_id => "user_sis_id_02")
+      @user3 = user_with_managed_pseudonym(:active_all => true, :account => @account, :name => "Rick Astley",
+                                           :sortable_name => "Astley, Rick", :username => 'rick@roll.com',
+                                           :sis_user_id => "user_sis_id_03")
+      @user4 = user_with_managed_pseudonym(:active_all => true, :username => 'jason@donovan.com',
+                                           :name => 'Jason Donovan', :account => @account,
+                                           :sis_user_id => "user_sis_id_04")
 
-  it "should run grade export"do
-    Notification.find_or_create_by_name("Report Generated")
-    Notification.find_or_create_by_name("Report Generation Failed")
-    @account = Account.default
-    term1 = EnrollmentTerm.create(:name => 'Fall', :start_at => '20-08-2012', :end_at => '20-12-2012')
-    term1.root_account = @account
-    term1.sis_source_id = 'fall12'
-    term1.save!
-    student_in_course(:course => @course, :active_all => true, :name => 'Luke Skywalker')
-    course1 = @course
-    course1.sis_source_id = "SISr2d2"
-    course1.name = 'robotics 101'
-    course1.enrollment_term_id = term1.id
-    course1.save
-    student0 = @student
-    @pseudonym = pseudonym(@student)
-    #this user should be second in the report
-    student0.pseudonym.sis_user_id = 'xwing001'
-    student0.pseudonym.save!
-    @student1 = User.create(:name => 'Bilbo Baggins')
-    @pseudonym = pseudonym(@student1, :username => 'bilbo@example.com')
-    # this user should be first in the report
-    @student1.pseudonym.sis_user_id = 'shire111'
-    @student1.pseudonym.save!
-    course1.enroll_user(@student1, "StudentEnrollment", :enrollment_state => 'active')
-    assignment_model(:course => course1, :title => 'Engrish Assignment')
-    @assignment.reload
-    @submission = @assignment.grade_student(student0, :grade => "1.46").first
-    @submission.save!
-    #create a concluded enrollment in the first course that should not show up
-    @student2 = User.create(:name => 'dead guy')
-    @pseudonym2 = pseudonym(@student2, :username => 'concluded@example.com')
-    @student2.pseudonym.sis_user_id = 'qwertyui23'
-    @student2.pseudonym.save!
-    course1.enroll_user(@student2, "StudentEnrollment", :enrollment_state => 'invited')
+      @course1 = Course.new(:name => 'English 101', :course_code => 'ENG101', :account => @account)
+      @course1.workflow_state = 'available'
+      @course1.enrollment_term_id = @term1.id
+      @course1.sis_source_id = "SIS_COURSE_ID_1"
+      @course1.save!
+      @course2 = course(:course_name => 'Math 101', :account => @account, :active_course => true)
+      @enrollment1 = @course1.enroll_user(@user1, 'StudentEnrollment', :enrollment_state => :active)
+      @enrollment1.computed_final_score = 88
+      @enrollment1.save!
+      @enrollment2 = @course1.enroll_user(@user2, 'StudentEnrollment', :enrollment_state => :active)
+      @enrollment2.computed_final_score = 90
+      @enrollment2.save!
+      @enrollment3 = @course2.enroll_user(@user2, 'StudentEnrollment', :enrollment_state => :active)
+      @enrollment3.computed_final_score = 93
+      @enrollment3.save!
+      @enrollment4 = @course1.enroll_user(@user3, 'StudentEnrollment', :enrollment_state => :active)
+      @enrollment4.computed_final_score = 97
+      @enrollment4.save!
+      @enrollment5 = @course2.enroll_user(@user4, 'StudentEnrollment', :enrollment_state => :active)
+      @enrollment5.computed_final_score = 99
+      @enrollment5.save!
+    end
 
-    #this user should be last in the report because no sis id
-    course_with_teacher(:account => @account, :active_all => true, :course_name => "course1")
-    course2 = @course
-    course2.sis_source_id = "haha"
-    course2.save
-    student_in_course(:course => course2, :active_all => true)
-    # student0 should have two courses, rows 2 and 3
-    course2.enroll_user(student0, "StudentEnrollment", :enrollment_state => 'active')
+    it "should run grade export for a term" do
 
-    enrollment1 = student0.enrollments.find_by_course_id(course1.id)
-    enrollment1.computed_final_score = 88
-    enrollment1.save!
-    enrollment2 = @student1.enrollments.first
-    enrollment2.computed_final_score = 90
-    enrollment2.save!
-    enrollment3 = @student.enrollments.first
-    enrollment3.computed_final_score = 93
-    enrollment3.save!
-    enrollment4 = student0.enrollments.find_by_course_id(course2.id)
-    enrollment4.computed_final_score = 98
-    enrollment4.save!
+      parameters = {}
+      parameters["enrollment_term"] = @term1.id
+      parsed = ReportsSpecHelper.run_report(@account,'grade_export_csv',parameters,13)
+      parsed.length.should == 3
 
-    #should run for term1
-    parameters = {}
-    parameters["enrollment_term"] = term1.id
-    parsed = ReportsSpecHelper.run_report(@account,'grade_export_csv',parameters,13)
-    parsed.length.should == 2
+      parsed[0].should == ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
+                           "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
+                           @term1.id.to_s, "fall12", nil, "88"]
+      parsed[1].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "English 101", @course1.id.to_s,
+                           "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
+                           @term1.id.to_s, "fall12", nil, "90"]
+      parsed[2].should == ["Rick Astley", @user3.id.to_s, "user_sis_id_03", "English 101", @course1.id.to_s,
+                           "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
+                           @term1.id.to_s, "fall12", nil, "97"]
+    end
 
-    parsed[0][0].should == student0.name
-    parsed[0][1].should == student0.id.to_s
-    parsed[0][2].should == student0.sis_user_id.to_s
-    parsed[0][3].should == course1.name
-    parsed[0][4].should == course1.id.to_s
-    parsed[0][5].should == course1.sis_source_id.to_s
-    course_section = course1.course_sections.first
-    parsed[0][6].should == course_section.name
-    parsed[0][7].should == course_section.id.to_s
-    parsed[0][8].to_s.should == course_section.sis_source_id.to_s
-    parsed[0][9].should == course1.enrollment_term.name
-    parsed[0][10].should == course1.enrollment_term.id.to_s
-    parsed[0][11].to_s.should == course1.enrollment_term.sis_source_id.to_s
-    parsed[0][12].to_s.should == enrollment1.computed_current_score.to_s
-    parsed[0][13].to_s.should == enrollment1.computed_final_score.to_s
+    it "should run grade export for a term using sis_id" do
 
-    parsed[1][0].should == @student1.name
-    parsed[1][1].should == @student1.id.to_s
-    parsed[1][2].should == @student1.sis_user_id.to_s
-    parsed[1][3].should == course1.name
-    parsed[1][4].should == course1.id.to_s
-    parsed[1][5].should == course1.sis_source_id.to_s
-    parsed[1][6].should == @student1.enrollments.first.course_section.name
-    parsed[1][7].should == @student1.enrollments.first.course_section.id.to_s
-    parsed[1][8].to_s.should == @student1.enrollments.first.course_section.sis_source_id.to_s
-    parsed[1][9].should == course1.enrollment_term.name
-    parsed[1][10].should == course1.enrollment_term.id.to_s
-    parsed[1][11].to_s.should == course1.enrollment_term.sis_source_id.to_s
-    parsed[1][12].to_s.should == enrollment2.computed_current_score.to_s
-    parsed[1][13].to_s.should == enrollment2.computed_final_score.to_s
+      parameters = {}
+      parameters["enrollment_term"] = "sis_term_id:fall12"
+      parsed = ReportsSpecHelper.run_report(@account,'grade_export_csv',parameters,13)
 
-    #should accept sis term ids
-    parameters = {}
-    parameters["enrollment_term"] = "sis_term_id:fall12"
-    parsed = ReportsSpecHelper.run_report(@account,'grade_export_csv',parameters,13)
-    parsed.length.should == 2
+      parsed[0].should == ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
+                           "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
+                           @term1.id.to_s, "fall12", nil, "88"]
+      parsed[1].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "English 101", @course1.id.to_s,
+                           "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
+                           @term1.id.to_s, "fall12", nil, "90"]
+      parsed[2].should == ["Rick Astley", @user3.id.to_s, "user_sis_id_03", "English 101", @course1.id.to_s,
+                           "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
+                           @term1.id.to_s, "fall12", nil, "97"]
+    end
 
-    parsed[0][0].should == student0.name
-    parsed[0][1].should == student0.id.to_s
-    parsed[0][2].should == student0.sis_user_id.to_s
-    parsed[0][3].should == course1.name
-    parsed[0][4].should == course1.id.to_s
-    parsed[0][5].should == course1.sis_source_id.to_s
-    course_section = course1.course_sections.first
-    parsed[0][6].should == course_section.name
-    parsed[0][7].should == course_section.id.to_s
-    parsed[0][8].to_s.should == course_section.sis_source_id.to_s
-    parsed[0][9].should == course1.enrollment_term.name
-    parsed[0][10].should == course1.enrollment_term.id.to_s
-    parsed[0][11].to_s.should == course1.enrollment_term.sis_source_id.to_s
-    parsed[0][12].to_s.should == enrollment1.computed_current_score.to_s
-    parsed[0][13].to_s.should == enrollment1.computed_final_score.to_s
+    it "should run grade export with no parameters" do
 
-    parsed[1][0].should == @student1.name
-    parsed[1][1].should == @student1.id.to_s
-    parsed[1][2].should == @student1.sis_user_id.to_s
-    parsed[1][3].should == course1.name
-    parsed[1][4].should == course1.id.to_s
-    parsed[1][5].should == course1.sis_source_id.to_s
-    parsed[1][6].should == @student1.enrollments.first.course_section.name
-    parsed[1][7].should == @student1.enrollments.first.course_section.id.to_s
-    parsed[1][8].to_s.should == @student1.enrollments.first.course_section.sis_source_id.to_s
-    parsed[1][9].should == course1.enrollment_term.name
-    parsed[1][10].should == course1.enrollment_term.id.to_s
-    parsed[1][11].to_s.should == course1.enrollment_term.sis_source_id.to_s
-    parsed[1][12].to_s.should == enrollment2.computed_current_score.to_s
-    parsed[1][13].to_s.should == enrollment2.computed_final_score.to_s
+      parsed = ReportsSpecHelper.run_report(@account,'grade_export_csv',{},13)
+      parsed.length.should == 5
 
-    #should run for all terms.
-    parameters = {}
-    parsed = ReportsSpecHelper.run_report(@account,'grade_export_csv',parameters,13)
-    parsed.length.should == 4
+      parsed[0].should == ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
+                           "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
+                           @term1.id.to_s, "fall12", nil, "88"]
+      parsed[1].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "English 101", @course1.id.to_s,
+                           "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
+                           @term1.id.to_s, "fall12", nil, "90"]
+      parsed[2].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "Math 101", @course2.id.to_s,
+                           nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
+                           @default_term.id.to_s, nil, nil, "93"]
+      parsed[3].should == ["Rick Astley", @user3.id.to_s, "user_sis_id_03", "English 101", @course1.id.to_s,
+                           "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
+                           @term1.id.to_s, "fall12", nil, "97"]
+      parsed[4].should == ["Jason Donovan", @user4.id.to_s, "user_sis_id_04", "Math 101", @course2.id.to_s,
+                           nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
+                           @default_term.id.to_s, nil, nil, "99"]
+    end
 
-    parsed[0][0].should == student0.name
-    parsed[0][1].should == student0.id.to_s
-    parsed[0][2].should == student0.sis_user_id.to_s
-    parsed[0][3].should == course1.name
-    parsed[0][4].should == course1.id.to_s
-    parsed[0][5].should == course1.sis_source_id.to_s
-    course_section = course1.course_sections.first
-    parsed[0][6].should == course_section.name
-    parsed[0][7].should == course_section.id.to_s
-    parsed[0][8].to_s.should == course_section.sis_source_id.to_s
-    parsed[0][9].should == course1.enrollment_term.name
-    parsed[0][10].should == course1.enrollment_term.id.to_s
-    parsed[0][11].to_s.should == course1.enrollment_term.sis_source_id.to_s
-    parsed[0][12].to_s.should == enrollment1.computed_current_score.to_s
-    parsed[0][13].to_s.should == enrollment1.computed_final_score.to_s
+    it "should run grade export with empty string parameter" do
 
-    parsed[1][0].should == @student1.name
-    parsed[1][1].should == @student1.id.to_s
-    parsed[1][2].should == @student1.sis_user_id.to_s
-    parsed[1][3].should == course1.name
-    parsed[1][4].should == course1.id.to_s
-    parsed[1][5].should == course1.sis_source_id.to_s
-    parsed[1][6].should == @student1.enrollments.first.course_section.name
-    parsed[1][7].should == @student1.enrollments.first.course_section.id.to_s
-    parsed[1][8].to_s.should == @student1.enrollments.first.course_section.sis_source_id.to_s
-    parsed[1][9].should == course1.enrollment_term.name
-    parsed[1][10].should == course1.enrollment_term.id.to_s
-    parsed[1][11].to_s.should == course1.enrollment_term.sis_source_id.to_s
-    parsed[1][12].to_s.should == enrollment2.computed_current_score.to_s
-    parsed[1][13].to_s.should == enrollment2.computed_final_score.to_s
+      parameters = {}
+      parameters["enrollment_term"] = ""
+      parsed = ReportsSpecHelper.run_report(@account,'grade_export_csv',parameters,13)
+      parsed.length.should == 5
 
-    parsed[2][0].should == @student.name
-    parsed[2][1].should == @student.id.to_s
-    parsed[2][2].to_s.should == @student.sis_user_id.to_s
-    parsed[2][3].should == course2.name
-    parsed[2][4].should == course2.id.to_s
-    parsed[2][5].should == course2.sis_source_id.to_s
-    parsed[2][6].should == @student.enrollments.last.course_section.name
-    parsed[2][7].should == @student.enrollments.last.course_section.id.to_s
-    parsed[2][8].to_s.should == @student.enrollments.last.course_section.sis_source_id.to_s
-    parsed[2][9].should == course2.enrollment_term.name
-    parsed[2][10].should == course2.enrollment_term.id.to_s
-    parsed[2][11].to_s.should == course2.enrollment_term.sis_source_id.to_s
-    parsed[2][12].to_s.should == enrollment3.computed_current_score.to_s
-    parsed[2][13].to_s.should == enrollment3.computed_final_score.to_s
+      parsed[0].should == ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
+                           "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
+                           @term1.id.to_s, "fall12", nil, "88"]
+      parsed[1].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "English 101", @course1.id.to_s,
+                           "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
+                           @term1.id.to_s, "fall12", nil, "90"]
+      parsed[2].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "Math 101", @course2.id.to_s,
+                           nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
+                           @default_term.id.to_s, nil, nil, "93"]
+      parsed[3].should == ["Rick Astley", @user3.id.to_s, "user_sis_id_03", "English 101", @course1.id.to_s,
+                           "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
+                           @term1.id.to_s, "fall12", nil, "97"]
+      parsed[4].should == ["Jason Donovan", @user4.id.to_s, "user_sis_id_04", "Math 101", @course2.id.to_s,
+                           nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
+                           @default_term.id.to_s, nil, nil, "99"]
+    end
 
-    parsed[3][0].should == student0.name
-    parsed[3][1].should == student0.id.to_s
-    parsed[3][2].should == student0.sis_user_id.to_s
-    parsed[3][3].should == course2.name
-    parsed[3][4].should == course2.id.to_s
-    parsed[3][5].should == course2.sis_source_id.to_s
-    parsed[3][6].should == course2.course_sections.first.name
-    parsed[3][7].should == course2.course_sections.first.id.to_s
-    parsed[3][8].to_s.should == course2.course_sections.first.sis_source_id.to_s
-    parsed[3][9].should == course2.enrollment_term.name
-    parsed[3][10].should == course2.enrollment_term.id.to_s
-    parsed[3][11].to_s.should == course2.enrollment_term.sis_source_id.to_s
-    parsed[3][12].to_s.should == enrollment4.computed_current_score.to_s
-    parsed[3][13].to_s.should == enrollment4.computed_final_score.to_s
+    it "should run grade export with deleted users" do
 
-    parameters = {}
-    parameters["enrollment_term"] = ""
-    parsed = ReportsSpecHelper.run_report(@account,'grade_export_csv',parameters,13)
-    parsed.length.should == 4
+      @course2.destroy
+      @enrollment1.destroy
+
+      parameters = {}
+      parameters["include_deleted"] = true
+      parsed = ReportsSpecHelper.run_report(@account,'grade_export_csv',parameters,13)
+      parsed.length.should == 5
+
+      parsed[0].should == ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
+                           "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
+                           @term1.id.to_s, "fall12", nil, "88"]
+      parsed[1].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "English 101", @course1.id.to_s,
+                           "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
+                           @term1.id.to_s, "fall12", nil, "90"]
+      parsed[2].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "Math 101", @course2.id.to_s,
+                           nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
+                           @default_term.id.to_s, nil, nil, "93"]
+      parsed[3].should == ["Rick Astley", @user3.id.to_s, "user_sis_id_03", "English 101", @course1.id.to_s,
+                           "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
+                           @term1.id.to_s, "fall12", nil, "97"]
+      parsed[4].should == ["Jason Donovan", @user4.id.to_s, "user_sis_id_04", "Math 101", @course2.id.to_s,
+                           nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
+                           @default_term.id.to_s, nil, nil, "99"]
+    end
+
+    it "should run grade export on a sub account" do
+      sub_account = Account.create(:parent_account => @account, :name => 'English')
+      @course2.account = sub_account
+      @course2.save!
+
+      parameters = {}
+      parsed = ReportsSpecHelper.run_report(sub_account,'grade_export_csv',parameters,13)
+      parsed.length.should == 2
+
+      parsed[0].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "Math 101", @course2.id.to_s,
+                           nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
+                           @default_term.id.to_s, nil, nil, "93"]
+      parsed[1].should == ["Jason Donovan", @user4.id.to_s, "user_sis_id_04", "Math 101", @course2.id.to_s,
+                           nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
+                           @default_term.id.to_s, nil, nil, "99"]
+    end
   end
 
   it "should find the default module and configured reports" do

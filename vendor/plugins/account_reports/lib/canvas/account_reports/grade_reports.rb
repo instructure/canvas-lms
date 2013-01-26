@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2012 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -26,7 +26,8 @@ module Canvas::AccountReports
       @account_report = account_report
       @account = @account_report.account
       @domain_root_account = @account.root_account
-      @term = api_find(@account.enrollment_terms, @account_report.parameters["enrollment_term"]) if @account_report.parameters && @account_report.parameters["enrollment_term"].presence
+      @term = api_find(@domain_root_account.enrollment_terms, @account_report.parameters["enrollment_term"]) if @account_report.has_parameter? "enrollment_term"
+      @include_deleted = @account_report.parameters["include_deleted"]  if @account_report.has_parameter? "include_deleted"
     end
 
     # retrieve the list of students for all active courses
@@ -47,7 +48,7 @@ module Canvas::AccountReports
     # - outcome result score
     def student_assignment_outcome_map
       parameters = {
-        :account_id => @account.id, 
+        :account_id => @account.id,
         :root_account_id => @domain_root_account.id
       }
       # believe it or not, we need two scopes here, one before the .active,
@@ -55,8 +56,7 @@ module Canvas::AccountReports
       # the Account#pseudonyms association, and one after the .active, to
       # actually perform the query.
       students = @domain_root_account.pseudonyms.
-        scoped(:include => { :exclude => :user }).active.
-        scoped(
+        scoped(:include => { :exclude => :user }).scoped(
         :select => %{
           pseudonyms.id,
           u.sortable_name        AS "student name",
@@ -80,18 +80,13 @@ module Canvas::AccountReports
           INNER JOIN (
             SELECT user_id, course_id
             FROM enrollments
-            WHERE workflow_state = 'active'
-            AND type = 'StudentEnrollment'
+            WHERE type = 'StudentEnrollment'
             AND root_account_id = :root_account_id
+            " + (@include_deleted ? "" :"AND workflow_state = 'active'") + "
             GROUP BY user_id, course_id
           ) e ON pseudonyms.user_id = e.user_id
           INNER JOIN courses c ON c.id = e.course_id
-          INNER JOIN (
-            SELECT course_id, account_id
-            FROM course_account_associations
-            WHERE account_id = :account_id
-            GROUP BY course_id, account_id
-          ) caa ON c.id = caa.course_id
+            AND c .root_account_id = :root_account_id
           INNER JOIN assignments a ON (a.context_id = c.id AND a.context_type = 'Course')
           INNER JOIN content_tags ct ON (ct.content_id = a.id AND ct.content_type = 'Assignment')
           INNER JOIN learning_outcomes lo ON (
@@ -103,11 +98,19 @@ module Canvas::AccountReports
           LEFT JOIN submissions sub ON sub.assignment_id = a.id
             AND sub.user_id = pseudonyms.user_id", parameters]),
         :conditions => "
-          c.workflow_state = 'available'
-          AND ct.tag_type = 'learning_outcome'
+          ct.tag_type = 'learning_outcome'
           AND ct.workflow_state != 'deleted'"
       )
-
+      students = students.scoped(:conditions => "pseudonyms.workflow_state != 'deleted'
+                                                 AND c.workflow_state = 'available'") unless @include_deleted
+      students = students.scoped(:conditions => ["c.enrollment_term_id=?", @term.id]) if @term
+      if @account.id != @domain_root_account.id
+        students = students.scoped(:conditions => ["EXISTS (SELECT course_id
+                                                            FROM course_account_associations caa
+                                                            WHERE caa.account_id = ?
+                                                            AND caa.course_id=c.id
+                                                            )", @account.id])
+      end
 
       total = students.count
       i = 0
@@ -125,7 +128,7 @@ module Canvas::AccountReports
             "https://#{host}" +
               "/courses/#{row['course id']}" +
               "/assignments/#{row['assignment id']}"
-          row['submission date'] = default_timezone_format(row['submission date'], @account)
+          row['submission date'] = default_timezone_format(row['submission date'])
           csv << headers.map { |h| row[h] }
           if i % 5 == 0
             @account_report.update_attribute(:progress, (i.to_f/total)*100)
@@ -165,33 +168,53 @@ module Canvas::AccountReports
     # - student final score
 
     def grade_export()
-      term = @term
-      name = term ? term.name : I18n.t('account_reports.default.all_terms', "All Terms")
+      name = @term ? @term.name : I18n.t('account_reports.default.all_terms', "All Terms")
+      parameters = {
+        :account_id => @account.id,
+        :root_account_id => @domain_root_account.id
+      }
       @account_report.parameters["extra_text"] = I18n.t('account_reports.default.extra_text', "For Term: %{term_name}", :term_name => name)
-      students = StudentEnrollment.scoped(:include => {:course => :enrollment_term, :course_section => [], :user => :pseudonyms},
-                                          :order => 'enrollment_terms.id, courses.id, enrollments.id',
-                                          :conditions => {:root_account_id => @account.id,
-                                                          'courses.workflow_state' => 'available', 'enrollments.workflow_state' => ['active', 'completed'] })
-      students = students.scoped(:conditions => { 'courses.enrollment_term_id' => term}) if term
+      students = @domain_root_account.pseudonyms.scoped(:include => { :exclude => :user }).scoped(
+        :select => "pseudonyms.id, u.name AS user_name, enrollments.user_id, pseudonyms.sis_user_id, courses.name AS course_name,
+                    enrollments.course_id, courses.sis_source_id AS course_sis_id, course_sections.name AS section_name,
+                    enrollments.course_section_id, course_sections.sis_source_id AS section_sis_id,
+                    enrollment_terms.name AS term_name, enrollment_terms.id AS term_id,
+                    enrollment_terms.sis_source_id AS term_sis_id, enrollments.computed_current_score,
+                    enrollments.computed_final_score",
+        :joins => Pseudonym.send(:sanitize_sql, ["INNER JOIN users u ON pseudonyms.user_id = u.id
+                                                  INNER JOIN enrollments ON pseudonyms.user_id = enrollments.user_id
+                                                  INNER JOIN courses ON courses.id = enrollments.course_id
+                                                  INNER JOIN course_sections ON enrollments.course_section_id = course_sections.id
+                                                  INNER JOIN enrollment_terms ON courses.enrollment_term_id = enrollment_terms.id", parameters]))
+      students = students.scoped(:conditions => ["courses.enrollment_term_id=?", @term.id]) if @term
+      students = students.scoped(:conditions => "pseudonyms.workflow_state != 'deleted'
+                                                 AND courses.workflow_state = 'available'
+                                                 AND enrollments.workflow_state IN ('active', 'completed')") unless @include_deleted
+      if @account.id != @domain_root_account.id
+        students = students.scoped(:conditions => ["EXISTS (SELECT course_section_id, account_id
+                                                            FROM course_account_associations caa
+                                                            WHERE caa.account_id = ?
+                                                            AND caa.course_section_id=course_sections.id
+                                                            )", @account.id])
+      end
 
       result = FasterCSV.generate do |csv|
-        csv << ['student name', 'student id', 'student sis', 'course', 'course id', 'course sis', 'section', 'section id', 'section sis', 'term', 'term id', 'term sis','current score', 'final score']
+        csv << ['student name', 'student id', 'student sis', 'course', 'course id', 'course sis', 'section',
+                'section id', 'section sis', 'term', 'term id', 'term sis','current score', 'final score']
         students.find_each do |student|
-          course = student.course
-          course_section = student.course_section
           arr = []
-          arr << student.user.name
-          arr << student.user.id
-          arr << student.user.sis_pseudonym_for(@account).try(:sis_user_id)
-          arr << course.name
-          arr << course.id
-          arr << course.sis_source_id
-          arr << course_section.name
-          arr << course_section.id
-          arr << course_section.sis_source_id
-          arr << course.enrollment_term.name
-          arr << course.enrollment_term.id
-          arr << course.enrollment_term.sis_source_id
+          arr << student.user_name
+          arr << student.user_id
+          arr << student.sis_user_id
+          arr << student.course_name
+          arr << student.course_id
+          arr << student.course_sis_id
+          arr << student.section_name
+          arr << student.course_section_id
+          arr << student.section_sis_id
+          arr << student.term_name
+          arr << student.term_id
+          arr << student.term_sis_id
           arr << student.computed_current_score
           arr << student.computed_final_score
           csv << arr

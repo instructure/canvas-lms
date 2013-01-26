@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2012 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -20,7 +20,7 @@ module Canvas::ReportHelpers::DateHelper
 
 # This function will take a datetime or a datetime string and convert into iso8601 for the @account's timezone
 # A string datetime needs to be in UTC
-  def default_timezone_format(datetime, account=@account)
+  def default_timezone_format(datetime, account=@account.root_account)
     if datetime.is_a? String
       datetime = Time.use_zone('UTC') do
         Time.zone.parse(datetime)
