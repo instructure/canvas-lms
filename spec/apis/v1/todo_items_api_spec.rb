@@ -18,14 +18,22 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
+
 describe UsersController, :type => :integration do
+  include Api
+  include Api::V1::Assignment
+  def update_assignment_json
+    @a1_json['assignment'] = controller.assignment_json(@a1,@user,session)
+    @a2_json['assignment'] = controller.assignment_json(@a2,@user,session)
+  end
+
   before do
-    course_with_teacher(:active_all => true, :user => user_with_pseudonym(:active_all => true))
+    @teacher = course_with_teacher(:active_all => true, :user => user_with_pseudonym(:active_all => true))
     @teacher_course = @course
     @student_course = course(:active_all => true)
     @student_course.enroll_student(@user).accept!
     # an assignment i need to submit (needs_submitting)
-    @a = Assignment.create!(:context => @student_course, :due_at => 6.days.from_now, :title => 'required work', :submission_types => 'online_text_entry', :points_possible => 10)
+    @a1 = Assignment.create!(:context => @student_course, :due_at => 6.days.from_now, :title => 'required work', :submission_types => 'online_text_entry', :points_possible => 10)
 
     # an assignment i created, and a student who submits the assignment (needs_grading)
     @a2 = Assignment.create!(:context => @teacher_course, :due_at => 1.day.from_now, :title => 'text', :submission_types => 'online_text_entry', :points_possible => 15)
@@ -34,41 +42,21 @@ describe UsersController, :type => :integration do
     @user = @me
     @teacher_course.enroll_student(student).accept!
     @sub = @a2.reload.submit_homework(student, :submission_type => 'online_text_entry', :body => 'done')
+    @a2.reload
     @a1_json = 
       {
         'type' => 'submitting',
-        'assignment' => {
-          'name' => 'required work',
-          'description' => nil,
-          'id' => @a.id,
-          'course_id' => @student_course.id,
-          'muted' => false,
-          'points_possible' => 10,
-          'submission_types' => ['online_text_entry'],
-          'due_at' => @a.due_at.as_json,
-          'html_url' => course_assignment_url(@a.context_id, @a),
-        },
-        'ignore' => api_v1_users_todo_ignore_url(@a.asset_string, 'submitting', :permanent => 0),
-        'ignore_permanently' => api_v1_users_todo_ignore_url(@a.asset_string, 'submitting', :permanent => 1),
-        'html_url' => "#{course_assignment_url(@a.context_id, @a.id)}#submit",
+        'assignment' => {},
+        'ignore' => api_v1_users_todo_ignore_url(@a1.asset_string, 'submitting', :permanent => 0),
+        'ignore_permanently' => api_v1_users_todo_ignore_url(@a1.asset_string, 'submitting', :permanent => 1),
+        'html_url' => "#{course_assignment_url(@a1.context_id, @a1.id)}#submit",
         'context_type' => 'Course',
         'course_id' => @student_course.id,
       }
     @a2_json =
       {
         'type' => 'grading',
-        'assignment' => {
-          'name' => 'text',
-          'description' => nil,
-          'id' => @a2.id,
-          'course_id' => @teacher_course.id,
-          'muted' => false,
-          'points_possible' => 15,
-          'needs_grading_count' => 1,
-          'submission_types' => ['online_text_entry'],
-          'due_at' => @a2.due_at.as_json,
-          'html_url' => course_assignment_url(@a2.context_id, @a2),
-        },
+        'assignment' => {},
         'needs_grading_count' => 1,
         'ignore' => api_v1_users_todo_ignore_url(@a2.asset_string, 'grading', :permanent => 0),
         'ignore_permanently' => api_v1_users_todo_ignore_url(@a2.asset_string, 'grading', :permanent => 1),
@@ -83,7 +71,10 @@ describe UsersController, :type => :integration do
     student2 = user(:active_all => true)
     @user = @me
     @teacher_course.enroll_student(student2).accept!
-    @sub2 = @a2.reload.submit_homework(student2, :submission_type => 'online_text_entry', :body => 'me too')
+    @sub2 = @a2.reload.submit_homework(student2,
+                                       :submission_type => 'online_text_entry',
+                                       :body => 'me too')
+    @a2.reload
   end
 
   it "should check for auth" do
@@ -101,17 +92,23 @@ describe UsersController, :type => :integration do
   it "should return a global user todo list" do
     json = api_call(:get, "/api/v1/users/self/todo",
                     :controller => "users", :action => "todo_items", :format => "json")
-    json.sort_by { |t| t['assignment']['id'] }.should == [@a1_json, @a2_json]
+    update_assignment_json
+    json = json.sort_by { |t| t['assignment']['id'] }
+    compare_json json.first, @a1_json
+    compare_json json.second, @a2_json
   end
 
   it "should return a course-specific todo list" do
-    json = api_call(:get, "/api/v1/courses/#{@student_course.id}/todo",
-                    :controller => "courses", :action => "todo_items", :format => "json", :course_id => @student_course.to_param)
-    json.should == [@a1_json]
+    a1_json = api_call(:get, "/api/v1/courses/#{@student_course.id}/todo",
+                    :controller => "courses", :action => "todo_items",
+                    :format => "json", :course_id => @student_course.to_param)
 
-    json = api_call(:get, "/api/v1/courses/#{@teacher_course.id}/todo",
-                    :controller => "courses", :action => "todo_items", :format => "json", :course_id => @teacher_course.to_param)
-    json.should == [@a2_json]
+    a2_json = api_call(:get, "/api/v1/courses/#{@teacher_course.id}/todo",
+                    :controller => "courses", :action => "todo_items",
+                    :format => "json", :course_id => @teacher_course.to_param)
+    update_assignment_json
+    compare_json( a1_json.first, @a1_json )
+    compare_json( a2_json.first, @a2_json )
   end
 
   it "should return a list for users who are both teachers and students" do
@@ -120,16 +117,22 @@ describe UsersController, :type => :integration do
     json = api_call(:get, "/api/v1/users/self/todo",
                     :controller => "users", :action => "todo_items", :format => "json")
     @a1_json.deep_merge!({ 'assignment' => { 'needs_grading_count' => 0 } })
-    json.sort_by { |t| t['assignment']['id'] }.should == [@a1_json, @a2_json]
+    json = json.sort_by { |t| t['assignment']['id'] }
+    update_assignment_json
+    compare_json( json.first, @a1_json )
+    compare_json( json.second, @a2_json )
   end
 
   it "should ignore a todo item permanently" do
     api_call(:delete, @a2_json['ignore_permanently'],
-             :controller => "users", :action => "ignore_item", :format => "json", :purpose => "grading", :asset_string => "assignment_#{@a2.id}", :permanent => "1")
+             :controller => "users", :action => "ignore_item",
+             :format => "json", :purpose => "grading",
+             :asset_string => "assignment_#{@a2.id}", :permanent => "1")
     response.should be_success
 
     json = api_call(:get, "/api/v1/courses/#{@teacher_course.id}/todo",
-                    :controller => "courses", :action => "todo_items", :format => "json", :course_id => @teacher_course.to_param)
+                    :controller => "courses", :action => "todo_items",
+                    :format => "json", :course_id => @teacher_course.to_param)
     json.should == []
 
     # after new student submission, still ignored
@@ -154,6 +157,16 @@ describe UsersController, :type => :integration do
                     :controller => "courses", :action => "todo_items", :format => "json", :course_id => @teacher_course.to_param)
     @a2_json['needs_grading_count'] = 2
     @a2_json['assignment']['needs_grading_count'] = 2
-    json.should == [@a2_json]
+    update_assignment_json
+    compare_json( json.first, @a2_json )
   end
+
+  it "works correctly when turnitin is enabled" do
+    @a2.context.any_instantiation.expects(:turnitin_enabled?).returns true
+    json = api_call(:get, "/api/v1/users/self/todo",
+                    :controller => "users", :action => "todo_items",
+                    :format => "json")
+    response.should be_success
+  end
+
 end

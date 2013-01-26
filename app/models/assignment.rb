@@ -70,6 +70,37 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  API_NEEDED_FIELDS = %w(
+    id
+    title
+    context_id
+    context_type
+    position
+    points_possible
+    grading_type
+    due_at
+    description
+    lock_at
+    unlock_at
+    assignment_group_id
+    peer_reviews
+    automatic_peer_reviews
+    peer_reviews_due_at
+    peer_review_count
+    submission_types
+    group_category_id
+    grade_group_students_individually
+    turnitin_enabled
+    turnitin_settings
+    allowed_extensions
+    muted
+    needs_grading_count
+    could_be_locked
+    freeze_on_copy
+    copied
+    all_day
+    all_day_date
+  )
   # create a shim for plugins that use the old association name. this is
   # TEMPORARY. the plugins should update to use the new association name, and
   # once they're updated, this shim removed. DO NOT USE in new code.
@@ -1382,8 +1413,8 @@ class Assignment < ActiveRecord::Base
   # This should only be used in the course drop down to show assignments needing a submission
   named_scope :need_submitting_info, lambda{|user_id, limit, ignored_ids|
     ignored_ids ||= []
-          {:select => 'id, title, points_possible, due_at, context_id, context_type, submission_types, description, could_be_locked, needs_grading_count, all_day_date,' +
-          '(SELECT name FROM courses WHERE id = assignments.context_id) AS context_name',
+          {:select => API_NEEDED_FIELDS.join( ',' ) +
+          ',(SELECT name FROM courses WHERE id = assignments.context_id) AS context_name',
           :conditions =>["(SELECT COUNT(id) FROM submissions
               WHERE assignment_id = assignments.id
               AND submission_type IS NOT NULL
@@ -1397,8 +1428,8 @@ class Assignment < ActiveRecord::Base
   named_scope :need_grading_info, lambda{|limit, ignore_ids|
     ignore_ids ||= []
     {
-      :select => 'assignments.id, title, points_possible, due_at, context_id, context_type, submission_types, description, could_be_locked, all_day_date,' +
-                 '(SELECT name FROM courses WHERE id = assignments.context_id) AS context_name, needs_grading_count',
+      :select => API_NEEDED_FIELDS.join(',') +
+                 ',(SELECT name FROM courses WHERE id = assignments.context_id) AS context_name, needs_grading_count',
       :conditions => "needs_grading_count > 0 #{ignore_ids.empty? ? "" : "AND id NOT IN (#{ignore_ids.join(',')})"}",
       :limit => limit,
       :order=>'due_at ASC'
