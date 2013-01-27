@@ -17,7 +17,6 @@ gem 'encrypted_cookie_store-instructure', '1.0.2', :require => 'encrypted_cookie
 gem 'erubis',         '2.7.0'
 gem 'ffi',            '1.1.5'
 gem 'hairtrigger',    '0.1.14'
-gem 'sass',           '3.2.1'
 if !ONE_NINE
   gem 'fastercsv', '1.5.3'
 end
@@ -44,7 +43,7 @@ gem 'nokogiri',       '1.5.5'
 gem 'oauth',          '0.4.5'
 gem 'rack',           '1.1.3'
 gem 'rake',           '< 0.10'
-gem 'rdoc',           '3.12'
+gem 'rdoc',           '3.12' #it seems like you shouldn't need this, at least not all the time
 gem 'ratom-instructure', '0.6.9', :require => "atom" # custom gem until necessary changes are merged into mainstream
 if !ONE_NINE
   gem 'rbx-require-relative', '0.0.5'
@@ -64,14 +63,9 @@ gem 'uuid',           '2.3.2'
 gem 'will_paginate',  '2.3.15'
 gem 'xml-simple',     '1.0.12', :require => 'xmlsimple'
 # this is only needed by jammit, but we're pinning at 0.9.4 because 0.9.5 breaks
-gem 'yui-compressor', '0.9.4'
+gem 'yui-compressor', '0.9.4', :require => false
 gem 'foreigner',      '0.9.2'
 gem 'crocodoc-ruby',  '0.0.1', :require => 'crocodoc'
-
-group :assets do
-  gem 'compass-rails', '1.0.2'
-  gem 'bootstrap-sass', '2.0.3.1'
-end
 
 group :mysql do
   gem 'mysql',        '2.8.1'
@@ -83,6 +77,29 @@ end
 
 group :sqlite do
   gem 'sqlite3-ruby', '1.3.2'
+end
+
+# Off the top of my head, I forgot if these things will be required when you start rails
+# but look at: http://gembundler.com/v1.2/groups.html and make sure you do whatever you need
+# to do so that script/* and rake dont load any of these.
+
+group :guard do
+  gem 'compass' # will pull in sass for you, note that you DON'T need compass-rails at all if 
+                # you are letting guard do your compilation for you.  this is the main change here
+                # the normal sass/compass way of doing things in a rails project is to make sure on every page load
+                # that it has made each css file that the page is going to need, since you guard doing that kind of stuff
+                # in a seperate process anyway, and doing it on a file modification basis and not on a page load basis
+                # you can just let rails work with the static generated css, like you do with the js your coffeescript guard
+                # generates.
+  
+  gem 'bootstrap-sass', '2.0.3.1'
+  gem 'guard'
+  gem 'rb-inotify', :require => false
+  gem 'rb-fsevent', :require => false
+  gem 'guard-coffeescript' # canvas has its own hacked guard-coffeescript, I think to support our vendor/plugins assets.
+                           # but even if you use it instead of this, make sure it only gets loaded by guard and not normal script/server
+  gem 'guard-livereload' # I was using this one in my own custom guardfile there, and it's awesome!
+  gem 'guard-sass' # or maybe use guard-compass, I forgot which one is the best
 end
 
 group :test do
@@ -112,7 +129,6 @@ group :development do
   else
     gem 'ruby-debug',   '0.10.4'
   end
-  gem 'guard', '1.0.3'
 end
 
 group :i18n_tools do
