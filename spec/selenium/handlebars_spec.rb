@@ -22,6 +22,7 @@ describe "handlebars" do
         <li>{{#t "protip" type=../type}}Important {{type}} tip:{{/t}} {{this}}</li>
         {{/each}}
       </ol>
+      <p>{{#t "html"}}lemme instructure you some html: if you type {{input}}, you get {{{input}}}{{/t}}</p>
       {{#t "bye"}}welp, see you l8r! dont forget 2 <a href="{{url}}">like us</a> on facebook lol{{/t}}
     HTML
     compiled = Handlebars.compile_template(template, 'test')
@@ -33,6 +34,7 @@ describe "handlebars" do
         name: 'katie'
         type: 'yoga'
         items: ['dont forget to stretch!!!']
+        input: '<input>'
         url: 'http://foo.bar'
     CS
 
@@ -44,6 +46,7 @@ describe "handlebars" do
         <li>Important yoga tip: dont forget to stretch!!!</li>
         
       </ol>
+      <p>lemme instructure you some html: if you type &lt;input&gt;, you get <input></p>
       welp, see you l8r! dont forget 2 <a href="http://foo.bar">like us</a> on facebook lol
     RESULT
   end

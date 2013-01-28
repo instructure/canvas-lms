@@ -362,7 +362,7 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
     Hash.send :include, HashExtensions
 
     def placeholders(str)
-      str.scan(/%\{[^\}]+\}/).sort
+      str.scan(/%h?\{[^\}]+\}/).sort
     end
 
     def markdown_and_wrappers(str)
