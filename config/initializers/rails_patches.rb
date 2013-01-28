@@ -1,4 +1,7 @@
 ActionController::Base.param_parsers.delete(Mime::XML)
+# CVE-2013-0333
+# https://groups.google.com/d/topic/rubyonrails-security/1h2DR63ViGo/discussion
+ActiveSupport::JSON.backend = "JSONGem"
 
 if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR >= 1
   raise "This patch has been merged into rails 3.1, remove it from our repo"
