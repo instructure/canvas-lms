@@ -810,6 +810,7 @@ class RoleOverride < ActiveRecord::Base
     # this override applies to descendants, and we're not applying it to self
     #   (presumed that other logic prevents calling this method with context being a parent of role_context)
     return [:self, :descendants] if context.id != permission[:context_id] && permission[:enabled].include?(:descendants)
+    []
   end
 
   # settings is a hash with recognized keys :override and :locked. each key
