@@ -102,6 +102,38 @@ describe "course outcomes" do
         ff('.outcomes-content').first.text.should contain "Setting up Outcomes"
       end
     end
+
+    describe "actions" do
+      it "should not render an HTML-escaped title in outcome directory while editing" do
+        title = 'escape & me <<->> if you dare'
+        escaped_title = 'escape &amp; me &lt;&lt;-&gt;&gt; if you dare'
+
+        who_to_login == 'teacher' ? @context = @course : @context = account
+        outcome_model
+        get outcome_url
+        wait_for_ajaximations
+        fj('.outcomes-sidebar .outcome-level:first li').click
+        f('.edit_button').click
+
+        # pass in the unescaped version of the title:
+        replace_content f('.outcomes-content input[name=title]'), title
+        f('.submit_button').click
+        wait_for_ajaximations
+
+        # the "readable" version should be rendered in directory browser
+        li_el = fj('.outcomes-sidebar .outcome-level:first li:first')
+        li_el.should be_true # should be present
+        li_el.text.should == title
+
+        # the "readable" version should be rendered in the view:
+        f(".outcomes-content .title").text.should == title
+
+        # and the escaped version should be stored!
+        # LearningOutcome.find_by_short_description(escaped_title).should be_present
+        # or not, looks like it isn't being escaped
+        LearningOutcome.find_by_short_description(title).should be_present
+      end
+    end
   end
 
   context "as a student" do
