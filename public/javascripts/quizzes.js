@@ -2526,7 +2526,7 @@ define([
         return;
       }
       var text = $(this).editorBox('get_code');
-      var matches = text.match(/\[[A-Za-z][A-Za-z0-9]*\]/g);
+      var matches = text.match(/\[[A-Za-z0-9_\-.]+\]/g);
       $select.find("option.shown_when_no_other_options_available").remove();
       $select.find("option").addClass('to_be_removed');
       var matchHash = {};
