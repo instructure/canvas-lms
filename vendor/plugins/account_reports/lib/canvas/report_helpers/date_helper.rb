@@ -32,4 +32,11 @@ module Canvas::ReportHelpers::DateHelper
       nil
     end
   end
+
+# This function will take a datetime string and parse into UTC from the @account's timezone
+  def account_time_parse(datetime, account=@account.root_account)
+    Time.use_zone(account.default_time_zone) do
+      Time.zone.parse datetime.to_s rescue nil
+    end
+  end
 end
