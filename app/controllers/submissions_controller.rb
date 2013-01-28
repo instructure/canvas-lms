@@ -88,6 +88,9 @@
 #
 #       // The submissions user (see user API) (optional)
 #       user: User
+#
+#       // Whether the submission was made after the applicable due date
+#       late: false
 #     }
 #
 class SubmissionsController < ApplicationController

@@ -70,16 +70,18 @@ describe SortsAssignments do
 
   describe "vdd_map" do
 
-    it "returns a new array with each assignment cloned as an object with " +
-      "the assignment's id and varied due date" do
-      assignment = stub
+    it "returns a new array of overridden assignments" do
       user = stub
-      varied_due_date = stub
+      varied_due_date = 2.days.from_now
       assignment_ids = assignments.map(&:id)
-      VariedDueDate.expects(:due_at_for?).at_least(6).returns varied_due_date
+      assignments.each do |assignment|
+        assignment.expects(:due_at).returns(varied_due_date)
+        assignment.expects(:overridden_for).returns(assignment)
+      end
+
       SortsAssignments.vdd_map(assignments,user).reject{ |assignment|
         assignment_ids.include?(assignment.id) &&
-          assignment.due_at = varied_due_date
+          assignment.due_at == varied_due_date
       }.size.should == 0
     end
   end

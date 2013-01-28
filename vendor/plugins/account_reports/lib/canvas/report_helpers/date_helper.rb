@@ -17,20 +17,19 @@
 #
 
 module Canvas::ReportHelpers::DateHelper
+
+# This function will take a datetime or a datetime string and convert into iso8601 for the @account's timezone
+# A string datetime needs to be in UTC
   def default_timezone_format(datetime, account=@account)
+    if datetime.is_a? String
+      datetime = Time.use_zone('UTC') do
+        Time.zone.parse(datetime)
+      end
+    end
     if datetime
       datetime.in_time_zone(account.default_time_zone).iso8601
     else
       nil
-    end
-  end
-
-  def default_timezone_parse(datetime_string, account=@account)
-    if datetime_string
-      datetime = Time.use_zone('UTC') do
-        Time.zone.parse(datetime_string)
-      end
-      datetime.in_time_zone(account.default_time_zone)
     end
   end
 end

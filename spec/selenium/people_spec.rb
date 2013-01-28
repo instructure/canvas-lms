@@ -3,8 +3,6 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "people" do
   it_should_behave_like "in-process server selenium tests"
 
-  DEFAULT_PASSWORD = 'qwerty'
-
   def add_user(option_text, username, user_list_selector)
     click_option('#enrollment_type', option_text)
     f('textarea.user_list').send_keys(username)
@@ -43,7 +41,7 @@ describe "people" do
   def create_user(student_name)
     user = User.create!(:name => student_name)
     user.register!
-    user.pseudonyms.create!(:unique_id => student_name, :password => DEFAULT_PASSWORD, :password_confirmation => DEFAULT_PASSWORD)
+    user.pseudonyms.create!(:unique_id => student_name, :password => 'qwerty', :password_confirmation => 'qwerty')
     @course.reload
     user
   end
@@ -65,9 +63,7 @@ describe "people" do
       course_with_teacher_logged_in
 
       #add first student
-      @student_1 = User.create!(:name => 'student@test.com')
-      @student_1.register!
-      @student_1.pseudonyms.create!(:unique_id => 'student@test.com', :password => DEFAULT_PASSWORD, :password_confirmation => DEFAULT_PASSWORD)
+      @student_1 = create_user('student@test.com')
 
       e1 = @course.enroll_student(@student_1)
       e1.workflow_state = 'active'

@@ -175,9 +175,13 @@ module SeleniumTestsHelperMethods
 
     if first_run
       wait_time = env_test_number.to_i * step_time
+      #thread 5 currently gets the most specs and lags behind the others this will decrease total build time by releasing it early
+      wait_time = 1 if env_test_number.to_i == 5
       sleep(wait_time)
     else
       wait_time = env_test_number.to_i * 2
+      #thread 5 currently gets the most specs and lags behind the others this will decrease total build time by releasing it early
+      wait_time = 1 if env_test_number.to_i == 5
       sleep(wait_time)
     end
   end
@@ -638,6 +642,14 @@ shared_examples_for "all selenium tests" do
     end
   end
 
+  def accept_alert
+    keep_trying_until do
+      alert = driver.switch_to.alert
+      alert.accept
+      true
+    end
+  end
+
   def in_frame(id, &block)
     saved_window_handle = driver.window_handle
     driver.switch_to.frame(id)
@@ -993,6 +1005,7 @@ TEST_FILE_UUIDS = {
     "cc_full_test.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_full_test.zip'),
     "cc_ark_test.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_ark_test.zip'),
     "canvas_cc_minimum.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/canvas_cc_minimum.zip'),
+    "canvas_cc_only_questions.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/canvas_cc_only_questions.zip'),
     "qti.zip" => File.read(File.dirname(__FILE__) + '/../fixtures/migration/package_identifier/qti.zip'),
     "a_file.txt" => File.read(File.dirname(__FILE__) + '/../fixtures/files/a_file.txt'),
     "b_file.txt" => File.read(File.dirname(__FILE__) + '/../fixtures/files/b_file.txt'),

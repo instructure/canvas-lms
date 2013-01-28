@@ -44,7 +44,7 @@ class PseudonymSessionsController < ApplicationController
 
     @pseudonym_session = PseudonymSession.new
     @headers = false
-    @is_delegated = @domain_root_account.delegated_authentication? && !@domain_root_account.ldap_authentication? && !params[:canvas_login]
+    @is_delegated = delegated_authentication_url?
     @is_cas = @domain_root_account.cas_authentication? && @is_delegated
     @is_saml = @domain_root_account.saml_authentication? && @is_delegated
     if @is_cas && !params[:no_auto]
@@ -226,7 +226,7 @@ class PseudonymSessionsController < ApplicationController
     flash[:logged_out] = true
     respond_to do |format|
       session.delete(:return_to)
-      if @domain_root_account.delegated_authentication? && !@domain_root_account.ldap_authentication?
+      if delegated_authentication_url?
         format.html { redirect_to login_url(:no_auto=>'true') }
       else
         format.html { redirect_to login_url }
@@ -590,7 +590,7 @@ class PseudonymSessionsController < ApplicationController
 
   def oauth2_accept
     # now generate the temporary code, and respond/redirect
-    code = Canvas::Oauth::Token.generate_code_for(@current_user.id, session[:oauth2][:client_id])
+    code = Canvas::Oauth::Token.generate_code_for(@current_user.global_id, session[:oauth2][:client_id])
     final_oauth2_redirect(session[:oauth2][:redirect_uri], :code => code)
     session.delete(:oauth2)
   end

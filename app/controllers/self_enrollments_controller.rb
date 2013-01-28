@@ -23,6 +23,12 @@ class SelfEnrollmentsController < ApplicationController
   include Api::V1::Course
 
   def new
+    if !@current_user && delegated_authentication_url?
+      store_location
+      flash[:notice] = t('notices.login_required', "Please log in to join this course.")
+      return redirect_to login_url
+    end
+
     js_env :USER => {:MIN_AGE => @course.self_enrollment_min_age || User.self_enrollment_min_age}
   end
 

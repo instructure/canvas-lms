@@ -69,7 +69,17 @@ class ErrorReport < ActiveRecord::Base
       ActiveRecord::Base::ConnectionSpecification.with_environment(nil) do
         report = ErrorReport.new
         report.assign_data(opts)
-        report.save
+        begin
+          report.save!
+          Rails.logger.info("Created ErrorReport ID #{report.global_id}")
+        rescue => e
+          Rails.logger.error("Failed creating ErrorReport: #{e.inspect}")
+          Rails.logger.error("Original error: #{opts[:message]}")
+          Rails.logger.error("Original exception: #{opts[:exception_message]}") if opts[:exception_message]
+          @exception.backtrace.each do |line|
+            Rails.logger.error("Trace: #{line}")
+          end if @exception
+        end
         report
       end
     end

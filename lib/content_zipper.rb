@@ -78,13 +78,17 @@ class ContentZipper
     end
   end
   
+  def assignment_zip_filename(assignment)
+    "#{assignment.context.short_name_slug}-#{assignment.title_slug} submissions"
+  end
+
   def zip_assignment(zip_attachment, assignment)
     files = []
     @logger.debug("zipping into attachment: #{zip_attachment.id}")
     zip_attachment.workflow_state = 'zipping'
     zip_attachment.scribd_attempts += 1
     zip_attachment.save!
-    filename = "#{assignment.context.short_name}-#{assignment.title} submissions"
+    filename = assignment_zip_filename(assignment)
     submissions = assignment.submissions
     if zip_attachment.user && assignment.context.enrollment_visibility_level_for(zip_attachment.user) != :full
       visible_student_ids = assignment.context.enrollments_visible_to(zip_attachment.user).find(:all, :select => 'user_id').map(&:user_id)
@@ -166,6 +170,12 @@ class ContentZipper
   def self.zip_eportfolio(*args)
     ContentZipper.new.zip_eportfolio(*args)
   end
+
+  StaticAttachment = Struct.new(:display_name,
+                                :filename,
+                                :content_type,
+                                :uuid,
+                                :attachment)
   
   def zip_eportfolio(zip_attachment, portfolio)
     static_attachments = []
@@ -184,7 +194,7 @@ class ContentZipper
       end
     end
     static_attachments = static_attachments.uniq.map do |a|
-      obj = OpenObject.new
+      obj = StaticAttachment.new
       obj.display_name = a.display_name
       obj.filename = "#{idx}_#{a.filename}"
       obj.content_type = a.content_type

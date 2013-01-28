@@ -30,6 +30,13 @@ describe SelfEnrollmentsController do
       response.should be_success
     end
 
+    it "should do the delegated auth dance" do
+      account = account_with_cas({:account => Account.default})
+      
+      get 'new', :self_enrollment_code => @course.self_enrollment_code
+      response.should redirect_to login_url
+    end
+
     it "should not render for an incorrect code" do
       lambda {
         get 'new', :self_enrollment_code => 'abc'

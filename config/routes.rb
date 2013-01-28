@@ -529,7 +529,6 @@ ActionController::Routing::Routes.draw do |map|
     user.assignments_needing_grading 'assignments_needing_grading', :controller => 'users', :action => 'assignments_needing_grading'
     user.assignments_needing_submitting 'assignments_needing_submitting', :controller => 'users', :action => 'assignments_needing_submitting'
     user.admin_merge 'admin_merge', :controller => 'users', :action => 'admin_merge', :conditions => {:method => :get}
-    user.confirm_merge 'merge', :controller => 'users', :action => 'confirm_merge', :conditions => {:method => :get}
     user.merge 'merge', :controller => 'users', :action => 'merge', :conditions => {:method => :post}
     user.grades 'grades', :controller => 'users', :action => 'grades'
     user.resources :user_notes
@@ -655,6 +654,8 @@ ActionController::Routing::Routes.draw do |map|
       courses.put 'courses/:id', :action => :update
       courses.get 'courses/:id', :action => :show
       courses.get 'courses/:course_id/students', :action => :students
+      courses.get 'courses/:course_id/settings', :action => :settings, :path_name => 'course_settings'
+      courses.put 'courses/:course_id/settings', :action => :update_settings
       courses.get 'courses/:course_id/recent_students', :action => :recent_students, :path_name => 'course_recent_students'
       courses.get 'courses/:course_id/users', :action => :users, :path_name => 'course_users'
       courses.get 'courses/:course_id/users/:id', :action => :user, :path_name => 'course_user'
@@ -760,6 +761,10 @@ ActionController::Routing::Routes.draw do |map|
       topic_routes(topics, "course")
       topic_routes(topics, "group")
       topic_routes(topics, "collection_item")
+    end
+
+    api.with_options(:controller => :collaborations) do |collaborations|
+      collaborations.get 'collaborations/:id/members', :action => :members, :path_name => 'collaboration_members'
     end
 
     api.with_options(:controller => :external_tools) do |tools|

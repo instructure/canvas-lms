@@ -2,7 +2,7 @@ source :rubygems
 
 ONE_NINE = RUBY_VERSION >= "1.9."
 
-gem 'rails',          '2.3.14'
+gem 'rails',          '2.3.15'
 gem 'authlogic',      '2.1.3'
 #gem 'aws-s3',         '0.6.2',  :require => 'aws/s3'
 # use custom gem until pull request at https://github.com/marcel/aws-s3/pull/41
@@ -11,6 +11,7 @@ gem "aws-s3-instructure", "0.6.2.1352914936",  :require => 'aws/s3'
 gem 'barby',          '0.5.0'
 gem 'bcrypt-ruby',    '3.0.1'
 gem 'builder',        '2.1.2'
+gem 'canvas_connect'
 gem 'daemons',        '1.1.0'
 gem 'diff-lcs',       '1.1.2',  :require => 'diff/lcs'
 gem 'encrypted_cookie_store-instructure', '1.0.2', :require => 'encrypted_cookie_store'
@@ -58,7 +59,7 @@ gem 'rscribd',        '1.2.0'
 gem 'net-ldap',       '0.3.1',  :require => 'net/ldap'
 gem 'ruby-saml-mod',  '0.1.19'
 gem 'rubycas-client', '2.2.1'
-gem 'rubyzip',        '0.9.4',  :require => 'zip/zip'
+gem 'rubyzip',        '0.9.5',  :require => 'zip/zip'
 gem 'sanitize',       '2.0.3'
 gem 'uuid',           '2.3.2'
 gem 'will_paginate',  '2.3.15'
@@ -86,16 +87,13 @@ group :sqlite do
 end
 
 group :test do
-  gem 'coffee-script'
-  gem 'coffee-script-source',  '1.3.1' #pinned so everyone's compiled output matches
   gem 'bluecloth',    '2.0.10' # for generating api docs
-  gem 'parallel',     '0.5.16'
-  gem 'parallelized_specs', '0.3.86'
+  gem 'parallelized_specs', '0.3.89'
   gem 'mocha',        '0.12.3', :require => 'mocha_standalone'
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.2'
   gem 'rspec-rails',  '1.3.4'
-  gem 'selenium-webdriver', '2.26.0'
+  gem 'selenium-webdriver', '2.27.2'
   gem 'webrat',       '0.7.3'
   gem 'yard',         '0.8.0'
   if ONE_NINE
@@ -104,15 +102,22 @@ group :test do
 end
 
 group :development do
-  gem 'coffee-script'
-  gem 'coffee-script-source',  '1.3.1' #pinned so everyone's compiled output matches
-  gem 'parallel',     '0.5.16'
+  gem 'guard', '1.6.0'
+  gem 'rb-inotify', :require => false
+  gem 'rb-fsevent', :require => false
+  gem 'rb-fchange', :require => false
+
   if ONE_NINE
     gem 'debugger',     '1.1.3'
   else
     gem 'ruby-debug',   '0.10.4'
   end
-  gem 'guard', '1.0.3'
+end
+
+group :development, :test do
+  gem 'coffee-script'
+  gem 'coffee-script-source',  '1.4.0' #pinned so everyone's compiled output matches
+  gem 'parallel',     '0.5.16'
 end
 
 group :i18n_tools do

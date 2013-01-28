@@ -61,6 +61,27 @@ class AssignmentOverride < ActiveRecord::Base
     end
   end
 
+  after_save :recompute_submission_lateness_later
+
+  def recompute_submission_lateness_later
+    if due_at_overridden_changed? || due_at_changed?
+      send_later_if_production :recompute_submission_lateness
+    end
+    true
+  end
+
+  def recompute_submission_lateness    
+    if (users = applies_to_students) && assignment
+      submissions = assignment.submissions.where(:user_id => users.map(&:id))
+      submissions.each do |s|
+        s.compute_lateness
+        s.save!
+      end
+    end
+    true
+  end
+  private :recompute_submission_lateness
+
   workflow do
     state :active
     state :deleted

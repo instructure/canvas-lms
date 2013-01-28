@@ -20,10 +20,11 @@ module Api::V1::Role
   include Api::V1::Json
   include Api::V1::Account
 
-  def role_json(account, role, current_user, session)
+  def role_json(account, role, current_user, session, opts={})
     json = {
       :account => account_json(account, current_user, session, []),
       :role => role.name,
+      :label => role.label,
       :base_role_type => role.base_role_type,
       :workflow_state => role.workflow_state,
       :permissions => {}
@@ -37,6 +38,8 @@ module Api::V1::Role
   end
 
   def permission_json(permission, current_user, session)
+    permission[:enabled] = !!permission[:enabled]
+    permission[:prior_default] = !!permission[:prior_default]
     permission.delete(:prior_default) unless permission[:explicit]
     permission.slice(:enabled, :locked, :readonly, :explicit, :prior_default)
   end

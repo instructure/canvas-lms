@@ -132,6 +132,37 @@ describe CalendarEventsApiController, :type => :integration do
       json.first['start_at'].should be_nil
     end
 
+    context 'all events' do
+      before do
+        @course.calendar_events.create(:title => 'undated')
+        @course.calendar_events.create(:title => 'dated', :start_at => '2012-01-08 12:00:00')
+      end
+
+      it 'should return all events' do
+        json = api_call(:get, "/api/v1/calendar_events?all_events=1&context_codes[]=course_#{@course.id}", {
+                          :controller => 'calendar_events_api', :action => 'index', :format => 'json',
+                          :context_codes => ["course_#{@course.id}"],
+                          :all_events => '1'})
+        json.size.should eql 2
+      end
+
+      it 'should return all events, ignoring the undated flag' do
+        json = api_call(:get, "/api/v1/calendar_events?all_events=1&undated=1&context_codes[]=course_#{@course.id}", {
+                          :controller => 'calendar_events_api', :action => 'index', :format => 'json',
+                          :context_codes => ["course_#{@course.id}"],
+                          :all_events => '1', :undated => '1'})
+        json.size.should eql 2
+      end
+
+      it 'should return all events, ignoring the start_date and end_date' do
+        json = api_call(:get, "/api/v1/calendar_events?all_events=1&start_date=2012-02-01&end_date=2012-02-01&context_codes[]=course_#{@course.id}", {
+                          :controller => 'calendar_events_api', :action => 'index', :format => 'json',
+                          :context_codes => ["course_#{@course.id}"],
+                          :all_events => '1', :start_date => '2012-02-01', :end_date => '2012-02-01'})
+        json.size.should eql 2
+      end
+    end
+
     context 'appointments' do
       it 'should include appointments for teachers (with participant info)' do
         ag1 = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 4, :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
@@ -534,7 +565,7 @@ describe CalendarEventsApiController, :type => :integration do
                         :controller => 'courses', :action => 'show', :format => 'json', :id => @course.id.to_s)
         get json['calendar']['ics']
         response.should be_success
-        cal = Icalendar.parse(response.body)[0]
+        cal = Icalendar.parse(response.body.dup)[0]
         cal.events[0].x_alt_desc
       end
     end
@@ -582,6 +613,19 @@ describe CalendarEventsApiController, :type => :integration do
         json['child_events'].should be_empty
         json['start_at'].should be_nil
         json['end_at'].should be_nil
+        json['hidden'].should be_false
+      end
+
+      it "should add the section name to a child event's title"  do
+        event = @course.calendar_events.build(:title => 'ohai', :child_event_data => {"0" => {:start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string}})
+        event.updating_user = @user
+        event.save!
+  
+        child_event_id = event.child_event_ids.first
+        json = api_call(:get, "/api/v1/calendar_events/#{child_event_id}",
+                        { :controller => 'calendar_events_api', :action => 'show', :id => child_event_id.to_s, :format => 'json' })
+        json.keys.sort.should eql((expected_fields + ['effective_context_code']).sort)
+        json['title'].should eql "ohai (#{@course.default_section.name})"
         json['hidden'].should be_false
       end
     end
@@ -651,6 +695,37 @@ describe CalendarEventsApiController, :type => :integration do
                         :context_codes => ["course_#{@course.id}"], :undated => '1'})
       json.size.should eql 1
       json.first['due_at'].should be_nil
+    end
+
+    context 'all assignments' do
+      before do
+        @course.assignments.create(:title => 'undated')
+        @course.assignments.create(:title => 'dated', :due_at => '2012-01-08 12:00:00')
+      end
+
+      it 'should return all assignments' do
+        json = api_call(:get, "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course.id}", {
+                          :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                          :context_codes => ["course_#{@course.id}"],
+                          :all_events => '1'})
+        json.size.should eql 2
+      end
+
+      it 'should return all assignments, ignoring the undated flag' do
+        json = api_call(:get, "/api/v1/calendar_events?type=assignment&all_events=1&undated=1&context_codes[]=course_#{@course.id}", {
+                          :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                          :context_codes => ["course_#{@course.id}"],
+                          :all_events => '1', :undated => '1'})
+        json.size.should eql 2
+      end
+
+      it 'should return all assignments, ignoring the start_date and end_date' do
+        json = api_call(:get, "/api/v1/calendar_events?type=assignment&all_events=1&start_date=2012-02-01&end_date=2012-02-01&context_codes[]=course_#{@course.id}", {
+                          :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+                          :context_codes => ["course_#{@course.id}"],
+                          :all_events => '1', :start_date => '2012-02-01', :end_date => '2012-02-01'})
+        json.size.should eql 2
+      end
     end
 
     it 'should get a single assignment' do
@@ -1238,4 +1313,58 @@ describe CalendarEventsApiController, :type => :integration do
       end
     end
   end
+
+  context "calendar feed" do
+    before :each do
+      now = Time.now
+      @student = user(:active_all => true, :active_state => 'active')
+      @course.enroll_student(@student, :enrollment_state => 'active')
+      @student2 = user(:active_all => true, :active_state => 'active')
+      @course.enroll_student(@student2, :enrollment_state => 'active')
+
+
+      @event = @course.calendar_events.create(:title => 'course event', :start_at => now + 1.day)
+      @assignment = @course.assignments.create(:title => 'original assignment', :due_at => now + 2.days)
+      @override = assignment_override_model(
+        :assignment => @assignment, :due_at => @assignment.due_at + 3.days, :set => @course.default_section)
+
+      @appointment_group = AppointmentGroup.create!(
+        :title => "appointment group", :participants_per_appointment => 4, 
+        :new_appointments => [
+          [now + 3.days, now + 3.days + 1.hour],
+          [now + 3.days + 1.hour, now + 3.days + 2.hours],
+          [now + 3.days + 2.hours, now + 3.days + 3.hours]],
+        :contexts => [@course])
+
+      @appointment_event = @appointment_group.appointments[0]
+      @appointment = @appointment_event.reserve_for(@student, @student)
+
+      @appointment_event2 = @appointment_group.appointments[1]
+      @appointment2 = @appointment_event2.reserve_for(@student2, @student2)
+    end
+
+    it "should have events for the teacher" do
+      raw_api_call(:get, "/feeds/calendars/#{@teacher.feed_code}.ics", {
+        :controller => 'calendar_events_api', :action => 'public_feed', :format => 'ics', :feed_code => @teacher.feed_code})
+      response.should be_success
+
+      response.body.scan(/UID:\s*event-([^\n]*)/).flatten.map(&:strip).sort.should eql [
+        "assignment-#{@assignment.id}", "assignment-override-#{@override.id}", "calendar-event-#{@event.id}",
+        "calendar-event-#{@appointment_event.id}", "calendar-event-#{@appointment_event2.id}"].sort
+    end
+
+    it "should have events for the student" do
+      raw_api_call(:get, "/feeds/calendars/#{@student.feed_code}.ics", {
+        :controller => 'calendar_events_api', :action => 'public_feed', :format => 'ics', :feed_code => @student.feed_code})
+      response.should be_success
+
+      response.body.scan(/UID:\s*event-([^\n]*)/).flatten.map(&:strip).sort.should eql [
+        "assignment-override-#{@override.id}", "calendar-event-#{@event.id}", "calendar-event-#{@appointment.id}"].sort
+
+      # make sure the assignment actually has the override date
+      expected_override_date_output = @override.due_at.utc.iso8601.gsub(/[-:]/, '').gsub(/\d\dZ$/, '00Z')
+      response.body.match(/DTSTART:\s*#{expected_override_date_output}/).should_not be_nil
+    end
+  end
+
 end

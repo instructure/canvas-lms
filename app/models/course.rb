@@ -20,6 +20,7 @@ class Course < ActiveRecord::Base
 
   include Context
   include Workflow
+  include TextHelper
 
   attr_accessible :name,
                   :section,
@@ -36,6 +37,7 @@ class Course < ActiveRecord::Base
                   :syllabus_body,
                   :public_description,
                   :allow_student_forum_attachments,
+                  :allow_student_discussion_topics,
                   :default_wiki_editing_roles,
                   :allow_student_organized_groups,
                   :course_code,
@@ -115,7 +117,6 @@ class Course < ActiveRecord::Base
   has_many :all_group_categories, :class_name => 'GroupCategory', :as => :context
   has_many :groups, :as => :context
   has_many :active_groups, :as => :context, :class_name => 'Group', :conditions => ['groups.workflow_state != ?', 'deleted']
-  has_many :group_categories, :as => :context, :conditions => ['deleted_at IS NULL']
   has_many :assignment_groups, :as => :context, :dependent => :destroy, :order => 'assignment_groups.position, assignment_groups.name'
   has_many :assignments, :as => :context, :dependent => :destroy, :order => 'assignments.created_at'
   has_many :calendar_events, :as => :context, :conditions => ['calendar_events.workflow_state != ?', 'cancelled'], :dependent => :destroy
@@ -792,6 +793,10 @@ class Course < ActiveRecord::Base
     write_attribute(:course_code, val)
   end
 
+  def short_name_slug
+    truncate_text(short_name, :ellipsis => '')
+  end
+
   # Allows the account to be set directly
   belongs_to :account
 
@@ -1157,7 +1162,7 @@ class Course < ActiveRecord::Base
     return false if session && session["role_course_#{self.id}"]
 
     @membership_allows ||= {}
-    @membership_allows[[user.id, permission]] ||= self.account_users_for(user).any? { |au| permission.nil? || au.has_permission_to?(permission) }
+    @membership_allows[[user.id, permission]] ||= self.account_users_for(user).any? { |au| permission.nil? || au.has_permission_to?(self, permission) }
   end
 
   def teacherless?
@@ -1471,6 +1476,7 @@ class Course < ActiveRecord::Base
     section = opts[:section]
     limit_privileges_to_course_section = opts[:limit_privileges_to_course_section]
     associated_user_id = opts[:associated_user_id]
+    role_name = opts[:role_name]
     section ||= self.default_section
     enrollment_state ||= self.available? ? "invited" : "creation_pending"
     if type == 'TeacherEnrollment' || type == 'TaEnrollment' || type == 'DesignerEnrollment'
@@ -1479,16 +1485,19 @@ class Course < ActiveRecord::Base
       enrollment_state = 'creation_pending' if enrollment_state == 'invited' && !self.available?
     end
     if opts[:allow_multiple_enrollments] && associated_user_id
-      e = self.enrollments.find_by_user_id_and_type_and_course_section_id_and_associated_user_id(user.id, type, section.id, associated_user_id)
+      e = self.enrollments.find_by_user_id_and_type_and_role_name_and_course_section_id_and_associated_user_id(user.id, type, role_name, section.id, associated_user_id)
     elsif opts[:allow_multiple_enrollments]
-      e = self.enrollments.find_by_user_id_and_type_and_course_section_id(user.id, type, section.id)
+      e = self.enrollments.find_by_user_id_and_type_and_role_name_and_course_section_id(user.id, type, role_name, section.id)
     else
-      e = self.enrollments.find_by_user_id_and_type(user.id, type)
+      e = self.enrollments.find_by_user_id_and_type_and_role_name(user.id, type, role_name)
     end
-    e.attributes = { 
-      :course_section => section, 
-      :workflow_state => 'invited', 
-      :limit_privileges_to_course_section => limit_privileges_to_course_section } if e && (e.completed? || e.rejected?)
+    if e
+      e.already_enrolled = true
+      e.attributes = {
+        :course_section => section,
+        :workflow_state => 'invited',
+        :limit_privileges_to_course_section => limit_privileges_to_course_section } if e.completed? || e.rejected?
+    end
     # if we're creating a new enrollment, we want to return it as the correct
     # subclass, but without using associations, we need to manually activate
     # sharding. We should probably find a way to go back to using the
@@ -1502,7 +1511,7 @@ class Course < ActiveRecord::Base
         :limit_privileges_to_course_section => limit_privileges_to_course_section)
     end
     e.associated_user_id = associated_user_id
-    e.role_name = opts[:role_name] if opts[:role_name].present?
+    e.role_name = role_name
     if e.changed?
       if opts[:no_notify]
         e.save_without_broadcasting
@@ -2549,16 +2558,13 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def enrollment_visibility_level_for(user, visibilities = section_visibilities_for(user))
-    if visibilities.empty? # i.e. not enrolled
-      if self.grants_rights?(user, nil, :manage_grades, :manage_students, :manage_admin_users, :read_roster)
-        :full
-      else
-        :none
-      end
-    elsif visibilities.all?{ |e| e[:type] == 'ObserverEnrollment' }
-      :restricted # e.g. observers shouldn't see anyone but the observed
-    elsif visibility_limited_to_course_sections?(user, visibilities)
+  def enrollment_visibility_level_for(user, visibilities = section_visibilities_for(user), require_message_permission = false)
+    permissions = require_message_permission ?
+      [:send_messages] :
+      [:manage_grades, :manage_students, :manage_admin_users, :read_roster, :view_all_grades]
+    if !self.grants_rights?(user, nil, *permissions).values.any?
+      :restricted # e.g. observer, can only see admins in the course
+    elsif visibilities.present? && visibility_limited_to_course_sections?(user, visibilities)
       :sections
     else
       :full
@@ -2614,6 +2620,11 @@ class Course < ActiveRecord::Base
       { :id => TAB_COLLABORATIONS, :label => t('#tabs.collaborations', "Collaborations"), :css_class => 'collaborations', :href => :course_collaborations_path },
       { :id => TAB_SETTINGS, :label => t('#tabs.settings', "Settings"), :css_class => 'settings', :href => :course_settings_path },
     ]
+  end
+
+  def tab_hidden?(id)
+    tab = self.tab_configuration.find{|t| t[:id] == id}
+    return tab && tab[:hidden]
   end
 
   def external_tool_tabs(opts)
@@ -2816,7 +2827,7 @@ class Course < ActiveRecord::Base
   end
 
   def allow_student_discussion_topics=(allow)
-    self.settings[:allow_student_discussion_topics] = allow
+    self.settings[:allow_student_discussion_topics] = Canvas::Plugin.value_to_boolean(allow)
   end
 
   def filter_attributes_for_user(hash, user, session)

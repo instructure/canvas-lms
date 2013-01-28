@@ -10,7 +10,7 @@
 
 <%= asset.title %>
 
-<% if asset.multiple_due_dates_apply_to(user) %>
+<% if asset.multiple_due_dates_apply_to?(user) %>
   <%= t('multiple_due_dates', 'due: Multiple Dates') %>
 <% elsif asset.due_at %>
   <%= t('due_at', 'due: %{assignment_due_date_time}', :assignment_due_date_time => datetime_string(force_zone(asset.due_at))) %>

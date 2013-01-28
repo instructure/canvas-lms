@@ -2,6 +2,13 @@ define ['Backbone'], ({View}) ->
 
   module 'View'
 
+  test 'template option', ->
+    view = new View
+      template: -> "hi"
+    view.render()
+    equal view.$el.html(), "hi",
+      "tempalte rendered with view as option"
+
   test 'View.mixin', 3, ->
 
     mixin1 =

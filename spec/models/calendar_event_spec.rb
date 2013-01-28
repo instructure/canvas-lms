@@ -159,12 +159,17 @@ describe CalendarEvent do
       course1 = @course
       course_with_teacher(@teacher)
       course2, @course = @course, course1
-      g1 = AppointmentGroup.create(:title => "foo", :contexts => [course1, course2])
+      g1 = AppointmentGroup.create!(:title => "foo", :contexts => [course1, course2])
       g1.publish!
-      a1 = g1.appointments.create.reserve_for(@student, @student)
-      g2 = AppointmentGroup.create(:title => "foo", :contexts => [@course], :sub_context_codes => [@course.default_section.asset_string])
+      ae1 = g1.appointments.create!
+      a1 = ae1.reserve_for(@student, @student)
+      g2 = AppointmentGroup.create!(:title => "foo", :contexts => [@course], :sub_context_codes => [@course.default_section.asset_string])
       g2.publish!
-      a2 = g2.appointments.create.reserve_for(@student, @student)
+      ae2 = g2.appointments.create!
+      a2 = ae2.reserve_for(@student, @student)
+      g3 = AppointmentGroup.create!(:title => "foo", :contexts => [@course])
+      g3.publish!
+      ae3 = g3.appointments.create!
       pe = @course.calendar_events.create!
       section = @course.default_section
       se = pe.child_events.build
@@ -185,6 +190,12 @@ describe CalendarEvent do
 
       CalendarEvent.for_user_and_context_codes(@student, [@course.asset_string]).events_without_child_events.sort_by(&:id).
         should eql [@e1, a1, a2, se]
+
+      CalendarEvent.for_user_and_context_codes(@student, [g1.asset_string, g2.asset_string, g3.asset_string]).sort_by(&:id).
+        should eql [ae1, ae2, ae3]
+
+      CalendarEvent.for_user_and_context_codes(@teacher, [g1.asset_string, g2.asset_string, g3.asset_string]).events_with_child_events.sort_by(&:id).
+        should eql [ae1, ae2]
     end
   end
 

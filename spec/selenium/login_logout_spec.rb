@@ -3,8 +3,6 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "login logout test" do
   it_should_behave_like "in-process server selenium tests"
 
-  LOGIN_ERROR_BOX_CSS = ".error_text:last"
-
   def should_show_message(message_text, selector)
     fj(selector).should include_text(message_text)
   end
@@ -23,6 +21,10 @@ describe "login logout test" do
     f('#login_forgot_password').click
   end
 
+  before do
+    @login_error_box_css = ".error_text:last"
+  end
+
   it "should login successfully with correct username and password" do
     user_with_pseudonym({:active_user => true})
     login_as
@@ -37,19 +39,19 @@ describe "login logout test" do
   it "should show invalid password message if password is nil" do
     expected_error = "Invalid password"
     login_as("fake@user.com", nil, false)
-    should_show_message(expected_error, LOGIN_ERROR_BOX_CSS)
+    should_show_message(expected_error, @login_error_box_css)
   end
 
   it "should show invalid login message if username is nil" do
     expected_error = "Invalid login"
     login_as(nil, "123", false)
-    should_show_message(expected_error, LOGIN_ERROR_BOX_CSS)
+    should_show_message(expected_error, @login_error_box_css)
   end
 
   it "should should invalid login message if both username and password are nil" do
     expected_error = "Invalid login"
     login_as(nil, nil, false)
-    should_show_message(expected_error, LOGIN_ERROR_BOX_CSS)
+    should_show_message(expected_error, @login_error_box_css)
   end
 
   it "should prompt must be logged in message when accessing permission based pages while not logged in" do

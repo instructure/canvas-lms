@@ -119,6 +119,7 @@ class QuizzesController < ApplicationController
       return
     end
     if authorized_action(@quiz, @current_user, :read)
+      @quiz = @quiz.overridden_for(@current_user)
       add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
 
       @headers = !params[:headless]
@@ -139,6 +140,7 @@ class QuizzesController < ApplicationController
       @quiz.context_module_action(@current_user, :read) if !@locked
 
       @assignment = @quiz.assignment
+      @assignment = @assignment.overridden_for(@current_user) if @assignment
       @submission = @quiz.quiz_submissions.find_by_user_id(@current_user.id, :order => 'created_at') rescue nil
       if !@current_user || (params[:preview] && @quiz.grants_right?(@current_user, session, :update))
         user_code = temporary_user_code

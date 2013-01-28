@@ -22,7 +22,7 @@
 class AssignmentGroupsController < ApplicationController
   before_filter :require_context
 
-  include Api::V1::Assignment
+  include Api::V1::AssignmentGroup
 
   # @API List assignment groups
   # Returns the list of assignment groups for the current context. The returned
@@ -65,27 +65,19 @@ class AssignmentGroupsController < ApplicationController
   def index
     @groups = @context.assignment_groups.active
 
-    include_assignments = Array(params[:include]).include?('assignments')
-    if include_assignments
-      @groups = @groups.scoped(:include => { :assignments => :rubric })
+    params[:include] = Array(params[:include])
+    if params[:include].include? 'assignments'
+      params[:include] << "discussion_topic"
+      @groups = @groups.scoped(:include => { :assignments => [:rubric, :discussion_topic] })
     end
 
     if authorized_action(@context.assignment_groups.new, @current_user, :read)
-
       respond_to do |format|
         format.json {
-          hashes = @groups.map do |group|
-            hash = group.as_json(:include_root => false,
-                                 :only => %w(id name position group_weight))
-            # note that 'rules_hash' gets to_jsoned as just 'rules' because that is what GradeCalculator expects. 
-            hash['rules'] = group.rules_hash
-            if include_assignments
-              hash['assignments'] = group.assignments.active.map { |a| assignment_json(a, @current_user, session) }
-            end
-            hash
-          end
-          hashes.each { |group| group['group_weight'] = nil } unless @context.apply_group_weights?
-          render :json => hashes.to_json
+          json = @groups.map { |g|
+            assignment_group_json(g, @current_user, session, params[:include])
+          }
+          render :json => json
         }
       end
     end
@@ -176,7 +168,7 @@ class AssignmentGroupsController < ApplicationController
   def destroy
     @assignment_group = AssignmentGroup.find(params[:id])
     if authorized_action(@assignment_group, @current_user, :delete)
-      if @assignment_group.has_frozen_assignments?(@current_user)
+      if @assignment_group.has_frozen_assignment_group_id_assignment?(@current_user)
         @assignment_group.errors.add('workflow_state', t('errors.cannot_delete_group', "You can not delete a group with a locked assignment.", :att_name => 'workflow_state'))
         respond_to do |format|
           format.html { redirect_to named_context_url(@context, :context_assignments_url) }

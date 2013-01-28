@@ -81,3 +81,4 @@ define [
       .removeAttr('data-tooltip')
       .tooltip(opts)
       .tooltip('open')
+      .click -> $this.tooltip('close')

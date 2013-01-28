@@ -53,21 +53,23 @@ describe "quizzes" do
       end
 
       describe "on individual quiz page" do
-        RESUME_TEXT = 'Resume Quiz'
-
         def validate_resume_button_text(text)
           f('#right-side .btn').text.should == text
+        end
+        
+        before do
+          @resume_text = 'Resume Quiz'
         end
 
         it "should show the resume quiz button if the quiz is unlocked" do
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-          validate_resume_button_text(RESUME_TEXT)
+          validate_resume_button_text(@resume_text)
         end
 
         it "should show the resume quiz button if the quiz unlock_at date is < now" do
           update_quiz_lock(Time.now - 1.day.ago, Time.now - 10.minutes.ago)
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-          validate_resume_button_text(RESUME_TEXT)
+          validate_resume_button_text(@resume_text)
         end
 
         it "should not show the resume quiz button if quiz is locked" do
@@ -75,7 +77,7 @@ describe "quizzes" do
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
           right_side = f('#right-side')
           right_side.should_not include_text("You're in the middle of taking this quiz.")
-          right_side.should_not include_text(RESUME_TEXT)
+          right_side.should_not include_text(@resume_text)
         end
       end
     end

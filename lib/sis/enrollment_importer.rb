@@ -181,7 +181,7 @@ module SIS
               next
             end
 
-            enrollment = @section.all_enrollments.find(:first, :conditions => { :user_id => user.id, :type => type, :associated_user_id => associated_enrollment.try(:user_id) })
+            enrollment = @section.all_enrollments.find(:first, :conditions => { :user_id => user.id, :type => type, :associated_user_id => associated_enrollment.try(:user_id), :role_name => custom_role.try(:name) })
             unless enrollment
               enrollment = Enrollment.new
               enrollment.root_account = @root_account
@@ -190,7 +190,7 @@ module SIS
             enrollment.sis_source_id = [course_id, user_id, role, @section.name].compact.join(":")
             enrollment.type = type
             enrollment.associated_user_id = associated_enrollment.try(:user_id)
-            enrollment.role_name = custom_role.name if custom_role
+            enrollment.role_name = custom_role.try(:name)
             enrollment.course = @course
             enrollment.course_section = @section
 

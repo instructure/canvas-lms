@@ -9,8 +9,6 @@ class SortsAssignments
     :future
   )
 
-  VDDAssignment = Struct.new(:id,:due_at)
-
   def self.by_varied_due_date(opts)
     assignments = opts.fetch( :assignments )
     user = opts.fetch( :user )
@@ -39,7 +37,7 @@ class SortsAssignments
   def self.vdd_map(assignments, user)
     assignments ||= []
     assignments.map do |assignment|
-      VDDAssignment.new(assignment.id, VariedDueDate.due_at_for?(assignment, user))
+      assignment.overridden_for(user)
     end
   end
 

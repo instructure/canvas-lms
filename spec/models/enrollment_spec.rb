@@ -1551,4 +1551,39 @@ describe Enrollment do
       pe.reload.should be_deleted
     end
   end
+
+  describe '#can_be_deleted_by' do
+
+    describe 'on a student enrollment' do
+      let(:enrollment) { StudentEnrollment.new }
+      let(:user) { stub(:id => 42) }
+      let(:session) { stub }
+
+      it 'is true for a user who has been granted the right' do
+        context = stub(:grants_right? => true)
+        enrollment.can_be_deleted_by(user, context, session).should be_true
+      end
+
+      it 'is false for a user without the right' do
+        context = stub(:grants_right? => false)
+        enrollment.can_be_deleted_by(user, context, session).should be_false
+      end
+
+      it 'is true for a user who can manage_admin_users' do
+        context = Object.new
+        context.stubs(:grants_right?).with(user, session, :manage_students).returns(false)
+        context.stubs(:grants_right?).with(user, session, :manage_admin_users).returns(true)
+        enrollment.can_be_deleted_by(user, context, session).should be_true
+      end
+
+      it 'is false if a user is trying to remove their own enrollment' do
+        context = Object.new
+        context.stubs(:grants_right?).with(user, session, :manage_students).returns(true)
+        context.stubs(:grants_right?).with(user, session, :manage_admin_users).returns(false)
+        context.stubs(:account => context)
+        enrollment.user_id = user.id
+        enrollment.can_be_deleted_by(user, context, session).should be_false
+      end
+    end
+  end
 end

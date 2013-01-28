@@ -21,18 +21,25 @@ module AssignmentOverrideApplicator
   # version) and user, determine the list of overrides, apply them to the
   # assignment or quiz, and return the overridden stand-in.
   def self.assignment_overridden_for(assignment_or_quiz, user)
-    return assignment_or_quiz if user.nil? or assignment_or_quiz.overridden_for_user_id == user.id
+    return assignment_or_quiz if assignment_or_quiz.overridden_for?(user)
 
     overrides = self.overrides_for_assignment_and_user(assignment_or_quiz, user)
  
     result_assignment_or_quiz = self.assignment_with_overrides(assignment_or_quiz, overrides) unless overrides.empty?
     result_assignment_or_quiz ||= assignment_or_quiz
-    result_assignment_or_quiz.overridden_for_user_id = user.id
+    result_assignment_or_quiz.overridden = true
+    result_assignment_or_quiz.overridden_for_user = user
     result_assignment_or_quiz
   end
 
   def self.quiz_overridden_for(quiz, user)
     assignment_overridden_for(quiz, user)
+  end
+
+
+  def self.assignment_overriden_for_section(assignment_or_quiz, section)
+    section_overrides = assignment_or_quiz.assignment_overrides.scoped(:conditions => {:set_type => 'CourseSection', :set_id => section.id})
+    override_for_due_at(assignment_or_quiz, section_overrides)
   end
 
   # determine list of overrides (of appropriate version) that apply to the
@@ -43,7 +50,7 @@ module AssignmentOverrideApplicator
     Rails.cache.fetch([user, assignment_or_quiz, assignment_or_quiz.version_number, 'overrides'].cache_key) do
 
       # return an empty array to the block if there is nothing to do here
-      next [] unless assignment_or_quiz.has_overrides?
+      next [] if user.nil? || !assignment_or_quiz.has_overrides?
 
       overrides = []
 
@@ -62,10 +69,17 @@ module AssignmentOverrideApplicator
         overrides << group_override if group_override
       end
 
+      observed_students = ObserverEnrollment.observed_students(assignment_or_quiz.context, user)
+      observed_student_overrides = observed_students.map do |student, enrollments|
+        overrides_for_assignment_and_user(assignment_or_quiz, student)
+      end
+
+      overrides += observed_student_overrides.flatten.uniq
+
       section_ids = user.enrollments.active.scoped(:conditions =>
-        { :type => ['StudentEnrollment', 'ObserverEnrollment'],
+        { :type => ['StudentEnrollment', 'ObserverEnrollment', 'StudentViewEnrollment'],
           :course_id => assignment_or_quiz.context_id}).map(&:course_section_id)
-      
+
       section_overrides = assignment_or_quiz.assignment_overrides.
         scoped(:conditions => {:set_type => 'CourseSection', :set_id => section_ids})
 
@@ -76,16 +90,20 @@ module AssignmentOverrideApplicator
       # for each potential override discovered, make sure we look at the
       # appropriate version
       overrides = overrides.map do |override|
-        override_version = override.versions.detect do |version|
-          model_version = assignment_or_quiz.is_a?(Quiz) ? version.model.quiz_version : version.model.assignment_version
-          model_version <= assignment_or_quiz.version_number
+        if override.versions.empty?
+          override
+        else
+          override_version = override.versions.detect do |version|
+            model_version = assignment_or_quiz.is_a?(Quiz) ? version.model.quiz_version : version.model.assignment_version
+            model_version <= assignment_or_quiz.version_number
+          end
+          override_version ? override_version.model : nil
         end
-        override_version ? override_version.model : nil
       end
 
       # discard overrides where there was no appropriate version or the
       # appropriate version is in the deleted state
-      overrides.select{ |override| override && override.active? }
+      overrides.compact.select(&:active?)
     end
   end
 
@@ -156,12 +174,7 @@ module AssignmentOverrideApplicator
     elsif override = applicable_overrides.detect{ |o| o.due_at.nil? }
       override
     else
-      override = applicable_overrides.sort_by(&:due_at).last
-      if assignment_or_quiz.due_at && assignment_or_quiz.due_at > override.due_at
-        assignment_or_quiz
-      else
-        override
-      end
+      applicable_overrides.sort_by(&:due_at).last
     end
   end
 

@@ -11,13 +11,22 @@ Teacher *or* students can set up group collaborations.
 HEREDOC
        %>
     </p>
-    <% if can_do(@context, @current_user, :create_collaborations) %>
-      <a href="#" class="add_collaboration_link btn button-sidebar-wide"><%= image_tag "add.png" %> <%= t 'links.new', "Start a New Collaboration" %></a>
-    <% end %>
   </div>
 <% end %>
 <a href="#" class="external_link" target="_blank" style="display: none;">&nbsp;</a>
-<h2><%= t 'titles.current', "Current Collaborations" %></h2>
+
+<header class="collaborations-header">
+  <h1 tabindex="-1"><%= t 'titles.current', "Current Collaborations" %></h1>
+
+  <% if can_do(@context, @current_user, :create_collaborations) %>
+    <a href="#"
+       class="add_collaboration_link btn">
+      <i class="icon-add" aria-hidden="true"></i>
+      <%= t('links.new', 'Start a new collaboration') %>
+    </a>
+  <% end %>
+</header>
+
 <div id="no_collaborations_message" style="<%= hidden unless @collaborations.empty? %>">
   <% if can_do(@context, @current_user, :manage_content) %>
     <p><%= mt :description_teacher, <<-HEREDOC, :google_url => "http://docs.google.com", :etherpad_url => "http://www.etherpad.org"
@@ -49,7 +58,7 @@ HEREDOC
 <div id="collaborations">
 <% @collaborations.each do |collaboration| %>
   <% if can_do(collaboration, @current_user, :read) %>
-    <div class="collaboration <%= collaboration.style_class %> collaboration_<%= collaboration.id %>">
+    <div class="collaboration <%= collaboration.style_class %> collaboration_<%= collaboration.id %>" data-id="<%= collaboration.id %>">
       <% if can_do(collaboration, @current_user, :delete) %>
       <div class="links">
         <a href="<%= context_url(@context, :context_collaboration_url, collaboration.id) %>" title="<%= t 'links.edit', "Edit this Collaboration" %>" class="edit_collaboration_link no-hover"><%= image_tag "edit.png" %></a>
@@ -60,24 +69,10 @@ HEREDOC
       <div style="margin-bottom: 5px;" class="description">
         <%= collaboration.description %>
       </div>
-      <%= t :collaborators_count, { :one => "*1 Collaborator* on %{service}", :other => "*%{count} Collaborators* on %{service}" },
-            :count => (collaboration.users + [collaboration.user]).compact.uniq.length,
-            :service => collaboration.service_name,
-            :wrapper => '<a href="#" class="toggle_collaborators_link">\1</a>' %>
-      <br/>
       <span style="font-size: 0.8em;"><%= t :started_by, "Started by *%{user}*, %{at}",
                                           :user => context_user_name(@context, collaboration.user),
                                           :wrapper => "<a href=\"#{context_url(@context, :context_user_url, collaboration.user_id)}\" class=\"collaborator_link\">\\1</a>",
                                           :at => datetime_string(collaboration.created_at) %></span>
-      <ul class="collaborators">
-        <li><b><%= context_user_name(@context, collaboration.user) %></b></li>
-        <% (collaboration.users.uniq - [collaboration.user]).each do |user| %>
-          <li>
-            <%= context_user_name(@context, user) %>
-            <span class="id" style="display: none;"><%= user.id %></span>
-          </li>
-        <% end %>
-      </ul>
     </div>
   <% end %>
 <% end %>

@@ -399,13 +399,13 @@ ul.messages
     .message_attachments
       border-top-color: #b7c2cc
 
-ul.messages li.other .actions:focus
+ul.messages li.other .admin-links:focus
   margin-left: 1em
   display: inline
   position: static
 
 ul.messages li.other:hover
-  .actions
+  .admin-links
     margin-left: 1em
     display: inline
     position: static
@@ -418,7 +418,7 @@ ul.messages li.other:hover
       background-position: 0 -18px
 
 ul.messages, ul.messages.private, ul.messages.private li:hover
-  .actions
+  .admin-links
     display: none
 
 #messages
@@ -489,10 +489,15 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
     text-align: center
   div.conversations
     position: relative
+  .admin-link-hover-area.active .admin-links
+    display: block
+    right: 17px
+    a, a:hover
+      background-position: 0 -44px
   div.conversations > ul
     a.details_link
       display: none
-    .actions
+    .admin-links
       position: absolute
       right: 9999px
       top: 5px
@@ -503,14 +508,14 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
         overflow: hidden
         width: 32px
         height: 22px
-    .actions > a:hover
+    .admin-links > a:hover
       background-position: 0 -22px
-    .actions.selected
+    .admin-links.selected
       display: block
       right: 17px
       a, a:hover
         background-position: 0 -44px
-    .actions:focus
+    .admin-links:focus
       right: 17px
     .count
       color: #fff
@@ -580,7 +585,7 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
       .action_star
         background-image: url(/images/messages/star-active.png)
       cursor: pointer
-      .actions
+      .admin-links
         display: block
         right: 17px
       .date

@@ -198,6 +198,8 @@ class CalendarEventsApiController < ApplicationController
   #   returned.
   # @argument undated [Optional] Boolean, defaults to false (dated events only).
   #   If true, only return undated events and ignore start_date and end_date.
+  # @argument all_events [Optional] Boolean, defaults to false (uses start_date, end_date, and undated criteria).
+  #   If true, all events are returned, ignoring start_date, end_date, and undated criteria.
   # @argument context_codes[] [Optional] List of context codes of courses/groups/users whose events you want to see.
   #   If not specified, defaults to the current user (i.e personal calendar, 
   #   no course/group events). Limited to 10 context codes, additional ones are 
@@ -388,6 +390,14 @@ class CalendarEventsApiController < ApplicationController
         @events.concat assignment_scope.all
         @events = apply_assignment_overrides(@events)
         @events.concat calendar_event_scope.events_without_child_events.all
+
+        # Add in any appointment groups this user can manage and someone has reserved
+        appointment_codes = manageable_appointment_group_codes
+        @events.concat CalendarEvent.active.
+          for_user_and_context_codes(@current_user, appointment_codes).
+          send(*date_scope_and_args).
+          events_with_child_events.
+          all
       end
     else
       # if the feed url doesn't give us the requesting user,
@@ -462,7 +472,9 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def get_options(codes)
-    unless value_to_boolean(params[:undated])
+    @all_events = value_to_boolean(params[:all_events])
+    @undated = value_to_boolean(params[:undated])
+    if !@all_events && !@undated
       today = ActiveSupport::TimeWithZone.new(Time.now, Time.zone).to_date
       @start_date ||= params[:start_date] && (Date.parse(params[:start_date]) rescue nil) || today.to_date
       @end_date ||= params[:end_date] && (Date.parse(params[:end_date]) rescue nil) || today.to_date
@@ -503,23 +515,24 @@ class CalendarEventsApiController < ApplicationController
       end
       # include manageable appointment group events for the specified contexts
       # and dates
-      @context_codes += AppointmentGroup.
-                          manageable_by(@current_user, @context_codes).
-                          intersecting(@start_date, @end_date).
-                          map(&:asset_string)
+      @context_codes += manageable_appointment_group_codes
     end
   end
 
   def assignment_scope
-    Assignment.active.
-      for_context_codes(@context_codes).
-      send(*date_scope_and_args(:due_between_with_overrides))
+    scope = Assignment.active.
+      for_context_codes(@context_codes)
+
+    scope = scope.send(*date_scope_and_args(:due_between_with_overrides)) unless @all_events
+    scope
   end
 
   def calendar_event_scope
-    CalendarEvent.active.
-      for_user_and_context_codes(@current_user, @context_codes, @section_codes).
-      send(*date_scope_and_args)
+    scope = CalendarEvent.active.
+      for_user_and_context_codes(@current_user, @context_codes, @section_codes)
+
+    scope = scope.send(*date_scope_and_args) unless @all_events
+    scope
   end
 
   def search_params
@@ -538,7 +551,7 @@ class CalendarEventsApiController < ApplicationController
 
         original_dates.each { |date| assignments << assignment }
       else
-        assignment.due_at = VariedDueDate.due_at_for?(assignment, @current_user)
+        assignment = assignment.overridden_for(@current_user)
         assignment.infer_all_day
         assignments << assignment
       end
@@ -546,14 +559,23 @@ class CalendarEventsApiController < ApplicationController
       assignments
     end
 
-    # Once we've got all of the possible assignments, delete anything
-    # whose overrides put it outside of the current range.
-    events.delete_if do |assignment|
-      due_at = assignment.due_at.try(:to_datetime)
-      due_at && (due_at > @end_date || due_at < @start_date)
+    if !@all_events && !@undated
+      # Once we've got all of the possible assignments, delete anything
+      # whose overrides put it outside of the current range.
+      events.delete_if do |assignment|
+        due_at = assignment.due_at.try(:to_datetime)
+        due_at && (due_at > @end_date || due_at < @start_date)
+      end
     end
 
     events
+  end
+
+  def manageable_appointment_group_codes
+    AppointmentGroup.
+      manageable_by(@current_user, @context_codes).
+      intersecting(@start_date, @end_date).
+      map(&:asset_string)
   end
 
 end

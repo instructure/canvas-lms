@@ -1,0 +1,13 @@
+<li>
+  <a href="#" data-id="{{id}}">
+    <i class="icon-{{type}}" aria-hidden="true"></i>
+    {{name}}
+
+    {{#if selected}}
+      <i class="icon-end" aria-hidden="true"></i>
+      <input type="hidden" id="{{type}}_{{id}}" name="{{type}}[]" value="{{id}}" />
+    {{else}}
+      <i class="icon-add" aria-hidden="true"></i>
+    {{/if}}
+  </a>
+</li>

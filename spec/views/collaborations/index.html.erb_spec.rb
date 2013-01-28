@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011-2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -24,7 +24,6 @@ describe "/collaborations/index" do
     course_with_student
     view_context(@course, @user)
     assigns[:collaborations] = [@course.collaborations.create!]
-    assigns[:users] = @course.users
   end
 
   it "should render" do
@@ -35,9 +34,9 @@ describe "/collaborations/index" do
   it "should provide labels for accessibility devices i.e. screen readers" do
     render :partial => "collaborations/forms"
     response.should_not be_nil
-    response.should have_tag("label[for=collaboration_title]", :text => "Document Name:")
-    response.should have_tag("label[for=collaboration_description]", :text => "Description:")
-    response.should have_tag("label[for=collaboration_collaboration_type]", :text => "Collaborate Using:")
+    response.should have_tag("label[for=collaboration_title]", :text => "Document name:")
+    response.should have_tag("label[for=collaboration_description]", :text => "Description")
+    response.should have_tag("label[for=collaboration_collaboration_type]", :text => "Collaborate using:")
   end
 end
 

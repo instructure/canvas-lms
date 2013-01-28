@@ -58,6 +58,7 @@ module Canvas::AccountReports
         scoped(:include => { :exclude => :user }).active.
         scoped(
         :select => %{
+          pseudonyms.id,
           u.sortable_name        AS "student name",
           pseudonyms.user_id     AS "student id",
           pseudonyms.sis_user_id AS "student sis id",
@@ -124,8 +125,7 @@ module Canvas::AccountReports
             "https://#{host}" +
               "/courses/#{row['course id']}" +
               "/assignments/#{row['assignment id']}"
-          datetime = default_timezone_parse(row['submission date'], @account)
-          row['submission date'] = default_timezone_format(datetime)
+          row['submission date'] = default_timezone_format(row['submission date'], @account)
           csv << headers.map { |h| row[h] }
           if i % 5 == 0
             @account_report.update_attribute(:progress, (i.to_f/total)*100)

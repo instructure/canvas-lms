@@ -279,7 +279,7 @@ class ApplicationController < ActionController::Base
           end
         end
 
-        @is_delegated = @domain_root_account.delegated_authentication? && !@domain_root_account.ldap_authentication? && !request.params[:canvas_login]
+        @is_delegated = delegated_authentication_url?
         render :template => "shared/unauthorized", :layout => "application", :status => :unauthorized
       }
       format.zip { redirect_to(url_for(params)) }
@@ -287,6 +287,12 @@ class ApplicationController < ActionController::Base
     end
     response.headers["Pragma"] = "no-cache"
     response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
+  end
+
+  def delegated_authentication_url?
+    @domain_root_account.delegated_authentication? &&
+    !@domain_root_account.ldap_authentication? &&
+    !params[:canvas_login]
   end
 
   # To be used as a before_filter, requires controller or controller actions

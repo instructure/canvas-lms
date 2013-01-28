@@ -19,13 +19,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe User do
-  
+
   context "validation" do
     it "should create a new instance given valid attributes" do
       user_model
     end
   end
-  
+
   it "should get the first email from communication_channel" do
     @user = User.create
     @cc1 = mock('CommunicationChannel')
@@ -36,7 +36,7 @@ describe User do
     @user.stubs(:communication_channel).returns(@cc1)
     @user.communication_channel.should eql(@cc1)
   end
-  
+
   it "should be able to assert a name" do
     @user = User.create
     @user.assert_name(nil)
@@ -57,46 +57,46 @@ describe User do
     course_with_student
     @user.associated_accounts.length.should eql(1)
     @user.associated_accounts.first.should eql(Account.default)
-    
+
     @course.account = account1
     @course.save!
     @course.reload
     @user.reload
-    
+
     @user.associated_accounts.length.should eql(1)
     @user.associated_accounts.first.should eql(account1)
-    
+
     @course.account = account2
     @course.save!
     @user.reload
-    
+
     @user.associated_accounts.length.should eql(1)
     @user.associated_accounts.first.should eql(account2)
   end
-  
+
   it "should update account associations when a course account moves in the hierachy" do
     account1 = account_model
-    
+
     @enrollment = course_with_student(:account => account1)
     @course.account = account1
     @course.save!
     @course.reload
     @user.reload
-    
+
     @user.associated_accounts.length.should eql(1)
     @user.associated_accounts.first.should eql(account1)
-    
+
     account2 = account_model
     account1.parent_account = account2
     account1.save!
     @course.reload
     @user.reload
-    
+
     @user.associated_accounts.length.should eql(2)
     @user.associated_accounts[0].should eql(account1)
     @user.associated_accounts[1].should eql(account2)
   end
-  
+
   it "should update account associations when a user is associated to an account just by pseudonym" do
     account1 = account_model
     account2 = account_model
@@ -105,7 +105,7 @@ describe User do
     pseudonym = user.pseudonyms.first
     pseudonym.account = account1
     pseudonym.save
-    
+
     user.reload
     user.associated_accounts.length.should eql(1)
     user.associated_accounts.first.should eql(account1)
@@ -121,7 +121,7 @@ describe User do
 
     account1.parent_account = account2
     account1.save!
-    
+
     user.reload
     user.associated_accounts.length.should eql(2)
     user.associated_accounts[0].should eql(account1)
@@ -137,7 +137,7 @@ describe User do
     @user.associated_accounts.length.should eql(1)
     @user.associated_accounts.first.should eql(account)
   end
-  
+
   it "should populate dashboard_messages" do
     Notification.create(:name => "Assignment Created")
     course_with_teacher(:active_all => true)
@@ -268,7 +268,7 @@ describe User do
     p3 = user1.pseudonyms.new :unique_id => "uniqueid3", :account => @account
     p3.sis_user_id = "sisid3"
     p3.save!
-    
+
     User.name_like("longname1").map(&:id).should == [user1.id]
     User.name_like("shortname2").map(&:id).should == [user2.id]
     User.name_like("sisid1").map(&:id).should == [user1.id]
@@ -288,7 +288,7 @@ describe User do
 
     user3 = User.create! :name => "longname1", :short_name => "shortname3"
     user3.register!
-    
+
     User.name_like("longname1").map(&:id).sort.should == [user1.id, user3.id].sort
     User.name_like("shortname2").map(&:id).should == [user2.id]
     User.name_like("sisid1").map(&:id).should == [user1.id]
@@ -402,46 +402,94 @@ describe User do
     @user.recent_feedback(:contexts => [@course]).should_not be_empty
   end
 
-  it "should return appropriate courses with primary enrollment" do
-    user
-    @course1 = course(:course_name => "course", :active_course => true)
-    @course1.enroll_user(@user, 'StudentEnrollment', :enrollment_state => 'active')
 
-    @course2 = course(:course_name => "other course", :active_course => true)
-    @course2.enroll_user(@user, 'TeacherEnrollment', :enrollment_state => 'active')
+  describe '#courses_with_primary_enrollment' do
 
-    @course3 = course(:course_name => "yet another course", :active_course => true)
-    @course3.enroll_user(@user, 'StudentEnrollment', :enrollment_state => 'active')
-    @course3.enroll_user(@user, 'TeacherEnrollment', :enrollment_state => 'active')
+    it "should return appropriate courses with primary enrollment" do
+      user
+      @course1 = course(:course_name => "course", :active_course => true)
+      @course1.enroll_user(@user, 'StudentEnrollment', :enrollment_state => 'active')
 
-    @course4 = course(:course_name => "not yet active")
-    @course4.enroll_user(@user, 'StudentEnrollment')
+      @course2 = course(:course_name => "other course", :active_course => true)
+      @course2.enroll_user(@user, 'TeacherEnrollment', :enrollment_state => 'active')
 
-    @course5 = course(:course_name => "invited")
-    @course5.enroll_user(@user, 'TeacherEnrollment')
+      @course3 = course(:course_name => "yet another course", :active_course => true)
+      @course3.enroll_user(@user, 'StudentEnrollment', :enrollment_state => 'active')
+      @course3.enroll_user(@user, 'TeacherEnrollment', :enrollment_state => 'active')
 
-    @course6 = course(:course_name => "active but date restricted", :active_course => true)
-    e = @course6.enroll_user(@user, 'StudentEnrollment')
-    e.accept!
-    e.start_at = 1.day.from_now
-    e.end_at = 2.days.from_now
-    e.save!
+      @course4 = course(:course_name => "not yet active")
+      @course4.enroll_user(@user, 'StudentEnrollment')
 
-    @course7 = course(:course_name => "soft concluded", :active_course => true)
-    e = @course7.enroll_user(@user, 'StudentEnrollment')
-    e.accept!
-    e.start_at = 2.days.ago
-    e.end_at = 1.day.ago
-    e.save!
+      @course5 = course(:course_name => "invited")
+      @course5.enroll_user(@user, 'TeacherEnrollment')
+
+      @course6 = course(:course_name => "active but date restricted", :active_course => true)
+      e = @course6.enroll_user(@user, 'StudentEnrollment')
+      e.accept!
+      e.start_at = 1.day.from_now
+      e.end_at = 2.days.from_now
+      e.save!
+
+      @course7 = course(:course_name => "soft concluded", :active_course => true)
+      e = @course7.enroll_user(@user, 'StudentEnrollment')
+      e.accept!
+      e.start_at = 2.days.ago
+      e.end_at = 1.day.ago
+      e.save!
 
 
-    # only four, in the right order (type, then name), and with the top type per course
-    @user.courses_with_primary_enrollment.map{|c| [c.id, c.primary_enrollment]}.should eql [
-      [@course5.id, 'TeacherEnrollment'],
-      [@course2.id, 'TeacherEnrollment'],
-      [@course3.id, 'TeacherEnrollment'],
-      [@course1.id, 'StudentEnrollment']
-    ]
+      # only four, in the right order (type, then name), and with the top type per course
+      @user.courses_with_primary_enrollment.map{|c| [c.id, c.primary_enrollment]}.should eql [
+        [@course5.id, 'TeacherEnrollment'],
+        [@course2.id, 'TeacherEnrollment'],
+        [@course3.id, 'TeacherEnrollment'],
+        [@course1.id, 'StudentEnrollment']
+      ]
+    end
+
+    describe 'with cross sharding' do
+      it_should_behave_like 'sharding'
+
+      it 'pulls the enrollments that are completed with global ids' do
+        alice = bob = bobs_enrollment = alices_enrollment = nil
+
+        duped_enrollment_id = 0
+
+        @shard1.activate do
+          alice = User.create!(:name => 'alice')
+          bob = User.create!(:name => 'bob')
+          courseX = Course.new
+          courseX.workflow_state = 'available'
+          courseX.save!
+          bobs_enrollment = StudentEnrollment.create!(:course => courseX, :user => bob, :workflow_state => 'completed')
+          duped_enrollment_id = bobs_enrollment.id
+        end
+
+        @shard2.activate do
+          courseY = Course.new
+          courseY.workflow_state = 'available'
+          courseY.save!
+          alices_enrollment = StudentEnrollment.new(:course => courseY, :user => alice, :workflow_state => 'active')
+          alices_enrollment.id = duped_enrollment_id
+          alices_enrollment.save!
+        end
+
+        alice.courses_with_primary_enrollment.size.should == 1
+      end
+
+      it 'still filters out completed enrollments for the correct user' do
+        alice = nil
+        @shard1.activate do
+          alice = User.create!(:name => 'alice')
+          courseX = Course.new
+          courseX.workflow_state = 'available'
+          courseX.save!
+          StudentEnrollment.create!(:course => courseX, :user => alice, :workflow_state => 'completed')
+        end
+        alice.courses_with_primary_enrollment.size.should == 0
+      end
+
+    end
   end
 
   it "should delete the user transactionally in case the pseudonym removal fails" do
@@ -477,7 +525,7 @@ describe User do
       @user1.should_not be_deleted
       @user2.should be_deleted
     end
-    
+
     it "should move pseudonyms to the new user" do
       @user1 = user_model
       @user2 = user_model
@@ -488,7 +536,7 @@ describe User do
       @user1.reload
       @user1.pseudonyms.map(&:unique_id).should be_include('sam@yahoo.com')
     end
-    
+
     it "should move submissions to the new user (but only if they don't already exist)" do
       @user1 = user_model
       @user2 = user_model
@@ -1020,6 +1068,25 @@ describe User do
       messageable_users.should be_empty
     end
 
+    it "should let students message the entire class by default" do
+      set_up_course_with_users
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+
+      @student.messageable_users(:context => "course_#{@course.id}").map(&:id).sort.
+        should eql [@student, @this_section_user, @this_section_teacher, @other_section_user, @other_section_teacher].map(&:id).sort
+    end
+
+    it "should not let users message the entire class if they cannot send_messages" do
+      set_up_course_with_users
+      RoleOverride.create!(:context => @course.account, :permission => 'send_messages',
+                           :enrollment_type => "StudentEnrollment", :enabled => false)
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+
+      # can only message self or the admins
+      @student.messageable_users(:context => "course_#{@course.id}").map(&:id).sort.
+        should eql [@student, @this_section_teacher, @other_section_teacher].map(&:id).sort
+    end
+
     it "should not include deleted users" do
       set_up_course_with_users
       @student.messageable_users.map(&:id).should_not include(@deleted_user.id)
@@ -1201,16 +1268,16 @@ describe User do
         set_up_course_with_users
         @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
         @this_section_user_enrollment.conclude
-  
+
         @this_section_user.messageable_users.map(&:id).should include @this_section_user.id
         @student.messageable_users.map(&:id).should include @this_section_user.id
       end
-  
+
       it "should not return concluded student enrollments in the course" do # when browsing a course you should not see concluded enrollments
         set_up_course_with_users
         @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
         @course.complete!
-  
+
         @this_section_user.messageable_users(:context => "course_#{@course.id}").map(&:id).should_not include @this_section_user.id
         # if the course was a concluded, a student should be able to browse it and message an admin (if if the admin's enrollment concluded too)
         @this_section_user.messageable_users(:context => "course_#{@course.id}").map(&:id).should include @this_section_teacher.id
@@ -1219,18 +1286,18 @@ describe User do
         @student.messageable_users(:context => "course_#{@course.id}").map(&:id).should include @this_section_teacher.id
         @student.enrollment_visibility[:user_counts][@course.id].should eql 2
       end
-  
+
       it "should return concluded enrollments in the group if they are still members" do
         set_up_course_with_users
         @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
         @this_section_user_enrollment.conclude
-  
+
         @this_section_user.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
         @this_section_user.group_membership_visibility[:user_counts][@group.id].should eql 1
         @student.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
         @student.group_membership_visibility[:user_counts][@group.id].should eql 1
       end
-  
+
       it "should return concluded enrollments in the group and section if they are still members" do
         set_up_course_with_users
         enrollment = @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
@@ -1239,7 +1306,7 @@ describe User do
 
         @group.users << @other_section_user
         @this_section_user_enrollment.conclude
-  
+
         @this_section_user.messageable_users(:context => "group_#{@group.id}").map(&:id).sort.should eql [@this_section_user.id, @other_section_user.id]
         @this_section_user.group_membership_visibility[:user_counts][@group.id].should eql 2
         # student can only see people in his section
@@ -1285,7 +1352,7 @@ describe User do
       end
     end
   end
-  
+
   context "lti_role_types" do
     it "should return the correct role types" do
       course_model
@@ -1305,7 +1372,7 @@ describe User do
       nobody.lti_role_types(@course).should == ['urn:lti:sysrole:ims/lis/None']
       admin.lti_role_types(@course).should == ['urn:lti:instrole:ims/lis/Administrator']
     end
-    
+
     it "should return multiple role types if applicable" do
       course_model
       @course.offer
@@ -1315,7 +1382,7 @@ describe User do
       @course.enroll_student(teacher).accept
       teacher.lti_role_types(@course).sort.should == ['Instructor','Learner','urn:lti:instrole:ims/lis/Administrator'].sort
     end
-    
+
     it "should not return role types from other contexts" do
       @course1 = course_model
       @course2 = course_model
@@ -1328,7 +1395,7 @@ describe User do
       student.lti_role_types(@course2).should == ['urn:lti:sysrole:ims/lis/None']
     end
   end
-  
+
   context "tabs_available" do
     it "should not include unconfigured external tools" do
       tool = Account.default.context_external_tools.new(:consumer_key => 'bob', :shared_secret => 'bob', :name => 'bob', :domain => "example.com")
@@ -1339,7 +1406,7 @@ describe User do
       tabs = @user.profile.tabs_available(@user, :root_account => Account.default)
       tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
     end
-    
+
     it "should include configured external tools" do
       tool = Account.default.context_external_tools.new(:consumer_key => 'bob', :shared_secret => 'bob', :name => 'bob', :domain => "example.com")
       tool.settings[:user_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
@@ -1354,7 +1421,7 @@ describe User do
       tab[:label].should == "Example URL"
     end
   end
-  
+
   context "avatars" do
     it "should find only users with avatars set" do
       user_model
@@ -2338,4 +2405,36 @@ describe User do
       users.first.as_json['user'].keys.should_not include('collkey')
     end
   end
+
+  describe '#grants_right?' do
+    let(:site_admin) do
+      user = User.create!
+      Account.site_admin.add_user(user)
+      Account.default.add_user(user)
+      user
+    end
+
+    let(:local_admin) do
+      user = User.create!
+      Account.default.add_user(user)
+      user
+    end
+
+    it 'allows site admins to manage their own logins' do
+      site_admin.grants_right?(site_admin, :manage_logins).should be_true
+    end
+
+    it 'allows local admins to manage their own logins' do
+      local_admin.grants_right?(local_admin, :manage_logins).should be_true
+    end
+
+    it 'allows site admins to manage local admins logins' do
+      local_admin.grants_right?(site_admin, :manage_logins).should be_true
+    end
+
+    it 'forbids local admins from managing site admins logins' do
+      site_admin.grants_right?(local_admin, :manage_logins).should be_false
+    end
+  end
+
 end

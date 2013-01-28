@@ -19,10 +19,34 @@ require 'iconv'
 
 class IncomingMessageProcessor
   
+  class SilentIgnoreError < StandardError; end
   class ReplyFromError < StandardError; end
   class UnknownAddressError < ReplyFromError; end
   class ReplyToLockedTopicError < ReplyFromError; end
   
+  def self.bounce_message?(mail)
+    mail.header.fields.any? do |field|
+      case field.name
+
+      # RFC-3834
+      when 'Auto-Submitted' then field.value != 'no'
+
+      # old klugey stuff uses this
+      when 'Precedence' then ['bulk', 'list', 'junk'].include?(field.value)
+
+      # Exchange sets this        
+      when 'X-Auto-Response-Suppress' then true 
+
+      # some other random headers I found that are easy to check
+      when 'X-Autoreply', 'X-Autorespond', 'X-Autoresponder' then true
+
+      # not a bounce header we care about
+      else false
+      end
+    end
+
+  end
+
   def self.utf8ify(string, encoding)
     encoding ||= 'UTF-8'
     encoding = encoding.upcase
@@ -31,6 +55,8 @@ class IncomingMessageProcessor
   end
 
   def self.process_single(incoming_message, secure_id, message_id)
+    return if IncomingMessageProcessor.bounce_message?(incoming_message)
+
     if incoming_message.multipart? && part = incoming_message.parts.find { |p| p.content_type.try(:match, %r{^text/html(;|$)}) }
       html_body = utf8ify(part.body.decoded, part.charset)
     end
@@ -46,9 +72,13 @@ class IncomingMessageProcessor
 
     begin
       original_message = Message.find_by_id(message_id)
-      raise IncomingMessageProcessor::UnknownAddressError unless original_message
+      # This prevents us from rebouncing users that have auto-replies setup -- only bounce something
+      # that was sent out because of a notification.
+      raise IncomingMessageProcessor::SilentIgnoreError unless original_message && original_message.notification_id
+      raise IncomingMessageProcessor::SilentIgnoreError unless secure_id == original_message.reply_to_secure_id
+
       original_message.shard.activate do
-        context = original_message.context if secure_id == original_message.reply_to_secure_id
+        context = original_message.context
         user = original_message.user
         raise IncomingMessageProcessor::UnknownAddressError unless user && context && context.respond_to?(:reply_from)
         context.reply_from({
@@ -61,6 +91,8 @@ class IncomingMessageProcessor
       end
     rescue IncomingMessageProcessor::ReplyFromError => error
       IncomingMessageProcessor.ndr(original_message, incoming_message, error)
+    rescue IncomingMessageProcessor::SilentIgnoreError
+      # ignore it
     end
   end
 

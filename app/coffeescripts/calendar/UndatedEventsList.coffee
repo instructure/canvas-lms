@@ -21,8 +21,9 @@ define [
         "CommonEvent/eventSaved" : @eventSaved
         "Calendar/visibleContextListChanged" : @visibleContextListChanged
 
-      @div.delegate('.event', 'click', @clickEvent)
-          .delegate('.undated-events-link', 'click', @show)
+      @div.on('click', '.event', @clickEvent)
+          .on('click', '.undated_event_title', @clickEvent)
+          .on('click', '.undated-events-link', @show)
 
     load: =>
       return if @hidden
@@ -36,6 +37,9 @@ define [
 
       @dataSource.getEvents null, null, @visibleContextList, (events) =>
         loadingDfd.resolve()
+        for e in events
+          e.details_url = e.fullDetailsURL()
+          e.icon = if e.calendarEvent then 'calendar-day' else 'assignment'
         @div.html undatedEventsTemplate({ events: events })
 
         for e in events
@@ -58,10 +62,13 @@ define [
       @load()
 
     clickEvent: (jsEvent) =>
+      jsEvent.preventDefault()
       eventId = $(jsEvent.target).data('event-id')
+      # Support handling a contained element being clicked within an event
+      eventId ||= $(jsEvent.target).closest('.event').data('event-id')
       event = @dataSource.eventWithId(eventId)
       if event
-        (new ShowEventDetailsDialog(event, @dataSource)).show()
+        new ShowEventDetailsDialog(event, @dataSource).show jsEvent
 
     visibleContextListChanged: (list) =>
       @visibleContextList = list

@@ -1,0 +1,28 @@
+<div id="tab-users">
+  <h2 style="margin-top: 10px;"><%= t('headings.current_users', %{Current Users}) %></h2>
+  <div style="margin-bottom: 10px; <%= hidden if @invited_count == 0 %>">
+    <%= t 'unaccepted_invitations', "%{count} Invitations haven't been accepted.  You can click a user's name to re-send their invitation", :count => %[<span class="unaccepted_invitations">#{@invited_count}</span>].html_safe %>
+
+    <% if @context.available? %>
+      <% ot 're_send_all', 'or *Re-Send All Unaccepted Invitations*', :wrapper => capture { %><div><span><button type="button" href="<%= course_re_send_invitations_url %>" class="btn btn-small re_send_invitations_link"><i class="icon-email"></i> \1</button></span>
+        </div><% } %>
+    <% end %>
+  </div>
+  <table style="width: 100%;">
+    <tr>
+      <td style="vertical-align: top; padding-right: 30px;">
+        <%= render :partial => 'user_box', :locals => {:base_role => @all_roles.find{|r|r[:base_role_name] == 'StudentEnrollment'}} %>
+        <%= render :partial => 'user_box', :locals => {:base_role => @all_roles.find{|r|r[:base_role_name] == 'ObserverEnrollment'}} %>
+      </td>
+      <td style="vertical-align: top;">
+        <%= render :partial => 'user_box', :locals => {:base_role => @all_roles.find{|r|r[:base_role_name] == 'TeacherEnrollment'}} %>
+        <%= render :partial => 'user_box', :locals => {:base_role => @all_roles.find{|r|r[:base_role_name] == 'DesignerEnrollment'}} %>
+        <%= render :partial => 'user_box', :locals => {:base_role => @all_roles.find{|r|r[:base_role_name] == 'TaEnrollment'}} %>
+      </td>
+    </tr>
+  </table>
+
+  <%= render :partial => 'add_users' %>
+
+  <%= render :partial => 'link_enrollment' %>
+</div>

@@ -3,7 +3,8 @@
   <ul>
     {{#each events}}
       <li class="undated_event event group_{{contextCode}} {{id}}" data-event-id="{{id}}">
-        {{title}}
+        <i class='icon-{{icon}}' aria-hidden='true'></i>
+        <a href="{{details_url}}" class='undated_event_title'>{{title}}</a>
       </li>
     {{/each}}
   </ul>

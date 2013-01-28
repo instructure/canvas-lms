@@ -12,7 +12,7 @@ describe "assignments" do
       expect_new_page_load { f('.more_options_link').click }
     end
 
-    before (:each) do
+    before(:each) do
       course_with_teacher_logged_in
     end
 
@@ -246,16 +246,10 @@ describe "assignments" do
 
     context "frozen assignments" do
 
-      append_before (:each) do
-        @att_map = {"lock_at" => "yes",
-                    "assignment_group" => "yes",
-                    "title" => "no",
-                    "assignment_group_id" => "yes",
-                    "submission_types" => "yes",
-                    "points_possible" => "yes",
-                    "description" => "yes",
-                    "peer_reviews" => "yes",
-                    "grading_type" => "yes"}
+      append_before(:each) do
+        @att_map = {
+          "assignment_group_id" => "true"
+        }
         PluginSetting.stubs(:settings_for_plugin).returns(@att_map)
 
         @asmnt = @course.assignments.create!(
@@ -291,9 +285,9 @@ describe "assignments" do
 
       it "should respect frozen attributes for teacher" do
         run_assignment_edit do
-          f('#assignment_assignment_group_id').should be_nil
-          f('#edit_assignment_form #assignment_peer_reviews').should be_nil
-          f('#edit_assignment_form #assignment_description').should be_nil
+          fj('#assignment_assignment_group_id').should be_nil
+          fj('#edit_assignment_form #assignment_peer_reviews').should_not be_nil
+          fj('#edit_assignment_form #assignment_description').should_not be_nil
         end
       end
 
@@ -307,11 +301,11 @@ describe "assignments" do
         end
       end
 
-      it "should not allow assignment group to be deleted" do
+      it "should not allow assignment group to be deleted by teacher if "+
+       "assignment group id frozen" do
         get "/courses/#{@course.id}/assignments"
-
-        f("#group_#{@asmnt.assignment_group_id} .delete_group_link").should be_nil
-        f("#assignment_#{@asmnt.id} .delete_assignment_link").should be_nil
+        fj("#group_#{@asmnt.assignment_group_id} .delete_group_link").should be_nil
+        fj("#assignment_#{@asmnt.id} .delete_assignment_link").should be_nil
       end
     end
 

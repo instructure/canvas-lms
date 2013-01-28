@@ -10,7 +10,6 @@ describe "discussions" do
   end
 
   context "as a teacher" do
-    DISCUSSION_NAME = 'new discussion'
 
     before (:each) do
       course_with_teacher_logged_in
@@ -118,6 +117,21 @@ describe "discussions" do
         let(:url) { "/courses/#{@course.id}/discussion_topics/" }
         let(:what_to_create) { DiscussionTopic }
         it_should_behave_like "discussion and announcement individual tests"
+      end
+
+      it "should allow teachers to edit discussions settings" do
+        assignment_name = 'topic assignment'
+        title = 'assignment topic title'
+        @course.allow_student_discussion_topics.should == true
+        @course.discussion_topics.create!(:title => title, :user => @user, :assignment => @course.assignments.create!(:name => assignment_name))
+        get "/courses/#{@course.id}/discussion_topics"
+        f('#edit_discussions_settings').click
+        wait_for_ajax_requests
+        f('#allow_student_discussion_topics').click
+        submit_form('.dialogFormView')
+        wait_for_ajax_requests
+        @course.reload
+        @course.allow_student_discussion_topics.should == false
       end
 
       it "should filter by assignments" do

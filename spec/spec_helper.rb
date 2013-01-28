@@ -136,6 +136,7 @@ Spec::Runner.configure do |config|
     Delayed::Job.redis.flushdb if Delayed::Job == Delayed::Backend::Redis::Job
     truncate_all_cassandra_tables
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
+    Attachment.domain_namespace = nil
   end
 
   # flush redis before the first spec, and before each spec that comes after
@@ -396,6 +397,33 @@ Spec::Runner.configure do |config|
   def group_with_user_logged_in(opts={})
     group_with_user(opts)
     user_session(@user)
+  end
+
+  def custom_role(base, name, opts={})
+    account = opts[:account] || @account
+    role = account.roles.find_by_name(name)
+    role ||= account.roles.create :name => name
+    role.base_role_type = base
+    role.save!
+    role
+  end
+  def custom_student_role(name, opts={})
+    custom_role('StudentEnrollment', name, opts)
+  end
+  def custom_teacher_role(name, opts={})
+    custom_role('TeacherEnrollment', name, opts)
+  end
+  def custom_ta_role(name, opts={})
+    custom_role('TaEnrollment', name, opts)
+  end
+  def custom_designer_role(name, opts={})
+    custom_role('DesignerEnrollment', name, opts)
+  end
+  def custom_observer_role(name, opts={})
+    custom_role('ObserverEnrollment', name, opts)
+  end
+  def custom_account_role(name, opts={})
+    custom_role(AccountUser::BASE_ROLE_NAME, name, opts)
   end
 
   def user_session(user, pseudonym=nil)
@@ -851,6 +879,21 @@ Spec::Runner.configure do |config|
     # now check payload
     post_lines[post_lines.index(""),-1].should ==
       expected_post_lines[expected_post_lines.index(""),-1]
+  end
+
+  def compare_json(actual, expected)
+    if actual.is_a?(Hash)
+      actual.each do |k,v|
+        expected_v = expected[k]
+        compare_json(v, expected_v)
+      end
+    elsif actual.is_a?(Array)
+      actual.zip(expected).each do |a,e|
+        compare_json(a,e)
+      end
+    else
+      actual.to_json.should == expected.to_json
+    end
   end
 
   class FakeHttpResponse

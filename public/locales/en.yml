@@ -482,7 +482,7 @@ en:
         example: "Example:"
         external_services: "Notifications Sent to External Services"
         external_services_label: "Display one time pop-up warning on Notification Preferences page."
-        external_services_warning: "Notice: Some Canvas notifications may contain confidential information. Selecting to receive notifications at an email other than your institution provided address may result in sending sensitive information outside of the institutional system."
+        external_services_warning: "Notice: Some notifications may contain confidential information. Selecting to receive notifications at an email other than your institution provided address may result in sending sensitive Canvas course and group information outside of the institutional system."
         external_services_warning_label: "Pop-up Message Content:"
         from: From
         sample_subject: "Grade Changed: Check In Survey, Testing Course"
@@ -980,6 +980,7 @@ en:
       links: 
         add_assignment_group: "Add Assignment Group"
     buttons: 
+      add_group: "Add Group"
       delete_group: "Delete Group"
       submit_assignment: "Submit Assignment"
     confirm: 
@@ -990,6 +991,7 @@ en:
     drop_highest_scores: "Drop the Highest %{number} Scores"
     drop_lowest_scores: "Drop the Lowest %{number} Scores"
     errors: 
+      add_group_failed: "Add Group Failed"
       delete_reminder_failed: "Delete failed"
       deleting_group_failed: "Delete Failed"
       reminder_failed: "Reminder failed"
@@ -1049,6 +1051,7 @@ en:
         wizard: "How Do I...?"
       page_title: Assignments
     messages: 
+      adding_group: "Adding Group..."
       agree_to_pledge: "You must agree to the submission pledge before you can submit this assignment."
       not_submitted_yet: "You haven't finished submitting your assignment.  You still need to click \"Submit\" to finish turning it in.  Do you want to leave this page anyway?"
       now_overdue: "This assignment is now overdue.  Any new submissions will be marked as late.  Continue anyway?"
@@ -1219,6 +1222,7 @@ en:
       syllabus: 
         other_day: Other
     titles: 
+      add_assignment_group: "Add Assignment Group"
       assignment_details: "Assignment Details"
       uploading: "Uploading Submission"
     wizard_box: 
@@ -1251,7 +1255,7 @@ en:
         wizard_box: "I would like to:"
   assignments_api: 
     errors: 
-      no_edit_frozen: "You cannot edit a frozen assignment."
+      no_edit_frozen: "You do not have permission to edit frozen assignments. Please see your account administrator."
   attachment: 
     default_filename: File
     errors: 
@@ -1287,7 +1291,6 @@ en:
   button: 
     submit_assignment: "Submit Assignment"
   buttons: 
-    add: Add
     add_external_tool: "Add External Tool"
     add_item: "Add Item"
     apply: Apply
@@ -1580,6 +1583,11 @@ en:
       created: "Event was successfully created."
       deleted: "This event has been deleted"
       updated: "Event was successfully updated."
+    show: 
+      links: 
+        back_to_calendar: "Back to Calendar"
+        delete: "Delete the Event"
+        edit: "Edit Calendar Event"
   calendar_events_api: 
     feed_title: "%{course_or_group_name} Calendar Feed"
     ics_description: "Calendar events for %{context_name}"
@@ -1744,6 +1752,7 @@ en:
     default_title: "Unnamed Collaboration"
   collaborations: 
     collaboration: 
+      delete: "Are you sure you want to delete this collaboration?"
       links: 
         delete: "Delete this Collaboration"
         edit: "Edit this Collaboration"
@@ -1752,13 +1761,28 @@ en:
           other: "*%{count}* Participants"
       titles: 
         collaboration: Collaboration
-    collaborators: 
+    collaborator_picker: 
       labels: 
-        collaborate_with: "Collaborate With"
+        available_groups: "Available groups"
+        available_users: "Available users"
+        collaborate_with: "Collaborate With:"
+        collaboration_members: "Collaboration members"
+        groups: Groups
+        loading: Loading
+        people: People
+        remove_all: "Remove All"
+      member_instructions: "Click or tap a user or group in the left-hand column to add Collaborators."
+    edit: 
+      buttons: 
+        cancel: Cancel
+        update: "Update collaboration"
+      labels: 
+        description: Description
+        title: "Collaboration title"
     errors: 
       cannot_load_collaboration: "Cannot load collaboration"
       create_failed: "Collaboration creation failed"
-      no_name: "Please enter a name for this document"
+      no_name: "Please enter a name for this collaboration."
       not_enabled: "Collaborations have not been enabled for this Canvas site"
       update_failed: "Collaboration update failed"
     forms: 
@@ -1779,17 +1803,14 @@ en:
               
             **Warning**: you (and all your collaborators) will need a Google account in order to participate in any Google Docs collaborations.
       labels: 
-        collaborate_using: "Collaborate Using"
+        collaboration_type: "Collaborate using:"
         description: Description
-        document_name: "Document Name"
+        document_name: "Document name:"
       messages: 
         delete_google_doc_as_well: "This collaboration is being stored as a Google Doc. Did you want to delete it just from Canvas, or remove it from Google Docs as well?"
       titles: 
         new: "Start a New Collaboration"
     index: 
-      collaborators_count: 
-        one: "*1 Collaborator* on %{service}"
-        other: "*%{count} Collaborators* on %{service}"
       description_rs: |-
           Free online web tools like [Google Docs](%{google_url}) and [EtherPad](%{etherpad_url})
           are an excellent place for students to work on group projects or papers, take shared notes, etc.
@@ -1812,11 +1833,13 @@ en:
       links: 
         delete: "Delete this Collaboration"
         edit: "Edit this Collaboration"
-        new: "Start a New Collaboration"
+        new: "Start a new collaboration"
       page_title: Collaboration
       started_by: "Started by *%{user}*, %{at}"
       titles: 
         current: "Current Collaborations"
+    titles: 
+      delete: "Delete collaboration?"
   collection_items: 
     new: 
       pin_to_canvas_network: "Pin to Canvas Network"
@@ -2716,6 +2739,7 @@ en:
       must_view: 
         fulfilled: "viewed the page"
         unfulfilled: "must view the page"
+    multiple_due_dates: "Multiple Due Dates"
     none_in_progress: "none in progress"
     optgroup: 
       assignments: Assignments
@@ -2759,8 +2783,14 @@ en:
       inbox_actions: 
         action_star: Star
         action_unstar: Unstar
+        archive: Archive
+        delete: Delete
         mark_as_read: "Mark as Read"
         mark_as_unread: "Mark as Unread"
+        subscribe: Subscribe
+        unarchive: Unarchive
+        unstar: Star
+        unsubscribe: Unsubscribe
       inbox_actions_description: Actions
       read_more: more...
     conversations_list: 
@@ -2785,16 +2815,8 @@ en:
     index: 
       add_recipients_instructions: "People you add to the conversation will see all previous messages."
       inbox_actions: 
-        archive: Archive
         delete: Delete
         forward: Forward
-        mark_as_read: "Mark as Read"
-        mark_as_unread: "Mark as Unread"
-        star: Star
-        subscribe: Subscribe
-        unarchive: Unarchive
-        unstar: Unstar
-        unsubscribe: Unsubscribe
       inbox_view: VIEW
       inbox_views: 
         archived_messages: Archived
@@ -3057,6 +3079,23 @@ en:
   course_statistics: 
     unknown: unknown
   courses: 
+    add_users: 
+      buttons: 
+        add_users: "OK Looks Good, Add These Users"
+        continue: Continue...
+        modify_users: "Go back and edit the list of users"
+      cannot_add_users_to_concluded_course: "You cannot add users to a concluded course."
+      headings: 
+        add_users: "Add Course Users"
+      invite_to_unpublished_course: "Since the course hasn't been published, students and TAs will be added, but won't be invited to join the course. Invitations will be sent out when the course is published."
+      labels: 
+        course_section_id: "For the section"
+        limit_privileges_to_course_section: "these admins can only grade students in their section"
+      links: 
+        add_users: "Add Users"
+      teacherless_invite_details: "If you invite a teacher and they accept, you will give up administrative privileges for this course."
+      titles: 
+        course_section: "Course Section"
     assignments_needing_grading: 
       headings: 
         grade: "Grade %{assignment}"
@@ -3169,9 +3208,16 @@ en:
         teacher: "You've been invited to join this course as a *teacher* for the user account *%{user}*."
       invitiation: 
         look_around: "Feel free to wander around and look over the course. When you're ready, you can either accept or reject the invitation."
+    enrollment_type_select: 
+      labels: 
+        enrollment_type: "Add More"
+      titles: 
+        enrollment_type: "Enrollment Type"
     errors: 
       create_failed: "Course creation failed"
       invalid_role: "Invalid role type"
+      role_not_active: "Can't add users for non-active role: '%{role}'"
+      role_not_found: "No role named '%{role}' exists."
       unauthorized: 
         switch_roles: "You do not have permission to switch roles"
     group_list: 
@@ -3238,12 +3284,8 @@ en:
       alerts_title: Alerts
       buttons: 
         add_section: "Add Section"
-        add_users: "OK Looks Good, Add These Users"
-        continue: Continue...
-        modify_users: "Go back and edit the list of users"
         move_course: "Move Course"
         update_course: "Update Course Details"
-      cannot_add_users_to_concluded_course: "You cannot add users to a concluded course."
       course_open_enrollment: "This course has enabled open enrollment. Students can self-enroll in the course once you share with them this URL: *%{url}*. Alternatively, they can sign up at *%{url2}* and use the following join code: *%{code}*"
       course_overrides_term: "This will override any term availability settings."
       date_restricted: "Users can only participate in the course between these dates"
@@ -3259,18 +3301,11 @@ en:
       grading_standard_currently_set: "Currently Set"
       grading_standard_not_set: "Not Set"
       headings: 
-        add_users: "Add Course Users"
-        current_users: "Current Users"
-        designers: Designers
         details: "Course Details"
         external_tools: "External Tools"
         grade_publishing: "Grade Publishing"
         move_course: "Move the course to another root account"
-        observers: Observers
         sections: "Course Sections"
-        students: Students
-        tas: TAs
-        teachers: Teachers
       help: 
         edit_navigation: "Drag and drop items to reorder them in the course navigation."
         public_course: "(student data will remain private)"
@@ -3285,7 +3320,6 @@ en:
         invitations_pending_publish: "Invitations aren't sent until the course is *published*"
         student_invitation_unaccepted_available: "%{name} hasn't yet accepted the invitation to join the course. The invitation was sent: %{time}"
         student_invitation_unaccepted_unavailable: "%{name} was added to the course: %{time}"
-      invite_to_unpublished_course: "Since the course hasn't been published, students and TAs will be added, but won't be invited to join the course. Invitations will be sent out when the course is published."
       labels: 
         account_id: Department
         allow_student_assignment_edits: "Let Students edit Assignment Descriptions"
@@ -3294,11 +3328,9 @@ en:
         conclude_at: Ends
         course_code: "Course Code"
         course_name: Name
-        course_section_id: "For the section"
         course_section_name: "Add a New Section"
         course_visibility: Visibility
         enrollment_term_id: Term
-        enrollment_type: "Add More"
         grading_scheme: "Grading Scheme"
         grading_standard_enabled: "Enable course grading scheme"
         hide_distribution_graphs: "Hide grade distribution graphs from students"
@@ -3307,7 +3339,6 @@ en:
         is_public: "Make this course publicly visible"
         language: Language
         license: License
-        limit_privileges_to_course_section: "these admins can only grade students in their section"
         open_enrollment: "Add a \"Join this Course\" link to the course home page"
         restrict_enrollments_to_course_dates: "Users can only participate in the course between these dates"
         root_account_id: "Root Account"
@@ -3321,7 +3352,6 @@ en:
         link_student_action: "To link the course observer *%{name}* to a student, select the student's name from the list below."
         link_student_desc: "When an observer is linked to a student, they have access to that student's grades and course interactions."
       links: 
-        add_users: "Add Users"
         edit_course: "Edit Course Details"
         more_options: "more options"
         move_course: "Move To Another Account"
@@ -3334,16 +3364,9 @@ en:
       no_language_preference: "Not set (user-configurable, defaults to %{language})"
       none: None
       not_date_restricted: "These dates will not affect course availability"
-      option: 
-        designers: Designers
-        observers: Observers
-        students: Students
-        tas: TAs
-        teachers: Teachers
       page_title: "Course Details"
       private_course: Private
       public_course: Public
-      re_send_all: "or *Re-Send All Unaccepted Invitations*"
       section_sis_id: "SIS ID: %{section_sis}"
       set_grading_scheme: "set grading scheme"
       sis_source_id: "SIS ID"
@@ -3358,14 +3381,10 @@ en:
         sections: Sections
         tools: "External Tools"
         users: Users
-      teacherless_invite_details: "If you invite a teacher and they accept, you will give up administrative privileges for this course."
       titles: 
-        course_section: "Course Section"
         edit_navigation: "Edit Course Navigation"
-        enrollment_type: "Enrollment Type"
       transifex_message: "Join the [Canvas Translation Community](%{transifex_url})"
       turnitin: "these comments will be shown to students when submitting a Turnitin-enabled assignment"
-      unaccepted_invitations: "%{count} Invitations haven't been accepted. You can click a user's name to re-send their invitation"
       user_view: 
         links: 
           edit_sections: "Edit Sections"
@@ -3385,12 +3404,6 @@ en:
         current_users: "Current Users"
       help: 
         reset_course_content: "Resetting course content will permanently delete all associated assignments, discussions, quizzes, modules, rubrics, pages, files, learning outcomes, question banks, collaborations, conferences, or any other content. This action is irreversible, and the data *cannot* be recovered. Are you sure you wish to continue?"
-      labels: 
-        designers: Designers
-        observers: Observers
-        students: Students
-        tas: TAs
-        teachers: Teachers
       links: 
         calendar: "Course Calendar"
         conclude: "Conclude this Course"
@@ -3504,6 +3517,11 @@ en:
       rss_feed: "%{course} Feed"
     unauthorized: 
       invalid_link: "The enrollment link you used appears to no longer be valid.  Please contact the course instructor and make sure you're still correctly enrolled."
+    user_tab: 
+      headings: 
+        current_users: "Current Users"
+      re_send_all: "or *Re-Send All Unaccepted Invitations*"
+      unaccepted_invitations: "%{count} Invitations haven't been accepted. You can click a user's name to re-send their invitation"
   crumb: 
     conversations: Conversations
     discussion_replies: "Discussion Replies"
@@ -3804,6 +3822,7 @@ en:
       add_rubric: "Add Rubric"
       assignment_settings: "Assignment Details"
       authors_name: "Author's name"
+      collapse_replies: "Collapse replies"
       confirm_delete_discussion: "Are you sure you want to delete this discussion?"
       delete: Delete
       delete_current_message: "Delete Current Message"
@@ -3814,6 +3833,7 @@ en:
       edit_assignment_settings: "Edit Assignment Settings"
       edit_current_message: "Edit Current Message"
       edited_by: "This topic was edited by %{user}"
+      expand_replies: "Expand replies"
       filter_replies: "Filter replies by search term"
       from_context: "From *%{context_name}*"
       initial_post_required: "Replies are only visible to those who have posted at least one reply."
@@ -3840,9 +3860,8 @@ en:
       topic: Topic
       topic_for_assignment: "This is a graded discussion"
       topic_locked: "This topic will not be visible to users until *%{date}*"
-      topic_locked_notice: "This topic is closed for comments."
       topic_podcast_feed_link: "Topic Podcast Feed"
-      unlock_topic: "Re-Open for Comments"
+      unlock_topic: "Open for Comments"
       unread: Unread
     sub_entry: 
       authors_name: "Author's name"
@@ -3901,11 +3920,6 @@ en:
     show_all_n_replies: 
       one: "Show one reply"
       other: "Show all %{count} replies"
-    toolbar: 
-      filter_replies: "Filter replies by search term"
-      search_entries: "Search entries or authors"
-      search_entries_placeholder: "Search entries or author"
-      unread: Unread
     uknown_author: "Unknown Author"
     unknown_author: "Unknown Author"
   due_dates: 
@@ -3941,11 +3955,22 @@ en:
     instructions: "Paste or type the URL of the image you'd like to embed:"
     loading: Loading...
     more_external_tools: "More External Tools"
+    role: 
+      duplicate_role_error: "Could not create this role because a role with this name already exists. Please try a different name"
+      remove_role_confirmation: "If there are any users with this role, they will keep the current permissions but you will not be able to create new users with this role. Click ok to continue deleting this role."
     save_failed: "Failed to save, please try again later"
     saving: Saving...
     search_flickr: "Search flickr creative commons"
     switch_views: "Switch Views"
     url: "URL:"
+  editor_accessibility: 
+    accessibles: 
+      background_color: "Background Color, press down to select"
+      forecolor: "Text Color, press down to select"
+    titles: 
+      font_size: "Font Size, press down to select"
+      formatting: "Formatting, press down to select"
+      rte_help: "Rich Text Area. Press ALT F10 for toolbar. Press ALT 0 for help."
   email: 
     default_from_name: "Instructure Canvas"
   enrollment: 
@@ -5093,7 +5118,6 @@ en:
         save: Save
         save_settings: "Save Settings"
         submit_comment: "Submit Comment"
-      due_at: "due %{datetime}"
       gradebook: 
         mute_assignment: "Mute Assignment"
         unmute_assignment: "Unmute Assignment"
@@ -8122,7 +8146,7 @@ en:
     notifications: 
       privacy_notice: 
         ok: Ok
-        privacy_notice: "Notice: Some Canvas notifications may contain confidential information. Selecting to receive notifications at an email other than your institution provided address may result in sending sensitive information outside of the institutional system."
+        privacy_notice: "Notice: Some notifications may contain confidential information. Selecting to receive notifications at an email other than your institution provided address may result in sending sensitive Canvas course and group information outside of the institutional system."
         privacy_notice_title: "Privacy Notice"
   pseudonym: 
     errors: 
@@ -9311,6 +9335,9 @@ en:
     too_young_error_join_code: "You must be at least %{min_years} years of age to use Canvas without a course join code."
     welcome_to_canvas: "Welcome to Canvas!"
   retrieve_timeout: "could not retrieve configuration, the server response timed out"
+  role: 
+    roles: 
+      account_admin: "Account Admin"
   role_override: 
     permission: 
       read_sis: "Read SIS data"
@@ -9358,52 +9385,43 @@ en:
       view_all_grades: "View all grades"
       view_error_reports: "View error reports"
       view_group_pages: "View the group pages of all student groups"
+      view_jobs: "View background jobs"
       view_statistics: "View statistics"
     roles: 
       account_admin: "Account Admin"
-      designer: "Course Designer"
+      designer: Designer
+      designers: Designers
       observer: Observer
+      observers: Observers
       student: Student
+      students: Students
       ta: TA
+      tas: TAs
       teacher: Teacher
+      teachers: Teachers
     tooltips: 
       readonly: "you do not have permission to change this."
       toogle: "Click to toggle this permission ON or OFF"
   role_overrides: 
+    account_permissions: "Account Permissions"
+    course_permissions: "Course & Account Permissions"
     index: 
-      buttons: 
-        save: "Save Changes"
       crumbs: 
         permissions: Permissions
-      explanation_defaults: "The partially transparent checkboxes (%{default_checked} and %{default_unchecked}) indicate the system default."
-      explanation_disabled: "A grayed out box (%{disabled_checked} or %{disabled_unchecked}) means you are not allowed to change it."
-      explanation_locked: "If you would like to prevent anyone from overriding this in any sub-accounts, click the lock (%{lock}) icon."
-      explanation_normal: "You can click to override the default and explicitly **allow** (%{normal_checked}) or **deny** (%{normal_unchecked}) this action."
-      headers: 
-        account_permissions: "Account Permissions"
-        account_role_type: "Account Role Type"
-        course_permissions: "Course & Account Permissions"
-        site_admin_permissions: "Site Admin Permissions"
-      labels: 
-        new_role_type: "New Role Type"
-      links: 
-        manage_accoiunt_roles: "Manage Account-Level Roles"
-        manage_course_roles: "Manage Course-Level Roles"
       page_title: "Manage Permissions for %{account}"
-      prompts: 
-        delete_role_type: "Are you sure you want to delete this role type?"
-      titles: 
-        explanation: "Explanation:"
-        manage_permissions: "Manage Permissions"
-        permissions: Permissions
-        subhead: "Set what users are allowed to do based on their role in the course."
-      tooltips: 
-        lock: "Click to not allow anyone to override what is set here."
-        locked: "This permission is locked, no one can override what is set here."
     no_role_found: "Role not found"
     notices: 
       saved: "Changes Saved Successfully."
+    site_admin_permissions: "Site Admin Permissions"
     update_failed_notice: "Role creation failed"
+  roles: 
+    permission_button: 
+      rolebutton: 
+        disable: Disable
+        disable_and_lock: "Disable and Lock"
+        enable: Enable
+        enable_and_lock: "Enable and Lock"
+        use_default: "Use Default"
   rubric: 
     context_name_rubric: "%{course_name} Rubric"
     errors: 
@@ -9621,6 +9639,8 @@ en:
       course_enrollment: "Course Enrollment"
       titles: 
         course_enrollment: "Enroll in %{course}"
+    notices: 
+      login_required: "Please log in to join this course."
     successfully_enrolled: 
       already_enrolled: "You have successfully enrolled in **%{course}**."
       buttons: 
@@ -9668,16 +9688,10 @@ en:
     add_assignment_group: 
       buttons: 
         add_group: "Add Group"
-      errors: 
-        add_group_failed: "Add Group Failed"
       labels: 
         group_weight: Weight
         name: Name
-      messages: 
-        adding_group: "Adding Group..."
       percent_of_grade: "%{percent} % of grade"
-      titles: 
-        add_assignment_group: "Add Assignment Group"
     assignment: 
       due_at: "%{date} at %{time}"
       graded_count: "%{graded_count} Graded"
@@ -9966,7 +9980,7 @@ en:
         reject: "Reject Invitation"
       wander_around_dont_get_lost: "Feel free to [wander around](%{link_to_course}) and see what it's like."
     keyboard_navigation_hint: 
-      body: "Hit \"?\" to see a list of keyboard shortcuts for this page."
+      body: "Type a question mark for a list of keyboard shortcuts for this page."
     login: 
       back_to_login: "Back to Login"
       buttons: 
@@ -10852,7 +10866,7 @@ en:
       merge_result_explanation: "Are you sure you want to merge the account, %{source_user_name} (%{source_user_email}) into this account, %{target_user_name} (%{target_user_email})? This process will have the following end result:"
       merge_result_explanation_again: "You've selected to merge the user, %{user_name} (%{user_email}) into the account, %{pending_other_user_name} (%{pending_other_user_email}). This process will have the following end result:"
       merge_somone_else: "Merge Someone Else With %{user_name}"
-      merge_user_initial_instructions: "You've selected to merge the user, %{user_name} (%{user_email}) with another account. You can search for the user you'd like to merge with this user using the form below, or just navigate to that user's page and click \"Merge User\" again to merge someone else with this user."
+      merge_user_initial_instructions: "You've selected to merge the user, %{user_name} (%{user_email}) with another account. You can search for the user you'd like to merge with this user using the form below."
       no_merge_undo: "This process cannot be undone, so please make sure you're certain before you continue."
       no_permission: "You don't have permission to search any accounts"
       prepare_to_merge: "Prepare to Merge Users"
@@ -10869,16 +10883,6 @@ en:
       comm_preferences_instructions: "Now that you're registered with Canvas, you might want to configure what notifications you'll receive as your courses progress. Canvas is flexible enough to let you choose how and for what events you'd like to be notified. When things happen in your courses you can choose to be emailed or texted to your cell immediately, daily or weekly."
       titles: 
         configure_com_prefs: "Configure Communication Preferences"
-    confirm_merge: 
-      buttons: 
-        merge_user_accounts: "Merge User Accounts"
-      login_to_merge_different_account: "To merge the account, %{current_user_name} (%{current_user_email}) into another account, please log in to the new account:"
-      merge_result_explanation: "Are you sure you want to merge the account, %{user_name} (%{user_email}) into this account, %{current_user_name} (%{current_user_email})?"
-      no_undo_for_merge: "This process cannot be undone, so please make sure you're certain before you continue."
-      titles: 
-        confirm_user_merge: "Confirm Merge User Accounts"
-        really_merge: "Really Merge User Accounts?"
-      users_to_merge: "%{first_user} and %{second_user}"
     confirms: 
       unenroll_user: "Are you sure you want to unenroll this user?"
     could_not_find_url: "Could not find download URL"
@@ -11050,7 +11054,7 @@ en:
     new: 
       create_a_canvas_account: "Create a Canvas Account"
     no_deleting_sis_user: "You cannot delete a system-generated user"
-    no_open_registration: "Open registration has not been enabled for this account"
+    no_self_registration: "Self registration has not been enabled for this account"
     oauth_fail: "OAuth Request failed. Couldn't find valid request"
     recaptcha_settings: 
       instructions: |-

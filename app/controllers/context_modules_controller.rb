@@ -122,20 +122,21 @@ class ContextModulesController < ApplicationController
   
   def content_tag_assignment_data
     if authorized_action(@context, @current_user, :read)
-      result = Rails.cache.fetch([ @context, "content_tag_assignment_info_all" ].cache_key) do
+      result = Rails.cache.fetch([ @context, @current_user, "content_tag_assignment_info_all" ].cache_key) do
         info = {}
         @context.context_module_tags.active.map do |tag|
-          info[tag.id] = {
-            :due_date => (tag.assignment.due_at.utc.iso8601 rescue tag.content.due_at.utc.iso8601 rescue nil),
-            :points_possible => (tag.assignment.points_possible rescue nil)
-          }
+          if tag.assignment
+            info[tag.id] = tag.assignment.context_module_tag_info(@current_user)
+          else
+            info[tag.id] = {:points_possible => nil, :due_date => (tag.content.due_at.utc.iso8601 rescue nil)}
+          end
         end
         info.to_json
       end
       render :json => result
     end
   end
-  
+
   def prerequisites_needing_finishing_for(mod, progression, before_tag=nil)
     tags = mod.content_tags.active #.find(:all, :conditions => ['position <= ?', progression.current_position], :order => :position)
     pres = []

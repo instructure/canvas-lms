@@ -93,7 +93,7 @@ describe "edititing grades" do
     edit_grade(f('#gradebook_grid [row="0"] .l3'), 'A-')
     wait_for_ajax_requests
     f('#gradebook_grid [row="0"] .l3').text.should == 'A-'
-    @assignment.submissions.size.should == 1
+    @assignment.reload.submissions.size.should == 1
     sub = @assignment.submissions.first
     sub.grade.should == 'A-'
     sub.score.should == 0.0
@@ -125,6 +125,29 @@ describe "edititing grades" do
     first_cell.send_keys(:tab)
     wait_for_ajax_requests
     f('#gradebook_grid [row="0"] .l1').should have_class('editable')
+  end
+
+  it "should display dropped grades correctly after editing a grade" do
+    @course.assignment_groups.first.update_attribute :rules, 'drop_lowest:1'
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+
+    assignment_1_sel = '#gradebook_grid [row="0"] .l1'
+    assignment_2_sel= '#gradebook_grid [row="0"] .l2'
+    a1 = f(assignment_1_sel)
+    a2 = f(assignment_2_sel)
+    a1['class'].should include 'dropped'
+    a2['class'].should_not include 'dropped'
+
+    grade_input = keep_trying_until do
+      a2.click
+      a2.find_element(:css, '.grade')
+    end
+    set_value(grade_input, 3)
+    a1.send_keys(:tab)
+    wait_for_ajax_requests
+    f(assignment_1_sel)['class'].should_not include 'dropped'
+    f(assignment_2_sel)['class'].should include 'dropped'
   end
 
   it "should update a grade when clicking outside of slickgrid" do

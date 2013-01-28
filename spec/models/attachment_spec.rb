@@ -1114,6 +1114,48 @@ describe Attachment do
       att3.save_without_broadcasting!
       att3.need_notify.should_not be_true
     end
+
+    it "should not send notifications to students if the file is uploaded to a locked folder" do
+      @teacher.register!
+      cc = @teacher.communication_channels.create!(:path => "default@example.com")
+      cc.confirm!
+      NotificationPolicy.create!(:notification => Notification.find_by_name('New File Added'), :communication_channel => cc, :frequency => "immediately")
+
+      attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
+
+      @attachment.folder.locked = true
+      @attachment.folder.save!
+
+      new_time = Time.now + 10.minutes
+      Time.stubs(:now).returns(new_time)
+      Attachment.do_notifications
+
+      @attachment.reload
+      @attachment.need_notify.should_not be_true
+      Message.find_by_user_id_and_notification_name(@student.id, 'New File Added').should be_nil
+      Message.find_by_user_id_and_notification_name(@teacher.id, 'New File Added').should_not be_nil
+    end
+
+    it "should not send notifications to students if the files navigation is hidden from student view" do
+      @teacher.register!
+      cc = @teacher.communication_channels.create!(:path => "default@example.com")
+      cc.confirm!
+      NotificationPolicy.create!(:notification => Notification.find_by_name('New File Added'), :communication_channel => cc, :frequency => "immediately")
+
+      attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
+
+      @course.tab_configuration = [{:id => Course::TAB_FILES, :hidden => true}]
+      @course.save!
+
+      new_time = Time.now + 10.minutes
+      Time.stubs(:now).returns(new_time)
+      Attachment.do_notifications
+
+      @attachment.reload
+      @attachment.need_notify.should_not be_true
+      Message.find_by_user_id_and_notification_name(@student.id, 'New File Added').should be_nil
+      Message.find_by_user_id_and_notification_name(@teacher.id, 'New File Added').should_not be_nil
+    end
   end
 
   context "quota" do

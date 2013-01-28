@@ -85,10 +85,10 @@ class UsersController < ApplicationController
   include LinkedIn
   include DeliciousDiigo
   include SearchHelper
-  before_filter :require_user, :only => [:grades, :confirm_merge, :merge, :kaltura_session, :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image, :user_dashboard, :toggle_dashboard, :masquerade, :external_tool]
+  before_filter :require_user, :only => [:grades, :merge, :kaltura_session, :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image, :user_dashboard, :toggle_dashboard, :masquerade, :external_tool]
   before_filter :require_registered_user, :only => [:delete_user_service, :create_user_service]
-  before_filter :reject_student_view_student, :only => [:delete_user_service, :create_user_service, :confirm_merge, :merge, :user_dashboard, :masquerade]
-  before_filter :require_open_registration, :only => [:new, :create]
+  before_filter :reject_student_view_student, :only => [:delete_user_service, :create_user_service, :merge, :user_dashboard, :masquerade]
+  before_filter :require_self_registration, :only => [:new, :create]
 
   def grades
     @user = User.find_by_id(params[:user_id]) if params[:user_id].present?
@@ -190,6 +190,7 @@ class UsersController < ApplicationController
           google_docs_get_access_token(oauth_request, params[:oauth_verifier])
           flash[:notice] = t('google_docs_added', "Google Docs access authorized!")
         rescue => e
+          ErrorReport.log_exception(:oauth, e)
           flash[:error] = t('google_docs_fail', "Google Docs authorization failed. Please try again")
         end
       elsif params[:service] == "linked_in"
@@ -197,6 +198,7 @@ class UsersController < ApplicationController
           linked_in_get_access_token(oauth_request, params[:oauth_verifier])
           flash[:notice] = t('linkedin_added', "LinkedIn account successfully added!")
         rescue => e
+          ErrorReport.log_exception(:oauth, e)
           flash[:error] = t('linkedin_fail', "LinkedIn authorization failed. Please try again")
         end
       else
@@ -204,6 +206,7 @@ class UsersController < ApplicationController
           token = twitter_get_access_token(oauth_request, params[:oauth_verifier])
           flash[:notice] = t('twitter_added', "Twitter access authorized!")
         rescue => e
+          ErrorReport.log_exception(:oauth, e)
           flash[:error] = t('twitter_fail_whale', "Twitter authorization failed. Please try again")
         end
       end
@@ -563,11 +566,13 @@ class UsersController < ApplicationController
     render :json => {:deleted => true}
   end
 
+  ServiceCredentials = Struct.new(:service_user_name,:decrypted_password)
+
   def create_user_service
     begin
       user_name = params[:user_service][:user_name]
       password = params[:user_service][:password]
-      service = OpenObject.new(:service_user_name => user_name, :decrypted_password => password)
+      service = ServiceCredentials.new( user_name, password )
       case params[:user_service][:service]
         when 'delicious'
           delicious_get_last_posted(service)
@@ -643,14 +648,6 @@ class UsersController < ApplicationController
 
   def new
     return redirect_to(root_url) if @current_user
-    unless @context == Account.default && @context.no_enrollments_can_create_courses?
-      # TODO: generic/brandable page, so we can up it up to non-default accounts
-      # also more control so we can conditionally enable features (e.g. if
-      # no_enrollments_can_create_courses==false, but open reg is on, students
-      # should still be able to sign up with join codes, etc. ... we should just
-      # not have the teacher button/form)
-      return redirect_to(root_url)
-    end
     render :layout => 'bare'
   end
 
@@ -938,7 +935,7 @@ class UsersController < ApplicationController
   end
 
   def merge
-    @user_about_to_go_away = User.find_by_id(session[:merge_user_id]) if session[:merge_user_id].present?
+    @user_about_to_go_away = User.find(params[:user_id])
 
     if params[:new_user_id] && @true_user = User.find_by_id(params[:new_user_id])
       if @true_user.grants_right?(@current_user, session, :manage_logins) && @user_about_to_go_away.grants_right?(@current_user, session, :manage_logins)
@@ -953,11 +950,11 @@ class UsersController < ApplicationController
     if @user_about_to_go_away && @user_that_will_still_be_around
       @user_about_to_go_away.move_to_user(@user_that_will_still_be_around)
       @user_that_will_still_be_around.touch
-      session.delete(:merge_user_id)
       flash[:notice] = t('user_merge_success', "User merge succeeded! %{first_user} and %{second_user} are now one and the same.", :first_user => @user_that_will_still_be_around.name, :second_user => @user_about_to_go_away.name)
     else
       flash[:error] = t('user_merge_fail', "User merge failed. Please make sure you have proper permission and try again.")
     end
+
     if @user_that_will_still_be_around == @current_user
       redirect_to user_profile_url(@current_user)
     elsif @user_that_will_still_be_around
@@ -969,47 +966,38 @@ class UsersController < ApplicationController
 
   def admin_merge
     @user = User.find(params[:user_id])
-    pending_user_id = params[:pending_user_id] || session[:pending_user_id]
-    pending_other_error = get_pending_user_and_error(pending_user_id, params[:pending_user_id])
+    pending_other_error = get_pending_user_and_error(params[:pending_user_id])
     @other_user = User.find_by_id(params[:new_user_id]) if params[:new_user_id].present?
     if authorized_action(@user, @current_user, :manage_logins)
       flash[:error] = pending_other_error if pending_other_error.present?
+
       if @user && (params[:clear] || !@pending_other_user)
-        session[:pending_user_id] = @user.id
         @pending_other_user = nil
       end
-      if @other_user && @other_user.grants_right?(@current_user, session, :manage_logins)
-        session[:merge_user_id] = @user.id
-        session.delete(:pending_user_id)
-      else
+
+      unless @other_user && @other_user.grants_right?(@current_user, session, :manage_logins)
         @other_user = nil
       end
+
       render :action => 'admin_merge'
     end
   end
 
-  def get_pending_user_and_error(pending_user_id, entered_user_id)
+  def get_pending_user_and_error(pending_user_id)
     pending_other_error = nil
-    @pending_other_user = api_find_all(User, [pending_user_id]).first if pending_user_id.present?
-    @pending_other_user = nil unless @pending_other_user.try(:grants_right?, @current_user, session, :manage_logins)
-    if @pending_other_user == @user
-      @pending_other_user = nil
-      pending_other_error = t('cant_self_merge', "You can't merge an account with itself.")
-    elsif @pending_other_user.blank? && entered_user_id.present? && pending_other_error.blank?
-      pending_other_error = t('user_not_found', "No active user with that ID was found.")
-    end
-    return pending_other_error
-  end
 
-  def confirm_merge
-    @user = User.find_by_id(session[:merge_user_id]) if session[:merge_user_id].present?
-    if @user && @user != @current_user
-      render :action => 'confirm_merge'
-    else
-      session[:merge_user_id] = @current_user.id
-      store_location(user_confirm_merge_url(@current_user.id))
-      render :action => 'merge'
+    if pending_user_id.present?
+      @pending_other_user = api_find_all(User, [pending_user_id]).first
+      @pending_other_user = nil unless @pending_other_user.try(:grants_right?, @current_user, session, :manage_logins)
+      if @pending_other_user == @user
+        @pending_other_user = nil
+        pending_other_error = t('cant_self_merge', "You can't merge an account with itself.")
+      elsif @pending_other_user.blank? && pending_other_error.blank?
+        pending_other_error = t('user_not_found', "No active user with that ID was found.")
+      end
     end
+
+    pending_other_error
   end
 
   def assignments_needing_grading
@@ -1138,12 +1126,12 @@ class UsersController < ApplicationController
     end
   end
 
-  def require_open_registration
+  def require_self_registration
     get_context
     @context = @domain_root_account || Account.default unless @context.is_a?(Account)
     @context = @context.root_account
-    unless @context.grants_right?(@current_user, session, :manage_user_logins) || @context.open_registration?
-      flash[:error] = t('no_open_registration', "Open registration has not been enabled for this account")
+    unless @context.grants_right?(@current_user, session, :manage_user_logins) || @context.self_registration?
+      flash[:error] = t('no_self_registration', "Self registration has not been enabled for this account")
       respond_to do |format|
         format.html { redirect_to root_url }
         format.json { render :json => {}, :status => 403 }
@@ -1158,7 +1146,7 @@ class UsersController < ApplicationController
     }
   end
 
-  protected :require_open_registration
+  protected :require_self_registration
 
   def teacher_activity
     @teacher = User.find(params[:user_id])

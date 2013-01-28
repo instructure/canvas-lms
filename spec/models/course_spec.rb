@@ -496,6 +496,25 @@ describe Course do
       events.should include assignment
     end
   end
+
+  context "migrate_content_links" do
+    it "should ignore types not in the supported_types arg" do
+      c1 = course_model
+      c2 = course_model
+      orig = <<-HTML
+      We aren't translating <a href="/courses/#{c1.id}/assignments/5">links to assignments</a>
+      HTML
+      html = Course.migrate_content_links(orig, c1, c2, ['files'])
+      html.should == orig
+    end
+  end
+
+  it "should be marshal-able" do
+    c = Course.new(:name => 'c1')
+    Marshal.dump(c)
+    c.save!
+    Marshal.dump(c)
+  end
 end
 
 describe Course, "enroll" do
@@ -2604,7 +2623,7 @@ describe Course, "section_visibility" do
     @course.enroll_user(@student2, "StudentEnrollment", :section => @other_section, :enrollment_state => 'active')
 
     @observer = User.create
-    @course.enroll_user(@observer, "ObserverEnrollment")
+    @course.enroll_user(@observer, "ObserverEnrollment").update_attribute(:associated_user_id, @student1.id)
   end
 
   it "should return a scope from sections_visible_to" do
@@ -2647,32 +2666,29 @@ describe Course, "section_visibility" do
   end
 
   context "restricted" do
-    it "should return no students" do
-      @course.students_visible_to(@observer).should eql []
+    it "should return no students except self and the observed" do
+      @course.students_visible_to(@observer).should eql [@student1]
+      RoleOverride.create!(:context => @course.account, :permission => 'read_roster',
+                           :enrollment_type => "StudentEnrollment", :enabled => false)
+      @course.students_visible_to(@student1).should eql [@student1]
     end
 
     it "should return no sections" do
       @course.sections_visible_to(@observer).should eql []
+      RoleOverride.create!(:context => @course.account, :permission => 'read_roster',
+                           :enrollment_type => "StudentEnrollment", :enabled => false)
+      @course.sections_visible_to(@student1).should eql []
     end
   end
 
-  context "migrate_content_links" do
-    it "should ignore types not in the supported_types arg" do
-      c1 = course_model
-      c2 = course_model
-      orig = <<-HTML
-      We aren't translating <a href="/courses/#{c1.id}/assignments/5">links to assignments</a>
-      HTML
-      html = Course.migrate_content_links(orig, c1, c2, ['files'])
-      html.should == orig
+  context "require_message_permission" do
+    it "should check the message permission" do
+      @course.enrollment_visibility_level_for(@teacher, @course.section_visibilities_for(@teacher), true).should eql :full
+      @course.enrollment_visibility_level_for(@observer, @course.section_visibilities_for(@observer), true).should eql :restricted
+      RoleOverride.create!(:context => @course.account, :permission => 'send_messages',
+                           :enrollment_type => "StudentEnrollment", :enabled => false)
+      @course.enrollment_visibility_level_for(@student1, @course.section_visibilities_for(@student1), true).should eql :restricted
     end
-  end
-
-  it "should be marshal-able" do
-    c = Course.new(:name => 'c1')
-    Marshal.dump(c)
-    c.save!
-    Marshal.dump(c)
   end
 end
 
@@ -3315,6 +3331,85 @@ describe Course do
       @course.enroll_user(@user1)
 
       @course.enrollments.count.should == enrollment_count
+    end
+
+    describe "already_enrolled" do
+      before do
+        course
+        user
+      end
+
+      it "should not be set for a new enrollment" do
+        @course.enroll_user(@user).already_enrolled.should_not be_true
+      end
+
+      it "should be set for an updated enrollment" do
+        @course.enroll_user(@user)
+        @course.enroll_user(@user).already_enrolled.should be_true
+      end
+    end
+
+    context "custom roles" do
+      before do
+        @account = Account.default
+        course
+        user
+        custom_student_role('LazyStudent')
+        custom_student_role('HonorStudent')
+      end
+
+      it "should re-use an enrollment with the same role" do
+        enrollment1 = @course.enroll_user(@user, 'StudentEnrollment', :role_name => 'HonorStudent')
+        enrollment2 = @course.enroll_user(@user, 'StudentEnrollment', :role_name => 'HonorStudent')
+        @user.enrollments.count.should eql 1
+        enrollment1.should eql enrollment2
+      end
+
+      it "should not re-use an enrollment with a different role" do
+        enrollment1 = @course.enroll_user(@user, 'StudentEnrollment', :role_name => 'LazyStudent')
+        enrollment2 = @course.enroll_user(@user, 'StudentEnrollment', :role_name => 'HonorStudent')
+        @user.enrollments.count.should eql 2
+        enrollment1.should_not eql enrollment2
+      end
+
+      it "should not re-use an enrollment with no role when enrolling with a role" do
+        enrollment1 = @course.enroll_user(@user, 'StudentEnrollment')
+        enrollment2 = @course.enroll_user(@user, 'StudentEnrollment', :role_name => 'HonorStudent')
+        @user.enrollments.count.should eql 2
+        enrollment1.should_not eql enrollment2
+      end
+
+      it "should not re-use an enrollment with a role when enrolling with no role" do
+        enrollment1 = @course.enroll_user(@user, 'StudentEnrollment', :role_name => 'LazyStudent')
+        enrollment2 = @course.enroll_user(@user, 'StudentEnrollment')
+        @user.enrollments.count.should eql 2
+        enrollment1.should_not eql enrollment2
+      end
+    end
+  end
+
+  describe "short_name_slug" do
+    before :each do
+      @course = course(:active_all => true)
+    end
+
+    it "should hard truncate at 30 characters" do
+      @course.short_name = "a" * 31
+      @course.short_name.length.should == 31
+      @course.short_name_slug.length.should == 30
+      @course.short_name.should =~ /^#{@course.short_name_slug}/
+    end
+
+    it "should not change the short_name" do
+      short_name = "a" * 31
+      @course.short_name = short_name
+      @course.short_name_slug.should_not == @course.short_name
+      @course.short_name.should == short_name
+    end
+
+    it "should leave short short_names alone" do
+      @course.short_name = 'short short_name'
+      @course.short_name_slug.should == @course.short_name
     end
   end
 end

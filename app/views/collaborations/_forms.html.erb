@@ -1,9 +1,10 @@
-<% form_tag(context_url(@context, :context_collaborations_url), {:id => "add_collaboration_form", :target => "_blank", :style => "display: none; margin-top: 10px;"}) do %>
-<h2><%= t 'titles.new', "Start a New Collaboration" %></h2>
+<% form_for([@context, Collaboration.new], :html => { :target => '_blank',
+                                                      :style => 'display: none; margin-top: 10px;' }) do |f| %>
+<h2 tabindex="-1"><%= t 'titles.new', "Start a New Collaboration" %></h2>
 <table class="formtable">
   <tr>
     <td style="white-space: nowrap">
-      <label for="collaboration_collaboration_type"><%= before_label :collaborate_using, "Collaborate Using" %></label>
+      <%= f.label :collaboration_type, t('labels.collaboration_type', 'Collaborate using:') %>
     </td>
     <td style="width: 90%;">
       <select id="collaboration_collaboration_type" name="collaboration[collaboration_type]">
@@ -34,27 +35,25 @@
     </td>
   </tr><tr class="collaborate_data">
     <td style="white-space: nowrap">
-      <label for="collaboration_title"><%= before_label :document_name, "Document Name" %></label>
+      <%= f.label :title, t('labels.document_name', 'Document name:') %>
     </td>
     <td>
-      <%= text_field :collaboration, :title, :style => "width: 300px;" %>
+      <%= f.text_field :title, :style => "width: 300px;" %>
     </td>
   </tr><tr class="collaborate_data">
     <td style="white-space: nowrap; vertical-align: top;">
-      <label for="collaboration_description"><%= before_label :description, "Description" %></label>
+      <%= f.label :description, t('labels.description', 'Description') %>
     </td>
     <td>
-      <%= text_area :collaboration, :description, :style => "width: 400px; height: 50px;" %>
+      <%= f.text_area :description, :style => "width: 400px; height: 50px;" %>
     </td>
-  </tr>
+  </tr><tr>
     <td colspan="2">
       <div class="collaborate_data">
-        <div class="collaborator_list">
-          <%= render :partial => "collaborators" %>
-        </div>
-        <div class="button-container">
-          <button type="submit" class="btn button-default-action"><%= t 'buttons.start_collaborating', "Start Collaborating" %></button>
-          <button type="button" class="button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+        <div class="collaborator_list"></div>
+        <div class="collaboration-actions form-actions">
+          <button type="button" class="btn cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+          <button type="submit" class="btn btn-primary"><%= t 'buttons.start_collaborating', "Start Collaborating" %></button>
         </div>
       </div>
       <div id="collaborate_authorize_google_docs" class="collaboration_authorization" style="display: none; margin: 20px;">
@@ -87,7 +86,7 @@
   <%= text_area :collaboration, :description, :style => "width: 400px; height: 50px;" %>
   </div>
   <div class="footer">
-    <%= render :partial => "collaborators" %>
+    <div class="collaborator_list"></div>
   </div>
   <div class="button-container">
     <button type="submit" class="btn button-default-action"><%= t 'buttons.update', "Update Collaboration" %></button>
