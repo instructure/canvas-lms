@@ -518,6 +518,8 @@ ActionController::Routing::Routes.draw do |map|
   map.services 'services', :controller => 'users', :action => 'services'
   map.bookmark_search 'search/bookmarks', :controller => 'users', :action => 'bookmark_search'
   map.search_rubrics 'search/rubrics', :controller => "search", :action => "rubrics"
+  map.dismiss_tour 'tours/dismiss/:name', :controller => :tours, :action => :dismiss, :conditions => {:method => :delete}
+  map.dismiss_tour_session 'tours/dismiss/session/:name', :controller => :tours, :action => :dismiss_session, :conditions => {:method => :delete}
   map.resources :users do |user|
     user.masquerade 'masquerade', :controller => 'users', :action => 'masquerade'
     user.delete 'delete', :controller => 'users', :action => 'delete'

@@ -49,6 +49,7 @@ class ApplicationController < ActionController::Base
   before_filter :init_body_classes
   after_filter :set_response_headers
   after_filter :update_enrollment_last_activity_at
+  include Tour
 
   add_crumb(proc { %Q{<i title="#{I18n.t('links.dashboard', "My Dashboard")}" class="icon-home standalone-icon"></i>}.html_safe }, :root_path, :class => "home")
 
