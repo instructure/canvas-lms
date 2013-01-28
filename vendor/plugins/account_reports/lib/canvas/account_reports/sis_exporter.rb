@@ -259,7 +259,7 @@ module Canvas::AccountReports
     def sections
       list_csv = FasterCSV.generate do |csv|
         if @sis_format
-          headers = ['section_id','course_id','name','status','start_date','end_date','account_id']
+          headers = ['section_id','course_id','name','status','start_date','end_date']
         else
           headers = [ 'canvas_section_id','section_id','canvas_course_id','course_id','name',
                       'status','start_date','end_date','canvas_account_id','account_id']
@@ -267,10 +267,13 @@ module Canvas::AccountReports
         csv << headers
         sections = @domain_root_account.course_sections.scoped(
           :select => "course_sections.*, nxc.sis_source_id AS non_x_course_sis_id,
-                      rc.sis_source_id AS course_sis_id, accounts.sis_source_id AS account_sis_id",
+                      rc.sis_source_id AS course_sis_id,
+                      ra.id AS r_account_id, ra.sis_source_id AS r_account_sis_id,
+                      nxc.account_id AS nx_account_id, nxa.sis_source_id AS nx_account_sis_id",
           :joins => "INNER JOIN courses AS rc ON course_sections.course_id = rc.id
+                     INNER JOIN accounts AS ra ON rc.account_id = ra.id
                      LEFT OUTER JOIN courses AS nxc ON course_sections.nonxlist_course_id = nxc.id
-                     LEFT OUTER JOIN accounts ON course_sections.account_id = accounts.id")
+                     LEFT OUTER JOIN accounts AS nxa ON nxc.account_id = nxa.id")
 
         if @term
           sections = sections.scoped(:conditions => ["rc.enrollment_term_id=?", @term])
@@ -320,8 +323,15 @@ module Canvas::AccountReports
             row << nil
             row << nil
           end
-          row << s.account_id unless @sis_format
-          row << s.try(:account_sis_id)
+          unless @sis_format
+            if s.nonxlist_course_id == nil
+              row << s.r_account_id
+              row << s.r_account_sis_id
+            else
+              row << s.nx_account_id
+              row << s.nx_account_sis_id
+            end
+          end
           csv << row
         end
       end

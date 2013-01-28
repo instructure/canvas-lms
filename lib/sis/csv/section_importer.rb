@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -44,7 +44,7 @@ module SIS
             end
 
             begin
-              importer.add_section(row['section_id'], row['course_id'], row['name'], row['status'], start_date, end_date, row['account_id'])
+              importer.add_section(row['section_id'], row['course_id'], row['name'], row['status'], start_date, end_date)
             rescue ImportError => e
               add_warning(csv, "#{e}")
             end

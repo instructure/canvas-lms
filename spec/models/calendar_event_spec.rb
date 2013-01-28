@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -610,9 +610,10 @@ describe CalendarEvent do
         }.should raise_error(/Invalid child event context/)
 
         lambda {
+          other_section = Course.create!.default_section
           event = @course.calendar_events.build :title => "ohai",
             :child_event_data => [
-              {:start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => CourseSection.create.asset_string}
+              {:start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => other_section.asset_string}
             ]
           event.updating_user = @user
           event.save!

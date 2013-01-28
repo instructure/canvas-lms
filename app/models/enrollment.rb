@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -430,7 +430,7 @@ class Enrollment < ActiveRecord::Base
 
   def assert_section
     self.course_section ||= self.course.default_section if self.course
-    self.root_account_id = self.course_section.root_account_id rescue nil
+    self.root_account_id = self.course.root_account_id rescue nil
   end
 
   def infer_privileges

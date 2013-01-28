@@ -145,7 +145,6 @@ describe "Default Account Reports" do
     @section1 = CourseSection.new(:name => 'English_01',:course => @course1,
                                   :start_at => @course1.start_at,:end_at => @course1.conclude_at)
     @section1.sis_source_id = 'english_section_1'
-    @section1.account_id = @sub_account.id
     @section1.restrict_enrollments_to_section_dates = true
     @section1.save!
 
@@ -548,7 +547,7 @@ describe "Default Account Reports" do
 
         parsed.length.should == 1
         parsed[0].should == [@section3.sis_source_id,@course2.sis_source_id,@section3.name,
-                             "active",nil,@course2.conclude_at.iso8601,nil]
+                             "active",nil,@course2.conclude_at.iso8601]
       end
 
       it "should run the sis export report" do
@@ -558,12 +557,11 @@ describe "Default Account Reports" do
 
         parsed.length.should == 3
         parsed[0].should ==[@section1.sis_source_id,@course1.sis_source_id,@section1.name,"active",
-                            @course1.start_at.iso8601,@course1.conclude_at.iso8601,
-                            @sub_account.sis_source_id]
+                            @course1.start_at.iso8601,@course1.conclude_at.iso8601]
         parsed[1].should == [@section2.sis_source_id,@course1.sis_source_id,@section2.name,"active",
-                             nil,@course1.conclude_at.iso8601,nil]
+                             nil,@course1.conclude_at.iso8601]
         parsed[2].should == ["english_section_3","SIS_COURSE_ID_2","Math_01","active",nil,
-                             @course2.conclude_at.iso8601,nil]
+                             @course2.conclude_at.iso8601]
       end
 
       it "should run the provisioning report" do
@@ -574,15 +572,15 @@ describe "Default Account Reports" do
         parsed[0].should ==[@section1.id.to_s,@section1.sis_source_id,@course1.id.to_s,
                             @course1.sis_source_id,@section1.name,"active",
                             @course1.start_at.iso8601,@course1.conclude_at.iso8601,
-                            @sub_account.id.to_s,@sub_account.sis_source_id]
+                            @sub_account.id.to_s,"sub1"]
         parsed[1].should == [@section2.id.to_s,@section2.sis_source_id,@course1.id.to_s,
                              @course1.sis_source_id,@section2.name,"active",nil,
-                             @course1.conclude_at.iso8601,nil,nil]
+                             @course1.conclude_at.iso8601, @sub_account.id.to_s,"sub1"]
         parsed[2].should == [@section3.id.to_s,"english_section_3",@course2.id.to_s,
                              "SIS_COURSE_ID_2","Math_01","active",nil,
-                             @course2.conclude_at.iso8601,nil,nil]
+                             @course2.conclude_at.iso8601,@account.id.to_s,nil]
         parsed[3].should == [@section4.id.to_s,nil,@course2.id.to_s,"SIS_COURSE_ID_2",
-                             "Math_02","active",nil,nil,nil,nil]
+                             "Math_02","active",nil,nil,@account.id.to_s,nil]
       end
 
       it "should run the provisioning report with deleted sections" do
@@ -595,15 +593,15 @@ describe "Default Account Reports" do
         parsed[0].should ==[@section1.id.to_s,@section1.sis_source_id,@course1.id.to_s,
                             @course1.sis_source_id,@section1.name,"deleted",
                             @course1.start_at.iso8601,@course1.conclude_at.iso8601,
-                            @sub_account.id.to_s,@sub_account.sis_source_id]
+                            @sub_account.id.to_s,"sub1"]
         parsed[1].should == [@section2.id.to_s,@section2.sis_source_id,@course1.id.to_s,
                              @course1.sis_source_id,@section2.name,"active",
-                             nil,@course1.conclude_at.iso8601,nil,nil]
+                             nil,@course1.conclude_at.iso8601,@sub_account.id.to_s,"sub1"]
         parsed[2].should == [@section3.id.to_s,"english_section_3",@course2.id.to_s,
                              "SIS_COURSE_ID_2","Math_01","active",nil,
-                             @course2.conclude_at.iso8601,nil,nil]
+                             @course2.conclude_at.iso8601,@account.id.to_s,nil]
         parsed[3].should == [@section4.id.to_s,nil,@course2.id.to_s,"SIS_COURSE_ID_2",
-                             "Math_02","active",nil,nil,nil,nil]
+                             "Math_02","active",nil,nil,@account.id.to_s,nil]
       end
 
       it "should run the provisioning report with deleted sections on a sub account" do
@@ -618,10 +616,10 @@ describe "Default Account Reports" do
         parsed[0].should ==[@section1.id.to_s,@section1.sis_source_id,@course1.id.to_s,
                             @course1.sis_source_id,@section1.name,"active",
                             @course1.start_at.iso8601,@course1.conclude_at.iso8601,
-                            @sub_account.id.to_s,@sub_account.sis_source_id]
+                            @sub_account.id.to_s,"sub1"]
         parsed[1].should == [@section2.id.to_s,@section2.sis_source_id,@course1.id.to_s,
                              @course1.sis_source_id,@section2.name,"deleted",
-                             nil,@course1.conclude_at.iso8601,nil,nil]
+                             nil,@course1.conclude_at.iso8601,@sub_account.id.to_s,"sub1"]
       end
     end
 
@@ -934,7 +932,7 @@ describe "Default Account Reports" do
       parsed["courses"].should == [["course_id","short_name","long_name","account_id",
                                     "term_id","status","start_date","end_date"]]
       parsed["sections"].should == [["section_id","course_id","name","status",
-                                     "start_date","end_date","account_id"]]
+                                     "start_date","end_date"]]
       parsed["enrollments"].should == [["course_id","user_id","role","section_id",
                                         "status","associated_user_id"]]
       parsed["groups"].should == [["group_id","account_id","name","status"]]

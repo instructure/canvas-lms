@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -334,7 +334,7 @@ class Course < ActiveRecord::Base
         course_ids = courses.map(&:id)
       else
         course_ids = courses_or_course_ids
-        courses = Course.find(:all, :conditions => {:id => course_ids }, :include => { :course_sections => :nonxlist_course })
+        courses = Course.find(:all, :conditions => {:id => course_ids }, :include => { :course_sections => [:course, :nonxlist_course] })
       end
       course_ids_to_update_user_account_associations = []
       CourseAccountAssociation.transaction do
@@ -342,8 +342,9 @@ class Course < ActiveRecord::Base
         to_delete = []
         CourseAccountAssociation.find(:all, :conditions => { :course_id => course_ids }).each do |aa|
           key = [aa.course_section_id, aa.account_id]
-          # duplicates
           current_course_associations = current_associations[aa.course_id] ||= {}
+          # duplicates. the unique index prevents these now, but this code
+          # needs to hang around for the migration itself
           if current_course_associations.has_key?(key)
             to_delete << aa.id
             next
@@ -359,7 +360,7 @@ class Course < ActiveRecord::Base
           (course.course_sections + [nil]).each do |section|
             next if section && !section.active?
             section.course = course if section
-            starting_account_ids = [course.account_id, section.try(:account_id), section.try(:nonxlist_course).try(:account_id)].compact.uniq
+            starting_account_ids = [course.account_id, section.try(:course).try(:account_id), section.try(:nonxlist_course).try(:account_id)].compact.uniq
 
             account_ids_with_depth = User.calculate_account_associations_from_accounts(starting_account_ids, account_chain_cache).map
 
@@ -1652,7 +1653,7 @@ class Course < ActiveRecord::Base
       section = course_sections.build
       section.default_section = true
       section.course = self
-      section.root_account = self.root_account
+      section.root_account_id = self.root_account_id
       section.save unless new_record?
     end
     section

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -28,7 +28,7 @@ class ActiveRecord::Base
     'calendar_events' => %w(calendar_event_repeat_id for_repeat_on),
     'content_tags' => %w(sequence_position context_module_association_id),
     'conversation_messages' => %w(context_message_id),
-    'course_sections' => %w(sis_cross_listed_section_id sis_cross_listed_section_sis_batch_id sticky_xlist sis_name students_can_participate_before_start_at section_organization_name long_section_code),
+    'course_sections' => %w(sis_cross_listed_section_id sis_cross_listed_section_sis_batch_id sticky_xlist sis_name students_can_participate_before_start_at section_organization_name long_section_code account_id),
     'courses' => %w(section hidden_tabs sis_name sis_course_code hashtag allow_student_assignment_edits),
     'discussion_topics' => %w(authorization_list_id),
     'enrollment_terms' => %w(sis_data sis_name),
