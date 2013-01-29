@@ -59,6 +59,8 @@ define [
     sectionsWithoutOverrides: =>
       @model.sectionsWithoutOverrides()
 
+    getOverrides: => @model.overrides.toJSON()
+
     showAddDueDateButton: => @$el.find( '#add_due_date' ).show()
       
     hideAddDueDateButton: => @$el.find( '#add_due_date' ).hide()

@@ -276,4 +276,16 @@ module Api::V1::AssignmentOverride
     # save the new/kept overrides
     overrides.each{ |override| override.save! }
   end
+
+  def deserialize_overrides( overrides )
+    if overrides.is_a?(Hash)
+      return unless overrides.keys.all?{ |k| k.to_i.to_s == k.to_s }
+      indices = overrides.keys.sort_by(&:to_i)
+      return unless indices.map(&:to_i) == (0...indices.size).to_a
+      overrides = indices.map{ |index| overrides[index] }
+    else
+      overrides
+    end
+  end
+
 end

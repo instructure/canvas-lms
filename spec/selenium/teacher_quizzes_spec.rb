@@ -1,9 +1,25 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides.rb')
 
 describe "quizzes" do
+  include AssignmentOverridesSeleniumHelper
   it_should_behave_like "quizzes selenium tests"
 
   context "as a teacher" do
+    let(:due_at) { Time.zone.now + 3.days }
+    let(:unlock_at) { Time.zone.now + 2.days }
+    let(:lock_at) { Time.zone.now + 4.days }
+
+    def create_quiz_with_default_due_dates
+      @context = @course
+      @quiz = quiz_model
+      @quiz.generate_quiz_data
+      @quiz.due_at = due_at
+      @quiz.lock_at = lock_at
+      @quiz.unlock_at = unlock_at
+      @quiz.save!
+      @quiz
+    end
 
     before (:each) do
       course_with_teacher_logged_in
@@ -15,7 +31,10 @@ describe "quizzes" do
     it "should allow a teacher to create a quiz from the quizzes tab directly" do
       get "/courses/#{@course.id}/quizzes"
       expect_new_page_load { f(".new-quiz-link").click }
-      expect_new_page_load { click_save_settings_button }
+      expect_new_page_load { 
+        click_save_settings_button 
+        wait_for_ajax_requests
+      }
       f('#quiz_title').should include_text "Unnamed Quiz"
     end
 
@@ -46,7 +65,10 @@ describe "quizzes" do
       wait_for_ajax_requests
 
       #save the quiz
-      click_save_settings_button
+      expect_new_page_load { 
+        click_save_settings_button 
+        wait_for_ajax_requests
+      }
       wait_for_ajax_requests
 
       #check quiz preview
@@ -504,6 +526,58 @@ describe "quizzes" do
 
       # Confirm that we make it back to the quizzes index page
       f('#content').should include_text("Course Quizzes")
+    end
+
+    it "creates assignment with default due date" do
+      get "/courses/#{@course.id}/quizzes/new"
+      wait_for_ajaximations
+      fill_assignment_overrides
+      replace_content(f('#quiz_title'), 'VDD Quiz')
+      expect_new_page_load { 
+        click_save_settings_button 
+        wait_for_ajax_requests
+      }
+      compare_assignment_times(Quiz.find_by_title('VDD Quiz'))
+    end
+
+    it "loads existing due date data into the form" do
+      @quiz = create_quiz_with_default_due_dates
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
+      wait_for_ajaximations
+      compare_assignment_times(@quiz.reload)
+    end
+
+    it "can create overrides" do
+      @quiz = create_quiz_with_default_due_dates
+      default_section = @course.course_sections.first
+      other_section = @course.course_sections.create!(:name => "other section")
+      default_section_due = Time.zone.now + 1.days
+      other_section_due = Time.zone.now + 2.days
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
+      wait_for_ajaximations
+      due_at = Time.zone.now + 1.days
+      select_first_override_section(default_section.name)
+      first_due_at_element.clear
+      first_due_at_element.
+        send_keys(default_section_due.strftime('%b %-d, %y'))
+
+      add_override
+
+      select_last_override_section(other_section.name)
+      last_due_at_element.
+        send_keys(other_section_due.strftime('%b %-d, %y'))
+      expect_new_page_load { 
+        click_save_settings_button 
+        wait_for_ajax_requests
+      }
+      overrides = @quiz.reload.assignment_overrides
+      overrides.count.should == 2
+      default_override = overrides.detect{ |o| o.set_id == default_section.id }
+      default_override.due_at.strftime('%b %-d, %y').
+        should == default_section_due.to_date.strftime('%b %-d, %y')
+      other_override = overrides.detect{ |o| o.set_id == other_section.id }
+      other_override.due_at.strftime('%b %-d, %y').
+        should == other_section_due.to_date.strftime('%b %-d, %y')
     end
   end
 end

@@ -5,14 +5,9 @@
   content_for :page_title, (@quiz.quiz_title || !@quiz.quiz_title.empty? ? @quiz.quiz_title : t(:default_page_title, 'New Quiz'))
 %>
 
-
-
 <% content_for :right_side do %>
   <%= render :partial => "shared/wiki_sidebar" %>
 <% end %>
-
-
-
 
 
 <% js_block do %>
@@ -53,7 +48,7 @@ $(document).ready(function() {
 
   <div class="row-fluid">
     <div class="span6">
-    <%= text_field :quiz, :title, :style => "font-size:1.8em;font-family:inherit;padding:0.2em 0.3em;", :placeholder => "Quiz Title" %>
+    <%= text_field :quiz, :title, :style => "font-size:1.8em;font-family:inherit;", :placeholder => "Quiz Title" %>
     </div>
     <div class="span6">
       <div class="admin-link-hover-area">
@@ -113,7 +108,6 @@ $(document).ready(function() {
 
           <fieldset>
             <input type="hidden" name="activate" value="true"/>
-
             <div class="control-group">
               <label class="control-label" for="quiz_assignment_id"><%= t(:quiz_type, "Quiz Type") %></label>
               <div class="controls">
@@ -274,8 +268,7 @@ $(document).ready(function() {
             </div>
           </fieldset>
 
-          <hr/>
-          <!-- TODO: VDD goes here! -->
+          <div class="js-assignment-overrides"></div>
 
         </div>
       <% end %>

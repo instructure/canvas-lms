@@ -23,6 +23,15 @@ describe Quiz do
     course
   end
 
+  describe "#publish!" do
+    it "sets the workflow state to available and save!s the quiz" do
+      quiz = Quiz.new(:title => "hello")
+      quiz.expects(:save!).once
+      quiz.publish!
+      quiz.workflow_state.should == 'available'
+    end
+  end
+
   it "should infer the times if none given" do
     q = factory_with_protected_attributes(@course.quizzes, :title => "new quiz", :due_at => "Sep 3 2008 12:00am", :quiz_type => 'assignment', :workflow_state => 'available')
     q.due_at.should == Time.parse("Sep 3 2008 12:00am UTC")
@@ -970,6 +979,21 @@ describe Quiz do
     end
   end
 
+  describe "#group_category_id" do
+
+    it "returns the assignment's group category id if it has an assignment" do
+      quiz = Quiz.new(:title => "Assignment Group Category Quiz")
+      quiz.expects(:assignment).returns stub(:group_category_id => 1)
+      quiz.group_category_id.should == 1
+    end
+
+    it "returns nil if it doesn't have an assignment" do
+      quiz = Quiz.new(:title => "Quiz w/o assignment")
+      quiz.group_category_id.should be_nil
+    end
+
+  end
+
   describe "linking overrides with assignments" do
     let(:course) { course_model }
     let(:quiz) { quiz_model(:course => course, :due_at => 5.days.from_now).reload }
@@ -1014,6 +1038,7 @@ describe Quiz do
         quiz.save
         override.reload
         override_student.reload
+        quiz.assignment.reload
       end
 
       context "override" do
@@ -1024,6 +1049,15 @@ describe Quiz do
         it "has the quiz's assignment" do
           override.assignment.should == quiz.assignment
         end
+
+        it "has the quiz's assignment's version number" do
+          override.assignment_version.should == quiz.assignment.version_number
+        end
+
+        it "has the quiz's version number" do
+          override.quiz_version.should == quiz.version_number
+        end
+
       end
 
       context "override student" do
@@ -1045,6 +1079,18 @@ describe Quiz do
         quiz.save
         quiz.expects(:link_assignment_overrides).never
         quiz.save
+      end
+    end
+
+    context "when the assignment ID changes" do
+      it "links overrides" do
+        quiz.expects(:link_assignment_overrides).once
+        quiz.workflow_state = 'available'
+        quiz.save!
+        quiz.expects(:link_assignment_overrides).once
+        quiz.assignment = nil
+        quiz.assignment_id = 345
+        quiz.save!
       end
     end
   end

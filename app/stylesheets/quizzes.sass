@@ -744,13 +744,18 @@ ul#quiz_versions
   .quiz_version
     &.selected
       :font-weight bold
-      
+
+
+
 #quiz_edit_wrapper
+  #quiz_title
+    margin-left: 0
+    margin-top: 5px
+    padding: 0.1em 0.1em 0.1em 0.3em
   padding: 1em
   background-color: #ffffff
   #student_submissions_warning,
   #unpublished_changes_message
-    margin: 0 20px 20px
     padding: 12px
     border-width: 1px
   #quiz_display_points_possible
@@ -771,6 +776,7 @@ ul#quiz_versions
         min-width: 415px
         margin: 1em auto
     #quiz_options_form
+      margin: 0 auto
       td
         vertical-align: top
       label.checkbox
@@ -1224,5 +1230,5 @@ ul#quiz_versions
 
 .form-actions
   border: 1px solid #999
-  margin: 18px -1px -1px
+  margin: 18px 0 -1px
   @include background-image(linear-gradient(#f3f3f3, #e3e3e3))

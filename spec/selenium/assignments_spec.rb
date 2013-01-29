@@ -184,6 +184,7 @@ describe "assignments" do
 
       edit_assignment
       f('#assignment_has_group_category').click
+      wait_for_animations
       submit_assignment_form
       @assignment.reload
       @assignment.group_category_id.should be_nil

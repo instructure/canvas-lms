@@ -206,6 +206,7 @@ preventDefault, MissingDateDialog, toggleAccessibly) ->
     submit: (event) =>
       event.preventDefault()
       event.stopPropagation()
+      @dueDateOverrideView.updateOverrides()
       if @dueDateOverrideView.containsSectionsWithoutOverrides()
         sections = @dueDateOverrideView.sectionsWithoutOverrides()
         missingDateDialog = new MissingDateDialog

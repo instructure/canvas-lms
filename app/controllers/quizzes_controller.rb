@@ -17,6 +17,8 @@
 #
 
 class QuizzesController < ApplicationController
+  include Api::V1::Quiz
+  include Api::V1::AssignmentOverride
   before_filter :require_context
   add_crumb(proc { t(:top_level_crumb, "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
@@ -115,6 +117,11 @@ class QuizzesController < ApplicationController
       if @has_student_submissions = @quiz.has_student_submissions?
         flash[:notice] = t('notices.has_submissions_already', "Keep in mind, some students have already taken or started taking this quiz")
       end
+      js_env :ASSIGNMENT_OVERRIDES => (assignment_overrides_json(@quiz.overrides_visible_to(@current_user)))
+      js_env :QUIZ => (quiz_json(@quiz,@context,@current_user,session))
+      js_env :SECTION_LIST => @context.course_sections.active.map {|section|
+        {:id => section.id, :name => section.name }
+      }
       render :action => "new"
     end
   end
@@ -337,6 +344,17 @@ class QuizzesController < ApplicationController
     end
   end
 
+  def delete_override_params
+    # nil represents the fact that we don't want to update the overrides
+    return nil unless params[:quiz].has_key?(:assignment_overrides)
+
+    overrides = params[:quiz].delete(:assignment_overrides)
+    overrides = deserialize_overrides(overrides)
+
+    # overrides might be "false" to indicate no overrides through form params
+    overrides.is_a?(Array) ? overrides : []
+  end
+
   def create
     if authorized_action(@context.quizzes.new, @current_user, :create)
       params[:quiz][:title] = nil if params[:quiz][:title] == "undefined"
@@ -358,24 +376,26 @@ class QuizzesController < ApplicationController
         params[:quiz][:assignment_id] = nil unless @assignment
         params[:quiz][:title] = @assignment.title if @assignment
       end
-      @quiz = @context.quizzes.build(params[:quiz])
+      @quiz = @context.quizzes.build
       @quiz.content_being_saved_by(@current_user)
       @quiz.infer_times
-      res = @quiz.save
-      if res && params[:activate]
-        @quiz.generate_quiz_data
-        @quiz.published_at = Time.now
-        @quiz.workflow_state = 'available'
-        res = @quiz.save
+      overrides = delete_override_params
+      @quiz.transaction do
+        @quiz.update_attributes!(params[:quiz])
+        batch_update_assignment_overrides(@quiz,overrides) unless overrides.nil?
+        if params[:activate]
+          @quiz.generate_quiz_data
+          @quiz.published_at = Time.now
+          @quiz.workflow_state = 'available'
+          @quiz.save!
+        end
       end
       @quiz.did_edit if @quiz.created?
-      if res
-        @quiz.reload
-        render :json => @quiz.to_json(:include => {:assignment => {:include => :assignment_group}})
-      else
-        render :json => @quiz.errors.to_json, :status => :bad_request
-      end
+      @quiz.reload
+      render :json => @quiz.to_json(:include => {:assignment => {:include => :assignment_group}})
     end
+  rescue
+    render :json => @quiz.errors.to_json, :status => :bad_request
   end
 
   def update
@@ -395,39 +415,48 @@ class QuizzesController < ApplicationController
         params[:quiz][:assignment_group_id] = @assignment_group && @assignment_group.id
       end
 
-      if params[:activate]
-        @quiz.with_versioning(true) do
-          @quiz.generate_quiz_data
-          @quiz.workflow_state = 'available'
-          @quiz.published_at = Time.now
-          @quiz.save
-        end
-      end
-
       params[:quiz][:lock_at] = nil if params[:quiz].delete(:do_lock_at) == 'false'
 
       @quiz.with_versioning(false) do
         @quiz.did_edit if @quiz.created?
       end
 
+      # TODO: API for Quiz overrides!
       respond_to do |format|
-        res = nil
-        @quiz.content_being_saved_by(@current_user)
-        @quiz.with_versioning(false) do
-          res = @quiz.update_attributes(params[:quiz])
-        end
-        if res
+        @quiz.transaction do
+          overrides = delete_override_params
+          if params[:activate]
+            # TODO: We need to handle notifications better here. We want to send
+            # notifications if the "notify_of_update" field is passed, but *after*
+            # the assignment overrides have been created.
+            @quiz.with_versioning(true) do
+              @quiz.generate_quiz_data
+              @quiz.workflow_state = 'available'
+              @quiz.published_at = Time.now
+              @quiz.save!
+            end
+          end
+          # TODO: We need to handle notifications better here. We want to send
+          # notifications if the "notify_of_update" field is passed, but *after*
+          # the assignment overrides have been created.
+          @quiz.content_being_saved_by(@current_user)
+          @quiz.with_versioning(false) do
+            @quiz.update_attributes!(params[:quiz])
+          end
+          batch_update_assignment_overrides(@quiz,overrides) unless overrides.nil?
           @quiz.reload
           @quiz.update_quiz_submission_end_at_times if params[:quiz][:time_limit].present?
-          flash[:notice] = t('notices.quiz_updated', "Quiz successfully updated")
-          format.html { redirect_to named_context_url(@context, :context_quiz_url, @quiz) }
-          format.json {render :json =>  @quiz.to_json(:include => {:assignment => {:include => :assignment_group}})}
-        else
-          flash[:error] = t('errors.quiz_update_failed', "Quiz failed to update")
-          format.html { redirect_to named_context_url(@context, :context_quiz_url, @quiz) }
-          format.json {render :json => @quiz.errors.to_json, :status => :bad_request}
         end
+        flash[:notice] = t('notices.quiz_updated', "Quiz successfully updated")
+        format.html { redirect_to named_context_url(@context, :context_quiz_url, @quiz) }
+        format.json { render :json => @quiz.to_json(:include => {:assignment => {:include => :assignment_group}}) }
       end
+    end
+  rescue
+    respond_to do |format|
+      flash[:error] = t('errors.quiz_update_failed', "Quiz failed to update")
+      format.html { redirect_to named_context_url(@context, :context_quiz_url, @quiz) }
+      format.json { render :json => @quiz.errors.to_json, :status => :bad_request }
     end
   end
 

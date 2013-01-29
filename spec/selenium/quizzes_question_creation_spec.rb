@@ -542,8 +542,10 @@ describe "quizzes question creation" do
       f('#protect_quiz').click
       alert_present?.should be_false
       fj('#quiz_allowed_attempts').should have_attribute('value', attempts) # fj to avoid selenium caching
-      f('.save_quiz_button').click
-      wait_for_ajax_requests
+      expect_new_page_load {
+        f('.save_quiz_button').click
+        wait_for_ajax_requests
+      }
       Quiz.last.allowed_attempts.should == attempts.to_i
     end
   end
@@ -551,7 +553,10 @@ describe "quizzes question creation" do
   it "should show errors for graded quizzes but not surveys" do
     quiz_with_new_questions
     change_quiz_type_to 'Graded Survey'
-    expect_new_page_load { save_settings }
+    expect_new_page_load {
+      save_settings
+      wait_for_ajax_requests
+    }
 
     edit_quiz
     click_questions_tab
@@ -564,7 +569,10 @@ describe "quizzes question creation" do
 
     click_settings_tab
     change_quiz_type_to 'Graded Quiz'
-    save_settings
+    expect_new_page_load {
+      save_settings
+      wait_for_ajax_requests
+    }
 
     edit_quiz
     click_questions_tab

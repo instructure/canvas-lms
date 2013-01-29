@@ -2,7 +2,9 @@ define [
   'Backbone'
   'underscore'
   'jst/assignments/DueDateView'
-], (Backbone, _, template) ->
+  'jquery'
+  'jquery.toJSON'
+], (Backbone, _, template, $) ->
   class DueDateView extends Backbone.View
     template: template
     tagName: 'li'
@@ -40,6 +42,5 @@ define [
       json = @$el.find('form').toJSON()
       json.course_section_id = parseInt(json.course_section_id, 10)
       json
-
     updateOverride: =>
       @model.set @getFormValues()
