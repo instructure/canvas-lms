@@ -121,7 +121,8 @@ module Canvas::AccountReports
          'attempt', 'outcome score', 'course name', 'course id', 'course sis id', 'assignment url']
 
       # Generate the CSV report
-      result = FasterCSV.generate do |csv|
+      filename = Canvas::AccountReports.generate_file(@account_report)
+      FasterCSV.open(filename, "w") do |csv|
         csv << headers
         students.find_each do |row|
           row['assignment url'] =
@@ -144,8 +145,7 @@ module Canvas::AccountReports
           'account_reports.default.outcome.message',
           "Student-assignment-outcome mapping report successfully generated for %{account_name}",
           :account_name => @account.name),
-        result)
-      result
+        filename)
     end
 
     # retrieve the list of courses for the account
@@ -198,8 +198,8 @@ module Canvas::AccountReports
                                                             AND caa.course_section_id=course_sections.id
                                                             )", @account.id])
       end
-
-      result = FasterCSV.generate do |csv|
+      filename = Canvas::AccountReports.generate_file(@account_report)
+      FasterCSV.open(filename, "w") do |csv|
         csv << ['student name', 'student id', 'student sis', 'course', 'course id', 'course sis', 'section',
                 'section id', 'section sis', 'term', 'term id', 'term sis','current score', 'final score']
         students.find_each do |student|
@@ -222,8 +222,7 @@ module Canvas::AccountReports
         end
       end
 
-      Canvas::AccountReports.message_recipient(@account_report, I18n.t('account_reports.default.grade.message',"Grade export successfully generated for term %{term_name}", :term_name => name), result)
-      result
+      Canvas::AccountReports.message_recipient(@account_report, I18n.t('account_reports.default.grade.message',"Grade export successfully generated for term %{term_name}", :term_name => name), filename)
     end
   end
 end

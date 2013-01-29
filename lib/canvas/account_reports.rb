@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -52,6 +52,17 @@ module Canvas::AccountReports
     end
   end
 
+  def self.generate_file_name(account_report, ext)
+    "#{account_report.report_type}_#{Time.now.strftime('%d_%b_%Y')}_#{account_report.id}_.#{ext}"
+  end
+
+  def self.generate_file(account_report)
+    temp = Tempfile.open(generate_file_name(account_report, "csv"))
+    filepath = temp.path
+    temp.close
+    filepath
+  end
+
   def self.message_recipient(account_report, message, csv=nil)
     user = account_report.user
     account = account_report.account
@@ -59,7 +70,7 @@ module Canvas::AccountReports
     notification = Notification.by_name("Report Generation Failed") if !csv
     attachment = nil
     if csv.is_a? Hash
-      filename = "#{account_report.report_type}_#{Time.now.strftime('%d_%b_%Y')}_#{account_report.id}_.zip"
+      filename = generate_file_name(account_report, "zip")
       temp = Tempfile.open(filename)
       filepath = temp.path
       temp.close
@@ -75,12 +86,22 @@ module Canvas::AccountReports
     elsif csv
       require 'action_controller'
       require 'action_controller/test_process.rb'
-      filename = "#{account_report.report_type}_#{Time.now.strftime('%d_%b_%Y')}_#{account_report.id}_.csv"
-      f = Tempfile.open(filename)
-      f << csv
-      f.close
-      filepath = f.path
-      filetype = 'text/csv'
+      ext = csv !~ /\n/ && File.extname(csv)
+      case ext
+        when ".csv"
+          filename = File.basename(csv);
+          filepath = csv
+          filetype = 'text/csv'
+        when ".zip"
+          filetype = 'application/zip'
+        else
+          filename = generate_file_name(account_report, "csv")
+          f = Tempfile.open(filename)
+          f << csv
+          f.close
+          filepath = f.path
+          filetype = 'text/csv'
+      end
     end
     if filename
       attachment = account.attachments.create!(

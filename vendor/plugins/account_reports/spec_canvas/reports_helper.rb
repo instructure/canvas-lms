@@ -40,7 +40,7 @@ module ReportsSpecHelper
         result
       end
     else
-      all_parsed = FasterCSV.parse(csv_report).to_a
+      all_parsed = FasterCSV.parse(account_report.attachment.open).to_a
       all_parsed[1..-1].sort_by { |r| r.values_at(*sort_columns).join }
     end
   end
