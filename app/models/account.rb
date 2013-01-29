@@ -466,14 +466,16 @@ class Account < ActiveRecord::Base
     res = [self]
 
     if ActiveRecord::Base.configurations[RAILS_ENV]['adapter'] == 'postgresql'
-      res.concat Account.find_by_sql(<<-SQL) if self.parent_account_id
-          WITH RECURSIVE t AS (
-            SELECT * FROM accounts WHERE id=#{self.parent_account_id}
-            UNION
-            SELECT accounts.* FROM accounts INNER JOIN t ON accounts.id=t.parent_account_id
-          )
-          SELECT * FROM t
-        SQL
+      self.shard.activate do
+        res.concat Account.find_by_sql(<<-SQL) if self.parent_account_id
+            WITH RECURSIVE t AS (
+              SELECT * FROM accounts WHERE id=#{self.parent_account_id}
+              UNION
+              SELECT accounts.* FROM accounts INNER JOIN t ON accounts.id=t.parent_account_id
+            )
+            SELECT * FROM t
+          SQL
+      end
     else
       account = self
       while account.parent_account

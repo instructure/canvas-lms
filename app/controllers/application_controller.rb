@@ -32,11 +32,12 @@ class ApplicationController < ActionController::Base
 
   include AuthenticationMethods
   protect_from_forgery
+  # load_user checks masquerading permissions, so this needs to be cleared first
+  before_filter :clear_cached_contexts
   before_filter :load_account, :load_user
   before_filter :check_pending_otp
   before_filter :set_user_id_header
   before_filter :set_time_zone
-  before_filter :clear_cached_contexts
   before_filter :set_page_view
   after_filter :log_page_view
   after_filter :discard_flash_if_xhr
