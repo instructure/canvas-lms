@@ -104,13 +104,16 @@ module GoogleDocs
     end
   end
 
-  def google_doc_list(access_token=google_docs_retrieve_access_token, only_extensions=nil)
-    response = access_token.get('https://docs.google.com/feeds/documents/private/full')
-    docs     = Atom::Feed.load_feed(response.body)
+  def google_doc_list(access_token = nil, only_extensions = nil)
+    access_token ||= google_docs_retrieve_access_token
+    docs = Atom::Feed.load_feed(access_token.get('https://docs.google.com/feeds/documents/private/full').body)
     folders, entries = [[], []]
 
     docs.entries.each do |entry|
-      folder = entry.categories.find{|c| c.scheme.match(/\Ahttp:\/\/schemas.google.com\/docs\/2007\/folders/)}
+      folder = entry.categories.find do |category|
+        category.scheme.match(%r{\Ahttp://schemas.google.com/docs/2007/folders})
+      end
+
       folders << folder.label if folder
       entries << GoogleDocEntry.new(entry)
     end
@@ -118,8 +121,10 @@ module GoogleDocs
     folders = folders.uniq.sort
     res     = Struct.new(:files, :folders).new
 
-    unless only_extensions.blank?
-      entries.reject! { |e| !only_extensions.include?(e.extension) }
+    if only_extensions.present?
+      entries.reject! do |entry|
+        !only_extensions.include?(entry.extension)
+      end
     end
 
     res.files   = entries
