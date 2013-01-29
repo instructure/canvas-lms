@@ -2,4 +2,4 @@ role :app, "canvas-as1.tier2.sfu.ca", "canvas-as2.tier2.sfu.ca", "canvas-as3.tie
 role :db, "canvas-ms.tier2.sfu.ca", :primary => true
 
 set :rails_env, "production"
-set :branch, "sfu-staging"
+set :branch, "sfu-develop"
