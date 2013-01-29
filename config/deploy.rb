@@ -60,6 +60,11 @@ namespace :canvas do
       run "sudo /etc/init.d/canvasconfig start"
     end
 
+    desc "Clone QTIMigrationTool"
+    task :clone_qtimigrationtool do
+      run "cd #{latest_release}/vendor && git clone https://github.com/instructure/QTIMigrationTool.git QTIMigrationTool && chmod +x QTIMigrationTool/migrate.py"
+    end
+
     desc "Compile static assets"
     task :compile_assets, :on_error => :continue do
       # On remote: bundle exec rake canvas:compile_assets
@@ -89,6 +94,7 @@ namespace :canvas do
     desc "Post-update commands"
     task :update_remote do
       copy_config
+      clone_qtimigrationtool
       deploy.migrate
       load_notifications
       restart_jobs
