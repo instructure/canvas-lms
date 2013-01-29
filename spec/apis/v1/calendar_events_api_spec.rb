@@ -191,6 +191,7 @@ describe CalendarEventsApiController, :type => :integration do
                           :controller => 'calendar_events_api', :action => 'index', :format => 'json',
                           :context_codes => [@course.asset_string], :start_date => '2012-01-01', :end_date => '2012-01-31'})
         json.size.should eql 2
+        json.sort_by! {|e| e['id']}
 
         e1json = json.first
         e1json.keys.sort.should eql(expected_slot_fields)
@@ -235,6 +236,8 @@ describe CalendarEventsApiController, :type => :integration do
                           :controller => 'calendar_events_api', :action => 'index', :format => 'json',
                           :context_codes => [group1.asset_string, group2.asset_string], :start_date => '2012-01-01', :end_date => '2012-01-31'})
         json.size.should eql 2
+        json.sort_by! { |e| e['id'] }
+
         ejson = json.first
         ejson.keys.sort.should eql((expected_slot_fields + ['reserved'] - ['child_events']).sort) # not reserved, so no child events can be seen
         ejson['reserve_url'].should match %r{calendar_events/#{event1.id}/reservations/#{@me.id}}
@@ -349,21 +352,17 @@ describe CalendarEventsApiController, :type => :integration do
                           :controller => 'calendar_events_api', :action => 'index', :format => 'json',
                           :context_codes => [ag1.asset_string, ag2.asset_string], :start_date => '2012-01-01', :end_date => '2012-01-31'})
         json.size.should eql 2
+        json.sort_by! {|e| e['id']}
         json.each do |e|
           e.keys.sort.should eql((expected_slot_fields + ['reserved']).sort)
           e['reserved'].should be_true
           e['child_events_count'].should eql 2
           e['child_events'].size.should eql 1 # can't see otherguy's stuff
           e['available_slots'].should eql 2
-          case e['id']
-          when event1.id
-            e['child_events'].first.keys.sort.should eql((expected_reservation_fields + ['own_reservation', 'user']).sort)
-          when event2.id
-            e['child_events'].first.keys.sort.should eql((expected_reservation_fields + ['own_reservation', 'group'] - ['effective_context_code']).sort)
-          else
-            fail "unexpected event id"
-          end
         end
+        json.first['child_events'].first.keys.sort.should eql((expected_reservation_fields + ['own_reservation', 'user']).sort)
+        json.last['child_events'].first.keys.sort.should eql((expected_reservation_fields + ['own_reservation', 'group'] - ['effective_context_code']).sort)
+
       end
 
       context "reservations" do
