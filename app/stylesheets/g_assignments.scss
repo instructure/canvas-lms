@@ -350,3 +350,46 @@
 table.full_assignment_table {
   select { width: 140px !important; }
 }
+
+#submit_from_external_tool_form {
+  #external_tool_submission_details {
+    padding-left: 10px;
+    &.not_selected {
+      color: #888;
+      font-style: italic;
+    }
+    &.file_submission {
+      font-weight: bold;
+      padding-left: 28px;
+      background: url(/images/file.png) no-repeat 10px center;
+      font-size: 16px;
+    }
+    &.url_submission {
+      font-weight: bold;
+      padding-left: 28px;
+      background: url(/images/link.png) no-repeat 10px center;
+      font-size: 16px;
+    }
+  }
+  &.has_submission {
+    .tools {
+      @include opacity(0.7);
+    }
+  }
+  .tools {
+    list-style-type: none;
+    margin-right: 20px;
+    .tool {
+      display: block;
+      padding: 2px 5px;
+      font-size: 14px;
+      img {
+        vertical-align: middle;
+      }
+      &:hover {
+        background: #eee;
+        @include border-radius(3px);
+      }
+    }
+  }
+}

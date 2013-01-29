@@ -78,7 +78,7 @@ define([
             })
             .bind('selection', function(event, data) {
               var editor = $dialog.data('editor') || ed;
-              if(data.embed_type == 'basic_lti') {
+              if(data.return_type == 'lti_launch_url') {
                 if($("#external_tool_retrieve_url").attr('href')) {
                   var external_url = $.replaceTags($("#external_tool_retrieve_url").attr('href'), 'url', data.url);
                   $("#" + ed.id).editorBox('create_link', {
@@ -89,7 +89,7 @@ define([
                 } else {
                   console.log("cannot embed basic lti links in this context");
                 }
-              } else if(data.embed_type == 'image') {
+              } else if(data.return_type == 'image_url') {
                 var html = $("<div/>").append($("<img/>", {
                   src: data.url,
                   alt: data.alt
@@ -98,14 +98,20 @@ define([
                   height: data.height
                 })).html();
                 $("#" + ed.id).editorBox('insert_code', html);
-              } else if(data.embed_type == 'link') { 
+              } else if(data.return_type == 'url') {
                 $("#" + ed.id).editorBox('create_link', {
                   url: data.url,
                   title: data.title,
                   text: data.text,
                   target: data.target == '_blank' ? '_blank' : null
                 });
-              } else if(data.embed_type == 'iframe') {
+              } else if(data.return_type == 'file') {
+                $("#" + ed.id).editorBox('create_link', {
+                  url: data.url,
+                  title: data.filename,
+                  text: data.filename
+                });
+              } else if(data.return_type == 'iframe') {
                 var html = $("<div/>").append($("<iframe/>", {
                   src: data.url,
                   title: data.title
@@ -114,12 +120,12 @@ define([
                   height: data.height
                 })).html();
                 $("#" + ed.id).editorBox('insert_code', html);
-              } else if(data.embed_type == 'rich_content') {
+              } else if(data.return_type == 'rich_content') {
                 $("#" + ed.id).editorBox('insert_code', data.html);
-              } else if(data.embed_type == 'error' && data.message) {
+              } else if(data.return_type == 'error' && data.message) {
                 alert(data.message);
               } else {
-                console.log("unrecognized embed type: " + data.embed_type);
+                console.log("unrecognized embed type: " + data.return_type);
               }
               $("#external_tool_button_dialog iframe").attr('src', 'about:blank');
               $("#external_tool_button_dialog").dialog('close');

@@ -19,7 +19,7 @@ the these type of tools as domain-matching tool and only return URLs
 whose domain matches the tool's specified domain.
 
 When tools are loaded as link selectors, Canvas sends an additional 
-parameter to notify the tool of the directive, "selection_directive=select_link". 
+parameter to notify the tool of the directive, "ext_content_return_types=select_link".
 When a tool receives this directive, it means Canvas is expecting the 
 tool to redirect the user to the LTI success URL with some specific 
 additional parameters. These additional parameters tell Canvas what 
@@ -30,7 +30,7 @@ values such as url.
 ### to embed an lti link:
 <table class="tool">
   <tr>
-    <td>embed_type=basic_lti</td>
+    <td>return_type=lti_launch_url</td>
     <td></td>
     <td>(required)</td>
   </tr><tr>
@@ -52,9 +52,9 @@ values such as url.
 If the <code>launch_presentation_return_url</code> were
 <code>http://www.example.com/done</code>, possible return URLs could include:
 
-- http://www.example.com/done?embed_type=basic_lti&url=https%3A%2F%2Fothersite.com%2Flti_link
-- http://www.example.com/done?embed_type=basic_lti&url=https%3A%2F%2Fothersite.com%2Flti_link&text=other+site+link
-- http://www.example.com/done?embed_type=basic_lti&url=https%3A%2F%2Fothersite.com%2Flti_link&title=link
+- http://www.example.com/done?return_type=lti_launch_url&url=https%3A%2F%2Fothersite.com%2Flti_link
+- http://www.example.com/done?return_type=lti_launch_url&url=https%3A%2F%2Fothersite.com%2Flti_link&text=other+site+link
+- http://www.example.com/done?return_type=lti_launch_url&url=https%3A%2F%2Fothersite.com%2Flti_link&title=link
 
 ## Settings
 All of these settings are contained under "resource_selection"

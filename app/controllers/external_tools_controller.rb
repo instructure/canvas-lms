@@ -63,7 +63,7 @@ class ExternalToolsController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :update)
       if params[:include_parents]
-        @tools = ContextExternalTool.all_tools_for(@context)
+        @tools = ContextExternalTool.all_tools_for(@context, :user => (params[:include_personal] ? @current_user : nil))
       else
         @tools = @context.context_external_tools.active
       end
@@ -74,6 +74,15 @@ class ExternalToolsController < ApplicationController
         else
           format.json { render :json => @tools.to_json(:include_root => false, :methods => [:resource_selection_settings, :custom_fields_string]) }
         end
+      end
+    end
+  end
+  
+  def homework_submissions
+    if authorized_action(@context, @current_user, :read)
+      @tools = ContextExternalTool.all_tools_for(@context, :user => @current_user).select(&:has_homework_submission)
+      respond_to do |format|
+        format.json { render :json => @tools.to_json(:include_root => false, :methods => [:homework_submission, :icon_url]) }
       end
     end
   end
@@ -160,7 +169,10 @@ class ExternalToolsController < ApplicationController
     return unless authorized_action(@context, @current_user, :read)
     add_crumb(@context.name, named_context_url(@context, :context_url))
 
-    selection_type = params[:editor].present? ? 'editor_button' : 'resource_selection'
+    selection_type = 'resource_selection'
+    selection_type = 'editor_button' if params[:editor]
+    selection_type = 'homework_submission' if params[:homework]
+
     @return_url    = external_content_success_url('external_tool')
     @headers       = false
     @self_target   = true
@@ -181,6 +193,10 @@ class ExternalToolsController < ApplicationController
     @resource_title = @tool.label_for(selection_type.to_sym)
     @return_url ||= url_for(@context)
     @launch = @tool.create_launch(@context, @current_user, @return_url, selection_type)
+    if selection_type == 'homework_submission'
+      @assignment = @context.assignments.active.find(params[:assignment_id])
+      @launch.for_homework_submission!(@assignment)
+    end
     @resource_url = @launch.url
 
     @tool_settings = @launch.generate
@@ -335,10 +351,10 @@ class ExternalToolsController < ApplicationController
   private
   
   def set_tool_attributes(tool, params)
-    [:name, :description, :url, :icon_url, :domain, :privacy_level, :consumer_key, :shared_secret,
-    :custom_fields, :custom_fields_string, :account_navigation, :user_navigation, 
-    :course_navigation, :editor_button, :resource_selection, :text,
-    :config_type, :config_url, :config_xml].each do |prop|
+    attrs = ContextExternalTool::EXTENSION_TYPES
+    attrs += [:name, :description, :url, :icon_url, :domain, :privacy_level, :consumer_key, :shared_secret,
+    :custom_fields, :custom_fields_string, :text, :config_type, :config_url, :config_xml]
+    attrs.each do |prop|
       tool.send("#{prop}=", params[prop]) if params.has_key?(prop)
     end
   end

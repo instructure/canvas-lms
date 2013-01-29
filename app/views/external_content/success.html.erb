@@ -24,7 +24,7 @@ require([
       $("#dialog_message").text("<%= t :content_failure, "Content retrieval failed, please try again or notify your system administrator of the error." %>");
     }
   }
-  if(data.embed_type == 'oembed') {
+  if(data.return_type == 'oembed') {
     var url = $.replaceTags($.replaceTags($("#oembed_retrieve_url").attr('href'), 'endpoint', encodeURIComponent(data.endpoint)), 'url', encodeURIComponent(data.url));
     $.ajaxJSON(url, 'GET', {}, function(data) {
       dataReady(data);

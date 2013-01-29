@@ -116,6 +116,21 @@ module BasicLTI
         hash['custom_canvas_assignment_id'] = assignment.id
       end
     end
+    
+    def for_homework_submission!(assignment)
+      self.resource_type = 'homework_submission'
+
+      return_types_map = {'online_upload' => 'file', 'online_url' => 'url'}
+      return_types = []
+      assignment.submission_types.split(',').each do |submission_type|
+        submission_type.strip!
+        return_types << return_types_map[submission_type.strip] if return_types_map.has_key? submission_type
+      end
+      hash['ext_content_return_types'] = return_types.join(',') unless return_types.blank?
+      hash['ext_content_file_extensions'] = assignment.allowed_extensions.join(',') unless assignment.allowed_extensions.blank?
+
+      hash['custom_canvas_assignment_id'] = assignment.id if tool.public?
+    end
 
     def generate
       hash['lti_message_type'] = 'basic-lti-launch-request'
@@ -173,11 +188,19 @@ module BasicLTI
       hash['tool_consumer_info_version'] = 'cloud'
       tool.set_custom_fields(hash, resource_type)
       if resource_type == 'editor_button'
-        hash['selection_directive'] = 'embed_content'
+        hash['selection_directive'] = 'embed_content' #backwards compatibility
+        hash['ext_content_intended_use'] = 'embed'
+        hash['ext_content_return_types'] = 'oembed,lti_launch_url,url,image_url,iframe'
+        hash['ext_content_return_url'] = return_url
       elsif resource_type == 'resource_selection'
-        hash['selection_directive'] = 'select_link'
+        hash['selection_directive'] = 'select_link' #backwards compatibility
+        hash['ext_content_intended_use'] = 'navigation'
+        hash['ext_content_return_types'] = 'lti_launch_url'
+        hash['ext_content_return_url'] = return_url
+      elsif resource_type == 'homework_submission'
+        hash['ext_content_intended_use'] = 'homework'
+        hash['ext_content_return_url'] = return_url
       end
-
       hash['oauth_callback'] = 'about:blank'
       BasicLTI.generate_params(hash, url, tool.consumer_key, tool.shared_secret)
     end

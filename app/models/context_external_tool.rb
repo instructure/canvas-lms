@@ -6,7 +6,7 @@ class ContextExternalTool < ActiveRecord::Base
   attr_accessible :privacy_level, :domain, :url, :shared_secret, :consumer_key, 
                   :name, :description, :custom_fields, :custom_fields_string,
                   :course_navigation, :account_navigation, :user_navigation,
-                  :resource_selection, :editor_button,
+                  :resource_selection, :editor_button, :homework_submission,
                   :config_type, :config_url, :config_xml, :tool_id
   validates_presence_of :name
   validates_presence_of :consumer_key
@@ -50,8 +50,9 @@ class ContextExternalTool < ActiveRecord::Base
     can :read and can :update and can :delete
   end
   
+  EXTENSION_TYPES = [:user_navigation, :course_navigation, :account_navigation, :resource_selection, :editor_button, :homework_submission]
   def url_or_domain_is_set
-    setting_types = [:user_navigation, :course_navigation, :account_navigation, :resource_selection, :editor_button]
+    setting_types = EXTENSION_TYPES
     # both url and domain should not be set
     if url.present? && domain.present?
       errors.add(:url, t('url_or_domain_not_both', "Either the url or domain should be set, not both."))
@@ -225,6 +226,14 @@ class ContextExternalTool < ActiveRecord::Base
   def editor_button
     settings[:editor_button]
   end
+  
+  def homework_submission=(hash)
+    tool_setting(:homework_submission, hash, :selection_width, :selection_height, :icon_url)
+  end
+  
+  def homework_submission
+    settings[:homework_submission]
+  end
 
   def icon_url=(i_url)
     settings[:icon_url] = i_url
@@ -250,14 +259,14 @@ class ContextExternalTool < ActiveRecord::Base
     self.url = nil if url.blank?
     self.domain = nil if domain.blank?
 
-    [:resource_selection, :editor_button].each do |type|
+    [:resource_selection, :editor_button, :homework_submission].each do |type|
       if settings[type]
         settings[:icon_url] ||= settings[type][:icon_url] if settings[type][:icon_url]
         settings[type][:selection_width] = settings[type][:selection_width].to_i if settings[type][:selection_width]
         settings[type][:selection_height] = settings[type][:selection_height].to_i if settings[type][:selection_height]
       end
     end
-    [:course_navigation, :account_navigation, :user_navigation, :resource_selection, :editor_button].each do |type|
+    EXTENSION_TYPES.each do |type|
       if settings[type]
         if !(settings[type][:url] || self.url) || (settings[type].has_key?(:enabled) && !settings[type][:enabled])
           settings.delete(type)
@@ -268,11 +277,10 @@ class ContextExternalTool < ActiveRecord::Base
     settings.delete(:resource_selection) if settings[:resource_selection] && (!settings[:resource_selection][:selection_width] || !settings[:resource_selection][:selection_height])
     settings.delete(:editor_button) if settings[:editor_button] && !settings[:icon_url]
 
-    self.has_user_navigation = !!settings[:user_navigation]
-    self.has_course_navigation = !!settings[:course_navigation]
-    self.has_account_navigation = !!settings[:account_navigation]
-    self.has_resource_selection = !!settings[:resource_selection]
-    self.has_editor_button = !!settings[:editor_button]
+    EXTENSION_TYPES.each do |type|
+      message = "has_#{type}="
+      self.send(message, !!settings[type]) if self.respond_to?(message)
+    end
     true
   end
 
@@ -358,9 +366,12 @@ class ContextExternalTool < ActiveRecord::Base
     !!(host && ('.' + host).match(/\.#{domain}\z/))
   end
   
-  def self.all_tools_for(context)
+  def self.all_tools_for(context, options={})
     contexts = []
     tools = []
+    if options[:user]
+      contexts << options[:user]
+    end
     while context
       if context.is_a?(Group)
         contexts << context

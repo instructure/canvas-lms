@@ -19,6 +19,7 @@
 class ExternalContentController < ApplicationController
   protect_from_forgery :except => [:selection_test]
   def success
+    normalize_deprecated_data!
     @retrieved_data = {}
     # TODO: poll for data if it's oembed
     if params[:service] == 'equella'
@@ -28,9 +29,9 @@ class ExternalContentController < ApplicationController
         end
       end
     elsif params[:service] == 'external_tool'
-      params[:embed_type] = nil unless ['oembed', 'basic_lti', 'link', 'image', 'iframe'].include?(params[:embed_type])
-      @retrieved_data = request.query_parameters
-      if @retrieved_data[:url] && ['oembed', 'basic_lti'].include?(params[:embed_type])
+      params[:return_type] = nil unless ['oembed', 'lti_launch_url', 'url', 'image_url', 'iframe', 'file'].include?(params[:return_type])
+      @retrieved_data = params
+      if @retrieved_data[:url] && ['oembed', 'lti_launch_url'].include?(params[:return_type])
         begin
           uri = URI.parse(@retrieved_data[:url])
           unless uri.scheme
@@ -45,6 +46,14 @@ class ExternalContentController < ApplicationController
     end
     @headers = false
   end
+
+  def normalize_deprecated_data!
+    params[:return_type] = params[:embed_type] if !params.key?(:return_type) && params.key?(:embed_type)
+
+    return_types = {'basic_lti' => 'lti_launch_url', 'link' => 'url', 'image' => 'image_url'}
+    params[:return_type] = return_types[params[:return_type]] if return_types.key? params[:return_type]
+
+  end
   
   def oembed_retrieve
     endpoint = params[:endpoint]
@@ -55,7 +64,7 @@ class ExternalContentController < ApplicationController
     if data['type']
       if data['type'] == 'photo' && data['url'].try(:match, /^http/)
         @retrieved_data = {
-          :embed_type => 'image',
+          :return_type => 'image_url',
           :url => data['url'],
           :width => data['width'].to_i,   # width and height are required according to the spec
           :height => data['height'].to_i,
@@ -63,14 +72,14 @@ class ExternalContentController < ApplicationController
         }
       elsif data['type'] == 'link' && data['url'].try(:match, /^(http|https|mailto)/)
         @retrieved_data = {
-          :embed_type => 'link',
+          :return_type => 'url',
           :url => data['url'] || params[:url],
           :title => data['title'],
           :text => data['title']
         }
       elsif data['type'] == 'video' || data['type'] == 'rich'
         @retrieved_data = {
-          :embed_type => 'rich_content',
+          :return_type => 'rich_content',
           :html => data['html']
         }
       end

@@ -25,13 +25,16 @@
       background-color: #eee
       .links
         +opacity(1.0)
-    &.has_editor_button,&.has_resource_selection,&.has_course_navigation,&.has_user_navigation,&.has_account_navigation
+    &.has_editor_button,&.has_resource_selection,&.has_course_navigation,&.has_user_navigation,&.has_account_navigation,&.has_homework_submission
       .extras
         display: table-row      
         div
           display: none
     &.has_editor_button
       div.editor_button
+        display: block
+    &.has_homework_submission
+      div.homework_submission
         display: block
     &.has_resource_selection
       div.resource_selection

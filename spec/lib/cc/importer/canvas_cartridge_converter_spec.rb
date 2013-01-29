@@ -89,6 +89,7 @@ describe "Canvas Cartridge importing" do
     tool1.settings[:account_navigation] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :extra => 'extra'}
     tool1.settings[:resource_selection] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :selection_width => 100, :selection_height => 50, :extra => 'extra'}
     tool1.settings[:editor_button] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :selection_width => 100, :selection_height => 50, :icon_url => "http://www.example.com", :extra => 'extra'}
+    tool1.settings[:homework_submission] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :selection_width => 100, :selection_height => 50, :extra => 'extra'}
     tool1.settings[:icon_url] = "http://www.example.com/favicon.ico"
     tool1.save!
     tool2 = @copy_from.context_external_tools.new
@@ -145,7 +146,7 @@ describe "Canvas Cartridge importing" do
         t1.settings[type].keys.map(&:to_s).sort.should == ['labels', 'text', 'url']
       end
     end
-    [:resource_selection, :editor_button].each do |type|
+    [:resource_selection, :editor_button, :homework_submission].each do |type|
       t1.settings[type][:url].should == "http://www.example.com"
       t1.settings[type][:text].should == "hello"
       t1.settings[type][:labels][:en].should == 'hello'
@@ -177,6 +178,7 @@ describe "Canvas Cartridge importing" do
     t2.settings[:account_navigation].should be_nil
     t2.settings[:resource_selection].should be_nil
     t2.settings[:editor_button].should be_nil
+    t2.settings[:homework_submission].should be_nil
     t2.settings.keys.map(&:to_s).sort.should == ['custom_fields', 'vendor_extensions']
     t2.settings[:vendor_extensions].should == [{'platform'=>"my.lms.com", 'custom_fields'=>{"key"=>"value"}}]
     t2.settings[:vendor_extensions][0][:platform].should == 'my.lms.com'
