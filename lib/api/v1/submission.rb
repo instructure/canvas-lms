@@ -46,6 +46,7 @@ module Api::V1::Submission
         sc_hash['attachments'] = sc.attachments.map do |a|
           attachment_json(a, user)
         end unless sc.attachments.blank?
+        sc_hash['author'] = user_display_json(sc.author, sc.context)
         sc_hash
       end
     end

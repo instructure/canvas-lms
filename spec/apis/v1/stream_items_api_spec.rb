@@ -301,6 +301,12 @@ describe UsersController, :type => :integration do
       'submission_comments' => [{
         'body' => 'c1',
         'comment' => 'c1',
+        'author' => {
+          'id' => @teacher.id,
+          'display_name' => 'teacher',
+          'html_url' => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
+          'avatar_image_url' => 'http://www.example.com/images/messages/avatar-50.png'
+        },
         'author_name' => 'teacher',
         'author_id' => @teacher.id,
         'created_at' => @sub.submission_comments[0].created_at.as_json,
@@ -308,6 +314,12 @@ describe UsersController, :type => :integration do
       {
         'body' => 'c2',
         'comment' => 'c2',
+        'author' => {
+          'id' => @user.id,
+          'display_name' => 'User',
+          'html_url' => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}",
+          'avatar_image_url' => 'http://www.example.com/images/messages/avatar-50.png'
+        },
         'author_name' => 'User',
         'author_id' => @user.id,
         'created_at' => @sub.submission_comments[1].created_at.as_json,
@@ -377,6 +389,12 @@ describe UsersController, :type => :integration do
       'submission_comments' => [{
         'body' => 'c1',
         'comment' => 'c1',
+        'author' => {
+          'id' => @teacher.id,
+          'display_name' => 'teacher',
+          'html_url' => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
+          'avatar_image_url' => 'http://www.example.com/images/messages/avatar-50.png'
+        },
         'author_name' => 'teacher',
         'author_id' => @teacher.id,
         'created_at' => @sub.submission_comments[0].created_at.as_json,
@@ -384,6 +402,12 @@ describe UsersController, :type => :integration do
       {
         'body' => 'c2',
         'comment' => 'c2',
+        'author' => {
+          'id' => @user.id,
+          'display_name' => 'User',
+          'html_url' => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}",
+          'avatar_image_url' => 'http://www.example.com/images/messages/avatar-50.png'
+        },
         'author_name' => 'User',
         'author_id' => @user.id,
         'created_at' => @sub.submission_comments[1].created_at.as_json,
