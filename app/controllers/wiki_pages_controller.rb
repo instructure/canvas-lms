@@ -52,6 +52,7 @@ class WikiPagesController < ApplicationController
   include Api::V1::WikiPage
 
   def show
+    @editing = true if Canvas::Plugin.value_to_boolean(params[:edit])
     if @page.deleted? && !@page.grants_right?(@current_user, session, :update) && @page.url != 'front-page'
       flash[:notice] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
       redirect_to named_context_url(@context, :context_wiki_page_url, 'front-page')
