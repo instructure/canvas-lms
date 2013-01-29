@@ -36,8 +36,10 @@
           <%= t(:points_possible, "%{points_possible} pts possible", :points_possible => @quiz.points_possible || 0) %>
         </td>
         <td style="padding: 5px 10px;">
-          <% if @quiz.due_at %>
-            <%= datetime_string(@quiz.due_at) %>
+          <% if @quiz.multiple_due_dates_apply_to?(@current_user) %>
+            <%=  t(:multiple_due_dates, 'Multiple Due Dates') %>
+          <% elsif due_at = @quiz.overridden_for(@current_user).due_at %>
+            <%= datetime_string(due_at) %>
           <% else %>
             <%= t(:no_due_date, 'No due date.') %>
           <% end %>

@@ -1,14 +1,15 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe QuizzesController do
+  def create_section_override(section, due_at)
+    override = assignment_override_model(:quiz => @quiz)
+    override.set = section
+    override.override_due_at(due_at)
+    override.save!
+  end
+
   context "#index" do
     context "with overridden due dates" do
-      def create_section_override(section, due_at)
-        override = assignment_override_model(:quiz => @quiz)
-        override.set = section
-        override.override_due_at(due_at)
-        override.save!
-      end
 
       before :each do
         course_with_teacher_logged_in(:active_all => true)
@@ -78,7 +79,46 @@ describe QuizzesController do
         doc.css("div.description").text.include?("Due: Multiple Dates").should_not be_true
         doc.css("div.description").text.include?("Due: #{due_at.strftime('%b %-d')}").should be_true
       end
+    end
+  end
 
+  context "#show" do
+    context "with overridden due dates" do
+      include TextHelper
+
+      before :each do
+        course_with_teacher_logged_in(:active_all => true)
+        assignment_model(:course => @course)
+        quiz_model(:course => @course, :assignment_id => @assignment.id)
+      end
+
+      it "should show an overridden due date for student" do
+        cs1 = @course.default_section
+
+        due_at = 3.days.from_now
+        create_section_override(cs1, due_at)
+
+        @course.enroll_user(user, 'StudentEnrollment')
+        user_session(@user)
+
+        get "courses/#{@course.id}/quizzes/#{@quiz.id}"
+
+        doc = Nokogiri::HTML(response.body)
+        doc.css("td:nth-child(4)").text.include?(datetime_string(due_at)).should be_true
+      end
+
+      it "should indicate multiple due dates" do
+        cs1 = @course.default_section
+        cs2 = @course.course_sections.create!
+
+        create_section_override(cs1, 3.days.from_now)
+        create_section_override(cs2, 4.days.from_now)
+
+        get "courses/#{@course.id}/quizzes/#{@quiz.id}"
+
+        doc = Nokogiri::HTML(response.body)
+        doc.css("td:nth-child(4)").text.include?("Multiple Due Dates").should be_true
+      end
     end
   end
 
