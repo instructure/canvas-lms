@@ -993,6 +993,34 @@ describe User do
     end
   end
 
+  describe '#has_subset_of_account_permissions?' do
+    let(:user) { User.new }
+    let(:other_user) { User.new }
+
+    it 'returns true for self' do
+      user.has_subset_of_account_permissions?(user, nil).should be_true
+    end
+
+    it 'is false if the account is not a root account' do
+      user.has_subset_of_account_permissions?(other_user, stub(:root_account? => false)).should be_false
+    end
+
+    it 'is true if there are no account users for this root account' do
+      account = stub(:root_account? => true, :all_account_users_for => [])
+      user.has_subset_of_account_permissions?(other_user, account).should be_true
+    end
+
+    it 'is true when all account_users for current user are subsets of target user' do
+      account = stub(:root_account? => true, :all_account_users_for => [stub(:is_subset_of? => true)])
+      user.has_subset_of_account_permissions?(other_user, account).should be_true
+    end
+
+    it 'is false when any account_user for current user is not a subset of target user' do
+      account = stub(:root_account? => true, :all_account_users_for => [stub(:is_subset_of? => false)])
+      user.has_subset_of_account_permissions?(other_user, account).should be_false
+    end
+  end
+
   context "permissions" do
     it "should not allow account admin to modify admin privileges of other account admins" do
       RoleOverride.readonly_for(Account.default, :manage_role_overrides, AccountUser::BASE_ROLE_NAME, 'AccountAdmin').should be_true
@@ -2415,6 +2443,13 @@ describe User do
   end
 
   describe '#grants_right?' do
+    let(:subaccount) do
+      account = Account.create!
+      account.root_account_id = Account.default.id
+      account.save!
+      account
+    end
+
     let(:site_admin) do
       user = User.create!
       Account.site_admin.add_user(user)
@@ -2425,8 +2460,16 @@ describe User do
     let(:local_admin) do
       user = User.create!
       Account.default.add_user(user)
+      subaccount.add_user(user)
       user
     end
+
+    let(:user) do
+      user = User.create!
+      subaccount.add_user(user)
+      user
+    end
+
 
     it 'allows site admins to manage their own logins' do
       site_admin.grants_right?(site_admin, :manage_logins).should be_true
@@ -2442,6 +2485,10 @@ describe User do
 
     it 'forbids local admins from managing site admins logins' do
       site_admin.grants_right?(local_admin, :manage_logins).should be_false
+    end
+
+    it 'only considers root accounts when checking subset permissions' do
+      user.grants_right?(local_admin, :manage_logins).should be_true
     end
   end
 
