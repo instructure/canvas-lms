@@ -710,14 +710,14 @@ describe CoursesController do
       @user.enrollments.length.should == 0
     end
 
-    it "should return to the course page if self_enrollment is disabled" do
+    it "should redirect to the new enrollment form even if self_enrollment is disabled" do
       course(:active_all => true)
-      user
-      user_session(@user)
+      @course.update_attribute(:self_enrollment, true) # generate code
+      code = @course.self_enrollment_code
+      @course.update_attribute(:self_enrollment, false)
 
-      get 'self_enrollment', :course_id => @course.id, :self_enrollment => @course.long_self_enrollment_code.dup
-      response.should redirect_to(course_url(@course))
-      @user.enrollments.length.should == 0
+      get 'self_enrollment', :course_id => @course.id, :self_enrollment => code
+      response.should redirect_to(enroll_url(code))
     end
   end
 

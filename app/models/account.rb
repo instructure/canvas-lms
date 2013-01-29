@@ -382,7 +382,7 @@ class Account < ActiveRecord::Base
 
   def self_enrollment_course_for(code)
     all_courses.
-      where(:self_enrollment => true, :self_enrollment_code => code).
+      where(:self_enrollment_code => code).
       first
   end
 

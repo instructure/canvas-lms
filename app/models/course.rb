@@ -715,7 +715,7 @@ class Course < ActiveRecord::Base
   end
 
   def self_enrollment_code
-    read_attribute(:self_enrollment_code) || set_self_enrollment_code if self_enrollment?
+    read_attribute(:self_enrollment_code) || set_self_enrollment_code
   end
 
   def set_self_enrollment_code

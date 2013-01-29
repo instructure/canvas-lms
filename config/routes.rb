@@ -147,6 +147,7 @@ ActionController::Routing::Routes.draw do |map|
   # and the application_helper method :context_url to make retrieving
   # these contexts, and also generating context-specific urls, easier.
   map.resources :courses do |course|
+    # DEPRECATED
     course.self_enrollment 'self_enrollment/:self_enrollment', :controller => 'courses', :action => 'self_enrollment', :conditions => {:method => :get}
     course.self_unenrollment 'self_unenrollment/:self_unenrollment', :controller => 'courses', :action => 'self_unenrollment', :conditions => {:method => :post}
     course.restore 'restore', :controller => 'courses', :action => 'restore'

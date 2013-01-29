@@ -858,7 +858,9 @@ class CoursesController < ApplicationController
   # DEPRECATED
   def self_enrollment
     get_context
-    unless @context.self_enrollment && params[:self_enrollment] && @context.self_enrollment_codes.include?(params[:self_enrollment])
+    unless params[:self_enrollment] &&
+        @context.self_enrollment_codes.include?(params[:self_enrollment]) &&
+        @context.self_enrollment_code
       return redirect_to course_url(@context)
     end
     redirect_to enroll_url(@context.self_enrollment_code)
