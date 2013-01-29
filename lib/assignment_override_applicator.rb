@@ -93,6 +93,7 @@ module AssignmentOverrideApplicator
         else
           override_version = override.versions.detect do |version|
             model_version = assignment_or_quiz.is_a?(Quiz) ? version.model.quiz_version : version.model.assignment_version
+            next if model_version.nil?
             model_version <= assignment_or_quiz.version_number
           end
           override_version ? override_version.model : nil

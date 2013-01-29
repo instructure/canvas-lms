@@ -58,6 +58,8 @@ define [
               @dueDateList.availableSectionsPlusOverride(assignmentOverride)
             override: assignmentOverride
 
+    getOverrides: => @overrides.toJSON()
+
     addDueDateView: ( assignmentOverride, render = true ) =>
       dueDateView = @_generateDueDateView assignmentOverride
       dueDateView.on 'remove', @_removeDueDateView

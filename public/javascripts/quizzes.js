@@ -22,6 +22,12 @@ define([
   'str/htmlEscape',
   'str/pluralize',
   'wikiSidebar',
+  'compiled/views/assignments/DueDateList',
+  'compiled/views/assignments/DueDateOverride',
+  'compiled/models/Quiz',
+  'compiled/models/DueDateList',
+  'compiled/collections/SectionCollection',
+  'compiled/views/calendar/MissingDateDialogView',
   'compiled/editor/MultipleChoiceToggle',
   'compiled/str/TextHelper',
   'jquery.ajaxJSON' /* ajaxJSON */,
@@ -41,7 +47,73 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, $, calcCmd, htmlEscape, pluralize, wikiSidebar, MultipleChoiceToggle, TextHelper) {
+], function(I18n,$, calcCmd, htmlEscape, pluralize, wikiSidebar,
+            DueDateListView, DueDateOverrideView, Quiz, DueDateList,SectionList,
+            MissingDateDialog,MultipleChoiceToggle,TextHelper){
+
+  var dueDateList, overrideView, quizModel, sectionList;
+
+  function unfudgeDates( overrides ) {
+    var dates = [ 'due_at', 'unlock_at', 'lock_at' ];
+    for (var i = 0; i < overrides.length; i++) {
+      for ( var date in dates ) {
+        var dateField = dates[date];
+        if (!dates.hasOwnProperty(date) || !overrides[i][dateField]) continue;
+        var _date = $.unfudgeDateForProfileTimezone(
+          Date.parse(overrides[i][dateField]||"")
+        );
+        if (_date) _date = _date.toISOString();
+        overrides[i][dateField] = _date || "";
+      }
+    }
+  }
+
+  function adjustOverridesForFormParams(overrides){
+    var idx = 0;
+    var overridesLength = overrides.length;
+    var _override = null;
+    // make sure we don't send the literal string "null" to the server.
+    unfudgeDates(overrides);
+    for (idx;idx< overridesLength;idx++){
+      _override = overrides[idx]
+      _override.due_at = _override.due_at || "";
+      _override.unlock_at = _override.unlock_at || "";
+      _override.lock_at = _override.lock_at || "";
+      // TODO: let the quiz API handle this.
+      // The AssignmentOverride model can take care of these values.
+      // See the automatically defined methods via self.override
+      // in app/models/assignment_override.rb
+      delete _override.unlock_at_overridden;
+      delete _override.lock_at_overridden;
+      delete _override.all_day_date;
+      delete _override.due_at_overridden;
+      delete _override.all_day;
+    }
+  }
+
+  if (ENV.QUIZ && ENV.ASSIGNMENT_OVERRIDES != null) {
+
+    ENV.QUIZ.assignment_overrides = ENV.ASSIGNMENT_OVERRIDES;
+    quizModel = new Quiz(ENV.QUIZ);
+
+    sectionList = new SectionList(ENV.SECTION_LIST);
+
+    dueDateList = new DueDateList(quizModel.get('assignment_overrides'),
+                                  sectionList, quizModel);
+
+    overrideView = new DueDateOverrideView({
+      el: '.js-assignment-overrides',
+      model: dueDateList,
+      views: {
+        'due-date-overrides': new DueDateListView({
+          model: dueDateList
+        })
+      }
+    });
+
+    overrideView.render();
+  }
+
 
   var clickSetCorrect = I18n.t('titles.click_to_set_as_correct', "Click to set this answer as correct"),
       isSetCorrect = I18n.t('titles.set_as_correct', "This answer is set as correct"),
@@ -1178,6 +1250,8 @@ define([
     //   $quiz_options_form.data('activator', 'publish');
     // });
 
+    var hasCheckedOverrides = false;
+
     $quiz_options_form.formSubmit({
       object_name: "quiz",
 
@@ -1204,6 +1278,43 @@ define([
         }
         data.allowed_attempts = attempts;
         data['quiz[allowed_attempts]'] = attempts;
+        overrideView.updateOverrides();
+        if (overrideView.containsSectionsWithoutOverrides() && !hasCheckedOverrides) {
+          sections = overrideView.sectionsWithoutOverrides();
+          var missingDateView = new MissingDateDialog({
+            validationFn: function(){ return sections },
+            labelFn: function( section ) { return section.get('name')},
+            success: function(){
+              missingDateView.$dialog.dialog('close').remove();
+              missingDateView.remove();
+              hasCheckedOverrides = true;
+              $quiz_options_form.trigger('submit');
+            }
+          });
+          missingDateView.cancel = function() {
+            missingDateView.$dialog.dialog('close').remove();
+          };
+          missingDateView.render();
+          return false;
+        } else {
+          var finalQuiz = overrideView.getDefaultDueDate();
+          if (finalQuiz) {
+            finalQuiz = finalQuiz.toJSON().assignment_override;
+            unfudgeDates([finalQuiz]);
+            data['quiz[due_at]'] = finalQuiz.due_at || ""
+            data['quiz[unlock_at]'] = finalQuiz.unlock_at || "";
+            data['quiz[lock_at]'] = finalQuiz.lock_at || "";
+          }
+          else {
+            data['quiz[due_at]'] = "";
+            data['quiz[unlock_at]'] = "";
+            data['quiz[lock_at]'] = "";
+          }
+          var overrides = overrideView.getOverrides();
+          adjustOverridesForFormParams(overrides);
+          if (overrides.length === 0) { overrides = false; }
+          data['quiz[assignment_overrides]'] = overrides;
+        }
         return data;
       },
 

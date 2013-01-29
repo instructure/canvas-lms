@@ -612,6 +612,27 @@ describe QuizzesController do
       assigns[:quiz].title.should eql("some quiz")
       response.should be_success
     end
+
+    it "creates quizzes with overrides" do
+      course_with_teacher_logged_in(:active_all => true)
+      section = @course.course_sections.create!
+      course_due_date = 3.days.from_now.iso8601
+      section_due_date = 5.days.from_now.iso8601
+      post 'create', :course_id => @course.id,
+        :quiz => {
+          :title => "overridden quiz",
+          :due_at => course_due_date,
+          :assignment_overrides => [{
+            :course_section_id => section.id,
+            :due_at => section_due_date,
+          }]
+        }
+      response.should be_success
+      quiz = assigns[:quiz].overridden_for(@user)
+      overrides = quiz.overrides_visible_to(@user)
+      overrides.length.should == 1
+      overrides.first[:due_at].iso8601.should == section_due_date
+    end
   end
 
   describe "PUT 'update'" do
@@ -652,6 +673,53 @@ describe QuizzesController do
       post 'update', :course_id => @course.id, :id => @quiz.id, :quiz => {"locked" => "false"}
       @quiz.reload
       @quiz.assignment.should_not be_nil
+    end
+
+    it "updates overrides for a quiz" do
+      course_with_teacher_logged_in(:active_all => true)
+      quiz = @course.quizzes.build( :title => "Update Overrides Quiz")
+      quiz.save!
+      section = @course.course_sections.build
+      section.save!
+      course_due_date = 3.days.from_now.iso8601
+      section_due_date = 5.days.from_now.iso8601
+      quiz.save!
+      post 'update', :course_id => @course.id,
+        :id => quiz.id,
+        :quiz => {
+          :title => "overridden quiz",
+          :due_at => course_due_date,
+          :assignment_overrides => [{
+            :course_section_id => section.id,
+            :due_at => section_due_date,
+            :due_at_overridden => true
+          }]
+        }
+      quiz = quiz.reload.overridden_for(@user)
+      overrides = quiz.overrides_visible_to(@user)
+      overrides.length.should == 1
+    end
+
+    it "deletes overrides for a quiz if assignment_overrides params is 'false'" do
+      course_with_teacher_logged_in(:active_all => true)
+      quiz = @course.quizzes.build(:title => "Delete overrides!")
+      quiz.save!
+      section = @course.course_sections.create!(:name => "VDD Course Section")
+      override = AssignmentOverride.new
+      override.set_type = 'CourseSection'
+      override.set = section
+      override.due_at = Time.zone.now
+      override.quiz = quiz
+      override.save!
+      course_due_date = 3.days.from_now.iso8601
+      post 'update', :course_id => @course.id,
+        :id => quiz.id,
+        :quiz => {
+          :title => "overridden quiz",
+          :due_at => course_due_date,
+          :assignment_overrides => "false"
+        }
+      quiz.reload.assignment_overrides.active.should be_empty
     end
   end
 

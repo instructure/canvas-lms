@@ -20,7 +20,7 @@ class AssignmentOverride < ActiveRecord::Base
   include Workflow
   include TextHelper
 
-  simply_versioned :keep => 5
+  simply_versioned :keep => 10
 
   attr_accessible
 
@@ -37,7 +37,10 @@ class AssignmentOverride < ActiveRecord::Base
   concrete_set = lambda{ |override| ['CourseSection', 'Group'].include?(override.set_type) }
 
   validates_presence_of :set, :set_id, :if => concrete_set
-  validates_uniqueness_of :set_id, :scope => [:assignment_id, :set_type, :workflow_state], :if => lambda{ |override| override.active? && concrete_set.call(override) }
+  validates_uniqueness_of :set_id, :scope => [:assignment_id, :set_type, :workflow_state],
+    :if => lambda{ |override| override.assignment? && override.active? && concrete_set.call(override) }
+  validates_uniqueness_of :set_id, :scope => [:quiz_id, :set_type, :workflow_state],
+    :if => lambda{ |override| override.quiz? && override.active? && concrete_set.call(override) }
   validate :if => concrete_set do |record|
     if record.set && record.assignment
       case record.set
@@ -70,6 +73,9 @@ class AssignmentOverride < ActiveRecord::Base
     true
   end
 
+  def assignment?; !!assignment; end
+  def quiz?; !!quiz; end
+
   def recompute_submission_lateness    
     if (users = applies_to_students) && assignment
       submissions = assignment.submissions.where(:user_id => users.map(&:id))
@@ -100,7 +106,6 @@ class AssignmentOverride < ActiveRecord::Base
   before_validation :default_values
   def default_values
     self.set_type ||= 'ADHOC'
-    
     if assignment
       self.assignment_version = assignment.version_number
       self.quiz = assignment.quiz

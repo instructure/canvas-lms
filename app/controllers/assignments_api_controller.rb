@@ -429,28 +429,18 @@ class AssignmentsApiController < ApplicationController
 
   protected
 
-  def update_and_save_assignment(assignment, assignment_params)
-    return if assignment_params.nil?
-
+  def update_and_save_assignment(assignment, params)
+    return if params.nil?
     old_assignment = assignment.new_record? ? nil : assignment.clone
     old_assignment.id = assignment.id if old_assignment.present?
-
-    # convert hashes like {0 => x, 1 => y} into arrays like [x, y]
-    overrides = assignment_params[:assignment_overrides]
-    if overrides.is_a?(Hash)
-      return unless overrides.keys.all?{ |k| k.to_i.to_s == k.to_s }
-      indices = overrides.keys.sort_by(&:to_i)
-      return unless indices.map(&:to_i) == (0...indices.size).to_a
-      overrides = indices.map{ |index| overrides[index] }
-    end
-
-    # require it to be formatted as an array if it's present
+    overrides = deserialize_overrides(params.delete(:assignment_overrides))
     return if overrides && !overrides.is_a?(Array)
-
-    # do the updating
-    update_api_assignment(assignment, assignment_params, false)
+    update_api_assignment( assignment, params, false )
     if overrides
       assignment.transaction do
+        # TODO: We need to handle notifications better here. We want to send
+        # notifications if the "notify_of_update" field is passed, but *after*
+        # the assignment overrides have been created.
         assignment.save_without_broadcasting!
         batch_update_assignment_overrides(assignment, overrides)
       end
