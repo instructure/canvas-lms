@@ -2466,8 +2466,20 @@ class Course < ActiveRecord::Base
 
 
   def section_visibilities_for(user)
-    Rails.cache.fetch(['section_visibilities_for', user, self].cache_key) do
-      Enrollment.find(:all, :select => "course_section_id, limit_privileges_to_course_section, type, associated_user_id", :conditions => ['user_id = ? AND course_id = ? AND workflow_state != ?', user.id, self.id, 'deleted']).map{|e| {:course_section_id => e.course_section_id, :limit_privileges_to_course_section => e.limit_privileges_to_course_section, :type => e.type, :associated_user_id => e.associated_user_id, :admin => e.admin?} }
+    shard.activate do
+      Rails.cache.fetch(['section_visibilities_for', user, self].cache_key) do
+        enrollments = Enrollment.all(:select => "course_section_id, limit_privileges_to_course_section, type, associated_user_id",
+                       :conditions => ['user_id = ? AND course_id = ? AND workflow_state != ?', user.id, self.id, 'deleted'])
+        enrollments.map do |e|
+          {
+            :course_section_id => e.course_section_id,
+            :limit_privileges_to_course_section => e.limit_privileges_to_course_section,
+            :type => e.type,
+            :associated_user_id => e.associated_user_id,
+            :admin => e.admin?
+          }
+        end
+      end
     end
   end
   memoize :section_visibilities_for
