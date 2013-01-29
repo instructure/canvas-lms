@@ -702,6 +702,7 @@ class Course < ActiveRecord::Base
     end
 
     if self.root_account_id_changed?
+      CourseSection.update_all({:root_account_id => self.root_account_id}, :course_id => self.id)
       Enrollment.update_all({:root_account_id => self.root_account_id}, :course_id => self.id)
     end
 

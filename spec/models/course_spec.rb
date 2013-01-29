@@ -2770,10 +2770,12 @@ describe Course, "enrollments" do
     @course.save!
 
     @course.student_enrollments.map(&:root_account_id).should eql [a1.id]
+    @course.course_sections.reload.map(&:root_account_id).should eql [a1.id]
 
     @course.root_account = a2
     @course.save!
     @course.student_enrollments(true).map(&:root_account_id).should eql [a2.id]
+    @course.course_sections.reload.map(&:root_account_id).should eql [a2.id]
   end
 end
 
