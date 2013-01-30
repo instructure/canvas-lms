@@ -96,6 +96,7 @@ group :test do
   gem 'selenium-webdriver', '2.27.2'
   gem 'webrat',       '0.7.3'
   gem 'yard',         '0.8.0'
+  gem 'timecop',      '0.5.9.1'
   if ONE_NINE
     gem 'test-unit',  '1.2.3'
   end
