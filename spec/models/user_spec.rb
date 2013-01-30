@@ -1970,6 +1970,46 @@ describe User do
       @ta.assignments_needing_grading_total_count.should eql(22)
       @ta.assignments_needing_grading.size.should < 22
     end
+
+    context "sharding" do
+      it_should_behave_like "sharding"
+
+      before do
+        @shard1.activate do
+          @account = Account.create!
+          @course3 = @account.courses.create!
+          @course3.offer!
+          @course3.enroll_teacher(@teacher).accept!
+          @course3.enroll_student(@studentA).accept!
+          @course3.enroll_student(@studentB).accept!
+          @assignment3 = @course3.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
+          @assignment3.submit_homework @studentA, :submission_type => "online_text_entry", :body => "submission for A"
+        end
+      end
+
+      it "should find assignments from all shards" do
+        @teacher.assignments_needing_grading_total_count.should == 3
+        @teacher.assignments_needing_grading.sort_by(&:id).should ==
+            [@course1.assignments.first, @course2.assignments.first, @assignment3].sort_by(&:id)
+      end
+
+      it "should honor ignores for a separate shard" do
+        @teacher.ignore_item!(@assignment3, 'grading')
+        @teacher.assignments_needing_grading_total_count.should == 2
+        @teacher.assignments_needing_grading.sort_by(&:id).should ==
+            [@course1.assignments.first, @course2.assignments.first].sort_by(&:id)
+
+        @shard1.activate do
+          @assignment3.submit_homework @studentB, :submission_type => "online_text_entry", :body => "submission for B"
+        end
+        @teacher = User.find(@teacher)
+        @teacher.assignments_needing_grading_total_count.should == 3
+      end
+
+      it "should apply a global limit" do
+        @teacher.assignments_needing_grading(:limit => 1).length.should == 1
+      end
+    end
   end
 
   describe ".initial_enrollment_type_from_type" do

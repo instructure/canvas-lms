@@ -1554,8 +1554,9 @@ class Course < ActiveRecord::Base
     enroll_user(user, 'TeacherEnrollment')
   end
 
-  def resubmission_for(asset_string)
-    instructors.each{|u| u.ignored_item_changed!(asset_string, 'grading') }
+  def resubmission_for(asset)
+    asset.ignores.scoped({}).delete_all({:purpose => 'grading', :permanent => false})
+    instructors.each(&:touch)
   end
 
   def grading_standard_enabled

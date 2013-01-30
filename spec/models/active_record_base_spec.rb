@@ -515,6 +515,15 @@ describe ActiveRecord::Base do
     end
   end
 
+  describe "find_by_asset_string" do
+    it "should enforce type restrictions" do
+      u = User.create!
+      ActiveRecord::Base.find_by_asset_string(u.asset_string).should == u
+      ActiveRecord::Base.find_by_asset_string(u.asset_string, ['User']).should == u
+      ActiveRecord::Base.find_by_asset_string(u.asset_string, ['Course']).should == nil
+    end
+  end
+
   describe "update_all/delete_all with_joins" do
     before do
       pending "MySQL and Postgres only" unless %w{PostgreSQL MySQL}.include?(ActiveRecord::Base.connection.adapter_name)

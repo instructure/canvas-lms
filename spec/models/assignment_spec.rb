@@ -1512,11 +1512,11 @@ describe Assignment do
         @assignment.publish!
         @assignment.should be_published
         @assignment.submissions.size.should == 1
-        Assignment.need_grading_info(15, []).find_by_id(@assignment.id).should be_nil
+        Assignment.need_grading_info(15).find_by_id(@assignment.id).should be_nil
         @assignment.submit_homework(@stu1, :body => "Changed my mind!")
         @sub1.reload
         @sub1.body.should == "Changed my mind!"
-        Assignment.need_grading_info(15, []).find_by_id(@assignment.id).should_not be_nil
+        Assignment.need_grading_info(15).find_by_id(@assignment.id).should_not be_nil
       end
     end
 

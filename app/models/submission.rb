@@ -506,7 +506,7 @@ class Submission < ActiveRecord::Base
 
   def update_admins_if_just_submitted
     if @just_submitted
-      context.send_later_if_production(:resubmission_for, "assignment_#{assignment_id}")
+      context.send_later_if_production(:resubmission_for, assignment)
     end
     true
   end

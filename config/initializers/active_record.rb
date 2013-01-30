@@ -63,6 +63,7 @@ class ActiveRecord::Base
   def self.find_all_by_asset_string(strings, asset_types=nil)
     # TODO: start checking asset_types, if provided
     strings.map{ |str| parse_asset_string(str) }.group_by(&:first).inject([]) do |result, (klass, id_pairs)|
+      next result if asset_types && !asset_types.include?(klass)
       result.concat((klass.constantize.find_all_by_id(id_pairs.map(&:last)) rescue []))
     end
   end

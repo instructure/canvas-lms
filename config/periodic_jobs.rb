@@ -110,6 +110,12 @@ Delayed::Periodic.cron 'Attachment.do_notifications', '*/10 * * * *', :priority 
   end
 end
 
+Delayed::Periodic.cron 'Ignore.cleanup', '45 23 * * *' do
+  Shard.with_each_shard do
+    Ignore.send_later_enqueue_args(:cleanup, :singleton => "Ignore.cleanup:#{Shard.current.id}")
+  end
+end
+
 Dir[Rails.root.join('vendor', 'plugins', '*', 'config', 'periodic_jobs.rb')].each do |plugin_periodic_jobs|
   require plugin_periodic_jobs
 end

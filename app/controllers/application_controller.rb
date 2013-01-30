@@ -502,7 +502,7 @@ class ApplicationController < ActionController::Base
       @assignments = @groups.map(&:active_assignments).flatten
     else
       @groups = AssignmentGroup.for_context_codes(@context_codes).active
-      @assignments = Assignment.active.for_context_codes(@context_codes)
+      @assignments = Assignment.active.for_course(@courses.map(&:id))
     end
     @assignment_groups = @groups
 

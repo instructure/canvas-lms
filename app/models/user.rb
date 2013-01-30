@@ -1325,90 +1325,83 @@ class User < ActiveRecord::Base
     save
   end
 
-  def ignore_item!(asset_string, purpose, permanent=nil)
-    permanent ||= false
-    asset_string = asset_string.gsub(/![0-9a-z_]/, '')
-    preferences[:ignore] ||= {}
-    preferences[:ignore][purpose.to_sym] ||= {}
-    preferences[:ignore][purpose.to_sym].each do |key, item|
-      preferences[:ignore][purpose.to_sym].delete(key) if item && (!item[:set] || item[:set] < 6.months.ago.utc.iso8601)
+  def ignore_item!(asset, purpose, permanent = false)
+    begin
+      # more likely this doesn't exist, so try the create first
+      asset.ignores.create!(:user => self, :purpose => purpose, :permanent => permanent)
+    rescue ActiveRecord::Base::UniqueConstraintViolation
+      asset.shard.activate do
+        ignore = asset.ignores.find_by_user_id_and_purpose(self.id, purpose)
+        ignore.permanent = permanent
+        ignore.save!
+      end
     end
-    preferences[:ignore][purpose.to_sym][asset_string] = {:permanent => permanent, :set => Time.now.utc.iso8601}
-    self.updated_at = Time.now
-    save!
-  end
-
-  def ignored_item_changed!(asset_string, purpose)
-    preferences[:ignore] ||= {}
-    preferences[:ignore][purpose.to_sym] ||= {}
-    if preferences[:ignore][purpose.to_sym][asset_string]
-      preferences[:ignore][purpose.to_sym].delete(asset_string) if !preferences[:ignore][purpose.to_sym][asset_string][:permanent]
-    end
-    self.updated_at = Time.now
-    save!
-  end
-
-  def ignored_items(purpose)
-    (preferences[:ignore] || {})[purpose.to_sym] || {}
+    self.touch
   end
 
   def assignments_needing_submitting(opts={})
     ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
-      course_codes = if opts[:contexts]
-        (Array(opts[:contexts]).map(&:asset_string) &
-         current_student_enrollment_course_codes)
+      course_ids = if opts[:contexts]
+        (Array(opts[:contexts]).map(&:id) &
+         current_student_enrollment_course_ids)
       else
-        current_student_enrollment_course_codes
+        current_student_enrollment_course_ids
       end
-      ignored_ids = ignored_items(:submitting).
-        select{|key, val| key.match(/\Aassignment_/) }.
-        map{|key, val| key.sub(/\Aassignment_/, "") }
-      Assignment.for_context_codes(course_codes).
-        active.
-        due_before(1.week.from_now).
-        expecting_submission.due_after(opts[:due_after] || 4.weeks.ago).
-        need_submitting_info(id, opts[:limit] || 15, ignored_ids).
-        not_locked
+
+      # allow explicitly passing a nil limit
+      limit = opts[:limit]
+      limit = 15 unless opts.key?(:limit)
+
+      result = Shard.partition_by_shard(course_ids) do |shard_course_ids|
+        Assignment.for_course(shard_course_ids).
+          active.
+          due_before(1.week.from_now).
+          not_ignored_by(self, 'submitting').
+          expecting_submission.due_after(opts[:due_after] || 4.weeks.ago).
+          need_submitting_info(id, limit).
+          not_locked
+      end
+      # outer limit, since there could be limit * n_shards results
+      result = result[0..(limit - 1)] if limit
+      result
     end
   end
   memoize :assignments_needing_submitting
 
   def assignments_needing_submitting_total_count(opts={})
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
-      course_codes = opts[:contexts] ? (Array(opts[:contexts]).map(&:asset_string) & current_student_enrollment_course_codes) : current_student_enrollment_course_codes
-      ignored_ids = ignored_items(:submitting).select{|key, val| key.match(/\Aassignment_/) }.map{|key, val| key.sub(/\Aassignment_/, "") }
-      Assignment.for_context_codes(course_codes).active.due_before(1.week.from_now).expecting_submission.due_after(4.weeks.ago).need_submitting_info(id, nil, ignored_ids).size
-    end
+    assignments_needing_submitting(opts.merge(:limit => nil)).size
   end
-  memoize :assignments_needing_submitting_total_count
 
   def assignments_needing_grading(opts={})
     ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
-      course_codes = if opts[:contexts]
-        (Array(opts[:contexts]).map(&:asset_string) &
-        current_admin_enrollment_course_codes)
+      course_ids = if opts[:contexts]
+        (Array(opts[:contexts]).map(&:id) &
+        current_admin_enrollment_course_ids)
       else
-        current_admin_enrollment_course_codes
+        current_admin_enrollment_course_ids
       end
-      ignored_ids = ignored_items(:grading).
-        select{|key, val| key.match(/\Aassignment_/) }.
-        map{|key, val| key.sub(/\Aassignment_/, "") }
-      Assignment.for_context_codes(course_codes).active.
-        expecting_submission.
-        need_grading_info(opts[:limit] || 15, ignored_ids).
-        reject{|a| a.needs_grading_count_for_user(self) == 0}
+
+      # allow explicitly passing a nil limit
+      limit = opts[:limit]
+      limit = 15 unless opts.key?(:limit)
+
+      result = Shard.partition_by_shard(course_ids) do |shard_course_ids|
+        Assignment.for_course(shard_course_ids).active.
+          expecting_submission.
+          not_ignored_by(self, 'grading').
+          need_grading_info(limit).
+          reject{|a| a.needs_grading_count_for_user(self) == 0}
+      end
+      # outer limit, since there could be limit * n_shards results
+      result = result[0..(limit - 1)] if limit
+      result
     end
   end
   memoize :assignments_needing_grading
 
   def assignments_needing_grading_total_count(opts={})
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
-      course_codes = opts[:contexts] ? (Array(opts[:contexts]).map(&:asset_string) & current_admin_enrollment_course_codes) : current_admin_enrollment_course_codes
-      ignored_ids = ignored_items(:grading).select{|key, val| key.match(/\Aassignment_/) }.map{|key, val| key.sub(/\Aassignment_/, "") }
-      Assignment.for_context_codes(course_codes).active.expecting_submission.need_grading_info(nil, ignored_ids).reject{|a| a.needs_grading_count_for_user(self) == 0}.size
-    end
+    assignments_needing_grading(opts.merge(:limit => nil)).size
   end
-  memoize :assignments_needing_grading_total_count
 
   def generate_access_verifier(ts)
     require 'openssl'
@@ -1648,16 +1641,18 @@ class User < ActiveRecord::Base
     end
   end
 
-  def current_student_enrollment_course_codes
-    @current_student_enrollment_course_codes ||= Rails.cache.fetch([self, 'current_student_enrollment_course_codes'].cache_key) do
-      self.enrollments.student.scoped(:select => "course_id").map{|e| "course_#{e.course_id}"}
+  def current_student_enrollment_course_ids
+    @current_student_enrollments ||= Rails.cache.fetch([self, 'current_student_enrollments'].cache_key) do
+      self.enrollments.with_each_shard { |scope| scope.student.scoped(:select => "course_id") }
     end
+    @current_student_enrollments.map(&:course_id)
   end
 
-  def current_admin_enrollment_course_codes
-    @current_admin_enrollment_course_codes ||= Rails.cache.fetch([self, 'current_admin_enrollment_course_codes'].cache_key) do
-      self.enrollments.admin.scoped(:select => "course_id").map{|e| "course_#{e.course_id}"}
+  def current_admin_enrollment_course_ids
+    @current_admin_enrollments ||= Rails.cache.fetch([self, 'current_admin_enrollments'].cache_key) do
+      self.enrollments.with_each_shard { |scope| scope.admin.scoped(:select => "course_id") }
     end
+    @current_admin_enrollments.map(&:course_id)
   end
 
   # TODO: this smells, I really don't get it (anymore... I wrote it :-( )
@@ -1719,7 +1714,12 @@ class User < ActiveRecord::Base
 
   # This is only feedback for student contexts (unless specific contexts are passed in)
   def recent_feedback(opts={})
-    context_codes = opts[:context_codes] || (opts[:contexts] ? setup_context_lookups(opts[:contexts]) : self.current_student_enrollment_course_codes)
+    context_codes = opts[:context_codes]
+    context_codes ||= if opts[:contexts]
+        setup_context_lookups(opts[:contexts])
+      else
+        self.current_student_enrollment_course_ids.map { |id| "course_#{id}" }
+      end
     submissions_for_context_codes(context_codes, opts)
   end
   memoize :recent_feedback
