@@ -21,13 +21,18 @@
           <flow class="FORMATTED_TEXT_BLOCK">
             <material>
               <mat_extension>
-                <mat_formattedtext type="HTML">I'm just a [1] boy from a [2-a] [family]&lt;br /&gt;</mat_formattedtext>
+                <mat_formattedtext type="HTML">I'm just a [1] [kind of being] from a [2-a] [family]&lt;br /&gt;</mat_formattedtext>
               </mat_extension>
             </material>
           </flow>
         </flow>
         <flow class="RESPONSE_BLOCK">
           <response_str ident="1" rcardinality="Single" rtiming="No">
+            <render_fib charset="us-ascii" columns="0" encoding="UTF_8"
+                        fibtype="String" maxchars="0" maxnumber="0"
+                        minnumber="0" prompt="Box" rows="0"/>
+          </response_str>
+          <response_str ident="kind of being" rcardinality="Single" rtiming="No">
             <render_fib charset="us-ascii" columns="0" encoding="UTF_8"
                         fibtype="String" maxchars="0" maxnumber="0"
                         minnumber="0" prompt="Box" rows="0"/>
@@ -56,6 +61,9 @@
             <or>
               <varequal case="No" respident="1">poor</varequal>
               <varequal case="No" respident="1">sad</varequal>
+            </or>
+            <or>
+              <varequal case="No" respident="kind of being">boy</varequal>
             </or>
             <or>
               <varequal case="No" respident="2-a">poor</varequal>

@@ -69,6 +69,12 @@ class ExtendedTextInteraction < AssessmentItemConverter
         if @question[:question_type] == 'fill_in_multiple_blanks_question' and id = get_node_att(match, 'variable', 'identifier')
           id = id.strip
           answer[:blank_id] = fib_map[id] || id
+          # strip illegal characters from blank ids
+          cleaned = answer[:blank_id].gsub(/[^A-Za-z0-9\-._]/, '-')
+          if answer[:blank_id] != cleaned
+            @question[:question_text].gsub!("[#{answer[:blank_id]}]", "[#{cleaned}]")
+            answer[:blank_id] = cleaned
+          end
         end
         unless existing || answer[:text] == ""
           @question[:answers] << answer

@@ -357,6 +357,7 @@ module BB8Expected
   FILL_IN_MULTIPLE_BLANKS = {:answers=>
           [{:text=>"poor", :comments=>"", :blank_id=>"1", :weight=>100},
            {:text=>"sad", :comments=>"", :blank_id=>"1", :weight=>100},
+           {:text=>"boy", :comments=>"", :blank_id=>"kind-of-being", :weight=>100},
            {:text=>"poor", :comments=>"", :blank_id=>"2-a", :weight=>100},
            {:text=>"destitute", :comments=>"", :blank_id=>"2-a", :weight=>100},
            {:text=>"family", :comments=>"", :blank_id=>"family", :weight=>100}],
@@ -365,7 +366,7 @@ module BB8Expected
                              :question_type=>"fill_in_multiple_blanks_question",
                              :question_name=>"",
                              :migration_id=>"_154761_1",
-                             :question_text=>"I'm just a [1] boy from a [2-a] [family]<br>",
+                             :question_text=>"I'm just a [1] [kind-of-being] from a [2-a] [family]<br>",
                              :correct_comments=>"right"}
 
   JUMBLED_SENTENCE = {
