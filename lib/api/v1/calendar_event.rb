@@ -38,6 +38,7 @@ module Api::V1::CalendarEvent
     participant = nil
 
     hash = api_json(event, user, session, :only => %w(id created_at updated_at start_at end_at all_day all_day_date title location_address location_name workflow_state))
+    hash['title'] += " (#{event.context.name})" if event.context_type == "CourseSection"
     hash['description'] = api_user_content(event.description, event.context)
 
     appointment_group_id = (options[:appointment_group_id] || event.appointment_group.try(:id))

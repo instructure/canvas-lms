@@ -45,13 +45,13 @@ describe "student interactions links" do
   it "should show the student link on the student's page" do
     get "/courses/#{@course.id}/users/#{@student.id}"
     response.should be_success
-    response.body.should match(/Your Interactions Report with #{@student.name}/)
+    response.body.should match(/Interactions with You/)
   end
 
   it "should show the teacher link on the teacher's page" do
     get "/courses/#{@course.id}/users/#{@teacher.id}"
     response.should be_success
-    response.body.should match(/Student Interactions Report for #{@teacher.name}/)
+    response.body.should match(/Student Interactions Report/)
   end
 
   it "should show mail link for teachers" do

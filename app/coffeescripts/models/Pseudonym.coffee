@@ -12,6 +12,7 @@ define [
         invalid:      I18n.t("errors.invalid", "May only contain letters, numbers, or the following: %{characters}", {characters: ". + - _ @ ="})
         taken:        I18n.t("errors.taken", "Email already in use")
         bad_credentials: I18n.t("errors.bad_credentials", "Invalid username or password")
+        not_email:    I18n.t("errors.not_email", "Not a valid email address")
       password:
         too_short:    I18n.t("errors.too_short", "Must be at least %{min} characters", {min: 6})
         confirmation: I18n.t("errors.mismatch", "Doesn't match")

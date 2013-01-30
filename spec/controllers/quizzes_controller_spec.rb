@@ -316,6 +316,24 @@ describe QuizzesController do
       assigns[:locked].should_not be_nil
     end
 
+    it "should let them take the quiz if it's locked but unlocked by an override" do
+      course_with_student_logged_in(:active_all => true)
+      course_quiz(true)
+      @quiz.lock_at = Time.now
+      @quiz.save!
+      override = AssignmentOverride.new
+      override.title = "ADHOC quiz override"
+      override.quiz = @quiz
+      override.lock_at = Time.now + 1.day
+      override.lock_at_overridden = true
+      override.save!
+      override_student = override.assignment_override_students.build
+      override_student.user = @user
+      override_student.save!
+      post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
+    end
+
     it "should let them take the quiz if it's locked but they've been explicitly unlocked" do
       course_with_student_logged_in(:active_all => true)
       course_quiz(true)
@@ -552,18 +570,18 @@ describe QuizzesController do
       response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}")
       flash[:notice].should match(/You cannot view the quiz history while the quiz is muted/)
     end
-    
+
     it "should allow teacher viewing if the assignment is muted" do
       u = user(:active_all => true)
       course_with_teacher_logged_in(:active_all => true)
       @course.enroll_student(u)
-      
+
       course_quiz
       @quiz.generate_quiz_data
       @quiz.workflow_state = 'available'
       @quiz.published_at = Time.now
       @quiz.save
-      
+
       @quiz.assignment.should_not be_nil
       @quiz.assignment.mute!
       s = @quiz.generate_submission(u)

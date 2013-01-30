@@ -115,6 +115,7 @@ describe BasicLTI do
       hash['resource_link_id'].should == '123456'
       hash['resource_link_title'].should == @tool.name
       hash['user_id'].should == @user.opaque_identifier(:asset_string)
+      hash['user_image'].should == @user.avatar_url
       hash['roles'].should == 'Instructor'
       hash['context_id'].should == @course.opaque_identifier(:asset_string)
       hash['context_title'].should == @course.name

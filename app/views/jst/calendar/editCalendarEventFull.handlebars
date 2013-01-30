@@ -1,6 +1,8 @@
 <form id="editCalendarEventFull" class="{{#if use_section_dates}}use_section_dates{{/if}}">
   <input class="title" name="title" placeholder="{{#t "event_title"}}Event Title{{/t}}" value="{{title}}" maxlength="255"/>
 
+  <a href="#" style="font-size: 0.8em; float: right;" class="switch_event_description_view">{{#t "#links.switch_views"}}Switch Views{{/t}}</a>
+  <div class="clear"></div>
   <textarea name="description">{{description}}</textarea>
 
   {{#if course_sections}}

@@ -209,11 +209,7 @@ module Canvas::AccountReports
           :select => "enrollments.*, courses.sis_source_id as course_sis_id,
                       course_sections.sis_source_id as course_section_sis_id,
                       pseudonyms.sis_user_id as pseudonym_sis_id,
-                      associated_user.sis_user_id as associated_user_sis_id,
-                 CASE WHEN enrollments.type = 'TeacherEnrollment' THEN 'teacher'
-                      WHEN enrollments.type='TaEnrollment' THEN 'ta'
-                      WHEN enrollments.type='StudentEnrollment' THEN 'student'
-                      WHEN enrollments.type='ObserverEnrollment' THEN 'observer' END as enrollment_type",
+                      associated_user.sis_user_id as associated_user_sis_id",
           :joins => "INNER JOIN courses on courses.id = enrollments.course_id
                      INNER JOIN course_sections on course_sections.id = enrollments.course_section_id
                      INNER JOIN pseudonyms ON pseudonyms.user_id=enrollments.user_id
@@ -230,7 +226,7 @@ module Canvas::AccountReports
           row << e.course_sis_id
           row << e.user_id unless @sis_format
           row << e.pseudonym_sis_id
-          row << e.enrollment_type
+          row << e.sis_role
           row << e.course_section_id unless @sis_format
           row << e.course_section_sis_id
           row << 'active'

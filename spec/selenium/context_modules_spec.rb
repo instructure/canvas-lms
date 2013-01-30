@@ -80,9 +80,9 @@ describe "context_modules" do
       #opens the student progression link and validates all modules have no information"
       f('.module_progressions_link').click
       wait_for_ajaximations
-      f(".student_list").should be_displayed
 
       student_list = f(".student_list")
+      student_list.should be_displayed
       student_list.should include_text(new_student.name)
       student_list.should include_text("none in progress")
       f(".module_#{modules[0].id} .progress").should include_text("no information")
@@ -93,10 +93,11 @@ describe "context_modules" do
 
       f('.refresh_progressions_link').click
       wait_for_ajaximations
-      f(".student_list").should be_displayed
+      # fj for last 3 lines to avoid selenium caching
+      fj(".student_list").should be_displayed
 
-      f(".module_#{modules[0].id} .progress").should include_text("completed")
-      f(".module_#{modules[1].id} .progress").should include_text("in progress")
+      fj(".module_#{modules[0].id} .progress").should include_text("completed")
+      fj(".module_#{modules[1].id} .progress").should include_text("in progress")
       student_list.should include_text(new_student.name)
     end
     #student_list.should include_text("module 2") ****Should update to module 2 but doesn't until renavigating to the page****
@@ -159,6 +160,7 @@ describe "context_modules" do
   end
 
   it "should rearrange child object to new module" do
+      pending('drag and drop selenium not working')
     modules = create_modules(2)
 
     #attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
@@ -182,7 +184,7 @@ describe "context_modules" do
     fj('#context_modules .context_module:last-child .context_module_items .context_module_item').should be_nil
   end
 
-  it "should only display 'out-of' on an assignment min score restriction when the assignment has a total" do
+    it "should only display out-of on an assignment min score restriction when the assignment has a total" do
     ag = @course.assignment_groups.create!
     a1 = ag.assignments.create!(:context => @course)
     a1.points_possible = 10
@@ -588,6 +590,92 @@ describe "context_modules" do
     module_item.find_element(:css, ".points_possible_display").should include_text "10"
   end
 
+  context "multiple overridden due dates" do
+    def create_section_override(section, due_at)
+      override = assignment_override_model(:assignment => @assignment)
+      override.set = section
+      override.override_due_at(due_at)
+      override.save!
+    end
+
+    it "should indicate when course sections have multiple due dates" do
+      modules = create_modules(1)
+      modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
+
+      cs1 = @course.default_section
+      cs2 = @course.course_sections.create!
+
+      create_section_override(cs1, 3.days.from_now)
+      create_section_override(cs2, 4.days.from_now)
+
+      refresh_page
+      wait_for_ajaximations
+
+      f(".due_date_display").text.should == "Multiple Due Dates"
+    end
+
+    it "should not indicate multiple due dates if the sections' dates are the same" do
+      modules = create_modules(1)
+      modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
+
+      cs1 = @course.default_section
+      cs2 = @course.course_sections.create!
+
+      due_at = 3.days.from_now
+      create_section_override(cs1, due_at)
+      create_section_override(cs2, due_at)
+
+      refresh_page
+      wait_for_ajaximations
+
+      f(".due_date_display").text.should_not be_blank
+      f(".due_date_display").text.should_not == "Multiple Due Dates"
+    end
+
+    it "should use assignment due date if there is no section override" do
+      modules = create_modules(1)
+      modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
+
+      cs1 = @course.default_section
+      cs2 = @course.course_sections.create!
+
+      due_at = 3.days.from_now
+      create_section_override(cs1, due_at)
+      @assignment.due_at = due_at
+      @assignment.save!
+
+      refresh_page
+      wait_for_ajaximations
+
+      f(".due_date_display").text.should_not be_blank
+      f(".due_date_display").text.should_not == "Multiple Due Dates"
+    end
+
+    it "should only use the sections the user is restricted to" do
+      modules = create_modules(1)
+      modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
+
+      cs1 = @course.default_section
+      cs2 = @course.course_sections.create!
+      cs3 = @course.course_sections.create!
+
+      user_logged_in
+      @course.enroll_user(@user, 'TaEnrollment', :section => cs1, :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true).accept!
+      @course.enroll_user(@user, 'TaEnrollment', :section => cs2, :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true).accept!
+
+      due_at = 3.days.from_now
+      create_section_override(cs1, due_at)
+      create_section_override(cs2, due_at)
+      create_section_override(cs3, due_at + 1.day) # This override should not matter
+
+      refresh_page
+      wait_for_ajaximations
+
+      f(".due_date_display").text.should_not be_blank
+      f(".due_date_display").text.should_not == "Multiple Due Dates"
+    end
+  end
+
   it "should preserve completion criteria after indent change" do
     add_existing_module_item('#assignments_select', 'Assignment', @assignment2.title)
     tag = ContentTag.last
@@ -621,6 +709,93 @@ describe "context_modules" do
     driver.execute_script("return $('#context_module_item_#{tag.id} .criterion_type').text()").should == "must_contribute"
   end
 end
+
+  context "as an observer" do
+    before (:each) do
+      @course   = course(:active_all => true)
+      @student  = user(:active_all => true, :active_state => 'active')
+      @observer = user(:active_all => true, :active_state => 'active')
+
+      @student_enrollment = @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+
+      @assignment = @course.assignments.create!(:title => 'assignment 1', :name => 'assignment 1')
+      @due_at = 3.days.from_now
+      override_for_student(@student, @due_at)
+
+      course_module
+      @module.add_item({:id => @assignment.id, :type => 'assignment'})
+
+      user_session(@observer)
+    end
+
+    def override_for_student(student, due_at)
+      override = assignment_override_model(:assignment => @assignment)
+      override.override_due_at(due_at)
+      override.save!
+      override_student = override.assignment_override_students.build
+      override_student.user = student
+      override_student.save!
+    end
+
+    it "when not associated, and in one section, it should show the section's due date" do
+      section2 = @course.course_sections.create!
+      override = assignment_override_model(:assignment => @assignment)
+      override.set = section2
+      override.override_due_at(@due_at)
+      override.save!
+
+      @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active', :section => section2)
+      get "/courses/#{@course.id}/modules"
+
+      wait_for_ajaximations
+      f(".due_date_display").text.should_not be_blank
+      f(".due_date_display").text.should == @due_at.strftime('%b %-d')
+    end
+
+    it "when not associated, and in multiple sections, it should show the latest due date" do
+      override = assignment_override_model(:assignment => @assignment)
+      override.set = @course.default_section
+      override.override_due_at(@due_at)
+      override.save!
+
+      section2 = @course.course_sections.create!
+      override = assignment_override_model(:assignment => @assignment)
+      override.set = section2
+      override.override_due_at(@due_at - 1.day)
+      override.save!
+
+      @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active')
+      @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active', :allow_multiple_enrollments => true, :section => section2)
+      get "/courses/#{@course.id}/modules"
+
+      wait_for_ajaximations
+      f(".due_date_display").text.should_not be_blank
+      f(".due_date_display").text.should == @due_at.strftime('%b %-d')
+    end
+
+    it "when associated with a student, it should show the student's overridden due date" do
+      @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
+      get "/courses/#{@course.id}/modules"
+
+      wait_for_ajaximations
+      f(".due_date_display").text.should_not be_blank
+      f(".due_date_display").text.should_not == "Multiple Due Dates"
+    end
+
+    it "should indicate multiple due dates for multiple observed students" do
+      student2 = user(:active_all => true, :active_state => 'active')
+      @course.enroll_user(student2, 'StudentEnrollment', :enrollment_state => 'active')
+      override_for_student(student2, @due_at + 1.day)
+
+      @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
+      @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active', :allow_multiple_enrollments => true, :associated_user_id => student2.id)
+
+      get "/courses/#{@course.id}/modules"
+
+      wait_for_ajaximations
+      f(".due_date_display").text.should == "Multiple Due Dates"
+    end
+  end
 
 describe "files" do
   FILE_NAME = 'some test file'

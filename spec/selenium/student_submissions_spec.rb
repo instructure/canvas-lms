@@ -9,13 +9,13 @@ describe "submissions" do
 
   context 'as a student' do
 
-    DUE_DATE = Time.now.utc + 2.days
     before(:each) do
+      @due_date = Time.now.utc + 2.days
       course_with_student_logged_in
-      @assignment = @course.assignments.create!(:title => 'assignment 1', :name => 'assignment 1', :due_at => DUE_DATE)
+      @assignment = @course.assignments.create!(:title => 'assignment 1', :name => 'assignment 1', :due_at => @due_date)
       @second_assignment = @course.assignments.create!(:title => 'assignment 2', :name => 'assignment 2', :due_at => nil)
       @third_assignment = @course.assignments.create!(:title => 'assignment 3', :name => 'assignment 3', :due_at => nil)
-      @fourth_assignment = @course.assignments.create!(:title => 'assignment 4', :name => 'assignment 4', :due_at => DUE_DATE - 1.day)
+      @fourth_assignment = @course.assignments.create!(:title => 'assignment 4', :name => 'assignment 4', :due_at => @due_date - 1.day)
     end
 
     it "should not break when you open and close the media comment dialog" do
@@ -109,7 +109,7 @@ describe "submissions" do
       f('#sidebar_content a.submit_assignment_link').text.should == "Submit Assignment"
     end
 
-    it "should not show as turned in or not turned in when assignment doesn't expect a submission" do
+    it "should not show as turned in or not turned in when assignment doesnt expect a submission" do
       # given
       @assignment.update_attributes(:submission_types => "on_paper")
       @assignment.grade_student(@student, :grade => "0")

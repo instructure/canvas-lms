@@ -275,11 +275,6 @@ describe "account" do
   end
 
   describe "user/course search" do
-
-    STUDENT_NAME = 'student@example.com'
-    COURSE_NAME = 'new course'
-    ERROR_TEXT = 'No Results Found'
-
     def submit_input(form_element, input_field_css, input_text, expect_new_page_load = true)
       form_element.find_element(:css, input_field_css).send_keys(input_text)
       go_button = form_element.find_element(:css, 'button')
@@ -291,37 +286,41 @@ describe "account" do
     end
 
     before (:each) do
-      course = Course.create!(:account => Account.default, :name => COURSE_NAME, :course_code => COURSE_NAME)
+      @student_name = 'student@example.com'
+      @course_name = 'new course'
+      @error_text = 'No Results Found'
+
+      course = Course.create!(:account => Account.default, :name => @course_name, :course_code => @course_name)
       course.reload
-      student_in_course(:name => STUDENT_NAME)
+      student_in_course(:name => @student_name)
       get "/accounts/#{Account.default.id}/courses"
     end
 
     it "should search for an existing course" do
       find_course_form = f('#new_course')
-      submit_input(find_course_form, '#course_name', COURSE_NAME)
-      f('#section-tabs-header').should include_text(COURSE_NAME)
+      submit_input(find_course_form, '#course_name', @course_name)
+      f('#section-tabs-header').should include_text(@course_name)
     end
 
     it "should search for an existing user" do
       find_user_form = f('#new_user')
-      submit_input(find_user_form, '#user_name', STUDENT_NAME, false)
+      submit_input(find_user_form, '#user_name', @student_name, false)
       wait_for_ajax_requests
-      f('.users').should include_text(STUDENT_NAME)
+      f('.users').should include_text(@student_name)
     end
 
     it "should behave correctly when searching for a course that does not exist" do
       find_course_form = f('#new_course')
       submit_input(find_course_form, '#course_name', 'some random course name that will not exist')
       wait_for_ajax_requests
-      f('#content').should include_text(ERROR_TEXT)
+      f('#content').should include_text(@error_text)
       f('#new_user').find_element(:id, 'user_name').text.should be_empty #verifies bug #5133 is fixed
     end
 
     it "should behave correctly when searching for a user that does not exist" do
       find_user_form = f('#new_user')
       submit_input(find_user_form, '#user_name', 'this student name will not exist', false)
-      f('#content').should include_text(ERROR_TEXT)
+      f('#content').should include_text(@error_text)
     end
   end
 end

@@ -74,7 +74,7 @@ describe QuizzesHelper do
   context 'duration_in_minutes' do
     it 'should work in russian when count == 1' do
       I18n.locale = "ru"
-      duration_in_minutes(60.6).should == "1 минут(ы)"
+      duration_in_minutes(60.6).should == "1 минута"
     end
   end
 end

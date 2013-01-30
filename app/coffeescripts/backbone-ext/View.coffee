@@ -22,26 +22,30 @@ define [
 
     ##
     # Define default options, options passed in to the view will overwrite these
-    defaults: {}
+    defaults:
+
+      # can hand a view a template option to avoid subclasses that only add a
+      # different template
+      template: null
 
     initialize: (options) ->
       @options = _.extend {}, @defaults, @options, options
+      @setTemplate()
       @$el.data 'view', this
       this
+
+    setTemplate: ->
+      @template = @options.template if @options.template
 
     ##
     # Extends render to add support for chid views and element filtering
     render: (opts = {}) =>
-      @$el.html @template(@toJSON()) if @template
-
-      # cacheEls before filter so we have access to elements in filter
-      @cacheEls() if @els
-      @filter() unless opts.noFilter is true
-
-      # its important for renderViews to come last so we don't filter
-      # and cache all the child views elements
-      @renderViews() if @options.views
+      @renderEl()
+      @_afterRender()
       this
+
+    renderEl: ->
+      @$el.html @template(@toJSON()) if @template
 
     ##
     # Caches elements from `els` config
@@ -56,23 +60,27 @@ define [
       @[name] = @$(selector) for selector, name of @els if @els
 
     ##
-    # Add behavior and bindings to elements. Can be called automatically in
-    # `render`, so be careful not to call it twice
-    #
-    # @api public
-    afterRender: ->
+    # Internal afterRender
+    # @api private
+    _afterRender: ->
+      @cacheEls() if @els
       @$('[data-bind]').each @createBinding
-      #@$('[data-behavior]').each => @_createBehavior.apply this, arguments
+      @afterRender()
+      # its important for renderViews to come last so we don't filter
+      # and cache all the child views elements
+      @renderViews() if @options.views
 
     ##
-    # backwards compat for old afterRender name
-    filter: @::afterRender
+    # Add behavior and bindings to elements.
+    afterRender: ->
 
     ##
     # in charge of getting variables ready to pass to handlebars during render
     # override with your own logic to do something fancy.
     toJSON: ->
-      (@model ? @collection)?.toJSON arguments...
+      json = ((@model ? @collection)?.toJSON arguments...) || {}
+      json.cid = @cid
+      json
 
     ##
     # Renders all child views
@@ -83,13 +91,15 @@ define [
 
     ##
     # Renders a single child view and appends its designated element
+    # Use ids in your view, not classes. This 
     #
     # @api private
-    renderView: (view, className) =>
-      target = @$('.' + className).first()
+    renderView: (view, selector) =>
+      target = @$("##{selector}")
+      target = @$(".#{selector}") unless target.length
       view.setElement target
       view.render()
-      @[className] ?= view
+      @[selector] ?= view
 
     ##
     # Binds a `@model` data to the element's html. Whenever the data changes
@@ -110,6 +120,14 @@ define [
 
     #_createBehavior: (index, el) ->
       # not using this yet
+
+    ##
+    # Use in cases where normal links occur inside elements with events
+    #   events:
+    #     'click .something': 'doStuff'
+    #     'click .something a': 'stopPropagation'
+    stopPropagation: (event) ->
+      event.stopPropagation()
 
     ##
     # Mixes in objects to a view's definition, being mindful of certain

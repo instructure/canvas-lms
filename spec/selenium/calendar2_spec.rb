@@ -94,7 +94,7 @@ describe "calendar2" do
           events.first.text.strip.should == c.start_at.day.to_s
         end
 
-        it "should change the main calendar's month on click" do
+        it "should change the main calendars month on click" do
           title_selector = "#calendar-app .fc-header-title"
           get "/calendar2"
 
@@ -535,14 +535,29 @@ describe "calendar2" do
         details.text.should include(@course.default_section.name)
       end
 
-      it "should redirect to the calendar and show the selected event" do
-        event = make_event(:context => @course, :start => 2.months.from_now, :title => "future event")
-        get "/courses/#{@course.id}/calendar_events/#{event.id}"
+      it "should display title link and go to event details page" do
+        make_event(:context => @course, :start => 0.days.from_now, :title => "future event")
+        get "/calendar2"
         wait_for_ajaximations
 
-        popup_title = f('.details_title')
-        popup_title.should be_displayed
-        popup_title.text.should == "future event"
+        # click the event in the calendar
+        f('.fc-event-title').click
+        popover = f('#popover-0')
+        popover.should be_displayed
+        expect_new_page_load { popover.find_element(:css, '.view_event_link').click }
+        wait_for_ajaximations
+
+        page_title = f('.title')
+        page_title.should be_displayed
+        page_title.text.should == 'future event'
+      end
+
+      it "should not redirect but load the event details page" do
+        event = make_event(:context => @course, :start => 2.months.from_now, :title => "future event")
+        get "/courses/#{@course.id}/calendar_events/#{event.id}"
+        page_title = f('.title')
+        page_title.should be_displayed
+        page_title.text.should == 'future event'
       end
 
     end
@@ -563,7 +578,7 @@ describe "calendar2" do
         # Use event to  open to a specific and testable month
         event = calendar_event_model(:title => 'Test Event', :start_at => date, :end_at => (date + 1.hour))
 
-        get "/courses/#{@course.id}/calendar_events/#{event.id}"
+        get "/courses/#{@course.id}/calendar_events/#{event.id}?calendar=1"
         wait_for_ajaximations
         fj('#calendar-app h2').text.should == 'Julio 2012'
         fj('#calendar-app .fc-sun').text.should == 'Domingo'

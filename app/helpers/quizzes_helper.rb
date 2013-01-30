@@ -223,7 +223,7 @@ module QuizzesHelper
   end
 
   def score_out_of_points_possible(score, points_possible, options={})
-    options = {:precision => 2}.merge(options)
+    options.reverse_merge!({ :precision => 2 })
     score_html = \
       if options[:id] or options[:class] or options[:style] then
         content_tag('span',
@@ -237,78 +237,63 @@ module QuizzesHelper
         :points_possible => render_score(points_possible, options[:precision]))
   end
   
-  def link_to_resume_poll
-    link_to_take_quiz(resume_poll_message)
-  end
-
-
-  def resume_poll_message
-    resume_survey_message || resume_quiz_message
-  end
-
-  def resume_survey_message
-    t('#quizzes.links.resume_survey', 'Resume Survey') if @quiz.survey?
-  end
-
-  def resume_quiz_message
-    t('#quizzes.links.resume_quiz', 'Resume Quiz')
-  end
-
-  def link_to_take_quiz(link_body)
-    opts = {
-      :class => poll_css_classes,
-      'aria-controls' => poll_aria_controls,
-      :id => "take_quiz_link"
-    }
-    opts['data-method'] = 'POST' unless @quiz.cant_go_back?
-    link_to(
-      link_body,
-      take_quiz_url,
-      opts
-    )
-  end
-
-  def poll_css_classes
-    'element_toggler' if @quiz.cant_go_back?
-  end
-
-  def poll_aria_controls
-    'js-sequential-warning-dialogue' if @quiz.cant_go_back?
+  def link_to_take_quiz(link_body, opts={})
+    opts = opts.with_indifferent_access
+    class_array = (opts['class'] || "").split(" ")
+    class_array << 'element_toggler' if @quiz.cant_go_back?
+    opts['class'] = class_array.compact.join(" ")
+    opts['aria-controls'] = 'js-sequential-warning-dialogue' if @quiz.cant_go_back?
+    opts['data-method'] = 'post' unless @quiz.cant_go_back?
+    link_to(link_body, take_quiz_url, opts)
   end
 
   def take_quiz_url
-    polymorphic_path(
-      [@context,@quiz,:take],
-      :user_id => @current_user && @current_user.id
-    )
+    user_id = @current_user && @current_user.id
+    polymorphic_path([@context, @quiz, :take], :user_id => user_id)
   end
 
-  def link_to_take_or_retake_poll
+  def link_to_take_or_retake_poll(opts={})
     if @submission && !@submission.settings_only?
-      link_to_retake_poll
+      link_to_retake_poll(opts)
     else
-      link_to_take_poll
+      link_to_take_poll(opts)
     end
   end
 
-  def link_to_retake_poll
-    link_to_take_quiz(take_poll_again_message)
+  def link_to_take_poll(opts={})
+    link_to_take_quiz(take_poll_message, opts)
   end
 
-  def take_poll_again_message
-    @quiz.survey? ?
+  def link_to_retake_poll(opts={})
+    link_to_take_quiz(retake_poll_message, opts)
+  end
+
+  def link_to_resume_poll(opts = {})
+    link_to_take_quiz(resume_poll_message, opts)
+  end
+
+  def take_poll_message(quiz=@quiz)
+    quiz.survey? ?
+      t('#quizzes.links.take_the_survey', 'Take the Survey') :
+      t('#quizzes.links.take_the_quiz', 'Take the Quiz')
+  end
+
+  def retake_poll_message(quiz=@quiz)
+    quiz.survey? ?
       t('#quizzes.links.take_the_survey_again', 'Take the Survey Again') :
       t('#quizzes.links.take_the_quiz_again', 'Take the Quiz Again')
   end
 
-  def link_to_take_poll
-    link_to_take_quiz(take_poll_message)
+  def resume_poll_message(quiz=@quiz)
+    quiz.survey? ?
+      t('#quizzes.links.resume_survey', 'Resume Survey') :
+      t('#quizzes.links.resume_quiz', 'Resume Quiz')
   end
 
-  def take_poll_message
-    @quiz.survey? ?
-      t('#quizzes.links.take_the_survey', 'Take the Survey') :
-      t('#quizzes.links.take_the_quiz', 'Take the Quiz')
+  def score_to_keep_message(quiz=@quiz)
+    quiz.scoring_policy == "keep_highest" ?
+      t('#quizzes.links.will_keep_highest_score', "Will keep the highest of all your scores") :
+      t('#quizzes.links.will_keep_latest_score', "Will keep the latest of all your scores")
   end
 
 end

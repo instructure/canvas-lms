@@ -345,4 +345,41 @@ Ad dolore andouille meatball irure, ham hock tail exercitation minim ribeye sint
       TextHelper.strip_invalid_utf8(input).should == output
     end
   end
+
+  it "should recursively strip out invalid utf-8" do
+    pending("ruby 1.9 only") if RUBY_VERSION < "1.9.0"
+    qd = %{
+ answers:
+ - !map:HashWithIndifferentAccess
+   weight: 0
+   id: 1
+   text: one
+   migration_id: QUE_1
+ - !map:HashWithIndifferentAccess
+   weight: 0
+   id: 2
+   html: ab&ecirc;cd.
+   text: "t\xEAwo"
+   migration_id: QUE_2
+ - !map:HashWithIndifferentAccess
+   weight: 100
+   id: 4685
+   text: three
+   migration_id: QUE_0_7_6554E77AEBFE42C7B02DAE225141AB51_A2
+ question_text: What is the answer
+ position: 2
+    }.force_encoding('binary')
+    data = YAML.load(qd)
+    answer = data['answers'][1]['text']
+    answer.valid_encoding?.should be_false
+    TextHelper.recursively_strip_invalid_utf8(data)
+    answer.should == "two"
+    answer.valid_encoding?.should be_true
+
+    # now check that the method is called on serialized AR columns
+    Account.default.update_attribute(:settings, "test")
+    a = Account.find(Account.default.id)
+    TextHelper.expects(:recursively_strip_invalid_utf8).with({})
+    a.settings # deserialization is lazy, trigger it
+  end
 end

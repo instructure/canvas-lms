@@ -55,29 +55,30 @@ describe IncomingMessageProcessor do
     DiscussionTopic.class_eval {
       alias_method :old_reply_from, :reply_from
       def reply_from(opts)
-        @@incoming_replies ||= []
-        @@incoming_replies << opts
-        if @@reply_from_result.kind_of?(Class) && @@reply_from_result.ancestors.include?(Exception)
-          raise @@reply_from_result
+        DiscussionTopic.incoming_replies ||= []
+        DiscussionTopic.incoming_replies << opts
+        result = DiscussionTopic.reply_from_result
+        if result.kind_of?(Class) && result.ancestors.include?(Exception)
+          raise result
         else
-          @@reply_from_result
+          result
         end
       end
 
       def self.reply_from_result
-        @@reply_from_result
+        @reply_from_result
       end
 
       def self.reply_from_result=(value)
-        @@reply_from_result = value
+        @reply_from_result = value
       end
 
       def self.incoming_replies
-        @@incoming_replies
+        @incoming_replies
       end
 
       def self.incoming_replies=(replies)
-        @@incoming_replies = replies
+        @incoming_replies = replies
       end
     }
   end
@@ -90,7 +91,8 @@ describe IncomingMessageProcessor do
     @cc = @user.communication_channels.build(:path_type => 'email', :path => "user@example.com")
     @cc.confirm
     @cc.save!
-    @message = Message.create(:context => @topic, :user => @user)
+    @notification = Notification.create!
+    @message = Message.create(:context => @topic, :user => @user, :notification => @notification)
     @previous_message_count = Message.count
     @previous_message_count.should == 1
   end
@@ -135,10 +137,43 @@ describe IncomingMessageProcessor do
   end
 
   describe "when data is not found" do
-    it "should send a bounce reply when sent a bogus secure_id" do
-      IncomingMessageProcessor.process_single(simple_mail_from_user,
-        "deadbeef", @message.id)
-      check_new_message(:unknown)
+    it "should not send a bounce reply sent a bogus message id" do
+      expect {
+        IncomingMessageProcessor.process_single(simple_mail_from_user,
+          @message.reply_to_secure_id, -1)
+      }.to change { ActionMailer::Base.deliveries.size }.by(0)
+      Message.count.should eql @previous_message_count
+    end
+
+    it "should not send a bounce reply when sent a bogus secure_id" do
+      expect {
+        IncomingMessageProcessor.process_single(simple_mail_from_user,
+          "deadbeef", @message.id)
+      }.to change { ActionMailer::Base.deliveries.size }.by(0)
+      Message.count.should eql @previous_message_count
+    end
+
+    it "should not send a bounce reply when the original message does not have a notification" do
+      @message.context = nil # potentially bounce
+      @message.notification = nil # but don't bounce this
+      @message.save!
+      expect {
+        IncomingMessageProcessor.process_single(simple_mail_from_user,
+          @message.reply_to_secure_id, @message.id)
+      }.to change { ActionMailer::Base.deliveries.size }.by(0)
+      Message.count.should eql @previous_message_count
+    end
+
+    it "should not send a bounce reply when the incoming message is an auto-response" do
+      @message.context = nil # potentially bounce
+      @message.save!
+      incoming_bounce_mail = simple_mail_from_user
+      incoming_bounce_mail['Auto-Submitted'] = 'auto-generated' # but don't bounce with this header
+      expect {
+        IncomingMessageProcessor.process_single(incoming_bounce_mail,
+          @message.reply_to_secure_id, @message.id)
+      }.to change { ActionMailer::Base.deliveries.size }.by(0)
+      Message.count.should eql @previous_message_count
     end
 
     it "should send a bounce reply when user is not found" do
@@ -157,20 +192,14 @@ describe IncomingMessageProcessor do
       check_new_message(:unknown)
     end
 
-    it "should send a bounce reply directly when sent a bogus message id" do
-      expect {
-        IncomingMessageProcessor.process_single(simple_mail_from_user,
-          @message.reply_to_secure_id, -1)
-      }.to change { ActionMailer::Base.deliveries.size }.by(1)
-      @previous_message_count.should eql @previous_message_count
-    end
-
     it "should send a bounce reply directly if no communication channel is found" do
+      @message.context = nil # to make it bounce
+      @message.save!
       expect {
         IncomingMessageProcessor.process_single(Mail.new(:body => "body", :from => "bogus_email@example.com"),
-        "deadbeef", @message.id)
+        @message.reply_to_secure_id, @message.id)
       }.to change { ActionMailer::Base.deliveries.size }.by(1)
-      @previous_message_count.should eql @previous_message_count
+      Message.count.should eql @previous_message_count
     end
   end
 

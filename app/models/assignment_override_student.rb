@@ -20,11 +20,12 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   belongs_to :assignment
   belongs_to :assignment_override
   belongs_to :user
+  belongs_to :quiz
 
   attr_accessible :user
 
-  validates_presence_of :assignment, :assignment_override, :user
-  validates_uniqueness_of :user_id, :scope => :assignment_id
+  validates_presence_of :assignment_override, :user
+  validates_uniqueness_of :user_id, :scope => [:assignment_id, :quiz_id]
 
   validate :assignment_override do |record|
     if record.assignment_override && record.assignment_override.set_type != 'ADHOC'
@@ -39,14 +40,31 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   end
 
   validate :user do |record|
-    if record.user && record.assignment && record.user.student_enrollments.scoped(:conditions => {:course_id => record.assignment.context_id}).first.nil?
+    if record.user && record.context_id && record.user.student_enrollments.scoped(:conditions => {:course_id => record.context_id}).first.nil?
       record.errors.add :user, "is not in the assignment's course"
+    end
+  end
+
+  validate do |record|
+    if [record.assignment, record.quiz].all?(&:nil?)
+      record.errors.add :base, "requires assignment or quiz"
+    end
+  end
+
+  def context_id
+    if quiz
+      quiz.context_id
+    elsif assignment
+      assignment.context_id
     end
   end
 
   before_validation :default_values
   def default_values
-    self.assignment_id = self.assignment_override.assignment_id if self.assignment_override
+    if assignment_override
+      self.assignment_id = assignment_override.assignment_id
+      self.quiz_id       = assignment_override.quiz_id
+    end
   end
   protected :default_values
 end

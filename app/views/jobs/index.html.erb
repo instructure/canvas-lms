@@ -85,11 +85,13 @@
     <input type='search' results='15' placeholder='<%= t :search_jobs, "Search Jobs" %>' autosave='canvas-jobs-search' id='jobs-search' name='q' value="<%= params[:q].presence %>" />
     <button id='jobs-refresh'><%= t '#buttons.refresh', "refresh" %></button>
     <%= before_label :total_jobs, "Total" %> <span id='jobs-total'><%= @jobs_count %></span>
-    <button id='select-all-jobs'><%= t 'buttons.select_all', 'select all' %></button>
-    <%= before_label :with_selection, "With Selection" %>
-    <button id='hold-jobs'><%= t 'buttons.hold', 'hold' %></button>
-    <button id='un-hold-jobs'><%= t 'buttons.un_hold', 'un-hold' %></button>
-    <button id='delete-jobs'><%= t 'buttons.delete', 'delete' %></button>
+    <% if Account.site_admin.grants_right?(@current_user, :manage_jobs) %>
+      <button id='select-all-jobs'><%= t 'buttons.select_all', 'select all' %></button>
+      <%= before_label :with_selection, "With Selection" %>
+      <button id='hold-jobs'><%= t 'buttons.hold', 'hold' %></button>
+      <button id='un-hold-jobs'><%= t 'buttons.un_hold', 'un-hold' %></button>
+      <button id='delete-jobs'><%= t 'buttons.delete', 'delete' %></button>
+    <% end %>
   </div>
   <div id="jobs-grid" style="width:700px; height:300px;" class='grid'>
   </div>

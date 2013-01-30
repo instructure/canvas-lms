@@ -120,7 +120,8 @@ module Turnitin
         settings[:originality_report_visibility] = 'immediate' unless ['immediate', 'after_grading', 'after_due_date'].include?(settings[:originality_report_visibility])
 
         [:s_paper_check, :internet_check, :journal_check, :exclude_biblio, :exclude_quoted].each do |key|
-          settings[key] = '0' unless settings[key] == '1'
+          bool = Canvas::Plugin.value_to_boolean(settings[key])
+          settings[key] = bool ? '1' : '0'
         end
 
         exclude_value = settings[:exclude_value].to_i

@@ -10,13 +10,23 @@ require [
 
   loadUsersTab = ->
     window.app = usersTab: {}
-    for eType in ['student', 'observer', 'teacher', 'designer', 'ta']
-      # produces app.usersTab.studentsView .observerView etc.
+    for baseRole in ENV.ALL_ROLES
+      eType = baseRole.label.toLowerCase()
       window.app.usersTab["#{eType}sView"] = new UserCollectionView
         el: $("##{eType}_enrollments")
         url: ENV.USERS_URL
+        count: baseRole.count
         requestParams:
-          enrollment_type: eType
+          enrollment_role: baseRole.base_role_name
+
+      for customRole in baseRole.custom_roles
+        continue if customRole.workflow_state == 'inactive' && customRole.count == 0
+        window.app.usersTab["#{customRole.asset_string}sView"] = new UserCollectionView
+          el: $("##{customRole.asset_string}")
+          url: ENV.USERS_URL
+          count: customRole.count
+          requestParams:
+            enrollment_role: customRole.name
 
   $ ->
     if $("#tab-users").is(":visible")

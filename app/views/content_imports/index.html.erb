@@ -43,8 +43,12 @@
   <h2><%= t 'titles.failed_migrations', "Failed Migrations" %></h2>
   <% @failed.each do |mig| %>
     <div>
-      <%= t :failed_migration, "%{plugin_type} migration - There was an error with this migration. 
-      Please let support know through the help button at the top of the page.", :plugin_type => mig.plugin_type %>
+      <% if mig.migration_settings[:user_error_message] %>
+        <%= t :failed_migration_with_error, "%{plugin_type} migration - %{error_message}", :plugin_type => mig.plugin_type, :error_message => mig.migration_settings[:user_error_message] %>
+      <% else %>
+        <%= t :failed_migration, "%{plugin_type} migration - There was an error with this migration. 
+        Please let support know through the help button at the top of the page.", :plugin_type => mig.plugin_type %>
+      <% end %>
       <%= render :partial => 'migration_warnings', :locals => {:cm => mig} %>
     </div>
   <% end %>

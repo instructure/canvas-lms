@@ -96,7 +96,7 @@ class PseudonymsController < ApplicationController
       format.js { render :json => {:requested => true}.to_json }
     end
   end
-  
+
   def confirm_change_password
     @pseudonym = Pseudonym.find(params[:pseudonym_id])
     @cc = @pseudonym.user.communication_channels.find_by_confirmation_code(params[:nonce])
@@ -109,7 +109,7 @@ class PseudonymsController < ApplicationController
       redirect_to root_url
     end
   end
-  
+
   def change_password
     @pseudonym = Pseudonym.find(params[:pseudonym][:id] || params[:pseudonym_id])
     @cc = @pseudonym.user.communication_channels.find_by_confirmation_code(params[:nonce])
@@ -200,7 +200,7 @@ class PseudonymsController < ApplicationController
     @user = @current_user
     @pseudonym = @current_pseudonym
   end
-  
+
   def get_user
     user_id = params[:user_id] || params[:user].try(:[], :id)
     @user = case

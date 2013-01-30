@@ -34,6 +34,7 @@
 define([
   'i18nObj',
   'jquery',
+  'compiled/editor/editorAccessibility', /* editorAccessibility */
   //'compiled/tinymce', // required, but the bundles that ACTUALLY use
                         // tiny can require it themselves or else we have
                         // build problems
@@ -42,7 +43,7 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'vendor/jquery.ba-tinypubsub',
   'vendor/scribd.view' /* scribd */
-], function(I18nObj, $) {
+], function(I18nObj, $, EditorAccessibility) {
 
   var enableBookmarking = $("body").hasClass('ie');
   $(document).ready(function() {
@@ -187,6 +188,11 @@ define([
             $textarea.data('last_bookmark', ed.selection.getBookmark(1));
           }
         });
+
+        ed.onInit.add(function(){
+          new EditorAccessibility(ed).accessiblize();
+        });
+
         ed.onInit.add(function(){
           $(window).triggerHandler("resize");
 
@@ -221,7 +227,6 @@ define([
               }
             });
           }
-
         });
       }
     }, options.tinyOptions || {});

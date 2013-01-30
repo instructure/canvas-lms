@@ -2541,7 +2541,6 @@ define([
               }
               $option
                 .removeClass('to_be_removed')
-                .addClass(variable)
                 .val(variable)
                 .text(variable);
               matchHash[variable] = true;

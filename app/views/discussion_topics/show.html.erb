@@ -41,16 +41,30 @@
   %>
 
   <div id="discussion-toolbar" class="toolbarView">
-    <div class="headerBar">
+    <div class="headerBar" data-sticky>
       <div class="headerBar-right">
-        <% if @topic.locked? %>
-          <% if can_do(@context, @current_user, :moderate_forum) %>
-            <button data-mark-locked="false" class="discussion_locked_toggler button button-sidebar-wide"><%= image_tag('unlock.png') %><%= t(:unlock_topic, %{Re-Open for Comments}) %></button>
-          <% else %>
-            <p><%= image_tag 'lock.png' %><%= t :topic_locked_notice, "This topic is closed for comments." %></p>
-          <% end %>
-        <% elsif can_do(@context, @current_user, :moderate_forum) && (!@topic.assignment.try(:due_at) || @topic.assignment.due_at <= Time.now) %>
-          <button data-mark-locked="true" class="discussion_locked_toggler button button-sidebar-wide"><%= image_tag('lock.png') %> <%= t(:lock_topic, %{Close for Comments}) %></button>
+        <% if can_do(@topic, @current_user, :update) || can_do(@topic, @current_user, :delete) %>
+          <div class="admin-links">
+            <button class="al-trigger ui-button" data-kyle-menu-options='{"appendMenuTo": "body"}'><span class="al-trigger-inner"><%= t :manage_discussion, 'Manage Discussion' %></span></button>
+            <ul class="al-options">
+              <% if can_do(@topic, @current_user, :update) %>
+                <li><a href="<%= context_url(@topic.context, :edit_context_discussion_topic_url, @topic) %>"><i class="icon-edit"></i> <%= t :edit, 'Edit' %></a></li>
+              <% end %>
+              <% if @topic.for_assignment? && (can_do(@topic.assignment, @current_user, :grade) || can_do(@topic.assignment.context, @current_user, :manage_assignments)) %>
+                <li><a href="<%= context_url(@topic.assignment.context, :edit_context_assignment_url, @topic.assignment.id, :return_to => request.url) %>"><i class="icon-edit"></i> <%= t :assignment_settings, 'Assignment Details' %></a></li>
+              <% end %>
+              <% if can_do(@topic, @current_user, :delete) %>
+                <li><a href="<%= context_url(@context, :context_discussion_topic_url, @topic.id) %>" data-method="delete" rel="nofollow" data-confirm="<%= t :confirm_delete_discussion, 'Are you sure you want to delete this discussion?' %>"><i class="icon-trash"></i> <%= t :delete, 'Delete' %></a></li>
+              <% end %>
+              <% if @topic.locked? %>
+                <% if can_do(@context, @current_user, :moderate_forum) %>
+                  <li><a href="#" data-mark-locked="false" class="discussion_locked_toggler"><i class="icon-unlock"></i> <%= t(:unlock_topic, %{Open for Comments}) %></a></li>
+                <% end %>
+              <% elsif can_do(@context, @current_user, :moderate_forum) && (!@topic.assignment.try(:due_at) || @topic.assignment.due_at <= Time.now) %>
+                <li><a href="#" data-mark-locked="true" class="discussion_locked_toggler"><i class="icon-lock"></i> <%= t(:lock_topic, %{Close for Comments}) %></a></li>
+              <% end %>
+            </ul>
+          </div>
         <% end %>
       </div>
 
@@ -72,176 +86,169 @@
           type    = "checkbox"
           id      = "onlyUnread"
         ><label for="onlyUnread"><%= t('unread', 'Unread') %></label>
+
+        &nbsp; &nbsp;
+        <button id="collapseAll" class="btn disableWhileFiltering" title="<%= t('collapse_replies', 'Collapse replies') %>"><%= image_tag 'discussions/collapse_icon.png' %></button>
+        <button id="expandAll" class="btn disableWhileFiltering" title="<%= t('expand_replies', 'Expand replies') %>"><%= image_tag 'discussions/expand_icon.png' %></button>
+
       </div>
     </div>
   </div>
 
-  <article id="discussion_topic" class="admin-link-hover-area topic discussion_entry <%= @topic.class.to_s.underscore %> <%= 'has_podcast' if @topic.podcast_enabled %> <%= 'has_unread_entries' if @topic.unread_count(@current_user) > 0 %> can_be_marked_as_read <%= @topic.read_state(@current_user) %>" data-mark-read-url="<%= context_url(@topic.context, :api_v1_context_discussion_topic_mark_read_url, @topic) %>">
-    <div class="entry_content">
-      <% if @topic.for_assignment? %>
-        <div class="discussion-section discussion-assignment-section alert alert-info">
-          <% if @topic.assignment.due_at %>
-            <div class="discussion-header-right">
-              <div class="discussion-pubdate">
-                <%= t :due, "due %{date}", :date => datetime_string(@topic.assignment.due_at) %>
+  <div id="discussion_container">
+    <article id="discussion_topic" class="admin-link-hover-area topic discussion_entry <%= @topic.class.to_s.underscore %> <%= 'has_podcast' if @topic.podcast_enabled %> <%= 'has_unread_entries' if @topic.unread_count(@current_user) > 0 %> can_be_marked_as_read <%= @topic.read_state(@current_user) %>" data-mark-read-url="<%= context_url(@topic.context, :api_v1_context_discussion_topic_mark_read_url, @topic) %>">
+      <div class="entry_content">
+        <% if @topic.for_assignment? %>
+          <div class="discussion-section discussion-assignment-section alert alert-info">
+            <% if @topic.assignment.due_at %>
+              <div class="discussion-header-right">
+                <div class="discussion-pubdate">
+                  <%= t :due, "due %{date}", :date => datetime_string(@topic.assignment.due_at) %>
+                </div>
               </div>
-            </div>
-          <% end %>
+            <% end %>
 
-          <div class="discussion-header-content">
-            <h2 class="discussion-title"><%= t :topic_for_assignment, "This is a graded discussion" %></h2>
-            <% if @topic.assignment.points_possible %>
-              <h3 class="discussion-subtitle"><%= t :points_possible, {:one => "1 point possible", :other => "%{count} points possible"}, :count => @topic.assignment.points_possible %></h3>
+            <div class="discussion-header-content">
+              <h2 class="discussion-title"><%= t :topic_for_assignment, "This is a graded discussion" %></h2>
+              <% if @topic.assignment.points_possible %>
+                <h3 class="discussion-subtitle"><%= t :points_possible, {:one => "1 point possible", :other => "%{count} points possible"}, :count => @topic.assignment.points_possible %></h3>
+              <% end %>
+            </div>
+
+            <% if @topic.for_group_assignment? %>
+              <p>
+                <%= t :separated_conversation_notice, "Since this is a group assignment, each group has its own conversation for this topic. Here are the ones you have access to:" %>
+                <ul>
+                  <% @group_topics.each do |group_and_topic| %>
+                    <li>
+                      <a href="<%= context_url(group_and_topic[:group], :context_discussion_topics_url, :root_discussion_topic_id => @topic.id) %>"><%= group_and_topic[:group].name %></a>
+                      <%= render :partial => 'new_and_total_badge', :locals => {
+                                 :unread_count => group_and_topic[:topic].unread_count(@current_user),
+                                 :reply_count => group_and_topic[:topic].discussion_entries.active.size } if group_and_topic[:topic] %>
+                    </li>
+                  <% end %>
+                </ul>
+              </p>
+            <% end %>
+            <%
+              can_grade = can_do(@topic.assignment, @current_user, :grade) || can_do(@topic.assignment.context, @current_user, :manage_assignments)
+              show_peer_reviews = can_do(@topic.assignment, @current_user, :grade) && @topic.assignment.has_peer_reviews?
+              attached_rubric =  @topic.assignment.try(:rubric_association).try(:rubric)
+              show_rubric = attached_rubric || can_do(@topic.assignment, @current_user, :update)
+             %>
+             <% if can_grade || show_peer_reviews || show_rubric %>
+              <div class="discussion-assignment-links">
+                <% if can_grade %>
+                  <a href="<%= context_url(@topic.assignment.context, :edit_context_assignment_url, @topic.assignment.id, :return_to => request.url) %>" class=" edit">
+                    <%= t :edit_assignment_settings, "Edit Assignment Settings" %>
+                  </a>
+                  <a class="speedgrader" href="<%= context_url(@topic.assignment.context, :speed_grader_context_gradebook_url, :assignment_id => @topic.assignment.id) %>">
+                    <%= t :speed_grader, "Speed Grader" %>
+                  </a>
+                <% end %>
+                <% if show_peer_reviews %>
+                  <a class="peer-review assignment_peer_reviews_link" href="<%= context_url(@topic.assignment.context, :context_assignment_peer_reviews_url, @topic.assignment.id) %>">
+                    <%= t 'links.peer_reviews', "Peer Reviews" %>
+                  </a>
+                <% end %>
+                <% if show_rubric %>
+
+                  <%# HACK! this is here because edit_rubric.js expects there to be a #add_rubric_url on the page and sets it's <form action="..."> to it %>
+                  <% if can_do(@topic.assignment, @current_user, :update) %>
+                      <a href="<%= context_url(@topic.assignment.context, :context_rubrics_url) %>" id="add_rubric_url" style="display: none;"></a>
+                  <% end %>
+
+                  <a class="rubric_dialog_trigger rubric" href="#" data-no-rubric-exists="<%= !attached_rubric %>" data-url="<%= context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) %>">
+                    <%= attached_rubric ? t(:show_rubric, "Show Rubric") : t(:add_rubric, "Add Rubric") %>
+                  </a>
+                <% end %>
+              </div>
             <% end %>
           </div>
+        <% end %>
+        <header class="discussion-section clearfix">
+          <%= avatar((@topic.user), @context.asset_string) %>
+          <div class="discussion-header-content right-of-avatar">
 
-          <% if @topic.for_group_assignment? %>
-            <p>
-              <%= t :separated_conversation_notice, "Since this is a group assignment, each group has its own conversation for this topic. Here are the ones you have access to:" %>
-              <ul>
-                <% @group_topics.each do |group_and_topic| %>
-                  <li>
-                    <a href="<%= context_url(group_and_topic[:group], :context_discussion_topics_url, :root_discussion_topic_id => @topic.id) %>"><%= group_and_topic[:group].name %></a>
-                    <%= render :partial => 'new_and_total_badge', :locals => {
-                               :unread_count => group_and_topic[:topic].unread_count(@current_user),
-                               :reply_count => group_and_topic[:topic].discussion_entries.active.size } if group_and_topic[:topic] %>
-                  </li>
-                <% end %>
-              </ul>
-            </p>
+            <div class="discussion-header-right">
+              <div class="discussion-pubdate"><%= friendly_datetime @topic.created_at %></div>
+              <%= render :partial => 'new_and_total_badge', :locals => { :unread_count => @topic.unread_count(@current_user), :reply_count => @topic.discussion_entries.size } %>
+            </div>
+            <h1 class="discussion-title"><%= @topic.title %></h1>
+            <h2 class="discussion-subtitle">
+              <a class="author" href="<%= context_url(@topic.context, :context_user_url, @topic.user_id) %>" title="<%= t :authors_name, "Author's name" %>"><%= context_user_name(@topic.context, @topic.user) %></a>
+            </h2>
+            <% if @topic.root_topic.try(:context) && @topic.root_topic.try(:context) != @context %>
+              <h3 class="discussion-subtitle">
+                <%= t(:from_context, "From *%{context_name}*", {
+                        :context_name => @topic.root_topic.context.short_name,
+                        :wrapper => "<a href='#{context_url(@topic.root_topic.context, :context_url)}'>\1</a>" }) %>
+              </h3>
+            <% end %>
+          </div>
+        </header>
+
+        <div class="discussion-section message_wrapper">
+          <div data-bind="message" class="message user_content"><%= user_content(@topic.message) %></div>
+
+          <% if @topic.post_delayed? && @topic.delayed_post_at > Time.now %>
+            <div class="discussion-fyi">
+              <%= t 'topic_locked', 'This topic will not be visible to users until *%{date}*', :date => datetime_string(@topic.delayed_post_at) %>
+            </div>
           <% end %>
-          <%
-            can_grade = can_do(@topic.assignment, @current_user, :grade) || can_do(@topic.assignment.context, @current_user, :manage_assignments)
-            show_peer_reviews = can_do(@topic.assignment, @current_user, :grade) && @topic.assignment.has_peer_reviews?
-            attached_rubric =  @topic.assignment.try(:rubric_association).try(:rubric)
-            show_rubric = attached_rubric || can_do(@topic.assignment, @current_user, :update)
-           %>
-           <% if can_grade || show_peer_reviews || show_rubric %>
-            <div class="discussion-assignment-links">
-              <% if can_grade %>
-                <a href="<%= context_url(@topic.assignment.context, :edit_context_assignment_url, @topic.assignment.id, :return_to => request.url) %>" class=" edit">
-                  <%= t :edit_assignment_settings, "Edit Assignment Settings" %>
-                </a>
-                <a class="speedgrader" href="<%= context_url(@topic.assignment.context, :speed_grader_context_gradebook_url, :assignment_id => @topic.assignment.id) %>">
-                  <%= t :speed_grader, "Speed Grader" %>
-                </a>
-              <% end %>
-              <% if show_peer_reviews %>
-                <a class="peer-review assignment_peer_reviews_link" href="<%= context_url(@topic.assignment.context, :context_assignment_peer_reviews_url, @topic.assignment.id) %>">
-                  <%= t 'links.peer_reviews', "Peer Reviews" %>
-                </a>
-              <% end %>
-              <% if show_rubric %>
 
-                <%# HACK! this is here because edit_rubric.js expects there to be a #add_rubric_url on the page and sets it's <form action="..."> to it %>
-                <% if can_do(@topic.assignment, @current_user, :update) %>
-                    <a href="<%= context_url(@topic.assignment.context, :context_rubrics_url) %>" id="add_rubric_url" style="display: none;"></a>
-                <% end %>
+          <% if @topic.editor_id && @topic.user_id && @topic.editor_id != @topic.user_id %>
+            <div class="discussion-fyi">
+              <%= t 'edited_by', 'This topic was edited by %{user}', :user => link_to(context_user_name(@topic.context, @topic.editor_id), context_url(@topic.context, :context_user_url, @topic.editor_id)) %>
+            </div>
+          <% end %>
 
-                <a class="rubric_dialog_trigger rubric" href="#" data-no-rubric-exists="<%= !attached_rubric %>" data-url="<%= context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) %>">
-                  <%= attached_rubric ? t(:show_rubric, "Show Rubric") : t(:add_rubric, "Add Rubric") %>
-                </a>
-              <% end %>
+          <% if @topic.locked? %>
+            <div class="discussion-fyi">
+              <%= t 'locked', 'This topic is closed for comments' %>
+            </div>
+          <% end %>
+
+          <% if @topic.podcast_enabled %>
+            <% if @context_enrollment %>
+              <div class="discussion-fyi">
+                <a class="feed" href="<%= feeds_topic_format_path(@topic.id, @context_enrollment.feed_code, :rss) %>"><%= t :topic_podcast_feed_link, "Topic Podcast Feed" %></a>
+              </div>
+            <% elsif @context.available? %>
+              <div class="discussion-fyi">
+                <a class="feed" href="<%= feeds_topic_format_path(@topic.id, @context.feed_code, :rss) %>"><%= t :topic_podcast_feed_link, "Topic Podcast Feed" %></a>
+              </div>
+            <% end %>
+          <% end %>
+
+          <% if @topic.external_feed %>
+            <div class="discussion-fyi">
+              <%= t 'retrieved_from_feed', 'Retrieved from %{feed}', :feed => link_to(@topic.external_feed.display_name, @topic.external_feed.url) %>
+            </div>
+          <% end %>
+
+          <% if @topic.attachment %>
+            <div>
+              <a href="<%= context_url(@topic.context, :context_file_download_url, @topic.attachment_id) %>" class="<%= @topic.attachment.mime_class %>"><%= @topic.attachment.display_name %></a>
             </div>
           <% end %>
         </div>
-      <% end %>
-      <header class="discussion-section clearfix">
-        <%= avatar((@topic.user), @context.asset_string) %>
-        <div class="discussion-header-content right-of-avatar">
-          <% if can_do(@topic, @current_user, :update) || can_do(@topic, @current_user, :delete) %>
-            <div class="admin-links">
-              <button class="al-trigger ui-button" data-kyle-menu-options='{"appendMenuTo": "body"}'><span class="al-trigger-inner"><%= t :manage_discussion, 'Manage Discussion' %></span></button>
-              <ul class="al-options">
-                <% if can_do(@topic, @current_user, :update) %>
-                  <li><a href="<%= context_url(@topic.context, :edit_context_discussion_topic_url, @topic) %>"><i class="icon-edit"></i> <%= t :edit, 'Edit' %></a></li>
-                <% end %>
-                <% if @topic.for_assignment? && (can_do(@topic.assignment, @current_user, :grade) || can_do(@topic.assignment.context, @current_user, :manage_assignments)) %>
-                  <li><a href="<%= context_url(@topic.assignment.context, :edit_context_assignment_url, @topic.assignment.id, :return_to => request.url) %>"><i class="icon-edit"></i> <%= t :assignment_settings, 'Assignment Details' %></a></li>
-                <% end %>
-                <% if can_do(@topic, @current_user, :delete) %>
-                  <li><a href="<%= context_url(@context, :context_discussion_topic_url, @topic.id) %>" data-method="delete" rel="nofollow" data-confirm="<%= t :confirm_delete_discussion, 'Are you sure you want to delete this discussion?' %>"><i class="icon-trash"></i> <%= t :delete, 'Delete' %></a></li>
-                <% end %>
-              </ul>
-            </div>
-          <% end %>
-          <div class="discussion-header-right">
-            <div class="discussion-pubdate"><%= friendly_datetime @topic.created_at %></div>
-            <%= render :partial => 'new_and_total_badge', :locals => { :unread_count => @topic.unread_count(@current_user), :reply_count => @topic.discussion_entries.size } %>
-          </div>
-          <h1 class="discussion-title"><%= @topic.title %></h1>
-          <h2 class="discussion-subtitle">
-            <a class="author" href="<%= context_url(@topic.context, :context_user_url, @topic.user_id) %>" title="<%= t :authors_name, "Author's name" %>"><%= context_user_name(@topic.context, @topic.user) %></a>
-          </h2>
-          <% if @topic.root_topic.try(:context) && @topic.root_topic.try(:context) != @context %>
-            <h3 class="discussion-subtitle">
-              <%= t(:from_context, "From *%{context_name}*", {
-                      :context_name => @topic.root_topic.context.short_name,
-                      :wrapper => "<a href='#{context_url(@topic.root_topic.context, :context_url)}'>\1</a>" }) %>
-            </h3>
-          <% end %>
-        </div>
-      </header>
 
-      <div class="discussion-section message_wrapper">
-        <div data-bind="message" class="message user_content"><%= user_content(@topic.message) %></div>
 
-        <% if @topic.post_delayed? && @topic.delayed_post_at > Time.now %>
-          <div class="discussion-fyi">
-            <%= t 'topic_locked', 'This topic will not be visible to users until *%{date}*', :date => datetime_string(@topic.delayed_post_at) %>
-          </div>
-        <% end %>
-
-        <% if @topic.editor_id && @topic.user_id && @topic.editor_id != @topic.user_id %>
-          <div class="discussion-fyi">
-            <%= t 'edited_by', 'This topic was edited by %{user}', :user => link_to(context_user_name(@topic.context, @topic.editor_id), context_url(@topic.context, :context_user_url, @topic.editor_id)) %>
-          </div>
-        <% end %>
-
-        <% if @topic.locked? %>
-          <div class="discussion-fyi">
-            <%= t 'locked', 'This topic is closed for comments' %>
-          </div>
-        <% end %>
-
-        <% if @topic.podcast_enabled %>
-          <% if @context_enrollment %>
-            <div class="discussion-fyi">
-              <a class="feed" href="<%= feeds_topic_format_path(@topic.id, @context_enrollment.feed_code, :rss) %>"><%= t :topic_podcast_feed_link, "Topic Podcast Feed" %></a>
-            </div>
-          <% elsif @context.available? %>
-            <div class="discussion-fyi">
-              <a class="feed" href="<%= feeds_topic_format_path(@topic.id, @context.feed_code, :rss) %>"><%= t :topic_podcast_feed_link, "Topic Podcast Feed" %></a>
-            </div>
-          <% end %>
-        <% end %>
-
-        <% if @topic.external_feed %>
-          <div class="discussion-fyi">
-            <%= t 'retrieved_from_feed', 'Retrieved from %{feed}', :feed => link_to(@topic.external_feed.display_name, @topic.external_feed.url) %>
-          </div>
-        <% end %>
-
-        <% if @topic.attachment %>
-          <div>
-            <a href="<%= context_url(@topic.context, :context_file_download_url, @topic.attachment_id) %>" class="<%= @topic.attachment.mime_class %>"><%= @topic.attachment.display_name %></a>
-          </div>
-        <% end %>
       </div>
+    </article>
 
-
+    <div id="discussion_subentries" class="discussion_subentries">
+      <% if @initial_post_required %>
+        <h2><%= t :initial_post_required, "Replies are only visible to those who have posted at least one reply." %></h2>
+      <% else %>
+        <h2><%= t :loading_replies, "Loading replies..." %></h2>
+      <% end %>
     </div>
-  </article>
 
-  <div id="discussion_subentries" class="discussion_subentries">
-    <% if @initial_post_required %>
-      <h2><%= t :initial_post_required, "Replies are only visible to those who have posted at least one reply." %></h2>
-    <% else %>
-      <h2><%= t :loading_replies, "Loading replies..." %></h2>
-    <% end %>
+    <div id="filterResults" class="discussion_subentries hidden"></div>
+
   </div>
-
-  <div id="filterResults" class="discussion_subentries hidden"></div>
 
   <%=
     render :partial => "shared/sequence_footer", :locals => {:asset => @sequence_asset, :context => @sequence_asset.context} if @sequence_asset

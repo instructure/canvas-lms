@@ -25,6 +25,7 @@ class Quiz < ActiveRecord::Base
   include ActionView::Helpers::SanitizeHelper
   extend ActionView::Helpers::SanitizeHelper::ClassMethods
   include ContextModuleItem
+  include DatesOverridable
 
   attr_accessible :title, :description, :points_possible, :assignment_id, :shuffle_answers,
     :show_correct_answers, :time_limit, :allowed_attempts, :scoring_policy, :quiz_type,
@@ -35,7 +36,7 @@ class Quiz < ActiveRecord::Base
 
   attr_readonly :context_id, :context_type
   attr_accessor :notify_of_update
-  
+
   has_many :quiz_questions, :dependent => :destroy, :order => 'position'
   has_many :quiz_submissions, :dependent => :destroy
   has_many :quiz_groups, :dependent => :destroy, :order => 'position'
@@ -53,9 +54,10 @@ class Quiz < ActiveRecord::Base
   before_save :set_defaults
   after_save :update_assignment
   after_save :touch_context
-  
+  after_save :link_assignment_overrides, :if => :new_assignment_id?
+
   serialize :quiz_data
-  
+
   simply_versioned
 
   def infer_times
@@ -90,6 +92,19 @@ class Quiz < ActiveRecord::Base
   end
   protected :set_defaults
   
+  def new_assignment_id?
+    last_assignment_id != assignment_id
+  end
+
+  def link_assignment_overrides
+    collections = [assignment_overrides, assignment_override_students]
+    collections += [assignment.assignment_overrides, assignment.assignment_override_students] if assignment
+
+    collections.each do |collection|
+      collection.update_all({ :assignment_id => assignment_id, :quiz_id => id })
+    end
+  end
+
   def build_assignment
     if self.available? && !self.assignment_id && self.graded? && @saved_by != :assignment && @saved_by != :clone
       assignment = self.assignment
@@ -305,21 +320,21 @@ class Quiz < ActiveRecord::Base
     state :created do
       event :did_edit, :transitions_to => :edited
     end
-    
+
     state :edited do
       event :offer, :transitions_to => :available
     end
-    
+
     state :available
     state :deleted
   end
-  
+
   def root_entries_max_position
     question_max = self.quiz_questions.maximum(:position, :conditions => 'quiz_group_id is null')
     group_max = self.quiz_groups.maximum(:position)
     [question_max, group_max, 0].compact.max
   end
-  
+
   # Returns the list of all "root" entries, either questions or question
   # groups for this quiz.  This is PRE-SAVED data.  Once the quiz has 
   # been saved, all the data can be found in Quiz.quiz_data
@@ -611,15 +626,16 @@ class Quiz < ActiveRecord::Base
     return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
-      if (self.unlock_at && self.unlock_at > Time.now)
+      quiz_for_user = self.overridden_for(user)
+      if (quiz_for_user.unlock_at && quiz_for_user.unlock_at > Time.now)
         sub = user && quiz_submissions.find_by_user_id(user.id)
         if !sub || !sub.manually_unlocked
-          locked = {:asset_string => self.asset_string, :unlock_at => self.unlock_at}
+          locked = {:asset_string => self.asset_string, :unlock_at => quiz_for_user.unlock_at}
         end
-      elsif (self.lock_at && self.lock_at <= Time.now)
+      elsif (quiz_for_user.lock_at && quiz_for_user.lock_at <= Time.now)
         sub = user && quiz_submissions.find_by_user_id(user.id)
         if !sub || !sub.manually_unlocked
-          locked = {:asset_string => self.asset_string, :lock_at => self.lock_at}
+          locked = {:asset_string => self.asset_string, :lock_at => quiz_for_user.lock_at}
         end
       elsif (self.for_assignment? && l = self.assignment.locked_for?(user, opts))
         sub = user && quiz_submissions.find_by_user_id(user.id)
@@ -803,7 +819,7 @@ class Quiz < ActiveRecord::Base
 
   def submissions_for_statistics(include_all_versions=true)
     ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
-      for_users = self.context.students.map(&:id)
+      for_users = context.student_ids
       self.quiz_submissions.scoped(:include => [:versions], :conditions => { :user_id => for_users }).
         map { |qs| if include_all_versions then qs.submitted_versions else qs.latest_submitted_version end }.
         flatten.
@@ -813,7 +829,7 @@ class Quiz < ActiveRecord::Base
         reverse
     end
   end
-  
+
   def statistics_csv(options={})
     options ||= {}
     columns = []
@@ -985,7 +1001,7 @@ class Quiz < ActiveRecord::Base
     stats[:last_submission_at] = submissions.map{|s| s.finished_at }.compact.max || self.created_at
     stats
   end
-  
+
   def stats_for_question(question, submissions)
     res = question
     res[:responses] = 0
@@ -1129,7 +1145,7 @@ class Quiz < ActiveRecord::Base
             end
           end
           if !found
-            
+
             if ['numerical_question', 'short_answer_question'].include?(question[:question_type]) && response_hash_id
               answer = {:id => response_hash_id, :responses => 1, :user_ids => [submission.user_id], :text => response[:text]}
               res[:answers] << answer
@@ -1148,13 +1164,13 @@ class Quiz < ActiveRecord::Base
     res[:answers] << none if none && none[:responses] > 0
     res
   end
-  
+
   def unpublished_changes?
     self.last_edited_at && self.published_at && self.last_edited_at > self.published_at
   end
-  
+
   def has_student_submissions?
-    self.quiz_submissions.any?{|s| !s.settings_only? && self.context.students.include?(s.user) }
+    self.quiz_submissions.any?{|s| !s.settings_only? && context.includes_student?(s.user) }
   end
 
   # clear out all questions so that the quiz can be replaced. this is currently

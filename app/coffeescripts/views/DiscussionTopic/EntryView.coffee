@@ -1,4 +1,5 @@
 define [
+  'underscore'
   'i18n!discussions'
   'compiled/discussions/MarkAsReadWatcher'
   'compiled/arr/walk'
@@ -15,9 +16,20 @@ define [
   'compiled/str/convertApiUserContent'
   'jst/_avatar'
   'jst/discussions/_reply_form'
-], (I18n, MarkAsReadWatcher, walk, Backbone, EntryCollection, entryContentPartial, deletedEntriesTemplate, entryWithRepliesTemplate, entryStats, Reply, EntryEditor, htmlEscape, {publish}, convertApiUserContent) ->
+], (_, I18n, MarkAsReadWatcher, walk, Backbone, EntryCollection, entryContentPartial, deletedEntriesTemplate, entryWithRepliesTemplate, entryStats, Reply, EntryEditor, htmlEscape, {publish}, convertApiUserContent) ->
 
   class EntryView extends Backbone.View
+
+    @instances = {}
+
+    @collapseRootEntries = ->
+      _.each @instances, (view) ->
+        view.collapse() unless view.model.get 'parent'
+
+    @expandRootEntries = ->
+      _.each @instances, (view) ->
+        view.expand() unless view.model.get 'parent'
+
 
     els:
       '.discussion_entry:first': '$entryContent'
@@ -42,6 +54,7 @@ define [
 
     initialize: ->
       super
+      @constructor.instances[@cid] = this
       @$el.attr 'id', "entry-#{@model.get 'id'}"
       @model.on 'change:deleted', @toggleDeleted
       @model.on 'change:read_state', @toggleReadState
@@ -75,6 +88,13 @@ define [
       @addCountsToHeader() unless @addedCountsToHeader
       @$el.toggleClass 'collapsed'
 
+    expand: ->
+      @$el.removeClass 'collapsed'
+
+    collapse: ->
+      @addCountsToHeader() unless @addedCountsToHeader
+      @$el.addClass 'collapsed'
+
     addCountsToHeader: ->
       stats = @countPosterity()
       html = """
@@ -91,6 +111,7 @@ define [
 
     afterRender: ->
       super
+      @collapse() if @options.collapsed
       if @model.get('read_state') is 'unread'
         @readMarker ?= new MarkAsReadWatcher this
         # this is throttled so calling it here is okay

@@ -18,8 +18,8 @@
     border: 0 none !important; }
 
   html, body {
-    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
-    color: black;
+    font-family: Arial, Helvetica, sans-serif;
+    color: black !important;
     font-size: 10pt;
     background: transparent none !important; }
 
@@ -40,18 +40,24 @@
       text-decoration: underline; } }
 
   #breadcrumbs {
+    margin: 0; padding: 0;
+    margin-bottom: 10px;
     box-shadow: 0 0 0 white;
     ul {
+      margin: 0; padding: 0;
       li {
+        margin: 0; padding: 0;
         padding-left: 10px;
         &:after {
           content: "   →   "; }
         &:last-child:after {
           content: ""; }
+        &:first-of-type {
+          padding-left: 0; }  
         &.home {
           display: none; } }
       a {
-        text-decoration: none;
+        text-decoration: none !important;
         padding-right: 10px; } } }
 
   a {
@@ -61,4 +67,5 @@
     &[href^="/"]:after, &[href^="#"]:after {
       content: ""; }
   }
+  
 }

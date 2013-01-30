@@ -91,10 +91,31 @@ describe Role do
       role.should be_valid
     end
 
-    it "should infer the root account id" do
-      role = @account.roles.create :name => "1337 Student"
+    it "should disallow names that match base sis enrollment role names" do
+      role = @account.roles.create
       role.base_role_type = 'StudentEnrollment'
-      role.save!
+
+      role.name = 'student'
+      role.should_not be_valid
+
+      role.name = 'teacher'
+      role.should_not be_valid
+
+      role.name = 'ta'
+      role.should_not be_valid
+
+      role.name = 'designer'
+      role.should_not be_valid
+
+      role.name = 'observer'
+      role.should_not be_valid
+
+      role.name = 'cheater'
+      role.should be_valid
+    end
+
+    it "should infer the root account id" do
+      role = custom_student_role("1337 Student")
       role.root_account_id.should == @account.id
     end
   end
@@ -107,9 +128,7 @@ describe Role do
       @root_account_2 = account_model
       @sub_account_2 = @root_account_2.sub_accounts.create!
 
-      @role = @sub_account_1a.roles.create :name => 'TestRole'
-      @role.base_role_type = 'StudentEnrollment'
-      @role.save!
+      @role = custom_student_role('TestRole', :account => @sub_account_1a)
     end
 
     it "should infer the root account name" do
@@ -138,10 +157,14 @@ describe Role do
   context "with active role" do
     before do
       account_model
-      @role = @account.roles.create :name => "1337 Student"
-      @role.base_role_type = 'StudentEnrollment'
-      @role.save!
+      @role = custom_student_role("1337 Student")
       @role.reload
+    end
+
+    it "should not allow a duplicate role to be created in the same account" do
+      dup_role = @account.roles.create :name => "1337 Student"
+      dup_role.base_role_type = 'StudentEnrollment'
+      dup_role.should be_invalid
     end
 
     describe "workflow" do
@@ -168,9 +191,7 @@ describe Role do
 
     describe "active scope" do
       before do
-        @deleted_role = @account.roles.create :name => 'Stupid Role'
-        @deleted_role.base_role_type = 'TaEnrollment'
-        @deleted_role.save!
+        @deleted_role = custom_ta_role("Stupid Role")
         @deleted_role.destroy
       end
 
@@ -180,4 +201,59 @@ describe Role do
       end
     end
   end
+
+  context "custom role helpers" do
+    before do
+      account_model
+      @sub_account = @account.sub_accounts.create!
+      @base_types = RoleOverride::ENROLLMENT_TYPES.map{|et|et[:base_role_name]}
+      @base_types.each do |bt|
+        if bt == 'DesignerEnrollment'
+          custom_role(bt, "custom #{bt}", :account => @sub_account)
+        else
+          custom_role(bt, "custom #{bt}")
+        end
+      end
+    end
+
+    def get_base_type(hash, name)
+      hash.find{|br|br[:base_role_name] == name}
+    end
+
+    it "should find all custom roles" do
+      all = Role.all_enrollment_roles_for_account(@sub_account)
+      @base_types.each do |bt|
+        get_base_type(all, bt)[:custom_roles][0][:name].should == "custom #{bt}"
+      end
+
+      expect { Role.all_enrollment_roles_for_account(@sub_account) }.to_not raise_error
+    end
+
+    it "should get counts for all roles" do
+      course(:account => @sub_account)
+
+      @base_types.each do |bt|
+        @course.enroll_user(user, bt)
+        @course.enroll_user(user, bt, :role_name => "custom #{bt}")
+      end
+
+      all = Role.custom_roles_and_counts_for_course(@course, @course.teachers.first)
+
+      @base_types.each do |bt|
+        hash = get_base_type(all, bt)
+        hash[:count].should == 1
+        hash[:custom_roles][0][:count].should == 1
+      end
+    end
+
+    it "should include inactive roles" do
+      @account.roles.each{|r| r.deactivate! }
+      all = Role.all_enrollment_roles_for_account(@sub_account, true)
+      @base_types.each do |bt|
+        get_base_type(all, bt)[:custom_roles][0][:name].should == "custom #{bt}"
+      end
+    end
+  end
+
+
 end

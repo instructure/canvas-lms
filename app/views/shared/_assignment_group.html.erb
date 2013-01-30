@@ -30,7 +30,7 @@
         <a href="#" class="edit_group_link no-hover">
           <i class="icon-edit standalone-icon"></i><span class="screen-reader-text"><%= t('alts.edit_group_details', "Edit") %></span>
         </a>
-        <% if !group || !group.has_frozen_assignments?(@current_user) %>
+        <% if (!group || !group.has_frozen_assignment_group_id_assignment?(@current_user)) %>
           <a href="<%= context_url(@context, :controller => :assignment_groups, :action => :destroy, :id => (assignment_group ? assignment_group.id : "{{ id }}")) %>" class="delete_group_link no-hover">
             <i class="icon-end standalone-icon"></i><span class="screen-reader-text"><%= t('alts.delete_assignment_group', "Delete Assignment Group") %></span>
           </a>

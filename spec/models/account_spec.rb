@@ -336,6 +336,29 @@ describe Account do
     end
   end
 
+  context "closest_turnitin_pledge" do
+    it "should work for custom sub, custom root" do
+      root_account = Account.create!(:turnitin_pledge => "root")
+      sub_account = Account.create!(:parent_account => root_account, :turnitin_pledge => "sub")
+      root_account.closest_turnitin_pledge.should == "root"
+      sub_account.closest_turnitin_pledge.should == "sub"
+    end
+
+    it "should work for nil sub, custom root" do
+      root_account = Account.create!(:turnitin_pledge => "root")
+      sub_account = Account.create!(:parent_account => root_account)
+      root_account.closest_turnitin_pledge.should == "root"
+      sub_account.closest_turnitin_pledge.should == "root"
+    end
+
+    it "should work for nil sub, nil root" do
+      root_account = Account.create!
+      sub_account = Account.create!(:parent_account => root_account)
+      root_account.closest_turnitin_pledge.should_not be_empty
+      sub_account.closest_turnitin_pledge.should_not be_empty
+    end
+  end
+
   it "should make a default enrollment term if necessary" do
     a = Account.create!(:name => "nada")
     a.enrollment_terms.size.should == 1
@@ -429,7 +452,9 @@ describe Account do
     some_access = [:read_reports] + limited_access
     hash.each do |k, v|
       account = v[:account]
-      account.role_overrides.create(:permission => 'read_reports', :enrollment_type => 'Restricted Admin', :enabled => true)
+      account.role_overrides.create!(:permission => 'read_reports', :enrollment_type => 'Restricted Admin', :enabled => true)
+      # clear caches
+      v[:account] = Account.find(account)
     end
     RoleOverride.clear_cached_contexts
     hash.each do |k, v|
@@ -844,6 +869,45 @@ describe Account do
         sa = Account.find(sa)
         sa.account_users_for(@user).should == []
       end
+    end
+  end
+
+  describe "available_course_roles_by_name" do
+    before do
+      account_model
+      @roleA = @account.roles.create :name => 'A'
+      @roleA.base_role_type = 'StudentEnrollment'
+      @roleA.save!
+      @roleB = @account.roles.create :name => 'B'
+      @roleB.base_role_type = 'StudentEnrollment'
+      @roleB.save!
+      @sub_account = @account.sub_accounts.create!
+      @roleBsub = @sub_account.roles.create :name => 'B'
+      @roleBsub.base_role_type = 'StudentEnrollment'
+      @roleBsub.save!
+    end
+
+    it "should return roles indexed by name" do
+      @account.available_course_roles_by_name.should == { 'A' => @roleA, 'B' => @roleB }
+    end
+
+    it "should not return inactive roles" do
+      @roleB.deactivate!
+      @account.available_course_roles_by_name.should == { 'A' => @roleA }
+    end
+
+    it "should not return deleted roles" do
+      @roleA.destroy
+      @account.available_course_roles_by_name.should == { 'B' => @roleB }
+    end
+
+    it "should find the most derived version of each role" do
+      @sub_account.available_course_roles_by_name.should == { 'A' => @roleA, 'B' => @roleBsub }
+    end
+
+    it "should find a base role if the derived version is inactive" do
+      @roleBsub.deactivate!
+      @sub_account.available_course_roles_by_name.should == { 'A' => @roleA, 'B' => @roleB }
     end
   end
 end

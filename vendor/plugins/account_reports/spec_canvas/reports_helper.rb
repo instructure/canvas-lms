@@ -25,8 +25,8 @@ module ReportsSpecHelper
     end
   end
 
-  def self.run_report(account,report_type, parameters = {}, column = 0)
-
+  def self.run_report(account,report_type, parameters = {}, sort_column_or_columns = 0)
+    sort_columns = Array(sort_column_or_columns)
     account_report = AccountReport.new(:user => @admin, :account => account, :report_type => report_type)
     account_report.parameters = {}
     account_report.parameters = parameters
@@ -35,13 +35,13 @@ module ReportsSpecHelper
     if csv_report.is_a? Hash
       csv_report.inject({}) do |result, (key, csv)|
         all_parsed = FasterCSV.parse(csv).to_a
-        all_parsed[1..-1].sort_by { |r| r[column] }
+        all_parsed[1..-1].sort_by { |r| r.values_at(*sort_columns).join }
         result[key] = all_parsed
         result
       end
     else
       all_parsed = FasterCSV.parse(csv_report).to_a
-      all_parsed[1..-1].sort_by { |r| r[column] }
+      all_parsed[1..-1].sort_by { |r| r.values_at(*sort_columns).join }
     end
   end
 end

@@ -146,8 +146,8 @@ ActionController::Routing::Routes.draw do |map|
   # and the application_helper method :context_url to make retrieving
   # these contexts, and also generating context-specific urls, easier.
   map.resources :courses do |course|
-    course.self_enrollment 'self_enrollment/:self_enrollment', :controller => 'courses', :action => 'self_enrollment'
-    course.self_unenrollment 'self_unenrollment/:self_unenrollment', :controller => 'courses', :action => 'self_unenrollment'
+    course.self_enrollment 'self_enrollment/:self_enrollment', :controller => 'courses', :action => 'self_enrollment', :conditions => {:method => :get}
+    course.self_unenrollment 'self_unenrollment/:self_unenrollment', :controller => 'courses', :action => 'self_unenrollment', :conditions => {:method => :post}
     course.restore 'restore', :controller => 'courses', :action => 'restore'
     course.backup 'backup', :controller => 'courses', :action => 'backup'
     course.unconclude 'unconclude', :controller => 'courses', :action => 'unconclude'
@@ -503,6 +503,8 @@ ActionController::Routing::Routes.draw do |map|
   map.register "register", :controller => "users", :action => "new"
   map.register_from_website "register_from_website", :controller => "users", :action => "new"
   map.registered "registered", :controller => "users", :action => "registered"
+  map.enroll 'enroll/:self_enrollment_code', :controller => 'self_enrollments', :action => 'new', :conditions => {:method => :get}
+  map.enroll_frd 'enroll/:self_enrollment_code', :controller => 'self_enrollments', :action => 'create', :conditions => {:method => :post}
   map.services 'services', :controller => 'users', :action => 'services'
   map.bookmark_search 'search/bookmarks', :controller => 'users', :action => 'bookmark_search'
   map.search_rubrics 'search/rubrics', :controller => "search", :action => "rubrics"
@@ -527,7 +529,6 @@ ActionController::Routing::Routes.draw do |map|
     user.assignments_needing_grading 'assignments_needing_grading', :controller => 'users', :action => 'assignments_needing_grading'
     user.assignments_needing_submitting 'assignments_needing_submitting', :controller => 'users', :action => 'assignments_needing_submitting'
     user.admin_merge 'admin_merge', :controller => 'users', :action => 'admin_merge', :conditions => {:method => :get}
-    user.confirm_merge 'merge', :controller => 'users', :action => 'confirm_merge', :conditions => {:method => :get}
     user.merge 'merge', :controller => 'users', :action => 'merge', :conditions => {:method => :post}
     user.grades 'grades', :controller => 'users', :action => 'grades'
     user.resources :user_notes
@@ -653,6 +654,8 @@ ActionController::Routing::Routes.draw do |map|
       courses.put 'courses/:id', :action => :update
       courses.get 'courses/:id', :action => :show
       courses.get 'courses/:course_id/students', :action => :students
+      courses.get 'courses/:course_id/settings', :action => :settings, :path_name => 'course_settings'
+      courses.put 'courses/:course_id/settings', :action => :update_settings
       courses.get 'courses/:course_id/recent_students', :action => :recent_students, :path_name => 'course_recent_students'
       courses.get 'courses/:course_id/users', :action => :users, :path_name => 'course_users'
       courses.get 'courses/:course_id/users/:id', :action => :user, :path_name => 'course_user'
@@ -760,6 +763,10 @@ ActionController::Routing::Routes.draw do |map|
       topic_routes(topics, "collection_item")
     end
 
+    api.with_options(:controller => :collaborations) do |collaborations|
+      collaborations.get 'collaborations/:id/members', :action => :members, :path_name => 'collaboration_members'
+    end
+
     api.with_options(:controller => :external_tools) do |tools|
       def et_routes(route_object, context)
         route_object.get "#{context}s/:#{context}_id/external_tools/:external_tool_id", :action => :show, :path_name => "#{context}_external_tool_show"
@@ -825,7 +832,8 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :role_overrides) do |roles|
-      roles.get 'accounts/:account_id/roles', :action => :index
+      roles.get 'accounts/:account_id/roles', :action => :api_index, :path_name => 'account_roles'
+      roles.get 'accounts/:account_id/roles/:role', :action => :show
       roles.post 'accounts/:account_id/roles', :action => :add_role
       roles.post 'accounts/:account_id/roles/:role/activate', :action => :activate_role
       roles.put 'accounts/:account_id/roles/:role', :action => :update
@@ -911,6 +919,9 @@ ActionController::Routing::Routes.draw do |map|
     api.with_options(:controller => :groups) do |groups|
       groups.resources :groups, :except => [:index]
       groups.get 'users/self/groups', :action => :index, :path_name => "current_user_groups"
+      groups.get 'accounts/:account_id/groups', :action => :context_index, :path_name => 'account_user_groups'
+      groups.get 'courses/:course_id/groups', :action => :context_index, :path_name => 'course_user_groups'
+      groups.get 'groups/:group_id/users', :action => :users, :path_name => 'group_users'
       groups.post 'groups/:group_id/invite', :action => :invite
       groups.post 'groups/:group_id/files', :action => :create_file
       groups.get 'groups/:group_id/activity_stream', :action => :activity_stream, :path_name => 'group_activity_stream'

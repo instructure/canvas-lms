@@ -48,6 +48,7 @@ class Group < ActiveRecord::Base
   has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_with_sub_folders, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_detailed, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders, :active_file_attachments], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
+  has_many :collaborators
   has_many :external_feeds, :as => :context, :dependent => :destroy
   has_many :messages, :as => :context, :dependent => :destroy
   belongs_to :wiki
@@ -145,6 +146,14 @@ class Group < ActiveRecord::Base
   def self.find_all_by_context_code(codes)
     ids = codes.map{|c| c.match(/\Agroup_(\d+)\z/)[1] rescue nil }.compact
     Group.find(ids)
+  end
+
+  def self.not_in_group_sql_fragment(groups)
+    "AND NOT EXISTS (SELECT * FROM group_memberships gm
+                      WHERE gm.user_id = u.id AND
+                      gm.workflow_state != 'deleted' AND
+                      gm.group_id IN (#{groups.map(&:id).join ','}))" unless groups.empty?
+
   end
 
   workflow do
@@ -321,7 +330,7 @@ class Group < ActiveRecord::Base
     can :delete and
     can :manage and
     can :manage_admin_users and
-    can :manage_students and 
+    can :manage_students and
     can :moderate_forum and
     can :update
 

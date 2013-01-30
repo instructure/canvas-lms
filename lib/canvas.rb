@@ -42,6 +42,11 @@ module Canvas
     }
     redis = ::Redis::Factory.create(redis_settings[:servers])
     if redis_settings[:database].present?
+      if Rails.env.test?
+        env_test_number = ENV['TEST_ENV_NUMBER']
+        env_test_number = 1 if ENV['TEST_ENV_NUMBER'].blank?
+        redis_settings[:database] = "#{env_test_number}#{redis_settings[:database]}"
+      end
       redis.select(redis_settings[:database])
     end
     redis

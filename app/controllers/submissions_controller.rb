@@ -88,6 +88,9 @@
 #
 #       // The submissions user (see user API) (optional)
 #       user: User
+#
+#       // Whether the submission was made after the applicable due date
+#       late: false
 #     }
 #
 class SubmissionsController < ApplicationController
@@ -258,8 +261,9 @@ class SubmissionsController < ApplicationController
   def create
     params[:submission] ||= {}
     @assignment = @context.assignments.active.find(params[:assignment_id])
+    @assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @current_user)
     if authorized_action(@assignment, @current_user, :submit)
-      if @assignment.locked_for?(@current_user) && !@assignment.grants_right?(@current_user, nil, :update)
+          if @assignment.locked_for?(@current_user) && !@assignment.grants_right?(@current_user, nil, :update)
         flash[:notice] = t('errors.can_not_submit_locked_assignment', "You can't submit an assignment when it is locked")
         redirect_to named_context_url(@context, :context_assignment_user, @assignment.id)
         return

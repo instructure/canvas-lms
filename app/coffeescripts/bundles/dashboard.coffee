@@ -3,11 +3,7 @@ require [
   'Backbone',
   'jquery',
   'i18n!dashboard'
-  'compiled/registration/incompleteRegistrationWarning'
-], (_, {View}, $, I18n, incompleteRegistrationWarning) ->
-
-  if ENV.INCOMPLETE_REGISTRATION
-    incompleteRegistrationWarning(ENV.USER_EMAIL)
+], (_, {View}, $, I18n) ->
 
   class DashboardView extends View
 
@@ -15,6 +11,7 @@ require [
 
     events:
       'click .stream_header': 'expandDetails'
+      'click .stream_header .links': 'stopPropagation'
       'click .stream-details': 'handleDetailsClick'
       'beforeremove': 'updateCategoryCounts' # ujsLinks event
 

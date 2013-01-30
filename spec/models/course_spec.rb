@@ -52,13 +52,26 @@ describe Course do
     @course.enrollment_term.update_attribute(:end_at, Time.now + 1.week)
     @course.should_not be_soft_concluded
   end
-  
+
+  describe "allow_student_discussion_topics" do
+
+    it "should default true" do
+      @course.allow_student_discussion_topics.should == true
+    end
+
+    it "should set and get" do
+      @course.allow_student_discussion_topics = false
+      @course.save!
+      @course.allow_student_discussion_topics.should == false
+    end
+  end
+
   context "validation" do
     it "should create a new instance given valid attributes" do
       course_model
     end
   end
-  
+
   it "should create a unique course." do
     @course = Course.create_unique
     @course.name.should eql("My Course")
@@ -66,7 +79,7 @@ describe Course do
     @course2 = Course.create_unique(@uuid)
     @course.should eql(@course2)
   end
-  
+
   it "should always have a uuid, if it was created" do
     @course.save!
     @course.uuid.should_not be_nil
@@ -483,6 +496,25 @@ describe Course do
       events.should include assignment
     end
   end
+
+  context "migrate_content_links" do
+    it "should ignore types not in the supported_types arg" do
+      c1 = course_model
+      c2 = course_model
+      orig = <<-HTML
+      We aren't translating <a href="/courses/#{c1.id}/assignments/5">links to assignments</a>
+      HTML
+      html = Course.migrate_content_links(orig, c1, c2, ['files'])
+      html.should == orig
+    end
+  end
+
+  it "should be marshal-able" do
+    c = Course.new(:name => 'c1')
+    Marshal.dump(c)
+    c.save!
+    Marshal.dump(c)
+  end
 end
 
 describe Course, "enroll" do
@@ -787,7 +819,7 @@ describe Course, "gradebook_to_csv" do
       rows[0][2].should == 'SIS User ID'
       rows[0][3].should == 'SIS Login ID'
       rows[0][4].should == 'Section'
-      rows[1][0].should == 'Muted assignments do not impact Current and Final score columns'
+      rows[1][0].should == ''
       rows[1][5].should == 'Muted'
       rows[1][6].should == ''
       rows[2][2].should == ''
@@ -2591,7 +2623,7 @@ describe Course, "section_visibility" do
     @course.enroll_user(@student2, "StudentEnrollment", :section => @other_section, :enrollment_state => 'active')
 
     @observer = User.create
-    @course.enroll_user(@observer, "ObserverEnrollment")
+    @course.enroll_user(@observer, "ObserverEnrollment").update_attribute(:associated_user_id, @student1.id)
   end
 
   it "should return a scope from sections_visible_to" do
@@ -2634,32 +2666,29 @@ describe Course, "section_visibility" do
   end
 
   context "restricted" do
-    it "should return no students" do
-      @course.students_visible_to(@observer).should eql []
+    it "should return no students except self and the observed" do
+      @course.students_visible_to(@observer).should eql [@student1]
+      RoleOverride.create!(:context => @course.account, :permission => 'read_roster',
+                           :enrollment_type => "StudentEnrollment", :enabled => false)
+      @course.students_visible_to(@student1).should eql [@student1]
     end
 
     it "should return no sections" do
       @course.sections_visible_to(@observer).should eql []
+      RoleOverride.create!(:context => @course.account, :permission => 'read_roster',
+                           :enrollment_type => "StudentEnrollment", :enabled => false)
+      @course.sections_visible_to(@student1).should eql []
     end
   end
 
-  context "migrate_content_links" do
-    it "should ignore types not in the supported_types arg" do
-      c1 = course_model
-      c2 = course_model
-      orig = <<-HTML
-      We aren't translating <a href="/courses/#{c1.id}/assignments/5">links to assignments</a>
-      HTML
-      html = Course.migrate_content_links(orig, c1, c2, ['files'])
-      html.should == orig
+  context "require_message_permission" do
+    it "should check the message permission" do
+      @course.enrollment_visibility_level_for(@teacher, @course.section_visibilities_for(@teacher), true).should eql :full
+      @course.enrollment_visibility_level_for(@observer, @course.section_visibilities_for(@observer), true).should eql :restricted
+      RoleOverride.create!(:context => @course.account, :permission => 'send_messages',
+                           :enrollment_type => "StudentEnrollment", :enabled => false)
+      @course.enrollment_visibility_level_for(@student1, @course.section_visibilities_for(@student1), true).should eql :restricted
     end
-  end
-
-  it "should be marshal-able" do
-    c = Course.new(:name => 'c1')
-    Marshal.dump(c)
-    c.save!
-    Marshal.dump(c)
   end
 end
 
@@ -2850,6 +2879,15 @@ describe Course, "student_view_student" do
     course_with_teacher(:active_all => true)
   end
 
+  it "should create a default section when enrolling for student view student" do
+    student_view_course = Course.create!
+    student_view_course.course_sections.should be_empty
+
+    student_view_student = student_view_course.student_view_student
+
+    student_view_course.enrollments.map(&:user_id).should be_include(student_view_student.id)
+  end
+
   it "should create and return the student view student for a course" do
     expect { @course.student_view_student }.to change(User, :count).by(1)
   end
@@ -2997,6 +3035,66 @@ describe Course do
     it "should return a scope" do
       # can't use "should respond_to", because that delegates to the instantiated Array
       lambda{ @course.groups_visible_to(@user).scoped({}) }.should_not raise_exception
+    end
+  end
+
+  describe 'permission policies' do
+    before do
+      @course = course_model
+      @course.write_attribute(:workflow_state, 'available')
+      @course.write_attribute(:is_public, true)
+    end
+
+    it 'can be read by a nil user if public and available' do
+      @course.check_policy(nil).should == [:read, :read_outcomes]
+    end
+
+    it 'cannot be read by a nil user if public but not available' do
+      @course.write_attribute(:workflow_state, 'created')
+      @course.check_policy(nil).should == []
+    end
+
+    describe 'when course is not public' do
+      before do
+        @course.write_attribute(:is_public, false)
+      end
+
+      let(:user) { user_model }
+
+
+      it 'cannot be read by a nil user' do
+        @course.check_policy(nil).should == []
+      end
+
+      it 'cannot be read by an unaffiliated user' do
+        @course.check_policy(user).should == []
+      end
+
+      it 'can be read by a prior user' do
+        user.enrollments.create!(:workflow_state => 'completed', :course => @course)
+        @course.check_policy(user).should == [:read, :read_outcomes]
+      end
+
+      it 'can have its forum read by an observer' do
+        enrollment = user.observer_enrollments.create!(:workflow_state => 'completed', :course => @course)
+        enrollment.update_attribute(:associated_user_id, user.id)
+        @course.check_policy(user).should include :read_forum
+      end
+
+      describe 'an instructor policy' do
+
+        let(:instructor) do
+          user.teacher_enrollments.create!(:workflow_state => 'completed', :course => @course)
+          user
+        end
+
+        subject{ @course.check_policy(instructor) }
+
+        it{ should include :read_prior_roster }
+        it{ should include :view_all_grades }
+        it{ should include :delete }
+      end
+
     end
   end
 
@@ -3191,24 +3289,127 @@ describe Course do
       end
     end
   end
+
+  describe '#includes_student' do
+    let(:course) { course_model }
+
+    it 'returns true when the provided user is a student' do
+      student = user_model
+      student.student_enrollments.create!(:course => course)
+      course.includes_student?(student).should be_true
+    end
+
+    it 'returns false when the provided user is not a student' do
+      course.includes_student?(User.create!).should be_false
+    end
+
+    it 'returns false when the user is not yet even in the database' do
+      course.includes_student?(User.new).should be_false
+    end
+
+    it 'returns false when the provided user is nil' do
+      course.includes_student?(nil).should be_false
+    end
+  end
 end
 
 describe Course do
   context "re-enrollments" do
     it "should update concluded enrollment on re-enrollment" do
       @course = course(:active_all => true)
-      
-      @user1 = user_model; @user1.sortable_name = 'jonny'; @user1.save      
+
+      @user1 = user_model
+      @user1.sortable_name = 'jonny'
+      @user1.save
       @course.enroll_user(@user1)
-      
+
       enrollment_count = @course.enrollments.count
-      
+
       @course.complete
       @course.unconclude
-      
+
       @course.enroll_user(@user1)
-      
+
       @course.enrollments.count.should == enrollment_count
+    end
+
+    describe "already_enrolled" do
+      before do
+        course
+        user
+      end
+
+      it "should not be set for a new enrollment" do
+        @course.enroll_user(@user).already_enrolled.should_not be_true
+      end
+
+      it "should be set for an updated enrollment" do
+        @course.enroll_user(@user)
+        @course.enroll_user(@user).already_enrolled.should be_true
+      end
+    end
+
+    context "custom roles" do
+      before do
+        @account = Account.default
+        course
+        user
+        custom_student_role('LazyStudent')
+        custom_student_role('HonorStudent')
+      end
+
+      it "should re-use an enrollment with the same role" do
+        enrollment1 = @course.enroll_user(@user, 'StudentEnrollment', :role_name => 'HonorStudent')
+        enrollment2 = @course.enroll_user(@user, 'StudentEnrollment', :role_name => 'HonorStudent')
+        @user.enrollments.count.should eql 1
+        enrollment1.should eql enrollment2
+      end
+
+      it "should not re-use an enrollment with a different role" do
+        enrollment1 = @course.enroll_user(@user, 'StudentEnrollment', :role_name => 'LazyStudent')
+        enrollment2 = @course.enroll_user(@user, 'StudentEnrollment', :role_name => 'HonorStudent')
+        @user.enrollments.count.should eql 2
+        enrollment1.should_not eql enrollment2
+      end
+
+      it "should not re-use an enrollment with no role when enrolling with a role" do
+        enrollment1 = @course.enroll_user(@user, 'StudentEnrollment')
+        enrollment2 = @course.enroll_user(@user, 'StudentEnrollment', :role_name => 'HonorStudent')
+        @user.enrollments.count.should eql 2
+        enrollment1.should_not eql enrollment2
+      end
+
+      it "should not re-use an enrollment with a role when enrolling with no role" do
+        enrollment1 = @course.enroll_user(@user, 'StudentEnrollment', :role_name => 'LazyStudent')
+        enrollment2 = @course.enroll_user(@user, 'StudentEnrollment')
+        @user.enrollments.count.should eql 2
+        enrollment1.should_not eql enrollment2
+      end
+    end
+  end
+
+  describe "short_name_slug" do
+    before :each do
+      @course = course(:active_all => true)
+    end
+
+    it "should hard truncate at 30 characters" do
+      @course.short_name = "a" * 31
+      @course.short_name.length.should == 31
+      @course.short_name_slug.length.should == 30
+      @course.short_name.should =~ /^#{@course.short_name_slug}/
+    end
+
+    it "should not change the short_name" do
+      short_name = "a" * 31
+      @course.short_name = short_name
+      @course.short_name_slug.should_not == @course.short_name
+      @course.short_name.should == short_name
+    end
+
+    it "should leave short short_names alone" do
+      @course.short_name = 'short short_name'
+      @course.short_name_slug.should == @course.short_name
     end
   end
 end

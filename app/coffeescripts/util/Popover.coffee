@@ -3,6 +3,18 @@ define [
   # 'jquery'
 ], () ->
 
+
+  # you can provide a 'using' option to jqueryUI position
+  # it will be passed the position cordinates and a feedback object which,
+  # among other things, tells you where it positioned it relative to the target. we use it to add some
+  # css classes that handle putting the pointer triangle (aka: caret) back to the trigger.
+  using = ( position, feedback ) ->
+    $( this )
+      .css( position )
+      .toggleClass('carat-bottom', feedback.vertical == 'bottom')
+
+
+
   idCounter = 0
   activePopovers = []
 
@@ -75,5 +87,6 @@ define [
         at: 'center top',
         of: @trigger,
         offset: '0 -10px',
-        within: '#main',
-        collision: 'fit fit'
+        within: 'body',
+        collision: 'flipfit flipfit'
+        using: using

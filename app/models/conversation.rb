@@ -47,6 +47,9 @@ class Conversation < ActiveRecord::Base
   end
 
   def self.initiate(user_ids, private)
+    if user_ids.first.is_a?(User)
+      user_ids = user_ids.map(&:id)
+    end
     user_ids = user_ids.map(&:to_i).uniq
     private_hash = private ? private_hash_for(user_ids) : nil
     transaction do
@@ -142,6 +145,9 @@ class Conversation < ActiveRecord::Base
   end
 
   def add_participants(current_user, user_ids, options={})
+    if user_ids.first.is_a?(User)
+      user_ids = users_ids.map(&:id)
+    end
     user_ids = user_ids.map(&:to_i).uniq
     raise "can't add participants to a private conversation" if private?
     transaction do

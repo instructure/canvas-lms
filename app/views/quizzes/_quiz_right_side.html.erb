@@ -74,13 +74,9 @@
       <% if allow_take && can_do(@quiz, @current_user, :submit) %>
         <div style="margin-top: 10px; font-size: 1.2em;">
         <% if (!@locked && (@quiz.unlimited_attempts? || @submission.attempts_left > 0)) || can_do(@quiz, @current_user, :update) %>
-          <% link_to context_url(@context, :context_quiz_take_url, @quiz.id, :user_id => @current_user && @current_user.id), :method => :post do %><%= @quiz.survey? ?
-            t('links.take_survey_again', "Take the Survey Again") :
-            t('links.take_quiz_again', "Take the Quiz Again") %><% end %><br/>
+          <%= link_to_take_or_retake_poll %><br/>
           <span style="font-size: 0.7em; padding-left: 20px;">
-            (<%= @quiz.scoring_policy == "keep_highest" ?
-                 t(:will_keep_highest_score, "Will keep the highest of all your scores") :
-                 t(:will_keep_latest_score, "Will keep the latest of all your scores") %>)
+            (<%= score_to_keep_message %>)
           </span>
         <% end %>
         </div>

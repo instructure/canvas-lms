@@ -96,26 +96,20 @@
     </thead>
 
     <tbody>
-      <tr>
-        <td><%= before_label('students', 'Students') %></td>
-        <td class="student_count"><%= user_count(@user_counts[:student]) %></td>
-      </tr>
-      <tr>
-        <td><%= before_label('teachers', 'Teachers') %></td>
-        <td class="teacher_count"><%= user_count(@user_counts[:teacher]) %></td>
-      </tr>
-      <tr>
-        <td><%= before_label('tas', 'TAs') %></td>
-        <td class="ta_count"><%= user_count(@user_counts[:ta]) %></td>
-      </tr>
-      <tr>
-        <td><%= before_label('observers', 'Observers') %></td>
-        <td class="observer_count"><%= user_count(@user_counts[:observer]) %></td>
-      </tr>
-      <tr>
-        <td><%= before_label('designers', 'Designers') %></td>
-        <td class="designer_count"><%= user_count(@user_counts[:designer]) %></td>
-      </tr>
+      <% @all_roles.each do |base_role| %>
+        <tr>
+          <td><%= base_role[:plural_label] %>:</td>
+          <td><%= user_count(base_role[:count]) %></td>
+        </tr>
+        <% base_role[:custom_roles].each do |cr|
+           next if skip_custom_role?(cr)
+        %>
+          <tr>
+            <td><%= cr[:label] %>:</td>
+            <td><%= user_count(cr[:count]) %></td>
+          </tr>
+        <% end %>
+      <% end %>
     </tbody>
   </table>
 </div>

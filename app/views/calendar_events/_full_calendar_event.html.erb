@@ -66,15 +66,11 @@
         <div><%= f.text_area :description, :style => 'width: 100%;' %></div>
       </td>
     </tr>
-    <tr>
-      <td colspan="4">
-        <div class="form-actions">
-          <button type="button" class="btn cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
-          <button type="submit" class="btn btn-primary submit_button"><%= calendar_event.new_record? ? t('buttons.create', "Create Event") : t('buttons.update', "Update Event") %></button>
-        </div>
-      </td>
-    </tr>
   </table>
+  <div class="form-actions">
+    <button type="button" class="btn cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+    <button type="submit" class="btn btn-primary submit_button"><%= calendar_event.new_record? ? t('buttons.create', "Create Event") : t('buttons.update', "Update Event") %></button>
+  </div>
   <% end %>
   <% end %>
 </div>

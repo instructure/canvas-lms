@@ -20,24 +20,27 @@ module Api::V1::Role
   include Api::V1::Json
   include Api::V1::Account
 
-  def role_json(account, role, current_user, session)
-    base_role_type, workflow_state = Role.get_base_role_and_workflow_state(role, account)
+  def role_json(account, role, current_user, session, opts={})
     json = {
       :account => account_json(account, current_user, session, []),
-      :role => role,
-      :base_role_type => base_role_type,
-      :workflow_state => workflow_state,
+      :role => role.name,
+      :label => role.label,
+      :base_role_type => role.base_role_type,
+      :workflow_state => role.workflow_state,
       :permissions => {}
     }
 
     RoleOverride.manageable_permissions(account).keys.each do |permission|
-      json[:permissions][permission] = permission_json(RoleOverride.permission_for(account, permission, base_role_type, role), current_user, session)
+      json[:permissions][permission] = permission_json(RoleOverride.permission_for(account, permission, role.base_role_type, role.name), current_user, session)
     end
 
     json
   end
 
   def permission_json(permission, current_user, session)
+    permission[:enabled] = !!permission[:enabled]
+    permission[:prior_default] = !!permission[:prior_default]
+    permission.delete(:prior_default) unless permission[:explicit]
     permission.slice(:enabled, :locked, :readonly, :explicit, :prior_default)
   end
 end

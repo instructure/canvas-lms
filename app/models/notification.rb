@@ -123,6 +123,7 @@ class Notification < ActiveRecord::Base
       message.user = user
       message.context = asset
       message.asset_context = opts[:asset_context] || asset.context(user) rescue asset
+      message.data = opts[:data] if opts[:data]
       message.parse!('summary')
       delayed_message = DelayedMessage.new(
         :notification => self,
@@ -196,7 +197,9 @@ class Notification < ActiveRecord::Base
       should_summarize = user && self.summarizable? && too_many_messages?(user)
       channels = CommunicationChannel.find_all_for(user, self, cc)
       fallback_channel = channels.sort_by{|c| c.path_type }.first
-      record_delayed_messages((options || {}).merge(:user => user, :communication_channel => cc, :asset => user_asset, :fallback_channel => should_summarize ? channels.first : nil))
+      delayed_options = (options || {}).merge(:user => user, :communication_channel => cc, :asset => user_asset, :fallback_channel => should_summarize ? channels.first : nil)
+      delayed_options[:data] = data if data
+      record_delayed_messages(delayed_options)
       if should_summarize
         channels = channels.select{|cc| cc.path_type != 'email' && cc.path_type != 'sms' }
       end
@@ -221,7 +224,7 @@ class Notification < ActiveRecord::Base
         message.context = user_asset
         message.asset_context = options[:asset_context] || user_asset.context(user) rescue user_asset
         message.notification_category = self.category
-        message.delay_for = self.delay_for if self.delay_for 
+        message.delay_for = self.delay_for if self.delay_for
         message.data = data if data
         message.parse!
         # keep track of new messages added for caching so we don't

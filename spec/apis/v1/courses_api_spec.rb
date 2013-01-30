@@ -1025,6 +1025,45 @@ describe CoursesController, :type => :integration do
     end
   end
 
+  describe "/settings" do
+    before do
+      course_with_teacher_logged_in(:active_all => true)
+    end
+
+    it "should render settings json" do
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/settings", {
+        :controller => 'courses',
+        :action => 'settings',
+        :course_id => @course.to_param,
+        :format => 'json'
+      })
+      json.should == {
+        'allow_student_discussion_topics' => true,
+        'allow_student_forum_attachments' => false
+      }
+    end
+
+    it "should update settings" do
+      json = api_call(:put, "/api/v1/courses/#{@course.id}/settings", {
+        :controller => 'courses',
+        :action => 'update_settings',
+        :course_id => @course.to_param,
+        :format => 'json'
+      }, {
+        :allow_student_discussion_topics => false,
+        :allow_student_forum_attachments => true
+      })
+      json.should == {
+        'allow_student_discussion_topics' => false,
+        'allow_student_forum_attachments' => true
+      }
+      @course.reload
+      @course.allow_student_discussion_topics.should == false
+      @course.allow_student_forum_attachments.should == true
+    end
+
+  end
+
   describe "/recent_students" do
     before do
       course_with_teacher_logged_in(:active_all => true)

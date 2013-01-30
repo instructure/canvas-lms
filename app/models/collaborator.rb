@@ -17,16 +17,30 @@
 #
 
 class Collaborator < ActiveRecord::Base
-  attr_accessible :user, :collaboration, :authorized_service_user_id
-  belongs_to :user
+  attr_accessible :authorized_service_user_id, :collaboration, :group, :user
+
   belongs_to :collaboration
-  
+  belongs_to :group
+  belongs_to :user
+
   has_a_broadcast_policy
-  
+
   set_broadcast_policy do |p|
     p.dispatch :collaboration_invitation
-    p.to { self.collaboration.collaboration_type == 'google_docs' ? self.user.gmail_channel : self.user }
-    p.whenever {|record| record.just_created && record.collaboration && record.user != record.collaboration.user }
+    p.to {
+      if self.collaboration.collaboration_type == 'google_docs'
+        self.group_id.nil? ? self.user.gmail_channel : (self.group.users - [self.user]).map(&:gmail_channel)
+      else
+        self.group_id.nil? ? self.user : self.group.users - [self.user]
+      end
+    }
+    p.whenever { |record|
+      if record.group_id.nil?
+        record.just_created && record.collaboration && record.user != record.collaboration.user
+      else
+        record.just_created && record.collaboration
+      end
+    }
   end
 
   def context

@@ -81,8 +81,12 @@ describe GradebookUploadsController do
       a_sub = @assignment.reload.submissions.first
       a2_sub = @assignment2.reload.submissions.first
       a_sub.grade.should == '5'
+      a_sub.graded_at.should_not be_nil
+      a_sub.grader_id.should_not be_nil
       a_sub.version_number.should == 2
       a2_sub.grade.should == '7'
+      a2_sub.graded_at.should_not be_nil
+      a2_sub.grader_id.should_not be_nil
       a2_sub.version_number.should == 2
     end
     

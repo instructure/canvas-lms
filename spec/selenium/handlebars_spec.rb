@@ -48,7 +48,7 @@ describe "handlebars" do
     RESULT
   end
 
-  it "should 'require' partials used within template" do
+  it "should require partials used within template" do
     driver.execute_script Handlebars.compile_template("hi from inside partial", "_test_partial")
     driver.execute_script Handlebars.compile_template("outside partial {{>test_partial}}", "test_template")
 

@@ -45,7 +45,8 @@ class Enrollment < ActiveRecord::Base
   after_save :cancel_future_appointments
   after_save :update_linked_enrollments
 
-  attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section
+  attr_accessor :already_enrolled
+  attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section, :already_enrolled
 
   def self.active_student_conditions(prefix = 'enrollments')
     "(#{prefix}.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND #{prefix}.workflow_state = 'active')"
@@ -137,11 +138,21 @@ class Enrollment < ActiveRecord::Base
 
   named_scope :active,
               :conditions => ['enrollments.workflow_state != ?', 'deleted']
+
   named_scope :admin,
               :select => 'course_id',
               :joins => :course,
               :conditions => "enrollments.type IN ('TeacherEnrollment','TaEnrollment', 'DesignerEnrollment')
                               AND (courses.workflow_state = 'claimed' OR (enrollments.workflow_state = 'active' and  courses.workflow_state = 'available'))"
+
+  named_scope :of_admin_type,
+              :conditions => "enrollments.type IN ('TeacherEnrollment','TaEnrollment', 'DesignerEnrollment')"
+
+  named_scope :of_instructor_type,
+              :conditions => "enrollments.type IN ('TeacherEnrollment','TaEnrollment')"
+
+  named_scope :of_content_admins,
+              :conditions => "enrollments.type IN ('TeacherEnrollment', 'DesignerEnrollment')"
 
   named_scope :student,
               :select => 'course_id',
@@ -180,9 +191,9 @@ class Enrollment < ActiveRecord::Base
 
   named_scope :past,
               :joins => :course,
-              :conditions => "courses.workflow_state = 'completed' OR
-                              enrollments.workflow_state IN ('rejected', 'completed')
-                              AND enrollments.workflow_state NOT IN ('invited', 'deleted')"
+              :conditions => "(courses.workflow_state = 'completed'
+                              AND enrollments.workflow_state NOT IN ('invited', 'deleted'))
+                              OR enrollments.workflow_state IN ('rejected', 'completed')"
 
   named_scope :not_fake, :conditions => "enrollments.type != 'StudentViewEnrollment'"
 
@@ -198,6 +209,29 @@ class Enrollment < ActiveRecord::Base
 
   def self.readable_type(type)
     READABLE_TYPES[type] || READABLE_TYPES['StudentEnrollment']
+  end
+
+  SIS_TYPES = {
+      'TeacherEnrollment' => 'teacher',
+      'TaEnrollment' => 'ta',
+      'DesignerEnrollment' => 'designer',
+      'StudentEnrollment' => 'student',
+      'ObserverEnrollment' => 'observer'
+  }
+  def self.sis_type(type)
+    SIS_TYPES[type] || SIS_TYPES['StudentEnrollment']
+  end
+
+  def sis_role
+    self.role_name || Enrollment.sis_type(self.type)
+  end
+
+  def self.valid_types
+    SIS_TYPES.keys
+  end
+
+  def self.valid_type?(type)
+    SIS_TYPES.has_key?(type)
   end
 
   TYPES_WITH_INDEFINITE_ARTICLE = {
@@ -467,13 +501,13 @@ class Enrollment < ActiveRecord::Base
     res
   end
 
-  def accept
-    return false unless invited?
+  def accept(force = false)
+    return false unless force || invited?
     ids = nil
     ids = self.user.dashboard_messages.find_all_by_context_id_and_context_type(self.id, 'Enrollment', :select => "id").map(&:id) if self.user
     Message.delete_all({:id => ids}) if ids && !ids.empty?
     update_attribute(:workflow_state, 'active')
-    user.touch
+    touch_user
   end
 
   workflow do
@@ -582,9 +616,9 @@ class Enrollment < ActiveRecord::Base
   def has_permission_to?(action)
     @permission_lookup ||= {}
     unless @permission_lookup.has_key? action
-      @permission_lookup[action] = RoleOverride.permission_for(course, action, base_role_name, self.role_name)[:enabled]
+      @permission_lookup[action] = RoleOverride.enabled_for?(course, course, action, base_role_name, self.role_name)
     end
-    @permission_lookup[action]
+    @permission_lookup[action].include?(:self)
   end
 
   def base_role_name
@@ -757,7 +791,7 @@ class Enrollment < ActiveRecord::Base
   def student?
     false
   end
-  
+
   def fake_student?
     false
   end

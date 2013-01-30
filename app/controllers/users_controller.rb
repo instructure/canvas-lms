@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -85,10 +85,10 @@ class UsersController < ApplicationController
   include LinkedIn
   include DeliciousDiigo
   include SearchHelper
-  before_filter :require_user, :only => [:grades, :confirm_merge, :merge, :kaltura_session, :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image, :user_dashboard, :toggle_dashboard, :masquerade, :external_tool]
+  before_filter :require_user, :only => [:grades, :merge, :kaltura_session, :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image, :user_dashboard, :toggle_dashboard, :masquerade, :external_tool]
   before_filter :require_registered_user, :only => [:delete_user_service, :create_user_service]
-  before_filter :reject_student_view_student, :only => [:delete_user_service, :create_user_service, :confirm_merge, :merge, :user_dashboard, :masquerade]
-  before_filter :require_open_registration, :only => [:new, :create]
+  before_filter :reject_student_view_student, :only => [:delete_user_service, :create_user_service, :merge, :user_dashboard, :masquerade]
+  before_filter :require_self_registration, :only => [:new, :create]
 
   def grades
     @user = User.find_by_id(params[:user_id]) if params[:user_id].present?
@@ -190,6 +190,7 @@ class UsersController < ApplicationController
           google_docs_get_access_token(oauth_request, params[:oauth_verifier])
           flash[:notice] = t('google_docs_added', "Google Docs access authorized!")
         rescue => e
+          ErrorReport.log_exception(:oauth, e)
           flash[:error] = t('google_docs_fail', "Google Docs authorization failed. Please try again")
         end
       elsif params[:service] == "linked_in"
@@ -197,6 +198,7 @@ class UsersController < ApplicationController
           linked_in_get_access_token(oauth_request, params[:oauth_verifier])
           flash[:notice] = t('linkedin_added', "LinkedIn account successfully added!")
         rescue => e
+          ErrorReport.log_exception(:oauth, e)
           flash[:error] = t('linkedin_fail', "LinkedIn authorization failed. Please try again")
         end
       else
@@ -204,6 +206,7 @@ class UsersController < ApplicationController
           token = twitter_get_access_token(oauth_request, params[:oauth_verifier])
           flash[:notice] = t('twitter_added', "Twitter access authorized!")
         rescue => e
+          ErrorReport.log_exception(:oauth, e)
           flash[:error] = t('twitter_fail_whale', "Twitter authorization failed. Please try again")
         end
       end
@@ -219,7 +222,6 @@ class UsersController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read_roster)
       @root_account = @context.root_account
-      @users = []
       @query = (params[:user] && params[:user][:name]) || params[:term]
       ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
         if @context && @context.is_a?(Account) && @query
@@ -235,10 +237,11 @@ class UsersController < ApplicationController
         end
 
         if api_request?
-          @users = User.of_account(@context).active.order_by_sortable_name
+          @users ||= User.of_account(@context).active.order_by_sortable_name
           @users = Api.paginate(@users, self, api_v1_account_users_url, :order => :sortable_name)
           user_json_preloads(@users)
         else
+          @users ||= []
           @users = @users.paginate(:page => params[:page], :per_page => @per_page, :total_entries => @users.size)
         end
 
@@ -284,10 +287,7 @@ class UsersController < ApplicationController
   end
 
   def user_dashboard
-    if @current_user && @current_user.registered? && params[:registration_success]
-      # user just joined with a course code
-      return redirect_to @current_user.courses.first if @current_user.courses.size == 1
-    end
+    check_incomplete_registration
     get_context
 
     # dont show crubms on dashboard because it does not make sense to have a breadcrumb
@@ -305,9 +305,6 @@ class UsersController < ApplicationController
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
     @pending_invitations = @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]).select { |e| e.invited? }
     @stream_items = @current_user.try(:cached_recent_stream_items) || []
-
-    incomplete_registration = @current_user && @current_user.pre_registered? && params[:registration_success]
-    js_env({:INCOMPLETE_REGISTRATION => incomplete_registration, :USER_EMAIL => @current_user.email})
   end
 
   def toggle_dashboard
@@ -569,11 +566,13 @@ class UsersController < ApplicationController
     render :json => {:deleted => true}
   end
 
+  ServiceCredentials = Struct.new(:service_user_name,:decrypted_password)
+
   def create_user_service
     begin
       user_name = params[:user_service][:user_name]
       password = params[:user_service][:password]
-      service = OpenObject.new(:service_user_name => user_name, :decrypted_password => password)
+      service = ServiceCredentials.new( user_name, password )
       case params[:user_service][:service]
         when 'delicious'
           delicious_get_last_posted(service)
@@ -624,7 +623,7 @@ class UsersController < ApplicationController
       @enrollments = @enrollments.sort_by {|e| [e.state_sortable, e.rank_sortable, e.course.name] }
       # pre-populate the reverse association
       @enrollments.each { |e| e.user = @user }
-      @group_memberships = @user.group_memberships.scoped(:include => :group)
+      @group_memberships = @user.current_group_memberships.scoped(:include => :group)
 
       respond_to do |format|
         format.html
@@ -678,7 +677,10 @@ class UsersController < ApplicationController
 
     manage_user_logins = @context.grants_right?(@current_user, session, :manage_user_logins)
     self_enrollment = params[:self_enrollment].present?
-    allow_password = self_enrollment || manage_user_logins
+    allow_non_email_pseudonyms = manage_user_logins || self_enrollment && params[:pseudonym_type] == 'username'
+    @domain_root_account.email_pseudonyms = !allow_non_email_pseudonyms
+    require_password = self_enrollment && allow_non_email_pseudonyms
+    allow_password = require_password || manage_user_logins
 
     notify = params[:pseudonym].delete(:send_confirmation) == '1'
     notify = :self_registration unless manage_user_logins
@@ -695,7 +697,7 @@ class UsersController < ApplicationController
     end
     @user.name ||= params[:pseudonym][:unique_id]
     unless @user.registered?
-      @user.workflow_state = if self_enrollment
+      @user.workflow_state = if require_password
         # no email confirmation required (self_enrollment_code and password
         # validations will ensure everything is legit)
         'registered'
@@ -727,7 +729,7 @@ class UsersController < ApplicationController
     end
 
     @pseudonym ||= @user.pseudonyms.build(:account => @context)
-    @pseudonym.require_password = self_enrollment
+    @pseudonym.require_password = require_password
     # pre-populate the reverse association
     @pseudonym.user = @user
     # don't require password_confirmation on api calls
@@ -754,7 +756,11 @@ class UsersController < ApplicationController
       # unless the user is registered/pre_registered (if the latter, he still
       # needs to confirm his email and set a password, otherwise he can't get
       # back in once his session expires)
-      @pseudonym.send(:skip_session_maintenance=, true) unless @user.registered? || @user.pre_registered? # automagically logged in
+      if @user.registered? || @user.pre_registered? # automagically logged in
+        PseudonymSession.new(@pseudonym).save unless @pseudonym.new_record?
+      else
+        @pseudonym.send(:skip_session_maintenance=, true)
+      end
       @user.save!
       message_sent = false
       if notify == :self_registration
@@ -762,7 +768,7 @@ class UsersController < ApplicationController
           message_sent = true
           @pseudonym.send_confirmation!
         end
-        @user.new_teacher_registration((params[:user] || {}).merge({:remote_ip  => request.remote_ip}))
+        @user.new_registration((params[:user] || {}).merge({:remote_ip  => request.remote_ip}))
       elsif notify && !@user.registered?
         message_sent = true
         @pseudonym.send_registration_notification!
@@ -770,7 +776,7 @@ class UsersController < ApplicationController
         @cc.send_merge_notification! if @cc.merge_candidates.length != 0
       end
 
-      data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :observee => @observee, :message_sent => message_sent }
+      data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :observee => @observee, :message_sent => message_sent, :course => @user.self_enrollment_course }
       if api_request?
         render(:json => user_json(@user, @current_user, session, %w{locale}))
       else
@@ -929,7 +935,7 @@ class UsersController < ApplicationController
   end
 
   def merge
-    @user_about_to_go_away = User.find_by_id(session[:merge_user_id]) if session[:merge_user_id].present?
+    @user_about_to_go_away = User.find(params[:user_id])
 
     if params[:new_user_id] && @true_user = User.find_by_id(params[:new_user_id])
       if @true_user.grants_right?(@current_user, session, :manage_logins) && @user_about_to_go_away.grants_right?(@current_user, session, :manage_logins)
@@ -944,11 +950,11 @@ class UsersController < ApplicationController
     if @user_about_to_go_away && @user_that_will_still_be_around
       @user_about_to_go_away.move_to_user(@user_that_will_still_be_around)
       @user_that_will_still_be_around.touch
-      session.delete(:merge_user_id)
       flash[:notice] = t('user_merge_success', "User merge succeeded! %{first_user} and %{second_user} are now one and the same.", :first_user => @user_that_will_still_be_around.name, :second_user => @user_about_to_go_away.name)
     else
       flash[:error] = t('user_merge_fail', "User merge failed. Please make sure you have proper permission and try again.")
     end
+
     if @user_that_will_still_be_around == @current_user
       redirect_to user_profile_url(@current_user)
     elsif @user_that_will_still_be_around
@@ -960,47 +966,38 @@ class UsersController < ApplicationController
 
   def admin_merge
     @user = User.find(params[:user_id])
-    pending_user_id = params[:pending_user_id] || session[:pending_user_id]
-    pending_other_error = get_pending_user_and_error(pending_user_id, params[:pending_user_id])
+    pending_other_error = get_pending_user_and_error(params[:pending_user_id])
     @other_user = User.find_by_id(params[:new_user_id]) if params[:new_user_id].present?
     if authorized_action(@user, @current_user, :manage_logins)
       flash[:error] = pending_other_error if pending_other_error.present?
+
       if @user && (params[:clear] || !@pending_other_user)
-        session[:pending_user_id] = @user.id
         @pending_other_user = nil
       end
-      if @other_user && @other_user.grants_right?(@current_user, session, :manage_logins)
-        session[:merge_user_id] = @user.id
-        session.delete(:pending_user_id)
-      else
+
+      unless @other_user && @other_user.grants_right?(@current_user, session, :manage_logins)
         @other_user = nil
       end
+
       render :action => 'admin_merge'
     end
   end
 
-  def get_pending_user_and_error(pending_user_id, entered_user_id)
+  def get_pending_user_and_error(pending_user_id)
     pending_other_error = nil
-    @pending_other_user = api_find_all(User, [pending_user_id]).first if pending_user_id.present?
-    @pending_other_user = nil unless @pending_other_user.try(:grants_right?, @current_user, session, :manage_logins)
-    if @pending_other_user == @user
-      @pending_other_user = nil
-      pending_other_error = t('cant_self_merge', "You can't merge an account with itself.")
-    elsif @pending_other_user.blank? && entered_user_id.present? && pending_other_error.blank?
-      pending_other_error = t('user_not_found', "No active user with that ID was found.")
-    end
-    return pending_other_error
-  end
 
-  def confirm_merge
-    @user = User.find_by_id(session[:merge_user_id]) if session[:merge_user_id].present?
-    if @user && @user != @current_user
-      render :action => 'confirm_merge'
-    else
-      session[:merge_user_id] = @current_user.id
-      store_location(user_confirm_merge_url(@current_user.id))
-      render :action => 'merge'
+    if pending_user_id.present?
+      @pending_other_user = api_find_all(User, [pending_user_id]).first
+      @pending_other_user = nil unless @pending_other_user.try(:grants_right?, @current_user, session, :manage_logins)
+      if @pending_other_user == @user
+        @pending_other_user = nil
+        pending_other_error = t('cant_self_merge', "You can't merge an account with itself.")
+      elsif @pending_other_user.blank? && pending_other_error.blank?
+        pending_other_error = t('user_not_found', "No active user with that ID was found.")
+      end
     end
+
+    pending_other_error
   end
 
   def assignments_needing_grading
@@ -1129,12 +1126,12 @@ class UsersController < ApplicationController
     end
   end
 
-  def require_open_registration
+  def require_self_registration
     get_context
     @context = @domain_root_account || Account.default unless @context.is_a?(Account)
     @context = @context.root_account
-    if !@context.grants_right?(@current_user, session, :manage_user_logins) && (!@context.open_registration? || !@context.no_enrollments_can_create_courses? || @context != Account.default)
-      flash[:error] = t('no_open_registration', "Open registration has not been enabled for this account")
+    unless @context.grants_right?(@current_user, session, :manage_user_logins) || @context.self_registration?
+      flash[:error] = t('no_self_registration', "Self registration has not been enabled for this account")
       respond_to do |format|
         format.html { redirect_to root_url }
         format.json { render :json => {}, :status => 403 }
@@ -1149,7 +1146,7 @@ class UsersController < ApplicationController
     }
   end
 
-  protected :require_open_registration
+  protected :require_self_registration
 
   def teacher_activity
     @teacher = User.find(params[:user_id])

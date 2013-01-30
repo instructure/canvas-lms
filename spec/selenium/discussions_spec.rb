@@ -10,7 +10,6 @@ describe "discussions" do
   end
 
   context "as a teacher" do
-    DISCUSSION_NAME = 'new discussion'
 
     before (:each) do
       course_with_teacher_logged_in
@@ -53,7 +52,8 @@ describe "discussions" do
 
       it "should validate closing the discussion for comments" do
         create_and_go_to_topic
-        expect_new_page_load { f('.discussion_locked_toggler').click }
+        f("#discussion-toolbar .al-trigger-inner").click
+        expect_new_page_load { f("#ui-id-4").click }
         f('.discussion-fyi').text.should == 'This topic is closed for comments'
         ff('.discussion-reply-label').should be_empty
         DiscussionTopic.last.workflow_state.should == 'locked'
@@ -61,7 +61,8 @@ describe "discussions" do
 
       it "should validate reopening the discussion for comments" do
         create_and_go_to_topic('closed discussion', 'side_comment', true)
-        expect_new_page_load { f('.discussion_locked_toggler').click }
+        f("#discussion-toolbar .al-trigger-inner").click
+        expect_new_page_load { f("#ui-id-4").click }
         ff('.discussion-reply-label').should_not be_empty
         DiscussionTopic.last.workflow_state.should == 'active'
       end
@@ -71,6 +72,24 @@ describe "discussions" do
         message = "message that needs escaping ' \" & !@#^&*()$%{}[];: blah"
         add_reply(message, 'graded.png')
         @last_entry.find_element(:css, '.message').text.should == message
+      end
+
+      it "should show attachments after showing hidden replies" do
+        @topic = @course.discussion_topics.create!(:title => 'test', :message => 'attachment test', :user => @user)
+        @entry = @topic.discussion_entries.create!(:user => @user, :message => 'blah')
+        @replies = []
+        5.times do
+          attachment = @course.attachments.create!(:context => @course, :filename => "text.txt", :user => @user, :uploaded_data => StringIO.new("testing"))
+          reply = @entry.discussion_subentries.create!(
+            :user => @user, :message => 'i haz attachments', :discussion_topic => @topic, :attachment => attachment)
+          @replies << reply
+        end
+        @topic.create_materialized_view
+        go_to_topic
+        ffj('.comment_attachments').count.should == 3
+        fj('.showMore').click
+        wait_for_ajaximations
+        ffj('.comment_attachments').count.should == @replies.count
       end
 
       it "should show only 10 root replies per page"
@@ -98,6 +117,21 @@ describe "discussions" do
         let(:url) { "/courses/#{@course.id}/discussion_topics/" }
         let(:what_to_create) { DiscussionTopic }
         it_should_behave_like "discussion and announcement individual tests"
+      end
+
+      it "should allow teachers to edit discussions settings" do
+        assignment_name = 'topic assignment'
+        title = 'assignment topic title'
+        @course.allow_student_discussion_topics.should == true
+        @course.discussion_topics.create!(:title => title, :user => @user, :assignment => @course.assignments.create!(:name => assignment_name))
+        get "/courses/#{@course.id}/discussion_topics"
+        f('#edit_discussions_settings').click
+        wait_for_ajax_requests
+        f('#allow_student_discussion_topics').click
+        submit_form('.dialogFormView')
+        wait_for_ajax_requests
+        @course.reload
+        @course.allow_student_discussion_topics.should == false
       end
 
       it "should filter by assignments" do
@@ -195,6 +229,25 @@ describe "discussions" do
       @topic = @course.discussion_topics.create!(:user => @teacher, :message => 'new topic from teacher', :discussion_type => 'side_comment')
       @entry = @topic.discussion_entries.create!(:user => @teacher, :message => 'new entry from teacher')
       user_session(@student)
+    end
+
+    it "should not allow students to create discussions according to setting" do
+      @course.allow_student_discussion_topics = false
+      @course.save!
+      get "/courses/#{@course.id}/discussion_topics/"
+      wait_for_ajax_requests
+      f('#new-discussion-button').should be_nil
+    end
+
+    it "should allow students to reply to a discussion even if they cannot create a topic" do
+      @course.allow_student_discussion_topics = false
+      @course.save!
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/"
+      wait_for_ajax_requests
+      new_student_entry_text = "'ello there"
+      f('#content').should_not include_text(new_student_entry_text)
+      add_reply new_student_entry_text
+      f('#content').should include_text(new_student_entry_text)
     end
 
     it "should validate a group assignment discussion" do

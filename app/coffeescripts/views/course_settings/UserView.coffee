@@ -20,6 +20,10 @@ define [
   invitationDialog = null
 
   class UserView extends Backbone.View
+    initialize: (attributes, options) ->
+      super
+      @role = attributes['role']
+      @role_tag = attributes['role_tag']
 
     tagName: 'li'
 
@@ -47,14 +51,15 @@ define [
       dfds = []
       data = $.extend @model.toJSON(),
         url: "#{ENV.COURSE_ROOT_URL}/users/#{@model.get('id')}"
-        isObserver: @model.hasEnrollmentType('ObserverEnrollment')
-        isDesigner: @model.hasEnrollmentType('DesignerEnrollment')
-        isPending: @model.pending()
+        isObserver: @model.hasEnrollmentType('ObserverEnrollment', @role)
+        isDesigner: @model.hasEnrollmentType('DesignerEnrollment', @role)
+        isPending: @model.pending(@role)
       data.canRemove =
-        if _.any(['TeacherEnrollment', 'DesignerEnrollment', 'TaEnrollment'], (et) => @model.hasEnrollmentType et)
+        if _.any(['TeacherEnrollment', 'DesignerEnrollment', 'TaEnrollment'], (et) => @model.hasEnrollmentType(et, @role))
           ENV.PERMISSIONS.manage_admin_users
         else
           ENV.PERMISSIONS.manage_students
+      data.enrollments = _.filter data.enrollments, (en) => en.role == @role
 
       for en in data.enrollments when ! data.isDesigner
         en.pending = @model.pending()
@@ -93,6 +98,7 @@ define [
     editSections: (e) ->
       editSectionsDialog ||= new EditSectionsView
       editSectionsDialog.model = @model
+      editSectionsDialog.role = @role
       editSectionsDialog.off 'updated'
       editSectionsDialog.on 'updated', @reload
       editSectionsDialog.render().show()
@@ -100,6 +106,7 @@ define [
     linkToStudents: (e) ->
       linkToStudentsDialog ||= new LinkToStudentsView
       linkToStudentsDialog.model = @model
+      linkToStudentsDialog.role = @role
       linkToStudentsDialog.off 'updated'
       linkToStudentsDialog.on 'updated', @reload
       linkToStudentsDialog.render().show()
@@ -108,14 +115,12 @@ define [
       return unless confirm I18n.t('delete_confirm', 'Are you sure you want to remove this user?')
       @$el.hide()
       success = =>
-        for e in @model.get('enrollments')
-          e_type = e.typeClass.split('_')[0]
-          c.innerText = parseInt(c.innerText) - 1 for c in $(".#{e_type}_count")
+        $(c).text(parseInt($(c).text()) - 1) for c in $(".#{@role_tag}_count")
         $.flashMessage I18n.t('flash.removed', 'User successfully removed.')
       failure = =>
         @$el.show()
         $.flashError I18n.t('flash.removeError', 'Unable to remove the user. Please try again later.')
-      deferreds = _.map @model.get('enrollments'), (e) ->
+      deferreds = _.map @model.allEnrollmentsWithRole(@role), (e) ->
         $.ajaxJSON "#{ENV.COURSE_ROOT_URL}/unenroll/#{e.id}", 'DELETE'
       $.when(deferreds...).then success, failure
 

@@ -94,6 +94,19 @@ describe Enrollment do
     e.readable_type.should eql('Student')
   end
 
+  describe "sis_role" do
+    it "should return role_name if present" do
+      e = TaEnrollment.new
+      e.role_name = 'Assistant Grader'
+      e.sis_role.should == 'Assistant Grader'
+    end
+
+    it "should return the sis enrollment type otherwise" do
+      e = TaEnrollment.new
+      e.sis_role.should == 'ta'
+    end
+  end
+
   it "should not allow an associated_user_id on a non-observer enrollment" do
     observed = User.create!
 
@@ -1536,6 +1549,41 @@ describe Enrollment do
 
       se.accept
       pe.reload.should be_deleted
+    end
+  end
+
+  describe '#can_be_deleted_by' do
+
+    describe 'on a student enrollment' do
+      let(:enrollment) { StudentEnrollment.new }
+      let(:user) { stub(:id => 42) }
+      let(:session) { stub }
+
+      it 'is true for a user who has been granted the right' do
+        context = stub(:grants_right? => true)
+        enrollment.can_be_deleted_by(user, context, session).should be_true
+      end
+
+      it 'is false for a user without the right' do
+        context = stub(:grants_right? => false)
+        enrollment.can_be_deleted_by(user, context, session).should be_false
+      end
+
+      it 'is true for a user who can manage_admin_users' do
+        context = Object.new
+        context.stubs(:grants_right?).with(user, session, :manage_students).returns(false)
+        context.stubs(:grants_right?).with(user, session, :manage_admin_users).returns(true)
+        enrollment.can_be_deleted_by(user, context, session).should be_true
+      end
+
+      it 'is false if a user is trying to remove their own enrollment' do
+        context = Object.new
+        context.stubs(:grants_right?).with(user, session, :manage_students).returns(true)
+        context.stubs(:grants_right?).with(user, session, :manage_admin_users).returns(false)
+        context.stubs(:account => context)
+        enrollment.user_id = user.id
+        enrollment.can_be_deleted_by(user, context, session).should be_false
+      end
     end
   end
 end

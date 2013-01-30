@@ -24,13 +24,13 @@ describe RoleOverride do
     RoleOverride.create!(:context => @account, :permission => 'moderate_forum',
                          :enrollment_type => "TeacherEnrollment", :enabled => false)
     permissions = RoleOverride.permission_for(Account.default, :moderate_forum, "TeacherEnrollment")
-    permissions[:enabled].should == true
-    permissions.key?(:prior_default).should == false
+    permissions[:enabled].should be_true
+    permissions[:prior_default].should be_true
     permissions[:explicit].should == false
 
     permissions = RoleOverride.permission_for(@account, :moderate_forum, "TeacherEnrollment")
-    permissions[:enabled].should == false
-    permissions[:prior_default].should == true
+    permissions[:enabled].should be_false
+    permissions[:prior_default].should be_true
     permissions[:explicit].should == true
   end
 
@@ -45,19 +45,19 @@ describe RoleOverride do
                          :enrollment_type => "TeacherEnrollment", :enabled => true)
 
     permissions = RoleOverride.permission_for(a1, :moderate_forum, "TeacherEnrollment")
-    permissions[:enabled].should == false
-    permissions[:prior_default].should == true
+    permissions[:enabled].should be_false
+    permissions[:prior_default].should be_true
     permissions[:explicit].should == true
 
     permissions = RoleOverride.permission_for(a2, :moderate_forum, "TeacherEnrollment")
-    permissions[:enabled].should == true
-    permissions[:prior_default].should == false
+    permissions[:enabled].should be_true
+    permissions[:prior_default].should be_false
     permissions[:explicit].should == true
 
     permissions = RoleOverride.permission_for(a3, :moderate_forum, "TeacherEnrollment")
-    permissions[:enabled].should == true
-    permissions[:prior_default].should == true
-    permissions[:explicit].should == true
+    permissions[:enabled].should be_true
+    permissions[:prior_default].should be_true
+    permissions[:explicit].should == false
   end
 
   it "should not fail when a context's associated accounts are missing" do
@@ -204,7 +204,7 @@ describe RoleOverride do
 
     def check_permission(base_role, role, enabled)
       hash = RoleOverride.permission_for(@account, @permission, base_role.to_s, role.to_s)
-      hash[:enabled].should == enabled
+      (!!hash[:enabled]).should == enabled
     end
 
     def create_role(base_role, role_name)
@@ -225,6 +225,22 @@ describe RoleOverride do
 
     it "should give no permissions if basetype is no permissions regardless of role" do
       check_permission(RoleOverride::NO_PERMISSIONS_TYPE, 'TeacherEnrollment', false)
+    end
+
+    it "should not mark a permission as explicit in a sub account when it's explicit in the root" do
+      @sub_account = @account
+      @account = Account.default
+      create_role('AccountMembership', 'somerole')
+      create_override('somerole', true)
+      permission_data = RoleOverride.permission_for(@sub_account, @permission, 'AccountMembership', 'somerole')
+      permission_data[:enabled].should be_true
+      permission_data[:explicit].should be_false
+      permission_data[:prior_default].should be_true
+
+      permission_data = RoleOverride.permission_for(@account, @permission, 'AccountMembership', 'somerole')
+      permission_data[:enabled].should be_true
+      permission_data[:explicit].should be_true
+      permission_data[:prior_default].should be_false
     end
 
     context "admin roles" do
@@ -282,7 +298,9 @@ describe RoleOverride do
           end
 
           it "should use permission for role in parent account" do
+            @parent_account = @account
             @sub = account_model(:parent_account => @account)
+            @account = @parent_account
 
             # create in parent
             create_role(@base_role, @role_name)
@@ -297,11 +315,13 @@ describe RoleOverride do
 
             # check based on sub account
             hash = RoleOverride.permission_for(@sub, @permission, @base_role.to_s, @role_name.to_s)
-            hash[:enabled].should == !@default_perm
+            (!!hash[:enabled]).should == !@default_perm
           end
 
           it "should use permission for role in parent account even if sub account doesn't have role" do
+            @parent_account = @account
             @sub = account_model(:parent_account => @account)
+            @account = @parent_account
 
             create_role(@base_role, @role_name)
 
@@ -310,7 +330,7 @@ describe RoleOverride do
 
             # check based on sub account
             hash = RoleOverride.permission_for(@sub, @permission, @base_role.to_s, @role_name.to_s)
-            hash[:enabled].should == !@default_perm
+            (!!hash[:enabled]).should == !@default_perm
           end
         end
       end
@@ -353,6 +373,33 @@ describe RoleOverride do
         check_permission(AccountUser::BASE_ROLE_NAME, 'AccountAdmin', false)
       end
     end
+  end
 
+  describe "enabled_for?" do
+    it "should honor applies_to_self" do
+      ro = RoleOverride.new(:context => Account.site_admin, :permission => 'manage_role_overrides',
+                            :enrollment_type => 'role', :enabled => true)
+      ro.applies_to_self = false
+      ro.save!
+      # for the UI - should be enabled
+      RoleOverride.permission_for(Account.site_admin, :manage_role_overrides, 'AccountMembership', 'role')[:enabled].should == [:descendants]
+      # applying to Site Admin, should be disabled
+      RoleOverride.enabled_for?(Account.site_admin, Account.site_admin, :manage_role_overrides, 'AccountMembership', 'role').should == [:descendants]
+      # applying to Default Account, should be enabled
+      RoleOverride.enabled_for?(Account.site_admin, Account.default, :manage_role_overrides, 'AccountMembership', 'role').should == [:self, :descendants]
+    end
+
+    it "should honor applies_to_descendants" do
+      ro = RoleOverride.new(:context => Account.site_admin, :permission => 'manage_role_overrides',
+                            :enrollment_type => 'role', :enabled => true)
+      ro.applies_to_descendants = false
+      ro.save!
+      # for the UI - should be enabled
+      RoleOverride.permission_for(Account.site_admin, :manage_role_overrides, 'AccountMembership', 'role')[:enabled].should == [:self]
+      # applying to Site Admin, should be enabled
+      RoleOverride.enabled_for?(Account.site_admin, Account.site_admin, :manage_role_overrides, 'AccountMembership', 'role').should == [:self]
+      # applying to Default Account, should be disabled
+      RoleOverride.enabled_for?(Account.site_admin, Account.default, :manage_role_overrides, 'AccountMembership', 'role').should == nil
+    end
   end
 end

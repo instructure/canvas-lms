@@ -5,6 +5,7 @@
   <a href="<%= url_for("file.pagination.html") %>" class="<%= 'current' if options[:object] == 'file.pagination.html' %>">Pagination</a>
   <a href="<%= url_for("file.file_uploads.html") %>" class="<%= 'current' if options[:object] == 'file.file_uploads.html' %>">File Uploads</a>
   <a href="<%= url_for("file.endpoint_attributes.html") %>" class="<%= 'current' if options[:object] == 'file.endpoint_attributes.html' %>">API Endpoint Attributes</a>
+  <a href="<%= url_for("file.masquerading.html") %>" class="<%= 'current' if options[:object] == 'file.masquerading.html' %>">Masquerading</a>
   <h2>Resources</h2>
   <a <%= "class='current'" if options[:all_resources] %> href="all_resources.html">All Resources Reference</a>
   <% options[:resources].each_with_index do |(resource, controllers), i| %>

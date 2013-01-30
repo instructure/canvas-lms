@@ -56,6 +56,7 @@ class CommunicationChannel < ActiveRecord::Base
         { 'AT&T' => 'txt.att.net',
           'Alltel' => 'message.alltel.com',
           'Boost' => 'myboostmobile.com',
+          'C Spire' => 'cspire1.com',
           'Cingular' => 'cingularme.com',
           'CellularOne' => 'mobile.celloneusa.com',
           'Cricket' => 'sms.mycricket.com',

@@ -20,6 +20,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/shared/_login" do
+  before do
+    assigns[:domain_root_account] = Account.default
+  end
+
   it "should render" do
     course_with_student
     view_context

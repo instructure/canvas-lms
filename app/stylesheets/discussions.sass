@@ -17,6 +17,9 @@
   padding: 0
   .entry
     padding: 4px 0 0 10px
+    margin: 5px 0 50px 0
+    &.collapsed, .entry
+      margin: 5px 0 5px 0
 
 .discussion_entry
   position: relative
@@ -168,9 +171,6 @@
   display: inline-block
   margin-top: 20px
 
-.admin-link-hover-area
-  border-bottom: solid 1px #eee
-
 .showMore
   box-shadow: 0px 1px 2px rgba(0,0,0, 0.2)
   margin-left: 18px
@@ -272,7 +272,6 @@
     box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.2)
     margin-left: 18px !important
     background: #fff
-    margin: 50px 0
     &:first-child
       margin-top: 5px
     .entry
@@ -346,16 +345,21 @@
   padding-top: 2px
   padding-bottom: 8px
 
-.al-trigger
-  background: none
-  border-color: #fff
+#discussion_container
+  .al-trigger
+    background: none
+    border-color: #fff
 
-.al-trigger:hover, .al-trigger.ui-state-active
-  border-color: #c2c2c2
-  border-bottom-color: #bfbfbf
+  .al-trigger:hover, .al-trigger.ui-state-active
+    border-color: #c2c2c2
+    border-bottom-color: #bfbfbf
+
+.collapsable
+  border-bottom: 1px solid #fff
 
 .collapsable:hover
   cursor: pointer
+  border-color: #e4e5e7
   &:before
     display: block
     content: ''
@@ -368,14 +372,12 @@
     border-color: transparent transparent #396eb2 transparent
     border-width: 8px
 
+.collapsed .collapsable:hover
+  border-color: #fff
+
 .collapsed .collapsable:before
   top: 10px
   border-color: #396eb2 transparent transparent transparent
-
-.toolbarView
-  background: #fff
-  padding: 10px 10px 6px 14px
-  border-bottom: solid 1px #efefef
 
 .bootstrap-form
   margin: 0
@@ -391,12 +393,11 @@
 
 #filterResults
 
+  .entry
+    margin: 5px 0
+
   .entry-controls
     display: block !important
-
-  .entry
-    margin-top: 10px !important
-    margin-bottom: 10px !important
 
   .entry:hover
     .discussion_entry
@@ -404,5 +405,35 @@
       .viewInDiscussion
         text-decoration: underline
 
+.toolbarView
+  background: #fff
+  height: 50px
 
+  .al-trigger
+    +opacity(1)
+    margin-left: 4px
+    margin-top: 2px
 
+  .btn
+    margin-bottom: 5px
+
+  .headerBar
+    padding: 10px 10px 6px 14px
+    border-bottom: solid 1px #efefef
+    height: 33px
+
+  .sticky
+    position: fixed
+    top: 0
+    left: 0
+    right: 0
+    margin-left: $left_side_width + 1
+    margin-right: $right_side_width + 1
+    z-index: 3
+    background: #fff
+    height: 33px
+    min-width: 484px
+    border-color: $menu-border-color
+
+  [disabled]
+    display: none

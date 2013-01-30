@@ -32,7 +32,7 @@ class UserNotesController < ApplicationController
   
    def user_notes
     get_context
-    return render 'shared/unauthorized' unless @context.root_account.enable_user_notes
+    return render_unauthorized_action unless @context.root_account.enable_user_notes
     if authorized_action(@context, @current_user, :manage_user_notes)
       if @context && @context.is_a?(Account)
         @users = @context.all_users.active.has_current_student_enrollments

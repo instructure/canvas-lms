@@ -1,10 +1,22 @@
 class HashAccessTokens < ActiveRecord::Migration
   tag :postdeploy
+  self.transactional = false
 
   def self.up
-    AccessToken.find_each(:conditions => "crypted_token is null") do |at|
-      at.token = at.read_attribute(:token) # regenerate as encrypted
-      at.save!
+    loop do
+      batch = AccessToken.connection.select_all(<<-SQL)
+        SELECT id, token FROM access_tokens WHERE crypted_token IS NULL LIMIT 1000
+      SQL
+
+      break if batch.empty?
+
+      batch.each do |at|
+        updates = {
+          :token_hint => at['token'][0,5],
+          :crypted_token => AccessToken.hashed_token(at['token']),
+        }
+        AccessToken.update_all(updates, { :id => at['id'] })
+      end
     end
   end
 

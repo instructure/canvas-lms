@@ -1,0 +1,8 @@
+<div class="form-horizontal bootstrap-form" id="enroll_form">
+  <p><%= mt :already_enrolled, "You are already enrolled in **%{course}**.", :course => @course.name %></p>
+  
+
+  <% if params[:login_warning] %>
+    <p><%= t :switch_users, "You are currently signed in as *%{user}*. **Sign in as another user**.", :user => @current_user.name, :wrapper => {'*' => '<b>\1</b>', '**' => link_to('\1', "/logout", :id => 'logout_link')} %></p>
+  <% end %>
+</div>

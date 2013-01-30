@@ -9,17 +9,20 @@
       submission = @current_user.submissions.scoped(:select => 'id, assignment_id, score, workflow_state', :conditions => { :assignment_id => recent_event.id }).first
     end
     
-    due_date = VariedDueDate.new(recent_event, @current_user)
+    if is_assignment
+      recent_event = recent_event.overridden_for(@current_user)
+    end
   end
 
   cache([ 'recent_event_render',
           submission || 'no_submission',
           recent_event || 'blank_event',
+          (recent_event.due_at if is_assignment),
           Date.today,
           Time.zone.name,
           recent_event.cached_context_grants_right?(@current_user, nil, :manage_grades),
-          recent_event.cached_context_grants_right?(@current_user, nil, :participate_as_student),
-          (due_date.all_due_dates if is_assignment)].cache_key) do
+          recent_event.cached_context_grants_right?(@current_user, nil, :participate_as_student)
+        ].cache_key) do
     icon_explanation, icon_class = icon_data(:context => @context, 
                                              :contexts => @contexts, 
                                              :current_user => @current_user, 
@@ -39,7 +42,7 @@
       <span class="tooltip_text">
         <% if is_assignment %>
           <span style="display: block;"><%= t(:due, "due") %>: 
-            <%= due_at(due_date) %>
+            <%= due_at(recent_event, @current_user) %>
           </span>
           <% if icon_explanation %>
             <span style="display: block; font-style: italic;"><%= icon_explanation %></span>
@@ -63,7 +66,7 @@
     <b><%= recent_event.title %></b>
     <em>
       <% if is_assignment %>
-        <%= due_at(due_date, 'date') %>
+        <%= due_at(recent_event, @current_user, 'date') %>
       <% else %>
         <%= datetime_string(recent_event.start_at, :short ) %>
       <% end %>

@@ -854,6 +854,8 @@ describe "Outcome Groups API", :type => :integration do
                    :outcome_id => @outcome.id.to_s,
                    :format => 'json')
       response.status.to_i.should == 400
+      parsed_body = JSON.parse( response.body )
+      parsed_body[ 'message' ].should =~ /link is the last link/i
     end
 
     it "should unlink the outcome from the group" do

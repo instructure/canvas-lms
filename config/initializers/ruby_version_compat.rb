@@ -109,6 +109,15 @@ else
     before_filter :force_utf8_params
   end
 
+  class ActiveRecord::Base
+    def unserialize_attribute_with_utf8_check(attr_name)
+      value = unserialize_attribute_without_utf8_check(attr_name)
+      TextHelper.recursively_strip_invalid_utf8(value)
+      value
+    end
+    alias_method_chain :unserialize_attribute, :utf8_check
+  end
+
   # Make sure the flash sets the encoding to UTF-8 as well.
   module ActionController
     module Flash

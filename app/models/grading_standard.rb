@@ -52,6 +52,7 @@ class GradingStandard < ActiveRecord::Base
   end
   
   named_scope :active, :conditions => ['grading_standards.workflow_state != ?', 'deleted']
+  named_scope :sorted, :order => "usage_count >= 3 DESC, title ASC"
 
   VERSION = 2
 
@@ -128,7 +129,7 @@ class GradingStandard < ActiveRecord::Base
   end
 
   def update_usage_count
-    self.usage_count = self.assignments.active.length
+    self.usage_count = self.assignments.active.count
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
   end
   
@@ -169,12 +170,7 @@ class GradingStandard < ActiveRecord::Base
   def self.standards_for(context)
     context_codes = [context.asset_string]
     context_codes.concat Account.all_accounts_for(context).map(&:asset_string)
-    standards = GradingStandard.active.find_all_by_context_code(context_codes.uniq)
-    standards.uniq
-  end
-  
-  def self.sorted_standards_for(context)
-    standards_for(context).sort_by{|s| [(s.usage_count || 0) > 3 ? 'a' : 'b', (s.title.downcase rescue "zzzzz")]}
+    GradingStandard.active.scoped(:conditions => { :context_code => context_codes.uniq })
   end
   
   def standard_data=(params={})

@@ -99,6 +99,9 @@ define([
       });
     });
 
+    $('#account_settings_external_notification_warning_checkbox').on('change', function(e) {
+      $('#account_settings_external_notification_warning').val($(this).prop('checked') ? 1 : 0);
+    });
 
     var $blankCustomHelpLink = $('.custom_help_link.blank').detach().removeClass('blank'),
         uniqueCounter = 1000;

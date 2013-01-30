@@ -52,7 +52,11 @@ define [
         $.replaceTags(@contextInfo.calendar_event_url, 'id', @calendarEvent.parent_event_id ? @calendarEvent.id)
 
     displayTimeString: () ->
-      semanticDateRange(@calendarEvent.start_at, @calendarEvent.end_at)
+        if @calendarEvent.all_day
+          date = this.startDate()
+          "<time datetime='#{date.toISOString()}'>#{$.dateString(date)}</time>"
+        else
+          semanticDateRange(@calendarEvent.start_at, @calendarEvent.end_at)
 
     saveDates: (success, error) =>
       @save {

@@ -71,7 +71,8 @@ define([
       }
 
       $criterion.find('.rating:not(.blank)').each(function(i) {
-        $(this).fillTemplateData(outcome.get('ratings')[i]);
+        var rating = outcome.get('ratings')[i];
+        $(this).fillTemplateData({data: rating});
       });
 
       $criterion.find(".cancel_button").click();

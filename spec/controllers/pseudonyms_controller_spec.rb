@@ -129,7 +129,7 @@ describe PseudonymsController do
       @other_pseudonym.should be_active
       @pseudonym.should be_active
     end
-    
+
     it "should not destroy if it's the last active pseudonym" do
       user_with_pseudonym(:active_all => true)
       user_session(@user, @pseudonym)
@@ -147,7 +147,7 @@ describe PseudonymsController do
       assert_status(400)
       @pseudonym.should be_active
     end
-    
+
     it "should destroy if for the current user with more than one pseudonym" do
       user_with_pseudonym(:active_all => true)
       user_session(@user, @pseudonym)
@@ -157,7 +157,7 @@ describe PseudonymsController do
       @pseudonym.should be_active
       @p2.reload.should be_deleted
     end
-    
+
     it "should not destroy if for the current user and it's a system-generated pseudonym" do
       rescue_action_in_public!
       user_with_pseudonym(:active_all => true)
@@ -171,7 +171,7 @@ describe PseudonymsController do
       @pseudonym.should be_active
       @p2.should be_active
     end
-    
+
     it "should destroy if authorized to delete pseudonyms" do
       rescue_action_in_public!
       user_with_pseudonym(:active_all => true)
@@ -200,6 +200,27 @@ describe PseudonymsController do
       it "should use the account id from params" do
         post 'create', :format => 'json', :user_id => @user.id, :pseudonym => { :account_id => Account.site_admin.id, :unique_id => 'unique1' }
         response.should be_success
+      end
+    end
+
+    context 'with default admin permissions' do
+      before do
+        user_with_pseudonym(:active_all => true)
+        Account.default.add_user(@user)
+        user_session(@user, @pseudonym)
+      end
+
+      it 'lets user create pseudonym for self' do
+        post 'create', :user_id => @user.id, :pseudonym => { :account_id => Account.default.id, :unique_id => 'a_new_unique_name' }
+        @user.reload.pseudonyms.map(&:unique_id).should include('a_new_unique_name')
+      end
+
+      it 'will not allow default admin to create pseudonym for site admin' do
+        siteadmin = User.create!(:name => 'siteadmin')
+        Account.site_admin.add_user(siteadmin)
+        Account.default.add_user(siteadmin)
+        post 'create', :user_id => siteadmin.id, :pseudonym => { :account_id => Account.site_admin.id, :unique_id => 'a_new_unique_name' }
+        assert_unauthorized
       end
     end
 

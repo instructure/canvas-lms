@@ -28,6 +28,7 @@ describe "courses/_settings_sidebar.html.erb" do
       @course.save!
       assigns[:context] = @course
       assigns[:user_counts] = {}
+      assigns[:all_roles] = Role.custom_roles_and_counts_for_course(@course, @user)
     end
 
     it "should not display if the course or term end date has passed" do

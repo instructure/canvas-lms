@@ -1,8 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
-EDIT_NAME = 'edited appointment'
-EDIT_LOCATION = 'edited location'
-
 shared_examples_for "scheduler selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
@@ -86,7 +83,7 @@ shared_examples_for "scheduler selenium tests" do
     wait_for_ajaximations
   end
 
-  def edit_appointment_group(appointment_name = EDIT_NAME, location_name = EDIT_LOCATION)
+  def edit_appointment_group(appointment_name = 'edited appointment', location_name = 'edited location')
     f('#edit_appointment_form').should be_displayed
     replace_content(fj('input[name="title"]'), appointment_name)
     replace_content(fj('input[name="location"]'), location_name)

@@ -132,9 +132,11 @@ Spec::Runner.configure do |config|
     Notification.reset_cache!
     ActiveRecord::Base.reset_any_instantiation!
     Attachment.clear_cached_mime_ids
+    RoleOverride.clear_cached_contexts
     Delayed::Job.redis.flushdb if Delayed::Job == Delayed::Backend::Redis::Job
     truncate_all_cassandra_tables
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
+    Attachment.domain_namespace = nil
   end
 
   # flush redis before the first spec, and before each spec that comes after
@@ -200,6 +202,7 @@ Spec::Runner.configure do |config|
         account.role_overrides.create(:permission => permission.to_s, :enrollment_type => opts[:membership_type] || 'AccountAdmin', :enabled => enabled)
       end
     end
+    RoleOverride.clear_cached_contexts
     account_admin_user(opts)
   end
 
@@ -396,6 +399,33 @@ Spec::Runner.configure do |config|
     user_session(@user)
   end
 
+  def custom_role(base, name, opts={})
+    account = opts[:account] || @account
+    role = account.roles.find_by_name(name)
+    role ||= account.roles.create :name => name
+    role.base_role_type = base
+    role.save!
+    role
+  end
+  def custom_student_role(name, opts={})
+    custom_role('StudentEnrollment', name, opts)
+  end
+  def custom_teacher_role(name, opts={})
+    custom_role('TeacherEnrollment', name, opts)
+  end
+  def custom_ta_role(name, opts={})
+    custom_role('TaEnrollment', name, opts)
+  end
+  def custom_designer_role(name, opts={})
+    custom_role('DesignerEnrollment', name, opts)
+  end
+  def custom_observer_role(name, opts={})
+    custom_role('ObserverEnrollment', name, opts)
+  end
+  def custom_account_role(name, opts={})
+    custom_role(AccountUser::BASE_ROLE_NAME, name, opts)
+  end
+
   def user_session(user, pseudonym=nil)
     unless pseudonym
       pseudonym = stub(:record => user, :user_id => user.id, :user => user, :login_count => 1)
@@ -563,8 +593,10 @@ Spec::Runner.configure do |config|
     @rubric.update_alignments
   end
 
-  def grading_standard_for(context)
-    @standard = context.grading_standards.create!(:title => "My Grading Standard", :standard_data => {
+  def grading_standard_for(context, opts={})
+    @standard = context.grading_standards.create!(
+      :title => opts[:title] || "My Grading Standard",
+      :standard_data => {
         "scheme_0" => {:name => "A", :value => "0.9"},
         "scheme_1" => {:name => "B", :value => "0.8"},
         "scheme_2" => {:name => "C", :value => "0.7"}
@@ -847,6 +879,21 @@ Spec::Runner.configure do |config|
     # now check payload
     post_lines[post_lines.index(""),-1].should ==
       expected_post_lines[expected_post_lines.index(""),-1]
+  end
+
+  def compare_json(actual, expected)
+    if actual.is_a?(Hash)
+      actual.each do |k,v|
+        expected_v = expected[k]
+        compare_json(v, expected_v)
+      end
+    elsif actual.is_a?(Array)
+      actual.zip(expected).each do |a,e|
+        compare_json(a,e)
+      end
+    else
+      actual.to_json.should == expected.to_json
+    end
   end
 
   class FakeHttpResponse

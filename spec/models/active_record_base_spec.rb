@@ -19,6 +19,52 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ActiveRecord::Base do
+  describe "count_by_date" do
+    def create_courses(start_times)
+      start_times.each_with_index do |time, i|
+        (i + 1).times do
+          course = Course.new
+          course.start_at = time
+          course.save!
+        end
+      end
+    end
+
+    it "should work" do
+      start_times = [
+        Time.zone.now,
+        Time.zone.now.advance(:days => -1),
+        Time.zone.now.advance(:days => -2),
+        Time.zone.now.advance(:days => -3)
+      ]
+      create_courses(start_times)
+
+      # updated_at
+      Course.count_by_date.should eql({start_times.first.to_date => 10})
+
+      Course.count_by_date(:column => :start_at).should eql Hash[
+        start_times.each_with_index.map{ |t, i| [t.to_date, i + 1]}
+      ]
+    end
+
+    it "should just do the last 20 days by default" do
+      start_times = [
+        Time.zone.now,
+        Time.zone.now.advance(:days => -19),
+        Time.zone.now.advance(:days => -20),
+        Time.zone.now.advance(:days => 1)
+      ]
+      create_courses(start_times)
+
+      # updated_at
+      Course.count_by_date.should eql({start_times.first.to_date => 10})
+
+      Course.count_by_date(:column => :start_at).should eql Hash[
+        start_times[0..1].each_with_index.map{ |t, i| [t.to_date, i + 1]}
+      ]
+    end
+  end
+
   describe "#remove_dropped_columns" do
     before do
       @orig_dropped = ActiveRecord::Base::DROPPED_COLUMNS

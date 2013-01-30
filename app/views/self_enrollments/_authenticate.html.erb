@@ -1,0 +1,22 @@
+<form action="<%= url_for(request.query_parameters) %>" method="post" id="enroll_form" class="form-horizontal bootstrap-form">
+  <%= registration_summary || content_tag(:p, mt(:getting_started, "You are enrolling in **%{course}**.", :course => @course.name)) %>
+  <p><%= mt :log_in, "Please enter your email and password:" %></p>
+  <input type="hidden" name="user_type" value="existing">
+  <div class="control-group">
+    <label class="control-label" for="student_email"><%= t "labels.email", "Email" %></label>
+    <div class="controls">
+      <input type="text" id="student_email" name="pseudonym[unique_id]">
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="student_password"><%= t "labels.password", "Password" %></label>
+    <div class="controls">
+      <input type="password" id="student_password" name="pseudonym[password]">
+    </div>
+  </div>
+  <div class="control-group embedded-footer">
+    <div class="controls">
+      <button class="btn btn-primary" type="submit"><%= t "buttons.enroll_in_course", "Enroll in Course" %></button>
+    </div>
+  </div>
+</form>

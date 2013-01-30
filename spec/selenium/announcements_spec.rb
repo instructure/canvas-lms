@@ -37,6 +37,7 @@ describe "announcements" do
     replace_content(f('input[name=title]'), topic_title)
     type_in_tiny('textarea[name=message]', 'hi, first announcement')
     f('#require_initial_post').click
+    wait_for_ajaximations
     expect_new_page_load { submit_form('.form-actions') }
     announcement = Announcement.find_by_title(topic_title)
     announcement[:require_initial_post].should == true

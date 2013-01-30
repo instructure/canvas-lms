@@ -70,8 +70,12 @@ define [
       else if $region.dialog('isOpen')
         $region.dialog('close')
 
-    # move focus to the region if tabbable (to make anything tabbable, just give it a tabindex)
-    $region.focus() if showRegion && $region.is(':focusable')
+    if showRegion
+      # to make things accessable:
+      # move focus to the region if tabbable (or it's first tabbable child).
+      # to make anything tabbable, just give it a tabindex
+      $firstFocusableEl = $region.find('*').andSelf().filter(':focusable').first()
+      $firstFocusableEl.focus() if $firstFocusableEl.length
 
     $allElementsControllingRegion.each updateTextToState( if showRegion then 'Shown' else 'Hidden' )
 

@@ -781,11 +781,11 @@ describe "security" do
         response.should be_success
       end
 
-      it "manage_jobs" do
+      it "view_jobs" do
         get "/jobs"
         response.should be_redirect
 
-        add_permission :manage_jobs
+        add_permission :view_jobs
 
         get "/jobs"
         response.should be_success

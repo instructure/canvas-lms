@@ -129,4 +129,9 @@ describe "external migrations" do
     dt.message.should == "<p>description</p>"
   end
 
+  it "should load import page for canvas cartridge without any items to select (e.g. only questions)" do
+    run_import("canvas_cc_only_questions.zip")
+
+    @course.assessment_questions.count.should == 41
+  end
 end

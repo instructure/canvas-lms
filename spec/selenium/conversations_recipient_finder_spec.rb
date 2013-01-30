@@ -102,7 +102,7 @@ describe "conversations recipient finder" do
     end
   end
 
-  it "should have working 'select all' checkboxes in appropriate contexts" do
+  it "should have working select all checkboxes in appropriate contexts" do
     browse_menu
 
     browse "the course" do

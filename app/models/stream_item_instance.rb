@@ -31,11 +31,7 @@ class StreamItemInstance < ActiveRecord::Base
   def set_context_code
     self.context_type ||= stream_item.context_type
     self.context_id ||= stream_item.context_id
-    # backcompat
-    self.context_code ||= stream_item.context_code
   end
-
-  define_asset_string_backcompat_method :context_code, :context
 
   class << self
     alias_method :original_update_all, :update_all

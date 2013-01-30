@@ -420,8 +420,12 @@ def self.date_component(start_date, style=:normal)
       end
     end
     translated = t(*args)
-    translated = ERB::Util.h(translated) unless translated.html_safe?
-    result = RDiscount.new(translated).to_html.strip
+    markdown(translated, inlinify)
+  end
+
+  def markdown(string, inlinify = :auto)
+    string = ERB::Util.h(string) unless string.html_safe?
+    result = RDiscount.new(string).to_html.strip
     # Strip wrapping <p></p> if inlinify == :auto && they completely wrap the result && there are not multiple <p>'s
     result.gsub!(/<\/?p>/, '') if inlinify == :auto && result =~ /\A<p>.*<\/p>\z/m && !(result =~ /.*<p>.*<p>.*/m)
     result.html_safe.strip
@@ -439,5 +443,18 @@ def self.date_component(start_date, style=:normal)
     # add four spaces to the end of the string, because iconv with the //IGNORE
     # option will still fail on incomplete byte sequences at the end of the input
     Iconv.conv('UTF-8//IGNORE', 'UTF-8', string + '    ')[0...-4]
+  end
+
+  def self.recursively_strip_invalid_utf8(object)
+    case object
+    when Hash
+      object.each_value { |o| self.recursively_strip_invalid_utf8(o) }
+    when Array
+      object.each { |o| self.recursively_strip_invalid_utf8(o) }
+    when String
+      if !object.valid_encoding?
+        object.replace(self.strip_invalid_utf8(object))
+      end
+    end
   end
 end

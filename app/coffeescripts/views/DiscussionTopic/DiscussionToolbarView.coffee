@@ -12,10 +12,13 @@ define [
     els:
       '#discussion-search': '$searchInput'
       '#onlyUnread': '$unread'
+      '.disableWhileFiltering': '$disableWhileFiltering'
 
     events:
       'keyup #discussion-search': 'filterBySearch'
       'change #onlyUnread': 'toggleUnread'
+      'click #collapseAll': 'collapseAll'
+      'click #expandAll': 'expandAll'
 
     initialize: ->
       @model.on 'change', @clearInputs
@@ -30,17 +33,32 @@ define [
       @$searchInput.val ''
       @$unread.prop 'checked', false
       @$unread.button 'refresh'
+      @maybeDisableFields()
 
     filterBySearch: _.debounce ->
       value = @$searchInput.val()
       value = null if value is ''
       @model.set 'query', value
+      @maybeDisableFields()
     , 250
 
     toggleUnread: ->
       # setTimeout so the ui can update the button before the rest
       # do expensive stuff
+
       setTimeout =>
         @model.set 'unread', @$unread.prop 'checked'
+        @maybeDisableFields()
       , 50
+
+    collapseAll: ->
+      @model.set 'collapsed', true
+      @trigger 'collapseAll'
+
+    expandAll: ->
+      @model.set 'collapsed', false
+      @trigger 'expandAll'
+
+    maybeDisableFields: ->
+      @$disableWhileFiltering.attr 'disabled', @model.hasFilter()
 

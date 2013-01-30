@@ -98,8 +98,7 @@ describe "links" do
     describe "right side links" do
 
       it "should navigate user to conversations page after inbox link is clicked" do
-        link = find_dashboard_link('#identity', 'Inbox')
-        validate_link(link, 'Conversations')
+        expect_new_page_load { find_dashboard_link('#identity', 'Inbox').click }
       end
 
       it "should navigate user to user settings page after settings link is clicked" do
