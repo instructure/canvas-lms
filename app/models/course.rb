@@ -3035,7 +3035,7 @@ class Course < ActiveRecord::Base
             failed_count += 1
           end
         end
-        progress.update_completion! (completed_count + failed_count).to_f / course_ids.size
+        progress.update_completion! 100.0 * (completed_count + failed_count) / course_ids.size
       end
       progress.completion = 100.0
       progress.message = t('batch_update_message', {
