@@ -74,3 +74,4 @@ mnt/*
 cache
 public/google*.html
 .rbenv-version
+deploy/vm.rb
