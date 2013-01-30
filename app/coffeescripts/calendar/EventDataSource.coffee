@@ -184,7 +184,8 @@ define [
               for childEventData in eventData.child_events
                 childEvent = commonEventFactory(childEventData, @contexts)
                 @addEventToCache event
-                event.childEvents.push childEvent
+                if childEvent
+                  event.childEvents.push childEvent
 
     getEventsForAppointmentGroup: (group, cb) =>
       if @inFlightRequest
