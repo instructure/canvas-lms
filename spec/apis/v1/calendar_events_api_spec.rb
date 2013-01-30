@@ -76,6 +76,52 @@ describe CalendarEventsApiController, :type => :integration do
       end
     end
 
+    context "timezones" do
+      it "shows today's events in user's timezone, even if UTC has crossed into tomorrow" do
+        akst = ActiveSupport::TimeZone.new('Alaska')
+
+        e1 = @user.calendar_events.create!(:title => "yesterday in AKST", :start_at => akst.parse('2012-01-28 21:00:00')) { |c| c.context = @user }
+        e2 = @user.calendar_events.create!(:title => "today in AKST", :start_at =>  akst.parse('2012-01-29 21:00:00')) { |c| c.context = @user }
+        e3 = @user.calendar_events.create!(:title => "tomorrow in AKST", :start_at => akst.parse('2012-01-30 21:00:00')) { |c| c.context = @user }
+
+        @user.update_attributes! :time_zone => "Alaska"
+
+        Timecop.freeze(akst.parse('2012-01-29 22:00:00')) do
+          json = api_call(:get, "/api/v1/calendar_events", {
+            :controller => 'calendar_events_api', :action => 'index', :format => 'json'
+            })
+
+          json.size.should eql 1
+          json.first.keys.sort.should eql expected_fields
+          json.first.slice('id', 'title').should eql({'id' => e2.id, 'title' => 'today in AKST'})
+        end
+      end
+
+      it "interprets user-specified date range in the user's time zone" do
+        akst = ActiveSupport::TimeZone.new('Alaska')
+
+        e1 = @user.calendar_events.create!(:title => "yesterday in AKST", :start_at => akst.parse('2012-01-28 21:00:00')) { |c| c.context = @user }
+        e2 = @user.calendar_events.create!(:title => "today in AKST", :start_at =>  akst.parse('2012-01-29 21:00:00')) { |c| c.context = @user }
+        e3 = @user.calendar_events.create!(:title => "tomorrow in AKST", :start_at => akst.parse('2012-01-30 21:00:00')) { |c| c.context = @user }
+
+        @user.update_attributes! :time_zone => "Alaska"
+
+        Timecop.freeze(akst.parse('2012-01-29 22:00:00')) do
+          json = api_call(:get, "/api/v1/calendar_events", {
+            :controller => 'calendar_events_api', :action => 'index', :format => 'json'
+            })
+
+          json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-28&end_date=2012-01-29&context_codes[]=user_#{@user.id}", {
+                            :controller => 'calendar_events_api', :action => 'index', :format => 'json',
+                            :context_codes => ["user_#{@user.id}"], :start_date => '2012-01-28', :end_date => '2012-01-29'})
+          json.size.should eql 2
+          json[0].keys.sort.should eql expected_fields
+          json[0].slice('id', 'title').should eql({'id' => e1.id, 'title' => 'yesterday in AKST'})
+          json[1].slice('id', 'title').should eql({'id' => e2.id, 'title' => 'today in AKST'})
+        end
+      end
+    end
+
     it 'should paginate events' do
       ids = 25.times.map { |i| @course.calendar_events.create(:title => "#{i}", :start_at => '2012-01-08 12:00:00').id }
       json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-08&context_codes[]=course_#{@course.id}&per_page=10", {

@@ -475,11 +475,10 @@ class CalendarEventsApiController < ApplicationController
     @all_events = value_to_boolean(params[:all_events])
     @undated = value_to_boolean(params[:undated])
     if !@all_events && !@undated
-      today = ActiveSupport::TimeWithZone.new(Time.now, Time.zone).to_date
-      @start_date ||= params[:start_date] && (Date.parse(params[:start_date]) rescue nil) || today.to_date
-      @end_date ||= params[:end_date] && (Date.parse(params[:end_date]) rescue nil) || today.to_date
-      @end_date = @start_date if @end_date < @start_date
-      @end_date += 1
+      today = Time.zone.now
+      @start_date ||= TimeHelper.try_parse(params[:start_date], today).beginning_of_day
+      @end_date ||= TimeHelper.try_parse(params[:end_date], today).end_of_day
+      @end_date = @start_date.end_of_day if @end_date < @start_date
     end
 
     @type ||= params[:type] == 'assignment' ? :assignment : :event
@@ -563,7 +562,7 @@ class CalendarEventsApiController < ApplicationController
       # Once we've got all of the possible assignments, delete anything
       # whose overrides put it outside of the current range.
       events.delete_if do |assignment|
-        due_at = assignment.due_at.try(:to_datetime)
+        due_at = assignment.due_at
         due_at && (due_at > @end_date || due_at < @start_date)
       end
     end
