@@ -105,6 +105,8 @@ class CalendarEvent < ActiveRecord::Base
     effective_context_code && ActiveRecord::Base.find_by_asset_string(effective_context_code) || context
   end
 
+  named_scope :order_by_start_at, :order => :start_at
+
   named_scope :active, :conditions => ['calendar_events.workflow_state != ?', 'deleted']
   named_scope :locked, :conditions => ["calendar_events.workflow_state = 'locked'"]
   named_scope :unlocked, :conditions => ['calendar_events.workflow_state NOT IN (?)', ['deleted', 'locked']]

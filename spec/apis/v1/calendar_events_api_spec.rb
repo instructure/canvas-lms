@@ -47,6 +47,19 @@ describe CalendarEventsApiController, :type => :integration do
       json.first.slice('title', 'start_at', 'id').should eql({'id' => e2.id, 'title' => '2', 'start_at' => '2012-01-08T12:00:00Z'})
     end
 
+    it 'orders result set by start_at' do
+      e2 = @course.calendar_events.create(:title => 'second', :start_at => '2012-01-08 12:00:00')
+      e1 = @course.calendar_events.create(:title => 'first', :start_at => '2012-01-07 12:00:00')
+      e3 = @course.calendar_events.create(:title => 'third', :start_at => '2012-01-19 12:00:00')
+
+      json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-07&end_date=2012-01-19&context_codes[]=course_#{@course.id}", {
+                        :controller => 'calendar_events_api', :action => 'index', :format => 'json',
+                        :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-19'})
+      json.size.should eql 3
+      json.first.keys.sort.should eql expected_fields
+      json.map { |event| event['title'] }.should == %w[first second third]
+    end
+
     it "should default to today's events for the current user if no parameters are specified" do
       Timecop.freeze('2012-01-29 12:00:00 UTC') do
         e1 = @user.calendar_events.create!(:title => "yesterday", :start_at => 1.day.ago) { |c| c.context = @user }

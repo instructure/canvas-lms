@@ -528,7 +528,7 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def calendar_event_scope
-    scope = CalendarEvent.active.
+    scope = CalendarEvent.active.order_by_start_at.
       for_user_and_context_codes(@current_user, @context_codes, @section_codes)
 
     scope = scope.send(*date_scope_and_args) unless @all_events
