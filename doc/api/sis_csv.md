@@ -17,7 +17,8 @@ the CSV as "Chevy ""The Man"" Chase".
 
 All text should be UTF-8 encoded.
 
-All timestamps are sent and returned in ISO 8601 format.  All timestamps default to UTC time zone unless specified.
+All timestamps are sent and returned in ISO 8601 format.  All timestamps default to UTC time zone
+unless specified.
 
     YYYY-MM-DDTHH:MM:SSZ
 
@@ -42,28 +43,25 @@ users.csv
 <tr>
 <th>Field Name</th>
 <th>Data Type</th>
-<th>Default</th>
 <th>Description</th>
 </tr>
 <tr>
 <td>user_id</td>
 <td>text</td>
-<td><em>required</em></td>
-<td>A unique identifier used to reference users in the enrollments table.
-This identifier must not change for the user, and must be globally unique. In the user interface, this is called the SIS ID.</td>
+<td><b>Required field</b>. A unique identifier used to reference users in the enrollments table.
+This identifier must not change for the user, and must be globally unique. In the user interface,
+ this is called the SIS ID.</td>
 </tr>
 <tr>
 <td>login_id</td>
 <td>text</td>
-<td><em>required</em></td>
-<td>The name that a user will use to login to Instructure. If you have an
+<td><b>Required field</b>. The name that a user will use to login to Instructure. If you have an
 authentication service configured (like LDAP), this will be their username
 from the remote system.</td>
 </tr>
 <tr>
 <td>password</td>
 <td>text</td>
-<td></td>
 <td><p>If the account is configured to use LDAP or an SSO protocol then
 this isn't needed. Otherwise this is the password that will be used to
 login to Canvas along with the 'login_id' above.</p>
@@ -73,27 +71,23 @@ otherwise) it will <em>not</em> be overwritten</p></td>
 <tr>
 <td>first_name</td>
 <td>text</td>
-<td></td>
 <td>Given name of the user.</td>
 </tr>
 <tr>
 <td>last_name</td>
 <td>text</td>
-<td></td>
 <td>Last name of the user.</td>
 </tr>
 <tr>
 <td>email</td>
 <td>text</td>
-<td></td>
 <td>The email address of the user. This might be the same as login_id, but should
 still be provided.</td>
 </tr>
 <tr>
 <td>status</td>
 <td>enum</td>
-<td><em>active</em></td>
-<td>active, deleted</td>
+<td><b>Required field</b>. active, deleted</td>
 </tr>
 </table>
 
@@ -118,38 +112,35 @@ accounts.csv
 <tr>
 <th>Field Name</th>
 <th>Data Type</th>
-<th>Default</th>
 <th>Description</th>
 </tr>
 <tr>
 <td>account_id</td>
 <td>text</td>
-<td>required</td>
-<td>A unique identifier used to reference accounts in the enrollments data.
-This identifier must not change for the account, and must be globally unique. In the user interface, this is called the SIS ID.</td>
+<td><b>Required field</b>. A unique identifier used to reference accounts in the enrollments data.
+This identifier must not change for the account, and must be globally unique. In the user
+interface, this is called the SIS ID.</td>
 </tr>
 <tr>
 <td>parent_account_id</td>
 <td>text</td>
-<td> </td>
 <td>The account identifier of the parent account.
 If this is blank the parent account will be the root account.</td>
 </tr>
 <tr>
 <td>name</td>
 <td>text</td>
-<td>required</td>
-<td>The name of the account</td>
+<td><b>Required field</b>. The name of the account</td>
 </tr>
 <tr>
 <td>status</td>
 <td>enum</td>
-<td>active</td>
-<td>active, deleted</td>
+<td><b>Required field</b>. active, deleted</td>
 </tr>
 </table>
 
-Any account that will have child accounts must be listed in the csv before any child account references it.
+Any account that will have child accounts must be listed in the csv before any child account
+references it.
 
 Sample:
 
@@ -167,50 +158,46 @@ terms.csv
 <tr>
 <th>Field Name</th>
 <th>Data Type</th>
-<th>Default</th>
 <th>Description</th>
 </tr>
 <tr>
 <td>term_id</td>
 <td>text</td>
-<td>required</td>
-<td>A unique identifier used to reference terms in the enrollments data.
-This identifier must not change for the account, and must be globally unique. In the user interface, this is called the SIS ID.</td>
+<td><b>Required field</b>. A unique identifier used to reference terms in the enrollments data.
+This identifier must not change for the account, and must be globally unique. In the user
+interface, this is called the SIS ID.</td>
 </tr>
 <tr>
 <td>name</td>
 <td>text</td>
-<td>required</td>
-<td>The name of the term</td>
+<td><b>Required field</b>. The name of the term</td>
 </tr>
 <tr>
 <td>status</td>
 <td>enum</td>
-<td>active</td>
-<td>active, deleted</td>
+<td><b>Required field</b>. active, deleted</td>
 </tr>
 <tr>
 <td>start_date</td>
 <td>date</td>
-<td></td>
-<td>The date the term starts. The format should be: YYYY-mm-DD HH:MM:SS</td>
+<td>The date the term starts. The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ</td>
 </tr>
 <tr>
 <td>end_date</td>
 <td>date</td>
-<td></td>
-<td>The date the term ends. The format should be: YYYY-mm-DD HH:MM:SS</td>
+<td>The date the term ends. The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ</td>
 </tr>
 </table>
 
-Any account that will have child accounts must be listed in the csv before any child account references it.
+Any account that will have child accounts must be listed in the csv before any child account
+references it.
 
 Sample:
 
 <pre>
 term_id,name,status,start_date,end_date
 T001,Winter2011,active,,
-T002,Spring2011,active,2010-9-03 00:00:00,2010-12-14 00:00:00-06:00
+T002,Spring2011,active,2013-1-03 00:00:00,2013-05-03 00:00:00-06:00
 T003,Fall2011,active,,
 </pre>
 
@@ -221,61 +208,57 @@ courses.csv
 <tr>
 <th>Field Name</th>
 <th>Data Type</th>
-<th>Default</th>
 <th>Description</th>
 </tr>
 <tr>
 <td>course_id</td>
 <td>text</td>
-<td>required</td>
-<td>A unique identifier used to reference courses in the enrollments data.
-This identifier must not change for the account, and must be globally unique. In the user interface, this is called the SIS ID.</td>
+<td><b>Required field</b>. A unique identifier used to reference courses in the enrollments data.
+This identifier must not change for the account, and must be globally unique. In the user
+interface, this is called the SIS ID.</td>
 </tr>
 <tr>
 <td>short_name</td>
 <td>text</td>
-<td>required</td>
-<td>A short name for the course</td>
+<td><b>Required field</b>. A short name for the course</td>
 </tr>
 <tr>
 <td>long_name</td>
 <td>text</td>
-<td>required</td>
-<td>A long name for the course. (This can be the same as the short name,
+<td><b>Required field</b>. A long name for the course. (This can be the same as the short name,
 but if both are available, it will provide a better user experience to provide both.)</td>
 </tr>
 <tr>
 <td>account_id</td>
 <td>text</td>
-<td> </td>
-<td>The account identifier from accounts.csv, if none is specified the course will be attached to the root account</td>
+<td>The account identifier from accounts.csv, if none is specified the course will be attached to
+the root account</td>
 </tr>
 <tr>
 <td>term_id</td>
 <td>text</td>
-<td> </td>
-<td>The term identifier from terms.csv, if no term_id is specified the default term for the account will be used</td>
+<td>The term identifier from terms.csv, if no term_id is specified the
+default term for the account will be used</td>
 </tr>
 <tr>
 <td>status</td>
 <td>enum</td>
-<td>active</td>
-<td>active, deleted, completed</td>
+<td><b>Required field</b>. active, deleted, completed</td>
 </tr>
 <tr>
 <td>start_date</td>
 <td>date</td>
-<td></td>
-<td>The date the term starts. The format should be: YYYY-mm-DD HH:MM:SS</td>
+<td>The course start date. The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ</td>
 </tr>
 <tr>
 <td>end_date</td>
 <td>date</td>
-<td></td>
-<td>The date the term ends. The format should be: YYYY-mm-DD HH:MM:SS</td>
+<td>The course end date. The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ</td>
 </tr>
 </table>
 
+<p>If the start_date is set, it will override the term start date. If the end_date is set, it will
+override the term end date.</p>
 
 Sample:
 
@@ -293,53 +276,50 @@ sections.csv
 <tr>
 <th>Field Name</th>
 <th>Data Type</th>
-<th>Default</th>
 <th>Description</th>
 </tr>
 <tr>
 <td>section_id</td>
 <td>text</td>
-<td>required</td>
-<td>A unique identifier used to reference sections in the enrollments data.
-This identifier must not change for the account, and must be globally unique. In the user interface, this is called the SIS ID.</td>
+<td><b>Required field</b>. A unique identifier used to reference sections in the enrollments data.
+This identifier must not change for the account, and must be globally unique. In the user
+interface, this is called the SIS ID.</td>
 </tr>
 <tr>
 <td>course_id</td>
 <td>text</td>
-<td>required</td>
-<td>The course identifier from courses.csv</td>
+<td><b>Required field</b>. The course identifier from courses.csv</td>
 </tr>
 <tr>
 <td>name</td>
 <td>text</td>
-<td>required</td>
-<td>The name of the section</td>
+<td><b>Required field</b>. The name of the section</td>
 </tr>
 <tr>
 <td>status</td>
 <td>enum</td>
-<td>active</td>
-<td>active, deleted</td>
+<td><b>Required field</b>. active, deleted</td>
 </tr>
 <tr>
 <td>start_date</td>
 <td>date</td>
-<td></td>
-<td>The date the term starts. The format should be: YYYY-mm-DD HH:MM:SS</td>
+<td>The section start date. The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ</td>
 </tr>
 <tr>
 <td>end_date</td>
 <td>date</td>
-<td></td>
-<td>The date the term ends. The format should be: YYYY-mm-DD HH:MM:SS</td>
+<td>The section end date The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ</td>
 </tr>
 <tr>
 <td>account_id</td>
 <td>text</td>
-<td> </td>
-<td>The account identifier from accounts.csv, if none is specified the course will be attached to the root account</td>
+<td>The account identifier from accounts.csv, if none is specified the course will be attached
+to the root account</td>
 </tr>
 </table>
+
+<p>If the start_date is set, it will override the course and term start dates. If the end_date is
+set, it will override the course and term end dates.</p>
 
 Sample:
 
@@ -357,43 +337,38 @@ enrollments.csv
 <tr>
 <th>Field Name</th>
 <th>Data Type</th>
-<th>Default</th>
 <th>Description</th>
 </tr>
 <tr>
 <td>course_id</td>
 <td>text</td>
-<td>required if section_id missing</td>
-<td>The course identifier from courses.csv</td>
+<td><b>Required field if section_id is missing</b>. The course identifier from courses.csv</td>
 </tr>
 <tr>
 <td>user_id</td>
 <td>text</td>
-<td>required</td>
-<td>The User identifier from users.csv</td>
+<td><b>Required field</b>. The User identifier from users.csv</td>
 </tr>
 <tr>
 <td>role</td>
 <td>text</td>
-<td>required</td>
-<td>student, teacher, ta, observer, designer, or a custom role defined by the account</td>
+<td><b>Required field</b>. student, teacher, ta, observer, designer, or a custom role defined
+by the account</td>
 </tr>
 <tr>
 <td>section_id</td>
 <td>text</td>
-<td>required if course_id missing</td>
-<td>The section identifier from sections.csv, if none is specified the default section for the course will be used</td>
+<td><b>Required field if course_id missing</b>. The section identifier from sections.csv, if none
+is specified the default section for the course will be used</td>
 </tr>
 <tr>
 <td>status</td>
 <td>enum</td>
-<td>active</td>
-<td>active, deleted, completed</td>
+<td><b>Required field</b>. active, deleted, completed</td>
 </tr>
 <tr>
 <td>associated_user_id</td>
 <td>text</td>
-<td> </td>
 <td>For observers, the user identifier from users.csv of a student
 in the same course that this observer should be able to see grades for.
 Ignored for any role other than observer</td>
@@ -401,7 +376,8 @@ Ignored for any role other than observer</td>
 </table>
 
 
-When an enrollment is in a 'completed' state the student is limited to read-only access to the course.
+When an enrollment is in a 'completed' state the student is limited to read-only access to the
+course.
 
 
 Sample:
@@ -420,33 +396,29 @@ groups.csv
 <tr>
 <th>Field Name</th>
 <th>Data Type</th>
-<th>Default</th>
 <th>Description</th>
 </tr>
 <tr>
 <td>group_id</td>
 <td>text</td>
-<td>required</td>
-<td>A unique identifier used to reference groups in the group_users data.
+<td><b>Required field</b>. A unique identifier used to reference groups in the group_users data.
 This identifier must not change for the group, and must be globally unique.</td>
 </tr>
 <tr>
 <td>account_id</td>
 <td>text</td>
-<td> </td>
-<td>The account identifier from accounts.csv, if none is specified the group will be attached to the root account.</td>
+<td>The account identifier from accounts.csv, if none is specified the group will be attached to
+the root account.</td>
 </tr>
 <tr>
 <td>name</td>
 <td>text</td>
-<td>required</td>
-<td>The name of the group.</td>
+<td><b>Required field</b>. The name of the group.</td>
 </tr>
 <tr>
 <td>status</td>
 <td>enum</td>
-<td>available</td>
-<td>available, closed, completed, deleted</td>
+<td><b>Required field</b>. available, closed, completed, deleted</td>
 </tr>
 </table>
 
@@ -466,26 +438,22 @@ groups_membership.csv
 <tr>
 <th>Field Name</th>
 <th>Data Type</th>
-<th>Default</th>
 <th>Description</th>
 </tr>
 <tr>
 <td>group_id</td>
 <td>text</td>
-<td>required</td>
-<td>The group identifier from groups.csv</td>
+<td><b>Required field</b>. The group identifier from groups.csv</td>
 </tr>
 <tr>
 <td>user_id</td>
 <td>text</td>
-<td>required</td>
-<td>The user identifier from users.csv</td>
+<td><b>Required field</b>. The user identifier from users.csv</td>
 </tr>
 <tr>
 <td>status</td>
 <td>enum</td>
-<td>accepted</td>
-<td>accepted, deleted</td>
+<td><b>Required field</b>. accepted, deleted</td>
 </tr>
 </table>
 
@@ -505,26 +473,22 @@ xlists.csv
 <tr>
 <th>Field Name</th>
 <th>Data Type</th>
-<th>Default</th>
 <th>Description</th>
 </tr>
 <tr>
 <td>xlist_course_id</td>
 <td>text</td>
-<td>required</td>
-<td>The course identifier from courses.csv</td>
+<td><b>Required field</b>. The course identifier from courses.csv</td>
 </tr>
 <tr>
 <td>section_id</td>
 <td>text</td>
-<td>required</td>
-<td>The section identifier from sections.csv</td>
+<td><b>Required field</b>. The section identifier from sections.csv</td>
 </tr>
 <tr>
 <td>status</td>
 <td>enum</td>
-<td>active</td>
-<td>active, deleted</td>
+<td><b>Required field</b>. active, deleted</td>
 </tr>
 </table>
 
@@ -544,4 +508,3 @@ E411208,1B,active
 E411208,2A,active
 E411208,2A,active
 </pre>
-
