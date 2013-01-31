@@ -194,12 +194,24 @@ module AssignmentOverrideApplicator
   end
 
   def self.overridden_unlock_at(assignment_or_quiz, overrides)
-    unlock_ats = overrides.select(&:unlock_at_overridden).map(&:unlock_at)
-    unlock_ats.any?(&:nil?) ? nil : [assignment_or_quiz.unlock_at, *unlock_ats].compact.min
+    applicable_overrides = overrides.select(&:unlock_at_overridden)
+    if applicable_overrides.empty?
+      assignment_or_quiz.unlock_at
+    elsif override = applicable_overrides.detect{ |o| o.unlock_at.nil? }
+      nil
+    else
+      applicable_overrides.sort_by(&:unlock_at).first.unlock_at
+    end
   end
 
   def self.overridden_lock_at(assignment_or_quiz, overrides)
-    lock_ats = overrides.select(&:lock_at_overridden).map(&:lock_at)
-    lock_ats.any?(&:nil?) ? nil : [assignment_or_quiz.lock_at, *lock_ats].compact.max
+    applicable_overrides = overrides.select(&:lock_at_overridden)
+    if applicable_overrides.empty?
+      assignment_or_quiz.lock_at
+    elsif override = applicable_overrides.detect{ |o| o.lock_at.nil? }
+      nil
+    else
+      applicable_overrides.sort_by(&:lock_at).last.lock_at
+    end
   end
 end

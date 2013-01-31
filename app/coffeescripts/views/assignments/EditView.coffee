@@ -13,6 +13,7 @@ define [
   'compiled/views/assignments/TurnitinSettingsDialog'
   'grading_standards'
   'compiled/fn/preventDefault'
+  'compiled/views/calendar/MissingDateDialogView'
   'compiled/tinymce'
   'tinymce.editor_box'
   'jqueryui/dialog'
@@ -21,7 +22,7 @@ define [
 ], (INST, I18n, ValidatedFormView, _, $, wikiSidebar, template,
 TurnitinSettings, AssignmentGroupSelector, GroupCategorySelector,
 PeerReviewsSelector, TurnitinSettingsDialog, showGradingSchemeDialog,
-preventDefault) ->
+preventDefault, MissingDateDialog) ->
 
   class EditView extends ValidatedFormView
 
@@ -53,10 +54,11 @@ preventDefault) ->
     EXTERNAL_TOOLS_NEW_TAB = '#assignment_external_tool_tag_attributes_new_tab'
     VIEW_GRADING_LEVELS = '#view-grading-levels'
 
-    initialize: ->
+    initialize: ( options ) ->
       @assignment = @model
+      {views} = options
+      @dueDateOverrideView = views['js-assignment-overrides']
       @model.on 'sync', -> window.location = @get 'html_url'
-      super
 
     initializeSubviews: =>
       @assignmentGroupSelector or= new AssignmentGroupSelector
@@ -71,7 +73,7 @@ preventDefault) ->
         el: PEER_REVIEWS_FIELDS
         parentModel: @assignment
 
-    events: _.extend(@::events, do ->
+    events: _.extend({}, @::events, do ->
       events = {}
       events["click .cancel_button"] = 'handleCancel'
       events["click #{ASSIGNMENT_TOGGLE_ADVANCED_OPTIONS}"] = 'toggleAdvancedOptions'
@@ -88,13 +90,16 @@ preventDefault) ->
 
     handleCancel: (ev) =>
       ev.preventDefault()
-      window.location = ENV.CANCEL_TO if ENV.CANCEL_TO
+      window.location = ENV.CANCEL_TO if ENV.CANCEL_TO?
+
+    showingAdvancedOptions: =>
+      ariaExpanded = @$advancedAssignmentOptions.attr('aria-expanded')
+      ariaExpanded == 'true' or ariaExpanded == true
 
     toggleAdvancedOptions: (ev) =>
       ev.preventDefault()
       $(ev.currentTarget).focus() # to ensure its errorBox gets cleaned up (if it has one)
-      ariaExpanded = @$advancedAssignmentOptions.attr('aria-expanded')
-      expanded = ariaExpanded == 'true' or ariaExpanded == true
+      expanded = @showingAdvancedOptions()
       @$advancedAssignmentOptions.attr('aria-expanded', !expanded)
       @$advancedAssignmentOptions.toggle(!expanded)
       if expanded
@@ -221,24 +226,37 @@ preventDefault) ->
       wikiSidebar.attachToEditor(@$description).show()
 
     # -- Data for Submitting --
-
     getFormData: =>
       data = super
-      data = @_inferDates data
       data = @_inferSubmissionTypes data
       data = @_filterAllowedExtensions data
       data = @groupCategorySelector.filterFormData data
-      data
+      # should update the date fields.. pretty hacky.
+      if @showingAdvancedOptions()
+        @dueDateOverrideView.updateOverrides()
+        defaultDates = @dueDateOverrideView.getDefaultDueDate()
+        data.lock_at = defaultDates?.get('lock_at') or null
+        data.unlock_at = defaultDates?.get('unlock_at') or null
+        data.due_at = defaultDates?.get('due_at') or null
+      return data
 
-    # Uses Datepicker magic to get us the correct date value.
-    _inferDates: (assignmentData) =>
-      if assignmentData.due_at
-        assignmentData.due_at = @$dueAt.data 'date'
-      if assignmentData.unlock_at
-        assignmentData.unlock_at = @$unlockAt.data 'date'
-      if assignmentData.lock_at
-        assignmentData.lock_at = @$lockAt.data 'date'
-      assignmentData
+    submit: (event) =>
+      event.preventDefault()
+      event.stopPropagation()
+      if @dueDateOverrideView.containsSectionsWithoutOverrides()
+        sections = @dueDateOverrideView.sectionsWithoutOverrides()
+        missingDateDialog = new MissingDateDialog
+          validationFn: -> sections
+          labelFn: ( section ) -> section.get 'name'
+          success: =>
+            @model.setNullDates()
+            ValidatedFormView::submit.call(this)
+        missingDateDialog.cancel = (e) ->
+          missingDateDialog.$dialog.dialog('close').remove()
+
+        missingDateDialog.render()
+      else
+        super
 
     _inferSubmissionTypes: (assignmentData) =>
       if assignmentData.grading_type == 'not_graded'
@@ -269,6 +287,7 @@ preventDefault) ->
       assignmentToggleAdvancedOptions: '#assignment_toggle_advanced_options'
 
     validateBeforeSave: (data, errors) =>
+      errors = @_validateTitle data, errors
       errors = @_validateSubmissionTypes data, errors
       errors = @_validateAllowedExtensions data, errors
       errors = @groupCategorySelector.validateBeforeSave(data, errors)

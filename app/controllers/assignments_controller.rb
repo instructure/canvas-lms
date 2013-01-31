@@ -18,7 +18,9 @@
 
 # @API Assignments
 class AssignmentsController < ApplicationController
+  include Api::V1::Section
   include Api::V1::Assignment
+  include Api::V1::AssignmentOverride
   include Api::V1::AssignmentGroup
   include Api::V1::Outcome
 
@@ -256,9 +258,11 @@ class AssignmentsController < ApplicationController
       edit
     end
   end
+
   
   def edit
     @assignment ||= @context.assignments.active.find(params[:id])
+    @assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @current_user)
     if authorized_action(@assignment, @current_user, @assignment.new_record? ? :create : :update)
       @assignment.title = params[:title] if params[:title]
       @assignment.due_at = params[:due_at] if params[:due_at]
@@ -281,9 +285,13 @@ class AssignmentsController < ApplicationController
       hash = {
         :ASSIGNMENT_GROUPS => assignment_groups.map{|g| assignment_group_json(g, @current_user, session) },
         :GROUP_CATEGORIES => group_categories,
-        :KALTURA_ENABLED => !!feature_enabled?( :kaltura )
+        :KALTURA_ENABLED => !!feature_enabled?( :kaltura ),
+        :SECTION_LIST => (@context.course_sections.active.map { |section|
+          {:id => section.id, :name => section.name }
+        }),
+        :ASSIGNMENT_OVERRIDES =>
+          (assignment_overrides_json(@assignment.overrides_visible_to(@current_user)))
       }
-
       hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session)
       hash[:URL_ROOT] = polymorphic_url([:api_v1, @context, :assignments])
       hash[:CANCEL_TO] = @assignment.new_record? ? polymorphic_url([@context, :assignments]) : polymorphic_url([@context, @assignment])

@@ -54,7 +54,9 @@
   </div>
 </div>
 
-<div id="assignment_due_date_controls" class="control-group">
+<div id="assignment_due_date_controls" 
+  class="control-group"
+  style="{{hiddenUnless isSimple}}">
   <label for="assignment_due_date" class="control-label">
     {{#t "due_date"}}Due Date{{/t}}
   </label>
@@ -65,8 +67,6 @@
       type="text"
       {{#if isSimple}}
         class="date_field datetime_field hasDatePicker"
-      {{else}}
-        disabled
       {{/if}}
       {{disabledIfIncludes frozenAttributes "due_at"}}/>
   </div>
@@ -134,7 +134,6 @@
     </div>
   </div>
 
-
   <div id="graded_assignment_fields"
     aria-expanded="{{not isNotGraded}}"
     style="{{hiddenIf isNotGraded}}">
@@ -166,6 +165,8 @@
       </div>
     </fieldset>
   {{/if}}
+
+  <div class='js-assignment-overrides'></div>
 
 </div>
 

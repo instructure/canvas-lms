@@ -3,14 +3,17 @@ define [
   'underscore'
   'Backbone'
   'compiled/models/TurnitinSettings'
-], ($, _, {Model}, TurnitinSettings ) ->
+  'compiled/collections/AssignmentOverrideCollection'
+], ($, _, {Model}, TurnitinSettings, AssignmentOverrideCollection ) ->
 
   class Assignment extends Model
 
     resourceName: 'assignments'
 
     initialize: ->
-      super
+      overrides = @get('assignment_overrides')
+      @set 'assignment_overrides',
+        new AssignmentOverrideCollection( overrides )
       @set 'turnitin_settings', new TurnitinSettings(@get 'turnitin_settings'),
         silent: true
 
@@ -46,11 +49,11 @@ define [
       @set 'description', newDescription
 
     name: ( newName ) =>
-      return @get 'name' unless newName
+      return @get 'name' unless arguments.length > 0
       @set 'name', newName
 
     pointsPossible: ( points ) =>
-      return @get('points_possible') || 0 unless points
+      return @get('points_possible') || 0 unless arguments.length > 0
       @set 'points_possible', points
 
     assignmentGroupID: ( assignment_group_id ) =>
@@ -166,11 +169,12 @@ define [
       @set 'external_tool_tag_attributes', tagAttributes
 
     isSimple: =>
-      @gradingType() == 'points' &&
-        @submissionType() == 'none' &&
-        !@groupCategoryId() &&
-        !@peerReviews() &&
-        !@frozen()
+      @gradingType() == 'points' and
+        @submissionType() == 'none' and
+        !@groupCategoryId() and
+        !@peerReviews() and
+        !@frozen() and
+        @get('assignment_overrides').isSimple()
 
     isLetterGraded: =>
       @gradingType() == 'letter_grade'
@@ -200,6 +204,12 @@ define [
       assignment: data
 
     parse: (data) ->
+      overrides = data.assignment_overrides
+      if overrides?
+        data.assignment_overrides =
+          new AssignmentOverrideCollection overrides
+      else
+        data.assignment_overrides = new AssignmentOverrideCollection
       data.turnitin_settings = new TurnitinSettings data.turnitin_settings
       data
 
@@ -235,3 +245,9 @@ define [
       delete data.frozen
       delete data.frozen_attributes
       data
+
+    setNullDates: =>
+      @dueAt null
+      @lockAt null
+      @unlockAt null
+      this

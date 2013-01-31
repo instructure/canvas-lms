@@ -1,6 +1,4 @@
 <div id="sidebar_content">
-  <%= render :partial => "assignment_locked" if @assignment.locked_for?(@current_user) %>
-  
   <% if can_do(@assignment, @current_user, :update) && @assignment.needs_publishing? %>
     <h2><%= t 'titles.unpublished', "Unpublished" %></h2>
     <div class="rs-margin-lr">

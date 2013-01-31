@@ -601,11 +601,12 @@ describe AssignmentOverrideApplicator do
       unlock_at.should == @override.unlock_at
     end
 
-    it "should include a non-empty original unlock date when finding most lenient unlock date" do
+    it "prefers overrides even when later when determining most lenient unlock date" do
+      later = 7.days.from_now
       @assignment.unlock_at = 6.days.from_now
-      @override.override_unlock_at(7.days.from_now)
+      @override.override_unlock_at(later)
       unlock_at = AssignmentOverrideApplicator.overridden_unlock_at(@assignment, [@override])
-      unlock_at.should == @assignment.unlock_at
+      unlock_at.should == later
     end
 
     it "should fallback on the assignment's unlock_at" do
@@ -662,11 +663,12 @@ describe AssignmentOverrideApplicator do
       lock_at.should == @override.lock_at
     end
 
-    it "should include a non-empty original lock date when finding most lenient lock date" do
+    it "prefers overrides even when earlier when determining most lenient lock date" do
+      earlier = 6.days.from_now
       @assignment.lock_at = 7.days.from_now
-      @override.override_lock_at(6.days.from_now)
+      @override.override_lock_at(earlier)
       lock_at = AssignmentOverrideApplicator.overridden_lock_at(@assignment, [@override])
-      lock_at.should == @assignment.lock_at
+      lock_at.should == earlier
     end
 
     it "should fallback on the assignment's lock_at" do

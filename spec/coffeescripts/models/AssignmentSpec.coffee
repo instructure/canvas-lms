@@ -1,10 +1,10 @@
 define [
-  'compiled/models/Assignment2'
+  'compiled/models/Assignment'
 ], (Assignment) ->
 
   module "Assignment"
 
-  module "Assignment2#isQuiz"
+  module "Assignment#isQuiz"
 
   test "returns true if record is a quiz", ->
     assignment = new Assignment name: 'foo'
@@ -16,7 +16,7 @@ define [
     assignment.set 'submission_types', ['on_paper']
     deepEqual assignment.isQuiz(), false
 
-  module "Assignment2#isDiscussionTopic"
+  module "Assignment#isDiscussionTopic"
 
   test "returns true if record is discussion topic", ->
     assignment = new Assignment name: 'foo'
@@ -28,7 +28,7 @@ define [
     assignment.submissionTypes( ['on_paper'] )
     deepEqual assignment.isDiscussionTopic(), false
 
-  module "Assignment2#isExternalTool"
+  module "Assignment#isExternalTool"
 
   test "returns true if record is external tool", ->
     assignment = new Assignment name: 'foo'
@@ -40,7 +40,7 @@ define [
     assignment.submissionTypes( [ 'on_paper' ] )
     deepEqual assignment.isExternalTool(), false
 
-  module "Assignment2#isNotGraded"
+  module "Assignment#isNotGraded"
 
   test "returns true if record is not graded", ->
     assignment = new Assignment name: 'foo'
@@ -53,7 +53,7 @@ define [
     assignment.submissionTypes [ 'online_url' ]
     deepEqual assignment.isNotGraded(), false
 
-  module "Assignment2#isAssignment"
+  module "Assignment#isAssignment"
 
   test "returns true if record is not quiz,ungraded,external tool, or discussion", ->
     assignment = new Assignment name: 'foo'
@@ -69,7 +69,7 @@ define [
     assignment.set 'submission_types', ['online_quiz']
     deepEqual assignment.isAssignment(), false
 
-  module "Assignment2#asignmentType as a setter"
+  module "Assignment#asignmentType as a setter"
 
   test "sets the record's submission_types to the value", ->
     assignment = new Assignment name: 'foo'
@@ -85,7 +85,7 @@ define [
     deepEqual assignment.assignmentType(), 'assignment'
     deepEqual assignment.get( 'submission_types' ), [ 'none' ]
 
-  module "Assignment2#assignmentType as a getter"
+  module "Assignment#assignmentType as a getter"
 
   test """
     returns 'assignment' if not quiz, discussion topic, external tool, or
@@ -100,7 +100,7 @@ define [
     assignment.set 'submission_types', ['online_quiz']
     deepEqual assignment.assignmentType(), 'online_quiz'
 
-  module "Assignment2#dueAt as a getter"
+  module "Assignment#dueAt as a getter"
 
   test "returns record's due_at", ->
     date = Date.now()
@@ -108,7 +108,7 @@ define [
     assignment.set 'due_at', date
     deepEqual assignment.dueAt(), date
 
-  module "Assignment2#dueAt as a setter"
+  module "Assignment#dueAt as a setter"
 
   test "sets the record's due_at", ->
     date = Date.now()
@@ -117,7 +117,7 @@ define [
     assignment.dueAt( date )
     deepEqual assignment.dueAt(), date
 
-  module "Assignment2#unlockAt as a getter"
+  module "Assignment#unlockAt as a getter"
 
   test "gets the records unlock_at", ->
     date = Date.now()
@@ -125,7 +125,7 @@ define [
     assignment.set 'unlock_at', date
     deepEqual assignment.unlockAt(), date
 
-  module "Assignment2#unlockAt as a setter"
+  module "Assignment#unlockAt as a setter"
 
   test "sets the record's unlock_at", ->
     date = Date.now()
@@ -134,7 +134,7 @@ define [
     assignment.unlockAt( date )
     deepEqual assignment.unlockAt(), date
 
-  module "Assignment2#lockAt as a getter"
+  module "Assignment#lockAt as a getter"
 
   test "gets the records lock_at", ->
     date = Date.now()
@@ -142,7 +142,7 @@ define [
     assignment.set 'lock_at', date
     deepEqual assignment.lockAt(), date
 
-  module "Assignment2#lockAt as a setter"
+  module "Assignment#lockAt as a setter"
 
   test "sets the record's lock_at", ->
     date = Date.now()
@@ -151,14 +151,14 @@ define [
     assignment.lockAt( date )
     deepEqual assignment.lockAt(), date
 
-  module "Assignment2#description as a getter"
+  module "Assignment#description as a getter"
 
   test "returns the record's description", ->
     assignment = new Assignment name: 'foo'
     assignment.set 'description', 'desc'
     deepEqual assignment.description(), 'desc'
 
-  module "Assignment2#description as a setter"
+  module "Assignment#description as a setter"
 
   test "sets the record's desciption", ->
     assignment = new Assignment name: 'foo'
@@ -167,14 +167,14 @@ define [
     deepEqual assignment.description(), 'desc'
     deepEqual assignment.get('description'), 'desc'
 
-  module "Assignment2#name as a getter"
+  module "Assignment#name as a getter"
 
   test "returns the record's name", ->
     assignment = new Assignment name: 'foo'
     assignment.set 'name', 'Todd'
     deepEqual assignment.name(), 'Todd'
 
-  module "Assignment2#name as a setter"
+  module "Assignment#name as a setter"
 
   test "sets the record's name", ->
     assignment = new Assignment name: 'foo'
@@ -182,7 +182,7 @@ define [
     assignment.name( 'Todd' )
     deepEqual assignment.get('name'), 'Todd'
 
-  module "Assignment2#pointsPossible as a setter"
+  module "Assignment#pointsPossible as a setter"
 
   test "sets the record's points_possible", ->
     assignment = new Assignment name: 'foo'
@@ -191,7 +191,7 @@ define [
     deepEqual assignment.pointsPossible(), 12
     deepEqual assignment.get('points_possible'), 12
 
-  module "Assignment2#assignmentGroupID as a setter"
+  module "Assignment#assignmentGroupID as a setter"
 
   test "sets the record's assignment group id", ->
     assignment = new Assignment name: 'foo'
@@ -200,7 +200,7 @@ define [
     deepEqual assignment.assignmentGroupID(), 12
     deepEqual assignment.get('assignment_group_id'), 12
 
-  module "Assignment2#gradingType as a setter"
+  module "Assignment#gradingType as a setter"
 
   test "sets the record's grading type", ->
     assignment = new Assignment name: 'foo'
@@ -209,7 +209,7 @@ define [
     deepEqual assignment.gradingType(), 'percent'
     deepEqual assignment.get('grading_type'), 'percent'
 
-  module "Assignment2#submissionType"
+  module "Assignment#submissionType"
 
   test "returns 'none' if record's submission_types is ['none']", ->
     assignment = new Assignment name: 'foo'
@@ -226,7 +226,7 @@ define [
     assignment.set 'submission_types', [ 'online_upload' ]
     deepEqual assignment.submissionType(), 'online'
 
-  module "Assignment2#acceptsOnlineUpload"
+  module "Assignment#acceptsOnlineUpload"
 
   test "returns true if record submission types includes online_upload", ->
     assignment = new Assignment name: 'foo'
@@ -238,7 +238,7 @@ define [
     assignment.set 'submission_types', []
     deepEqual assignment.acceptsOnlineUpload(), false
   
-  module "Assignment2#acceptsOnlineURL"
+  module "Assignment#acceptsOnlineURL"
 
   test "returns true if assignment allows online url", ->
     assignment = new Assignment name: 'foo'
@@ -250,21 +250,21 @@ define [
     assignment.set 'submission_types', []
     deepEqual assignment.acceptsOnlineURL(), false
 
-  module "Assignment2#acceptsMediaRecordings"
+  module "Assignment#acceptsOnlineMediaRecording"
 
   test "returns true if submission types includes media recordings", ->
     assignment = new Assignment name: 'foo'
-    assignment.set 'submission_types', [ 'media_recording' ]
-    deepEqual assignment.acceptsMediaRecording(), true
+    assignment.set 'submission_types', [ 'online_media_recording' ]
+    deepEqual assignment.acceptsOnlineMediaRecording(), true
 
-  module "Assignment2#acceptsOnlineTextEntries"
+  module "Assignment#acceptsOnlineTextEntries"
 
   test "returns true if submission types includes online text entry", ->
     assignment = new Assignment name: 'foo'
     assignment.set 'submission_types', [ 'online_text_entry' ]
     deepEqual assignment.acceptsOnlineTextEntries(), true
 
-  module "Assignment2#peerReviews"
+  module "Assignment#peerReviews"
 
   test "returns the peer_reviews on the record if no args passed", ->
     assignment = new Assignment name: 'foo'
@@ -277,7 +277,7 @@ define [
     assignment.peerReviews( true )
     deepEqual assignment.peerReviews(), true
 
-  module "Assignment2#automaticPeerReviews"
+  module "Assignment#automaticPeerReviews"
 
   test "returns the automatic_peer_reviews on the model if no args passed", ->
     assignment = new Assignment name: 'foo'
@@ -290,7 +290,7 @@ define [
     assignment.automaticPeerReviews( true )
     deepEqual assignment.automaticPeerReviews(), true
 
-  module "Assignment2#notifyOfUpdate"
+  module "Assignment#notifyOfUpdate"
 
   test "returns record's notifyOfUpdate if no args passed", ->
     assignment = new Assignment name: 'foo'
@@ -302,7 +302,7 @@ define [
     assignment.notifyOfUpdate( false )
     deepEqual assignment.notifyOfUpdate(), false
 
-  module "Assignment2#toView"
+  module "Assignment#toView"
 
   test "returns the assignment's name", ->
     assignment = new Assignment name: 'foo'
@@ -381,9 +381,9 @@ define [
 
   test "includes whether or not assignment accepts media recordings", ->
     assignment = new Assignment name: 'foo'
-    assignment.set 'submission_types', [ 'media_recording' ]
+    assignment.set 'submission_types', [ 'online_media_recording' ]
     json = assignment.toView()
-    deepEqual json.acceptsMediaRecording, true
+    deepEqual json.acceptsOnlineMediaRecording, true
 
   test "includes submissionType", ->
     assignment = new Assignment name: 'foo'

@@ -80,7 +80,6 @@ class AssignmentOverride < ActiveRecord::Base
     end
     true
   end
-  private :recompute_submission_lateness
 
   workflow do
     state :active
