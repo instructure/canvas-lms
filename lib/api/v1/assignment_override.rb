@@ -165,7 +165,7 @@ module Api::V1::AssignmentOverride
     # collect override values
     [:due_at, :unlock_at, :lock_at].each do |field|
       if data.has_key?(field)
-        if data[field].empty?
+        if data[field].blank?
           # override value of nil/'' is meaningful
           override_data[field] = nil
         elsif value = Time.zone.parse(data[field].to_s)
