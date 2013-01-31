@@ -203,4 +203,43 @@ else
       end
     end
   end
+
+  # Handle quoting properly for Infinity and NaN. This fix exists in Rails 3.1
+  # and can be safely removed once we upgrade.
+  #
+  # Adapted from: https://github.com/rails/rails/commit/06c23c4c7ff842f7c6237f3ac43fc9d19509a947
+  #
+  # This patch is covered by tests in spec/initializers/active_record_quoting_spec.rb
+  if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
+    ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
+      # Quotes PostgreSQL-specific data types for SQL input.
+      def quote(value, column = nil) #:nodoc:
+        if value.kind_of?(String) && column && column.type == :binary
+          "'#{escape_bytea(value)}'"
+        elsif value.kind_of?(String) && column && column.sql_type == 'xml'
+          "xml '#{quote_string(value)}'"
+        elsif value.kind_of?(Float)
+          if value.infinite? && column && column.type == :datetime
+            "'#{value.to_s.downcase}'"
+          elsif value.infinite? || value.nan?
+            "'#{value.to_s}'"
+          else
+            super
+          end
+        elsif value.kind_of?(Numeric) && column && column.sql_type == 'money'
+          # Not truly string input, so doesn't require (or allow) escape string syntax.
+          "'#{value.to_s}'"
+        elsif value.kind_of?(String) && column && column.sql_type =~ /^bit/
+          case value
+            when /^[01]*$/
+              "B'#{value}'" # Bit-string notation
+            when /^[0-9A-F]*$/i
+              "X'#{value}'" # Hexadecimal notation
+          end
+        else
+          super
+        end
+      end
+    end
+  end
 end
