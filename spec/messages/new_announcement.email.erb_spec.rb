@@ -23,6 +23,9 @@ describe 'new_announcement.email' do
   it "should render" do
     announcement_model
     @object = @a
-    generate_message(:new_announcement, :email, @object)
+    @message = generate_message(:new_announcement, :email, @object)
+    @message.subject.should == "value for title: value for name"
+    @message.url.should match(/\/courses\/\d+\/announcements\/\d+/)
+    @message.body.should match(/\/courses\/\d+\/announcements\/\d+/)
   end
 end

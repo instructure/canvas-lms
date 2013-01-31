@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2011 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,13 +19,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
-describe 'new_announcement.summary' do
+describe 'new_announcement.twitter' do
   it "should render" do
     announcement_model
     @object = @a
-    @message = generate_message(:new_announcement, :summary, @object)
-    @message.subject.should == "value for title: value for name"
+    @message = generate_message(:new_announcement, :twitter, @object)
+    @message.subject.should == "Canvas Alert"
     @message.url.should match(/\/courses\/\d+\/announcements\/\d+/)
-    @message.body.strip.should == "value for message"
+    @message.body.should include("Canvas Alert - Announcement: value for title")
   end
 end
