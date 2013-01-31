@@ -181,6 +181,7 @@ describe ConversationParticipant do
 
     it "should let site admins see everything" do
       Account.site_admin.add_user(@admin_user)
+      Account.site_admin.stubs(:grants_right?).with(@admin_user, :become_user).returns(false)
       convos = @target_user.conversations.for_masquerading_user(@admin_user)
       convos.size.should eql 4
       convos.should eql @target_user.conversations.to_a

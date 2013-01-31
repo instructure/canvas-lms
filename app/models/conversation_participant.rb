@@ -36,7 +36,7 @@ class ConversationParticipant < ActiveRecord::Base
   named_scope :sent, :conditions => "visible_last_authored_at IS NOT NULL", :order => "visible_last_authored_at DESC, conversation_id DESC"
   named_scope :for_masquerading_user, lambda { |user|
     # site admins can see everything
-    return {} if Account.site_admin.grants_right?(user, :become_user)
+    return {} if user.account_users.map(&:account_id).include?(Account.site_admin.id)
 
     # we need to ensure that the user can access *all* of each conversation's
     # accounts (and that each conversation has at least one account). so given
