@@ -840,6 +840,14 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
   end
 end
 
+ActiveRecord::NamedScope::Scope.class_eval do
+  # returns a new scope, with just the order replaced
+  # does *not* support extended scopes
+  def reorder(new_order)
+    self.class.new(proxy_scope, proxy_options.merge(:order => new_order))
+  end
+end
+
 class ActiveRecord::Serialization::Serializer
   def serializable_record
     hash = HashWithIndifferentAccess.new.tap do |serializable_record|

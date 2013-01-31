@@ -542,4 +542,19 @@ describe ActiveRecord::Base do
       @p2.reload.unique_id.should == 'pb'
     end
   end
+
+  describe "reorder" do
+    it "should discard previous order by options" do
+      @user1 = User.create!(:name => 'a')
+      @user2 = User.create!(:name => 'b')
+      scopeForward = User.order('name')
+      scopeForward.all.should == [@user1, @user2]
+      # AR method, doesn't work cause Rails just adds the order, instead of replacing
+      scopeBackward = scopeForward.order('name DESC')
+      scopeBackward.all.should == [@user1, @user2]
+      # our way, does work
+      scopeBackward = scopeForward.reorder('name DESC')
+      scopeBackward.all.should == [@user2, @user1]
+    end
+  end
 end
