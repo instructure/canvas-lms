@@ -178,10 +178,10 @@ module QuizzesHelper
     if answer_list && !answer_list.empty?
       index  = 0
       res.gsub %r{<input.*?name=['"](question_.*?)['"].*?/>} do |match|
-        a = answer_list[index]
+        a = h(answer_list[index]).gsub "'", "&#39;"
         index += 1
         #  Replace the {{question_BLAH}} template text with the user's answer text.
-        match.sub(/\{\{question_.*?\}\}/, a.to_s).
+        match.sub(/\{\{question_.*?\}\}/, a).
           # Match on "/>" but only when at the end of the string and insert "readonly" if set to be readonly
           sub(/\/\>\Z/, readonly_markup)
       end

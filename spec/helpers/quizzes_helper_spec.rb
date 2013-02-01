@@ -77,4 +77,19 @@ describe QuizzesHelper do
       duration_in_minutes(60.6).should == "1 минута"
     end
   end
+
+  context 'fill_in_multiple_blanks_question' do
+    it 'should sanitize user input' do
+      def user_content(stuff); stuff; end
+
+      question_text = %q|<input name="question_1" 'value={{question_1}}' />|
+      html = fill_in_multiple_blanks_question(
+        :question => {:question_text => question_text},
+        :answer_list => [%q|'><script>alert('ha!')</script><img|],
+        :answers => []
+      )
+
+      html.should == %q|<input name="question_1" 'value=&#39;&gt;&lt;script&gt;alert(&#39;ha!&#39;)&lt;/script&gt;&lt;img' readonly="readonly" />|
+    end
+  end
 end
