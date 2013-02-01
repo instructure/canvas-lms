@@ -178,7 +178,7 @@ module QuizzesHelper
     if answer_list && !answer_list.empty?
       index  = 0
       res.gsub %r{<input.*?name=['"](question_.*?)['"].*?/>} do |match|
-        a = h(answer_list[index]).gsub "'", "&#39;"
+        a = h(answer_list[index])
         index += 1
         #  Replace the {{question_BLAH}} template text with the user's answer text.
         match.sub(/\{\{question_.*?\}\}/, a).
