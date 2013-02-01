@@ -1,6 +1,7 @@
 ActionController::Base.param_parsers.delete(Mime::XML)
 # CVE-2013-0333
 # https://groups.google.com/d/topic/rubyonrails-security/1h2DR63ViGo/discussion
+# With Rails 2.3.16 we could remove this line, but we still prefer JSONGem for performance reasons
 ActiveSupport::JSON.backend = "JSONGem"
 
 if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR >= 1
@@ -40,39 +41,6 @@ else
       target
     end
   end
-
-  # https://github.com/rails/rails/commit/0e17cf17ebeb70490d7c7cd25c6bf8f9401e44b3
-  # https://github.com/rails/rails/commit/63cd9432265a32d222353b535d60333c2a6a5125
-  # Backport from Rails 3.1
-  ERB::Util.module_eval do
-    # Detect whether 1.9 can transcode with XML escaping.
-    if '"&gt;&lt;&amp;&quot;"' == ('><&"'.encode('utf-8', :xml => :attr) rescue false)
-      def html_escape(s)
-        s = s.to_s
-        if s.html_safe?
-          s
-        else
-          s.encode(s.encoding, :xml => :attr)[1...-1].html_safe
-        end
-      end
-    else
-      def html_escape(s)
-        s = s.to_s
-        if s.html_safe?
-          s
-        else
-          s.gsub(/[&"><]/n) { |special| ERB::Util::HTML_ESCAPE[special] }.html_safe
-        end
-      end
-    end
-
-    remove_method(:h)
-    alias h html_escape
-
-    module_function :h
-    module_function :html_escape
-  end
-
 
   # Fix for has_many :through where the through and target reflections are the
   # same table (the through table needs to be aliased)
