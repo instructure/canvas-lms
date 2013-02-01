@@ -437,17 +437,7 @@ define([
     $("#unlock_module_at").change(function() {
       $this = $(this);
       $unlock_module_at_details = $(".unlock_module_at_details");
-
       $unlock_module_at_details.showIf($this.attr('checked'))
-
-      //if($this.attr('checked')){
-        //$unlock_module_at_details.show();// removeClass("accessible_hide");
-      //}else{
-        //$unlock_module_at_details.hide(); //addClass("accessible_hide");
-      //}
-
-      //$(".unlock_module_at_details").showIf($(this).attr('checked'));
-      //$('.unlock_module_at_details').attr('aria-hidden', false);
 
       if (!$this.attr('checked')) {
         $("#context_module_unlock_at").val('').triggerHandler('change');
