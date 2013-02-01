@@ -493,6 +493,24 @@ class ActiveRecord::Base
     options
   end
 
+  def self.useful_find_in_batches(options = {})
+    offset = 0
+    batch_size = options[:batch_size] || 1000
+    while true
+      batch = find(:all, :limit => batch_size, :offset => offset)
+      break if batch.empty?
+      with_exclusive_scope { yield batch }
+      break if batch.size < batch_size
+      offset += batch_size
+    end
+  end
+
+  def self.useful_find_each(options = {})
+    useful_find_in_batches(options) do |batch|
+      batch.each { |row| yield row }
+    end
+  end
+
   # provides a way to override :order and :select in an association, while
   # still just getting a scope (rather than doing an immediate find). primarily
   # useful if you intend to paginate or otherwise use the scope multiple times.

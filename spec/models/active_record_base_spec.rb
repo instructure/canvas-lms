@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -62,6 +62,42 @@ describe ActiveRecord::Base do
       Course.count_by_date(:column => :start_at).should eql Hash[
         start_times[0..1].each_with_index.map{ |t, i| [t.to_date, i + 1]}
       ]
+    end
+  end
+
+  describe "useful_find_in_batches and useful_find_each" do
+    before do
+      c1 = course(:name => 'course1', :active_course => true)
+      c2 = course(:name => 'course2', :active_course => true)
+      u1 = user(:name => 'user1', :active_user => true)
+      u2 = user(:name => 'user2', :active_user => true)
+      u3 = user(:name => 'user3', :active_user => true)
+      c1.enroll_student(u1, :enrollment_state => 'active')
+      c1.enroll_student(u2, :enrollment_state => 'active')
+      c1.enroll_student(u3, :enrollment_state => 'active')
+      c2.enroll_student(u1, :enrollment_state => 'active')
+      c2.enroll_student(u2, :enrollment_state => 'active')
+      c2.enroll_student(u3, :enrollment_state => 'active')
+    end
+
+    it "should find each enrollment from course join" do
+      e = Course.active.scoped(:joins => :enrollments)
+      all_enrollments = []
+      e.useful_find_each(:batch_size => 2) do |e|
+        all_enrollments << e.id
+      end
+      all_enrollments.length.should == 6
+    end
+
+    it "should find all enrollments from course join in batches" do
+      e = Course.active.scoped(:select => "enrollments.id as eid", :joins => :enrollments)
+      all_enrollments = []
+      e.useful_find_in_batches(:batch_size => 2) do |batch|
+        batch.each do |e|
+          all_enrollments << e.eid
+        end
+      end
+      all_enrollments.length.should == 6
     end
   end
 
