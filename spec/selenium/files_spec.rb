@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/files_specs')
+#require File.expand_path(File.dirname(__FILE__) + '/helpers/files_specs')
 
 
 def add_folders(name = 'new folder', number_to_add = 1)
@@ -249,4 +249,3 @@ describe "collaborations folder in files menu" do
     message.should include_text("New collaboration")
   end
 end
-

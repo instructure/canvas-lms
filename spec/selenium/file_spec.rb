@@ -1,13 +1,82 @@
-require File.expand_path(File.dirname(__FILE__) + '/../common')
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/files_common')
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/files_specs')
+require File.expand_path(File.dirname(__FILE__) + '/common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 
+describe "shared files tests" do
+  it_should_behave_like "forked server selenium tests"
 
-describe "shared files local tests" do
-  it_should_behave_like "files selenium tests"
+  def fixture_file_path(file)
+    path = ActionController::TestCase.respond_to?(:fixture_path) ? ActionController::TestCase.send(:fixture_path) : nil
+    return "#{path}#{file}"
+  end
+
+  def fixture_file_upload(file, mimetype)
+    ActionController::TestUploadedFile.new(fixture_file_path(file), mimetype)
+  end
+
+  def login(username, password)
+    resp = SSLCommon.get "#{app_host}/login"
+    resp.code.should == "200"
+    @cookie = resp.response['set-cookie']
+    resp = SSLCommon.post_form("#{app_host}/login", {
+        "pseudonym_session[unique_id]" => username,
+        "pseudonym_session[password]" => password,
+        "redirect_to_ssl" => "0",
+        "pseudonym_session[remember_me]" => "0"},
+                               {"Cookie" => @cookie})
+    resp.code.should == "302"
+    @cookie = resp.response['set-cookie']
+    login_as username, password
+  end
+
+  def add_file(fixture, context, name)
+    if context.is_a?(Course)
+      path = "/courses/#{context.id}/files"
+    elsif context.is_a?(User)
+      path = "/dashboard/files"
+    end
+    context_code = context.asset_string.capitalize
+    resp = SSLCommon.get "#{app_host}#{path}",
+                         "Cookie" => @cookie
+    body = resp.body
+    resp.code.should == "200"
+    body.should =~ /<div id="ajax_authenticity_token">([^<]*)<\/div>/
+    authenticity_token = $1
+    resp= SSLCommon.post_form("#{app_host}/files/pending", {
+        "attachment[folder_id]" => context.folders.active.first.id,
+        "attachment[filename]" => name,
+        "attachment[context_code]" => context_code,
+        "authenticity_token" => authenticity_token,
+        "no_redirect" => true}, {"Cookie" => @cookie})
+    body = resp.body
+    resp.code.should == "200"
+    data = json_parse(body)
+    data["upload_url"] = data["proxied_upload_url"] || data["upload_url"]
+    data["upload_url"] = "#{app_host}#{data["upload_url"]}" if data["upload_url"] =~ /^\//
+    data["success_url"] = "#{app_host}#{data["success_url"]}" if data["success_url"] =~ /^\//
+    data["upload_params"]["file"] = fixture
+    resp = SSLCommon.post_multipart_form(data["upload_url"], data["upload_params"], {"Cookie" => @cookie}, ["bucket", "key", "acl"])
+    body = resp.body
+    resp.code.should =~ /^20/
+    if body =~ /<PostResponse>/
+      resp = SSLCommon.get data["success_url"]
+      resp.code.should == "200"
+    end
+  end
+
+  def make_folder_actions_visible
+    driver.execute_script("$('.folder_item').addClass('folder_item_hover')")
+  end
 
   prepend_before(:each) do
     Setting.set("file_storage_test_override", "local")
+  end
+
+  it "should make folders in the menu droppable local" do
+    should_make_folders_in_the_menu_droppable
+  end
+
+  it "should show students link to download zip of folder local" do
+    should_show_students_link_to_download_zip_of_folder
   end
 
   context "as a teacher" do
@@ -145,42 +214,73 @@ describe "shared files local tests" do
     end
   end
 
-
   describe "files S3 tests" do
-    it_should_behave_like "files selenium tests"
     prepend_before(:each) { Setting.set("file_storage_test_override", "s3") }
     prepend_before(:all) { Setting.set("file_storage_test_override", "s3") }
+
+    it "should make folders in the menu droppable s3" do
+      should_make_folders_in_the_menu_droppable
+    end
+
+    it "should show students link to download zip of folder s3" do
+      should_show_students_link_to_download_zip_of_folder
+    end
   end
 end
 
-describe "shared zip file uploads" do
+
+describe "zip file uploads" do
+  it_should_behave_like "in-process server selenium tests"
+
   context "courses" do
-    it_should_behave_like "zip file uploads"
     before do
       course_with_teacher_logged_in
       @files_url = "/courses/#{@course.id}/files"
       @files_import_url = "/courses/#{@course.id}/imports/files"
       @context = @course
     end
+
+    it "should allow unzipping into a folder from the form courses" do
+      unzip_from_form_to_folder
+    end
+
+    it "should allow unzipping into a folder from drag-and-drop courses" do
+      unzip_into_folder_drag_and_drop
+    end
   end
 
+
   context "groups" do
-    it_should_behave_like "zip file uploads"
     before do
       group_with_user_logged_in(:group_context => course)
       @files_url = "/groups/#{@group.id}/files"
       @files_import_url = "/groups/#{@group.id}/imports/files"
       @context = @group
     end
+
+    it "should allow unzipping into a folder from the form groups" do
+      unzip_from_form_to_folder
+    end
+
+    it "should allow unzipping into a folder from drag-and-drop groups" do
+      unzip_into_folder_drag_and_drop
+    end
   end
 
   context "profile" do
-    it_should_behave_like "zip file uploads"
     before do
       course_with_student_logged_in
       @files_url = "/dashboard/files"
       @files_import_url = "/users/#{@user.id}/imports/files"
       @context = @user
+    end
+
+    it "should allow unzipping into a folder from the form profile" do
+      unzip_from_form_to_folder
+    end
+
+    it "should allow unzipping into a folder from drag-and-drop profile" do
+      unzip_into_folder_drag_and_drop
     end
   end
 end
