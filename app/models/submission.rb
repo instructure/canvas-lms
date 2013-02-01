@@ -87,6 +87,10 @@ class Submission < ActiveRecord::Base
     )
   SQL
 
+  named_scope :for_course, lambda{ |course|
+    { :conditions => ["submissions.assignment_id IN (SELECT assignments.id FROM assignments WHERE assignments.context_id = ? AND assignments.context_type = 'Course')", course.id] }
+  }
+
   def self.needs_grading_conditions(prefix = nil)
     conditions = needs_grading.proxy_options[:conditions].gsub(/\s+/, ' ')
     conditions.gsub!("submissions.", prefix + ".") if prefix

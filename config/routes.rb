@@ -736,6 +736,12 @@ ActionController::Routing::Routes.draw do |map|
       submissions_api(submissions, "section")
     end
 
+    api.with_options(:controller => :gradebook_history_api) do |gradebook_history|
+      gradebook_history.get "courses/:course_id/gradebook_history/days", :action => :days, :path_name => 'gradebook_history'
+      gradebook_history.get "courses/:course_id/gradebook_history/:date", :action =>:day_details, :path_name => 'gradebook_history_for_day'
+      gradebook_history.get "courses/:course_id/gradebook_history/:date/graders/:grader_id/assignments/:assignment_id/submissions", :action => :submissions, :path_name => 'gradebook_history_submissions'
+    end
+
     api.get 'courses/:course_id/assignment_groups', :controller => :assignment_groups, :action => :index, :path_name => 'course_assignment_groups'
 
     api.with_options(:controller => :discussion_topics) do |topics|
