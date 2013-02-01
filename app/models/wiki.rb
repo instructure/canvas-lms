@@ -98,7 +98,11 @@ class Wiki < ActiveRecord::Base
       # TODO i18n
       t :default_course_wiki_name, "%{course_name} Wiki", :course_name => nil
       t :default_group_wiki_name, "%{group_name} Wiki", :group_name => nil
-      context.wiki = wiki = Wiki.create!(:title => "#{context.name} Wiki")
+
+      self.extend TextHelper
+      name = truncate_text(context.name, {:max_length => 200, :ellipsis => ''})
+
+      context.wiki = wiki = Wiki.create!(:title => "#{name} Wiki")
       context.save!
       wiki
     end
