@@ -158,8 +158,11 @@ class ConversationParticipant < ActiveRecord::Base
       context_info[user.id] = user
     }
     participants.each { |user|
-      user.common_courses = user.id == self.user_id ? {} : context_info[user.id].common_courses
-      user.common_groups = user.id == self.user_id ? {} : context_info[user.id].common_groups
+      # normally context_info should have found the results, but messageable_users
+      # is not shard aware/safe yet, so sometimes it won't find all the results
+      # so for now, just pretend it didn't find anything instead of failing
+      user.common_courses = user.id == self.user_id ? {} : context_info[user.id].try(:common_courses) || {}
+      user.common_groups = user.id == self.user_id ? {} : context_info[user.id].try(:common_groups) || {}
     }
   end
   memoize :participants
