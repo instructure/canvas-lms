@@ -41,7 +41,7 @@ class FilesController < ApplicationController
   before_filter :require_context, :except => [:public_feed,:full_index,:assessment_question_show,:image_thumbnail,:show_thumbnail,:preflight,:create_pending,:s3_success,:show,:api_create,:api_create_success,:api_show,:api_index,:destroy,:api_update,:api_file_status]
   before_filter :check_file_access_flags, :only => [:show_relative, :show]
   prepend_around_filter :load_pseudonym_from_policy, :only => :create
-  skip_before_filter :verify_authenticity_token, :only => :api_create
+  skip_before_filter :verify_authenticity_token, :only => [:api_create, :create]
 
   include Api::V1::Attachment
   include Api::V1::Avatar
