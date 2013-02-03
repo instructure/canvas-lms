@@ -117,6 +117,29 @@ Rails::Initializer.run do |config|
   end
 end
 
+# We need to make sure that safe_yaml is loaded *after* the YAML engine
+# is switched to Syck (which DelayedJob needs for now). Otherwise we
+# won't have access to (safe|unsafe)_load.
+require 'yaml'
+YAML::ENGINE.yamler = 'syck' if defined?(YAML::ENGINE)
+require 'safe_yaml'
+YAML.enable_symbol_parsing!
+# We don't need to be reminded that safe loads are being used everywhere.
+SafeYAML::OPTIONS[:suppress_warnings] = true
+
+# This tag whitelist is syck specific. We'll need to tweak it when we upgrade to psych.
+# See the tests in spec/lib/safe_yaml_spec.rb
+YAML.whitelist.add(*%w[
+  tag:ruby.yaml.org,2002:symbol
+  tag:yaml.org,2002:map:HashWithIndifferentAccess
+  tag:ruby.yaml.org,2002:object:OpenStruct
+  tag:ruby.yaml.org,2002:object:Scribd::Document
+  tag:ruby.yaml.org,2002:object:Mime::Type
+  tag:ruby.yaml.org,2002:object:URI::HTTP
+  tag:ruby.yaml.org,2002:object:URI::HTTPS
+])
+YAML.whitelist.add('tag:ruby.yaml.org,2002:object:Class') { |classname| Canvas::Migration.valid_converter_classes.include?(classname) }
+
 # Extend any base classes, even gem classes
 Dir.glob("#{RAILS_ROOT}/lib/ext/**/*.rb").each { |file| require file }
 

@@ -1,4 +1,4 @@
-source :rubygems
+source 'https://rubygems.org/'
 
 ONE_NINE = RUBY_VERSION >= "1.9."
 
@@ -60,6 +60,7 @@ gem 'net-ldap',       '0.3.1',  :require => 'net/ldap'
 gem 'ruby-saml-mod',  '0.1.19'
 gem 'rubycas-client', '2.2.1'
 gem 'rubyzip',        '0.9.5',  :require => 'zip/zip'
+gem 'safe_yaml-instructure', '0.8.0',  :require => false
 gem 'sanitize',       '2.0.3'
 gem 'uuid',           '2.3.2'
 gem 'will_paginate',  '2.3.15'
