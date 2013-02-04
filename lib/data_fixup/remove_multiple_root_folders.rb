@@ -39,9 +39,11 @@ module DataFixup::RemoveMultipleRootFolders
           }.first
 
           if main_root_folder.nil?
-            main_root_folder = Folder.create!(
-              :context_type => context_type, :context_id => context_id,
-              :name => root_folder_name, :full_name => root_folder_name, :workflow_state => "visible")
+            main_root_folder = Folder.new(
+                :name => root_folder_name, :full_name => root_folder_name, :workflow_state => "visible")
+            main_root_folder.context_type = context_type
+            main_root_folder.context_id = context_id
+            main_root_folder.save!
             context_root_folders << main_root_folder
           end
 
