@@ -141,7 +141,6 @@ class ConversationParticipant < ActiveRecord::Base
       :include_indirect_participants => false
     }.merge(options)
 
-    context_info = {}
     participants = conversation.participants
     if options[:include_indirect_participants]
       user_ids =
@@ -150,20 +149,12 @@ class ConversationParticipant < ActiveRecord::Base
           |m| m.submission.submission_comments.map(&:author_id) if m.submission
         }.compact.flatten
       user_ids -= participants.map(&:id)
-      participants += User.find(:all, :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_courses, NULL AS common_groups", :conditions => {:id => user_ids})
+      participants += MessageableUser.available.where(:id => user_ids).all
     end
     return participants unless options[:include_participant_contexts]
+
     # we do this to find out the contexts they share with the user
-    user.messageable_users(:ids => participants.map(&:id), :skip_visibility_checks => true).each { |user|
-      context_info[user.id] = user
-    }
-    participants.each { |user|
-      # normally context_info should have found the results, but messageable_users
-      # is not shard aware/safe yet, so sometimes it won't find all the results
-      # so for now, just pretend it didn't find anything instead of failing
-      user.common_courses = user.id == self.user_id ? {} : context_info[user.id].try(:common_courses) || {}
-      user.common_groups = user.id == self.user_id ? {} : context_info[user.id].try(:common_groups) || {}
-    }
+    user.load_messageable_users(participants, :strict_checks => false)
   end
   memoize :participants
 

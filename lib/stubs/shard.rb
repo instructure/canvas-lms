@@ -58,6 +58,10 @@ class Shard
     "default"
   end
 
+  def self.global_id_for(any_id)
+    any_id
+  end
+
   yaml_as "tag:instructure.com,2012:Shard"
 
   def self.yaml_new(klass, tag, val)

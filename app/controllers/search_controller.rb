@@ -117,17 +117,22 @@ class SearchController < ApplicationController
 
     recipients = []
     if params[:user_id]
-      recipients = matching_participants(:ids => [params[:user_id]], :conversation_id => params[:from_conversation_id])
+      recipient = @current_user.load_messageable_user(params[:user_id], :conversation_id => params[:from_conversation_id], :admin_context => @admin_context)
+      if recipient
+        recipients = conversation_users_json([recipient], @current_user, session)
+      else
+        recipients = []
+      end
     elsif (params[:context] || params[:search])
       options = {:search => params[:search], :context => params[:context], :limit => limit, :offset => offset, :synthetic_contexts => params[:synthetic_contexts]}
 
       rank_results = params[:search].present?
       contexts = types[:context] ? matching_contexts(options.merge(:rank_results => rank_results,
                                                                    :include_inactive => params[:include_inactive],
-                                                                   :exclude_ids => exclude.grep(User::MESSAGEABLE_USER_CONTEXT_REGEX),
+                                                                   :exclude_ids => MessageableUser.context_recipients(exclude),
                                                                    :search_all_contexts => params[:search_all_contexts],
                                                                    :types => types[:context])) : []
-      participants = types[:user] && !@skip_users ? matching_participants(options.merge(:rank_results => rank_results, :exclude_ids => exclude.grep(/\A\d+\z/).map(&:to_i), :skip_visibility_checks => params[:skip_visibility_checks])) : []
+      participants = types[:user] && !@skip_users ? matching_participants(options.merge(:rank_results => rank_results, :exclude_ids => MessageableUser.individual_recipients(exclude), :skip_visibility_checks => params[:skip_visibility_checks])) : []
       if max_results
         if types[:user] ^ types[:context]
           recipients = contexts + participants
@@ -161,7 +166,7 @@ class SearchController < ApplicationController
   private
 
   def matching_participants(options)
-    conversation_users_json(@current_user.messageable_users(options.merge(:admin_context => @admin_context)), @current_user, session, options.merge(:include_participant_avatars => true, :include_participant_contexts => true))
+    conversation_users_json(@current_user.deprecated_search_messageable_users(options.merge(:admin_context => @admin_context)), @current_user, session, options.merge(:include_participant_avatars => true, :include_participant_contexts => true))
   end
 
   def matching_contexts(options)
@@ -262,7 +267,7 @@ class SearchController < ApplicationController
     @skip_users = true
     # TODO: move the aggregation entirely into the DB. we only select a little
     # bit of data per user, but this still isn't ideal
-    users = @current_user.messageable_users(:context => context)
+    users = @current_user.messageable_users_in_context(context)
     enrollment_counts = {:all => users.size}
     users.each do |user|
       user.common_courses[course[:id]].uniq.each do |role|

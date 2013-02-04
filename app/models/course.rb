@@ -2550,7 +2550,7 @@ class Course < ActiveRecord::Base
     unless visibilities.any?{|v|v[:admin]}
       scope = scope.scoped(:conditions => "enrollments.type != 'StudentViewEnrollment'")
     end
-    # See also Users#messageable_users (same logic used to get users across multiple courses)
+    # See also MessageableUser::Calculator (same logic used to get users across multiple courses) (should refactor)
     case enrollment_visibility_level_for(user, visibilities)
       when :full then scope
       when :sections then scope.scoped(:conditions => ["enrollments.course_section_id IN (?) OR (enrollments.limit_privileges_to_course_section=? AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'))", visibilities.map{|s| s[:course_section_id]}, false])
@@ -2562,7 +2562,7 @@ class Course < ActiveRecord::Base
   def users_visible_to(user, include_priors=false)
     visibilities = section_visibilities_for(user)
     scope = include_priors ? users : current_users
-    # See also Users#messageable_users (same logic used to get users across multiple courses)
+    # See also MessageableUsers (same logic used to get users across multiple courses) (should refactor)
     case enrollment_visibility_level_for(user, visibilities)
       when :full then scope
       when :sections then scope.scoped({:conditions => "enrollments.course_section_id IN (#{visibilities.map{|s| s[:course_section_id]}.join(",")})"})

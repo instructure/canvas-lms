@@ -25,7 +25,7 @@ class Conversation < ActiveRecord::Base
   has_many :conversation_messages, :order => "created_at DESC, id DESC", :dependent => :delete_all
   has_one :stream_item, :as => :asset
 
-  # see also User#messageable_users
+  # see also MessageableUser
   def participants(reload = false)
     if !@participants || reload
       Conversation.preload_participants([self])
@@ -68,7 +68,7 @@ class Conversation < ActiveRecord::Base
   end
 
   def self.initiate(users, private)
-    users = users.uniq
+    users = users.uniq_by(&:id)
     user_ids = users.map(&:id)
     private_hash = private ? private_hash_for(users) : nil
     transaction do
@@ -183,7 +183,7 @@ class Conversation < ActiveRecord::Base
 
   def add_participants(current_user, users, options={})
     self.shard.activate do
-      user_ids = users.uniq.map(&:id)
+      user_ids = users.map(&:id).uniq
       raise "can't add participants to a private conversation" if private?
       transaction do
         lock!
@@ -608,33 +608,40 @@ class Conversation < ActiveRecord::Base
   # options, so we roll our own that does (plus we do it in one query so we
   # don't load conversation_participants into memory)
   def self.preload_participants(conversations)
-    # clear the cached participants
+    # start with no participants per conversation
+    participants = {}
     conversations.each do |conversation|
-      conversation.instance_variable_set(:@participants, [])
+      participants[conversation.global_id] = []
     end
 
+    # look up participants across all shards
     shards = conversations.map(&:associated_shards).flatten.uniq
     Shard.with_each_shard(shards) do
-      user_map = User.find(:all,
-        :select => "#{User::MESSAGEABLE_USER_COLUMN_SQL}, last_authored_at, NULL AS common_courses, NULL AS common_groups, conversation_id",
+      user_map = MessageableUser.find(:all,
+        :select => "#{MessageableUser.build_select}, last_authored_at, conversation_id",
         :joins => :all_conversations,
         :conditions => ["conversation_id IN (?)", conversations.map(&:id)],
         :order => 'last_authored_at IS NULL, last_authored_at DESC, LOWER(COALESCE(short_name, name))').group_by(&:conversation_id)
       conversations.each do |conversation|
-        conversation.participants.concat(user_map[conversation.id.to_s] || [])
+        participants[conversation.global_id].concat(user_map[conversation.id.to_s] || [])
       end
     end
 
-    # post-sort in Ruby
+    # post-sort and -uniq in Ruby
     if shards.length > 1
-      conversations.each do |conversation|
-        conversation.participants.sort! do |user1, user2|
+      participants.each do |key, value|
+        participants[key] = value.uniq_by(&:id).sort do |user1, user2|
           result = (user1.last_authored_at ? 0 : 1) <=> (user2.last_authored_at ? 0 : 1)
           result = -(user1.last_authored_at <=> user2.last_authored_at) if result == 0 && user1.last_authored_at
           result = (user1.short_name.try(:downcase) || user1.name.downcase) <=> (user2.short_name.try(:downcase) || user2.name.downcase) if result == 0
           result
         end
       end
+    end
+
+    # set the cached participants
+    conversations.each do |conversation|
+      conversation.instance_variable_set(:@participants, participants[conversation.global_id])
     end
   end
 

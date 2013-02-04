@@ -86,8 +86,7 @@ module SearchHelper
       else
         add_courses.call @current_user.concluded_courses, :concluded
         add_courses.call @current_user.courses, :current
-        section_ids = @current_user.enrollment_visibility[:section_user_counts].keys
-        add_sections.call CourseSection.where({:id => section_ids}) if section_ids.present?
+        add_sections.call @current_user.messageable_sections
         add_groups.call @current_user.messageable_groups
       end
       contexts

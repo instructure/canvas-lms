@@ -711,11 +711,11 @@ class ConversationsController < ApplicationController
       if recipient_ids.is_a?(String)
         params[:recipients] = recipient_ids = recipient_ids.split(/,/)
       end
-      @recipients = @current_user.messageable_users(:ids => recipient_ids.grep(/\A\d+\z/), :conversation_id => params[:from_conversation_id])
-      recipient_ids.grep(User::MESSAGEABLE_USER_CONTEXT_REGEX).map do |context|
-        @recipients.concat @current_user.messageable_users(:context => context)
+      @recipients = @current_user.load_messageable_users(MessageableUser.individual_recipients(recipient_ids), :conversation_id => params[:from_conversation_id])
+      MessageableUser.context_recipients(recipient_ids).map do |context|
+        @recipients.concat @current_user.messageable_users_in_context(context)
       end
-      @recipients.uniq!
+      @recipients = @recipients.uniq_by(&:id)
     end
   end
 

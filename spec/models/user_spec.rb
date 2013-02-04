@@ -668,7 +668,7 @@ describe User do
     end
   end
 
-  context "messageable_users" do
+  context "deprecated_search_messageable_users" do
     before(:each) do
       @admin = user_model
       @student = user_model
@@ -701,28 +701,28 @@ describe User do
     end
 
     it "should include yourself even when not enrolled in courses" do
-      @student.messageable_users(:ids => [@student.id]).should eql [@student]
+      @student.deprecated_search_messageable_users(:ids => [@student.id]).should eql [@student]
     end
 
     it "should only return users from the specified context and type" do
       set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
-      @student.messageable_users(:context => "course_#{@course.id}").map(&:id).sort.
+      @student.deprecated_search_messageable_users(:context => "course_#{@course.id}").map(&:id).sort.
         should eql [@student, @this_section_user, @this_section_teacher, @other_section_user, @other_section_teacher].map(&:id).sort
       @student.enrollment_visibility[:user_counts][@course.id].should eql 5
 
-      @student.messageable_users(:context => "course_#{@course.id}_students").map(&:id).sort.
+      @student.deprecated_search_messageable_users(:context => "course_#{@course.id}_students").map(&:id).sort.
         should eql [@student, @this_section_user, @other_section_user].map(&:id).sort
 
-      @student.messageable_users(:context => "group_#{@group.id}").map(&:id).sort.
+      @student.deprecated_search_messageable_users(:context => "group_#{@group.id}").map(&:id).sort.
         should eql [@this_section_user].map(&:id).sort
       @student.group_membership_visibility[:user_counts][@group.id].should eql 1
 
-      @student.messageable_users(:context => "section_#{@other_section.id}").map(&:id).sort.
+      @student.deprecated_search_messageable_users(:context => "section_#{@other_section.id}").map(&:id).sort.
         should eql [@other_section_user, @other_section_teacher].map(&:id).sort
 
-      @student.messageable_users(:context => "section_#{@other_section.id}_teachers").map(&:id).sort.
+      @student.deprecated_search_messageable_users(:context => "section_#{@other_section.id}_teachers").map(&:id).sort.
         should eql [@other_section_teacher].map(&:id).sort
     end
 
@@ -731,15 +731,15 @@ describe User do
       enrollment = @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
       # we currently force limit_privileges_to_course_section to be false for students; override it in the db
       Enrollment.update_all({ :limit_privileges_to_course_section => true }, :id => enrollment.id)
-      messageable_users = @student.messageable_users.map(&:id)
+      messageable_users = @student.deprecated_search_messageable_users.map(&:id)
       messageable_users.should include @this_section_user.id
       messageable_users.should_not include @other_section_user.id
 
-      messageable_users = @student.messageable_users(:context => "course_#{@course.id}").map(&:id)
+      messageable_users = @student.deprecated_search_messageable_users(:context => "course_#{@course.id}").map(&:id)
       messageable_users.should include @this_section_user.id
       messageable_users.should_not include @other_section_user.id
 
-      messageable_users = @student.messageable_users(:context => "section_#{@other_section.id}").map(&:id)
+      messageable_users = @student.deprecated_search_messageable_users(:context => "section_#{@other_section.id}").map(&:id)
       messageable_users.should be_empty
     end
 
@@ -747,7 +747,7 @@ describe User do
       set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
-      @student.messageable_users(:context => "course_#{@course.id}").map(&:id).sort.
+      @student.deprecated_search_messageable_users(:context => "course_#{@course.id}").map(&:id).sort.
         should eql [@student, @this_section_user, @this_section_teacher, @other_section_user, @other_section_teacher].map(&:id).sort
     end
 
@@ -758,32 +758,32 @@ describe User do
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
       # can only message self or the admins
-      @student.messageable_users(:context => "course_#{@course.id}").map(&:id).sort.
+      @student.deprecated_search_messageable_users(:context => "course_#{@course.id}").map(&:id).sort.
         should eql [@student, @this_section_teacher, @other_section_teacher].map(&:id).sort
     end
 
     it "should not include deleted users" do
       set_up_course_with_users
-      @student.messageable_users.map(&:id).should_not include(@deleted_user.id)
-      @student.messageable_users(:search => @deleted_user.name).map(&:id).should be_empty
-      @student.messageable_users(:ids => [@deleted_user.id]).map(&:id).should be_empty
-      @student.messageable_users(:skip_visibility_checks => true).map(&:id).should_not include(@deleted_user.id)
-      @student.messageable_users(:skip_visibility_checks => true, :search => @deleted_user.name).map(&:id).should be_empty
+      @student.deprecated_search_messageable_users.map(&:id).should_not include(@deleted_user.id)
+      @student.deprecated_search_messageable_users(:search => @deleted_user.name).map(&:id).should be_empty
+      @student.deprecated_search_messageable_users(:ids => [@deleted_user.id]).map(&:id).should be_empty
+      @student.deprecated_search_messageable_users(:skip_visibility_checks => true).map(&:id).should_not include(@deleted_user.id)
+      @student.deprecated_search_messageable_users(:skip_visibility_checks => true, :search => @deleted_user.name).map(&:id).should be_empty
     end
 
     it "should include deleted iff skip_visibility_checks=true && ids are given" do
       set_up_course_with_users
-      @student.messageable_users(:skip_visibility_checks => true, :ids => [@deleted_user.id]).map(&:id).should == [@deleted_user.id]
+      @student.deprecated_search_messageable_users(:skip_visibility_checks => true, :ids => [@deleted_user.id]).map(&:id).should == [@deleted_user.id]
     end
 
     it "should only include users from the specified section" do
       set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
-      messageable_users = @student.messageable_users(:context => "section_#{@course.default_section.id}").map(&:id)
+      messageable_users = @student.deprecated_search_messageable_users(:context => "section_#{@course.default_section.id}").map(&:id)
       messageable_users.should include @this_section_user.id
       messageable_users.should_not include @other_section_user.id
 
-      messageable_users = @student.messageable_users(:context => "section_#{@other_section.id}").map(&:id)
+      messageable_users = @student.deprecated_search_messageable_users(:context => "section_#{@other_section.id}").map(&:id)
       messageable_users.should_not include @this_section_user.id
       messageable_users.should include @other_section_user.id
     end
@@ -791,7 +791,7 @@ describe User do
     it "should include users from all sections if visibility is not limited to sections" do
       set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
-      messageable_users = @student.messageable_users.map(&:id)
+      messageable_users = @student.deprecated_search_messageable_users.map(&:id)
       messageable_users.should include @this_section_user.id
       messageable_users.should include @other_section_user.id
     end
@@ -800,9 +800,9 @@ describe User do
       set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
-      @this_section_user.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
+      @this_section_user.deprecated_search_messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
       # student can see it too, even though he's not in the group (since he can view the roster)
-      @student.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
+      @student.deprecated_search_messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
     end
 
     it "should respect section visibility when returning users for a specified group" do
@@ -813,10 +813,10 @@ describe User do
 
       @group.users << @other_section_user
 
-      @this_section_user.messageable_users(:context => "group_#{@group.id}").map(&:id).sort.should eql [@this_section_user.id, @other_section_user.id]
+      @this_section_user.deprecated_search_messageable_users(:context => "group_#{@group.id}").map(&:id).sort.should eql [@this_section_user.id, @other_section_user.id]
       @this_section_user.group_membership_visibility[:user_counts][@group.id].should eql 2
       # student can only see people in his section
-      @student.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
+      @student.deprecated_search_messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
       @student.group_membership_visibility[:user_counts][@group.id].should eql 1
     end
 
@@ -831,7 +831,7 @@ describe User do
       enrollment.associated_user_id = @student.id
       enrollment.save
 
-      messageable_users = observer.messageable_users.map(&:id)
+      messageable_users = observer.deprecated_search_messageable_users.map(&:id)
       messageable_users.should include @admin.id
       messageable_users.should include @student.id
       messageable_users.should_not include @this_section_user.id
@@ -850,9 +850,9 @@ describe User do
       enrollment.associated_user_id = student1.id
       enrollment.save
 
-      student1.messageable_users.map(&:id).should include observer.id
+      student1.deprecated_search_messageable_users.map(&:id).should include observer.id
       student1.enrollment_visibility[:user_counts][@course.id].should eql 8
-      student2.messageable_users.map(&:id).should_not include observer.id
+      student2.deprecated_search_messageable_users.map(&:id).should_not include observer.id
       student2.enrollment_visibility[:user_counts][@course.id].should eql 7
     end
 
@@ -868,7 +868,7 @@ describe User do
       # other_section_user is a teacher in one course, student in another
       @other_course.enroll_user(@other_section_user, 'TeacherEnrollment', :enrollment_state => 'active')
 
-      messageable_users = @admin.messageable_users
+      messageable_users = @admin.deprecated_search_messageable_users
       this_section_user = messageable_users.detect{|u| u.id == @this_section_user.id}
       this_section_user.common_courses.keys.should include @first_course.id
       this_section_user.common_courses[@first_course.id].sort.should eql ['StudentEnrollment', 'TaEnrollment']
@@ -881,8 +881,8 @@ describe User do
     end
 
     it "should include users with no shared contexts iff admin" do
-      @admin.messageable_users(:ids => [@student.id]).should_not be_empty
-      @student.messageable_users(:ids => [@admin.id]).should be_empty
+      @admin.deprecated_search_messageable_users(:ids => [@student.id]).should_not be_empty
+      @student.deprecated_search_messageable_users(:ids => [@admin.id]).should be_empty
     end
 
     it "should not do admin catch-all if specific contexts requested" do
@@ -899,9 +899,9 @@ describe User do
       enrollment.workflow_state = 'active'
       enrollment.save
 
-      @admin.messageable_users(:context => "course_#{course1.id}", :ids => [@student.id]).should be_empty
-      @admin.messageable_users(:context => "course_#{course2.id}", :ids => [@student.id]).should_not be_empty
-      @student.messageable_users(:context => "course_#{course2.id}", :ids => [@admin.id]).should_not be_empty
+      @admin.deprecated_search_messageable_users(:context => "course_#{course1.id}", :ids => [@student.id]).should be_empty
+      @admin.deprecated_search_messageable_users(:context => "course_#{course2.id}", :ids => [@student.id]).should_not be_empty
+      @student.deprecated_search_messageable_users(:context => "course_#{course2.id}", :ids => [@admin.id]).should_not be_empty
     end
 
     it "should return names with shared contexts" do
@@ -924,7 +924,7 @@ describe User do
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
       # ordered by name (all the same), then id
-      @student.messageable_users.map(&:id).
+      @student.deprecated_search_messageable_users.map(&:id).
         should eql [@student.id, @this_section_teacher.id, @this_section_user.id, @other_section_user.id, @other_section_teacher.id]
     end
 
@@ -933,7 +933,7 @@ describe User do
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
       # ordered by rank, then name (all the same), then id
-      @student.messageable_users(:rank_results => true).map(&:id).
+      @student.deprecated_search_messageable_users(:rank_results => true).map(&:id).
         should eql [@this_section_user.id] + # two contexts (course and group)
                    [@student.id, @this_section_teacher.id, @other_section_user.id, @other_section_teacher.id] # just the course
     end
@@ -944,8 +944,8 @@ describe User do
         @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
         @this_section_user_enrollment.conclude
 
-        @this_section_user.messageable_users.map(&:id).should include @this_section_user.id
-        @student.messageable_users.map(&:id).should include @this_section_user.id
+        @this_section_user.deprecated_search_messageable_users.map(&:id).should include @this_section_user.id
+        @student.deprecated_search_messageable_users.map(&:id).should include @this_section_user.id
       end
 
       it "should not return concluded student enrollments in the course" do # when browsing a course you should not see concluded enrollments
@@ -953,12 +953,12 @@ describe User do
         @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
         @course.complete!
 
-        @this_section_user.messageable_users(:context => "course_#{@course.id}").map(&:id).should_not include @this_section_user.id
+        @this_section_user.deprecated_search_messageable_users(:context => "course_#{@course.id}").map(&:id).should_not include @this_section_user.id
         # if the course was a concluded, a student should be able to browse it and message an admin (if if the admin's enrollment concluded too)
-        @this_section_user.messageable_users(:context => "course_#{@course.id}").map(&:id).should include @this_section_teacher.id
+        @this_section_user.deprecated_search_messageable_users(:context => "course_#{@course.id}").map(&:id).should include @this_section_teacher.id
         @this_section_user.enrollment_visibility[:user_counts][@course.id].should eql 2 # just the admins
-        @student.messageable_users(:context => "course_#{@course.id}").map(&:id).should_not include @this_section_user.id
-        @student.messageable_users(:context => "course_#{@course.id}").map(&:id).should include @this_section_teacher.id
+        @student.deprecated_search_messageable_users(:context => "course_#{@course.id}").map(&:id).should_not include @this_section_user.id
+        @student.deprecated_search_messageable_users(:context => "course_#{@course.id}").map(&:id).should include @this_section_teacher.id
         @student.enrollment_visibility[:user_counts][@course.id].should eql 2
       end
 
@@ -967,9 +967,9 @@ describe User do
         @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
         @this_section_user_enrollment.conclude
 
-        @this_section_user.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
+        @this_section_user.deprecated_search_messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
         @this_section_user.group_membership_visibility[:user_counts][@group.id].should eql 1
-        @student.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
+        @student.deprecated_search_messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
         @student.group_membership_visibility[:user_counts][@group.id].should eql 1
       end
 
@@ -982,10 +982,10 @@ describe User do
         @group.users << @other_section_user
         @this_section_user_enrollment.conclude
 
-        @this_section_user.messageable_users(:context => "group_#{@group.id}").map(&:id).sort.should eql [@this_section_user.id, @other_section_user.id]
+        @this_section_user.deprecated_search_messageable_users(:context => "group_#{@group.id}").map(&:id).sort.should eql [@this_section_user.id, @other_section_user.id]
         @this_section_user.group_membership_visibility[:user_counts][@group.id].should eql 2
         # student can only see people in his section
-        @student.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
+        @student.deprecated_search_messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
         @student.group_membership_visibility[:user_counts][@group.id].should eql 1
       end
     end
@@ -997,17 +997,17 @@ describe User do
       end
 
       it "should find users in the course" do
-        @admin.messageable_users(:context => @course.asset_string, :admin_context => @course).map(&:id).sort.should ==
+        @admin.deprecated_search_messageable_users(:context => @course.asset_string, :admin_context => @course).map(&:id).sort.should ==
           [@this_section_teacher.id, @this_section_user.id, @other_section_user.id, @other_section_teacher.id]
       end
 
       it "should find users in the section" do
-        @admin.messageable_users(:context => "section_#{@course.default_section.id}", :admin_context => @course.default_section).map(&:id).sort.should ==
+        @admin.deprecated_search_messageable_users(:context => "section_#{@course.default_section.id}", :admin_context => @course.default_section).map(&:id).sort.should ==
           [@this_section_teacher.id, @this_section_user.id]
       end
 
       it "should find users in the group" do
-        @admin.messageable_users(:context => @group.asset_string, :admin_context => @group).map(&:id).sort.should ==
+        @admin.deprecated_search_messageable_users(:context => @group.asset_string, :admin_context => @group).map(&:id).sort.should ==
           [@this_section_user.id]
       end
     end
@@ -1016,14 +1016,14 @@ describe User do
       it "should optionally show invited enrollments" do
         course(:active_all => true)
         student_in_course(:user_state => 'creation_pending')
-        @teacher.messageable_users(:skip_visibility_checks => true).map(&:id).should include @student.id
+        @teacher.deprecated_search_messageable_users(:skip_visibility_checks => true).map(&:id).should include @student.id
       end
 
       it "should optionally show pending enrollments in unpublished courses" do
         course()
         teacher_in_course(:active_user => true)
         student_in_course()
-        @teacher.messageable_users(:skip_visibility_checks => true, :admin_context => @course).map(&:id).should include @student.id
+        @teacher.deprecated_search_messageable_users(:skip_visibility_checks => true, :admin_context => @course).map(&:id).should include @student.id
       end
     end
   end

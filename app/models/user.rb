@@ -680,7 +680,7 @@ class User < ActiveRecord::Base
 
   def infer_defaults
     self.name = nil if self.name == "User"
-    self.name ||= self.email || t(:default_user_name, "User")
+    self.name ||= self.email || t('#user.default_user_name', "User")
     self.short_name = nil if self.short_name == ""
     self.short_name ||= self.name
     self.sortable_name = nil if self.sortable_name == ""
@@ -2034,17 +2034,13 @@ class User < ActiveRecord::Base
   end
 
   def initiate_conversation(users, private = nil)
-    users = ([self] + users).uniq
+    users = ([self] + users).uniq_by(&:id)
     private = users.size <= 2 if private.nil?
-    Conversation.initiate(users, private).conversation_participants.find_by_user_id(self.id)
-  end
-
-  def messageable_user_clause
-    "users.workflow_state IN ('registered', 'pre_registered')"
+    Conversation.initiate(users, private).conversation_participants.find_by_user_id(self)
   end
 
   def messageable_enrollment_user_clause
-    "EXISTS (SELECT 1 FROM users WHERE id = enrollments.user_id AND #{messageable_user_clause})"
+    "EXISTS (SELECT 1 FROM users WHERE id = enrollments.user_id AND #{MessageableUser::AVAILABLE_CONDITIONS})"
   end
 
   def messageable_enrollment_clause(options={})
@@ -2116,7 +2112,21 @@ class User < ActiveRecord::Base
 
   def messageable_groups
     group_visibility = group_membership_visibility
-    Group.scoped(:conditions => {:id => visible_group_ids.reject{ |id| group_visibility[:user_counts][id] == 0 } + [0]})
+    group_ids = visible_group_ids.reject{ |id| group_visibility[:user_counts][id] == 0 }
+    if group_ids.present?
+      Group.scoped(:conditions => {:id => group_ids})
+    else
+      []
+    end
+  end
+
+  def messageable_sections
+    section_ids = enrollment_visibility[:section_user_counts].keys
+    if section_ids.present?
+      CourseSection.where({:id => section_ids})
+    else
+      []
+    end
   end
 
   def visible_group_ids
@@ -2160,10 +2170,7 @@ class User < ActiveRecord::Base
   end
   memoize :group_membership_visibility
 
-  MESSAGEABLE_USER_COLUMNS = ['id', 'short_name', 'name', 'avatar_image_url', 'avatar_image_source'].map{|col|"users.#{col}"}
-  MESSAGEABLE_USER_COLUMN_SQL = MESSAGEABLE_USER_COLUMNS.join(", ")
-  MESSAGEABLE_USER_CONTEXT_REGEX = /\A(course|section|group)_(\d+)(_([a-z]+))?\z/
-  def messageable_users(options = {})
+  def deprecated_search_messageable_users(options = {})
     # if :ids is specified but empty (different than just not specified), don't
     # bother doing a query that's guaranteed to return no results.
     return [] if options[:ids] && options[:ids].empty?
@@ -2197,7 +2204,7 @@ class User < ActiveRecord::Base
     include_concluded_students = true
 
     if options[:context]
-      if options[:context].sub(/_all\z/, '') =~ MESSAGEABLE_USER_CONTEXT_REGEX
+      if options[:context].sub(/_all\z/, '') =~ MessageableUser::Calculator::CONTEXT_RECIPIENT
         type = $1
         include_concluded_students = false unless type == 'group'
         limited_id[type] = $2.to_i
@@ -2233,7 +2240,7 @@ class User < ActiveRecord::Base
     if options[:skip_visibility_checks]
       user_conditions << "users.workflow_state != 'deleted'" if options[:ids].blank?
     else
-      user_conditions << messageable_user_clause
+      user_conditions << MessageableUser::AVAILABLE_CONDITIONS
     end
     user_conditions << "users.id IN (#{options[:ids].map(&:to_i).join(', ')})" if options[:ids].present?
     user_conditions << "users.id NOT IN (#{options[:exclude_ids].map(&:to_i).join(', ')})" if options[:exclude_ids].present?
@@ -2256,18 +2263,18 @@ class User < ActiveRecord::Base
     course_sql << "(course_section_id IN (#{group_section_ids.join(',')}) AND EXISTS(SELECT 1 FROM group_memberships WHERE user_id = users.id AND group_id = #{limited_id['group']}) )" if limited_id['group'] && group_section_ids.present?
     course_sql << "(course_id IN (#{restricted_course_hash.keys.join(',')}) AND (enrollments.type = 'TeacherEnrollment' OR enrollments.type = 'TaEnrollment' OR enrollments.user_id IN (#{([self.id] + restricted_course_hash.values.flatten.uniq).join(',')})))" if restricted_course_hash.present?
     user_sql << <<-SQL if course_sql.present?
-      SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, course_id, NULL AS group_id, #{connection.func(:group_concat, :'enrollments.type', ':')} AS roles
+      SELECT #{MessageableUser::SELECT}, course_id, NULL AS group_id, #{connection.func(:group_concat, :'enrollments.type', ':')} AS roles
       FROM users, enrollments, courses
       WHERE course_id IN (#{all_course_ids.join(', ')})
         AND (#{course_sql.join(' OR ')}) AND users.id = user_id AND courses.id = course_id
         AND #{messageable_enrollment_clause(:include_concluded_students => include_concluded_students, :strict_course_state => !options[:skip_visibility_checks])}
         #{enrollment_type_sql}
         #{user_condition_sql}
-      GROUP BY #{connection.group_by(['users.id', 'course_id'], *(MESSAGEABLE_USER_COLUMNS[1, MESSAGEABLE_USER_COLUMNS.size]))}
+      GROUP BY #{connection.group_by(['users.id', 'course_id'], *(MessageableUser::COLUMNS[1, MessageableUser::COLUMNS.size]))}
     SQL
 
     user_sql << <<-SQL if full_group_ids.present?
-      SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, NULL AS course_id, group_id, NULL AS roles
+      SELECT #{MessageableUser::SELECT}, NULL AS course_id, group_id, NULL AS roles
       FROM users, group_memberships
       WHERE group_id IN (#{full_group_ids.join(',')}) AND users.id = user_id
         AND group_memberships.workflow_state = 'accepted'
@@ -2286,14 +2293,14 @@ class User < ActiveRecord::Base
       LIMIT 1
     SQL
     user_sql << <<-SQL if account_ids.present?
-      SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, 0 AS course_id, NULL AS group_id, (#{highest_enrollment_sql}) AS roles
+      SELECT #{MessageableUser::SELECT}, 0 AS course_id, NULL AS group_id, (#{highest_enrollment_sql}) AS roles
       FROM users, user_account_associations
       WHERE user_account_associations.account_id IN (#{account_ids.join(',')})
         AND user_account_associations.user_id = users.id
         #{user_condition_sql}
     SQL
     user_sql << <<-SQL unless options[:context]
-      SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, NULL AS course_id, NULL AS group_id, NULL AS roles
+      SELECT #{MessageableUser::SELECT}, NULL AS course_id, NULL AS group_id, NULL AS roles
       FROM users
       WHERE id = #{self.id}
         #{user_condition_sql}
@@ -2305,7 +2312,7 @@ class User < ActiveRecord::Base
       # conversation with that user)
       if options[:conversation_id].present?
         user_sql << <<-SQL
-          SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, NULL AS course_id, NULL AS group_id, NULL AS roles
+          SELECT #{MessageableUser::SELECT}, NULL AS course_id, NULL AS group_id, NULL AS roles
           FROM users, conversation_participants
           WHERE conversation_participants.user_id = users.id
             AND conversation_participants.conversation_id = #{options[:conversation_id].to_i}
@@ -2313,7 +2320,7 @@ class User < ActiveRecord::Base
         SQL
       elsif options[:skip_visibility_checks] # we don't care about the contexts, we've passed in ids
         user_sql << <<-SQL
-          SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, NULL AS course_id, NULL AS group_id, NULL AS roles
+          SELECT #{MessageableUser::SELECT}, NULL AS course_id, NULL AS group_id, NULL AS roles
           FROM users
           #{user_condition_sql.sub(/\AAND/, "WHERE")}
         SQL
@@ -2325,13 +2332,13 @@ class User < ActiveRecord::Base
 
     concat_sql = connection.adapter_name =~ /postgres/i ? :"course_id::text || ':' || roles::text" : :"course_id || ':' || roles"
     users = User.find_by_sql(<<-SQL)
-      SELECT #{MESSAGEABLE_USER_COLUMN_SQL},
+      SELECT #{MessageableUser::SELECT},
         #{connection.func(:group_concat, concat_sql)} AS common_courses,
         #{connection.func(:group_concat, :group_id)} AS common_groups
       FROM (
         #{user_sql.join(' UNION ')}
       ) users
-      GROUP BY #{connection.group_by(*MESSAGEABLE_USER_COLUMNS)}
+      GROUP BY #{connection.group_by(*MessageableUser::COLUMNS)}
       ORDER BY #{options[:rank_results] ? "(COUNT(course_id) + COUNT(group_id)) DESC," : ""}
         LOWER(COALESCE(short_name, name)),
         id
@@ -2352,6 +2359,18 @@ class User < ActiveRecord::Base
     end
   end
 
+  def load_messageable_user(user, options={})
+    MessageableUser::Calculator.load_messageable_user(self, user, options)
+  end
+
+  def load_messageable_users(users, options={})
+    MessageableUser::Calculator.load_messageable_users(self, users, options)
+  end
+
+  def messageable_users_in_context(asset_string)
+    MessageableUser::Calculator.messageable_users_in_context(self, asset_string)
+  end
+
   def short_name_with_shared_contexts(user)
     if (contexts = shared_contexts(user)).present?
       "#{short_name} (#{contexts[0, 2].to_sentence})"
@@ -2362,7 +2381,7 @@ class User < ActiveRecord::Base
 
   def shared_contexts(user)
     contexts = []
-    if info = messageable_users(:ids => [user.id]).first
+    if info = load_messageable_user(user)
       contexts += Course.find(:all, :conditions => {:id => info.common_courses.keys}) if info.common_courses.present?
       contexts += Group.find(:all, :conditions => {:id => info.common_groups.keys}) if info.common_groups.present?
     end
@@ -2548,7 +2567,7 @@ class User < ActiveRecord::Base
   end
 
   def default_collection_name
-    t :default_collection_name, "%{user_name}'s Collection", :user_name => self.short_name
+    t('#user.default_collection_name', "%{user_name}'s Collection", :user_name => self.short_name)
   end
 
   def profile(force_reload = false)

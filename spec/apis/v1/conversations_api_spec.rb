@@ -617,11 +617,6 @@ describe ConversationsController, :type => :integration do
           ],
           "submissions" => []
         }
-        # TODO: remove this when messageable_users works correctly
-        if Shard.current != @bob.shard
-          expected['participants'][1]['common_courses'] = {}
-          expected['audience_contexts']['courses'][@course.id.to_s] = []
-        end
         json.should == expected
       end
 

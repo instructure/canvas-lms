@@ -213,8 +213,8 @@ describe ConversationParticipant do
     it "should not include shared contexts by default" do
       users = @convo.reload.participants
       users.each do |user|
-        user.common_groups.should be_nil
-        user.common_courses.should be_nil
+        user.common_groups.should be_empty
+        user.common_courses.should be_empty
       end
     end
 
@@ -255,7 +255,7 @@ describe ConversationParticipant do
       c.move_to_user @user2
 
       c.reload.user_id.should eql @user2.id
-      c.conversation.participants.should_not include(@user1)
+      c.conversation.participants.map(&:id).should_not include(@user1.id)
       @user1.reload.unread_conversations_count.should eql 0
       @user2.reload.unread_conversations_count.should eql 1
     end
@@ -273,8 +273,8 @@ describe ConversationParticipant do
 
       rconvo.reload
       rconvo.participants.size.should eql 3
-      rconvo.participants.should_not include(@user1)
-      rconvo.participants.should include(@user2)
+      rconvo.participants.map(&:id).should_not include(@user1.id)
+      rconvo.participants.map(&:id).should include(@user2.id)
       @user1.reload.unread_conversations_count.should eql 0
       @user2.reload.unread_conversations_count.should eql 1
     end

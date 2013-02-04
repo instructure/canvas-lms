@@ -57,7 +57,7 @@ describe Conversation do
           conversation.shard.should == Shard.current
           conversation.conversation_participants.all? { |cp| cp.shard == Shard.current }.should be_true
           conversation.conversation_participants.length.should == 3
-          conversation.participants.should == users
+          conversation.participants.map(&:id).should == users.map(&:id)
           cp = users[0].all_conversations.last
           cp.shard.should == Shard.default
           cp = users[1].all_conversations.last
@@ -154,7 +154,7 @@ describe Conversation do
           conversation.conversation_participants(:reload).size.should == 4
           conversation.conversation_participants.all? { |cp| cp.shard == Shard.default }.should be_true
           users.last.all_conversations.last.shard.should == @shard1
-          conversation.participants(true).should == users
+          conversation.participants(true).map(&:id).should == users.map(&:id)
         end
         @shard2.activate do
           users << user(:name => 'e')
@@ -162,7 +162,7 @@ describe Conversation do
           conversation.conversation_participants(:reload).size.should == 5
           conversation.conversation_participants.all? { |cp| cp.shard == Shard.default }.should be_true
           users.last.all_conversations.last.shard.should == @shard2
-          conversation.participants(true).should == users
+          conversation.participants(true).map(&:id).should == users.map(&:id)
         end
       end
     end
@@ -883,7 +883,7 @@ describe Conversation do
     ConversationMessage.find_all_by_conversation_id(source.id).should == []
 
     target.reload
-    target.participants(true).should == [sender, target_user]
+    target.participants(true).map(&:id).should == [sender.id, target_user.id]
     target_user.reload.all_conversations.map(&:conversation).should == [target]
     cp = target_user.all_conversations.first
     cp.messages.length.should == message_count
