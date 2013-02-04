@@ -170,9 +170,6 @@ describe 'DataFixup::RemoveMultipleRootFolders' do
     extra_folders = []
 
     @contexts.each do |context|
-      root_folder_name = get_root_folder_name(context)
-      context.folders.find_by_name(root_folder_name).should be_nil
-
       extra_folder1 = context.folders.create!(:name => "name1")
       extra_folders << extra_folder1
       extra_folder1.sub_folders.create!(:name => "name2", :context => context)
@@ -184,11 +181,15 @@ describe 'DataFixup::RemoveMultipleRootFolders' do
       a.uploaded_data = default_uploaded_data
       a.save!
 
+      root_folder_name = get_root_folder_name(context)
+      context.folders.find_by_name(root_folder_name).delete
+      context.folders.find_by_name(root_folder_name).should be_nil
+
       Folder.update_all({:parent_folder_id => nil}, {:id => [extra_folder1.id, extra_folder2.id]})
 
       Folder.count(:conditions => ["context_type = ? AND context_id = ? AND workflow_state != ? AND parent_folder_id IS NULL",
                                    context.class.to_s, context.id, 'deleted']
-      ).should == 3
+      ).should == 2
     end
 
     DataFixup::RemoveMultipleRootFolders.run(:limit => 2)
