@@ -459,6 +459,22 @@ describe 'Submissions API', :type => :integration do
     JSON.parse(response.body).should == {"status"=>"unauthorized", "message"=>"You are not authorized to perform that action."}
   end
 
+  it "should return grading information for observers" do
+    @student = user(:active_all => true)
+    e = course_with_observer(:active_all => true)
+    e.associated_user_id = @student.id
+    e.save!
+    @course.enroll_student(@student).accept!
+    a1 = @course.assignments.create!(:title => 'assignment1', :points_possible => 15)
+    submit_homework(a1, @student)
+    a1.grade_student(@student, {:grade => 15})
+    json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{@student.id}.json",
+                  { :controller => "submissions_api", :action => "show",
+                    :format => "json", :course_id => @course.id.to_s,
+                    :assignment_id => a1.id.to_s, :id => @student.id.to_s })
+    json["score"].should == 15
+  end
+
   it "should api translate online_text_entry submissions" do
     student1 = user(:active_all => true)
     course_with_teacher(:active_all => true)
