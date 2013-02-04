@@ -32,7 +32,7 @@ describe "users" do
   context "page views" do
 
     before (:each) do
-      @teacher = course_with_teacher_logged_in
+      course_with_admin_logged_in
       @student = student_in_course.user
       Setting.set('enable_page_views', 'db')
     end

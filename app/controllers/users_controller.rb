@@ -614,7 +614,7 @@ class UsersController < ApplicationController
     get_context
     @context_account = @context.is_a?(Account) ? @context : @domain_root_account
     @user = params[:id] && params[:id] != 'self' ? User.find(params[:id]) : @current_user
-    if authorized_action(@user, @current_user, :view_statistics)
+    if authorized_action(@context_account, @current_user, :view_statistics)
       add_crumb(t('crumbs.profile', "%{user}'s profile", :user => @user.short_name), @user == @current_user ? user_profile_path(@current_user) : user_path(@user) )
 
       # course_section and enrollment term will only be used if the enrollment dates haven't been cached yet;

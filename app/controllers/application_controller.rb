@@ -376,7 +376,7 @@ class ApplicationController < ActionController::Base
         params[:context_type] = "Group"
         @context_enrollment = @context.group_memberships.find_by_user_id(@current_user.id) if @context && @current_user      
         @context_membership = @context_enrollment
-      elsif params[:user_id]
+      elsif params[:user_id] || (self.is_a?(UsersController) && params[:user_id] = params[:id])
         case params[:user_id]
         when 'self'
           @context = @current_user
