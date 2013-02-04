@@ -367,7 +367,7 @@ class CommunicationChannel < ActiveRecord::Base
 
   def merge_candidates
     shards = self.class.associated_shards(self.path) if Enrollment.cross_shard_invitations?
-    shards ||= [Shard.default]
+    shards ||= [self.shard]
     scope = CommunicationChannel.active.by_path(self.path).of_type(self.path_type)
     Shard.with_each_shard(shards) do
       scope.find(:all, :conditions => ["user_id<>?", self.user_id], :include => :user).map(&:user)
