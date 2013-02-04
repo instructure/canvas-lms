@@ -89,8 +89,6 @@ class Profile < ActiveRecord::Base
             profile.root_account = root_account
             profile.title = name
             profile.visibility = "private"
-            self.profile = profile
-            profile.errors.clear
             profile
           end
         end
