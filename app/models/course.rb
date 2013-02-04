@@ -59,7 +59,8 @@ class Course < ActiveRecord::Base
                   :grading_standard_enabled,
                   :locale,
                   :hide_final_grades,
-                  :hide_distribution_graphs
+                  :hide_distribution_graphs,
+                  :lock_all_announcements
 
   serialize :tab_configuration
   serialize :settings, Hash
@@ -2377,7 +2378,7 @@ class Course < ActiveRecord::Base
       :storage_quota, :tab_configuration, :allow_wiki_comments,
       :turnitin_comments, :self_enrollment, :license, :indexed, :locale,
       :hide_final_grade, :hide_distribution_graphs,
-      :allow_student_discussion_topics ]
+      :allow_student_discussion_topics, :lock_all_announcements ]
   end
 
   # TODO: remove me? looks like only a single spec exercises this code (incidentally, no less)
@@ -2861,6 +2862,7 @@ class Course < ActiveRecord::Base
   add_setting :hide_distribution_graphs, :boolean => true
   add_setting :allow_student_discussion_topics, :boolean => true, :default => true
   add_setting :allow_student_discussion_editing, :boolean => true, :default => true
+  add_setting :lock_all_announcements, :boolean => true, :default => false
 
   def user_can_manage_own_discussion_posts?(user)
     return true if allow_student_discussion_editing?

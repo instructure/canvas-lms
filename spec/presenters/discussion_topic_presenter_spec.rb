@@ -115,4 +115,18 @@ describe DiscussionTopicPresenter do
       presenter.due_at(override: override).should == presenter.datetime_string(override.due_at)
     end
   end
+
+  context 'an announcement' do
+    let(:announcement) { course.announcements.new(:title => 'test', :message => 'body') }
+    let(:presenter)    { DiscussionTopicPresenter.new(announcement) }
+
+    it "should know if comments are not disabled" do
+      presenter.comments_disabled?.should be_false
+    end
+
+    it "should know if comments are disabled" do
+      Course.any_instance.stubs(:settings).returns(:lock_all_announcements => true)
+      presenter.comments_disabled?.should be_true
+    end
+  end
 end

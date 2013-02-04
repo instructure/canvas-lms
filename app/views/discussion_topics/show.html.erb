@@ -121,12 +121,14 @@
                   </li>
                 <% end %>
 
-                <% if @topic.locked? %>
-                  <% if can_do(@context, @current_user, :moderate_forum) %>
-                    <li><a href="#" data-mark-locked="false" class="discussion_locked_toggler"><i class="icon-unlock"></i> <%= t(:unlock_topic, %{Open for Comments}) %></a></li>
+                <% unless @presenter.comments_disabled? %>
+                  <% if @topic.locked? %>
+                    <% if can_do(@context, @current_user, :moderate_forum) %>
+                      <li><a href="#" data-mark-locked="false" class="discussion_locked_toggler"><i class="icon-unlock"></i> <%= t(:unlock_topic, %{Open for Comments}) %></a></li>
+                    <% end %>
+                  <% elsif can_do(@context, @current_user, :moderate_forum) && (!@topic.assignment.try(:due_at) || @topic.assignment.due_at <= Time.now) %>
+                    <li><a href="#" data-mark-locked="true" class="discussion_locked_toggler"><i class="icon-lock"></i> <%= t(:lock_topic, %{Close for Comments}) %></a></li>
                   <% end %>
-                <% elsif can_do(@context, @current_user, :moderate_forum) && (!@topic.assignment.try(:due_at) || @topic.assignment.due_at <= Time.now) %>
-                  <li><a href="#" data-mark-locked="true" class="discussion_locked_toggler"><i class="icon-lock"></i> <%= t(:lock_topic, %{Close for Comments}) %></a></li>
                 <% end %>
               </ul>
             </div>

@@ -196,7 +196,6 @@ describe DiscussionTopicsController do
     end
   end
 
-
   describe 'POST create:' do
     before(:each) do
       Setting.set('enable_page_views', 'db')

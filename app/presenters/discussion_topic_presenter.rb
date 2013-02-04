@@ -136,4 +136,13 @@ class DiscussionTopicPresenter
       false
     end
   end
+
+  # Public: Determine if comment feature is disabled for the context/announcement.
+  #
+  # Returns a boolean.
+  def comments_disabled?
+    topic.is_a?(Announcement) &&
+      topic.context.is_a?(Course) &&
+      topic.context.settings[:lock_all_announcements]
+  end
 end

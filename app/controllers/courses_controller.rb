@@ -1296,6 +1296,15 @@ class CoursesController < ApplicationController
       end
       params[:course][:event] = :offer if params[:offer].present?
 
+      lock_announcements = params[:course].delete(:lock_all_announcements)
+      if lock_announcements
+        @course.lock_all_announcements = true
+        Announcement.update_all(['workflow_state = ?', 'locked'],
+          :context_type => 'Course', :context_id => @course.id, :workflow_state => 'active')
+      elsif @course.lock_all_announcements
+        @course.lock_all_announcements = false
+      end
+
       @course.process_event(params[:course].delete(:event)) if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
       params[:course][:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)
       respond_to do |format|

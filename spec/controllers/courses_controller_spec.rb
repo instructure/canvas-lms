@@ -524,7 +524,7 @@ describe CoursesController do
       response.location.should match(%r{/courses/#{@course2.id}})
     end
   end
-  
+
   describe "POST 'unenroll'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -663,6 +663,37 @@ describe CoursesController do
       assigns[:course].should_not be_nil
       assigns[:course].state.should eql(:completed)
     end
+
+    it "should lock active course announcements" do
+      course_with_teacher_logged_in(:active_all => true)
+      active_announcement  = @course.announcements.create!(:title => 'active', :message => 'test')
+      delayed_announcement = @course.announcements.create!(:title => 'delayed', :message => 'test')
+      deleted_announcement = @course.announcements.create!(:title => 'deleted', :message => 'test')
+
+      delayed_announcement.workflow_state  = 'post_delayed'
+      delayed_announcement.delayed_post_at = Time.now + 3.weeks
+      delayed_announcement.save!
+
+      deleted_announcement.destroy
+
+      put 'update', :id => @course.id, :course => { :lock_all_announcements => 1 }
+      assigns[:course].lock_all_announcements.should be_true
+
+      active_announcement.reload.should be_locked
+      delayed_announcement.reload.should be_post_delayed
+      deleted_announcement.reload.should be_deleted
+    end
+
+
+    it "should update its lock_all_announcements setting" do
+      course_with_teacher_logged_in(:active_all => true)
+      @course.lock_all_announcements = true
+      @course.save!
+      put 'update', :id => @course.id, :course => { }
+      assigns[:course].lock_all_announcements.should be_false
+    end
+
+
   end
 
   describe "POST unconclude" do
