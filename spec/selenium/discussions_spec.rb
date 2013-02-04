@@ -221,6 +221,56 @@ describe "discussions" do
     end
   end
 
+  context "with blank pages fetched from server" do
+    before(:each) do
+      course_with_student_logged_in
+    end
+
+    it "should display empty version of view if there are no topics" do
+      get "/courses/#{@course.id}/discussion_topics"
+      wait_for_ajaximations
+      f('.btn-large').should be_present
+      f('.btn-large').should be_displayed
+    end
+
+    it "should display empty version of view if all pages are empty" do
+      (1..15).each do |n|
+        @course.discussion_topics.create!({
+          :title => "general topic #{n}",
+          :discussion_type => 'side_comment',
+          :delayed_post_at => 5.days.from_now,
+        })
+      end
+
+      get "/courses/#{@course.id}/discussion_topics"
+      wait_for_ajaximations
+      f('.btn-large').should be_present
+      f('.btn-large').should be_displayed
+    end
+    
+    it "should display topics even if first page is blank but later pages have data" do
+      # topics that should be visible
+      (1..5).each do |n|
+        @course.discussion_topics.create!({
+          :title => "general topic #{n}",
+          :discussion_type => 'side_comment',
+        })
+      end
+      # a page worth of invisible topics
+      (6..15).each do |n|
+        @course.discussion_topics.create!({
+          :title => "general topic #{n}",
+          :discussion_type => 'side_comment',
+          :delayed_post_at => 5.days.from_now,
+        })
+      end
+
+      get "/courses/#{@course.id}/discussion_topics"
+      wait_for_ajaximations
+      f('.btn-large').should be_nil
+    end
+  end
+
   context "as a student" do
     before (:each) do
       course_with_teacher(:name => 'teacher@example.com', :active_all => true)
