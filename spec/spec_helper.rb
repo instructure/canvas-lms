@@ -864,6 +864,16 @@ Spec::Runner.configure do |config|
     str
   end
 
+  # from minitest, MIT licensed
+  def capture_io
+    orig_stdout, orig_stderr = $stdout, $stderr
+    $stdout, $stderr = StringIO.new, StringIO.new
+    yield
+    return $stdout.string, $stderr.string
+  ensure
+    $stdout, $stderr = orig_stdout, orig_stderr
+  end
+
   def verify_post_matches(post_lines, expected_post_lines)
     # first lines should match
     post_lines[0].should == expected_post_lines[0]
