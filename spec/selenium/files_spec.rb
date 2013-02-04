@@ -249,3 +249,36 @@ describe "collaborations folder in files menu" do
     message.should include_text("New collaboration")
   end
 end
+
+describe "course files" do
+  it_should_behave_like "in-process server selenium tests"
+
+  it "should not show root folder files in the collaborations folder when there is a collaboration" do
+    course_with_teacher_logged_in
+
+    f = Folder.root_folders(@course).first
+    a = f.active_file_attachments.build
+    a.context = @course
+    a.uploaded_data = default_uploaded_data
+    a.save!
+
+    PluginSetting.create!(:name => 'etherpad', :settings => {})
+
+    @collaboration = Collaboration.typed_collaboration_instance('EtherPad')
+    @collaboration.context = @course
+    @collaboration.attributes = { :title => 'My collaboration',
+                                  :user  => @teacher }
+    @collaboration.save!
+
+    get "/courses/#{@course.id}/files"
+    wait_for_ajaximations
+
+    file_elements = keep_trying_until do
+      file_elements = ffj('#files_structure_list > .context > ul > .file > .name')
+      file_elements.count.should == 1
+      file_elements
+    end
+
+    file_elements.first.text.should == a.name
+  end
+end
