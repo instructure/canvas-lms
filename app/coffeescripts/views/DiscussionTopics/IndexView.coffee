@@ -18,7 +18,9 @@ define [
       super
       @collection.on 'remove', => @render() unless @collection.length
       @collection.on 'reset', @render
-      @collection.on 'add fetch:next', @renderList
+      @collection.on 'add', @renderList
+      @collection.on 'fetch:next', @fetchedNextPage
+      @collection.on 'fetched:last', @fetchedLastPage
       @collection.on 'change:selected', @toggleActionsForSelectedDiscussions
       @render()
 
@@ -58,6 +60,18 @@ define [
           model: discussionTopic
           permissions: @options.permissions
         @$('.discussionTopicIndexList').append view.render().el
+
+    fetchedNextPage: =>
+      $list = @$('.discussionTopicIndexList')
+      if @collection.length && !$list.length
+        @render()
+      else
+        @renderList()
+
+    fetchedLastPage: =>
+      @lastPageFetched = true
+      @render() if !@collection.length
+
 
     toggleActionsForSelectedDiscussions: =>
       selectedTopics = @selectedTopics()
@@ -164,4 +178,5 @@ define [
         new_topic_url: new_topic_url
         options: @options
         showingAnnouncements: @isShowingAnnouncements()
+        lastPageFetched: @lastPageFetched
       , filterProps, collectionProps
