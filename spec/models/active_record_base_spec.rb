@@ -65,19 +65,19 @@ describe ActiveRecord::Base do
     end
   end
 
-  describe "useful_find_in_batches and useful_find_each" do
+  describe "find in batches" do
     before do
       c1 = course(:name => 'course1', :active_course => true)
       c2 = course(:name => 'course2', :active_course => true)
       u1 = user(:name => 'user1', :active_user => true)
       u2 = user(:name => 'user2', :active_user => true)
       u3 = user(:name => 'user3', :active_user => true)
-      c1.enroll_student(u1, :enrollment_state => 'active')
-      c1.enroll_student(u2, :enrollment_state => 'active')
-      c1.enroll_student(u3, :enrollment_state => 'active')
-      c2.enroll_student(u1, :enrollment_state => 'active')
-      c2.enroll_student(u2, :enrollment_state => 'active')
-      c2.enroll_student(u3, :enrollment_state => 'active')
+      @e1 = c1.enroll_student(u1, :enrollment_state => 'active')
+      @e2 = c1.enroll_student(u2, :enrollment_state => 'active')
+      @e3 = c1.enroll_student(u3, :enrollment_state => 'active')
+      @e4 = c2.enroll_student(u1, :enrollment_state => 'active')
+      @e5 = c2.enroll_student(u2, :enrollment_state => 'active')
+      @e6 = c2.enroll_student(u3, :enrollment_state => 'active')
     end
 
     it "should find each enrollment from course join" do
@@ -89,7 +89,7 @@ describe ActiveRecord::Base do
       all_enrollments.length.should == 6
     end
 
-    it "should find all enrollments from course join in batches" do
+    it "should find in batches all enrollments from course join" do
       e = Course.active.scoped(:select => "enrollments.id as eid", :joins => :enrollments)
       all_enrollments = []
       e.useful_find_in_batches(:batch_size => 2) do |batch|
@@ -98,6 +98,33 @@ describe ActiveRecord::Base do
         end
       end
       all_enrollments.length.should == 6
+    end
+
+    it "should find each enrollment from course using temp table" do
+      e = Course.active.scoped(:select => "enrollments.id AS e_id",
+                               :joins => :enrollments, :order => "e_id asc")
+      es = []
+      e.find_each_with_temp_table(:batch_size => 2) do |record|
+        es << record["e_id"]
+      end
+      es.length.should == 6
+      es.should == [@e1.id.to_s,@e2.id.to_s,@e3.id.to_s,@e4.id.to_s,@e5.id.to_s,@e6.id.to_s]
+
+    end
+
+    it "should find all enrollments from course join in batches" do
+      e = Course.active.scoped(:select => "enrollments.id AS e_id",
+                               :joins => :enrollments, :order => "e_id asc")
+      batch_size = 2
+      es = []
+      e.find_in_batches_with_temp_table(:batch_size => batch_size) do |batch|
+        batch.size.should == batch_size
+        batch.each do |r|
+          es << r["e_id"]
+        end
+      end
+      es.length.should == 6
+      es.should == [@e1.id.to_s,@e2.id.to_s,@e3.id.to_s,@e4.id.to_s,@e5.id.to_s,@e6.id.to_s]
     end
   end
 

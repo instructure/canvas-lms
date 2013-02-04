@@ -494,6 +494,23 @@ class ActiveRecord::Base
     options
   end
 
+  def self.generate_temp_table(options = {})
+    Canvas::TempTable.new(connection, construct_finder_sql({}), options)
+  end
+
+  def self.find_in_batches_with_temp_table(options = {})
+    generate_temp_table(options).execute! do |table|
+      table.find_in_batches(options) { |batch| yield batch }
+    end
+  end
+
+  def self.find_each_with_temp_table(options = {})
+    find_in_batches_with_temp_table(options) do |batch|
+      batch.each { |record| yield record }
+    end
+    self
+  end
+
   def self.useful_find_in_batches(options = {})
     offset = 0
     batch_size = options[:batch_size] || 1000
