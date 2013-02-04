@@ -82,7 +82,9 @@ define [
 
       if $('[name=use_section_dates]').prop('checked')
         dialog = new MissingDateDialogView
-          dateFields: $('[name*=start_date]:visible')
+          validationFn: ->
+            $fields = $('[name*=start_date]:visible').filter -> $(this).val() is ''
+            if $fields.length > 0 then $fields else true
           labelFn   : (input) -> $(input).parents('td:first').prev().find('label').text()
           success   : ($dialog) =>
             $dialog.dialog('close')
