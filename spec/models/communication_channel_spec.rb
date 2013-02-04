@@ -382,6 +382,25 @@ describe CommunicationChannel do
 
         cc1.merge_candidates.should == [@user2]
       end
+
+      it "should search a non-default shard *only*" do
+        Enrollment.stubs(:cross_shard_invitations?).returns(false)
+        user1 = User.create!
+        cc1 = user1.communication_channels.create!(:path => 'jt@instructure.com')
+        cc1.confirm!
+        Account.default.pseudonyms.create!(:user => user1, :unique_id => 'user1')
+
+        @shard1.activate do
+          @user2 = User.create!
+          @cc2 = @user2.communication_channels.create!(:path => 'jt@instructure.com')
+          @cc2.confirm!
+          account = Account.create!
+          account.pseudonyms.create!(:user => @user2, :unique_id => 'user2')
+        end
+
+        cc1.merge_candidates.should == []
+        @cc2.merge_candidates.should == []
+      end
     end
   end
 end
