@@ -486,10 +486,8 @@ describe "context_modules" do
   end
 
   it "should add 2 modules with the first one as a prerequisite" do
-    pending("Bug 6711 - Prerequisite module doesn't save when creating and saving module in one step") do
       first_module_name = 'First Module'
       second_module_name = 'Second Module'
-
       add_module(first_module_name)
       #adding second module - can't use add_module method because a prerequisite needs to be added to this module
       add_form = new_module_form
@@ -509,7 +507,6 @@ describe "context_modules" do
       prereq_select = fj('.criterion select')
       option = first_selected_option(prereq_select)
       option.text.should == 'the module, ' + first_module_name
-    end
   end
 
   it "should rearrange modules" do

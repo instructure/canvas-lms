@@ -29,27 +29,41 @@ class ContextModule < ActiveRecord::Base
   serialize :completion_requirements
   serialize :downstream_modules
   before_save :infer_position
+  before_save :validate_prerequisites
   before_save :confirm_valid_requirements
   after_save :check_students
   after_save :touch_context
-  
+
   def self.module_positions(context)
-    # Keep a cached hash of all modules for a given context and their 
+    # Keep a cached hash of all modules for a given context and their
     # respective positions -- used when enforcing valid prerequisites
     # and when generating the list of downstream modules
     Rails.cache.fetch(['module_positions', context].cache_key) do
       hash = {}
-      context.context_modules.active.each{|m| hash[m.id] = m.position || 0 }
+      context.context_modules.not_deleted.each{|m| hash[m.id] = m.position || 0 }
       hash
     end
   end
-  
+
   def infer_position
+    if !self.position
+      positions = ContextModule.module_positions(self.context)
+      if max = positions.values.max
+        self.position = max + 1
+      else
+        self.position = 1
+      end
+    end
+    self.position
+  end
+
+  def validate_prerequisites
+    positions = ContextModule.module_positions(self.context)
     @already_confirmed_valid_requirements = false
     prereqs = []
     (self.prerequisites || []).each do |pre|
       if pre[:type] == 'context_module'
-        position = ContextModule.module_positions(self.context)[pre[:id].to_i] || 0
+        position = positions[pre[:id].to_i] || 0
         prereqs << pre if position && position < (self.position || 0)
       else
         prereqs << pre
@@ -78,22 +92,25 @@ class ContextModule < ActiveRecord::Base
     original_position ||= self.position || 0
     positions = ContextModule.module_positions(self.context).to_a.sort_by{|a| a[1] }
     downstream_ids = positions.select{|a| a[1] > (self.position || 0)}.map{|a| a[0] }
-    downstreams = downstream_ids.empty? ? [] : self.context.context_modules.active.find_all_by_id(downstream_ids)
+    downstreams = downstream_ids.empty? ? [] : self.context.context_modules.not_deleted.find_all_by_id(downstream_ids)
     downstreams.each {|m| m.save_without_touching_context }
   end
   
   workflow do
-    state :active
+    state :unpublished do
+      event :publish, :transitions_to => :active
+    end
+    state :active do
+      event :unpublish, :transitions_to => :unpublished
+    end
     state :deleted
   end
   
-  named_scope :active, lambda{
-    {:conditions => ['context_modules.workflow_state != ?', 'deleted'] }
-  }
-  named_scope :include_tags_and_progressions, lambda{
-    {:include => [:content_tags, :context_module_progressions]}
-  }
-  
+  named_scope :active, :conditions => ['context_modules.workflow_state = ?', 'active']
+  named_scope :unpublished, :conditions => ['context_modules.workflow_state = ?', 'unpublished']
+  named_scope :not_deleted, :conditions => ['context_modules.workflow_state != ?', 'deleted']
+  named_scope :include_tags_and_progressions, :include => [:content_tags, :context_module_progressions]
+
   def check_students
     return if @dont_check_students || self.deleted?
     send_later_if_production :update_student_progressions
@@ -127,8 +144,12 @@ class ContextModule < ActiveRecord::Base
   end
   
   def available_for?(user, tag=nil, deep_check=false)
-    return true if !self.to_be_unlocked && self.prerequisites.blank? && !self.require_sequential_progress
-    return true if self.grants_right?(user, nil, :update)
+    return true if self.active? && !self.to_be_unlocked && self.prerequisites.blank? && !self.require_sequential_progress
+    if self.grants_right?(user, nil, :update)
+     return true
+    elsif !self.active?
+      return false
+    end
     progression = self.evaluate_for(user)
     # if the progression is locked, then position in the progression doesn't
     # matter. we're not available.
@@ -187,7 +208,7 @@ class ContextModule < ActiveRecord::Base
     end
     if val.is_a?(String)
       res = []
-      modules = self.context.context_modules.active
+      modules = self.context.context_modules.not_deleted
       module_prereqs = ContextModule.context_prerequisites(self.context)
       invalid_prereqs = module_prereqs.to_a.map{|id, ps| id if (ps.any?{|p| p[:type] == 'context_module' && p[:id].to_i == self.id}) }.compact
       pres = val.split(",")
@@ -353,25 +374,35 @@ class ContextModule < ActiveRecord::Base
     end
   end
   
+
   def prerequisites_satisfied?(user, recursive_check=false)
-    unlocked = (self.prerequisites || []).all? do |pre|
+    unlocked = (self.active_prerequisites || []).all? do |pre|
       if pre[:type] == 'context_module'
         prog = user.module_progression_for(pre[:id])
-        if !prog
-          prereq = self.context.context_modules.active.find_by_id(pre[:id]) if !prog && pre[:id].present?
-          prog = prereq.evaluate_for(user, true) if prereq
+        if prog
+          prog.completed?
+        elsif pre[:id].present?
+          if prereq = self.context.context_modules.active.find_by_id(pre[:id])
+            prog = prereq.evaluate_for(user, true)
+            prog.completed?
+          else
+            true
+          end
+        else
+          true
         end
-        prog.completed? rescue false
-      elsif pre[:type] == 'min_score'
-      elsif pre[:type] == 'max_score'
-      elsif pre[:type] == 'must_contribute'
-      elsif pre[:type] == 'must_submit'
-      elsif pre[:type] == 'must_view'
       else
         true
       end
     end
     unlocked
+  end
+
+  def active_prerequisites
+    return [] unless self.prerequisites
+    prereq_ids = self.prerequisites.select{|pre|pre[:type] == 'context_module'}.map{|pre| pre[:id] }
+    active_ids = self.context.context_modules.active.scoped(:select => :id, :conditions => {:id => prereq_ids}).map(&:id)
+    self.prerequisites.select{|pre| pre[:type] == 'context_module' && active_ids.member?(pre[:id])}
   end
   
   def clear_cached_lookups
@@ -471,6 +502,11 @@ class ContextModule < ActiveRecord::Base
     end
     return nil unless user
     progression ||= self.find_or_create_progression_with_multiple_lookups(user)
+    if self.unpublished?
+      progression.workflow_state = 'locked'
+      progression.save if progression.workflow_state_changed?
+      return progression
+    end
     requirements_met_changed = false
     if User.module_progression_jobs_queued?(user.id)
       progression.workflow_state = 'locked'
@@ -481,7 +517,7 @@ class ContextModule < ActiveRecord::Base
     @cached_tags ||= self.content_tags.active
     tags = @cached_tags
     if recursive_check || progression.new_record? || progression.updated_at < self.updated_at || ENV['RAILS_ENV'] == 'test' || User.module_progression_jobs_queued?(user.id)
-      if self.completion_requirements.blank? && self.prerequisites.blank?
+      if self.completion_requirements.blank? && active_prerequisites.empty?
         progression.workflow_state = 'completed'
         progression.save
       end
@@ -638,7 +674,7 @@ class ContextModule < ActiveRecord::Base
     migration_ids = modules.map{|m| m['module_id'] }.compact
     conn = self.connection
     cases = []
-    max = migration.context.context_modules.map(&:position).compact.max || 0
+    max = migration.context.context_modules.not_deleted.map(&:position).compact.max || 0
     modules.each_with_index{|m, idx| cases << " WHEN migration_id=#{conn.quote(m['module_id'])} THEN #{max + idx + 1} " if m['module_id'] }
     unless cases.empty?
       conn.execute("UPDATE context_modules SET position=CASE #{cases.join(' ')} ELSE NULL END WHERE context_id=#{migration.context.id} AND context_type=#{conn.quote(migration.context.class.to_s)} AND migration_id IN (#{migration_ids.map{|id| conn.quote(id)}.join(',')})")
@@ -654,7 +690,12 @@ class ContextModule < ActiveRecord::Base
     context.imported_migration_items << item if context.imported_migration_items && item.new_record?
     item.name = hash[:title] || hash[:description]
     item.migration_id = hash[:migration_id]
-    item.workflow_state = 'active' if item.deleted?
+    if hash[:workflow_state] == 'unpublished'
+      item.workflow_state = 'unpublished'
+    else
+      item.workflow_state = 'active'
+    end
+
     item.position = hash[:position] || hash[:order]
     item.context = context
     item.unlock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:unlock_at]) if hash[:unlock_at]

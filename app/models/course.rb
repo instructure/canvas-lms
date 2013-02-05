@@ -242,6 +242,14 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def modules_visible_to(user)
+    if self.grants_right?(user, :manage_content)
+      self.context_modules.not_deleted
+    else
+      self.context_modules.active
+    end
+  end
+
   def verify_unique_sis_source_id
     return true unless self.sis_source_id
     infer_root_account unless self.root_account_id

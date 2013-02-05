@@ -19,7 +19,7 @@ module Api::V1::ContextModule
   include Api::V1::Json
   include Api::V1::User
 
-  MODULE_JSON_ATTRS = %w(id position name unlock_at)
+  MODULE_JSON_ATTRS = %w(id position name unlock_at workflow_state)
 
   MODULE_ITEM_JSON_ATTRS = %w(id position title indent)
 

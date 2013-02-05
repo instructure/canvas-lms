@@ -271,6 +271,21 @@ describe ContentMigration do
       page_to.body.should == body % [@copy_to.id, tag_to.id]
     end
 
+    it "should copy unpublished modules" do
+      cm = @copy_from.context_modules.create!(:name => "some module")
+      cm.publish
+      cm2 = @copy_from.context_modules.create!(:name => "another module")
+      cm2.unpublish
+
+      run_course_copy
+
+      @copy_to.context_modules.count.should == 2
+      cm_2 = @copy_to.context_modules.find_by_migration_id(mig_id(cm))
+      cm_2.workflow_state.should == 'active'
+      cm2_2 = @copy_to.context_modules.find_by_migration_id(mig_id(cm2))
+      cm2_2.workflow_state.should == 'unpublished'
+    end
+
     it "should find and fix wiki links by title or id" do
       # simulating what happens when the user clicks "link to new page" and enters a title that isn't
       # urlified the same way by the client vs. the server.  this doesn't break navigation because

@@ -29,6 +29,8 @@
 #     {
 #       // the unique identifier for the module
 #       id: 123,
+#       // the state of the module: active, unpublished, deleted
+#       workflow_state: active,
 #
 #       // the position of this module in the course (1-based)
 #       position: 2,
@@ -109,7 +111,7 @@ class ContextModulesApiController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read)
       route = polymorphic_url([:api_v1, @context, :context_modules])
-      scope = @context.context_modules.active
+      scope = @context.modules_visible_to(@current_user)
       modules = Api.paginate(scope, self, route)
       modules_and_progressions = if @context.grants_right?(@current_user, session, :participate_as_student)
         modules.map { |m| [m, m.evaluate_for(@current_user)] }
@@ -131,7 +133,7 @@ class ContextModulesApiController < ApplicationController
   # @returns Module
   def show
     if authorized_action(@context, @current_user, :read)
-      mod = @context.context_modules.active.find(params[:id])
+      mod = @context.modules_visible_to(@current_user).find(params[:id])
       prog = @context.grants_right?(@current_user, session, :participate_as_student) ? mod.evaluate_for(@current_user) : nil
       render :json => module_json(mod, @current_user, session, prog)
     end
@@ -148,7 +150,7 @@ class ContextModulesApiController < ApplicationController
   # @returns [Module Item]
   def list_module_items
     if authorized_action(@context, @current_user, :read)
-      mod = @context.context_modules.active.find(params[:module_id])
+      mod = @context.modules_visible_to(@current_user).find(params[:module_id])
       route = polymorphic_url([:api_v1, @context, mod, :items])
       scope = mod.content_tags.active
       items = Api.paginate(scope, self, route)
@@ -168,7 +170,7 @@ class ContextModulesApiController < ApplicationController
   # @returns Module Item
   def show_module_item
     if authorized_action(@context, @current_user, :read)
-      mod = @context.context_modules.active.find(params[:module_id])
+      mod = @context.modules_visible_to(@current_user).find(params[:module_id])
       item = mod.content_tags.active.find(params[:id])
       prog = @context.grants_right?(@current_user, session, :participate_as_student) ? mod.evaluate_for(@current_user) : nil
       render :json => module_item_json(item, @current_user, session, mod, prog)

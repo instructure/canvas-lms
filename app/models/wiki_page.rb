@@ -404,7 +404,7 @@ class WikiPage < ActiveRecord::Base
         elsif sub_item[:type] == 'linked_resource'
           case sub_item[:linked_resource_type]
           when 'TOC_TYPE'
-            obj = context.context_modules.find_by_migration_id(sub_item[:linked_resource_id])
+            obj = context.context_modules.not_deleted.find_by_migration_id(sub_item[:linked_resource_id])
             contents += "  <li><a href='/courses/#{context.id}/modules'>#{obj.name}</a></li>\n" if obj
           when 'ASSESSMENT_TYPE'
             obj = context.quizzes.find_by_migration_id(sub_item[:linked_resource_id])
