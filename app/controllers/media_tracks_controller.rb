@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# @API Media Objects
+# Not yet an API, for reasons outlined in MediaObjectsController
 class MediaTracksController < ApplicationController
   include Api::V1::MediaObject
 
