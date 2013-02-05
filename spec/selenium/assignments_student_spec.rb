@@ -149,7 +149,7 @@ describe "assignments" do
       get "/courses/#{@course.id}/assignments/#{@fourth_assignment.id}"
 
       driver.current_url.should match %r{/courses/\d+/discussion_topics/\d+}
-      f('h1.discussion-title').should include_text(@fourth_assignment.title)
+      f('div.discussion-title').should include_text(@fourth_assignment.title)
     end
 
     it "should validate an assignment created with the type of external tool" do

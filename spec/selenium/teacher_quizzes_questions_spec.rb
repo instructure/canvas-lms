@@ -37,7 +37,7 @@ describe "quizzes questions" do
 
       # check that the wiki sidebar shows up
       f('#quiz_options_holder .link_to_content_link').click
-      f('#editor_tabs h4').should include_text("Insert Content into the Page")
+      f('#editor_tabs .wiki-sidebar-header').should include_text("Insert Content into the Page")
       f('#quiz_content_links .quiz_options_link').click
 
       submit_form(question)

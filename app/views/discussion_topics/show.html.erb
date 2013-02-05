@@ -150,16 +150,16 @@
               <div class="discussion-pubdate"><%= friendly_datetime @topic.created_at %></div>
               <%= render :partial => 'new_and_total_badge', :locals => { :unread_count => @topic.unread_count(@current_user), :reply_count => @topic.discussion_entries.size } %>
             </div>
-            <h1 class="discussion-title"><%= @topic.title %></h1>
-            <h2 class="discussion-subtitle">
+            <div class="discussion-title"><%= @topic.title %></div>
+            <div class="discussion-subtitle">
               <a class="author" href="<%= context_url(@topic.context, :context_user_url, @topic.user_id) %>" title="<%= t :authors_name, "Author's name" %>"><%= context_user_name(@topic.context, @topic.user) %></a>
-            </h2>
+            </div>
             <% if @topic.root_topic.try(:context) && @topic.root_topic.try(:context) != @context %>
-              <h3 class="discussion-subtitle">
+              <span class="discussion-subtitle">
                 <%= t(:from_context, "From *%{context_name}*", {
                         :context_name => @topic.root_topic.context.short_name,
                         :wrapper => "<a href='#{context_url(@topic.root_topic.context, :context_url)}'>\1</a>" }) %>
-              </h3>
+              </span>
             <% end %>
           </div>
         </header>
@@ -216,9 +216,9 @@
 
     <div id="discussion_subentries" class="discussion_subentries">
       <% if @initial_post_required %>
-        <h2><%= t :initial_post_required, "Replies are only visible to those who have posted at least one reply." %></h2>
+        <span><%= t :initial_post_required, "Replies are only visible to those who have posted at least one reply." %></span>
       <% else %>
-        <h2><%= t :loading_replies, "Loading replies..." %></h2>
+        <span><%= t :loading_replies, "Loading replies..." %></span>
       <% end %>
     </div>
 

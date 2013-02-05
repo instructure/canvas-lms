@@ -46,7 +46,7 @@ describe "announcements" do
 
     login_as(student.primary_pseudonym.unique_id, password)
     get "/courses/#{@course.id}/announcements/#{announcement.id}"
-    f('#discussion_subentries h2').text.should == "Replies are only visible to those who have posted at least one reply."
+    f('#discussion_subentries span').text.should == "Replies are only visible to those who have posted at least one reply."
     ff('.discussion_entry').each { |entry| entry.should_not include_text(student_2_entry) }
     f('.discussion-reply-label').click
     type_in_tiny('.reply-textarea', 'reply')
