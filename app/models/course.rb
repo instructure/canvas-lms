@@ -3035,48 +3035,24 @@ class Course < ActiveRecord::Base
   end
 
   def self.do_batch_update(progress, user, course_ids, update_params)
-    begin
-      account = progress.context
-      progress.start!
-      update_every = [course_ids.size / 20, 4].max
-      completed_count = failed_count = 0
-      errors = {}
-      course_ids.each_slice(update_every) do |batch|
-        batch.each do |course_id|
-          course = account.associated_courses.find_by_id(course_id)
-          begin
-            raise t('course_not_found', "The course was not found") unless course
-            raise t('access_denied', "Access was denied") unless course.grants_right? user, :update
-            course.update_one(update_params)
-            completed_count += 1
-          rescue Exception => e
-            message = e.message
-            (errors[message] ||= []) << course_id
-            failed_count += 1
-          end
-        end
-        progress.update_completion! 100.0 * (completed_count + failed_count) / course_ids.size
-      end
-      progress.completion = 100.0
-      progress.message = t('batch_update_message', {
+    account = progress.context
+    progress_runner = ProgressRunner.new(progress)
+
+    progress_runner.completed_message do |completed_count|
+      t('batch_update_message', {
           :one => "1 course processed",
           :other => "%{count} courses processed"
         },
         :count => completed_count)
-      errors.each do |message, ids|
-        progress.message += t('batch_update_error', "\n%{error}: %{ids}", :error => message, :ids => ids.join(', '))
-      end
-      if completed_count > 0
-        progress.complete!
-      else
-        progress.fail!
-      end
-      progress.save
-    rescue Exception => e
-      progress.message = e.message
-      progress.fail!
-      progress.save
     end
+
+    progress_runner.do_batch_update(course_ids) do |course_id|
+      course = account.associated_courses.find_by_id(course_id)
+      raise t('course_not_found', "The course was not found") unless course
+      raise t('access_denied', "Access was denied") unless course.grants_right? user, :update
+      course.update_one(update_params)
+    end
+
   end
 
   def self.batch_update(account, user, course_ids, update_params)

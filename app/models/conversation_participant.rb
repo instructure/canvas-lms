@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -373,6 +373,56 @@ class ConversationParticipant < ActiveRecord::Base
     order = 'last_message_at DESC' unless scope[:order]
     self.find(:all, :select => 'conversation_id', :order => order).map(&:conversation_id)
   end
+
+  
+  def update_one(update_params)
+    case update_params[:event]
+
+    when 'mark_as_read'
+      self.workflow_state = 'read'
+    when 'mark_as_unread'
+      self.workflow_state = 'unread'
+    when 'archive'
+      self.workflow_state = 'archived'
+
+    when 'star'
+      self.starred = true
+    when 'unstar'
+      self.starred = false
+
+    when 'destroy'
+      self.remove_messages(:all)
+
+    end
+    self.save!
+  end
+
+  def self.do_batch_update(progress, user, conversation_ids, update_params)
+    progress_runner = ProgressRunner.new(progress)
+    progress_runner.completed_message do |completed_count|
+      t('batch_update_message', {
+          :one => "1 conversation processed",
+          :other => "%{count} conversations processed"
+        },
+        :count => completed_count)
+    end
+
+    progress_runner.do_batch_update(conversation_ids) do |conversation_id|
+      participant = user.all_conversations.find_by_conversation_id(conversation_id)
+      raise t('not_participating', 'The user is not participating in this conversation') unless participant
+      participant.update_one(update_params)
+    end
+  end
+
+  def self.batch_update(user, conversation_ids, update_params)
+    progress = user.progresses.create! :tag => "conversation_batch_update", :completion => 0.0
+    job = ConversationParticipant.send_later(:do_batch_update, progress, user, conversation_ids, update_params)
+    progress.user_id = user.id
+    progress.delayed_job_id = job.id
+    progress.save!
+    progress
+  end
+
 
   protected
   def message_tags

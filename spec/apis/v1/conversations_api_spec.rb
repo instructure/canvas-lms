@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -1007,4 +1007,238 @@ describe ConversationsController, :type => :integration do
       json.first['visible'].should be_true
     end
   end
+
+  describe "bulk updates" do
+    it "should mark conversations as read" do
+      c1 = conversation(@me, @bob, :workflow_state => 'unread')
+      c2 = conversation(@me, @jane, :workflow_state => 'read')
+      @me.reload.unread_conversations_count.should eql(1)
+
+      conversation_ids = [c1,c2].map {|c| c.conversation.id}
+      json = api_call(:put, "/api/v1/conversations",
+        { :controller => 'conversations', :action => 'batch_update', :format => 'json' },
+        { :event => 'mark_as_read', :conversation_ids => conversation_ids })
+      run_jobs
+      progress = Progress.find(json['id'])
+      progress.message.to_s.should include "#{conversation_ids.size} conversations processed"
+      c1.reload.should be_read
+      c2.reload.should be_read
+      @me.reload.unread_conversations_count.should eql(0)
+    end
+
+    it "should mark conversations as unread" do
+      c1 = conversation(@me, @bob, :workflow_state => 'unread')
+      c2 = conversation(@me, @jane, :workflow_state => 'read')
+      @me.reload.unread_conversations_count.should eql(1)
+
+      conversation_ids = [c1,c2].map {|c| c.conversation.id}
+      json = api_call(:put, "/api/v1/conversations",
+        { :controller => 'conversations', :action => 'batch_update', :format => 'json' },
+        { :event => 'mark_as_unread', :conversation_ids => conversation_ids })
+      run_jobs
+      progress = Progress.find(json['id'])
+      progress.message.to_s.should include "#{conversation_ids.size} conversations processed"
+      c1.reload.should be_unread
+      c2.reload.should be_unread
+      @me.reload.unread_conversations_count.should eql(2)
+    end
+
+    it "should mark conversations as starred" do
+      c1 = conversation(@me, @bob, :workflow_state => 'unread', :starred => true)
+      c2 = conversation(@me, @jane, :workflow_state => 'read')
+      @me.reload.unread_conversations_count.should eql(1)
+
+      conversation_ids = [c1,c2].map {|c| c.conversation.id}
+      json = api_call(:put, "/api/v1/conversations",
+        { :controller => 'conversations', :action => 'batch_update', :format => 'json' },
+        { :event => 'star', :conversation_ids => conversation_ids })
+      run_jobs
+      progress = Progress.find(json['id'])
+      progress.message.to_s.should include "#{conversation_ids.size} conversations processed"
+      c1.reload.starred.should be_true
+      c2.reload.starred.should be_true
+      @me.reload.unread_conversations_count.should eql(1)
+    end
+
+    it "should mark conversations as unstarred" do
+      c1 = conversation(@me, @bob, :workflow_state => 'unread', :starred => true)
+      c2 = conversation(@me, @jane, :workflow_state => 'read')
+      @me.reload.unread_conversations_count.should eql(1)
+
+      conversation_ids = [c1,c2].map {|c| c.conversation.id}
+      json = api_call(:put, "/api/v1/conversations",
+        { :controller => 'conversations', :action => 'batch_update', :format => 'json' },
+        { :event => 'unstar', :conversation_ids => conversation_ids })
+      run_jobs
+      progress = Progress.find(json['id'])
+      progress.message.to_s.should include "#{conversation_ids.size} conversations processed"
+      c1.reload.starred.should be_false
+      c2.reload.starred.should be_false
+      @me.reload.unread_conversations_count.should eql(1)
+    end
+
+    # it "should mark conversations as subscribed"
+    # it "should mark conversations as unsubscribed"
+    it "should archive conversations" do
+      conversations = %w(archived read unread).map do |state|
+        conversation(@me, @bob, :workflow_state => state)
+      end
+      @me.reload.unread_conversations_count.should eql(1)
+
+      conversation_ids = conversations.map {|c| c.conversation.id}
+      json = api_call(:put, "/api/v1/conversations",
+        { :controller => 'conversations', :action => 'batch_update', :format => 'json' },
+        { :event => 'archive', :conversation_ids => conversation_ids })
+      run_jobs
+      progress = Progress.find(json['id'])
+      progress.message.to_s.should include "#{conversation_ids.size} conversations processed"
+      conversations.each do |c|
+        c.reload.should be_archived
+      end
+      @me.reload.unread_conversations_count.should eql(0)
+    end
+
+    it "should destroy conversations" do
+      c1 = conversation(@me, @bob, :workflow_state => 'unread')
+      c2 = conversation(@me, @jane, :workflow_state => 'read')
+      @me.reload.unread_conversations_count.should eql(1)
+
+      conversation_ids = [c1,c2].map {|c| c.conversation.id}
+      json = api_call(:put, "/api/v1/conversations",
+        { :controller => 'conversations', :action => 'batch_update', :format => 'json' },
+        { :event => 'destroy', :conversation_ids => conversation_ids })
+      run_jobs
+      progress = Progress.find(json['id'])
+      progress.message.to_s.should include "#{conversation_ids.size} conversations processed"
+      c1.reload.messages.should be_empty
+      c2.reload.messages.should be_empty
+      @me.reload.unread_conversations_count.should eql(0)
+    end
+
+    describe "immediate failures" do
+      it "should fail if event is invalid" do
+        c1 = conversation(@me, @bob, :workflow_state => 'unread')
+        c2 = conversation(@me, @jane, :workflow_state => 'read')
+        conversation_ids = [c1,c2].map {|c| c.conversation.id}
+
+        json = api_call(:put, "/api/v1/conversations",
+          { :controller => 'conversations', :action => 'batch_update', :format => 'json' },
+          { :event => 'NONSENSE', :conversation_ids => conversation_ids },
+          {}, {:expected_status => 400})
+
+        json['message'].should include 'invalid event'
+      end
+
+      it "should fail if event parameter is not specified" do
+        c1 = conversation(@me, @bob, :workflow_state => 'unread')
+        c2 = conversation(@me, @jane, :workflow_state => 'read')
+        conversation_ids = [c1,c2].map {|c| c.conversation.id}
+
+        json = api_call(:put, "/api/v1/conversations",
+          { :controller => 'conversations', :action => 'batch_update', :format => 'json' },
+          { :conversation_ids => conversation_ids },
+          {}, {:expected_status => 400})
+
+        json['message'].should include 'event not specified'
+      end
+
+      it "should fail if conversation_ids is not specified" do
+        c1 = conversation(@me, @bob, :workflow_state => 'unread')
+        c2 = conversation(@me, @jane, :workflow_state => 'read')
+        conversation_ids = [c1,c2].map {|c| c.conversation.id}
+
+        json = api_call(:put, "/api/v1/conversations",
+          { :controller => 'conversations', :action => 'batch_update', :format => 'json' },
+          { :event => 'mark_as_read' },
+          {}, {:expected_status => 400})
+
+        json['message'].should include 'conversation_ids not specified'
+      end
+
+      it "should fail if batch size limit is exceeded" do
+        conversation_ids = (1..501).to_a
+        json = api_call(:put, "/api/v1/conversations",
+          { :controller => 'conversations', :action => 'batch_update', :format => 'json' },
+          { :event => 'mark_as_read', :conversation_ids => conversation_ids },
+          {}, {:expected_status => 400})
+        json['message'].should include 'exceeded'
+      end
+    end
+
+    describe "progress" do
+      it "should create and update a progress object" do
+        c1 = conversation(@me, @bob, :workflow_state => 'unread')
+        c2 = conversation(@me, @jane, :workflow_state => 'read')
+        conversation_ids = [c1,c2].map {|c| c.conversation.id}
+        json = api_call(:put, "/api/v1/conversations",
+          { :controller => 'conversations', :action => 'batch_update', :format => 'json' },
+          { :event => 'mark_as_read', :conversation_ids => conversation_ids })
+        progress = Progress.find(json['id'])
+        progress.should be_present
+        progress.should be_queued
+        progress.completion.should eql(0.0)
+        run_jobs
+        progress.reload.should be_completed
+        progress.completion.should eql(100.0)
+      end
+
+      describe "progress failures" do
+        it "should not update conversations the current user does not participate in" do
+          c1 = conversation(@me, @bob, :workflow_state => 'unread')
+          c2 = conversation(@me, @jane, :workflow_state => 'read')
+          c3 = conversation(@bob, @jane, :sender => @bob, :workflow_state => 'unread')
+          conversation_ids = [c1,c2,c3].map {|c| c.conversation.id}
+
+          json = api_call(:put, "/api/v1/conversations",
+            { :controller => 'conversations', :action => 'batch_update', :format => 'json' },
+            { :event => 'mark_as_read', :conversation_ids => conversation_ids })
+          run_jobs
+          progress = Progress.find(json['id'])
+          progress.should be_completed
+          progress.completion.should eql(100.0)
+          c1.reload.should be_read
+          c2.reload.should be_read
+          c3.reload.should be_unread
+          progress.message.should include 'not participating'
+          progress.message.should include '2 conversations processed'
+        end
+
+        it "should fail if all conversation ids are invalid" do
+          c1 = conversation(@bob, @jane, :sender => @bob, :workflow_state => 'unread')
+          conversation_ids = [c1.conversation.id]
+
+          json = api_call(:put, "/api/v1/conversations",
+            { :controller => 'conversations', :action => 'batch_update', :format => 'json' },
+            { :event => 'mark_as_read', :conversation_ids => conversation_ids })
+
+          run_jobs
+          progress = Progress.find(json['id'])
+          progress.should be_failed
+          progress.completion.should eql(100.0)
+          c1.reload.should be_unread
+          progress.message.should include 'not participating'
+          progress.message.should include '0 conversations processed'
+        end
+
+        it "should fail progress if exception is raised in job" do
+          begin
+            Progress.any_instance.stubs(:complete!).raises "crazy exception"
+
+            c1 = conversation(@me, @jane, :workflow_state => 'unread')
+            conversation_ids = [c1.conversation.id]
+            json = api_call(:put, "/api/v1/conversations",
+              { :controller => 'conversations', :action => 'batch_update', :format => 'json' },
+              { :event => 'mark_as_read', :conversation_ids => conversation_ids })
+            run_jobs
+            progress = Progress.find(json['id'])
+            progress.should be_failed
+            progress.message.should include 'crazy exception'
+          ensure
+            Progress.any_instance.unstub(:complete!)
+          end
+        end
+      end
+    end
+  end
+
 end

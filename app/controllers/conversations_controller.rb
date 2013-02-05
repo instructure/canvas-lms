@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -23,6 +23,7 @@ class ConversationsController < ApplicationController
   include ConversationsHelper
   include SearchHelper
   include Api::V1::Conversation
+  include Api::V1::Progress
 
   before_filter :require_user, :except => [:public_feed]
   before_filter :reject_student_view_student
@@ -553,6 +554,37 @@ class ConversationsController < ApplicationController
       render :json => conversation_json(@conversation, @current_user, session)
     end
   end
+
+  # @API Batch update conversations
+  # Perform a change on a set of conversations. Operates asynchronously; use the {api:ProgressController#show progress endpoint}
+  # to query the status of an operation.
+  #
+  # @argument conversation_ids[] List of conversations to update. Limited to 500 conversations.
+  # @argument event The action to take on each conversation. Must be one of 'mark_as_read', 'mark_as_unread', 'star', 'unstar', 'archive', 'destroy'
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/conversations \ 
+  #       -X PUT \ 
+  #       -H 'Authorization: Bearer <token>' \ 
+  #       -d 'event=mark_as_read' \ 
+  #       -d 'conversation_ids[]=1' \ 
+  #       -d 'conversation_ids[]=2'
+  #
+  # @returns Progress
+  def batch_update
+    conversation_ids = params[:conversation_ids]
+    update_params = params.slice(:event).with_indifferent_access
+
+    allowed_events = %w(mark_as_read mark_as_unread star unstar archive destroy)
+    return render(:json => {:message => 'conversation_ids not specified'}, :status => :bad_request) unless params[:conversation_ids].is_a?(Array)
+    return render(:json => {:message => 'conversation batch size limit (500) exceeded'}, :status => :bad_request) unless params[:conversation_ids].size <= 500
+    return render(:json => {:message => 'event not specified'}, :status => :bad_request) unless update_params[:event]
+    return render(:json => {:message => 'invalid event'}, :status => :bad_request) unless allowed_events.include? update_params[:event]
+
+    progress = ConversationParticipant.batch_update(@current_user, conversation_ids, update_params)
+    render :json => progress_json(progress, @current_user, session)
+  end
+
 
   # @API Find recipients
   #

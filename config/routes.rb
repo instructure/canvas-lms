@@ -901,6 +901,7 @@ ActionController::Routing::Routes.draw do |map|
       conversations.post 'conversations/:id/add_message', :action => :add_message
       conversations.post 'conversations/:id/add_recipients', :action => :add_recipients
       conversations.post 'conversations/:id/remove_messages', :action => :remove_messages
+      conversations.put 'conversations', :action => :batch_update
     end
 
     api.with_options(:controller => :communication_channels) do |channels|

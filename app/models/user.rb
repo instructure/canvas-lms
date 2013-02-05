@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -167,6 +167,8 @@ class User < ActiveRecord::Base
 
   has_one :profile, :class_name => 'UserProfile'
   alias :orig_profile :profile
+
+  has_many :progresses, :as => :context
 
   belongs_to :otp_communication_channel, :class_name => 'CommunicationChannel'
 
