@@ -46,7 +46,7 @@
     aria-enabled="{{automaticPeerReviews}}"
     style="{{hiddenUnless automaticPeerReviews}}">
 
-    <div class="control-group" style="margin-bottom:9px">
+    <div class="control-group">
       <label for="assignment_peer_review_count" class="control-label">
         {{#t "reviews_per_user"}}Reviews Per User{{/t}}
       </label>
@@ -59,7 +59,7 @@
       </div>
     </div>
 
-    <div class="control-group" style="margin-bottom:9px">
+    <div class="control-group">
       <label for="assignment_peer_reviews_assign_at" class="control-label">
         {{#t "locked_until"}}Assign Reviews{{/t}}
       </label>
@@ -70,7 +70,7 @@
           value="{{datetimeFormatted peerReviewsAssignAt}}"
           type="text"
           {{disabledIfIncludes frozenAttributes "peer_reviews"}}/>
-        <div class="explanation" style="font-size: 0.8em; color: #888;">
+        <div class="explanation" style="font-size:0.8em;color:#888;">
           {{#t "peer_reviews_assign_at_explanation"}}
             Must come after due date. If blank, uses due date.
           {{/t}}

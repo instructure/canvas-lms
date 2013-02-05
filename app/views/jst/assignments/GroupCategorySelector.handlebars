@@ -12,7 +12,7 @@
 <div id="group_category_options" style="{{hiddenUnless groupCategoryId}}">
 
   <div class="controls">
-    <label class="checkbox" >
+    <label class="checkbox">
       <input name="grade_group_students_individually"
         type="checkbox"
         {{checkedIf gradeGroupStudentsIndividually}}
@@ -23,23 +23,23 @@
     </label>
   </div>
 
-  <label for="group_category_id" class="control-label">
-  {{#t "group_set"}}Group Set{{/t}}
-  </label>
   <div class="controls">
-    <select id="assignment_group_category_id"
-      name="group_category_id"
-      {{disabledIfIncludes frozenAttributes "group_category_id"}}>
-      {{#each groupCategories}}
-        <option value="{{id}}"
-        {{selectedIf ../groupCategoryId this.id}}>
-          {{name}}
+    <label for="group_category_id" class="nobr">
+      {{#t "group_set"}}Group Set{{/t}}
+      <select id="assignment_group_category_id"
+        name="group_category_id"
+        {{disabledIfIncludes frozenAttributes "group_category_id"}}>
+        {{#each groupCategories}}
+          <option value="{{id}}"
+          {{selectedIf ../groupCategoryId this.id}}>
+            {{name}}
+          </option>
+        {{/each}}
+        <option value="new">
+          [ {{#t "group_category_options"}}New Group Category{{/t}} ]
         </option>
-      {{/each}}
-      <option value="new">
-        [ {{#t "group_category_options"}}New Group Category{{/t}} ]
-      </option>
-    </select>
+      </select>
+    </label>
   </div>
 
 </div>
