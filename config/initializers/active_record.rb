@@ -681,7 +681,7 @@ class ActiveRecord::Base
                end.join(', ')
              else
                updates
-             end
+             end << " "
         else
           raise "Joins in update not supported!"
         end
