@@ -25,9 +25,7 @@ module AssignmentOverrideApplicator
 
     overrides = self.overrides_for_assignment_and_user(assignment_or_quiz, user)
  
-    result_assignment_or_quiz = self.assignment_with_overrides(assignment_or_quiz, overrides) unless overrides.empty?
-    result_assignment_or_quiz ||= assignment_or_quiz
-    result_assignment_or_quiz.overridden = true
+    result_assignment_or_quiz = self.assignment_with_overrides(assignment_or_quiz, overrides)
     result_assignment_or_quiz.overridden_for_user = user
     result_assignment_or_quiz
   end
@@ -111,24 +109,29 @@ module AssignmentOverrideApplicator
   # assignment or quiz which can then be used in place of the original object.
   # the clone is marked readonly to prevent saving
   def self.assignment_with_overrides(assignment_or_quiz, overrides)
+    unoverridden_assignment_or_quiz = assignment_or_quiz.without_overrides
     # ActiveRecord::Base#clone nils out the primary key; put it back
-    cloned_assignment_or_quiz = assignment_or_quiz.clone
-    cloned_assignment_or_quiz.id = assignment_or_quiz.id
+    cloned_assignment_or_quiz = unoverridden_assignment_or_quiz.clone
+    cloned_assignment_or_quiz.id = unoverridden_assignment_or_quiz.id
 
     # update attributes with overrides
-    self.collapsed_overrides(assignment_or_quiz, overrides).each do |field,value|
-      # for any times in the value set, bring them back from raw UTC into the
-      # current Time.zone before placing them in the assignment
-      value = value.in_time_zone if value && value.respond_to?(:in_time_zone) && !value.is_a?(Date)
-      cloned_assignment_or_quiz.write_attribute(field, value)
+    if overrides
+      self.collapsed_overrides(unoverridden_assignment_or_quiz, overrides).each do |field,value|
+        # for any times in the value set, bring them back from raw UTC into the
+        # current Time.zone before placing them in the assignment
+        value = value.in_time_zone if value && value.respond_to?(:in_time_zone) && !value.is_a?(Date)
+        cloned_assignment_or_quiz.write_attribute(field, value)
+      end
     end
     cloned_assignment_or_quiz.applied_overrides = overrides
+    cloned_assignment_or_quiz.without_overrides = unoverridden_assignment_or_quiz
+    cloned_assignment_or_quiz.overridden = true
     cloned_assignment_or_quiz.readonly!
 
     # make new_record? match the original (typically always true on AR clones,
     # at least until saved, which we don't want to do)
     klass = class << cloned_assignment_or_quiz; self; end
-    klass.send(:define_method, :new_record?) { assignment_or_quiz.new_record? }
+    klass.send(:define_method, :new_record?) { unoverridden_assignment_or_quiz.new_record? }
 
     cloned_assignment_or_quiz
   end

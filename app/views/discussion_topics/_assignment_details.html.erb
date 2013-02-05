@@ -14,7 +14,7 @@
     <div class="span6 right-align">
       <% if @assignment.try(:due_at).present? %>
         <div class="discussion-pubdate">
-          <% if @assignment.multiple_due_dates? %>
+          <% if @presenter.multiple_due_dates? %>
             <a href="#" class="toggle_due_dates"><%= t(:show_due_dates, 'Show Due Dates') %></a>
 
           <% else %>
@@ -58,10 +58,10 @@
           <tbody>
             <% @presenter.visible_due_dates.each do |due_date| %>
               <tr>
-                <td><%= @presenter.due_at(due_date) %></td>
+                <td><%= @presenter.unoverridden.due_at(due_date) %></td>
                 <td><%= due_date[:title] || t(:everyone, 'Everyone else') %></td>
-                <td><%= @presenter.unlock_at(due_date) %></td>
-                <td><%= @presenter.lock_at(due_date) %></td>
+                <td><%= @presenter.unoverridden.unlock_at(due_date) %></td>
+                <td><%= @presenter.unoverridden.lock_at(due_date) %></td>
               </tr>
             <% end %>
           </tbody>

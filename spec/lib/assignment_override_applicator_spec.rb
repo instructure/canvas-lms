@@ -721,6 +721,20 @@ describe AssignmentOverrideApplicator do
     end
   end
 
+  describe "without_overrides" do
+    before :each do
+      student_in_course
+      @assignment = assignment_model(:course => @course)
+    end
+
+    it "should return an unoverridden copy of an overridden assignment" do
+      @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
+      @overridden_assignment.overridden_for_user.id.should == @student.id
+      @unoverridden_assignment = @overridden_assignment.without_overrides
+      @unoverridden_assignment.overridden_for_user.should == nil
+    end
+  end
+  
   it "should use the full stack" do
     student_in_course
     original_due_at = 3.days.from_now

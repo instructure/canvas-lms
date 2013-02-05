@@ -72,6 +72,12 @@ shared_examples_for "an object whose dates are overridable" do
     end
   end
 
+  describe "without_overrides" do
+    it "returns an object with no overrides applied" do
+      overridable.without_overrides.overridden.should be_false
+    end
+  end
+    
   describe "#overrides_visible_to(user)" do
     before :each do
       override.set = course.default_section
@@ -154,6 +160,11 @@ shared_examples_for "an object whose dates are overridable" do
         as_student[:all_day].should == override.all_day
         as_student[:all_day_date].should == override.all_day_date
       end
+    end
+
+    it "doesn't use an overridden due date for a nil user's due dates" do
+      as_student, _ = overridable.overridden_for(@student).due_dates_for(nil)
+      as_student[:due_at].should == overridable.due_at
     end
 
     it "includes the base due date in the list of due dates" do
@@ -288,6 +299,11 @@ shared_examples_for "an object whose dates are overridable" do
       as_instructor.should include({ :base => true, :unlock_at => overridable.unlock_at })
     end
 
+    it "doesn't use an overridden unlock date as the base unlock date" do
+      _, as_instructor = overridable.overridden_for(@student).unlock_ats_for(@teacher)
+      as_instructor.should include({ :base => true, :unlock_at => overridable.unlock_at})
+    end
+
     it "includes visible unlock date overrides in the list of unlock dates" do
       _, as_instructor = overridable.unlock_ats_for(@teacher)
       as_instructor.should include({
@@ -375,6 +391,11 @@ shared_examples_for "an object whose dates are overridable" do
     it "includes the base lock date in the list of lock dates" do
       _, as_instructor = overridable.lock_ats_for(@teacher)
       as_instructor.should include({ :base => true, :lock_at => overridable.lock_at })
+    end
+
+    it "doesn't use an overridden lock date as the base lock date" do
+      _, as_instructor = overridable.overridden_for(@student).lock_ats_for(@teacher)
+      as_instructor.should include({ :base => true, :lock_at => overridable.lock_at})
     end
 
     it "includes visible lock date overrides in the list of lock dates" do

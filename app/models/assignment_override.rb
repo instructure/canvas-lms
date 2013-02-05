@@ -256,6 +256,12 @@ class AssignmentOverride < ActiveRecord::Base
       :joins => "INNER JOIN assignment_overrides ON assignment_overrides.set_type='CourseSection' AND course_sections.id=assignment_overrides.set_id"
     )
 
+    # section overrides for visible students
+    scopes << course.enrollments_visible_to(admin).scoped(
+      :select => "assignment_overrides.id",
+      :joins => "INNER JOIN assignment_overrides ON assignment_overrides.set_type='CourseSection' AND enrollments.course_section_id=assignment_overrides.set_id"
+    )
+
     # union the visible override subselects and join against them
     subselect = scopes.map{ |scope| scope.construct_finder_sql({}) }.join(' UNION ')
     { :joins => "INNER JOIN (#{subselect}) AS visible_overrides ON visible_overrides.id=assignment_overrides.id" }

@@ -1,5 +1,6 @@
 module DatesOverridable
   attr_accessor :applied_overrides, :overridden_for_user, :overridden
+  attr_writer :without_overrides
 
   def self.included(base)
     base.has_many :assignment_overrides, :dependent => :destroy
@@ -29,6 +30,10 @@ module DatesOverridable
     assignment_overrides.count > 0
   end
 
+  def without_overrides
+    @without_overrides || self
+  end
+
   # returns two values indicating which due dates for this assignment apply
   # and/or are visible to the user.
   #
@@ -50,7 +55,7 @@ module DatesOverridable
     return nil, nil if context.nil?
 
     if user.nil?
-      return self.due_date_hash, nil
+      return self.without_overrides.due_date_hash, nil
     end
 
     if context.user_has_been_student?(user)
@@ -76,7 +81,7 @@ module DatesOverridable
 
   def all_due_dates
     all_dates = assignment_overrides.overriding_due_at.map(&:as_hash)
-    all_dates << due_date_hash.merge(:base => true)
+    all_dates << without_overrides.due_date_hash.merge(:base => true)
   end
 
   def due_dates_visible_to(user)
@@ -85,7 +90,7 @@ module DatesOverridable
     list = overrides.map(&:as_hash)
 
     # Base
-    list << self.due_date_hash.merge(:base => true)
+    list << without_overrides.due_date_hash.merge(:base => true)
   end
 
   def observed_student_due_dates(user)
@@ -165,7 +170,7 @@ module DatesOverridable
 
       as_instructor << {
         :base => true,
-        :unlock_at => self.unlock_at
+        :unlock_at => self.without_overrides.unlock_at
       }
     end
 
@@ -194,7 +199,7 @@ module DatesOverridable
 
       as_instructor << {
         :base => true,
-        :lock_at => self.lock_at
+        :lock_at => self.without_overrides.lock_at
       }
     end
 

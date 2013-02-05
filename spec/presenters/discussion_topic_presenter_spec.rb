@@ -19,15 +19,25 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe DiscussionTopicPresenter do
-  let (:presenter)  { DiscussionTopicPresenter.new(topic) }
-  let (:course)     { course_model }
   let (:topic)      { DiscussionTopic.new(:title => 'Test Topic', :assignment => assignment) }
+  let (:presenter)  { DiscussionTopicPresenter.new(topic, user_model) }
+  let (:course)     { course_model }
   let (:assignment) {
     Assignment.new(:title => 'Test Topic',
                    :due_at => Time.now,
                    :lock_at => Time.now + 1.week,
-                   :unlock_at => Time.now - 1.week)
+                   :unlock_at => Time.now - 1.week,
+                   :submission_types => 'discussion_topic')
   }
+
+  it 'should override the topic assignment when given a user' do
+    topic.for_assignment?.should == 0
+    presenter.assignment.overridden_for_user.id.should == @user.id
+  end
+  
+  it 'should present an unoverridden copy' do
+    presenter.unoverridden.assignment.overridden_for_user.should be_nil
+  end
 
   context 'a topic with no overrides' do
     context 'with dates' do

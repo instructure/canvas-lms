@@ -7,28 +7,27 @@ class DiscussionTopicPresenter
     @topic = discussion_topic
     @user  = current_user
 
-    @assignment = if topic.assignment
-      AssignmentOverrideApplicator.assignment_overridden_for(topic.assignment,
-                                                             user)
+    @assignment = if @topic.for_assignment?
+      AssignmentOverrideApplicator.assignment_overridden_for(@topic.assignment, @user)
     else
       nil
     end
   end
 
+  # Public: Return a presenter using an unoverridden copy of the topic's assignment
+  #
+  # Returns a DiscussionTopicPresenter
+  def unoverridden
+    self.class.new(@topic, nil)
+  end
+  
   # Public: Return a date string for the discussion assignment's lock at date.
   #
   # due_date - A due date as a hash.
   #
   # Returns a date or date/time string.
   def lock_at(due_date = {})
-    lock_at = if due_date[:override].present?
-      due_date[:override].lock_at
-    else
-      assignment.try(:lock_at)
-    end
-
-    formatted_lock_at = lock_at.present? ? datetime_string(lock_at) : '-'
-    formatted_lock_at.match(/11:59/) ? date_string(lock_at) : formatted_lock_at
+    formatted_date_string(:lock_at, due_date)
   end
 
   # Public: Return a date string for the discussion assignment's unlock at date.
@@ -37,14 +36,7 @@ class DiscussionTopicPresenter
   #
   # Returns a date or date/time string.
   def unlock_at(due_date = {})
-    unlock_at = if due_date[:override].present?
-      due_date[:override].unlock_at
-    else
-      assignment.try(:unlock_at)
-    end
-
-    formatted_unlock_at = unlock_at.present? ? datetime_string(unlock_at) : '-'
-    formatted_unlock_at.match(/11:59/) ? date_string(unlock_at) : formatted_unlock_at
+    formatted_date_string(:unlock_at, due_date)
   end
 
   # Public: Return a date string for the given due date.
@@ -53,16 +45,24 @@ class DiscussionTopicPresenter
   #
   # Returns a date or date/time string.
   def due_at(due_date = {})
-    due_at = if due_date[:override].present?
-      due_date[:override].due_at
-    else
-      assignment.try(:due_at)
-    end
-
-    formatted_due_at = due_at.present? ? datetime_string(due_at) : '-'
-    formatted_due_at.match(/11:59/) ? date_string(due_at) : formatted_due_at
+    formatted_date_string(:due_at, due_date)
   end
 
+  def formatted_date_string(date_field, date_hash = {})
+    date = date_hash[:override].try(date_field) if date_hash[:override].present?
+    date ||= assignment.try(date_field)
+ 
+    formatted_date = date.present? ? datetime_string(date) : '-'
+    formatted_date.match(/11:59/) ? date_string(date) : formatted_date
+  end
+
+  # Public: Determine if multiple due dates are visible to user.
+  #
+  # Returns a boolean
+  def multiple_due_dates?
+    assignment.multiple_due_dates_apply_to?(user)
+  end
+  
   # Public: Return all due dates visible to user, filtering out assignment info
   #   if it isn't needed (e.g. if all sections have overrides).
   #
@@ -76,8 +76,13 @@ class DiscussionTopicPresenter
     if section_overrides.count > 0 && section_overrides.count == topic.context.course_sections.count
       due_dates.delete_if { |d| d[:override].nil? }
     end
-
-    due_dates.sort_by { |date| date[:due_at] }
+    
+    # Sort by due_at, nils and earliest first
+    due_dates.sort{ |date1, date2|
+      due_at1 = date1[:due_at]
+      due_at2 = date2[:due_at]
+      (due_at1 and due_at2) ? due_at1 <=> due_at2 : (due_at1 ? 1 : -1)
+    }
   end
 
   # Public: Determine if the given user has permissions to manage this discussion.
