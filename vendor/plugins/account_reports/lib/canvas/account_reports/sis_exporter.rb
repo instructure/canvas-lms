@@ -59,7 +59,9 @@ module Canvas::AccountReports
           headers = ['canvas_user_id','user_id','login_id','first_name','last_name','email','status']
         end
         csv << headers
-        users = @domain_root_account.pseudonyms.scoped(:include => :user)
+        users = @domain_root_account.pseudonyms.scoped(:include => :user ).scoped(
+          :select => "pseudonyms.id, pseudonyms.sis_user_id, pseudonyms.user_id,
+                      pseudonyms.unique_id, pseudonyms.workflow_state")
 
         if @sis_format
           users = users.scoped(:conditions => 'sis_user_id IS NOT NULL')
@@ -74,24 +76,33 @@ module Canvas::AccountReports
         end
 
         if @account.id != @domain_root_account.id
-          users = users.scoped(:conditions => ["EXISTS (SELECT user_id, account_id
+          users = users.scoped(:conditions => ["EXISTS (SELECT user_id
                                                         FROM user_account_associations uaa
                                                         WHERE uaa.account_id = ?
                                                         AND uaa.user_id=users.id
                                                         )", @account.id])
         end
 
-        users.find_each do |i|
-          row = []
-          row << i.user_id unless @sis_format
-          row << i.sis_user_id
-          row << i.login
-          row << nil if @sis_format
-          row << i.user.first_name
-          row << i.user.last_name
-          row << i.user.email
-          row << i.workflow_state
-          csv << row
+        users.find_in_batches do |batch|
+          emails = Shard.partition_by_shard(batch.map(&:user_id)) do |user_ids|
+            CommunicationChannel.active.scoped(:select => "DISTINCT ON (user_id) user_id, path",
+                                               :conditions => ["user_id IN (?)
+                                                                AND path_type = 'email'", user_ids],
+                                               :order => 'user_id, position')
+          end.index_by(&:user_id)
+
+          batch.each do |u|
+            row = []
+            row << u.user_id unless @sis_format
+            row << u.sis_user_id
+            row << u.unique_id
+            row << nil if @sis_format
+            row << u.user.first_name
+            row << u.user.last_name
+            row << emails[u.user_id].try(:path)
+            row << u.workflow_state
+            csv << row
+          end
         end
       end
       list_csv
