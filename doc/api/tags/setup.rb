@@ -18,7 +18,12 @@
 
 def init
   super
-  sections :argument, :request_field, :response_field, :example_request, :example_response, :returns
+  sections :argument, :request_field, :response_field, :example_request, :example_response, :returns, :see
+end
+
+def see
+  return unless object.has_tag?(:see)
+  erb(:see)
 end
 
 def request_field
