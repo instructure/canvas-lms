@@ -28,14 +28,27 @@ define [
       # different template
       template: null
 
+    ##
+    # Any property names defined here will be assigned directly to the instance
+    # if found in the options, exactly like `el`, `model`, etc.
+    optionProperties: ['template']
+
+    ##
+    # At class definition, call this to add properties of the view option that
+    # become instance properties at initialization.
+    @optionProperty: (property) ->
+      @::optionProperties.push property
+
     initialize: (options) ->
       @options = _.extend {}, @defaults, @options, options
-      @setTemplate()
+      @setOptionProperties()
       @$el.data 'view', this
+      @model.view = this if @model
       this
 
-    setTemplate: ->
-      @template = @options.template if @options.template
+    setOptionProperties: ->
+      for property in @optionProperties
+        @[property] = @options[property] if @options[property]?
 
     ##
     # Extends render to add support for chid views and element filtering
