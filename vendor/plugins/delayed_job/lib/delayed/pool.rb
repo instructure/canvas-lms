@@ -143,6 +143,7 @@ class Pool
     end
 
     pid = fork do
+      Canvas.reconnect_redis
       Delayed::Job.reconnect!
       Delayed::Periodic.load_periodic_jobs_config
       worker.start
