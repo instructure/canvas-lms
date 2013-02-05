@@ -429,11 +429,6 @@ define([
         }
       },
       nodeFromPath: function(path) {
-        try {
-          if($files_structure.find("#files_structure_list > li." + path).length > 0) {
-            return $files_structure.find("#files_structure_list > li." + path);
-          }
-        } catch(e) {}
         var names = path.replace(/\/\//g, "\\").split('/');
         var $node = $files_structure;
         var keepGoing = true;
