@@ -38,7 +38,7 @@
 #       student_ids: [1, 2, 3],
 #
 #       // the ID of the override's target group (present if the override
-#       // targets a group)
+#       // targets a group and the assignment is a group assignment)
 #       group_id: 2,
 #
 #       // the ID of the overrides's target section (present if the override
@@ -138,9 +138,14 @@ class AssignmentOverridesController < ApplicationController
   #   instead).
   #
   # @argument assignment_override[group_id] [Optional, Integer] The ID of the
-  #   override's target group. If present, the assignment must be a group
-  #   assignment and the ID must identify an active group in the assignment's
-  #   group category not already targetted by a different override.
+  #   override's target group. If present, the following conditions must be met
+  #   for the override to be successful:
+  #
+  #   1. the assignment MUST be a group assignment (a group_category_id is assigned to it)
+  #   2. the ID must identify an active group in the group set the assignment is in
+  #   3. the ID must not be targetted by a different override
+  #
+  #   See {Appendix: Group assignments} for more info.
   #
   # @argument assignment_override[course_section_id] [Optional, Integer] The ID
   #   of the override's target section. If present, must identify an active
@@ -263,7 +268,6 @@ class AssignmentOverridesController < ApplicationController
   #   curl 'http://<canvas>/api/v1/courses/1/assignments/2/overrides/3.json' \ 
   #        -X DELETE \ 
   #        -H "Authorization: Bearer <token>"
-  #
   def destroy
     if @override.destroy
       render :json => assignment_override_json(@override)
@@ -306,4 +310,12 @@ class AssignmentOverridesController < ApplicationController
   def bad_request(errors)
     render :json => errors.to_json, :status => :bad_request
   end
+
+  # @!appendix Group assignments
+  #
+  #  {include:file:doc/examples/group_assignment.md}
+  #
+  #  @see api:AssignmentOverridesController#create Creating an assignment override
+  #  @see api:AssignmentsApiController#create Creating an assignment
+  #  @see api:Assignments:Assignment
 end
