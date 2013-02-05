@@ -245,6 +245,8 @@ describe "zip file uploads" do
     end
 
     it "should allow unzipping into a folder from drag-and-drop courses" do
+      get @files_url
+      next unless driver.execute_script("return $.handlesHTML5Files;") == true
       unzip_into_folder_drag_and_drop
     end
   end
@@ -263,6 +265,8 @@ describe "zip file uploads" do
     end
 
     it "should allow unzipping into a folder from drag-and-drop groups" do
+      get @files_url
+      next unless driver.execute_script("return $.handlesHTML5Files;") == true
       unzip_into_folder_drag_and_drop
     end
   end
@@ -280,6 +284,8 @@ describe "zip file uploads" do
     end
 
     it "should allow unzipping into a folder from drag-and-drop profile" do
+      get @files_url
+      next unless driver.execute_script("return $.handlesHTML5Files;") == true
       unzip_into_folder_drag_and_drop
     end
   end

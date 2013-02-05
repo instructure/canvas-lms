@@ -82,9 +82,6 @@ def unzip_from_form_to_folder()
   def unzip_into_folder_drag_and_drop
     # we can't actually drag a file into the browser from selenium, so we have
     # to mock some of the process
-    get @files_url
-
-    next unless driver.execute_script("return $.handlesHTML5Files;") == true
 
     folder = Folder.root_folders(@context).first
     keep_trying_until { f('#files_content .message.no_content').should be_nil }
