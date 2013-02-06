@@ -83,6 +83,15 @@ describe DiscussionTopicsController, :type => :integration do
     nil
   end
 
+  describe "user_display_json" do
+    it "should return a html_url based on parent_context" do
+      user_display_json(@user)[:html_url].should == "http://www.example.com/users/#{@user.id}"
+      user_display_json(@user, nil)[:html_url].should == "http://www.example.com/users/#{@user.id}"
+      user_display_json(@user, :profile)[:html_url].should == "http://www.example.com/about/#{@user.id}"
+      user_display_json(@user, @course)[:html_url].should == "http://www.example.com/courses/#{@course.id}/users/#{@user.id}"
+    end
+  end
+
   context "create topic" do
     it "should check permissions" do
       @user = user(:active_all => true)
