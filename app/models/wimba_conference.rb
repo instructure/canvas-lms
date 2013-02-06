@@ -36,8 +36,13 @@ class WimbaConference < WebConference
         end
         if date_info = data[:longname].match(Regexp.new(" - (\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2})\\z"))
           # convert from wimba's local time to the user's local time
-          tz = ActiveSupport::TimeZone[config[:timezone] || config[:plugin].default_settings[:timezone]]
-          new_date = datetime_string(tz.parse(date_info[1]))
+          tz       = ActiveSupport::TimeZone[config[:timezone] || config[:plugin].default_settings[:timezone]]
+          new_date = nil
+
+          Time.use_zone(tz) do
+            new_date = datetime_string(DateTime.strptime(date_info[1], '%m/%d/%Y %H:%M'))
+          end
+
           data[:longname].sub!(date_info[1], new_date)
         end
         urls << {:id => data[:class_id], :name => data[:longname]} unless url_id && data[:class_id] != url_id
