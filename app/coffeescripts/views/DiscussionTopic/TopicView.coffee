@@ -75,7 +75,7 @@ define [
     addReply: (event) ->
       event?.preventDefault()
       unless @reply?
-        @reply = new Reply this, topLevel: true, focus: false
+        @reply = new Reply this, topLevel: true, focus: true
         @reply.on 'edit', => @$addRootReply?.hide()
         @reply.on 'hide', => @$addRootReply?.show()
         @reply.on 'save', (entry) => @trigger 'addReply', entry

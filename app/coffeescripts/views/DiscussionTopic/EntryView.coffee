@@ -168,7 +168,7 @@ define [
       @editor.edit() if not @editor.editing
 
     addReply: (event, $el) ->
-      @reply ?= new Reply this
+      @reply ?= new Reply this, focus: true
       @model.set 'notification', ''
       @reply.edit()
       @reply.on 'save', (entry) =>
