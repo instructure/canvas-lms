@@ -99,7 +99,7 @@
 #         // Whether or not there is a new tab for the external tool
 #         new_tab: false
 #       },
-#       
+#
 #       // Boolean indicating if peer reviews are required for this assignment
 #       peer_reviews: false,
 #
@@ -176,7 +176,7 @@
 #       // Otherwise, it is only advisory. Included if there is an associated rubric.
 #       use_rubric_for_grading: true,
 #
-#       // (Optional) An object describing the basic attributes of the rubric, including 
+#       // (Optional) An object describing the basic attributes of the rubric, including
 #       // the point total. Included if there is an associated rubric.
 #       rubric_settings: {
 #         points_possible: 12
@@ -249,7 +249,7 @@ class AssignmentsApiController < ApplicationController
     end
   end
 
-  # @API Get a single assignment 
+  # @API Get a single assignment
   # Returns the assignment with the given id.
   # @returns Assignment
   def show
@@ -391,7 +391,7 @@ class AssignmentsApiController < ApplicationController
   # @API Edit an assignment
   # Modify an existing assignment. See the documentation for assignment
   # creation.
-  # 
+  #
   # If the assignment[assignment_overrides] key is absent, any existing
   # overrides are kept as is. If the assignment[assignment_overrides] key is
   # present, existing overrides are updated or deleted (and new ones created,

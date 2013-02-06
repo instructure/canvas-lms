@@ -41,12 +41,20 @@ module Api::V1::Assignment
 
   def assignment_json(assignment, user, session,include_discussion_topic = true)
     hash = api_json(assignment, user, session, API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS)
-    hash['course_id'] = assignment.context_id
-    hash['name'] = assignment.title
-    hash['description'] = api_user_content(hash['description'], @context || assignment.context)
-    hash['html_url'] = course_assignment_url(assignment.context_id, assignment)
-    hash['muted'] = assignment.muted?
-    hash['submission_types'] = assignment.submission_types_array
+
+    hash.merge!(
+      'course_id' => assignment.context_id,
+      'name' => assignment.title,
+      'description' => api_user_content(hash['description'], @context || assignment.context),
+      'html_url' => course_assignment_url(assignment.context_id, assignment),
+      'muted' => assignment.muted?,
+      'submission_types' => assignment.submission_types_array
+    )
+
+    if assignment.external_tool? && assignment.external_tool_tag.present?
+      external_tool_tag = assignment.external_tool_tag
+      hash['external_tool_tag_attributes'] = { 'url' => external_tool_tag.url, 'new_tab' => external_tool_tag.new_tab }
+    end
 
     if assignment.automatic_peer_reviews? && assignment.peer_reviews?
       hash[ 'peer_review_count' ] = assignment.peer_review_count
