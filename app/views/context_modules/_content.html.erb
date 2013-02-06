@@ -7,7 +7,7 @@
 
 <div id="no_context_modules_message" style="display:none; clear: both;">
   <% if can_do(@context.context_modules.new, @current_user, :create) %>
-    <%= mt 'help.create', <<TEXT, :button => t('#context_modules.buttons.add_module', 'Add a New Module')
+    <%= mt 'help.create', <<TEXT, :button => t('#context_modules.buttons.add_module_first', 'Add a New Module')
 Course modules let you organize your assignments, pages, files, etc. into smaller sections or units. Modules could be centered around a theme, focused on a specific topic, or even just grouped chronologically.
 
 You can also sequence modules by defining criteria and prerequisites for each module. Students won't be able to access modules until they have unlocked all their prerequisites. That way you can prevent students from accessing certain content or files until they have, say, gotten at least 75% on a review quiz.

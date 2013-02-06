@@ -43,6 +43,8 @@ stylesheets:
     - public/stylesheets/compiled/g_mini_calendar.css
     - public/stylesheets/compiled/helpDialog.css
     - public/stylesheets/compiled/print.css
+  context_modules: 
+    - public/stylesheets/compiled/context_modules.css
   collection_item_save:
     - public/stylesheets/compiled/collection_item_save.css
   collections_app:

@@ -214,6 +214,7 @@ describe "context_modules" do
     refresh_page
 
     keep_trying_until do
+      f('.admin-links button').click
       hover_and_click('#context_modules .edit_module_link')
       wait_for_ajax_requests
       f('#add_context_module_form').should be_displayed
@@ -242,6 +243,7 @@ describe "context_modules" do
   it "should delete a module" do
     add_module('Delete Module')
     driver.execute_script("$('.context_module').addClass('context_module_hover')")
+    f('.admin-links button').click
     f('.delete_module_link').click
     driver.switch_to.alert.should_not be_nil
     driver.switch_to.alert.accept
@@ -255,6 +257,7 @@ describe "context_modules" do
     add_module('Edit Module')
     context_module = f('.context_module')
     driver.action.move_to(context_module).perform
+    f('.admin-links button').click
     f('.edit_module_link').click
     f('.ui-dialog').should be_displayed
     edit_form = f('#add_context_module_form')
@@ -271,6 +274,7 @@ describe "context_modules" do
     # add completion criterion
     context_module = f('.context_module')
     driver.action.move_to(context_module).perform
+    f('.admin-links button').click
     f('.edit_module_link').click
     f('.ui-dialog').should be_displayed
     edit_form = f('#add_context_module_form')
@@ -291,6 +295,7 @@ describe "context_modules" do
 
     # delete the criterion, then cancel the form
     driver.action.move_to(context_module).perform
+    f('.admin-links button').click
     f('.edit_module_link').click
     f('.ui-dialog').should be_displayed
     edit_form = f('#add_context_module_form')
@@ -302,6 +307,7 @@ describe "context_modules" do
     # now delete the criterion frd
     # (if the previous step did even though it shouldn't have, this will error)
     driver.action.move_to(context_module).perform
+    f('.admin-links button').click
     f('.edit_module_link').click
     f('.ui-dialog').should be_displayed
     edit_form = f('#add_context_module_form')
@@ -316,6 +322,7 @@ describe "context_modules" do
 
     # and also make sure the form remembers that it's gone (#8329)
     driver.action.move_to(context_module).perform
+    f('.admin-links button').click
     f('.edit_module_link').click
     f('.ui-dialog').should be_displayed
     edit_form = f('#add_context_module_form')
@@ -395,6 +402,7 @@ describe "context_modules" do
     add_module('TestModule')
 
     # add a text header
+    f('.admin-links button').click
     f('.add_module_item_link').click
     select_module_item('#add_module_item_select', 'Text Header')
     wait_for_ajaximations
@@ -405,6 +413,7 @@ describe "context_modules" do
     tag1 = ContentTag.last
 
     # and another one
+    f('.admin-links button').click
     f('.add_module_item_link').click
     select_module_item('#add_module_item_select', 'Text Header')
     wait_for_ajaximations
@@ -448,6 +457,7 @@ describe "context_modules" do
   it "should add a text header to a module" do
     header_text = 'new header text'
     add_module('Text Header Module')
+    f('.admin-links button').click
     f('.add_module_item_link').click
     select_module_item('#add_module_item_select', 'Text Header')
     keep_trying_until do
@@ -471,6 +481,7 @@ describe "context_modules" do
 
   it "should not save an invalid external tool" do
     add_module 'Test module'
+    f('.admin-links button').click
     f('.add_module_item_link').click
     select_module_item('#add_module_item_select', 'External Tool')
     find_with_jquery('.add_item_button:visible').click
@@ -501,6 +512,7 @@ describe "context_modules" do
       db_module = ContextModule.last
       context_module = f("#context_module_#{db_module.id}")
       driver.action.move_to(context_module).perform
+      f("#context_module_#{db_module.id} .admin-links button").click
       f("#context_module_#{db_module.id} .edit_module_link").click
       f('.ui-dialog').should be_displayed
       wait_for_ajaximations
@@ -685,6 +697,7 @@ describe "context_modules" do
     # add completion criterion
     context_module = f('.context_module')
     driver.action.move_to(context_module).perform
+    f('.admin-links button').click
     f('.edit_module_link').click
     edit_form = f('#add_context_module_form')
     f('.add_completion_criterion_link', edit_form).click

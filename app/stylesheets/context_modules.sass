@@ -1,0 +1,87 @@
+@import environment.sass
+
+/* 
+ * <div class="context-modules-main-header">
+ *   <h2 class="context-modules-title">Course Modules</h2>
+ *   <div class="context-modules-main-toolbar">
+ *     <button class="btn">View Progress</button>
+ *     <button class="btn btn-primary">Create a Module</button>
+ *   </div>
+ *  </div>
+ */
+.context-modules-main-header
+  .context-modules-title
+    float: left
+    margin: 0
+
+  .context-modules-main-toolbar
+    float: right
+
+  .context-modules-main-toolbar .btn.btn-small
+    margin-right: 5px
+    padding-left: 25px
+    padding-right: 25px
+/*
+ * Example Usage
+ *   <ul class="context-module-toolbar">
+ *     <li class="context-module-toolbar-item">
+ *       <div class="admin-links">
+ *         <button class="al-trigger ui-button"><span class="al-trigger-inner">Manage (will be accessibly hidden)</span></button>
+ *         <ul class="al-options">
+ *           <li><a href="#" class="icon-plus">Add Content</a></li>
+ *           <li><a href="#" class="icon-edit">Edit</a></li>
+ *           <li><a href="#" class="icon-trash">Delete</a></li>
+ *         </ul>
+ *       </div>
+ *     </li>
+ *     <li class="context-module-toolbar-item adjust-top"><a href="#" class="icon icon-collapse"></a></li>
+ *     <li class="context-module-toolbar-item"><span>Hello world</span></li>
+ *     <li class="context-module-toolbar-item"><span>Something</span></li>
+ *  </ul><!-- end context-module-toolbar -->
+ */
+
+
+.context-module-header
+  .context-module-left-toolbar
+    float: left
+  
+  .context-module-toolbar
+    margin: 0
+    padding: 0
+    list-style-type: none
+    float: right
+
+    .icon
+      color: $grayLight
+
+    .context-module-toolbar-item
+      float: right
+      margin-right: 5px
+
+    .adjust-top
+      margin-top: 2px
+
+/* 
+ * These are overrides in css fixing the g_context_modules.sass file. 
+ * We are leaving that file in the source code until we can verify it
+ * doesn't get used anywhere else. Better to just not break thigs.
+ */
+.add_module_item_link, .edit_module_link, .delete_module_link
+  display: block !important
+
+// This is a hack to get the javascript to work when
+// collapsing and expanding modules. See context_modules.js
+.collapse_module_link, .expand_module_link
+  background-color: #e4e6e8
+
+.context_module
+  border: none
+
+.context_module div.footer
+  padding: 0
+
+.context_module .header
+  border: none
+
+
+
