@@ -1,0 +1,100 @@
+@import 'utilities/token_input'
+@import 'utilities/token_selector'
+
+.autocomplete_menu
+  ul
+    max-height: 218px
+    position: relative
+  li, li.active.expanded
+    height: 32px
+    cursor: pointer
+    a
+      position: relative
+      padding: 1px
+      background: transparent
+    i
+      display: block
+      width: 30px
+      height: 30px
+    a.expand
+      float: right
+      i
+        background: transparent url(/images/messages/expand-context.png) no-repeat 10px -23px
+    a.toggle
+      float: left
+      margin: 0 14px 0 6px
+      i
+        width: 16px
+        height: 16px
+        margin: 7px
+    img.avatar
+      width: 32px
+      height: 32px
+      float: left
+      margin-right: 6px
+      background: transparent url(/images/messages/avatar-sprites.png) 0 0 no-repeat
+    span.name, span.details
+      white-space: nowrap
+      overflow: hidden
+      display: block
+    b
+      color: #000
+      text-shadow: none
+    span.details, span.context_info
+      color: #2571bd
+      font-weight: bold
+      font-size: 0.8em
+    span.details
+      display: block
+    span.context_info
+      padding-left: 6px
+  li.toggleable a.toggle i
+    background: transparent url(/images/messages/checkbox-sprite.png) no-repeat 0 0
+  li.context img.avatar, li.context.active.expanded img.avatar
+    background-position: 0 -64px
+  li.user.active img.avatar
+    background-position: 0 -32px
+  li.context.active img.avatar
+    background-position: 0 -96px
+  li.active
+    a.expand
+      i
+        background-position: 10px 10px
+    a.expand:hover
+      padding: 0
+      border: 1px solid #2da5f0
+      background: #2da5f0 url(/images/messages/finder-active.png) repeat-x 0 0
+    b
+      color: #fff
+      text-shadow: 0px 1px 1px #0587bb
+    span
+      color: #0d4276
+    a.toggle i
+      background-position: 0 -48px
+    img.user.avatar
+      background-position: 0 -32px
+    img.context.avatar
+      background-position: 0 -96px
+  li.toggleable.on a.toggle i
+    background-position: 0 -32px
+  li.toggleable.on.active a.toggle i
+    background-position: 0 -80px
+  li.toggleable.on.active a.toggle:hover i
+    background-position: 0 -64px
+  li.expanded, li.active.expanded
+    cursor: default
+    a.expand
+      i
+        background-position: 10px -55px
+    a.toggle
+      display: none
+  li.active.expanded
+    a.expand:hover
+      cursor: pointer
+      background: #fff
+      border-color: #e4ebef
+  &.with-toggles
+    li.expanded, li.active.expanded
+      padding-left: 11px
+      img.avatar
+        margin: 0 14px 0 0
