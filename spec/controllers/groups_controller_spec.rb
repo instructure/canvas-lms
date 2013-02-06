@@ -59,10 +59,38 @@ describe GroupsController do
       assigns[:groups].should_not be_nil
     end
 
-    it "should return an empty list for json" do
-      get 'index', :format => 'json'
-      response.should be_success
-      response.body.should == "[]"
+    describe 'empty' do
+      it "should assign an empty list for non-json when empty" do
+        get 'index', :format => 'json'
+        response.should be_success
+        assigns[:groups].should == []
+      end
+
+      it "should return an empty list for json when empty" do
+        get 'index', :format => 'json'
+        response.should be_success
+        response.body.should == "[]"
+      end
+    end
+
+    describe 'pagination' do
+      before do
+        course_with_student_logged_in(:active_all => 1)
+        group_with_user(:group_context => @course, :user => @student, :active_all => true)
+        group_with_user(:group_context => @course, :user => @student, :active_all => true)
+      end
+
+      it "should not paginate non-json" do
+        get 'index', :per_page => 1
+        assigns[:groups].should == @student.current_groups
+        response.headers['Link'].should be_nil
+      end
+
+      it "should paginate json" do
+        get 'index', :format => 'json', :per_page => 1
+        assigns[:groups].should == [@student.current_groups.order(:id).first]
+        response.headers['Link'].should_not be_nil
+      end
     end
   end
 

@@ -145,18 +145,26 @@ class GroupsController < ApplicationController
   # @returns [Group]
   def index
     return context_index if @context
-    if @current_user
-      @groups = BookmarkedCollection.with_each_shard(
-        Group::Bookmarker,
-        @current_user.current_groups,
-        :include => :group_category)
-    else
-      @groups = []
-    end
     respond_to do |format|
-      format.html {}
+      format.html do
+        if @current_user
+          @groups = @current_user.current_groups.
+            with_each_shard{ |scope| scope.scoped(:include => :group_category) }
+        else
+          @groups = []
+        end
+      end
+
       format.json do
-        @groups = Api.paginate(@groups, self, api_v1_current_user_groups_url)
+        if @current_user
+          @groups = BookmarkedCollection.with_each_shard(
+            Group::Bookmarker,
+            @current_user.current_groups,
+            :include => :group_category)
+          @groups = Api.paginate(@groups, self, api_v1_current_user_groups_url)
+        else
+          @groups = []
+        end
         render :json => @groups.map { |g| group_json(g, @current_user, session) }
       end
     end
