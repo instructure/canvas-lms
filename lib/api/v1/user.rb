@@ -85,9 +85,19 @@ module Api::V1::User
   #   /users/Y
   # keep in mind the latter form is only accessible if the user has a public profile
   # (or if the api caller is an admin)
+  #
+  # if parent_context is :profile, the html_url will always be the user's
+  # public profile url, regardless of @current_user permissions
   def user_display_json(user, parent_context = nil)
     return {} unless user
-    participant_url = parent_context ? polymorphic_url([parent_context, user]) : user_url(user)
+    participant_url = case parent_context
+    when :profile
+      user_profile_url(user)
+    when nil, false
+      user_url(user)
+    else
+      polymorphic_url([parent_context, user])
+    end
     { :id => user.id, :display_name => user.short_name, :avatar_image_url => avatar_url_for_user(user, blank_fallback), :html_url => participant_url }
   end
 
