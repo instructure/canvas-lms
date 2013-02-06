@@ -544,7 +544,7 @@ describe "context_modules" do
 
     driver.execute_script("$('#context_module_item_#{tag.id} .indent_item_link').hover().click()")
     wait_for_ajaximations
-    f("#context_module_item_#{tag.id}").attribute(:class).should include("indent_1")
+    f("#context_module_item_#{tag.id}").should have_class('indent_1')
 
     tag.reload
     tag.indent.should == 1
@@ -558,7 +558,7 @@ describe "context_modules" do
     click_option("#content_tag_indent_select", "Indent 1 Level")
     submit_form("#edit_item_form")
     wait_for_ajaximations
-    f("#context_module_item_#{tag.id}").attribute(:class).should include("indent_1")
+    f("#context_module_item_#{tag.id}").should have_class('indent_1')
 
     tag.reload
     tag.indent.should == 1

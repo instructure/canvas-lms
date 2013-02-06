@@ -52,7 +52,7 @@ describe "submissions" do
 
       create_assignment_and_go_to_page 'media_recording'
       f(".submit_assignment_link").click
-      f('#media_comment_submit_button').attribute('disabled').should == 'true'
+      f('#media_comment_submit_button').should have_attribute('disabled', 'true')
       # leave so the "are you sure?!" message doesn't freeze up selenium
       f('#section-tabs .home').click
       driver.switch_to.alert.accept

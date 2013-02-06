@@ -22,9 +22,9 @@ describe "conversations sent filter" do
     get "/conversations/sent"
 
     conversations = get_conversations
-    conversations.first.attribute('data-id').should == @c1.conversation_id.to_s
+    conversations.first.should have_attribute('data-id', @c1.conversation_id.to_s)
     conversations.first.should include_text('yay i sent this')
-    conversations.last.attribute('data-id').should == @c2.conversation_id.to_s
+    conversations.last.should have_attribute('data-id', @c2.conversation_id.to_s)
     conversations.last.should include_text('test')
   end
 

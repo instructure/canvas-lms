@@ -95,8 +95,8 @@ describe "cross-listing" do
     form.find_element(:css, "#course_id").send_keys([:control, 'a'], other_course.id.to_s, "\n")
     keep_trying_until { f("#course_autocomplete_name").text != "Confirming Course ID \"#{other_course.id}\"..." }
     f("#course_autocomplete_name").text.should == other_course.name
-    form.find_element(:css, "#course_autocomplete_id").attribute(:value).should ==(other_course.id.to_s)
-    form.find_element(:css, ".submit_button").attribute(:disabled).should == "false"
+    form.find_element(:css, "#course_autocomplete_id").should have_attribute(:value, other_course.id.to_s)
+    form.find_element(:css, ".submit_button").should have_attribute(:disable, 'false')
     submit_form(form)
     keep_trying_until { driver.current_url.match(/courses\/#{other_course.id}/) }
 

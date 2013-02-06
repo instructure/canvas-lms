@@ -4,15 +4,14 @@ describe "account" do
   it_should_behave_like "in-process server selenium tests"
 
   before (:each) do
-    course_with_admin_logged_in
+   course_with_admin_logged_in
   end
 
   describe "authentication configs" do
 
     it "should allow setting up a secondary ldap server" do
       get "/accounts/#{Account.default.id}/account_authorization_configs"
-      f('#add_auth_select').
-          find_element(:css, 'option[value="ldap"]').click
+      click_option('#add_auth_select', 'ldap', :value)
       ldap_div = f('#ldap_div')
       ldap_form = f('form.ldap_form')
       ldap_div.should be_displayed
@@ -109,8 +108,7 @@ describe "account" do
 
     it "should be able to set login labels for delegated auth accounts" do
       get "/accounts/#{Account.default.id}/account_authorization_configs"
-      f('#add_auth_select').
-          find_element(:css, 'option[value="cas"]').click
+      click_option('#add_auth_select', 'cas', :value)
       f("#account_authorization_config_0_login_handle_name").should be_displayed
 
       f("#account_authorization_config_0_auth_base").send_keys("cas.example.com")

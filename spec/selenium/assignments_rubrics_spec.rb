@@ -195,7 +195,7 @@ describe "assignment rubrics" do
       f('.rubric_total').should include_text "5"
       f('.save_rubric_button').click
       wait_for_ajaximations
-      f('.grading_value').attribute(:value).should == "5"
+      f('.grading_value').should have_attribute(:value, '5')
     end
 
     def mark_rubric_for_grading(rubric, expect_confirmation)

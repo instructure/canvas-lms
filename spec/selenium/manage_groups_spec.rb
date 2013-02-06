@@ -28,7 +28,7 @@ describe "manage groups" do
     get "/courses/#{@course.id}/groups"
     ff(".group_category").size.should == 3
     ff(".group_category.student_organized").size.should == 1
-    f(".group_category.student_organized").attribute(:id).should == "category_#{group_category1.id}"
+    f(".group_category.student_organized").should have_attribute(:id, "category_#{group_category1.id}")
   end
 
   it "should show one li.category per category" do
