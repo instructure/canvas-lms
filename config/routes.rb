@@ -860,6 +860,8 @@ ActionController::Routing::Routes.draw do |map|
 
     api.with_options(:controller => :admins) do |admins|
       admins.post 'accounts/:account_id/admins', :action => :create
+      admins.delete 'accounts/:account_id/admins/:user_id', :action => :destroy
+      admins.get 'accounts/:account_id/admins', :action => :index, :path_name => 'account_admins'
     end
 
     api.with_options(:controller => :account_authorization_configs) do |authorization_configs|
