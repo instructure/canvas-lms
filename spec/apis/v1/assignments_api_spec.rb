@@ -576,47 +576,28 @@ describe AssignmentsApiController, :type => :integration do
       end
     end
 
-    context "when a non-admin tries to update a completely frozen assignment" do
-      it "doesn't allow the non-admin to update the frozen assignment" do
+    context "when a non-admin tries to update a frozen assignment" do
+      before do
         course_with_teacher(:active_all => true)
-        PluginSetting.stubs(:settings_for_plugin).
-          returns(fully_frozen_settings).at_least_once
+        PluginSetting.stubs(:settings_for_plugin).returns({"title" => "yes"}).at_least_once
         @assignment = create_frozen_assignment_in_course(@course)
+      end
+
+      it "doesn't allow the non-admin to update a frozen attribute" do
         title_before_update = @assignment.title
         raw_api_update_assignment(@course,@assignment,{
           :name => "should not change!"
         })
         response.code.should eql '400'
-        json = JSON.parse(response.body)
-        json['message'].should =~ /You do not have permission to edit frozen/i
-        a = @course.assignments.first
-        a.title.should == title_before_update
-      end
-    end
-
-    context "when a non-admin tries to update a partially frozen assignment" do
-      it "allows the non-admin to update the fields that are not frozen" do
-        course_with_teacher(:active_all => true)
-        PluginSetting.stubs(:settings_for_plugin).returns({"title" => "yes"}).
-         at_least_once #enable plugin
-        @assignment = create_frozen_assignment_in_course(@course)
-        raw_api_update_assignment(@course,@assignment,{
-          'description' => "This is updated!"
-        })
-        response.code.to_i.should eql 201
+        @assignment.reload.title.should == title_before_update
       end
 
-      it "doesn't allow the non-admin to update fields that are frozen" do
-        course_with_teacher(:active_all => true)
-        PluginSetting.stubs(:settings_for_plugin).returns({"title" => "yes"}).
-         at_least_once #set frozen field 'title'
-        @assignment = create_frozen_assignment_in_course(@course)
-        raw_api_update_assignment(@course,@assignment,{
-          # name is translated to the 'title' attribute.
-          :name => "not the old name"
+      it "does allow editing a non-frozen attribute" do
+        raw_api_update_assignment(@course, @assignment, {
+          :points_possible => 15
         })
-        response.body.should =~ /error/
-        response.code.should eql '400'
+        response.code.should eql '201'
+        @assignment.reload.points_possible.should == 15
       end
     end
 
@@ -816,11 +797,15 @@ describe AssignmentsApiController, :type => :integration do
         end
 
         it "excludes a field indicating whether the assignment is frozen" do
-          @json.has_key?( 'frozen' ).should == false
+          @json.has_key?('frozen').should == false
         end
 
         it "excludes a field listing frozen attributes" do
-          @json.has_key?( 'frozen_attributes' ).should == false
+          @json.has_key?('frozen_attributes').should == false
+        end
+
+        it "excludes a field listing frozen attributes" do
+          @json.has_key?('frozen_attributes').should == false
         end
       end
 
@@ -840,6 +825,10 @@ describe AssignmentsApiController, :type => :integration do
 
           it "returns an list of frozen attributes" do
             @json['frozen_attributes'].should == ["title"]
+          end
+
+          it "tells the consumer that the assignment will be frozen when copied" do
+            @json['freeze_on_copy'].should be_true
           end
 
           it "returns an empty list when no frozen attributes" do
@@ -867,6 +856,10 @@ describe AssignmentsApiController, :type => :integration do
 
           it "gives the consumer an empty list for frozen attributes" do
             @json['frozen_attributes'].should == []
+          end
+
+          it "tells the consumer that the assignment will not be frozen when copied" do
+            @json['freeze_on_copy'].should == false
           end
         end
       end
@@ -933,8 +926,10 @@ def api_get_assignments_index_from_course(course)
 end
 
 def create_frozen_assignment_in_course(course)
-    assignment = @course.assignments.create!(:title => "some assignment",
-                                              :freeze_on_copy => true)
+    assignment = @course.assignments.create!({
+      :title => "some assignment",
+      :freeze_on_copy => true
+    })
     assignment.copied = true
     assignment.save!
     assignment

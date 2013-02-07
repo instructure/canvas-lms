@@ -159,7 +159,12 @@
 #       // (Optional) the DiscussionTopic associated with the assignment, if applicable
 #       discussion_topic: { ... },
 #
-#       // (Optional) Boolean indicating if assignment is frozen.
+#       // (Optional) Boolean indicating if assignment will be frozen when it is copied.
+#       // NOTE: This field will only be present if the AssignmentFreezer
+#       // plugin is available for your account.
+#       freeze_on_copy: false,
+#
+#       // (Optional) Boolean indicating if assignment is frozen for the calling user.
 #       // NOTE: This field will only be present if the AssignmentFreezer
 #       // plugin is available for your account.
 #       frozen: false,
@@ -409,11 +414,7 @@ class AssignmentsApiController < ApplicationController
   end
 
   def save_and_render_response
-    if @assignment.frozen_for_user?( @current_user )
-      render :json => {:message => t("errors.no_edit_frozen",
-        "You do not have permission to edit frozen assignments. Please see your account administrator."
-      )}.to_json, :status => 400
-    elsif update_and_save_assignment(@assignment, params[:assignment])
+    if update_and_save_assignment(@assignment, params[:assignment])
       render :json => assignment_json(@assignment, @current_user, session).to_json, :status => 201
     else
       # TODO: we don't really have a strategy in the API yet for returning

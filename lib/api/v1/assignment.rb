@@ -78,8 +78,9 @@ module Api::V1::Assignment
     end
 
     if PluginSetting.settings_for_plugin(:assignment_freezer)
-      hash['frozen'] = assignment.frozen?
-      hash['frozen_attributes'] = assignment.frozen_attributes_for_user @current_user
+      hash['freeze_on_copy'] = assignment.freeze_on_copy?
+      hash['frozen'] = assignment.frozen_for_user?(user)
+      hash['frozen_attributes'] = assignment.frozen_attributes_for_user(user)
     end
 
     if assignment.context && assignment.context.turnitin_enabled?
@@ -163,6 +164,7 @@ module Api::V1::Assignment
     set_custom_field_values
     turnitin_enabled
     turnitin_settings
+    freeze_on_copy
   )
 
   API_ALLOWED_TURNITIN_SETTINGS = %w(

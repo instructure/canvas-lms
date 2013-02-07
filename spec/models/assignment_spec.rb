@@ -2137,10 +2137,6 @@ describe Assignment do
         @asmnt.frozen_for_user?(nil).should == true
       end
 
-      it "is not frozen for teacher when some attributes are not frozen" do
-        @asmnt.frozen_for_user?(@teacher).should == false
-      end
-
       it "should not be frozen for admin" do
         @asmnt.frozen_for_user?(@admin).should == false
       end

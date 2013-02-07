@@ -1818,8 +1818,7 @@ class Assignment < ActiveRecord::Base
   # them
   def frozen_for_user?(user)
     return true if user.blank?
-    (frozen? && !self.context.grants_right?(user, :manage_frozen_assignments))&&
-    (frozen_attributes_for_user(user).length == FREEZABLE_ATTRIBUTES.length)
+    frozen? && !self.context.grants_right?(user, :manage_frozen_assignments)
   end
 
   def frozen_attributes_for_user(user)
