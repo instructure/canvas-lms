@@ -22,6 +22,8 @@ shared_examples_for "conversations selenium tests" do
       f("#action_compose_message").click
     end
 
+    wait_for_dom_ready
+
     @input = fj("#create_message_form input:visible")
     @browser = fj("#create_message_form .browser:visible")
     @level = 1
@@ -37,8 +39,9 @@ shared_examples_for "conversations selenium tests" do
 
   def browse_menu
     @browser.click
+    wait_for_ajaximations(300)
     keep_trying_until { ffj('.autocomplete_menu:visible .list').size.should == @level }
-    wait_for_animations
+    wait_for_ajaximations(300)
   end
 
   def browse(*names)
@@ -46,12 +49,10 @@ shared_examples_for "conversations selenium tests" do
     @level += 1
     prev_elements = elements
     element = prev_elements.detect { |e| e.last == name } or raise "menu item does not exist"
-
     element.first.click
-    wait_for_ajaximations(150)
+    wait_for_ajaximations(300)
     keep_trying_until { ffj('.autocomplete_menu:visible .list').size.should == @level }
     @elements = nil
-    elements
 
     if names.present?
       browse(*names, &Proc.new)
@@ -60,13 +61,14 @@ shared_examples_for "conversations selenium tests" do
     end
 
     @level -= 1
-    @elements = @level == 1 ? nil : prev_elements
+    @elements = nil
     @input.send_keys(:arrow_left) unless ffj('.autocomplete_menu:visible .list').empty?
-    wait_for_animations
+    wait_for_ajaximations(300)
   end
 
   def elements
-    @elements ||= driver.execute_script("return $('.autocomplete_menu:visible .list').last().find('ul').last().find('li').toArray();").map { |e|
+    wait_for_js
+    @elements = ffj(".autocomplete_menu:visible .list:last ul:last li").map { |e|
       [e, (e.find_element(:tag_name, :b).text rescue e.text)]
     }
   end
@@ -115,11 +117,11 @@ shared_examples_for "conversations selenium tests" do
 
     if opts[:add_recipient] && browser = fj("#create_message_form .browser:visible")
       browser.click
-      wait_for_ajaximations(150)
+      wait_for_ajaximations(300)
       fj('.autocomplete_menu .selectable:visible').click
-      wait_for_ajaximations(150)
+      wait_for_ajaximations(300)
       fj('.autocomplete_menu .toggleable:visible .toggle').click
-      wait_for_ajaximations
+      wait_for_ajaximations(300)
       ff('.token_input ul li').length.should > 0
       fj("#create_message_form input:visible").send_keys("\t")
     end
@@ -151,6 +153,8 @@ shared_examples_for "conversations selenium tests" do
       assert_message_status("sent", opts[:message][0, 10])
     }.to change(ConversationMessage, :count).by_at_least(opts[:group_conversation] ? 1 : ff('.token_input li').size)
 
+    @elements = nil
+
     if opts[:group_conversation]
       message = ConversationMessage.last
       f("#message_#{message.id}").should_not be_nil
@@ -159,6 +163,7 @@ shared_examples_for "conversations selenium tests" do
   end
 
   def assert_message_status(status = "sent", text = '')
+    wait_for_ajaximations
     keep_trying_until {
       e = ff('#message_status li').last
       e.text.downcase.should include("#{status} #{text.downcase}") #rescue false
@@ -191,7 +196,7 @@ shared_examples_for "conversations selenium tests" do
   def delete_selected_messages(confirm_conversation_deleted = true)
     orig_size = get_conversations.size
 
-    wait_for_animations
+    wait_for_ajaximations(300)
     delete = f('#action_delete')
     delete.should be_displayed
     delete.click

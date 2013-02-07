@@ -306,6 +306,7 @@ describe "conversations" do
       submit_form('#create_message_form')
       wait_for_ajaximations
       run_jobs
+      wait_for_ajaximations
       f('.others').click
       f('#others_popup').should be_displayed
       ff('#others_popup li').count.should == (@conversation_students.count - 2) # - 2 because the first 2 show up in the conversation summary
