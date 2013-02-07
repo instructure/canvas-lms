@@ -58,7 +58,7 @@ class Course < ActiveRecord::Base
                   :grading_standard_enabled,
                   :locale,
                   :hide_final_grades,
-                  :settings
+                  :hide_distribution_graphs
 
   serialize :tab_configuration
   serialize :settings, Hash
@@ -1980,9 +1980,6 @@ class Course < ActiveRecord::Base
     if settings[:storage_quota] && ( migration.for_course_copy? || self.account.grants_right?(migration.user, nil, :manage_courses))
       self.storage_quota = settings[:storage_quota]
     end
-    [:hide_final_grade, :hide_distribution_graph].each do |setting|
-      self.settings[setting] = !!settings[setting] unless settings[setting].nil?
-    end
     atts = Course.clonable_attributes
     atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
     settings.slice(*atts.map(&:to_s)).each do |key, val|
@@ -2372,14 +2369,17 @@ class Course < ActiveRecord::Base
       :default_wiki_editing_roles, :allow_student_organized_groups,
       :default_view, :show_all_discussion_entries, :open_enrollment,
       :storage_quota, :tab_configuration, :allow_wiki_comments,
-      :turnitin_comments, :self_enrollment, :license, :indexed, :settings, :locale ]
+      :turnitin_comments, :self_enrollment, :license, :indexed, :locale,
+      :hide_final_grade, :hide_distribution_graphs,
+      :allow_student_discussion_topics ]
   end
 
+  # TODO: remove me? looks like only a single spec exercises this code (incidentally, no less)
   def clone_for(account, opts={})
     new_course = Course.new
     root_account = account.root_account
     self.attributes.delete_if{|k,v| [:id, :section, :account_id, :workflow_state, :created_at, :updated_at, :root_account_id, :enrollment_term_id, :sis_source_id, :sis_batch_id].include?(k.to_sym) }.each do |key, val|
-      new_course.send("#{key}=", val)
+      new_course.write_attribute(key, val)
     end
     new_course.workflow_state = 'created'
     new_course.name = opts[:name] if opts[:name]
@@ -2822,72 +2822,63 @@ class Course < ActiveRecord::Base
   cattr_accessor :settings_options
   self.settings_options = {}
 
-  def self.add_setting(setting, opts=nil)
-    self.settings_options[setting.to_sym] = opts || {}
-  end
-
-  # these settings either are or could be easily added to
-  # the course settings page
-  add_setting :hide_final_grade, :boolean => true
-  add_setting :hide_distribution_graphs, :boolean => true
-
-  def hide_final_grades
-    self.settings[:hide_final_grade]
-  end
-
-  def hide_final_grades=(hide_final_grade)
-    self.settings[:hide_final_grade] = hide_final_grade
-  end
-
-  def allow_student_discussion_topics
-    allow = self.settings[:allow_student_discussion_topics]
-    if allow.nil?
-      true
-    else
-      allow
+  def self.add_setting(setting, opts = {})
+    setting = setting.to_sym
+    settings_options[setting] = opts
+    cast_expression = "val.to_s"
+    if opts[:boolean]
+      opts[:default] ||= false
+      cast_expression = "Canvas::Plugin.value_to_boolean(val)"
+    end
+    class_eval <<-CODE
+      def #{setting}
+        settings_frd[#{setting.inspect}].nil? && !@disable_setting_defaults ?
+          #{opts[:default].inspect} :
+          settings_frd[#{setting.inspect}]
+      end
+      def #{setting}=(val)
+        settings_frd[#{setting.inspect}] = #{cast_expression}
+      end
+    CODE
+    alias_method "#{setting}?", setting if opts[:boolean]
+    if opts[:alias]
+      alias_method opts[:alias], setting
+      alias_method "#{opts[:alias]}=", "#{setting}="
+      alias_method "#{opts[:alias]}?", "#{setting}?"
     end
   end
 
-  def allow_student_discussion_topics=(allow)
-    self.settings[:allow_student_discussion_topics] = Canvas::Plugin.value_to_boolean(allow)
-  end
+  # unfortunately we decided to pluralize this in the API after the fact...
+  # so now we pluralize it everywhere except the actual settings hash and
+  # course import/export :(
+  add_setting :hide_final_grade, :alias => :hide_final_grades, :boolean => true
+  add_setting :hide_distribution_graphs, :boolean => true
+  add_setting :allow_student_discussion_topics, :boolean => true, :default => true
 
   def filter_attributes_for_user(hash, user, session)
-    hash.delete(:hide_final_grade) unless grants_right? user, :update
+    hash.delete(:hide_final_grades) unless grants_right? user, :update
     hash
   end
 
+  # DEPRECATED, use setting accessors instead
   def settings=(hash)
-    if hash.is_a?(Hash)
-      hash.each do |key, val|
-        if settings_options[key.to_sym]
-          opts = settings_options[key.to_sym]
-          if opts[:boolean]
-            settings[key.to_sym] = (val == true || val == 'true' || val == '1' || val == 'on')
-          elsif opts[:hash]
-            new_hash = {}
-            if val.is_a?(Hash)
-              val.each do |inner_key, inner_val|
-                if opts[:values].include?(inner_key.to_sym)
-                  new_hash[inner_key.to_sym] = inner_val.to_s
-                end
-              end
-            end
-            settings[key.to_sym] = new_hash.empty? ? nil : new_hash
-          else
-            settings[key.to_sym] = val.to_s
-          end
-        end
-      end
-    end
-    settings
+    write_attribute(:settings, hash)
   end
 
+  # frozen, because you should use setters
   def settings
-    result = self.read_attribute(:settings)
-    return result if result
-    return self.write_attribute(:settings, {}) unless frozen?
-    {}.freeze
+    settings_frd.dup.freeze
+  end
+
+  def settings_frd
+    read_attribute(:settings) || write_attribute(:settings, {})
+  end
+
+  def disable_setting_defaults
+    @disable_setting_defaults = true
+    yield
+  ensure
+    @disable_setting_defaults = nil
   end
 
   def reset_content

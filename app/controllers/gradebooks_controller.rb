@@ -65,7 +65,7 @@ class GradebooksController < ApplicationController
             @assignments = @context.assignments.active.gradeable.find(:all, :include => [:assignment_overrides])
             @assignments.collect!{|a| a.overridden_for(@student)}.sort!
             groups_assignments =
-              groups_as_assignments(@groups, :out_of_final => true, :exclude_total => @context.settings[:hide_final_grade])
+              groups_as_assignments(@groups, :out_of_final => true, :exclude_total => @context.hide_final_grades?)
             @no_calculations = groups_assignments.empty?
             @assignments.concat(groups_assignments)
             @submissions = @context.submissions.all(

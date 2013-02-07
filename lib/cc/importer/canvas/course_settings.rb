@@ -62,7 +62,8 @@ module CC::Importer::Canvas
        'allow_student_assignment_edits', 'show_public_context_messages',
        'allow_student_forum_attachments', 'allow_student_organized_groups',
        'show_all_discussion_entries', 'open_enrollment', 'allow_wiki_comments',
-       'self_enrollment', 'hide_final_grade', 'grading_standard_enabled'].each do |bool_val|
+       'self_enrollment', 'hide_final_grade', 'grading_standard_enabled', 
+       'hide_distribution_graphs', 'allow_student_discussion_topics'].each do |bool_val|
         val = get_bool_val(doc, bool_val)
         course[bool_val] = val unless val.nil?
       end
