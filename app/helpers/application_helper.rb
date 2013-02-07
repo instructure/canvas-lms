@@ -225,7 +225,7 @@ module ApplicationHelper
   end
 
   def hidden(include_style=false)
-    include_style ? "style='display:none;'" : "display: none;"
+    include_style ? "style='display:none;'".html_safe : "display: none;"
   end
 
   # Helper for easily checking vender/plugins/adheres_to_policy.rb
