@@ -168,7 +168,7 @@ class RoleOverride < ActiveRecord::Base
         ]
       },
       :send_messages => {
-        :label => lambda { t('permissions.send_messages', "Send messages to course members") },
+        :label => lambda { t('permissions.send_messages', "Send messages to individual course members") },
         :available_to => [
           'StudentEnrollment',
           'TaEnrollment',
@@ -181,6 +181,25 @@ class RoleOverride < ActiveRecord::Base
         ],
         :true_for => [
           'StudentEnrollment',
+          'TaEnrollment',
+          'DesignerEnrollment',
+          'TeacherEnrollment',
+          'AccountAdmin'
+        ]
+      },
+      :send_messages_all => {
+        :label => lambda { t('permissions.send_messages_all', "Send messages to the entire class") },
+        :available_to => [
+          'StudentEnrollment',
+          'TaEnrollment',
+          'DesignerEnrollment',
+          'TeacherEnrollment',
+          'TeacherlessStudentEnrollment',
+          'ObserverEnrollment',
+          'AccountAdmin',
+          'AccountMembership'
+        ],
+        :true_for => [
           'TaEnrollment',
           'DesignerEnrollment',
           'TeacherEnrollment',

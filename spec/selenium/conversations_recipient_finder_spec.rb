@@ -26,6 +26,7 @@ describe "conversations recipient finder" do
     menu.should == ["the course", "the group"]
     browse "the course" do
       menu.should == ["Everyone", "Teachers", "Students", "Course Sections", "Student Groups"]
+      toggleable.should == ["Everyone", "Teachers", "Students"]
       browse("Everyone") { menu.should == ["Select All", "nobody@example.com", "student 1", "student 2"] }
       browse("Teachers") { menu.should == ["nobody@example.com"] }
       browse("Students") { menu.should == ["Select All", "student 1", "student 2"] }
@@ -38,6 +39,40 @@ describe "conversations recipient finder" do
         browse "the section" do
           menu.should == ["Everyone", "Teachers", "Students"]
           browse("Everyone") { menu.should == ["Select All", "nobody@example.com", "student 1"] }
+          browse("Teachers") { menu.should == ["nobody@example.com"] }
+          browse("Students") { menu.should == ["student 1"] }
+        end
+      end
+      browse "Student Groups" do
+        menu.should == ["the group"]
+        browse("the group") { menu.should == ["Select All", "nobody@example.com", "student 1"] }
+      end
+    end
+    browse("the group") { menu.should == ["Select All", "nobody@example.com", "student 1"] }
+  end
+
+  it "should respect permissions" do
+    # only affects courses/sections, not groups
+    RoleOverride.create!(:context => Account.default, :permission => 'send_messages_all', :enrollment_type => 'TeacherEnrollment', :enabled => false)
+
+    browse_menu
+
+    menu.should == ["the course", "the group"]
+    browse "the course" do
+      menu.should == ["Everyone", "Teachers", "Students", "Course Sections", "Student Groups"]
+      toggleable.should == []
+      browse("Everyone") { menu.should == ["nobody@example.com", "student 1", "student 2"] }
+      browse("Teachers") { menu.should == ["nobody@example.com"] }
+      browse("Students") { menu.should == ["student 1", "student 2"] }
+      browse "Course Sections" do
+        menu.should == ["the other section", "the section"]
+        browse "the other section" do
+          menu.should == ["Students"]
+          browse("Students") { menu.should == ["student 2"] }
+        end
+        browse "the section" do
+          menu.should == ["Everyone", "Teachers", "Students"]
+          browse("Everyone") { menu.should == ["nobody@example.com", "student 1"] }
           browse("Teachers") { menu.should == ["nobody@example.com"] }
           browse("Students") { menu.should == ["student 1"] }
         end

@@ -31,7 +31,7 @@ describe SearchHelper do
       @contexts[:courses][@course.id][:permissions].should be_empty
 
       load_all_contexts(:permissions => [:manage_assignments])
-      @contexts[:courses][@course.id][:permissions].should eql({:manage_assignments => true})
+      @contexts[:courses][@course.id][:permissions][:manage_assignments].should be_true
     end
   end
 end

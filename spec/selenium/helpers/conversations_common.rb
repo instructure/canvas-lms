@@ -77,8 +77,16 @@ shared_examples_for "conversations selenium tests" do
     elements.map(&:last)
   end
 
+  def toggleable
+    with_class("toggleable")
+  end
+
   def toggled
-    elements.select { |e| e.first.attribute('class') =~ /(^| )on($| )/ }.map(&:last)
+    with_class("on")
+  end
+
+  def with_class(klass)
+    elements.select { |e| e.first.attribute('class') =~ /(\A| )#{klass}(\z| )/ }.map(&:last)
   end
 
   def click(name)

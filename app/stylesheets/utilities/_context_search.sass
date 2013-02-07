@@ -21,6 +21,7 @@
       i
         background: transparent url(/images/messages/expand-context.png) no-repeat 10px -23px
     a.toggle
+      display: none
       float: left
       margin: 0 14px 0 6px
       i
@@ -87,13 +88,15 @@
       i
         background-position: 10px -55px
     a.toggle
-      display: none
+      display: none !important
   li.active.expanded
     a.expand:hover
       cursor: pointer
       background: #fff
       border-color: #e4ebef
-  &.with-toggles
+  div.with-toggles
+    a.toggle
+      display: block
     li.expanded, li.active.expanded
       padding-left: 11px
       img.avatar

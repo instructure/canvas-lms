@@ -543,6 +543,8 @@ define [
             delete data.avatar_url # since it's the wrong size and possibly a blank image
             currentData = @userCache[data.id] ? {}
             @userCache[data.id] = $.extend(currentData, data)
+        canToggle: (data) ->
+          data.type is 'user' or data.permissions?.send_messages_all
         selector:
           limiter: (options) =>
             if options.level > 0 then -1 else 5
@@ -550,25 +552,30 @@ define [
           preparer: (postData, data, parent) =>
             context = postData.context
             if not postData.search and context and data.length > 1
+              parentData = parent.data('user_data')
               if context.match(/^(course|section)_\d+$/)
                 # i.e. we are listing synthetic contexts under a course or section
                 data.unshift
                   id: "#{context}_all"
                   name: everyoneText
-                  user_count: parent.data('user_data').user_count
+                  user_count: parentData.user_count
                   type: 'context'
-                  avatar_url: parent.data('user_data').avatar_url
-                  selectAll: true
-              else if context.match(/^((course|section)_\d+_.*|group_\d+)$/) and not context.match(/^course_\d+_(groups|sections)$/)
+                  avatar_url: parentData.avatar_url
+                  permissions: parentData.permissions
+                  selectAll: parentData.permissions.send_messages_all
+              else if context.match(/^((course|section)_\d+_.*|group_\d+)$/) and not context.match(/^course_\d+_(groups|sections)$/) and parentData.permissions.send_messages_all
                 # i.e. we are listing all users in a group or synthetic context
                 data.unshift
                   id: context
                   name: selectAllText
-                  user_count: parent.data('user_data').user_count
+                  user_count: parentData.user_count
                   type: 'context'
-                  avatar_url: parent.data('user_data').avatar_url
+                  avatar_url: parentData.avatar_url
+                  permissions: parentData.permissions
                   selectAll: true
                   noExpand: true # just a magic select-all checkbox, you can't drill into it
+          baseData:
+            permissions: ["send_messages_all"]
 
       return if $scope
 

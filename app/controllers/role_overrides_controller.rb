@@ -239,7 +239,8 @@ class RoleOverridesController < ApplicationController
   #     read_reports                     -- [sTAD ] View usage reports for the course
   #     read_roster                      -- [STADo] See the list of users
   #     read_sis                         -- [sTa  ] Read SIS data
-  #     send_messages                    -- [STADo] Send messages to course members
+  #     send_messages                    -- [STADo] Send messages to individual course members
+  #     send_messages_all                -- [sTADo] Send messages to the entire class
   #     view_all_grades                  -- [ TAd ] View all grades
   #     view_group_pages                 -- [sTADo] View the group pages of all student groups
   #

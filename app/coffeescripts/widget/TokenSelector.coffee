@@ -31,7 +31,6 @@ define [
       @fetchListAjaxRequests = []
       @queryCache = {}
       @$container = $('<div />').addClass('autocomplete_menu')
-      @$container.addClass('with-toggles') if @options.showToggles
       @$menu = $('<div />').append(@$list = @newList())
       @$container.append($('<div />').append(@$menu))
       @$container.css('top', 0).css('left', 0)
@@ -92,7 +91,9 @@ define [
                 @clear()
                 @close()
           @input.focus()
-      $list.body = $list.find('ul').last()
+      $uls = $list.find('ul')
+      $list.heading = $uls.first()
+      $list.body = $uls.last()
       $list
 
     captureKeyDown: (e) ->
@@ -367,6 +368,9 @@ define [
       @$list.disableWhileLoading(deferred)
       deferred
 
+    toggleableItems: (data) ->
+      return false unless data.length
+
     renderList: (data, options={}, postData={}) ->
       @open()
 
@@ -377,10 +381,8 @@ define [
       $list.selectAll = null
 
       @selection = null
-      $uls = $list.find('ul')
-      $uls.html('')
-      $heading = $uls.first()
-      $body = $uls.last()
+      $list.heading.html('')
+      $list.body.html('')
       if data.length
         parent = if @stack.length then @stack[@stack.length - 1][0] else null
         ancestors = if @stack.length then (ancestor[0].data('id') for ancestor in @stack) else []
@@ -393,19 +395,20 @@ define [
           @populateRow($li, row, level: @stack.length, first: (i is 0), last: (i is data.length - 1), parent: parent, ancestors: ancestors)
           $list.selectAll = $li if row.selectAll
           $li.addClass('on') if $li.hasClass('toggleable') and @input.hasToken($li.data('id'))
-          $body.append($li)
+          $list.body.append($li)
         $list.body.find('li.toggleable').addClass('on') if $list.selectAll?.hasClass?('on') or @stack.length and @stack[@stack.length - 1][0].hasClass?('on')
       else
         $message = $('<li class="message first last"></li>')
         $message.text(@options.messages?.noResults ? '')
-        $body.append($message)
+        $list.body.append($message)
+      $list.toggleClass('with-toggles', @options.showToggles and $list.body.find('li.toggleable').length > 0)
 
       if @listExpanded()
         $li = @stack[@stack.length - 1][0].clone()
         $li.addClass('expanded').removeClass('active first last')
-        $heading.append($li).show()
+        $list.heading.append($li).show()
       else
-        $heading.hide()
+        $list.heading.hide()
 
       if options.expand
         $list.insertAfter(@$list)
