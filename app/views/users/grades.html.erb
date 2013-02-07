@@ -22,7 +22,7 @@
   <tr>
     <td class="course"><a href="<%= course_student_grades_path(course.id, enrollment.user_id) %>"><%= course.name %></a></td>
     <td class="percent">
-      <% if course.settings[:hide_final_grade] %>
+      <% if course.hide_final_grades? %>
         --
       <% elsif enrollment.computed_current_score %>
         <%= enrollment.computed_current_score %>%
@@ -42,7 +42,7 @@
   <tr>
     <td class="course"><a href="<%= course_student_grades_path(enrollment.course_id, enrollment.user_id) %>"><%= context_user_name(nil, enrollment.user_id) %>, <%= enrollment.course.name %></a></td>
     <td class="percent">
-      <% if enrollment.course.settings[:hide_final_grade] %>
+      <% if enrollment.course.hide_final_grades? %>
         --
       <% elsif enrollment.computed_current_score %>
         <%= enrollment.computed_current_score %>%
@@ -89,7 +89,7 @@
     <tr>
       <td><%= enrollment.course.name %></td>
       <td>
-        <% if enrollment.course.settings[:hide_final_grade] %>
+        <% if enrollment.course.hide_final_grades? %>
           --
         <% elsif enrollment.computed_current_score %>
           <%= enrollment.computed_current_score %>%

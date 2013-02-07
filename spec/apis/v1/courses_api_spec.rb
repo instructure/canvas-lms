@@ -619,7 +619,7 @@ describe CoursesController, :type => :integration do
 
   it "should not include scores in course list, even if requested, if final grades are hidden" do
     @course2.grading_standard_enabled = true
-    @course2.settings[:hide_final_grade] = true
+    @course2.hide_final_grades = true
     @course2.save
     @course2.all_student_enrollments.update_all(:computed_current_score => 80, :computed_final_score => 70)
 

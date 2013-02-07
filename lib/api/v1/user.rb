@@ -164,7 +164,7 @@ module Api::V1::User
   def has_grade_permissions?(user, enrollment)
     course = enrollment.course
 
-    (user.id == enrollment.user_id && !course.settings[:hide_final_grade]) ||
+    (user.id == enrollment.user_id && !course.hide_final_grades?) ||
      course.grants_rights?(user, :manage_grades, :view_all_grades).values.any?
   end
 end
