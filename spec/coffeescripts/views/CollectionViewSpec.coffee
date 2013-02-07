@@ -53,8 +53,9 @@ define [
     ok view.$el.text().match(/No items/), 'empty template rendered'
 
   test 'renders added items', ->
+    collection.reset()
     collection.add {name: 'Joe', id: 110}
-    assertItemRendered 'Joe'
+    assertRenderedItems ['Joe']
 
   test 'renders empty template', ->
     collection.reset()

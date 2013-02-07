@@ -26,7 +26,7 @@ define ['Backbone'], ({View}, _) ->
 
     onEnter: ->
       @el.select()
-      @trigger 'enter'
+      @trigger 'enter', @el.value
 
     keyup: (event) ->
       clearTimeout @onInputTimer

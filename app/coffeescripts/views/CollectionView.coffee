@@ -40,6 +40,7 @@ define [
       @attachCollection()
 
     ##
+    # Renders the main template and the item templates
     # @api public
     render: =>
       super
@@ -55,8 +56,7 @@ define [
     attachCollection: ->
       @collection.on 'reset', @removePreviousItems
       @collection.on 'reset', @render
-      @collection.on 'add', @rerenderIfCollection
-      @collection.on 'add', @renderItem
+      @collection.on 'add', @renderOnAdd
       @collection.on 'remove', @removeItem
       @collection.on 'remove', @rerenderUnlessCollection
 
@@ -83,8 +83,11 @@ define [
     ##
     # Ensures main template is rerendered when the first item is added
     # @api private
-    rerenderIfCollection: =>
-      @render() if @collection.length is 1
+    renderOnAdd: (model) =>
+      if @collection.length is 1
+        @render()
+      else
+        @renderItem model
 
     ##
     # Ensures the template rerenders when there is no collection
