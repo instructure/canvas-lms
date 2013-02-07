@@ -252,7 +252,7 @@ describe CalendarEventsApiController, :type => :integration do
                           :controller => 'calendar_events_api', :action => 'index', :format => 'json',
                           :context_codes => [@course.asset_string], :start_date => '2012-01-01', :end_date => '2012-01-31'})
         json.size.should eql 2
-        json.sort_by! {|e| e['id']}
+        json.sort! {|e1, e2| e1['id'] <=> e2['id']}
 
         e1json = json.first
         e1json.keys.sort.should eql(expected_slot_fields)
@@ -297,7 +297,7 @@ describe CalendarEventsApiController, :type => :integration do
                           :controller => 'calendar_events_api', :action => 'index', :format => 'json',
                           :context_codes => [group1.asset_string, group2.asset_string], :start_date => '2012-01-01', :end_date => '2012-01-31'})
         json.size.should eql 2
-        json.sort_by! { |e| e['id'] }
+        json.sort! {|e1, e2| e1['id'] <=> e2['id']}
 
         ejson = json.first
         ejson.keys.sort.should eql((expected_slot_fields + ['reserved'] - ['child_events']).sort) # not reserved, so no child events can be seen
@@ -413,7 +413,7 @@ describe CalendarEventsApiController, :type => :integration do
                           :controller => 'calendar_events_api', :action => 'index', :format => 'json',
                           :context_codes => [ag1.asset_string, ag2.asset_string], :start_date => '2012-01-01', :end_date => '2012-01-31'})
         json.size.should eql 2
-        json.sort_by! {|e| e['id']}
+        json.sort! {|e1, e2| e1['id'] <=> e2['id']}
         json.each do |e|
           e.keys.sort.should eql((expected_slot_fields + ['reserved']).sort)
           e['reserved'].should be_true
