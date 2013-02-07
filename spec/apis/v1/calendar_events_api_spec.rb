@@ -717,6 +717,19 @@ describe CalendarEventsApiController, :type => :integration do
       json.first.slice('title', 'start_at', 'id').should eql({'id' => "assignment_#{e2.id}", 'title' => '2', 'start_at' => '2012-01-08T12:00:00Z'})
     end
 
+    it 'orders result set by base due_at' do
+      e2 = @course.assignments.create(:title => '2', :due_at => '2012-01-08 12:00:00')
+      e1 = @course.assignments.create(:title => '1', :due_at => '2012-01-07 12:00:00')
+      e3 = @course.assignments.create(:title => '3', :due_at => '2012-01-19 12:00:00')
+
+      json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-19&context_codes[]=course_#{@course.id}", {
+          :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+          :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-19'})
+      json.size.should eql 3
+      json.first.keys.sort.should eql expected_fields
+      json.map { |event| event['title'] }.should == %w[1 2 3]
+    end
+
     it 'should paginate assignments' do
       ids = 25.times.map { |i| @course.assignments.create(:title => "#{i}", :due_at => '2012-01-08 12:00:00').id }
       json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-08&end_date=2012-01-08&context_codes[]=course_#{@course.id}&per_page=10", {

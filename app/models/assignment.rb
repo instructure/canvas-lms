@@ -1460,6 +1460,8 @@ class Assignment < ActiveRecord::Base
                      {:now => Time.zone.now}]}
   }
 
+  named_scope :order_by_base_due_at, :order => 'assignments.due_at ASC'
+
   def needs_publishing?
     self.due_at && self.due_at < 1.week.ago && self.available?
   end

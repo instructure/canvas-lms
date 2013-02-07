@@ -519,7 +519,10 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def assignment_scope
-    scope = Assignment.active.
+    # Fully ordering by due_at requires examining all the overrides linked and as it applies to
+    # specific people, sections, etc. This applies the base assignment due_at for ordering
+    # as a more sane default then natural DB order. No, it isn't perfect but much better.
+    scope = Assignment.active.order_by_base_due_at.
       for_context_codes(@context_codes)
 
     scope = scope.send(*date_scope_and_args(:due_between_with_overrides)) unless @all_events
