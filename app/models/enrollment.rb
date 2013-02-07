@@ -1021,4 +1021,19 @@ class Enrollment < ActiveRecord::Base
   def role
     self.role_name || self.type
   end
+
+  # DO NOT TRUST
+  # This is only a convenience method to assist in identifying which enrollment
+  # goes to which user when users have accidentally been merged together
+  # This is the *only* reason the sis_source_id column has not been dropped
+  def sis_user_id
+    return @sis_user_id if @sis_user_id
+    sis_source_id_parts = sis_source_id.split(':')
+    if sis_source_id_parts.length == 4
+      @sis_user_id = sis_source_id_parts[1]
+    else
+      @sis_user_id = sis_source_id_parts[0]
+    end
+    @sis_user_id
+  end
 end
