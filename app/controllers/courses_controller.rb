@@ -1295,9 +1295,6 @@ class CoursesController < ApplicationController
           end
         end
       end
-      unless (hide_final_grades = params[:course].delete(:hide_final_grades)).nil?
-        @course.hide_final_grades = value_to_boolean(hide_final_grades)
-      end
       params[:course][:event] = :offer if params[:offer].present?
 
       @course.process_event(params[:course].delete(:event)) if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)

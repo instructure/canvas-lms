@@ -250,37 +250,35 @@ TEXT
           </span>
           <a href="#" class="course_form course_form_more_options_link" style="padding-left: 20px;"><%= t('links.more_options', %{more options}) %></a>
           <div class="course_form_more_options" style="display: none; padding-left: 20px;">
-            <% f.fields_for :settings do |settings| %>
-              <% if @context.self_enrollment_allowed? %>
-                <%= f.check_box :self_enrollment, :class => 'self_enrollment_checkbox' %>
-                <%= f.label :self_enrollment, :en => "Let students self-enroll by sharing with them a secret URL or code" %><br/>
-                <div class="open_enrollment_holder" style="display: none;">
-                <%= f.check_box :open_enrollment %>
-                <%= f.label :open_enrollment, :en => "Add a \"Join this Course\" link to the course home page" %><br/>
-                </div>
-              <% end %>
-              <%= f.check_box :allow_student_forum_attachments %>
-              <%= f.label :allow_student_forum_attachments, :en => "Let Students attach files to Discussions" %><br/>
-              <%= f.check_box :allow_student_discussion_topics, :checked => @context.allow_student_discussion_topics %>
-              <%= f.label :allow_student_discussion_topics, :en => "Let Students create Discussion Topics" %><br/>
-              <%= f.check_box :allow_student_organized_groups %>
-              <%= f.label :allow_student_organized_groups, :en => "Let Students organize their own Groups" %><br/>
-              <%= settings.check_box :hide_final_grade, :checked => @context.settings[:hide_final_grade] %>
-              <%= settings.label :hide_final_grade, :en => "Hide totals in student grades summary" %><br/>
-              <%= settings.check_box :hide_distribution_graphs, :checked => @context.settings[:hide_distribution_graphs] %>
-              <%= settings.label :hide_distribution_graphs, :en => "Hide grade distribution graphs from students" %><br/>
-              <label for="course_default_wiki_editing_roles">
-                <%= f.select :default_wiki_editing_roles, [
-                  [t('#course.wiki_permissions.only_teachers', "Only Teachers"), "teachers"],
-                  [t('#course.wiki_permissions.teachers_students', "Teacher and Students"), "teachers,students"],
-                  [t('#course.wiki_permissions.all', "Anyone"), "teachers,students,public"]] %>
-                <%= t('wiki_editing_roles', %{can edit course wiki pages by default}) %>
-              </label><br/>
-              <div class="changed_default_wiki_editing_roles" style="display: none; padding-left: 20px; font-size: 0.8em;">
-                <input type="checkbox" name="update_default_pages" id="update_default_pages"/>
-                <label for="update_default_pages"><%= t 'wiki_editing_roles_change_existing', %{Change pages currently editable by "%{current_setting}" to "%{new_setting}".}, :current_setting => content_tag('span', @context.readable_default_wiki_editing_roles), :new_setting => content_tag('span', nbsp, :class => 'default_wiki_editing_roles_change') %></label>
+            <% if @context.self_enrollment_allowed? %>
+              <%= f.check_box :self_enrollment, :class => 'self_enrollment_checkbox' %>
+              <%= f.label :self_enrollment, :en => "Let students self-enroll by sharing with them a secret URL or code" %><br/>
+              <div class="open_enrollment_holder" style="display: none;">
+              <%= f.check_box :open_enrollment %>
+              <%= f.label :open_enrollment, :en => "Add a \"Join this Course\" link to the course home page" %><br/>
               </div>
             <% end %>
+            <%= f.check_box :allow_student_forum_attachments %>
+            <%= f.label :allow_student_forum_attachments, :en => "Let Students attach files to Discussions" %><br/>
+            <%= f.check_box :allow_student_discussion_topics %>
+            <%= f.label :allow_student_discussion_topics, :en => "Let Students create Discussion Topics" %><br/>
+            <%= f.check_box :allow_student_organized_groups %>
+            <%= f.label :allow_student_organized_groups, :en => "Let Students organize their own Groups" %><br/>
+            <%= f.check_box :hide_final_grades %>
+            <%= f.label :hide_final_grades, :en => "Hide totals in student grades summary" %><br/>
+            <%= f.check_box :hide_distribution_graphs %>
+            <%= f.label :hide_distribution_graphs, :en => "Hide grade distribution graphs from students" %><br/>
+            <label for="course_default_wiki_editing_roles">
+              <%= f.select :default_wiki_editing_roles, [
+                [t('#course.wiki_permissions.only_teachers', "Only Teachers"), "teachers"],
+                [t('#course.wiki_permissions.teachers_students', "Teacher and Students"), "teachers,students"],
+                [t('#course.wiki_permissions.all', "Anyone"), "teachers,students,public"]] %>
+              <%= t('wiki_editing_roles', %{can edit course wiki pages by default}) %>
+            </label><br/>
+            <div class="changed_default_wiki_editing_roles" style="display: none; padding-left: 20px; font-size: 0.8em;">
+              <input type="checkbox" name="update_default_pages" id="update_default_pages"/>
+              <label for="update_default_pages"><%= t 'wiki_editing_roles_change_existing', %{Change pages currently editable by "%{current_setting}" to "%{new_setting}".}, :current_setting => content_tag('span', @context.readable_default_wiki_editing_roles), :new_setting => content_tag('span', nbsp, :class => 'default_wiki_editing_roles_change') %></label>
+            </div>
           </div>
         </td>
       </tr><tr>
