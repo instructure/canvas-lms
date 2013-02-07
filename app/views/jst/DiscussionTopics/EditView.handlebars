@@ -66,7 +66,7 @@
           {{#t "delay_posting"}}Delay posting{{/t}}
         </label>
         <label id="discussion_topic_delay_post_container"
-               {{#unless delayed_post_at}}style="display: none;"{{/unless}}
+               style="{{hiddenUnless delayed_post_at}}"
                class="checkbox">
           {{#t "post_at"}}Post At{{/t}}
           <input type="text"
@@ -92,7 +92,7 @@
         </label>
   
         <label id="podcast_has_student_posts_container"
-               {{#unless podcast_url}}style="display: none"{{/unless}}
+               style="{{hiddenUnless podcast_url}}"
                class="checkbox">
           {{checkbox "podcast_has_student_posts"}}
           {{#t "include_replies_in_podcast_feed"}}Include Replies in podcast feed{{/t}}
@@ -106,7 +106,7 @@
                  class="element_toggler"
                  aria-controls="assignment_options"
                  name="assignment[set_assignment]"
-                 {{#if assignment_id}}checked{{/if}}
+                 {{#if useForGrading}}checked{{/if}}
                  value="1">
           {{#t "use_for_grading"}}Use for grading{{/t}}
         </label>
@@ -118,7 +118,7 @@
 </fieldset>
 
 {{#if showAssignment}}
-  <fieldset id="assignment_options" {{#unless assignment_id}}style="display:none"{{/unless}}>
+  <fieldset id="assignment_options" style="{{hiddenUnless useForGrading}}">
 
     <div class="control-group">
       <label class="control-label" for="discussion_topic_assignment_points_possible">{{#t "points_possible"}}Points possible{{/t}}</label>

@@ -36,6 +36,7 @@ define [
     toJSON: ->
       _.extend super, @options,
         showAssignment: !!@assignmentGroupCollection
+        useForGrading: @model.get('assignment')?
         isTopic: @model.constructor is DiscussionTopic
         contextIsCourse: @options.contextType is 'courses'
         canAttach: @permissions.CAN_ATTACH

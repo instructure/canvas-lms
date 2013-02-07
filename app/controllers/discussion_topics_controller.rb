@@ -171,6 +171,7 @@ class DiscussionTopicsController < ApplicationController
         hash[:ATTRIBUTES] = discussion_topic_api_json(@topic, @context, @current_user, session)
       end
       (hash[:ATTRIBUTES] ||= {})[:is_announcement] = @topic.is_announcement
+      handle_assignment_edit_params(hash[:ATTRIBUTES])
       js_env :DISCUSSION_TOPIC => hash
       render :action => "edit"
     end
@@ -475,6 +476,20 @@ class DiscussionTopicsController < ApplicationController
 
   def user_can_edit_course_settings?
     @context.is_a?(Course) && @context.grants_right?(@current_user, session, :update)
+  end
+
+  def handle_assignment_edit_params(hash)
+    hash[:title] = params[:title] if params[:title]
+    if params.slice(*[:due_at, :points_possible, :assignment_group_id]).present?
+      if hash[:assignment].nil? && @context.respond_to?(:assignments) && @context.assignments.new.grants_right?(@current_user, session, :create)
+        hash[:assignment] ||= {}
+      end
+      if !hash[:assignment].nil?
+        hash[:assignment][:due_at] = params[:due_at].to_date if params[:due_at]
+        hash[:assignment][:points_possible] = params[:points_possible] if params[:points_possible]
+        hash[:assignment][:assignment_group_id] = params[:assignment_group_id] if params[:assignment_group_id]
+      end
+    end
   end
 
 end

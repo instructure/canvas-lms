@@ -52,7 +52,11 @@ class QuizzesController < ApplicationController
     if authorized_action(@context.quizzes.new, @current_user, :create)
       @assignment = nil
       @assignment = @context.assignments.active.find(params[:assignment_id]) if params[:assignment_id]
-      @quiz = @context.quizzes.create
+      @quiz = @context.quizzes.build
+      @quiz.title = params[:title] if params[:title]
+      @quiz.due_at = params[:due_at] if params[:due_at]
+      @quiz.assignment_group_id = params[:assignment_group_id] if params[:assignment_group_id]
+      @quiz.save!
       add_crumb((!@quiz.quiz_title || @quiz.quiz_title.empty? ? t(:default_new_crumb, "New Quiz") : @quiz.quiz_title))
       # this is a weird check... who can create but not update???
       if authorized_action(@quiz, @current_user, :update)
@@ -95,6 +99,11 @@ class QuizzesController < ApplicationController
     @assignment = @quiz.assignment
     if authorized_action(@quiz, @current_user, :update)
       add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
+
+      @quiz.title = params[:title] if params[:title]
+      @quiz.due_at = params[:due_at] if params[:due_at]
+      @quiz.assignment_group_id = params[:assignment_group_id] if params[:assignment_group_id]
+
       student_ids = @context.student_ids
       @banks_hash = {}
       bank_ids = @quiz.quiz_groups.map(&:assessment_question_bank_id)

@@ -7,16 +7,9 @@ class DiscussionTopicPresenter
     @topic = discussion_topic
     @user  = current_user
 
-    @assignment = if @topic.for_assignment?
-      AssignmentOverrideApplicator.assignment_overridden_for(@topic.assignment, @user)
-    else
-      nil
-    end
-
-    @override_list = if @topic.for_assignment?
-      OverrideListPresenter.new(topic.assignment, user)
-    else
-      nil
+    if @topic.for_assignment?
+      @assignment = AssignmentOverrideApplicator.assignment_overridden_for(@topic.assignment, @user)
+      @override_list = OverrideListPresenter.new(topic.assignment, user)
     end
   end
 

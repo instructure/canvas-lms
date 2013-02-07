@@ -251,14 +251,13 @@ class AssignmentsController < ApplicationController
     add_crumb t :create_new_crumb, "Create new"
 
     if params[:submission_types] == 'online_quiz'
-      redirect_to new_polymorphic_url([@context, :quiz])
+      redirect_to new_polymorphic_url([@context, :quiz], index_edit_params)
     elsif params[:submission_types] == 'discussion_topic'
-      redirect_to new_polymorphic_url([@context, :discussion_topic])
+      redirect_to new_polymorphic_url([@context, :discussion_topic], index_edit_params)
     else
       edit
     end
   end
-
   
   def edit
     @assignment ||= @context.assignments.active.find(params[:id])
@@ -272,9 +271,9 @@ class AssignmentsController < ApplicationController
       @assignment.ensure_assignment_group(false)
 
       if @assignment.submission_types == 'online_quiz' && @assignment.quiz
-        redirect_to edit_polymorphic_url([@context, @assignment.quiz])
+        return redirect_to edit_polymorphic_url([@context, @assignment.quiz], index_edit_params)
       elsif @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic
-        redirect_to edit_polymorphic_url([@context, @assignment.discussion_topic])
+        return redirect_to edit_polymorphic_url([@context, @assignment.discussion_topic], index_edit_params)
       end
 
       assignment_groups = @context.assignment_groups.active
@@ -378,4 +377,9 @@ class AssignmentsController < ApplicationController
       group = @context.assignment_groups.find(group_id)
     end
   end
+
+  def index_edit_params
+    params.slice(*[:title, :due_at, :points_possible, :assignment_group_id])
+  end
+
 end
