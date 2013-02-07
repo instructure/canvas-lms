@@ -201,6 +201,13 @@ shared_examples_for "discussion and announcement permissions tests" do
     check_permissions(0)
   end
 
+  it "should not allow a student to delete/edit topics if allow_student_discussion_editing = false" do
+    @course.update_attributes(:allow_student_discussion_editing => false)
+    what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => 'other users', :user => @other_user) : announcement_model(:title => 'other users', :user => @other_user)
+    login_as(@other_user.primary_pseudonym.unique_id, 'asdfasdf')
+    check_permissions(0)
+  end
+
   it "should give the teacher delete/lock permissions on all topics" do
     what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => 'other users', :user => @other_user) : announcement_model(:title => 'other users', :user => @other_user)
     login_as(@teacher.primary_pseudonym.unique_id, 'asdfasdf')

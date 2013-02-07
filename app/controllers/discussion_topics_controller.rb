@@ -229,6 +229,7 @@ class DiscussionTopicsController < ApplicationController
               :PERMISSIONS => {
                 :CAN_REPLY => !(@topic.for_group_assignment? || @topic.locked?),
                 :CAN_ATTACH => @topic.grants_right?(@current_user, session, :attach),
+                :CAN_MANAGE_OWN => @context.user_can_manage_own_discussion_posts?(@current_user),
                 :MODERATE => @context.grants_right?(@current_user, session, :moderate_forum)
               },
               :ROOT_URL => named_context_url(@context, :api_v1_context_discussion_topic_view_url, @topic),

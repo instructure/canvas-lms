@@ -259,11 +259,13 @@ TEXT
               </div>
             <% end %>
             <%= f.check_box :allow_student_forum_attachments %>
-            <%= f.label :allow_student_forum_attachments, :en => "Let Students attach files to Discussions" %><br/>
+            <%= f.label :allow_student_forum_attachments, :en => "Let students attach files to discussions" %><br/>
             <%= f.check_box :allow_student_discussion_topics %>
-            <%= f.label :allow_student_discussion_topics, :en => "Let Students create Discussion Topics" %><br/>
+            <%= f.label :allow_student_discussion_topics, :en => "Let students create discussion topics" %><br/>
+            <%= f.check_box :allow_student_discussion_editing %>
+            <%= f.label :allow_student_discussion_editing, :en => "Let students edit or delete their own discussion posts" %><br/>
             <%= f.check_box :allow_student_organized_groups %>
-            <%= f.label :allow_student_organized_groups, :en => "Let Students organize their own Groups" %><br/>
+            <%= f.label :allow_student_organized_groups, :en => "Let students organize their own groups" %><br/>
             <%= f.check_box :hide_final_grades %>
             <%= f.label :hide_final_grades, :en => "Hide totals in student grades summary" %><br/>
             <%= f.check_box :hide_distribution_graphs %>

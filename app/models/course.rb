@@ -37,6 +37,7 @@ class Course < ActiveRecord::Base
                   :public_description,
                   :allow_student_forum_attachments,
                   :allow_student_discussion_topics,
+                  :allow_student_discussion_editing,
                   :default_wiki_editing_roles,
                   :allow_student_organized_groups,
                   :course_code,
@@ -2854,6 +2855,13 @@ class Course < ActiveRecord::Base
   add_setting :hide_final_grade, :alias => :hide_final_grades, :boolean => true
   add_setting :hide_distribution_graphs, :boolean => true
   add_setting :allow_student_discussion_topics, :boolean => true, :default => true
+  add_setting :allow_student_discussion_editing, :boolean => true, :default => true
+
+  def user_can_manage_own_discussion_posts?(user)
+    return true if allow_student_discussion_editing?
+    return true if user_is_instructor?(user)
+    false
+  end
 
   def filter_attributes_for_user(hash, user, session)
     hash.delete(:hide_final_grades) unless grants_right? user, :update
