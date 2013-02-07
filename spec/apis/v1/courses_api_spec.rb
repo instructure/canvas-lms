@@ -1279,7 +1279,8 @@ describe CoursesController, :type => :integration do
       })
       json.should == {
         'allow_student_discussion_topics' => true,
-        'allow_student_forum_attachments' => false
+        'allow_student_forum_attachments' => false,
+        'allow_student_discussion_editing' => true
       }
     end
 
@@ -1291,15 +1292,18 @@ describe CoursesController, :type => :integration do
         :format => 'json'
       }, {
         :allow_student_discussion_topics => false,
-        :allow_student_forum_attachments => true
+        :allow_student_forum_attachments => true,
+        :allow_student_discussion_editing => false
       })
       json.should == {
         'allow_student_discussion_topics' => false,
-        'allow_student_forum_attachments' => true
+        'allow_student_forum_attachments' => true,
+        'allow_student_discussion_editing' => false
       }
       @course.reload
       @course.allow_student_discussion_topics.should == false
       @course.allow_student_forum_attachments.should == true
+      @course.allow_student_discussion_editing.should == false
     end
 
   end

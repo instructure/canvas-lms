@@ -548,6 +548,7 @@ class CoursesController < ApplicationController
   #   {
   #     "allow_student_discussion_topics": true,
   #     "allow_student_forum_attachments": false,
+  #     "allow_student_discussion_editing": true
   #   }
   include Api::V1::Course
   def settings
@@ -589,6 +590,7 @@ class CoursesController < ApplicationController
   #
   # - `allow_student_discussion_topics` (true|false)
   # - `allow_student_forum_attachments` (true|false)
+  # - `allow_student_discussion_editing` (true|false)
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id>/settings \ 
@@ -599,14 +601,11 @@ class CoursesController < ApplicationController
     return unless api_request?
     @course = api_find(Course, params[:course_id])
     return unless authorized_action(@course, @current_user, :update)
-    bool_settings = [ :allow_student_discussion_topics,
-                      :allow_student_forum_attachments ]
-    bool_settings.each do |setting|
-      unless params[setting].nil?
-        @course.send("#{setting}=", value_to_boolean(params[setting]))
-      end
-    end
-    @course.save
+    @course.update_attributes params.slice(
+      :allow_student_discussion_topics,
+      :allow_student_forum_attachments,
+      :allow_student_discussion_editing
+    )
     render :json => course_settings_json(@course)
   end
 
