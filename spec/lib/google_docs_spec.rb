@@ -42,6 +42,7 @@ describe GoogleDocs do
 
   let(:xml_doc_list_empty)      { load_fixture("doc_list_empty.xml") }
   let(:xml_doc_list_one)        { load_fixture("doc_list_one.xml") }
+  let(:xml_doc_list_many)        { load_fixture("doc_list_many.xml") }
   let(:xml_create_doc_request)  { load_fixture("create_doc_request.xml") }
   let(:xml_create_doc_response) { load_fixture("create_doc_response.xml") }
   let(:xml_delete_doc_request)  { load_fixture("delete_doc_request.xml") }
@@ -61,6 +62,17 @@ describe GoogleDocs do
     )
   end
 
+  it "should allow a null access_token to be passed (deprecated)" do
+    body     = File.read('spec/fixtures/google_docs/doc_list.xml')
+    token    = mock()
+    token.expects(:get).
+      with('https://docs.google.com/feeds/documents/private/full').
+      returns(Struct.new(:body).new(body))
+    lib.expects(:google_docs_retrieve_access_token).returns(token)
+
+    lib.google_doc_list_deprecated(nil)
+  end
+
   it "should allow a null access_token to be passed" do
     body     = File.read('spec/fixtures/google_docs/doc_list.xml')
     token    = mock()
@@ -69,21 +81,48 @@ describe GoogleDocs do
       returns(Struct.new(:body).new(body))
     lib.expects(:google_docs_retrieve_access_token).returns(token)
 
-    lib.google_doc_list(nil)
+    lib.google_docs_list(nil)
   end
 
   describe "documents" do
+    it "can be an empty list (deprecated)" do
+      prepare_mock_get xml_doc_list_empty
+
+      document_id_list = lib.google_doc_list_deprecated.files.map(&:document_id)
+      document_id_list.should == []
+    end
+
     it "can be an empty list" do
       prepare_mock_get xml_doc_list_empty
 
-      document_id_list = lib.google_doc_list.files.map(&:document_id)
+      document_id_list = lib.google_docs_list.files.map(&:document_id)
       document_id_list.should == []
+    end
+
+    it "can be listed (deprecated)" do
+      prepare_mock_get xml_doc_list_one
+      list = lib.google_doc_list_deprecated
+      document_id_list = list.files.map(&:document_id)
+      document_id_list.should == ["document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA"]
     end
 
     it "can be listed" do
       prepare_mock_get xml_doc_list_one
-      document_id_list = lib.google_doc_list.files.map(&:document_id)
+      list = lib.google_docs_list
+      document_id_list = list.files.map(&:document_id)
       document_id_list.should == ["document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA"]
+    end
+
+    it "can folderize the list" do
+      prepare_mock_get xml_doc_list_many
+      root_folder = lib.google_docs_list
+      root_folder.should be_a(GoogleDocs::Folder)
+      root_folder.name.should == '/'
+      root_folder.folders.size.should == 1
+      root_folder.folders.map{ |f| f.name }.should == ["Good Stuff"]
+      root_folder.folders.first.files.size.should == 1
+      root_folder.folders.first.files.map(&:display_name).should == ["2012 Employee Review Form"]
+      root_folder.files.size.should == 10
     end
 
     it "can be created" do

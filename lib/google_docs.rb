@@ -104,9 +104,12 @@ module GoogleDocs
     end
   end
 
-  def google_doc_list(access_token = nil, only_extensions = nil)
+  # This can be removed as soon as our assignment submission page lazy loads
+  # the list of google docs.
+  def google_doc_list_deprecated(access_token = nil, only_extensions = nil)
     access_token ||= google_docs_retrieve_access_token
-    docs = Atom::Feed.load_feed(access_token.get('https://docs.google.com/feeds/documents/private/full').body)
+    response = access_token.get('https://docs.google.com/feeds/documents/private/full')
+    docs = Atom::Feed.load_feed(response.body)
     folders, entries = [[], []]
 
     docs.entries.each do |entry|
@@ -131,6 +134,77 @@ module GoogleDocs
     res.folders = folders
 
     res
+  end
+
+  class Folder
+    attr_reader :name, :folders, :files
+
+    def initialize(name, folders=[], files=[])
+      @name = name
+      # File objects are GoogleDocEntry objects
+      @folders, @files = folders, files
+    end
+
+    def add_file(file)
+      @files << file
+    end
+
+    def add_folder(folder)
+      @folders << folder
+    end
+
+    def select(&block)
+      Folder.new(@name,
+        @folders.map{ |f| f.select(&block) }.select{ |f| !f.files.empty? },
+        @files.select(&block))
+    end
+
+    def map(&block)
+      @folders.map{ |f| f.map(&block) }.flatten +
+        @files.map(&block)
+    end
+
+    def to_hash
+      {
+        "name" => @name,
+        "folders" => @folders.map{ |sf| sf.to_hash },
+        "files" => @files.map{ |f| f.to_hash }
+      }
+    end
+  end
+
+  def google_doc_fetch_list(access_token)
+    response = access_token.get('https://docs.google.com/feeds/documents/private/full')
+    Atom::Feed.load_feed(response.body)
+  end
+
+  def google_doc_folderize_list(docs)
+    root = Folder.new('/')
+    folders = { nil => root }
+
+    docs.entries.each do |entry|
+      entry = GoogleDocEntry.new(entry)
+      if !folders.has_key?(entry.folder)
+        folder = Folder.new(entry.folder)
+        root.add_folder folder
+        folders[entry.folder] = folder
+      else
+        folder = folders[entry.folder]
+      end
+      folder.add_file entry
+    end
+
+    return root
+  end
+
+  def google_docs_list(access_token=nil)
+    access_token ||= google_docs_retrieve_access_token
+    google_doc_folderize_list(google_doc_fetch_list(access_token))
+  end
+
+  def google_docs_list_with_extension_filter(extensions, access_token=nil)
+    access_token ||= google_docs_retrieve_access_token
+    google_docs_list(access_token).select{ |e| extensions.include?(e.extension) }
   end
 
   def google_consumer(key = GoogleDocs.config['api_key'], secret = GoogleDocs.config['secret_key'])

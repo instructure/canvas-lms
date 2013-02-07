@@ -90,7 +90,7 @@ class AssignmentsController < ApplicationController
       # prevent masquerading users from accessing google docs
       if @assignment.allow_google_docs_submission? && @real_current_user.blank?
         # TODO: make this happen asynchronously via ajax, and only if the user selects the google docs tab
-        @google_docs = google_doc_list(nil, @assignment.allowed_extensions) rescue nil
+        @google_docs = google_doc_list_deprecated(nil, @assignment.allowed_extensions) rescue nil
       end
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
@@ -110,6 +110,25 @@ class AssignmentsController < ApplicationController
         end
         format.json { render :json => @assignment.to_json(:permissions => {:user => @current_user, :session => session}) }
       end
+    end
+  end
+
+  def list_google_docs
+    assignment ||= @context.assignments.find(params[:id])
+    # prevent masquerading users from accessing google docs
+    if assignment.allow_google_docs_submission? && @real_current_user.blank?
+      begin
+        docs = google_docs_list_with_extension_filter(assignment.allowed_extensions)
+      rescue => e
+        ErrorReport.log_exception(:oauth, e)
+        raise e
+      end
+      format.json { render :json => docs.to_hash }
+    else
+      error_object = {:errors =>
+        {:base => t('errors.google_docs_masquerade_rejected', "Unable to connect to Google Docs as a masqueraded user.")}
+      }
+      format.json { render :json => error_object.to_json, :status => :bad_request }
     end
   end
   
