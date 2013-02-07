@@ -35,10 +35,10 @@ describe SearchController, :type => :integration do
               { :controller => 'search', :action => 'recipients', :format => 'json', :search => 'o' })
       json.each { |c| c.delete("avatar_url") }
       json.should eql [
-        {"id" => "course_#{@course.id}", "name" => "the course", "type" => "context", "user_count" => 6},
-        {"id" => "section_#{@other_section.id}", "name" => "the other section", "type" => "context", "user_count" => 1, "context_name" => "the course"},
-        {"id" => "section_#{@course.default_section.id}", "name" => "the section", "type" => "context", "user_count" => 5, "context_name" => "the course"},
-        {"id" => "group_#{@group.id}", "name" => "the group", "type" => "context", "user_count" => 3, "context_name" => "the course"},
+        {"id" => "course_#{@course.id}", "name" => "the course", "type" => "context", "user_count" => 6, "permissions" => {}},
+        {"id" => "section_#{@other_section.id}", "name" => "the other section", "type" => "context", "user_count" => 1, "context_name" => "the course", "permissions" => {}},
+        {"id" => "section_#{@course.default_section.id}", "name" => "the section", "type" => "context", "user_count" => 5, "context_name" => "the course", "permissions" => {}},
+        {"id" => "group_#{@group.id}", "name" => "the group", "type" => "context", "user_count" => 3, "context_name" => "the course", "permissions" => {}},
         {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
         {"id" => @joe.id, "name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
         {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
@@ -210,8 +210,8 @@ describe SearchController, :type => :integration do
                 { :controller => 'search', :action => 'recipients', :format => 'json', :context => "course_#{@course.id}", :synthetic_contexts => "1" })
         json.each { |c| c.delete("avatar_url") }
         json.should eql [
-          {"id" => "course_#{@course.id}_teachers", "name" => "Teachers", "type" => "context", "user_count" => 1},
-          {"id" => "course_#{@course.id}_students", "name" => "Students", "type" => "context", "user_count" => 5},
+          {"id" => "course_#{@course.id}_teachers", "name" => "Teachers", "type" => "context", "user_count" => 1, "permissions" => {}},
+          {"id" => "course_#{@course.id}_students", "name" => "Students", "type" => "context", "user_count" => 5, "permissions" => {}},
           {"id" => "course_#{@course.id}_sections", "name" => "Course Sections", "type" => "context", "item_count" => 2},
           {"id" => "course_#{@course.id}_groups", "name" => "Student Groups", "type" => "context", "item_count" => 1}
         ]
@@ -222,8 +222,8 @@ describe SearchController, :type => :integration do
                 { :controller => 'search', :action => 'recipients', :format => 'json', :context => "section_#{@course.default_section.id}", :synthetic_contexts => "1" })
         json.each { |c| c.delete("avatar_url") }
         json.should eql [
-          {"id" => "section_#{@course.default_section.id}_teachers", "name" => "Teachers", "type" => "context", "user_count" => 1},
-          {"id" => "section_#{@course.default_section.id}_students", "name" => "Students", "type" => "context", "user_count" => 4}
+          {"id" => "section_#{@course.default_section.id}_teachers", "name" => "Teachers", "type" => "context", "user_count" => 1, "permissions" => {}},
+          {"id" => "section_#{@course.default_section.id}_students", "name" => "Students", "type" => "context", "user_count" => 4, "permissions" => {}}
         ]
       end
 
@@ -232,7 +232,7 @@ describe SearchController, :type => :integration do
                 { :controller => 'search', :action => 'recipients', :format => 'json', :context => "course_#{@course.id}_groups", :synthetic_contexts => "1" })
         json.each { |c| c.delete("avatar_url") }
         json.should eql [
-          {"id" => "group_#{@group.id}", "name" => "the group", "type" => "context", "user_count" => 3}
+          {"id" => "group_#{@group.id}", "name" => "the group", "type" => "context", "user_count" => 3, "permissions" => {}}
         ]
       end
 
@@ -241,8 +241,34 @@ describe SearchController, :type => :integration do
                 { :controller => 'search', :action => 'recipients', :format => 'json', :context => "course_#{@course.id}_sections", :synthetic_contexts => "1" })
         json.each { |c| c.delete("avatar_url") }
         json.should eql [
-          {"id" => "section_#{@other_section.id}", "name" => @other_section.name, "type" => "context", "user_count" => 1},
-          {"id" => "section_#{@course.default_section.id}", "name" => @course.default_section.name, "type" => "context", "user_count" => 5}
+          {"id" => "section_#{@other_section.id}", "name" => @other_section.name, "type" => "context", "user_count" => 1, "permissions" => {}},
+          {"id" => "section_#{@course.default_section.id}", "name" => @course.default_section.name, "type" => "context", "user_count" => 5, "permissions" => {}}
+        ]
+      end
+    end
+
+    context "permissions" do
+      it "should return valid permission data" do
+        json = api_call(:get, "/api/v1/search/recipients.json?search=the%20o&permissions[]=send_messages_all",
+                { :controller => 'search', :action => 'recipients', :format => 'json', :search => 'the o', :permissions => ["send_messages_all"] })
+        json.each { |c| c.delete("avatar_url") }
+        json.should eql [
+          {"id" => "course_#{@course.id}", "name" => "the course", "type" => "context", "user_count" => 6, "permissions" => {"send_messages_all" => true}},
+          {"id" => "section_#{@other_section.id}", "name" => "the other section", "type" => "context", "user_count" => 1, "context_name" => "the course", "permissions" => {"send_messages_all" => true}},
+          {"id" => "section_#{@course.default_section.id}", "name" => "the section", "type" => "context", "user_count" => 5, "context_name" => "the course", "permissions" => {"send_messages_all" => true}},
+          {"id" => "group_#{@group.id}", "name" => "the group", "type" => "context", "user_count" => 3, "context_name" => "the course", "permissions" => {"send_messages_all" => true}}
+        ]
+      end
+
+      it "should not return invalid permission data" do
+        json = api_call(:get, "/api/v1/search/recipients.json?search=the%20o&permissions[]=foo_bar",
+                { :controller => 'search', :action => 'recipients', :format => 'json', :search => 'the o', :permissions => ["foo_bar"] })
+        json.each { |c| c.delete("avatar_url") }
+        json.should eql [
+          {"id" => "course_#{@course.id}", "name" => "the course", "type" => "context", "user_count" => 6, "permissions" => {}},
+          {"id" => "section_#{@other_section.id}", "name" => "the other section", "type" => "context", "user_count" => 1, "context_name" => "the course", "permissions" => {}},
+          {"id" => "section_#{@course.default_section.id}", "name" => "the section", "type" => "context", "user_count" => 5, "context_name" => "the course", "permissions" => {}},
+          {"id" => "group_#{@group.id}", "name" => "the group", "type" => "context", "user_count" => 3, "context_name" => "the course", "permissions" => {}}
         ]
       end
     end

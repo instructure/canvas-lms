@@ -95,7 +95,7 @@ module SearchHelper
     permissions = options[:permissions] || []
     @contexts.each do |type, contexts|
       contexts.each do |id, context|
-        context[:permissions] ||= {}
+        context[:permissions] = HashWithIndifferentAccess.new(context[:permissions] || {})
         context[:permissions].slice!(*permissions) unless permissions == :all
       end
     end

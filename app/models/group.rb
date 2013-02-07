@@ -319,6 +319,7 @@ class Group < ActiveRecord::Base
     can :read and 
     can :read_roster and
     can :send_messages and
+    can :send_messages_all and
     can :follow
 
     # if I am a member of this group and I can moderate_forum in the group's context

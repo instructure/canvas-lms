@@ -45,10 +45,13 @@ define [
       options = $.extend true, {}, @defaults(), options
       @prefixUserIds = options.prefixUserIds
       @contexts = options.contexts
+      @canToggle = options.canToggle if options.canToggle
       super $node, options
 
     populator: (selector, $node, data, options={}) =>
       data.id = "#{data.id}"
+      data.type ?= 'user'
+      
       if data.avatar_url
         $img = $('<img class="avatar" />')
         $img.attr('src', data.avatar_url)
@@ -61,7 +64,7 @@ define [
       $span = $('<span />', class: 'details')
       if data.common_courses?
         $span.html(@contextList(courses: data.common_courses, groups: data.common_groups))
-      else if data.type and data.user_count?
+      else if data.user_count?
         $span.text(I18n.t('people_count', 'person', {count: data.user_count}))
       else if data.item_count?
         if data.id.match(/_groups$/)
@@ -82,13 +85,16 @@ define [
       $node.data('id', if data.type is 'context' or not @prefixUserIds then data.id else "user_#{data.id}")
       data.rootId = options.ancestors[0]
       $node.data('user_data', data)
-      $node.addClass(if data.type then data.type else 'user')
+      $node.addClass(data.type)
       if options.level > 0 and selector.options.showToggles
         $node.prepend('<a class="toggle"><i></i></a>')
-        $node.addClass('toggleable') unless data.item_count # can't toggle certain synthetic contexts, e.g. "Student Groups"
-      if data.type == 'context' and not data.noExpand
+        $node.addClass('toggleable') if @canToggle(data)
+      if data.type is 'context' and not data.noExpand
         $node.prepend('<a class="expand"><i></i></a>')
         $node.addClass('expandable')
+
+    canToggle: (data) ->
+      not data.item_count # can't toggle certain synthetic contexts, e.g. "Student Groups"
 
     buildContextInfo: (data) =>
       match = data.id.match(/^(course|section)_(\d+)$/)
