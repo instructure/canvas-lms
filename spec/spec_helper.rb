@@ -157,8 +157,6 @@ Spec::Runner.configure do |config|
     Canvas.redis_used = false
   end
 
-  def use_remote_services; ENV['ACTUALLY_TALK_TO_REMOTE_SERVICES'].to_i > 0; end
-
   def account_with_cas(opts={})
     @account = opts[:account]
     @account ||= Account.create!
