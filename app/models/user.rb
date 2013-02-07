@@ -1817,7 +1817,7 @@ class User < ActiveRecord::Base
       due_between_with_overrides(Time.now.utc, opts[:end_at]).
       include_submitted_count.
       map {|a| a.overridden_for(self)}.
-      select {|a| a.due_at >= Time.now.utc && a.due_at <= opts[:end_at]}.
+      select {|a| a.due_at && a.due_at >= Time.now.utc && a.due_at <= opts[:end_at]}.
       first(opts[:limit])
     appointment_groups = AppointmentGroup.manageable_by(self, context_codes).intersecting(Time.now.utc, opts[:end_at]).scoped(:limit => opts[:limit])
     appointment_groups.each { |ag| ag.context = ag.contexts_for_user(self).first }
