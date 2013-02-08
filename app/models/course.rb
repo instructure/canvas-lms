@@ -1077,13 +1077,16 @@ class Course < ActiveRecord::Base
   def enrollment_allows(user, session, permission)
     return false unless user && permission
 
+    temp_type = session && session["role_course_#{self.id}"]
+
     @enrollment_lookup ||= {}
-    @enrollment_lookup[user.id] ||=
-      if session && temp_type = session["role_course_#{self.id}"]
+    @enrollment_lookup[user.id] ||= shard.activate do
+      if temp_type
         [Enrollment.typed_enrollment(temp_type).new(:course => self, :user => user, :workflow_state => 'active')]
       else
         self.enrollments.active_or_pending.for_user(user).reject { |e| [:inactive, :completed].include?(e.state_based_on_date)}
       end
+    end
 
     @enrollment_lookup[user.id].any? {|e| e.has_permission_to?(permission) }
   end
