@@ -99,7 +99,8 @@ end
 module ActiveRecord::Associations
   %w{HasManyAssociation HasManyThroughAssociation}.each do |klass|
     const_get(klass).class_eval do
-      def with_each_shard(options = nil)
+      def with_each_shard(*shards_or_options)
+        options = shards_or_options.pop if shards_or_options.last.is_a?(Hash)
         scope = self
         scope = self.scoped(options) if options
         scope = yield(scope) if block_given?
