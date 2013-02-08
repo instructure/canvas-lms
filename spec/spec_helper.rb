@@ -180,15 +180,18 @@ Spec::Runner.configure do |config|
   end
 
   def course(opts={})
-    @course = Course.create!(:name => opts[:course_name], :account => opts[:account])
-    @course.offer! if opts[:active_course] || opts[:active_all]
-    if opts[:active_all]
-      u = User.create!
-      u.register!
-      e = @course.enroll_teacher(u)
-      e.workflow_state = 'active'
-      e.save!
-      @teacher = u
+    account = opts[:account] || Account.default
+    account.shard.activate do
+      @course = Course.create!(:name => opts[:course_name], :account => account)
+      @course.offer! if opts[:active_course] || opts[:active_all]
+      if opts[:active_all]
+        u = User.create!
+        u.register!
+        e = @course.enroll_teacher(u)
+        e.workflow_state = 'active'
+        e.save!
+        @teacher = u
+      end
     end
     @course
   end
@@ -205,9 +208,12 @@ Spec::Runner.configure do |config|
   end
 
   def account_admin_user(opts={:active_user => true})
-    @user = opts[:user] || user(opts)
+    account = opts[:account] || Account.default
+    @user = opts[:user] || account.shard.activate{ user(opts) }
     @admin = @user
-    @user.account_users.create(:account => opts[:account] || Account.default, :membership_type => opts[:membership_type] || 'AccountAdmin')
+    account_user = @user.account_users.build(:account => account, :membership_type => opts[:membership_type] || 'AccountAdmin')
+    account_user.shard = account.shard
+    account_user.save!
     @user
   end
 
@@ -287,7 +293,7 @@ Spec::Runner.configure do |config|
 
   def course_with_user(enrollment_type, opts={})
     @course = opts[:course] || course(opts)
-    @user = opts[:user] || user(opts)
+    @user = opts[:user] || @course.shard.activate{ user(opts) }
     @enrollment = @course.enroll_user(@user, enrollment_type, opts)
     @enrollment.course = @course # set the reverse association
     if opts[:active_enrollment] || opts[:active_all]
