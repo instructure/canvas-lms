@@ -1526,7 +1526,10 @@ class Course < ActiveRecord::Base
     end
     e.user = user
     self.claim if self.created? && e && e.admin?
-    user.try(:touch) unless opts[:skip_touch_user]
+    unless opts[:skip_touch_user]
+      e.associated_user.try(:touch)
+      user.try(:touch)
+    end
     user.try(:reload)
     e
  end
