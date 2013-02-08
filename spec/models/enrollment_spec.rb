@@ -1194,61 +1194,78 @@ describe Enrollment do
     context "sharding" do
       it_should_behave_like "sharding"
 
-      before do
-        Enrollment.stubs(:cross_shard_invitations?).returns(true)
-        course(:active_all => 1)
-        user
-        @user.update_attribute(:workflow_state, 'creation_pending')
-        @user.communication_channels.create!(:path => 'jt@instructure.com')
-        @enrollment1 = @course.enroll_user(@user)
-        @shard1.activate do
-          account = Account.create!
-          course(:active_all => 1, :account => account)
+      describe "limit_privileges_to_course_section!" do
+        it "should use the right shard to find the enrollments" do
+          @shard1.activate do
+            account = Account.create!
+            course_with_student(:active_all => true, :account => account)
+          end
+
+          @shard2.activate do
+            Enrollment.limit_privileges_to_course_section!(@course, @user, true)
+          end
+
+          @enrollment.reload.limit_privileges_to_course_section.should be_true
+        end
+      end
+
+      describe "cached_temporary_invitations" do
+        before do
+          Enrollment.stubs(:cross_shard_invitations?).returns(true)
+          course(:active_all => 1)
           user
           @user.update_attribute(:workflow_state, 'creation_pending')
           @user.communication_channels.create!(:path => 'jt@instructure.com')
-          @enrollment2 = @course.enroll_user(@user)
-        end
-
-        pending "working CommunicationChannel.associated_shards" unless CommunicationChannel.associated_shards('jt@instructure.com').length == 2
-      end
-
-      it "should include invitations from other shards" do
-        Enrollment.cached_temporary_invitations('jt@instructure.com').sort_by(&:global_id).should == [@enrollment1, @enrollment2].sort_by(&:global_id)
-        @shard1.activate do
-          Enrollment.cached_temporary_invitations('jt@instructure.com').sort_by(&:global_id).should == [@enrollment1, @enrollment2].sort_by(&:global_id)
-        end
-        @shard2.activate do
-          Enrollment.cached_temporary_invitations('jt@instructure.com').sort_by(&:global_id).should == [@enrollment1, @enrollment2].sort_by(&:global_id)
-        end
-      end
-
-      it "should have a single cache for all shards" do
-        enable_cache do
-          @shard2.activate do
-            Enrollment.cached_temporary_invitations('jt@instructure.com').sort_by(&:global_id).should == [@enrollment1, @enrollment2].sort_by(&:global_id)
+          @enrollment1 = @course.enroll_user(@user)
+          @shard1.activate do
+            account = Account.create!
+            course(:active_all => 1, :account => account)
+            user
+            @user.update_attribute(:workflow_state, 'creation_pending')
+            @user.communication_channels.create!(:path => 'jt@instructure.com')
+            @enrollment2 = @course.enroll_user(@user)
           end
-          Shard.expects(:with_each_shard).never
+
+          pending "working CommunicationChannel.associated_shards" unless CommunicationChannel.associated_shards('jt@instructure.com').length == 2
+        end
+
+        it "should include invitations from other shards" do
+          Enrollment.cached_temporary_invitations('jt@instructure.com').sort_by(&:global_id).should == [@enrollment1, @enrollment2].sort_by(&:global_id)
           @shard1.activate do
             Enrollment.cached_temporary_invitations('jt@instructure.com').sort_by(&:global_id).should == [@enrollment1, @enrollment2].sort_by(&:global_id)
           end
-          Enrollment.cached_temporary_invitations('jt@instructure.com').sort_by(&:global_id).should == [@enrollment1, @enrollment2].sort_by(&:global_id)
-        end
-      end
-
-      it "should invalidate the cache from any shard" do
-        enable_cache do
           @shard2.activate do
             Enrollment.cached_temporary_invitations('jt@instructure.com').sort_by(&:global_id).should == [@enrollment1, @enrollment2].sort_by(&:global_id)
-            @enrollment2.reject!
           end
-          @shard1.activate do
-            Enrollment.cached_temporary_invitations('jt@instructure.com').should == [@enrollment1]
-            @enrollment1.reject!
-          end
-          Enrollment.cached_temporary_invitations('jt@instructure.com').should == []
         end
 
+        it "should have a single cache for all shards" do
+          enable_cache do
+            @shard2.activate do
+              Enrollment.cached_temporary_invitations('jt@instructure.com').sort_by(&:global_id).should == [@enrollment1, @enrollment2].sort_by(&:global_id)
+            end
+            Shard.expects(:with_each_shard).never
+            @shard1.activate do
+              Enrollment.cached_temporary_invitations('jt@instructure.com').sort_by(&:global_id).should == [@enrollment1, @enrollment2].sort_by(&:global_id)
+            end
+            Enrollment.cached_temporary_invitations('jt@instructure.com').sort_by(&:global_id).should == [@enrollment1, @enrollment2].sort_by(&:global_id)
+          end
+        end
+
+        it "should invalidate the cache from any shard" do
+          enable_cache do
+            @shard2.activate do
+              Enrollment.cached_temporary_invitations('jt@instructure.com').sort_by(&:global_id).should == [@enrollment1, @enrollment2].sort_by(&:global_id)
+              @enrollment2.reject!
+            end
+            @shard1.activate do
+              Enrollment.cached_temporary_invitations('jt@instructure.com').should == [@enrollment1]
+              @enrollment1.reject!
+            end
+            Enrollment.cached_temporary_invitations('jt@instructure.com').should == []
+          end
+
+        end
       end
     end
   end
