@@ -23,6 +23,7 @@ define ['Backbone', 'jst/searchView'], (Backbone, template) ->
       @inputFilterView.on 'enter', @fetchResults
 
     fetchResults: (query) =>
+      @lastRequest?.abort()
       @collection.setParam 'search_term', query
-      @collection.fetch()
+      @lastRequest = @collection.fetch()
 

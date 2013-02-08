@@ -166,8 +166,8 @@ define [
     #
     # 1. `@model.present()`
     # 2. `@model.toJSON()`
-    # 3. `@colleciton.present()`
-    # 4. `@colleciton.toJSON()`
+    # 3. `@collection.present()`
+    # 4. `@collection.toJSON()`
     # 5. `@options`
     #
     # Using `present` is encouraged so that when a model or collection is saved
@@ -240,7 +240,7 @@ define [
     #   class RecentItemsView
     #     events:
     #       'click .header': 'expand'
-    #       'click .something a': 'stopPropagation'
+    #       'click .header a': 'stopPropagation'
     #
     # @param {$Event} event
     # @api public
