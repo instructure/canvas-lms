@@ -17,12 +17,15 @@
 #
 
 class GradeCalculator
+  attr_accessor :submissions
   
-  def initialize(user_ids, course_id, opts = {})
+  def initialize(user_ids, course, opts = {})
     opts = opts.reverse_merge(:ignore_muted => true)
 
-    @course_id = course_id
-    @course = Course.find(course_id)
+    @course = course.is_a?(Course) ?
+      @course = course :
+      @course = Course.find(course)
+    @course_id = @course.id
     @groups = @course.assignment_groups.active
     @assignments = @course.assignments.active.only_graded
     @user_ids = Array(user_ids).map(&:to_i)
@@ -39,11 +42,12 @@ class GradeCalculator
 
   # recomputes the scores and saves them to each user's Enrollment
   def compute_scores
-    all_submissions = @course.submissions.for_user(@user_ids).to_a
+    @submissions = @course.submissions.for_user(@user_ids)
+    submissions_by_user = @submissions.group_by(&:user_id)
     @user_ids.map do |user_id|
-      submissions = all_submissions.select { |submission| submission.user_id == user_id }
-      current = calculate_current_score(user_id, submissions)
-      final = calculate_final_score(user_id, submissions)
+      user_submissions = submissions_by_user[user_id] || []
+      current = calculate_current_score(user_id, user_submissions)
+      final = calculate_final_score(user_id, user_submissions)
       [current, final]
     end
   end
