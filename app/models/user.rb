@@ -2464,10 +2464,10 @@ class User < ActiveRecord::Base
   def find_pseudonym_for_account(account, allow_implicit = false)
     # try to find one that's already loaded if possible
     if self.pseudonyms.loaded?
-      p = self.pseudonyms.detect { |p| p.active? && p.works_for_account?(account, allow_implicit) }
-      return p if p
+      self.pseudonyms.detect { |p| p.active? && p.works_for_account?(account, allow_implicit) }
+    else
+      self.all_active_pseudonyms.detect { |p| p.works_for_account?(account, allow_implicit) }
     end
-    self.all_active_pseudonyms.detect { |p| p.works_for_account?(account, allow_implicit) }
   end
 
   # account = the account that you want a pseudonym for

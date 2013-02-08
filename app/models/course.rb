@@ -1375,13 +1375,16 @@ class Course < ActiveRecord::Base
     includes = [:user, :course_section]
     includes = {:user => :pseudonyms, :course_section => []} if options[:include_sis_id]
     scope = options[:user] ? self.enrollments_visible_to(options[:user]) : self.student_enrollments
-    student_enrollments = scope.order_by_sortable_name(:include => includes)
-    # remove duplicate enrollments for students enrolled in multiple sections
-    seen_users = []
-    student_enrollments.reject! { |e| seen_users.include?(e.user_id) ? true : (seen_users << e.user_id; false) }
-    submissions = self.submissions.inject({}) { |h, sub|
-      h[[sub.user_id, sub.assignment_id]] = sub; h
-    }
+    student_enrollments = scope.order_by_sortable_name(:include => includes) # remove duplicate enrollments for students enrolled in multiple sections
+    student_enrollments = student_enrollments.all.uniq_by(&:user_id)
+
+    calc = GradeCalculator.new(student_enrollments.map(&:user_id), self,
+                               :ignore_muted => false)
+    grades = calc.compute_scores
+
+    submissions = {}
+    calc.submissions.each { |s| submissions[[s.user_id, s.assignment_id]] = s }
+
     read_only = t('csv.read_only_field', '(read only)')
     t 'csv.student', 'Student'
     t 'csv.id', 'ID'
@@ -1442,10 +1445,7 @@ class Course < ActiveRecord::Base
         row << student_section
         row.concat(student_submissions)
 
-        calc = GradeCalculator.new([student.id],
-                                   student_enrollment.course_id,
-                                   :ignore_muted => false)
-        current_score, final_score = calc.compute_scores.first
+        current_score, final_score = grades.shift
         row.concat [current_score, final_score]
         if self.grading_standard_enabled?
           row.concat([score_to_grade(final_score)])
@@ -1469,8 +1469,9 @@ class Course < ActiveRecord::Base
 
   def score_to_grade(score)
     return nil unless self.grading_standard_enabled? && score
-    scheme = self.grading_standard.try(:data) || GradingStandard.default_grading_standard
-    GradingStandard.score_to_grade(scheme, score)
+    @scheme ||= self.grading_standard.try(:data) ||
+                GradingStandard.default_grading_standard
+    GradingStandard.score_to_grade(@scheme, score)
   end
 
   def participants(include_observers=false)
