@@ -186,6 +186,11 @@ namespace :i18n do
     file_translations = {}
 
     locales = I18n.available_locales - [:en]
+    # allow passing of extra, empty locales by including a comma-separated
+    # list of abbreviations in the LOCALES environment variable. e.g.
+    #
+    # LOCALES=hi,ja,pt,zh-hans rake i18n:generate_js
+    locales = locales + ENV['LOCALES'].split(',') if ENV['LOCALES']
     all_translations = I18n.backend.send(:translations)
     flat_translations = all_translations.flatten_keys
 
