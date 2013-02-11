@@ -74,10 +74,16 @@ class GradebooksController < ApplicationController
             )
             # pre-cache the assignment group for each assignment object
             @assignments.each { |a| a.assignment_group = @groups.find { |g| g.id == a.assignment_group_id } }
-            # Yes, fetch *all* submissions for this course; otherwise the view will end up doing a query for each
-            # assignment in order to calculate grade distributions
-            all_submissions = @context.submissions.all(:select => "submissions.assignment_id, submissions.score, submissions.grade, submissions.quiz_submission_id")
+            all_submissions = if @context.large_roster?
+                                []
+                              else
+                                # Yes, fetch *all* submissions for this course; otherwise the view will end up doing a query for each
+                                # assignment in order to calculate grade distributions
+                                @context.submissions.all(:select => "submissions.assignment_id, submissions.score, submissions.grade, submissions.quiz_submission_id")
+                              end
+            
             @submissions_by_assignment = submissions_by_assignment(all_submissions)
+              
             @unread_submission_ids = []
           end
 
