@@ -17,7 +17,7 @@
 #
 
 class GradeCalculator
-  attr_accessor :submissions
+  attr_accessor :submissions, :assignments
   
   def initialize(user_ids, course, opts = {})
     opts = opts.reverse_merge(:ignore_muted => true)
@@ -26,8 +26,10 @@ class GradeCalculator
       @course = course :
       @course = Course.find(course)
     @course_id = @course.id
-    @groups = @course.assignment_groups.active
-    @assignments = @course.assignments.active.only_graded
+    @groups = @course.assignment_groups.active.scoped(:include => :assignments)
+    @assignments = @groups.map(&:assignments).flatten.select { |a|
+      a.graded? && a.active?
+    }
     @user_ids = Array(user_ids).map(&:to_i)
     @current_updates = []
     @final_updates = []

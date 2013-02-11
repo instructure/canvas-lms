@@ -1902,4 +1902,12 @@ class Assignment < ActiveRecord::Base
     end
     true
   end
+
+  def graded?
+    submission_types != 'not_graded'
+  end
+
+  def active?
+    workflow_state != 'deleted'
+  end
 end
