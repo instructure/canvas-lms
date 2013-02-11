@@ -170,6 +170,7 @@ class GradebooksController < ApplicationController
   end
 
   def show
+    return redirect_to polymorphic_url([@context, 'gradebook2']) unless @context.old_gradebook_visible?
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       return submissions_json if params[:updated] && request.format == :json
       return gradebook_init_json if params[:init] && request.format == :json

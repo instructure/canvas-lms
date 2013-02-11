@@ -1089,6 +1089,10 @@ class Course < ActiveRecord::Base
     !large_roster?
   end
 
+  def old_gradebook_visible?
+    !large_roster?
+  end
+
   def enrollment_allows(user, session, permission)
     return false unless user && permission
 
