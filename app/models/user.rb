@@ -1128,7 +1128,7 @@ class User < ActiveRecord::Base
         # or, if the user we are given is an admin in one of this user's accounts
         Account.site_admin.grants_right?(user, :manage_user_logins) ||
         (self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_user_logins) } &&
-         self.accounts.all? {|a| has_subset_of_account_permissions?(user, a) } )
+         self.accounts.select(&:root_account?).all? {|a| has_subset_of_account_permissions?(user, a) } )
       )
     end
     can :manage_user_details and can :manage_logins and can :rename
@@ -1145,6 +1145,7 @@ class User < ActiveRecord::Base
 
   def has_subset_of_account_permissions?(user, account)
     return true if user == self
+    return false unless account.root_account?
     account_users = account.all_account_users_for(self)
     return true if account_users.empty?
     account_users.all? do |account_user|

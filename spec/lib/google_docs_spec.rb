@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011-2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -60,6 +60,19 @@ describe GoogleDocs do
       :service_user_id => GoogleDocs.config["test_user_id"],
       :service_user_name => GoogleDocs.config["test_user_name"]
     )
+  end
+
+  it "should allow a null access_token to be passed" do
+    body     = File.read('spec/fixtures/google_docs/doc_list.xml')
+    Response = Struct.new(:body)
+    lib      = GoogleDocsTest.new(@user, nil, nil)
+    token    = mock()
+    token.expects(:get).
+      with('https://docs.google.com/feeds/documents/private/full').
+      returns(Response.new(body))
+    lib.expects(:google_docs_retrieve_access_token).returns(token)
+
+    lib.google_doc_list(nil, [])
   end
 
   it 'should add and remove documents' do

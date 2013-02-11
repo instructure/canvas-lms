@@ -910,4 +910,20 @@ describe Account do
       @sub_account.available_course_roles_by_name.should == { 'A' => @roleA, 'B' => @roleB }
     end
   end
+
+  describe "account_chain" do
+    context "sharding" do
+      it_should_behave_like "sharding"
+
+      it "should find parent accounts when not on the correct shard" do
+        @shard1.activate do
+          @account1 = Account.create!
+          @account2 = @account1.sub_accounts.create!
+          @account3 = @account2.sub_accounts.create!
+        end
+
+        @account3.account_chain.should == [@account3, @account2, @account1]
+      end
+    end
+  end
 end
