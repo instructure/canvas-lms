@@ -2835,9 +2835,12 @@ class Course < ActiveRecord::Base
     end
     class_eval <<-CODE
       def #{setting}
-        settings_frd[#{setting.inspect}].nil? && !@disable_setting_defaults ?
-          #{opts[:default].inspect} :
+        if settings_frd[#{setting.inspect}].nil? && !@disable_setting_defaults
+          default = Course.settings_options[#{setting.inspect}][:default]
+          default.respond_to?(:call) ? default.call(self) : default
+        else
           settings_frd[#{setting.inspect}]
+        end
       end
       def #{setting}=(val)
         settings_frd[#{setting.inspect}] = #{cast_expression}
@@ -2858,6 +2861,7 @@ class Course < ActiveRecord::Base
   add_setting :hide_distribution_graphs, :boolean => true
   add_setting :allow_student_discussion_topics, :boolean => true, :default => true
   add_setting :allow_student_discussion_editing, :boolean => true, :default => true
+  add_setting :large_roster, :boolean => true, :default => lambda { |c| c.root_account.large_course_rosters? }
 
   def user_can_manage_own_discussion_posts?(user)
     return true if allow_student_discussion_editing?
