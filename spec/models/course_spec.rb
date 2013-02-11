@@ -3106,7 +3106,8 @@ describe Course do
     it "should properly return site admin permissions from another shard" do
       enable_cache do
         @shard1.activate do
-          course_with_student(:active_all => 1)
+          acct = Account.create!
+          course_with_student(:active_all => 1, :account => acct)
         end
         @site_admin = user
         site_admin = Account.site_admin
