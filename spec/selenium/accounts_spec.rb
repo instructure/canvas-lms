@@ -288,8 +288,8 @@ describe "account" do
       @course_name = 'new course'
       @error_text = 'No Results Found'
 
-      course = Course.create!(:account => Account.default, :name => @course_name, :course_code => @course_name)
-      course.reload
+      @course = Course.create!(:account => Account.default, :name => @course_name, :course_code => @course_name)
+      @course.reload
       student_in_course(:name => @student_name)
       get "/accounts/#{Account.default.id}/courses"
     end
@@ -298,6 +298,22 @@ describe "account" do
       find_course_form = f('#new_course')
       submit_input(find_course_form, '#course_name', @course_name)
       f('#section-tabs-header').should include_text(@course_name)
+    end
+
+    it "should correctly autocomplete for courses" do
+      get "/accounts/#{Account.default.id}"
+      f('#course_name').send_keys(@course_name.chop)
+
+      keep_trying_until do
+        ui_auto_complete = f('.ui-autocomplete')
+        ui_auto_complete.should be_displayed
+      end
+
+      element = ff('.ui-autocomplete li a').first
+      element.text.should == @course_name
+      element.click
+
+      driver.current_url.should include("/courses/#{@course.id}")
     end
 
     it "should search for an existing user" do
