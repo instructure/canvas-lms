@@ -1369,14 +1369,6 @@ class Course < ActiveRecord::Base
   end
 
   def gradebook_to_csv(options = {})
-    if options[:assignment_id]
-      assignments = [self.assignments.active.gradeable.find(options[:assignment_id])]
-    else
-      group_order = {}
-      self.assignment_groups.active.each_with_index{|group, idx| group_order[group.id] = idx}
-      assignments = self.assignments.active.gradeable.find(:all).sort_by{|a| [a.due_at ? 1 : 0, a.due_at || 0, group_order[a.assignment_group_id] || 0, a.position || 0, a.title || ""]}
-    end
-    single = assignments.length == 1
     includes = [:user, :course_section]
     includes = {:user => :pseudonyms, :course_section => []} if options[:include_sis_id]
     scope = options[:user] ? self.enrollments_visible_to(options[:user]) : self.student_enrollments
@@ -1389,6 +1381,7 @@ class Course < ActiveRecord::Base
 
     submissions = {}
     calc.submissions.each { |s| submissions[[s.user_id, s.assignment_id]] = s }
+    assignments = calc.assignments
 
     read_only = t('csv.read_only_field', '(read only)')
     t 'csv.student', 'Student'
@@ -1406,38 +1399,36 @@ class Course < ActiveRecord::Base
       row = ["Student", "ID"]
       row.concat(["SIS User ID", "SIS Login ID"]) if options[:include_sis_id]
       row << "Section"
-      row.concat(assignments.map{|a| single ? [a.title_with_id, 'Comments'] : a.title_with_id})
+      row.concat assignments.map(&:title_with_id)
       row.concat(["Current Score", "Final Score"])
       row.concat(["Final Grade"]) if self.grading_standard_enabled?
-      csv << row.flatten
+      csv << row
 
       #Possible muted row
       if assignments.any?(&:muted)
         #This is is not translated since we look for this exact string when we upload to gradebook.
         row = ['', '', '']
         row.concat(['', '']) if options[:include_sis_id]
-        row.concat(assignments.map{|a| single ? [(a.muted ? 'Muted': ''), ''] : (a.muted ? 'Muted' : '')})
-        row.concat(['', ''])
-        row.concat(['']) if self.grading_standard_enabled?
-        csv << row.flatten
+        row.concat(assignments.map { |a| a.muted? ? 'Muted' : '' })
+        row.concat ['', '']
+        row.concat ['']  if self.grading_standard_enabled?
+        csv << row
       end
 
       #Second Row
       row = ["    Points Possible", "", ""]
       row.concat(["", ""]) if options[:include_sis_id]
-      row.concat(assignments.map{|a| single ? [a.points_possible, ''] : a.points_possible})
+      row.concat assignments.map(&:points_possible)
       row.concat([read_only, read_only])
       row.concat([read_only]) if self.grading_standard_enabled?
-      csv << row.flatten
+      csv << row
 
       student_enrollments.each do |student_enrollment|
         student = student_enrollment.user
         student_section = (student_enrollment.course_section.display_name rescue nil) || ""
         student_submissions = assignments.map do |a|
           submission = submissions[[student.id, a.id]]
-          score = submission && submission.score ? submission.score : ""
-          data = [score, ''] rescue ["", '']
-          single ? data : data[0]
+          submission.try(:score)
         end
         #Last Row
         row = [student.last_name_first, student.id]
@@ -1455,7 +1446,7 @@ class Course < ActiveRecord::Base
         if self.grading_standard_enabled?
           row.concat([score_to_grade(final_score)])
         end
-        csv << row.flatten
+        csv << row
       end
     end
   end
@@ -1539,7 +1530,7 @@ class Course < ActiveRecord::Base
     end
     user.try(:reload)
     e
- end
+  end
 
   def enroll_student(user, opts={})
     enroll_user(user, 'StudentEnrollment', opts)
