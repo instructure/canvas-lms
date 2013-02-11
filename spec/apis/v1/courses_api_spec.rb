@@ -570,6 +570,55 @@ describe CoursesController, :type => :integration do
     end
   end
 
+  it "should include term name in course list if requested" do
+
+    [@course1.enrollment_term, @course2.enrollment_term].each do |term|
+      term.start_at = 1.day.from_now
+      term.end_at = 2.days.from_now
+      term.save!
+    end
+
+    json = api_call(:get, "/api/v1/courses.json",
+                    { :controller => 'courses', :action => 'index', :format => 'json' },
+                    { :include => ['term'] })
+
+    json.should == [
+        {
+            'id' => @course1.id,
+            'name' => @course1.name,
+            'account_id' => @course1.account_id,
+            'course_code' => @course1.course_code,
+            'enrollments' => [{'type' => 'teacher', 'role' => 'TeacherEnrollment'}],
+            'sis_course_id' => nil,
+            'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
+            'hide_final_grades' => false,
+            'start_at' => nil,
+            'end_at' => nil,
+            'default_view' => 'feed',
+            'term' => {'id' => @course1.enrollment_term_id, 'name' => @course1.enrollment_term.name,
+                       'start_at' => @course1.enrollment_term.start_at.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                       'end_at' => @course1.enrollment_term.end_at.strftime('%Y-%m-%dT%H:%M:%SZ')}
+        },
+        {
+            'id' => @course2.id,
+            'name' => @course2.name,
+            'account_id' => @course2.account_id,
+            'course_code' => @course2.course_code,
+            'enrollments' => [{'type' => 'student',
+                               'role' => 'StudentEnrollment'}],
+            'sis_course_id' => 'TEST-SIS-ONE.2011',
+            'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course2.uuid}.ics" },
+            'hide_final_grades' => false,
+            'start_at' => nil,
+            'end_at' => nil,
+            'default_view' => 'wiki',
+            'term' => {'id' => @course2.enrollment_term_id, 'name' => @course2.enrollment_term.name,
+                       'start_at' => @course2.enrollment_term.start_at.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                       'end_at' => @course2.enrollment_term.end_at.strftime('%Y-%m-%dT%H:%M:%SZ')}
+        },
+    ]
+  end
+
   it "should include scores in course list if requested" do
     @course2.grading_standard_enabled = true
     @course2.save
