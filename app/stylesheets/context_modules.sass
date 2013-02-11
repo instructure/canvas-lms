@@ -1,5 +1,42 @@
 @import environment.sass
+.hide
+  display: none
 
+.unpublish-module-link
+  background: url('/images/draft_white.png') no-repeat
+  padding-left: 18px
+  margin-left: -2px
+
+.bordered.context_module
+  border-left: 3px solid #A0A1A1
+  border-right: 3px solid #A0A1A1
+
+.context_module:last-child
+  margin-bottom: 100px
+
+.context_module.unpublished_module
+  background-color: rgb(252, 250, 244)
+  border-left: 3px solid #D5B988
+  border-right: 3px solid #D5B988
+
+  .context-module-header
+    background-color: #FCF8E3
+    border: 1px solid #FBEED5
+    .name, .draft-text
+      color: rgb(163, 128, 67)
+
+  .context_module_item.context_module_item_hover, .context_module_item:hover
+    background-color: #FCF8E3
+
+  .context_module_item tr
+    border-bottom: 1px dotted #D5B988
+
+  .publish-module-link
+    background: url('/images/publish_white.png') no-repeat
+    padding-left: 18px
+    margin-left: -2px
+
+  
 /* 
  * <div class="context-modules-main-header">
  *   <h2 class="context-modules-title">Course Modules</h2>
@@ -21,6 +58,9 @@
     margin-right: 5px
     padding-left: 25px
     padding-right: 25px
+
+  .context-modules-main-toolbar .btn.btn-small:last-child
+    margin-right: 0px
 /*
  * Example Usage
  *   <ul class="context-module-toolbar">
@@ -73,6 +113,9 @@
 // collapsing and expanding modules. See context_modules.js
 .collapse_module_link, .expand_module_link
   background-color: #e4e6e8
+
+.unpublished_module .collapse_module_link, .unpublished_module .expand_module_link
+  background-color: #FCF8E3
 
 .context_module
   border: none

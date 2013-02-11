@@ -20,6 +20,7 @@ define([
   'INST' /* INST */,
   'i18n!context_modules',
   'jquery' /* $ */,
+  'compiled/views/context_modules/context_modules', /* handles the publish/unpublish state */
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* parseFromISO, time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors, errorBox */,
@@ -33,7 +34,7 @@ define([
   'vendor/date' /* Date.parse */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/sortable' /* /\.sortable/ */
-], function(INST, I18n, $) {
+], function(INST, I18n, $, ContextModulesView) {
 
   // TODO: AMD don't export global, use as module
   window.modules = (function() {
@@ -433,6 +434,10 @@ define([
   
 
   modules.initModuleManagement = function() {
+    // Create the context modules backbone view to manage the publish button. 
+    var context_modules_view = new ContextModulesView({
+      el: $("#content")
+    });
 
     $("#unlock_module_at").change(function() {
       $this = $(this);
@@ -444,6 +449,7 @@ define([
       }
     }).triggerHandler('change');
 
+    // -------- BINDING THE UPDATE EVENT -----------------
     $(".context_module").bind('update', function(event, data) {
       data.context_module.unlock_at = $.parseFromISO(data.context_module.unlock_at).datetime_formatted;
       var $module = $("#context_module_" + data.context_module.id);
@@ -451,18 +457,22 @@ define([
         data: data.context_module,
         hrefValues: ['id']
       });
+
       $module.find(".footer").fillTemplateData({
         data: data.context_module,
         hrefValues: ['id']
       });
+
       $module.find(".unlock_details").showIf(data.context_module.unlock_at && Date.parse(data.context_module.unlock_at) > new Date());
       $module.find(".footer .prerequisites").empty();
+
       for(var idx in data.context_module.prerequisites) {
         var pre = data.context_module.prerequisites[idx];
         var $pre = $("#display_criterion_blank").clone(true).removeAttr('id');
         $pre.fillTemplateData({data: pre});
         $module.find(".footer .prerequisites").append($pre.show());
       }
+
       $module.find(".context_module_items .context_module_item")
         .removeClass('progression_requirement')
         .removeClass('min_score_requirement')
@@ -471,6 +481,7 @@ define([
         .removeClass('must_submit_requirement')
         .removeClass('must_contribute_requirement')
         .find('.criterion').removeClass('defined');
+
       for(var idx in data.context_module.completion_requirements) {
         var req = data.context_module.completion_requirements[idx];
         req.criterion_type = req.type;
@@ -480,9 +491,11 @@ define([
         $item.find(".criterion").addClass('defined');
         $item.addClass(req.type + "_requirement").addClass('progression_requirement');
       }
-      $module.find(".footer.prerequisites_footer").showIf(data.context_module.prerequisites && data.context_module.prerequisites.length > 0);
+
+      $module.find(".prerequisites_footer").showIf(data.context_module.prerequisites && data.context_module.prerequisites.length > 0);
       modules.refreshModuleList();
     });
+
     $("#add_context_module_form").formSubmit({
       object_name: 'context_module',
       processData: function(data) {
@@ -516,6 +529,17 @@ define([
       success: function(data, $module) {
         $module.loadingImage('remove');
         $module.attr('id', 'context_module_' + data.context_module.id);
+
+        // Set this module up with correct data attributes
+        $module.data('module-url', "/courses/" + data.context_module.context_id + "/modules/" + data.context_module.id);
+        $module.data('workflow-state', data.context_module.workflow_state);
+        if(data.context_module.workflow_state == "unpublished"){
+          $module.find('.workflow-state-action').text("Publish");
+          $module.find('.workflow-state-icon').addClass('publish-module-link')
+                                              .removeClass('unpublish-module-link');
+          $module.addClass('unpublished_module');
+        }
+
         $("#no_context_modules_message").slideUp();
         $module.triggerHandler('update', data);
       },
@@ -523,6 +547,7 @@ define([
         $module.loadingImage('remove');
       }
     });
+
     $("#add_context_module_form .add_prerequisite_link").click(function(event) {
       event.preventDefault();
       var $form = $(this).parents("#add_context_module_form");
@@ -531,20 +556,24 @@ define([
       var $pre = $form.find("#criterion_blank").clone(true).removeAttr('id');
       $select.find("." + $module.attr('id')).remove();
       var afters = [];
+
       $("#context_modules .context_module").each(function() {
         if($(this)[0] == $module[0] || afters.length > 0) {
           afters.push($(this).getTemplateData({textValues: ['id']}).id);
         }
       });
+
       for(var idx in afters) {
         $select.find(".context_module_" + afters[idx]).attr('disabled', true);
       }
+
       $pre.find(".option").empty().append($select.show());
       $form.find(".prerequisites_list .criteria_list").append($pre).show();
       $pre.slideDown();
       $form.find(".no_prerequisites_message").hide();
       $select.focus();
     });
+
     $("#add_context_module_form .add_completion_criterion_link").click(function(event) {
       event.preventDefault();
       var $form = $(this).parents("#add_context_module_form");
@@ -704,13 +733,15 @@ define([
         }
       });
     });
+
     $(".edit_module_link").live('click', function(event) {
       event.preventDefault();
       modules.editModule($(this).parents(".context_module"));
     });
+
     $(".add_module_link").live('click', function(event) {
       event.preventDefault();
-      var $module = $("#context_module_blank").clone(true).attr('id', 'context_module_new');
+      var $module = $("#context_module_blank").clone(true).attr('id', 'context_module_new').addClass('unpublished_module');
       $("#context_modules").append($module);
         $module.find(".context_module_items").sortable(modules.sortable_module_options);
         $("#context_modules.ui-sortable").sortable('refresh');
@@ -720,6 +751,7 @@ define([
         });
       modules.editModule($module);
     });
+
     $(".add_module_item_link").live('click', function(event) {
       event.preventDefault();
       var $module = $(this).closest(".context_module");
@@ -760,6 +792,7 @@ define([
       event.preventDefault();
       var $criterion = $(this).parents(".criterion");
       var prereqs = []
+
       $(this).parents(".context_module .prerequisites .criterion").each(function() {
         if($(this)[0] != $criterion[0]) {
           var data = $(this).getTemplateData({textValues: ['id', 'type']});
@@ -767,9 +800,12 @@ define([
           prereqs.push(type + "_" + data.id);
         }
       });
+
       var url = $(this).parents(".context_module").find(".edit_module_link").attr('href');
       var data = {'context_module[prerequisites]': prereqs.join(",")}
+
       $criterion.dim();
+
       $.ajaxJSON(url, 'PUT', data, function(data) {
         $("#context_module_" + data.context_module.id).triggerHandler('update', data);
       });
