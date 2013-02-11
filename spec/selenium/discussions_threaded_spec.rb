@@ -37,6 +37,16 @@ describe "threaded discussions" do
     DiscussionEntry.last.depth.should == reply_depth
   end
 
+  it "should allow edits to entries with replies" do
+    edit_text = 'edit message '
+    entry       = @topic.discussion_entries.create!(:user => @student, :message => 'new threaded reply from student')
+    child_entry = @topic.discussion_entries.create!(:user => @student, :message => 'new threaded child reply from student', :parent_entry => entry)
+    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    wait_for_ajax_requests
+    edit_entry(entry, edit_text)
+    entry.reload.message.should match(edit_text)
+  end
+
   it "should edit a reply" do
     pending("intermittently fails")
     edit_text = 'edit message '

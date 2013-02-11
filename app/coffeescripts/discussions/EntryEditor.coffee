@@ -33,6 +33,10 @@ define [
       super
       @cancelButton.detach()
       if opts?.cancel isnt true
+        # empty replies b/c (1) their references back to the parent create
+        # a circular JSON structure, and (2) we aren't saving them here
+        # anyway.
+        @view.model.set('replies', [])
         @view.model.save
           messageNotification: I18n.t('saving', 'Saving...')
           message: @content
