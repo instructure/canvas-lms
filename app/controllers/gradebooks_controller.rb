@@ -190,14 +190,17 @@ class GradebooksController < ApplicationController
             @enrollments_hash = Hash.new{ |hash,key| hash[key] = [] }
             @context.enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.each{ |e| @enrollments_hash[e.user_id] << e }
             @students = @context.students_visible_to(@current_user).order_by_sortable_name.uniq
-            js_env :assignment_groups => assignment_groups_json
-            set_gradebook_warnings(@groups, @just_assignments)
-            if params[:view] == "simple"
-              @headers = false
-              render :action => "show_simple"
-            else
-              render :action => "show"
-            end
+          end
+
+          # this can't happen in the slave block because this may trigger
+          # writes in ContextModule
+          js_env :assignment_groups => assignment_groups_json
+          set_gradebook_warnings(@groups, @just_assignments)
+          if params[:view] == "simple"
+            @headers = false
+            render :action => "show_simple"
+          else
+            render :action => "show"
           end
         }
         format.csv {
