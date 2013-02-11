@@ -2,7 +2,7 @@ source :rubygems
 
 ONE_NINE = RUBY_VERSION >= "1.9."
 
-gem 'rails',          '2.3.16'
+gem 'rails',          '2.3.17'
 gem 'authlogic',      '2.1.3'
 #gem 'aws-s3',         '0.6.2',  :require => 'aws/s3'
 # use custom gem until pull request at https://github.com/marcel/aws-s3/pull/41
@@ -27,7 +27,7 @@ gem 'highline',       '1.6.1'
 gem 'i18n',           '0.6.0'
 gem 'icalendar',      '1.1.5'
 gem 'jammit',         '0.6.0'
-gem 'json',           '1.5.2'
+gem 'json',           '1.5.5'
 # native xml parsing, diigo
 gem 'libxml-ruby',    '2.3.2',  :require => 'xml/libxml'
 gem 'macaddr',        '1.0.0'  # macaddr 1.2.0 tries to require 'systemu' which isn't a dependency
