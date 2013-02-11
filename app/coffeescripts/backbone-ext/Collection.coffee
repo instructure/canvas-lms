@@ -36,11 +36,37 @@ define [
       contextAssetString: undefined
 
     ##
+    # Defines a key on the options object to be added as an instance property
+    # like `model`, `collection`, `el`, etc. on a Backbone.View
+    #
+    # Example:
+    #   class UserCollection extends Backbone.Collection
+    #     @optionProperty 'sections'
+    #   view = new UserCollection
+    #     sections: new SectionCollection
+    #   view.sections #=> SectionCollection
+    #
+    #  @param {String} property
+    #  @api public
+
+    @optionProperty: (property) ->
+      @__optionProperties__ = (@__optionProperties__ or []).concat [property]
+
+    ##
+    # Sets the option properties
+    #
+    # @api private
+
+    setOptionProperties: ->
+      for property in @constructor.__optionProperties__
+        @[property] = @options[property] if @options[property]?
+
+    ##
     # `options` will be merged into @defaults. Some options will become direct
     # properties of your instance, see `_directPropertyOptions`
     initialize: (models, options) ->
       @options = _.extend {}, @defaults, options
-      _.each @_directPropertyOptions, (prop) => @[prop] = @options[prop]
+      @setOptionProperties()
       super
 
     ##
@@ -49,6 +75,11 @@ define [
       @options.params ?= {}
       @options.params[name] = value
 
+    ##
+    # Deletes a parameter from @options.params
+    deleteParam: (name) ->
+      delete @options.params?[name]
+
     fetch: (options = {}) ->
       # TODO: we might want to merge options.data and options.params here instead
       options.data = @options.params if !options.data? and @options.params?
@@ -56,9 +87,9 @@ define [
 
     url: -> @_defaultUrl()
 
-    ##
-    # Options with these keys become direct members of the instance.
-    _directPropertyOptions: ['contextAssetString', 'resourceName']
+    @optionProperty 'contextAssetString'
+
+    @optionProperty 'resourceName'
 
     ##
     # In the spirit of convention over configuration, if the base API route of

@@ -10,6 +10,8 @@ define [
         multi: ['foos', 'bars']
         single: 1
 
+    @optionProperty 'foo'
+
     url: '/fake'
 
     model: Backbone.Model.extend()
@@ -30,6 +32,10 @@ define [
     collection2 = new TestCollection null, foo: 'baz'
     equal collection2.options.foo, 'baz',
       'overrides default options with instance options'
+
+  test 'optionProperty', ->
+    collection = new TestCollection foo: 'bar'
+    equal collection.foo, 'bar'
 
   test 'sends @params in request', ->
     collection = new TestCollection()
