@@ -18,22 +18,22 @@
 
 <div id="course_details_tabs" style="display:none;" class="ui-tabs-minimal">
   <ul>
-    <li><a href="#tab-details"><%= t('tabs.details', %{Course Details}) %></a></li>
-    <li><a href="#tab-sections"><%= t('tabs.sections', %{Sections}) %></a></li>
+    <li id="course_details_tab"><a href="#tab-details"><%= t('tabs.details', %{Course Details}) %></a></li>
+    <li id="sections_tab"><a href="#tab-sections"><%= t('tabs.sections', %{Sections}) %></a></li>
     <% if can_see_users %>
-      <li><a href="#tab-users" id="tab-users-link"><%= t('tabs.users', %{Users}) %></a></li>
+      <li id="users_tab"><a href="#tab-users" id="tab-users-link"><%= t('tabs.users', %{Users}) %></a></li>
     <% end %>
     <% if can_do @context, @current_user, :update %>
-      <li><a href="#tab-navigation"><%= t('tabs.navigation', %{Navigation}) %></a></li>
+      <li id="navigation_tab"><a href="#tab-navigation"><%= t('tabs.navigation', %{Navigation}) %></a></li>
     <% end %>
     <% if can_do @context, @current_user, :update %>
-      <li><a href="#tab-tools" id="tab-tools-link"><%= t('tabs.tools', %{External Tools}) %></a></li>
+      <li id="external_tools_tab"><a href="#tab-tools" id="tab-tools-link"><%= t('tabs.tools', %{External Tools}) %></a></li>
     <% end %>
     <% if publishing_enabled %>
-      <li><a href="#tab-grade-publishing" id="tab-grade-publishing-link"><%= t('tabs.grade_publishing', %{Grade Publishing}) %></a></li>
+      <li id="grade_publishing_tab"><a href="#tab-grade-publishing" id="tab-grade-publishing-link"><%= t('tabs.grade_publishing', %{Grade Publishing}) %></a></li>
     <% end %>
     <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
-      <li><a href="#tab-alerts" id="tab-alerts-link"><%= t('tabs.alerts', %{Alerts}) %></a></li>
+      <li id="alerts_tab"><a href="#tab-alerts" id="tab-alerts-link"><%= t('tabs.alerts', %{Alerts}) %></a></li>
     <% end %>
   </ul>
   <div id="tab-details">
