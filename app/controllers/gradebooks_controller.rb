@@ -29,73 +29,31 @@ class GradebooksController < ApplicationController
   before_filter { |c| c.active_tab = "grades" }
 
   def grade_summary
+    @presenter = GradeSummaryPresenter.new(@context, @current_user, params[:id])
     # do this as the very first thing, if the current user is a teacher in the course and they are not trying to view another user's grades, redirect them to the gradebook
-    if (@context.grants_right?(@current_user, nil, :manage_grades) || @context.grants_right?(@current_user, nil, :view_all_grades)) && !params[:id]
-      redirect_to_appropriate_gradebook_version
-      return
+    if @presenter.user_needs_redirection?
+      return redirect_to_appropriate_gradebook_version
     end
 
-    @observed_students = ObserverEnrollment.observed_students(@context, @current_user)
-
-    # always use id if given
-    if params[:id]
-      @student_enrollment = @context.all_student_enrollments.find_by_user_id(params[:id])
-    # otherwise try to find an observed student
-    elsif @observed_students.present?
-      # be consistent about which student we return by default
-      @student_enrollment = (@observed_students.to_a.sort_by {|e| e[0].sortable_name}.first)[1].first
-    # or just fall back to @current_user
-    else
-      @student_enrollment = @context.all_student_enrollments.find_by_user_id(@current_user.id)
+    if !@presenter.student || !@presenter.student_enrollment
+      return authorized_action(nil, @current_user, :permission_fail)
     end
 
-    @student = @student_enrollment && @student_enrollment.user
-    if !@student || !@student_enrollment
-      authorized_action(nil, @current_user, :permission_fail)
-      return
-    end
-    if authorized_action(@student_enrollment, @current_user, :read_grades)
+    if authorized_action(@presenter.student_enrollment, @current_user, :read_grades)
       log_asset_access("grades:#{@context.asset_string}", "grades", "other")
       respond_to do |format|
-        if @student
-          add_crumb(@student.name, named_context_url(@context, :context_student_grades_url, @student.id))
+        if @presenter.student
+          add_crumb(@presenter.student_name, named_context_url(@context, :context_student_grades_url, @presenter.student_id))
 
           ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
-            @groups = @context.assignment_groups.active.all
-            @assignments = @context.assignments.active.gradeable.find(:all, :include => [:assignment_overrides])
-            @assignments.collect!{|a| a.overridden_for(@student)}.sort!
-            groups_assignments =
-              groups_as_assignments(@groups, :out_of_final => true, :exclude_total => @context.hide_final_grades?)
-            @no_calculations = groups_assignments.empty?
-            @assignments.concat(groups_assignments)
-            @submissions = @context.submissions.all(
-              :conditions => {:user_id => @student.id},
-              :include => %w(submission_comments rubric_assessments assignment)
-            )
-            # pre-cache the assignment group for each assignment object
-            @assignments.each { |a| a.assignment_group = @groups.find { |g| g.id == a.assignment_group_id } }
-            all_submissions = if @context.allows_gradebook_uploads?
-                                # Yes, fetch *all* submissions for this course; otherwise the view will end up doing a query for each
-                                # assignment in order to calculate grade distributions
-                                @context.submissions.all(:select => "submissions.assignment_id, submissions.score, submissions.grade, submissions.quiz_submission_id")
-                              else
-                                []
-                              end
-            
-            @submissions_by_assignment = submissions_by_assignment(all_submissions)
-              
-            @unread_submission_ids = []
+            #run these queries on the slave database for speed
+            @presenter.assignments
+            @presenter.groups_assignments = groups_as_assignments(@presenter.groups, :out_of_final => true, :exclude_total => @context.hide_final_grades?)
+            @presenter.submissions
+            @presenter.submissions_by_assignment
           end
 
-          if @student == @current_user
-            @courses_with_grades = @student.available_courses.select{|c| c.grants_right?(@student, nil, :participate_as_student)}
-            # remember unread submissions and then mark all as read
-            @unread_submissions = @submissions.select{ |s| s.unread?(@current_user) }
-            @unread_submissions.each{ |s| s.change_read_state("read", @current_user) }
-            @unread_submission_ids = @unread_submissions.map(&:id)
-          end
-
-          submissions_json = @submissions.map { |s|
+          submissions_json = @presenter.submissions.map { |s|
             submission_json(s, s.assignment, @current_user, session)
           }
           js_env :submissions => submissions_json,
@@ -523,14 +481,6 @@ class GradebooksController < ApplicationController
   end
   private :set_gradebook_warnings
 
-  def submissions_by_assignment(submissions)
-    submissions.inject({}) do |hash, sub|
-      hash[sub.assignment_id] ||= []
-      hash[sub.assignment_id] << sub
-      hash
-    end
-  end
-  protected :submissions_by_assignment
 
   def assignment_groups_json
     @context.assignment_groups.active.map { |g|

@@ -451,6 +451,7 @@ describe UsersController do
   end
 
   context "GET 'grades'" do
+
     it "should not include designers in the teacher enrollments" do
       # teacher needs to be in two courses to get to the point where teacher
       # enrollments are queried
@@ -466,8 +467,9 @@ describe UsersController do
       get 'grades', :course_id => @course.id
       response.should be_success
 
-      assigns[:teacher_enrollments].should_not be_nil
-      teachers = assigns[:teacher_enrollments].map{ |e| e.user }
+      teacher_enrollments = assigns[:presenter].teacher_enrollments
+      teacher_enrollments.should_not be_nil
+      teachers = teacher_enrollments.map{ |e| e.user }
       teachers.should be_include(@teacher)
       teachers.should_not be_include(@designer)
     end
@@ -497,10 +499,30 @@ describe UsersController do
       run_transaction_commit_callbacks
 
       get 'grades'
-      assigns[:course_grade_summaries][@course.id].should == { :score => 70, :students => 2 }
+      assigns[:presenter].course_grade_summaries[@course.id].should == { :score => 70, :students => 2 }
+    end
+
+    context 'across shards' do
+      it_should_behave_like "sharding"
+
+      it 'loads courses from all shards' do
+        course_with_teacher_logged_in :active_all => true
+        @shard1.activate do
+          account = Account.create!
+          course = account.courses.create!
+          @e2 = course.enroll_teacher(@teacher)
+          @e2.update_attribute(:workflow_state, 'active')
+        end
+
+        get 'grades'
+        response.should be_success
+        enrollments = assigns[:presenter].teacher_enrollments
+        enrollments.should include(@e2)
+      end
+
     end
   end
-  
+
   describe "GET 'avatar_image'" do
     it "should redirect to no-pic if avatars are disabled" do
       course_with_student_logged_in(:active_all => true)

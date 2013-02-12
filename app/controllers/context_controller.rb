@@ -383,7 +383,7 @@ class ContextController < ApplicationController
 
   def roster_user
     if authorized_action(@context, @current_user, :read_roster)
-      user_id = Shard.relative_id_for(params[:id])
+      user_id = Shard.relative_id_for(params[:id], @context.shard)
       if @context.is_a?(Course)
         @membership = @context.enrollments.find_by_user_id(user_id)
         log_asset_access(@membership, "roster", "roster")

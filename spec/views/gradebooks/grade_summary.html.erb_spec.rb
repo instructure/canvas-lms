@@ -24,11 +24,7 @@ describe "/gradebooks/grade_summary" do
     course_with_student
     view_context
     a = @course.assignments.create!(:title => "some assignment")
-    assigns[:student] = @user
-    assigns[:assignments] = [a]
-    assigns[:submissions] = []
-    assigns[:courses_with_grades] = []
-    assigns[:submissions_by_assignment] = {}
+    assigns[:presenter] = GradeSummaryPresenter.new(@course, @user, nil)
     render "gradebooks/grade_summary"
     response.should_not be_nil
   end
@@ -38,11 +34,7 @@ describe "/gradebooks/grade_summary" do
     @course.hide_final_grades = true
     view_context
     a = @course.assignments.create!(:title => "some assignment")
-    assigns[:student] = @user
-    assigns[:assignments] = [a]
-    assigns[:submissions] = []
-    assigns[:courses_with_grades] = []
-    assigns[:submissions_by_assignment] = {}
+    assigns[:presenter] = GradeSummaryPresenter.new(@course, @user, nil)
     render "gradebooks/grade_summary"
     response.should_not be_nil
     page = Nokogiri('<document>' + response.body + '</document>')
@@ -56,13 +48,10 @@ describe "/gradebooks/grade_summary" do
     @user = @teacher
     view_context
     a = @course.assignments.create!(:title => "some assignment")
-    assigns[:student] = @student
-    assigns[:assignments] = [a]
-    assigns[:submissions] = []
-    assigns[:courses_with_grades] = []
-    assigns[:submissions_by_assignment] = {}
+    assigns[:presenter] = GradeSummaryPresenter.new(@course, @teacher, @student.id)
+    assigns[:presenter].student_enrollment.should_not be_nil
     render "gradebooks/grade_summary"
     response.should_not be_nil
-    response.body.should_not match /Click any score/
+    response.body.should_not match(/Click any score/)
   end
 end

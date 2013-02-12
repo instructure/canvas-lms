@@ -94,48 +94,16 @@ class UsersController < ApplicationController
     @user = User.find_by_id(params[:user_id]) if params[:user_id].present?
     @user ||= @current_user
     if authorized_action(@user, @current_user, :read)
-      @current_active_enrollments = @user.current_enrollments.scoped(:include => :course)
-      @prior_enrollments = []; @current_enrollments = []
-      @current_active_enrollments.each do |e|
-        case e.state_based_on_date
-        when :active
-          @current_enrollments << e
-        when :completed
-          #@prior_enrollments << e
-        end
-      end
-      #@prior_enrollments.concat @user.concluded_enrollments.select{|e| e.is_a?(StudentEnrollment) }
+      current_active_enrollments = @user.current_enrollments.with_each_shard { |scope| scope.scoped(:include => :course) }
 
-      @student_enrollments = @current_enrollments.
-        select{ |e| e.student? }.
-        inject({}){ |hash, e| hash[e.course] = e; hash }
+      @presenter = GradesPresenter.new(current_active_enrollments)
 
-      @observer_enrollments = @current_enrollments.select{|e| e.is_a?(ObserverEnrollment) && e.associated_user_id }
-      @observed_enrollments = []
-      @observer_enrollments.each do |e|
-        @observed_enrollments << StudentEnrollment.active.find_by_user_id_and_course_id(e.associated_user_id, e.course_id)
-      end
-      @observed_enrollments = @observed_enrollments.uniq.compact
-
-      @teacher_enrollments = @current_enrollments.select{|e| e.instructor? }
-
-      if @student_enrollments.length + @teacher_enrollments.length + @observed_enrollments.length == 1# && @prior_enrollments.empty?
-        enrollment = @student_enrollments.first.try(:last) || @teacher_enrollments.first || @observed_enrollments.first
-        redirect_to course_grades_url(enrollment.course_id)
+      if @presenter.has_single_enrollment?
+        redirect_to course_grades_url(@presenter.single_enrollment.course_id)
         return
       end
 
       Enrollment.send(:preload_associations, @observed_enrollments, :course)
-      #Enrollment.send(:preload_associations, @prior_enrollments, :course)
-
-      @course_grade_summaries = {}
-      @teacher_enrollments.each do |enrollment|
-        @course_grade_summaries[enrollment.course_id] = Rails.cache.fetch(['computed_avg_grade_for', enrollment.course].cache_key) do
-          current_scores = enrollment.course.student_enrollments.not_fake.maximum(:computed_current_score, :group => :user_id).values.compact
-          score = (current_scores.sum.to_f * 100.0 / current_scores.length.to_f).round.to_f / 100.0 rescue nil
-          {:score => score, :students => current_scores.length }
-        end
-      end
     end
   end
 

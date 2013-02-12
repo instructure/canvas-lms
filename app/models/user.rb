@@ -891,7 +891,7 @@ class User < ActiveRecord::Base
   end
 
   def courses_with_grades
-    self.available_courses.select{|c| c.grants_right?(self, nil, :participate_as_student)}
+    self.available_courses.with_each_shard.select{|c| c.grants_right?(self, nil, :participate_as_student)}
   end
   memoize :courses_with_grades
 
