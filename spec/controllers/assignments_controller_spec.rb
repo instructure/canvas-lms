@@ -162,6 +162,19 @@ describe AssignmentsController do
       # in normal cases we redirect to the assignment's external_tool_tag.
       response.rendered[:template].should eql 'assignments/show.html.erb'
     end
+
+    it "should require login for external tools in a public course" do
+      course_with_student(:active_all => true)
+      @course.update_attribute(:is_public, true)
+      @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'test tool', :domain => 'example.com')
+      course_assignment
+      @assignment.submission_types = 'external_tool'
+      @assignment.build_external_tool_tag(:url => "http://example.com/test")
+      @assignment.save!
+
+      get 'show', :course_id => @course.id, :id => @assignment.id
+      assert_require_login
+    end
   end
   
   describe "GET 'syllabus'" do

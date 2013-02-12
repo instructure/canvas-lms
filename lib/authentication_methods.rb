@@ -173,9 +173,11 @@ module AuthenticationMethods
   private :load_user
 
   def require_user
-    unless @current_user && @current_pseudonym
+    if @current_user && @current_pseudonym
+      true
+    else
       redirect_to_login
-      return false
+      false
     end
   end
   protected :require_user
