@@ -20,6 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/gradebook2/show" do
+
   def test_grade_publishing(course_allows, permissions_allow)
     course_with_student
     view_context
@@ -51,4 +52,34 @@ describe "/gradebook2/show" do
   it "should disable grade publishing when permissions disallow it" do
     test_grade_publishing(true, false)
   end
+
+  describe "uploading scores" do
+    before :each do
+      course_with_teacher(:active_all => true)
+      view_context
+      assigns[:gradebook_is_editable] = true
+      assigns[:assignments] = []
+      assigns[:students] = []
+      assigns[:submissions] = []
+      assigns[:gradebook_upload] = @course.build_gradebook_upload
+      assigns[:body_classes] = []
+    end
+
+    it "should not allow uploading scores for large roster courses" do
+      render "gradebook2/show"
+      response.should_not be_nil
+      response.body.should =~ /Upload Scores \(from .csv\)/
+    end
+
+    it "should not allow uploading scores for large roster courses" do
+      @course.large_roster = true
+      @course.save!
+      @course.reload
+      render "gradebook2/show"
+      response.should_not be_nil
+      response.body.should_not =~ /Upload Scores \(from .csv\)/
+    end
+  end
+
+
 end

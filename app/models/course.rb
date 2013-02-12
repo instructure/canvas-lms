@@ -1070,6 +1070,10 @@ class Course < ActiveRecord::Base
     can :read_prior_roster
   end
 
+  def allows_gradebook_uploads?
+    !large_roster?
+  end
+
   def enrollment_allows(user, session, permission)
     return false unless user && permission
 

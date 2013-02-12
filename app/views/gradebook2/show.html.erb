@@ -13,7 +13,7 @@
     <ul style="display: none;">
       <li><a href="<%= context_url(@context, :context_gradebook_url) %>/history"><%= t('view_grading_history', 'View Grading History') %></a></li>
       <li><a href="<%= context_url(@context, :context_gradebook_url) %>.csv"><%= t('download_scores', 'Download Scores (.csv)') %></a></li>
-      <% if @gradebook_is_editable %>
+      <% if @gradebook_is_editable && @context.allows_gradebook_uploads? %>
         <li><a class="gradebook_upload_link" href="#"><%= t('upload_scores', 'Upload Scores (from .csv)') %></a></li>
       <% end %>
       <% if @context.allows_grade_publishing_by(@current_user) && can_do(@context, @current_user, :manage_grades) %>
