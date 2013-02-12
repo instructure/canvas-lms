@@ -9,7 +9,7 @@
       </div>
     <% else %>
       <div class="rs-margin-lr rs-margin-top">
-        <% if can_do(@quiz, @current_user, :manage) && @submitted_students && !@submitted_students.empty? %>
+        <% if can_do(@quiz, @current_user, :manage) && @submitted_students && !@submitted_students.empty? && !@context.large_roster? %>
           <a href="<%= context_url(@context, :context_quiz_statistics_url, @quiz.id) %>" class="btn button-sidebar-wide"><i class="icon-stats"></i> <%= @quiz.survey? ? t('links.survey_statistics', "Survey Statistics") : t('links.quiz_statistics', "Quiz Statistics") %></a>
         <% end %>
         <% if can_do(@quiz, @current_user, :update) %>
@@ -45,7 +45,7 @@
             <% end %>
           <% end %>
         <% elsif can_do(@quiz, @current_user, :review_grades) %>
-          <% if @submitted_students && !@submitted_students.empty? %>
+          <% if @submitted_students && !@submitted_students.empty? && !@context.large_roster? %>
             <a href="<%= context_url(@context, :context_quiz_statistics_url, @quiz.id) %>" class="btn button-sidebar-wide"><i class="icon-stats"></i> <%= @quiz.survey? ? t('links.survey_statistics', "Survey Statistics") : t('links.quiz_statistics', "Quiz Statistics") %></a>
           <% end %>
           <a href="<%= context_url(@context, :context_quiz_read_only_url, @quiz.id) %>" class="btn button-sidebar-wide"><i class="icon-quiz"></i> <%= t('links.see_full_quiz', "See Full Quiz") %></a>

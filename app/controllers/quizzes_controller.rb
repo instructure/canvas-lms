@@ -64,6 +64,12 @@ class QuizzesController < ApplicationController
 
   def statistics
     if authorized_action(@quiz, @current_user, :read_statistics)
+      if @context.large_roster?
+        flash[:notice] = t "#application.notices.page_disabled_for_course", "That page has been disabled for this course"
+        redirect_to named_context_url(@context, :context_quiz_url, @quiz)
+        return
+      end
+      
       respond_to do |format|
         format.html {
           add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))

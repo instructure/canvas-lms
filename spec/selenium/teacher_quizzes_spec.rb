@@ -474,6 +474,15 @@ describe "quizzes" do
       f('#content .question_name').should include_text("Question 1")
     end
 
+    it "should not display a link to quiz statistics for a MOOC" do
+      quiz_with_submission
+      @course.large_roster = true
+      @course.save!
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+
+      f('#right-side').should_not include_text('Quiz Statistics')
+    end
+
     it "should delete a quiz" do
       quiz_with_submission
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"

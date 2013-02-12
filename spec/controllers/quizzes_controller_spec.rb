@@ -668,6 +668,16 @@ describe QuizzesController do
       response.should be_success
       response.should render_template('statistics')
     end
+
+    it "should redirect to the quiz show page if the course is a MOOC" do
+      course_with_teacher_logged_in(:active_all => true)
+      @course.large_roster = true
+      @course.save!
+      course_quiz
+      get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
+      flash[:notice].should == "That page has been disabled for this course"
+      response.should redirect_to course_quiz_url(@course.id, @quiz.id)
+    end
   end
 
   describe "GET 'read_only'" do
