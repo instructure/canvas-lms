@@ -689,7 +689,7 @@ describe CoursesController do
       course_with_teacher_logged_in(:active_all => true)
       @course.lock_all_announcements = true
       @course.save!
-      put 'update', :id => @course.id, :course => { }
+      put 'update', :id => @course.id, :course => { :lock_all_announcements => 0 }
       assigns[:course].lock_all_announcements.should be_false
     end
 

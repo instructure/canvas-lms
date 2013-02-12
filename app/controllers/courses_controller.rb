@@ -1311,7 +1311,7 @@ class CoursesController < ApplicationController
       params[:course][:event] = :offer if params[:offer].present?
 
       lock_announcements = params[:course].delete(:lock_all_announcements)
-      if lock_announcements
+      if value_to_boolean(lock_announcements)
         @course.lock_all_announcements = true
         Announcement.update_all(['workflow_state = ?', 'locked'],
           :context_type => 'Course', :context_id => @course.id, :workflow_state => 'active')

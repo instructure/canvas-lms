@@ -39,7 +39,7 @@ class Announcement < DiscussionTopic
   def respect_context_lock_rules
     lock if active? &&
             context.is_a?(Course) &&
-            context.settings[:lock_all_announcements]
+            context.lock_all_announcements?
   end
   protected :respect_context_lock_rules
 
