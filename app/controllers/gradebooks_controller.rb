@@ -350,6 +350,11 @@ class GradebooksController < ApplicationController
   end
 
   def submissions_zip_upload
+    unless @context.allows_gradebook_uploads?
+      flash[:error] = t('errors.not_allowed', "This course does not allow score uploads.")
+      redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
+      return
+    end
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if !params[:submissions_zip] || params[:submissions_zip].is_a?(String)
       flash[:error] = t('errors.missing_file', "Could not find file to upload")
