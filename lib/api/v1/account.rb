@@ -37,7 +37,8 @@ module Api::V1::Account
   end
 
   def account_json(account, user, session, includes)
-    api_json(account, user, session, :only => %w(id name parent_account_id root_account_id)).tap do |hash|
+    attributes = %w(id name parent_account_id root_account_id default_time_zone)
+    api_json(account, user, session, :only => attributes).tap do |hash|
       hash['sis_account_id'] = account.sis_source_id if !account.root_account? && account.root_account.grants_rights?(user, :read_sis, :manage_sis).values.any?
       @@extensions.each do |extension|
         hash = extension.extend_account_json(hash, account, user, session, includes)

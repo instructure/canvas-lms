@@ -22,33 +22,37 @@ describe "Accounts API", :type => :integration do
   before do
     Pseudonym.any_instance.stubs(:works_for_account?).returns(true)
     user_with_pseudonym(:active_all => true)
-    @a1 = account_model(:name => 'root')
+    @a1 = account_model(:name => 'root', :default_time_zone => 'UTC')
     @a1.add_user(@user)
-    @a2 = account_model(:name => 'subby', :parent_account => @a1, :root_account => @a1, :sis_source_id => 'sis1')
+    @a2 = account_model(:name => 'subby', :parent_account => @a1, :root_account => @a1, :sis_source_id => 'sis1', :default_time_zone => 'Alaska')
     @a2.add_user(@user)
     @a3 = account_model(:name => 'no-access')
     # even if we have access to it implicitly, it's not listed
     @a4 = account_model(:name => 'implicit-access', :parent_account => @a1, :root_account => @a1)
   end
 
-  it "should return the account list" do
-    json = api_call(:get, "/api/v1/accounts.json",
-                    { :controller => 'accounts', :action => 'index', :format => 'json' })
-    json.sort_by { |a| a['id'] }.should == [
-      {
-        'id' => @a1.id,
-        'name' => 'root',
-        'root_account_id' => nil,
-        'parent_account_id' => nil
-      },
-      {
-        'id' => @a2.id,
-        'name' => 'subby',
-        'root_account_id' => @a1.id,
-        'parent_account_id' => @a1.id,
-        'sis_account_id' => 'sis1',
-      },
-    ]
+  describe 'index' do
+    it "should return the account list" do
+      json = api_call(:get, "/api/v1/accounts.json",
+                      { :controller => 'accounts', :action => 'index', :format => 'json' })
+      json.sort_by { |a| a['id'] }.should == [
+        {
+          'id' => @a1.id,
+          'name' => 'root',
+          'root_account_id' => nil,
+          'parent_account_id' => nil,
+          'default_time_zone' => 'UTC'
+        },
+        {
+          'id' => @a2.id,
+          'name' => 'subby',
+          'root_account_id' => @a1.id,
+          'parent_account_id' => @a1.id,
+          'sis_account_id' => 'sis1',
+          'default_time_zone' => 'Alaska'
+        },
+      ]
+    end
   end
 
   describe 'sub_accounts' do
@@ -84,19 +88,23 @@ describe "Accounts API", :type => :integration do
         'Account 2', 'Account 2.1', 'Account 2.2', 'Account 2.3'].sort
     end
   end
-
-  it "should return an individual account" do
-    # by id
-    json = api_call(:get, "/api/v1/accounts/#{@a1.id}",
-                    { :controller => 'accounts', :action => 'show', :id => @a1.to_param, :format => 'json' })
-    json.should ==
-      {
-        'id' => @a1.id,
-        'name' => 'root',
-        'root_account_id' => nil,
-        'parent_account_id' => nil
-      }
+  
+  describe 'show' do
+    it "should return an individual account" do
+      # by id
+      json = api_call(:get, "/api/v1/accounts/#{@a1.id}",
+                      { :controller => 'accounts', :action => 'show', :id => @a1.to_param, :format => 'json' })
+      json.should ==
+        {
+          'id' => @a1.id,
+          'name' => 'root',
+          'root_account_id' => nil,
+          'parent_account_id' => nil,
+          'default_time_zone' => 'UTC'
+        }
+    end
   end
+
 
   it "should update the name for an account" do
     new_name = 'root2'
@@ -132,6 +140,29 @@ describe "Accounts API", :type => :integration do
 
     @a1.reload
     @a1.name.should == "blah"
+  end
+
+  it "should update the default_time_zone for an account" do
+    new_zone = 'Alaska'
+    json = api_call(:put, "/api/v1/accounts/#{@a1.id}",
+                    { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' },
+                    { :account => {:default_time_zone => new_zone} })
+    expected =
+        {
+            'id' => @a1.id,
+            'default_time_zone' => new_zone
+        }
+    (expected.to_a - json.to_a).should be_empty
+
+    @a1.reload
+    @a1.default_time_zone.should == new_zone
+  end
+  
+  it "should check for a valid time zone" do
+    json = api_call(:put, "/api/v1/accounts/#{@a1.id}",
+             { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' },
+             { :account => {:name => '', :default_time_zone => 'Booger'} }, {}, { :expected_status => 400 })
+    json["errors"]["default_time_zone"].first["message"].should == "'Booger' is not a recognized time zone"
   end
 
   it "should not update other attributes (yet)" do

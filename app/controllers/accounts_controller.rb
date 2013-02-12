@@ -34,7 +34,7 @@ class AccountsController < ApplicationController
       format.html
       format.json do
         @accounts = Api.paginate(@accounts, self, api_v1_accounts_url)
-        render :json => @accounts.map { |a| account_json(a, @current_user, session, []) }
+        render :json => @accounts.map { |a| account_json(a, @current_user, session, params[:includes] || []) }
       end
     end
   end
@@ -44,7 +44,6 @@ class AccountsController < ApplicationController
   # sis_account_id.
   def show
     return unless authorized_action(@account, @current_user, :read)
-
     respond_to do |format|
       format.html do
         return redirect_to account_settings_url(@account) if @account.site_admin? || !@account.grants_right?(@current_user, nil, :read_course_list)
@@ -53,7 +52,7 @@ class AccountsController < ApplicationController
         @courses = @account.fast_all_courses(:term => @term, :limit => @maximum_courses_im_gonna_show, :hide_enrollmentless_courses => @hide_enrollmentless_courses)
         build_course_stats
       end
-      format.json { render :json => account_json(@account, @current_user, session, []) }
+      format.json { render :json => account_json(@account, @current_user, session, params[:includes] || []) }
     end
   end
 
@@ -145,17 +144,20 @@ class AccountsController < ApplicationController
   # Update an existing account.
   #
   # @argument account[name] [optional] Updates the account name
+  # @argument account[default_time_zone] [Optional] The default time zone of the account. Allowed time zones are listed in {http://rubydoc.info/docs/rails/ActiveSupport/TimeZone The Ruby on Rails documentation}.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/accounts/<account_id> \ 
   #     -X PUT \ 
   #     -H 'Authorization: Bearer <token>' \ 
-  #     -d 'account[name]=New account name'
+  #     -d 'account[name]=New account name' \ 
+  #     -d 'account[default_time_zone]=Mountain Time (US & Canada)'
   #
   # @example_response
   #   {
   #     "id": "1",
   #     "name": "New account name",
+  #     "default_time_zone": "Mountain Time (US & Canada)",
   #     "parent_account_id": null,
   #     "root_account_id": null
   #   }
@@ -163,10 +165,10 @@ class AccountsController < ApplicationController
     if authorized_action(@account, @current_user, :manage_account_settings)
       if api_request?
         account_params = params[:account] || {}
-        account_params.reject{|k, v| ![:name].include?(k.to_sym)}
+        account_params.reject{|k, v| ![:name, :default_time_zone].include?(k.to_sym)}
 
         @account.errors.add(:name, "The account name cannot be blank") if account_params.has_key?(:name) && account_params[:name].blank?
-
+        @account.errors.add(:default_time_zone, "'#{account_params[:default_time_zone]}' is not a recognized time zone") if account_params.has_key?(:default_time_zone) && ActiveSupport::TimeZone.new(account_params[:default_time_zone]).nil?
         if @account.errors.empty? && @account.update_attributes(account_params)
           render :json => account_json(@account, @current_user, session, params[:includes] || [])
         else
