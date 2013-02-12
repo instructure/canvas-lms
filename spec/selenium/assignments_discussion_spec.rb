@@ -56,7 +56,6 @@ describe "discussion assignments" do
     submit_form(edit_form)
     wait_for_ajaximations
     expect_new_page_load { f("#assignment_#{Assignment.last.id} .title").click }
-    f('.al-trigger').click
-    f('.icon-peer-review').should be_displayed
+    f('.assignment_peer_reviews_link').should be_displayed
   end
 end

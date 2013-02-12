@@ -127,7 +127,8 @@ shared_examples_for "discussion and announcement individual tests" do
     end
     get url
     expect_new_page_load { f('.discussion-title').click }
-    expect_new_page_load { f(".edit-btn").click }
+    f("#discussion-toolbar .al-trigger-inner").click
+    expect_new_page_load { f("#ui-id-2").click }
 
     add_attachment_and_validate
   end
@@ -136,7 +137,8 @@ shared_examples_for "discussion and announcement individual tests" do
     edit_name = 'edited discussion name'
     topic = what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => @topic_title, :user => @user) : announcement_model(:title => @topic_title, :user => @user)
     get url + "#{topic.id}"
-    expect_new_page_load { f(".edit-btn").click }
+    f("#discussion-toolbar .al-trigger-inner").click
+    expect_new_page_load { f("#ui-id-2").click }
 
     edit(edit_name, 'edit message')
   end
