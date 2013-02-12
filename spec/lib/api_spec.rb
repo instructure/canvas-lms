@@ -538,6 +538,24 @@ describe Api do
 
   end
 
+  context "map_non_sis_ids" do
+    it 'should return an array of numeric ids' do
+      Api.map_non_sis_ids([1, 2, 3, 4]).should == [1, 2, 3, 4]
+    end
+    
+    it 'should convert string ids to numeric' do
+      Api.map_non_sis_ids(%w{5 4 3 2}).should == [5, 4, 3, 2]
+    end
+    
+    it "should exclude things that don't look like ids" do
+      Api.map_non_sis_ids(%w{1 2 lolrus 4chan 5 6!}).should == [1, 2, 5]
+    end
+    
+    it "should strip whitespace" do
+      Api.map_non_sis_ids(["  1", "2  ", " 3 ", "4\n"]).should == [1, 2, 3, 4]
+    end
+  end
+  
   context ".api_user_content" do
     class T
       extend Api

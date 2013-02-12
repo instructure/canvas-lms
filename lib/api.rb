@@ -126,6 +126,15 @@ module Api
     return columns
   end
 
+  # remove things that don't look like valid database IDs
+  # return in integer format if possible
+  # (note that ID_REGEX may be redefined by a plugin!)
+  def self.map_non_sis_ids(ids)
+    ids.map{ |id| id.to_s.strip }.select{ |id| id =~ ID_REGEX }.map do |id|
+      id =~ /\A\d+\z/ ? id.to_i : id
+    end
+  end
+
   def self.sis_find_sis_mapping_for_collection(collection)
     SIS_MAPPINGS[collection.table_name] or
         raise(ArgumentError, "need to add support for table name: #{collection.table_name}")

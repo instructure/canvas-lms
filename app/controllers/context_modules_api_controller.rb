@@ -192,4 +192,53 @@ class ContextModulesApiController < ApplicationController
     end
   end
 
+  # @API Update modules
+  #
+  # Update multiple modules in an account.
+  #
+  # @argument module_ids[] List of ids of modules to update.
+  # @argument event The action to take on each module. Must be one of 'publish', 'unpublish', or 'delete'.
+  #
+  # @response_field completed A list of IDs for modules that were updated.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/courses/<course_id>/modules \  
+  #       -X PUT \ 
+  #       -H 'Authorization: Bearer <token>' \ 
+  #       -d 'event=publish' \ 
+  #       -d 'module_ids[]=1' \ 
+  #       -d 'module_ids[]=2' 
+  #
+  # @example_response
+  #    {
+  #      "completed": [1, 2]
+  #    }
+  def batch_update
+    if authorized_action(@context, @current_user, :manage_content)
+      event = params[:event]
+      return render(:json => { :message => 'need to specify event' }, :status => :bad_request) unless event.present?
+      return render(:json => { :message => 'invalid event' }, :status => :bad_request) unless %w(publish unpublish delete).include? event
+      return render(:json => { :message => 'must specify module_ids[]' }, :status => :bad_request) unless params[:module_ids].present?
+
+      module_ids = Api.map_non_sis_ids(Array(params[:module_ids]))
+      modules = @context.context_modules.not_deleted.find_all_by_id(module_ids)
+      return render(:json => { :message => 'no modules found' }, :status => :not_found) if modules.empty?
+
+      completed_ids = []
+      modules.each do |mod|
+        case event
+          when 'publish'
+            mod.publish unless mod.active?
+          when 'unpublish'
+            mod.unpublish unless mod.unpublished?
+          when 'delete'
+            mod.destroy
+        end
+        completed_ids << mod.id
+      end
+
+      render :json => { :completed => completed_ids }
+    end
+  end
+
 end

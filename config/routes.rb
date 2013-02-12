@@ -1029,6 +1029,7 @@ ActionController::Routing::Routes.draw do |map|
       context_modules.get "courses/:course_id/modules/:module_id/items", :action => :list_module_items, :path_name => 'course_context_module_items'
       context_modules.get "courses/:course_id/modules/:module_id/items/:id", :action => :show_module_item, :path_name => 'course_context_module_item'
       context_modules.get "courses/:course_id/module_item_redirect/:id", :action => :module_item_redirect, :path_name => 'course_context_module_item_redirect'
+      context_modules.put "courses/:course_id/modules", :action => :batch_update
     end
 
     api.with_options(:controller => :quizzes_api) do |quizzes|

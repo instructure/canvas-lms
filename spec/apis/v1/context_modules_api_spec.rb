@@ -245,6 +245,93 @@ describe "Modules API", :type => :integration do
 
       ids.should == module3.content_tags.sort_by(&:position).collect(&:id)
     end
+
+    describe "batch update" do
+      before do
+        @path = "/api/v1/courses/#{@course.id}/modules"
+        @path_opts = { :controller => "context_modules_api", :action => "batch_update", :format => "json",
+                       :course_id => @course.to_param }
+        @test_modules = (1..4).map { |x| @course.context_modules.create! :name => "test module #{x}" }
+        @test_modules[2..3].each { |m| m.update_attribute(:workflow_state , 'unpublished') }
+        @test_modules.map { |tm| tm.workflow_state }.should == %w(active active unpublished unpublished)
+        @modules_to_update = [@test_modules[1], @test_modules[3]]
+        @ids_to_update = @modules_to_update.map(&:id)
+      end
+      
+      it "should publish modules" do
+        json = api_call(:put, @path, @path_opts, { :event => 'publish', :module_ids => @ids_to_update })
+        json['completed'].sort.should == @ids_to_update
+        @test_modules.map { |tm| tm.reload.workflow_state }.should == %w(active active unpublished active)
+      end
+
+      it "should unpublish modules" do
+        json = api_call(:put, @path, @path_opts, { :event => 'unpublish', :module_ids => @ids_to_update })
+        json['completed'].sort.should == @ids_to_update
+        @test_modules.map { |tm| tm.reload.workflow_state }.should == %w(active unpublished unpublished unpublished)
+      end
+
+      it "should delete modules" do
+        json = api_call(:put, @path, @path_opts, { :event => 'delete', :module_ids => @ids_to_update })
+        json['completed'].sort.should == @ids_to_update
+        @test_modules.map { |tm| tm.reload.workflow_state }.should == %w(active deleted unpublished deleted)
+      end
+
+      it "should convert module ids to integer and ignore non-numeric ones" do
+        json = api_call(:put, @path, @path_opts, { :event => 'publish', :module_ids => %w(lolcats abc123) + @ids_to_update.map(&:to_s) })
+        json['completed'].sort.should == @ids_to_update
+        @test_modules.map { |tm| tm.reload.workflow_state }.should == %w(active active unpublished active)
+      end
+      
+      it "should not update soft-deleted modules" do
+        @modules_to_update.each { |m| m.destroy }
+        api_call(:put, @path, @path_opts, { :event => 'delete', :module_ids => @ids_to_update },
+                 {}, { :expected_status => 404 })
+      end
+
+      it "should 404 if no modules exist with the given ids" do
+        @modules_to_update.each { |m| m.destroy! }
+        api_call(:put, @path, @path_opts, { :event => 'publish', :module_ids => @ids_to_update },
+                 {}, { :expected_status => 404 })
+      end
+      
+      it "should 404 if only non-numeric ids are given" do
+        api_call(:put, @path, @path_opts, { :event => 'publish', :module_ids => @ids_to_update.map { |id| id.to_s + "abc" } },
+                 {}, { :expected_status => 404})
+      end
+
+      it "should succeed if only some ids don't exist" do
+        @modules_to_update.first.destroy!
+        json = api_call(:put, @path, @path_opts, { :event => 'publish', :module_ids => @ids_to_update })
+        json['completed'].should == [@modules_to_update.last.id]
+        @modules_to_update.last.reload.should be_active
+      end
+      
+      it "should 400 if :module_ids is missing" do
+        api_call(:put, @path, @path_opts, { :event => 'publish' }, {}, { :expected_status => 400 })
+      end
+
+      it "should 400 if :event is missing" do
+        api_call(:put, @path, @path_opts, { :module_ids => @ids_to_update }, {}, { :expected_status => 400 })
+      end
+
+      it "should 400 if :event is invalid" do
+        api_call(:put, @path, @path_opts, { :event => 'burninate', :module_ids => @ids_to_update },
+                 {}, { :expected_status => 400 })
+      end
+
+      it "should scope to the course" do
+        other_course = Course.create! :name => "Other Course"
+        other_module = other_course.context_modules.create! :name => "Other Module"
+        
+        json = api_call(:put, @path, @path_opts, { :event => 'unpublish',
+          :module_ids => [@test_modules[1].id, other_module.id] })
+        json['completed'].should == [@test_modules[1].id]
+
+        @test_modules[1].reload.should be_unpublished
+        other_module.reload.should be_active
+      end
+    end
+
   end
   
   context "as a student" do
@@ -324,8 +411,36 @@ describe "Modules API", :type => :integration do
           |rm| rm[:type] == "must_view" && rm[:id] == @external_url_tag.id }
     end
 
-    it "should check permissions" do
+    describe "batch update" do
+      it "should disallow deleting" do
+        api_call(:put, "/api/v1/courses/#{@course.id}/modules?event=delete&module_ids[]=#{@module1.id}",
+                 { :controller => "context_modules_api", :action => "batch_update", :event => 'delete',
+                   :module_ids => [@module1.to_param], :format => "json", :course_id => "#{@course.id}"},
+                 {}, {}, { :expected_status => 401 })
+      end
+
+      it "should disallow publishing" do
+        api_call(:put, "/api/v1/courses/#{@course.id}/modules?event=publish&module_ids[]=#{@module1.id}",
+                 { :controller => "context_modules_api", :action => "batch_update", :event => 'publish',
+                   :module_ids => [@module1.to_param], :format => "json", :course_id => "#{@course.id}"},
+                 {}, {}, { :expected_status => 401 })
+      end
+
+      it "should disallow unpublishing" do
+        api_call(:put, "/api/v1/courses/#{@course.id}/modules?event=unpublish&module_ids[]=#{@module1.id}",
+                 { :controller => "context_modules_api", :action => "batch_update", :event => 'unpublish',
+                   :module_ids => [@module1.to_param], :format => "json", :course_id => "#{@course.id}"},
+                 {}, {}, { :expected_status => 401 })
+      end
+    end
+  end
+
+  context "unauthorized user" do
+    before do
       user
+    end
+
+    it "should check permissions" do
       api_call(:get, "/api/v1/courses/#{@course.id}/modules",
                { :controller => "context_modules_api", :action => "index", :format => "json",
                  :course_id => "#{@course.id}"}, {}, {}, {:expected_status => 401})
@@ -345,7 +460,10 @@ describe "Modules API", :type => :integration do
                { :controller => "context_modules_api", :action => "module_item_redirect",
                  :format => "json", :course_id => "#{@course.id}", :id => "#{@external_url_tag.id}"},
                {}, {}, { :expected_status => 401 })
+      api_call(:put, "/api/v1/courses/#{@course.id}/modules?event=publish&module_ids[]=1",
+               { :controller => "context_modules_api", :action => "batch_update", :event => 'publish',
+                 :module_ids => %w(1), :format => "json", :course_id => "#{@course.id}"},
+               {}, {}, { :expected_status => 401 })
     end
   end
-
 end
