@@ -218,6 +218,10 @@ describe DiscussionEntriesController do
       topic_entry
       delete 'destroy', :course_id => @course.id, :id => @entry.id
       response.should be_redirect
+
+      @entry.reload
+      @entry.editor.should eql(@teacher)
+
       @topic.reload
       @topic.discussion_entries.should_not be_empty
       @topic.discussion_entries.active.should be_empty

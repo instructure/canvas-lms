@@ -79,7 +79,7 @@ module Api::V1::DiscussionTopics
   def discussion_entry_api_json(entries, context, user, session, includes = [:user_name, :subentries])
     entries.map do |entry|
       if entry.deleted?
-        json = api_json(entry, user, session, :only => %w(id created_at updated_at parent_id))
+        json = api_json(entry, user, session, :only => %w(id created_at updated_at parent_id editor_id))
         json[:deleted] = true
       else
         json = api_json(entry, user, session,

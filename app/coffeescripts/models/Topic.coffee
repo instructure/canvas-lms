@@ -11,7 +11,7 @@ define [
   'compiled/arr/erase'
 ], (I18n, {each}, Backbone, BackoffPoller, walk, erase) ->
 
-  UNKOWN_AUTHOR =
+  UNKNOWN_AUTHOR =
     avatar_image_url: null
     display_name: I18n.t 'uknown_author', 'Unknown Author'
     id: null
@@ -74,10 +74,10 @@ define [
       if entry.user_id?
         entry.author = @participants[entry.user_id]
       else
-        entry.author = UNKOWN_AUTHOR
+        entry.author = UNKNOWN_AUTHOR
 
       if entry.editor_id?
-        entry.editor = @participants[entry.user_id]
+        entry.editor = @participants[entry.editor_id]
 
       if entry.parent_id?
         entry.root_entry = @lastRoot

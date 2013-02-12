@@ -78,7 +78,15 @@ define [
         no
 
     toJSON: ->
-      @model.attributes
+      json = @model.attributes
+      json.edited_at = $.parseFromISO(json.updated_at).datetime_formatted
+      if json.editor
+        json.editor_name = json.editor.display_name
+        json.editor_href = "href=\"#{json.editor.html_url}\""
+      else
+        json.editor_name = I18n.t 'unknown', 'Unknown'
+        json.editor_href = ""
+      json
 
     toggleReadState: (model, read_state) =>
       @$entryContent.toggleClass 'unread', read_state is 'unread'
