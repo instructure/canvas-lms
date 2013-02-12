@@ -1074,6 +1074,13 @@ class Course < ActiveRecord::Base
     !large_roster?
   end
 
+  # Public: Determine if SpeedGrader is enabled for the Course.
+  #
+  # Returns a boolean.
+  def allows_speed_grader?
+    !large_roster?
+  end
+
   def enrollment_allows(user, session, permission)
     return false unless user && permission
 

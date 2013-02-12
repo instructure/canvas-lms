@@ -66,6 +66,21 @@ describe DiscussionTopicsController do
       assigns[:topic].should eql(@topic)
     end
 
+    it "should display speedgrader when not for a large course" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_topic(:with_assignment => true)
+      get 'show', :course_id => @course.id, :id => @topic.id
+      assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE].should be_true
+    end
+
+    it "should hide speedgrader when for a large course" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_topic(:with_assignment => true)
+      Course.any_instance.stubs(:large_roster?).returns(true)
+      get 'show', :course_id => @course.id, :id => @topic.id
+      assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE].should be_nil
+    end
+
     it "should mark as read when viewed" do
       course_with_student_logged_in(:active_all => true)
       course_topic(:skip_set_user => true)

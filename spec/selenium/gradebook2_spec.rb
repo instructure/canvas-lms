@@ -572,4 +572,14 @@ describe "gradebook2" do
     ff('.late').count.should == 1
   end
 
+  it "should not display a speedgrader link for large courses" do
+    Course.any_instance.stubs(:large_roster?).returns(true)
+
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+
+    f('.gradebook-header-drop').click
+    f('.gradebook-header-menu').text.should_not match(/SpeedGrader/)
+  end
+
 end

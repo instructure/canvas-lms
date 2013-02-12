@@ -92,6 +92,14 @@ describe "discussions" do
         ffj('.comment_attachments').count.should == @replies.count
       end
 
+      it "should hide the speedgrader in large courses" do
+        Course.any_instance.stubs(:large_roster?).returns(true)
+        @topic = @course.discussion_topics.create!(:title => 'discussion', :user => @user, :assignment => @course.assignments.create!(:name => 'assignment'))
+        go_to_topic
+        f('.al-trigger').click
+        f('.al-options').text.should_not match(/Speed Grader/)
+      end
+
       it "should show only 10 root replies per page"
       it "should paginate root entries"
       it "should show only three levels deep"

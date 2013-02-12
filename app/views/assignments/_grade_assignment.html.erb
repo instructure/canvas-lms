@@ -19,11 +19,13 @@
 <% end %>
 
 <ul class='page-action-list'>
-  <li>
-    <a target="_blank" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @assignment.id) %>">
-      <i class="icon-speed-grader"></i> SpeedGrader&trade;
-    </a>
-  </li>
+  <% if @context.allows_speed_grader? %>
+    <li>
+      <a target="_blank" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @assignment.id) %>">
+        <i class="icon-speed-grader"></i> SpeedGrader&trade;
+      </a>
+    </li>
+  <% end %>
 
   <% if @current_student_submissions.present? %>
     <% if @assignment.submission_types && @assignment.submission_types.match(/(online_upload|online_text_entry|online_url)/)%>

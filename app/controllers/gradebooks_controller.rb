@@ -74,12 +74,12 @@ class GradebooksController < ApplicationController
             )
             # pre-cache the assignment group for each assignment object
             @assignments.each { |a| a.assignment_group = @groups.find { |g| g.id == a.assignment_group_id } }
-            all_submissions = if @context.large_roster?
-                                []
-                              else
+            all_submissions = if @context.allows_gradebook_uploads?
                                 # Yes, fetch *all* submissions for this course; otherwise the view will end up doing a query for each
                                 # assignment in order to calculate grade distributions
                                 @context.submissions.all(:select => "submissions.assignment_id, submissions.score, submissions.grade, submissions.quiz_submission_id")
+                              else
+                                []
                               end
             
             @submissions_by_assignment = submissions_by_assignment(all_submissions)
@@ -200,7 +200,8 @@ class GradebooksController < ApplicationController
 
           # this can't happen in the slave block because this may trigger
           # writes in ContextModule
-          js_env :assignment_groups => assignment_groups_json
+          js_env :assignment_groups => assignment_groups_json,
+                 :speed_grader_enabled => @context.allows_speed_grader?
           set_gradebook_warnings(@groups, @just_assignments)
           if params[:view] == "simple"
             @headers = false
@@ -375,16 +376,25 @@ class GradebooksController < ApplicationController
   end
 
   def speed_grader
-    if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
-      @assignment = @context.assignments.active.find(params[:assignment_id])
-      respond_to do |format|
-        format.html {
-          @headers = false
-          @outer_frame = true
-          log_asset_access("speed_grader:#{@context.asset_string}", "grades", "other")
-          render :action => "speed_grader"
-        }
-        format.json { render :json => @assignment.speed_grader_json(@current_user, service_enabled?(:avatars)) }
+    if !@context.allows_speed_grader?
+      flash[:notice] = t(:speed_grader_disabled, 'SpeedGrader is disabled for this course')
+      return redirect_to(course_gradebook_path(@context))
+    end
+
+    return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
+
+    @assignment = @context.assignments.active.find(params[:assignment_id])
+
+    respond_to do |format|
+      format.html do
+        @headers = false
+        @outer_frame = true
+        log_asset_access("speed_grader:#{@context.asset_string}", "grades", "other")
+        render :action => "speed_grader"
+      end
+
+      format.json do
+        render :json => @assignment.speed_grader_json(@current_user, service_enabled?(:avatars))
       end
     end
   end

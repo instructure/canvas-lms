@@ -24,6 +24,7 @@ class Gradebook2Controller < ApplicationController
           :grading_standard =>  @context.grading_standard_enabled? && (@context.grading_standard.try(:data) || GradingStandard.default_grading_standard),
           :course_is_concluded => @context.completed?,
           :gradebook_is_editable => @gradebook_is_editable,
+          :speed_grader_enabled => @context.allows_speed_grader?,
         }
 
     end

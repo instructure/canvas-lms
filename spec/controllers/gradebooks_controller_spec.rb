@@ -458,6 +458,17 @@ describe GradebooksController do
       params_from(:get, "/courses/20/gradebook/speed_grader").should ==
         {:controller => "gradebooks", :action => "speed_grader", :course_id => "20"}
     end
+
+    it "should redirect user if course's large_roster? setting is true" do
+      course_with_teacher_logged_in(:active_all => true)
+      assignment = @course.assignments.create!(:title => 'some assignment')
+
+      Course.any_instance.stubs(:large_roster?).returns(true)
+
+      get 'speed_grader', :course_id => @course.id, :assignment_id => assignment.id
+      response.should be_redirect
+      response.flash[:notice].should == 'SpeedGrader is disabled for this course'
+    end
   end
 
   describe "GET 'public_feed.atom'" do

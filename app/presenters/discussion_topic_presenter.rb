@@ -112,4 +112,22 @@ class DiscussionTopicPresenter
       topic.context.is_a?(Course) &&
       topic.context.settings[:lock_all_announcements]
   end
+
+  # Public: Determine if the discussion's context has a large roster flag set.
+  #
+  # Returns a boolean.
+  def large_roster?
+    if topic.context.respond_to?(:large_roster?)
+      topic.context.large_roster?
+    else
+      topic.context.try(:context).try(:large_roster?)
+    end
+  end
+
+  # Public: Determine if SpeedGrader should be enabled for the Discussion Topic.
+  #
+  # Returns a boolean.
+  def allows_speed_grader?
+    !large_roster?
+  end
 end

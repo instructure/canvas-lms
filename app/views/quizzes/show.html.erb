@@ -9,7 +9,7 @@
       </div>
     <% else %>
       <div class="rs-margin-lr rs-margin-top">
-        <% if can_do(@quiz, @current_user, :manage) && @submitted_students && !@submitted_students.empty? && !@context.large_roster? %>
+        <% if can_do(@quiz, @current_user, :manage) && @submitted_students && !@submitted_students.empty? && @context.allows_speed_grader? %>
           <a href="<%= context_url(@context, :context_quiz_statistics_url, @quiz.id) %>" class="btn button-sidebar-wide"><i class="icon-stats"></i> <%= @quiz.survey? ? t('links.survey_statistics', "Survey Statistics") : t('links.quiz_statistics', "Quiz Statistics") %></a>
         <% end %>
         <% if can_do(@quiz, @current_user, :update) %>
@@ -45,7 +45,7 @@
             <% end %>
           <% end %>
         <% elsif can_do(@quiz, @current_user, :review_grades) %>
-          <% if @submitted_students && !@submitted_students.empty? && !@context.large_roster? %>
+          <% if @submitted_students && !@submitted_students.empty? && @context.allows_speed_grader? %>
             <a href="<%= context_url(@context, :context_quiz_statistics_url, @quiz.id) %>" class="btn button-sidebar-wide"><i class="icon-stats"></i> <%= @quiz.survey? ? t('links.survey_statistics', "Survey Statistics") : t('links.quiz_statistics', "Quiz Statistics") %></a>
           <% end %>
           <a href="<%= context_url(@context, :context_quiz_read_only_url, @quiz.id) %>" class="btn button-sidebar-wide"><i class="icon-quiz"></i> <%= t('links.see_full_quiz', "See Full Quiz") %></a>
@@ -62,7 +62,7 @@
             <% end %>
             <i class="icon-group"></i> <%= @quiz.survey? ? t('links.show_student_survey_results', "Show Student Survey Results") : t('links.show_student_quiz_results', "Show Student Quiz Results") %>
             <div style="font-size: 0.8em; padding-left: 20px;">(<%= t(:students_submitted_so_far, {:one => "1 student submitted so far", :other => "%{count} students submitted so far"}, :count => @submitted_students.length) %>)</div>
-            <% if @quiz.assignment %>
+            <% if @quiz.assignment && @context.allows_speed_grader? %>
               <a target="_blank" class="btn button-sidebar-wide" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @quiz.assignment.id) %>"><i class="icon-speed-grader"></i> <%= t(:speed_grader, "SpeedGrader™") %></a><br/>
             <% end %>
           </a>

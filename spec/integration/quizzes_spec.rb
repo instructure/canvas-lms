@@ -83,14 +83,14 @@ describe QuizzesController do
   end
 
   context "#show" do
+    before :each do
+      course_with_teacher_logged_in(:active_all => true)
+      assignment_model(:course => @course)
+      quiz_model(:course => @course, :assignment_id => @assignment.id)
+    end
+
     context "with overridden due dates" do
       include TextHelper
-
-      before :each do
-        course_with_teacher_logged_in(:active_all => true)
-        assignment_model(:course => @course)
-        quiz_model(:course => @course, :assignment_id => @assignment.id)
-      end
 
       it "should show an overridden due date for student" do
         cs1 = @course.default_section
@@ -118,6 +118,22 @@ describe QuizzesController do
 
         doc = Nokogiri::HTML(response.body)
         doc.css("td:nth-child(4)").text.include?("Multiple Due Dates").should be_true
+      end
+    end
+
+    context "SpeedGrader" do
+      it "should link to SpeedGrader when not large_roster" do
+        @course.large_roster = false
+        @course.save!
+        get "courses/#{@course.id}/quizzes/#{@quiz.id}"
+        response.body.should match(%r{SpeedGrader})
+      end
+
+      it "should not link to SpeedGrader when large_roster" do
+        @course.large_roster = true
+        @course.save!
+        get "courses/#{@course.id}/quizzes/#{@quiz.id}"
+        response.body.should_not match(%r{SpeedGrader})
       end
     end
   end
