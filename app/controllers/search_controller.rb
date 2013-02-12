@@ -83,7 +83,7 @@ class SearchController < ApplicationController
   #   enrollment types for each group to show what they share with this user
   # @response_field permissions[] Only set for contexts. Mapping of requested
   #   permissions that the context grants the current user, e.g.
-  #   {send_messages: true}
+  #   { send_messages: true }
   def recipients
 
     # admins may not be able to see the course listed at the top level (since
