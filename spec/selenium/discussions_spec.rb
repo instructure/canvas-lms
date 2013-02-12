@@ -289,6 +289,14 @@ describe "discussions" do
       f('#new-discussion-button').should be_nil
     end
 
+    it "should not show an empty gear menu to students who've created a discussion" do
+      @student_topic = @course.discussion_topics.create!(:user => @student, :message => 'student topic', :discussion_type => 'side_comment')
+      @student_entry = @student_topic.discussion_entries.create!(:user => @student, :message => 'student entry')
+      get "/courses/#{@course.id}/discussion_topics/#{@student_topic.id}"
+      wait_for_ajax_requests
+      f('.headerBar .admin-links').should be_nil
+    end
+
     it "should allow students to reply to a discussion even if they cannot create a topic" do
       @course.allow_student_discussion_topics = false
       @course.save!

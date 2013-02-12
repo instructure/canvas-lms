@@ -80,7 +80,10 @@
             </a>
           <% end %>
 
-          <% if can_do(@topic, @current_user, :update) || can_do(@topic, @current_user, :delete) %>
+          <% if can_do(@topic, @current_user, :delete) ||
+                @presenter.can_grade?(@current_user) ||
+                @presenter.show_peer_reviews?(@current_user) ||
+                @presenter.should_show_rubric?(@current_user) %>
             <div class="admin-links">
               <button class="al-trigger btn" data-kyle-menu-options='{"appendMenuTo": "body"}'><span class="al-trigger-inner"><%= t :manage_discussion, 'Manage Discussion' %></span></button>
               <ul class="al-options">
