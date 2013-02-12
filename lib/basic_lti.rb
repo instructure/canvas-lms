@@ -127,7 +127,7 @@ module BasicLTI
       hash['launch_presentation_height'] = 400
       hash['launch_presentation_return_url'] = return_url
       root_context = (context.respond_to?(:root_account) && context.root_account) || context
-      hash['tool_consumer_instance_guid'] = "#{root_context.opaque_identifier(:asset_string)}.#{HostUrl.context_host(context)}"
+      hash['tool_consumer_instance_guid'] = root_context.uuid
       hash['tool_consumer_instance_name'] = root_context.name
       hash['tool_consumer_instance_contact_email'] = HostUrl.outgoing_email_address # TODO: find a better email address to use here
       hash['tool_consumer_info_product_family_code'] = 'canvas'
