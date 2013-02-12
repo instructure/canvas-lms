@@ -13,13 +13,12 @@ define [
     events:
       'change': 'updateCourseSectionID'
 
-    initialize: (options) ->
-      @sections = options.sections
-      @override = options.override
+    @optionProperty 'sections'
+    @optionProperty 'override'
 
     toJSON: =>
       override: @override.toJSON().assignment_override
-      sections:  _.map( @sections, ( section ) -> section.toJSON() )
+      sections:  _.map(@sections, (section) -> section.toJSON() )
 
     updateCourseSectionID: =>
       @override.set 'course_section_id', parseInt(@$el.val(), 10)

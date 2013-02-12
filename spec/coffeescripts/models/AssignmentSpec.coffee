@@ -191,13 +191,13 @@ define [
     deepEqual assignment.pointsPossible(), 12
     deepEqual assignment.get('points_possible'), 12
 
-  module "Assignment#assignmentGroupID as a setter"
+  module "Assignment#assignmentGroupId as a setter"
 
   test "sets the record's assignment group id", ->
     assignment = new Assignment name: 'foo'
     assignment.set 'assignment_group_id', 0
-    assignment.assignmentGroupID(12)
-    deepEqual assignment.assignmentGroupID(), 12
+    assignment.assignmentGroupId(12)
+    deepEqual assignment.assignmentGroupId(), 12
     deepEqual assignment.get('assignment_group_id'), 12
 
   module "Assignment#gradingType as a setter"

@@ -9,6 +9,7 @@ define [
   #   Holds a list of Due Dates and adds items to the collection
   #   when the user creates a new due date. 
   class DueDateOverrideView extends Backbone.View
+
     template: template
 
     events:
@@ -17,6 +18,7 @@ define [
     className: 'due-date-container'
 
     initialize: ->
+      super
       @model.overrides.on 'remove', @showAddDueDateButton
 
     # Method Summary

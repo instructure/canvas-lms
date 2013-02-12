@@ -83,7 +83,7 @@ define  [
     ts = new TurnitinSettings exclude_small_matches_type: null
     strictEqual ts.excludesSmallMatches(), false
 
-  module "TurnitinSettings#toView",
+  module "TurnitinSettings#present",
     setup: ->
       @options =
         exclude_small_matches_value: 100
@@ -95,7 +95,7 @@ define  [
         originality_report_visibility: 'after_grading'
         s_paper_check: true
       @ts = new TurnitinSettings @options
-      @view = @ts.toView()
+      @view = @ts.present()
 
   test "includes excludesSmallMatches", ->
     strictEqual @view.excludesSmallMatches, @ts.excludesSmallMatches()

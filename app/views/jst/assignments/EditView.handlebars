@@ -140,15 +140,19 @@
 
     {{>[assignments/submission_types_form]}}
 
-    <fieldset id="group_category_selector"
-      class="control-group"
-      style="{{hiddenIf isExternalTool}}">
-    </fieldset>
+    {{#unless isLargeRoster}}
+      <fieldset id="group_category_selector"
+        class="control-group"
+        style="{{hiddenIf isExternalTool}}">
+      </fieldset>
+    {{/unless}}
 
-    <fieldset id="assignment_peer_reviews_fields"
-      class="control-group"
-      style="{{hiddenIf isExternalTool}}">
-    </fieldset>
+    {{#unless isLargeRoster}}
+      <fieldset id="assignment_peer_reviews_fields"
+        class="control-group"
+        style="{{hiddenIf isExternalTool}}">
+      </fieldset>
+    {{/unless}}
 
   </div>
 

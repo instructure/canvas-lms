@@ -12,38 +12,32 @@ define [
 
     ASSIGNMENT_GROUP_ID = '#assignment_group_id'
 
-    initialize: ->
-      super
-      @parentModel = @options.parentModel
-      @assignmentGroups = @options.assignmentGroups
+    els: do ->
+      els = {}
+      els["#{ASSIGNMENT_GROUP_ID}"] = '$assignmentGroupId'
+      els
 
     events: do ->
       events = {}
-      events[ "change #{ASSIGNMENT_GROUP_ID}" ] = 'showAssignmentGroupCreateDialog'
+      events["change #{ASSIGNMENT_GROUP_ID}"] = 'showAssignmentGroupCreateDialog'
       events
 
+    @optionProperty 'parentModel'
+    @optionProperty 'assignmentGroups'
+
     showAssignmentGroupCreateDialog: =>
-      if @$assignmentGroupID.val() is 'new'
+      if @$assignmentGroupId.val() is 'new'
         @dialog = new AssignmentGroupCreateDialog().render()
         @dialog.on 'assignmentGroup:created', (group) =>
           $newGroup = $('<option>')
           $newGroup.val(group.id)
           $newGroup.text(group.name)
-          @$assignmentGroupID.prepend $newGroup
-          @$assignmentGroupID.val(group.id)
+          @$assignmentGroupId.prepend $newGroup
+          @$assignmentGroupId.val(group.id)
         @dialog.on 'assignmentGroup:canceled', =>
-          @$assignmentGroupID.val(@assignmentGroups[0].id)
-
-    render: =>
-      super
-      @_findElements()
-      this
+          @$assignmentGroupId.val(@assignmentGroups[0].id)
 
     toJSON: =>
       assignmentGroups: @assignmentGroups
+      assignmentGroupId: @parentModel.assignmentGroupId()
       frozenAttributes: @parentModel.frozenAttributes()
-
-    _findElements: =>
-      @$assignmentGroupID = @find ASSIGNMENT_GROUP_ID
-
-    find: ( selector ) => @$el.find selector

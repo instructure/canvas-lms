@@ -36,12 +36,10 @@ define [
     updateOverrides: =>
       _.each @dueDateViews, ( dueDateView ) -> dueDateView.updateOverride()
 
-    render: (opts = {}) =>
-      super
+    afterRender: =>
       _.each @dueDateViews, ( view ) =>
         @$el.append view.render().el
       @hideOrShowRemoveButtons()
-      this
 
     hideOrShowRemoveButtons: =>
       firstDueDateView = @dueDateViews[0]

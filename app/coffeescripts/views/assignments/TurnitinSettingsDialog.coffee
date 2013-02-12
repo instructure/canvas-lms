@@ -7,24 +7,24 @@ define [
 
   class TurnitinSettingsDialog extends View
 
+    tagName: 'div'
+
     EXCLUDE_SMALL_MATCHES_OPTIONS = '.js-exclude-small-matches-options'
     EXCLUDE_SMALL_MATCHES = '[name="exclude_small_matches"]'
     EXCLUDE_SMALL_MATCHES_TYPE = '[name="exclude_small_matches_type"]'
 
-    initialize: -> @settings = @model
-
-    _findElements: =>
-      @$excludeSmallMatchesOptions = @$el.find EXCLUDE_SMALL_MATCHES_OPTIONS
-      @$excludeSmallMatches = @$el.find EXCLUDE_SMALL_MATCHES
-      @$excludeSmallMatchesType = @$el.find EXCLUDE_SMALL_MATCHES_TYPE
-
-    tagName: 'div'
-
     events: do ->
       events = {}
       events.submit = 'handleSubmit'
-      events[ "change #{EXCLUDE_SMALL_MATCHES}" ] = 'toggleExcludeOptions'
+      events["change #{EXCLUDE_SMALL_MATCHES}"] = 'toggleExcludeOptions'
       events
+
+    els: do ->
+      els = {}
+      els["#{EXCLUDE_SMALL_MATCHES_OPTIONS}"] = '$excludeSmallMatchesOptions'
+      els["#{EXCLUDE_SMALL_MATCHES}"] = '$excludeSmallMatches'
+      els["#{EXCLUDE_SMALL_MATCHES_TYPE}"] = '$excludeSmallMatchesType'
+      els
 
     toggleExcludeOptions: =>
       if @$excludeSmallMatches.prop 'checked'
@@ -32,29 +32,31 @@ define [
       else
         @$excludeSmallMatchesOptions.hide()
 
-    render: =>
-      values = _.extend @settings.toView(),
+    toJSON: =>
+      json = super
+      _.extend json,
         wordsInput: """
-          <input id="exclude_small_matches_words_value" name="words" value="#{@settings.words()}" type="text"/>
+          <input id="exclude_small_matches_words_value" name="words" value="#{json.words}" type="text"/>
         """
         percentInput: """
-          <input id="exclude_small_matches_percent_value" name="percent" value="#{@settings.percent()}" type="text"/>
+          <input id="exclude_small_matches_percent_value" name="percent" value="#{json.percent}" type="text"/>
         """
-      @$el.html(turnitinSettingsDialog(values))
-      @$el.dialog
-        width: 'auto'
-        modal: true
-      .fixDialogButtons()
-      @_findElements()
-      this
+
+    renderEl: =>
+      @$el.html(turnitinSettingsDialog(@toJSON()))
+      @$el.dialog({width: 'auto', modal: true}).fixDialogButtons()
 
     getFormValues: =>
       values = @$el.find('form').toJSON()
-      values.exclude_small_matches_type = @$excludeSmallMatchesType.val()
-      if values.exclude_small_matches_type is 'words'
-        values.exclude_small_matches_value = values.words
+      if @$excludeSmallMatches.prop 'checked'
+        values.exclude_small_matches_type = @$excludeSmallMatchesType.val()
+        if values.exclude_small_matches_type is 'words'
+          values.exclude_small_matches_value = values.words
+        else
+          values.exclude_small_matches_value = values.percent
       else
-        values.exclude_small_matches_value = values.percent
+        values.exclude_small_matches_type = null
+        values.exclude_small_matches_value = null
       values
 
     handleSubmit: (ev) =>

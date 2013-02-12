@@ -3,7 +3,8 @@ define [
   'underscore'
   'jquery'
   'jst/assignments/PeerReviewsSelector'
-], (Backbone, _, $, template) ->
+  'compiled/jquery/toggleAccessibly'
+], (Backbone, _, $, template, toggleAccessibly) ->
 
   class PeerReviewsSelector extends Backbone.View
 
@@ -15,27 +16,31 @@ define [
     PEER_REVIEWS_DETAILS = '#peer_reviews_details'
     AUTO_PEER_REVIEWS_OPTIONS = '#automatic_peer_reviews_options'
 
-    initialize: ->
-      super
-      @parentModel = @options.parentModel
-
     events: do ->
       events = {}
-      events[ "change #{PEER_REVIEWS}" ] = 'handlePeerReviewsChange'
-      events[ "change #{AUTO_PEER_REVIEWS}" ] = 'handleAutomaticPeerReviewsChange'
+      events["change #{PEER_REVIEWS}"] = 'handlePeerReviewsChange'
+      events["change #{AUTO_PEER_REVIEWS}"] = 'handleAutomaticPeerReviewsChange'
       events
 
+    els: do ->
+      els = {}
+      els["#{PEER_REVIEWS_ASSIGN_AT}"] = '$peerReviewsAssignAt'
+      els["#{PEER_REVIEWS}"] = '$peerReviews'
+      els["#{PEER_REVIEWS_DETAILS}"] = '$peerReviewsDetails'
+      els["#{AUTO_PEER_REVIEWS}"] = '$autoPeerReviews'
+      els["#{AUTO_PEER_REVIEWS_OPTIONS}"] = '$autoPeerReviewsOptions'
+      els
+
+    @optionProperty 'parentModel'
+
     handlePeerReviewsChange: =>
-      @showAccessibly @$peerReviewsDetails, @$peerReviews.prop('checked')
+      @$peerReviewsDetails.toggleAccessibly @$peerReviews.prop('checked')
 
     handleAutomaticPeerReviewsChange: =>
-      @showAccessibly(@$autoPeerReviewsOptions, @$autoPeerReviews.filter(':checked').val() is '1')
+      @$autoPeerReviewsOptions.toggleAccessibly(@$autoPeerReviews.filter(':checked').val() is '1')
 
-    render: =>
-      super
-      @_findElements()
-      @_attachDatepickerToDateFields()
-      this
+    afterRender: =>
+      @$peerReviewsAssignAt.datetime_field()
 
     toJSON: =>
       peerReviews: @parentModel.peerReviews()
@@ -43,23 +48,3 @@ define [
       peerReviewCount: @parentModel.peerReviewCount()
       peerReviewsAssignAt: @parentModel.peerReviewsAssignAt()
       frozenAttributes: @parentModel.frozenAttributes()
-
-    _attachDatepickerToDateFields: =>
-      @$peerReviewsAssignAt.datetime_field()
-
-    _findElements: =>
-      @$peerReviewsAssignAt = @find PEER_REVIEWS_ASSIGN_AT
-      @$peerReviews = @find PEER_REVIEWS
-      @$peerReviewsDetails = @find PEER_REVIEWS_DETAILS
-      @$autoPeerReviews = @find AUTO_PEER_REVIEWS
-      @$autoPeerReviewsOptions = @find AUTO_PEER_REVIEWS_OPTIONS
-
-    find: (selector) => @$el.find selector
-
-    showAccessibly: ($element, visible) ->
-      if visible
-        $element.show()
-        $element.attr('aria-expanded', 'true')
-      else
-        $element.hide()
-        $element.attr('aria-expanded', 'false')

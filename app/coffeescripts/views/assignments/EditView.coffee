@@ -7,9 +7,6 @@ define [
   'wikiSidebar'
   'jst/assignments/EditView'
   'compiled/models/TurnitinSettings'
-  'compiled/views/assignments/AssignmentGroupSelector'
-  'compiled/views/assignments/GroupCategorySelector'
-  'compiled/views/assignments/PeerReviewsSelector'
   'compiled/views/assignments/TurnitinSettingsDialog'
   'grading_standards'
   'compiled/fn/preventDefault'
@@ -19,10 +16,10 @@ define [
   'jqueryui/dialog'
   'jquery.toJSON'
   'compiled/jquery.rails_flash_notifications',
+  'compiled/jquery/toggleAccessibly',
 ], (INST, I18n, ValidatedFormView, _, $, wikiSidebar, template,
-TurnitinSettings, AssignmentGroupSelector, GroupCategorySelector,
-PeerReviewsSelector, TurnitinSettingsDialog, showGradingSchemeDialog,
-preventDefault, MissingDateDialog) ->
+TurnitinSettings, TurnitinSettingsDialog, showGradingSchemeDialog,
+preventDefault, MissingDateDialog, toggleAccessibly) ->
 
   class EditView extends ValidatedFormView
 
@@ -30,10 +27,9 @@ preventDefault, MissingDateDialog) ->
 
     dontRenableAfterSaveSuccess: true
 
+    ASSIGNMENT_GROUP_SELECTOR = '#assignment_group_selector'
     DUE_DATE_AREA = '#assignment_due_date_controls'
     DUE_AT = '[name="due_at"]'
-    UNLOCK_AT = '[name="unlock_at"]'
-    LOCK_AT = '[name="lock_at"]'
     DESCRIPTION = '[name="description"]'
     SUBMISSION_TYPE = '[name="submission_type"]'
     ONLINE_SUBMISSION_TYPES = '#assignment_online_submission_types'
@@ -54,25 +50,32 @@ preventDefault, MissingDateDialog) ->
     EXTERNAL_TOOLS_NEW_TAB = '#assignment_external_tool_tag_attributes_new_tab'
     VIEW_GRADING_LEVELS = '#view-grading-levels'
 
-    initialize: ( options ) ->
-      @assignment = @model
-      {views} = options
-      @dueDateOverrideView = views['js-assignment-overrides']
-      @model.on 'sync', -> window.location = @get 'html_url'
-
-    initializeSubviews: =>
-      @assignmentGroupSelector or= new AssignmentGroupSelector
-        el: '#assignment_group_selector'
-        parentModel: @assignment
-        assignmentGroups: ENV?.ASSIGNMENT_GROUPS || []
-      unless ENV?.IS_LARGE_ROSTER
-        @groupCategorySelector or= new GroupCategorySelector
-          el: GROUP_CATEGORY_SELECTOR
-          parentModel: @assignment
-          groupCategories: ENV?.GROUP_CATEGORIES || []
-        @peerReviewsSelector or= new PeerReviewsSelector
-          el: PEER_REVIEWS_FIELDS
-          parentModel: @assignment
+    els: _.extend({}, @::els, do ->
+      els = {}
+      els["#{ASSIGNMENT_GROUP_SELECTOR}"] = '$assignmentGroupSelector'
+      els["#{DUE_DATE_AREA}"] = '$dueDateArea'
+      els["#{DUE_AT}"] = '$dueAt'
+      els["#{DESCRIPTION}"] = '$description'
+      els["#{SUBMISSION_TYPE}"] = '$submissionType'
+      els["#{ONLINE_SUBMISSION_TYPES}"] = '$onlineSubmissionTypes'
+      els["#{GRADING_TYPE}"] = '$gradingType'
+      els["#{NAME}"] = '$name'
+      els["#{ALLOW_FILE_UPLOADS}"] = '$allowFileUploads'
+      els["#{RESTRICT_FILE_UPLOADS}"] = '$restrictFileUploads'
+      els["#{ALLOWED_EXTENSIONS}"] = '$allowedExtensions'
+      els["#{ADVANCED_ASSIGNMENT_OPTIONS}"] = '$advancedAssignmentOptions'
+      els["#{TURNITIN_ENABLED}"] = '$turnitinEnabled'
+      els["#{ADVANCED_TURNITIN_SETTINGS}"] = '$advancedTurnitinSettings'
+      els["#{ASSIGNMENT_TOGGLE_ADVANCED_OPTIONS}"] = '$assignmentToggleAdvancedOptions'
+      els["#{GRADED_ASSIGNMENT_FIELDS}"] = '$gradedAssignmentFields'
+      els["#{EXTERNAL_TOOL_SETTINGS}"] = '$externalToolSettings'
+      els["#{GROUP_CATEGORY_SELECTOR}"] = '$groupCategorySelector'
+      els["#{PEER_REVIEWS_FIELDS}"] = '$peerReviewsFields'
+      els["#{EXTERNAL_TOOLS_URL}"] = '$externalToolsUrl'
+      els["#{EXTERNAL_TOOLS_NEW_TAB}"] = '$externalToolsNewTab'
+      els["#{VIEW_GRADING_LEVELS}"] = '$viewGradingLevels'
+      els
+    )
 
     events: _.extend({}, @::events, do ->
       events = {}
@@ -88,6 +91,17 @@ preventDefault, MissingDateDialog) ->
       events["click .edit_letter_grades_link"] = 'showGradingSchemeDialog'
       events
     )
+
+    @child 'assignmentGroupSelector', "#{ASSIGNMENT_GROUP_SELECTOR}"
+    @child 'groupCategorySelector', "#{GROUP_CATEGORY_SELECTOR}"
+    @child 'peerReviewsSelector', "#{PEER_REVIEWS_FIELDS}"
+
+    initialize: ( options ) ->
+      super
+      @assignment = @model
+      {views} = options
+      @dueDateOverrideView = views['js-assignment-overrides']
+      @model.on 'sync', -> window.location = @get 'html_url'
 
     handleCancel: (ev) =>
       ev.preventDefault()
@@ -139,68 +153,28 @@ preventDefault, MissingDateDialog) ->
         close: -> $(ev.target).focus()
 
     toggleRestrictFileUploads: =>
-      @showAccessibly @$restrictFileUploads, @$allowFileUploads.prop('checked')
+      @$restrictFileUploads.toggleAccessibly @$allowFileUploads.prop('checked')
 
     toggleAdvancedTurnitinSettings: (ev) =>
       ev.preventDefault()
-      @showAccessibly @$advancedTurnitinSettings, @$turnitinEnabled.prop('checked')
+      @$advancedTurnitinSettings.toggleAccessibly @$turnitinEnabled.prop('checked')
 
     handleRestrictFileUploadsChange: =>
-      @showAccessibly @$allowedExtensions, @$restrictFileUploads.find('input').prop('checked')
+      @$allowedExtensions.toggleAccessibly @$restrictFileUploads.find('input').prop('checked')
 
     handleGradingTypeChange: (ev) =>
       gradingType = @$gradingType.val()
-      @showAccessibly @$gradedAssignmentFields, gradingType != 'not_graded'
-      @showAccessibly @$viewGradingLevels, gradingType == 'letter_grade'
+      @$gradedAssignmentFields.toggleAccessibly gradingType != 'not_graded'
+      @$viewGradingLevels.toggleAccessibly gradingType == 'letter_grade'
 
     handleSubmissionTypeChange: (ev) =>
       subVal = @$submissionType.val()
-      @showAccessibly(@$onlineSubmissionTypes,  subVal == 'online')
-      @showAccessibly(@$externalToolSettings, subVal == 'external_tool')
-      @showAccessibly(@$groupCategorySelector, subVal != 'external_tool')
-      @showAccessibly(@$peerReviewsFields, subVal != 'external_tool')
+      @$onlineSubmissionTypes.toggleAccessibly subVal == 'online'
+      @$externalToolSettings.toggleAccessibly subVal == 'external_tool'
+      @$groupCategorySelector.toggleAccessibly subVal != 'external_tool'
+      @$peerReviewsFields.toggleAccessibly subVal != 'external_tool'
 
-    _findElements: =>
-      @$dueAt = @$ DUE_AT
-      @$dueDateArea = @$ DUE_DATE_AREA
-      @$unlockAt = @$ UNLOCK_AT
-      @$lockAt = @$ LOCK_AT
-      @$description = @$ DESCRIPTION
-      @$submissionType = @$ SUBMISSION_TYPE
-      @$onlineSubmissionTypes = @$ ONLINE_SUBMISSION_TYPES
-      @$gradingType = @$ GRADING_TYPE
-      @$name = @$ NAME
-      @$allowFileUploads = @$ ALLOW_FILE_UPLOADS
-      @$restrictFileUploads = @$ RESTRICT_FILE_UPLOADS
-      @$allowedExtensions = @$ ALLOWED_EXTENSIONS
-      @$turnitinEnabled = @$ TURNITIN_ENABLED
-      @$advancedTurnitinSettings = @$ ADVANCED_TURNITIN_SETTINGS
-      @$advancedAssignmentOptions = @$ ADVANCED_ASSIGNMENT_OPTIONS
-      @$assignmentToggleAdvancedOptions = @$ ASSIGNMENT_TOGGLE_ADVANCED_OPTIONS
-      @$gradedAssignmentFields = @$ GRADED_ASSIGNMENT_FIELDS
-      @$externalToolSettings = @$ EXTERNAL_TOOL_SETTINGS
-      @$groupCategorySelector = @$ GROUP_CATEGORY_SELECTOR
-      @$peerReviewsFields = @$ PEER_REVIEWS_FIELDS
-      @$externalToolsUrl = @$ EXTERNAL_TOOLS_URL
-      @$externalToolsNewTab = @$ EXTERNAL_TOOLS_NEW_TAB
-      @$viewGradingLevels = @$(VIEW_GRADING_LEVELS)
-
-    showAccessibly: ($element, visible) ->
-      if visible
-        $element.show()
-        $element.attr('aria-expanded', 'true')
-      else
-        $element.hide()
-        $element.attr('aria-expanded', 'false')
-
-    render: =>
-      super
-      @initializeSubviews()
-      @assignmentGroupSelector.render()
-      unless ENV?.IS_LARGE_ROSTER
-        @groupCategorySelector.render()
-        @peerReviewsSelector.render()
-      @_findElements()
+    afterRender: =>
       @_attachDatepickerToDateFields()
       @_attachEditorToDescription()
       $ @_initializeWikiSidebar
@@ -209,6 +183,7 @@ preventDefault, MissingDateDialog) ->
     toJSON: =>
       _.extend @assignment.toView(),
         kalturaEnabled: ENV?.KALTURA_ENABLED || false
+        isLargeRoster: ENV?.IS_LARGE_ROSTER || false
 
     _attachEditorToDescription: =>
       @$description.editorBox()
@@ -217,8 +192,6 @@ preventDefault, MissingDateDialog) ->
     _attachDatepickerToDateFields: =>
       if @assignment.isSimple()
         @$dueAt.datetime_field()
-      @$unlockAt.datetime_field()
-      @$lockAt.datetime_field()
 
     _initializeWikiSidebar: =>
       # $("#sidebar_content").hide()
@@ -250,7 +223,7 @@ preventDefault, MissingDateDialog) ->
         sections = @dueDateOverrideView.sectionsWithoutOverrides()
         missingDateDialog = new MissingDateDialog
           validationFn: -> sections
-          labelFn: ( section ) -> section.get 'name'
+          labelFn: (section) -> section.get 'name'
           success: =>
             @model.setNullDates()
             ValidatedFormView::submit.call(this)
@@ -263,13 +236,13 @@ preventDefault, MissingDateDialog) ->
 
     _inferSubmissionTypes: (assignmentData) =>
       if assignmentData.grading_type == 'not_graded'
-        assignmentData.submission_types = [ 'not_graded' ]
+        assignmentData.submission_types = ['not_graded']
       else if assignmentData.submission_type == 'online'
         types = _.select _.keys(assignmentData.online_submission_types), (k) ->
           assignmentData.online_submission_types[k]
         assignmentData.submission_types = types
       else
-        assignmentData.submission_types = [ assignmentData.submission_type ]
+        assignmentData.submission_types = [assignmentData.submission_type]
       delete assignmentData.online_submission_type
       delete assignmentData.online_submission_types
       assignmentData

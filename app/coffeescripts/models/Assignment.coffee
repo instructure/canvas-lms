@@ -56,7 +56,7 @@ define [
       return @get('points_possible') || 0 unless arguments.length > 0
       @set 'points_possible', points
 
-    assignmentGroupID: ( assignment_group_id ) =>
+    assignmentGroupId: ( assignment_group_id ) =>
       return @get 'assignment_group_id' unless assignment_group_id
       @set 'assignment_group_id', assignment_group_id
 
@@ -191,7 +191,7 @@ define [
         'turnitinAvailable','turnitinEnabled',
         'gradeGroupStudentsIndividually', 'groupCategoryId', 'frozen',
         'frozenAttributes', 'freezeOnCopy', 'canFreeze', 'isSimple',
-        'gradingStandardId', 'isLetterGraded'
+        'gradingStandardId', 'isLetterGraded', 'assignmentGroupId'
       ]
       hash = {}
       for field in fields

@@ -31,11 +31,11 @@ define [], ->
     excludesSmallMatches: =>
       !!@excludeSmallMatchesType?
 
-    toView: =>
-      viewJSON = {}
+    present: =>
+      json = {}
       for own key,value of this
-        viewJSON[key] = value
-      viewJSON.excludesSmallMatches = @excludesSmallMatches()
-      viewJSON.words = @words()
-      viewJSON.percent = @percent()
-      viewJSON
+        json[key] = value
+      json.excludesSmallMatches = @excludesSmallMatches()
+      json.words = @words()
+      json.percent = @percent()
+      json

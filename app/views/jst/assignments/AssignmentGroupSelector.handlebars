@@ -6,7 +6,9 @@
     name="assignment_group_id"
     {{disabledIfIncludes frozenAttributes "assignment_group_id"}}>
     {{#each assignmentGroups}}
-      <option value="{{id}}" {{selected}}>{{name}}</option>
+      <option value="{{id}}" {{selectedIf ../assignmentGroupId this.id}}>
+        {{name}}
+      </option>
     {{/each}}
     <option value="new">
       [ {{#t "assignment_group_options.new_group"}}New Group{{/t}} ]

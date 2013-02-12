@@ -4,7 +4,8 @@ define [
   'underscore'
   'jquery'
   'jst/assignments/GroupCategorySelector'
-], (I18n, Backbone, _, $, template) ->
+  'compiled/jquery/toggleAccessibly'
+], (I18n, Backbone, _, $, template, toggleAccessibly) ->
 
   class GroupCategorySelector extends Backbone.View
 
@@ -14,16 +15,21 @@ define [
     HAS_GROUP_CATEGORY = '#assignment_has_group_category'
     GROUP_CATEGORY_OPTIONS = '#group_category_options'
 
-    initialize: ->
-      super
-      @parentModel = @options.parentModel
-      @groupCategories = @options.groupCategories
+    els: do ->
+      els = {}
+      els["#{GROUP_CATEGORY_ID}"] = '$groupCategoryID'
+      els["#{HAS_GROUP_CATEGORY}"] = '$hasGroupCategory'
+      els["#{GROUP_CATEGORY_OPTIONS}"] = '$groupCategoryOptions'
+      els
 
     events: do ->
       events = {}
       events[ "change #{GROUP_CATEGORY_ID}" ] = 'showGroupCategoryCreateDialog'
       events[ "change #{HAS_GROUP_CATEGORY}" ] = 'toggleGroupCategoryOptions'
       events
+
+    @optionProperty 'parentModel'
+    @optionProperty 'groupCategories'
 
     showGroupCategoryCreateDialog: =>
       if @$groupCategoryID.val() == 'new'
@@ -39,14 +45,9 @@ define [
           @groupCategories.push(group)
 
     toggleGroupCategoryOptions: =>
-      @showAccessibly @$groupCategoryOptions, @$hasGroupCategory.prop('checked')
+      @$groupCategoryOptions.toggleAccessibly @$hasGroupCategory.prop('checked')
       if @$hasGroupCategory.prop('checked') and @groupCategories.length == 0
         @showGroupCategoryCreateDialog()
-
-    render: =>
-      super
-      @_findElements()
-      this
 
     toJSON: =>
       groupCategoryId: @parentModel.groupCategoryId()
@@ -61,19 +62,6 @@ define [
         data.group_category_id = null
         data.grade_group_students_individually = false
       data
-
-    _findElements: =>
-      @$groupCategoryID = @$ GROUP_CATEGORY_ID
-      @$hasGroupCategory = @$ HAS_GROUP_CATEGORY
-      @$groupCategoryOptions = @$ GROUP_CATEGORY_OPTIONS
-
-    showAccessibly: ($element, visible) ->
-      if visible
-        $element.show()
-        $element.attr('aria-expanded', 'true')
-      else
-        $element.hide()
-        $element.attr('aria-expanded', 'false')
 
     validateBeforeSave: (data, errors) =>
       errors = @_validateGroupCategoryID data, errors

@@ -30,8 +30,7 @@
         name="group_category_id"
         {{disabledIfIncludes frozenAttributes "group_category_id"}}>
         {{#each groupCategories}}
-          <option value="{{id}}"
-          {{selectedIf ../groupCategoryId this.id}}>
+          <option value="{{id}}" {{selectedIf ../groupCategoryId this.id}}>
             {{name}}
           </option>
         {{/each}}
