@@ -1571,9 +1571,6 @@ define([
                 $panel.find(".breadcrumb").empty().append(files.breadcrumb());
 
                 var collaborations_url = $("." + data.context_string + "_collaborations_url").attr('href');
-                $panel.find(".collaborations_link").attr('href', collaborations_url);
-                $panel.find(".add_collaboration_link").attr('href', collaborations_url);
-                $panel.find(".view_collaborations").showIf(context && context.permissions && context.permissions.manage_grades);
                 $panel.removeClass('to_be_hidden');
                 $panel.toggleClass('addable_content_panel', !!(data.context && data.context.permissions && data.context.permissions.create_collaborations));
                 $panel.data('node', node);
@@ -1770,7 +1767,6 @@ define([
                 $panel.find(".breadcrumb").empty().append(files.breadcrumb());
                 var collaboration_url = $("." + data.context_string + "_collaboration_url").attr('href');
                 collaboration_url = $.replaceTags(collaboration_url, 'id', data.id);
-                $panel.find(".collaborations_link").attr('href', collaboration_url);
                 $panel.find(".edit_collaboration_link").attr('href', collaboration_url);
                 $panel.find(".delete_collaboration_link").attr('href', collaboration_url);
                 $panel.find(".view_item_link").attr('href', collaboration_url);
@@ -1858,31 +1854,6 @@ define([
         });
       });
 
-      $("#collaborations_panel .add_collaboration_link").click(function(event) {
-        event.preventDefault();
-        $("#edit_collaboration_form").attr('action', $(this).attr('href'));
-        $("#edit_collaboration_form").attr('method', 'POST');
-        $("#edit_collaboration_form .submit_button").text(I18n.t('buttons.add_collaboration', "Add Collaboration"));
-        $("#edit_collaboration_form .add_collaboration").show();
-        $("#collaboration_collaboration_type").triggerHandler('change');
-        if($files_content.find(".add_form:visible").length> 0) { return; };
-        $files_content.children(".message").remove();
-        var data = files.itemData($("#collaborations_panel").data('node'));
-        data.title = "";
-        data.description = "";
-        $("#edit_collaboration_form").fillFormData(data, {object_name: 'collaboration'});
-        var context_string = data.context_string;
-        $("#edit_collaboration_dialog").data('context_string', context_string);
-        var $users = $("." + context_string + "_user_list:first").clone(true);
-        $users.find(".collaborator input").each(function() {
-          $(this).attr('id', $(this).attr('class'));
-        });
-        $("#edit_collaboration_dialog .collaborator_list").empty().append($users);
-        $("#edit_collaboration_dialog").dialog({
-          title: I18n.t('titles.add_collaboration', 'Add New Collaboration'),
-          width: 500
-        });
-      });
 
       $("#folder_panel .download_zip").click(function(event) {
         event.preventDefault();
