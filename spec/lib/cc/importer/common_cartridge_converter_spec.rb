@@ -1,5 +1,5 @@
 # coding: utf-8
-require File.dirname(__FILE__) + '/../cc_spec_helper'
+require File.expand_path(File.dirname(__FILE__) + '/../cc_spec_helper')
 
 describe "Standard Common Cartridge importing" do
   before(:all) do
@@ -165,6 +165,27 @@ describe "Standard Common Cartridge importing" do
       bank = @course.assessment_question_banks.find_by_migration_id("I_00004_R_QDB_1")
       bank.assessment_questions.count.should == 11
       bank.title.should == "QDB_1"
+    else
+      pending("Can't import assessment data with python QTI tool.")
+    end
+  end
+
+  it "should import assessment data into an active question bank" do
+    if Qti.qti_enabled?
+      bank = @course.assessment_question_banks.find_by_migration_id("I_00004_R_QDB_1")
+      bank.assessment_questions.count.should == 11
+      bank.destroy
+      bank.reload
+      bank.workflow_state.should == "deleted"
+
+      @migration = ContentMigration.create(:context => @course)
+      @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
+      @course.import_from_migration(@course_data, nil, @migration)
+
+      bank = @course.assessment_question_banks.active.find_by_migration_id("I_00004_R_QDB_1")
+      bank.should_not be_nil
+
+      bank.assessment_questions.count.should == 11
     else
       pending("Can't import assessment data with python QTI tool.")
     end
