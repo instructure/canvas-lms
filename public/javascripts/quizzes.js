@@ -1242,14 +1242,6 @@ define([
       }
     }).triggerHandler('change');
 
-    $quiz_options_form.find(".save_quiz_button").click(function() {
-      $quiz_options_form.data('activator', 'save');
-    });
-
-    // $quiz_options_form.find(".publish_quiz_button").click(function() {
-    //   $quiz_options_form.data('activator', 'publish');
-    // });
-
     var hasCheckedOverrides = false;
 
     $quiz_options_form.formSubmit({
@@ -1257,9 +1249,6 @@ define([
 
       processData: function(data) {
         $(this).attr('method', 'PUT');
-        if ($(this).data('submit_type') == 'save_only') {
-          delete data['activate'];
-        }
         var quiz_title = $("#quiz_title").val();
         if (quiz_title.length == 0) {
           var offset = $("#quiz_title").errorBox(I18n.t('errors.field_is_required', "This field is required")).offset();
@@ -1329,7 +1318,6 @@ define([
         var $form = $(this);
         $quiz_edit_wrapper
           .find(".btn.save_quiz_button")
-          .attr('disabled', false)
           .text(I18n.t('buttons.saved', "Saved!"));
         if (data.quiz.assignment) {
           var assignment = data.quiz.assignment;

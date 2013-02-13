@@ -107,15 +107,14 @@ $(document).ready(function() {
           </div>
 
           <fieldset>
-            <input type="hidden" name="activate" value="true"/>
             <div class="control-group">
               <label class="control-label" for="quiz_assignment_id"><%= t(:quiz_type, "Quiz Type") %></label>
               <div class="controls">
                 <select name="quiz[quiz_type]" id="quiz_assignment_id">
-                  <option value="practice_quiz"><%= t(:practice_quiz, "Practice Quiz") %></option>
-                  <option value="assignment" <%= 'selected' if @quiz.quiz_type == 'assignment' %> ><%= t(:graded_quiz, "Graded Quiz") %></option>
-                  <option value="graded_survey" <%= 'selected' if @quiz.quiz_type == 'graded_survey' %> ><%= t(:graded_survey, "Graded Survey") %></option>
-                  <option value="survey" <%= 'selected' if @quiz.quiz_type == 'survey' %> ><%= t(:ungraded_survey, "Ungraded Survey") %></option>
+                  <option value="practice_quiz"><%= render_quiz_type('practice_quiz') %></option>
+                  <option value="assignment" <%= 'selected' if @quiz.quiz_type == 'assignment' %> ><%= render_quiz_type('assignment') %></option>
+                  <option value="graded_survey" <%= 'selected' if @quiz.quiz_type == 'graded_survey' %> ><%= render_quiz_type('graded_survey') %></option>
+                  <option value="survey" <%= 'selected' if @quiz.quiz_type == 'survey' %> ><%= render_quiz_type('survey') %></option>
                 </select>
               </div>
             </div>
@@ -168,7 +167,7 @@ $(document).ready(function() {
                 <div id="multiple_attempts_suboptions">
                   <div>
                     <label for="keep_score_select" class="inline"><%= t(:score_to_keep, "Quiz Score to Keep") %></label>
-                    <%= select(:quiz, :scoring_policy, [[t('keep_highest', 'Highest'), 'keep_highest'], [t('keep_latest', 'Latest'), 'keep_latest']], {}, :id => 'keep_score_select') %>
+                    <%= select(:quiz, :scoring_policy, [[render_score_to_keep('keep_highest'), 'keep_highest'], [render_score_to_keep('keep_latest'), 'keep_latest']], {}, :id => 'keep_score_select') %>
                   </div>
                   <div style="margin-top:5px">
                     <label for="limit_attempts_option" class="checkbox inline nowrap">
@@ -272,10 +271,6 @@ $(document).ready(function() {
 
         </div>
       <% end %>
-
-      <div id="unpublished_changes_message" class="content-callout border hanging" style="<%= hidden unless @quiz.available? && @quiz.unpublished_changes? %>;">
-        <i class="icon-warning"></i> <%= t('warnings.unpublished_changes', "You have made unpublished changes to this quiz.  These changes will not appear for students until you publish or re-publish the quiz.") %>
-      </div>
     </div>
 
     <div id="questions_tab">

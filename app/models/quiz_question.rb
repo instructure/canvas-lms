@@ -27,6 +27,7 @@ class QuizQuestion < ActiveRecord::Base
   before_save :infer_defaults
   before_save :create_assessment_question
   before_destroy :delete_assessment_question
+  before_destroy :update_quiz
   validates_presence_of :quiz_id
   serialize :question_data
   after_save :update_quiz

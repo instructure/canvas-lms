@@ -122,6 +122,27 @@ $(document).ready(function () {
     }).find('.datetime_field').datetime_field();
   });
 
+  $('#lock_this_quiz_now_link').ifExists(function($link) {
+    $link.click(function(e) {
+      e.preventDefault();
+      $link.closest('form').submit();
+    })
+  });
+
+  if ($('ul.page-action-list').find('li').length > 0) {
+    $('ul.page-action-list').show();
+  }
+
+  $('#publish_quiz_form').formSubmit({
+    beforeSubmit: function(data) {
+      $(this).find('button').attr('disabled', true).text(I18n.t('buttons.publishing', "Publishing..."));
+    },
+    success: function(data) {
+      $(this).find('button').text(I18n.t('buttons.published', "Published!"));
+      location.reload();
+    }
+  });
+
 });
 
 });

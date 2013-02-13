@@ -195,15 +195,9 @@ describe "quizzes questions" do
       submit_form(question)
       wait_for_ajax_requests
 
-      expect_new_page_load {
-        f('.save_quiz_button').click
-      }
-
-      pending '[elyngved] skip until we add the publish button to the quiz show page'
-      
-      expect_new_page_load {
-        driver.find_element(:link, 'Take the Quiz').click
-      }
+      expect_new_page_load { f('.save_quiz_button').click }
+      expect_new_page_load { f('.publish_quiz_button').click }
+      expect_new_page_load { driver.find_element(:link, 'Take the Quiz').click }
 
       input = f('input[type=text]')
       input.click

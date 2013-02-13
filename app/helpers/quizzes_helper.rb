@@ -17,12 +17,68 @@
 #
 
 module QuizzesHelper
+  def unpublished_quiz_warning
+    I18n.t("#quizzes.warnings.unpublished_quiz",
+      '*This quiz is unpublished* Only teachers can see the quiz until ' +
+      'it is published.',
+      :wrapper => '<strong class=unpublished_quiz_warning>\1</strong>')
+  end
+
+  def unpublished_changes_warning
+    I18n.t("#quizzes.warnings.unpublished_changes",
+      '*You have made unpublished changes to this quiz.* '+
+      'These changes will not appear for students until you publish or ' +
+      'republish the quiz.',
+      :wrapper => '<strong class=unpublished_quiz_warning>\1</strong>')
+  end
+
   def render_score(score, precision=2)
     if score.nil?
       '_'
     else
       score.to_f.round(precision).to_s
     end
+  end
+
+  def render_quiz_type(quiz_type)
+    case quiz_type
+    when "practice_quiz"
+      I18n.t('#quizzes.practice_quiz', "Practice Quiz")
+    when "assignment"
+      I18n.t('#quizzes.graded_quiz', "Graded Quiz")
+    when "graded_survey"
+      I18n.t('#quizzes.graded_survey', "Graded Survey")
+    when "survey"
+      I18n.t('#quizzes.ungraded_survey', "Ungraded Survey")
+    end
+  end
+
+  def render_score_to_keep(quiz_scoring_policy)
+    case quiz_scoring_policy
+    when "keep_highest"
+      I18n.t('#quizzes.keep_highest', 'Highest')
+    when "keep_latest"
+      I18n.t('#quizzes.keep_latest', 'Latest')
+    end
+  end
+
+  def render_show_responses(quiz_hide_results)
+    # "Let Students See Their Quiz Responses?"
+    case quiz_hide_results
+    when "always"
+      I18n.t('#options.no', "No")
+    when "until_after_last_attempt"
+      I18n.t('#quizzes.after_last_attempt', "After Last Attempt")
+    when nil
+      I18n.t('#quizzes.always', "Always")
+    end
+  end
+
+  def render_unsubmitted_students(student_count)
+    I18n.t('#quizzes.headers.unsubmitted_students_count',
+      { :one => "1 student hasn't taken the survey",
+        :other => "%{count} students haven't taken the survey" },
+      { :count => student_count })
   end
 
   QuestionType = Struct.new(:question_type,
