@@ -4,6 +4,7 @@ define([
   'jquery' /* $ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* parseFromISO, date_field */,
+  'jquery.instructure_forms' /* formSubmit, getFormData, validateForm */,
   'jquery.instructure_misc_plugins' /* showIf */,
   'compiled/jquery.rails_flash_notifications',
   'vendor/date' /* Date.parse */,
