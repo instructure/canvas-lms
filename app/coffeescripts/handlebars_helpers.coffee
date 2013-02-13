@@ -262,6 +262,9 @@ define [
       else
         if thing then 'selected' else ''
 
+    disabledIf: ( thing, hash ) ->
+      if thing then 'disabled' else ''
+
     checkedUnless: ( thing ) ->
       if thing then '' else 'checked'
 

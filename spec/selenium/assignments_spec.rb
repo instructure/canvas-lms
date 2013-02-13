@@ -197,6 +197,29 @@ describe "assignments" do
       f('title').should include_text(assignment_name + ' edit')
     end
 
+    it "should not allow group assignment or peer review for mooc course assignment" do
+      assignment_name = 'mooc test assignment'
+      due_date = Time.now.utc + 2.days
+      @course.update_attribute(:large_roster, true)
+      group = @course.assignment_groups.create!(:name => "default")
+      second_group = @course.assignment_groups.create!(:name => "second default")
+      @assignment = @course.assignments.create!(
+          :name => assignment_name,
+          :due_at => due_date,
+          :assignment_group => group,
+          :unlock_at => due_date - 1.day
+      )
+      get "/courses/#{@course.id}/assignments"
+
+      expect_new_page_load { f("#assignment_#{@assignment.id} .title").click }
+      edit_assignment
+
+      #ensure group assignment and peer reviews options are disabled
+      f('#assignment_toggle_advanced_options').click
+      ff("fieldset#group_category_selector div").should == []
+      ff("fieldset#assignment_peer_reviews_fields div").should == []
+    end
+
     context "frozen assignments" do
 
       append_before(:each) do

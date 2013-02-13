@@ -928,6 +928,10 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  def is_mooc?
+    context.large_roster
+  end
+
   def group_students(student)
     group = nil
     students = [student]

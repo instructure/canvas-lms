@@ -65,13 +65,14 @@ preventDefault, MissingDateDialog) ->
         el: '#assignment_group_selector'
         parentModel: @assignment
         assignmentGroups: ENV?.ASSIGNMENT_GROUPS || []
-      @groupCategorySelector or= new GroupCategorySelector
-        el: GROUP_CATEGORY_SELECTOR
-        parentModel: @assignment
-        groupCategories: ENV?.GROUP_CATEGORIES || []
-      @peerReviewsSelector or= new PeerReviewsSelector
-        el: PEER_REVIEWS_FIELDS
-        parentModel: @assignment
+      unless ENV?.IS_MOOC
+        @groupCategorySelector or= new GroupCategorySelector
+          el: GROUP_CATEGORY_SELECTOR
+          parentModel: @assignment
+          groupCategories: ENV?.GROUP_CATEGORIES || []
+        @peerReviewsSelector or= new PeerReviewsSelector
+          el: PEER_REVIEWS_FIELDS
+          parentModel: @assignment
 
     events: _.extend({}, @::events, do ->
       events = {}
@@ -196,8 +197,9 @@ preventDefault, MissingDateDialog) ->
       super
       @initializeSubviews()
       @assignmentGroupSelector.render()
-      @groupCategorySelector.render()
-      @peerReviewsSelector.render()
+      unless ENV?.IS_MOOC
+        @groupCategorySelector.render()
+        @peerReviewsSelector.render()
       @_findElements()
       @_attachDatepickerToDateFields()
       @_attachEditorToDescription()
@@ -230,7 +232,8 @@ preventDefault, MissingDateDialog) ->
       data = super
       data = @_inferSubmissionTypes data
       data = @_filterAllowedExtensions data
-      data = @groupCategorySelector.filterFormData data
+      unless ENV?.IS_MOOC
+        data = @groupCategorySelector.filterFormData data
       # should update the date fields.. pretty hacky.
       if @showingAdvancedOptions()
         @dueDateOverrideView.updateOverrides()
@@ -290,7 +293,8 @@ preventDefault, MissingDateDialog) ->
       errors = @_validateTitle data, errors
       errors = @_validateSubmissionTypes data, errors
       errors = @_validateAllowedExtensions data, errors
-      errors = @groupCategorySelector.validateBeforeSave(data, errors)
+      unless ENV?.IS_MOOC
+        errors = @groupCategorySelector.validateBeforeSave(data, errors)
       errors = @_validateAdvancedOptions(data, errors)
       errors
 
