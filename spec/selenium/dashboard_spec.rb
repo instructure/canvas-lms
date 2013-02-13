@@ -174,7 +174,7 @@ describe "dashboard" do
 
       get "/"
 
-      ffj(".to-do-list li:visible").size.should == 5 + 1 # +1 is the see more link
+      keep_trying_until { ffj(".to-do-list li:visible").size.should == 5 + 1 } # +1 is the see more link
       f(".more_link").click
       wait_for_animations
       ffj(".to-do-list li:visible").size.should == 20
@@ -277,6 +277,7 @@ describe "dashboard" do
       @assignment.save!
 
       get "/"
+      keep_trying_until { ffj(".events_list .event .tooltip_wrap").size.should > 0 }
       driver.execute_script("$('.events_list .event .tooltip_wrap, .events_list .event .tooltip_text').css('visibility', 'visible')")
       f('.events_list .event .tooltip_wrap').should include_text 'submitted'
     end

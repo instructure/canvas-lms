@@ -1,0 +1,25 @@
+<%= render :partial => 'courses/assignments_needing_grading', :locals => {:contexts => nil} %>
+<% locals = {:title => t('coming_up', "Coming Up"), :display_count => 3, :period => :one_week, :show_context => true, :upcoming => true} %>
+<% if @current_user %>
+<% cache([@current_user, 'user_dashboard_upcoming_events' ], :expires_in => 3.minutes) do %>
+  <%
+    upcoming_events = @current_user.upcoming_events
+    @current_user_submissions ||= @current_user && @current_user.submissions.scoped(:select => 'id, assignment_id, score, workflow_state', :conditions => {:assignment_id => upcoming_events.select{|e| e.is_a?(Assignment) }.map(&:id)})
+  %>
+  <%= render :partial => "shared/event_list", :object => upcoming_events, :locals => locals %>
+<% end %>
+<% else %>
+<%= render :partial => "shared/event_list", :object => [], :locals => locals %>
+<% end %>
+<% if @show_recent_feedback %>
+<%= render :partial => "shared/event_list", :object => @recent_feedback, :locals => {:title => t('recent_feedback', "Recent Feedback"), :display_count => 3, :period => :two_weeks, :show_context => true, :is_recent_feedback => true} %>
+<% end %>
+<% if show_user_create_course_button(@current_user) %>
+<div class="rs-margin-lr">
+<button type="button"
+        id="start_new_course"
+        class="element_toggler btn button-sidebar-wide"
+        aria-controls="new_course_form"><%= t('start_new_course', 'Start a New Course') %></button>
+<%= render :partial => 'shared/new_course_form' %>
+</div>
+<% end %>

@@ -978,7 +978,7 @@ define([
 
     // this is for things like the to-do, recent items and upcoming, it
     // happend a lot so rather than duplicating it everywhere I stuck it here
-    $(".more_link").click(function(event) {
+    $("#right-side").delegate(".more_link", "click", function(event) {
       var $this = $(this);
       var $children = $this.parents("ul").children().show();
       $this.closest('li').remove();
@@ -993,7 +993,7 @@ define([
       }
       return false;
     });
-    $(".to-do-list, #topic_list").delegate('.disable_item_link', 'click', function(event) {
+    $("#right-side, #topic_list").delegate('.disable_item_link', 'click', function(event) {
       event.preventDefault();
       var $item = $(this).parents("li, div.topic_message");
       var url = $(this).data('api-href');

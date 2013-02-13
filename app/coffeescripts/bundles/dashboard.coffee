@@ -3,7 +3,14 @@ require [
   'Backbone',
   'jquery',
   'i18n!dashboard'
+  'jquery.disableWhileLoading'
 ], (_, {View}, $, I18n) ->
+
+  if ENV.DASHBOARD_SIDEBAR_URL
+    rightSide = $('#right-side')
+    rightSide.disableWhileLoading(
+      $.get ENV.DASHBOARD_SIDEBAR_URL , (data) ->
+        rightSide.html data)
 
   class DashboardView extends View
 

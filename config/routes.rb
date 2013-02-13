@@ -562,6 +562,7 @@ ActionController::Routing::Routes.draw do |map|
 
   # dashboard_url is / , not /dashboard
   map.dashboard '', :controller => 'users', :action => 'user_dashboard', :conditions => {:method => :get}
+  map.dashboard_sidebar 'dashboard-sidebar', :controller => 'users', :action => 'dashboard_sidebar', :conditions => {:method => :get}
   map.toggle_dashboard 'toggle_dashboard', :controller => 'users', :action => 'toggle_dashboard', :conditions => {:method => :post}
   map.styleguide 'styleguide', :controller => 'info', :action => 'styleguide', :conditions => {:method => :get}
   map.root :dashboard
