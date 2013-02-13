@@ -24,6 +24,43 @@ class IncomingMessageProcessor
   class UnknownAddressError < ReplyFromError; end
   class ReplyToLockedTopicError < ReplyFromError; end
   
+  class << self
+    attr_accessor :mailman_method, :mailman_accounts
+  end
+
+  # See config/incoming_mail.yml.example for documentation on how to configure incoming mail
+  def self.configure(config)
+    configure_mailman(config.except(*account_keys))
+    configure_accounts(config.slice(*account_keys))
+  end
+
+  def self.account_keys
+    %w(imap pop3)
+  end
+
+  def self.configure_mailman(mailman_config)
+    mailman_config.each do |key, value|
+      Mailman.config.send(key + '=', value)
+    end
+    # yes, this is lame, but setting this to real nil makes mailman assume '.',
+    # which then reloads the rails configuration (and gets an error because we
+    # try to remove a method that's already there)
+    Mailman.config.rails_root = 'nil'
+    Mailman.config.logger = Rails.logger
+  end
+
+  def self.configure_accounts(account_config)
+    raise "Only one of [#{account_keys.join(', ')}] can be specified in incoming_mail" if account_config.size > 1
+    self.mailman_method, account_defaults = account_config.first || [nil, {}]
+    accounts = account_defaults['accounts'] || [{}]
+    account_defaults = account_defaults.except('accounts')
+
+    raise "poll_interval must be 0 if multiple accounts are specified" if accounts.size > 1 && Mailman.config.poll_interval != 0
+
+    self.mailman_accounts = accounts.map { |account| account_defaults.merge(account) }.map(&:symbolize_keys)
+  end
+
+
   def self.bounce_message?(mail)
     mail.header.fields.any? do |field|
       case field.name
@@ -54,7 +91,7 @@ class IncomingMessageProcessor
     Iconv.conv('UTF-8//TRANSLIT//IGNORE', encoding, string) rescue TextHelper.strip_invalid_utf8(string)
   end
 
-  def self.process_single(incoming_message, secure_id, message_id)
+  def self.process_single(incoming_message, secure_id, message_id, inbox_address = default_inbox_address)
     return if IncomingMessageProcessor.bounce_message?(incoming_message)
 
     if incoming_message.multipart? && part = incoming_message.parts.find { |p| p.content_type.try(:match, %r{^text/html(;|$)}) }
@@ -90,19 +127,31 @@ class IncomingMessageProcessor
         })
       end
     rescue IncomingMessageProcessor::ReplyFromError => error
-      IncomingMessageProcessor.ndr(original_message, incoming_message, error)
+      IncomingMessageProcessor.ndr(original_message, incoming_message, error, inbox_address)
     rescue IncomingMessageProcessor::SilentIgnoreError
       # ignore it
     end
   end
 
   def self.process
-    addr, domain = HostUrl.outgoing_email_address.split(/@/)
+    mailman_accounts.each do |account|
+      Mailman.config.send(mailman_method + '=', account) if mailman_method
+      inbox_address = account[:username] || default_inbox_address
+      process_account(inbox_address)
+    end
+  end
+
+  def self.default_inbox_address
+    HostUrl.outgoing_email_address
+  end
+
+  def self.process_account(inbox_address)
+    addr, domain = inbox_address.split(/@/)
     regex = Regexp.new("#{Regexp.escape(addr)}\\+([0-9a-f]+)-(\\d+)@#{Regexp.escape(domain)}")
     Mailman::Application.run do
       to regex do
         begin
-          IncomingMessageProcessor.process_single(message, params['captures'][0], params['captures'][1].to_i)
+          IncomingMessageProcessor.process_single(message, params['captures'][0], params['captures'][1].to_i, inbox_address)
         rescue => e
           ErrorReport.log_exception(:default, e, :from => message.from.try(:first),
                                                  :to => message.to.to_s)
@@ -114,7 +163,7 @@ class IncomingMessageProcessor
     end
   end
 
-  def self.ndr(original_message, incoming_message, error)
+  def self.ndr(original_message, incoming_message, error, inbox_address)
     incoming_from = incoming_message.from.try(:first)
     incoming_subject = incoming_message.subject
     return unless incoming_from
@@ -122,7 +171,7 @@ class IncomingMessageProcessor
     ndr_subject, ndr_body = IncomingMessageProcessor.ndr_strings(incoming_subject, error)
     outgoing_message = Message.new({
       :to => incoming_from,
-      :from => HostUrl.outgoing_email_address,
+      :from => inbox_address,
       :subject => ndr_subject,
       :body => ndr_body,
       :delay_for => 0,
