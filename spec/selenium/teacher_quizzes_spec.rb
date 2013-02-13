@@ -72,8 +72,7 @@ describe "quizzes" do
       wait_for_ajax_requests
 
       #check quiz preview
-      pending "[elyngved] skip until we add the quiz preview button to the quiz show page"
-      driver.find_element(:link, 'Preview the Quiz').click
+      f('#preview_quiz_button').click
       f('#questions').should be_present
     end
 
@@ -89,9 +88,9 @@ describe "quizzes" do
     end
 
     it "should pop up calendar on top of #main" do
-      pending "[elyngved] skip until we add vdd to the quiz edit page"
       get "/courses/#{@course.id}/quizzes/new"
-      f('#quiz_lock_at + .ui-datepicker-trigger').click
+      wait_for_ajaximations
+      fj('.due-date-row input:first + .ui-datepicker-trigger').click
       cal = f('#ui-datepicker-div')
       cal.should be_displayed
       cal.style('z-index').should > f('#main').style('z-index')
@@ -255,9 +254,11 @@ describe "quizzes" do
 
     it "should flag a quiz question while taking a quiz as a teacher" do
       quiz_with_new_questions
-
-      pending "[elyngved] skip until we add quiz publish button to the quiz edit page"
-      expect_new_page_load { f('.publish_quiz_button').click }
+      expect_new_page_load { 
+        click_save_settings_button 
+        wait_for_ajax_requests
+      }
+      f('.publish_quiz_button').click
       wait_for_ajax_requests
 
       expect_new_page_load { driver.find_element(:link, 'Take the Quiz').click }
@@ -520,6 +521,7 @@ describe "quizzes" do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
       expect_new_page_load do
+        f('.al-trigger-inner').click
         f('.delete_quiz_link').click
         accept_alert
       end

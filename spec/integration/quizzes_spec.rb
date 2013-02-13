@@ -104,20 +104,24 @@ describe QuizzesController do
         get "courses/#{@course.id}/quizzes/#{@quiz.id}"
 
         doc = Nokogiri::HTML(response.body)
-        doc.css("td:nth-child(4)").text.include?(datetime_string(due_at)).should be_true
+        doc.css("#quiz_student_details .value").first.text.should include(datetime_string(due_at))
       end
 
-      it "should indicate multiple due dates" do
+      it "should show multiple due dates to teachers" do
         cs1 = @course.default_section
         cs2 = @course.course_sections.create!
 
-        create_section_override(cs1, 3.days.from_now)
-        create_section_override(cs2, 4.days.from_now)
+        due_at1 = 3.days.from_now
+        due_at2 = 4.days.from_now
+        create_section_override(cs1, due_at1)
+        create_section_override(cs2, due_at2)
 
         get "courses/#{@course.id}/quizzes/#{@quiz.id}"
 
         doc = Nokogiri::HTML(response.body)
-        doc.css("td:nth-child(4)").text.include?("Multiple Due Dates").should be_true
+        doc.css(".assignment_dates tbody tr").count.should be 2
+        doc.css(".assignment_dates tbody tr > td:first-child").text.
+          should include(datetime_string(due_at1), datetime_string(due_at2))
       end
     end
 

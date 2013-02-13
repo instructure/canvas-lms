@@ -4,8 +4,97 @@ $backgroundColor: #dfe9f0
 $borderColor: #AAA
 $questionHeaderBackground: #F5F5F5
 
-#content
-  background-color: $backgroundColor
+#quiz_show
+  .alert
+    padding-right: 14px
+    .actions
+      text-align: right
+      line-height: 36px
+    .publish_quiz_button
+      width: 90px
+    #preview_quiz_button
+      font-weight: normal
+      color: #333333
+    .unpublished_quiz_warning
+      display: block
+
+
+  .admin-links
+    text-align: left
+    margin-left: 10px
+    .al-options
+      min-width: 125px
+
+  .description.teacher-version
+    padding: 15px
+    overflow-y: auto
+    height: 200px
+    border: 1px solid #AAA
+    resize: vertical
+
+  .lock_explanation
+    text-align: left
+    margin-top: 20px
+
+  .take_quiz_button
+    text-align: center
+    margin-top: 20px
+    font-size: 1.3em
+
+  #quiz_details
+    display: none
+    clear: both
+
+    td
+      vertical-align: top
+
+  .control-group
+    margin-bottom: 0px
+
+    .control-label
+      font-weight: bold
+      width: 33.3%
+
+    .controls 
+      margin-left: 35%
+      .value
+        display: block
+        padding-top: 5px
+
+  .assignment_dates
+    border-collapse: collapse
+    width: 100%
+    margin-bottom: 1em
+
+    tr
+      th
+        font-weight: bold
+        padding: 0.25em 0.5em
+
+      td
+        border-top: 1px solid #BBB
+        border-bottom: 1px solid #BBB
+        padding: 0.25em 0.5em
+
+  ul#quiz_student_details
+    list-style: none
+    padding: 0
+    border-top: 1px solid #BBB
+    border-bottom: 1px solid #BBB
+    width: 100%
+    font-size: 1.1em
+    padding: 0.5em 0.25em
+    margin: 0 0 1em
+
+    li
+      display: inline-block
+
+      .label
+        font-weight: bold
+        margin-right: 2px
+
+      .value
+        padding-right: 2.5em
 
 
 #wrapper-container
