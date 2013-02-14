@@ -1055,7 +1055,7 @@ describe Quiz do
         quiz = @course.quizzes.create! :title => "test quiz"
         quiz.quiz_type = "totally_invalid_quiz_type"
         quiz.save.should be_false
-        quiz.errors.any?{|e| e =~ /quiz_type/}.should be_true
+        quiz.errors["invalid_quiz_type"].should be_present
       end
 
       it "should not validate quiz_type if not changed" do
@@ -1073,7 +1073,7 @@ describe Quiz do
         quiz = @course.quizzes.create! :title => "test quiz"
         quiz.ip_filter = "999.999.1942.489"
         quiz.save.should be_false
-        quiz.errors.any?{|e| e =~ /ip_filter/}.should be_true
+        quiz.errors["invalid_ip_filter"].should be_present
       end
 
       it "should not validate ip_filter if not changed" do
@@ -1091,7 +1091,7 @@ describe Quiz do
         quiz = @course.quizzes.create! :title => "test quiz"
         quiz.hide_results = "totally_invalid_value"
         quiz.save.should be_false
-        quiz.errors.any?{|e| e =~ /hide_results/}.should be_true
+        quiz.errors["invalid_hide_results"].should be_present
       end
 
       it "should not validate hide_results if not changed" do
