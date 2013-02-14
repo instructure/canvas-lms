@@ -47,6 +47,8 @@ describe "context_modules" do
 
       get "/courses/#{@course.id}/modules"
 
+      # button appears after ajax requests
+      wait_for_ajaximations
       f('.module_progressions_link').click
       wait_for_ajaximations
       f(".student_list").should be_displayed
@@ -78,6 +80,7 @@ describe "context_modules" do
       get "/courses/#{@course.id}/modules"
 
       #opens the student progression link and validates all modules have no information"
+      wait_for_ajaximations
       f('.module_progressions_link').click
       wait_for_ajaximations
 
