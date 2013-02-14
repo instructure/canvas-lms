@@ -216,8 +216,8 @@ describe "calendar2" do
 
         f('.fc-event').click
         fj('.popover-links-holder:visible').should_not be_nil
-        f('.event-details-links .edit_event_link').click
-        expect_new_page_load { f('#edit_calendar_event_form .more_options_link').click }
+        driver.execute_script("$('.edit_event_link').hover().click()")
+        expect_new_page_load { driver.execute_script("$('#edit_calendar_event_form .more_options_link').hover().click()") }
         f('#breadcrumbs').text.should include 'Calendar Events'
       end
 
@@ -225,7 +225,9 @@ describe "calendar2" do
         name = 'special assignment'
         create_middle_day_assignment(name)
         f('.fc-event.assignment').click
-        expect_new_page_load { f('.view_event_link').click }
+        wait_for_ajaximations
+        driver.execute_script("$('.view_event_link').hover().click()")
+
         f('h2.title').text.should include(name)
       end
 
@@ -233,16 +235,18 @@ describe "calendar2" do
         name = 'super big assignment'
         create_middle_day_assignment(name)
         f('.fc-event.assignment').click
-        f('.edit_event_link').click
-        expect_new_page_load { f('.more_options_link').click }
+        driver.execute_script("$('.edit_event_link').hover().click()")
+        expect_new_page_load { driver.execute_script("$('.more_options_link').hover().click()") }
         f('#assignment_name').attribute(:value).should include(name)
       end
 
       it "should delete an event" do
         create_middle_day_event('doomed event')
         fj('.fc-event:visible').click
-        fj('.delete_event_link').click
-        fj('.ui-dialog .btn-primary').click
+        wait_for_ajaximations
+        driver.execute_script("$('.delete_event_link').hover().click()")
+        wait_for_ajaximations
+        driver.execute_script("$('.ui-dialog .btn-primary').hover().click()")
         wait_for_ajaximations
         fj('.fc-event:visible').should be_nil
         # make sure it was actually deleted and not just removed from the interface
@@ -254,8 +258,9 @@ describe "calendar2" do
       it "should delete an assignment" do
         create_middle_day_assignment
         fj('.fc-event').click
-        fj('.delete_event_link').click
-        fj('.ui-dialog .btn-primary').click
+        driver.execute_script("$('.delete_event_link').hover().click()")
+        wait_for_ajaximations
+        driver.execute_script("$('.ui-dialog .btn-primary').hover().click()")
         wait_for_ajaximations
         fj('.fc-event').should be_nil
         # make sure it was actually deleted and not just removed from the interface
@@ -282,7 +287,9 @@ describe "calendar2" do
         wait_for_ajaximations
         fj('.fc-event').click
         wait_for_ajaximations
-        fj('.message_students').click
+
+        driver.execute_script("$('.message_students').hover().click()")
+
         wait_for_ajaximations
         ff(".participant_list input").size.should == 1
         set_value f('textarea[name="body"]'), 'hello'
@@ -310,7 +317,7 @@ describe "calendar2" do
 
         event1.click
         wait_for_ajaximations
-        f('.popover-links-holder .edit_event_link').click
+        driver.execute_script("$('.edit_event_link').hover().click()")
         wait_for_ajaximations
 
         select = f('#edit_assignment_form .assignment_group')
@@ -320,7 +327,7 @@ describe "calendar2" do
         event2.click
         wait_for_ajaximations
 
-        f('.popover-links-holder .edit_event_link').click
+        driver.execute_script("$('.edit_event_link').hover().click()")
         wait_for_ajaximations
         select = f('#edit_assignment_form .assignment_group')
         first_selected_option(select).attribute(:value).to_i.should == group2.id
@@ -336,7 +343,7 @@ describe "calendar2" do
         get "/calendar2"
         f('.fc-event').click
         wait_for_ajaximations
-        f('.popover-links-holder .edit_event_link').click
+        driver.execute_script("$('.edit_event_link').hover().click()")
         wait_for_ajaximations
         original_more_options = f('.more_options_link')['href']
         original_more_options.should_not match(/undefined/)
@@ -349,7 +356,7 @@ describe "calendar2" do
 
         fj('.fc-event').click
         wait_for_ajaximations
-        fj('.popover-links-holder .edit_event_link').click
+        driver.execute_script("$('.edit_event_link').hover().click()")
         wait_for_ajaximations
         fj('.more_options_link')['href'].should match(original_more_options)
       end
@@ -358,7 +365,7 @@ describe "calendar2" do
         create_middle_day_assignment("undate me")
         f(".undated-events-link").click
         f('.fc-event').click
-        f('.popover-links-holder .edit_event_link').click
+        driver.execute_script("$('.popover-links-holder .edit_event_link').hover().click()")
         replace_content(f('.ui-dialog #assignment_due_at'), "")
         submit_form('#edit_assignment_form')
         wait_for_ajax_requests
@@ -590,7 +597,8 @@ describe "calendar2" do
 
         fj('.fc-event:visible').click
         fj("#popover-0").should be_displayed
-        expect_new_page_load  { fj('#popover-0 .view_event_link').click }
+        expect_new_page_load { driver.execute_script("$('#popover-0 .view_event_link').hover().click()") }
+
 
         is_checked('#scheduler').should be_true
         f('#appointment-group-list').should include_text(ag.title)
@@ -628,7 +636,7 @@ describe "calendar2" do
         # click the event in the calendar
         fj('.fc-event').click
         fj("#popover-0").should be_displayed
-        expect_new_page_load  { fj('#popover-0 .view_event_link').click }
+        expect_new_page_load  { driver.execute_script("$('.view_event_link').hover().click()") }
 
         page_title = f('.title')
         page_title.should be_displayed

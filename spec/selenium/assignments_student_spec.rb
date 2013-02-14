@@ -202,11 +202,15 @@ describe "assignments" do
 
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         f('.submit_assignment_link').click
+        wait_for_ajaximations
         assignment_form = f('#submit_online_text_entry_form')
         wait_for_tiny(assignment_form)
+        wait_for_ajaximations
         expect {
           type_in_tiny('#submission_body', 'something to submit')
+          wait_for_ajaximations
           submit_form(assignment_form)
+          wait_for_ajaximations
         }.to change(Submission, :count).by(1)
       end
     end

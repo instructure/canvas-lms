@@ -13,10 +13,6 @@ describe "scheduler" do
       make_full_screen
     end
 
-    #after(:all) do
-    #  set_native_events("false")
-    #end
-
     def open_edit_appointment_slot_dialog
       fj('.fc-event').click
       driver.execute_script("$('.edit_event_link').trigger('click')")

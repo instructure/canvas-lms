@@ -24,9 +24,9 @@ shared_examples_for "discussion and announcement main page tests" do
 
   def refresh_and_filter(filter_type, filter, expected_text, expected_results = 1)
     refresh_page # in order to get the new topic information
-    wait_for_ajax_requests
+    wait_for_ajaximations
     keep_trying_until { ff('.toggleSelected').count.should == what_to_create.count }
-    filter_type == :css ? f(filter).click : replace_content(f('#searchTerm'), filter)
+    filter_type == :css ? driver.execute_script("$('#{filter}').click()") : replace_content(f('#searchTerm'), filter)
     ff('.discussionTopicIndexList .discussion-topic').count.should == expected_results
     expected_results > 1 ? ff('.discussionTopicIndexList .discussion-topic').each { |topic| topic.should include_text(expected_text) } : (f('.discussionTopicIndexList .discussion-topic').should include_text(expected_text))
   end

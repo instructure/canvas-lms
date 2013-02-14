@@ -87,10 +87,13 @@ describe "course rubrics" do
 
       get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
       f('.edit_rubric_link').click
+      wait_for_ajaximations
       f('.rubric.editing tr.criterion .delete_criterion_link').click
+      wait_for_ajaximations
       f('.rubric.editing .find_outcome_link').click
+      wait_for_ajaximations
       f('.outcome-link').click
-      wait_for_ajax_requests
+      wait_for_ajaximations
       f('.ui-dialog .btn-primary').click
       accept_alert
       wait_for_ajaximations
@@ -98,7 +101,7 @@ describe "course rubrics" do
       ff('tr.learning_outcome_criterion td.rating .description').map(&:text).should == @outcome.data[:rubric_criterion][:ratings].map { |c| c[:description] }
       ff('tr.learning_outcome_criterion td.rating .points').map(&:text).should == @outcome.data[:rubric_criterion][:ratings].map { |c| c[:points].to_s }
       submit_form('#edit_rubric_form')
-      wait_for_ajax_requests
+      wait_for_ajaximations
       rubric = Rubric.last(:order => :id)
       rubric.data.first[:ratings].map { |r| r[:description] }.should == @outcome.data[:rubric_criterion][:ratings].map { |c| c[:description] }
       rubric.data.first[:ratings].map { |r| r[:points] }.should == @outcome.data[:rubric_criterion][:ratings].map { |c| c[:points] }

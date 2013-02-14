@@ -81,14 +81,13 @@ shared_examples_for "manage groups selenium tests" do
   end
 
   def add_group_to_category(context, name)
-
-    fj(".add_group_link:visible").click
-    f("#group_name").send_keys(name)
+    driver.execute_script("$('.add_group_link:visible').click()")
+    wait_for_ajaximations
+    replace_content(f("#group_name"), name)
+    wait_for_ajaximations
     submit_form("#edit_group_form")
     wait_for_ajaximations
-    group = context.groups.find_by_name(name)
-    group.should_not be_nil
-    group
+    context.groups.find_by_name(name)
   end
 
   def add_groups_in_category (category, i=3)

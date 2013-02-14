@@ -255,7 +255,6 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     equation_text = '\\text{yay math stuff:}\\:\\frac{d}{dx}\\sqrt{x}=\\frac{d}{dx}x^{\\frac{1}{2}}=\\frac{1}{2}x^{-\\frac{1}{2}}=\\frac{1}{2\\sqrt{x}}\\text{that. is. so. cool.}'
 
     get "/courses/#{@course.id}/wiki"
-
     f('#wiki_page_body_instructure_equation').click
     wait_for_animations
     f('.mathquill-editor').should be_displayed
@@ -264,7 +263,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       textarea.send_keys(:backspace)
     end
 
-    # "paste" some latex
+    # "paste" some text
     driver.execute_script "$('.mathquill-editor .textarea textarea').val('\\\\text{yay math stuff:}\\\\:\\\\frac{d}{dx}\\\\sqrt{x}=').trigger('paste')"
     # make sure it renders correctly (inclding the medium space)
     f('.mathquill-editor').text.should include "yay math stuff: \nd\n\dx\n"
@@ -275,14 +274,15 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     textarea.send_keys "x^1/2"
     textarea.send_keys :arrow_right
     textarea.send_keys :arrow_right
-    f('.mathquill-editor .mathquill-toolbar a[title="="]').click
+    textarea.send_keys "="
     textarea.send_keys "1/2"
     textarea.send_keys :arrow_right
     textarea.send_keys "x^-1/2"
     textarea.send_keys :arrow_right
     textarea.send_keys :arrow_right
     textarea.send_keys "=1/2"
-    f('.mathquill-editor .mathquill-toolbar a[title="\\\\sqrt"]').click
+    textarea.send_keys "\\sqrt"
+    textarea.send_keys :space
     textarea.send_keys "x"
     textarea.send_keys :arrow_right
     textarea.send_keys :arrow_right

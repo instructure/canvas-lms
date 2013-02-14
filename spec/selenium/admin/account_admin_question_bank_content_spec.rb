@@ -7,8 +7,8 @@ describe "account admin question bank" do
   before(:each) do
     admin_logged_in
     @question_bank = create_question_bank
-    @question      = create_question
-    @outcome       = create_outcome
+    @question = create_question
+    @outcome = create_outcome
     get "/accounts/#{Account.default.id}/question_banks/#{@question_bank.id}"
   end
 
@@ -31,17 +31,17 @@ describe "account admin question bank" do
 
   def create_outcome (short_description = "good student")
     outcome = Account.default.learning_outcomes.create!(
-      :short_description => short_description,
-      :rubric_criterion  => {
-        :description => "test description",
-        :points_possible => 10,
-        :mastery_points => 9,
-        :ratings => [
-          { :description => "Exceeds Expectations", :points => 5 },
-          { :description => "Meets Expectations", :points => 3 },
-          { :description => "Does Not Meet Expectations", :points => 0 }
-        ]
-      })
+        :short_description => short_description,
+        :rubric_criterion => {
+            :description => "test description",
+            :points_possible => 10,
+            :mastery_points => 9,
+            :ratings => [
+                {:description => "Exceeds Expectations", :points => 5},
+                {:description => "Meets Expectations", :points => 3},
+                {:description => "Does Not Meet Expectations", :points => 0}
+            ]
+        })
     Account.default.root_outcome_group.add_outcome(outcome)
     outcome
   end
@@ -67,15 +67,20 @@ describe "account admin question bank" do
     multiple_choice_value = "multiple_choice_question"
     question_text = "what is the answer to #{name}?"
     f(".add_question_link").click
+    wait_for_ajaximations
     question_form = f(".question_form")
     question_form.find_element(:css, "[name='question_name']").send_keys(name)
     replace_content(question_form.find_element(:css, "[name='question_points']"), points)
+    wait_for_ajaximations
     click_option(".header .question_type", multiple_choice_value, :value)
+    wait_for_ajaximations
     type_in_tiny(".question_content", question_text)
+    wait_for_ajaximations
     answer_inputs = ff(".form_answers .select_answer input")
     answer_inputs[0].send_keys("correct answer")
     (1..3).each do |i|
       answer_inputs[i*2].send_keys("incorrect answer")
+      wait_for_ajaximations
     end
     submit_form(question_form)
     wait_for_ajaximations
@@ -91,8 +96,10 @@ describe "account admin question bank" do
     driver.switch_to.alert.accept
     wait_for_ajaximations
     @question.reload
-    @question.workflow_state.should == "deleted"
-    f("#questions .question_name").should be_nil
+    keep_trying_until do
+      @question.workflow_state.should == "deleted"
+      fj("#questions .question_name").should be_nil
+    end
   end
 
   it "should edit a multiple choice question" do
@@ -119,7 +126,9 @@ describe "account admin question bank" do
   it "should move question to another bank" do
     question_bank_2 = create_question_bank("bank 2")
     f(".move_question_link").click
+    wait_for_ajaximations
     f("#move_question_dialog #question_bank_#{question_bank_2.id}").click
+    wait_for_ajaximations
     submit_dialog("#move_question_dialog", '.submit_button')
     wait_for_ajaximations
     question_bank_2.assessment_questions.find_by_name(@question.name).should be_present
@@ -136,6 +145,7 @@ describe "account admin question bank" do
 
   it "should edit bank details" do
     f(".edit_bank_link").click
+    wait_for_ajaximations
     question_bank_title = f("#assessment_question_bank_title")
     new_title = "bank 2"
     replace_content(question_bank_title, new_title)
@@ -149,7 +159,7 @@ describe "account admin question bank" do
     driver.switch_to.alert.accept
     wait_for_ajaximations
     @question_bank.reload
-    @question_bank.workflow_state.should == "deleted"
+    keep_trying_until { @question_bank.workflow_state.should == "deleted" }
   end
 
   context "moving multiple questions" do
@@ -159,12 +169,13 @@ describe "account admin question bank" do
       questions.push @question
       question_count.times { |i| questions.push create_question("question #{question_number+i}") }
       f(".move_questions_link").click
-      wait_for_ajax_requests
+      wait_for_ajaximations
       question_list = ffj(".list_question:visible")
       question_list.count.should == questions.count
       question_list.each_with_index do |question, i|
         question.should include_text questions[i].name
         f("#list_question_#{questions[i].id}").click
+        wait_for_ajaximations
       end
       questions
     end
@@ -205,9 +216,9 @@ describe "account admin question bank" do
   context "outcome alignment" do
     def add_outcome_to_bank(outcome, mastery_percent = 60)
       f('.add_outcome_link').click
-      wait_for_ajax_requests
+      wait_for_ajaximations
       f('.outcome-link').click
-      wait_for_ajax_requests
+      wait_for_ajaximations
       replace_content(f('#outcome_mastery_at'), mastery_percent)
       fj('.btn-primary:visible').click
       driver.switch_to.alert.accept

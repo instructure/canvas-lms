@@ -15,6 +15,7 @@ describe "users" do
       get "/users/#{@user.id}"
       pseudonym_form = f('#edit_pseudonym_form')
       f(".add_pseudonym_link").click
+      wait_for_ajaximations
       pseudonym_form.find_element(:css, "#pseudonym_unique_id").send_keys('new_user')
       pseudonym_form.find_element(:css, "#pseudonym_password").send_keys('qwerty1')
       pseudonym_form.find_element(:css, "#pseudonym_password_confirmation").send_keys('qwerty1')
@@ -139,7 +140,7 @@ describe "users" do
       user_names[0].should include_text(@student_2.name)
       user_names[1].should include_text(@student_1.name)
       f('#switch_user_positions').click
-      wait_for_ajax_requests
+      wait_for_ajaximations
       user_names = ff('.result td')
       user_names[0].should include_text(@student_1.name)
       user_names[1].should include_text(@student_2.name)
@@ -153,7 +154,9 @@ describe "users" do
     it "should cancel a merge and validate both users still exist" do
       setup_user_merge(@student_2, @student_1)
       expect_new_page_load { f('#prepare_to_merge').click }
+      wait_for_ajaximations
       expect_new_page_load { f('.button-secondary').click }
+      wait_for_ajaximations
       f('#courses_menu_item').should be_displayed
       @student_1.workflow_state.should == 'registered'
       @student_2.workflow_state.should == 'registered'
@@ -164,6 +167,7 @@ describe "users" do
       f('.static_message').should be_false
       f('#manual_user_id').send_keys(@student_1.id)
       expect_new_page_load { f('button[type="submit"]').click }
+      wait_for_ajaximations
       f('.static_message').text.should =~ /You can't merge an account with itself./
     end
 
@@ -172,6 +176,7 @@ describe "users" do
       f('.static_message').should be_false
       f('#manual_user_id').send_keys("azxcvbytre34567uijmm23456yhj")
       expect_new_page_load { f('button[type="submit"]').click }
+      wait_for_ajaximations
       f('.static_message').text.should =~ /No active user with that ID was found./
     end
 
@@ -205,6 +210,7 @@ describe "users" do
       f('#student_password').send_keys('asdfasdf')
       f('#student_password_confirmation').send_keys('asdfasdf')
       form.find_element(:css, 'input[name="user[terms_of_use]"]').click
+      wait_for_ajaximations
 
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
@@ -215,12 +221,14 @@ describe "users" do
     it "should register a student without a join code" do
       get '/register'
       f('#signup_student').click
-
+      wait_for_ajaximations
       f('.registration-dialog .signup_link').click
+      wait_for_ajaximations
 
       form = fj('.ui-dialog:visible form')
       f('#student_higher_ed_name').send_keys('student!')
       f('#student_higher_ed_email').send_keys('student@example.com')
+      wait_for_ajaximations
       form.find_element(:css, 'input[name="user[terms_of_use]"]').click
 
       expect_new_page_load { form.submit }
@@ -232,11 +240,13 @@ describe "users" do
     it "should register a teacher" do
       get '/register'
       f('#signup_teacher').click
+      wait_for_ajaximations
 
       form = fj('.ui-dialog:visible form')
       f('#teacher_name').send_keys('teacher!')
       f('#teacher_email').send_keys('teacher@example.com')
       form.find_element(:css, 'input[name="user[terms_of_use]"]').click
+      wait_for_ajaximations
 
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
@@ -249,6 +259,7 @@ describe "users" do
 
       get '/register'
       f('#signup_parent').click
+      wait_for_ajaximations
 
       form = fj('.ui-dialog:visible form')
       f('#parent_name').send_keys('parent!')
@@ -256,6 +267,7 @@ describe "users" do
       f('#parent_child_username').send_keys(@pseudonym.unique_id)
       f('#parent_child_password').send_keys('lolwut')
       form.find_element(:css, 'input[name="user[terms_of_use]"]').click
+      wait_for_ajaximations
 
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard

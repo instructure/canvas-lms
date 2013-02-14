@@ -64,12 +64,12 @@ shared_examples_for "grading scheme basic tests" do
 
     it "should add a grading scheme item" do
       data_count = @grading_standard.data.count
-      driver.action.move_to(grading_standard_rows[0]).perform
-      f('.insert_grading_standard_link').click
-      replace_content(ff('.editing_box .standard_name')[0], 'F')
+      grading_standard_rows[0].click
+      ff('.insert_grading_standard_link')[1].click
+      replace_content(ff('.editing_box .standard_name')[1], 'F')
       save_and_reload_changes(@grading_standard)
       @grading_standard.data.count.should == data_count + 1
-      @grading_standard.data[0][0].should == 'F'
+      @grading_standard.data[1][0].should == 'F'
     end
 
     it "should edit a grading scheme item" do

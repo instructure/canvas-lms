@@ -125,19 +125,21 @@ describe "submissions" do
       @assignment.update_attributes(:submission_types => "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       f('.submit_assignment_link').click
+      wait_for_ajaximations
       assignment_form = f('#submit_online_text_entry_form')
       wait_for_tiny(assignment_form)
       submit_form(assignment_form)
+      wait_for_ajaximations
 
       # it should not actually submit and pop up an error message
       f('.error_box').should be_displayed
       Submission.count.should == 0
 
       # now make sure it works
-      expect {
-        type_in_tiny('#submission_body', 'now it is not blank')
-        submit_form(assignment_form)
-      }.to change(Submission, :count).by(1)
+      type_in_tiny('#submission_body', 'now it is not blank')
+      submit_form(assignment_form)
+      wait_for_ajaximations
+      Submission.count.should == 1
     end
 
     it "should not allow a submission with only comments" do

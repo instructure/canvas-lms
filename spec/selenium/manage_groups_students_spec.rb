@@ -271,27 +271,29 @@ describe "manage groups students" do
     it "should add multiple groups and be sure they are all deleted" do
       add_groups_in_category @courses_group_category
       get "/courses/#{@course.id}/groups"
-      delete = f(".delete_category_link")
-      delete.click
+      driver.execute_script("$('.delete_category_link').click()")
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.accept
-      wait_for_ajaximations
       ff(".left_side .group").should be_empty
       @course.group_categories.all.count.should == 0
     end
 
     it "should edit an individual group" do
       get "/courses/#{@course.id}/groups"
-      group = add_group_to_category @courses_group_category, "group 1"
+      group = add_group_to_category(@courses_group_category, "group 1")
+      group.should_not be_nil
       f("#group_#{group.id}").click
+      wait_for_ajaximations
       f("#group_#{group.id} .edit_group_link").click
+      wait_for_ajaximations
       name = "new group 1"
       f("#group_name").send_keys(name)
       submit_form("#edit_group_form")
       wait_for_ajaximations
-      new_group = @course.groups.find_by_name(name)
+      group = @course.groups.find_by_name(name)
       group.should_not be_nil
     end
+
 
     it "should delete an individual group" do
       get "/courses/#{@course.id}/groups"

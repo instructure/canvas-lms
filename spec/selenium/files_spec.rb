@@ -25,18 +25,25 @@ end
 
 def add_file(file_fullpath)
   attachment_field = keep_trying_until do
-    fj('#add_file_link').click # fj to avoid selenium caching
+    driver.execute_script "$('.add_file_link').click()"
     wait_for_ajaximations
     attachment_field = fj('#attachment_uploaded_data')
     attachment_field.should be_displayed
     attachment_field
   end
-  wait_for_ajaximations
   attachment_field.send_keys(file_fullpath)
   wait_for_ajaximations
   f('.add_file_form').submit
   wait_for_ajaximations
   wait_for_js
+end
+
+def create_temp_file(filename)
+  path = "#{RAILS_ROOT}/tmp/#{filename}"
+  file = File.open!(path, 'w')
+  file.write filename
+  file.close
+  path
 end
 
 def get_file_elements
@@ -50,9 +57,10 @@ end
 
 def file_setup
   sleep 5
-  @a_filename, a_fullpath, a_data = get_file("a_file.txt")
-  @b_filename, b_fullpath, b_data = get_file("b_file.txt")
-  @c_filename, c_fullpath, c_data = get_file("c_file.txt")
+
+  a_fullpath = create_temp_file(@a_filename = "a_file.txt")
+  b_fullpath = create_temp_file(@b_filename = "b_file.txt")
+  c_fullpath = create_temp_file(@c_filename = "c_file.txt")
 
   add_file(a_fullpath)
   add_file(c_fullpath)
@@ -64,12 +72,14 @@ describe "common file behaviors" do
 
   def add_file(file_fullpath)
     attachment_field = keep_trying_until do
-      fj('#add_file_link').click # fj to avoid selenium caching
+      driver.execute_script "$('.add_file_link').click()"
+      wait_for_ajaximations
       attachment_field = fj('#attachment_uploaded_data')
       attachment_field.should be_displayed
       attachment_field
     end
     attachment_field.send_keys(file_fullpath)
+    wait_for_ajaximations
     f('.add_file_form').submit
     wait_for_ajaximations
     wait_for_js
@@ -138,10 +148,15 @@ describe "common file behaviors" do
 
     it "should ignore file name case when alphabetizing" do
       sleep 5 # page does a weird load twice which is causing selenium failures so we sleep and wait for the page
-      amazing_filename, amazing_fullpath, amazing_data = get_file("amazing_file.txt")
-      dog_filename, dog_fullpath, dog_data = get_file("Dog_file.txt")
+
+      dog_fullpath = create_temp_file("Dog_file.txt")
+      amazing_fullpath = create_temp_file("amazing_file.txt")
+
       file_paths = [dog_fullpath, amazing_fullpath]
-      file_paths.each { |name| add_file(name) }
+      file_paths.each do
+        |name| add_file(name)
+        wait_for_ajaximations
+      end
       files = ff('#files_content .file')
       files.first.should include_text('amazing')
       files.last.should include_text('Dog')

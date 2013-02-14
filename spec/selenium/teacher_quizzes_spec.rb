@@ -31,18 +31,19 @@ describe "quizzes" do
     it "should allow a teacher to create a quiz from the quizzes tab directly" do
       get "/courses/#{@course.id}/quizzes"
       expect_new_page_load { f(".new-quiz-link").click }
-      expect_new_page_load { 
-        click_save_settings_button 
+      expect_new_page_load do
+        click_save_settings_button
         wait_for_ajax_requests
-      }
+      end
       f('#quiz_title').should include_text "Unnamed Quiz"
     end
 
     it "should create and preview a new quiz" do
       get "/courses/#{@course.id}/quizzes"
-      expect_new_page_load {
+      expect_new_page_load do
         f('.new-quiz-link').click
-      }
+        wait_for_ajaximations
+      end
       #check url
       driver.current_url.should match %r{/courses/\d+/quizzes/(\d+)\/edit}
       driver.current_url =~ %r{/courses/\d+/quizzes/(\d+)\/edit}
@@ -62,14 +63,14 @@ describe "quizzes" do
       click_questions_tab
       click_new_question_button
       submit_form('.question_form')
-      wait_for_ajax_requests
+      wait_for_ajaximations
 
       #save the quiz
-      expect_new_page_load { 
-        click_save_settings_button 
-        wait_for_ajax_requests
+      expect_new_page_load {
+        click_save_settings_button
+        wait_for_ajaximations
       }
-      wait_for_ajax_requests
+      wait_for_ajaximations
 
       #check quiz preview
       f('#preview_quiz_button').click
@@ -103,7 +104,7 @@ describe "quizzes" do
       q.save!
 
       get "/courses/#{@course.id}/quizzes/#{q.id}/edit"
-      wait_for_ajax_requests
+      wait_for_ajaximations
 
       test_text = "changed description"
       keep_trying_until { f('#quiz_description_ifr').should be_displayed }
@@ -112,7 +113,7 @@ describe "quizzes" do
         f('#tinymce').text.include?(test_text).should be_true
       end
       click_save_settings_button
-      wait_for_ajax_requests
+      wait_for_ajaximations
 
       get "/courses/#{@course.id}/quizzes/#{q.id}"
 
@@ -267,10 +268,10 @@ describe "quizzes" do
 
     it "should flag a quiz question while taking a quiz as a teacher" do
       quiz_with_new_questions
-      expect_new_page_load { 
-        click_save_settings_button 
+      expect_new_page_load do
+        click_save_settings_button
         wait_for_ajax_requests
-      }
+      end
       f('.publish_quiz_button').click
       wait_for_ajax_requests
 
@@ -318,14 +319,14 @@ describe "quizzes" do
 
         input.click
         input.send_keys('asdf')
+        wait_for_ajaximations
         error_displayed?.should be_true
         input.send_keys(:tab)
-        keep_trying_until { !error_displayed? }
-        # gets cleared out since it's not valid
         input[:value].should be_blank
 
         input.click
         input.send_keys('1')
+        wait_for_ajaximations
         error_displayed?.should be_false
         input.send_keys(:tab)
         input.should have_attribute(:value, "1.0000")
@@ -532,7 +533,6 @@ describe "quizzes" do
     it "should delete a quiz" do
       quiz_with_submission
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-
       expect_new_page_load do
         f('.al-trigger').click
         f('.delete_quiz_link').click
@@ -549,10 +549,10 @@ describe "quizzes" do
       wait_for_ajaximations
       fill_assignment_overrides
       replace_content(f('#quiz_title'), 'VDD Quiz')
-      expect_new_page_load { 
-        click_save_settings_button 
+      expect_new_page_load do
+        click_save_settings_button
         wait_for_ajax_requests
-      }
+      end
       compare_assignment_times(Quiz.find_by_title('VDD Quiz'))
     end
 
@@ -575,25 +575,25 @@ describe "quizzes" do
       select_first_override_section(default_section.name)
       first_due_at_element.clear
       first_due_at_element.
-        send_keys(default_section_due.strftime('%b %-d, %y'))
+          send_keys(default_section_due.strftime('%b %-d, %y'))
 
       add_override
 
       select_last_override_section(other_section.name)
       last_due_at_element.
-        send_keys(other_section_due.strftime('%b %-d, %y'))
-      expect_new_page_load { 
-        click_save_settings_button 
+          send_keys(other_section_due.strftime('%b %-d, %y'))
+      expect_new_page_load do
+        click_save_settings_button
         wait_for_ajax_requests
-      }
+      end
       overrides = @quiz.reload.assignment_overrides
       overrides.count.should == 2
-      default_override = overrides.detect{ |o| o.set_id == default_section.id }
+      default_override = overrides.detect { |o| o.set_id == default_section.id }
       default_override.due_at.strftime('%b %-d, %y').
-        should == default_section_due.to_date.strftime('%b %-d, %y')
-      other_override = overrides.detect{ |o| o.set_id == other_section.id }
+          should == default_section_due.to_date.strftime('%b %-d, %y')
+      other_override = overrides.detect { |o| o.set_id == other_section.id }
       other_override.due_at.strftime('%b %-d, %y').
-        should == other_section_due.to_date.strftime('%b %-d, %y')
+          should == other_section_due.to_date.strftime('%b %-d, %y')
     end
   end
 end

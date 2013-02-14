@@ -145,16 +145,20 @@ describe "eportfolios" do
 
       it "should add a user file" do
         f('.add_file_link').click
-        fj('.file_list:visible .sign:visible').click # my files
+        wait_for_ajaximations
+        fj('.file_list:visible .sign:visible').click
+        wait_for_ajaximations# my files
         file = fj('li.file .text:visible')
         file.should include_text @attachment.filename
+        wait_for_ajaximations
         file.click
         f('.upload_file_button').click
+        wait_for_ajaximations
         download = fj('.eportfolio_download:visible')
         download.should be_present
         download.should include_text @attachment.filename
         submit_form('.form_content')
-        wait_for_ajax_requests
+        wait_for_ajaximations
         f('.section.read_only').should include_text @attachment.filename
         refresh_page
         f('.section.read_only').should include_text @attachment.filename
@@ -169,7 +173,8 @@ describe "eportfolios" do
 
         def add_html
           submit_form(".form_content")
-          wait_for_ajax_requests
+          #driver.execute_script("$('.form_content .btn-primary').click()")
+          wait_for_ajaximations
           f(".section_content b").text.should == "student"
           entry_verifier ({:section_type => "html", :content => @html_content})
         end
@@ -200,7 +205,6 @@ describe "eportfolios" do
         it "should put comment in html" do
           put_comment_in_html
         end
-
 
         it "should delete the html content" do
           add_html
@@ -273,7 +277,8 @@ describe "eportfolios file upload" do
     filename, fullpath, data = get_file("testfile5.zip")
     expect_new_page_load { f(".icon-arrow-right").click }
     f(".edit_content_link").click
-    f(".add_file_link").click
+    wait_for_ajaximations
+    driver.execute_script "$('.add_file_link').click()"
     fj(".file_upload:visible").send_keys(fullpath)
     fj(".upload_file_button").click
     wait_for_ajaximations

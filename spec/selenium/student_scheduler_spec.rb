@@ -11,6 +11,7 @@ describe "scheduler" do
     before (:each) do
       #set_native_events("false")
       course_with_student_logged_in
+      make_full_screen
     end
 
     #after(:all) do
