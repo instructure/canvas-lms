@@ -62,17 +62,6 @@ describe GoogleDocs do
     )
   end
 
-  it "should allow a null access_token to be passed (deprecated)" do
-    body     = File.read('spec/fixtures/google_docs/doc_list.xml')
-    token    = mock()
-    token.expects(:get).
-      with('https://docs.google.com/feeds/documents/private/full').
-      returns(Struct.new(:body).new(body))
-    lib.expects(:google_docs_retrieve_access_token).returns(token)
-
-    lib.google_doc_list_deprecated(nil)
-  end
-
   it "should allow a null access_token to be passed" do
     body     = File.read('spec/fixtures/google_docs/doc_list.xml')
     token    = mock()
@@ -85,25 +74,12 @@ describe GoogleDocs do
   end
 
   describe "documents" do
-    it "can be an empty list (deprecated)" do
-      prepare_mock_get xml_doc_list_empty
-
-      document_id_list = lib.google_doc_list_deprecated.files.map(&:document_id)
-      document_id_list.should == []
-    end
 
     it "can be an empty list" do
       prepare_mock_get xml_doc_list_empty
 
       document_id_list = lib.google_docs_list.files.map(&:document_id)
       document_id_list.should == []
-    end
-
-    it "can be listed (deprecated)" do
-      prepare_mock_get xml_doc_list_one
-      list = lib.google_doc_list_deprecated
-      document_id_list = list.files.map(&:document_id)
-      document_id_list.should == ["document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA"]
     end
 
     it "can be listed" do
@@ -156,6 +132,21 @@ describe GoogleDocs do
     lib = GoogleDocsTest.new nil, @user, nil
     access_token = mock_access_token()
     lib.google_docs_retrieve_access_token.should eql access_token
+  end
+
+  describe '#google_docs_download' do
+    it 'pulls the document out that matches the provided id' do
+      doc_id = 'spreadsheet:0AiN8C_VHrPxkdEF6YmQyc3p2Qm02ODhJWGJnUmJYY2c'
+      token = mock_access_token
+      token.expects(:get).with('https://docs.google.com/feeds/download/spreadsheets/Export?key=0AiN8C_VHrPxkdEF6YmQyc3p2Qm02ODhJWGJnUmJYY2c').returns(mock())
+      response = mock()
+      response.expects(:body).returns(xml_doc_list_many)
+      token.expects(:get).with(xml_schema_id).returns(response)
+
+      lib = GoogleDocsTest.new nil, @user, nil
+      doc_array = lib.google_docs_download(doc_id)
+      doc_array[1].should == 'Sprint Teams'
+    end
   end
 
   # ----------------------------

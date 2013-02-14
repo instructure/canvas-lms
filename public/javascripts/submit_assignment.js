@@ -19,6 +19,7 @@
 define([
   'i18n!assignments' /* I18n.t */,
   'jquery' /* $ */,
+  'compiled/views/GoogleDocsTreeView',
   'compiled/jquery.rails_flash_notifications',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.inst_tree' /* instTree */,
@@ -31,7 +32,7 @@ define([
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, $) {
+], function(I18n, $, GoogleDocsTreeView) {
 
   window.submissionAttachmentIndex = -1;
 
@@ -109,11 +110,13 @@ define([
         submitting = true;
       }
     });
+
     window.onbeforeunload = function() {
       if($("#submit_assignment:visible").length > 0 && !submitting) {
         return I18n.t('messages.not_submitted_yet', "You haven't finished submitting your assignment.  You still need to click \"Submit\" to finish turning it in.  Do you want to leave this page anyway?");
       }
     };
+
     $(document).fragmentChange(function(event, hash) {
       if(hash && hash.indexOf("#submit") == 0) {
         $(".submit_assignment_link").triggerHandler('click', true);
@@ -122,6 +125,7 @@ define([
         }
       }
     });
+
     $(".submit_assignment_link").click(function(event, skipConfirmation) {
       event.preventDefault();
       var late = $(this).hasClass('late');
@@ -140,15 +144,19 @@ define([
       $("html,body").scrollTo($("#submit_assignment"));
       $("#submit_online_text_entry_form textarea:first").editorBox();
     });
+
     $("#switch_text_entry_submission_views").click(function(event) {
       event.preventDefault();
       $("#submit_online_text_entry_form textarea:first").editorBox('toggle');
     });
+
     $(".submit_assignment_form .cancel_button").click(function() {
       $("#submit_assignment").hide();
       $(".submit_assignment_link").show();
     });
+
     $("#submit_assignment_tabs").tabs();
+
     $("#uploaded_files > ul").instTree({
       autoclose: false,
       multi: true,
@@ -164,22 +172,42 @@ define([
         $("#submission_attachment_ids").val(ids.join(","));
       }
     });
+
     $(".toggle_uploaded_files_link").click(function(event) {
       event.preventDefault();
       $("#uploaded_files").slideToggle();
     });
+
     $(".add_another_file_link").click(function(event) {
       event.preventDefault();
       $('#submission_attachment_blank').clone(true).removeAttr('id').show().insertBefore(this)
         .find("input").attr('name', 'attachments[' + (++submissionAttachmentIndex) + '][uploaded_data]');
       toggleRemoveAttachmentLinks();
     }).click();
+
     $(".remove_attachment_link").click(function(event) {
       event.preventDefault();
       $(this).parents(".submission_attachment").remove();
       checkAllowUploadSubmit();
       toggleRemoveAttachmentLinks();
     });
+
+    $(".submit_online_url_option").click(function(event) {
+      if($(this).attr("href") == '#submit_google_doc_form'){
+        var url = window.location.pathname + "/list_google_docs";
+        $.get(url,{}, function(data, textStatus){
+
+          var tree = new GoogleDocsTreeView({model: data});
+          $('div#google_docs_container').html(tree.el);
+          tree.render();
+          tree.on('activate-file', function(file_id){
+            $("#submit_google_doc_form").find("input[name='google_doc[document_id]']").val(file_id);
+          });
+
+        }, 'json');
+      }
+    });
+
     function toggleRemoveAttachmentLinks(){
       $('#submit_online_upload_form .remove_attachment_link').showIf($('#submit_online_upload_form .submission_attachment:not(#submission_attachment_blank)').length > 1);
     }
@@ -196,26 +224,6 @@ define([
     });
   });
 
-  $(document).ready(function() {
-    $("#google_docs_tree").instTree({
-      autoclose: false,
-      multi: false,
-      dragdrop: false
-    });
-    $("#google_docs_tree li.file").click(function(event) {
-      if($(event.target).closest(".popout").length > 0) { return; }
-      event.preventDefault();
-      event.stopPropagation();
-      $("#google_docs_tree li.file.active").removeClass('active');
-      $(this).addClass('active');
-      $("#submit_google_doc_form").find("input[name='google_doc[document_id]']").val($(this).attr('id').substring(9));
-    });
-    $("#google_docs_tree li.folder").click(function(event) {
-      if($(event.target).closest('.sign').length == 0 && $(event.target).closest('.file,.folder').hasClass('folder')) {
-        $(this).find(".sign").click();
-      }
-    });
-  });
   $("#submit_google_doc_form").submit(function() {
     $("#uploading_google_doc_message").dialog({
       title: I18n.t('titles.uploading', "Uploading Submission"),

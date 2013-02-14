@@ -187,67 +187,48 @@
     }
     </style>
     <% if show_google_docs %>
-      <% if @google_docs %>
+      <% if @google_docs_token %>
         <% form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_google_doc_form", :class => "submit_assignment_form"}) do %>
-        <%= hidden_field :submission, :submission_type, :value => "google_doc" %>
-        <%= hidden_field :google_doc, :document_id, :value => "", :class => "google_doc_id" %>
-        <table class="formtable" style="width: 100%;">
-          <tr>
-            <td style="padding-bottom: 10px;" colspan="2">
-              <%= t 'instructions.google_docs', "Select the file from the list below." %>
-              <%= render :partial => "assignments/group_submission_reminder" if @assignment.has_group_category? %>
+          <%= hidden_field :submission, :submission_type, :value => "google_doc" %>
+          <%= hidden_field :google_doc, :document_id, :value => "", :class => "google_doc_id" %>
+          <table class="formtable" style="width: 100%;">
+            <tr>
+              <td style="padding-bottom: 10px;" colspan="2">
+                <%= t 'instructions.google_docs', "Select the file from the list below." %>
+                <%= render :partial => "assignments/group_submission_reminder" if @assignment.has_group_category? %>
+                </td>
+            </tr><tr>
+              <td colspan="2">
+                <div id="google_docs_container" style="height: 200px; overflow: auto;">
+                  <div style="text-align: center; margin: 10px;">
+                    <%= image_tag "ajax-loader-bar.gif" %>
+                  </div>
+                </div>
               </td>
-          </tr><tr>
-            <td colspan="2">
-              <div style="height: 200px; overflow: auto;">
-              <ul id="google_docs_tree" style="width: 100%;">
-                <% @google_docs.folders.each do |folder| %>
-                  <li class="folder"><%= folder %>
-                    <ul>
-                      <% @google_docs.files.select{|f| f.folder == folder}.each do |file| %>
-                        <li class="file <%= file.extension %>" id="document_<%= file.document_id %>">
-                          <span class="filename"><%= file.entry.title %></span>
-                          <a class="popout no-hover" href="<%= file.alternate_url %>" title="<%= t 'titles.view_in_separate_window', 'View in Separate Window' %>" target="_blank"><%= image_tag "popout.png " %></a>
-                          <div class="clear"></div>
-                        </li>
-                      <% end %>
-                    </ul>
-                  </li>
-                <% end %>
-                <% @google_docs.files.select{|f| f.folder == nil}.each do |file| %>
-                  <li class="file <%= file.extension %>" id="document_<%= file.document_id %>">
-                    <span class="filename"><%= file.entry.title %></span>
-                    <a class="popout no-hover" href="<%= file.alternate_url %>" target="_blank"><%= image_tag "popout.png " %></a>
-                    <div class="clear"></div>
-                  </li>
-                <% end %>
-              </ul>
-              </div>
-            </td>
-          </tr><tr>
-            <td colspan="2" style="text-align: center;">
-              <div style="text-align: left;">
-                <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
-              </div>
-            </td>
-          </tr>
-          <%= render :partial => "group_comment" %>
-          <% if @assignment.turnitin_enabled? %>
-            <%= render :partial => "turnitin" %>
-          <% end %>
-          <tr>
-            <td colspan="2" class='button-container'>
-              <button type="submit" class="btn"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
-              <button type="button" class='cancel_button button-secondary'><%= t '#buttons.cancel', "Cancel" %></button>
-            </td>
-          </tr>
-        </table>
-        <div id="uploading_google_doc_message" style="display: none;">
-          <%= t 'messages.uploading', "Retrieving a copy of your Google Doc to submit for this assignment.  This may take a little while, depending on the size of the file..." %>
-          <div style="text-align: center; margin: 10px;">
-            <%= image_tag "ajax-loader-bar.gif" %>
+            </tr><tr>
+              <td colspan="2" style="text-align: center;">
+                <div style="text-align: left;">
+                  <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
+                </div>
+              </td>
+            </tr>
+            <%= render :partial => "group_comment" %>
+            <% if @assignment.turnitin_enabled? %>
+              <%= render :partial => "turnitin" %>
+            <% end %>
+            <tr>
+              <td colspan="2" class='button-container'>
+                <button type="submit" class="btn"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
+                <button type="button" class='cancel_button button-secondary'><%= t '#buttons.cancel', "Cancel" %></button>
+              </td>
+            </tr>
+          </table>
+          <div id="uploading_google_doc_message" style="display: none;">
+            <%= t 'messages.uploading', "Retrieving a copy of your Google Doc to submit for this assignment.  This may take a little while, depending on the size of the file..." %>
+            <div style="text-align: center; margin: 10px;">
+              <%= image_tag "ajax-loader-bar.gif" %>
+            </div>
           </div>
-        </div>
         <% end %>
       <% else %>
         <div id="submit_google_doc_form">
