@@ -102,17 +102,17 @@ describe DiscussionTopicPresenter do
 
     it 'should present lock_at' do
       override.lock_at = Time.now + 2.weeks
-      presenter.lock_at(override: override).should == presenter.datetime_string(override.lock_at)
+      presenter.lock_at(:override => override).should == presenter.datetime_string(override.lock_at)
     end
 
     it 'should present unlock_at' do
       override.unlock_at = Time.now + 2.weeks
-      presenter.unlock_at(override: override).should == presenter.datetime_string(override.unlock_at)
+      presenter.unlock_at(:override => override).should == presenter.datetime_string(override.unlock_at)
     end
 
     it 'should present due_at' do
       override.due_at = Time.now + 2.weeks
-      presenter.due_at(override: override).should == presenter.datetime_string(override.due_at)
+      presenter.due_at(:override => override).should == presenter.datetime_string(override.due_at)
     end
   end
 
