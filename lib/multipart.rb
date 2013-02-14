@@ -57,7 +57,7 @@ module Multipart
       def file_param(k, v)
         file_data = v.read rescue nil
         if file_data
-          file_path = v.respond_to?(:path) ? v.path : k.to_s
+          file_path = (v.respond_to?(:path) && v.path) || k.to_s
           FileParam.new(k, file_path, file_data)
         else
           Param.new(k,v)
