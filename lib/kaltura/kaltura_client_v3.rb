@@ -237,7 +237,7 @@ module Kaltura
       result = postRequest(:bulkUpload, :add,
                            :ks => @ks,
                            :conversionProfileId => -1,
-                           :csvFileData => StringIO.new(csv)
+                           :csvFileData => KalturaStringIO.new(csv, "bulk_data.csv")
                        )
       parseBulkUpload(result)
       # results will have entryId values -- do we get them right away?
