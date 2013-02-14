@@ -295,10 +295,12 @@ describe "assignments" do
 
     def submit_assignment_form
       expect_new_page_load { f('.btn-primary[type=submit]').click }
+      wait_for_ajaximations
     end
 
     def edit_assignment
       expect_new_page_load { f('.edit_assignment_link').click }
+      wait_for_ajaximations
     end
   end
 end
