@@ -94,7 +94,7 @@ module GoogleDocs
 
   def google_docs_download(document_id)
     access_token = google_docs_retrieve_access_token
-    entry = google_doc_list(access_token).files.find{|e| e.document_id == document_id}
+    entry = google_doc_fetch_list(access_token).entries.map{|e| GoogleDocEntry.new(e) }.find{|e| e.document_id == document_id}
     if entry
       response = access_token.get(entry.download_url)
       response = access_token.get(response['Location']) if response.is_a?(Net::HTTPFound)
@@ -102,38 +102,6 @@ module GoogleDocs
     else
       [nil, nil, nil]
     end
-  end
-
-  # This can be removed as soon as our assignment submission page lazy loads
-  # the list of google docs.
-  def google_doc_list_deprecated(access_token = nil, only_extensions = nil)
-    access_token ||= google_docs_retrieve_access_token
-    response = access_token.get('https://docs.google.com/feeds/documents/private/full')
-    docs = Atom::Feed.load_feed(response.body)
-    folders, entries = [[], []]
-
-    docs.entries.each do |entry|
-      folder = entry.categories.find do |category|
-        category.scheme.match(%r{\Ahttp://schemas.google.com/docs/2007/folders})
-      end
-
-      folders << folder.label if folder
-      entries << GoogleDocEntry.new(entry)
-    end
-
-    folders = folders.uniq.sort
-    res     = Struct.new(:files, :folders).new
-
-    if only_extensions.present?
-      entries.reject! do |entry|
-        !only_extensions.include?(entry.extension)
-      end
-    end
-
-    res.files   = entries
-    res.folders = folders
-
-    res
   end
 
   class Folder

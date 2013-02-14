@@ -219,7 +219,7 @@ ActionController::Routing::Routes.draw do |map|
     course.old_calendar 'calendar', :controller => 'calendars', :action => 'show'
     course.locks 'locks', :controller => 'courses', :action => 'locks'
     add_discussions(course)
-    course.resources :assignments, :collection => {:syllabus => :get, :submissions => :get}, :member => {:update_submission => :any} do |assignment|
+    course.resources :assignments, :collection => {:syllabus => :get, :submissions => :get}, :member => {:list_google_docs => :get, :update_submission => :any} do |assignment|
       assignment.resources :submissions do |submission|
         submission.resubmit_to_turnitin 'turnitin/resubmit', :controller => 'submissions', :action => 'resubmit_to_turnitin', :conditions => {:method => :post}
         submission.turnitin_report 'turnitin/:asset_string', :controller => 'submissions', :action => 'turnitin_report'

@@ -87,11 +87,10 @@ class AssignmentsController < ApplicationController
         @current_user_submission.send_later(:context_module_action) if @current_user_submission
       end
 
-      # prevent masquerading users from accessing google docs
-      if @assignment.allow_google_docs_submission? && @real_current_user.blank?
-        # TODO: make this happen asynchronously via ajax, and only if the user selects the google docs tab
-        @google_docs = google_doc_list_deprecated(nil, @assignment.allowed_extensions) rescue nil
-      end
+
+      begin
+        @google_docs_token = google_docs_retrieve_access_token
+      rescue RuntimeError => ex; end
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
       log_asset_access(@assignment, "assignments", @assignment.assignment_group)
@@ -123,15 +122,19 @@ class AssignmentsController < ApplicationController
         ErrorReport.log_exception(:oauth, e)
         raise e
       end
-      format.json { render :json => docs.to_hash }
+      respond_to do |format|
+        format.json { render :json => docs.to_hash }
+      end
     else
       error_object = {:errors =>
         {:base => t('errors.google_docs_masquerade_rejected', "Unable to connect to Google Docs as a masqueraded user.")}
       }
-      format.json { render :json => error_object.to_json, :status => :bad_request }
+      respond_to do |format|
+        format.json { render :json => error_object.to_json, :status => :bad_request }
+      end
     end
   end
-  
+
   def rubric
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @root_outcome_group = outcome_group_json(@context.root_outcome_group, @current_user, session).to_json
