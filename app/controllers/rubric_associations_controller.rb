@@ -32,7 +32,7 @@ class RubricAssociationsController < ApplicationController
     rubric_id = params[:rubric_association].delete(:rubric_id)
     @rubric = @association ? @association.rubric : Rubric.find(rubric_id)
     # raise "User doesn't have access to this rubric" unless @rubric.grants_right?(@current_user, session, :read)
-    if !@association && !authorized_action(@context, @current_user, :manage_grades)
+    if !@association && !authorized_action(@context, @current_user, :manage_rubrics)
       return
     elsif !@association || authorized_action(@association, @current_user, :update)
       if params[:rubric] && @rubric.grants_rights?(@current_user, session, :update)[:update]

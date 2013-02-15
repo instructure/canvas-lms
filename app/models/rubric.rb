@@ -47,7 +47,7 @@ class Rubric < ActiveRecord::Base
   }
   
   set_policy do
-    given {|user, session| self.cached_context_grants_right?(user, session, :manage_grades)}
+    given {|user, session| self.cached_context_grants_right?(user, session, :manage_rubrics)}
     can :read and can :create and can :delete_associations
     
     given {|user, session| self.cached_context_grants_right?(user, session, :manage_assignments)}
@@ -60,13 +60,13 @@ class Rubric < ActiveRecord::Base
     given {|user, session| !self.read_only && self.rubric_associations.for_grading.length < 2 && self.cached_context_grants_right?(user, session, :manage_assignments)}
     can :update and can :delete
     
-    given {|user, session| !self.read_only && self.rubric_associations.for_grading.length < 2 && self.cached_context_grants_right?(user, session, :manage_grades)}
+    given {|user, session| !self.read_only && self.rubric_associations.for_grading.length < 2 && self.cached_context_grants_right?(user, session, :manage_rubrics)}
     can :update and can :delete
 
     given {|user, session| self.cached_context_grants_right?(user, session, :manage_assignments)}
     can :delete
     
-    given {|user, session| self.cached_context_grants_right?(user, session, :manage_grades)}
+    given {|user, session| self.cached_context_grants_right?(user, session, :manage_rubrics)}
     can :delete
 
     given {|user, session| self.cached_context_grants_right?(user, session, :read) }

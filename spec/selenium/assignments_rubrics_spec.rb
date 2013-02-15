@@ -276,20 +276,18 @@ describe "assignment rubrics" do
       course_with_designer_logged_in
     end
 
-    it "should allow an designer to create a course rubric" do
-      pending "Bug #7136 - Rubrics cannot be created by designers" do
-        rubric_name = 'this is a new rubric'
-        get "/courses/#{@course.id}/rubrics"
+    it "should allow a designer to create a course rubric" do
+      rubric_name = 'this is a new rubric'
+      get "/courses/#{@course.id}/rubrics"
 
-        expect {
-          f('.add_rubric_link').click
-          replace_content(f('.rubric_title input'), rubric_name)
-          submit_form('#edit_rubric_form')
-          wait_for_ajaximations
-        }.to change(Rubric, :count).by(1)
-        refresh_page
-        f('#rubrics .title').text.should == rubric_name
-      end
+      expect {
+        f('.add_rubric_link').click
+        replace_content(f('.rubric_title input'), rubric_name)
+        submit_form('#edit_rubric_form')
+        wait_for_ajaximations
+      }.to change(Rubric, :count).by(1)
+      refresh_page
+      f('#rubrics .title').text.should == rubric_name
     end
   end
 end

@@ -161,7 +161,7 @@ class RubricAssessment < ActiveRecord::Base
     given {|user, session| 
       self.rubric_association && 
       self.rubric_association.grants_rights?(user, session, :manage)[:manage] &&
-      (self.rubric_association.association.context.grants_right?(self.assessor, nil, :manage_grades) rescue false)
+      (self.rubric_association.association.context.grants_right?(self.assessor, nil, :manage_rubrics) rescue false)
     }
     can :update
   end

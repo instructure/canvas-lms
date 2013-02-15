@@ -301,7 +301,7 @@ class RoleOverride < ActiveRecord::Base
         ]
       },
       :manage_grades => {
-        :label => lambda { t('permissions.manage_grades', "Edit grades (includes assessing rubrics)") },
+        :label => lambda { t('permissions.manage_grades', "Edit grades") },
         :available_to => [
           'TaEnrollment',
           'TeacherEnrollment',
@@ -313,6 +313,22 @@ class RoleOverride < ActiveRecord::Base
           'TeacherEnrollment',
           'AccountAdmin'
         ]
+      },
+      :manage_rubrics => {
+          :label => lambda { t('permissions.manage_rubrics', "Create and edit assessing rubrics") },
+          :available_to => [
+              'TaEnrollment',
+              'DesignerEnrollment',
+              'TeacherEnrollment',
+              'AccountAdmin',
+              'AccountMembership'
+          ],
+          :true_for => [
+              'DesignerEnrollment',
+              'TaEnrollment',
+              'TeacherEnrollment',
+              'AccountAdmin'
+          ]
       },
       :comment_on_others_submissions => {
         :label => lambda { t('permissions.comment_on_others_submissions', "View all students' submissions and make comments on them") },

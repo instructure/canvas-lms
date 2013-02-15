@@ -224,13 +224,14 @@ class RoleOverridesController < ApplicationController
   #     manage_calendar                  -- [sTADo] Add, edit and delete events on the course calendar
   #     manage_content                   -- [ TADo] Manage all other course content
   #     manage_files                     -- [ TADo] Manage (add / edit / delete) course files
-  #     manage_grades                    -- [ TA  ] Edit grades (includes assessing rubrics)
+  #     manage_grades                    -- [ TA  ] Edit grades
   #     manage_groups                    -- [ TAD ] Manage (create / edit / delete) groups
   #     manage_interaction_alerts        -- [ Ta  ] Manage alerts
   #     manage_outcomes                  -- [sTaDo] Manage learning outcomes
   #     manage_sections                  -- [ TaD ] Manage (create / edit / delete) course sections
   #     manage_students                  -- [ TAD ] Add/remove students for the course
   #     manage_user_notes                -- [ TA  ] Manage faculty journal entries
+  #     manage_rubrics                   -- [ TAD ] Edit assessing rubrics
   #     manage_wiki                      -- [ TADo] Manage wiki (add / edit / delete pages)
   #     read_forum                       -- [STADO] View discussions
   #     moderate_forum                   -- [sTADo] Moderate discussions (delete/edit others' posts, lock topics)
