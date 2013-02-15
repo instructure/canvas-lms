@@ -347,7 +347,8 @@ class CalendarEventsApiController < ApplicationController
       end
       params[:calendar_event].delete(:context_code)
       if @event.update_attributes(params[:calendar_event])
-        render :json => event_json(@event, @current_user, session)
+        json_response = event_json(@event, @current_user, session)
+        render :json => json_response
       else
         render :json => @event.errors.to_json, :status => :bad_request
       end

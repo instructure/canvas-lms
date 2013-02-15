@@ -67,6 +67,7 @@ define [
       @save {
         'calendar_event[start_at]': if @start then $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(@start)) else ''
         'calendar_event[end_at]': if @end then $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(@end)) else ''
+        'calendar_event[all_day]': @allDay
       }, success, error
 
     methodAndURLForSave: () ->

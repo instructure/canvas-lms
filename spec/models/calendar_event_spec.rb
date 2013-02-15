@@ -30,6 +30,91 @@ describe CalendarEvent do
     @c.description.should eql("<a href=\"#\">only this should stay</a>")
   end
 
+  describe "default_values" do
+    before(:each) do
+      course_model
+      @original_start_at =  Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
+      @original_end_at = @original_start_at + 2.hours
+
+      # Create the initial event
+      @event = calendar_event_model(
+          :start_at => @original_start_at,
+          :end_at => @original_end_at,
+          :time_zone_edited => "Mountain Time (US & Canada)"
+      )
+    end
+
+    it "should get localized start_at" do
+      df = "%Y-%m-%d %H:%M"
+      @event.start_at.strftime(df).should == "2008-09-03 12:05"
+      @event.zoned_start_at.strftime(df).should == "2008-09-03 06:05"
+    end
+
+    it "should populate missing dates" do
+      event_1 = calendar_event_model
+      event_1.start_at = @original_start_at
+      event_1.end_at = nil
+      event_1.send(:populate_missing_dates)
+      event_1.end_at.should eql(event_1.start_at)
+
+      event_2 = calendar_event_model
+      event_2.start_at = nil
+      event_2.end_at = @original_end_at
+      event_2.send(:populate_missing_dates)
+      event_2.start_at.should eql(event_2.end_at)
+
+      event_3 = calendar_event_model
+      event_3.start_at = @original_end_at
+      event_3.end_at = @original_start_at
+      event_3.send(:populate_missing_dates)
+      event_3.end_at.should eql(event_3.start_at)
+    end
+
+    it "should populate all day flag" do
+      midnight = Time.at(1361862000) # 2013-02-26 00:00:00
+
+      event_1 = calendar_event_model(:time_zone_edited => "Mountain Time (US & Canada)")
+      event_1.start_at = event_1.end_at = midnight
+      event_1.send(:populate_all_day_flag)
+      event_1.all_day?.should be_true
+      event_1.all_day_date.strftime("%Y-%m-%d").should == "2013-02-26"
+
+      event_2 = calendar_event_model(:time_zone_edited => "Mountain Time (US & Canada)")
+      event_2.start_at = @original_start_at
+      event_2.end_at = @original_end_at
+      event_2.send(:populate_all_day_flag)
+      event_2.all_day?.should be_false
+
+      event_3 = calendar_event_model(
+          :start_at => midnight,
+          :end_at => midnight + 1.hour,
+          :time_zone_edited => "Mountain Time (US & Canada)"
+      )
+      event_3.start_at = midnight
+      event_3.end_at = midnight + 30.minutes
+      event_3.all_day = true
+      event_3.send(:populate_all_day_flag)
+      event_3.all_day?.should be_true
+      event_3.end_at.should eql(event_3.start_at)
+    end
+
+    it "should retain all day flag when date is changed (calls :default_values)" do
+      # Flag the event as all day
+      @event.update_attributes({ :start_at => @original_start_at, :end_at => @original_end_at, :all_day => true })
+      @event.all_day?.should be_true
+      @event.all_day_date.strftime("%Y-%m-%d").should == "2008-09-03"
+      @event.zoned_start_at.strftime("%H:%M").should == "00:00"
+      @event.end_at.should eql(@event.zoned_start_at)
+
+      # Change the date but keep the all day flag as true
+      @event.update_attributes({ :start_at => @event.start_at - 1.day, :end_at => @event.end_at - 1.day, :all_day => true })
+      @event.all_day?.should be_true
+      @event.all_day_date.strftime("%Y-%m-%d").should == "2008-09-02"
+      @event.zoned_start_at.strftime("%H:%M").should == "00:00"
+      @event.end_at.should eql(@event.zoned_start_at)
+    end
+  end
+
   context "ical" do
     it ".to_ics should not fail for null times" do
       calendar_event_model(:start_at => "", :end_at => "")

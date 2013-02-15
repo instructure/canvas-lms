@@ -542,6 +542,10 @@ describe "calendar2" do
         elt = fj('.fc-event:visible')
         elt.attribute('title').should match(/12:00.*12:05/)
       end
+
+      it "should update the event as all day if dragged to all day row" do
+        pending("dragging events doesn't seem to work")
+      end
     end
   end
 

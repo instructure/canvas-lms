@@ -261,22 +261,34 @@ define [
 
     eventResizeStart: (event, jsEvent, ui, view) =>
       @closeEventPopups()
-      
+
+    # event triggered by items being dropped from within the calendar
     eventDrop: (event, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view) =>
+
+      if event.eventType == "assignment" && allDay
+        revertFunc()
+        return
+
       # isDueAtMidnight() will read cached midnightFudged property
       if event.eventType == "assignment" && event.isDueAtMidnight() && minuteDelta == 0
         event.start.setMinutes(59)
+
+      # set event as an all day event if allDay
+      if event.eventType == "calendar_event" && allDay
+        event.allDay = true
 
       # if a short event gets dragged, we don't want to change its duration
       if event.end && event.endDate()
         originalDuration = event.endDate().getTime() - event.startDate().getTime()
         event.end = new Date(event.start.getTime() + originalDuration)
+
       event.saveDates null, revertFunc
 
     eventResize: (event, dayDelta, minuteDelta, revertFunc, jsEvent, ui, view) =>
       # assignments can't be resized
       # if short events are being resized, assume the user knows what they're doing
       event.saveDates null, revertFunc
+
 
     eventClick: (event, jsEvent, view) =>
       $event = $(jsEvent.currentTarget)
@@ -308,19 +320,35 @@ define [
     viewDisplay: (view) =>
       @updateFragment view_start: $.dateToISO8601UTC(view.start)
 
+    # event triggered by items being dropped from outside the calendar
     drop: (date, allDay, jsEvent, ui) =>
-      eventId = $(ui.helper).data('event-id')
-      event   = $("[data-event-id=#{eventId}]").data('calendarEvent')
-
-      date.setHours(23)
-      date.setMinutes(59)
+      eventId    = $(ui.helper).data('event-id')
+      event      = $("[data-event-id=#{eventId}]").data('calendarEvent')
+      revertFunc = -> console.log("could not save date on undated event")
 
       if event
         event.start = date
         event.addClass 'event_pending'
-        @calendar.fullCalendar('renderEvent', event)
-        event.saveDates null, -> console.log("could not save date on undated event")
 
+        if event.eventType == "assignment" && allDay
+          revertFunc()
+          return
+
+        # isDueAtMidnight() will read cached midnightFudged property
+        if event.eventType == "assignment" && event.isDueAtMidnight() && minuteDelta == 0
+          event.start.setMinutes(59)
+
+        # set event as an all day event if allDay
+        if event.eventType == "calendar_event" && allDay
+          event.allDay = true
+
+        # if a short event gets dragged, we don't want to change its duration
+        if event.end && event.endDate()
+          originalDuration = event.endDate().getTime() - event.startDate().getTime()
+          event.end = new Date(event.start.getTime() + originalDuration)
+
+        @calendar.fullCalendar('renderEvent', event)
+        event.saveDates null, revertFunc
 
     # DOM callbacks
 
