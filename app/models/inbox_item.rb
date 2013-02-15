@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011-2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,17 +17,34 @@
 #
 
 class InboxItem < ActiveRecord::Base
+  # Included modules
   include Workflow
-  belongs_to :user
-  belongs_to :author, :class_name => 'User', :foreign_key => :sender_id
-  belongs_to :asset, :polymorphic => true
-  before_save :flag_changed
-  before_save :infer_context_code
-  after_save :update_user_inbox_items_count
-  after_destroy :update_user_inbox_items_count
 
+  # Associations
+  belongs_to :asset,  :polymorphic => true
+  belongs_to :author, :class_name => 'User', :foreign_key => :sender_id
+  belongs_to :user
+
+  # Callbacks
+  before_save       :flag_changed
+  before_save       :infer_context_code
+  before_validation :trim_subject
+  after_destroy     :update_user_inbox_items_count
+  after_save        :update_user_inbox_items_count
+
+  # Validations
+  validates_length_of :subject, :maximum => 255
+
+  # Access control
   attr_accessible :user_id, :asset, :subject, :body_teaser, :sender_id
-  
+
+  # Named scopes
+  named_scope :active, :conditions => ['workflow_state NOT IN ?',
+    %w{deleted retired retired_unread}]
+  named_scope :unread, lambda {
+    { :conditions => ['workflow_state = ?', 'unread'] } }
+
+  # State machine
   workflow do
     state :unread
     state :read
@@ -35,54 +52,65 @@ class InboxItem < ActiveRecord::Base
     state :retired
     state :retired_unread
   end
-  
+
   def infer_context_code
-    self.context_code ||= self.asset.context_code rescue nil
-    self.context_code ||= self.asset.context.asset_string rescue nil
+    self.context_code ||= asset.context_code rescue nil
+    self.context_code ||= asset.context.asset_string rescue nil
   end
-  
+
   def mark_as_read
     update_attribute(:workflow_state, 'read')
   end
-  
+
   def sender_name
-    User.cached_name(self.sender_id)
+    User.cached_name(sender_id)
   end
-  
+
   def context
-    Context.find_by_asset_string(self.context_code) rescue nil
+    Context.find_by_asset_string(context_code) rescue nil
   end
-  
+
   def context_short_name
-    return unless self.context_code
-    Rails.cache.fetch(['short_name_lookup', self.context_code].cache_key) do
-      Context.find_by_asset_string(self.context_code).short_name rescue ""
+    return unless context_code.present?
+    Rails.cache.fetch(['short_name_lookup', context_code].cache_key) do
+      Context.find_by_asset_string(context_code).short_name rescue ''
     end
   end
-  
+
   def flag_changed
-    @item_state_changed = self.new_record? || self.workflow_state_changed?
+    @item_state_changed = new_record? || workflow_state_changed?
     true
   end
-  
+
+  # Public: Limit the subject line to 255 characters by stripping any "Re: "
+  # occurrences and then truncating what's left to 255 characters.
+  #
+  # Returns nothing.
+  def trim_subject
+    return unless subject.present?
+
+    subject.strip!
+    subject.sub!(/^(Re:\s*)+/, '')
+
+    self.subject = subject[0..254]
+  end
+
   def update_user_inbox_items_count
-    User.update_all({:unread_inbox_items_count => (self.user.inbox_items.unread.count rescue 0)}, {:id => self.user_id})
+    new_unread_count = user.inbox_items.unread.count rescue 0
+    User.update_all({ :unread_inbox_items_count => new_unread_count },
+      { :id => user_id })
   end
-  
+
   def context_type_plural
-    self.context_code.split("_")[0..-2].join("_").pluralize
+    context_code.split('_')[0..-2].join('_').pluralize
   end
-  
+
   def context_id
-    self.context_code.split("_").last.to_i rescue nil
+    context_code.split('_').last.to_i rescue nil
   end
-  
+
   def item_asset_string
-    "#{self.asset_type.underscore}_#{self.asset_id}"
+    "#{asset_type.underscore}_#{asset_id}"
   end
-  
-  named_scope :active, :conditions => "workflow_state NOT IN ('deleted', 'retired', 'retired_unread')"
-  named_scope :unread, lambda {
-    {:conditions => ['workflow_state = ?', 'unread']}
-  }
+
 end
