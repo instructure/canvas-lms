@@ -256,7 +256,8 @@ module Canvas::AccountReports
         csv << headers
         sections = @domain_root_account.course_sections.scoped(
           :select => "course_sections.*, nxc.sis_source_id AS non_x_course_sis_id,
-                      rc.sis_source_id AS course_sis_id, accounts.sis_source_id AS account_sis_id",
+                      rc.sis_source_id AS course_sis_id, accounts.sis_source_id AS account_sis_id,
+                      nxc.id AS non_x_course_id",
           :joins => "INNER JOIN courses AS rc ON course_sections.course_id = rc.id
                      LEFT OUTER JOIN courses AS nxc ON course_sections.nonxlist_course_id = nxc.id
                      LEFT OUTER JOIN accounts ON course_sections.account_id = accounts.id")
