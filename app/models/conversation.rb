@@ -74,6 +74,10 @@ class Conversation < ActiveRecord::Base
     transaction do
       if private
         conversation = users.first.all_conversations.find_by_private_hash(private_hash).try(:conversation)
+        # for compatibility during migration, before ConversationParticipant has finished populating
+        if Setting.get_cached('populate_conversation_participants_private_hash_complete', '0') == '0'
+          conversation ||= Conversation.find_by_private_hash(private_hash)
+        end
       end
       unless conversation
         conversation = new
