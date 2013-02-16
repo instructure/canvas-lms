@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe "Kaltura::ClientV3" do
-  before(:each) do
+  def create_config(opts={})
     Kaltura::ClientV3.stubs(:config).returns({
       'domain' => 'www.instructuremedia.com',
       'resource_domain' => 'www.instructuremedia.com',
@@ -30,9 +30,13 @@ describe "Kaltura::ClientV3" do
       'player_ui_conf' => '1',
       'kcw_ui_conf' => '1',
       'upload_ui_conf' => '1'
-    })
+    }.merge(opts))
 
     @kaltura = Kaltura::ClientV3.new
+  end
+
+  before(:each) do
+    create_config
   end
 
   it "should properly sanitize thumbnail parameters" do
@@ -105,4 +109,42 @@ describe "Kaltura::ClientV3" do
               ]
     end
   end
+
+  describe "caching" do
+    def create_config_with_mock(seconds)
+      create_config('cache_play_list_seconds' => seconds)
+      @source = {:height => "240", :bitrate => "382", :isOriginal => "0", :width => "336", :content_type => "video/mp4",
+                                                   :containerFormat => "isom", :url => "https://kaltura.example.com/url", :size =>"204", :fileExt=>"mp4"}
+      @kaltura.expects(:flavorAssetGetByEntryId).returns([@source.merge({:status => '2'})])
+      @kaltura.expects(:flavorAssetGetPlaylistUrl).returns("https://kaltura.example.com/url")
+    end
+
+    it "should not cache" do
+      enable_cache do
+        create_config_with_mock(0)
+        @kaltura.media_sources('hi')
+        Rails.cache.read(['media_sources', 'hi', 0].cache_key).should be_nil
+      end
+    end
+
+    it "should cache for set length" do
+      create_config_with_mock(2)
+      m = mock()
+      m.expects(:write).with(['media_sources', 'hi', 2].cache_key, [@source], {:expires_in => 2})
+      m.expects(:read).returns(nil)
+      Rails.stubs(:cache).returns(m)
+      @kaltura.media_sources('hi')
+    end
+
+    it "should cache indefinitely" do
+      create_config_with_mock(nil)
+      m = mock()
+      m.expects(:write).with(['media_sources', 'hi', nil].cache_key, [@source])
+      m.expects(:read).returns(nil)
+      Rails.stubs(:cache).returns(m)
+      @kaltura.media_sources('hi')
+    end
+
+  end
+
 end
