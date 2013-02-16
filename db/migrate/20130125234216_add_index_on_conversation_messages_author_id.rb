@@ -3,7 +3,7 @@ class AddIndexOnConversationMessagesAuthorId < ActiveRecord::Migration
   self.transactional = false
 
   def self.up
-    add_index :conversation_messages, :author_id, :concurrent => true
+    add_index :conversation_messages, :author_id, :concurrently => true
   end
 
   def self.down
