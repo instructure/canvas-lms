@@ -551,6 +551,15 @@ describe GradeCalculator do
       check_grades(104.7, 104.7)
     end
 
+    it "grade dropping should work even in ridiculous circumstances" do
+      set_grades [[nil, 20], [3, 10], [nil, 10],
+                  [nil, 100000000000000007629769841091887003294964970946560],
+                  [nil, nil]]
+
+      @group.update_attribute(:rules, 'drop_lowest:2')
+      check_grades(30, 15)
+    end
+
     context "assignment groups with 0 points possible" do
       before do
         @group1.update_attribute :group_weight, 50
