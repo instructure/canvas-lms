@@ -565,6 +565,7 @@ describe "Default Account Reports" do
       end
 
       it "should run the provisioning report" do
+        @section1.crosslist_to_course(@course2)
         parameters = {}
         parameters["sections"] = true
         parsed = ReportsSpecHelper.run_report(@account,"provisioning_csv",parameters,4)
