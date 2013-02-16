@@ -1030,7 +1030,7 @@ class Enrollment < ActiveRecord::Base
   # This is the *only* reason the sis_source_id column has not been dropped
   def sis_user_id
     return @sis_user_id if @sis_user_id
-    sis_source_id_parts = sis_source_id.split(':')
+    sis_source_id_parts = sis_source_id ? sis_source_id.split(':') : []
     if sis_source_id_parts.length == 4
       @sis_user_id = sis_source_id_parts[1]
     else

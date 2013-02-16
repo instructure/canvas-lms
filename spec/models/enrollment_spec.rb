@@ -1603,4 +1603,12 @@ describe Enrollment do
       end
     end
   end
+
+  describe "#sis_user_id" do
+    it "should work when sis_source_id is nil" do
+      course_with_student(:active_all => 1)
+      @enrollment.sis_source_id.should be_nil
+      @enrollment.sis_user_id.should be_nil
+    end
+  end
 end
