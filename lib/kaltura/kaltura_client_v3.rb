@@ -44,6 +44,9 @@ module Kaltura
       @user_secret = config['user_secret_key']
       @host ||= "www.kaltura.com"
       @endpoint ||= "/api_v3"
+      if @cache_play_list_seconds = config['cache_play_list_seconds']
+        @cache_play_list_seconds = @cache_play_list_seconds.to_i
+      end
     end
 
     def self.config
@@ -81,7 +84,7 @@ module Kaltura
     }
 
     def media_sources(entryId)
-      cache_key = ['media_sources', entryId].cache_key
+      cache_key = ['media_sources', entryId, @cache_play_list_seconds].cache_key
       sources = Rails.cache.read(cache_key)
       unless sources
         startSession(Kaltura::SessionType::ADMIN)
@@ -106,8 +109,15 @@ module Kaltura
         end
         sources = sort_source_list(sources)
         # only cache if all the sources are done converting
-        # purposely not setting an expires because it does not look like the kaltura urls actually expire.
-        Rails.cache.write(cache_key, sources) if sources.present? && all_assets_are_done_converting
+        # @cache_play_list_seconds of 0 means don't cache
+        # @cache_play_list_seconds of nil means cache indefinitely
+        if @cache_play_list_seconds != 0 && sources.present? && all_assets_are_done_converting
+          if @cache_play_list_seconds
+            Rails.cache.write(cache_key, sources, :expires_in => @cache_play_list_seconds)
+          else
+            Rails.cache.write(cache_key, sources)
+          end
+        end
       end
       sources
     end
