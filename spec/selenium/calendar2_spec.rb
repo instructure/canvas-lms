@@ -452,11 +452,11 @@ describe "calendar2" do
       it "should render assignments due just before midnight" do
         assignment_model(:course => @course,
                          :title => "super important",
-                         :due_at => Time.zone.now.beginning_of_week + 1.day - 1.minute)
+                         :due_at => Time.zone.now.beginning_of_day + 1.day - 1.minute)
         calendar_events = @teacher.calendar_events_for_calendar.last
 
         calendar_events.title.should == "super important"
-        @assignment.due_date == Time.zone.now.beginning_of_week + 1.day - 1.minute
+        @assignment.due_date.should == (Time.zone.now.beginning_of_day + 1.day - 1.minute).to_date
 
         get "/calendar2"
         wait_for_ajaximations
