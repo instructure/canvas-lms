@@ -1200,6 +1200,38 @@ describe 'Submissions API', :type => :integration do
     json['score'].should == 12.9
   end
 
+  it "should add hidden comments if the assignment is muted" do
+    course_with_teacher(:active_all => true)
+    student    = user(:active_all => true)
+    assignment = @course.assignments.create!(:title => 'assignment')
+    assignment.update_attribute(:muted, true)
+    @user = @teacher
+    @course.enroll_student(student).accept!
+    submission = assignment.find_or_create_submission(student)
+    api_call(:put, "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{student.id}",
+      { :controller => 'submissions_api', :action => 'update', :format => 'json',
+        :course_id => @course.to_param, :assignment_id => assignment.to_param,
+        :id => student.to_param },
+      { :comment => { :text_comment => 'hidden comment' } })
+    submission.submission_comments.scoped(:order => 'id DESC').first.should be_hidden
+  end
+
+  it "should not hide student comments on muted assignments" do
+    course_with_teacher(:active_all => true)
+    student    = user(:active_all => true)
+    assignment = @course.assignments.create!(:title => 'assignment')
+    assignment.update_attribute(:muted, true)
+    @user = student
+    @course.enroll_student(student).accept!
+    submission = assignment.find_or_create_submission(student)
+    api_call(:put, "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{student.id}",
+      { :controller => 'submissions_api', :action => 'update', :format => 'json',
+        :course_id => @course.to_param, :assignment_id => assignment.to_param,
+        :id => student.to_param },
+      { :comment => { :text_comment => 'hidden comment' } })
+    submission.submission_comments.scoped(:order => 'id DESC').first.should_not be_hidden
+  end
+
   it "should allow submitting points" do
     submit_with_grade({ :grading_type => 'points', :points_possible => 15 }, '13.2', 13.2, '13.2')
   end

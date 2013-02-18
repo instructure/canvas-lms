@@ -288,8 +288,10 @@ class SubmissionsApiController < ApplicationController
 
       comment = params[:comment]
       if comment.is_a?(Hash)
+        admin_in_context = !@context_enrollment || @context_enrollment.admin?
         comment = {
-          :comment => comment[:text_comment], :author => @current_user }.merge(
+          :comment => comment[:text_comment], :author => @current_user,
+          :hidden => @assignment.muted? && admin_in_context }.merge(
           comment.slice(:media_comment_id, :media_comment_type, :group_comment)
         ).with_indifferent_access
         @assignment.update_submission(@submission.user, comment)
