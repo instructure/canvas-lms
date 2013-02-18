@@ -46,6 +46,17 @@ describe QuizSubmissionsController do
       post 'create', :course_id => @quiz.context_id, :quiz_id => @quiz.id, :question_123 => 'hi'
       response.should be_redirect
     end
+
+    it "clears the access code key in user's session" do
+      student_in_course(:active_all => true)
+      user_session(@student)
+      @quiz.access_code = "Testing Testing 123"
+      @quiz.save!
+      access_code_key = @quiz.access_code_key_for_user(@student)
+      session[access_code_key] = true
+      post 'create', :course_id => @quiz.context_id, :quiz_id => @quiz.id, :question_123 => 'hi'
+      session.has_key?(access_code_key).should == false
+    end
   end
   
   describe "PUT 'update'" do
