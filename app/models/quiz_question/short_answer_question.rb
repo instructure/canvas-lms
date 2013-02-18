@@ -40,7 +40,7 @@ class QuizQuestion::ShortAnswerQuestion < QuizQuestion::Base
     answer = @question_data[:answers].sort_by{|a| a[:weight] || 0}.find do |answer|
       valid_answer = (answer[:text] || '').strip.downcase
       # Ignore blank answers (no match on that)
-      (valid_answer == answer_text) && !valid_answer.blank?
+      (CGI::escapeHTML(valid_answer) == answer_text) && !valid_answer.blank?
     end
     answer
   end

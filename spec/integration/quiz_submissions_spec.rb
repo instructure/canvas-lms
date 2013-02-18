@@ -29,7 +29,7 @@ describe QuizSubmissionsController do
         :question_type => 'short_answer_question',
         :question_text => '',
         :answers => [
-          :text => 'asdf',
+          :text => 'M&Ms',
           :id => 1235,
         ],
       },
@@ -47,6 +47,12 @@ describe QuizSubmissionsController do
     put  "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/backup",
          :question_1 => 'blah_overridden'
     response.should be_success
+  end
+
+  def record_answer_2
+    post "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@qs.id}/record_answer",
+         :question_2 => 'M&Ms', :last_question_id => 2
+    response.should be_redirect
   end
 
   describe "record_answer / backup" do
@@ -86,6 +92,15 @@ describe QuizSubmissionsController do
       submit_quiz
 
       @qs.reload.submission_data[0][:correct].should be_false
+    end
+
+    context "with a symbol in an answer" do
+      it "should mark the answer as correct" do
+        record_answer_2
+        submit_quiz
+
+        @qs.reload.submission_data[1][:correct].should be_true
+      end
     end
   end
 
