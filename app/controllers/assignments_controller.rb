@@ -292,7 +292,7 @@ class AssignmentsController < ApplicationController
           (assignment_overrides_json(@assignment.overrides_visible_to(@current_user)))
       }
       hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session)
-      hash[:IS_MOOC] = @assignment.is_mooc?
+      hash[:IS_LARGE_ROSTER] = @assignment.context.large_roster?
       hash[:URL_ROOT] = polymorphic_url([:api_v1, @context, :assignments])
       hash[:CANCEL_TO] = @assignment.new_record? ? polymorphic_url([@context, :assignments]) : polymorphic_url([@context, @assignment])
       hash[:CONTEXT_ID] = @context.id

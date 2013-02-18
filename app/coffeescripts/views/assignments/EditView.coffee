@@ -65,7 +65,7 @@ preventDefault, MissingDateDialog) ->
         el: '#assignment_group_selector'
         parentModel: @assignment
         assignmentGroups: ENV?.ASSIGNMENT_GROUPS || []
-      unless ENV?.IS_MOOC
+      unless ENV?.IS_LARGE_ROSTER
         @groupCategorySelector or= new GroupCategorySelector
           el: GROUP_CATEGORY_SELECTOR
           parentModel: @assignment
@@ -197,7 +197,7 @@ preventDefault, MissingDateDialog) ->
       super
       @initializeSubviews()
       @assignmentGroupSelector.render()
-      unless ENV?.IS_MOOC
+      unless ENV?.IS_LARGE_ROSTER
         @groupCategorySelector.render()
         @peerReviewsSelector.render()
       @_findElements()
@@ -232,7 +232,7 @@ preventDefault, MissingDateDialog) ->
       data = super
       data = @_inferSubmissionTypes data
       data = @_filterAllowedExtensions data
-      unless ENV?.IS_MOOC
+      unless ENV?.IS_LARGE_ROSTER
         data = @groupCategorySelector.filterFormData data
       # should update the date fields.. pretty hacky.
       if @showingAdvancedOptions()
@@ -293,7 +293,7 @@ preventDefault, MissingDateDialog) ->
       errors = @_validateTitle data, errors
       errors = @_validateSubmissionTypes data, errors
       errors = @_validateAllowedExtensions data, errors
-      unless ENV?.IS_MOOC
+      unless ENV?.IS_LARGE_ROSTER
         errors = @groupCategorySelector.validateBeforeSave(data, errors)
       errors = @_validateAdvancedOptions(data, errors)
       errors
