@@ -507,11 +507,26 @@ class User < ActiveRecord::Base
           association = current_associations[key]
           if association.nil?
             # new association, create it
-            UserAccountAssociation.create! do |aa|
-              aa.user_id = user_id
-              aa.account_id = account_id
-              aa.depth = depth
-              aa.shard = Shard.shard_for(account_id)
+            aa = UserAccountAssociation.new
+            aa.user_id = user_id
+            aa.account_id = account_id
+            aa.depth = depth
+            aa.shard = Shard.shard_for(account_id)
+            aa.shard.activate do
+              begin
+                UserAccountAssociation.transaction(:requires_new => true) do
+                  aa.save!
+                end
+              rescue ActiveRecord::Base::UniqueConstraintViolation
+                # race condition - someone else created the UAA after we queried for existing ones
+                old_aa = UserAccountAssociation.find_by_user_id_and_account_id(aa.user_id, aa.account_id)
+                raise unless old_aa # wtf!
+                # make sure we don't need to change the depth
+                if depth < old_aa.depth
+                  old_aa.depth = depth
+                  old_aa.save!
+                end
+              end
             end
           else
             # for incremental, only update the old association if it is deeper than the new one
