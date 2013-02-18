@@ -3,6 +3,7 @@ define [
   'Backbone'
   'jquery'
   'underscore'
+  'compiled/jquery/fixDialogButtons'
 ], (turnitinSettingsDialog, { View }, $, _) ->
 
   class TurnitinSettingsDialog extends View

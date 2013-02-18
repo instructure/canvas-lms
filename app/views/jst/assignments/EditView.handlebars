@@ -92,47 +92,7 @@
   class="advanced-togglable-{{isSimple}}"
   style="{{hiddenIf isSimple}}">
 
-  <div class="control-group">
-    <label for="assignment_grading_type" class="control-label">
-      {{#t "grading_type"}}Grading Type{{/t}}
-    </label>
-    <div class="controls">
-      <select id="assignment_grading_type" 
-        name="grading_type"
-        aria-controls="graded_assignment_fields view-grading-levels"
-        {{disabledIfIncludes frozenAttributes "grading_type"}}>
-        <option value="percent" {{selectedIf gradingType "percent"}}>
-          {{#t "grading_type_options.percent"}}Percentage{{/t}}
-        </option>
-        <option value="pass_fail" {{selectedIf gradingType "pass_fail" }}>
-          {{#t "grading_type_options.pass_fail"}}Complete/Incomplete{{/t}}
-        </option>
-        <option value="points" {{selectedIf gradingType "points"}}>
-          {{#t "grading_type_options.points"}}Points{{/t}}
-        </option>
-        <option value="letter_grade" {{selectedIf gradingType "letter_grade"}}>
-          {{#t "grading_type_options.letter_grade"}}Letter Grade{{/t}}
-        </option>
-        <option value="not_graded" {{selectedIf isNotGraded}}>
-          {{#t "grading_type_options.not_graded"}}Not Graded{{/t}}
-        </option>
-      </select>
-
-      <p id=view-grading-levels
-        class="help-block"
-        style="{{hiddenUnless isLetterGraded}}"
-        aria-expanded={{isLetterGraded}}>
-        <a href="#" class=edit_letter_grades_link>
-          {{#t "view_grading_levels"}}View Grading Levels{{/t}}
-        </a>
-      </p>
-
-      <input name=grading_standard_id
-        class=grading_standard_id
-        value="{{grading_standard_id}}"
-        type="hidden">
-    </div>
-  </div>
+  <div id="grading_type_selector" class="control-group"></div>
 
   <div id="graded_assignment_fields"
     aria-expanded="{{not isNotGraded}}"

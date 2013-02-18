@@ -7,12 +7,13 @@ require [
   'compiled/views/assignments/DueDateList'
   'compiled/views/assignments/DueDateOverride'
   'compiled/views/assignments/AssignmentGroupSelector'
+  'compiled/views/assignments/GradingTypeSelector'
   'compiled/views/assignments/GroupCategorySelector'
   'compiled/views/assignments/PeerReviewsSelector'
   'manage_groups'
 ], (Assignment, EditView, SectionCollection, DueDateList, DueDateListView,
-OverrideView, AssignmentGroupSelector, GroupCategorySelector,
-PeerReviewsSelector) ->
+OverrideView, AssignmentGroupSelector, GradingTypeSelector,
+GroupCategorySelector, PeerReviewsSelector) ->
 
   ENV.ASSIGNMENT.assignment_overrides = ENV.ASSIGNMENT_OVERRIDES
 
@@ -25,6 +26,8 @@ PeerReviewsSelector) ->
   assignmentGroupSelector = new AssignmentGroupSelector
     parentModel: assignment
     assignmentGroups: ENV?.ASSIGNMENT_GROUPS || []
+  gradingTypeSelector = new GradingTypeSelector
+    parentModel: assignment
   groupCategorySelector = new GroupCategorySelector
     parentModel: assignment
     groupCategories: ENV?.GROUP_CATEGORIES || []
@@ -35,6 +38,7 @@ PeerReviewsSelector) ->
     el: '#edit_assignment_form'
     model: assignment
     assignmentGroupSelector: assignmentGroupSelector
+    gradingTypeSelector: gradingTypeSelector
     groupCategorySelector: groupCategorySelector
     peerReviewsSelector: peerReviewsSelector
     views:

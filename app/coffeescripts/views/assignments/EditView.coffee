@@ -33,7 +33,6 @@ preventDefault, MissingDateDialog, toggleAccessibly) ->
     DESCRIPTION = '[name="description"]'
     SUBMISSION_TYPE = '[name="submission_type"]'
     ONLINE_SUBMISSION_TYPES = '#assignment_online_submission_types'
-    GRADING_TYPE = '[name="grading_type"]'
     NAME = '[name="name"]'
     ALLOW_FILE_UPLOADS = '[name="online_submission_types[online_upload]"]'
     RESTRICT_FILE_UPLOADS = '#restrict_file_extensions_container'
@@ -42,13 +41,13 @@ preventDefault, MissingDateDialog, toggleAccessibly) ->
     TURNITIN_ENABLED = '[name="turnitin_enabled"]'
     ADVANCED_TURNITIN_SETTINGS = '#advanced_turnitin_settings_link'
     ASSIGNMENT_TOGGLE_ADVANCED_OPTIONS = '#assignment_toggle_advanced_options'
+    GRADING_TYPE_SELECTOR = '#grading_type_selector'
     GRADED_ASSIGNMENT_FIELDS = '#graded_assignment_fields'
     EXTERNAL_TOOL_SETTINGS = '#assignment_external_tool_settings'
     GROUP_CATEGORY_SELECTOR = '#group_category_selector'
     PEER_REVIEWS_FIELDS = '#assignment_peer_reviews_fields'
     EXTERNAL_TOOLS_URL = '#assignment_external_tool_tag_attributes_url'
     EXTERNAL_TOOLS_NEW_TAB = '#assignment_external_tool_tag_attributes_new_tab'
-    VIEW_GRADING_LEVELS = '#view-grading-levels'
 
     els: _.extend({}, @::els, do ->
       els = {}
@@ -58,7 +57,6 @@ preventDefault, MissingDateDialog, toggleAccessibly) ->
       els["#{DESCRIPTION}"] = '$description'
       els["#{SUBMISSION_TYPE}"] = '$submissionType'
       els["#{ONLINE_SUBMISSION_TYPES}"] = '$onlineSubmissionTypes'
-      els["#{GRADING_TYPE}"] = '$gradingType'
       els["#{NAME}"] = '$name'
       els["#{ALLOW_FILE_UPLOADS}"] = '$allowFileUploads'
       els["#{RESTRICT_FILE_UPLOADS}"] = '$restrictFileUploads'
@@ -67,13 +65,13 @@ preventDefault, MissingDateDialog, toggleAccessibly) ->
       els["#{TURNITIN_ENABLED}"] = '$turnitinEnabled'
       els["#{ADVANCED_TURNITIN_SETTINGS}"] = '$advancedTurnitinSettings'
       els["#{ASSIGNMENT_TOGGLE_ADVANCED_OPTIONS}"] = '$assignmentToggleAdvancedOptions'
+      els["#{GRADING_TYPE_SELECTOR}"] = '$gradingTypeSelector'
       els["#{GRADED_ASSIGNMENT_FIELDS}"] = '$gradedAssignmentFields'
       els["#{EXTERNAL_TOOL_SETTINGS}"] = '$externalToolSettings'
       els["#{GROUP_CATEGORY_SELECTOR}"] = '$groupCategorySelector'
       els["#{PEER_REVIEWS_FIELDS}"] = '$peerReviewsFields'
       els["#{EXTERNAL_TOOLS_URL}"] = '$externalToolsUrl'
       els["#{EXTERNAL_TOOLS_NEW_TAB}"] = '$externalToolsNewTab'
-      els["#{VIEW_GRADING_LEVELS}"] = '$viewGradingLevels'
       els
     )
 
@@ -82,17 +80,16 @@ preventDefault, MissingDateDialog, toggleAccessibly) ->
       events["click .cancel_button"] = 'handleCancel'
       events["click #{ASSIGNMENT_TOGGLE_ADVANCED_OPTIONS}"] = 'toggleAdvancedOptions'
       events["change #{SUBMISSION_TYPE}"] = 'handleSubmissionTypeChange'
-      events["change #{GRADING_TYPE}"] = 'handleGradingTypeChange'
       events["change #{RESTRICT_FILE_UPLOADS}"] = 'handleRestrictFileUploadsChange'
       events["click #{ADVANCED_TURNITIN_SETTINGS}"] = 'showTurnitinDialog'
       events["change #{TURNITIN_ENABLED}"] = 'toggleAdvancedTurnitinSettings'
       events["change #{ALLOW_FILE_UPLOADS}"] = 'toggleRestrictFileUploads'
       events["click #{EXTERNAL_TOOLS_URL}"] = 'showExternalToolsDialog'
-      events["click .edit_letter_grades_link"] = 'showGradingSchemeDialog'
       events
     )
 
     @child 'assignmentGroupSelector', "#{ASSIGNMENT_GROUP_SELECTOR}"
+    @child 'gradingTypeSelector', "#{GRADING_TYPE_SELECTOR}"
     @child 'groupCategorySelector', "#{GROUP_CATEGORY_SELECTOR}"
     @child 'peerReviewsSelector', "#{PEER_REVIEWS_FIELDS}"
 
@@ -102,6 +99,7 @@ preventDefault, MissingDateDialog, toggleAccessibly) ->
       {views} = options
       @dueDateOverrideView = views['js-assignment-overrides']
       @model.on 'sync', -> window.location = @get 'html_url'
+      @gradingTypeSelector.on 'change:gradingType', @handleGradingTypeChange
 
     handleCancel: (ev) =>
       ev.preventDefault()
@@ -143,15 +141,6 @@ preventDefault, MissingDateDialog, toggleAccessibly) ->
           @$externalToolsUrl.val(data['item[url]'])
           @$externalToolsNewTab.prop('checked', data['item[new_tab]'] == '1')
 
-    showGradingSchemeDialog: (ev) =>
-      # TODO: clean up. slightly dependent on grading_standards.js
-      ev.preventDefault()
-      $("#edit_letter_grades_form").dialog
-        title: I18n.t('titles.grading_scheme_info', "View/Edit Grading Scheme"),
-        width: 600,
-        height: 310,
-        close: -> $(ev.target).focus()
-
     toggleRestrictFileUploads: =>
       @$restrictFileUploads.toggleAccessibly @$allowFileUploads.prop('checked')
 
@@ -162,10 +151,8 @@ preventDefault, MissingDateDialog, toggleAccessibly) ->
     handleRestrictFileUploadsChange: =>
       @$allowedExtensions.toggleAccessibly @$restrictFileUploads.find('input').prop('checked')
 
-    handleGradingTypeChange: (ev) =>
-      gradingType = @$gradingType.val()
+    handleGradingTypeChange: (gradingType) =>
       @$gradedAssignmentFields.toggleAccessibly gradingType != 'not_graded'
-      @$viewGradingLevels.toggleAccessibly gradingType == 'letter_grade'
 
     handleSubmissionTypeChange: (ev) =>
       subVal = @$submissionType.val()

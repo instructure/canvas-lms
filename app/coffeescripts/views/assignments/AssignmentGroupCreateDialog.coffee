@@ -7,6 +7,7 @@ define [
   'jquery.instructure_forms'
   'jquery.disableWhileLoading'
   'compiled/jquery.rails_flash_notifications'
+  'compiled/jquery/fixDialogButtons'
 ], (I18n, {View}, $, template) ->
 
   class AssignmentGroupCreateDialog extends View
