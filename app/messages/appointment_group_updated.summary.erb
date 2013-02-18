@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  http://<%= HostUrl.context_host(asset.contexts.first) %>/appointment_groups/<%= asset.id %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.contexts.first) %>/appointment_groups/<%= asset.id %>
 <% end %>
 
 <% define_content :subject do %>

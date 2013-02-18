@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  http://<%= HostUrl.context_host(asset.submission.assignment.context) %>/<%= asset.submission.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.submission.assignment.context_id %>/assignments/<%= asset.submission.assignment_id %>/submissions/<%= asset.submission.user_id %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.submission.assignment.context) %>/<%= asset.submission.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.submission.assignment.context_id %>/assignments/<%= asset.submission.assignment_id %>/submissions/<%= asset.submission.user_id %>
 <% end %>
 <%= t :tweet, "Canvas Alert - Comment: %{author} for %{assignment}, %{user}, %{context}.", :author => asset.author.short_name, :assignment => asset.submission.assignment.title, :user => asset.submission.user.short_name, :context => asset.submission.assignment.context.name %>
 <%= strip_and_truncate(asset.comment, :max_length => 50) %>

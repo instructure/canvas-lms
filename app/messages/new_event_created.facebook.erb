@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context_type.underscore.pluralize %>/<%= asset.context_id %>/calendar_events/<%= asset.id %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context_type.underscore.pluralize %>/<%= asset.context_id %>/calendar_events/<%= asset.id %>
 <% end %>
 
 <%= t('body', "There's a new event scheduled for %{course_name}:", :course_name => asset.context.name) %>

@@ -1,4 +1,4 @@
 <% define_content :link do %>
-  http://<%= HostUrl.context_host(asset.collaboration.context) %>/<%= asset.collaboration.context.class.to_s.downcase.pluralize %>/<%= asset.collaboration.context_id %>/collaborations
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.collaboration.context) %>/<%= asset.collaboration.context.class.to_s.downcase.pluralize %>/<%= asset.collaboration.context_id %>/collaborations
 <% end %>
 <%= t :body, "Canvas Alert - Collaboration Invite: %{document}, %{course_or_group}", :document => asset.collaboration.title, :course_or_group => asset.collaboration.context.name %>

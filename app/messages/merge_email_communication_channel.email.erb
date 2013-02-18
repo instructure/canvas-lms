@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  http://<%= HostUrl.default_host %>/register/<%= asset.confirmation_code %>
+  <%= HostUrl.protocol %>://<%= HostUrl.default_host %>/register/<%= asset.confirmation_code %>
 <% end %>
 
 <% define_content :subject do %>

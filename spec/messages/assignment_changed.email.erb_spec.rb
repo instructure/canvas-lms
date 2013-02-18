@@ -26,7 +26,7 @@ describe 'assignment_changed.email' do
     @message.subject.should match(/Quiz 1/)
     @message.body.should match(/Quiz 1/)
     @message.body.should match(Regexp.new(@course.name))
-    @message.body.should match(/http:\/\//)
+    @message.body.should match(/#{HostUrl.protocol}:\/\//)
     @message.body.should match(/courses\/#{@assignment.context_id}\/assignments\/#{@assignment.id}/)
   end
 end
