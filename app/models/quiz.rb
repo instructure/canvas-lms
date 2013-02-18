@@ -1420,4 +1420,8 @@ class Quiz < ActiveRecord::Base
   def self.shuffleable_question_type?(question_type)
     !non_shuffled_questions.include?(question_type)
   end
+
+  def access_code_key_for_user(user)
+    "quiz_#{id}_#{user.id}_entered_access_code"
+  end
 end
