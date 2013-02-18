@@ -1910,7 +1910,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def recompute_submission_lateness
-    submissions.each do |s|
+    submissions.find_each do |s|
       s.compute_lateness
       s.save!
     end
