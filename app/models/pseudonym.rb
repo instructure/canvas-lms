@@ -35,7 +35,7 @@ class Pseudonym < ActiveRecord::Base
   end
   before_validation :validate_unique_id
   before_destroy :retire_channels
-  
+
   before_save :set_password_changed
   before_validation :infer_defaults, :verify_unique_sis_user_id
   after_save :update_passwords_on_related_pseudonyms
@@ -43,7 +43,7 @@ class Pseudonym < ActiveRecord::Base
   has_a_broadcast_policy
 
   alias_method :context, :account
-  
+
   include StickySisFields
   are_sis_sticky :unique_id
 
@@ -66,14 +66,14 @@ class Pseudonym < ActiveRecord::Base
   end
 
   acts_as_list :scope => :user_id
-  
+
   set_broadcast_policy do |p|
     p.dispatch :confirm_registration
     p.to { self.communication_channel || self.user.communication_channel }
     p.whenever { |record|
       @send_confirmation
     }
-    
+
     p.dispatch :pseudonym_registration
     p.to { self.communication_channel || self.user.communication_channel }
     p.whenever { |record|
@@ -180,15 +180,15 @@ class Pseudonym < ActiveRecord::Base
     self.save
     @dont_update_passwords_on_related_pseudonyms = false
   end
-  
+
   def <=>(other)
     self.position <=> other.position
   end
-  
+
   def retire_channels
     communication_channels.each{|cc| cc.update_attribute(:workflow_state, 'retired') }
   end
-  
+
   def validate_unique_id
     if (!self.account || self.account.email_pseudonyms) && !self.deleted?
       unless self.unique_id.match(/\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i)
@@ -198,21 +198,20 @@ class Pseudonym < ActiveRecord::Base
     end
     true
   end
-  
+
   def verify_unique_sis_user_id
     return true unless self.sis_user_id
-    existing_pseudo = Pseudonym.find_by_account_id_and_sis_user_id(self.account_id, self.sis_user_id)
-    return true if !existing_pseudo || existing_pseudo.id == self.id 
-    
+    existing_pseudo = Pseudonym.find_by_account_id_and_sis_user_id(self.account_id, self.sis_user_id.to_s)
+    return true if !existing_pseudo || existing_pseudo.id == self.id
     self.errors.add(:sis_user_id, t('#errors.sis_id_in_use', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_user_id))
     false
   end
 
   workflow do
-    state :active 
+    state :active
     state :deleted
   end
-  
+
   alias_method :destroy!, :destroy
   def destroy(even_if_managed_password=false)
     raise "Cannot delete system-generated pseudonyms" if !even_if_managed_password && self.managed_password?
@@ -222,35 +221,35 @@ class Pseudonym < ActiveRecord::Base
     self.user.try(:update_account_associations) if result
     result
   end
-  
+
   def never_logged_in?
     !self.login_count || self.login_count == 0
   end
-  
+
   def login
     self.unique_id
   end
-  
+
   def login=(val)
     self.unique_id = val
   end
-  
+
   def login_changed?
     self.unique_id_changed?
   end
-  
+
   def user_code
     self.user.uuid rescue nil
   end
-  
+
   def email
     user.email if user
   end
-  
+
   def email_channel
     self.communication_channel if self.communication_channel && self.communication_channel.path_type == 'email'
   end
-  
+
   def email=(e)
     return false unless user
     self.user.email=(e)
@@ -297,13 +296,13 @@ class Pseudonym < ActiveRecord::Base
     end
     res
   end
-  
+
   def generate_temporary_password
     self.reset_password
     self.password_auto_generated = true
     self.password
   end
-  
+
   def move_to_user(user, migrate=true)
     return unless user
     return true if self.user_id == user.id
@@ -319,10 +318,10 @@ class Pseudonym < ActiveRecord::Base
       User.update_all({:updated_at => Time.now.utc}, {:id => [old_user_id, user.id]})
     end
     if User.find(old_user_id).pseudonyms.empty? && migrate
-      old_user.move_to_user(user)
+      UserMerge.from(old_user).into(user)
     end
   end
-  
+
   def valid_ssha?(plaintext_password)
     return false unless plaintext_password && self.sis_ssha
     decoded = Base64::decode64(self.sis_ssha.sub(/\A\{SSHA\}/, ""))

@@ -44,12 +44,12 @@ define [
       input = @$('#student_input').data('token_input')
       input.$fakeInput.css('width', '100%')
 
-      for e in @model.allEnrollmentsWithRole(@role) when e.associated_user_id
-        dfds.push @getUserData(e.associated_user_id).done (user) ->
+      for e in @model.allEnrollmentsWithRole(@role)
+        if e.observed_user && _.any(e.observed_user.enrollments)
           input.addToken
-            value: user.id
-            text: user.name
-            data: user
+            value: e.observed_user.id
+            text: e.observed_user.name
+            data: e.observed_user
 
       # if a dfd fails (e.g. observee was removed from course), we still want
       # the observer dialog to render (possibly with other observees)

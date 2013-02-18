@@ -10,11 +10,12 @@
   </div>
   <table style="width: 100%;">
     <tr>
-      <td style="vertical-align: top; padding-right: 30px;">
+      <td style="vertical-align: top; width: 50%;">
         <%= render :partial => 'user_box', :locals => {:base_role => @all_roles.find{|r|r[:base_role_name] == 'StudentEnrollment'}} %>
         <%= render :partial => 'user_box', :locals => {:base_role => @all_roles.find{|r|r[:base_role_name] == 'ObserverEnrollment'}} %>
       </td>
-      <td style="vertical-align: top;">
+      <td style="display: block; width: 30px;"></td>
+      <td style="vertical-align: top; width: 50%;">
         <%= render :partial => 'user_box', :locals => {:base_role => @all_roles.find{|r|r[:base_role_name] == 'TeacherEnrollment'}} %>
         <%= render :partial => 'user_box', :locals => {:base_role => @all_roles.find{|r|r[:base_role_name] == 'DesignerEnrollment'}} %>
         <%= render :partial => 'user_box', :locals => {:base_role => @all_roles.find{|r|r[:base_role_name] == 'TaEnrollment'}} %>

@@ -1048,4 +1048,60 @@ describe Quiz do
       end
     end
   end
+
+  context "custom validations" do
+    context "quiz_type" do
+      it "should not save an invalid quiz_type" do
+        quiz = @course.quizzes.create! :title => "test quiz"
+        quiz.quiz_type = "totally_invalid_quiz_type"
+        quiz.save.should be_false
+        quiz.errors.any?{|e| e =~ /quiz_type/}.should be_true
+      end
+
+      it "should not validate quiz_type if not changed" do
+        quiz = @course.quizzes.build :title => "test quiz", :quiz_type => 'invalid'
+        quiz.save(false).should be_true  # save without validation
+        quiz.reload
+        quiz.save.should be_true
+        quiz.errors.should be_blank
+        quiz.quiz_type.should == 'invalid'
+      end
+    end
+
+    context "ip_filter" do
+      it "should not save an invalid ip_filter" do
+        quiz = @course.quizzes.create! :title => "test quiz"
+        quiz.ip_filter = "999.999.1942.489"
+        quiz.save.should be_false
+        quiz.errors.any?{|e| e =~ /ip_filter/}.should be_true
+      end
+
+      it "should not validate ip_filter if not changed" do
+        quiz = @course.quizzes.build :title => "test quiz", :ip_filter => '123.fourfivesix'
+        quiz.save(false).should be_true  # save without validation
+        quiz.reload
+        quiz.save.should be_true
+        quiz.errors.should be_blank
+        quiz.ip_filter.should == '123.fourfivesix'
+      end
+    end
+
+    context "hide_results" do
+      it "should not save an invalid hide_results" do
+        quiz = @course.quizzes.create! :title => "test quiz"
+        quiz.hide_results = "totally_invalid_value"
+        quiz.save.should be_false
+        quiz.errors.any?{|e| e =~ /hide_results/}.should be_true
+      end
+
+      it "should not validate hide_results if not changed" do
+        quiz = @course.quizzes.build :title => "test quiz", :hide_results => 'invalid'
+        quiz.save(false).should be_true  # save without validation
+        quiz.reload
+        quiz.save.should be_true
+        quiz.errors.should be_blank
+        quiz.hide_results.should == 'invalid'
+      end
+    end
+  end
 end

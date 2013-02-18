@@ -18,7 +18,7 @@
     <% 6.times do %>
     <tr class="mini_calendar_week">
       <% 7.times do %>
-        <td class="mini_calendar_day day <%= day.month == current.month ? 'current_month' : 'other_month' %><%= day == today ? ' today' : '' %> <%= day.strftime("date_%m_%d_%Y") %>">
+        <td id="<%= day.strftime("mini_day_%Y_%m_%d") %>" class="mini_calendar_day day <%= day.month == current.month ? 'current_month' : 'other_month' %><%= day == today ? ' today' : '' %> <%= day.strftime("date_%m_%d_%Y") %>">
           <span class="day_number" title="<%= day.strftime "%m/%d/%Y" %>"><%= day.day %></span>
           <% day = day.next %>
         </td>

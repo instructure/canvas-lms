@@ -112,12 +112,12 @@ table {
 
 /* line 151, ../../../../../../../.rbenv/versions/1.9.3-p286/lib/ruby/gems/1.9.1/gems/bootstrap-sass-2.2.1.1/vendor/assets/stylesheets/bootstrap/_tables.scss */
 .table-striped tbody tr:nth-child(odd) td,
-.table-striped tbody tr:nth-child(odd) th {
+.table-striped tbody tr:nth-child(odd):not(.toolbar) th {
   background-color: #f9f9f9; }
 
 /* line 164, ../../../../../../../.rbenv/versions/1.9.3-p286/lib/ruby/gems/1.9.1/gems/bootstrap-sass-2.2.1.1/vendor/assets/stylesheets/bootstrap/_tables.scss */
 .table-hover tbody tr:hover td,
-.table-hover tbody tr:hover th {
+.table-hover tbody tr:hover:not(.toolbar) th {
   background-color: whitesmoke; }
 
 /* line 178, ../../../../../../../.rbenv/versions/1.9.3-p286/lib/ruby/gems/1.9.1/gems/bootstrap-sass-2.2.1.1/vendor/assets/stylesheets/bootstrap/_tables.scss */

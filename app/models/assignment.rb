@@ -47,6 +47,7 @@ class Assignment < ActiveRecord::Base
   has_one :rubric_association, :as => :association, :conditions => ['rubric_associations.purpose = ?', "grading"], :order => :created_at, :include => :rubric
   has_one :rubric, :through => :rubric_association
   has_one :teacher_enrollment, :class_name => 'TeacherEnrollment', :foreign_key => 'course_id', :primary_key => 'context_id', :include => :user, :conditions => ["enrollments.workflow_state = 'active' AND enrollments.type = 'TeacherEnrollment'"]
+  has_many :ignores, :as => :asset
   belongs_to :context, :polymorphic => true
   belongs_to :cloned_item
   belongs_to :grading_standard
@@ -404,20 +405,20 @@ class Assignment < ActiveRecord::Base
 
   def context_module_tag_info(user)
     tag_info = {:points_possible => self.points_possible}
-    as_student, as_instructor = self.due_dates_for(user, {:exclude_base_if_all_sections_overridden => true})
 
-    if as_instructor
-      if as_instructor.map{ |hash| self.class.due_date_compare_value(hash[:due_at]) }.uniq.size > 1
-        tag_info[:due_dates] = as_instructor.map{|hash| {:title => hash[:title], :due_date => hash[:due_at].utc.iso8601}}
-      else
-        tag_info[:due_date] = as_instructor.first[:due_at]
-      end
+    if self.multiple_due_dates_apply_to?(user)
+      as_student, as_instructor = self.due_dates_for(user)
+      tag_info[:due_dates] = as_instructor.map{|hash| {
+          :title => hash[:title],
+          :due_date => (hash[:due_at].utc.iso8601 rescue nil)}
+      }
     else
-      tag_info[:due_date] = as_student[:due_at]
+      tag_info[:due_date] = self.overridden_for(user).due_at.utc.iso8601 rescue nil
     end
-    tag_info[:due_date] = tag_info[:due_date].utc.iso8601 if tag_info[:due_date]
+
     tag_info
   end
+
 
   # call this to perform notifications on an Assignment that is not being saved
   # (useful when a batch of overrides associated with a new assignment have been saved)
@@ -824,17 +825,11 @@ class Assignment < ActiveRecord::Base
     }
     can :submit and can :attach_submission_comment_files
 
-    given { |user, session| !self.locked_for?(user) &&
-      (self.context.allow_student_assignment_edits rescue false) &&
-      self.cached_context_grants_right?(user, session, :participate_as_student)
-    }
-    can :update_content
-
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_grades) }
-    can :update and can :update_content and can :grade and can :delete and can :create and can :read and can :attach_submission_comment_files
+    can :update and can :grade and can :delete and can :create and can :read and can :attach_submission_comment_files
 
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_assignments) }
-    can :update and can :update_content and can :delete and can :create and can :read and can :attach_submission_comment_files
+    can :update and can :delete and can :create and can :read and can :attach_submission_comment_files
   end
 
   def filter_attributes_for_user(hash, user, session)
@@ -1375,6 +1370,9 @@ class Assignment < ActiveRecord::Base
   named_scope :for_context_codes, lambda {|codes|
     {:conditions => ['assignments.context_code IN (?)', codes] }
   }
+  named_scope :for_course, lambda { |course_id|
+    {:conditions => {:context_type => 'Course', :context_id => course_id}}
+  }
 
   named_scope :due_before, lambda{|date|
     {:conditions => ['assignments.due_at < ?', date] }
@@ -1410,27 +1408,33 @@ class Assignment < ActiveRecord::Base
     end
   }
 
+  named_scope :not_ignored_by, lambda { |user, purpose|
+    {:conditions =>
+         ["NOT EXISTS (SELECT * FROM ignores WHERE asset_type='Assignment' AND asset_id=assignments.id AND user_id=? AND purpose=?)",
+          user.id, purpose]}
+  }
+
   # This should only be used in the course drop down to show assignments needing a submission
-  named_scope :need_submitting_info, lambda{|user_id, limit, ignored_ids|
+  named_scope :need_submitting_info, lambda{|user_id, limit|
     ignored_ids ||= []
           {:select => API_NEEDED_FIELDS.join( ',' ) +
           ',(SELECT name FROM courses WHERE id = assignments.context_id) AS context_name',
           :conditions =>["(SELECT COUNT(id) FROM submissions
               WHERE assignment_id = assignments.id
               AND submission_type IS NOT NULL
-              AND user_id = ?) = 0 #{ignored_ids.empty? ? "" : "AND id NOT IN (#{ignored_ids.join(',')})"}", user_id],
+              AND user_id = ?) = 0", user_id],
           :limit => limit,
           :order => 'due_at ASC'
     }
   }
 
   # This should only be used in the course drop down to show assignments not yet graded.
-  named_scope :need_grading_info, lambda{|limit, ignore_ids|
+  named_scope :need_grading_info, lambda{|limit|
     ignore_ids ||= []
     {
       :select => API_NEEDED_FIELDS.join(',') +
                  ',(SELECT name FROM courses WHERE id = assignments.context_id) AS context_name, needs_grading_count',
-      :conditions => "needs_grading_count > 0 #{ignore_ids.empty? ? "" : "AND id NOT IN (#{ignore_ids.join(',')})"}",
+      :conditions => "needs_grading_count > 0",
       :limit => limit,
       :order=>'due_at ASC'
     }
@@ -1680,6 +1684,8 @@ class Assignment < ActiveRecord::Base
         quiz.workflow_state = 'available'
         quiz.save
       end
+      item.submission_types = 'online_quiz'
+      item.saved_by = :quiz
     end
     if hash[:assignment_group_migration_id]
       item.assignment_group = context.assignment_groups.find_by_migration_id(hash[:assignment_group_migration_id])
@@ -1855,27 +1861,29 @@ class Assignment < ActiveRecord::Base
 
   def needs_grading_count_for_user(user)
     vis = self.context.section_visibilities_for(user)
-    # the needs_grading_count trigger should change self.updated_at, invalidating the cache
-    Rails.cache.fetch(['assignment_user_grading_count', self, user].cache_key) do
-      case self.context.enrollment_visibility_level_for(user, vis)
-        when :full
-          self.needs_grading_count
-        when :sections
-          self.submissions.count('DISTINCT submissions.id',
-            :joins => "INNER JOIN enrollments e ON e.user_id = submissions.user_id",
-            :conditions => [<<-SQL, self.id, self.context.id, vis.map {|v| v[:course_section_id]}])
-            submissions.assignment_id = ?
-              AND e.course_id = ?
-              AND e.course_section_id in (?)
-              AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-              AND e.workflow_state = 'active'
-              AND submissions.submission_type IS NOT NULL
-              AND (submissions.workflow_state = 'pending_review'
-                OR (submissions.workflow_state = 'submitted'
-                  AND (submissions.score IS NULL OR NOT submissions.grade_matches_current_submission)))
-            SQL
-        else
-          0
+    self.shard.activate do
+      # the needs_grading_count trigger should change self.updated_at, invalidating the cache
+      Rails.cache.fetch(['assignment_user_grading_count', self, user].cache_key) do
+        case self.context.enrollment_visibility_level_for(user, vis)
+          when :full
+            self.needs_grading_count
+          when :sections
+            self.submissions.count('DISTINCT submissions.id',
+              :joins => "INNER JOIN enrollments e ON e.user_id = submissions.user_id",
+              :conditions => [<<-SQL, self.id, self.context.id, vis.map {|v| v[:course_section_id]}])
+              submissions.assignment_id = ?
+                AND e.course_id = ?
+                AND e.course_section_id in (?)
+                AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
+                AND e.workflow_state = 'active'
+                AND submissions.submission_type IS NOT NULL
+                AND (submissions.workflow_state = 'pending_review'
+                  OR (submissions.workflow_state = 'submitted'
+                    AND (submissions.score IS NULL OR NOT submissions.grade_matches_current_submission)))
+              SQL
+          else
+            0
+        end
       end
     end
   end

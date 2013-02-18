@@ -1,9 +1,9 @@
-<form action="{{action}}" id="curve_grade_dialog" style="display: none;" title="{{#t "curve_grade_for_assignment"}}Curve Grade for %{assignment.name}{{/t}}">
+<form action="{{action}}" id="curve_grade_dialog" style="display: none;" title="{{#t "curve_grade_for_assignment"}}Curve Grade for {{assignment.name}}{{/t}}">
   <input type="hidden" name="_method" value="POST"/>
   <input type="hidden" name="assignment_id" class="assignment_id" value="{{assignment.id}}" />
   <p>
     {{#t "curve_average"}}
-      Enter an average grade for the curve for <b>%{assignment.name}</b>. The chart shows a best attempt at curving the grades based on current student scores.
+      Enter an average grade for the curve for <b>{{assignment.name}}</b>. The chart shows a best attempt at curving the grades based on current student scores.
     {{/t}}
   </p>
   <div style="min-height: 100px;">
@@ -17,7 +17,7 @@
     <input type="number" min="0" name="middle_score" id="middle_score" style="width: 45px;" value="{{middleScore}}"/>
     {{#if showOutOf}}
       {{#t "out_of_points_possible"}}
-        out of %{assignment.points_possible}
+        out of {{assignment.points_possible}}
       {{/t}}
     {{/if}}
   </p>

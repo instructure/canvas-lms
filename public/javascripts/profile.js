@@ -361,6 +361,10 @@ define([
       folder_id: ENV.folder_id,
       formDataTarget: 'uploadDataUrl'
     },
+    
+    // validateForm
+    object_name: "attachment",
+    required: ["uploaded_data"],
 
     beforeSubmit: function() {
       $(this).find("button").attr('disabled', true).text(I18n.t('buttons.adding_file', "Adding File..."));

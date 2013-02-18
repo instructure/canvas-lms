@@ -77,12 +77,12 @@ module Mutable
       outstanding = submissions.map{ |submission|
         comments = submission.hidden_submission_comments.all
         next if comments.empty?
-        [submission, comments.map(&:author_id).uniq.size == 1 ? [comments.last.author_id] : []]
+        [submission, comments.map(&:author_id).uniq.size == 1 ? [comments.last.author] : []]
       }.compact
       SubmissionComment.update_all({ :hidden => false }, { :hidden => true, :submission_id => submissions.map(&:id) })
       Submission.send(:preload_associations, outstanding.map(&:first), :visible_submission_comments)
-      outstanding.each do |submission, skip_ids|
-        submission.create_or_update_conversations!(:create, :skip_ids => skip_ids)
+      outstanding.each do |submission, skip_users|
+        submission.create_or_update_conversations!(:create, :skip_users => skip_users)
       end
     end
   end

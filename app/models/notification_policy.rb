@@ -150,7 +150,7 @@ class NotificationPolicy < ActiveRecord::Base
     categories = {}
     # Get the list of notification categories and its default. Like this:
     # {"Announcement" => 'immediately'}
-    full_category_list.each {|c| categories[c.category] = c.default_frequency}
+    full_category_list.each {|c| categories[c.category] = c.default_frequency(user) }
     if default_channel_id = user.communication_channel.try(:id)
       # Load unique list of categories that the user currently has settings for.
       user_categories = NotificationPolicy.for(user).scoped({

@@ -207,7 +207,7 @@ define([
           $form.attr('method', 'PUT');
           $form.find(".submit_button").text(I18n.t('buttons.update', "Update Module"));
         }
-        $form.find("#unlock_module_at").prop('checked', data.unlock_at).triggerHandler('change');
+        $form.find("#unlock_module_at").prop('checked', data.unlock_at);
         $form.find("#require_sequential_progress").attr('checked', data.require_sequential_progress == "true" || data.require_sequential_progress == "1");
         $form.find(".prerequisites_entry").showIf($("#context_modules .context_module").length > 1);
         var prerequisites = [];
@@ -310,8 +310,13 @@ define([
           var data = $(this).find(".header").getTemplateData({textValues: ['name', 'id']});
           var $option = $(document.createElement('option'));
           $option.val(data.id);
+
           // data.id could come back as undefined, so calling $option.val(data.id) would return an "", which is not chainable, so $option.val(data.id).text... would die.
-          $option.text("the module, " + data.name).addClass('context_module_' + data.id).addClass('context_module_option');
+          $option.attr('role', 'option')
+                 .text("the module, " + data.name)
+                 .addClass('context_module_' + data.id)
+                 .addClass('context_module_option');
+
           $("#module_list").append($option);
         });
       },
@@ -428,12 +433,27 @@ define([
   
 
   modules.initModuleManagement = function() {
+
     $("#unlock_module_at").change(function() {
-      $(".unlock_module_at_details").showIf($(this).attr('checked'));
-      if (!$(this).attr('checked')) {
+      $this = $(this);
+      $unlock_module_at_details = $(".unlock_module_at_details");
+
+      $unlock_module_at_details.showIf($this.attr('checked'))
+
+      //if($this.attr('checked')){
+        //$unlock_module_at_details.show();// removeClass("accessible_hide");
+      //}else{
+        //$unlock_module_at_details.hide(); //addClass("accessible_hide");
+      //}
+
+      //$(".unlock_module_at_details").showIf($(this).attr('checked'));
+      //$('.unlock_module_at_details').attr('aria-hidden', false);
+
+      if (!$this.attr('checked')) {
         $("#context_module_unlock_at").val('').triggerHandler('change');
       }
     }).triggerHandler('change');
+
     $(".context_module").bind('update', function(event, data) {
       data.context_module.unlock_at = $.parseFromISO(data.context_module.unlock_at).datetime_formatted;
       var $module = $("#context_module_" + data.context_module.id);
@@ -855,16 +875,20 @@ define([
 
   $(document).ready(function() {
     $(".datetime_field").datetime_field();
+
     $(".context_module").live('mouseover', function() {
       $(".context_module_hover").removeClass('context_module_hover');
       $(this).addClass('context_module_hover');
     });
-    $(".context_module_item").live('mouseover', function() {
+
+    $(".context_module_item").live('mouseover focus', function() {
       $(".context_module_item_hover").removeClass('context_module_item_hover');
       $(this).addClass('context_module_item_hover');
     });
+
     var $currentElem = null;
     var hover = function($elem) {
+
       if($elem.hasClass('context_module')) {
         $(".context_module_hover").removeClass('context_module_hover');
         $(".context_module_item_hover").removeClass('context_module_item_hover');

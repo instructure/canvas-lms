@@ -17,16 +17,23 @@ define [
     ]
 
     # Method Summary
-    #   make a comment
+    #   Roles are ordered by base_role_type then alphabetically within those
+    #   base role types. The order that these base role types live is defined
+    #   by the sortOrder array. There is a special case however. AccountAdmin
+    #   role always goes first. This uses the index of the sortOrder to ensure
+    #   the correct order since comparator is just using _.sort in it's 
+    #   underlining implementation which is just ordering based on alphabetical
+    #   correctness. 
     # @api backbone override
     comparator: (role) -> 
       base_role_type= role.get 'base_role_type'
-
       index = _.indexOf @sortOrder, base_role_type
-      if base_role_type == role.get 'role' 
-        return "#{index}_#{base_role_type}"
-      else if role.get "role" == "AccountAdmin"
-        return "0_#{base_role_type}"
-      else
-        return "#{index}_#{base_role_type}_#{role}"
+      role_name = role.get 'role'
+
+      position_string = "#{index}_#{base_role_type}_#{role_name}"
+
+      if base_role_type == role_name then position_string = "#{index}_#{base_role_type}"
+      if role_name == "AccountAdmin" then position_string = "0_#{base_role_type}"
+
+      position_string
       

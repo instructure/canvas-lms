@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -62,6 +62,42 @@ describe ActiveRecord::Base do
       Course.count_by_date(:column => :start_at).should eql Hash[
         start_times[0..1].each_with_index.map{ |t, i| [t.to_date, i + 1]}
       ]
+    end
+  end
+
+  describe "useful_find_in_batches and useful_find_each" do
+    before do
+      c1 = course(:name => 'course1', :active_course => true)
+      c2 = course(:name => 'course2', :active_course => true)
+      u1 = user(:name => 'user1', :active_user => true)
+      u2 = user(:name => 'user2', :active_user => true)
+      u3 = user(:name => 'user3', :active_user => true)
+      c1.enroll_student(u1, :enrollment_state => 'active')
+      c1.enroll_student(u2, :enrollment_state => 'active')
+      c1.enroll_student(u3, :enrollment_state => 'active')
+      c2.enroll_student(u1, :enrollment_state => 'active')
+      c2.enroll_student(u2, :enrollment_state => 'active')
+      c2.enroll_student(u3, :enrollment_state => 'active')
+    end
+
+    it "should find each enrollment from course join" do
+      e = Course.active.scoped(:joins => :enrollments)
+      all_enrollments = []
+      e.useful_find_each(:batch_size => 2) do |e|
+        all_enrollments << e.id
+      end
+      all_enrollments.length.should == 6
+    end
+
+    it "should find all enrollments from course join in batches" do
+      e = Course.active.scoped(:select => "enrollments.id as eid", :joins => :enrollments)
+      all_enrollments = []
+      e.useful_find_in_batches(:batch_size => 2) do |batch|
+        batch.each do |e|
+          all_enrollments << e.eid
+        end
+      end
+      all_enrollments.length.should == 6
     end
   end
 
@@ -476,6 +512,58 @@ describe ActiveRecord::Base do
         should eql @enrollments.map(&:id).reverse
       StudentEnrollment.uber_scope(:order => "id desc").paginate(:page => nil).map(&:id).
         should eql @enrollments.map(&:id).reverse
+    end
+  end
+
+  describe "find_by_asset_string" do
+    it "should enforce type restrictions" do
+      u = User.create!
+      ActiveRecord::Base.find_by_asset_string(u.asset_string).should == u
+      ActiveRecord::Base.find_by_asset_string(u.asset_string, ['User']).should == u
+      ActiveRecord::Base.find_by_asset_string(u.asset_string, ['Course']).should == nil
+    end
+  end
+
+  describe "update_all/delete_all with_joins" do
+    before do
+      pending "MySQL and Postgres only" unless %w{PostgreSQL MySQL}.include?(ActiveRecord::Base.connection.adapter_name)
+
+      @u1 = User.create!(:name => 'a')
+      @u2 = User.create!(:name => 'b')
+      @p1 = @u1.pseudonyms.create!(:unique_id => 'pa', :account => Account.default)
+      @p1_2 = @u1.pseudonyms.create!(:unique_id => 'pa2', :account => Account.default)
+      @p2 = @u2.pseudonyms.create!(:unique_id => 'pb', :account => Account.default)
+      @p1_2.destroy
+    end
+
+    it "should do an update all with a join" do
+      Pseudonym.scoped(:joins => :user).active.update_all({:unique_id => 'pa3'}, {:users => {:name => 'a'}})
+      @p1.reload.unique_id.should == 'pa3'
+      @p1_2.reload.unique_id.should == 'pa2'
+      @p2.reload.unique_id.should == 'pb'
+    end
+
+    it "should do a delete all with a join" do
+      Pseudonym.scoped(:joins => :user).active.delete_all({:users => {:name => 'a'}})
+      lambda { @p1.reload }.should raise_error(ActiveRecord::RecordNotFound)
+      @u1.reload.should_not be_deleted
+      @p1_2.reload.unique_id.should == 'pa2'
+      @p2.reload.unique_id.should == 'pb'
+    end
+  end
+
+  describe "reorder" do
+    it "should discard previous order by options" do
+      @user1 = User.create!(:name => 'a')
+      @user2 = User.create!(:name => 'b')
+      scopeForward = User.order('name')
+      scopeForward.all.should == [@user1, @user2]
+      # AR method, doesn't work cause Rails just adds the order, instead of replacing
+      scopeBackward = scopeForward.order('name DESC')
+      scopeBackward.all.should == [@user1, @user2]
+      # our way, does work
+      scopeBackward = scopeForward.reorder('name DESC')
+      scopeBackward.all.should == [@user2, @user1]
     end
   end
 end

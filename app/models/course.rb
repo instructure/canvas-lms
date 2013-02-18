@@ -32,7 +32,6 @@ class Course < ActiveRecord::Base
                   :is_public,
                   :publish_grades_immediately,
                   :allow_student_wiki_edits,
-                  :allow_student_assignment_edits,
                   :show_public_context_messages,
                   :syllabus_body,
                   :public_description,
@@ -171,6 +170,8 @@ class Course < ActiveRecord::Base
   attr_accessor :import_source
   has_many :zip_file_imports, :as => :context
   has_many :content_participation_counts, :as => :context, :dependent => :destroy
+
+  include Profile::Association
 
   before_save :assign_uuid
   before_save :assert_defaults
@@ -408,7 +409,9 @@ class Course < ActiveRecord::Base
   end
 
   def update_account_associations
-    Course.update_account_associations([self])
+    self.shard.activate do
+      Course.update_account_associations([self])
+    end
   end
 
   def associated_accounts
@@ -716,7 +719,7 @@ class Course < ActiveRecord::Base
   end
 
   def self_enrollment_code
-    read_attribute(:self_enrollment_code) || set_self_enrollment_code if self_enrollment?
+    read_attribute(:self_enrollment_code) || set_self_enrollment_code
   end
 
   def set_self_enrollment_code
@@ -1066,13 +1069,16 @@ class Course < ActiveRecord::Base
   def enrollment_allows(user, session, permission)
     return false unless user && permission
 
+    temp_type = session && session["role_course_#{self.id}"]
+
     @enrollment_lookup ||= {}
-    @enrollment_lookup[user.id] ||=
-      if session && temp_type = session["role_course_#{self.id}"]
+    @enrollment_lookup[user.id] ||= shard.activate do
+      if temp_type
         [Enrollment.typed_enrollment(temp_type).new(:course => self, :user => user, :workflow_state => 'active')]
       else
         self.enrollments.active_or_pending.for_user(user).reject { |e| [:inactive, :completed].include?(e.state_based_on_date)}
       end
+    end
 
     @enrollment_lookup[user.id].any? {|e| e.has_permission_to?(permission) }
   end
@@ -1504,10 +1510,10 @@ class Course < ActiveRecord::Base
     # association here -- just ran out of time.
     self.shard.activate do
       e ||= Enrollment.typed_enrollment(type).new(
-        :user => user, 
+        :user => user,
         :course => self,
-        :course_section => section, 
-        :workflow_state => enrollment_state, 
+        :course_section => section,
+        :workflow_state => enrollment_state,
         :limit_privileges_to_course_section => limit_privileges_to_course_section)
     end
     e.associated_user_id = associated_user_id
@@ -1553,8 +1559,9 @@ class Course < ActiveRecord::Base
     enroll_user(user, 'TeacherEnrollment')
   end
 
-  def resubmission_for(asset_string)
-    instructors.each{|u| u.ignored_item_changed!(asset_string, 'grading') }
+  def resubmission_for(asset)
+    asset.ignores.scoped({}).delete_all({:purpose => 'grading', :permanent => false})
+    instructors.each(&:touch)
   end
 
   def grading_standard_enabled
@@ -1963,7 +1970,7 @@ class Course < ActiveRecord::Base
   attr_accessor :folder_name_lookups, :attachment_path_id_lookup, :attachment_path_id_lookup_lower, :assignment_group_no_drop_assignments
 
   def import_syllabus_from_migration(syllabus_body)
-    self.syllabus_body = ImportedHtmlConverter.convert(syllabus_body, self) 
+    self.syllabus_body = ImportedHtmlConverter.convert(syllabus_body, self)
   end
 
   def import_settings_from_migration(data, migration)
@@ -2060,52 +2067,57 @@ class Course < ActiveRecord::Base
 
     attachments.each_with_index do |file, i|
       cm.fast_update_progress((i.to_f/total) * 18.0) if cm && (i % 10 == 0)
-      if !ce || ce.export_object?(file)
-        new_file = file.clone_for(self, nil, :overwrite => true)
-        self.attachment_path_id_lookup[file.full_display_path.gsub(/\A#{root_folder_name}/, '')] = new_file.migration_id
-        new_folder_id = merge_mapped_id(file.folder)
 
-        if file.folder && file.folder.parent_folder_id.nil?
-          new_folder_id = root_folder.id
-        end
-        # make sure the file has somewhere to go
-        if !new_folder_id
-          # gather mapping of needed folders from old course to new course
-          old_folders = []
-          old_folders << file.folder
-          new_folders = []
-          new_folders << old_folders.last.clone_for(self, nil, options.merge({:include_subcontent => false}))
-          while old_folders.last.parent_folder && old_folders.last.parent_folder.parent_folder_id && !merge_mapped_id(old_folders.last.parent_folder)
-            old_folders << old_folders.last.parent_folder
-            new_folders << old_folders.last.clone_for(self, nil, options.merge({:include_subcontent => false}))
-          end
-          old_folders.reverse!
-          new_folders.reverse!
-          # try to use folders that already match if possible
-          final_new_folders = []
-          parent_folder = Folder.root_folders(self).first
-          old_folders.each_with_index do |folder, idx|
-            if f = parent_folder.active_sub_folders.find_by_name(folder.name)
-              final_new_folders << f
-            else
-              final_new_folders << new_folders[idx]
-            end
-            parent_folder = final_new_folders.last
-          end
-          # add or update the folder structure needed for the file
-          final_new_folders.first.parent_folder_id ||=
-            merge_mapped_id(old_folders.first.parent_folder) ||
-            Folder.root_folders(self).first.id
-          old_folders.each_with_index do |folder, idx|
-            final_new_folders[idx].save!
-            map_merge(folder, final_new_folders[idx])
-            final_new_folders[idx + 1].parent_folder_id ||= final_new_folders[idx].id if final_new_folders[idx + 1]
-          end
+      if !ce || ce.export_object?(file)
+        begin
+          new_file = file.clone_for(self, nil, :overwrite => true)
+          self.attachment_path_id_lookup[file.full_display_path.gsub(/\A#{root_folder_name}/, '')] = new_file.migration_id
           new_folder_id = merge_mapped_id(file.folder)
+
+          if file.folder && file.folder.parent_folder_id.nil?
+            new_folder_id = root_folder.id
+          end
+          # make sure the file has somewhere to go
+          if !new_folder_id
+            # gather mapping of needed folders from old course to new course
+            old_folders = []
+            old_folders << file.folder
+            new_folders = []
+            new_folders << old_folders.last.clone_for(self, nil, options.merge({:include_subcontent => false}))
+            while old_folders.last.parent_folder && old_folders.last.parent_folder.parent_folder_id && !merge_mapped_id(old_folders.last.parent_folder)
+              old_folders << old_folders.last.parent_folder
+              new_folders << old_folders.last.clone_for(self, nil, options.merge({:include_subcontent => false}))
+            end
+            old_folders.reverse!
+            new_folders.reverse!
+            # try to use folders that already match if possible
+            final_new_folders = []
+            parent_folder = Folder.root_folders(self).first
+            old_folders.each_with_index do |folder, idx|
+              if f = parent_folder.active_sub_folders.find_by_name(folder.name)
+                final_new_folders << f
+              else
+                final_new_folders << new_folders[idx]
+              end
+              parent_folder = final_new_folders.last
+            end
+            # add or update the folder structure needed for the file
+            final_new_folders.first.parent_folder_id ||=
+              merge_mapped_id(old_folders.first.parent_folder) ||
+              Folder.root_folders(self).first.id
+            old_folders.each_with_index do |folder, idx|
+              final_new_folders[idx].save!
+              map_merge(folder, final_new_folders[idx])
+              final_new_folders[idx + 1].parent_folder_id ||= final_new_folders[idx].id if final_new_folders[idx + 1]
+            end
+            new_folder_id = merge_mapped_id(file.folder)
+          end
+          new_file.folder_id = new_folder_id
+          new_file.save_without_broadcasting!
+          map_merge(file, new_file)
+        rescue
+          cm.add_warning(t(:file_copy_error, "Couldn't copy file \"%{name}\"", :name => file.display_name || file.path_name), $!)
         end
-        new_file.folder_id = new_folder_id
-        new_file.save_without_broadcasting!
-        map_merge(file, new_file)
       end
     end
   end
@@ -2357,7 +2369,7 @@ class Course < ActiveRecord::Base
   def self.clonable_attributes
     [ :group_weighting_scheme, :grading_standard_id, :is_public,
       :publish_grades_immediately, :allow_student_wiki_edits,
-      :allow_student_assignment_edits, :show_public_context_messages,
+      :show_public_context_messages,
       :syllabus_body, :allow_student_forum_attachments,
       :default_wiki_editing_roles, :allow_student_organized_groups,
       :default_view, :show_all_discussion_entries, :open_enrollment,
@@ -2993,4 +3005,74 @@ class Course < ActiveRecord::Base
     student_enrollments.find_by_user_id(user.id).present?
   end
 
+  def update_one(update_params)
+    case update_params[:event]
+      when 'offer'
+        if self.completed?
+          self.unconclude!
+        else
+          self.offer! unless self.available?
+        end
+      when 'conclude'
+        self.complete! unless self.completed?
+      when 'delete'
+        self.sis_source_id = nil
+        self.workflow_state = 'deleted'
+        self.save!
+    end
+  end
+
+  def self.do_batch_update(progress, user, course_ids, update_params)
+    begin
+      account = progress.context
+      progress.start!
+      update_every = [course_ids.size / 20, 4].max
+      completed_count = failed_count = 0
+      errors = {}
+      course_ids.each_slice(update_every) do |batch|
+        batch.each do |course_id|
+          course = account.associated_courses.find_by_id(course_id)
+          begin
+            raise t('course_not_found', "The course was not found") unless course
+            raise t('access_denied', "Access was denied") unless course.grants_right? user, :update
+            course.update_one(update_params)
+            completed_count += 1
+          rescue Exception => e
+            message = e.message
+            (errors[message] ||= []) << course_id
+            failed_count += 1
+          end
+        end
+        progress.update_completion! 100.0 * (completed_count + failed_count) / course_ids.size
+      end
+      progress.completion = 100.0
+      progress.message = t('batch_update_message', {
+          :one => "1 course processed",
+          :other => "%{count} courses processed"
+        },
+        :count => completed_count)
+      errors.each do |message, ids|
+        progress.message += t('batch_update_error', "\n%{error}: %{ids}", :error => message, :ids => ids.join(', '))
+      end
+      if completed_count > 0
+        progress.complete!
+      else
+        progress.fail!
+      end
+      progress.save
+    rescue Exception => e
+      progress.message = e.message
+      progress.fail!
+      progress.save
+    end
+  end
+
+  def self.batch_update(account, user, course_ids, update_params)
+    progress = account.progresses.create! :tag => "course_batch_update", :completion => 0.0
+    job = Course.send_later(:do_batch_update, progress, user, course_ids, update_params)
+    progress.user_id = user.id
+    progress.delayed_job_id = job.id
+    progress.save!
+    progress
+  end
 end

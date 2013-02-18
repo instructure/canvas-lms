@@ -17,8 +17,10 @@ I18n.defaultSeparator = ".";
 
 I18n.locale = document.documentElement.getAttribute('lang');
 
-// Set the placeholder format. Accepts `{{placeholder}}` and `%{placeholder}`.
-I18n.PLACEHOLDER = /(?:\{\{|%\{)(.*?)(?:\}\}?)/gm;
+// Set the placeholder format. Accepts `%{placeholder}` and %h{placeholder}.
+// %h{placeholder} indicate it is an htmlSafe value, (e.g. an input) and
+// anything not already safe should be html-escaped
+I18n.PLACEHOLDER = /%h?\{(.*?)\}/gm;
 
 I18n.isValidNode = function(obj, node) { 
   // handle names like "foo.bar.baz"
@@ -94,7 +96,7 @@ I18n.prepareOptions = function() {
 };
 
 I18n.interpolate = function(message, options) {
-  var placeholder, value, name, matches, needsEscaping = false;
+  var placeholder, value, name, matches, needsEscaping = false, htmlSafe;
 
   options = this.prepareOptions(options);
   if (options.wrapper) {
@@ -106,6 +108,7 @@ I18n.interpolate = function(message, options) {
 
   for (var i = 0; placeholder = matches[i]; i++) {
     name = placeholder.replace(this.PLACEHOLDER, "$1");
+    htmlSafe = (placeholder[1] === 'h'); // e.g. %h{input}
 
     // handle names like "foo.bar.baz"
     var nameParts = name.split('.');
@@ -118,10 +121,10 @@ I18n.interpolate = function(message, options) {
       value = "[missing " + placeholder + " value]";
     }
     if (needsEscaping) {
-      if (!value.htmlSafe) {
+      if (!value.htmlSafe && !htmlSafe) {
         value = htmlEscape(value);
       }
-    } else if (value.htmlSafe) {
+    } else if (value.htmlSafe || htmlSafe) {
       needsEscaping = true;
       message = htmlEscape(message);
     }

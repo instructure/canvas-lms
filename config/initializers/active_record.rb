@@ -63,6 +63,7 @@ class ActiveRecord::Base
   def self.find_all_by_asset_string(strings, asset_types=nil)
     # TODO: start checking asset_types, if provided
     strings.map{ |str| parse_asset_string(str) }.group_by(&:first).inject([]) do |result, (klass, id_pairs)|
+      next result if asset_types && !asset_types.include?(klass)
       result.concat((klass.constantize.find_all_by_id(id_pairs.map(&:last)) rescue []))
     end
   end
@@ -300,14 +301,18 @@ class ActiveRecord::Base
       args = args.map{ |a| column_str % a.to_s }
     end
 
+    value = wildcard_pattern(value, options)
+    cols = args.map{ |col| like_condition(col, '?', !options[:case_sensitive]) }
+    sanitize_sql_array ["(" + cols.join(" OR ") + ")", *([value] * cols.size)]
+  end
+
+  def self.wildcard_pattern(value, options = {})
     value = value.to_s
     value = value.downcase unless options[:case_sensitive]
     value = value.gsub('\\', '\\\\\\\\').gsub('%', '\\%').gsub('_', '\\_')
     value = '%' + value unless options[:type] == :right
     value += '%' unless options[:type] == :left
-
-    cols = args.map{ |col| like_condition(col, '?', !options[:case_sensitive]) }
-    sanitize_sql_array ["(" + cols.join(" OR ") + ")", *([value] * cols.size)]
+    value
   end
 
   def self.like_condition(value, pattern = '?', downcase = true)
@@ -423,7 +428,7 @@ class ActiveRecord::Base
     native = (connection.adapter_name == 'PostgreSQL')
     options[:select] = "DISTINCT ON (#{Array(columns).join(', ')}) " + (options[:select] || '*') if native
     raise "can't use limit with distinct on" if options[:limit] # while it's possible, it would be gross for non-native, so we don't allow it
-    raise "distinct on columns must match the leftmost part of the order-by clause" unless options[:order] && options[:order] =~ /\A#{Array(columns).map{ |c| Regexp.escape(c) }.join(' (asc|desc)?,')}/i
+    raise "distinct on columns must match the leftmost part of the order-by clause" unless options[:order] && options[:order] =~ /\A#{Array(columns).map{ |c| Regexp.escape(c) }.join(' *(?:asc|desc)?, *')}/i
 
     result = find(:all, options)
 
@@ -487,6 +492,24 @@ class ActiveRecord::Base
     end
     options[:group] << ", #{unqualified_field}" if options[:group]
     options
+  end
+
+  def self.useful_find_in_batches(options = {})
+    offset = 0
+    batch_size = options[:batch_size] || 1000
+    while true
+      batch = find(:all, :limit => batch_size, :offset => offset)
+      break if batch.empty?
+      with_exclusive_scope { yield batch }
+      break if batch.size < batch_size
+      offset += batch_size
+    end
+  end
+
+  def self.useful_find_each(options = {})
+    useful_find_in_batches(options) do |batch|
+      batch.each { |row| yield row }
+    end
   end
 
   # provides a way to override :order and :select in an association, while
@@ -610,6 +633,106 @@ class ActiveRecord::Base
       ids = connection.select_rows("select min(id), max(id) from (#{self.send(:construct_finder_sql, :select => "#{quoted_table_name}.#{primary_key} as id", :conditions => ["#{quoted_table_name}.#{primary_key}>?", last_value], :order => primary_key, :limit => batch_size)}) as subquery").first
     end
   end
+
+  class << self
+    def deconstruct_joins
+      joins_sql = ''
+      add_joins!(joins_sql, nil)
+      tables = []
+      join_conditions = []
+      joins_sql.strip.split('INNER JOIN')[1..-1].each do |join|
+        # this could probably be improved
+        raise "PostgreSQL update_all/delete_all only supports INNER JOIN" unless join.strip =~ /([a-zA-Z'"_]+)\s+ON\s+(.*)/
+        tables << $1
+        join_conditions << $2
+      end
+      [tables, join_conditions]
+    end
+
+    def update_all_with_joins(updates, conditions = nil, options = {})
+      scope = scope(:find)
+      if scope && scope[:joins]
+        case connection.adapter_name
+        when 'PostgreSQL'
+          sql  = "UPDATE #{quoted_table_name} SET #{sanitize_sql_for_assignment(updates)} "
+
+          tables, join_conditions = deconstruct_joins
+
+          unless tables.empty?
+            sql.concat('FROM ')
+            sql.concat(tables.join(', '))
+            sql.concat(' ')
+          end
+
+          conditions = merge_conditions(conditions, *join_conditions)
+        when 'MySQL'
+          sql  = "UPDATE #{quoted_table_name}"
+          add_joins!(sql, nil, scope)
+          sql << " SET "
+          # can't just use sanitize_sql_for_assignment cause MySQL supports
+          # updating multiple tables in a single statement, so we have to
+          # qualify the column names
+          sql << case updates
+             when Array
+               sanitize_sql_array(updates)
+             when Hash;
+               updates.map do |attr, value|
+                 "#{quoted_table_name}.#{connection.quote_column_name(attr)} = #{quote_bound_value(value)}"
+               end.join(', ')
+             else
+               updates
+             end << " "
+        else
+          raise "Joins in update not supported!"
+        end
+        select_sql = ""
+        add_conditions!(select_sql, conditions, scope)
+
+        if options.has_key?(:limit) || (scope && scope[:limit])
+          # Only take order from scope if limit is also provided by scope, this
+          # is useful for updating a has_many association with a limit.
+          add_order!(select_sql, options[:order], scope)
+
+          add_limit!(select_sql, options, scope)
+          sql.concat(connection.limited_update_conditions(select_sql, quoted_table_name, connection.quote_column_name(primary_key)))
+        else
+          add_order!(select_sql, options[:order], nil)
+          sql.concat(select_sql)
+        end
+
+        return connection.update(sql, "#{name} Update")
+      end
+      update_all_without_joins(updates, conditions, options)
+    end
+    alias_method_chain :update_all, :joins
+
+    def delete_all_with_joins(conditions = nil)
+      scope = scope(:find)
+      if scope && scope[:joins]
+        case connection.adapter_name
+        when 'PostgreSQL'
+          sql = "DELETE FROM #{quoted_table_name} "
+
+          tables, join_conditions = deconstruct_joins
+
+          sql.concat('USING ')
+          sql.concat(tables.join(', '))
+          sql.concat(' ')
+
+          conditions = merge_conditions(conditions, *join_conditions)
+        when 'MySQL'
+          sql = "DELETE #{quoted_table_name} FROM #{quoted_table_name}"
+          add_joins!(sql, nil, scope)
+        else
+          raise "Joins in delete not supported!"
+        end
+        add_conditions!(sql, conditions, scope)
+        return connection.delete(sql, "#{name} Delete all")
+      end
+      delete_all_without_joins(conditions)
+    end
+    alias_method_chain :delete_all, :joins
+  end
 end
 
 ActiveRecord::ConnectionAdapters::AbstractAdapter.class_eval do
@@ -715,6 +838,14 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
 
       execute "CREATE #{index_type} INDEX #{concurrently}#{quote_column_name(index_name)} ON #{quote_table_name(table_name)} (#{quoted_column_names})#{conditions}"
     end
+  end
+end
+
+ActiveRecord::NamedScope::Scope.class_eval do
+  # returns a new scope, with just the order replaced
+  # does *not* support extended scopes
+  def reorder(new_order)
+    self.class.new(proxy_scope, proxy_options.merge(:order => new_order))
   end
 end
 
@@ -1008,6 +1139,15 @@ class ActiveRecord::Migration
     def tags
       @tags ||= []
     end
+
+    def is_postgres?
+      connection.adapter_name == 'PostgreSQL'
+    end
+
+    def has_postgres_proc?(procname)
+      connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='#{procname}'").to_i != 0
+    end
+
   end
 
   def transactional?
@@ -1036,12 +1176,13 @@ end
 
 class ActiveRecord::Migrator
   def self.migrations_paths
-    @@migration_paths ||= [migrations_path]
+    @@migration_paths ||= []
   end
 
   def migrations
     @@migrations ||= begin
-      files = self.class.migrations_paths.map { |p| Dir["#{p}/[0-9]*_*.rb"] }.flatten
+      files = ([@migrations_path].compact + self.class.migrations_paths).uniq.
+        map { |p| Dir["#{p}/[0-9]*_*.rb"] }.flatten
 
       migrations = files.inject([]) do |klasses, file|
         version, name = file.scan(/([0-9]+)_([_a-z0-9]*).rb/).first

@@ -1184,7 +1184,7 @@ define([
               var index = _.indexOf(folder_files, folder_file);
               var $element = $files_structure.find(".folder_" + attachment.folder_id)
                               .children("ul")
-                              .find('li.file')
+                              .find('> li.file')
                               .eq(index);
 
               // Insert file in the correct location

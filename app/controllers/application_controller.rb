@@ -438,7 +438,7 @@ class ApplicationController < ActionController::Base
       # the grants_right? check to avoid querying for the various memberships
       # again.
       courses = @context.current_enrollments.select { |e| e.state_based_on_date == :active }.map(&:course).uniq
-      groups = include_groups ? @context.groups.active : []
+      groups = include_groups ? @context.current_groups : []
       if only_contexts.present?
         # find only those courses and groups passed in the only_contexts
         # parameter, but still scoped by user so we know they have rights to
@@ -502,7 +502,7 @@ class ApplicationController < ActionController::Base
       @assignments = @groups.map(&:active_assignments).flatten
     else
       @groups = AssignmentGroup.for_context_codes(@context_codes).active
-      @assignments = Assignment.active.for_context_codes(@context_codes)
+      @assignments = Assignment.active.for_course(@courses.map(&:id))
     end
     @assignment_groups = @groups
 
@@ -1248,6 +1248,15 @@ class ApplicationController < ActionController::Base
   def json_as_text?
     (request.headers['CONTENT_TYPE'].to_s =~ %r{multipart/form-data}) &&
     (params[:format].to_s != 'json' || in_app?)
+  end
+
+  def params_are_integers?(*check_params)
+    begin
+      check_params.each{ |p| Integer(params[p]) }
+    rescue ArgumentError
+      return false
+    end
+    true
   end
 
   def reset_session

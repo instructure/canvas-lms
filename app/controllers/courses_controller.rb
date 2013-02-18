@@ -77,6 +77,7 @@ class CoursesController < ApplicationController
   before_filter :require_context, :only => [:roster, :locks, :switch_role, :create_file]
 
   include Api::V1::Course
+  include Api::V1::Progress
 
   # @API List your courses
   # Returns the list of active courses for the current user.
@@ -90,8 +91,8 @@ class CoursesController < ApplicationController
   #   When set, only return courses where the user is enrolled with the specified
   #   course-level role.  This can be a role created with the
   #   {api:RoleOverridesController#add_role Add Role API} or a base role type of
-  #   ‘StudentEnrollment’, ‘TeacherEnrollment’, ‘TaEnrollment’, ‘ObserverEnrollment’,
-  #   or ‘DesignerEnrollment’.
+  #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
+  #   or 'DesignerEnrollment'.
   #
   # @argument include[] ["needs_grading_count"] Optional information to include with each Course.
   #   When needs_grading_count is given, and the current user has grading
@@ -160,7 +161,6 @@ class CoursesController < ApplicationController
   # @argument course[is_public] [Boolean] [optional] Set to true if course if public.
   # @argument course[public_description] [String] [optional] A publicly visible description of the course.
   # @argument course[allow_student_wiki_edits] [Boolean] [optional] If true, students will be able to modify the course wiki.
-  # @argument course[allow_student_assignment_edits] [optional] Set to true if students should be allowed to make modifications to assignments.
   # @argument course[allow_wiki_comments] [Boolean] [optional] If true, course members will be able to comment on wiki pages.
   # @argument course[allow_student_forum_attachments] [Boolean] [optional] If true, students can attach files to forum posts.
   # @argument course[open_enrollment] [Boolean] [optional] Set to true if the course is open enrollment.
@@ -304,8 +304,8 @@ class CoursesController < ApplicationController
   # @argument enrollment_role [optional]
   #   When set, only return users enrolled with the specified course-level role.  This can be
   #   a role created with the {api:RoleOverridesController#add_role Add Role API} or a
-  #   base role type of ‘StudentEnrollment’, ‘TeacherEnrollment’, ‘TaEnrollment’,
-  #   ‘ObserverEnrollment’, or ‘DesignerEnrollment’.
+  #   base role type of 'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment',
+  #   'ObserverEnrollment', or 'DesignerEnrollment'.
   #
   # @argument include[] ["email"] Optional user email.
   # @argument include[] ["enrollments"] Optionally include with each Course the
@@ -321,17 +321,8 @@ class CoursesController < ApplicationController
   def users
     get_context
     if authorized_action(@context, @current_user, :read_roster)
-      enrollment_role = Array(params[:enrollment_role]) if params[:enrollment_role]
-      enrollment_type = Array(params[:enrollment_type]).map { |e| "#{e.capitalize}Enrollment" } if params[:enrollment_type]
-      users = @context.users_visible_to(@current_user)
-      # TODO: convert this to the good user sorting stuff
-      users = users.scoped(:order => "users.sortable_name")
-      if enrollment_role
-        users = users.scoped(:conditions => ["COALESCE(enrollments.role_name, enrollments.type) IN (?) ", enrollment_role])
-      elsif enrollment_type
-        users = users.scoped(:conditions => ["enrollments.type IN (?) ", enrollment_type])
-      end
-
+      enrollment_params = params.slice(:enrollment_role, :enrollment_type)
+      users = UserSearch.scope_for(@context, @current_user, enrollment_params)
       # If a user_id is passed in, modify the page parameter so that the page
       # that contains that user is returned.
       # We delete it from params so that it is not maintained in pagination links.
@@ -356,6 +347,43 @@ class CoursesController < ApplicationController
         enrollments = u.not_ended_enrollments if includes.include?('enrollments')
         user_json(u, @current_user, session, includes, @context, enrollments)
       }
+    end
+  end
+
+  # @API Search users
+  # Returns a list of users in this course that match a search term. No pagination.
+  #
+  # @argument search_term
+  #   The partial name or full ID of the users to match and return in the results list.
+  # @argument limit [optional]
+  #   The number of search results to return. Maximum 20.
+  # @argument enrollment_type [optional, "teacher"|"student"|"ta"|"observer"|"designer"]
+  #   When set, only return users where the user is enrolled as this type.
+  #   This argument is ignored if enrollment_role is given.
+  # @argument enrollment_role [optional]
+  #   When set, only return users enrolled with the specified course-level role.  This can be
+  #   a role created with the {api:RoleOverridesController#add_role Add Role API} or a
+  #   base role type of 'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment',
+  #   'ObserverEnrollment', or 'DesignerEnrollment'.
+  #
+  # @returns [User]
+  def search_users
+    get_context
+    if authorized_action(@context, @current_user, :read_roster)
+      search_params = params.slice(:search_term, :enrollment_type, :enrollment_role, :limit)
+      if (search_term = search_params[:search_term]) && search_term.size >= 3
+        search_params[:limit] = 20 if search_params[:limit].to_i > 20 if search_params[:limit]
+        users = UserSearch.for_user_in_course(search_term, @context, @current_user, search_params)
+        render :json => users.map { |u|
+          user_json(u, @current_user, session, [], @context)
+        }
+      else
+        render \
+          :json => {
+            "status" => "argument_error", 
+            "message" => "search_term of 3 or more characters is required" },
+          :status => :bad_request
+      end
     end
   end
 
@@ -543,7 +571,7 @@ class CoursesController < ApplicationController
              :COURSE_ROOT_URL => "/courses/#{ @context.id }",
              :SEARCH_URL => search_recipients_url,
              :CONTEXTS => @contexts,
-             :USER_PARAMS => {:include => ['email', 'enrollments', 'locked']},
+             :USER_PARAMS => {:include => ['email', 'enrollments', 'locked', 'observed_users']},
              :PERMISSIONS => {
                :manage_students => @context.grants_right?(@current_user, session, :manage_students),
                :manage_admin_users => @context.grants_right?(@current_user, session, :manage_admin_users),
@@ -830,7 +858,9 @@ class CoursesController < ApplicationController
   # DEPRECATED
   def self_enrollment
     get_context
-    unless @context.self_enrollment && params[:self_enrollment] && @context.self_enrollment_codes.include?(params[:self_enrollment])
+    unless params[:self_enrollment] &&
+        @context.self_enrollment_codes.include?(params[:self_enrollment]) &&
+        @context.self_enrollment_code
       return redirect_to course_url(@context)
     end
     redirect_to enroll_url(@context.self_enrollment_code)
@@ -1293,6 +1323,36 @@ class CoursesController < ApplicationController
           format.json { render :json => @course.errors.to_json, :status => :bad_request }
         end
       end
+    end
+  end
+
+  # @API Update courses
+  # Update multiple courses in an account.  Operates asynchronously; use the {api:ProgressController#show progress endpoint}
+  # to query the status of an operation.
+  #
+  # @argument course_ids[] List of ids of courses to update. At most 500 courses may be updated in one call.
+  # @argument event The action to take on each course.  Must be one of 'offer', 'conclude', or 'delete'.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/accounts/<account_id>/courses \  
+  #       -X PUT \ 
+  #       -H 'Authorization: Bearer <token>' \ 
+  #       -d 'event=offer' \ 
+  #       -d 'course_ids[]=1' \ 
+  #       -d 'course_ids[]=2' 
+  #
+  # @returns Progress
+  def batch_update
+    @account = Account.find(params[:account_id])
+    if authorized_action(@account, @current_user, :manage_courses)
+      return render(:json => { :message => 'must specify course_ids[]' }, :status => :bad_request) unless params[:course_ids].is_a?(Array)
+      @course_ids = Api.map_ids(params[:course_ids], Course, @domain_root_account).map(&:to_i)
+      return render(:json => { :message => 'course batch size limit (500) exceeded' }, :status => :forbidden) if @course_ids.size > 500
+      update_params = params.slice(:event).with_indifferent_access
+      return render(:json => { :message => 'need to specify event' }, :status => :bad_request) unless update_params[:event]
+      return render(:json => { :message => 'invalid event' }, :status => :bad_request) unless %w(offer conclude delete).include? update_params[:event]
+      progress = Course.batch_update(@account, @current_user, @course_ids, update_params)
+      render :json => progress_json(progress, @current_user, session)
     end
   end
 

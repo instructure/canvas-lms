@@ -617,7 +617,7 @@ Spec::Runner.configure do |config|
 
   def conversation(*users)
     options = users.last.is_a?(Hash) ? users.pop : {}
-    @conversation = (options.delete(:sender) || @me || users.shift).initiate_conversation(users.map(&:id))
+    @conversation = (options.delete(:sender) || @me || users.shift).initiate_conversation(users)
     @message = @conversation.add_message('test')
     @conversation.update_attributes(options)
     @conversation.reload
@@ -862,6 +862,16 @@ Spec::Runner.configure do |config|
       str.force_encoding(encoding)
     end
     str
+  end
+
+  # from minitest, MIT licensed
+  def capture_io
+    orig_stdout, orig_stderr = $stdout, $stderr
+    $stdout, $stderr = StringIO.new, StringIO.new
+    yield
+    return $stdout.string, $stderr.string
+  ensure
+    $stdout, $stderr = orig_stdout, orig_stderr
   end
 
   def verify_post_matches(post_lines, expected_post_lines)

@@ -18,18 +18,70 @@
 
 # @API Quizzes
 #
-# The Quizzes API is very primitive for now, and just returns a title and a url to the quiz.
-#
 # @object Quiz
 #     {
-#       // The ID of the quiz
+#       // the ID of the quiz
 #       id: 5,
 #
 #       // the title of the quiz
-#       title: "My Quiz",
+#       title: "Hamlet Act 3 Quiz",
 #
-#       // The HTTP/HTTPS URL to the feed
+#       // the HTTP/HTTPS URL to the quiz
 #       html_url: "http://canvas.example.edu/courses/1/quizzes/2",
+#
+#       // the description of the quiz
+#       description: "This is a quiz on Act 3 of Hamlet",
+#
+#       // type of quiz
+#       // possible values: "practice_quiz", "assignment", "graded_survey", "survey"
+#       quiz_type: "assignment",
+#
+#       // the ID of the quiz's assignment group:
+#       assignment_group_id: 3,
+#
+#       // quiz time limit in minutes
+#       time_limit: 5,
+#
+#       // shuffle answers for students?
+#       shuffle_answers: false,
+#
+#       // let students see their quiz responses?
+#       // possible values: null, "always", "until_after_last_attempt"
+#       hide_results: "always",
+#
+#       // show which answers were correct when results are shown?
+#       // only valid if hide_results=null
+#       show_correct_answers: true,
+#
+#       // which quiz score to keep (only if allowed_attempts != 1)
+#       // possible values: "keep_highest", "keep_latest"
+#       scoring_policy: "keep_highest",
+#
+#       // how many times a student can take the quiz
+#       // -1 = unlimited attempts
+#       allowed_attempts: 3,
+#
+#       // show one question at a time?
+#       one_question_at_a_time: false,
+#
+#       // lock questions after answering?
+#       // only valid if one_question_at_a_time=true
+#       cant_go_back: false,
+#
+#       // access code to restrict quiz access
+#       access_code: "2beornot2be",
+#
+#       // IP address or range that quiz access is limited to
+#       ip_filter: "123.123.123.123",
+#
+#       // when the quiz is due
+#       due_at: "2013-01-23T23:59:00-07:00",
+#
+#       // when to lock the quiz
+#       lock_at: null,
+#
+#       // when to unlock the quiz
+#       unlock_at: "2013-01-21T23:59:00-07:00"
 #
 #     }
 #
@@ -37,13 +89,18 @@ class QuizzesApiController < ApplicationController
   include Api::V1::Quiz
 
   before_filter :require_context
+  before_filter :require_quiz, :only => [:show, :update]
+
+  @@errors = {
+    :quiz_not_found => "Quiz not found"
+  }
 
   # @API List quizzes in a course
   #
   # Returns the list of Quizzes in this course.
   #
-  # @example_request
-  #     curl https://<canvas>/api/v1/courses/<course_id>/quzzes \ 
+  # @example_request    
+  #     curl https://<canvas>/api/v1/courses/<course_id>/quizzes \ 
   #          -H 'Authorization: Bearer <token>'
   #
   # @returns [Quiz]
@@ -55,4 +112,146 @@ class QuizzesApiController < ApplicationController
     end
   end
 
+  # @API Get a single quiz
+  #
+  # Returns the quiz with the given id.
+  #
+  # @returns Quiz
+  def show
+    if authorized_action(@quiz, @current_user, :read) && tab_enabled?(@context.class::TAB_QUIZZES)
+      render :json => quiz_json(@quiz, @context, @current_user, session)
+    end
+  end
+
+  # @API Create a quiz
+  #
+  # Create a new quiz for this course.
+  #
+  # @argument quiz[title] [String] The quiz title.
+  #
+  # @argument quiz[description] [String] A description of the quiz.
+  #
+  # @argument quiz[quiz_type] ["practice_quiz"|"assignment"|"graded_survey"|"survey"]
+  #   The type of quiz.
+  #
+  # @argument quiz[assignment_group_id] [Integer]
+  #   The assignment group id to put the assignment in.
+  #   Defaults to the top assignment group in the course.
+  #   Only valid if the quiz is graded, i.e. if quiz_type is "assignment" or "graded_survey"
+  #
+  # @argument quiz[time_limit] [Integer]
+  #   Time limit to take this quiz, in minutes.
+  #   Set to null for no time limit.
+  #   Defaults to null.
+  #
+  # @argument quiz[shuffle_answers] [Boolean]
+  #   If true, quiz answers for multiple choice questions will be randomized for each student.
+  #   Defaults to false.
+  #
+  # @argument quiz[hide_results] [null|"always"|"until_after_last_attempt"]
+  #   Dictates whether or not quiz results are hidden from students.
+  #   If null, students can see their results after any attempt.
+  #   If "always", students can never see their results.
+  #   If "until_after_last_attempt", students can only see results after their last attempt. (Only valid if allowed_attempts > 1)
+  #   Defaults to null.
+  #
+  # @argument quiz[show_correct_answers] [Boolean]
+  #   Only valid if hide_results=null
+  #   If false, hides correct answers from students when quiz results are viewed.
+  #   Defaults to true.
+  #
+  # @argument quiz[allowed_attempts] [Integer]
+  #   Number of times a student is allowed to take a quiz.
+  #   Set to -1 for unlimited attempts.
+  #   Defaults to 1.
+  #
+  # @argument quiz[scoring_policy] ["keep_highest"|"keep_latest"]
+  #   Required and only valid if allowed_attempts > 1.
+  #   Scoring policy for a quiz that students can take multiple times.
+  #   Defaults to "keep_highest".
+  #
+  # @argument quiz[one_question_at_a_time] [Boolean]
+  #   If true, shows quiz to student one question at a time.
+  #   Defaults to false.
+  #
+  # @argument quiz[cant_go_back] [Boolean]
+  #   Only valid if one_question_at_a_time=true
+  #   If true, questions are locked after answering.
+  #   Defaults to false.
+  #
+  # @argument quiz[access_code] [Optional,String]
+  #   Restricts access to the quiz with a password.
+  #   For no access code restriction, set to null.
+  #   Defaults to null.
+  #
+  # @argument quiz[ip_filter] [Optional,String]
+  #   Restricts access to the quiz to computers in a specified IP range.
+  #   Filters can be a comma-separated list of addresses, or an address followed by a mask
+  #
+  #   Examples:
+  #     "192.168.217.1"
+  #     "192.168.217.1/24"
+  #     "192.168.217.1/255.255.255.0"
+  #
+  #   For no IP filter restriction, set to null.
+  #   Defaults to null.
+  #
+  # @argument quiz[due_at] [Timestamp]
+  #   The day/time the quiz is due.
+  #   Accepts times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
+  #
+  # @argument quiz[lock_at] [Timestamp]
+  #   The day/time the quiz is locked for students.
+  #   Accepts times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
+  #
+  # @argument quiz[unlock_at] [Timestamp]
+  #   The day/time the quiz is unlocked for students.
+  #   Accepts times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
+  #
+  # @returns Quiz
+  def create
+    if authorized_action(@context.quizzes.new, @current_user, :create) && tab_enabled?(@context.class::TAB_QUIZZES)
+      @quiz = @context.quizzes.build
+      update_api_quiz(@quiz, params[:quiz])
+      unless @quiz.new_record?
+        render :json => quiz_json(@quiz, @context, @current_user, session)
+      else
+        # TODO: we don't really have a strategy in the API yet for returning
+        # errors.
+        render :json => {:errors => @quiz.errors.to_json}, :status => 400
+      end
+    end
+  end
+
+  # @API Edit a quiz
+  # Modify an existing quiz. See the documentation for quiz creation.
+  #
+  # Additional arguments:
+  #
+  # @argument quiz[notify_of_update] [Boolean]
+  #   If true, notifies users that the quiz has changed.
+  #   Defaults to true
+  #
+  # @returns Quiz
+  def update
+    if authorized_action(@quiz, @current_user, :update) && tab_enabled?(@context.class::TAB_QUIZZES)
+      update_api_quiz(@quiz, params[:quiz])
+      unless @quiz.changed?
+        render :json => quiz_json(@quiz, @context, @current_user, session)
+      else
+        render :json => {:errors => @quiz.errors.to_json}, :status => 400
+      end
+    end
+  end
+
+  private
+    def require_quiz
+      unless @quiz = @context.quizzes.find_by_id(params[:id])
+        render :json => {:message => @@errors[:quiz_not_found]}, :status => :not_found
+      end
+    end
+
+    def quiz_params
+      filter_params params[:quiz]
+    end
 end

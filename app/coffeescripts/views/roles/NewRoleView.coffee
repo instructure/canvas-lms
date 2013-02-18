@@ -59,11 +59,13 @@ define [
         role: role_name
         account: ENV.CURRENT_ACCOUNT.account
 
+      @$el.find("a.dropdown-toggle").after('<img class="loading-icon" src="/images/ajax-reload-animated.gif">')
       @collection.create attributes,
         success: (model) => 
           @clearForm()
-        error: -> 
+        error: => 
           alert I18n.t "role.duplicate_role_error", "Could not create this role because a role with this name already exists. Please try a different name"
+          @clearForm()
         wait: true
 
     # Method Summary
@@ -72,3 +74,5 @@ define [
     clearForm: -> 
       @$role_name.val('')
       @$base_role_type.val('')
+      @$el.find(".loading-icon").remove()
+      

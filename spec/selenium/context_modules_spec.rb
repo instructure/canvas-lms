@@ -615,6 +615,7 @@ describe "context_modules" do
     end
 
     it "should not indicate multiple due dates if the sections' dates are the same" do
+      pending("needs to ignore base if all visible sections are overridden")
       modules = create_modules(1)
       modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
 
@@ -652,6 +653,7 @@ describe "context_modules" do
     end
 
     it "should only use the sections the user is restricted to" do
+      pending("needs to ignore base if all visible sections are overridden")
       modules = create_modules(1)
       modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
 

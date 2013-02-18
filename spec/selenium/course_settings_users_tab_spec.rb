@@ -192,6 +192,33 @@ describe "course settings" do
       obs = user_model(:name => "The Observer")
       student_in_course(:name => "Student 1", :active_all => true, :role_name => 'custom stu')
       @course.enroll_user(obs, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id, :role_name => 'obob')
+      student = student_in_course(:name => "Student 2", :active_all => true, :role_name => 'custom stu')
+      @course.enroll_user(obs, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id, :allow_multiple_enrollments => true, :role_name => 'obob')
+
+      # bye bye Student 2
+      student.destroy
+
+      go_to_users_tab
+
+      observeds = ff("#user_#{obs.id} .enrollment_type")
+      observeds.length.should == 1
+      observeds.first.text.should include "Student 1"
+      observeds.first.text.should_not include "Student 2"
+
+      # dialog loads too
+      use_link_dialog(obs) do
+        input = fj("#link_students")
+        input.text.should include "Student 1"
+        input.text.should_not include "Student 2"
+      end
+    end
+
+    it "should handle deleted observee enrollments" do
+      custom_observer_role("obob")
+      students = []
+      obs = user_model(:name => "The Observer")
+      student_in_course(:name => "Student 1", :active_all => true, :role_name => 'custom stu')
+      @course.enroll_user(obs, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id, :role_name => 'obob')
       student_in_course(:name => "Student 2", :active_all => true, :role_name => 'custom stu')
       @course.enroll_user(obs, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id, :allow_multiple_enrollments => true, :role_name => 'obob')
 

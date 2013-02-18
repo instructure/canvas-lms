@@ -109,8 +109,6 @@ class CourseSection < ActiveRecord::Base
 
   def update_account_associations
     Course.update_account_associations([self.course, self.nonxlist_course].compact)
-    self.course.try(:update_account_associations)
-    self.nonxlist_course.try(:update_account_associations)
   end
 
   def verify_unique_sis_source_id

@@ -181,15 +181,20 @@ module Api
     pagination_args.reverse_merge!({ :page => controller.params[:page], :per_page => per_page })
     collection = collection.paginate(pagination_args)
     return unless collection.respond_to?(:next_page)
-    total_pages = (pagination_args[:without_count] ? nil : collection.total_pages)
-    total_pages = nil if total_pages.to_i <= 1
+
+    first_page = collection.respond_to?(:first_page) && collection.first_page
+    first_page ||= 1
+
+    last_page = (pagination_args[:without_count] ? nil : collection.total_pages)
+    last_page = nil if last_page.to_i <= 1
+
     links = build_links(base_url, {
       :query_parameters => controller.request.query_parameters,
       :per_page => collection.per_page,
       :next => collection.next_page,
       :prev => collection.previous_page,
-      :first => 1,
-      :last => total_pages,
+      :first => first_page,
+      :last => last_page,
     })
     controller.response.headers["Link"] = links.join(',') if links.length > 0
     collection

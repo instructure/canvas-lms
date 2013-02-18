@@ -15,7 +15,7 @@ class ContextExternalTool < ActiveRecord::Base
   serialize :settings
   attr_accessor :config_type, :config_url, :config_xml
   
-  before_save :infer_defaults
+  before_save :infer_defaults, :validate_vendor_help_link
   after_save :touch_context
   validate :check_for_xml_error
 
@@ -109,7 +109,25 @@ class ContextExternalTool < ActiveRecord::Base
       "#{key}=#{val}"
     }.sort.join("\n")
   end
-  
+
+  def vendor_help_link
+    settings[:vendor_help_link]
+  end
+
+  def vendor_help_link=(val)
+    settings[:vendor_help_link] = val
+  end
+
+  def validate_vendor_help_link
+    return if self.vendor_help_link.blank?
+    begin
+      value, uri = CustomValidations.validate_url(self.vendor_help_link)
+      self.vendor_help_link = uri.to_s
+    rescue URI::InvalidURIError, ArgumentError
+      self.vendor_help_link = nil
+    end
+  end
+
   def config_type=(val)
     @config_type = val
     process_extended_configuration

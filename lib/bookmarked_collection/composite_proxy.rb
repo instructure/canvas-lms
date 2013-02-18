@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,21 +16,19 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
+class BookmarkedCollection::CompositeProxy < BookmarkedCollection::Proxy
+  attr_reader :collections
 
-describe "/gradebooks/_assignments" do
-  it "should render" do
-    course_with_student
-    view_context
-    a = @course.assignments.create!(:title => "some assignment")
-    
-    assigns[:assignments] = [a]
-    assigns[:students] = [@user]
-    assigns[:submissions] = []
-    assigns[:submissions_hash] = {}
-    render :partial => "gradebooks/assignments"
-    response.should_not be_nil
+  def initialize(collections)
+    @labels = collections.map(&:first)
+    @depth = collections.map{ |(_,coll)| coll.depth }.max + 1
+    @collections = collections.map do |(label,coll)|
+      adjustment = @depth - 1 - coll.depth
+      adjustment.times.inject(coll) { |c,i| BookmarkedCollection.concat([label, c]) }
+    end
+  end
+
+  def new_pager
+    BookmarkedCollection::CompositeCollection.new(@depth, @labels)
   end
 end
-

@@ -131,6 +131,13 @@ describe UnzipAttachment do
       end
     end
 
+    it "should not fall over when facing a filename starting with ~" do
+      filename = fixture_filename('tilde.zip')
+      ua = UnzipAttachment.new(:course => @course, :filename => filename)
+      lambda { ua.process }.should_not raise_error
+      @course.attachments.map(&:display_name).should == ['~tilde']
+    end
+
     describe 'validations' do
 
       let(:filename) { fixture_filename('huge_zip.zip') }

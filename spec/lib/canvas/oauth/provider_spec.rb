@@ -20,6 +20,7 @@ module Canvas::Oauth
       it 'can override the default redirect_uri' do
         Provider.new('123','456').redirect_uri.should == '456'
       end
+
     end
 
     describe '#has_valid_key?' do
@@ -31,6 +32,20 @@ module Canvas::Oauth
       it 'is false when there is no key' do
         stub_dev_key(nil)
         provider.has_valid_key?.should be_false
+      end
+    end
+
+    describe '#client_id_is_valid?' do
+      it 'is false for a nil id' do
+        Provider.new(nil, '456').client_id_is_valid?.should be_false
+      end
+
+      it 'is false for a non-integer' do
+        Provider.new('XXXXX', '456').client_id_is_valid?.should be_false
+      end
+
+      it 'is true for an integer' do
+        Provider.new('123', '456').client_id_is_valid?.should be_true
       end
     end
 
@@ -110,7 +125,7 @@ module Canvas::Oauth
       end
 
       it 'passes the redirect_uri through' do
-        provider = Provider.new('', 'some uri')
+        provider = Provider.new('123', 'some uri')
         provider.session_hash[:redirect_uri].should == 'some uri'
       end
     end

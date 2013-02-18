@@ -899,6 +899,22 @@ describe Attachment do
         @attachment.should be_scribdable
       end
     end
+
+    it "grants rights to owning user even if the user is on a seperate shard" do
+      user = nil
+      attachments = []
+
+      @shard1.activate do
+        user = User.create!
+        user.attachments.build.grants_right?(user, nil, :read).should be_true
+      end
+
+      @shard2.activate do
+        user.attachments.build.grants_right?(user, nil, :read).should be_true
+      end
+
+      user.attachments.build.grants_right?(user, nil, :read).should be_true
+    end
   end
 
   context "s3" do

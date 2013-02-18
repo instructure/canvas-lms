@@ -43,12 +43,8 @@ define [
         @$el.html userViewTemplate(data)
       this
 
-    getUserData: (id) ->
-      $.get("/api/v1/courses/#{ENV.COURSE_ID}/users/#{id}", include:['enrollments'])
-
     data: ->
       dfd = $.Deferred()
-      dfds = []
       data = $.extend @model.toJSON(),
         url: "#{ENV.COURSE_ROOT_URL}/users/#{@model.get('id')}"
         isObserver: @model.hasEnrollmentType('ObserverEnrollment', @role)
@@ -68,21 +64,23 @@ define [
         en.sectionTitle = h section.name if section
       if data.isObserver
         users = {}
+
         for en in data.enrollments
-          users[en.associated_user_id] ||= en.enrollment_state in ['creation_pending', 'invited'] if en.associated_user_id
+          if en.observed_user && _.any(en.observed_user.enrollments)
+            user = en.observed_user
+            user.pending = en.enrollment_state in ['creation_pending', 'invited']
+            users[user.id] ||= user
+
         data.enrollments = []
-        for id, pending of users
-          dfds.push @getUserData(id).done (user) =>
-            ob = {pending}
-            ob.sectionTitle = I18n.t('observing_user', '*Observing*: %{user_name}', wrapper: '<i>$1</i>', user_name: user.name)
-            for en in user.enrollments
-              section = ENV.CONTEXTS['sections'][en.course_section_id]
-              ob.sectionTitle += h(I18n.t('#support.array.words_connector') + section.name) if section
-            data.enrollments.push ob
-      # if a dfd fails (e.g. observee was removed from course), we still want
-      # the observer to render (possibly with other observees)
-      $.whenAll(dfds...).then ->
-        dfd.resolve(data)
+        for id, user of users
+          ob = {pending: user.pending}
+          ob.sectionTitle = I18n.t('observing_user', '*Observing*: %{user_name}', wrapper: '<i>$1</i>', user_name: user.name)
+          for en in user.enrollments
+            section = ENV.CONTEXTS['sections'][en.course_section_id]
+            ob.sectionTitle += h(I18n.t('#support.array.words_connector') + section.name) if section
+          data.enrollments.push ob
+
+      dfd.resolve(data)
       dfd.promise()
 
     reload: =>

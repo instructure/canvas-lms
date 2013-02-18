@@ -17,8 +17,8 @@
 #
 
 class QuestionBanksController < ApplicationController
-  before_filter :require_context
-  add_crumb("Question Banks") { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_question_banks_url }
+  before_filter :require_context, :except => :bookmark
+  add_crumb("Question Banks", :except => :bookmark) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_question_banks_url }
 
   include Api::V1::Outcome
 
@@ -109,9 +109,12 @@ class QuestionBanksController < ApplicationController
   end
   
   def bookmark
-    @bank = @context.assessment_question_banks.find(params[:question_bank_id])
-    if authorized_action(@bank, @current_user, :update)
-      render :json => @bank.bookmark_for(@current_user, params[:unbookmark] != '1').to_json
+    @bank = AssessmentQuestionBank.find(params[:question_bank_id])
+
+    if params[:unbookmark] == "1"
+      render :json => @bank.bookmark_for(@current_user, false).to_json
+    elsif authorized_action(@bank, @current_user, :update)
+      render :json => @bank.bookmark_for(@current_user).to_json
     end
   end
   

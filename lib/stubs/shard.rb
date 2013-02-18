@@ -38,6 +38,10 @@ class Shard
     Array(yield)
   end
 
+  def self.shard_for(object)
+    default
+  end
+
   def activate
     yield
   end
@@ -70,6 +74,10 @@ class Shard
 end
 
 ActiveRecord::Base.class_eval do
+  class << self
+    VALID_FIND_OPTIONS << :shard
+  end
+
   def shard
     Shard.default
   end

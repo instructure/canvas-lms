@@ -360,9 +360,10 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
   task :import => :environment do
     require 'ya2yaml'
     Hash.send :include, HashExtensions
+    YAML.send :include, I18nExtraction::SafeYAML
 
     def placeholders(str)
-      str.scan(/%\{[^\}]+\}/).sort
+      str.scan(/%h?\{[^\}]+\}/).sort
     end
 
     def markdown_and_wrappers(str)
@@ -384,9 +385,7 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
     begin
       puts "Enter path to original en.yml file:"
       arg = $stdin.gets.strip
-      source_translations = File.exist?(arg) && YAML.load(File.read(arg))
-    rescue Exception => e
-      puts e
+      source_translations = File.exist?(arg) && YAML.load(File.read(arg)) rescue nil
     end until source_translations
     raise "Source does not have any English strings" unless source_translations.keys.include?('en')
     source_translations = source_translations['en'].flatten_keys

@@ -55,10 +55,14 @@ module I18nExtraction
 
     def convert_placeholders!(source, base_line_number)
       source.lines.each_with_index do |line, line_number|
-        if line =~ /\{\{(.*?)\}\}/ && $1 =~ /[^a-z0-9_\.]/i
+        if line =~ /%h?\{(.*?)\}/
+          raise "use {{placeholder}} instead of %{placeholder}"
+        end
+        if line =~ /\{{2,3}(.*?)\}{2,3}/ && $1 =~ /[^a-z0-9_\.]/i
           raise "helpers may not be used inside #t calls (line #{base_line_number + line_number})"
         end
       end
+      source.gsub!(/\{{3}(.*?)\}{3}/, '%h{\1}')
       source.gsub!(/\{\{(.*?)\}\}/, '%{\1}')
     end
 

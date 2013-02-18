@@ -85,7 +85,7 @@ class FilesController < ApplicationController
 
   def index
     if request.format == :json
-      if authorized_action(@context.attachments.new, @current_user, :read)
+      if authorized_action(@context.attachments.build, @current_user, :read)
         @current_folder = Folder.find_folder(@context, params[:folder_id])
         if !@current_folder || authorized_action(@current_folder, @current_user, :read)
           if params[:folder_id]
@@ -119,10 +119,12 @@ class FilesController < ApplicationController
     folder = Folder.find(params[:id])
     if authorized_action(folder, @current_user, :read_contents)
       @context = folder.context
-      if @context.grants_right?(@current_user, session, :manage_files)
+      can_manage_files = @context.grants_right?(@current_user, session, :manage_files)
+
+      if can_manage_files
         scope = folder.active_file_attachments
       else
-        scope = folder.visible_file_attachments
+        scope = folder.visible_file_attachments.not_hidden.not_locked
       end
       if params[:sort_by] == 'position'
         scope = scope.by_position_then_display_name
@@ -130,14 +132,21 @@ class FilesController < ApplicationController
         scope = scope.by_display_name
       end
       @files = Api.paginate(scope, self, api_v1_list_files_url(@folder))
-      can_manage_files = @context.grants_right?(@current_user, session, :manage_files)
       render :json => attachments_json(@files, @current_user, {}, :can_manage_files => can_manage_files)
     end
   end
 
   def images
     if authorized_action(@context.attachments.new, @current_user, :read)
-      @images = @context.active_images.paginate :page => params[:page]
+      if Folder.root_folders(@context).first.grants_right?(@current_user, session, :read_contents)
+        if @context.grants_right?(@current_user, session, :manage_files)
+          @images = @context.active_images.paginate :page => params[:page]
+        else
+          @images = @context.active_images.not_hidden.not_locked.where(:folder_id => @context.active_folders.not_hidden.not_locked).paginate :page => params[:page]
+        end
+      else
+        @images = [].paginate
+      end
       headers['X-Total-Pages'] = @images.total_pages.to_s
       render :partial => "shared/wiki_image", :collection => @images
     end
@@ -153,9 +162,10 @@ class FilesController < ApplicationController
     end
     @too_many_contexts = @contexts.length > 15
     @contexts = @contexts[0,15]
-    if @contexts.length <= 1 && !authorized_action(@context.attachments.new, @current_user, :read)
+    if @contexts.length <= 1 && !authorized_action(@context.attachments.build, @current_user, :read)
       return
     end
+
     return unless tab_enabled?(@context.class::TAB_FILES)
     log_asset_access("files:#{@context.asset_string}", "files", 'other') if @context
     respond_to do |format|

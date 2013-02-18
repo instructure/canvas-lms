@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,15 +16,20 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
+class BookmarkedCollection::Proxy < PaginatedCollection::Proxy
+  attr_reader :depth
 
-describe "/gradebooks/_assignment" do
-  it "should render" do
-    course_with_student
-    view_context
-    render :partial => "gradebooks/assignment", :object => @course.assignments.create!(:title => "some assignment")
-    response.should_not be_nil
+  def initialize(bookmarker, block)
+    @bookmarker = bookmarker
+    @depth = 0
+    super block
+  end
+
+  def new_pager
+    BookmarkedCollection::Collection.new(@bookmarker)
+  end
+
+  def configure_pager(pager, options)
+    super pager, options.merge(:total_entries => nil)
   end
 end
-

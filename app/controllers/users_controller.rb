@@ -527,7 +527,8 @@ class UsersController < ApplicationController
     unless %w[grading submitting].include?(params[:purpose])
       return render(:json => { :ignored => false }, :status => 400)
     end
-    @current_user.ignore_item!(params[:asset_string], params[:purpose], params[:permanent] == '1')
+    @current_user.ignore_item!(ActiveRecord::Base.find_by_asset_string(params[:asset_string], ['Assignment']),
+                               params[:purpose], params[:permanent] == '1')
     render :json => { :ignored => true }
   end
 
@@ -899,32 +900,10 @@ class UsersController < ApplicationController
   end
 
   def media_download
-    url = Rails.cache.fetch(['media_download_url', params[:entryId], params[:type]].cache_key, :expires_in => 30.minutes) do
-      client = Kaltura::ClientV3.new
-      client.startSession(Kaltura::SessionType::ADMIN)
-      assets = client.flavorAssetGetByEntryId(params[:entryId])
-      asset = assets.find {|a| a[:fileExt] == params[:type] }
-      if asset
-        client.flavorAssetGetDownloadUrl(asset[:id])
-      else
-        nil
-      end
-    end
-
+    asset = Kaltura::ClientV3.new.media_sources(params[:entryId]).find{|a| a[:fileExt] == params[:type] }
+    url = asset && asset[:url]
     if url
       if params[:redirect] == '1'
-        if %w(mp3 mp4).include?(params[:type])
-          # hack alert -- iTunes (and maybe others who follow the same podcast
-          # spec) requires that the download URL for podcast items end in .mp3
-          # or another supported media type. Normally, the Kaltura download URL
-          # doesn't end in .mp3. But Kaltura's first download URL redirects to
-          # the same download url with /relocate/filename.ext appended, so we're
-          # just going to explicitly append that to skip the first redirect, so
-          # that iTunes will download the podcast items. This doesn't appear to
-          # be documented anywhere though, so we're talking with Kaltura about
-          # a more official solution.
-          url = "#{url}/relocate/download.#{params[:type]}"
-        end
         redirect_to url
       else
         render :json => { 'url' => url }
@@ -948,7 +927,7 @@ class UsersController < ApplicationController
     end
 
     if @user_about_to_go_away && @user_that_will_still_be_around
-      @user_about_to_go_away.move_to_user(@user_that_will_still_be_around)
+      UserMerge.from(@user_about_to_go_away).into(@user_that_will_still_be_around)
       @user_that_will_still_be_around.touch
       flash[:notice] = t('user_merge_success', "User merge succeeded! %{first_user} and %{second_user} are now one and the same.", :first_user => @user_that_will_still_be_around.name, :second_user => @user_about_to_go_away.name)
     else

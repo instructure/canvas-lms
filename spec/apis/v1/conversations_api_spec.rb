@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe ConversationsController, :type => :integration do
   before do
@@ -39,7 +40,6 @@ describe ConversationsController, :type => :integration do
     enrollment = @course.enroll_user(u, 'StudentEnrollment', :section => section)
     enrollment.workflow_state = 'active'
     enrollment.save
-    u.associated_accounts << Account.default
     u
   end
 
@@ -202,7 +202,7 @@ describe ConversationsController, :type => :integration do
         @c1 = conversation(@bob)
         @c2 = conversation(@bob, @billy)
         @c2.conversation.add_message(@bob, 'ohai')
-        @c2.remove_messages([@message]) # delete my original message
+        @c2.remove_messages(@message) # delete my original message
         @c3 = conversation(@jane, :workflow_state => 'archived')
 
         json = api_call(:get, "/api/v1/conversations.json?scope=sent",
@@ -580,6 +580,60 @@ describe ConversationsController, :type => :integration do
       })
     end
 
+    context "sharding" do
+      it_should_behave_like "sharding"
+
+      def check_conversation
+        json = api_call(:get, "/api/v1/conversations/#{@conversation.conversation_id}",
+                        { :controller => 'conversations', :action => 'show', :id => @conversation.conversation_id.to_s, :format => 'json' })
+        json.delete("avatar_url")
+        json["participants"].each{ |p|
+          p.delete("avatar_url")
+        }
+        expected = {
+          "id" => @conversation.conversation_id,
+          "workflow_state" => "read",
+          "last_message" => "test",
+          "last_message_at" => @conversation.last_message_at.to_json[1, 20],
+          "last_authored_message" => "test",
+          "last_authored_message_at" => @conversation.last_message_at.to_json[1, 20],
+          "message_count" => 1,
+          "subscribed" => true,
+          "private" => true,
+          "starred" => false,
+          "properties" => ["last_author"],
+          "visible" => true,
+          "audience" => [@bob.id],
+          "audience_contexts" => {
+              "groups" => {},
+              "courses" => {@course.id.to_s => ["StudentEnrollment"]}
+          },
+          "participants" => [
+              {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {}},
+              {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+          ],
+          "messages" => [
+              {"id" => @conversation.messages.last.id, "created_at" => @conversation.messages.last.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => []}
+          ],
+          "submissions" => []
+        }
+        # TODO: remove this when messageable_users works correctly
+        if Shard.current != @bob.shard
+          expected['participants'][1]['common_courses'] = {}
+          expected['audience_contexts']['courses'][@course.id.to_s] = []
+        end
+        json.should == expected
+      end
+
+      it "should show ids relative to the current shard" do
+        Setting.set('conversations_sharding_migration_still_running', '0')
+        @conversation = @shard1.activate { conversation(@bob) }
+        check_conversation
+        @shard1.activate { check_conversation }
+        @shard2.activate { check_conversation }
+      end
+    end
+
     it "should auto-mark-as-read if unread" do
       conversation = conversation(@bob, :workflow_state => 'unread')
 
@@ -916,10 +970,10 @@ describe ConversationsController, :type => :integration do
               { :controller => 'search', :action => 'recipients', :format => 'json', :search => 'o' })
       json.each { |c| c.delete("avatar_url") }
       json.should eql [
-        {"id" => "course_#{@course.id}", "name" => "the course", "type" => "context", "user_count" => 6},
-        {"id" => "section_#{@other_section.id}", "name" => "the other section", "type" => "context", "user_count" => 1, "context_name" => "the course"},
-        {"id" => "section_#{@course.default_section.id}", "name" => "the section", "type" => "context", "user_count" => 5, "context_name" => "the course"},
-        {"id" => "group_#{@group.id}", "name" => "the group", "type" => "context", "user_count" => 3, "context_name" => "the course"},
+        {"id" => "course_#{@course.id}", "name" => "the course", "type" => "context", "user_count" => 6, "permissions" => {}},
+        {"id" => "section_#{@other_section.id}", "name" => "the other section", "type" => "context", "user_count" => 1, "context_name" => "the course", "permissions" => {}},
+        {"id" => "section_#{@course.default_section.id}", "name" => "the section", "type" => "context", "user_count" => 5, "context_name" => "the course", "permissions" => {}},
+        {"id" => "group_#{@group.id}", "name" => "the group", "type" => "context", "user_count" => 3, "context_name" => "the course", "permissions" => {}},
         {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
         {"id" => @joe.id, "name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
         {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
@@ -930,9 +984,9 @@ describe ConversationsController, :type => :integration do
 
   context "batches" do
     it "should return all in-progress batches" do
-      batch1 = ConversationBatch.generate(Conversation.build_message(@me, "hi all"), [@bob.id, @billy.id], :async)
-      batch2 = ConversationBatch.generate(Conversation.build_message(@me, "ohai"), [@bob.id, @billy.id], :sync)
-      batch3 = ConversationBatch.generate(Conversation.build_message(@bob, "sup"), [@me.id, @billy.id], :async)
+      batch1 = ConversationBatch.generate(Conversation.build_message(@me, "hi all"), [@bob, @billy], :async)
+      batch2 = ConversationBatch.generate(Conversation.build_message(@me, "ohai"), [@bob, @billy], :sync)
+      batch3 = ConversationBatch.generate(Conversation.build_message(@bob, "sup"), [@me, @billy], :async)
 
       json = api_call(:get, "/api/v1/conversations/batches",
                       :controller => 'conversations',

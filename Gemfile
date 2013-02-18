@@ -88,7 +88,7 @@ end
 
 group :test do
   gem 'bluecloth',    '2.0.10' # for generating api docs
-  gem 'parallelized_specs', '0.3.89'
+  gem 'parallelized_specs', '0.3.98'
   gem 'mocha',        '0.12.3', :require => 'mocha_standalone'
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.2'
@@ -96,6 +96,7 @@ group :test do
   gem 'selenium-webdriver', '2.27.2'
   gem 'webrat',       '0.7.3'
   gem 'yard',         '0.8.0'
+  gem 'timecop',      '0.5.9.1'
   if ONE_NINE
     gem 'test-unit',  '1.2.3'
   end

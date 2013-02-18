@@ -144,4 +144,18 @@ else
       super.force_encoding('utf-8')
     end
   end
+
+  # Fix for https://bugs.ruby-lang.org/issues/7278 , which was filling up our logs with these warnings
+  if RUBY_VERSION < "2."
+    require 'net/protocol'
+    class Net::InternetMessageIO
+      def each_crlf_line(src)
+        buffer_filling(@wbuf, src) do
+          while line = @wbuf.slice!(/\A[^\r\n]*(?:\n|\r(?:\n|(?!\z)))/)
+            yield line.chomp("\n") + "\r\n"
+          end
+        end
+      end
+    end
+  end
 end

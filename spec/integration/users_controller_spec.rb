@@ -38,7 +38,7 @@ describe UsersController do
       get user_student_teacher_activity_url(@teacher, @e1.user)
       Nokogiri::HTML(response.body).at_css('table.report tr:first td:nth(2)').text.should match(/never/)
 
-      @conversation = Conversation.initiate([@e1.user_id, @teacher.id], false)
+      @conversation = Conversation.initiate([@e1.user, @teacher], false)
       @conversation.add_message(@teacher, "hello")
 
       get user_student_teacher_activity_url(@teacher, @e1.user)

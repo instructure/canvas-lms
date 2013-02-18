@@ -332,6 +332,38 @@ describe 'Submissions API', :type => :integration do
       }].sort_by { |h| h['user_id'] }
   end
 
+  it "should return user display info along with submission comments" do
+    student1 = user(:active_all => true)
+    course_with_teacher(:active_all => true)
+    @course.enroll_student(student1).accept!
+    quiz = Quiz.create!(:title => 'quiz1', :context => @course)
+    quiz.did_edit!
+    quiz.offer!
+    a1 = quiz.assignment
+    sub = a1.find_or_create_submission(student1)
+    sub.submission_type = 'online_quiz'
+    sub.workflow_state = 'submitted'
+    sub.save!
+    a1.update_submission(student1, :comment => "i am a comment")
+
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions.json",
+          { :controller => 'submissions_api', :action => 'index',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => a1.id.to_s },
+          { :include => %w(submission_comments) })
+
+    json.first["submission_comments"].size.should == 1
+    comment = json.first["submission_comments"].first
+    comment.should have_key("author")
+    comment["author"].should == {
+      "id" => student1.id,
+      "display_name" => "User",
+      "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{student1.id}",
+      "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png"
+    }
+  end
+
   it "should return a valid preview url for quiz submissions" do
     student1 = user(:active_all => true)
     course_with_teacher_logged_in(:active_all => true) # need to be logged in to view the preview url below
@@ -403,6 +435,12 @@ describe 'Submissions API', :type => :integration do
              "display_name" => nil
            },
            "created_at"=>comment.created_at.as_json,
+           "author"=>{
+              "id" => @teacher.id,
+              "display_name" => "User",
+              "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
+              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png"
+           },
            "author_name"=>"User",
            "author_id"=>@teacher.id}],
         "score"=>13.5,
@@ -419,6 +457,22 @@ describe 'Submissions API', :type => :integration do
                     { :include => %w(submission_comments) })
     response.status.should =~ /401/
     JSON.parse(response.body).should == {"status"=>"unauthorized", "message"=>"You are not authorized to perform that action."}
+  end
+
+  it "should return grading information for observers" do
+    @student = user(:active_all => true)
+    e = course_with_observer(:active_all => true)
+    e.associated_user_id = @student.id
+    e.save!
+    @course.enroll_student(@student).accept!
+    a1 = @course.assignments.create!(:title => 'assignment1', :points_possible => 15)
+    submit_homework(a1, @student)
+    a1.grade_student(@student, {:grade => 15})
+    json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{@student.id}.json",
+                  { :controller => "submissions_api", :action => "show",
+                    :format => "json", :course_id => @course.id.to_s,
+                    :assignment_id => a1.id.to_s, :id => @student.id.to_s })
+    json["score"].should == 15
   end
 
   it "should api translate online_text_entry submissions" do
@@ -462,9 +516,9 @@ describe 'Submissions API', :type => :integration do
     media_object(:media_id => "54321", :context => student1, :user => student1)
     mock_kaltura = mock('Kaltura::ClientV3')
     Kaltura::ClientV3.stubs(:new).returns(mock_kaltura)
-    mock_kaltura.expects :startSession
-    mock_kaltura.expects(:flavorAssetGetByEntryId).returns([{:fileExt => 'mp4', :id => 'fake'}])
-    mock_kaltura.expects(:flavorAssetGetDownloadUrl).returns("https://kaltura.example.com/some/url")
+    mock_kaltura.expects(:media_sources).returns([{:height => "240", :bitrate => "382", :isOriginal => "0", :width => "336", :content_type => "video/mp4",
+                                                   :containerFormat => "isom", :url => "https://kaltura.example.com/some/url", :size =>"204", :fileExt=>"mp4"}])
+
     submit_homework(a1, student1, :media_comment_id => "54321", :media_comment_type => "video")
     stub_kaltura
     json = api_call(:get,
@@ -633,6 +687,12 @@ describe 'Submissions API', :type => :integration do
              "display_name" => nil
            },
            "created_at"=>comment.reload.created_at.as_json,
+           "author"=>{
+             "id" => @teacher.id,
+             "display_name" => "User",
+             "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
+             "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png"
+           },
            "author_name"=>"User",
            "author_id"=>@teacher.id}],
         "media_comment" =>

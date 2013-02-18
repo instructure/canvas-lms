@@ -115,7 +115,7 @@ class ConversationsController < ApplicationController
     if request.format == :json
       conversations = Api.paginate(@conversations_scope, self, api_v1_conversations_url)
       # optimize loading the most recent messages for each conversation into a single query
-      ConversationParticipant.preload_latest_messages(conversations, @current_user.id)
+      ConversationParticipant.preload_latest_messages(conversations, @current_user)
       @conversations_json = conversations.map{ |c| conversation_json(c, @current_user, session, :include_participant_avatars => false, :include_participant_contexts => false, :visible => true) }
   
       if params[:include_all_conversation_ids]
@@ -123,11 +123,8 @@ class ConversationsController < ApplicationController
       end
       render :json => @conversations_json
     else
-      if @current_user.shard != Shard.current
-        flash[:notice] = 'Conversations are not yet cross-shard enabled'
-        return redirect_to dashboard_url
-      end
       return redirect_to conversations_path(:scope => params[:redirect_scope]) if params[:redirect_scope]
+      @current_user.reset_unread_conversations_counter
       load_all_contexts :permissions => [:manage_user_notes]
       notes_enabled = @current_user.associated_accounts.any?{|a| a.enable_user_notes }
       can_add_notes_for_account = notes_enabled && @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) }
@@ -181,12 +178,11 @@ class ConversationsController < ApplicationController
     return render_error('body', 'blank') if params[:body].blank?
 
     batch_private_messages = !value_to_boolean(params[:group_conversation]) && @recipients.size > 1
-    recipient_ids = @recipients.keys
 
     message = build_message
     if batch_private_messages
       mode = params[:mode] == 'async' ? :async : :sync
-      batch = ConversationBatch.generate(message, recipient_ids, mode, :user_map => @recipients, :tags => @tags)
+      batch = ConversationBatch.generate(message, @recipients, mode, :tags => @tags)
       if mode == :async
         headers['X-Conversation-Batch-Id'] = batch.id.to_s
         return render :json => [], :status => :accepted
@@ -195,11 +191,11 @@ class ConversationsController < ApplicationController
       # reload and preload stuff
       conversations = ConversationParticipant.find(:all, :conditions => {:id => batch.conversations.map(&:id)}, :include => [:conversation], :order => "visible_last_authored_at DESC, last_message_at DESC, id DESC")
       Conversation.preload_participants(conversations.map(&:conversation))
-      ConversationParticipant.preload_latest_messages(conversations, @current_user.id)
+      ConversationParticipant.preload_latest_messages(conversations, @current_user)
       visibility_map = infer_visibility(*conversations) 
       render :json => conversations.map{ |c| conversation_json(c, @current_user, session, :include_participant_avatars => false, :include_participant_contexts => false, :visible => visibility_map[c.conversation_id]) }, :status => :created
     else
-      @conversation = @current_user.initiate_conversation(recipient_ids)
+      @conversation = @current_user.initiate_conversation(@recipients)
       @conversation.add_message(message, :tags => @tags)
       render :json => [conversation_json(@conversation.reload, @current_user, session, :include_indirect_participants => true, :messages => [message])], :status => :created
     end
@@ -471,7 +467,7 @@ class ConversationsController < ApplicationController
   #
   def add_recipients
     if @recipients.present?
-      @conversation.add_participants(@recipients.keys, :tags => @tags, :root_account_id => @domain_root_account.id)
+      @conversation.add_participants(@recipients, :tags => @tags, :root_account_id => @domain_root_account.id)
       render :json => conversation_json(@conversation.reload, @current_user, session, :messages => [@conversation.messages.first])
     else
       render :json => {}, :status => :bad_request
@@ -553,11 +549,7 @@ class ConversationsController < ApplicationController
   #   }
   def remove_messages
     if params[:remove]
-      to_delete = []
-      @conversation.messages.each do |message|
-        to_delete << message if params[:remove].include?(message.id.to_s)
-      end
-      @conversation.remove_messages(*to_delete)
+      @conversation.remove_messages(*@conversation.messages.find_all_by_id(*params[:remove]))
       render :json => conversation_json(@conversation, @current_user, session)
     end
   end
@@ -600,7 +592,7 @@ class ConversationsController < ApplicationController
     content = ""
     audience = conversation.other_participants
     audience_names = audience.map(&:name)
-    audience_contexts = contexts_for(audience, conversation.context_tags) # will be 0, 1, or 2 contexts
+    audience_contexts = contexts_for(audience, conversation.local_context_tags) # will be 0, 1, or 2 contexts
     audience_context_names = [:courses, :groups].inject([]) { |ary, context_key|
       ary + audience_contexts[context_key].keys.map { |k| @contexts[context_key][k] && @contexts[context_key][k][:name] }
     }.reject(&:blank?)
@@ -667,10 +659,12 @@ class ConversationsController < ApplicationController
 
   def infer_visibility(*conversations)
     result = Hash.new(false)
-    visible_conversations = @conversations_scope.find(:all,
-      :select => "conversation_id",
-      :conditions => {:conversation_id => conversations.map(&:conversation_id)}
-    )
+    visible_conversations = @current_user.shard.activate do
+        @conversations_scope.find(:all,
+          :select => "conversation_id",
+          :conditions => {:conversation_id => conversations.map(&:conversation_id)}
+        )
+      end
     visible_conversations.each { |c| result[c.conversation_id] = true }
     if conversations.size == 1
       result[conversations.first.conversation_id]
@@ -685,14 +679,11 @@ class ConversationsController < ApplicationController
       if recipient_ids.is_a?(String)
         params[:recipients] = recipient_ids = recipient_ids.split(/,/)
       end
-      recipients = @current_user.messageable_users(:ids => recipient_ids.grep(/\A\d+\z/), :conversation_id => params[:from_conversation_id])
+      @recipients = @current_user.messageable_users(:ids => recipient_ids.grep(/\A\d+\z/), :conversation_id => params[:from_conversation_id])
       recipient_ids.grep(User::MESSAGEABLE_USER_CONTEXT_REGEX).map do |context|
-        recipients.concat @current_user.messageable_users(:context => context)
+        @recipients.concat @current_user.messageable_users(:context => context)
       end
-      @recipients = recipients.inject({}){ |hash, user|
-        hash[user.id] ||= user
-        hash
-      }
+      @recipients.uniq!
     end
   end
 

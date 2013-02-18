@@ -22,7 +22,7 @@ define [
     else if el.type == 'file'
       el if $input.val()
     else if $input.hasClass 'datetime_field_enabled'
-      $input.data('date')
+      $input.data('date') || null
     else if $input.data('rich_text')
       $input.editorBox('get_code', false)
     else

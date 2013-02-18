@@ -1240,6 +1240,10 @@ class Attachment < ActiveRecord::Base
     { :conditions => ['attachments.file_state != ?', 'deleted'] }
   }
 
+  named_scope :not_hidden, :conditions => ['attachments.file_state != ?', 'hidden']
+  named_scope :not_locked, lambda {{:conditions => ['(attachments.locked IS NULL OR attachments.locked = ?) AND ((attachments.lock_at IS NULL) OR
+    (attachments.lock_at > ? OR (attachments.unlock_at IS NOT NULL AND attachments.unlock_at < ?)))', false, Time.now, Time.now]}}
+
   alias_method :destroy!, :destroy
   # file_state is like workflow_state, which was already taken
   # possible values are: available, deleted

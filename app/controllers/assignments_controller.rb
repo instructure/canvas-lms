@@ -268,52 +268,44 @@ class AssignmentsController < ApplicationController
   
   def edit
     @assignment = @context.assignments.active.find(params[:id])
-    if authorized_action(@assignment, @current_user, :update_content)
+    if authorized_action(@assignment, @current_user, :update)
       @editing = true
       params[:return_to] = nil
-      if @assignment.grants_right?(@current_user, session, :update)
-        @assignment.title = params[:title] if params[:title]
-        @assignment.due_at = params[:due_at] if params[:due_at]
-        @assignment.submission_types = params[:submission_types] if params[:submission_types]
-        @assignment.assignment_group_id = params[:assignment_group_id] if params[:assignment_group_id]
-      end
+      @assignment.title = params[:title] if params[:title]
+      @assignment.due_at = params[:due_at] if params[:due_at]
+      @assignment.submission_types = params[:submission_types] if params[:submission_types]
+      @assignment.assignment_group_id = params[:assignment_group_id] if params[:assignment_group_id]
       show
     end
   end
 
   def update
     @assignment = @context.assignments.find(params[:id])
-    if authorized_action(@assignment, @current_user, :update_content)
+    if authorized_action(@assignment, @current_user, :update)
       params[:assignment][:time_zone_edited] = Time.zone.name if params[:assignment]
-      if !@assignment.grants_rights?(@current_user, session, :update)[:update]
-        p = {}
-        p[:description] = params[:assignment][:description]
-        params[:assignment] = p
-      else
-        params[:assignment] ||= {}
-        @assignment.updating_user = @current_user
-        if params[:assignment][:default_grade]
-          params[:assignment][:overwrite_existing_grades] = (params[:assignment][:overwrite_existing_grades] == "1")
-          @assignment.set_default_grade(params[:assignment])
-          render :json => @assignment.submissions.to_json(:include => :quiz_submission)
-          return
-        end
-        params[:assignment].delete :default_grade
-        params[:assignment].delete :overwrite_existing_grades
-        if params[:publish]
-          @assignment.workflow_state = 'published'
-        elsif params[:unpublish]
-          @assignment.workflow_state = 'available'
-        end
-        if params[:assignment_type] == "quiz"
-          params[:assignment][:submission_types] = "online_quiz"
-        elsif params[:assignment_type] == "attendance"
-          params[:assignment][:submission_types] = "attendance"
-        elsif params[:assignment_type] == "discussion_topic"
-          params[:assignment][:submission_types] = "discussion_topic"
-        elsif params[:assignment_type] == "external_tool"
-          params[:assignment][:submission_types] = "external_tool"
-        end
+      params[:assignment] ||= {}
+      @assignment.updating_user = @current_user
+      if params[:assignment][:default_grade]
+        params[:assignment][:overwrite_existing_grades] = (params[:assignment][:overwrite_existing_grades] == "1")
+        @assignment.set_default_grade(params[:assignment])
+        render :json => @assignment.submissions.to_json(:include => :quiz_submission)
+        return
+      end
+      params[:assignment].delete :default_grade
+      params[:assignment].delete :overwrite_existing_grades
+      if params[:publish]
+        @assignment.workflow_state = 'published'
+      elsif params[:unpublish]
+        @assignment.workflow_state = 'available'
+      end
+      if params[:assignment_type] == "quiz"
+        params[:assignment][:submission_types] = "online_quiz"
+      elsif params[:assignment_type] == "attendance"
+        params[:assignment][:submission_types] = "attendance"
+      elsif params[:assignment_type] == "discussion_topic"
+        params[:assignment][:submission_types] = "discussion_topic"
+      elsif params[:assignment_type] == "external_tool"
+        params[:assignment][:submission_types] = "external_tool"
       end
       respond_to do |format|
         @assignment.content_being_saved_by(@current_user)

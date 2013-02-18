@@ -369,6 +369,12 @@ class AssignmentsApiController < ApplicationController
   #   The assignment group id to put the assignment in.
   #   Defaults to the top assignment group in the course.
   #
+  # @argument assignment[muted] [Boolean]
+  #   Whether this assignment is muted.
+  #   A muted assignment does not send change notifications
+  #   and hides grades from students.
+  #   Defaults to false.
+  #
   # @argument assignment[assignment_overrides] [Optional, [AssignmentOverride]]
   #   List of overrides for the assignment.
   #   NOTE: The assignment overrides feature is in beta.
@@ -397,7 +403,7 @@ class AssignmentsApiController < ApplicationController
   def update
     @assignment = @context.assignments.find(params[:id])
 
-    if authorized_action(@assignment, @current_user, :update_content)
+    if authorized_action(@assignment, @current_user, :update)
       save_and_render_response
     end
   end

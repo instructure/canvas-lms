@@ -199,7 +199,7 @@ describe "speed grader" do
   end
 
   it "should create a comment on assignment" do
-    pending("failing because it is dependant on an external kaltura system")
+    #pending("failing because it is dependant on an external kaltura system")
 
     student_submission
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
@@ -307,10 +307,12 @@ describe "speed grader" do
     f("#settings_link").click
     f('#hide_student_names').click
     expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
-    wait_for_animations
+    wait_for_ajaximations
 
-    f("#avatar_image").should_not be_displayed
-    f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text.should == "Student 1"
+    keep_trying_until do
+      f("#avatar_image").should_not be_displayed
+      fj('#students_selectmenu-button .ui-selectmenu-item-header').text.should == "Student 1"
+    end
 
     f('#comments > .comment').should include_text('ohai')
     f("#comments > .comment .avatar").should_not be_displayed

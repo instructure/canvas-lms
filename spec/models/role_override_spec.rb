@@ -412,7 +412,7 @@ describe RoleOverride do
       # applying to Site Admin, should be enabled
       RoleOverride.enabled_for?(Account.site_admin, Account.site_admin, :manage_role_overrides, 'AccountMembership', 'role').should == [:self]
       # applying to Default Account, should be disabled
-      RoleOverride.enabled_for?(Account.site_admin, Account.default, :manage_role_overrides, 'AccountMembership', 'role').should == nil
+      RoleOverride.enabled_for?(Account.site_admin, Account.default, :manage_role_overrides, 'AccountMembership', 'role').should == []
     end
   end
 end

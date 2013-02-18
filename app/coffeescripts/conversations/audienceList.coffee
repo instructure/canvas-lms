@@ -2,7 +2,7 @@ define [
   'i18n!conversations'
   'underscore'
   'str/htmlEscape'
-  'compiled/conversations/listWithOthers'
+  'compiled/util/listWithOthers'
   'jquery.instructure_misc_helpers'
 ], (I18n, _, h, listWithOthers) ->
 

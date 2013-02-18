@@ -130,7 +130,6 @@ describe ContentMigration do
       @copy_from.course_code = 'something funny'
       @copy_from.publish_grades_immediately = false
       @copy_from.allow_student_wiki_edits = true
-      @copy_from.allow_student_assignment_edits = true
       @copy_from.show_public_context_messages = false
       @copy_from.allow_student_forum_attachments = false
       @copy_from.default_wiki_editing_roles = 'teachers'
@@ -885,6 +884,16 @@ describe ContentMigration do
       new_attachment.full_path.should == "course files/dummy.txt"
       new_attachment.folder.should == to_root
       @copy_to.syllabus_body.should == %{<a href="/courses/#{@copy_to.id}/files/#{new_attachment.id}/download?wrap=1">link</a>}
+    end
+
+    it "should add a warning instead of failing when trying to copy an invalid file" do
+      att = Attachment.create!(:filename => 'dummy.txt', :uploaded_data => StringIO.new('fakety'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      Attachment.update_all({:filename => nil}, {:id => att.id})
+
+      att.reload
+      att.should_not be_valid
+
+      run_course_copy(["Couldn't copy file \"dummy.txt\""])
     end
 
     it "should preserve media comment links" do

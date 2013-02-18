@@ -73,7 +73,11 @@ course will see this page first.  You can change that from [the course home page
       </div>
     <% else %>
       <div id="wiki_body" class="user_content">
-        <%= user_content(@page.body) %>
+        <% if @editing %>
+          <%= t('editing_content', 'Editing Content.') %>
+        <% else %>
+          <%= user_content(@page.body) %>
+        <% end %>
       </div>
     <% end %>
   <% end %>
@@ -142,7 +146,7 @@ course will see this page first.  You can change that from [the course home page
 
     <% if @editing %>
       $(document).ready(function() {
-        $("#wiki_show_view_secondary .edit:first").click();
+        $("#wiki_show_view_secondary .edit_link:first").click();
       });
     <% end %>
 

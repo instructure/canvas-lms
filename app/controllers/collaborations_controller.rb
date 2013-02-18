@@ -138,7 +138,7 @@ class CollaborationsController < ApplicationController
 
   private
   def require_collaboration_and_context
-    @collaboration = if defined?(@context)
+    @collaboration = if @context.present?
                        @context.collaborations.find(params[:id])
                      else
                        Collaboration.find(params[:id])

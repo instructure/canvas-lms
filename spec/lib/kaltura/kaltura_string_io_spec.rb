@@ -16,16 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
-describe 'message templates' do
-  # it "should have tests for all message templates" do
-    Dir.glob(File.join(RAILS_ROOT, 'app', 'messages', '*.erb')) do |filename|
-      filename = File.split(filename)[1]
-      if !filename.match(/^_/)
-        it "should have a spec test for #{filename}" unless File.exists?(File.expand_path(File.dirname(__FILE__) + '/' + filename + '_spec.rb'))
-        # File.should be_exists(File.expand_path(File.dirname(__FILE__) + '/' + filename + '_spec.rb'))
-      end
-    end
-  # end
+describe Kaltura::KalturaStringIO do
+  it "should set path" do
+    io = Kaltura::KalturaStringIO.new("hey there", "custom_path.csv")
+    io.path.should == "custom_path.csv"
+  end
+
 end

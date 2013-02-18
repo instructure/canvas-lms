@@ -160,6 +160,10 @@ class Submission < ActiveRecord::Base
       self.assignment.context.observer_enrollments.find_by_user_id_and_associated_user_id_and_workflow_state(user.id, self.user.id, 'active') }
     can :read and can :read_comments
 
+    given {|user| self.assignment && !self.assignment.muted? && self.assignment.context && user && self.user &&
+      self.assignment.context.observer_enrollments.find_by_user_id_and_associated_user_id_and_workflow_state(user.id, self.user.id, 'active').try(:grants_right?, user, :read_grades) }
+    can :read_grade
+
     given {|user, session| self.assignment.cached_context_grants_right?(user, session, :manage_grades) }#admins.include?(user) }
     can :read and can :comment and can :make_group_comment and can :read_grade and can :grade
 
@@ -506,7 +510,7 @@ class Submission < ActiveRecord::Base
 
   def update_admins_if_just_submitted
     if @just_submitted
-      context.send_later_if_production(:resubmission_for, "assignment_#{assignment_id}")
+      context.send_later_if_production(:resubmission_for, assignment)
     end
     true
   end
@@ -855,14 +859,14 @@ class Submission < ActiveRecord::Base
   end
 
   def conversation_groups
-    participating_instructors.map{ |i| [user_id, i.id] }
+    participating_instructors.map{ |i| [user, i] }
   end
 
   def conversation_message_data
     latest = visible_submission_comments.scoped(:conditions => ["author_id IN (?)", possible_participants_ids]).last or return
     {
       :created_at => latest.created_at,
-      :author_id => latest.author_id,
+      :author => latest.author,
       :body => latest.comment
     }
   end
@@ -896,7 +900,7 @@ class Submission < ActiveRecord::Base
   #                        updating the conversation.
   #
   # ==== Overrides
-  # * <tt>:skip_ids</tt> - Gets passed through to <tt>Conversation</tt>.<tt>update_all_for_asset</tt>.
+  # * <tt>:skip_users</tt> - Gets passed through to <tt>Conversation</tt>.<tt>update_all_for_asset</tt>.
   #                        nil by default, which means mark-as-unread for
   #                        everyone but the author.
   def create_or_update_conversations!(trigger, overrides={})
@@ -905,10 +909,10 @@ class Submission < ActiveRecord::Base
     when :create
       options[:update_participants] = true
       options[:update_for_skips] = false
-      options[:skip_ids] = overrides[:skip_ids] || [conversation_message_data[:author_id]] # don't mark-as-unread for the author
+      options[:skip_users] = overrides[:skip_users] || [conversation_message_data[:author]] # don't mark-as-unread for the author
       participating_instructors.each do |t|
-        # Check their settings and add to :skip_ids if set to suppress.
-        options[:skip_ids] << t.id if t.preferences[:no_submission_comments_inbox] == true
+        # Check their settings and add to :skip_users if set to suppress.
+        options[:skip_users] << t if t.preferences[:no_submission_comments_inbox] == true
       end
     when :destroy
       options[:delete_all] = visible_submission_comments.empty?

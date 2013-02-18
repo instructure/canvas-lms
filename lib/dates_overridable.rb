@@ -45,7 +45,7 @@ module DatesOverridable
   # course is affected by that due date, and an 'override' key referencing the
   # override itself. for the original due date, it will instead have a 'base'
   # flag (value true).
-  def due_dates_for(user, opts={})
+  def due_dates_for(user)
     as_student, as_admin = nil, nil
     return nil, nil if context.nil?
 
@@ -69,16 +69,6 @@ module DatesOverridable
 
     elsif context.user_has_no_enrollments?(user)
       as_admin = all_due_dates
-    end
-
-    if opts[:exclude_base_if_all_sections_overridden] && as_admin
-      # Don't include the assignment base due date if all the sections are overridden
-      overridden_section_ids = as_admin.select{|hash| hash[:override] &&
-          hash[:override].set_type == 'CourseSection'}.map{|hash| hash[:override].set_id}
-      section_ids = context.sections_visible_to(user).map(&:id)
-      if section_ids.sort == overridden_section_ids.sort
-        as_admin.delete_if{|hash| hash[:base]}
-      end
     end
 
     return as_student, as_admin
