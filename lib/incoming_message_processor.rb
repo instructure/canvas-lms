@@ -112,7 +112,7 @@ class IncomingMessageProcessor
       # This prevents us from rebouncing users that have auto-replies setup -- only bounce something
       # that was sent out because of a notification.
       raise IncomingMessageProcessor::SilentIgnoreError unless original_message && original_message.notification_id
-      raise IncomingMessageProcessor::SilentIgnoreError unless secure_id == original_message.reply_to_secure_id
+      raise IncomingMessageProcessor::SilentIgnoreError unless secure_id == ReplyToAddress.new(original_message).secure_id
 
       original_message.shard.activate do
         context = original_message.context

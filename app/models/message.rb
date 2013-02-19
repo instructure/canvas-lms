@@ -324,20 +324,9 @@ class Message < ActiveRecord::Base
     @i18n_scope = nil
   end
 
-  def reply_to_secure_id
-    Canvas::Security.hmac_sha1(self.global_id.to_s)
-  end
-
-  def reply_to_address
-    res = (self.forced_reply_to || nil) rescue nil
-    res = nil if self.path_type == 'sms' rescue false
-    res = self.from if self.context_type == 'ErrorReport'
-    unless res
-      addr, domain = HostUrl.outgoing_email_address.split(/@/)
-      res = "#{addr}+#{self.reply_to_secure_id}-#{self.global_id}@#{domain}"
-    end
-  end
-
+  # Public: Deliver this message.
+  #
+  # Returns nothing.
   def deliver
     unless self.dispatch
       return # don't dispatch cancelled or already-sent messages
