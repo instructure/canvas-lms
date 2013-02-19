@@ -193,6 +193,7 @@ describe "discussions" do
     context "editing" do
       it "should save and display all changes" do
         @topic = @course.discussion_topics.create!(:title => "topic", :user => @user)
+        @course.require_assignment_group
 
         def confirm(state)
           checkbox_state = state == :on ? 'true' : nil
@@ -216,7 +217,7 @@ describe "discussions" do
           f('input[type=checkbox][name=podcast_has_student_posts]').click if state == :on
           f('input[type=checkbox][name="assignment[set_assignment]"]').click
 
-          f('.form-actions button[type=submit]').click
+          expect_new_page_load { f('.form-actions button[type=submit]').click }
           wait_for_ajaximations
         end
 
@@ -225,6 +226,58 @@ describe "discussions" do
         confirm(:on)
         toggle(:off)
         confirm(:off)
+      end
+
+      context "graded" do
+        before do
+          @topic = @course.discussion_topics.build(:title => "topic", :user => @user)
+          @topic.assignment = @course.assignments.build
+          @topic.save!
+        end
+
+        it "should allow editing the assignment group" do
+          assign_group_2 = @course.assignment_groups.create!(:name => "Group 2")
+
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+          wait_for_ajaximations
+
+          click_option("#assignment_group_id", assign_group_2.name)
+
+          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          @topic.reload.assignment.assignment_group_id.should == assign_group_2.id
+        end
+
+        it "should allow editing the grading type" do
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+          wait_for_ajaximations
+
+          click_option("#assignment_grading_type", "Letter Grade")
+
+          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          @topic.reload.assignment.grading_type.should == "letter_grade"
+        end
+
+        it "should allow editing the group category" do
+          group_cat = @course.group_categories.create!(:name => "Groupies")
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+          wait_for_ajaximations
+
+          f("#assignment_has_group_category").click
+          click_option("#assignment_group_category_id", group_cat.name)
+
+          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          @topic.reload.assignment.group_category_id.should == group_cat.id
+        end
+
+        it "should allow editing the peer review" do
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+          wait_for_ajaximations
+
+          f("#assignment_peer_reviews").click
+
+          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          @topic.reload.assignment.peer_reviews.should == true
+        end
       end
     end
   end

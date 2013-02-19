@@ -172,7 +172,13 @@ class DiscussionTopicsController < ApplicationController
       end
       (hash[:ATTRIBUTES] ||= {})[:is_announcement] = @topic.is_announcement
       handle_assignment_edit_params(hash[:ATTRIBUTES])
-      js_env :DISCUSSION_TOPIC => hash
+      categories = @context.respond_to?(:group_categories) ? @context.group_categories : []
+      js_env :DISCUSSION_TOPIC => hash,
+             :GROUP_CATEGORIES => categories.
+                                  reject { |category| category.student_organized? }.
+                                  map { |category| { :id => category.id, :name => category.name } },
+             :IS_LARGE_ROSTER => @context.respond_to?(:large_roster?) && @context.large_roster?,
+             :CONTEXT_ID => @context.id
       render :action => "edit"
     end
   end

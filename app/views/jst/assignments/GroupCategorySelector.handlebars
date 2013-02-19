@@ -1,7 +1,7 @@
 <div class="controls">
   <label class="checkbox">
     <input id="assignment_has_group_category"
-    name="has_group_category"
+    name="{{#if nested}}assignment[has_group_category]{{else}}has_group_category{{/if}}"
       type="checkbox"
       {{checkedIf groupCategoryId}}
       {{disabledIfIncludes frozenAttributes "group_category_id"}}/>
@@ -12,8 +12,8 @@
 <div id="group_category_options" style="{{hiddenUnless groupCategoryId}}">
 
   <div class="controls">
-    <label class="checkbox">
-      <input name="grade_group_students_individually"
+    <label class="checkbox" >
+      <input name="{{#if nested}}assignment[grade_group_students_individually]{{else}}grade_group_students_individually{{/if}}"
         type="checkbox"
         {{checkedIf gradeGroupStudentsIndividually}}
         {{disabledIfIncludes frozenAttributes "group_category_id"}}/>
@@ -23,11 +23,13 @@
     </label>
   </div>
 
-  <div class="controls">
-    <label for="group_category_id" class="nobr">
+  <div class="control-group">
+    <label for="group_category_id" class="control-label">
       {{#t "group_set"}}Group Set{{/t}}
+    </label>
+    <div class="controls">
       <select id="assignment_group_category_id"
-        name="group_category_id"
+        name="{{#if nested}}assignment[group_category_id]{{else}}group_category_id{{/if}}"
         {{disabledIfIncludes frozenAttributes "group_category_id"}}>
         {{#each groupCategories}}
           <option value="{{id}}" {{selectedIf ../groupCategoryId this.id}}>
@@ -38,7 +40,7 @@
           [ {{#t "group_category_options"}}New Group Category{{/t}} ]
         </option>
       </select>
-    </label>
+    </div>
   </div>
 
 </div>

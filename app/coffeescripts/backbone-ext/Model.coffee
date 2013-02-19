@@ -28,7 +28,7 @@ define [
     #   @model.on 'saving', -> console.log "Do something awesome"
     #
     # @api backbone override
-    save: -> 
+    save: ->
       @trigger "saving"
       super
 
@@ -43,8 +43,6 @@ define [
     #   @model.on 'destroying', -> console.log 'Do something awesome'
     #
     # @api backbone override
-    destroy: -> 
+    destroy: ->
       @trigger "destroying"
       super
-
-

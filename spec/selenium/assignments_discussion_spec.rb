@@ -58,24 +58,4 @@ describe "discussion assignments" do
       f('#discussion_topic_assignment_points_possible').attribute(:value).should == "10"
     end
   end
-
-  it "should create a discussion topic with requires peer reviews" do
-    pending "needs peer review form in discussion edit page"
-    assignment_title = 'discussion assignment peer reviews'
-    get "/courses/#{@course.id}/assignments"
-    driver.execute_script %{$('.header_content .add_assignment_link:first').addClass('focus');}
-    f(".header_content .add_assignment_link").click
-    wait_for_animations
-    click_option(".assignment_submission_types", 'Discussion')
-    expect_new_page_load { f('.more_options_link').click }
-    edit_form = f('#edit_assignment_form')
-    keep_trying_until { edit_form.should be_displayed }
-    replace_content(edit_form.find_element(:id, 'assignment_title'), assignment_title)
-    edit_form.find_element(:id, 'assignment_peer_reviews').click
-    submit_form(edit_form)
-    wait_for_ajaximations
-    expect_new_page_load { f("#assignment_#{Assignment.last.id} .title").click }
-    f('.al-trigger').click
-    f('.icon-peer-review').should be_displayed
-  end
 end

@@ -242,7 +242,7 @@ define([
           'assignment[grading_type]': 'letter_grade'
         };
         var url = $("#edit_assignment_form").attr('action');
-        $("#edit_assignment_form .grading_standard_id").val(standard.id);
+        $("input.grading_standard_id, ").val(standard.id);
         if($("#update_course_url").length) {
           put_data = {
             'course[grading_standard_id]': standard.id

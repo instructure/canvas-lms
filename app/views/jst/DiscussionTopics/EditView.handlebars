@@ -127,16 +127,8 @@
         <input type="number"
                id="discussion_topic_assignment_points_possible"
                name="assignment[points_possible]"
-               value="{{assignment.points_possible}}">
-      </div>
-    </div>
-
-    <div class="control-group">
-      <label class="control-label" for="discussion_topic_assignment_assignment_group_id">{{#t "assignment_group"}}Assignment Group{{/t}}</label>
-      <div class="controls">
-        <select name="assignment[assignment_group_id]" id="discussion_topic_assignment_assignment_group_id" disabled>
-          <option>{{#t "loading"}}Loading...{{/t}}</option>
-        </select>
+               class="input-small"
+               value="{{assignment.points_possible}}" />
       </div>
     </div>
 
@@ -152,6 +144,17 @@
       </div>
     </div>
 
+    <div id="grading_type_options" class="control-group"></div>
+
+    <div id="assignment_group_options" class="control-group"></div>
+
+    {{#unless isLargeRoster}}
+      <div id="group_category_options" class="control-group"></div>
+    {{/unless}}
+
+    {{#unless isLargeRoster}}
+      <div id="peer_review_options" class="control-group"></div>
+    {{/unless}}
   </fieldset>
 {{/if}}
 

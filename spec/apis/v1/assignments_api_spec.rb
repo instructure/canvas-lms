@@ -349,6 +349,8 @@ describe AssignmentsApiController, :type => :integration do
         @assignment.group_category = @assignment.context.group_categories.create!
         @assignment.save!
 
+        @new_grading_standard = grading_standard_for(@course)
+
         # make sure we can assign a custom field during update
         CustomField.create!(:name => 'test_custom',
                             :field_type => 'boolean',
@@ -364,6 +366,7 @@ describe AssignmentsApiController, :type => :integration do
             }
           },
           'peer_reviews' => false,
+          'grading_standard_id' => @new_grading_standard.id,
           'group_category_id' => nil,
           'description' => 'assignment description',
           'grading_type' => 'points',
@@ -452,6 +455,11 @@ describe AssignmentsApiController, :type => :integration do
 
       it "updates custom fields" do
         @assignment.get_custom_field_value('test_custom').true?.should == true
+      end
+
+      it "updates the grading standard" do
+        @assignment.grading_standard_id.should == @new_grading_standard.id
+        @json['grading_standard_id'].should == @new_grading_standard.id
       end
     end
 
