@@ -2854,7 +2854,7 @@ class Course < ActiveRecord::Base
       opts[:default] ||= false
       cast_expression = "Canvas::Plugin.value_to_boolean(val)"
     end
-    class_eval <<-CODE
+    class_eval <<-CODE, __FILE__, __LINE__ + 1
       def #{setting}
         if settings_frd[#{setting.inspect}].nil? && !@disable_setting_defaults
           default = Course.settings_options[#{setting.inspect}][:default]
@@ -2884,6 +2884,16 @@ class Course < ActiveRecord::Base
   add_setting :allow_student_discussion_editing, :boolean => true, :default => true
   add_setting :lock_all_announcements, :boolean => true, :default => false
   add_setting :large_roster, :boolean => true, :default => lambda { |c| c.root_account.large_course_rosters? }
+
+  LARGE_ROSTER_THRESHOLD = 250
+  alias_method :orig_large_roster, :large_roster
+  def large_roster
+    orig_large_roster || (
+      student_count = Rails.cache.fetch(['student_count', self].cache_key) { students.count }
+      student_count > LARGE_ROSTER_THRESHOLD
+    )
+  end
+  alias_method :large_roster?, :large_roster
 
   def user_can_manage_own_discussion_posts?(user)
     return true if allow_student_discussion_editing?

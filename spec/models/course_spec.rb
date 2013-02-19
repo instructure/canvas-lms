@@ -53,6 +53,15 @@ describe Course do
     @course.should_not be_soft_concluded
   end
 
+  context "#large_roster?" do
+    it "should return true when enrollment count is large enough" do
+        @course.large_roster = false
+        @course.large_roster?.should be_false
+        @course.students.stubs(:count).returns(Course::LARGE_ROSTER_THRESHOLD + 1)
+        @course.large_roster?.should be_true
+    end
+  end
+
   describe "allow_student_discussion_topics" do
 
     it "should default true" do
