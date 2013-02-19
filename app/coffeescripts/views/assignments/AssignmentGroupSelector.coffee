@@ -1,10 +1,11 @@
 define [
+  'i18n!assignment'
   'Backbone'
   'underscore'
   'jquery'
   'compiled/views/assignments/AssignmentGroupCreateDialog'
   'jst/assignments/AssignmentGroupSelector'
-], (Backbone, _, $, AssignmentGroupCreateDialog, template) ->
+], (I18n, Backbone, _, $, AssignmentGroupCreateDialog, template) ->
 
   class AssignmentGroupSelector extends Backbone.View
 
@@ -24,6 +25,7 @@ define [
 
     @optionProperty 'parentModel'
     @optionProperty 'assignmentGroups'
+    @optionProperty 'nested'
 
     showAssignmentGroupCreateDialog: =>
       if @$assignmentGroupId.val() is 'new'
@@ -41,3 +43,15 @@ define [
       assignmentGroups: @assignmentGroups
       assignmentGroupId: @parentModel.assignmentGroupId()
       frozenAttributes: @parentModel.frozenAttributes()
+      nested: @nested
+
+    validateBeforeSave: (data, errors) =>
+      errors = @_validateAssignmentGroupId data, errors
+      errors
+
+    _validateAssignmentGroupId: (data, errors) =>
+      if data.assignment_group_id == 'new'
+        errors["'assignment_group_id'"] = [
+          message: I18n.t 'assignment_group_must_have_group', 'Please select an assignment group for this assignment'
+        ]
+      errors

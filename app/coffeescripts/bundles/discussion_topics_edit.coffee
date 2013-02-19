@@ -5,6 +5,8 @@ require [
   'compiled/views/DiscussionTopics/EditView'
   'compiled/collections/AssignmentGroupCollection'
   'compiled/str/splitAssetString'
+  'grading_standards'
+  'manage_groups'
 ], ($, DiscussionTopic, Announcement, EditView, AssignmentGroupCollection, splitAssetString) ->
 
   is_announcement = ENV.DISCUSSION_TOPIC.ATTRIBUTES?.is_announcement

@@ -10,6 +10,7 @@ require [
   'compiled/views/assignments/GradingTypeSelector'
   'compiled/views/assignments/GroupCategorySelector'
   'compiled/views/assignments/PeerReviewsSelector'
+  'grading_standards'
   'manage_groups'
 ], (Assignment, EditView, SectionCollection, DueDateList, DueDateListView,
 OverrideView, AssignmentGroupSelector, GradingTypeSelector,

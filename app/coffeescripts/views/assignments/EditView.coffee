@@ -8,7 +8,6 @@ define [
   'jst/assignments/EditView'
   'compiled/models/TurnitinSettings'
   'compiled/views/assignments/TurnitinSettingsDialog'
-  'grading_standards'
   'compiled/fn/preventDefault'
   'compiled/views/calendar/MissingDateDialogView'
   'compiled/tinymce'
@@ -18,8 +17,8 @@ define [
   'compiled/jquery.rails_flash_notifications',
   'compiled/jquery/toggleAccessibly',
 ], (INST, I18n, ValidatedFormView, _, $, wikiSidebar, template,
-TurnitinSettings, TurnitinSettingsDialog, showGradingSchemeDialog,
-preventDefault, MissingDateDialog, toggleAccessibly) ->
+TurnitinSettings, TurnitinSettingsDialog, preventDefault, MissingDateDialog,
+toggleAccessibly) ->
 
   class EditView extends ValidatedFormView
 
@@ -254,6 +253,7 @@ preventDefault, MissingDateDialog, toggleAccessibly) ->
       errors = @_validateTitle data, errors
       errors = @_validateSubmissionTypes data, errors
       errors = @_validateAllowedExtensions data, errors
+      errors = @assignmentGroupSelector.validateBeforeSave(data, errors)
       unless ENV?.IS_LARGE_ROSTER
         errors = @groupCategorySelector.validateBeforeSave(data, errors)
       errors = @_validateAdvancedOptions(data, errors)

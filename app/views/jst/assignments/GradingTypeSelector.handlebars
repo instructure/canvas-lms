@@ -3,7 +3,7 @@
 </label>
 <div class="controls">
   <select id="assignment_grading_type"
-    name="grading_type"
+    name="{{#if nested}}assignment[grading_type]{{else}}grading_type{{/if}}"
     aria-controls="graded_assignment_fields view-grading-levels"
     {{disabledIfIncludes frozenAttributes "grading_type"}}>
     <option value="percent" {{selectedIf gradingType "percent"}}>
@@ -18,9 +18,11 @@
     <option value="letter_grade" {{selectedIf gradingType "letter_grade"}}>
       {{#t "grading_type_options.letter_grade"}}Letter Grade{{/t}}
     </option>
-    <option value="not_graded" {{selectedIf isNotGraded}}>
-      {{#t "grading_type_options.not_graded"}}Not Graded{{/t}}
-    </option>
+    {{#unless preventNotGraded}}
+      <option value="not_graded" {{selectedIf isNotGraded}}>
+        {{#t "grading_type_options.not_graded"}}Not Graded{{/t}}
+      </option>
+    {{/unless}}
   </select>
 
   <p id=view-grading-levels
@@ -32,7 +34,7 @@
     </a>
   </p>
 
-  <input name=grading_standard_id
+  <input name="{{#if nested}}assignment[grading_standard_id]{{else}}grading_standard_id{{/if}}"
     class=grading_standard_id
     value="{{gradingStandardId}}"
     type="hidden">

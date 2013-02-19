@@ -35,6 +35,7 @@ module Api::V1::Assignment
       automatic_peer_reviews
       grade_group_students_individually
       group_category_id
+      grading_standard_id
     )
   }
 

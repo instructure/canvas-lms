@@ -151,6 +151,10 @@
 #       // "percent", "letter_grade", "points"
 #       grading_type: "points",
 #
+#       // The id of the grading standard being applied to this assignment.
+#       // Valid if grading_type is "letter_grade".
+#       grading_standard_id: null,
+#
 #       // (Optional) explanation of lock status
 #       lock_explanation: "This assignment is locked until September 1 at 12:00am",
 #

@@ -10,15 +10,17 @@ define [
 
     template: template
 
-    PEER_REVIEWS_ASSIGN_AT = '[name="peer_reviews_assign_at"]'
-    PEER_REVIEWS = '[name="peer_reviews"]'
-    AUTO_PEER_REVIEWS = '[name="automatic_peer_reviews"]'
-    PEER_REVIEWS_DETAILS = '#peer_reviews_details'
+    PEER_REVIEWS_ASSIGN_AT    = '#assignment_peer_reviews_assign_at'
+    PEER_REVIEWS              = '#assignment_peer_reviews'
+    MANUAL_PEER_REVIEWS       = '#assignment_manual_peer_reviews'
+    AUTO_PEER_REVIEWS         = '#assignment_automatic_peer_reviews'
+    PEER_REVIEWS_DETAILS      = '#peer_reviews_details'
     AUTO_PEER_REVIEWS_OPTIONS = '#automatic_peer_reviews_options'
 
     events: do ->
       events = {}
       events["change #{PEER_REVIEWS}"] = 'handlePeerReviewsChange'
+      events["change #{MANUAL_PEER_REVIEWS}"] = 'handleAutomaticPeerReviewsChange'
       events["change #{AUTO_PEER_REVIEWS}"] = 'handleAutomaticPeerReviewsChange'
       events
 
@@ -32,6 +34,7 @@ define [
       els
 
     @optionProperty 'parentModel'
+    @optionProperty 'nested'
 
     handlePeerReviewsChange: =>
       @$peerReviewsDetails.toggleAccessibly @$peerReviews.prop('checked')
@@ -48,3 +51,4 @@ define [
       peerReviewCount: @parentModel.peerReviewCount()
       peerReviewsAssignAt: @parentModel.peerReviewsAssignAt()
       frozenAttributes: @parentModel.frozenAttributes()
+      nested: @nested

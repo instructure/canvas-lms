@@ -30,6 +30,7 @@ define [
 
     @optionProperty 'parentModel'
     @optionProperty 'groupCategories'
+    @optionProperty 'nested'
 
     showGroupCategoryCreateDialog: =>
       if @$groupCategoryID.val() == 'new'
@@ -54,6 +55,7 @@ define [
       groupCategories: @groupCategories
       gradeGroupStudentsIndividually: @parentModel.gradeGroupStudentsIndividually()
       frozenAttributes: @parentModel.frozenAttributes()
+      nested: @nested
 
     filterFormData: (data) =>
       hasGroupCategory = data.has_group_category

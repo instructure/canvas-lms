@@ -12,7 +12,7 @@ define [
 
     template: template
 
-    GRADING_TYPE = '[name="grading_type"]'
+    GRADING_TYPE = '#assignment_grading_type'
     VIEW_GRADING_LEVELS = '#view-grading-levels'
 
     els: do ->
@@ -28,6 +28,8 @@ define [
       events
 
     @optionProperty 'parentModel'
+    @optionProperty 'nested'
+    @optionProperty 'preventNotGraded'
 
     handleGradingTypeChange: (ev) =>
       gradingType = @$gradingType.val()
@@ -50,3 +52,5 @@ define [
       isLetterGraded: @parentModel.isLetterGraded()
       gradingStandardId: @parentModel.gradingStandardId()
       frozenAttributes: @parentModel.frozenAttributes()
+      nested: @nested
+      preventNotGraded: @preventNotGraded
