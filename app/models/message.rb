@@ -435,31 +435,6 @@ class Message < ActiveRecord::Base
     @i18n_scope = nil
   end
 
-  # Public: Construct a unique reply_to string for this message. This allows
-  # us to associate any email responses to this message.
-  #
-  # Returns a secure ID string.
-  def reply_to_secure_id
-    Canvas::Security.hmac_sha1(global_id.to_s)
-  end
-
-  # Public: Construct a reply_to address for this message.
-  #
-  # Returns an email address string.
-  def reply_to_address
-    # Not sure this first line needs to be a thing.
-    reply_address = (forced_reply_to || nil)  rescue nil
-    reply_address = nil if path_type == 'sms' rescue false
-    reply_address = from if context_type == 'ErrorReport'
-
-    unless reply_address
-      address, domain = HostUrl.outgoing_email_address.split('@')
-      reply_address = "#{address}+#{reply_to_secure_id}-#{global_id}@#{domain}"
-    end
-
-    reply_address
-  end
-
   # Public: Deliver this message.
   #
   # Returns nothing.

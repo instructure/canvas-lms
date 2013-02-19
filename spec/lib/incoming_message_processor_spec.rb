@@ -106,7 +106,7 @@ describe IncomingMessageProcessor do
     end
 
     it "should not choke on invalid UTF-8" do
-      IncomingMessageProcessor.process_single(Mail.new { body "he\xffllo" }, @message.reply_to_secure_id, @message.id)
+      IncomingMessageProcessor.process_single(Mail.new { body "he\xffllo" }, ReplyToAddress.new(@message).secure_id, @message.id)
       DiscussionTopic.incoming_replies.length.should == 1
       DiscussionTopic.incoming_replies[0][:text].should == 'hello'
       DiscussionTopic.incoming_replies[0][:html].should == 'hello'
@@ -116,7 +116,7 @@ describe IncomingMessageProcessor do
       IncomingMessageProcessor.process_single(Mail.new {
           content_type 'text/plain; charset=Shift-JIS'
           body "\x83\x40"
-        }, @message.reply_to_secure_id, @message.id)
+        }, ReplyToAddress.new(@message).secure_id, @message.id)
       DiscussionTopic.incoming_replies.length.should == 1
       comparison_string = "\xe3\x82\xa1"
       comparison_string.force_encoding("UTF-8") if RUBY_VERSION >= '1.9'
@@ -133,7 +133,7 @@ describe IncomingMessageProcessor do
             content_type 'text/html; charset=UTF-8'
             body '<h1>This is HTML</h1>'
           end
-        }, @message.reply_to_secure_id, @message.id)
+        }, ReplyToAddress.new(@message).secure_id, @message.id)
       DiscussionTopic.incoming_replies.length.should == 1
       DiscussionTopic.incoming_replies[0][:text].should == 'This is plain text'
       DiscussionTopic.incoming_replies[0][:html].should == '<h1>This is HTML</h1>'
@@ -143,7 +143,7 @@ describe IncomingMessageProcessor do
       it "should not send a bounce reply sent a bogus message id" do
         expect {
           IncomingMessageProcessor.process_single(simple_mail_from_user,
-            @message.reply_to_secure_id, -1)
+            ReplyToAddress.new(@message).secure_id, -1)
         }.to change { ActionMailer::Base.deliveries.size }.by(0)
         Message.count.should eql @previous_message_count
       end
@@ -162,7 +162,7 @@ describe IncomingMessageProcessor do
         @message.save!
         expect {
           IncomingMessageProcessor.process_single(simple_mail_from_user,
-            @message.reply_to_secure_id, @message.id)
+            ReplyToAddress.new(@message).secure_id, @message.id)
         }.to change { ActionMailer::Base.deliveries.size }.by(0)
         Message.count.should eql @previous_message_count
       end
@@ -174,7 +174,7 @@ describe IncomingMessageProcessor do
         incoming_bounce_mail['Auto-Submitted'] = 'auto-generated' # but don't bounce with this header
         expect {
           IncomingMessageProcessor.process_single(incoming_bounce_mail,
-            @message.reply_to_secure_id, @message.id)
+            ReplyToAddress.new(@message).secure_id, @message.id)
         }.to change { ActionMailer::Base.deliveries.size }.by(0)
         Message.count.should eql @previous_message_count
       end
@@ -183,7 +183,7 @@ describe IncomingMessageProcessor do
         @message.user = nil
         @message.save!
         IncomingMessageProcessor.process_single(simple_mail_from_user, 
-          @message.reply_to_secure_id, @message.id)
+          ReplyToAddress.new(@message).secure_id, @message.id)
         check_new_message(:unknown)
       end
 
@@ -191,7 +191,7 @@ describe IncomingMessageProcessor do
         @message.context = nil
         @message.save!
         IncomingMessageProcessor.process_single(simple_mail_from_user, 
-          @message.reply_to_secure_id, @message.id)
+          ReplyToAddress.new(@message).secure_id, @message.id)
         check_new_message(:unknown)
       end
 
@@ -200,7 +200,7 @@ describe IncomingMessageProcessor do
         @message.save!
         expect {
           IncomingMessageProcessor.process_single(Mail.new(:body => "body", :from => "bogus_email@example.com"),
-          @message.reply_to_secure_id, @message.id)
+          ReplyToAddress.new(@message).secure_id, @message.id)
         }.to change { ActionMailer::Base.deliveries.size }.by(1)
         Message.count.should eql @previous_message_count
       end
@@ -209,7 +209,7 @@ describe IncomingMessageProcessor do
     it "should send a bounce reply when reply_from raises ReplyToLockedTopicError" do
       DiscussionTopic.reply_from_result = IncomingMessageProcessor::ReplyToLockedTopicError
       IncomingMessageProcessor.process_single(simple_mail_from_user, 
-        @message.reply_to_secure_id, @message.id)
+        ReplyToAddress.new(@message).secure_id, @message.id)
       check_new_message(:locked)
     end
 
@@ -219,7 +219,7 @@ describe IncomingMessageProcessor do
         Dir.mkdir(newdir)
         
         addr, domain = HostUrl.outgoing_email_address.split(/@/)
-        to_address = "#{addr}+#{@message.reply_to_secure_id}-#{@message.id}@#{domain}"
+        to_address = "#{addr}+#{ReplyToAddress.new(@message).secure_id}-#{@message.id}@#{domain}"
         mail = Mail.new do
           from 'test@example.com'
           to to_address
