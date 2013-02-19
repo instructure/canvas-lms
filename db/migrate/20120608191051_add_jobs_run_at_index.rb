@@ -8,14 +8,7 @@ class AddJobsRunAtIndex < ActiveRecord::Migration
   end
 
   def self.up
-    case connection.adapter_name
-    when 'PostgreSQL'
-      execute <<-SQL
-        CREATE INDEX CONCURRENTLY index_delayed_jobs_on_run_at_and_tag ON delayed_jobs (run_at, tag);
-      SQL
-    else
-      add_index :delayed_jobs, %w[run_at tag], :name => "index_delayed_jobs_on_run_at_and_tag"
-    end
+    add_index :delayed_jobs, %w[run_at tag], :concurrently => true
   end
 
   def self.down
