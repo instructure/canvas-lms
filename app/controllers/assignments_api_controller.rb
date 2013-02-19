@@ -97,7 +97,9 @@
 #         // URL to the external tool
 #         url: "http://instructure.com",
 #         // Whether or not there is a new tab for the external tool
-#         new_tab: false
+#         new_tab: false,
+#         // the identifier for this tool_tag
+#         resource_link_id: 'ab81173af98b8c33e66a'
 #       },
 #
 #       // Boolean indicating if peer reviews are required for this assignment

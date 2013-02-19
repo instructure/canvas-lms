@@ -865,12 +865,13 @@ describe AssignmentsApiController, :type => :integration do
       end
 
       context "external tool assignment" do
+
         before do
           course_with_student(:active_all => true)
           assignment = @course.assignments.create!
-          tool_tag = ContentTag.new({:url => 'http://www.example.com', :new_tab=>false})
-          tool_tag.context = assignment
-          tool_tag.save!
+          @tool_tag = ContentTag.new({:url => 'http://www.example.com', :new_tab=>false})
+          @tool_tag.context = assignment
+          @tool_tag.save!
           assignment.submission_types = 'external_tool'
           assignment.save!
           assignment.external_tool_tag.should_not be_nil
@@ -882,7 +883,11 @@ describe AssignmentsApiController, :type => :integration do
         end
 
         it 'includes the external tool attributes' do
-          @json['external_tool_tag_attributes'].should == {'url' => 'http://www.example.com', 'new_tab' => false}
+          @json['external_tool_tag_attributes'].should == {
+            'url' => 'http://www.example.com',
+            'new_tab' => false,
+            'resource_link_id' => @tool_tag.opaque_identifier(:asset_string)
+          }
         end
       end
     end

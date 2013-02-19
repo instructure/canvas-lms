@@ -74,7 +74,11 @@ module Api::V1::Assignment
 
     if assignment.external_tool? && assignment.external_tool_tag.present?
       external_tool_tag = assignment.external_tool_tag
-      hash['external_tool_tag_attributes'] = { 'url' => external_tool_tag.url, 'new_tab' => external_tool_tag.new_tab }
+      hash['external_tool_tag_attributes'] = {
+        'url' => external_tool_tag.url,
+        'new_tab' => external_tool_tag.new_tab,
+        'resource_link_id' => external_tool_tag.opaque_identifier(:asset_string)
+      }
     end
 
     if assignment.automatic_peer_reviews? && assignment.peer_reviews?
