@@ -51,7 +51,6 @@ define [
       @chunk_start = 0
       @students = {}
       @rows = []
-      @studentsPage = 1
       @sortFn = (student) -> student.sortable_name
       @assignmentsToHide = userSettings.contextGet('hidden_columns') || []
       @sectionToShow = userSettings.contextGet 'grading_show_only_section'
@@ -70,12 +69,31 @@ define [
       else
         'students_url'
 
-      promise = $.when(
-        $.ajaxJSON( @options[enrollmentsUrl], "GET"),
-        $.ajaxJSON( @options.assignment_groups_url, "GET", {}, @gotAssignmentGroups),
-        $.ajaxJSON( @options.sections_url, "GET", {}, @gotSections)
-      ).then ([students, status, xhr]) =>
-        @gotChunkOfStudents(students, xhr)
+      # getting all the enrollments for a course via the api in the polite way
+      # is too slow, so we're going to cheat.
+      $.when($.ajaxJSON(@options[enrollmentsUrl], "GET")
+      , $.ajaxJSON(@options.assignment_groups_url, "GET", {}, @gotAssignmentGroups)
+      , $.ajaxJSON( @options.sections_url, "GET", {}, @gotSections))
+      .then ([students, status, xhr]) =>
+        @gotChunkOfStudents students
+
+        paginationLinks = xhr.getResponseHeader('Link')
+        lastLink = paginationLinks.match(/<[^>]+>; *rel="last"/)
+        unless lastLink?
+          @gotAllStudents()
+          return
+        lastPage = lastLink[0].match(/page=(\d+)/)[1]
+        lastPage = parseInt lastPage, 10
+
+        fetchEnrollments = (page) =>
+          $.ajaxJSON @options[enrollmentsUrl], "GET", {page}
+        dfds = (fetchEnrollments(page) for page in [2..lastPage])
+        $.when(dfds...).then (responses...) =>
+          if dfds.length == 1
+            @gotChunkOfStudents responses[0]
+          else
+            @gotChunkOfStudents(students) for [students, x, y] in responses
+          @gotAllStudents()
 
       @spinner = new Spinner()
       $(@spinner.spin().el).css(
@@ -107,20 +125,13 @@ define [
         @sections[section.id] = section
       @sections_enabled = sections.length > 1
 
-    gotChunkOfStudents: (studentEnrollments, xhr) =>
+    gotChunkOfStudents: (studentEnrollments) =>
       for studentEnrollment in studentEnrollments
         student = studentEnrollment.user
         student.enrollment = studentEnrollment
         @students[student.id] ||= htmlEscape(student)
         @students[student.id].sections ||= []
         @students[student.id].sections.push(studentEnrollment.course_section_id)
-
-      link = xhr.getResponseHeader('Link')
-      if link && link.match /rel="next"/
-        @studentsPage += 1
-        $.ajaxJSON( @options.students_url, "GET", { "page": @studentsPage}, @gotChunkOfStudents)
-      else
-        @gotAllStudents()
 
     gotAllStudents: ->
       for id, student of @students
