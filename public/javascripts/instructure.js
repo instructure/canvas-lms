@@ -219,8 +219,7 @@ define([
             width: 400,
             height: "auto",
             open: function() {
-              $("li", this).attr("tabindex", "0");
-              $(".ui-dialog").focus();
+              $(".navigation_list:first").focus();
             },
             close: function() {
               $("li", this).attr("tabindex", ""); // prevents chrome bsod
