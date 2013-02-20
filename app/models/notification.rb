@@ -47,7 +47,7 @@ class Notification < ActiveRecord::Base
   has_many :notification_policies, :dependent => :destroy
   before_save :infer_default_content
 
-  attr_accessible  :name, :subject, :body, :sms_body, :main_link, :delay_for, :category
+  attr_accessible  :name, :subject, :main_link, :delay_for, :category
   
   named_scope :to_show_in_feed, :conditions => ["messages.category = ? OR messages.notification_name IN (?) ", "TestImmediately", TYPES_TO_SHOW_IN_FEED]
   
@@ -81,9 +81,7 @@ class Notification < ActiveRecord::Base
   end
 
   def infer_default_content
-    self.body ||= t(:no_comments, "No comments")
     self.subject ||= t(:no_subject, "No Subject")
-    self.sms_body ||= t(:no_comments, "No comments")
   end
   protected :infer_default_content
   
@@ -117,7 +115,6 @@ class Notification < ActiveRecord::Base
       message = Message.new(
         :subject => self.subject
       )
-      message.body = self.sms_body
       message.notification = self
       message.notification_name = self.name
       message.user = user
@@ -215,8 +212,6 @@ class Notification < ActiveRecord::Base
           :notification => self
         )
 
-        message.body = self.body
-        message.body = self.sms_body if c.respond_to?("path_type") && c.path_type == "sms"
         message.notification_name = self.name
         message.communication_channel = c if c.is_a?(CommunicationChannel)
         message.dispatch_at = nil

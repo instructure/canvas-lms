@@ -117,7 +117,6 @@ class DelayedMessage < ActiveRecord::Base
     message = to.messages.build(
       :subject => notification.subject,
       :to => to.path,
-      :body => notification.body,
       :notification_name => notification.name,
       :notification => notification,
       :from => path,

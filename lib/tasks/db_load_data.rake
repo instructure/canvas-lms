@@ -104,6 +104,8 @@ namespace :db do
   
   desc "Find or create the notifications"
   task :load_notifications => :load_environment do 
+    Notification.reset_column_information
+
     create_notification 'Announcement', 'Announcement', 0,
       'http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/announcements', %{
       New Announcement

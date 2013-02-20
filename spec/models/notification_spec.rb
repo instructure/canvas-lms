@@ -18,17 +18,45 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
-describe Notification do
+## Helpers
+def notification_set(opts = {})
+  user_opts = opts.delete(:user_opts) || {}
+  notification_opts = opts.delete(:notification_opts)  || {}
 
+  assignment_model
+  notification_model({:subject => "<%= t :subject, 'This is 5!' %>", :name => "Test Name"}.merge(notification_opts))
+  user_model({:workflow_state => 'registered'}.merge(user_opts))
+  communication_channel_model(:user_id => @user).confirm!
+  notification_policy_model(:notification => @notification,
+    :communication_channel => @communication_channel)
+
+  @notification.reload
+end
+
+# The opts pertain to user only
+def create_user_with_cc(opts = {})
+  user_model(opts)
+
+  if @notification
+    communication_channel_model
+    @communication_channel.notification_policies.create!(:notification => @notification)
+  else
+    communication_channel_model
+  end
+
+  @user.reload
+end
+
+describe Notification do
   it "should create a new instance given valid attributes" do
     Notification.create!(notification_valid_attributes)
   end
-  
+
   it "should have a default delay_for" do
     notification_model
     @notification.delay_for.should be >= 0
   end
-  
+
   it "should have a decent state machine" do
     notification_model
     @notification.state.should eql(:active)
@@ -37,12 +65,9 @@ describe Notification do
     @notification.reactivate
     @notification.state.should eql(:active)
   end
-  
-  it "should always have some subject and body" do
-    n = Notification.create
-    n.body.should_not be_nil
-    n.subject.should_not be_nil
-    n.sms_body.should_not be_nil
+
+  it "should always have some subject" do
+    n = Notification.create!.subject.should_not be_nil
   end
 
   context "by_name" do
@@ -64,8 +89,12 @@ describe Notification do
       n1.should_not equal n2
     end
   end
-  
+
   context "create_message" do
+    before(:each) do
+      Message.any_instance.stubs(:get_template).returns('template')
+    end
+
     it "should only send dashboard messages for users with non-validated channels" do
       notification_model
       u1 = create_user_with_cc(:name => "user 1", :workflow_state => "registered")
@@ -77,7 +106,7 @@ describe Notification do
       messages.length.should eql(2)
       messages.map(&:to).should be_include('dashboard')
     end
-    
+
     it "should not send dispatch messages for pre-registered users" do
       notification_model
       u1 = user_model(:name => "user 2")
@@ -86,7 +115,7 @@ describe Notification do
       messages = @notification.create_message(@a, u1)
       messages.should be_empty
     end
-    
+
     it "should send registration messages for pre-registered users" do
       notification_set(:user_opts => {:workflow_state => "pre_registered"}, :notification_opts => {:category => "Registration"})
       messages = @notification.create_message(@assignment, @user)
@@ -94,7 +123,7 @@ describe Notification do
       messages.length.should eql(1)
       messages.first.to.should eql(@communication_channel.path)
     end
-    
+
     it "should send dashboard and dispatch messages for registered users based on default policies" do
       notification_model(:category => 'TestImmediately')
       u1 = user_model(:name => "user 1", :workflow_state => "registered")
@@ -106,17 +135,17 @@ describe Notification do
       messages[0].to.should eql("user1@example.com")
       messages[1].to.should eql("dashboard")
     end
-    
+
     it "should not dispatch non-immediate message based on default policies" do
       notification_model(:category => 'TestDaily', :name => "Show In Feed")
       @notification.default_frequency.should eql("daily")
       u1 = user_model(:name => "user 1", :workflow_state => "registered")
-      
+
       # make the first channel retired, to verify that it'll get an active one
       retired_cc = u1.communication_channels.create(:path => "retired@example.com").retire!
       cc = u1.communication_channels.create(:path => "active@example.com")
       cc.confirm!
-      
+
       @a = Assignment.create
       messages = @notification.create_message(@a, u1)
       messages.should_not be_empty
@@ -128,7 +157,7 @@ describe Notification do
       DelayedMessage.last.communication_channel_id.should eql(cc.id)
       DelayedMessage.last.send_at.should > Time.now.utc
     end
-    
+
     it "should send dashboard (but not dispatch messages) for registered users based on default policies" do
       notification_model(:category => 'TestNever', :name => "Show In Feed")
       @notification.default_frequency.should eql("never")
@@ -143,19 +172,19 @@ describe Notification do
 
     it "should replace messages when a similar notification occurs" do
       notification_set
-      
+
       all_messages = []
       messages = @notification.create_message(@assignment, @user)
       all_messages += messages
       messages.length.should eql(2)
       m1 = messages.first
       m2 = messages.last
-      
+
       messages = @notification.create_message(@assignment, @user)
       all_messages += messages
       messages.should_not be_empty
       messages.length.should eql(2)
-      
+
       all_messages.select {|m| 
         m.to == m1.to and m.notification == m1.notification and m.communication_channel == m1.communication_channel
       }.length.should eql(2)
@@ -164,7 +193,7 @@ describe Notification do
         m.to == m2.to and m.notification == m2.notification and m.communication_channel == m2.communication_channel
       }.length.should eql(2)
     end
-    
+
     it "should create stream items" do
       notification_set(:notification_opts => {:name => "Show In Feed"})
       @user.stream_item_instances.count.should == 0
@@ -174,61 +203,13 @@ describe Notification do
       si.asset_type.should == 'Message'
       si.asset_id.should be_nil
     end
-    
-    it "should translate ERB in the notification" do
-      notification_set
-      messages = @notification.create_message(@assignment, @user)
-      messages.each {|m| m.subject.should eql("This is 5!")}
-    end
-
-    context "localization" do
-      before { notification_set }
-
-      it "should respect browser locales" do
-        I18n.backend.store_translations :piglatin, {:messages => {:test_name => {:email => {:subject => "Isthay isay ivefay!"}}}}
-        @user.browser_locale = 'piglatin'
-        @user.save(false) # the validation was declared before :piglatin was added, so we skip it
-        messages = @notification.create_message(@assignment, @user)
-        messages.each {|m| m.subject.should eql("Isthay isay ivefay!")}
-        I18n.locale.should eql(:en)
-      end
-
-      it "should respect user locales" do
-        I18n.backend.store_translations :shouty, {:messages => {:test_name => {:email => {:subject => "THIS IS *5*!!!!?!11eleventy1"}}}}
-        @user.locale = 'shouty'
-        @user.save(false)
-        messages = @notification.create_message(@assignment, @user)
-        messages.each {|m| m.subject.should eql("THIS IS *5*!!!!?!11eleventy1")}
-        I18n.locale.should eql(:en)
-      end
-
-      it "should respect course locales" do
-        course
-        I18n.backend.store_translations :es, { :messages => { :test_name => { :email => { :subject => 'El Tigre Chino' } } } }
-        @course.enroll_teacher(@user).accept!
-        @course.update_attribute(:locale, 'es')
-        messages = @notification.create_message(@course, @user)
-        messages.each { |m| m.subject.should eql('El Tigre Chino') }
-        I18n.locale.should eql(:en)
-      end
-
-      it "should respect account locales" do
-        course
-        I18n.backend.store_translations :es, { :messages => { :test_name => { :email => { :subject => 'El Tigre Chino' } } } }
-        @course.account.update_attribute(:default_locale, 'es')
-        @course.enroll_teacher(@user).accept!
-        messages = @notification.create_message(@course, @user)
-        messages.each { |m| m.subject.should eql('El Tigre Chino') }
-        I18n.locale.should eql(:en)
-      end
-    end
 
     it "should not get confused with nil values in the to list" do
       notification_set
       messages = @notification.create_message(@assignment, nil)
       messages.should be_empty
     end
-    
+
     it "should not send messages after the user's limit" do
       notification_set
       NotificationPolicy.count.should == 1
@@ -248,7 +229,7 @@ describe Notification do
       messages.select{|m| m.to != 'dashboard'}.should be_empty
       NotificationPolicy.count.should == 2
     end
-    
+
     it "should not use notification policies for unconfirmed communication channels" do
       notification_set
       cc = communication_channel_model(:user_id => @user.id, :workflow_state => 'unconfirmed', :path => "nope")
@@ -269,24 +250,77 @@ describe Notification do
       @notification_policy.save!
       expect { @notification.create_message(@assignment, @user) }.to change(DelayedMessage, :count).by 0
     end
+  end
 
-    context "sharding" do
-      it_should_behave_like "sharding"
+  context "localization" do
+    before(:each) do
+      notification_set
+      Message.any_instance.stubs(:body).returns('template')
+    end
 
-      it "should create the message on the user's shard" do
-        notification_set
-        @shard1.activate do
-          user_with_pseudonym(:active_all => 1)
-          messages = @notification.create_message(@assignment, @user)
-          messages.length.should >= 1
-          messages.each { |m| m.shard.should == @shard1 }
-        end
+    it "should translate ERB in the notification" do
+      messages = @notification.create_message(@assignment, @user)
+      messages.each {|m| m.subject.should eql("This is 5!")}
+    end
+
+    it "should respect browser locales" do
+      I18n.backend.store_translations :piglatin, {:messages => {:test_name => {:email => {:subject => "Isthay isay ivefay!"}}}}
+      @user.browser_locale = 'piglatin'
+      @user.save(false) # the validation was declared before :piglatin was added, so we skip it
+      messages = @notification.create_message(@assignment, @user)
+      messages.each {|m| m.subject.should eql("Isthay isay ivefay!")}
+      I18n.locale.should eql(:en)
+    end
+
+    it "should respect user locales" do
+      I18n.backend.store_translations :shouty, {:messages => {:test_name => {:email => {:subject => "THIS IS *5*!!!!?!11eleventy1"}}}}
+      @user.locale = 'shouty'
+      @user.save(false)
+      messages = @notification.create_message(@assignment, @user)
+      messages.each {|m| m.subject.should eql("THIS IS *5*!!!!?!11eleventy1")}
+      I18n.locale.should eql(:en)
+    end
+
+    it "should respect course locales" do
+      course
+      I18n.backend.store_translations :es, { :messages => { :test_name => { :email => { :subject => 'El Tigre Chino' } } } }
+      @course.enroll_teacher(@user).accept!
+      @course.update_attribute(:locale, 'es')
+      messages = @notification.create_message(@course, @user)
+      messages.each { |m| m.subject.should eql('El Tigre Chino') }
+      I18n.locale.should eql(:en)
+    end
+
+    it "should respect account locales" do
+      course
+      I18n.backend.store_translations :es, { :messages => { :test_name => { :email => { :subject => 'El Tigre Chino' } } } }
+      @course.account.update_attribute(:default_locale, 'es')
+      @course.enroll_teacher(@user).accept!
+      messages = @notification.create_message(@course, @user)
+      messages.each { |m| m.subject.should eql('El Tigre Chino') }
+      I18n.locale.should eql(:en)
+    end
+  end
+
+
+  context "sharding" do
+    it_should_behave_like "sharding"
+
+    it "should create the message on the user's shard" do
+      notification_set
+      Message.any_instance.stubs(:get_template).returns('template')
+      @shard1.activate do
+        user_with_pseudonym(:active_all => 1)
+        messages = @notification.create_message(@assignment, @user)
+        messages.length.should >= 1
+        messages.each { |m| m.shard.should == @shard1 }
       end
     end
   end
 
   context "record_delayed_messages" do
     before do
+      Message.any_instance.stubs(:get_template).returns('template')
       user_model
       communication_channel_model(:user_id => @user.id)
       @cc.confirm
@@ -339,25 +373,27 @@ describe Notification do
       before do
         NotificationPolicy.delete_all
 
+        Message.any_instance.stubs(:get_template).returns('template')
+
         @trifecta_opts = {
           :communication_channel => @communication_channel,
           :notification => @notification
         }
       end
-        
+
       it "should return false without these policies in place" do
         notification_policy_model
         @notification.record_delayed_messages(@valid_record_delayed_messages_opts).should be_false
       end
-      
+
       it "should return false with the right models and the wrong policies" do
         notification_policy_model({:frequency => "immediately"}.merge(@trifecta_opts) )
         @notification.record_delayed_messages(@valid_record_delayed_messages_opts).should be_false
-        
+
         notification_policy_model({:frequency => "never"}.merge(@trifecta_opts) )
         @notification.record_delayed_messages(@valid_record_delayed_messages_opts).should be_false
       end
-      
+
       it "should return the delayed message model with the right models and the daily policies" do
         notification_policy_model({:frequency => "daily"}.merge(@trifecta_opts) )
         @user.reload
@@ -375,7 +411,7 @@ describe Notification do
         delayed_messages.size.should eql(1)
         delayed_messages.each {|x| x.should be_is_a(DelayedMessage) }
       end
-      
+
       it "should return the delayed message model with the right models and a mix of policies" do
         notification_policy_model({:frequency => "immediately"}.merge(@trifecta_opts) )
         notification_policy_model({:frequency => "never"}.merge(@trifecta_opts) )
@@ -387,15 +423,16 @@ describe Notification do
         delayed_messages.size.should eql(2)
         delayed_messages.each {|x| x.should be_is_a(DelayedMessage) }
       end
-      
+
       it "should actually create the DelayedMessage model" do
         i = DelayedMessage.all.size
         notification_policy_model({:frequency => "weekly"}.merge(@trifecta_opts) )
         @user.reload
+        @notification.instance_variable_set(:@i18n_scope, 'messages.show_in_feed.html')
         @notification.record_delayed_messages(@valid_record_delayed_messages_opts)
         DelayedMessage.all.size.should eql(i + 1)
       end
-      
+
       it "should not send a delayed message to a retired cc" do
         notification_policy_model({:frequency => "weekly"}.merge(@trifecta_opts) )
         @cc.retire!
@@ -412,32 +449,4 @@ describe Notification do
 end
 
 
-def notification_set(opts={})
-  user_opts = opts.delete(:user_opts) || {}
-  notification_opts = opts.delete(:notification_opts)  || {}
-  
-  assignment_model
-  notification_model({:subject => "<%= t :subject, 'This is 5!' %>", :name => "Test Name"}.merge(notification_opts))
-  user_model({:workflow_state => 'registered'}.merge(user_opts))
-  communication_channel_model(:user_id => @user).confirm!
-  notification_policy_model(
-    :notification => @notification,
-    :communication_channel => @communication_channel
-  )
-  @notification.reload
-end
 
-# The opts pertain to user only
-def create_user_with_cc(opts={})
-  user_model(opts)
-
-  if @notification
-    communication_channel_model
-    @communication_channel.notification_policies.create!(:notification => @notification)
-  else
-    communication_channel_model
-  end
-
-  @user.reload
-  @user
-end

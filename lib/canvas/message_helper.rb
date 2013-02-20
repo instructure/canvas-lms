@@ -47,10 +47,9 @@ module Canvas::MessageHelper
     split_txt = txt.strip.split("\n").map { |line| line.strip }
     name = split_txt[0]
     subject = split_txt[2]
-    body = split_txt[4..-1].join("\n") rescue ""
     n = Notification.find_or_initialize_by_name(name)
     begin
-      n.update_attributes(:subject => subject, :body => body, :sms_body => sms[0..254], :main_link => link[0..254], :delay_for => delay, :category => type)
+      n.update_attributes(:subject => subject, :main_link => link[0..254], :delay_for => delay, :category => type)
     rescue => e
       if n.new_record?
         raise "New notification creation failed"
