@@ -114,7 +114,7 @@
       <th scope="row"><%= t('headers.due', "Due") %></th>
       <th scope="row"><%= t('headers.score', "Score") %></th>
       <th scope="row" style="text-align: right; white-space: nowrap;"><%= t('headers.out_of', "Out of") %></th>
-      <th scope="row"></th>
+      <th scope="row"><span class="accessible_hide"><%= t('headers.details', "Details") %></span></th>
     </tr>
   </thead>
 <% turnitin_enabled = @context.turnitin_enabled? && @assignments.any?(&:turnitin_enabled) %>
