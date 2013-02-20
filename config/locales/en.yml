@@ -21,6 +21,8 @@ en:
         last_word_connector: ', or '
     help_menu:
       community_support_forums: 'Community Support Forums'
+      contact_support: 'Contact Support'
+      contact_support_sub_text: 'Get assistance with time-sensitive issues.'
       networking_academy_faqs: 'Networking Academy FAQs'
       curriculum_assessment_errata: 'Curriculum/Assessment Errata'
       community_support_description: 'Interact with and get assistance from your peers.'
