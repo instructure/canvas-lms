@@ -2435,38 +2435,43 @@ class Course < ActiveRecord::Base
     result[:new_start_date] = Date.parse(options[:new_start_date]) rescue self.real_start_date
     result[:new_end_date] = Date.parse(options[:new_end_date]) rescue self.real_end_date
     result[:day_substitutions] = options[:day_substitutions]
+    result[:time_zone] = options[:time_zone]
+    result[:time_zone] ||= course.account.default_time_zone unless course.account.nil?
     result
   end
 
   def shift_date(time, options={})
     return nil unless time
-    time = ActiveSupport::TimeWithZone.new(time.utc, Time.zone)
-    old_date = time.to_date
-    new_date = old_date.clone
-    old_start_date = options[:old_start_date]
-    old_end_date = options[:old_end_date]
-    new_start_date = options[:new_start_date]
-    new_end_date = options[:new_end_date]
-    return time unless old_start_date && old_end_date && new_start_date && new_end_date
-    old_full_diff = old_end_date - old_start_date
-    old_event_diff = old_date - old_start_date
-    old_event_percent = old_full_diff > 0 ? old_event_diff.to_f / old_full_diff.to_f : 0
-    new_full_diff = new_end_date - new_start_date
-    new_event_diff = (new_full_diff.to_f * old_event_percent).to_i
-    new_date = new_start_date + new_event_diff
-    options[:day_substitutions] ||= {}
-    options[:day_substitutions][old_date.wday.to_s] ||= old_date.wday.to_s
-    if options[:day_substitutions] && options[:day_substitutions][old_date.wday.to_s]
-      if new_date.wday != options[:day_substitutions][old_date.wday.to_s].to_i
-        new_date += (options[:day_substitutions][old_date.wday.to_s].to_i - new_date.wday) % 7
-        new_date -= 7 unless new_date - 7 < new_start_date
+    time_zone = options[:time_zone] || Time.zone
+    Time.use_zone time_zone do
+      time = ActiveSupport::TimeWithZone.new(time.utc, Time.zone)
+      old_date = time.to_date
+      new_date = old_date.clone
+      old_start_date = options[:old_start_date]
+      old_end_date = options[:old_end_date]
+      new_start_date = options[:new_start_date]
+      new_end_date = options[:new_end_date]
+      return time unless old_start_date && old_end_date && new_start_date && new_end_date
+      old_full_diff = old_end_date - old_start_date
+      old_event_diff = old_date - old_start_date
+      old_event_percent = old_full_diff > 0 ? old_event_diff.to_f / old_full_diff.to_f : 0
+      new_full_diff = new_end_date - new_start_date
+      new_event_diff = (new_full_diff.to_f * old_event_percent).to_i
+      new_date = new_start_date + new_event_diff
+      options[:day_substitutions] ||= {}
+      options[:day_substitutions][old_date.wday.to_s] ||= old_date.wday.to_s
+      if options[:day_substitutions] && options[:day_substitutions][old_date.wday.to_s]
+        if new_date.wday != options[:day_substitutions][old_date.wday.to_s].to_i
+          new_date += (options[:day_substitutions][old_date.wday.to_s].to_i - new_date.wday) % 7
+          new_date -= 7 unless new_date - 7 < new_start_date
+        end
       end
-    end
 
-    new_time = Time.utc(new_date.year, new_date.month, new_date.day, (time.hour rescue 0), (time.min rescue 0)).in_time_zone
-    new_time -= new_time.utc_offset
-    log_merge_result("Events for #{old_date.to_s} moved to #{new_date.to_s}")
-    new_time
+      new_time = Time.utc(new_date.year, new_date.month, new_date.day, (time.hour rescue 0), (time.min rescue 0)).in_time_zone
+      new_time -= new_time.utc_offset
+      log_merge_result("Events for #{old_date.to_s} moved to #{new_date.to_s}")
+      new_time
+    end
   end
 
   def real_start_date
