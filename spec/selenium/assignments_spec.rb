@@ -95,6 +95,41 @@ describe "assignments" do
       Assignment.find_by_title('new assignment').due_at.strftime('%b %d').should == expected_date
     end
 
+    it "only allows an assignment editor to edit points and title if assignment " +
+      "if assignment has multiple due dates" do
+      middle_number = '15'
+      expected_date = (Time.now - 1.month).strftime("%b #{middle_number}")
+      @assignment = @course.assignments.create!(
+        :title => "VDD Test Assignment",
+        :due_at => expected_date
+      )
+      @assignment.any_instantiation.expects(:overridden_for).at_least_once.
+        returns @assignment
+      @assignment.any_instantiation.expects(:multiple_due_dates?).at_least_once.
+        returns true
+      get "/courses/#{@course.id}/assignments"
+      wait_for_animations
+      driver.execute_script "$('.edit_assignment_link').first().hover().click()"
+      # Assert input element is hidden to the user, but still present in the
+      # form so the due date doesn't get changed to no due date.
+      fj('.add_assignment_form .datetime_field_enabled').attribute('style').
+        should contain 'display: none;'
+      f('.vdd_no_edit').text.
+        should == I18n.t("#assignments.multiple_due_dates","Multiple Due Dates")
+      assignment_title = f("#assignment_title")
+      assignment_points_possible = f("#assignment_points_possible")
+      assignment_title.clear
+      assignment_title.send_keys("VDD Test Assignment Updated")
+      assignment_points_possible.clear
+      assignment_points_possible.send_keys("100")
+      f("#add_assignment_form").submit
+      wait_for_ajaximations
+      @assignment.reload.points_possible.should == 100
+      @assignment.title.should == "VDD Test Assignment Updated"
+      # Assert the time didn't change
+      @assignment.due_at.strftime('%b %d').should == expected_date
+    end
+
     it "should create an assignment with more options" do
       enable_cache do
         expected_text = "Assignment 1"

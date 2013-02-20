@@ -44,6 +44,11 @@ define([
     var $form = $("#add_assignment_form");
     var $assignment = $form.parents(".group_assignment");
     var $group = $assignment.parents(".assignment_group");
+    $form.find('.date_text').show();
+    $('.vdd_no_edit').remove();
+    $form.find('img.ui-datepicker-trigger').show();
+    $form.find('.datetime_suggest').text('');
+    $form.find('.datetime_field_enabled').show();
     $form.find("").end()
       .hide().appendTo($("body"));
     $assignment.removeClass('editing');
@@ -81,7 +86,17 @@ define([
     }
     $assignment.find(".more_options_link").attr('href', url);
     $form.find("input[type='submit']").val(buttonMsg);
-    var data = $assignment.getTemplateData({textValues: ["title", "points_possible", "due_date_string", "due_time_string", "assignment_group_id", "submission_types"]});
+    var data = $assignment.getTemplateData({
+      textValues: [
+        "title",
+        "points_possible",
+        "due_date_string",
+        "due_time_string",
+        "assignment_group_id",
+        "submission_types",
+        "multiple_due_dates"
+      ]
+    });
     data.title = data.title || title;
     if(data.submission_types != "online_quiz" && data.submission_types != "discussion_topic") {
       $form.find(".assignment_submission_types .current_submission_types").val(data.submission_types);
@@ -91,11 +106,12 @@ define([
     data.due_time = data.due_time_string;
     data.due_date = data.due_date_string;
     var due_at = Date.parse(data.due_date_string + " " + data.due_time_string);
+    var id = $assignment.attr('id');
     data.due_at = "";
     if(due_at) {
       data.due_at = due_at.toString($.datetime.defaultFormat);
     }
-    if($assignment.attr('id') == 'assignment_new') {
+    if(id == 'assignment_new') {
       if(defaultShowDateOptions) {
         $form.find(".date_options").show();
         $form.find(".show_date_link").hide();
@@ -116,10 +132,16 @@ define([
       $form.attr('action', $assignment.find(".title").attr('href'))
         .attr('method', 'PUT');
     }
-    if(data.due_time && data.due_date) {
-
-    }
     $form.fillFormData(data, { object_name: "assignment" });
+    if ( data.multiple_due_dates === "true" && id !== 'assignment_new' ) {
+      var $dateInput = $form.find('.datetime_field_enabled');
+      $dateInput.before($("<span class=vdd_no_edit>" +
+                           I18n.t('multiple_due_dates','Multiple Due Dates')+
+                            "</span>"));
+      $dateInput.hide();
+      $form.find('img.ui-datepicker-trigger').hide();
+      $form.find('.datetime_suggest').text('');
+    }
     $form.find(":text:first").focus().select();
     //$("html,body").scrollToVisible($assignment);
   }
@@ -232,10 +254,16 @@ define([
   function updateAssignment($assignment, data) {
     var assignment = data.assignment;
     var id = $assignment.attr('id');
+    var oldData = $assignment.getTemplateData({
+      textValues: ['multiple_due_dates']
+    });
     if((id == 'assignment_new' || id == 'assignment_creating')) {
       updateAssignmentCounts();
     }
-    if(assignment.due_at) {
+    if (oldData.multiple_due_dates === 'true') {
+      $assignment.find(".date_text").show();
+    }
+    else if(assignment.due_at) {
       var date_data = $.parseFromISO(assignment.due_at, 'due_date');
       assignment.due_date = date_data.date_formatted;
       assignment.due_time = date_data.time_formatted;

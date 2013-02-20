@@ -91,6 +91,11 @@
   .add_assignment_form {
     display: table-row;
 
+    .vdd_no_edit {
+      margin-top: 5px;
+      display: inline-block;
+    }
+
     .cell.first { padding-left:  6px; }
     .cell.last  { padding-right: 6px; }
 
