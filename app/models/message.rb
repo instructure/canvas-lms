@@ -19,10 +19,13 @@
 class Message < ActiveRecord::Base
   # Included modules
   include ActionController::UrlWriter
+  include ERB::Util
   include SendToStream
   include TextHelper
   include Twitter
   include Workflow
+
+  extend TextHelper
 
   # Associations
   belongs_to :asset_context, :polymorphic => true
@@ -306,6 +309,42 @@ class Message < ActiveRecord::Base
     end
   end
 
+  # Public: Get the template name based on the path type.
+  #
+  # path_type - The path to send the message across, e.g, 'email'.
+  #
+  # Returns file name for erb template
+  def template_filename(path_type=nil)
+    self.notification.name.parameterize.underscore + "." + path_type + ".erb"
+  end
+
+  # Public: Assign the body, subject and url to the message.
+  #
+  # message_body_template - Raw template body
+  # path_type             - Path to send the message across, e.g, 'email'.
+  # _binding              - Message binding
+  #
+  # Returns message body
+  def populate_body(message_body_template, path_type, _binding)
+    # Build the body content based on the path type
+
+    if path_type == 'facebook'
+      # this will ensure we escape anything that's not already safe
+      self.body =RailsXss::Erubis.new(message_body_template).result(_binding)
+    else
+      self.body =Erubis::Eruby.new(message_body_template, :bufvar => "@output_buffer").result(_binding)
+    end
+
+    # Append a footer to the body if the path type is email
+    if path_type == 'email'
+      raw_footer_message = File.read(Canvas::MessageHelper.find_message_path('_email_footer.email.erb'))
+      footer_message = Erubis::Eruby.new(raw_footer_message, :bufvar => "@output_buffer").result(b) rescue nil
+      self.body = self.body + "\n\n\n\n\n\n________________________________________\n" + footer_message if footer_message.present?
+    end
+
+    self.body
+  end
+
   # Public: Prepare a message for delivery by setting body, subject, etc.
   #
   # path_type - The path to send the message across, e.g, 'email'.
@@ -313,55 +352,47 @@ class Message < ActiveRecord::Base
   # Returns nothing.
   def parse!(path_type=nil)
     raise StandardError, "Cannot parse without a context" unless self.context
-    @user = self.user
-    old_time_zone = Time.zone.name || "UTC"
-    Time.zone = (@user && @user.time_zone) || old_time_zone
-    # This makes me sad every time I see it.  What we call context on a 
-    # message is different than what we call context anywhere else in the
-    # app.  In message templates you should use "asset" instead of "context"
-    # to prevent confusion.
-    @context = self.context
-    @asset = @context
-    @asset_context = self.asset_context
-    context, asset, user, delayed_messages, asset_context, data = [@context, @asset, @user, @delayed_messages, @asset_context, @data]
-    @time_zone = Time.zone
-    time_zone = Time.zone
-    path_type ||= self.communication_channel.path_type rescue path_type
-    path_type = "summary" if self.to == 'dashboard'
-    path_type ||= "email"
-    filename = self.notification.name.downcase.gsub(/\s/, '_') + "." + path_type + ".erb"
-    if message = get_template(filename)
-      @message_content_link = nil; @message_content_subject = nil
-      self.extend TextHelper
-      self.extend ERB::Util
-      b = binding
 
-      if path_type == 'facebook'
-        # this will ensure we escape anything that's not already safe
-        self.body = RailsXss::Erubis.new(message).result(b)
-      else
-        self.body = Erubis::Eruby.new(message, :bufvar => "@output_buffer").result(b)
-      end
-      if path_type == 'email'
-        message = File.read(Canvas::MessageHelper.find_message_path('_email_footer.email.erb'))
-        comm_message = Erubis::Eruby.new(message, :bufvar => "@output_buffer").result(b) rescue nil
-        self.body = self.body + "\n\n\n\n\n\n________________________________________\n" + comm_message if comm_message
-      end
+    # Get the users timezone but maintain the original timezone in order to set it back at the end
+    original_time_zone = Time.zone.name || "UTC"
+    user_time_zone = self.user.try(:time_zone) || original_time_zone
+    Time.zone = user_time_zone
+
+    # Ensure we have a path_type
+    path_type = 'dashboard' if to == 'summary'
+    unless path_type
+      path_type = communication_channel.try(:path_type) || 'email'
+    end
+
+    # Determine the message template file to be used in the message
+    filename = template_filename(path_type)
+    message_body_template = get_template(filename)
+
+    context, asset, user, delayed_messages, asset_context, data = [self.context, self.context, @user, @delayed_messages, self.asset_context, @data]
+
+    if message_body_template.present? && path_type.present?
+      #extend TextHelper
+      #extend ERB::Util
+      populate_body(message_body_template, path_type, binding)
+
+      # Set the subject and url
       self.subject = @message_content_subject || t('#message.default_subject', 'Canvas Alert')
       self.url = @message_content_link || nil
-      self.body
+
     else
-      self.extend TextHelper
-      b = binding
-      main_link = Erubis::Eruby.new(self.notification.main_link || "").result(b)
-      b = binding
-      self.subject = Erubis::Eruby.new(self.subject).result(b)
-      self.body = Erubis::Eruby.new(self.body).result(b)
+      # Message doesn't exist so we flag the message as an error
+      main_link = Erubis::Eruby.new(self.notification.main_link || "").result(binding)
+      self.subject = Erubis::Eruby.new(subject).result(binding)
+      self.body = Erubis::Eruby.new(body).result(binding)
       self.transmission_errors = "couldn't find #{Canvas::MessageHelper.find_message_path(filename)}"
     end
-    Time.zone = old_time_zone
+
     self.body
+
   ensure
+    # Set the timezone back to what it originally was
+    Time.zone = original_time_zone if original_time_zone.present?
+
     @i18n_scope = nil
   end
 

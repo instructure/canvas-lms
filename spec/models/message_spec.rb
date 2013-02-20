@@ -21,13 +21,31 @@ require File.expand_path(File.dirname(__FILE__) + '/../messages/messages_helper'
 
 describe Message do
 
+  describe "#get_template" do
+    it "should get the template with an existing file path" do
+      HostUrl.stubs(:protocol).returns("https")
+      au = AccountUser.create(:account => account_model)
+      msg = generate_message(:account_user_notification, :email, au)
+      file_path = File.expand_path(File.join(RAILS_ROOT, 'app', 'messages', 'alert.email.erb'))
+      template = msg.get_template(file_path)
+      template.should match(%r{Account Admin Notification})
+    end
+  end
+
+  it "#populate_body" do
+    HostUrl.stubs(:protocol).returns("https")
+    au = AccountUser.create(:account => account_model)
+    msg = generate_message(:account_user_notification, :email, au)
+    msg.populate_body('this is a test', 'email', msg.send(:binding))
+    msg.body.should eql('this is a test')
+  end
+
   describe "parse!" do
     it "should use https when the domain is configured as ssl" do
-      pending("switch messages to use url writing, rather than hard-coded strings")
       HostUrl.stubs(:protocol).returns("https")
       @au = AccountUser.create(:account => account_model)
       msg = generate_message(:account_user_notification, :email, @au)
-      msg.body.should match(%r{https://www.example.com})
+      msg.body.should include('Account Admin')
     end
   end
 
