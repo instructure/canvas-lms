@@ -368,6 +368,16 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
 
     def placeholders(str)
       str.scan(/%h?\{[^\}]+\}/).sort
+    rescue ArgumentError => e
+      puts "Unable to scan string: #{str.inspect}"
+      raise e
+    end
+
+    def scan_and_report(str, re)
+      str.scan(re)
+    rescue ArgumentError => e
+      puts "Unable to scan string: #{str.inspect}"
+      raise e
     end
 
     def markdown_and_wrappers(str)
@@ -376,13 +386,13 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
       #   reference links, e.g. "[an example][id]"
       #   indented code
       (
-        str.scan(/\\[\\`\*_\{\}\[\]\(\)#\+\-\.!]/) +
-        str.scan(/(\*+|_+|`+)[^\s].*?[^\s]?\1/).map{|m|"#{m}-wrap"} +
-        str.scan(/(!?\[)[^\]]+\]\(([^\)"']+).*?\)/).map{|m|"link:#{m.last}"} +
-        str.scan(/^((\s*\*\s*){3,}|(\s*-\s*){3,}|(\s*_\s*){3,})$/).map{"hr"} +
-        str.scan(/^[^=\-\n]+\n^(=+|-+)$/).map{|m|m.first[0]=='=' ? 'h1' : 'h2'} +
-        str.scan(/^(\#{1,6})\s+[^#]*#*$/).map{|m|"h#{m.first.size}"} +
-        str.scan(/^ {0,3}(\d+\.|\*|\+|\-)\s/).map{|m|m.first =~ /\d/ ? "1." : "*"}
+        scan_and_report(str, /\\[\\`\*_\{\}\[\]\(\)#\+\-\.!]/) +
+        scan_and_report(str, /(\*+|_+|`+)[^\s].*?[^\s]?\1/).map{|m|"#{m}-wrap"} +
+        scan_and_report(str, /(!?\[)[^\]]+\]\(([^\)"']+).*?\)/).map{|m|"link:#{m.last}"} +
+        scan_and_report(str, /^((\s*\*\s*){3,}|(\s*-\s*){3,}|(\s*_\s*){3,})$/).map{"hr"} +
+        scan_and_report(str, /^[^=\-\n]+\n^(=+|-+)$/).map{|m|m.first[0]=='=' ? 'h1' : 'h2'} +
+        scan_and_report(str, /^(\#{1,6})\s+[^#]*#*$/).map{|m|"h#{m.first.size}"} +
+        scan_and_report(str, /^ {0,3}(\d+\.|\*|\+|\-)\s/).map{|m|m.first =~ /\d/ ? "1." : "*"}
       ).sort
     end
 
