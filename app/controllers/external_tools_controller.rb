@@ -204,6 +204,9 @@ class ExternalToolsController < ApplicationController
       @launch.for_homework_submission!(@assignment)
     end
     @resource_url = @launch.url
+    resource_uri = URI.parse @launch.url
+    @tool_id = @tool.tool_id || resource_uri.host || 'unknown'
+    @tool_path = (resource_uri.path.empty? ? "/" : resource_uri.path)
 
     @tool_settings = @launch.generate
     render :template => 'external_tools/tool_show'
