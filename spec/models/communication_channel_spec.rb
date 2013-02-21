@@ -53,8 +53,8 @@ describe CommunicationChannel do
       a = communication_channel_model(:user_id => @user.id, :workflow_state => 'active')
       d = communication_channel_model(:user_id => @user.id, :path => "path4@example.com")
       notification_model
-      notification_policy_model(:communication_channel_id => a.id, :notification_id => @notification.id )
-      notification_policy_model(:communication_channel_id => d.id, :notification_id => @notification.id )
+      notification_policy_model(:communication_channel_id => a.id, :notification => @notification )
+      notification_policy_model(:communication_channel_id => d.id, :notification => @notification )
       @user.reload
       channels = CommunicationChannel.find_all_for(@user, @notification)
       channels.should include(a)

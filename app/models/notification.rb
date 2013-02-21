@@ -50,7 +50,9 @@ class Notification < ActiveRecord::Base
   attr_accessible  :name, :subject, :main_link, :delay_for, :category
   
   named_scope :to_show_in_feed, :conditions => ["messages.category = ? OR messages.notification_name IN (?) ", "TestImmediately", TYPES_TO_SHOW_IN_FEED]
-  
+
+  validates_uniqueness_of :name
+
   workflow do
     state :active do
       event :deactivate, :transitions_to => :inactive

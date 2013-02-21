@@ -42,24 +42,50 @@ module Canvas::MessageHelper
     path || default_message_path(filename)
   end
 
-  def self.create_notification(context, type, delay, link, txt, sms="")
-    # Ignoring context for now.
-    split_txt = txt.strip.split("\n").map { |line| line.strip }
-    name = split_txt[0]
-    subject = split_txt[2]
-    n = Notification.find_or_initialize_by_name(name)
+  # Create or update a Notification entry.
+  #
+  # ==== Arguments
+  # Accepts a backward compatible list of explicit parameters
+  # or a hash of values (preferred).
+  #
+  # ==== Value Hash
+  # * <tt>:category</tt> - Category name notification is
+  #                        associated with.
+  # * <tt>:name</tt> - Name of the notification.
+  # * <tt>:delay_for</tt> - Delay in seconds. Assigned
+  #                         to delay_for attribute.
+  #
+  # ==== Backward Compatible Arguments
+  # Previous call signature: create_notification(context, type, delay, link, txt, sms="")
+  #
+  # Legacy Arguments
+  # * context - ignored
+  # * type - Mapped to :category
+  # * delay - Mapped to :delay_for
+  # * link - ignored
+  # * txt - First line of text mapped to :name
+  # * sms - ignored
+  def self.create_notification(*args)
+    values = args.extract_options!
+    using = { :delay_for => 0 }.with_indifferent_access.merge(values)
+    using[:category] ||= args[1] # type
+    using[:delay_for] ||= args[2] # delay
+    # 'txt' is the legacy message body. Pull name from first line.
+    if args[4].present?
+       # txt
+      split_txt = args[4].strip.split("\n").map { |line| line.strip }
+      using[:name] ||= split_txt[0]
+    end
+    raise 'Name is required' unless using[:name]
+    n = Notification.find_or_initialize_by_name(using[:name])
     begin
-      n.update_attributes(:subject => subject, :main_link => link[0..254], :delay_for => delay, :category => type)
+      n.update_attributes(:delay_for => using[:delay_for], :category => using[:category])
     rescue => e
       if n.new_record?
-        raise "New notification creation failed"
+        raise "New notification '#{using[:name]}' creation failed. Message: #{e.message}"
       else
         puts "#{name} failed to update"
       end
-    end
-    others = Notification.find_all_by_name_and_category(name, type)
-    others.each do |other|
-      other.destroy unless other == n
     end
     n
   end

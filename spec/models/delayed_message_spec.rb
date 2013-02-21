@@ -40,7 +40,7 @@ describe DelayedMessage do
     it "should scope for notification" do
       DelayedMessage.delete_all
       notification_model
-      delayed_message_model(:notification_id => @notification.id)
+      delayed_message_model
       DelayedMessage.for(@notification).should eql([@delayed_message])
     end
     
@@ -72,7 +72,7 @@ describe DelayedMessage do
     # }
     
     it "should have a scope to order the messages by a field" do
-      notification = Notification.create!
+      notification = notification_model
       cc = CommunicationChannel.create!(:path => 'path@example.com')
       nps = (1..3).inject([]) do |list, e|
         list << cc.notification_policies.create!(:notification => notification)
@@ -87,6 +87,7 @@ describe DelayedMessage do
     end
     
     it "should have a scope to filter by the state" do
+      notification = notification_model :name => 'New Stuff'
       delayed_message_model(:workflow_state => 'pending')
       delayed_message_model(:workflow_state => 'cancelled')
       delayed_message_model(:workflow_state => 'sent')
@@ -120,7 +121,7 @@ describe DelayedMessage do
   end
 
   it "should use the user's main account domain for links" do
-    Canvas::MessageHelper.create_notification('Summary', 'Summaries', 0, '', 'Summaries')
+    Canvas::MessageHelper.create_notification(:name => 'Summaries', :category => 'Summaries')
     account = Account.create!(:name => 'new acct')
     user = user_with_pseudonym(:account => account)
     user.pseudonym.account.should == account
@@ -137,7 +138,7 @@ describe DelayedMessage do
     it_should_behave_like "sharding"
 
     it "should create messages on the user's shard" do
-      Canvas::MessageHelper.create_notification('Summary', 'Summaries', 0, '', 'Summaries')
+      Canvas::MessageHelper.create_notification(:name => 'Summaries', :category => 'Summaries')
 
       @shard1.activate do
         account = Account.create!(:name => 'new acct')

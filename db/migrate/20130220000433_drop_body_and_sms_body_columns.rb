@@ -4,6 +4,7 @@ class DropBodyAndSmsBodyColumns < ActiveRecord::Migration
   def self.up
     remove_column :notifications, :body
     remove_column :notifications, :sms_body
+    Notification.reset_column_information
   end
 
   def self.down

@@ -67,7 +67,7 @@ describe Notification do
   end
 
   it "should always have some subject" do
-    n = Notification.create!.subject.should_not be_nil
+    Notification.create!(:name => 'Testing').subject.should_not be_nil
   end
 
   context "by_name" do
@@ -382,7 +382,7 @@ describe Notification do
       end
 
       it "should return false without these policies in place" do
-        notification_policy_model
+        notification_policy_model(:notification => @notification)
         @notification.record_delayed_messages(@valid_record_delayed_messages_opts).should be_false
       end
 
