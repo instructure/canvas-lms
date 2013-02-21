@@ -29,11 +29,12 @@
             <div class="span6">
               <ul class="social-links">
                 <li>
-                  <label for="social_message" class="social message"></label>
+                  <label for="social_message" class="social message" title="<%= t :message_title, 'Message' %>" data-tooltip><%= t :message_me, 'message me in Canvas' %></label>
                 </li>
                 <% @user_data[:user_services].each do |s| %>
                   <li>
-                    <label for="social_<%= s[:service] %>" class="social <%= s[:service] %>"><%= s[:service] %></label>
+                    <% service_name = s[:service_name] || s[:service].to_s.titleize %>
+                    <label for="social_<%= s[:service] %>" class="social <%= s[:service] %>" title="<%= service_name %>" data-tooltip><%= t :service_contact, 'contact %{user} with %{service}', :user => @user_data[:short_name], :service => service_name %></label>
                     <input type="hidden" value="0" name="user_services[<%= s[:service] %>">
                     <%= check_box_tag "user_services[#{s[:service]}]", 1, s[:visible], :id => "social_#{s[:service]}" %>
                   </li>
@@ -54,10 +55,11 @@
       <div class="hide-if-editing">
         <h2 class="h2 border border-b"><%= t :ways_to_contact_user, "Ways to contact %{name}", :name => @user_data[:short_name] %></h2>
         <ul class="social-links">
-          <li><a href="<%= message_user_path(@user) %>" class="social message">message</a></li>
+          <li><a href="<%= message_user_path(@user) %>" class="social message" title="<%= t :message_title, 'Message' %>" data-tooltip><%= t :message_user_canvas, 'Message %{user} in Canvas', :user => @user_data[:short_name] %></a></li>
           <% if @user_data[:user_services].present? %>
             <% @user_data[:user_services].select{|s| s[:visible] }.each do |s| %>
-              <li><a href="<%= s[:service_user_link] %>" class="social <%= s[:service] %>"><%= s[:service_name] %></a></li>
+              <% service_name = s[:service_name] || s[:service].to_s.titleize %>
+              <li><a href="<%= s[:service_user_link] %>" class="social <%= s[:service] %>" title="<%= service_name %>" data-tooltip><%= t :service_contact, 'contact %{user} with %{service}', :user => @user_data[:short_name], :service => service_name %></a></li>
             <% end %>
           <% end %>
         </ul>
