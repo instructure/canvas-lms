@@ -125,6 +125,17 @@ define([
     });
   }
 
+  function loadFields () {
+    var selection = $(tinyMCE.get($editor.attr('id')).selection.getContent());
+    if (selection.length) {
+      $altText.val(selection.attr('alt'));
+      $userURL.val(selection.attr('src'));
+    } else {
+      $altText.val('');
+      $userURL.val('');
+    }
+  }
+
   tinymce.create('tinymce.plugins.InstructureEmbed', {
     init: function (editor, url) {
       var thisEditor = $('#' + editor.id);
@@ -132,6 +143,8 @@ define([
       editor.addCommand('instructureEmbed', function (search) {
         if (!initted) initShared();
         $editor = thisEditor; // set shared $editor so images are pasted into the correct editor
+
+        loadFields();
         $box.dialog('open');
 
         if (search === 'flickr') $flickrLink.click();
