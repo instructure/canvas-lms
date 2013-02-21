@@ -152,15 +152,6 @@ describe AssignmentOverrideApplicator do
         overrides.should be_empty
       end
 
-      it "should not include section overrides for sections with non-student enrollments" do
-        @enrollment = @student.student_enrollments.first
-        @enrollment.type = 'TeacherEnrollment'
-        @enrollment.save!
-
-        overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
-        overrides.should be_empty
-      end
-
       it "should include all relevant section overrides" do
         @override2 = assignment_override_model(:assignment => @assignment)
         @override2.set = @course.course_sections.create!
@@ -752,6 +743,59 @@ describe AssignmentOverrideApplicator do
       @overridden_assignment.overridden_for_user.id.should == @student.id
       AssignmentOverrideApplicator.expects(:overrides_for_assignment_and_user).never
       @reoverridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@overridden_assignment, @student)
+    end
+
+    context "give teachers the more lenient of override.due_at or assignment.due_at" do
+      before do
+        teacher_in_course
+        @section = @course.course_sections.create! :name => "Overridden Section"
+        student_in_section(@section)
+        @student = @user
+      end
+
+      def override_section(section, due)
+        override = assignment_override_model(:assignment => @assignment)
+        override.set = section
+        override.override_due_at(due)
+        override.save!
+      end
+
+      def setup_overridden_assignments(section_due_at, assignment_due_at)
+        override_section(@section, section_due_at)
+        @assignment.update_attribute(:due_at, assignment_due_at)
+
+        @students_assignment = AssignmentOverrideApplicator.
+          assignment_overridden_for(@assignment, @student)
+        @teachers_assignment = AssignmentOverrideApplicator.
+          assignment_overridden_for(@assignment, @teacher)
+      end
+
+      it "assignment.due_at is more lenient" do
+        section_due_at = 5.days.ago
+        assignment_due_at = nil
+        setup_overridden_assignments(section_due_at, assignment_due_at)
+        @teachers_assignment.due_at.to_i.should == assignment_due_at.to_i
+        @students_assignment.due_at.to_i.should == section_due_at.to_i
+      end
+
+      it "override.due_at is more lenient" do
+        section_due_at = 5.days.from_now
+        assignment_due_at = 5.days.ago
+        setup_overridden_assignments(section_due_at, assignment_due_at)
+        @teachers_assignment.due_at.to_i.should == section_due_at.to_i
+        @students_assignment.due_at.to_i.should == section_due_at.to_i
+      end
+
+      it "ignores assignment.due_at if all sections have overrides" do
+        section_due_at = 5.days.from_now
+        assignment_due_at = 1.year.from_now
+
+        override_section(@course.default_section, section_due_at)
+        setup_overridden_assignments(section_due_at, assignment_due_at)
+
+        @teachers_assignment.due_at.to_i.should == section_due_at.to_i
+        @students_assignment.due_at.to_i.should == section_due_at.to_i
+      end
     end
   end
 

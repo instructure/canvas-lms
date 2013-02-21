@@ -35,7 +35,8 @@ class OverrideListPresenter
   end
 
   def formatted_date_string(date_field, date_hash = {})
-    date = date_hash[:override].try(date_field) if date_hash[:override].present?
+    date   = date_hash[:override].try(date_field)
+    date ||= date_hash[date_field]
     date ||= assignment.try(date_field)
  
     formatted_date = date.present? ? datetime_string(date) : '-'
