@@ -24,9 +24,36 @@ module AssignmentOverrideApplicator
     return assignment_or_quiz if assignment_or_quiz.overridden_for?(user)
 
     overrides = self.overrides_for_assignment_and_user(assignment_or_quiz, user)
- 
+
     result_assignment_or_quiz = self.assignment_with_overrides(assignment_or_quiz, overrides)
     result_assignment_or_quiz.overridden_for_user = user
+
+    # students get the last overridden date that applies to them, but teachers
+    # should see the assignment's due_date if that is more lenient
+    context = result_assignment_or_quiz.context
+    if context && result_assignment_or_quiz.grants_right?(user, nil, :delete)
+
+      overridden_section_ids = assignment_or_quiz.active_assignment_overrides.
+        where(:set_type => 'CourseSection').map(&:set_id)
+      course_section_ids = context.active_course_sections.map(&:id)
+
+      result_assignment_or_quiz.due_at =
+        # if only some sections are overridden, return the most due date for
+        # teachers, if all sections are overridden, return the most lenient
+        # section overriddden due date
+        if overridden_section_ids.sort == course_section_ids.sort
+          result_assignment_or_quiz.due_at
+        else
+          potential_due_dates = [
+            result_assignment_or_quiz.without_overrides.due_at,
+            result_assignment_or_quiz.due_at
+          ]
+          potential_due_dates.include?(nil) ?
+            nil :
+            potential_due_dates.max
+        end
+    end
+
     result_assignment_or_quiz
   end
 
@@ -67,16 +94,20 @@ module AssignmentOverrideApplicator
         overrides << group_override if group_override
       end
 
-      observed_students = ObserverEnrollment.observed_students(assignment_or_quiz.context, user)
+      context = assignment_or_quiz.context
+
+      observed_students = ObserverEnrollment.observed_students(context, user)
       observed_student_overrides = observed_students.map do |student, enrollments|
         overrides_for_assignment_and_user(assignment_or_quiz, student)
       end
 
       overrides += observed_student_overrides.flatten.uniq
 
-      section_ids = user.enrollments.active.scoped(:conditions =>
-        { :type => ['StudentEnrollment', 'ObserverEnrollment', 'StudentViewEnrollment'],
-          :course_id => assignment_or_quiz.context_id}).map(&:course_section_id)
+      section_ids  = context.sections_visible_to(user).map(&:id)
+      # stupid special case for observers
+      section_ids += context.section_visibilities_for(user).select { |v|
+        v[:type] == 'ObserverEnrollment'
+      }.map { |v| v[:course_section_id] }
 
       section_overrides = assignment_or_quiz.assignment_overrides.
         scoped(:conditions => {:set_type => 'CourseSection', :set_id => section_ids})
