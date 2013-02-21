@@ -37,6 +37,10 @@ class DiscussionTopicPresenter
     override_list.due_at(date_hash)
   end
 
+  def due_for(due_hash = {})
+    override_list.due_for(due_hash)
+  end
+
   # Public: Determine if multiple due dates are visible to user.
   #
   # Returns a boolean

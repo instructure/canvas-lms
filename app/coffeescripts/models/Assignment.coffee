@@ -201,7 +201,7 @@ define [
     toJSON: ->
       data = super
       data = @_filterFrozenAttributes(data)
-      assignment: data
+      if @alreadyScoped then data else { assignment: data }
 
     parse: (data) ->
       overrides = data.assignment_overrides

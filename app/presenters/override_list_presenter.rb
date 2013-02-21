@@ -5,10 +5,8 @@ class OverrideListPresenter
 
   def initialize(assignment, user)
     @user = user
-    @assignment = if assignment.present? && user.present?
-      AssignmentOverrideApplicator.assignment_overridden_for(assignment, user)
-    else
-      nil
+    if assignment.present?
+      @assignment = AssignmentOverrideApplicator.assignment_overridden_for(assignment, user)
     end
   end
 
