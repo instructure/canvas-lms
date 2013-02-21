@@ -318,6 +318,33 @@ class Message < ActiveRecord::Base
     self.notification.name.parameterize.underscore + "." + path_type + ".erb"
   end
 
+  # Public: Load an HTML email template for this message.
+  #
+  # _binding - The binding to attach to the template.
+  #
+  # Returns a template string (or nil).
+  def load_html_template(_binding)
+    html_file   = template_filename('email.html')
+    html_path   = Canvas::MessageHelper.find_message_path(html_file)
+
+    if File.exist?(html_path)
+      html_layout do
+        Erubis::Eruby.new(File.read(html_path), :bufvar => '@output_buffer').result(_binding)
+      end
+    end
+  end
+
+  # Public: Return the layout for HTML emails. We need this because
+  # Erubis::Eruby.new.result(binding) doesn't accept a block; by wrapping it
+  # in a method we can pass it a block to handle the <%= yield %> call in the
+  # layout.
+  #
+  # Returns an HTML string.
+  def html_layout
+    layout_path = Canvas::MessageHelper.find_message_path('_layout.email.html.erb')
+    Erubis::Eruby.new(File.read(layout_path)).result(binding)
+  end
+
   # Public: Assign the body, subject and url to the message.
   #
   # message_body_template - Raw template body
@@ -330,16 +357,30 @@ class Message < ActiveRecord::Base
 
     if path_type == 'facebook'
       # this will ensure we escape anything that's not already safe
-      self.body =RailsXss::Erubis.new(message_body_template).result(_binding)
+      self.body = RailsXss::Erubis.new(message_body_template).result(_binding)
     else
-      self.body =Erubis::Eruby.new(message_body_template, :bufvar => "@output_buffer").result(_binding)
+      self.body = Erubis::Eruby.new(message_body_template,
+        :bufvar => '@output_buffer').result(_binding)
+      self.html_body = load_html_template(_binding) if path_type == 'email'
     end
 
     # Append a footer to the body if the path type is email
     if path_type == 'email'
       raw_footer_message = File.read(Canvas::MessageHelper.find_message_path('_email_footer.email.erb'))
       footer_message = Erubis::Eruby.new(raw_footer_message, :bufvar => "@output_buffer").result(b) rescue nil
-      self.body = self.body + "\n\n\n\n\n\n________________________________________\n" + footer_message if footer_message.present?
+      if footer_message.present?
+        self.body = <<-END.strip_heredoc
+          #{self.body}
+
+
+
+
+
+          ________________________________________
+
+          #{footer_message}
+        END
+      end
     end
 
     self.body
@@ -355,8 +396,8 @@ class Message < ActiveRecord::Base
 
     # Get the users timezone but maintain the original timezone in order to set it back at the end
     original_time_zone = Time.zone.name || "UTC"
-    user_time_zone = self.user.try(:time_zone) || original_time_zone
-    Time.zone = user_time_zone
+    user_time_zone     = self.user.try(:time_zone) || original_time_zone
+    Time.zone          = user_time_zone
 
     # Ensure we have a path_type
     path_type = 'dashboard' if to == 'summary'
@@ -364,31 +405,29 @@ class Message < ActiveRecord::Base
       path_type = communication_channel.try(:path_type) || 'email'
     end
 
+
     # Determine the message template file to be used in the message
     filename = template_filename(path_type)
     message_body_template = get_template(filename)
 
-    context, asset, user, delayed_messages, asset_context, data = [self.context, self.context, @user, @delayed_messages, self.asset_context, @data]
+    context, asset, user, delayed_messages, asset_context, data = [self.context,
+      self.context, @user, @delayed_messages, self.asset_context, @data]
 
     if message_body_template.present? && path_type.present?
-      #extend TextHelper
-      #extend ERB::Util
       populate_body(message_body_template, path_type, binding)
 
       # Set the subject and url
       self.subject = @message_content_subject || t('#message.default_subject', 'Canvas Alert')
-      self.url = @message_content_link || nil
-
+      self.url     = @message_content_link || nil
     else
       # Message doesn't exist so we flag the message as an error
-      main_link = Erubis::Eruby.new(self.notification.main_link || "").result(binding)
+      main_link    = Erubis::Eruby.new(self.notification.main_link || "").result(binding)
       self.subject = Erubis::Eruby.new(subject).result(binding)
-      self.body = Erubis::Eruby.new(body).result(binding)
+      self.body    = Erubis::Eruby.new(body).result(binding)
       self.transmission_errors = "couldn't find #{Canvas::MessageHelper.find_message_path(filename)}"
     end
 
     self.body
-
   ensure
     # Set the timezone back to what it originally was
     Time.zone = original_time_zone if original_time_zone.present?
