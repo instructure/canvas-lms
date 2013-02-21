@@ -194,8 +194,36 @@ module Api::V1::Assignment
     exclude_small_matches_value
   )
 
-  def update_api_assignment(assignment, assignment_params, save = true)
+  def update_api_assignment(assignment, assignment_params)
     return nil unless assignment_params.is_a?(Hash)
+
+    old_assignment = assignment.new_record? ? nil : assignment.clone
+    old_assignment.id = assignment.id if old_assignment.present?
+
+    overrides = deserialize_overrides(assignment_params.delete(:assignment_overrides))
+    return if overrides && !overrides.is_a?(Array)
+
+    assignment = update_from_params(assignment, assignment_params)
+
+    if overrides
+      assignment.transaction do
+        # TODO: We need to handle notifications better here. We want to send
+        # notifications if the "notify_of_update" field is passed, but *after*
+        # the assignment overrides have been created.
+        assignment.save_without_broadcasting!
+        batch_update_assignment_overrides(assignment, overrides)
+      end
+      assignment.do_notifications!(old_assignment)
+    else
+      assignment.save!
+    end
+
+    return true
+  rescue ActiveRecord::RecordInvalid
+    return false
+  end
+
+  def update_from_params(assignment, assignment_params)
     update_params = assignment_params.slice(*API_ALLOWED_ASSIGNMENT_INPUT_FIELDS)
 
     if update_params.has_key?('peer_reviews_assign_at')
@@ -248,13 +276,9 @@ module Api::V1::Assignment
     # TODO: allow rubric creation
 
     assignment.updating_user = @current_user
-    if save
-      assignment.update_attributes(update_params)
-    else
-      assignment.attributes = update_params
-    end
+    assignment.attributes = update_params
     assignment.infer_due_at
 
-    return assignment
+    assignment
   end
 end

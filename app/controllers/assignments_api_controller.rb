@@ -422,38 +422,12 @@ class AssignmentsApiController < ApplicationController
   end
 
   def save_and_render_response
-    if update_and_save_assignment(@assignment, params[:assignment])
+    if update_api_assignment(@assignment, params[:assignment])
       render :json => assignment_json(@assignment, @current_user, session).to_json, :status => 201
     else
       # TODO: we don't really have a strategy in the API yet for returning
       # errors.
       render :json => "error".to_json, :status => 400
     end
-  end
-
-  protected
-
-  def update_and_save_assignment(assignment, params)
-    return if params.nil?
-    old_assignment = assignment.new_record? ? nil : assignment.clone
-    old_assignment.id = assignment.id if old_assignment.present?
-    overrides = deserialize_overrides(params.delete(:assignment_overrides))
-    return if overrides && !overrides.is_a?(Array)
-    update_api_assignment( assignment, params, false )
-    if overrides
-      assignment.transaction do
-        # TODO: We need to handle notifications better here. We want to send
-        # notifications if the "notify_of_update" field is passed, but *after*
-        # the assignment overrides have been created.
-        assignment.save_without_broadcasting!
-        batch_update_assignment_overrides(assignment, overrides)
-      end
-      assignment.do_notifications!(old_assignment)
-    else
-      assignment.save!
-    end
-    return true
-  rescue ActiveRecord::RecordInvalid
-    return false
   end
 end

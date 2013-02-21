@@ -92,11 +92,10 @@ toggleAccessibly) ->
     @child 'groupCategorySelector', "#{GROUP_CATEGORY_SELECTOR}"
     @child 'peerReviewsSelector', "#{PEER_REVIEWS_FIELDS}"
 
-    initialize: ( options ) ->
+    initialize: (options) ->
       super
       @assignment = @model
-      {views} = options
-      @dueDateOverrideView = views['js-assignment-overrides']
+      @dueDateOverrideView = options.views['js-assignment-overrides']
       @model.on 'sync', -> window.location = @get 'html_url'
       @gradingTypeSelector.on 'change:gradingType', @handleGradingTypeChange
 

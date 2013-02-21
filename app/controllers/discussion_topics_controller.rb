@@ -103,6 +103,7 @@ class DiscussionTopicsController < ApplicationController
 
   include Api::V1::DiscussionTopics
   include Api::V1::Assignment
+  include Api::V1::AssignmentOverride
 
   # @API List discussion topics
   #
@@ -172,8 +173,16 @@ class DiscussionTopicsController < ApplicationController
       end
       (hash[:ATTRIBUTES] ||= {})[:is_announcement] = @topic.is_announcement
       handle_assignment_edit_params(hash[:ATTRIBUTES])
+
+      if @topic.assignment.present?
+        hash[:ATTRIBUTES][:assignment][:assignment_overrides] =
+          (assignment_overrides_json(@topic.assignment.overrides_visible_to(@current_user)))
+      end
+
       categories = @context.respond_to?(:group_categories) ? @context.group_categories : []
+      sections = @context.respond_to?(:course_sections) ? @context.course_sections.active : []
       js_env :DISCUSSION_TOPIC => hash,
+             :SECTION_LIST => sections.map { |section| { :id => section.id, :name => section.name } },
              :GROUP_CATEGORIES => categories.
                                   reject { |category| category.student_organized? }.
                                   map { |category| { :id => category.id, :name => category.name } },

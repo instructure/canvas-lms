@@ -278,6 +278,59 @@ describe "discussions" do
           expect_new_page_load { f('.form-actions button[type=submit]').click }
           @topic.reload.assignment.peer_reviews.should == true
         end
+
+        it "should allow editing the due dates" do
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+          wait_for_ajaximations
+
+          due_at = Time.zone.now + 3.days
+          unlock_at = Time.zone.now + 2.days
+          lock_at = Time.zone.now + 4.days
+
+          # set due_at, lock_at, unlock_at
+          f('.due-date-overrides [name="due_at"]').send_keys(due_at.strftime('%b %-d, %y'))
+          f('.due-date-overrides [name="unlock_at"]').send_keys(unlock_at.strftime('%b %-d, %y'))
+          f('.due-date-overrides [name="lock_at"]').send_keys(lock_at.strftime('%b %-d, %y'))
+
+          expect_new_page_load { f('.form-actions button[type=submit]').click }
+
+          a = DiscussionTopic.last.assignment
+          a.due_at.strftime('%b %-d, %y').should == due_at.to_date.strftime('%b %-d, %y')
+          a.unlock_at.strftime('%b %-d, %y').should == unlock_at.to_date.strftime('%b %-d, %y')
+          a.lock_at.strftime('%b %-d, %y').should == lock_at.to_date.strftime('%b %-d, %y')
+        end
+
+        it "should allow creating multiple due dates" do
+          sec1 = @course.default_section
+          sec2 = @course.course_sections.create!(:name => "Section 2")
+
+          get "/courses/#{@course.id}/discussion_topics/new"
+          wait_for_ajaximations
+
+          f('input[type=checkbox][name="assignment[set_assignment]"]').click
+
+          due_at1 = Time.zone.now + 3.days
+          due_at2 = Time.zone.now + 4.days
+
+          click_option('.due-date-row:first select', sec1.name)
+          fj('.due-date-overrides:first [name="due_at"]').send_keys(due_at1.strftime('%b %-d, %y'))
+
+          f('#add_due_date').click
+          wait_for_animations
+
+          click_option('.due-date-row:last select', sec2.name)
+          ff('.due-date-overrides [name="due_at"]')[1].send_keys(due_at2.strftime('%b %-d, %y'))
+
+          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          topic = DiscussionTopic.last
+
+          overrides = topic.assignment.assignment_overrides
+          overrides.count.should == 2
+          default_override = overrides.detect{ |o| o.set_id == sec1.id }
+          default_override.due_at.strftime('%b %-d, %y').should == due_at1.to_date.strftime('%b %-d, %y')
+          other_override = overrides.detect{ |o| o.set_id == sec2.id }
+          other_override.due_at.strftime('%b %-d, %y').should == due_at2.to_date.strftime('%b %-d, %y')
+        end
       end
     end
   end

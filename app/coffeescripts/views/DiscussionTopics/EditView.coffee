@@ -35,16 +35,18 @@ htmlEscape, DiscussionTopic, Assignment, $, preventDefault) ->
       'click .removeAttachment' : 'removeAttachment'
     )
 
-    initialize: ->
-      @permissions = @options.permissions
+    @optionProperty 'permissions'
+
+    initialize: (options) ->
+      @assignment = @model.get("assignment")
+      @dueDateOverrideView = options.views['js-assignment-overrides']
       @model.on 'sync', -> window.location = @get 'html_url'
-      @assignment = new Assignment(@model.get('assignment') or {})
       super
 
     isTopic: => @model.constructor is DiscussionTopic
 
     toJSON: ->
-      _.extend super, @options,
+      json = _.extend super, @options,
         showAssignment: !!@assignmentGroupCollection
         useForGrading: @model.get('assignment')?
         isTopic: @isTopic()
@@ -52,6 +54,8 @@ htmlEscape, DiscussionTopic, Assignment, $, preventDefault) ->
         canAttach: @permissions.CAN_ATTACH
         canModerate: @permissions.CAN_MODERATE
         isLargeRoster: ENV?.IS_LARGE_ROSTER || false
+      json.assignment = json.assignment.toView()
+      json
 
     render: =>
       super
@@ -118,21 +122,56 @@ htmlEscape, DiscussionTopic, Assignment, $, preventDefault) ->
       data.title ||= I18n.t 'default_discussion_title', 'No Title'
       data.delayed_post_at = '' unless data.delay_posting
       data.discussion_type = if data.threaded then 'threaded' else 'side_comment'
-      delete data.assignment unless data.assignment?.set_assignment?
       data.podcast_has_student_posts = false unless data.podcast_enabled
-      if @isTopic() and not ENV?.IS_LARGE_ROSTER
-        data.assignment = @groupCategorySelector.filterFormData data.assignment
+
+      assign_data = data.assignment
+      delete data.assignment
+
+      data.set_assignment = assign_data?.set_assignment?
+      if assign_data?.set_assignment?
+        data.assignment = @updateAssignment(assign_data)
 
       # these options get passed to Backbone.sync in ValidatedFormView
       @saveOpts = multipart: !!data.attachment
 
       data
 
+    updateAssignment: (data) =>
+      unless ENV?.IS_LARGE_ROSTER
+        data = @groupCategorySelector.filterFormData data
+      @dueDateOverrideView.updateOverrides()
+      defaultDate = @dueDateOverrideView.getDefaultDueDate()
+      data.lock_at = defaultDate?.get('lock_at') or null
+      data.unlock_at = defaultDate?.get('unlock_at') or null
+      data.due_at = defaultDate?.get('due_at') or null
+
+      assignment = @model.get('assignment')
+      assignment or= new Assignment
+      assignment.set(data)
+
     removeAttachment: ->
       @model.set 'attachments', []
       @$el.append '<input type="hidden" name="remove_attachment" >'
       @$('.attachmentRow').remove()
       @$('[name="attachment"]').show()
+
+    submit: (event) =>
+      event.preventDefault()
+      event.stopPropagation()
+      if @dueDateOverrideView.containsSectionsWithoutOverrides()
+        sections = @dueDateOverrideView.sectionsWithoutOverrides()
+        missingDateDialog = new MissingDateDialog
+          validationFn: -> sections
+          labelFn: (section) -> section.get 'name'
+          success: =>
+            @model.setNullDates()
+            ValidatedFormView::submit.call(this)
+        missingDateDialog.cancel = (e) ->
+          missingDateDialog.$dialog.dialog('close').remove()
+
+        missingDateDialog.render()
+      else
+        super
 
     validateBeforeSave: (data, errors) =>
       if @isTopic()

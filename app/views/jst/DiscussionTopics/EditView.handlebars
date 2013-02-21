@@ -107,7 +107,7 @@
                  class="element_toggler"
                  aria-controls="assignment_options"
                  name="assignment[set_assignment]"
-                 {{#if useForGrading}}checked{{/if}}
+                 {{checkedIf set_assignment}}
                  value="1">
           {{#t "use_for_grading"}}Use for grading{{/t}}
         </label>
@@ -119,7 +119,7 @@
 </fieldset>
 
 {{#if showAssignment}}
-  <fieldset id="assignment_options" style="{{hiddenUnless useForGrading}}">
+  <fieldset id="assignment_options" style="{{hiddenUnless set_assignment}}">
 
     <div class="control-group">
       <label class="control-label" for="discussion_topic_assignment_points_possible">{{#t "points_possible"}}Points possible{{/t}}</label>
@@ -128,19 +128,7 @@
                id="discussion_topic_assignment_points_possible"
                name="assignment[points_possible]"
                class="input-small"
-               value="{{assignment.points_possible}}" />
-      </div>
-    </div>
-
-    <div class="control-group">
-      <label class="control-label" for="discussion_topic_assignment_due_at">{{#t "due"}}Due{{/t}}</label>
-      <div class="controls">
-        <input type="text"
-               class="datetime_field"
-               id="discussion_topic_assignment_due_at"
-               name="assignment[due_at]"
-               {{! TODO: what would be the best way to get this formatted right? }}
-               value="{{datetimeFormatted assignment.due_at}}">
+               value="{{assignment.pointsPossible}}" />
       </div>
     </div>
 
@@ -155,6 +143,8 @@
     {{#unless isLargeRoster}}
       <div id="peer_review_options" class="control-group"></div>
     {{/unless}}
+
+    <div class='js-assignment-overrides'></div>
   </fieldset>
 {{/if}}
 

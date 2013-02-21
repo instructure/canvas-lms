@@ -4,7 +4,8 @@ define [
   'underscore'
   'compiled/collections/ParticipantCollection'
   'compiled/collections/DiscussionEntriesCollection'
-], (Backbone, $, _, ParticipantCollection, DiscussionEntriesCollection) ->
+  'compiled/models/Assignment'
+], (Backbone, $, _, ParticipantCollection, DiscussionEntriesCollection, Assignment) ->
 
   class DiscussionTopic extends Backbone.Model
     resourceName: 'discussion_topics'
@@ -28,6 +29,21 @@ define [
       @entries = new DiscussionEntriesCollection
       @entries.url = => "#{_.result this, 'url'}/entries"
       @entries.participants = @participants
+
+      @set 'set_assignment', @get('assignment')?
+      assign = new Assignment(@get('assignment') or {})
+      assign.alreadyScoped = true
+      @set 'assignment', assign
+
+    # always include assignment in view presentation
+    present: =>
+      Backbone.Model::toJSON.call(this)
+
+    toJSON: ->
+      json = super
+      unless json.set_assignment
+        delete json.assignment
+      json
 
     ##
     # this is for getting the topic 'full view' from the api

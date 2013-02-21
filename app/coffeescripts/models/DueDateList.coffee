@@ -4,11 +4,11 @@ define [
   'i18n!overrides'
   'compiled/models/AssignmentOverride'
   'compiled/models/Section'
-], ( {Model}, _, I18n, AssignmentOverride, Section ) ->
+], ({Model}, _, I18n, AssignmentOverride, Section) ->
 
   class DueDateList
 
-    constructor: ( @overrides, @sections, @assignment ) ->
+    constructor: (@overrides, @sections, @assignment) ->
       if @assignment?
         # if we don't have an override for each real section
         if @overrides.length < @sections.length
