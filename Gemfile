@@ -31,10 +31,9 @@ gem 'json',           '1.5.5'
 # native xml parsing, diigo
 gem 'libxml-ruby',    '2.3.2',  :require => 'xml/libxml'
 gem 'macaddr',        '1.0.0'  # macaddr 1.2.0 tries to require 'systemu' which isn't a dependency
-if !ONE_NINE
-  # mail gem v2.5.* introduces a failure on 1.8 with bad unicode in headers
-  gem 'mail', '2.4.4'
-end
+# mail 2.5.3 has a parsing error in it and introduces a failure on 1.8 with bad unicode in headers
+# stick to 2.4.4 until we drop 1.8 support and a newer gem is released
+gem 'mail',           '2.4.4'
 gem 'mailman',        '0.5.3'
 gem 'mime-types',     '1.17.2',   :require => 'mime/types'
 # attachment_fu (even the current technoweenie one on github) does not work
