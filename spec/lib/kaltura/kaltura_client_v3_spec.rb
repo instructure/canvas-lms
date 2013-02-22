@@ -122,14 +122,14 @@ describe "Kaltura::ClientV3" do
       enable_cache do
         create_config_with_mock(0)
         @kaltura.media_sources('hi')
-        Rails.cache.read(['media_sources', 'hi', 0].cache_key).should be_nil
+        Rails.cache.read(['media_sources2', 'hi', 0].cache_key).should be_nil
       end
     end
 
     it "should cache for set length" do
       create_config_with_mock(2)
       m = mock()
-      m.expects(:write).with(['media_sources', 'hi', 2].cache_key, [@source], {:expires_in => 2})
+      m.expects(:write).with(['media_sources2', 'hi', 2].cache_key, [@source], {:expires_in => 2})
       m.expects(:read).returns(nil)
       Rails.stubs(:cache).returns(m)
       @kaltura.media_sources('hi')
@@ -138,7 +138,7 @@ describe "Kaltura::ClientV3" do
     it "should cache indefinitely" do
       create_config_with_mock(nil)
       m = mock()
-      m.expects(:write).with(['media_sources', 'hi', nil].cache_key, [@source])
+      m.expects(:write).with(['media_sources2', 'hi', nil].cache_key, [@source])
       m.expects(:read).returns(nil)
       Rails.stubs(:cache).returns(m)
       @kaltura.media_sources('hi')
@@ -148,7 +148,18 @@ describe "Kaltura::ClientV3" do
   it "should skip empty urls" do
     create_config
     @source = {:content_type => "video/mp4", :containerFormat => "isom", :url => nil, :fileExt => "mp4", :status => '2', :id => "1"}
-    @kaltura.expects(:flavorAssetGetByEntryId).returns([@source, @source.merge({:url => '', :id => '2'})])
+    @kaltura.expects(:flavorAssetGetByEntryId).returns([@source, @source.merge({:fileExt => "wav", :id => '2'})])
+    @kaltura.stubs(:flavorAssetGetPlaylistUrl).returns(nil)
+    @kaltura.stubs(:flavorAssetGetDownloadUrl).returns(nil)
+
+    res = @kaltura.media_sources('hi')
+    res.should == []
+  end
+
+  it "should skip unknown types" do
+    create_config
+    @source = {:content_type => "video/mp4", :containerFormat => "isom", :url => nil, :fileExt => "wav", :status => '2', :id => "1"}
+    @kaltura.expects(:flavorAssetGetByEntryId).returns([@source])
     @kaltura.stubs(:flavorAssetGetPlaylistUrl).returns(nil)
 
     res = @kaltura.media_sources('hi')
