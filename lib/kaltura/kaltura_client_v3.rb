@@ -84,7 +84,7 @@ module Kaltura
     }
 
     def media_sources(entryId)
-      cache_key = ['media_sources', entryId, @cache_play_list_seconds].cache_key
+      cache_key = ['media_sources2', entryId, @cache_play_list_seconds].cache_key
       sources = Rails.cache.read(cache_key)
       unless sources
         startSession(Kaltura::SessionType::ADMIN)
@@ -95,13 +95,15 @@ module Kaltura
           if ASSET_STATUSES[asset[:status]] == :READY
             hash = asset.slice :containerFormat, :width, :fileExt, :size, :bitrate, :height, :isOriginal
             hash[:url] = flavorAssetGetPlaylistUrl(entryId, asset[:id])
+            if hash[:content_type] = CONTENT_TYPES[asset[:fileExt]]
+              hash[:url] ||= flavorAssetGetDownloadUrl(asset[:id])
+            end
 
-            if hash[:url].blank?
-              Rails.logger.warn "kaltura entry (#{entryId}) has asset (#{asset[:id]}) with a missing url"
+            if hash[:url].blank? || hash[:content_type].blank?
+              Rails.logger.warn "kaltura entry (#{entryId}) has an invalid asset (#{asset[:id]})"
               next
             end
 
-            hash[:content_type] = CONTENT_TYPES[asset[:fileExt]]
             sources << hash
           else
             # if it was deleted or if it did not convert because it did not need to
