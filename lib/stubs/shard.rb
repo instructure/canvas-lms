@@ -62,6 +62,10 @@ class Shard
     any_id
   end
 
+  def self.relative_id_for(any_id, target_shard = nil)
+    any_id
+  end
+
   yaml_as "tag:instructure.com,2012:Shard"
 
   def self.yaml_new(klass, tag, val)
