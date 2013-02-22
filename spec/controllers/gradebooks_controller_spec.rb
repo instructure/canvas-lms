@@ -390,20 +390,34 @@ describe GradebooksController do
       response.should redirect_to(:controller => 'gradebook2', :action => 'show')
     end
 
-    it 'should use gradebook2 always for large_roster courses even if user prefers gradebook 1' do
-      course_with_teacher_logged_in(:active_all => true)
-      @user.preferences[:use_gradebook2] = false
-      @user.save!
-      @user.prefers_gradebook2?.should == false
-      @course.large_roster = true
-      @course.save!
-      @course.reload
-      @course.large_roster?.should == true
-      get 'grade_summary', :course_id => @course.id
-      response.should be_redirect
-      response.should redirect_to(:controller => 'gradebook2', :action => 'show')
-    end
+    context "large roster courses" do
+      before do
+        course_with_teacher_logged_in(:active_all => true)
+        @user.preferences[:use_gradebook2] = false
+        @user.save!
+        @user.prefers_gradebook2?.should == false
+        @course.large_roster = true
+        @course.save!
+        @course.reload
+        @course.large_roster?.should == true
+      end
 
+      it 'should use gradebook2 always for large_roster courses even if user prefers gradebook 1' do
+        get 'grade_summary', :course_id => @course.id
+        response.should be_redirect
+        response.should redirect_to(:controller => 'gradebook2', :action => 'show')
+      end
+
+      it 'should not render gb1 json' do
+        get 'show', :course_id => @course.id, :format => :json
+        response.status.to_i.should == 404
+      end
+
+      it 'should not prevent you from getting gradebook.csv' do
+        get 'show', :course_id => @course.id, :format => 'csv'
+        response.should be_success
+      end
+    end
   end
 
   describe "POST 'update_submission'" do

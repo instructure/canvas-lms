@@ -170,15 +170,25 @@ class GradebooksController < ApplicationController
   end
 
   def show
-    return redirect_to polymorphic_url([@context, 'gradebook2']) unless @context.old_gradebook_visible?
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
+      if !@context.old_gradebook_visible? && request.format == :json
+        render :json => {:error => "gradebook is disabled for this course"},
+               :status => 404
+        return
+      end
       return submissions_json if params[:updated] && request.format == :json
       return gradebook_init_json if params[:init] && request.format == :json
+
       @context.require_assignment_group
 
       log_asset_access("gradebook:#{@context.asset_string}", "grades", "other")
       respond_to do |format|
         format.html {
+          unless @context.old_gradebook_visible?
+            redirect_to polymorphic_url([@context, 'gradebook2'])
+            return
+          end
+
           ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
             @groups = @context.assignment_groups.active
             @groups_order = {}
