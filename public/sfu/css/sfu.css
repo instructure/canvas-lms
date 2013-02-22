@@ -1,0 +1,86 @@
+#header {
+    background: #6a7177 url(../images/clf-header-bg-rainbow.png);
+}
+
+#header-rainbow {
+    height: 10px;
+    background: #494950 url(../images/bg-small.png) -70px 0 no-repeat;
+}
+
+#header-logo {
+    background: url(../images/sfu-canvas-logo.png) no-repeat;
+    width: 140px;
+    height: 50px;
+    bottom: 0;
+}
+
+.with-right-side #header-inner, #header-inner {
+    max-width: 100%;
+}
+
+#identity {
+    margin-top: 4px;
+    background: none;
+    border: none;
+    box-shadow: none;
+    font-family: "DINProRegular", "Helvetica Neue", Arial, "Liberation Sans", FreeSans, sans-serif;;
+}
+
+#menu {
+    margin-bottom: 12px;
+}
+
+.menu-item .menu-item-title, .menu-item .menu-item-no-drop {
+    font-family: "DINProRegular", "Helvetica Neue", Arial, "Liberation Sans", FreeSans, sans-serif;
+    font-size: 16px;
+}
+
+#topbar {
+    margin-top: 10px;
+}
+
+#identity .user_name {
+    font-family: "DINProMedium", "Helvetica Neue", Arial, "Liberation Sans", FreeSans, sans-serif;
+    margin-right: 12px;
+    padding-right: 20px;
+    border-right: 1px solid white;
+    text-transform: uppercase;
+}
+
+#footer {
+    display:none;
+    margin: 0 0 34px 26px;
+}
+
+@font-face {
+    font-family: 'DINProBold';
+    src: url('../fonts/dinpro-bold-webfont.eot');
+    src: url('../fonts/dinpro-bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/dinpro-bold-webfont.woff') format('woff'),
+         url('../fonts/dinpro-bold-webfont.ttf') format('truetype'),
+         url('../fonts/dinpro-bold-webfont.svg#DINProBold') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'DINProRegular';
+    src: url('../fonts/dinpro-regular-webfont.eot');
+    src: url('../fonts/dinpro-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/dinpro-regular-webfont.woff') format('woff'),
+         url('../fonts/dinpro-regular-webfont.ttf') format('truetype'),
+         url('../fonts/dinpro-regular-webfont.svg#DINProRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'DINProMedium';
+    src: url('../fonts/dinpro-medium-webfont.eot');
+    src: url('../fonts/dinpro-medium-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/dinpro-medium-webfont.woff') format('woff'),
+         url('../fonts/dinpro-medium-webfont.ttf') format('truetype'),
+         url('../fonts/dinpro-medium-webfont.svg#DINProMedium') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
