@@ -210,4 +210,22 @@ else
       end
     end
   end
+
+  # This change allows us to use whatever is in the latest tzinfo gem
+  # (like the Moscow change to always be on daylight savings)
+  # instead of the hard-coded list in ActiveSupport::TimeZone.zones_map
+  #
+  # Fixed in Rails 3
+  ActiveSupport::TimeZone.class_eval do
+    instance_variable_set '@zones', nil
+    instance_variable_set '@zones_map', nil
+    instance_variable_set '@us_zones', nil
+
+    def self.zones_map
+      @zones_map ||= begin
+        zone_names = ActiveSupport::TimeZone::MAPPING.keys
+        Hash[zone_names.map { |place| [place, create(place)] }]
+      end
+    end
+  end
 end
