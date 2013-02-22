@@ -608,7 +608,7 @@ class MessageableUser
       @shard_caches[key] ||= 
         begin
           by_shard = {}
-          Shard.with_each_shard(@user.associated_shards) do |shard|
+          Shard.with_each_shard(@user.associated_shards) do
             shard_key = [@user, 'messageable_user', key]
             methods.each do |method|
               canonical = send(method).cache_key
