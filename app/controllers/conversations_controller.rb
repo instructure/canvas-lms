@@ -683,10 +683,26 @@ class ConversationsController < ApplicationController
         @current_user.conversations.default
     end
 
-    filters = param_array(:filter)
+    filters = normalize_filters(param_array(:filter))
     @conversations_scope = @conversations_scope.for_masquerading_user(@real_current_user) if @real_current_user
     @conversations_scope = @conversations_scope.tagged(*filters) if filters.present?
     @set_visibility = true
+  end
+
+  # tags in the database now use the id relative to the default shard. ids in
+  # the filters are assumed relative to the current shard and need to be cast
+  # to an id relative to the default shard before use in queries.
+  #
+  # NOTE: clients providing values for the filter parameter should ensure that
+  # ids emitted are either global or relative to the current shard. if an id is
+  # emitted as a local id relative to some other shard, this will incorrectly
+  # interpret it as being relative to this shard.
+  def normalize_filters(filters)
+    filters.map do |filter|
+      type, id = ActiveRecord::Base.parse_asset_string(filter)
+      id = Shard.relative_id_for(id, Shard.default)
+      "#{type.underscore}_#{id}"
+    end
   end
 
   def infer_visibility(*conversations)

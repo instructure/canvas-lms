@@ -93,7 +93,8 @@ class ActiveRecord::Base
   end
 
   def asset_string
-    @asset_string ||= "#{self.class.base_ar_class.name.underscore}_#{id}"
+    @asset_string ||= {}
+    @asset_string[Shard.current] ||= "#{self.class.base_ar_class.name.underscore}_#{id}"
   end
 
   def global_asset_string

@@ -165,6 +165,79 @@ describe ConversationsController, :type => :integration do
       ]
     end
 
+    context "filtering by tags" do
+      it_should_behave_like "sharding"
+
+      before do
+        @conversations = []
+      end
+
+      def verify_filter(filter)
+        json = api_call(:get, "/api/v1/conversations.json?filter=#{filter}",
+                { :controller => 'conversations', :action => 'index', :format => 'json', :filter => filter })
+        json.size.should == @conversations.size
+        json.map{ |item| item["id"] }.sort.should == @conversations.map(&:conversation_id).sort
+      end
+
+      context "tag context on default shard" do
+        before do
+          Shard.default.activate do
+            account = Account.create!
+            course_with_teacher(:account => account, :active_course => true, :active_enrollment => true, :user => @me)
+            @course.update_attribute(:name, "another course")
+            @alex = student_in_course(:name => "alex")
+            @buster = student_in_course(:name => "buster")
+          end
+
+          @conversations << conversation(@alex)
+          @conversations << @shard1.activate{ conversation(@buster) }
+        end
+
+        it "should recognize filter on the default shard" do
+          verify_filter(@course.asset_string)
+        end
+
+        it "should recognize filter on an unrelated shard" do
+          @shard2.activate{ verify_filter(@course.asset_string) }
+        end
+
+        it "should recognize explicitly global filter on the default shard" do
+          verify_filter(@course.global_asset_string)
+        end
+      end
+
+      context "tag context on non-default shard" do
+        before do
+          @shard1.activate do
+            account = Account.create!
+            course_with_teacher(:account => account, :active_course => true, :active_enrollment => true, :user => @me)
+            @course.update_attribute(:name, "the course 2")
+            @alex = student_in_course(:name => "alex")
+            @buster = student_in_course(:name => "buster")
+          end
+
+          @conversations << @shard1.activate{ conversation(@alex) }
+          @conversations << conversation(@buster)
+        end
+
+        it "should recognize filter on the default shard" do
+          verify_filter(@course.asset_string)
+        end
+
+        it "should recognize filter on the context's shard" do
+          @shard1.activate{ verify_filter(@course.asset_string) }
+        end
+
+        it "should recognize filter on an unrelated shard" do
+          @shard2.activate{ verify_filter(@course.asset_string) }
+        end
+
+        it "should recognize explicitly global filter on the context's shard" do
+          @shard1.activate{ verify_filter(@course.global_asset_string) }
+        end
+      end
+    end
+
     context "sent scope" do
       it "should sort by last authored date" do
         expected_times = 5.times.to_a.reverse.map{ |h| Time.parse((Time.now.utc - h.hours).to_s) }
