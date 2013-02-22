@@ -2171,4 +2171,59 @@ describe User do
     end
   end
 
+  describe "#conversation_context_codes" do
+    before do
+      @user = user(:active_all => true)
+    end
+
+    it "should include courses" do
+      course_with_student(:user => @user, :active_all => true)
+      @user.conversation_context_codes.should include(@course.asset_string)
+    end
+
+    it "should include concluded courses" do
+      course_with_student(:user => @user, :active_all => true)
+      @enrollment.workflow_state = 'completed'
+      @enrollment.save!
+      @user.conversation_context_codes.should include(@course.asset_string)
+    end
+
+    it "should include groups" do
+      group_with_user(:user => @user, :active_all => true)
+      @user.conversation_context_codes.should include(@group.asset_string)
+    end
+
+    context "sharding" do
+      it_should_behave_like "sharding"
+
+      before do
+        @shard1_account = @shard1.activate{ Account.create! }
+      end
+
+      it "should include courses on other shards" do
+        course_with_student(:account => @shard1_account, :user => @user, :active_all => true)
+        @user.conversation_context_codes.should include(@course.asset_string)
+      end
+
+      it "should include concluded courses on other shards" do
+        course_with_student(:account => @shard1_account, :user => @user, :active_all => true)
+        @enrollment.workflow_state = 'completed'
+        @enrollment.save!
+        @user.conversation_context_codes.should include(@course.asset_string)
+      end
+
+      it "should include groups on other shards" do
+        # course is just to associate the get shard1 in @user's associated shards
+        course_with_student(:account => @shard1_account, :user => @user, :active_all => true)
+        @shard1.activate{ group_with_user(:user => @user, :active_all => true) }
+        @user.conversation_context_codes.should include(@group.asset_string)
+      end
+
+      it "should include the default shard version of the asset string" do
+        course_with_student(:account => @shard1_account, :user => @user, :active_all => true)
+        default_asset_string = @course.asset_string
+        @shard1.activate{ @user.conversation_context_codes.should include(default_asset_string) }
+      end
+    end
+  end
 end
