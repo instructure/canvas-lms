@@ -113,8 +113,7 @@ describe "Kaltura::ClientV3" do
   describe "caching" do
     def create_config_with_mock(seconds)
       create_config('cache_play_list_seconds' => seconds)
-      @source = {:height => "240", :bitrate => "382", :isOriginal => "0", :width => "336", :content_type => "video/mp4",
-                                                   :containerFormat => "isom", :url => "https://kaltura.example.com/url", :size =>"204", :fileExt=>"mp4"}
+      @source = {:content_type => "video/mp4", :containerFormat => "isom", :url => "https://kaltura.example.com/url", :fileExt=>"mp4"}
       @kaltura.expects(:flavorAssetGetByEntryId).returns([@source.merge({:status => '2'})])
       @kaltura.expects(:flavorAssetGetPlaylistUrl).returns("https://kaltura.example.com/url")
     end
@@ -144,7 +143,16 @@ describe "Kaltura::ClientV3" do
       Rails.stubs(:cache).returns(m)
       @kaltura.media_sources('hi')
     end
+  end
 
+  it "should skip empty urls" do
+    create_config
+    @source = {:content_type => "video/mp4", :containerFormat => "isom", :url => nil, :fileExt => "mp4", :status => '2', :id => "1"}
+    @kaltura.expects(:flavorAssetGetByEntryId).returns([@source, @source.merge({:url => '', :id => '2'})])
+    @kaltura.stubs(:flavorAssetGetPlaylistUrl).returns(nil)
+
+    res = @kaltura.media_sources('hi')
+    res.should == []
   end
 
 end
