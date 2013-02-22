@@ -92,10 +92,14 @@ module Kaltura
         sources = []
         all_assets_are_done_converting = true
         assets.each do |asset|
-
           if ASSET_STATUSES[asset[:status]] == :READY
             hash = asset.slice :containerFormat, :width, :fileExt, :size, :bitrate, :height, :isOriginal
             hash[:url] = flavorAssetGetPlaylistUrl(entryId, asset[:id])
+
+            if hash[:url].blank?
+              Rails.logger.warn "kaltura entry (#{entryId}) has asset (#{asset[:id]}) with a missing url"
+              next
+            end
 
             hash[:content_type] = CONTENT_TYPES[asset[:fileExt]]
             sources << hash
