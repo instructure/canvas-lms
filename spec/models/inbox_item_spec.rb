@@ -21,7 +21,7 @@ require File.expand_path('../spec_helper.rb', File.dirname(__FILE__))
 describe InboxItem do
   it "should truncate its title to 255 characters on validation" do
     long_subject = ' Re: Re: ' + (0..299).map { 'a' }.join('')
-    inbox_item   = InboxItem.new(subject: long_subject)
+    inbox_item   = InboxItem.new(:subject => long_subject)
     inbox_item.valid?
     inbox_item.subject.should match(/^a{255}$/)
   end
