@@ -108,6 +108,22 @@ describe "Kaltura::ClientV3" do
                       {:fileExt => 'flv', :bitrate => '100'},
               ]
     end
+    
+    it "should prefer converted assets to the original" do
+      @kaltura.sort_source_list(
+          [
+              {:fileExt => 'mp4', :bitrate => '200', :isOriginal => '1'},
+              {:fileExt => 'flv', :bitrate => '100', :isOriginal => '0'},
+              {:fileExt => 'mp3', :bitrate => '100', :isOriginal => '0'},
+              {:fileExt => 'mp4', :bitrate => '100', :isOriginal => '0'},
+          ]).should ==
+          [
+              {:fileExt => 'mp4', :bitrate => '100', :isOriginal => '0'},
+              {:fileExt => 'mp3', :bitrate => '100', :isOriginal => '0'},
+              {:fileExt => 'flv', :bitrate => '100', :isOriginal => '0'},
+              {:fileExt => 'mp4', :bitrate => '200', :isOriginal => '1'},
+          ]
+    end
   end
 
   describe "caching" do
