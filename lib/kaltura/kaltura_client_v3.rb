@@ -129,10 +129,11 @@ module Kaltura
     end
 
     # Given an array of sources, it will sort them putting preferred file types at the front,
+    # preferring converted assets over the original (since they're likely to stream better)
     # and sorting by descending bitrate for identical file types.
     def sort_source_list(sources)
       sources.sort_by do |a|
-        [PREFERENCE.index(a[:fileExt]) || PREFERENCE.size + 1, 0 - a[:bitrate].to_i]
+        [a[:isOriginal] == '0' ? 0 : 1, PREFERENCE.index(a[:fileExt]) || PREFERENCE.size + 1, 0 - a[:bitrate].to_i]
       end
     end
 
