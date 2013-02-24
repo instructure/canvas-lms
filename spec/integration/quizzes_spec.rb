@@ -87,41 +87,70 @@ describe QuizzesController do
       course_with_teacher_logged_in(:active_all => true)
       assignment_model(:course => @course)
       quiz_model(:course => @course, :assignment_id => @assignment.id)
+      @quiz.update_attribute :due_at, 5.days.from_now
+      @cs1 = @course.default_section
+      @cs2 = @course.course_sections.create!
     end
 
     context "with overridden due dates" do
       include TextHelper
 
-      it "should show an overridden due date for student" do
-        cs1 = @course.default_section
+      context "with no overrides" do
+        it "should show a due date for 'Everyone'" do
+          get "courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-        due_at = 3.days.from_now
-        create_section_override(cs1, due_at)
-
-        @course.enroll_user(user, 'StudentEnrollment')
-        user_session(@user)
-
-        get "courses/#{@course.id}/quizzes/#{@quiz.id}"
-
-        doc = Nokogiri::HTML(response.body)
-        doc.css("#quiz_student_details .value").first.text.should include(datetime_string(due_at))
+          doc = Nokogiri::HTML(response.body)
+          doc.css(".assignment_dates").text.should include "Everyone"
+          doc.css(".assignment_dates").text.should_not include "Everyone else"
+        end
       end
 
-      it "should show multiple due dates to teachers" do
-        cs1 = @course.default_section
-        cs2 = @course.course_sections.create!
+      context "with some sections overridden" do
+        before do
+          @due_at = 3.days.from_now
+          create_section_override(@cs1, @due_at)
+        end
 
-        due_at1 = 3.days.from_now
-        due_at2 = 4.days.from_now
-        create_section_override(cs1, due_at1)
-        create_section_override(cs2, due_at2)
+        it "should show an overridden due date for student" do
+          @course.enroll_user(user, 'StudentEnrollment')
+          user_session(@user)
 
-        get "courses/#{@course.id}/quizzes/#{@quiz.id}"
+          get "courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-        doc = Nokogiri::HTML(response.body)
-        doc.css(".assignment_dates tbody tr").count.should be 2
-        doc.css(".assignment_dates tbody tr > td:first-child").text.
-          should include(datetime_string(due_at1), datetime_string(due_at2))
+          doc = Nokogiri::HTML(response.body)
+          doc.css("#quiz_student_details .value").first.text.should include(datetime_string(@due_at))
+        end
+
+        it "should show 'Everyone else' when some sections have a due date override" do
+          get "courses/#{@course.id}/quizzes/#{@quiz.id}"
+
+          doc = Nokogiri::HTML(response.body)
+          doc.css(".assignment_dates").text.should include "Everyone else"
+        end
+      end
+
+      context "with all sections overridden" do
+        before do
+          @due_at1, @due_at2 = 3.days.from_now, 4.days.from_now
+          create_section_override(@cs1, @due_at1)
+          create_section_override(@cs2, @due_at2)
+        end
+
+        it "should show multiple due dates to teachers" do
+          get "courses/#{@course.id}/quizzes/#{@quiz.id}"
+
+          doc = Nokogiri::HTML(response.body)
+          doc.css(".assignment_dates tbody tr").count.should be 2
+          doc.css(".assignment_dates tbody tr > td:first-child").text.
+            should include(datetime_string(@due_at1), datetime_string(@due_at2))
+        end
+
+        it "should not show a date for 'Everyone else'" do
+          get "courses/#{@course.id}/quizzes/#{@quiz.id}"
+
+          doc = Nokogiri::HTML(response.body)
+          doc.css(".assignment_dates").text.should_not include "Everyone"
+        end
       end
     end
 

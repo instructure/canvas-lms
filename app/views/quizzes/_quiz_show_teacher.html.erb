@@ -220,7 +220,7 @@
     <% presenter.visible_due_dates.each do |due_date| %>
       <tr>
         <td><%= presenter.due_at(due_date) %></td>
-        <td><%= due_date[:title] || t(:everyone, 'Everyone else') %></td>
+        <td><%= presenter.due_for(due_date) %></td>
         <td><%= presenter.unlock_at(due_date) %></td>
         <td><%= presenter.lock_at(due_date) %></td>
       </tr>
