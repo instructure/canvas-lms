@@ -1350,10 +1350,17 @@ class CoursesController < ApplicationController
   # to query the status of an operation.
   #
   # @argument course_ids[] List of ids of courses to update. At most 500 courses may be updated in one call.
-  # @argument event The action to take on each course.  Must be one of 'offer', 'conclude', or 'delete'.
-  #
+  # @argument event The action to take on each course.  Must be one of 'offer', 'conclude', 'delete', or 'undelete'.
+  #   * 'offer' makes a course visible to students. This action is also called "publish" on the web site.
+  #   * 'conclude' prevents future enrollments and makes a course read-only for all participants. The course still appears
+  #     in prior-enrollment lists.
+  #   * 'delete' completely removes the course from the web site (including course menus and prior-enrollment lists).
+  #     All enrollments are deleted. Course content may be physically deleted at a future date.
+  #   * 'undelete' attempts to recover a course that has been deleted. (Recovery is not guaranteed; please conclude
+  #     rather than delete a course if there is any possibility the course will be used again.) The recovered course
+  #     will be unpublished. Deleted enrollments will not be recovered.
   # @example_request
-  #     curl https://<canvas>/api/v1/accounts/<account_id>/courses \  
+  #     curl https://<canvas>/api/v1/accounts/<account_id>/courses \ 
   #       -X PUT \ 
   #       -H 'Authorization: Bearer <token>' \ 
   #       -d 'event=offer' \ 
@@ -1365,11 +1372,11 @@ class CoursesController < ApplicationController
     @account = Account.find(params[:account_id])
     if authorized_action(@account, @current_user, :manage_courses)
       return render(:json => { :message => 'must specify course_ids[]' }, :status => :bad_request) unless params[:course_ids].is_a?(Array)
-      @course_ids = Api.map_ids(params[:course_ids], Course, @domain_root_account).map(&:to_i)
+      @course_ids = Api.map_ids(params[:course_ids], Course, @domain_root_account)
       return render(:json => { :message => 'course batch size limit (500) exceeded' }, :status => :forbidden) if @course_ids.size > 500
       update_params = params.slice(:event).with_indifferent_access
       return render(:json => { :message => 'need to specify event' }, :status => :bad_request) unless update_params[:event]
-      return render(:json => { :message => 'invalid event' }, :status => :bad_request) unless %w(offer conclude delete).include? update_params[:event]
+      return render(:json => { :message => 'invalid event' }, :status => :bad_request) unless %w(offer conclude delete undelete).include? update_params[:event]
       progress = Course.batch_update(@account, @current_user, @course_ids, update_params)
       render :json => progress_json(progress, @current_user, session)
     end

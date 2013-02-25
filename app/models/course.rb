@@ -3052,6 +3052,9 @@ class Course < ActiveRecord::Base
         self.sis_source_id = nil
         self.workflow_state = 'deleted'
         self.save!
+      when 'undelete'
+        self.workflow_state = 'claimed'
+        self.save!
     end
   end
 
@@ -3069,7 +3072,8 @@ class Course < ActiveRecord::Base
 
     progress_runner.do_batch_update(course_ids) do |course_id|
       course = account.associated_courses.find_by_id(course_id)
-      raise t('course_not_found', "The course was not found") unless course
+      raise t('course_not_found', "The course was not found") unless course &&
+          (course.workflow_state != 'deleted' || update_params[:event] == 'undelete')
       raise t('access_denied', "Access was denied") unless course.grants_right? user, :update
       course.update_one(update_params)
     end
