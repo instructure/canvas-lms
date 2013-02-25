@@ -360,7 +360,7 @@ class CoursesController < ApplicationController
       # We delete it from params so that it is not maintained in pagination links.
       user_id = params.delete(:user_id)
       if user_id.present? && user = users.scoped(:conditions => ["users.id = ?", user_id]).first
-        position_scope = users.scoped(:conditions => ["sortable_name <= ?", user.sortable_name])
+        position_scope = users.scoped(:conditions => ["#{User.sortable_name_order_by_clause}<=#{User.best_unicode_collation_key('?')}", user.sortable_name])
         position = position_scope.count(:select => "users.*", :distinct => true)
         per_page = Api.per_page_for(self)
         params[:page] = (position.to_f / per_page.to_f).ceil

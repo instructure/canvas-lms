@@ -33,7 +33,7 @@ module UserSearch
     enrollment_role = Array(options[:enrollment_role]) if options[:enrollment_role]
     enrollment_type = Array(options[:enrollment_type]) if options[:enrollment_type]
 
-    users = course.users_visible_to(searcher).scoped(:order => "users.sortable_name")
+    users = course.users_visible_to(searcher).uniq.order_by_sortable_name
 
     if enrollment_role
       users = users.scoped(:conditions => ["COALESCE(enrollments.role_name, enrollments.type) IN (?) ", enrollment_role])
