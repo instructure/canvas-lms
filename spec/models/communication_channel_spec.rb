@@ -28,7 +28,33 @@ describe CommunicationChannel do
   it "should create a new instance given valid attributes" do
     factory_with_protected_attributes(CommunicationChannel, communication_channel_valid_attributes)
   end
-  
+
+  describe 'imported?' do
+    it 'should default to false' do
+      CommunicationChannel.new.should_not be_imported
+    end
+
+    it 'should be false if the channel has no pseudonym' do
+      communication_channel_model
+      @communication_channel.should_not be_imported
+    end
+
+    it 'should be false if the channel is associated with a pseudonym' do
+      user_with_pseudonym(:active_all => true)
+      channel = @pseudonym.communication_channel
+
+      channel.should_not be_imported
+    end
+
+    it "should be true if the channel is the sis_communication_channel of a pseudonym" do
+      user_with_pseudonym(:active_all => true)
+      channel = @pseudonym.communication_channel
+      @pseudonym.update_attribute(:sis_communication_channel_id, channel.id)
+
+      channel.should be_imported
+    end
+  end
+
   context "find_all_for" do
     it "should find all *active* matching channels based on a user's notification policies" do
       user_model(:workflow_state => 'registered')

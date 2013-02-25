@@ -226,6 +226,7 @@ class AccountsController < ApplicationController
             params[:account][:settings].try(:delete, key)
           end
         end
+
         if sis_id = params[:account].delete(:sis_source_id)
           if !@account.root_account? && sis_id != @account.sis_source_id && @account.root_account.grants_right?(@current_user, session, :manage_sis)
             if sis_id == ''
@@ -235,6 +236,12 @@ class AccountsController < ApplicationController
             end
           end
         end
+
+        can_edit_email = params[:account][:settings].try(:delete, :edit_institution_email)
+        if @account.root_account? && !can_edit_email.nil?
+          @account[:settings][:edit_institution_email] = value_to_boolean(can_edit_email)
+        end
+
         if @account.update_attributes(params[:account])
           format.html { redirect_to account_settings_url(@account) }
           format.json { render :json => @account.to_json }

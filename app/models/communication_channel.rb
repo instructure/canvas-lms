@@ -68,7 +68,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def pseudonym
-    self.user.pseudonyms.find_by_unique_id(self.path)
+    user.pseudonyms.first(:conditions => { :unique_id => path }) if user
   end
 
   set_broadcast_policy do |p|
@@ -139,6 +139,14 @@ class CommunicationChannel < ActiveRecord::Base
 
   def context
     pseudonym.try(:account)
+  end
+
+  # Public: Determine if this channel is the product of an SIS import.
+  #
+  # Returns a boolean.
+  def imported?
+    id.present? &&
+      Pseudonym.first(:conditions => { :sis_communication_channel_id => id }).present?
   end
 
   # Return the 'path' for simple communication channel types like email and sms. For

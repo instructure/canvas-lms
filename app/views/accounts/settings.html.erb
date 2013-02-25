@@ -255,6 +255,11 @@ TEXT
                 <%= settings.check_box :users_can_edit_name, :checked => @account.settings[:users_can_edit_name] != false %>
                 <%= settings.label :users_can_edit_name, :en => "Users can edit display name" %>
               </div>
+
+              <div>
+                <%= settings.check_box :edit_institution_email, :checked => @account.edit_institution_email? %>
+                <%= settings.label     :edit_institution_email, :en => "Users can delete their institution-assigned email address" %>
+              </div>
             <% end %>
             <% unless @account.site_admin? %>
               <div>

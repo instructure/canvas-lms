@@ -167,6 +167,7 @@ class Account < ActiveRecord::Base
   add_setting :allow_invitation_previews, :boolean => true, :root_only => true, :default => false
   add_setting :self_registration, :boolean => true, :root_only => true, :default => false
   add_setting :large_course_rosters, :boolean => true, :root_only => true, :default => false
+  add_setting :edit_institution_email, :boolean => true, :root_only => true, :default => true
 
   def settings=(hash)
     if hash.is_a?(Hash)
