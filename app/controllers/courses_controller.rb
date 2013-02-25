@@ -335,8 +335,23 @@ class CoursesController < ApplicationController
   def users
     get_context
     if authorized_action(@context, @current_user, :read_roster)
-      enrollment_params = params.slice(:enrollment_role, :enrollment_type)
-      users = UserSearch.scope_for(@context, @current_user, enrollment_params)
+      #backcompat limit param
+      params[:per_page] ||= params.delete(:limit)
+
+      search_params = params.slice(:search_term, :enrollment_role, :enrollment_type)
+      if (search_term = search_params[:search_term]) && search_term.size < 3
+        return render \
+            :json => {
+            "status" => "argument_error",
+            "message" => "search_term of 3 or more characters is required" },
+            :status => :bad_request
+      end
+
+      if search_term
+        users = UserSearch.for_user_in_course(search_term, @context, @current_user, search_params)
+      else
+        users = UserSearch.scope_for(@context, @current_user, search_params)
+      end
       # If a user_id is passed in, modify the page parameter so that the page
       # that contains that user is returned.
       # We delete it from params so that it is not maintained in pagination links.
@@ -365,12 +380,10 @@ class CoursesController < ApplicationController
   end
 
   # @API Search users
-  # Returns a list of users in this course that match a search term. No pagination.
+  # Returns a list of users in this course that match a search term.
   #
   # @argument search_term
   #   The partial name or full ID of the users to match and return in the results list.
-  # @argument limit [optional]
-  #   The number of search results to return. Maximum 20.
   # @argument enrollment_type [optional, "teacher"|"student"|"ta"|"observer"|"designer"]
   #   When set, only return users where the user is enrolled as this type.
   #   This argument is ignored if enrollment_role is given.
@@ -379,26 +392,19 @@ class CoursesController < ApplicationController
   #   a role created with the {api:RoleOverridesController#add_role Add Role API} or a
   #   base role type of 'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment',
   #   'ObserverEnrollment', or 'DesignerEnrollment'.
+  # @argument include[]
+  #   The same as the List Users API
   #
   # @returns [User]
   def search_users
-    get_context
-    if authorized_action(@context, @current_user, :read_roster)
-      search_params = params.slice(:search_term, :enrollment_type, :enrollment_role, :limit)
-      if (search_term = search_params[:search_term]) && search_term.size >= 3
-        search_params[:limit] = 20 if search_params[:limit].to_i > 20 if search_params[:limit]
-        users = UserSearch.for_user_in_course(search_term, @context, @current_user, search_params)
-        render :json => users.map { |u|
-          user_json(u, @current_user, session, [], @context)
-        }
-      else
-        render \
-          :json => {
-            "status" => "argument_error", 
-            "message" => "search_term of 3 or more characters is required" },
-          :status => :bad_request
-      end
+    unless params['search_term']
+      return render \
+              :json => {
+          "status" => "argument_error",
+          "message" => "search_term of 3 or more characters is required" },
+              :status => :bad_request
     end
+    users
   end
 
   # @API List recently logged in students

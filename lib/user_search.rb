@@ -1,19 +1,14 @@
 module UserSearch
 
   def self.for_user_in_course(search_term, course, searcher, options = {})
-    limit = options.fetch(:limit, 20)
-
     base_scope = scope_for(course, searcher, options.slice(:enrollment_type, :enrollment_role))
-    if search_term.to_s =~ /^\d+$/
-      begin
-        user = base_scope.find(search_term)
-        return [user]
-      rescue ActiveRecord::RecordNotFound
-        #no user found by id, so lets go ahead with the regular search, maybe this person just has a ton of numbers in their name
-      end
+    if search_term.to_s =~ Api::ID_REGEX
+      user = base_scope.find_by_id(search_term)
+      return [user] if user
+      # no user found by id, so lets go ahead with the regular search, maybe this person just has a ton of numbers in their name
     end
 
-    base_scope.find(:all, :conditions => conditions_statement(search_term), :limit => limit)
+    base_scope.where(conditions_statement(search_term))
   end
 
   def self.conditions_statement(search_term)
