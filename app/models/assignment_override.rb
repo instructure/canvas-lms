@@ -268,6 +268,6 @@ class AssignmentOverride < ActiveRecord::Base
 
     # union the visible override subselects and join against them
     subselect = scopes.map{ |scope| scope.construct_finder_sql({}) }.join(' UNION ')
-    { :joins => "INNER JOIN (#{subselect}) AS visible_overrides ON visible_overrides.id=assignment_overrides.id" }
+    { :joins => "INNER JOIN (#{subselect}) AS visible_overrides ON visible_overrides.id=assignment_overrides.id", :readonly => false }
   }
 end

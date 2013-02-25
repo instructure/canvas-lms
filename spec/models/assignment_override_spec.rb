@@ -487,6 +487,17 @@ describe AssignmentOverride do
       visible_overrides.should include @override1
       visible_overrides.should include @override2
     end
+
+    it "should not return readonly objects" do
+      section = @course.default_section
+      override = assignment_override_model(:assignment => @assignment)
+      override.set = section
+      override.save!
+
+      override = AssignmentOverride.visible_to(@teacher, @course).first
+      override.should_not be_nil
+      override.should_not be_readonly
+    end
   end
 
   describe "default_values" do
