@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../cc_spec_helper'
+require File.expand_path(File.dirname(__FILE__) + '/../cc_spec_helper')
 
 describe "Canvas Cartridge importing" do
   before(:each) do

@@ -256,7 +256,7 @@ describe ContentMigration do
       new_att.grants_right?(student, :download).should be_false
     end
 
-    it "should tranlsate links to module items in html content" do
+    it "should translate links to module items in html content" do
       mod1 = @copy_from.context_modules.create!(:name => "some module")
       asmnt1 = @copy_from.assignments.create!(:title => "some assignment")
       tag = mod1.add_item({:id => asmnt1.id, :type => 'assignment', :indent => 1})

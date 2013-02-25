@@ -106,5 +106,31 @@ describe CC::CCHelper do
       urls[0].should == "%24WIKI_REFERENCE%24/wiki/front-page"
       urls[1].should == "http://www.example.com:8080/courses/#{@othercourse.id}/wiki/front-page"
     end
+
+    it "should copy pages correctly when the title starts with a number" do
+      HostUrl.stubs(:protocol).returns('http')
+      HostUrl.stubs(:context_host).returns('www.example.com:8080')
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => false)
+      page = @course.wiki.wiki_pages.create(:title => '9000, the level is over')
+      html = <<-HTML
+        <a href="/courses/#{@course.id}/wiki/#{page.url}">This course's wiki page</a>
+      HTML
+      doc = Nokogiri::HTML.parse(@exporter.html_content(html))
+      urls = doc.css('a').map{ |attr| attr[:href] }
+      urls[0].should == "%24WIKI_REFERENCE%24/wiki/#{page.url}"
+    end
+
+    it "should copy pages correctly when the title consists only of a number" do
+      HostUrl.stubs(:protocol).returns('http')
+      HostUrl.stubs(:context_host).returns('www.example.com:8080')
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => false)
+      page = @course.wiki.wiki_pages.create(:title => '9000')
+      html = <<-HTML
+        <a href="/courses/#{@course.id}/wiki/#{page.url}">This course's wiki page</a>
+      HTML
+      doc = Nokogiri::HTML.parse(@exporter.html_content(html))
+      urls = doc.css('a').map{ |attr| attr[:href] }
+      urls[0].should == "%24WIKI_REFERENCE%24/wiki/#{page.url}"
+    end
   end
 end
