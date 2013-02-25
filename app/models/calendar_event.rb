@@ -629,7 +629,7 @@ class CalendarEvent < ActiveRecord::Base
         event.end = event.start
         event.end.ical_params = {"VALUE"=>["DATE"]}
       end
-      event.summary = @event.title
+      event.summary = (@event.context_type == "Course" && "#{@event.title} (#{@event.context.course_code})" || @event.title)   #event.summary = @event.title
       if @event.description
         html = api_user_content(@event.description, @event.context)
         event.description html_to_text(html)
