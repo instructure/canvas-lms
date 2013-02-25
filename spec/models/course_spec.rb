@@ -53,6 +53,15 @@ describe Course do
     @course.should_not be_soft_concluded
   end
 
+  context "#old_gradebook_visible?" do
+    it "should always return false when enrollment count is large enough" do
+        @course.large_roster = false
+        @course.old_gradebook_visible?.should be_true
+        @course.students.stubs(:count).returns(251)
+        @course.old_gradebook_visible?.should be_false
+    end
+  end
+
   describe "allow_student_discussion_topics" do
 
     it "should default true" do
