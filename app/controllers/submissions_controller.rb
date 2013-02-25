@@ -118,7 +118,7 @@ class SubmissionsController < ApplicationController
     if @context_enrollment && @context_enrollment.is_a?(ObserverEnrollment) && @context_enrollment.associated_user_id
       id = @context_enrollment.associated_user_id
     else
-      id = @current_user.id
+      id = @current_user.try(:id)
     end
     @user = @context.all_students.find(params[:id]) rescue nil
     if !@user
