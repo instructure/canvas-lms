@@ -110,9 +110,31 @@ else
   end
 
   class ActiveRecord::Base
+    # this is basically all potentially affected AR serialized columns that
+    # existed in the DB before Canvas was Ruby 1.9 only. We've verified that
+    # none of these columns should legitimately contain binary data, only text.
+    SERIALIZED_COLUMNS_WITH_POTENTIALLY_INVALID_UTF8 = {
+      'AssessmentQuestion'       => %w[question_data],
+      'ContextExternalTool'      => %w[settings],
+      'EportfolioEntry'          => %w[content],
+      'ErrorReport'              => %w[http_env data],
+      'LearningOutcome'          => %w[data],
+      'Profile'                  => %w[data],
+      'Quiz'                     => %w[quiz_data],
+      'QuizQuestion'             => %w[question_data],
+      'QuizSubmission'           => %w[quiz_data submission_data],
+      'QuizSubmissionSnapshot'   => %w[data],
+      'Rubric'                   => %w[data],
+      'RubricAssessment'         => %w[data],
+      'SisBatch'                 => %w[processing_errors processing_warnings],
+      'StreamItem'               => %w[data],
+    }
+
     def unserialize_attribute_with_utf8_check(attr_name)
       value = unserialize_attribute_without_utf8_check(attr_name)
-      TextHelper.recursively_strip_invalid_utf8(value)
+      if SERIALIZED_COLUMNS_WITH_POTENTIALLY_INVALID_UTF8[self.class.name].try(:include?, attr_name.to_s)
+        TextHelper.recursively_strip_invalid_utf8!(value, true)
+      end
       value
     end
     alias_method_chain :unserialize_attribute, :utf8_check
