@@ -1,0 +1,11 @@
+GEM
+  specs:
+    mime-types (1.20.1)
+    rest-client (1.6.7)
+      mime-types (>= 1.16)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  rest-client

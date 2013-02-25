@@ -1,0 +1,22 @@
+SFU
+=====
+
+SFU Custom functionality for Canvas
+
+New Course Request Form - http://<canvas_server>/sfu/course/new
+
+REST URLs available:
+http://<canvas_server>/sfu/courses/<sfu_computing_id>/[term_code]
+http://<canvas_server>/sfu/course/<course_code>/<term_code>
+http://<canvas_server>/sfu/terms/<sfu_computing_id>
+http://<canvas_server>/sfu/user/<sfu_computing_id>
+
+Installation:
+
+1. Clone repository in <canvas_home_dir>/vendor/plugins/
+	git clone git@github.com:sfu/canvas-plugin.git sfu_course_form
+2. Run 'bundle install' within your <canvas_home_dir>
+3. Get a copy of 'sfu.yml' and save it within <canvas_home_dir>/config/	
+
+
+Copyright (c) 2013 SFU / Ron Santos

@@ -1,0 +1,28 @@
+Course CSV:<br>
+course_id,short_name,long_name,account_id,term_id,status<br>
+<% @course_csv.each do |l| %>
+    <%=  l %><br>
+<% end %>
+<br><br>
+Section CSV:<br>
+section_id,course_id,name,status,start_date,end_date<br>
+<% @section_csv.each do |l| %>
+    <%=  l %><br>
+<% end %>
+<br><br>
+Enrollment CSV:<br>
+course_id,user_id,role,section_id,status<br>
+<% @enrollment_csv.each do |l| %>
+    <%=  l %><br>
+<% end %>
+
+<hr>
+Post parameters: <br>
+<ul>
+  <% params.each do |k, v| %>
+      <li><%= k %> => '<%= v %>'</li>
+  <% end	%>
+</ul>
+
+
+
