@@ -36,7 +36,7 @@
 <% end %>
 
 <%= javascript_include_tag "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" %>
-<%= javascript_include_tag "http://fgnass.github.com/spin.js/dist/spin.min.js" %>
+<%= javascript_include_tag "/javascripts/vendor/spin.min.js" %>
 
 <script>
 var opts = {
@@ -60,7 +60,7 @@ var opts = {
     $(document).ready(function () {
        $("#enroll_me_div").hide();
        $("#course_list").html("<h5>Retrieving course list...</h5>");
-       var target = document.getElementById("button-container");
+       var target = document.getElementById("course_list");
        var spinner = new Spinner(opts).spin(target);
        course_list();
     });
@@ -69,7 +69,7 @@ var opts = {
     $("#create_course_btn").click(function() {
         $("#create_course_btn").toggleClass("btn btn-info");
         $("#create_course_btn").attr("value","Submitting...");
-        var target = document.getElementById("course_list");
+        var target = document.getElementById("button-container");
         var spinner = new Spinner(opts).spin(target);        
     });
 
