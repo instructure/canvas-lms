@@ -393,6 +393,55 @@ matching, and to only return URLs matching that domain.
         </blti:extensions>
     </cartridge_basiclti_link>
 
+## Test Environment Setting Examples
+
+External tools can support different LTI environments for different canvas environments.
+If the URL is set it will replace the launch_url in the test and beta canvas environments.
+If the domain is set it will replace the domain setting and the domain on all configured
+links with the test domain.  It will only replace configured settings on tools.  For example,
+if the launch_url parameter is not set in the main configuration, the environment's
+launch_url will have no affect when the tool is copied to another canvas environment.
+
+### Test Environment Example
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
+        xmlns:blti = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
+        xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0"
+        xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0"
+        xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation = "http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd
+        http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
+        http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
+        http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+        <blti:title>Attendance</blti:title>
+        <blti:description>Provides an interactive seating chart and attendance tool</blti:description>
+        <blti:extensions platform="canvas.instructure.com">
+          <lticm:property name="privacy_level">public</lticm:property>
+          <lticm:property name="domain">example.com</lticm:property>
+          <lticm:options name="course_navigation">
+            <lticm:property name="enabled">true</lticm:property>
+            <lticm:property name="url">https://example.com/attendance</lticm:property>
+            <lticm:property name="text">Attendance</lticm:property>
+            <lticm:property name="visibility">admins</lticm:property>
+            <lticm:property name="default">disabled</lticm:property>
+          </lticm:options>
+          <lticm:options name="account_navigation">
+            <lticm:property name="enabled">true</lticm:property>
+            <lticm:property name="url">https://example.com/attendance_admin</lticm:property>
+            <lticm:property name="text">Attendance</lticm:property>
+          </lticm:options>
+          <lticm:options name="environments">
+            <lticm:property name="launch_url">http://test.example.com/content</lticm:property>
+            <lticm:property name="domain">test.example.com</lticm:property>
+            <lticm:property name="test_launch_url">http://test.example.com/content</lticm:property>
+            <lticm:property name="test_domain">test.example.com</lticm:property>
+            <lticm:property name="beta_launch_url">http://beta.example.com/content</lticm:property>
+            <lticm:property name="beta_domain">beta.example.com</lticm:property>
+          </lticm:options>
+    </blti:extensions>
+    </cartridge_basiclti_link>
+
 ## Combined External Tool Configuration Examples
 
 External tools can support multiple extensions in a single tool since each 
