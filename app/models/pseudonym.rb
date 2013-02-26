@@ -104,7 +104,7 @@ class Pseudonym < ActiveRecord::Base
   end
 
   named_scope :by_unique_id, lambda { |unique_id|
-    if connection_pool.spec.config[:adapter] == 'mysql'
+    if %w{mysql mysql2}.include?(connection_pool.spec.config[:adapter])
       { :conditions => {:unique_id => unique_id } }
     else
       { :conditions => ["LOWER(#{quoted_table_name}.unique_id)=?", unique_id.mb_chars.downcase] }

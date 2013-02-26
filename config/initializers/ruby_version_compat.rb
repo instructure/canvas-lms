@@ -3,6 +3,10 @@ if RUBY_VERSION < "1.9."
 else
   # ruby 1.9 compatibility fixes
 
+  if ActiveRecord::Base.configurations[RAILS_ENV]['adapter'] == 'mysql'
+    STDERR.puts "NOTE: It's recommended that you change your database adapter to mysql2 for usage with Ruby 1.9"
+  end
+
   # 1.9 has a built-in equivalent to fastercsv
   # make an alias for CSV, which has replaced FasterCSV
   require 'csv'

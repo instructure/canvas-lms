@@ -15,7 +15,7 @@ class MessageMigration < ActiveRecord::Migration
       return
     end
 
-    mysql = connection.adapter_name =~ /mysql/i
+    mysql = %w{MySQL Mysql2}.include?(connection.adapter_name)
     table_opts = mysql ? 'engine=innodb' : 'AS'
 
     # for grouping messages into conversations

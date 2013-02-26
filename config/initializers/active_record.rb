@@ -355,14 +355,14 @@ class ActiveRecord::Base
     # other side of dst will be wrong though)
     offset = max_date.utc_offset
 
-    expression = case connection.adapter_name.downcase
-    when /mysql/
+    expression = case connection.adapter_name
+    when 'MySQL', 'Mysql2'
       # TODO: detect mysql named timezone support and use it
       offset = "%s%02d:%02d" % [offset < 0 ? "-" : "+", offset.abs / 3600, offset.abs % 3600]
       "DATE(CONVERT_TZ(#{column}, '+00:00', '#{offset}'))"
     when /sqlite/
       "DATE(STRFTIME('%s', #{column}) + #{offset}, 'unixepoch')"
-    when /postgres/
+    when 'PostgreSQL'
       "(#{column} AT TIME ZONE '#{Time.zone.tzinfo.name}')::DATE"
     end
 
@@ -602,7 +602,7 @@ class ActiveRecord::Base
   module UniqueConstraintViolation
     def self.===(error)
       ActiveRecord::StatementInvalid === error &&
-      error.message.match(/PG(?:::)?Error: ERROR: +duplicate key value violates unique constraint|Mysql::Error: Duplicate entry .* for key|SQLite3::ConstraintException: columns .* not unique/)
+      error.message.match(/PG(?:::)?Error: ERROR: +duplicate key value violates unique constraint|Mysql2?::Error: Duplicate entry .* for key|SQLite3::ConstraintException: columns .* not unique/)
     end
   end
 
@@ -682,7 +682,7 @@ class ActiveRecord::Base
           end
 
           conditions = merge_conditions(conditions, *join_conditions)
-        when 'MySQL'
+        when 'MySQL', 'Mysql2'
           sql  = "UPDATE #{quoted_table_name}"
           add_joins!(sql, nil, scope)
           sql << " SET "
@@ -737,7 +737,7 @@ class ActiveRecord::Base
           sql.concat(' ')
 
           conditions = merge_conditions(conditions, *join_conditions)
-        when 'MySQL'
+        when 'MySQL', 'Mysql2'
           sql = "DELETE #{quoted_table_name} FROM #{quoted_table_name}"
           add_joins!(sql, nil, scope)
         else
@@ -770,19 +770,122 @@ ActiveRecord::ConnectionAdapters::AbstractAdapter.class_eval do
   end
 end
 
-if defined?(ActiveRecord::ConnectionAdapters::MysqlAdapter)
-  ActiveRecord::ConnectionAdapters::MysqlAdapter.class_eval do
-    def bulk_insert(table_name, records)
-      return if records.empty?
-      transaction do
-        keys = records.first.keys
-        quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
-        execute "INSERT INTO #{quote_table_name(table_name)} (#{quoted_keys}) VALUES" <<
-          records.map{ |record| "(#{keys.map{ |k| quote(record[k]) }.join(', ')})" }.join(',')
-      end
+class ActiveRecord::ConnectionAdapters::AbstractAdapter
+  # for functions that differ from one adapter to the next, use the following
+  # method (overriding as needed in non-standard adapters), e.g.
+  #
+  #   connection.func(:group_concat, :name, '|') ->
+  #     group_concat(name, '|')           (default)
+  #     group_concat(name SEPARATOR '|')  (mysql)
+  #     string_agg(name::text, '|')       (postgres)
+
+  def func(name, *args)
+    "#{name}(#{args.map{ |arg| func_arg_esc(arg) }.join(', ')})"
+  end
+
+  def func_arg_esc(arg)
+    arg.is_a?(Symbol) ? arg : quote(arg)
+  end
+
+  def group_by(*columns)
+    # the first item should be the primary key(s) that the other columns are
+    # functionally dependent on. alternatively, it can be a class, and all
+    # columns will be inferred from it. this is useful for cases where you want
+    # to select all columns from one table, and an aggregate from another.
+    Array(infer_group_by_columns(columns).first).join(", ")
+  end
+
+  def infer_group_by_columns(columns)
+    columns.map { |col|
+      col.respond_to?(:columns) ?
+          col.columns.map { |c|
+            "#{col.quoted_table_name}.#{quote_column_name(c.name)}"
+          } :
+          col
+    }
+  end
+
+  def after_transaction_commit(&block)
+    if open_transactions == 0
+      block.call
+    else
+      @after_transaction_commit ||= []
+      @after_transaction_commit << block
+    end
+  end
+
+  def after_transaction_commit_callbacks
+    @after_transaction_commit || []
+  end
+
+  # the alias_method_chain needs to happen in the subclass, since they all
+  # override commit_db_transaction
+  def commit_db_transaction_with_callbacks
+    commit_db_transaction_without_callbacks
+    return unless @after_transaction_commit
+    # the callback could trigger a new transaction on this connection,
+    # and leaving the callbacks in @after_transaction_commit could put us in an
+    # infinite loop.
+    # so we store off the callbacks to a local var here.
+    callbacks = @after_transaction_commit
+    @after_transaction_commit = []
+    callbacks.each { |cb| cb.call() }
+  ensure
+    @after_transaction_commit = [] if @after_transaction_commit
+  end
+
+  def rollback_db_transaction_with_callbacks
+    rollback_db_transaction_without_callbacks
+    @after_transaction_commit = [] if @after_transaction_commit
+  end
+end
+
+module MySQLAdapterExtensions
+  def self.included(klass)
+    klass::NATIVE_DATABASE_TYPES[:primary_key] = "bigint DEFAULT NULL auto_increment PRIMARY KEY".freeze
+    klass.alias_method_chain :add_column, :foreign_key_check
+    klass.alias_method_chain :configure_connection, :pg_compat
+    klass.alias_method_chain :commit_db_transaction, :callbacks
+    klass.alias_method_chain :rollback_db_transaction, :callbacks
+  end
+
+  def bulk_insert(table_name, records)
+    return if records.empty?
+    transaction do
+      keys = records.first.keys
+      quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
+      execute "INSERT INTO #{quote_table_name(table_name)} (#{quoted_keys}) VALUES" <<
+                  records.map{ |record| "(#{keys.map{ |k| quote(record[k]) }.join(', ')})" }.join(',')
+    end
+  end
+
+  def add_column_with_foreign_key_check(table, name, type, options = {})
+    Canvas.active_record_foreign_key_check(name, type, options)
+    add_column_without_foreign_key_check(table, name, type, options)
+  end
+
+  def configure_connection_with_pg_compat
+    configure_connection_without_pg_compat
+    execute "SET SESSION SQL_MODE='PIPES_AS_CONCAT'"
+  end
+
+  def func(name, *args)
+    case name
+      when :group_concat
+        "group_concat(#{func_arg_esc(args.first)} SEPARATOR #{quote(args[1] || ',')})"
+      else
+        super
     end
   end
 end
+
+if defined?(ActiveRecord::ConnectionAdapters::MysqlAdapter)
+  ActiveRecord::ConnectionAdapters::MysqlAdapter.send(:include, MySQLAdapterExtensions)
+end
+if defined?(ActiveRecord::ConnectionAdapters::Mysql2Adapter)
+  ActiveRecord::ConnectionAdapters::Mysql2Adapter.send(:include, MySQLAdapterExtensions)
+end
+
 if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
   ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
     def bulk_insert(table_name, records)
@@ -918,17 +1021,6 @@ class ActiveRecord::Error
 end
 
 # We need to have 64-bit ids and foreign keys.
-if defined?(ActiveRecord::ConnectionAdapters::MysqlAdapter)
-  ActiveRecord::ConnectionAdapters::MysqlAdapter::NATIVE_DATABASE_TYPES[:primary_key] = "bigint DEFAULT NULL auto_increment PRIMARY KEY".freeze
-  ActiveRecord::ConnectionAdapters::MysqlAdapter.class_eval do
-    def add_column_with_foreign_key_check(table, name, type, options = {})
-      Canvas.active_record_foreign_key_check(name, type, options)
-      add_column_without_foreign_key_check(table, name, type, options)
-    end
-    alias_method_chain :add_column, :foreign_key_check
-  end
-end
-
 if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
   ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::NATIVE_DATABASE_TYPES[:primary_key] = "bigserial primary key".freeze
   ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
@@ -973,16 +1065,6 @@ if defined?(ActiveRecord::ConnectionAdapters::SQLiteAdapter)
   end
 end
 
-if defined?(ActiveRecord::ConnectionAdapters::MysqlAdapter)
-  ActiveRecord::ConnectionAdapters::MysqlAdapter.class_eval do
-    def configure_connection_with_pg_compat
-      configure_connection_without_pg_compat
-      execute "SET SESSION SQL_MODE='PIPES_AS_CONCAT'"
-    end
-    alias_method_chain :configure_connection, :pg_compat
-  end
-end
-
 # postgres doesn't support limit on text columns, but it does on varchars. assuming we don't exceed
 # the varchar limit, change the type. otherwise drop the limit. not a big deal since we already
 # have max length validations in the models.
@@ -1018,77 +1100,6 @@ ActiveRecord::Associations::HasManyThroughAssociation.class_eval do
   alias_method_chain :construct_scope, :has_many_fix
 end
 
-
-class ActiveRecord::ConnectionAdapters::AbstractAdapter
-  # for functions that differ from one adapter to the next, use the following
-  # method (overriding as needed in non-standard adapters), e.g.
-  #
-  #   connection.func(:group_concat, :name, '|') ->
-  #     group_concat(name, '|')           (default)
-  #     group_concat(name SEPARATOR '|')  (mysql)
-  #     string_agg(name::text, '|')       (postgres)
-
-  def func(name, *args)
-    "#{name}(#{args.map{ |arg| func_arg_esc(arg) }.join(', ')})"
-  end
-
-  def func_arg_esc(arg)
-    arg.is_a?(Symbol) ? arg : quote(arg)
-  end
-
-  def group_by(*columns)
-    # the first item should be the primary key(s) that the other columns are
-    # functionally dependent on. alternatively, it can be a class, and all
-    # columns will be inferred from it. this is useful for cases where you want
-    # to select all columns from one table, and an aggregate from another.
-    Array(infer_group_by_columns(columns).first).join(", ")
-  end
-
-  def infer_group_by_columns(columns)
-    columns.map { |col|
-      col.respond_to?(:columns) ?
-        col.columns.map { |c|
-          "#{col.quoted_table_name}.#{quote_column_name(c.name)}"
-        } :
-        col
-    }
-  end
-
-  def after_transaction_commit(&block)
-    if open_transactions == 0
-      block.call
-    else
-      @after_transaction_commit ||= []
-      @after_transaction_commit << block
-    end
-  end
-
-  def after_transaction_commit_callbacks
-    @after_transaction_commit || []
-  end
-
-  # the alias_method_chain needs to happen in the subclass, since they all
-  # override commit_db_transaction
-  def commit_db_transaction_with_callbacks
-    commit_db_transaction_without_callbacks
-    return unless @after_transaction_commit
-    # the callback could trigger a new transaction on this connection,
-    # and leaving the callbacks in @after_transaction_commit could put us in an
-    # infinite loop.
-    # so we store off the callbacks to a local var here.
-    callbacks = @after_transaction_commit
-    @after_transaction_commit = []
-    callbacks.each { |cb| cb.call() }
-  ensure
-    @after_transaction_commit = [] if @after_transaction_commit
-  end
-
-  def rollback_db_transaction_with_callbacks
-    rollback_db_transaction_without_callbacks
-    @after_transaction_commit = [] if @after_transaction_commit
-  end
-end
-
 if defined?(ActiveRecord::ConnectionAdapters::SQLiteAdapter)
   ActiveRecord::ConnectionAdapters::SQLiteAdapter.class_eval do
     alias_method_chain :commit_db_transaction, :callbacks
@@ -1096,21 +1107,6 @@ if defined?(ActiveRecord::ConnectionAdapters::SQLiteAdapter)
   end
 end
 
-if defined?(ActiveRecord::ConnectionAdapters::MysqlAdapter)
-  ActiveRecord::ConnectionAdapters::MysqlAdapter.class_eval do
-    def func(name, *args)
-      case name
-        when :group_concat
-          "group_concat(#{func_arg_esc(args.first)} SEPARATOR #{quote(args[1] || ',')})"
-        else
-          super
-      end
-    end
-
-    alias_method_chain :commit_db_transaction, :callbacks
-    alias_method_chain :rollback_db_transaction, :callbacks
-  end
-end
 if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
   ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
     def func(name, *args)
@@ -1332,7 +1328,7 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     begin
       remove_foreign_key(table, options)
     rescue ActiveRecord::StatementInvalid => e
-      raise unless e.message =~ /PG(?:::)?Error: ERROR:.+does not exist|Mysql::Error: Error on rename/
+      raise unless e.message =~ /PG(?:::)?Error: ERROR:.+does not exist|Mysql2?::Error: Error on rename/
     end
   end
 end

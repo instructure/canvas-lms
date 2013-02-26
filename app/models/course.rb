@@ -718,7 +718,7 @@ class Course < ActiveRecord::Base
     end
 
     case Enrollment.connection.adapter_name
-    when 'MySQL'
+    when 'MySQL', 'Mysql2'
       Enrollment.connection.execute("UPDATE users, enrollments SET users.updated_at=NOW(), enrollments.updated_at=NOW() WHERE users.id=enrollments.user_id AND enrollments.course_id=#{self.id}")
     else
       Enrollment.update_all({:updated_at => Time.now.utc}, :course_id => self.id)
@@ -2946,7 +2946,7 @@ class Course < ActiveRecord::Base
       # we also want to bring along prior enrollments, so don't use the enrollments
       # association
       case Enrollment.connection.adapter_name
-      when 'MySQL'
+      when 'MySQL', 'Mysql2'
         Enrollment.connection.execute("UPDATE users, enrollments SET users.updated_at=#{Course.sanitize(Time.now.utc)}, enrollments.updated_at=#{Course.sanitize(Time.now.utc)}, enrollments.course_id=#{new_course.id} WHERE users.id=enrollments.user_id AND enrollments.course_id=#{self.id}")
       else
         Enrollment.update_all({:course_id => new_course.id, :updated_at => Time.now.utc}, :course_id => self.id)

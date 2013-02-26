@@ -210,7 +210,7 @@ class CommunicationChannel < ActiveRecord::Base
   }
 
   named_scope :by_path, lambda { |path|
-    if connection_pool.spec.config[:adapter] == 'mysql'
+    if %{mysql mysql2}.include?(connection_pool.spec.config[:adapter])
       { :conditions => {:path => path } }
     else
       { :conditions => ["LOWER(communication_channels.path)=?", path.try(:downcase)]}

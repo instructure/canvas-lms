@@ -296,10 +296,10 @@ class Quiz < ActiveRecord::Base
   def update_quiz_submission_end_at_times
     new_end_at = time_limit * 60.0
 
-    update_sql = case ActiveRecord::Base.connection.adapter_name.downcase
-                 when /postgres/
+    update_sql = case ActiveRecord::Base.connection.adapter_name
+                 when 'PostgreSQL'
                    "started_at + INTERVAL '+? seconds'"
-                 when /mysql/
+                 when 'MySQL', 'Mysql2'
                    "started_at + INTERVAL ? SECOND"
                  when /sqlite/
                    "DATETIME(started_at, '+? seconds')"

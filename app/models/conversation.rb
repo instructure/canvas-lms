@@ -409,7 +409,7 @@ class Conversation < ActiveRecord::Base
         self.id,
         skip_ids
       ])
-      if connection.adapter_name =~ /mysql/i
+      if %w{MySQL Mysql2}.include?(connection.adapter_name)
         connection.execute <<-SQL
           UPDATE users, conversation_participants cp
           SET unread_conversations_count = unread_conversations_count + 1
@@ -621,9 +621,9 @@ class Conversation < ActiveRecord::Base
         :select => "#{MessageableUser.build_select}, last_authored_at, conversation_id",
         :joins => :all_conversations,
         :conditions => ["conversation_id IN (?)", conversations.map(&:id)],
-        :order => 'last_authored_at IS NULL, last_authored_at DESC, LOWER(COALESCE(short_name, name))').group_by(&:conversation_id)
+        :order => 'last_authored_at IS NULL, last_authored_at DESC, LOWER(COALESCE(short_name, name))').group_by { |mu| mu.conversation_id.to_i }
       conversations.each do |conversation|
-        participants[conversation.global_id].concat(user_map[conversation.id.to_s] || [])
+        participants[conversation.global_id].concat(user_map[conversation.id] || [])
       end
     end
 

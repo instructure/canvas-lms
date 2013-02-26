@@ -77,6 +77,7 @@ end
 
 group :mysql do
   gem 'mysql',        '2.8.1'
+  gem 'mysql2',       '0.2.18'
 end
 
 group :postgres do

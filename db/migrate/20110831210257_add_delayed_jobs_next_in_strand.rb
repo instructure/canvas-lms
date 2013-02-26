@@ -4,7 +4,7 @@ class AddDelayedJobsNextInStrand < ActiveRecord::Migration
   end
 
   def self.up
-    raise("#{connection.adapter_name} is not supported for delayed jobs queue") unless %w(PostgreSQL MySQL SQLite).include?(connection.adapter_name)
+    raise("#{connection.adapter_name} is not supported for delayed jobs queue") unless %w(PostgreSQL MySQL Mysql2 SQLite).include?(connection.adapter_name)
 
     remove_index :delayed_jobs, :name => 'index_delayed_jobs_for_get_next'
 
@@ -33,7 +33,7 @@ class AddDelayedJobsNextInStrand < ActiveRecord::Migration
       $$ LANGUAGE plpgsql;
       CODE
       execute("CREATE TRIGGER delayed_jobs_before_insert_row_tr BEFORE INSERT ON delayed_jobs FOR EACH ROW WHEN (NEW.strand IS NOT NULL) EXECUTE PROCEDURE delayed_jobs_before_insert_row_tr_fn()")
-    when 'MySQL'
+    when 'MySQL', 'Mysql2'
       execute(<<-CODE)
       CREATE TRIGGER delayed_jobs_before_insert_row_tr BEFORE INSERT ON delayed_jobs
       FOR EACH ROW
@@ -67,7 +67,7 @@ class AddDelayedJobsNextInStrand < ActiveRecord::Migration
       $$ LANGUAGE plpgsql;
       CODE
       execute("CREATE TRIGGER delayed_jobs_after_delete_row_tr AFTER DELETE ON delayed_jobs FOR EACH ROW WHEN (OLD.strand IS NOT NULL AND OLD.next_in_strand = 't') EXECUTE PROCEDURE delayed_jobs_after_delete_row_tr_fn()")
-    when 'MySQL'
+    when 'MySQL', 'Mysql2'
       # mysql doesn't support modifying the underlying table inside a trigger,
       # so we can't do this here -- we have to use a rails after_destroy
       # callback :/
@@ -92,7 +92,7 @@ class AddDelayedJobsNextInStrand < ActiveRecord::Migration
       CODE
     end
 
-    if connection.adapter_name == 'MySQL'
+    if %w{MySQL Mysql2}.include?(connection.adapter_name)
       # use temp tables to work around subselect limitations in mysql
       execute(%{CREATE TEMPORARY TABLE dj_20110831210257 (strand varchar(255), next_job_id bigint) SELECT strand, min(id) as next_job_id FROM delayed_jobs WHERE strand IS NOT NULL GROUP BY strand})
       execute(%{UPDATE delayed_jobs SET next_in_strand = #{Delayed::Backend::ActiveRecord::Job.quote_value(false)} WHERE strand IS NOT NULL AND id <> (SELECT t.next_job_id FROM dj_20110831210257 t WHERE t.strand = delayed_jobs.strand)})
@@ -109,7 +109,7 @@ class AddDelayedJobsNextInStrand < ActiveRecord::Migration
       execute %{DROP FUNCTION delayed_jobs_before_insert_row_tr_fn()}
       execute %{DROP TRIGGER delayed_jobs_after_delete_row_tr ON delayed_jobs}
       execute %{DROP FUNCTION delayed_jobs_after_delete_row_tr_fn()}
-    when 'MySQL'
+    when 'MySQL', 'Mysql2'
       execute %{DROP TRIGGER delayed_jobs_before_insert_row_tr}
     when 'SQLite'
       execute %{DROP TRIGGER delayed_jobs_after_insert_row_tr}

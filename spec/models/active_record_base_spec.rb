@@ -553,7 +553,7 @@ describe ActiveRecord::Base do
 
   describe "update_all/delete_all with_joins" do
     before do
-      pending "MySQL and Postgres only" unless %w{PostgreSQL MySQL}.include?(ActiveRecord::Base.connection.adapter_name)
+      pending "MySQL and Postgres only" unless %w{PostgreSQL MySQL Mysql2}.include?(ActiveRecord::Base.connection.adapter_name)
 
       @u1 = User.create!(:name => 'a')
       @u2 = User.create!(:name => 'b')
