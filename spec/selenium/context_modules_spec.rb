@@ -37,6 +37,20 @@ describe "context_modules" do
       modules
     end
 
+    it "should render as course home page" do
+      create_modules(1)
+      @course.default_view = 'modules'
+      @course.save!
+      get "/courses/#{@course.id}"
+
+      keep_trying_until do
+        f('.admin-links button').click
+        hover_and_click('#context_modules .change-workflow-state-link')
+        wait_for_ajax_requests
+        f('.context_module').should have_class('published_module')
+      end
+    end
+
     it "publishes an unpublished module" do 
       create_modules(1, "unpublished")
       get "/courses/#{@course.id}/modules"
