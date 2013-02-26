@@ -53,6 +53,17 @@ describe "assignment groups" do
         should == due_at.to_date.strftime('%b %-d, %y')
     end
 
+    it "should clear a due date" do
+      assign = @course.assignments.create!(:title => "due tomorrow", :due_at => Time.zone.now + 2.days)
+      get "/courses/#{@course.id}/assignments/#{assign.id}/edit"
+
+      f('#assignment_toggle_advanced_options').click
+      f('.due-date-overrides [name="due_at"]').clear
+      expect_new_page_load { submit_form('#edit_assignment_form') }
+
+      assign.reload.due_at.should be_nil
+    end
+
     it "should allow setting overrides" do
       default_section = @course.course_sections.first
       other_section = @course.course_sections.create!(:name => "other section")

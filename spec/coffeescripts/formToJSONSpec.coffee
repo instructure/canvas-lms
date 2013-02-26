@@ -72,5 +72,6 @@ define [
     @form.prepend $dateEl
     date = Date.now()
     $dateEl.data 'date', date
+    $dateEl.val(date)
     strictEqual @form.toJSON().date, date
 
