@@ -1,18 +1,2 @@
 <% content_for :page_title, join_title(t('titles.course_modules', "Course Modules"), @context.name) %>
-<% js_bundle :context_modules %>
-<% jammit_css :context_modules %>
-
-<div class="context-modules-main-header clearfix">
-  <h2 class="context-modules-title">
-    <%= t('headings.course_modules', %{Course Modules}) %>
-  </h2>
-
-  <% if can_do(@context, @current_user, :manage_content) %>
-    <div class="context-modules-main-toolbar">
-      <button class="btn btn-small module_progressions_link"><%= t('links.student_progress', 'View Progress') %></button>
-      <button class="btn btn-small btn-primary add_module_link"><%= t('#context_modules.buttons.add_module', 'Create a Module') %></button>
-    </div>
-  <% end %>
-</div>
-
 <%= render :partial => "context_modules/content" %>

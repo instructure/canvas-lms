@@ -1,9 +1,26 @@
 <% course_home ||= false %>
+<% js_bundle :context_modules %>
+<% jammit_css :context_modules %>
 <% js_env :COLLAPSED_MODULES => @collapsed_modules %>
+<% js_env :CAN_MANAGE_MODULES  => can_do(@context, @current_user, :manage_grades) || can_do(@context, @current_user, :manage_content) %>
+<% js_env :COURSE_ID => @context.id %>
 
 <% if course_home %>
   <h2><%= @context.name %></h2>
 <% end %>
+
+<div class="context-modules-main-header clearfix">
+  <h2 class="context-modules-title">
+    <%= t('headings.course_modules', %{Course Modules}) %>
+  </h2>
+
+  <% if can_do(@context, @current_user, :manage_content) %>
+    <div class="context-modules-main-toolbar">
+      <button class="btn btn-small module_progressions_link"><%= t('links.student_progress', 'View Progress') %></button>
+      <button class="btn btn-small btn-primary add_module_link"><%= t('#context_modules.buttons.add_module', 'Create a Module') %></button>
+    </div>
+  <% end %>
+</div>
 
 <div id="no_context_modules_message" style="display:none; clear: both;">
   <% if can_do(@context.context_modules.new, @current_user, :create) %>
