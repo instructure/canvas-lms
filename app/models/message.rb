@@ -609,7 +609,7 @@ class Message < ActiveRecord::Base
       @exception = e
       logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
       cancel if e.message.try(:match, /Bad recipient/)
-    rescue => e
+    rescue StandardError, Timeout::Error => e
       @exception = e
       logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
     end
