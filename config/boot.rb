@@ -2,7 +2,7 @@
 # Configure your app in config/environment.rb and config/environments/*.rb
 
 RAILS_ROOT = "#{File.dirname(__FILE__)}/.." unless defined?(RAILS_ROOT)
-$LOAD_PATH.unshift RAILS_ROOT
+$LOAD_PATH.unshift RAILS_ROOT.dup
 
 module Rails
   class << self
@@ -107,7 +107,7 @@ module Rails
       end
 
       def parse_gem_version(text)
-        $1 if text =~ /\A[^#]*RAILS_GEM_VERSION\s*=\s*["']([!~<>=]*\s*[\d.]+)["']/
+        $1 if text =~ /^[^#]*RAILS_GEM_VERSION\s*=\s*["']([!~<>=]*\s*[\d.]+)["']/
       end
 
       private
