@@ -121,10 +121,14 @@ require([
     $(".add_user_link").click(function(event) {
       event.preventDefault();
       $("#add_user_form :text").val("");
-      $("#add_user_dialog").dialog({
+      var $dialog = $("#add_user_dialog"),
+          $privacy = $('<a>', {href: "http://www.instructure.com/privacy-policy", style: "padding-left: 1em; line-height: 3em", target: "_blank"});
+      $dialog.dialog({
         title: <%= jt('#accounts.add_user_dialog_title', "Add a New User") %>,
         width: 500
       }).fixDialogButtons();
+      $privacy.text(<%= jt('#site.view_privacy_policy', 'View Privacy Policy') %>);
+      $dialog.closest('.ui-dialog').find('.ui-dialog-buttonpane').append($privacy);
       $("#add_user_form :text:visible:first").focus().select();
     });
     $("#add_user_form").formSubmit({

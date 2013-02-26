@@ -19,6 +19,7 @@ define [
     $node = $nodes[id] ?= $('<div />')
     $node.html templates[id](
       terms_url: "http://www.instructure.com/terms-of-use"
+      privacy_url: "http://www.instructure.com/privacy-policy"
     )
     $node.find('.date-field').datetime_field()
 
