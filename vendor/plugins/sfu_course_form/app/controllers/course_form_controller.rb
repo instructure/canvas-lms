@@ -131,6 +131,9 @@ class CourseFormController < ApplicationController
     SFU::Canvas.sis_import section_csv
     SFU::Canvas.sis_import enrollment_csv
 
+    # give some time for the delayed_jobs to process the import
+    sleep 5
+    
     # redirect to list of courses
     redirect_to courses_url
   end
