@@ -1,0 +1,17 @@
+<div class="course_section" id="course_section_<%= f.id %>">
+  <div class="control-group">
+    <%= f.label :name, :en => "Section Name", :class => "control-label" %>
+    <div class="controls">
+      <%= f.text_field :name,
+                       :placeholder => t('section_name_placeholder', 'D100'),
+                       :class => 'input-large',
+		       :onkeyup => 'update_section_sis_id(this.id)',
+		       :required => true,
+                       :maxlength => '50' %>
+      <%= f.text_field :sis_source_id,
+		       :readonly => true,
+                       :class => 'input-large',
+                       :maxlength => '50' %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,70 @@
+<div class="manual" style="display: none;">
+  <div class="control-group">
+    <%= label_tag "enrollment_term_id", :en => "Term", :class => "control-label" %>
+    <div class="controls">
+      <%= select_tag "enrollment_term_id", @terms.map { |t| [t.name,t.id]}, :id => "enrollment_term_id" %>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <%= label_tag "Course Subject", "Course Subject", :class => "control-label" %>
+    <div class="controls">
+      <%= text_field_tag "course_subject", nil, :class => "input-large", :placeholder => t('course_subject_placeholder', 'MATH'), :onkeyup => "update_course_params();", :required => true %>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <%= label_tag "Course Number", "Course Number", :class => "control-label" %>
+    <div class="controls">
+      <%= text_field_tag "course_number", nil, :class => "input-large", :placeholder => t('course_number_placeholder', '100'), :onkeyup => "update_course_params();", :required => true %>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <%= label_tag "Course Title", "Course Title", :class => "control-label" %>
+    <div class="controls">
+      <%= text_field_tag "course_title", nil, :class => "input-large", :placeholder => t('course_title_placeholder', 'Intro to Math'), :onkeyup => "update_course_params();", :required => true %>
+    </div>
+  </div>
+</div>
+
+<script>
+    var div_array = [ <%= div_sections.join(", ") %> ];
+
+    for (var i = 0; i < div_array.length; i++) {
+        if (i > 0) document.getElementById("course_section_" + div_array[i]).style.display = "none";
+    }
+
+    function addSection() {
+        var visible_sections = document.getElementById("number_section_shown").value;
+        var i = Number(visible_sections) + 1;
+        document.getElementById("course_section_" + div_array[i-1]).style.display = "block";
+        document.getElementById("number_section_shown").value = i;
+    }
+
+    function get_term_sis_id(term_id) {
+        var terms = {};
+        <% @terms.map do |t| %>
+        terms['<%= t.id %>'] = <%= t.sis_source_id %>;
+        <% end %>
+        return terms[term_id];
+    }
+
+    function update_course_params(){
+        var selected_term = get_term_sis_id(document.getElementById("course_enrollment_term_id").value);
+        var course_subject = document.getElementById("course_subject").value;
+        var course_number = document.getElementById("course_number").value;
+        var course_title = document.getElementById("course_title").value;
+
+        document.getElementById("course_name").value = course_subject.toUpperCase() + course_number + " - " + course_title;
+        document.getElementById("sis_course_id").value = selected_term + "-" + course_subject.toLowerCase() + "-" + course_number;
+        document.getElementById("course_course_code").value = course_subject.toUpperCase() + course_number;
+    }
+
+    function update_section_sis_id(textfield_name_id) {
+        var course_sis_id = document.getElementById("sis_course_id").value;
+        var section_name = document.getElementById(textfield_name_id).value;
+        var textfield_sis_id = textfield_name_id.replace("_name", "_sis_source_id");
+        document.getElementById(textfield_sis_id).value = course_sis_id + "-" + section_name.toLowerCase();
+    }
+</script>
