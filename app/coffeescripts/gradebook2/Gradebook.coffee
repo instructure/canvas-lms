@@ -158,42 +158,94 @@ define [
       @getSubmissionsChunks()
       @initHeader()
 
-    arrangeColumnsBy: (newThingToArrangeBy) =>
-      if newThingToArrangeBy and newThingToArrangeBy != @_sortColumnsBy
-        @$columnArrangementTogglers.each ->
-          $(this).closest('li').showIf $(this).data('arrangeColumnsBy') isnt newThingToArrangeBy
-        @_sortColumnsBy = newThingToArrangeBy
-        userSettings[ if newThingToArrangeBy is 'due_date' then 'contextSet' else 'contextRemove']('sort_grade_colums_by', newThingToArrangeBy)
-        columns = @gradeGrid.getColumns()
-        columns.sort @columnSortFn
-        @gradeGrid.setColumns(columns)
-        @fixColumnReordering()
-        @buildRows()
-      @_sortColumnsBy ||= userSettings.contextGet('sort_grade_colums_by') || 'assignment_group'
+    defaultSortType: 'assignment_group'
+      
 
-    columnSortFn: (a,b) =>
-      return -1 if b.type is 'total_grade'
-      return  1 if a.type is 'total_grade'
-      return -1 if b.type is 'assignment_group' and a.type isnt 'assignment_group'
-      return  1 if a.type is 'assignment_group' and b.type isnt 'assignment_group'
-      if a.type is 'assignment_group' and b.type is 'assignment_group'
-        return a.object.position - b.object.position
-      else if a.type is 'assignment' and b.type is 'assignment'
-        if @arrangeColumnsBy() is 'assignment_group'
-          diffOfAssignmentGroupPosition = a.object.assignment_group.position - b.object.assignment_group.position
-          diffOfAssignmentPosition = a.object.position - b.object.position
+    getStoredSortOrder: =>
+      userSettings.contextGet('sort_grade_columns_by') || { sortType: @defaultSortType }
 
-          # order first by assignment_group position and then by assignment position
-          # will work when there are less than 1000000 assignments in an assignment_group
-          return (diffOfAssignmentGroupPosition * 1000000) + diffOfAssignmentPosition
+    setStoredSortOrder: (newSortOrder) =>
+      if newSortOrder.sortType == @defaultSortType
+        userSettings.contextRemove('sort_grade_columns_by')
+      else
+        userSettings.contextSet('sort_grade_columns_by', newSortOrder)
+
+    storeCustomColumnOrder: =>
+      newSortOrder =
+        sortType: 'custom'
+        customOrder: []
+      columns = @gradeGrid.getColumns()
+      assignment_columns = _.filter(columns, (c) -> c.type is 'assignment')
+      newSortOrder.customOrder = _.map(assignment_columns, (a) -> a.object.id)
+      @setStoredSortOrder(newSortOrder)
+
+    setArrangementTogglersVisibility: (newSortOrder) =>
+      @$columnArrangementTogglers.each ->
+        $(this).closest('li').showIf $(this).data('arrangeColumnsBy') isnt newSortOrder.sortType
+
+    arrangeColumnsBy: (newSortOrder) =>
+      @setArrangementTogglersVisibility(newSortOrder)
+      @setStoredSortOrder(newSortOrder)
+
+      columns = @gradeGrid.getColumns()
+      columns.sort @makeColumnSortFn(newSortOrder)
+      @gradeGrid.setColumns(columns)
+
+      @fixColumnReordering()
+      @buildRows()
+
+    makeColumnSortFn: (sortOrder) =>
+      fn = switch sortOrder.sortType
+        when 'assignment_group' then @compareAssignmentPositions
+        when 'due_date' then @compareAssignmentDueDates
+        when 'custom' then @makeCompareAssignmentCustomOrderFn(sortOrder)
+        else throw "unhandled column sort condition"
+      @wrapColumnSortFn(fn)
+
+    compareAssignmentPositions: (a, b) =>
+      diffOfAssignmentGroupPosition = a.object.assignment_group.position - b.object.assignment_group.position
+      diffOfAssignmentPosition = a.object.position - b.object.position
+
+      # order first by assignment_group position and then by assignment position
+      # will work when there are less than 1000000 assignments in an assignment_group
+      return (diffOfAssignmentGroupPosition * 1000000) + diffOfAssignmentPosition
+
+    compareAssignmentDueDates: (a, b) =>
+      aDate = a.object.due_at?.timestamp or Number.MAX_VALUE
+      bDate = b.object.due_at?.timestamp or Number.MAX_VALUE
+      if aDate is bDate
+        return 0 if a.object.name is b.object.name
+        return (if a.object.name > b.object.name then 1 else -1)
+      return aDate - bDate
+
+    makeCompareAssignmentCustomOrderFn: (sortOrder) =>
+      sortMap = {}
+      indexCounter = 0
+      for assignmentId in sortOrder.customOrder
+        sortMap[String(assignmentId)] = indexCounter
+        indexCounter += 1
+      return (a, b) =>
+        aIndex = sortMap[String(a.object.id)]
+        bIndex = sortMap[String(b.object.id)]
+        if aIndex? and bIndex?
+          return aIndex - bIndex
+        # if there's a new assignment and its order has not been stored, it should come at the end
+        else if aIndex? and not bIndex?
+          return -1
+        else if bIndex?
+          return 1
         else
-          aDate = a.object.due_at?.timestamp or Number.MAX_VALUE
-          bDate = b.object.due_at?.timestamp or Number.MAX_VALUE
-          if aDate is bDate
-            return 0 if a.object.name is b.object.name
-            return (if a.object.name > b.object.name then 1 else -1)
-          return aDate - bDate
-      throw "unhandled column sort condition"
+          return @compareAssignmentPositions(a, b)
+
+    wrapColumnSortFn: (wrappedFn) =>
+      (a, b) =>
+        return -1 if b.type is 'total_grade'
+        return  1 if a.type is 'total_grade'
+        return -1 if b.type is 'assignment_group' and a.type isnt 'assignment_group'
+        return  1 if a.type is 'assignment_group' and b.type isnt 'assignment_group'
+        if a.type is 'assignment_group' and b.type is 'assignment_group'
+          return a.object.position - b.object.position
+        return wrappedFn(a, b)
 
     rowFilter: (student) =>
       !@sectionToShow || (@sectionToShow in student.sections)
@@ -546,9 +598,9 @@ define [
 
       @$columnArrangementTogglers = $('#gradebook-toolbar [data-arrange-columns-by]').bind 'click', (event) =>
         event.preventDefault()
-        thingToArrangeBy = $(event.currentTarget).data('arrangeColumnsBy')
-        @arrangeColumnsBy(thingToArrangeBy)
-      @arrangeColumnsBy('assignment_group')
+        newSortOrder = { sortType: $(event.currentTarget).data('arrangeColumnsBy') }
+        @arrangeColumnsBy(newSortOrder)
+      @arrangeColumnsBy(@getStoredSortOrder())
 
       $('#gradebook_settings').show().kyleMenu()
 
@@ -784,6 +836,9 @@ define [
       @multiGrid.parent_grid.onKeyDown.subscribe ->
         # TODO: start editing automatically when a number or letter is typed
         false
+
+      @multiGrid.parent_grid.onColumnsReordered.subscribe @storeCustomColumnOrder
+
       @onGridInit()
 
     # show warnings for bad grading setups
