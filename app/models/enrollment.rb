@@ -183,10 +183,12 @@ class Enrollment < ActiveRecord::Base
 
   named_scope :future, lambda { {
     :joins => :course,
-    :conditions => ["courses.start_at > ?
+    :conditions => ["(courses.start_at > ?
                     AND courses.workflow_state = 'available'
                     AND courses.restrict_enrollments_to_course_dates = ?
-                    AND enrollments.workflow_state IN ('invited', 'active', 'completed')", Time.now, true]
+                    AND enrollments.workflow_state IN ('invited', 'active', 'completed'))
+                    OR (courses.workflow_state IN ('created', 'claimed')
+                    AND enrollments.workflow_state IN ('invited', 'active', 'completed', 'creation_pending'))", Time.now, true]
   } }
 
   named_scope :past,

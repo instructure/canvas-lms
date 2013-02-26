@@ -51,6 +51,34 @@ describe CoursesController do
         assigns[:current_enrollments].should_not include e
       end
     end
+
+    it "should include unpublished enrollments in future enrollments" do
+      user
+      future_course  = Course.create!(:name => 'future course', :start_at => Time.now + 2.weeks,
+                                      :restrict_enrollments_to_course_dates => true)
+      current_course = Course.create!(:name => 'current course', :start_at => Time.now - 2.weeks)
+
+      current_unpublished_course  = Course.create!(:name => 'future course 2', :start_at => Time.now - 2.weeks)
+      future_unpublished_course  = Course.create!(:name => 'future course 2', :start_at => Time.now + 2.weeks)
+      future_unrestricted_course = Course.create!(:name => 'future course 3', :start_at => Time.now + 2.weeks)
+
+      current_enrollment = StudentEnrollment.create!(:course => current_course, :user => @user)
+      future_enrollment  = StudentEnrollment.create!(:course => future_course, :user => @user)
+      current_unpublished_enrollment = StudentEnrollment.create!(:course => current_unpublished_course, :user => @user)
+      future_unpublished_enrollment = StudentEnrollment.create!(:course => future_unpublished_course, :user => @user)
+      future_unrestricted_enrollment = StudentEnrollment.create!(:course => future_unrestricted_course, :user => @user)
+
+      [future_course, current_course, future_unrestricted_course].each { |course| course.offer }
+      [current_enrollment, future_enrollment, current_unpublished_enrollment, future_unpublished_enrollment, future_unrestricted_enrollment].each { |e| e.accept }
+
+      user_session(@user)
+      get 'index'
+      response.should be_success
+      assigns[:future_enrollments].count.should == 3
+      assigns[:future_enrollments].should include(future_enrollment)
+      assigns[:future_enrollments].should include(current_unpublished_enrollment)
+      assigns[:future_enrollments].should include(future_unpublished_enrollment)
+    end
   end
 
   describe "GET 'settings'" do
