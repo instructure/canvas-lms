@@ -20,9 +20,12 @@ class CourseFormController < ApplicationController
   # course_id,user_id,role,section_id,status
   def create
     selected_courses = []
+    sections = []
     account_id = Account.find_by_name('Simon Fraser University').id
-    teacher_username = Pseudonym.find_by_unique_id_and_account_id(params[:username], account_id).sis_user_id
-    teacher2_username = Pseudonym.find_by_unique_id_and_account_id(params[:enroll_me], account_id).sis_user_id
+    teacher_username = params[:username]
+    teacher2_username = params[:enroll_me]
+    teacher_sis_user_id = Pseudonym.find_by_unique_id(params[:username]).sis_user_id
+    teacher2_sis_user_id = Pseudonym.find_by_unique_id(params[:enroll_me]).sis_user_id unless params[:enroll_me].nil?
     cross_list = params[:cross_list]
     params.each do |key, value|
       if key.to_s.starts_with? "selected_course"
@@ -30,14 +33,15 @@ class CourseFormController < ApplicationController
       end
     end
 
-    course_csv = "course_id,short_name,long_name,account_id,term_id,status\n"
-    section_csv = "section_id,course_id,name,status,start_date,end_date\n"
-    enrollment_csv = "course_id,user_id,role,section_id,status\n"
+    course_array = ["course_id,short_name,long_name,account_id,term_id,status"]
+    section_array = ["section_id,course_id,name,status,start_date,end_date"]
+    enrollment_array = ["course_id,user_id,role,section_id,status"]
 
     unless cross_list
       selected_courses.each do |course|
         # 20131:::ensc:::351:::d100:::Real Time and Embedded Systems
         unless course == "sandbox"
+          logger.info "[SFU Course Form] Creating single course container : #{course}"
           course_info = course.split(":::")
           term = course_info[0]
           name = course_info[1].to_s
@@ -51,39 +55,54 @@ class CourseFormController < ApplicationController
           short_name = "#{name.upcase}#{number} #{section.upcase}"
           long_name =  "#{short_name} #{title}"
 
+          sections.push "#{section_id}:::#{section.upcase}"
+
+          # add section tutorials csv
+          unless section_tutorials.nil?
+            section_tutorials.split(",").each do |tutorial|
+              section_id = "#{term}-#{name}-#{number}-#{tutorial.downcase}"
+              sections.push "#{section_id}:::#{tutorial.upcase}"
+            end
+          end
+
           # create course csv
-          course_csv.concat "#{course_id},#{short_name},#{long_name},#{account_id},#{term},active\n"
+          course_array.push "#{course_id},#{short_name},#{long_name},#{account_id},#{term},active"
 
           # create section csv
-          section_csv.concat "#{section_id},#{course_id},#{section.upcase},active,,,\n"
+          section_array.push "#{section_id},#{course_id},#{section.upcase},active,,,"
 
-          # create enrollment csv
-          #@enrollment_csv.push "#{course_id},#{teacher_username},teacher,#{section_id},active"
-	        # enroll teacher to default section
-	        enrollment_csv.concat "#{course_id},#{teacher_username},teacher,,active\n"
+          # create section csv
+          sections.each do  |section|
+            section_info = section.split(":::")
+            section_array.push "#{section_info[0]}:::section,#{course_id},#{section_info[1]},active,,,"
 
-	        # enroll other teacher/ta
-	        enrollment_csv.concat "#{course_id},#{teacher2_username},teacher,,active\n" unless teacher2_username.nil?
+            # create enrollment csv
+            enrollment_array.push "#{course_id},#{teacher_sis_user_id},teacher,#{section_info[0]}:::section,active"
+
+            # enroll other teacher/ta
+            enrollment_array.push "#{course_id},#{teacher2_sis_user_id},teacher,#{section_info[0]}:::section,active" unless teacher2_sis_user_id.nil?
+          end
         else
-          t = Time.new
-          datestamp = "#{t.year}#{t.month}#{t.day}"
+          logger.info "[SFU Course Form] Creating sandbox for #{teacher_username}"
+          #t = Time.new
+          #datestamp = "#{t.year}#{t.month}#{t.day}"
+          datestamp = "1"
           course_id = "sandbox-#{teacher_username}-#{datestamp}:::course"
           short_name = "Sandbox"
           long_name =  "Sandbox - #{teacher_username}"
 
-          course_csv.concat "#{course_id},#{short_name},#{long_name},#{account_id},#{term},active\n"
-          enrollment_csv.concat "#{course_id},#{teacher_username},teacher,,active\n"
+          course_array.push "#{course_id},#{short_name},#{long_name},#{account_id},,active"
+          enrollment_array.push "#{course_id},#{teacher_sis_user_id},teacher,,active"
           # enroll other teacher/ta
-          enrollment_csv.concat "#{course_id},#{teacher2_username},teacher,,active\n" unless teacher2_username.nil?
+          enrollment_array.push "#{course_id},#{teachers_sis_user_id},teacher,,active" unless teacher2_sis_user_id.nil?
         end
       end
     else
+      logger.info "[SFU Course Form] Creating cross-list container : #{selected_courses.inspect}"
       course_id = ""
       short_name = ""
       long_name = ""
       term = ""
-
-      sections = []
 
       selected_courses.each do |course|
         course_info = course.split(":::")
@@ -99,7 +118,7 @@ class CourseFormController < ApplicationController
         short_name.concat "#{name.upcase}#{number} #{section.upcase} / "
         long_name.concat  "#{name.upcase}#{number} #{section.upcase} #{title} / "
 
-        sections.push "#{section_id}:::#{section.upcase}"
+        sections.push "#{section_id}:::#{name.upcase}#{number} - #{section.upcase}"
 
         # add section tutorials csv
         unless section_tutorials.nil?
@@ -112,30 +131,42 @@ class CourseFormController < ApplicationController
 
       # create course csv
       course_id.concat "::course"
-      course_csv.concat "#{course_id},#{short_name[0..-4]},#{long_name[0..-4]},#{account_id},#{term},active\n"
+      course_array.push "#{course_id},#{short_name[0..-4]},#{long_name[0..-4]},#{account_id},#{term},active\n"
 
       # create section csv
       sections.each do  |section|
           section_info = section.split(":::")
-          section_csv.concat "#{section_info[0]}:::section,#{course_id},#{section_info[1]},active,,,\n"
+          section_id = "#{section_info[0]}:::section"
+          section_array.push "#{section_id},#{course_id},#{section_info[1]},active,,,\n"
+
+          # create enrollment csv
+          enrollment_array.push "#{course_id},#{teacher_sis_user_id},teacher,#{section_id},active\n"
+          # enroll other teacher/ta
+          enrollment_array.push "#{course_id},#{teacher2_sis_user_id},teacher,#{section_id},active\n" unless teacher2_sis_user_id.nil?
       end
 
-      # create enrollment csv
-      enrollment_csv.concat "#{course_id},#{teacher_username},teacher,,active\n"
-      # enroll other teacher/ta
-      enrollment_csv.concat "#{course_id},#{teacher2_username},teacher,,active\n" unless teacher2_username.nil?
+
     end
 
     # Send POST to import
+    course_csv = course_array.join("\n")
+    section_csv = section_array.join("\n")
+    enrollment_csv = enrollment_array.join("\n")
+
+    logger.info "[SFU Course Form] course_csv: #{course_csv.inspect}"
     SFU::Canvas.sis_import course_csv
+
+    logger.info "[SFU Course Form] section_csv: #{section_csv.inspect}"
     SFU::Canvas.sis_import section_csv
+
+    logger.info "[SFU Course Form] enrollment_csv: #{enrollment_csv.inspect}"
     SFU::Canvas.sis_import enrollment_csv
 
     # give some time for the delayed_jobs to process the import
     sleep 5
     
     # redirect to list of courses
-    redirect_to courses_url
+    #redirect_to courses_url
   end
 
   def course_exists?(sis_source_id)
