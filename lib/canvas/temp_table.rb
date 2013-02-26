@@ -12,21 +12,25 @@ module Canvas
     end
 
     def execute!
-      begin
-        @connection.execute "create temporary table #{@name} as #{@sql}"
-        case @connection.adapter_name
-          when 'PostgreSQL'
-            @connection.execute "ALTER TABLE #{@name} ADD temp_primary_key SERIAL"
-          when 'MySQL'
-            @connection.execute "ALTER TABLE #{@name} ADD temp_primary_key MEDIUMINT NOT NULL AUTO_INCREMENT"
-          else
-            raise "Temp tables not supported!"
-        end
-        @connection.execute "create index #{@name}_index ON #{@name}(#{@index})"
+      ActiveRecord::Base.transaction do
+        begin
+          @connection.execute "create temporary table #{@name} as #{@sql}"
+          case @connection.adapter_name
+            when 'PostgreSQL'
+              @connection.execute "ALTER TABLE #{@name}
+                                   ADD temp_primary_key SERIAL"
+            when 'MySQL'
+              @connection.execute "ALTER TABLE #{@name}
+                                   ADD temp_primary_key MEDIUMINT NOT NULL AUTO_INCREMENT"
+            else
+              raise "Temp tables not supported!"
+          end
+          @connection.execute "create index #{@name}_index ON #{@name}(#{@index})"
 
-        yield self
-      ensure
-        @connection.execute "drop table #{@name}"
+          yield self
+        ensure
+          @connection.execute "drop table #{@name}"
+        end
       end
     end
 
