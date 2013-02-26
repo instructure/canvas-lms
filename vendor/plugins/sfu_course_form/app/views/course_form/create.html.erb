@@ -1,28 +1,19 @@
-Course CSV:<br>
-course_id,short_name,long_name,account_id,term_id,status<br>
-<% @course_csv.each do |l| %>
-    <%=  l %><br>
-<% end %>
-<br><br>
-Section CSV:<br>
-section_id,course_id,name,status,start_date,end_date<br>
-<% @section_csv.each do |l| %>
-    <%=  l %><br>
-<% end %>
-<br><br>
-Enrollment CSV:<br>
-course_id,user_id,role,section_id,status<br>
-<% @enrollment_csv.each do |l| %>
-    <%=  l %><br>
-<% end %>
+<h5>
+Course request has been submitted successfully. It can take up to 2 minutes to complete.
+</h5>
 
-<hr>
-Post parameters: <br>
-<ul>
-  <% params.each do |k, v| %>
-      <li><%= k %> => '<%= v %>'</li>
-  <% end	%>
-</ul>
+<div class="button-container" id="button-container">
+<button type="button" id="course_list" class="btn">Course List</button>
+<button type="button" id="dashboard" class="btn">User Dashboard</button>
+<button type="button" id="course_form" class="btn">Request Another Course</button>
+</div>
 
+<%= javascript_include_tag "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" %>
+
+<script>
+    $("#course_list").click(function(){ window.location = "/courses"});
+    $("#dashboard").click(function(){ window.location = "/"});
+    $("#course_form").click(function(){ window.location = "/sfu/course/new"});
+</script>
 
 
