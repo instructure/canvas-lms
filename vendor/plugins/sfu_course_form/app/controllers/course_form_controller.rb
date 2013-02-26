@@ -24,8 +24,8 @@ class CourseFormController < ApplicationController
     account_id = Account.find_by_name('Simon Fraser University').id
     teacher_username = params[:username]
     teacher2_username = params[:enroll_me]
-    teacher_sis_user_id = Pseudonym.find_by_unique_id(params[:username]).sis_user_id
-    teacher2_sis_user_id = Pseudonym.find_by_unique_id(params[:enroll_me]).sis_user_id unless params[:enroll_me].nil?
+    teacher_sis_user_id = Pseudonym.find_by_unique_id_and_account_id(teacher_username, account_id).sis_user_id
+    teacher2_sis_user_id = Pseudonym.find_by_unique_id_and_account_id(teacher2_username, account_id).sis_user_id unless teacher2_username.nil?
     cross_list = params[:cross_list]
     params.each do |key, value|
       if key.to_s.starts_with? "selected_course"
@@ -80,7 +80,7 @@ class CourseFormController < ApplicationController
             enrollment_array.push "#{course_id},#{teacher_sis_user_id},teacher,#{section_info[0]}:::section,active"
 
             # enroll other teacher/ta
-            enrollment_array.push "#{course_id},#{teacher2_sis_user_id},teacher,#{section_info[0]}:::section,active" unless teacher2_sis_user_id.nil?
+            enrollment_array.push "#{course_id},#{teacher2_sis_user_id},teacher,#{section_info[0]}:::section,active" unless teacher2_username.nil?
           end
         else
           logger.info "[SFU Course Form] Creating sandbox for #{teacher_username}"
@@ -88,13 +88,12 @@ class CourseFormController < ApplicationController
           #datestamp = "#{t.year}#{t.month}#{t.day}"
           datestamp = "1"
           course_id = "sandbox-#{teacher_username}-#{datestamp}:::course"
-          short_name = "Sandbox"
-          long_name =  "Sandbox - #{teacher_username}"
+          short_long_name = "Sandbox - #{teacher_username}"
 
-          course_array.push "#{course_id},#{short_name},#{long_name},#{account_id},,active"
+          course_array.push "#{course_id},#{short_long_name},#{short_long_name},#{account_id},,active"
           enrollment_array.push "#{course_id},#{teacher_sis_user_id},teacher,,active"
           # enroll other teacher/ta
-          enrollment_array.push "#{course_id},#{teachers_sis_user_id},teacher,,active" unless teacher2_sis_user_id.nil?
+          enrollment_array.push "#{course_id},#{teacher2_sis_user_id},teacher,,active" unless teacher2_sis_user_id.nil?
         end
       end
     else
