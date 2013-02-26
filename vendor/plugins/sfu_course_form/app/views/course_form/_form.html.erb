@@ -3,7 +3,7 @@
   <div class="control-group">
     <%= label_tag "Courses For", "Courses For", :class => "control-label" %>
     <div class="controls">
-      <%= text_field_tag "username", nil, :class => "input-large", :value => @sfuid, :required => true %>
+      <%= text_field_tag "username", nil, :class => "input-large", :value => @sfuid, :required => true, :placeholder => "SFU Computing ID" %>
       <button type="button" id="update_course_list" class="btn">Update</button>
     </div>
   </div>
@@ -65,9 +65,12 @@ var opts = {
        course_list();
     });
 
+    $("#username").click(function() {
+        $("#username").val("");
+    });
 
     $("#create_course_btn").click(function() {
-        $("#create_course_btn").toggleClass("btn btn-info");
+        $("#create_course_btn").toggleClass("btn btn-success");
         $("#create_course_btn").attr("value","Submitting...");
         var target = document.getElementById("button-container");
         var spinner = new Spinner(opts).spin(target);        
