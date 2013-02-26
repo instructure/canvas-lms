@@ -81,6 +81,7 @@ class CourseFormController < ApplicationController
       course_id = ""
       short_name = ""
       long_name = ""
+      term = ""
 
       sections = []
 
