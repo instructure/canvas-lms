@@ -21,8 +21,8 @@ class CourseFormController < ApplicationController
   def create
     selected_courses = []
     account_id = Account.find_by_name('Simon Fraser University').id
-    teacher_username = params[:username]
-    teacher2_username = params[:enroll_me]
+    teacher_username = Pseudonym.find_by_unique_id_and_account_id(params[:username], account_id).sis_user_id
+    teacher2_username = Pseudonym.find_by_unique_id_and_account_id(params[:enroll_me], account_id).sis_user_id
     cross_list = params[:cross_list]
     params.each do |key, value|
       if key.to_s.starts_with? "selected_course"
