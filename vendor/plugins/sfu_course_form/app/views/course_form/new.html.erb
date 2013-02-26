@@ -1,0 +1,8 @@
+<div class="new_course_container">
+  <% unless SFU::User.student_only? @sfuid %>
+      <%= render :partial => 'form' %>
+  <% else  %>
+      <%= render :partial => 'error' %>
+  <% end %>
+</div>
+

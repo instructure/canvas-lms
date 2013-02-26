@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title><%= h(yield(:title) || "Untitled") %></title>
+    <%= stylesheet_link_tag 'application' %>
+    <%= yield(:head) %>
+    <% javascript_tag do %>
+      <%= yield(:jstemplates) %>
+    <% end -%>
+  </head>
+  <body>
+xxx
+    <div id="container">
+      <%- flash.each do |name, msg| -%>
+      <%= content_tag :div, msg, :id => "flash_#{name}" %>
+    <%- end -%>
+
+
+
+    <%- if show_title? -%>
+      <h1><%=h yield(:title) %></h1>
+    <%- end -%>
+
+    <%= yield %>
+  </div>
+</body>
+</html>
