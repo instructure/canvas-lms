@@ -130,24 +130,34 @@ describe "MessageableUser" do
       MessageableUser.prepped(:strict_checks => true).length.should == 0
     end
 
-    it "should exclude deleted students with strict_checks true" do
-      user(:user_state => 'deleted')
-      MessageableUser.prepped(:strict_checks => true).length.should == 0
-    end
-
     it "should include creation_pending students with strict_checks false" do
       user(:user_state => 'creation_pending')
       MessageableUser.prepped(:strict_checks => false).length.should == 1
     end
 
-    it "should include deleted students with strict_checks false" do
+    it "should exclude deleted students with include_deleted true but strict_checks true" do
       user(:user_state => 'deleted')
-      MessageableUser.prepped(:strict_checks => false).length.should == 1
+      MessageableUser.prepped(:strict_checks => true, :include_deleted => true).length.should == 0
+    end
+
+    it "should exclude deleted students with with strict_checks false but include_deleted false" do
+      user(:user_state => 'deleted')
+      MessageableUser.prepped(:strict_checks => false, :include_deleted => false).length.should == 0
+    end
+
+    it "should include deleted students with strict_checks false and include_deleted true" do
+      user(:user_state => 'deleted')
+      MessageableUser.prepped(:strict_checks => false, :include_deleted => true).length.should == 1
     end
 
     it "should default strict_checks to true" do
       user(:user_state => 'creation_pending')
       MessageableUser.prepped().length.should == 0
+    end
+
+    it "should default include_delete to false" do
+      user(:user_state => 'deleted')
+      MessageableUser.prepped(:strict_checks => false).length.should == 0
     end
   end
 

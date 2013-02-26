@@ -330,7 +330,6 @@ define [
         postData.context = @parent().data('id')
       else
         postData.exclude = postData.exclude.concat @input.tokenValues()
-      postData.per_page ?= @options.limiter?(level: @stack.length)
       postData
 
     collectionForQuery: (query) ->

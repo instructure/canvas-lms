@@ -199,7 +199,7 @@ describe "conversations recipient finder" do
 
   it "should allow searching" do
     search("t") do
-      menu.should == ["the course", "the other section", "the section", "student 1", "student 2"]
+      menu.should == ["the course", "the other section", "the section", "the group", "student 1", "student 2"]
     end
   end
 

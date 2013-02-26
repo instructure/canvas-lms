@@ -31,13 +31,11 @@ define [
       placeholder: I18n.t('context_search_placeholder', 'Enter a name, course, or group')
       selector:
         messages: {noResults: I18n.t('no_results', 'No results found')}
-        limiter: -> 5
         populator: @populator
         baseData:
           synthetic_contexts: 1
         browser:
           data:
-            per_page: -1
             types: ['context']
 
     constructor: ($node, options) ->

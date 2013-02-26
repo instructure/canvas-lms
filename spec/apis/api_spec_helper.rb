@@ -101,6 +101,15 @@ def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {}
   end
 end
 
+def follow_pagination_link(rel, params={})
+  links = Api.parse_pagination_links(response.headers['Link'])
+  link = links.find{ |l| l[:rel] == rel }
+  link.delete(:rel)
+  uri = link.delete(:uri).to_s
+  link.each{ |key,value| params[key.to_sym] = value }
+  api_call(:get, uri, params)
+end
+
 def params_from_with_nesting(method, path)
   path, querystring = path.split('?')
   params = ActionController::Routing::Routes.recognize_path(path, :method => method)

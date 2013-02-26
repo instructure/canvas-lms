@@ -546,8 +546,6 @@ define [
         canToggle: (data) ->
           data.type is 'user' or data.permissions?.send_messages_all
         selector:
-          limiter: (options) =>
-            if options.level > 0 then -1 else 5
           showToggles: true
           includeEveryoneOption: (postData, parent) =>
             # i.e. we are listing synthetic contexts under a course or section
@@ -570,8 +568,6 @@ define [
           $token.prevAll().remove() # only one token at a time
         tokenWrapBuffer: 80
         selector:
-          limiter: (options) =>
-            if options.level > 0 then -1 else 5
           includeEveryoneOption: (postData, parent) =>
             if postData.context?.match(/^course_\d+$/)
               everyoneText

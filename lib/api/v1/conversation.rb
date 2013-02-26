@@ -53,6 +53,19 @@ module Api::V1::Conversation
     result
   end
 
+  def conversation_recipients_json(recipients, current_user, session)
+    recipients.map do |recipient|
+      if recipient.is_a?(MessageableUser)
+        conversation_user_json(recipient, current_user, session,
+          :include_participant_avatars => true,
+          :include_participant_contexts => true)
+      else
+        # contexts are already json
+        recipient
+      end
+    end
+  end
+
   def conversation_users_json(users, current_user, session, options = {})
     options = {
       :include_participant_avatars => true,

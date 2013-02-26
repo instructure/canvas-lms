@@ -274,15 +274,13 @@ describe SearchController, :type => :integration do
     end
 
     context "pagination" do
-      it "should not paginate if no type is specified" do
-        # it's a synthetic result (we might a few of each type), making
-        # pagination pretty tricksy. so we don't allow it
+      it "should paginate even if no type is specified" do
         4.times{ student_in_course(:name => "cletus") }
 
         json = api_call(:get, "/api/v1/search/recipients.json?search=cletus&per_page=3",
                         {:controller => 'search', :action => 'recipients', :format => 'json', :search => 'cletus', :per_page => '3'})
         json.size.should eql 3
-        response.headers['Link'].should be_nil
+        response.headers['Link'].should_not be_nil
       end
 
       it "should paginate users and return proper pagination headers" do
@@ -291,44 +289,24 @@ describe SearchController, :type => :integration do
         json = api_call(:get, "/api/v1/search/recipients.json?search=cletus&type=user&per_page=3",
                         {:controller => 'search', :action => 'recipients', :format => 'json', :search => 'cletus', :type => 'user', :per_page => '3'})
         json.size.should eql 3
-        links = response.headers['Link'].split(",")
-        links.all?{ |l| l =~ /api\/v1\/search\/recipients/ }.should be_true
-        links.all?{ |l| l.scan(/search=cletus/).size == 1 }.should be_true
-        links.all?{ |l| l.scan(/type=user/).size == 1 }.should be_true
-        links.find{ |l| l.match(/rel="next"/)}.should =~ /page=2&per_page=3>/
-        links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1&per_page=3>/
+        links = Api.parse_pagination_links(response.headers['Link'])
+        links.each do |l|
+          l[:uri].to_s.should match(%r{api/v1/search/recipients})
+          l['search'].should == 'cletus'
+          l['type'].should == 'user'
+        end
+        links.map{ |l| l[:rel] }.should == ['next', 'first']
 
         # get the next page
-        json = api_call(:get, "/api/v1/search/recipients.json?search=cletus&type=user&page=2&per_page=3",
-                        {:controller => 'search', :action => 'recipients', :format => 'json', :search => 'cletus', :type => 'user', :page => '2', :per_page => '3'})
+        json = follow_pagination_link('next', :controller => 'search', :action => 'recipients')
         json.size.should eql 1
-        links = response.headers['Link'].split(",")
-        links.all?{ |l| l =~ /api\/v1\/search\/recipients/ }.should be_true
-        links.all?{ |l| l.scan(/search=cletus/).size == 1 }.should be_true
-        links.all?{ |l| l.scan(/type=user/).size == 1 }.should be_true
-        links.find{ |l| l.match(/rel="prev"/)}.should =~ /page=1&per_page=3>/
-        links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1&per_page=3>/
-      end
-
-      it "should allow fetching all users iff a context is specified" do
-        # for admins in particular, there may be *lots* of messageable users,
-        # so we don't allow retrieval of all of them unless a context is given
-        11.times{ student_in_course(:name => "cletus") }
-
-        json = api_call(:get, "/api/v1/search/recipients.json?search=cletus&type=user&per_page=-1",
-                        {:controller => 'search', :action => 'recipients', :format => 'json', :search => 'cletus', :type => 'user', :per_page => '-1'})
-        json.size.should eql 10
-        links = response.headers['Link'].split(",")
-        links.all?{ |l| l =~ /api\/v1\/search\/recipients/ }.should be_true
-        links.all?{ |l| l.scan(/search=cletus/).size == 1 }.should be_true
-        links.all?{ |l| l.scan(/type=user/).size == 1 }.should be_true
-        links.find{ |l| l.match(/rel="next"/)}.should =~ /page=2&per_page=10>/
-        links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1&per_page=10>/
-
-        json = api_call(:get, "/api/v1/search/recipients.json?search=cletus&type=user&context=course_#{@course.id}&per_page=-1",
-                        {:controller => 'search', :action => 'recipients', :format => 'json', :search => 'cletus', :context => "course_#{@course.id}", :type => 'user', :per_page => '-1'})
-        json.size.should eql 11
-        response.headers['Link'].should be_nil
+        links = Api.parse_pagination_links(response.headers['Link'])
+        links.each do |l|
+          l[:uri].to_s.should match(%r{api/v1/search/recipients})
+          l['search'].should == 'cletus'
+          l['type'].should == 'user'
+        end
+        links.map{ |l| l[:rel] }.should == ['first']
       end
 
       it "should paginate contexts and return proper pagination headers" do
@@ -340,35 +318,166 @@ describe SearchController, :type => :integration do
         json = api_call(:get, "/api/v1/search/recipients.json?search=ofcourse&type=context&per_page=3",
                         {:controller => 'search', :action => 'recipients', :format => 'json', :search => 'ofcourse', :type => 'context', :per_page => '3'})
         json.size.should eql 3
-        links = response.headers['Link'].split(",")
-        links.all?{ |l| l =~ /api\/v1\/search\/recipients/ }.should be_true
-        links.all?{ |l| l.scan(/search=ofcourse/).size == 1 }.should be_true
-        links.all?{ |l| l.scan(/type=context/).size == 1 }.should be_true
-        links.find{ |l| l.match(/rel="next"/)}.should =~ /page=2&per_page=3>/
-        links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1&per_page=3>/
+        links = Api.parse_pagination_links(response.headers['Link'])
+        links.each do |l|
+          l[:uri].to_s.should match(%r{api/v1/search/recipients})
+          l['search'].should == 'ofcourse'
+          l['type'].should == 'context'
+        end
+        links.map{ |l| l[:rel] }.should == ['next', 'first']
 
         # get the next page
-        json = api_call(:get, "/api/v1/search/recipients.json?search=ofcourse&type=context&page=2&per_page=3",
-                        {:controller => 'search', :action => 'recipients', :format => 'json', :search => 'ofcourse', :type => 'context', :page => '2', :per_page => '3'})
+        json = follow_pagination_link('next', :controller => 'search', :action => 'recipients')
         json.size.should eql 1
-        links = response.headers['Link'].split(",")
-        links.all?{ |l| l =~ /api\/v1\/search\/recipients/ }.should be_true
-        links.all?{ |l| l.scan(/search=ofcourse/).size == 1 }.should be_true
-        links.all?{ |l| l.scan(/type=context/).size == 1 }.should be_true
-        links.find{ |l| l.match(/rel="prev"/)}.should =~ /page=1&per_page=3>/
-        links.find{ |l| l.match(/rel="first"/)}.should =~ /page=1&per_page=3>/
+        links = Api.parse_pagination_links(response.headers['Link'])
+        links.each do |l|
+          l[:uri].to_s.should match(%r{api/v1/search/recipients})
+          l['search'].should == 'ofcourse'
+          l['type'].should == 'context'
+        end
+        links.map{ |l| l[:rel] }.should == ['first']
       end
 
-      it "should allow fetching all contexts" do
-        4.times{
+      it "should ignore invalid per_page" do
+        11.times{ student_in_course(:name => "cletus") }
+
+        json = api_call(:get, "/api/v1/search/recipients.json?search=cletus&type=user&per_page=-1",
+                        {:controller => 'search', :action => 'recipients', :format => 'json', :search => 'cletus', :type => 'user', :per_page => '-1'})
+        json.size.should eql 10
+        links = Api.parse_pagination_links(response.headers['Link'])
+        links.each do |l|
+          l[:uri].to_s.should match(%r{api/v1/search/recipients})
+          l['search'].should == 'cletus'
+          l['type'].should == 'user'
+        end
+        links.map{ |l| l[:rel] }.should == ['next', 'first']
+
+        # get the next page
+        json = follow_pagination_link('next', :controller => 'search', :action => 'recipients')
+        json.size.should eql 1
+        links = Api.parse_pagination_links(response.headers['Link'])
+        links.each do |l|
+          l[:uri].to_s.should match(%r{api/v1/search/recipients})
+          l['search'].should == 'cletus'
+          l['type'].should == 'user'
+        end
+        links.map{ |l| l[:rel] }.should == ['first']
+      end
+
+      it "should paginate combined context/user results" do
+        # 6 courses, 6 users, 12 items total
+        course_ids = []
+        user_ids = []
+        6.times do
           course_with_teacher(:active_course => true, :active_enrollment => true, :user => @user)
-          @course.update_attribute(:name, "ofcourse")
+          @course.update_attribute(:name, "term")
+          student = student_in_course(:name => "term")
+          course_ids << @course.asset_string
+          user_ids << student.id
+        end
+
+        json = api_call(:get, "/api/v1/search/recipients.json?search=term&per_page=4",
+                        {:controller => 'search', :action => 'recipients', :format => 'json', :search => 'term', :per_page => '4'})
+        json.size.should eql 4
+        json.map{ |item| item['id'] }.should == course_ids[0...4]
+        links = Api.parse_pagination_links(response.headers['Link'])
+        links.each do |l|
+          l[:uri].to_s.should match(%r{api/v1/search/recipients})
+          l['search'].should == 'term'
+        end
+        links.map{ |l| l[:rel] }.should == ['next', 'first']
+
+        # get the next page
+        json = follow_pagination_link('next', :controller => 'search', :action => 'recipients')
+        json.size.should eql 4
+        json.map{ |item| item['id'] }.should == course_ids[4...6] + user_ids[0...2]
+        links = Api.parse_pagination_links(response.headers['Link'])
+        links.each do |l|
+          l[:uri].to_s.should match(%r{api/v1/search/recipients})
+          l['search'].should == 'term'
+        end
+        links.map{ |l| l[:rel] }.should == ['next', 'first']
+
+        # get the final page
+        json = follow_pagination_link('next', :controller => 'search', :action => 'recipients')
+        json.size.should eql 4
+        json.map{ |item| item['id'] }.should == user_ids[2...6]
+        links = Api.parse_pagination_links(response.headers['Link'])
+        links.each do |l|
+          l[:uri].to_s.should match(%r{api/v1/search/recipients})
+          l['search'].should == 'term'
+        end
+        links.map{ |l| l[:rel] }.should == ['first']
+      end
+    end
+
+    describe "sorting contexts" do
+      it "should sort contexts by workflow state first when searching" do
+        course_with_teacher(:active_course => true, :active_enrollment => true, :user => @user)
+        course1 = @course
+        course1.update_attribute(:name, "Context Alpha")
+        @enrollment.update_attribute(:workflow_state, 'completed')
+
+        course_with_teacher(:active_course => true, :active_enrollment => true, :user => @user)
+        course2 = @course
+        course2.update_attribute(:name, "Context Beta")
+
+        json = api_call(:get, "/api/v1/search/recipients.json?type=context&search=Context&include_inactive=1",
+                        {:controller => 'search', :action => 'recipients', :format => 'json', :type => 'context', :search => 'Context', :include_inactive => '1'})
+        json.map{ |item| item['id'] }.should == [course2.asset_string, course1.asset_string]
+      end
+
+      it "should sort contexts by type second when searching" do
+        @course.update_attribute(:name, "Context Beta")
+        @group.update_attribute(:name, "Context Alpha")
+        json = api_call(:get, "/api/v1/search/recipients.json?type=context&search=Context",
+                        {:controller => 'search', :action => 'recipients', :format => 'json', :type => 'context', :search => 'Context'})
+        json.map{ |item| item['id'] }.should == [@course.asset_string, @group.asset_string]
+      end
+
+      it "should sort contexts by name third when searching" do
+        course_with_teacher(:active_course => true, :active_enrollment => true, :user => @user)
+        course1 = @course
+        course_with_teacher(:active_course => true, :active_enrollment => true, :user => @user)
+        course2 = @course
+
+        course1.update_attribute(:name, "Context Beta")
+        course2.update_attribute(:name, "Context Alpha")
+
+        json = api_call(:get, "/api/v1/search/recipients.json?type=context&search=Context",
+                        {:controller => 'search', :action => 'recipients', :format => 'json', :type => 'context', :search => 'Context'})
+        json.map{ |item| item['id'] }.should == [course2.asset_string, course1.asset_string]
+      end
+    end
+
+    context "sharding" do
+      it_should_behave_like "sharding"
+
+      it "should find top-level groups from any shard" do
+        @me.associate_with_shard(@shard1)
+        @me.associate_with_shard(@shard2)
+        @bob.associate_with_shard(@shard1)
+        @joe.associate_with_shard(@shard2)
+
+        group1 = nil
+        @shard1.activate{
+          group1 = Group.create(:context => Account.create!, :name => "shard 1 group")
+          group1.add_user(@me)
+          group1.add_user(@bob)
         }
 
-        json = api_call(:get, "/api/v1/search/recipients.json?search=ofcourse&type=context&per_page=-1",
-                        {:controller => 'search', :action => 'recipients', :format => 'json', :search => 'ofcourse', :type => 'context', :per_page => '-1'})
-        json.size.should eql 4
-        response.headers['Link'].should be_nil
+        group2 = nil
+        @shard2.activate{
+          group2 = Group.create(:context => Account.create!, :name => "shard 2 group")
+          group2.users = [@me, @joe]
+          group2.save!
+        }
+
+        json = api_call(:get, "/api/v1/search/recipients.json?type=group&search=group",
+                        {:controller => 'search', :action => 'recipients', :format => 'json', :type => 'group', :search => 'group'})
+        ids = json.map{ |item| item['id'] }
+        ids.should include(group1.asset_string)
+        ids.should include(group2.asset_string)
       end
     end
   end

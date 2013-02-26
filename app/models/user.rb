@@ -2026,326 +2026,6 @@ class User < ActiveRecord::Base
     Conversation.initiate(users, private).conversation_participants.find_by_user_id(self)
   end
 
-  def messageable_enrollment_user_clause
-    "EXISTS (SELECT 1 FROM users WHERE id = enrollments.user_id AND #{MessageableUser::AVAILABLE_CONDITIONS})"
-  end
-
-  def messageable_enrollment_clause(options={})
-    options = {:strict_course_state => true}.merge(options)
-    <<-SQL
-    (
-      #{self.class.enrollment_conditions(:current_and_invited, options[:strict_course_state])}
-      OR
-      #{self.class.enrollment_conditions(:completed, options[:strict_course_state])}
-      #{options[:include_concluded_students] ? "" : "AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment')"}
-    )
-    SQL
-  end
-
-  def enrollment_visibility(require_message_permission = true)
-    Rails.cache.fetch([self, 'enrollment_visibility', require_message_permission].cache_key, :expires_in => 1.day) do
-      full_course_ids = []
-      section_id_hash = {}
-      restricted_course_hash = {}
-      user_counts = {}
-      section_user_counts = {}
-      student_in_course_ids = []
-      linked_observer_ids = observee_enrollments.collect {|e| e.user_id}.uniq
-      courses_with_primary_enrollment(:current_and_concluded_courses, nil, :include_completed_courses => true).each do |course|
-        section_visibilities = course.section_visibilities_for(self)
-        conditions = nil
-        case course.enrollment_visibility_level_for(self, section_visibilities, require_message_permission)
-          when :full
-            full_course_ids << course.id
-          when :sections
-            section_id_hash[course.id] = section_visibilities.map{|s| s[:course_section_id]}
-            conditions = {:course_section_id => section_id_hash[course.id]}
-          when :restricted
-            section_visibilities.each do |s|
-              restricted_course_hash[course.id] ||= []
-              restricted_course_hash[course.id] << s[:associated_user_id] if s[:associated_user_id]
-            end
-            conditions = "enrollments.type = 'TeacherEnrollment' OR enrollments.type = 'TaEnrollment' OR enrollments.user_id IN (#{([self.id] + restricted_course_hash[course.id].uniq).join(',')})"
-        end
-        base_conditions = messageable_enrollment_clause
-        base_conditions << " AND " << messageable_enrollment_user_clause
-        if course.primary_enrollment == 'StudentEnrollment'
-          student_in_course_ids << course.id
-          base_conditions << " AND (enrollments.type != 'ObserverEnrollment'"
-          base_conditions << "  OR enrollments.user_id IN (#{linked_observer_ids.join(',')})" if linked_observer_ids.any?
-          base_conditions << ")"
-        end
-        user_counts[course.id] = course.enrollments.scoped(:conditions => base_conditions).scoped(:conditions => conditions).scoped(:conditions => "enrollments.type != 'StudentViewEnrollment'").count("DISTINCT user_id")
-
-        sections = course.sections_visible_to(self)
-        if sections.size > 1
-          sections.each{ |section| section_user_counts[section.id] = 0 }
-          connection.select_all("SELECT course_section_id, COUNT(DISTINCT user_id) AS user_count FROM courses, enrollments WHERE (#{base_conditions}) AND course_section_id IN (#{sections.map(&:id).join(', ')}) AND courses.id = #{course.id} AND enrollments.type != 'StudentViewEnrollment' GROUP BY course_section_id").each do |row|
-            section_user_counts[row["course_section_id"].to_i] = row["user_count"].to_i
-          end
-        end
-      end
-      {:full_course_ids => full_course_ids,
-       :section_id_hash => section_id_hash,
-       :restricted_course_hash => restricted_course_hash,
-       :user_counts => user_counts,
-       :section_user_counts => section_user_counts,
-       :student_in_course_ids => student_in_course_ids,
-       :linked_observer_ids => linked_observer_ids
-      }
-    end
-  end
-  memoize :enrollment_visibility
-
-  def messageable_groups
-    group_visibility = group_membership_visibility
-    group_ids = visible_group_ids.reject{ |id| group_visibility[:user_counts][id] == 0 }
-    if group_ids.present?
-      Group.find_all_by_id(group_ids)
-    else
-      []
-    end
-  end
-
-  def messageable_sections
-    section_ids = enrollment_visibility[:section_user_counts].keys
-    if section_ids.present?
-      CourseSection.find_all_by_id(section_ids)
-    else
-      []
-    end
-  end
-
-  def visible_group_ids
-    Rails.cache.fetch([self, 'messageable_groups'].cache_key, :expires_in => 1.day) do
-      (courses + concluded_courses.recently_ended).inject(self.current_groups) { |groups, course|
-        groups | course.groups.active
-      }.map(&:id)
-    end
-  end
-  memoize :visible_group_ids
-
-  def group_membership_visibility(require_message_permission = true)
-    Rails.cache.fetch([self, 'group_membership_visibility', require_message_permission].cache_key, :expires_in => 1.day) do
-      course_visibility = enrollment_visibility(require_message_permission)
-      own_group_ids = current_groups.map(&:id)
-
-      full_group_ids = []
-      section_id_hash = {}
-      user_counts = {}
-
-      if visible_group_ids.present?
-        Group.find_all_by_id(visible_group_ids).each do |group|
-          if own_group_ids.include?(group.id) || group.context_type == 'Course' && course_visibility[:full_course_ids].include?(group.context_id)
-            full_group_ids << group.id
-            user_counts[group.id] = group.users.size
-          elsif group.context_type == 'Course' && sections = course_visibility[:section_id_hash][group.context_id]
-            section_id_hash[group.id] = sections
-            user_counts[group.id] = group.context.enrollments.scoped(:conditions => [
-              "user_id IN (?) AND course_section_id IN (?) AND #{messageable_enrollment_user_clause} AND #{messageable_enrollment_clause(:include_concluded_students => true)}",
-              group.group_memberships.map(&:user_id),
-              sections
-            ]).size
-          end
-        end
-      end
-      {:full_group_ids => full_group_ids,
-       :section_id_hash => section_id_hash,
-       :user_counts => user_counts
-      }
-    end
-  end
-  memoize :group_membership_visibility
-
-  def deprecated_search_messageable_users(options = {})
-    # if :ids is specified but empty (different than just not specified), don't
-    # bother doing a query that's guaranteed to return no results.
-    return [] if options[:ids] && options[:ids].empty?
-
-    # provides a mechanism for admins to search within a context, even if not
-    # enrolled in it
-    admin_context = options[:admin_context]
-
-    course_hash = enrollment_visibility
-    course_hash[:full_course_ids] << admin_context.id if admin_context.is_a?(Course)
-    course_hash[:full_course_ids] << admin_context.course_id if admin_context.is_a?(CourseSection)
-    full_course_ids = course_hash[:full_course_ids]
-    restricted_course_hash = course_hash[:restricted_course_hash]
-
-    group_hash = group_membership_visibility
-    group_hash[:full_group_ids] << admin_context.id if admin_context.is_a?(Group)
-    full_group_ids = group_hash[:full_group_ids]
-    group_section_ids = []
-    student_in_course_ids = course_hash[:student_in_course_ids]
-    linked_observer_ids = course_hash[:linked_observer_ids]
-    account_ids = []
-
-    limited_id = {}
-    enrollment_type_sql = " AND enrollments.type != 'StudentViewEnrollment'"
-    if student_in_course_ids.present?
-      enrollment_type_sql += " AND (enrollments.type != 'ObserverEnrollment' OR course_id NOT IN (#{student_in_course_ids.join(',')})"
-      enrollment_type_sql += "  OR user_id IN (#{linked_observer_ids.join(',')})" if linked_observer_ids.present?
-      enrollment_type_sql += ")"
-    end
-    
-    include_concluded_students = true
-
-    if options[:context]
-      if options[:context].sub(/_all\z/, '') =~ MessageableUser::Calculator::CONTEXT_RECIPIENT
-        type = $1
-        include_concluded_students = false unless type == 'group'
-        limited_id[type] = $2.to_i
-        enrollment_type = $4
-        if enrollment_type && type != 'group' # course and section only, since the only group "enrollment type" is member
-          if enrollment_type == 'admins'
-            enrollment_type_sql += " AND enrollments.type IN ('TeacherEnrollment','TaEnrollment')"
-          else
-            enrollment_type_sql += " AND enrollments.type = '#{enrollment_type.capitalize.singularize}Enrollment'"
-          end
-        end
-      end
-      full_course_ids &= [limited_id['course']]
-      full_group_ids &= [limited_id['group']]
-      restricted_course_hash.delete_if{ |course_id, ids| course_id != limited_id['course']}
-      if limited_id['section'] && section = CourseSection.find_by_id(limited_id['section'])
-        course_section_ids = course_hash[:full_course_ids].include?(section.course_id) ?
-          [limited_id['section']] :
-          (course_hash[:section_id_hash][section.course_id] || []) & [limited_id['section']]
-      else
-        course_section_ids = course_hash[:section_id_hash].values_at(limited_id['course']).flatten.compact
-        group_section_ids = group_hash[:section_id_hash].values_at(limited_id['group']).flatten.compact
-      end
-    else
-      course_section_ids = course_hash[:section_id_hash].values.flatten
-      # if we're not searching with a context in mind, include any users we
-      # have admin access to know about
-      account_ids = associated_accounts.select{ |a| a.grants_right?(self, nil, :read_roster) }.map(&:id)
-      account_ids &= options[:account_ids] if options[:account_ids]
-    end
-
-    user_conditions = []
-    if options[:skip_visibility_checks]
-      user_conditions << "users.workflow_state != 'deleted'" if options[:ids].blank?
-    else
-      user_conditions << MessageableUser::AVAILABLE_CONDITIONS
-    end
-    user_conditions << "users.id IN (#{options[:ids].map(&:to_i).join(', ')})" if options[:ids].present?
-    user_conditions << "users.id NOT IN (#{options[:exclude_ids].map(&:to_i).join(', ')})" if options[:exclude_ids].present?
-    if options[:search] && (parts = options[:search].strip.split(/\s+/)).present?
-      parts.each do |part|
-        user_conditions << "(#{wildcard('users.name', 'users.short_name', part)})"
-      end
-    end
-    user_condition_sql = user_conditions.present? ? "AND " + user_conditions.join(" AND ") : ""
-    user_sql = []
-
-    # this is redundant (and potentially less restrictive than course_sql),
-    # but it allows the planner to initially limit enrollments to relevant
-    # courses much more efficiently than the OR'ed course_sql does
-    all_course_ids = (course_hash[:full_course_ids] + course_hash[:section_id_hash].keys + restricted_course_hash.keys).compact
-
-    course_sql = []
-    course_sql << "(course_id IN (#{full_course_ids.join(',')}))" if full_course_ids.present?
-    course_sql << "(course_section_id IN (#{course_section_ids.join(',')}))" if course_section_ids.present?
-    course_sql << "(course_section_id IN (#{group_section_ids.join(',')}) AND EXISTS(SELECT 1 FROM group_memberships WHERE user_id = users.id AND group_id = #{limited_id['group']}) )" if limited_id['group'] && group_section_ids.present?
-    course_sql << "(course_id IN (#{restricted_course_hash.keys.join(',')}) AND (enrollments.type = 'TeacherEnrollment' OR enrollments.type = 'TaEnrollment' OR enrollments.user_id IN (#{([self.id] + restricted_course_hash.values.flatten.uniq).join(',')})))" if restricted_course_hash.present?
-    user_sql << <<-SQL if course_sql.present?
-      SELECT #{MessageableUser::SELECT}, course_id, NULL AS group_id, #{connection.func(:group_concat, :'enrollments.type', ':')} AS roles
-      FROM users, enrollments, courses
-      WHERE course_id IN (#{all_course_ids.join(', ')})
-        AND (#{course_sql.join(' OR ')}) AND users.id = user_id AND courses.id = course_id
-        AND #{messageable_enrollment_clause(:include_concluded_students => include_concluded_students, :strict_course_state => !options[:skip_visibility_checks])}
-        #{enrollment_type_sql}
-        #{user_condition_sql}
-      GROUP BY #{connection.group_by(['users.id', 'course_id'], *(MessageableUser::COLUMNS[1, MessageableUser::COLUMNS.size]))}
-    SQL
-
-    user_sql << <<-SQL if full_group_ids.present?
-      SELECT #{MessageableUser::SELECT}, NULL AS course_id, group_id, NULL AS roles
-      FROM users, group_memberships
-      WHERE group_id IN (#{full_group_ids.join(',')}) AND users.id = user_id
-        AND group_memberships.workflow_state = 'accepted'
-        #{user_condition_sql}
-    SQL
-
-    # if this is an account admin who doesn't have any courses/groups in common
-    # with the user, we want to know the user's highest current enrollment type
-    highest_enrollment_sql = <<-SQL
-      SELECT type
-      FROM enrollments, courses
-      WHERE
-        user_id = users.id AND courses.id = course_id
-        AND (#{self.class.enrollment_conditions(:current_and_invited)})
-      ORDER BY #{Enrollment.type_rank_sql}
-      LIMIT 1
-    SQL
-    user_sql << <<-SQL if account_ids.present?
-      SELECT #{MessageableUser::SELECT}, 0 AS course_id, NULL AS group_id, (#{highest_enrollment_sql}) AS roles
-      FROM users, user_account_associations
-      WHERE user_account_associations.account_id IN (#{account_ids.join(',')})
-        AND user_account_associations.user_id = users.id
-        #{user_condition_sql}
-    SQL
-    user_sql << <<-SQL unless options[:context]
-      SELECT #{MessageableUser::SELECT}, NULL AS course_id, NULL AS group_id, NULL AS roles
-      FROM users
-      WHERE id = #{self.id}
-        #{user_condition_sql}
-    SQL
-
-    if options[:ids]
-      # provides a way for this user to start a conversation with someone
-      # that isn't normally messageable (requires that they already be in a
-      # conversation with that user)
-      if options[:conversation_id].present?
-        user_sql << <<-SQL
-          SELECT #{MessageableUser::SELECT}, NULL AS course_id, NULL AS group_id, NULL AS roles
-          FROM users, conversation_participants
-          WHERE conversation_participants.user_id = users.id
-            AND conversation_participants.conversation_id = #{options[:conversation_id].to_i}
-            #{user_condition_sql}
-        SQL
-      elsif options[:skip_visibility_checks] # we don't care about the contexts, we've passed in ids
-        user_sql << <<-SQL
-          SELECT #{MessageableUser::SELECT}, NULL AS course_id, NULL AS group_id, NULL AS roles
-          FROM users
-          #{user_condition_sql.sub(/\AAND/, "WHERE")}
-        SQL
-      end
-    end
-
-    # if none of our potential sources was included, we're done
-    return [] if user_sql.empty?
-
-    concat_sql = connection.adapter_name =~ /postgres/i ? :"course_id::text || ':' || roles::text" : :"course_id || ':' || roles"
-    users = User.find_by_sql(<<-SQL)
-      SELECT #{MessageableUser::SELECT},
-        #{connection.func(:group_concat, concat_sql)} AS common_courses,
-        #{connection.func(:group_concat, :group_id)} AS common_groups
-      FROM (
-        #{user_sql.join(' UNION ')}
-      ) users
-      GROUP BY #{connection.group_by(*MessageableUser::COLUMNS)}
-      ORDER BY #{options[:rank_results] ? "(COUNT(course_id) + COUNT(group_id)) DESC," : ""}
-        LOWER(COALESCE(short_name, name)),
-        id
-      #{options[:limit] && options[:limit] > 0 ? "LIMIT #{options[:limit].to_i}" : ""}
-      #{options[:offset] && options[:offset] > 0 ? "OFFSET #{options[:offset].to_i}" : ""}
-    SQL
-    users.each do |user|
-      user.common_courses = user.common_courses.to_s.split(",").inject({}){ |hash, info|
-        roles = info.split(/:/)
-        hash[roles.shift.to_i] = roles
-        hash
-      }
-      user.common_groups = user.common_groups.to_s.split(",").inject({}){ |hash, info|
-        roles = info.split(/:/)
-        hash[roles.shift.to_i] = ['Member']
-        hash
-      }
-    end
-  end
-
   def load_messageable_user(user, options={})
     MessageableUser::Calculator.load_messageable_user(self, user, options)
   end
@@ -2356,6 +2036,46 @@ class User < ActiveRecord::Base
 
   def messageable_users_in_context(asset_string)
     MessageableUser::Calculator.messageable_users_in_context(self, asset_string)
+  end
+
+  def count_messageable_users_in_context(asset_string)
+    MessageableUser::Calculator.count_messageable_users_in_context(self, asset_string)
+  end
+
+  def messageable_users_in_course(course_or_id)
+    MessageableUser::Calculator.messageable_users_in_course(self, course_or_id)
+  end
+
+  def count_messageable_users_in_course(course_or_id)
+    MessageableUser::Calculator.count_messageable_users_in_course(self, course_or_id)
+  end
+
+  def messageable_users_in_section(section_or_id)
+    MessageableUser::Calculator.messageable_users_in_section(self, section_or_id)
+  end
+
+  def count_messageable_users_in_section(section_or_id)
+    MessageableUser::Calculator.count_messageable_users_in_section(self, section_or_id)
+  end
+
+  def messageable_users_in_group(group_or_id)
+    MessageableUser::Calculator.messageable_users_in_group(self, group_or_id)
+  end
+
+  def count_messageable_users_in_group(group_or_id)
+    MessageableUser::Calculator.count_messageable_users_in_group(self, group_or_id)
+  end
+
+  def search_messageable_users(options={})
+    MessageableUser::Calculator.search_messageable_users(self, options)
+  end
+
+  def messageable_sections
+    MessageableUser::Calculator.messageable_sections(self)
+  end
+
+  def messageable_groups
+    MessageableUser::Calculator.messageable_groups(self)
   end
 
   def short_name_with_shared_contexts(user)
