@@ -39,10 +39,8 @@ class InboxItem < ActiveRecord::Base
   attr_accessible :user_id, :asset, :subject, :body_teaser, :sender_id
 
   # Named scopes
-  named_scope :active, :conditions => ['workflow_state NOT IN ?',
-    %w{deleted retired retired_unread}]
-  named_scope :unread, lambda {
-    { :conditions => ['workflow_state = ?', 'unread'] } }
+  named_scope :active, :conditions => "workflow_state NOT IN ('deleted', 'retired', 'retired_unread')"
+  named_scope :unread, :conditions => {:workflow_state => 'unread'}
 
   # State machine
   workflow do
