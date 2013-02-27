@@ -39,12 +39,6 @@
       </div>
     </div>
     <div class="control-group">
-      <label class="control-label" for="student_birthdate"><%= t "labels.birthdate", "Birth Date" %></label>
-      <div class="controls">
-        <%= date_select 'user', 'birthdate', {:start_year => Time.now.year - 1, :end_year => Time.now.year - 125, :include_blank => true}, :class => 'date-select', :id => 'student_birthdate' %>
-      </div>
-    </div>
-    <div class="control-group">
       <div class="controls">
         <label class="checkbox">
           <input type="checkbox" name="user[terms_of_use]" value="1">

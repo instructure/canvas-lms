@@ -201,9 +201,6 @@ describe "users" do
       form = fj('.ui-dialog:visible form')
       f('#student_join_code').send_keys(@course.self_enrollment_code)
       f('#student_name').send_keys('student!')
-      form.find_element(:css, "select[name='user[birthdate(1i)]'] option[value='#{Time.now.year - 20}']").click
-      form.find_element(:css, "select[name='user[birthdate(2i)]'] option[value='1']").click
-      form.find_element(:css, "select[name='user[birthdate(3i)]'] option[value='1']").click
       f('#student_username').send_keys('student')
       f('#student_password').send_keys('asdfasdf')
       f('#student_password_confirmation').send_keys('asdfasdf')
@@ -224,9 +221,6 @@ describe "users" do
       form = fj('.ui-dialog:visible form')
       f('#student_higher_ed_name').send_keys('student!')
       f('#student_higher_ed_email').send_keys('student@example.com')
-      form.find_element(:css, "select[name='user[birthdate(1i)]'] option[value='#{Time.now.year - 20}']").click
-      form.find_element(:css, "select[name='user[birthdate(2i)]'] option[value='1']").click
-      form.find_element(:css, "select[name='user[birthdate(3i)]'] option[value='1']").click
       form.find_element(:css, 'input[name="user[terms_of_use]"]').click
 
       expect_new_page_load { form.submit }

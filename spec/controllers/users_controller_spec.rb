@@ -270,23 +270,6 @@ describe UsersController do
         json["errors"]["user"]["terms_of_use"].should be_present
       end
 
-      it "should validate the birthdate if a student" do
-        post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :initial_enrollment_type => 'student' }
-        response.status.should =~ /400 Bad Request/
-        json = JSON.parse(response.body)
-        json["errors"]["user"]["birthdate"].should be_present
-
-        post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :birthdate => 2.years.ago.strftime('%Y-%m-%d'), :initial_enrollment_type => 'student' }
-        response.status.should =~ /400 Bad Request/
-        json = JSON.parse(response.body)
-        json["errors"]["user"]["birthdate"].should be_present
-
-        post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :birthdate => 20.years.ago.strftime('%Y-%m-%d'), :initial_enrollment_type => 'student' }
-        u = User.find_by_name 'Jacob Fugal'
-        u.should be_pre_registered
-        response.should be_success
-      end
-
       it "should require email pseudonyms by default" do
         post 'create', :pseudonym => { :unique_id => 'jacob' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' }
         response.status.should =~ /400 Bad Request/
@@ -302,14 +285,14 @@ describe UsersController do
       end
 
       it "should validate the self enrollment code" do
-        post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :birthdate => 20.years.ago.strftime('%Y-%m-%d'), :self_enrollment_code => 'omg ... not valid', :initial_enrollment_type => 'student' }, :self_enrollment => '1'
+        post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => 'omg ... not valid', :initial_enrollment_type => 'student' }, :self_enrollment => '1'
         response.status.should =~ /400 Bad Request/
         json = JSON.parse(response.body)
         json["errors"]["user"]["self_enrollment_code"].should be_present
       end
 
       it "should ignore the password if not self enrolling" do
-        post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :birthdate => 20.years.ago.strftime('%Y-%m-%d'), :initial_enrollment_type => 'student' }
+        post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :initial_enrollment_type => 'student' }
         response.should be_success
         u = User.find_by_name 'Jacob Fugal'
         u.should be_pre_registered
@@ -320,7 +303,7 @@ describe UsersController do
         course(:active_all => true)
         @course.update_attribute(:self_enrollment, true)
 
-        post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :birthdate => 20.years.ago.strftime('%Y-%m-%d'), :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'email', :self_enrollment => '1'
+        post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'email', :self_enrollment => '1'
         response.should be_success
         u = User.find_by_name 'Jacob Fugal'
         u.should be_pre_registered
@@ -331,7 +314,7 @@ describe UsersController do
         course(:active_all => true)
         @course.update_attribute(:self_enrollment, true)
 
-        post 'create', :pseudonym => { :unique_id => 'jacob' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :birthdate => 20.years.ago.strftime('%Y-%m-%d'), :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'username', :self_enrollment => '1'
+        post 'create', :pseudonym => { :unique_id => 'jacob' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'username', :self_enrollment => '1'
         response.status.should =~ /400 Bad Request/
         json = JSON.parse(response.body)
         json["errors"]["pseudonym"]["password"].should be_present
@@ -342,7 +325,7 @@ describe UsersController do
         course(:active_all => true)
         @course.update_attribute(:self_enrollment, true)
 
-        post 'create', :pseudonym => { :unique_id => 'jacob', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :birthdate => 20.years.ago.strftime('%Y-%m-%d'), :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'username', :self_enrollment => '1'
+        post 'create', :pseudonym => { :unique_id => 'jacob', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'username', :self_enrollment => '1'
         response.should be_success
         u = User.find_by_name 'Jacob Fugal'
         @course.students.should include(u)
@@ -403,7 +386,7 @@ describe UsersController do
         end
 
 
-        it "should not require acceptance of the terms or birthdate" do
+        it "should not require acceptance of the terms" do
           post 'create', :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }
           response.should be_success
         end

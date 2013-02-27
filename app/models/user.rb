@@ -264,13 +264,8 @@ class User < ActiveRecord::Base
   has_a_broadcast_policy
 
   attr_accessor :require_acceptance_of_terms, :require_presence_of_name,
-    :require_self_enrollment_code, :require_birthdate, :self_enrollment_code,
+    :require_self_enrollment_code, :self_enrollment_code,
     :self_enrollment_course, :validation_root_account
-
-  # users younger than this age can't sign up without a course join code
-  def self.self_enrollment_min_age
-    13
-  end
 
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
   validates_length_of :short_name, :maximum => maximum_string_length, :allow_nil => true
@@ -278,14 +273,6 @@ class User < ActiveRecord::Base
   validates_presence_of :name, :if => :require_presence_of_name
   validates_locale :locale, :browser_locale, :allow_nil => true
   validates_acceptance_of :terms_of_use, :if => :require_acceptance_of_terms, :allow_nil => false
-  validates_each :birthdate do |record, attr, value|
-    next unless record.require_birthdate
-    if value
-      record.errors.add(attr, "too_young") if !record.require_self_enrollment_code && value > self_enrollment_min_age.years.ago
-    else
-      record.errors.add(attr, "blank")
-    end
-  end
   validates_each :self_enrollment_code do |record, attr, value|
     next unless record.require_self_enrollment_code
     if value.blank?
@@ -296,7 +283,6 @@ class User < ActiveRecord::Base
       if course && course.self_enrollment?
         record.errors.add(attr, "full") if course.self_enrollment_limit_met?
         record.errors.add(attr, "already_enrolled") if course.user_is_student?(record, :include_future => true)
-        record.errors.add(:birthdate, "too_young") if course.self_enrollment_min_age && record.birthdate && record.birthdate > course.self_enrollment_min_age.years.ago
       else
         record.errors.add(attr, "invalid")
       end

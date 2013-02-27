@@ -758,10 +758,6 @@ class Course < ActiveRecord::Base
     code
   end
 
-  # can be overridden via plugin
-  def self_enrollment_min_age
-  end
-
   def self_enrollment_limit_met?
     self_enrollment_limit && self_enrolled_students.size >= self_enrollment_limit
   end
