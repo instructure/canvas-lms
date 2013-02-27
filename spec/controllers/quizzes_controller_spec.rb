@@ -139,6 +139,34 @@ describe QuizzesController do
       assigns[:stored_params].should_not be_nil
     end
 
+    it "should set the submission count variables" do
+      course(:active_all => 1)
+      @section = @course.course_sections.create!(:name => 'section 2')
+      @user2 = user_with_pseudonym(:active_all => true, :name => 'Student2', :username => 'student2@instructure.com')
+      @section.enroll_user(@user2, 'StudentEnrollment', 'active')
+      @user1 = user_with_pseudonym(:active_all => true, :name => 'Student1', :username => 'student1@instructure.com')
+      @course.enroll_student(@user1)
+      @ta1 = user_with_pseudonym(:active_all => true, :name => 'TA1', :username => 'ta1@instructure.com')
+      @course.enroll_ta(@ta1).update_attribute(:limit_privileges_to_course_section, true)
+      course_quiz
+      @sub1 = @quiz.generate_submission(@user1)
+      @sub2 = @quiz.generate_submission(@user2)
+      @sub2.start_grading
+      @sub2.update_attribute(:workflow_state, 'pending_review')
+
+      user_session @teacher
+      get 'show', :course_id => @course.id, :id => @quiz.id
+      assigns[:submitted_student_count].should == 2
+      assigns[:any_submissions_pending_review].should == true
+
+      user_session @ta1
+      get 'show', :course_id => @course.id, :id => @quiz.id
+      assigns[:submitted_student_count].should == 1
+      assigns[:any_submissions_pending_review].should == false
+    end
+  end
+
+  describe "GET 'managed_quiz_data'" do
     it "should respect section privilege limitations" do
       course(:active_all => 1)
       @section = @course.course_sections.create!(:name => 'section 2')
@@ -153,12 +181,12 @@ describe QuizzesController do
       @sub2 = @quiz.generate_submission(@user2)
 
       user_session @teacher
-      get 'show', :course_id => @course.id, :id => @quiz.id
+      get 'managed_quiz_data', :course_id => @course.id, :quiz_id => @quiz.id
       assigns[:submissions].sort_by(&:id).should ==[@sub1, @sub2].sort_by(&:id)
       assigns[:submitted_students].sort_by(&:id).should == [@user1, @user2].sort_by(&:id)
 
       user_session @ta1
-      get 'show', :course_id => @course.id, :id => @quiz.id
+      get 'managed_quiz_data', :course_id => @course.id, :quiz_id => @quiz.id
       assigns[:submissions].should ==[@sub1]
       assigns[:submitted_students].should == [@user1]
     end

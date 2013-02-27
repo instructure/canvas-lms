@@ -131,6 +131,7 @@ describe "quizzes" do
       get "/courses/#{@course.id}/quizzes/#{q.id}"
 
       driver.find_element(:partial_link_text, "Message Students Who...").click
+      wait_for_ajaximations
       dialog = ffj("#message_students_dialog:visible")
       dialog.length.should == 1
       dialog = dialog.first
@@ -150,6 +151,18 @@ describe "quizzes" do
       wait_for_ajax_requests
 
       student.conversations.size.should == 1
+    end
+
+    it "should asynchronously load student quiz results" do
+      @context = @course
+      q = quiz_model
+      q.generate_quiz_data
+      q.save!
+
+      get "/courses/#{@course.id}/quizzes/#{q.id}"
+      f('.quiz_details_link').click
+      wait_for_ajaximations
+      f('#quiz_details').should be_displayed
     end
 
     it "should not duplicate unpublished quizzes each time you open the publish multiple quizzes dialog" do

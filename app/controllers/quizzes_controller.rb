@@ -22,7 +22,7 @@ class QuizzesController < ApplicationController
   before_filter :require_context
   add_crumb(proc { t(:top_level_crumb, "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
-  before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :filters, :read_only]
+  before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :filters, :read_only, :managed_quiz_data]
 
   # The number of questions that can display "details". After this number, the "Show details" option is disabled
   # and the data is not even loaded.
@@ -174,7 +174,7 @@ class QuizzesController < ApplicationController
         @submission.reload
         @just_graded = true
       end
-      managed_quiz_data if @quiz.grants_right?(@current_user, session, :grade) || @quiz.grants_right?(@current_user, session, :read_statistics)
+      submission_counts if @quiz.grants_right?(@current_user, session, :grade) || @quiz.grants_right?(@current_user, session, :read_statistics)
       @stored_params = (@submission.temporary_data rescue nil) if params[:take] && @submission && (@submission.untaken? || @submission.preview?)
       @stored_params ||= {}
       log_asset_access(@quiz, "quizzes", "quizzes")
@@ -190,17 +190,19 @@ class QuizzesController < ApplicationController
   end
 
   def managed_quiz_data
-    students = @context.students_visible_to(@current_user).order_by_sortable_name.to_a
-    @submissions = @quiz.quiz_submissions.for_user_ids(students.map(&:id)).scoped(:conditions => "workflow_state<>'settings_only'").all
-    submission_ids = {}
-    @submissions.each{|s| submission_ids[s.user_id] = s.id }
-    @submitted_students = students.select{|stu| submission_ids[stu.id] }
-    if @quiz.survey? && @quiz.anonymous_submissions
-      @submitted_students = @submitted_students.sort_by{|stu| submission_ids[stu.id] }
+    if authorized_action(@quiz, @current_user, [:grade, :read_statistics])
+      students = @context.students_visible_to(@current_user).order_by_sortable_name.to_a
+      @submissions = @quiz.quiz_submissions.for_user_ids(students.map(&:id)).scoped(:conditions => "workflow_state<>'settings_only'").all
+      submission_ids = {}
+      @submissions.each{|s| submission_ids[s.user_id] = s.id }
+      @submitted_students = students.select{|stu| submission_ids[stu.id] }
+      if @quiz.survey? && @quiz.anonymous_submissions
+        @submitted_students = @submitted_students.sort_by{|stu| submission_ids[stu.id] }
+      end
+      @unsubmitted_students = students.reject{|stu| submission_ids[stu.id] }
+      render :layout => false
     end
-    @unsubmitted_students = students.reject{|stu| submission_ids[stu.id] }
   end
-  protected :managed_quiz_data
 
   def lockdown_browser_required
     plugin = Canvas::LockdownBrowser.plugin
@@ -593,5 +595,12 @@ class QuizzesController < ApplicationController
 
   def quiz_submission_active?
     @submission && (@submission.untaken? || @submission.preview?) && !@just_graded
+  end
+
+  # counts of submissions queried in #managed_quiz_data
+  def submission_counts
+    submitted_with_submissions = @context.students_visible_to(@current_user).scoped(:joins => :quiz_submissions, :conditions => ["quiz_submissions.quiz_id=? AND quiz_submissions.workflow_state<>'settings_only'", @quiz.id])
+    @submitted_student_count = submitted_with_submissions.count('DISTINCT users.id')
+    @any_submissions_pending_review = submitted_with_submissions.scoped(:conditions => "quiz_submissions.workflow_state = 'pending_review'").count > 0
   end
 end

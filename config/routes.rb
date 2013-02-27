@@ -252,6 +252,7 @@ ActionController::Routing::Routes.draw do |map|
     add_question_banks(course)
     course.quizzes_publish 'quizzes/publish', :controller => 'quizzes', :action => 'publish'
     course.resources :quizzes do |quiz|
+      quiz.managed_quiz_data "managed_quiz_data", :controller => "quizzes", :action => "managed_quiz_data"
       quiz.reorder "reorder", :controller => "quizzes", :action => "reorder"
       quiz.history "history", :controller => "quizzes", :action => "history"
       quiz.statistics "statistics", :controller => 'quizzes', :action => 'statistics'

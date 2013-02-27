@@ -8,7 +8,7 @@
 
         <% if can_do(@quiz, @current_user, :update) %>
           <% if can_do(@quiz, @current_user, :manage) %>
-            <% if @submitted_students && !@submitted_students.empty? && @context.allows_speed_grader? %>
+            <% if @submitted_student_count && @submitted_student_count > 0 && @context.allows_speed_grader? %>
               <li>
                 <a href="<%= context_url(@context, :context_quiz_statistics_url, @quiz.id) %>">
                   <i class="icon-stats"></i> <%= @quiz.survey? ? t('links.survey_statistics', "Survey Statistics") : t('links.quiz_statistics', "Quiz Statistics") %>
@@ -52,7 +52,7 @@
             <% end %>
           <% end %>
         <% elsif can_do(@quiz, @current_user, :review_grades) %>
-          <% if @submitted_students && !@submitted_students.empty? && @context.allows_speed_grader? %>
+          <% if @submitted_student_count && @submitted_student_count > 0 && @context.allows_speed_grader? %>
             <li>
               <a href="<%= context_url(@context, :context_quiz_statistics_url, @quiz.id) %>" class="btn button-sidebar-wide"><i class="icon-stats"></i> <%= @quiz.survey? ? t('links.survey_statistics', "Survey Statistics") : t('links.quiz_statistics', "Quiz Statistics") %></a>
             </li>
@@ -63,15 +63,13 @@
         <% end %>
 
         <% if (can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades)) && @quiz.available? %>
-          <% submitted_student_ids = @submitted_students.map{|s| s.id} %>
-
           <li>
             <a href="#" class="quiz_details_link">
-              <% if @submissions.find{|s| s.pending_review? && submitted_student_ids.include?(s.user_id)} %>
+              <% if @any_submissions_pending_review %>
                 <i class="icon-warning"></i>
               <% end %>
               <i class="icon-group"></i> <%= @quiz.survey? ? t('links.show_student_survey_results', "Show Student Survey Results") : t('links.show_student_quiz_results', "Show Student Quiz Results") %>
-              <div style="font-size: 0.8em; padding-left: 20px;">(<%= t(:students_submitted_so_far, {:one => "1 student submitted so far", :other => "%{count} students submitted so far"}, :count => @submitted_students.length) %>)</div>
+              <div style="font-size: 0.8em; padding-left: 20px;">(<%= t(:students_submitted_so_far, {:one => "1 student submitted so far", :other => "%{count} students submitted so far"}, :count => @submitted_student_count) %>)</div>
             </a>
           </li>
             <% if @quiz.assignment && @context.allows_speed_grader? %>
@@ -228,66 +226,7 @@
     <% end %>
 
     <% if @quiz.available? %>
-      <% if can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades) %>
-        <table id="quiz_details">
-          <tr>
-            <td>
-              <h3><%= @quiz.survey? ? t('headers.submitted_students_survey', "Students who have taken the survey") : t('headers.submitted_students_quiz', "Students who have taken the quiz") %></h3>
-              <ul class="student_list submitted">
-                <% if @submitted_students.empty? %>
-                  <li><%= @quiz.survey? ? t(:survey_no_submissions, "No Students have taken the survey yet") : t(:quiz_no_submissions, "No Students have taken the quiz yet") %></li>
-                <% end %>
-                <% @submitted_students.each_with_index do |s, idx| %>
-                  <% submission = @submissions.find{|qs| qs.user_id == s.id} %>
-                  <li class="student" data-id="<%= s.id %>">
-                    <% if submission.pending_review? %>
-                      <i class="icon-warning" title="<%= t('titles.submission_needs_review', "This submission needs review") %>"></i>
-                    <% end %>
-                    <a href="<%= context_url(@context, :context_quiz_history_url, @quiz, :quiz_submission_id => submission.id) %>" class="name">
-                      <% if @quiz.survey? && @quiz.anonymous_submissions %>
-                        <%= t(:anonymous_student, "Student %{n}", :n => idx + 1) %>
-                      <% else %>
-                        <%= s.name %>
-                      <% end %>
-                    </a>
-                  </li>
-                <% end %>
-              </ul>
-            </td>
-            <td style="padding-left: 20px;">
-              <% if @quiz.survey? && @quiz.anonymous_submissions %>
-                <h3>
-                  <%= render_unsubmitted_students(@unsubmitted_students.length) %>
-                </h3>
-              <% else %>
-                <h3>
-                  <% if @quiz.survey? %>
-                    <%= t('headers.survey_unsubmitted_students', "Students who haven't taken the survey") %>
-                  <% else %>
-                    <%= t('headers.quiz_unsubmitted_students', "Students who haven't taken the quiz") %>
-                  <% end %>
-                </h3>
-                <ul class="student_list">
-                  <% if @unsubmitted_students.empty? && !@submitted_students.empty? %>
-                    <li>
-                      <% if @quiz.survey? %>
-                        <%= t(:survey_all_students_submitted, "All Students have taken the survey") %>
-                      <% else %>
-                        <%= t(:quiz_all_students_submitted, "All Students have taken the quiz") %>
-                      <% end %>
-                    </li>
-                  <% end %>
-                  <% @unsubmitted_students.each do |s| %>
-                    <li class="student" data-id="<%= s.id %>">
-                      <span class="name"><%= s.name %></span>
-                    </li>
-                  <% end %>
-                </ul>
-              <% end %>
-            </td>
-          </tr>
-        </table>
-      <% end %>
+      <div id="quiz_details_wrapper" data-url="<%= course_quiz_managed_quiz_data_url(@context.id, @quiz.id) %>" data-submitted-count="<%= @submitted_student_count %>"></div>
 
       <% if !@submission || !@submission.completed? || @quiz.unlimited_attempts? || (@submission.completed? && @submission.attempts_left > 0) %>
         <% if @locked && !can_do(@quiz, @current_user, :update) %>
