@@ -53,32 +53,23 @@ define([
 
   var dueDateList, overrideView, quizModel, sectionList;
 
-  function unfudgeDates( overrides ) {
-    var dates = [ 'due_at', 'unlock_at', 'lock_at' ];
-    for (var i = 0; i < overrides.length; i++) {
-      for ( var date in dates ) {
-        var dateField = dates[date];
-        if (!dates.hasOwnProperty(date) || !overrides[i][dateField]) continue;
-        var _date = $.unfudgeDateForProfileTimezone(
-          Date.parse(overrides[i][dateField]||"")
-        );
-        if (_date) _date = _date.toISOString();
-        overrides[i][dateField] = _date || "";
-      }
-    }
-  }
-
   function adjustOverridesForFormParams(overrides){
     var idx = 0;
     var overridesLength = overrides.length;
     var _override = null;
+    var dates = [ 'due_at', 'lock_at', 'unlock_at' ];
     // make sure we don't send the literal string "null" to the server.
-    unfudgeDates(overrides);
     for (idx;idx< overridesLength;idx++){
       _override = overrides[idx]
-      _override.due_at = _override.due_at || "";
-      _override.unlock_at = _override.unlock_at || "";
-      _override.lock_at = _override.lock_at || "";
+      for (var date in dates) {
+        var _date = dates[date];
+        if (!dates.hasOwnProperty(date)) continue;
+        if (_override[_date]) {
+          _override[_date] = _override[_date].toUTCString();
+        } else {
+          _override[_date] = "";
+        }
+      }
       // TODO: let the quiz API handle this.
       // The AssignmentOverride model can take care of these values.
       // See the automatically defined methods via self.override
@@ -1289,7 +1280,7 @@ define([
           var finalQuiz = overrideView.getDefaultDueDate();
           if (finalQuiz) {
             finalQuiz = finalQuiz.toJSON().assignment_override;
-            unfudgeDates([finalQuiz]);
+            adjustOverridesForFormParams([finalQuiz]);
             data['quiz[due_at]'] = finalQuiz.due_at || ""
             data['quiz[unlock_at]'] = finalQuiz.unlock_at || "";
             data['quiz[lock_at]'] = finalQuiz.lock_at || "";
