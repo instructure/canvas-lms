@@ -2,8 +2,7 @@
   js_bundle :registration
   jammit_css :registration
   js_env :USER => {
-    :LOGIN_HANDLE_NAME => (@domain_root_account.login_handle_name rescue AccountAuthorizationConfig.default_login_handle_name),
-    :MIN_AGE => User.self_enrollment_min_age
+    :LOGIN_HANDLE_NAME => (@domain_root_account.login_handle_name rescue AccountAuthorizationConfig.default_login_handle_name)
   }
   content_for :page_title, t('create_a_canvas_account', "Create a Canvas Account")
   content_for :head, include_stylesheets(:common, :media => "all")
