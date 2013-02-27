@@ -3,7 +3,7 @@
   <div class="control-group">
     <%= label_tag "Courses For", "Courses For", :class => "control-label" %>
     <div class="controls">
-      <%= text_field_tag "username", nil, :class => "input-large", :value => @username, :required => true, :placeholder => "SFU Computing ID" %>
+      <%= text_field_tag "username", nil, :class => "input-large", :value => @sfuid, :required => true, :placeholder => "SFU Computing ID" %>
       <button type="button" id="update_course_list" class="btn">Update</button>
     </div>
   </div>
@@ -11,7 +11,7 @@
     <div class="control-group" id="enroll_me_div">
       <%= label_tag "Enroll Me", "Enroll Me", :class => "control-label" %>
       <div class="controls">
-        <%=  check_box_tag "enroll_me", @username, false, :disabled => true  %>
+        <%=  check_box_tag "enroll_me", @sfuid, false, :disabled => true  %>
         <div>You will be enrolled as a Teacher to the selected courses</div>
       </div>
     </div>
@@ -77,15 +77,15 @@ var opts = {
     });
 
     $("#update_course_list").click(function() {
-        var username = $("#username").val();
+        var sfuid = $("#username").val();
 	      $("#enroll_me_div").hide();
         $("#course_list").html("<h5>Retrieving course list...</h5>");
         var target = document.getElementById("course_list");
         var spinner = new Spinner(opts).spin(target);
 
-        $.getJSON("/sfu/user/" + username, function(data) {
+        $.getJSON("/sfu/user/" + sfuid, function(data) {
             if (data.login_id != null){
-                course_list(username);
+                course_list(sfuid);
             } else {
                 $("#course_list").html("<h5>Invalid SFU Computing ID</h5>");
             }
@@ -95,25 +95,25 @@ var opts = {
 
     function course_list() {
         toggle_enroll_me();
-        var username = $("#username").val();
+        var sfuid = $("#username").val();
 
-        $.getJSON("/sfu/terms/" + username, function(data) {
+        $.getJSON("/sfu/terms/" + sfuid, function(data) {
             $("#course_list").html("");
 
             $.each(data, function (index, term) {
                 $("#course_list").append('<div id="' + term.peopleSoftCode + '"><h4>' + term.formatted1 + '</h4><div id="' + term.peopleSoftCode + '_courses"></div></div>');
                 $("#"+term.peopleSoftCode+"_courses").html("&nbsp;&nbsp;Retrieving courses...");
-                courses_for_terms(username, term.peopleSoftCode);
+                courses_for_terms(sfuid, term.peopleSoftCode);
             });
            $("#course_list").append("<div id='sandbox'><h4>Other</h4></div>");
-           $("#sandbox").append(sandbox_course(username));
+           $("#sandbox").append(sandbox_course(sfuid));
         });
     }
 
-    function courses_for_terms(username, term) {
+    function courses_for_terms(sfuid, term) {
         var target = document.getElementById(term+"_courses");
-  	    var spinner = new Spinner(opts).spin(target);
-        $.getJSON("/sfu/courses/" + username + "/" + term, function(data) {
+  	var spinner = new Spinner(opts).spin(target);
+        $.getJSON("/sfu/courses/" + sfuid + "/" + term, function(data) {
             var num = 1;
             $("#"+term+"_courses").html("");
             $.each(data, function (index, course) {
@@ -188,8 +188,8 @@ var opts = {
             $("#enroll_me_div").hide();
         }
     }
-    function sandbox_course(username) {
-        var title = "Sandbox - " + username;
+    function sandbox_course(sfuid) {
+        var title = "Sandbox - " + sfuid;
         return '<p>&nbsp;&nbsp;<input type="checkbox" name="selected_course_sandbox" id="selected_course_sandbox" value="sandbox" onchange="enable_submit_crosslist();"> ' + title + '</p>';
     }
 
