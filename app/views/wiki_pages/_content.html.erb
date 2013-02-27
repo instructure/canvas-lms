@@ -78,7 +78,9 @@ course will see this page first.  You can change that from [the course home page
         <% if @editing %>
           <%= t('editing_content', 'Editing Content.') %>
         <% else %>
-          <%= user_content(@page.body) %>
+          <% cache(['wiki_page_body_render', @page].cache_key) do %>
+            <%= user_content(@page.body) %>
+          <% end %>
         <% end %>
       </div>
     <% end %>
