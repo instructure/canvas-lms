@@ -39,7 +39,7 @@ module Twitter
   end
 
   def twitter_get_service_user(access_token)
-    credentials = JSON.parse(access_token.get('/1/account/verify_credentials.json').body)
+    credentials = JSON.parse(access_token.get('/1.1/account/verify_credentials.json').body)
     service_user_id = credentials["id"]
     service_user_name = credentials["screen_name"]
     return service_user_id, service_user_name
@@ -87,7 +87,7 @@ module Twitter
 
   def twitter_send(message, access_token=nil)
     access_token ||= twitter_retrieve_access_token
-    response = access_token.post("/1/statuses/update.json", {:status => message})
+    response = access_token.post("/1.1/statuses/update.json", {:status => message})
     res = JSON.parse(response.body)
     res
   end
@@ -95,14 +95,14 @@ module Twitter
   def twitter_self_dm(service, message)
     @twitter_service = service
     access_token = twitter_retrieve_access_token
-    response = access_token.post("/1/direct_messages/new.json", {:screen_name => service.service_user_name, :user_id => service.service_user_id, :text => message})
+    response = access_token.post("/1.1/direct_messages/new.json", {:screen_name => service.service_user_name, :user_id => service.service_user_id, :text => message})
     res = JSON.parse(response.body)
     res
   end
 
   def twitter_list(access_token=nil, since_id=nil)
     access_token ||= twitter_retrieve_access_token
-    url = "/1/statuses/user_timeline.json"
+    url = "/1.1/statuses/user_timeline.json"
     url += "?since_id=#{since_id}" if since_id
     response = access_token.get(url)
     case response
