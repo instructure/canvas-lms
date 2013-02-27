@@ -50,7 +50,7 @@ class CourseFormController < ApplicationController
           short_name = "#{name.upcase}#{number} #{section_name.upcase}"
           long_name =  "#{short_name} #{title}"
           # Default Section set D100, D200, E300, G800 or if only 1 section (i.e. no section tutorials)
-          default_section_id = section_id if section.end_with? "00" || section_tutorials.nil?
+          default_section_id = section_id if section_name.end_with? "00" || section_tutorials.nil?
 
           sections.push "#{section_id}:_:#{section_name.upcase}"
 
