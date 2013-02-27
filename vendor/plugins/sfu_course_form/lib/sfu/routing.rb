@@ -3,7 +3,8 @@ module SFU #:nodoc:
     module MapperExtensions 
 
       def course_form
-	@set.add_route("/sfu/course/new", {:controller => "course_form", :action => "new"})
+        @set.add_route("/sfu/sandbox/:sfuid", {:controller => "course_form", :action => "sandbox_info"})
+        @set.add_route("/sfu/course/new", {:controller => "course_form", :action => "new"})
         @set.add_route("/sfu/course/create", {:controller => "course_form", :action => "create"})
         @set.add_route("/sfu/course/:course_code/:term", {:controller => "course_form", :action => "course_info"})
         @set.add_route("/sfu/courses/:sfuid", {:controller => "course_form", :action => "courses"})

@@ -6,17 +6,29 @@ SFU Custom functionality for Canvas
 New Course Request Form - http://<canvas_server>/sfu/course/new
 
 REST URLs available:
+http://<canvas_server>/sfu/sandbox/<sfu_computing_id>
+    - Check if sandbox course already exists
+
 http://<canvas_server>/sfu/courses/<sfu_computing_id>/[term_code]
+    - List of available courses user is teaching (term optional)
+    - Excludes courses that already exists in Canvas
+
 http://<canvas_server>/sfu/course/<course_code>/<term_code>
+    - Get course info for a given course code and term
+
 http://<canvas_server>/sfu/terms/<sfu_computing_id>
+    - List of available terms user is teaching
+
 http://<canvas_server>/sfu/user/<sfu_computing_id>
+    - Get user info
+
 
 Installation:
-
-1. Clone repository in <canvas_home_dir>/vendor/plugins/
+1. Clone repository in <canvas_install_dir>/vendor/plugins/
 	git clone git@github.com:sfu/canvas-plugin.git sfu_course_form
-2. Run 'bundle install' within your <canvas_home_dir>
-3. Get a copy of 'sfu.yml' and save it within <canvas_home_dir>/config/	
-
+2. Run 'bundle install' within your <canvas_install_dir>
+3. Get a copy of 'sfu.yml' and save it within <canvas_install_dir>/config/
+	- You will need to update the canvas_oauth_token for your instance
+4. Get a copy of '<canvas_install_dir>/public/sfu/js/course_request_form.js'
 
 Copyright (c) 2013 SFU / Ron Santos
