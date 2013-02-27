@@ -294,8 +294,8 @@ define([
       var $form = $tr.find("#edit_rubric_form");
       $rubric.append($tr);
       $form.attr('method', 'POST').attr('action', $("#add_rubric_url").attr('href'));
-      var assignment_points = parseFloat($("#assignment_show .points_possible,#rubrics.rubric_dialog .assignment_points_possible").filter(":first").text());
-      $form.find(".rubric_grading").showIf(assignment_points != null && assignment_points != undefined);
+      var $assignPoints = $("#assignment_show .points_possible,#rubrics.rubric_dialog .assignment_points_possible")
+      $form.find(".rubric_grading").showIf($assignPoints.length > 0);
       return $rubric;
     },
     editRubric: function($original_rubric, url) {
