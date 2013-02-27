@@ -1040,4 +1040,20 @@ class Enrollment < ActiveRecord::Base
     end
     @sis_user_id
   end
+
+  def record_recent_activity_threshold
+    Setting.get_cached('enrollment_last_activity_at_threshold', 10.minutes).to_i
+  end
+
+  def record_recent_activity_worthwhile?(as_of, threshold)
+    last_activity_at.nil? || (as_of - last_activity_at >= threshold)
+  end
+
+  def record_recent_activity(as_of = Time.zone.now,
+                             threshold = record_recent_activity_threshold)
+    if record_recent_activity_worthwhile?(as_of, threshold)
+      self.class.update_all({:last_activity_at => as_of}, {:id => self.id})
+      self.last_activity_at = as_of
+    end
+  end
 end

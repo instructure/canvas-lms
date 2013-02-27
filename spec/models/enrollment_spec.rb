@@ -1615,4 +1615,31 @@ describe Enrollment do
       @enrollment.sis_user_id.should be_nil
     end
   end
+
+  describe "record_recent_activity" do
+    it "should record on the first call (last_activity_at is nil)" do
+      course_with_student(:active_all => 1)
+      @enrollment.last_activity_at.should be_nil
+      @enrollment.record_recent_activity
+      @enrollment.last_activity_at.should_not be_nil
+    end
+
+    it "should not record anything within the time threshold" do
+      course_with_student(:active_all => 1)
+      @enrollment.last_activity_at.should be_nil
+      now = Time.zone.now
+      @enrollment.record_recent_activity(now)
+      @enrollment.record_recent_activity(now + 5.minutes)
+      @enrollment.last_activity_at.to_s.should == now.to_s
+    end
+
+    it "should record again after the threshold is done" do
+      course_with_student(:active_all => 1)
+      @enrollment.last_activity_at.should be_nil
+      now = Time.zone.now
+      @enrollment.record_recent_activity(now)
+      @enrollment.record_recent_activity(now + 11.minutes)
+      @enrollment.last_activity_at.should.to_s == (now + 11.minutes).to_s
+    end
+  end
 end

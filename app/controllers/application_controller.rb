@@ -48,6 +48,7 @@ class ApplicationController < ActionController::Base
   before_filter :fix_xhr_requests
   before_filter :init_body_classes
   after_filter :set_response_headers
+  after_filter :update_enrollment_last_activity_at
 
   add_crumb(proc { %Q{<i title="#{I18n.t('links.dashboard', "My Dashboard")}" class="icon-home standalone-icon"></i>}.html_safe }, :root_path, :class => "home")
 
@@ -708,6 +709,12 @@ class ApplicationController < ActionController::Base
   def disable_page_views
     @log_page_views = false
     true
+  end
+
+  def update_enrollment_last_activity_at
+    if @context.is_a?(Course) && @context_enrollment
+      @context_enrollment.record_recent_activity
+    end
   end
 
   # Asset accesses are used for generating usage statistics.  This is how
