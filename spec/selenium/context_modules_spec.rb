@@ -75,6 +75,29 @@ describe "context_modules" do
       end
     end
 
+    it "should show progressions link in modules home page" do
+      create_modules(1)
+      @course.default_view = 'modules'
+      @course.save!
+
+      get "/courses/#{@course.id}"
+      wait_for_ajaximations
+
+      f('.module_progressions_link').should be_displayed
+    end
+
+    it "should not show progressions link in modules home page for large rosters (MOOCs)" do
+      create_modules(1)
+      @course.default_view = 'modules'
+      @course.large_roster = true
+      @course.save!
+
+      get "/courses/#{@course.id}"
+      wait_for_ajaximations
+
+      f('.module_progressions_link').should be_nil
+    end
+
     it "publishes an unpublished module" do
       get "/courses/#{@course.id}/modules"
 
@@ -321,12 +344,22 @@ describe "context_modules" do
       driver.execute_script('return $(".points_possible_parent:visible").length').should == 0
     end
 
-    it "should add a module" do
+    it "should show progressions link" do
       get "/courses/#{@course.id}/modules"
 
       add_module('New Module')
-      # should always show the student progressions button for teachers
+
       f('.module_progressions_link').should be_displayed
+    end
+
+    it "should not show progressions link for large rosters (MOOCs)" do
+      @course.large_roster = true
+      @course.save!
+      get "/courses/#{@course.id}/modules"
+
+      add_module('New Module')
+
+      f('.module_progressions_link').should be_nil
     end
 
     it "should delete a module" do

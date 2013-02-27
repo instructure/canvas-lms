@@ -4,6 +4,7 @@
 <% js_env :COLLAPSED_MODULES => @collapsed_modules %>
 <% js_env :CAN_MANAGE_MODULES  => can_do(@context, @current_user, :manage_grades) || can_do(@context, @current_user, :manage_content) %>
 <% js_env :COURSE_ID => @context.id %>
+<% js_env :NO_MODULE_PROGRESSIONS => @context.large_roster %>
 
 <% if course_home %>
   <h2><%= @context.name %></h2>
