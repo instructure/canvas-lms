@@ -39,29 +39,29 @@ class CourseFormController < ApplicationController
 
     unless cross_list
       selected_courses.each do |course|
-        # 20131:::ensc:::351:::d100:::Real Time and Embedded Systems
+        # 1131:::ensc:::351:::d100:::Real Time and Embedded Systems
         unless course == "sandbox"
           logger.info "[SFU Course Form] Creating single course container : #{course}"
           course_info = course.split(":::")
           term = course_info[0]
           name = course_info[1].to_s
           number = course_info[2]
-          section = course_info[3].to_s
+          section_name = course_info[3].to_s
           title = course_info[4].to_s
           section_tutorials = course_info[5]
 
-          course_id = "#{term}-#{name}-#{number}-#{section}:::course"
-          section_id = "#{term}-#{name}-#{number}-#{section}:::section"
-          short_name = "#{name.upcase}#{number} #{section.upcase}"
+          course_id = "#{term}-#{name}-#{number}-#{section_name}:::course"
+          section_id = "#{term}-#{name}-#{number}-#{section_name}:::section"
+          short_name = "#{name.upcase}#{number} #{section_name.upcase}"
           long_name =  "#{short_name} #{title}"
 
-          sections.push "#{section_id}:::#{section.upcase}"
+          sections.push "#{section_id}:_:#{section_name.upcase}"
 
           # add section tutorials csv
           unless section_tutorials.nil?
-            section_tutorials.split(",").each do |tutorial|
-              section_id = "#{term}-#{name}-#{number}-#{tutorial.downcase}"
-              sections.push "#{section_id}:::#{tutorial.upcase}"
+            section_tutorials.split(",").each do |tutorial_name|
+              section_id = "#{term}-#{name}-#{number}-#{tutorial_name.downcase}:::section"
+              sections.push "#{section_id}:_:#{tutorial_name.upcase}"
             end
           end
 
@@ -69,30 +69,25 @@ class CourseFormController < ApplicationController
           course_array.push "#{course_id},#{short_name},#{long_name},#{account_id},#{term},active"
 
           # create section csv
-          section_array.push "#{section_id},#{course_id},#{section.upcase},active,,,"
-
-          # create section csv
-          sections.each do  |section|
-            section_info = section.split(":::")
-            section_array.push "#{section_info[0]}:::section,#{course_id},#{section_info[1]},active,,,"
-
-            # create enrollment csv
-            enrollment_array.push "#{course_id},#{teacher_sis_user_id},teacher,#{section_info[0]}:::section,active"
-
-            # enroll other teacher/ta
-            enrollment_array.push "#{course_id},#{teacher2_sis_user_id},teacher,#{section_info[0]}:::section,active" unless teacher2_username.nil?
+          sections.compact.uniq.each do  |section|
+            section_info = section.split(":_:")
+            section_array.push "#{section_info[0]},#{course_id},#{section_info[1]},active,,,"
           end
+
+          # create enrollment csv to default section
+          enrollment_array.push "#{course_id},#{teacher_sis_user_id},teacher,,active"
+          # enroll other teacher/ta to default section
+          enrollment_array.push "#{course_id},#{teacher2_sis_user_id},teacher,,active" unless teacher2_username.nil?
         else
           logger.info "[SFU Course Form] Creating sandbox for #{teacher_username}"
-          #t = Time.new
-          #datestamp = "#{t.year}#{t.month}#{t.day}"
           datestamp = "1"
           course_id = "sandbox-#{teacher_username}-#{datestamp}:::course"
           short_long_name = "Sandbox - #{teacher_username}"
 
           course_array.push "#{course_id},#{short_long_name},#{short_long_name},#{account_id},,active"
+          # create enrollment csv to default section
           enrollment_array.push "#{course_id},#{teacher_sis_user_id},teacher,,active"
-          # enroll other teacher/ta
+          # enroll other teacher/ta to default section
           enrollment_array.push "#{course_id},#{teacher2_sis_user_id},teacher,,active" unless teacher2_sis_user_id.nil?
         end
       end
@@ -108,42 +103,40 @@ class CourseFormController < ApplicationController
         term = course_info[0]
         name = course_info[1].to_s
         number = course_info[2]
-        section = course_info[3].to_s
+        section_name = course_info[3].to_s
         title = course_info[4].to_s
         section_tutorials = course_info[5]
 
-        course_id.concat "#{term}-#{name}-#{number}-#{section}:"
-        section_id = "#{term}-#{name}-#{number}-#{section}"
-        short_name.concat "#{name.upcase}#{number} #{section.upcase} / "
-        long_name.concat  "#{name.upcase}#{number} #{section.upcase} #{title} / "
+        course_id.concat "#{term}-#{name}-#{number}-#{section_name}:"
+        section_id = "#{term}-#{name}-#{number}-#{section_name}:::section"
+        short_name.concat "#{name.upcase}#{number} #{section_name.upcase} / "
+        long_name.concat  "#{name.upcase}#{number} #{section_name.upcase} #{title} / "
 
-        sections.push "#{section_id}:::#{name.upcase}#{number} - #{section.upcase}"
+        sections.push "#{section_id}:_:#{name.upcase}#{number} #{section_name.upcase}"
 
         # add section tutorials csv
         unless section_tutorials.nil?
-          section_tutorials.split(",").each do |tutorial|
-            section_id = "#{term}-#{name}-#{number}-#{tutorial.downcase}"
-            sections.push "#{section_id}:::#{tutorial.upcase}"
+          section_tutorials.split(",").compact.uniq.each do |tutorial_name|
+            section_id = "#{term}-#{name}-#{number}-#{tutorial_name.downcase}:::section"
+            sections.push "#{section_id}:_:#{tutorial_name.upcase}"
           end
         end
       end
 
       # create course csv
       course_id.concat "::course"
-      course_array.push "#{course_id},#{short_name[0..-4]},#{long_name[0..-4]},#{account_id},#{term},active\n"
+      course_array.push "#{course_id},#{short_name[0..-4]},#{long_name[0..-4]},#{account_id},#{term},active"
 
       # create section csv
-      sections.each do  |section|
-          section_info = section.split(":::")
-          section_id = "#{section_info[0]}:::section"
-          section_array.push "#{section_id},#{course_id},#{section_info[1]},active,,,\n"
-
-          # create enrollment csv
-          enrollment_array.push "#{course_id},#{teacher_sis_user_id},teacher,#{section_id},active\n"
-          # enroll other teacher/ta
-          enrollment_array.push "#{course_id},#{teacher2_sis_user_id},teacher,#{section_id},active\n" unless teacher2_sis_user_id.nil?
+      sections.compact.uniq.each do  |section|
+          section_info = section.split(":_:")
+          section_array.push "#{section_info[0]},#{course_id},#{section_info[1]},active,,,"
       end
 
+      # create enrollment csv to default section
+      enrollment_array.push "#{course_id},#{teacher_sis_user_id},teacher,,active\n"
+      # enroll other teacher/ta to default section
+      enrollment_array.push "#{course_id},#{teacher2_sis_user_id},teacher,,active\n" unless teacher2_sis_user_id.nil?
 
     end
 
@@ -163,9 +156,7 @@ class CourseFormController < ApplicationController
 
     # give some time for the delayed_jobs to process the import
     sleep 5
-    
-    # redirect to list of courses
-    #redirect_to courses_url
+
   end
 
   def course_exists?(sis_source_id)
