@@ -19,6 +19,47 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe WikiPageRevisionsController do
+  describe 'GET index' do
+    it "should not be visible to students" do
+      course_with_student_logged_in(:active_all => true)
+      page = @course.wiki.wiki_pages.create!(:title => 'Course page')
+
+      get 'index', :course_id => @course.id, :wiki_page_id => page.id
+
+      response.code.should == '401'
+    end
+
+    it "should be visible to teachers" do
+      course_with_teacher_logged_in(:active_all => true)
+      page = @course.wiki.wiki_pages.create!(:title => 'Course page')
+
+      get 'index', :course_id => @course.id, :wiki_page_id => page.id
+
+      response.code.should == '200'
+    end
+  end
+
+  describe 'GET show' do
+    it "should not be visible to students" do
+      course_with_student_logged_in(:active_all => true)
+      page = @course.wiki.wiki_pages.create!(:title => 'Course page')
+
+      get 'show', :course_id => @course.id, :wiki_page_id => page.id, :id => 'latest'
+
+      response.code.should == '401'
+    end
+
+    it "should be visible to teachers" do
+      course_with_teacher_logged_in(:active_all => true)
+      page = @course.wiki.wiki_pages.create!(:title => 'Course page')
+
+      get 'show', :course_id => @course.id, :wiki_page_id => page.id, :id => 'latest'
+
+      response.code.should == '200'
+    end
+
+  end
+
   describe "PUT 'update'" do
     it "should redirect to the right course wiki page" do
       course_with_teacher_logged_in(:active_all => true)
