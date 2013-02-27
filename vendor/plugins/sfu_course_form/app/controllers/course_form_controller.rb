@@ -12,12 +12,6 @@ class CourseFormController < ApplicationController
     @terms = Account.find_by_name('Simon Fraser University').enrollment_terms.delete_if {|t| t.name == 'Default Term'}
   end
 
-  # course.csv
-  # course_id,short_name,long_name,account_id,term_id,status
-  # section.csv
-  # section_id,course_id,name,status,start_date,end_date
-  # enrollment.csv
-  # course_id,user_id,role,section_id,status
   def create
     selected_courses = []
     sections = []
@@ -36,9 +30,10 @@ class CourseFormController < ApplicationController
     course_array = ["course_id,short_name,long_name,account_id,term_id,status"]
     section_array = ["section_id,course_id,name,status,start_date,end_date"]
     enrollment_array = ["course_id,user_id,role,section_id,status"]
+    default_section_id = ""
 
     unless cross_list
-      selected_courses.each do |course|
+      selected_courses.compact.uniq.each do |course|
         # 1131:::ensc:::351:::d100:::Real Time and Embedded Systems
         unless course == "sandbox"
           logger.info "[SFU Course Form] Creating single course container : #{course}"
@@ -54,6 +49,8 @@ class CourseFormController < ApplicationController
           section_id = "#{term}-#{name}-#{number}-#{section_name}:::section"
           short_name = "#{name.upcase}#{number} #{section_name.upcase}"
           long_name =  "#{short_name} #{title}"
+          # Default Section set D100, D200, E300, G800 or if only 1 section (i.e. no section tutorials)
+          default_section_id = section_id if section_name.end_with? "00" || section_tutorials.nil?
 
           sections.push "#{section_id}:_:#{section_name.upcase}"
 
@@ -75,9 +72,9 @@ class CourseFormController < ApplicationController
           end
 
           # create enrollment csv to default section
-          enrollment_array.push "#{course_id},#{teacher_sis_user_id},teacher,,active"
+          enrollment_array.push "#{course_id},#{teacher_sis_user_id},teacher,#{default_section_id},active"
           # enroll other teacher/ta to default section
-          enrollment_array.push "#{course_id},#{teacher2_sis_user_id},teacher,,active" unless teacher2_username.nil?
+          enrollment_array.push "#{course_id},#{teacher2_sis_user_id},teacher,#{default_section_id},active" unless teacher2_username.nil?
         else
           logger.info "[SFU Course Form] Creating sandbox for #{teacher_username}"
           datestamp = "1"
@@ -86,9 +83,9 @@ class CourseFormController < ApplicationController
 
           course_array.push "#{course_id},#{short_long_name},#{short_long_name},#{account_id},,active"
           # create enrollment csv to default section
-          enrollment_array.push "#{course_id},#{teacher_sis_user_id},teacher,,active"
+          enrollment_array.push "#{course_id},#{teacher_sis_user_id},teacher,#{default_section_id},active"
           # enroll other teacher/ta to default section
-          enrollment_array.push "#{course_id},#{teacher2_sis_user_id},teacher,,active" unless teacher2_sis_user_id.nil?
+          enrollment_array.push "#{course_id},#{teacher2_sis_user_id},teacher,#{default_section_id},active" unless teacher2_sis_user_id.nil?
         end
       end
     else
@@ -134,9 +131,9 @@ class CourseFormController < ApplicationController
       end
 
       # create enrollment csv to default section
-      enrollment_array.push "#{course_id},#{teacher_sis_user_id},teacher,,active\n"
+      enrollment_array.push "#{course_id},#{teacher_sis_user_id},teacher,#{default_section_id},active\n"
       # enroll other teacher/ta to default section
-      enrollment_array.push "#{course_id},#{teacher2_sis_user_id},teacher,,active\n" unless teacher2_sis_user_id.nil?
+      enrollment_array.push "#{course_id},#{teacher2_sis_user_id},teacher,#{default_section_id},active\n" unless teacher2_sis_user_id.nil?
 
     end
 
@@ -156,7 +153,6 @@ class CourseFormController < ApplicationController
 
     # give some time for the delayed_jobs to process the import
     sleep 5
-
   end
 
   def course_exists?(sis_source_id)
@@ -248,7 +244,6 @@ class CourseFormController < ApplicationController
     respond_to do |format|
       format.json { render :text => course_array.to_json }
     end
-
   end
 
   # course_code : <name><number>
@@ -277,7 +272,21 @@ class CourseFormController < ApplicationController
     respond_to do |format|
       format.json { render :text => details.to_json }
     end
+  end
 
+  def sandbox_info
+    sandbox_source_id = "sandbox-#{params[:sfuid]}-1:::course"
+    course = Course.find(:all, :conditions => "sis_source_id='#{sandbox_source_id}'")
+    course_hash = {}
+    if course.length == 1
+      course_hash["name"] = course.first.name
+      course_hash["course_code"] = course.first.course_code
+      course_hash["sis_source_id"] = course.first.sis_source_id
+    end
+
+    respond_to do |format|
+      format.json { render :text => course_hash.to_json }
+    end
   end
 
   def terms

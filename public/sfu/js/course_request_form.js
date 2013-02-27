@@ -109,8 +109,7 @@
                 $("#"+term.peopleSoftCode+"_courses").html("&nbsp;&nbsp;Retrieving courses...");
                 courses_for_terms(sfuid, term.peopleSoftCode);
             });
-           $("#course_list").append("<div id='sandbox'><h4>Other</h4></div>");
-           $("#sandbox").append(sandbox_course(sfuid));
+           sandbox_course(sfuid);
           },
           error: function(xhr) {
             var statusCode = xhr.status;
@@ -206,7 +205,18 @@
 
     function sandbox_course(sfuid) {
         var title = "Sandbox - " + sfuid;
-        return '<p>&nbsp;&nbsp;<input type="checkbox" name="selected_course_sandbox" id="selected_course_sandbox" value="sandbox"> ' + title + '</p>';
+        $.ajax({
+            url: "/sfu/sandbox/" + sfuid,
+            dataType: 'json',
+            success: function(data) {
+                if (data.sis_source_id != "sandbox-" + sfuid + "-1:::course") {
+                    $("#course_list").append("<div id='sandbox'><h4>Other</h4></div>");
+                    var checkbox_html = '<p>&nbsp;&nbsp;<input type="checkbox" name="selected_course_sandbox" id="selected_course_sandbox" value="sandbox" onchange="enable_submit_crosslist();"> ' + title + '</p>';
+                    $("#sandbox").append(checkbox_html);
+                }
+            },
+            error: function() {  /* TODO: do something useful here */ }
+        });
     }
 
     function format_term(term_code) {
