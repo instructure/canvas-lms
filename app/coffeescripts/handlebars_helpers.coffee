@@ -46,6 +46,10 @@ define [
       return unless datetime?
       new Handlebars.SafeString "<time title='#{datetime}' datetime='#{datetime.toISOString()}' #{'pubdate' if pubdate}>#{datetime.toString(format)}</time>"
 
+    # IMPORTANT: this handlebars helper "fudges", or adjusts the time for the
+    # user's timezone chosen in their preferences using
+    # $.fudgeDateForProfileTimezone. If you use this helper, you need to use
+    # $.unfudgeDateForProfileTimezone before sending to the server!
     datetimeFormatted : (isoString) ->
       return '' unless isoString
       isoString = $.parseFromISO(isoString) unless isoString.datetime
