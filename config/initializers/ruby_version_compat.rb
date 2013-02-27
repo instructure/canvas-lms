@@ -98,7 +98,7 @@ else
           o.force_encoding(Encoding::UTF_8)
           raise ActionController::InvalidByteSequenceErrorFromParams unless o.valid_encoding?
         end
-        if o.respond_to?(:original_filename)
+        if o.respond_to?(:original_filename) && o.original_filename
           o.original_filename.force_encoding(Encoding::UTF_8)
           raise ActionController::InvalidByteSequenceErrorFromParams unless o.original_filename.valid_encoding?
         end
