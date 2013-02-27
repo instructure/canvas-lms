@@ -21,8 +21,6 @@ describe "context_modules" do
       @ag2 = @course.assignment_groups.create!(:name => "Assignment Group 2")
 
       @course.reload
-
-      get "/courses/#{@course.id}/modules"
     end
 
     def create_modules(number_to_create, workflow_state = "unpublished")
@@ -78,6 +76,8 @@ describe "context_modules" do
     end
 
     it "publishes an unpublished module" do
+      get "/courses/#{@course.id}/modules"
+
       add_module('New Module')
       publish_module
       open_admin_module_menu
@@ -85,6 +85,8 @@ describe "context_modules" do
     end
 
     it "unpublishes a published module" do
+      get "/courses/#{@course.id}/modules"
+
       add_module('New Module')
       publish_module
       open_admin_module_menu
@@ -95,12 +97,16 @@ describe "context_modules" do
     end
 
     it "add unpublished_module css class when creating new module" do
+      get "/courses/#{@course.id}/modules"
+
       add_module('New Module')
       f('.context_module').should have_class('unpublished_module')
       @course.context_modules.first.workflow_state.should == "unpublished"
     end
 
     it "allows you to publish a newly created module without reloading the page" do
+      get "/courses/#{@course.id}/modules"
+
       add_module('New Module')
       f('.context_module').should have_class('unpublished_module')
       @course.context_modules.first.workflow_state.should == "unpublished"
@@ -217,6 +223,8 @@ describe "context_modules" do
     end
 
     it "should rearrange child objects in same module" do
+      get "/courses/#{@course.id}/modules"
+
       modules = create_modules(1, "active")
 
       #attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
@@ -265,6 +273,8 @@ describe "context_modules" do
     end
 
     it "should only display out-of on an assignment min score restriction when the assignment has a total" do
+      get "/courses/#{@course.id}/modules"
+
       ag = @course.assignment_groups.create!
       a1 = ag.assignments.create!(:context => @course)
       a1.points_possible = 10
@@ -312,12 +322,16 @@ describe "context_modules" do
     end
 
     it "should add a module" do
+      get "/courses/#{@course.id}/modules"
+
       add_module('New Module')
       # should always show the student progressions button for teachers
       f('.module_progressions_link').should be_displayed
     end
 
     it "should delete a module" do
+      get "/courses/#{@course.id}/modules"
+
       add_module('Delete Module')
       driver.execute_script("$('.context_module').addClass('context_module_hover')")
       f('.admin-links .al-trigger').click
@@ -331,6 +345,8 @@ describe "context_modules" do
     end
 
     it "should edit a module" do
+      get "/courses/#{@course.id}/modules"
+
       edit_text = 'Module Edited'
       add_module('Edit Module')
       context_module = f('.context_module')
@@ -347,6 +363,8 @@ describe "context_modules" do
     end
 
     it "should add and remove completion criteria" do
+      get "/courses/#{@course.id}/modules"
+
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
 
       # add completion criterion
@@ -414,6 +432,8 @@ describe "context_modules" do
     end
 
     it "should delete a module item" do
+      get "/courses/#{@course.id}/modules"
+
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
       driver.execute_script("$('.context_module_item').addClass('context_module_item_hover')")
       wait_for_ajaximations
@@ -428,6 +448,8 @@ describe "context_modules" do
     end
 
     it "should edit a module item and validate the changes stick" do
+      get "/courses/#{@course.id}/modules"
+
       item_edit_text = "Assignment Edit 1"
       module_item = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
       tag = ContentTag.last
@@ -445,10 +467,14 @@ describe "context_modules" do
     end
 
     it "should add an assignment to a module" do
+      get "/courses/#{@course.id}/modules"
+
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
     end
 
     it "should allow adding an item twice" do
+      get "/courses/#{@course.id}/modules"
+
       item1 = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
       item2 = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
       item1.should_not == item2
@@ -456,6 +482,8 @@ describe "context_modules" do
     end
 
     it "should rename all instances of an item" do
+      get "/courses/#{@course.id}/modules"
+
       item1 = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
       item2 = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
       edit_module_item(item2) do |edit_form|
@@ -484,6 +512,8 @@ describe "context_modules" do
     end
 
     it "should not rename every text header when you rename one" do
+      get "/courses/#{@course.id}/modules"
+
       add_module('TestModule')
 
       # add a text header
@@ -520,10 +550,14 @@ describe "context_modules" do
     end
 
     it "should add a quiz to a module" do
+      get "/courses/#{@course.id}/modules"
+
       add_existing_module_item('#quizs_select', 'Quiz', @quiz.title)
     end
 
     it "should add a new quiz to a module in a specific assignment group" do
+      get "/courses/#{@course.id}/modules"
+
       add_new_module_item('#quizs_select', 'Quiz', '[ New Quiz ]', "New Quiz") do
         click_option("select[name='quiz[assignment_group_id]']", @ag2.name)
       end
@@ -532,14 +566,20 @@ describe "context_modules" do
     end
 
     it "should add a content page item to a module" do
+      get "/courses/#{@course.id}/modules"
+
       add_new_module_item('#wiki_pages_select', 'Content Page', '[ New Page ]', 'New Page Title')
     end
 
     it "should add a discussion item to a module" do
+      get "/courses/#{@course.id}/modules"
+
       add_new_module_item('#discussion_topics_select', 'Discussion', '[ New Topic ]', 'New Discussion Title')
     end
 
     it "should add a text header to a module" do
+      get "/courses/#{@course.id}/modules"
+
       header_text = 'new header text'
       add_module('Text Header Module')
       f('.admin-links .al-trigger').click
@@ -557,14 +597,20 @@ describe "context_modules" do
     end
 
     it "should add an external url item to a module" do
+      get "/courses/#{@course.id}/modules"
+
       add_new_external_item('External URL', 'www.google.com', 'Google')
     end
 
     it "should add an external tool item to a module" do
+      get "/courses/#{@course.id}/modules"
+
       add_new_external_item('External Tool', 'www.instructure.com', 'Instructure')
     end
 
     it "should not save an invalid external tool" do
+      get "/courses/#{@course.id}/modules"
+
       add_module 'Test module'
       f('.admin-links .al-trigger').click
       f('.add_module_item_link').click
@@ -575,6 +621,8 @@ describe "context_modules" do
     end
 
     it "should hide module contents" do
+      get "/courses/#{@course.id}/modules"
+
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
       f('.collapse_module_link').click
       wait_for_animations
@@ -582,6 +630,8 @@ describe "context_modules" do
     end
 
     it "should add 2 modules with the first one as a prerequisite" do
+      get "/courses/#{@course.id}/modules"
+
       first_module_name = 'First Module'
       second_module_name = 'Second Module'
       add_module(first_module_name)
@@ -610,7 +660,7 @@ describe "context_modules" do
       m1 = @course.context_modules.create!(:name => 'module 1')
       m2 = @course.context_modules.create!(:name => 'module 2')
 
-      refresh_page
+      get "/courses/#{@course.id}/modules"
       sleep 2 #not sure what we are waiting on but drag and drop will not work, unless we wait
 
       m1_img = fj('#context_modules .context_module:first-child .reorder_module_link img')
@@ -625,6 +675,8 @@ describe "context_modules" do
     end
 
     it "should validate locking a module item display functionality" do
+      get "/courses/#{@course.id}/modules"
+
       add_form = new_module_form
       lock_check = add_form.find_element(:id, 'unlock_module_at')
       lock_check.click
@@ -636,6 +688,8 @@ describe "context_modules" do
     end
 
     it "should properly change indent of an item with arrows" do
+      get "/courses/#{@course.id}/modules"
+
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
       tag = ContentTag.last
 
@@ -648,6 +702,8 @@ describe "context_modules" do
     end
 
     it "should properly change indent of an item from edit dialog" do
+      get "/courses/#{@course.id}/modules"
+
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
       tag = ContentTag.last
 
@@ -662,6 +718,8 @@ describe "context_modules" do
     end
 
     it "should still display due date and points possible after indent change" do
+      get "/courses/#{@course.id}/modules"
+
       module_item = add_existing_module_item('#assignments_select', 'Assignment', @assignment2.title)
       tag = ContentTag.last
 
@@ -705,7 +763,7 @@ describe "context_modules" do
         create_section_override(cs1, 3.days.from_now)
         create_section_override(cs2, 4.days.from_now)
 
-        refresh_page
+        get "/courses/#{@course.id}/modules"
         wait_for_ajaximations
 
         f(".due_date_display").text.should == "Multiple Due Dates"
@@ -723,7 +781,7 @@ describe "context_modules" do
         create_section_override(cs1, due_at)
         create_section_override(cs2, due_at)
 
-        refresh_page
+        get "/courses/#{@course.id}/modules"
         wait_for_ajaximations
 
         f(".due_date_display").text.should_not be_blank
@@ -742,7 +800,7 @@ describe "context_modules" do
         @assignment.due_at = due_at
         @assignment.save!
 
-        refresh_page
+        get "/courses/#{@course.id}/modules"
         wait_for_ajaximations
 
         f(".due_date_display").text.should_not be_blank
@@ -767,7 +825,7 @@ describe "context_modules" do
         create_section_override(cs2, due_at)
         create_section_override(cs3, due_at + 1.day) # This override should not matter
 
-        refresh_page
+        get "/courses/#{@course.id}/modules"
         wait_for_ajaximations
 
         f(".due_date_display").text.should_not be_blank
@@ -776,6 +834,8 @@ describe "context_modules" do
     end
 
     it "should preserve completion criteria after indent change" do
+      get "/courses/#{@course.id}/modules"
+
       add_existing_module_item('#assignments_select', 'Assignment', @assignment2.title)
       tag = ContentTag.last
 
