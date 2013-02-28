@@ -1,3 +1,7 @@
+<% 
+  content_for :page_title, "Start a New Course"
+%>
+
 <div class="new_course_container">
   <% unless SFU::User.student_only? @sfuid %>
       <%= render :partial => 'form' %>
