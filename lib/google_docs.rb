@@ -22,6 +22,7 @@ module GoogleDocs
 
   def google_docs_retrieve_access_token
     consumer = google_consumer
+    return nil unless consumer
     if google_docs_user
       service_token, service_secret = Rails.cache.fetch(['google_docs_tokens', google_docs_user].cache_key) do
         service = google_docs_user.user_services.find_by_service("google_docs")
@@ -175,7 +176,13 @@ module GoogleDocs
     google_docs_list(access_token).select{ |e| extensions.include?(e.extension) }
   end
 
-  def google_consumer(key = GoogleDocs.config['api_key'], secret = GoogleDocs.config['secret_key'])
+  def google_consumer(key = nil, secret = nil)
+    if key.nil? || secret.nil?
+      return nil if GoogleDocs.config.nil?
+      key ||= GoogleDocs.config['api_key']
+      secret ||= GoogleDocs.config['secret_key']
+    end
+
     require 'oauth'
     require 'oauth/consumer'
 
