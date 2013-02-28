@@ -336,7 +336,7 @@ describe "Modules API", :type => :integration do
   
   context "as a student" do
     before :each do
-      course_with_student(:course => @course, :active_all => true)
+      course_with_student_logged_in(:course => @course, :active_all => true)
     end
 
     it "should show locked state" do
@@ -344,6 +344,27 @@ describe "Modules API", :type => :integration do
                       :controller => "context_modules_api", :action => "show", :format => "json",
                       :course_id => "#{@course.id}", :id => "#{@module2.id}")
       json['state'].should == 'locked'
+    end
+
+    it "should list module items" do
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+        :controller => "context_modules_api", :action => "list_module_items", :format => "json",
+        :course_id => "#{@course.id}", :module_id => "#{@module1.id}")
+
+      json.map{|item| item['id']}.sort.should == @module1.content_tags.map(&:id).sort
+
+      #also for locked modules that have completion requirements
+      @assignment2 = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"])
+      @assignment_tag2 = @module2.add_item(:id => @assignment2.id, :type => 'assignment')
+      @module2.completion_requirements = {
+          @assignment_tag2.id => { :type => 'must_submit' }}
+      @module2.save!
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items",
+        :controller => "context_modules_api", :action => "list_module_items", :format => "json",
+        :course_id => "#{@course.id}", :module_id => "#{@module2.id}")
+
+      json.map{|item| item['id']}.sort.should == @module2.content_tags.map(&:id).sort
     end
 
     it "should show module progress" do
