@@ -71,7 +71,7 @@ module Api::V1::ContextModule
     if criterion = context_module.completion_requirements && context_module.completion_requirements.detect { |r| r[:id] == content_tag.id }
       ch = { 'type' => criterion[:type] }
       ch['min_score'] = criterion[:min_score] if criterion[:type] == 'min_score'
-      ch['completed'] = !!progression.requirements_met.detect{|r|r[:type] == criterion[:type] && r[:id] == content_tag.id} if progression
+      ch['completed'] = !!progression.requirements_met.detect{|r|r[:type] == criterion[:type] && r[:id] == content_tag.id} if progression && progression.requirements_met.present?
       hash['completion_requirement'] = ch
     end
 
