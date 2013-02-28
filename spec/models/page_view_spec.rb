@@ -48,8 +48,8 @@ describe PageView do
     end
 
     it "should not start a db transaction on save" do
-      PageView.expects(:transaction_without_cassandra_check).never
       PageView.new { |p| p.send(:attributes=, { :user => @user, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcdef", :interaction_seconds => 5 }, false) }.store
+      PageView.connection.expects(:transaction).never
       PageView.process_cache_queue
       PageView.find("abcdef").should be_present
     end
