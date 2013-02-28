@@ -137,7 +137,7 @@
                         course_display += "<br><label> (Includes section tutorials: " + section_tutorials  + ") </label>";
                     }
                     var course_value = course.key;
-                    var checkbox_html = '<p>&nbsp;&nbsp;<label class="checkbox"><input type="checkbox" name="selected_course_'+ num +'" id="selected_course_'+ num +'" value="' + course_value + '">' + course_display + '</label></p>';
+                    var checkbox_html = '<label class="checkbox"><input type="checkbox" name="selected_course_'+ num +'" id="selected_course_'+ num +'" value="' + course_value + '">' + course_display + '</label>';
                     $("#"+term+"_courses").append(checkbox_html);
                     num++;
                 });
@@ -211,7 +211,7 @@
             success: function(data) {
                 if (data.sis_source_id != "sandbox-" + sfuid + "-1:::course") {
                     $("#course_list").append("<div id='sandbox'><h4>Other</h4></div>");
-                    var checkbox_html = '<p>&nbsp;&nbsp;<label class="checkbox"><input type="checkbox" name="selected_course_sandbox" id="selected_course_sandbox" value="sandbox" onchange="enable_submit_crosslist();">' + title + '</label></p>';
+                    var checkbox_html = '<label class="checkbox"><input type="checkbox" name="selected_course_sandbox" id="selected_course_sandbox" value="sandbox" onchange="enable_submit_crosslist();">' + title + '</label>';
                     $("#sandbox").append(checkbox_html);
                 }
             },
