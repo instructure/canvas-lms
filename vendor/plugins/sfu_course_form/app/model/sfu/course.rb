@@ -40,7 +40,7 @@ module SFU
     class << self
       def roles(sfuid)
         account = Rest.json Rest.account_url, "&username=#{sfuid}"
-        account["roles"]
+        account != "[]" ? account["roles"] : account
       end
 
       def info(sfuid)
@@ -49,7 +49,7 @@ module SFU
 
       def student_only?(sfuid)
         result = roles sfuid
-        if result.join("").eql? "undergrad"
+        if result.to_a.join("").eql? "undergrad"
           return true
         end
         false
