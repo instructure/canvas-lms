@@ -30,10 +30,10 @@ describe "submissions" do
       # open it twice
       open_button.click
       # swf and other stuff load, give it half a second before it starts trying to click
-      sleep 0.5
+      sleep 1
       close_visible_dialog
       open_button.click
-      sleep 0.5
+      sleep 1
       close_visible_dialog
 
       # fire the callback that the flash object fires
