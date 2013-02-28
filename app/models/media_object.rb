@@ -150,7 +150,7 @@ class MediaObject < ActiveRecord::Base
         attachment.update_attribute(:media_entry_id, entry[:entryId])
         # check for attachments that were created temporarily, just to import a media object
         if attachment.full_path.starts_with?(File.join(Folder::ROOT_FOLDER_NAME, CC::CCHelper::MEDIA_OBJECTS_FOLDER) + '/')
-          attachment.destroy(false)
+          attachment.destroy
         end
       end
       mo.context ||= mo.root_account

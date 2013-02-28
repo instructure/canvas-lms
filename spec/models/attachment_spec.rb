@@ -720,6 +720,21 @@ describe Attachment do
       @attachment.file_state = 'available'
       @attachment.save!
     end
+    
+    it "should disassociate but not delete the associated media object" do
+      @attachment.media_entry_id = '0_feedbeef'
+      @attachment.save!
+      
+      media_object = @course.media_objects.build :media_id => '0_feedbeef'
+      media_object.attachment_id = @attachment.id
+      media_object.save!
+      
+      @attachment.destroy
+      
+      media_object.reload
+      media_object.should_not be_deleted
+      media_object.attachment_id.should be_nil
+    end
   end
 
   context "destroy" do
