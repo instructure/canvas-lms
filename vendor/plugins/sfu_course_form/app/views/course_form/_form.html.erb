@@ -11,8 +11,10 @@
     <div class="control-group" id="enroll_me_div">
       <%= label_tag "Enroll Me", "Enroll Me", :class => "control-label" %>
       <div class="controls">
-        <%=  check_box_tag "enroll_me", @sfuid, false, :disabled => true  %>
-        <div>You will be enrolled as a Teacher to the selected courses</div>
+        <label class="checkbox">
+          <%=  check_box_tag "enroll_me", @sfuid, false, :disabled => true  %>
+          <div>You will be enrolled as a Teacher to the selected courses</div>
+        </label>
       </div>
     </div>
 
@@ -24,9 +26,11 @@
     <div class="control-group">
       <%= label_tag "Cross-list", "Cross-List Courses", :class => "control-label" %>
       <div class="controls">
-        <%=  check_box_tag "cross_list", true, false, :disabled => true %>
-        <div>Cross-listing will place all the selected courses into a single course container</div>
-        <div id="cross-list-course"></div>
+        <label class="checkbox">
+          <%=  check_box_tag "cross_list", true, false, :disabled => true %>
+          <div>Cross-listing will place all the selected courses into a single course container</div>
+          <div id="cross-list-course"></div>
+        </label>
       </div>
     </div>
 <hr>
