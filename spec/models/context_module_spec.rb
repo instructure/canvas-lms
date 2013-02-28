@@ -690,6 +690,27 @@ describe ContextModule do
       @assignment.locked_for?(@user).should be_false
     end
   end
+
+  describe "after_save" do
+    before do
+      course_module
+      course_with_student(:course => @course, :active_all => true)
+      @assignment = @course.assignments.create!(:title => "some assignment")
+      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
+      @module.completion_requirements = {@tag.id => {:type => 'min_score', :min_score => 90}}
+      @module.save!
+    end
+
+    it "should not recompute everybody's progressions" do
+      new_module = @course.context_modules.build :name => 'new module'
+      new_module.prerequisites = "context_module_#{@module.id}"
+
+      ContextModule.any_instance.expects(:re_evaluate_for).never
+      new_module.save!
+      run_jobs
+    end
+  end
+
   describe "clone_for" do
     it "should clone a context module" do
       course_module

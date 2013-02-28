@@ -31,7 +31,6 @@ class ContextModule < ActiveRecord::Base
   before_save :infer_position
   before_save :validate_prerequisites
   before_save :confirm_valid_requirements
-  after_save :check_students
   after_save :touch_context
 
   def self.module_positions(context)
@@ -111,12 +110,6 @@ class ContextModule < ActiveRecord::Base
   named_scope :not_deleted, :conditions => ['context_modules.workflow_state != ?', 'deleted']
   named_scope :include_tags_and_progressions, :include => [:content_tags, :context_module_progressions]
 
-  def check_students
-    return if @dont_check_students || self.deleted?
-    send_later_if_production :update_student_progressions
-    true
-  end
-  
   def update_student_progressions(user=nil)
     # modules are ordered by position, so running through them in order will
     # automatically handle issues with dependencies loading in the correct
@@ -445,7 +438,6 @@ class ContextModule < ActiveRecord::Base
       changed = true if !added
     end
     self.completion_requirements = new_reqs
-    @dont_check_students = true
     self.save if do_save && changed
     new_reqs
   end
