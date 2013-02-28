@@ -66,7 +66,7 @@
               url: "/sfu/user/" + sfuid,
               dataType: "json",
               success: function(data) {
-                if (data.login_id !== null){
+                if (data.login_id !== null && data.login_id !== undefined){
                     course_list(sfuid);
                 } else {
                     $("#course_list").html("<h5>Invalid SFU Computing ID</h5>");
