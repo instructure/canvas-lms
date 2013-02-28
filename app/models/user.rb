@@ -2100,7 +2100,7 @@ class User < ActiveRecord::Base
     group_visibility = group_membership_visibility
     group_ids = visible_group_ids.reject{ |id| group_visibility[:user_counts][id] == 0 }
     if group_ids.present?
-      Group.scoped(:conditions => {:id => group_ids})
+      Group.find_all_by_id(group_ids)
     else
       []
     end
@@ -2109,7 +2109,7 @@ class User < ActiveRecord::Base
   def messageable_sections
     section_ids = enrollment_visibility[:section_user_counts].keys
     if section_ids.present?
-      CourseSection.where({:id => section_ids})
+      CourseSection.find_all_by_id(section_ids)
     else
       []
     end

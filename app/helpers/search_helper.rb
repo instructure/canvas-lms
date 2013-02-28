@@ -84,8 +84,8 @@ module SearchHelper
         add_sections.call context.course_sections
         add_groups.call context.groups
       else
-        add_courses.call @current_user.concluded_courses, :concluded
-        add_courses.call @current_user.courses, :current
+        add_courses.call @current_user.concluded_courses.with_each_shard, :concluded
+        add_courses.call @current_user.courses.with_each_shard, :current
         add_sections.call @current_user.messageable_sections
         add_groups.call @current_user.messageable_groups
       end
