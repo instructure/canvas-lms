@@ -50,7 +50,6 @@ module SFU
       def student_only?(sfuid)
         result = roles sfuid
         if result.to_a.join("").eql? "undergrad"
-          flash[:error] = "Error starting a course."
           return true
         end
         false
