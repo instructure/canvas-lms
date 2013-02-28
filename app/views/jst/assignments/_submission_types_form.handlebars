@@ -107,6 +107,11 @@
             placeholder="{{#t "labels.allowed_extensions"}}Allowed File Extensions{{/t}}"
             value="{{join allowedExtensions ","}}"
             {{disabledIfIncludes frozenAttributes "submission_types"}}/>
+            <p class="help-block">
+              {{#t "descriptions.allowed_extensions"}}
+                enter a list of accepted extensions, for example: doc,xls,txt
+              {{/t}}
+            </p>
         </div>
       </div>
     </div>
