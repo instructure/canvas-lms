@@ -66,7 +66,7 @@
               url: "/sfu/user/" + sfuid,
               dataType: "json",
               success: function(data) {
-                if (data.login_id !== null){
+                if (data.login_id !== null && data.login_id !== undefined){
                     course_list(sfuid);
                 } else {
                     $("#course_list").html("<h5>Invalid SFU Computing ID</h5>");
@@ -106,7 +106,7 @@
 
             $.each(data, function (index, term) {
                 $("#course_list").append('<div id="' + term.peopleSoftCode + '"><h4>' + term.formatted1 + '</h4><div id="' + term.peopleSoftCode + '_courses"></div></div>');
-                $("#"+term.peopleSoftCode+"_courses").html("&nbsp;&nbsp;Retrieving courses...");
+                $("#"+term.peopleSoftCode+"_courses").html("<label> Retrieving courses... </label>");
                 courses_for_terms(sfuid, term.peopleSoftCode);
             });
            sandbox_course(sfuid);
@@ -134,10 +134,10 @@
                     var section_tutorials = course.sectionTutorials;
                     var course_display = course.name + course.number + " - " + course.section + " " + course.title;
                     if (section_tutorials) {
-                        course_display += "<br>&nbsp;&nbsp;(Includes section tutorials: " + section_tutorials  + ")";
+                        course_display += "<br><label> (Includes section tutorials: " + section_tutorials  + ") </label>";
                     }
                     var course_value = course.key;
-                    var checkbox_html = '<p>&nbsp;&nbsp;<input type="checkbox" name="selected_course_'+ num +'" id="selected_course_'+ num +'" value="' + course_value + '">' + course_display + '</p>';
+                    var checkbox_html = '<label class="checkbox"><input type="checkbox" name="selected_course_'+ num +'_'+ term +'" id="selected_course_'+ num +'_'+ term +'" value="'+ course_value + '">' + course_display +'</label>';
                     $("#"+term+"_courses").append(checkbox_html);
                     num++;
                 });
@@ -148,28 +148,29 @@
 
     function enable_submit_crosslist() {
         var num_selected_courses = "";
+        var selected_terms = [];
         $('input[type="checkbox"]:checked').each(function() {
             if ($(this).attr('id').match(/^selected_course_/)) {
                 num_selected_courses++;
+                var checkbox_id_arr = $(this).attr('id').split("_");
+                selected_terms.push(checkbox_id_arr[checkbox_id_arr.length-1]);
             }
         }).get();
 
         if ( (num_selected_courses > 2) || (num_selected_courses > 1 && !$("#selected_course_sandbox").is(':checked')) ) {
             $("#create_course_btn").removeAttr("disabled");
             $("#enroll_me").removeAttr("disabled");
-            $("#cross_list").removeAttr("disabled");
+            enable_cross_list(true);
         } else if (num_selected_courses > 0) {
             $("#create_course_btn").removeAttr("disabled");
             $("#enroll_me").removeAttr("disabled");
-            $("#cross_list").removeAttr("checked");
-            $("#cross_list").attr("disabled", "disabled");
-            $("#cross-list-course").html("");
+            enable_cross_list(false);
         } else {
             $("#create_course_btn").attr("disabled", "disabled");
-            $("#cross_list").attr("disabled", "disabled");
-            $("#cross-list-course").html("");
+            enable_cross_list(false);
         }
 
+        if (jQuery.unique(selected_terms).length > 1) enable_cross_list(false); // Cannot cross-list across terms
     }
 
     function cross_list_course_title() {
@@ -203,6 +204,16 @@
         }
     }
 
+    function enable_cross_list(enable){
+        if (enable) {
+            $("#cross_list").removeAttr("disabled");
+        } else {
+            $("#cross_list").removeAttr("checked");
+            $("#cross_list").attr("disabled", "disabled");
+            $("#cross-list-course").html("");
+        }
+    }
+
     function sandbox_course(sfuid) {
         var title = "Sandbox - " + sfuid;
         $.ajax({
@@ -211,24 +222,12 @@
             success: function(data) {
                 if (data.sis_source_id != "sandbox-" + sfuid + "-1:::course") {
                     $("#course_list").append("<div id='sandbox'><h4>Other</h4></div>");
-                    var checkbox_html = '<p>&nbsp;&nbsp;<input type="checkbox" name="selected_course_sandbox" id="selected_course_sandbox" value="sandbox" onchange="enable_submit_crosslist();"> ' + title + '</p>';
+                    var checkbox_html = '<label class="checkbox"><input type="checkbox" name="selected_course_sandbox" id="selected_course_sandbox" value="sandbox" onchange="enable_submit_crosslist();">'+ title +'</label>';
                     $("#sandbox").append(checkbox_html);
                 }
             },
             error: function() {  /* TODO: do something useful here */ }
         });
-    }
-
-    function format_term(term_code) {
-        var terms = {
-          1: "Spring",
-          4: "Summer",
-          7: "Fall"
-        };
-
-        var year = Number(term_code.toString().substring(0,3)) + 1900;
-        var term_index = term_code.toString().substring(3);
-        return year + " " + terms[term_index];
     }
 
 })(jQuery);
