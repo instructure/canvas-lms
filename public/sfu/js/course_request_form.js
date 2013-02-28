@@ -106,7 +106,7 @@
 
             $.each(data, function (index, term) {
                 $("#course_list").append('<div id="' + term.peopleSoftCode + '"><h4>' + term.formatted1 + '</h4><div id="' + term.peopleSoftCode + '_courses"></div></div>');
-                $("#"+term.peopleSoftCode+"_courses").html("&nbsp;&nbsp;Retrieving courses...");
+                $("#"+term.peopleSoftCode+"_courses").html("<label> Retrieving courses... </label>");
                 courses_for_terms(sfuid, term.peopleSoftCode);
             });
            sandbox_course(sfuid);
@@ -134,10 +134,10 @@
                     var section_tutorials = course.sectionTutorials;
                     var course_display = course.name + course.number + " - " + course.section + " " + course.title;
                     if (section_tutorials) {
-                        course_display += "<br>&nbsp;&nbsp;(Includes section tutorials: " + section_tutorials  + ")";
+                        course_display += "<br><label> (Includes section tutorials: " + section_tutorials  + ") </label>";
                     }
                     var course_value = course.key;
-                    var checkbox_html = '<p>&nbsp;&nbsp;<input type="checkbox" name="selected_course_'+ num +'" id="selected_course_'+ num +'" value="' + course_value + '">' + course_display + '</p>';
+                    var checkbox_html = '<p>&nbsp;&nbsp;<input type="checkbox" name="selected_course_'+ num +'" id="selected_course_'+ num +'" value="' + course_value + '"><label>' + course_display + '</label></p>';
                     $("#"+term+"_courses").append(checkbox_html);
                     num++;
                 });
@@ -211,24 +211,12 @@
             success: function(data) {
                 if (data.sis_source_id != "sandbox-" + sfuid + "-1:::course") {
                     $("#course_list").append("<div id='sandbox'><h4>Other</h4></div>");
-                    var checkbox_html = '<p>&nbsp;&nbsp;<input type="checkbox" name="selected_course_sandbox" id="selected_course_sandbox" value="sandbox" onchange="enable_submit_crosslist();"> ' + title + '</p>';
+                    var checkbox_html = '<p>&nbsp;&nbsp;<input type="checkbox" name="selected_course_sandbox" id="selected_course_sandbox" value="sandbox" onchange="enable_submit_crosslist();"><label>' + title + '</label></p>';
                     $("#sandbox").append(checkbox_html);
                 }
             },
             error: function() {  /* TODO: do something useful here */ }
         });
-    }
-
-    function format_term(term_code) {
-        var terms = {
-          1: "Spring",
-          4: "Summer",
-          7: "Fall"
-        };
-
-        var year = Number(term_code.toString().substring(0,3)) + 1900;
-        var term_index = term_code.toString().substring(3);
-        return year + " " + terms[term_index];
     }
 
 })(jQuery);
