@@ -57,7 +57,7 @@
         });
 
         $("#update_course_list").click(function() {
-            var sfuid = username($("#username").val());
+            var sfuid = username();
             $("#enroll_me_div").hide();
             $("#course_list").html("<h5>Retrieving course list...</h5>");
             $("#course_list").spin(spinnerOpts);
@@ -96,7 +96,7 @@
 
     function course_list() {
         toggle_enroll_me();
-        var sfuid = username($("#username").val());
+        var sfuid = username();
 
         $.ajax({
           url: "/sfu/terms/" + sfuid,
@@ -230,11 +230,13 @@
         });
     }
 
-    function username(value) {
-        username = value;
-        if (value.contains("@")) username = value.split("@")[0];
-        $("#username").val(username);
-        return username;
+    function username() {
+        var value = $("#username").val();
+        if (value.indexOf("@") > 0) {
+            value = value.split("@")[0];
+            $("#username").val(value);
+        }
+        return value;
     }
 
 })(jQuery);
