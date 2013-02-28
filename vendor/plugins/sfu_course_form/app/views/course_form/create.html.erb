@@ -1,7 +1,8 @@
-<h5>
-Course request has been submitted successfully. It can take up to 5 minutes to complete.
-</h5>
-
+<% if @error_message.nil? %>
+    <h5>Course request has been submitted successfully. It can take up to 5 minutes to complete.</h5>
+<% else %>
+    <h5><%= @error_message %></h5>
+<% end %>
 <div class="button-container" id="button-container">
 <button type="button" id="course_list" class="btn">Course List</button>
 <button type="button" id="course_form" class="btn">Request Another Course</button>
@@ -13,5 +14,6 @@ Course request has been submitted successfully. It can take up to 5 minutes to c
     $("#course_list").click(function(){ window.location = "/courses"});
     $("#course_form").click(function(){ window.location = "/sfu/course/new"});
 </script>
+
 
 
