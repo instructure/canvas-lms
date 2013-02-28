@@ -18,7 +18,6 @@ class CourseFormController < ApplicationController
   def create
     selected_courses = []
     sections = []
-    @error_message
     account_id = Account.find_by_name('Simon Fraser University').id
     teacher_username = params[:username]
     teacher2_username = params[:enroll_me]
@@ -158,7 +157,7 @@ class CourseFormController < ApplicationController
 
       # give some time for the delayed_jobs to process the import
       sleep 5
-      flash[:notice] = "Course form submitted successfully"
+      flash[:notice] = "Course request submitted successfully"
     else
       flash[:error] = "Course request failed. Please try agin."
       redirect_to "/sfu/course/new"
