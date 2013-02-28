@@ -155,7 +155,9 @@ class CourseFormController < ApplicationController
 
       # give some time for the delayed_jobs to process the import
       sleep 5
+      flash[:notice] = "Course request submitted successfully."
     else
+      flash[:error] = "Course request failed."
       @error_message = "Error creating courses for '#{teacher_username}'. Please try again."
     end
   end
