@@ -96,7 +96,7 @@
 
     function course_list() {
         toggle_enroll_me();
-        var sfuid = username();
+        var sfuid = $("#username").val();
 
         $.ajax({
           url: "/sfu/terms/" + sfuid,
@@ -197,7 +197,7 @@
     }
 
     function toggle_enroll_me(){
-        if (username($("#username").val()) !== $("#enroll_me").val()) {
+        if ($("#username").val() !== $("#enroll_me").val()) {
             $("#enroll_me_div").show();
         } else {
             $("#enroll_me_div").hide();
@@ -222,7 +222,7 @@
             success: function(data) {
                 if (data.sis_source_id != "sandbox-" + sfuid + "-1:::course") {
                     $("#course_list").append("<div id='sandbox'><h4>Other</h4></div>");
-                    var checkbox_html = '<label class="checkbox"><input type="checkbox" name="selected_course_sandbox" id="selected_course_sandbox" value="sandbox" onchange="enable_submit_crosslist();">'+ title +'</label>';
+                    var checkbox_html = '<label class="checkbox"><input type="checkbox" name="selected_course_sandbox" id="selected_course_sandbox" value="sandbox">'+ title +'</label>';
                     $("#sandbox").append(checkbox_html);
                 }
             },
