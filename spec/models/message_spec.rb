@@ -108,6 +108,19 @@ describe Message do
       Message.staged.should eql([@message])
     end
 
+    it "should have a list of messages that can be cancelled" do
+      Message.any_instance.stubs(:stage_message)
+      Message.workflow_spec.states.each do |state_symbol, state|
+        Message.destroy_all
+        message = message_model(:workflow_state => state_symbol.to_s, :user => user, :to => 'nobody')
+        if state.events.any?{ |event_symbol, event| event.transitions_to == :cancelled }
+          Message.cancellable.should eql([message])
+        else
+          Message.cancellable.should eql([])
+        end
+      end
+    end
+    
     it "should go back to the staged state if sending fails" do
       message_model(:dispatch_at => Time.now - 1, :workflow_state => 'sending', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user)
       @message.errored_dispatch

@@ -364,7 +364,7 @@ describe Notification do
                                 :notification => @notification,
                                 :communication_channel => @communication_channel)
 
-      @notification.create_message(@assignment, [@user,{:data => {:user => @user}}])
+      @notification.create_message(@assignment, @user, {:data => {:user => @user}})
       message = @notification.instance_variable_get(:@delayed_messages_to_save).first
       message.summary.should == "Hello, #{@user.name}!"
     end
