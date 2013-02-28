@@ -15,11 +15,12 @@ class CourseFormController < ApplicationController
   def create
     selected_courses = []
     sections = []
+    @error_message
     account_id = Account.find_by_name('Simon Fraser University').id
     teacher_username = params[:username]
     teacher2_username = params[:enroll_me]
-    teacher_sis_user_id = Pseudonym.find_by_unique_id_and_account_id(teacher_username, account_id).sis_user_id
-    teacher2_sis_user_id = Pseudonym.find_by_unique_id_and_account_id(teacher2_username, account_id).sis_user_id unless teacher2_username.nil?
+    teacher_sis_user_id = sis_user_id(teacher_username, account_id)
+    teacher2_sis_user_id = sis_user_id(teacher2_username, account_id) unless teacher2_username.nil?
     cross_list = params[:cross_list]
     params.each do |key, value|
       if key.to_s.starts_with? "selected_course"
@@ -137,22 +138,26 @@ class CourseFormController < ApplicationController
 
     end
 
-    # Send POST to import
-    course_csv = course_array.join("\n")
-    section_csv = section_array.join("\n")
-    enrollment_csv = enrollment_array.join("\n")
+    unless teacher_sis_user_id.nil?
+      # Send POST to import
+      course_csv = course_array.join("\n")
+      section_csv = section_array.join("\n")
+      enrollment_csv = enrollment_array.join("\n")
 
-    logger.info "[SFU Course Form] course_csv: #{course_csv.inspect}"
-    SFU::Canvas.sis_import course_csv
+      logger.info "[SFU Course Form] course_csv: #{course_csv.inspect}"
+      SFU::Canvas.sis_import course_csv
 
-    logger.info "[SFU Course Form] section_csv: #{section_csv.inspect}"
-    SFU::Canvas.sis_import section_csv
+      logger.info "[SFU Course Form] section_csv: #{section_csv.inspect}"
+      SFU::Canvas.sis_import section_csv
 
-    logger.info "[SFU Course Form] enrollment_csv: #{enrollment_csv.inspect}"
-    SFU::Canvas.sis_import enrollment_csv
+      logger.info "[SFU Course Form] enrollment_csv: #{enrollment_csv.inspect}"
+      SFU::Canvas.sis_import enrollment_csv
 
-    # give some time for the delayed_jobs to process the import
-    sleep 5
+      # give some time for the delayed_jobs to process the import
+      sleep 5
+    else
+      @error_message = "Error creating courses for '#{teacher_username}'. Please try again."
+    end
   end
 
   def course_exists?(sis_source_id)
@@ -301,4 +306,8 @@ class CourseFormController < ApplicationController
     end
   end
 
+  def sis_user_id(username, account_id)
+    user = Pseudonym.find_by_unique_id_and_account_id(username, account_id)
+    user.sis_user_id unless user.nil?
+  end
 end

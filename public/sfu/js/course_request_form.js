@@ -57,7 +57,7 @@
         });
 
         $("#update_course_list").click(function() {
-            var sfuid = $("#username").val();
+            var sfuid = username();
             $("#enroll_me_div").hide();
             $("#course_list").html("<h5>Retrieving course list...</h5>");
             $("#course_list").spin(spinnerOpts);
@@ -222,12 +222,21 @@
             success: function(data) {
                 if (data.sis_source_id != "sandbox-" + sfuid + "-1:::course") {
                     $("#course_list").append("<div id='sandbox'><h4>Other</h4></div>");
-                    var checkbox_html = '<label class="checkbox"><input type="checkbox" name="selected_course_sandbox" id="selected_course_sandbox" value="sandbox" onchange="enable_submit_crosslist();">'+ title +'</label>';
+                    var checkbox_html = '<label class="checkbox"><input type="checkbox" name="selected_course_sandbox" id="selected_course_sandbox" value="sandbox">'+ title +'</label>';
                     $("#sandbox").append(checkbox_html);
                 }
             },
             error: function() {  /* TODO: do something useful here */ }
         });
+    }
+
+    function username() {
+        var value = $("#username").val();
+        if (value.indexOf("@") > 0) {
+            value = value.split("@")[0];
+            $("#username").val(value);
+        }
+        return value;
     }
 
 })(jQuery);
