@@ -121,6 +121,7 @@ Spec::Runner.configure do |config|
   end
 
   config.before :each do
+    I18n.locale = :en
     Time.zone = 'UTC'
     Account.clear_special_account_cache!
     Account.default.update_attribute(:default_time_zone, 'UTC')
