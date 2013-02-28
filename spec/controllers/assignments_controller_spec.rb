@@ -88,28 +88,28 @@ describe AssignmentsController do
       rescue_action_in_public!
       #controller.use_rails_error_handling!
       course_with_student_logged_in(:active_all => true)
-      
+
       get 'show', :course_id => @course.id, :id => 5
       response.status.should eql('404 Not Found')
     end
-    
+
     it "should return unauthorized if not enrolled" do
       course_with_student(:active_all => true)
       course_assignment
-      
+
       get 'show', :course_id => @course.id, :id => @assignment.id
       assert_unauthorized
     end
-    
+
     it "should assign variables" do
       course_with_student_logged_in(:active_all => true)
       a = @course.assignments.create(:title => "some assignment")
-      
+
       get 'show', :course_id => @course.id, :id => a.id
       @course.reload.assignment_groups.should_not be_empty
       assigns[:unlocked].should_not be_nil
     end
-    
+
     it "should assign submission variable if current user and submitted" do
       course_with_student_logged_in(:active_all => true)
       course_assignment
@@ -175,8 +175,16 @@ describe AssignmentsController do
       get 'show', :course_id => @course.id, :id => @assignment.id
       assert_require_login
     end
+
+    it 'should not error out when google docs is not configured' do
+      GoogleDocs.stubs(:config).returns nil
+      course_with_student_logged_in(:active_all => true)
+      a = @course.assignments.create(:title => "some assignment")
+      get 'show', :course_id => @course.id, :id => a.id
+      GoogleDocs.unstub(:config)
+    end
   end
-  
+
   describe "GET 'syllabus'" do
     it "should require authorization" do
       course_with_student

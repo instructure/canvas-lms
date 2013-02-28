@@ -120,18 +120,26 @@ describe GoogleDocs do
     end
   end
 
-  it "should use the real_current_user if possible" do
-    lib = GoogleDocsTest.new nil, @user, User.create!
-    mock_consumer()
+  describe '#google_docs_retrieve_access_token' do
+    it "should use the real_current_user if possible" do
+      lib = GoogleDocsTest.new nil, @user, User.create!
+      mock_consumer()
 
-    lambda { lib.google_docs_retrieve_access_token }.should \
-      raise_error(RuntimeError, 'User does not have valid Google Docs token')
-  end
+      lambda { lib.google_docs_retrieve_access_token }.should \
+        raise_error(RuntimeError, 'User does not have valid Google Docs token')
+    end
 
-  it "should use the current_user if no real_current_user" do
-    lib = GoogleDocsTest.new nil, @user, nil
-    access_token = mock_access_token()
-    lib.google_docs_retrieve_access_token.should eql access_token
+    it "should use the current_user if no real_current_user" do
+      lib = GoogleDocsTest.new nil, @user, nil
+      access_token = mock_access_token()
+      lib.google_docs_retrieve_access_token.should eql access_token
+    end
+
+    it 'should not error out if the google plugin is not configured' do
+      GoogleDocs.stubs(:config).returns nil
+      lib = GoogleDocsTest.new nil, @user, nil
+      lib.google_docs_retrieve_access_token.should be_nil
+    end
   end
 
   describe '#google_docs_download' do
