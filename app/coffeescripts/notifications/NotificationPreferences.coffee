@@ -182,7 +182,7 @@ define [
       btnData = @findButtonDataForCode(value)
       # Setup display
       $cell.attr('data-selection', value)
-      $cell.find('a.change-selection span.ui-icon').attr('class', 'ui-icon '+btnData['image'])
+      $cell.find('a.change-selection i').attr('class', btnData['icon'])
       $cell.find('a.change-selection span.img-text').text(btnData['text'])
       # Get category and channel values
       category = $cell.attr('data-category')

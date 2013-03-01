@@ -1,17 +1,36 @@
 @import 'environment'
 
+$stripeColor: #f3f4f8
+
+/* Column striping */
+.table-columns-striped tr
+  td:nth-child(2n),
+  th:nth-child(2n)
+    background: none repeat scroll 0 0 $stripeColor
+
 .notification-prefs-table
 
   .ui-button
     padding: 1px
 
+  .ui-buttonset
+    margin-right: 0
+
+  .grouping > td:first-child
+    min-width: 205px
+
   .group-name
     font-weight: bold
     margin-bottom: 0
-    padding-top: 1em
+    padding-top: 0.25em
     line-height: 1em
 
-  tr:not(:first-child) .comm-channel *
+  .category-name
+    font-size: 1.2em
+    font-weight: normal
+    vertical-align: middle
+
+  tr:not(:first-child) .comm-channel > div
     display: none
 
   .comm-channel
@@ -30,6 +49,9 @@
   td.comm-event-option
     text-align: left
     width: 110px
+    min-width: 110px
+    padding: 4px
+    vertical-align: middle
 
     // By default, hide buttons and show selection text
     .event-option-selection
@@ -49,6 +71,8 @@
         a
           &:hover, &:focus, &:active
             text-decoration: none
+          color: $gray
+
       select
         +opacity(0)
         outline: 0
@@ -56,10 +80,11 @@
         top: 0px
         left: 0px
 
-
-  div.user-preference
+  .user-preference
     margin-left: 1.1em
-
+    label
+      display: block
+      font-size: 13px
 
   .no-touch &
     td.comm-event-option[data-selection='never'] .event-option-selection a.change-selection
