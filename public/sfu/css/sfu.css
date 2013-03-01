@@ -84,3 +84,12 @@
     font-weight: normal;
     font-style: normal;
 }
+
+/* !-- Form styles -- */
+
+.bootstrap-form div.help
+{
+    margin-top: 0.5em;
+    font-size: 0.8em;
+    color: #888;
+}
