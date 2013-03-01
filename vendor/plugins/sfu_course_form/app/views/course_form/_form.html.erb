@@ -1,10 +1,11 @@
 <h1>Start a New Course</h1>
   <% form_tag({:controller => "course_form" ,:action => "create"}, :class => "bootstrap-form form-horizontal") do -%>
   <div class="control-group">
-    <%= label_tag "Courses For", "Courses For", :class => "control-label" %>
+    <%= label_tag "username", "Courses Taught By", :class => "control-label" %>
     <div class="controls">
       <%= text_field_tag "username", nil, :class => "input-large", :value => @sfuid, :required => true, :placeholder => "SFU Computing ID" %>
       <button type="button" id="update_course_list" class="btn">Update</button>
+      <div class="help">Enter the SFU Computing ID of the instructor teaching the courses to be created</div>
     </div>
   </div>
 
