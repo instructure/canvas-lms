@@ -264,6 +264,7 @@ define([
       // files list, remove the uploader progress bar and re-set the submit button.
       // Re-set the recorders, too?  I guess probably, yeah, if you can.
       $(document).triggerHandler('reset_media_comment_forms');
+
       var temporaryName = $.trim($("#identity .user_name").text()) + " " + (new Date()).toISOString();
       setTimeout(function() {
         var recordVars = {
@@ -296,12 +297,12 @@ define([
           "pluginspage": "http://www.adobe.com/go/getflashplayer",
           "wmode": "opaque"
         }
-        $("#audio_record").text(I18n.t('messages.flash_required_record_audio', "Flash required for recording audio."))
+        $("#audio_record").text(I18n.t('messages.flash_required_record_audio', "Flash required for recording audio."));
         swfobject.embedSWF("/media_record/KRecord.swf", "audio_record", "400", "300", "9.0.0", false, recordVars, params);
 
         var params = $.extend({}, params, {name: 'KRecordVideo'});
         var recordVars = $.extend({}, recordVars, {useCamera: '1'});
-        $("#video_record").html("Flash required for recording video.")
+        $("#video_record").html("Flash required for recording video.");
         swfobject.embedSWF("/media_record/KRecord.swf", "video_record", "400", "300", "9.0.0", false, recordVars, params);
 
         // give all swfs integer positions in the DOM to avoid a chrome 21
@@ -351,13 +352,13 @@ define([
       $("#audio_upload").text(I18n.t('messages.flash_required_upload_audio', "Flash required for uploading audio."));
       var width = "180";
       var height = "50";
-      swfobject.embedSWF("//" + INST.kalturaSettings.domain + "/kupload/ui_conf_id/" + INST.kalturaSettings.upload_ui_conf, "audio_upload", width, height, "9.0.0", false, flashVars, params)
+      swfobject.embedSWF("//" + INST.kalturaSettings.domain + "/kupload/ui_conf_id/" + INST.kalturaSettings.upload_ui_conf, "audio_upload", width, height, "9.0.0", false, flashVars, params);
 
       flashVars = $.extend({}, flashVars, {jsDelegate: '$.mediaComment.video_delegate'});
       $("#video_upload").text(I18n.t('messages.flash_required_upload_video', "Flash required for uploading video."));
       var width = "180";
       var height = "50";
-      swfobject.embedSWF("//" + INST.kalturaSettings.domain + "/kupload/ui_conf_id/" + INST.kalturaSettings.upload_ui_conf, "video_upload", width, height, "9.0.0", false, flashVars, params)
+      swfobject.embedSWF("//" + INST.kalturaSettings.domain + "/kupload/ui_conf_id/" + INST.kalturaSettings.upload_ui_conf, "video_upload", width, height, "9.0.0", false, flashVars, params);
 
 
       var $audio_record_holder, $audio_record, $audio_record_meter;
@@ -459,11 +460,7 @@ define([
         var checkForKS = function() {
           if($div.data('ks')) {
             $div.html(html);
-            $div.find("#media_record_tabs").tabs({
-              select: function() {
-                $(document).triggerHandler('reset_media_comment_forms');
-              }
-            });
+            $div.find("#media_record_tabs").tabs();
             mediaCommentReady();
           } else if($div.data('ks-error')) {
             $div.html($div.data('ks-error'));
