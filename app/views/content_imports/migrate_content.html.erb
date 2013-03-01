@@ -19,7 +19,7 @@
 <% form_tag context_url(@context, :context_import_migrate_url), :method => :post, :class=> 'file_upload', :id => "migration_form", :multipart => true do %>
   <input type="hidden" name="export_file_enabled" value="0" id="export_file_enabled"/>
   <input type="hidden" name="content_migration_id" id="content_migration_id"/>
-  <select id="choose_migration_system" name="migration_settings[migration_type]" style="font-size: 1.3em; border: 2px solid #aaa;">
+  <select id="choose_migration_system" name="migration_settings[migration_type]" class="span4">
     <option value="none"><%= t 'options.source_system', "Choose the system you want to migrate from" %></option>
     <%= options_for_select @select_options %>
   </select>

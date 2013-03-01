@@ -166,7 +166,7 @@
     <div style="margin-top: 20px;">
       <h3><%= check_box :copy, :shift_dates, :class => "shift_dates_checkbox" %><%= label :copy, :shift_dates, :en => "Adjust events and due dates" %></h3>
       <div style="display: none; margin-left: 50px;" class="shift_dates_settings">
-        <div>
+        <div class="row">
           <div style="margin-bottom: 5px;"><%= t 'labels.dates_range', "%{course} dates range", :course => '<strong class="course_name">...</strong>'.html_safe %></div>
           <% ot 'from_to', "*from* %{start_date} **to** %{end_date}",
                 :start_date => capture { %>
@@ -177,7 +177,7 @@
             '**' => '<div style="float: left;">&nbsp;\1&nbsp;</div>' } %>
           <div class="clear"></div>
         </div>
-        <div>
+        <div class="row">
           <div style="margin-bottom: 5px margin-top: 10px;"><%= mt 'labels.this_course_date_range', "**This Course** dates range" %></div>
           <% ot 'from_to', "*from* %{start_date} **to** %{end_date}",
                 :start_date => capture { %>
@@ -186,7 +186,6 @@
             <div style="float: left;"><%= text_field :copy, :new_end_date, :value => date_string(@context.real_end_date, :long), :class => "date_field", :style => "width: 120px;" %></div>
           <% }, :wrapper => { '*' => '<div style="float: left; margin-left: 10px;">\1&nbsp;</div>',
             '**' => '<div style="float: left;">&nbsp;\1&nbsp;</div>' } %>
-          <div class="clear"></div>
         </div>
         <div style="margin-top: 15px;">
           <%= t 'descriptions.day_substitutions', "You can also explicitly define day substitutions to adjust for changing class schedules
