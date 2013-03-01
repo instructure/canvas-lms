@@ -10,7 +10,7 @@
 
 <% jammit_css :content_imports %>
 
-<% form_tag context_url(@context, :context_import_copy_content_url), :id => "copy_context_form" do %>
+<% form_tag context_url(@context, :context_import_copy_content_url), :id => "copy_context_form", :class => "form-inline" do %>
     <input type="hidden" name="source_course" id="source_cource_id" value="<%= @source_course.id %>"/>
     <h2><%= t 'titles.copy_from_course', "Copy Content From %{course}", :course => @source_course.name %></h2>
     <p><%= t 'descriptions.copy_content', "Select the content you'd like copied into this course." %></p>
