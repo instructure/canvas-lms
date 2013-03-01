@@ -162,7 +162,7 @@ define([
           $countdown_seconds.text(d.getUTCSeconds());
           if(diff <= 0 && !quizSubmission.submitting) {
             quizSubmission.submitting = true;
-            $("#submit_quiz_form").submit();
+            quizSubmission.submitQuiz();
           }
         }
         var diff = quizSubmission.referenceDate.getTime() - now.getTime() - quizSubmission.clientServerDiff;
@@ -185,7 +185,7 @@ define([
               close: function() {
                 if(!quizSubmission.submitting) {
                   quizSubmission.submitting = true;
-                  $("#submit_quiz_form").submit();
+                  quizSubmission.submitQuiz();
                 }
               }
             });
@@ -240,6 +240,10 @@ define([
         var addClass = (primary ? 'btn-primary' : 'btn-secondary');
         var removeClass = (primary ? 'btn-secondary' : 'btn-primary');
         $(selector).addClass(addClass).removeClass(removeClass);
+      },
+      submitQuiz: function() {
+        var action = $('#submit_quiz_button').data('action');
+        $('#submit_quiz_form').attr('action', action).submit();
       }
     };
   })();
@@ -497,15 +501,21 @@ define([
 
     setTimeout(function() { quizSubmission.updateSubmission(true) }, 15000);
 
+    var $submit_buttons = $("#submit_quiz_form button[type=submit]");
+
     // set the form action depending on the button clicked
-    $("#submit_quiz_form button[type=submit]").click(function(event) {
-      quizSubmission.updateSubmission();
+    $submit_buttons.click(function(event) {
+      // call updateSubmission with beforeLeave=true so quiz is saved synchronously
+      quizSubmission.updateSubmission(false, true);
 
       var action = $(this).data('action');
       if(action != undefined) {
-        $('#submit_quiz_form').attr('action', action);          
+        $('#submit_quiz_form').attr('action', action);
       }
     });
+
+    // now that JS has been initialized, enable the next and previous buttons
+    $submit_buttons.removeAttr('disabled');
   });
 });
 
