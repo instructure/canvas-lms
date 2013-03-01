@@ -1,5 +1,5 @@
 {{#if frozen}}
-  <div class="content-callout border border-trbl" style="padding:10px; margin-bottom:18px;">
+  <div class="alert alert-info">
     <i class="icon-warning"></i> {{#t "warnings.assignment_is_frozen"}}Some settings have been administratively locked.{{/t}}
   </div>
 {{/if}}
@@ -13,7 +13,6 @@
       value="{{name}}"
       type="text"
       maxlength="254"
-      style="font-size: 15px"
       class="input-block-level"
       {{disabledIfIncludes frozenAttributes "title"}}/>
   </div>
@@ -119,7 +118,7 @@
 
   {{#if canFreeze}}
     <fieldset>
-      <div class="control-group controls" style="text-align:left;">
+      <div class="control-group controls">
         <label class="checkbox">
           <input id="assignment_freeze_on_copy"
             name="freeze_on_copy"
@@ -135,7 +134,7 @@
 
 </div>
 
-<div class="form-actions" style="padding-left: 10px;">
+<div class="form-actions flush" style="padding-left: 10px;">
 
   <div style="float: left; min-width: 300px;">
     <label class="checkbox" style="text-align:left;">

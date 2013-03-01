@@ -36,7 +36,7 @@ $(document).ready(function() {
 
 <div id="quiz_edit_wrapper">
   <% if @has_student_submissions %>
-    <div class="content-callout border" id="student_submissions_warning">
+    <div class="alert alert-info" id="student_submissions_warning">
       <i class="icon-warning"></i> <%= t('warnings.has_student_submissions', <<-TEXT)
       Students have either already taken or started taking this quiz, so be careful
       about editing it.  If you change any quiz questions in a significant way, you
