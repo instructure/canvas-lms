@@ -31,7 +31,7 @@ Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |fil
 # globally on every object. :context is already heavily used in our application,
 # so we remove rspec's definition.
 module Spec::DSL::Main
-  remove_method :context
+  remove_method :context if respond_to? :context
 end
 
 def truncate_table(model)

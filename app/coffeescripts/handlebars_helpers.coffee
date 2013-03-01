@@ -8,10 +8,11 @@ define [
   'compiled/util/dateSelect'
   'compiled/util/mimeClass'
   'compiled/str/convertApiUserContent'
+  'compiled/str/TextHelper'
   'jquery.instructure_date_and_time'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
-], (Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, mimeClass, convertApiUserContent) ->
+], (Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, mimeClass, convertApiUserContent, textHelper) ->
 
   Handlebars.registerHelper name, fn for name, fn of {
     t : (key, defaultValue, options) ->
@@ -289,5 +290,9 @@ define [
         'disabled'
       else
         ''
+
+    truncate: ( string, max ) ->
+      return textHelper.truncateText( string, { max: max } )
+
   }
   return Handlebars

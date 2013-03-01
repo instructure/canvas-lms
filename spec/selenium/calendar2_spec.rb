@@ -150,6 +150,17 @@ describe "calendar2" do
           undated_events.size.should == 1
           undated_events.first.text.should =~ /#{e.title}/
         end
+
+        it "should truncate very long undated event titles" do
+          e = make_event :start => nil, :title => "asdfjkasldfjklasdjfklasdjfklasjfkljasdklfjasklfjkalsdjsadkfljasdfkljfsdalkjsfdlksadjklsadjsadklasdf"
+          get "/calendar2"
+
+          f(".undated-events-link").click
+          wait_for_ajaximations
+          undated_events = ff("#undated-events > ul > li")
+          undated_events.size.should == 1
+          undated_events.first.text.should == "asdfjkasldfjklasdjfklasdjfklasjf..."
+        end
       end
     end
 
