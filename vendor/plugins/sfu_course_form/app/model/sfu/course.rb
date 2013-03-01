@@ -8,7 +8,7 @@ module SFU
     class << self
       def terms(sfuid)
         terms = Rest.json Rest.terms_url, "&username=#{sfuid}"
-        if terms.empty?
+        if terms.empty? || terms["teachingSemester"].nil?
           {}
         else
           terms["teachingSemester"]

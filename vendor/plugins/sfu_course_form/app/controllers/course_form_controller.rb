@@ -3,19 +3,21 @@ require "json"
 require Pathname(File.dirname(__FILE__)) + "../model/sfu/course"
 
 class CourseFormController < ApplicationController
-  unloadable
 
   def new
     @user = User.find(@current_user.id)
     @sfuid = @user.pseudonym.unique_id
     @course_list = Array.new
     @terms = Account.find_by_name('Simon Fraser University').enrollment_terms.delete_if {|t| t.name == 'Default Term'}
+    if SFU::User.student_only? @sfuid
+      flash[:error] = "You don't have permission to access that page"
+      redirect_to dashboard_url
+    end
   end
 
   def create
     selected_courses = []
     sections = []
-    @error_message
     account_id = Account.find_by_name('Simon Fraser University').id
     teacher_username = params[:username]
     teacher2_username = params[:enroll_me]
@@ -155,8 +157,10 @@ class CourseFormController < ApplicationController
 
       # give some time for the delayed_jobs to process the import
       sleep 5
+      flash[:notice] = "Course request submitted successfully"
     else
-      @error_message = "Error creating courses for '#{teacher_username}'. Please try again."
+      flash[:error] = "Course request failed. Please try agin."
+      redirect_to "/sfu/course/new"
     end
   end
 

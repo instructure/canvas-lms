@@ -1,9 +1,5 @@
 <% content_for :page_title, "Course Request Submitted" %>
-<% if @error_message.nil? %>
-    <h5>Course request has been submitted successfully. It can take up to 5 minutes to complete.</h5>
-<% else %>
-    <h5><%= @error_message %></h5>
-<% end %>
+<h5>Course creation can take up to 5 minutes to complete.</h5>
 
 <div class="button-container" id="button-container">
 <button type="button" id="course_list" class="btn">Course List</button>
