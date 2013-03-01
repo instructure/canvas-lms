@@ -48,7 +48,7 @@ class CourseFormController < ApplicationController
           title = course_info[4].to_s
           section_tutorials = course_info[5]
 
-          course_id = "#{term}-#{name}-#{number}-#{section_name}:::course"
+          course_id = "#{term}-#{name}-#{number}-#{section_name}"
           section_id = "#{term}-#{name}-#{number}-#{section_name}:::section"
           short_name = "#{name.upcase}#{number} #{section_name.upcase}"
           long_name =  "#{short_name} #{title}"
@@ -81,7 +81,7 @@ class CourseFormController < ApplicationController
         else
           logger.info "[SFU Course Form] Creating sandbox for #{teacher_username}"
           datestamp = "1"
-          course_id = "sandbox-#{teacher_username}-#{datestamp}:::course"
+          course_id = "sandbox-#{teacher_username}-#{datestamp}"
           short_long_name = "Sandbox - #{teacher_username}"
 
           course_array.push "#{course_id},#{short_long_name},#{short_long_name},#{account_id},,active"
@@ -244,7 +244,7 @@ class CourseFormController < ApplicationController
             course_hash["title"]  + ":::" +
             course_hash["sectionTutorials"].downcase.delete(" ")
 
-        unless course_exists? course_hash["sis_source_id"].concat(":::course")
+        unless course_exists? course_hash["sis_source_id"]
           course_array.push course_hash
         end
       end
@@ -284,7 +284,7 @@ class CourseFormController < ApplicationController
   end
 
   def sandbox_info
-    sandbox_source_id = "sandbox-#{params[:sfuid]}-1:::course"
+    sandbox_source_id = "sandbox-#{params[:sfuid]}-1"
     course = Course.find(:all, :conditions => "sis_source_id='#{sandbox_source_id}'")
     course_hash = {}
     if course.length == 1
