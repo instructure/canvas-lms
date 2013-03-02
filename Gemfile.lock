@@ -11,7 +11,7 @@ GEM
     activeresource (2.3.15)
       activesupport (= 2.3.15)
     activesupport (2.3.15)
-    addressable (2.3.2)
+    addressable (2.3.3)
     authlogic (2.1.3)
       activesupport
     aws-s3-instructure (0.6.2.1352914936)
@@ -27,11 +27,11 @@ GEM
     cassandra-cql (1.1.1)
       simple_uuid (>= 0.2.0)
       thrift_client (>= 0.7.1)
-    childprocess (0.3.7)
-      ffi (~> 1.0, >= 1.0.6)
+    childprocess (0.3.8)
+      ffi (~> 1.0, >= 1.0.11)
     chunky_png (1.2.7)
     closure-compiler (1.1.8)
-    coderay (1.0.8)
+    coderay (1.0.9)
     coffee-script (2.2.0)
       coffee-script-source
       execjs
@@ -74,6 +74,7 @@ GEM
       libxml-ruby (~> 2.0)
     hashery (1.3.0)
     highline (1.6.1)
+    httpclient (2.3.3)
     i18n (0.6.0)
     icalendar (1.1.5)
     instructure-redis-store (1.0.0.2.instructure1)
@@ -89,7 +90,7 @@ GEM
     libxml-ruby (2.3.2)
     linecache (0.46)
       rbx-require-relative (> 0.0.4)
-    listen (0.7.2)
+    listen (0.7.3)
     lumberjack (1.0.2)
     macaddr (1.0.0)
     mail (2.4.4)
@@ -117,7 +118,7 @@ GEM
       rdiscount
       rubyzip
       thor
-    multi_json (1.5.0)
+    multi_json (1.6.1)
     mysql (2.8.1)
     net-ldap (0.3.1)
     netaddr (1.5.0)
@@ -128,7 +129,7 @@ GEM
       parallel
     pg (0.10.1)
     polyglot (0.3.3)
-    pry (0.9.11.4)
+    pry (0.9.12)
       coderay (~> 1.0.5)
       method_source (~> 0.8)
       slop (~> 3.4)
@@ -159,6 +160,8 @@ GEM
     recaptcha (0.3.1)
     redis (3.0.1)
     require_relative (1.0.1)
+    rest-client (1.6.7)
+      mime-types (>= 1.16)
     ritex (1.0.1)
     rotp (1.4.1)
     rqrcode (0.4.2)
@@ -186,6 +189,7 @@ GEM
     rubyzip (0.9.5)
     rufus-scheduler (2.0.6)
     sanitize (2.0.3)
+      nokogiri (>= 1.4.4, < 1.6)
       nokogiri (>= 1.4.4, < 1.6)
     sass (3.2.1)
     selenium-webdriver (2.27.2)
@@ -253,6 +257,7 @@ DEPENDENCIES
   hairtrigger (= 0.1.14)
   hashery (= 1.3.0)
   highline (= 1.6.1)
+  httpclient
   i18n (= 0.6.0)
   icalendar (= 1.1.5)
   instructure-redis-store (= 1.0.0.2.instructure1)
@@ -288,6 +293,7 @@ DEPENDENCIES
   recaptcha (= 0.3.1)
   redis (= 3.0.1)
   require_relative (= 1.0.1)
+  rest-client
   ritex (= 1.0.1)
   rotp (= 1.4.1)
   rqrcode (= 0.4.2)
