@@ -12,18 +12,12 @@
   }
 
   .due-date-override-headers {
-    min-width: 650px;
+    min-width: 900px;
 
     div {
-      width: 160px;
+      width: 210px;
       float: left;
       margin-right: 10px;
-    }
-    div.due-date-header {
-      width: 145px;
-    }
-    div.lock-header {
-      width: 142px;
     }
   }
 
@@ -33,18 +27,18 @@
     li.due-date-row {
       list-style-type: none;
       overflow: hidden;
-      min-width: 771px;
+      min-width: 900px;
       select {
         float: left;
         margin: 0px 10px 0px 0px;
-        width: 160px;
+        width: 210px;
       }
       .date_field_container {
         float: left;
         position: relative;
         margin-right: 10px;
         input {
-          width: 88px;
+          width: 155px;
         }
         .datetime_suggest {
           height: 20px;
