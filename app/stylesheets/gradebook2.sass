@@ -378,11 +378,21 @@ $gradebook_checkbox_width: 16px
 .gradebook_filter input
   width: 300px
 
+=gradebook_menu_label
+  font-size: 12px
+  font-weight: bold
+  margin-bottom: 0
+  vertical-align: 0px !important
+  position: relative
+  line-height: 1.5
+
 #section-to-show-menu
   width: 200px
   overflow-x: hidden
   overflow-y: auto
   max-height: 550px
+  label
+    +gradebook_menu_label
 
 .submission_type_icon
   display: block
@@ -412,3 +422,8 @@ $gradebook_checkbox_width: 16px
 
 .final-warning
   margin-left: -16px
+
+.gradebook_drop_down
+  label
+    +gradebook_menu_label
+
