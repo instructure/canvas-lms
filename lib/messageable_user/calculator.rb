@@ -368,6 +368,10 @@ class MessageableUser
       "(#{state_clauses.join(' OR ')}) AND enrollments.type != 'StudentViewEnrollment'"
     end
 
+    def base_scope(options={})
+      MessageableUser.prepped(options)
+    end
+
     # scopes MessageableUsers via enrollments in courses, setting up the common
     # context fields to produce common_course entries.
     #
@@ -389,30 +393,13 @@ class MessageableUser
         :common_course_column => 'enrollments.course_id',
         :common_role_column => 'enrollments.type'
       }.merge(options.slice(:common_course_column, :common_group_column, :common_role_column, :strict_checks))
-      scope = MessageableUser.prepped(common_context_options)
 
-      # if either of our common course/group id columns are column names (vs.
-      # strings), they need to go in the group by. we turn the first element
-      # into an array and add them to that, so that both postgresql/mysql are
-      # happy (see the documentation on group_concat if you're curious about
-      # the gory details)
-      group_columns = MessageableUser::COLUMNS.dup
-      if common_context_options[:common_course_column].is_a?(String) || common_context_options[:common_group_column].is_a?(String)
-        group_columns = group_columns.dup
-        head = [group_columns.shift]
-        head << common_context_options[:common_course_column] if common_context_options[:common_course_column].is_a?(String)
-        head << common_context_options[:common_group_column] if common_context_options[:common_group_column].is_a?(String)
-        group_columns.unshift(head)
-      end
-
-      scope.scoped(
+      base_scope(common_context_options).scoped(
         :joins => <<-SQL,
           INNER JOIN enrollments ON enrollments.user_id=users.id
           INNER JOIN courses ON courses.id=enrollments.course_id
         SQL
-        :conditions => self.class.enrollment_conditions(options.slice(:include_completed, :strict_checks)),
-        :group => MessageableUser.connection.group_by(*group_columns),
-        :order => "LOWER(COALESCE(users.short_name, users.name)), users.id")
+        :conditions => self.class.enrollment_conditions(options.slice(:include_completed, :strict_checks)))
     end
 
     # further restricts the enrollment scope to users whose enrollment is
@@ -481,7 +468,7 @@ class MessageableUser
     # outer query). used to fake a common "course" context with that enrollment
     # type in users found via the account roster.
     HIGHEST_ENROLLMENT_SQL = <<-SQL
-      SELECT enrollments.type
+      (SELECT enrollments.type
       FROM enrollments
       INNER JOIN courses ON courses.id=enrollments.course_id
       INNER JOIN course_account_associations ON
@@ -490,7 +477,7 @@ class MessageableUser
       WHERE enrollments.user_id=user_account_associations.user_id
         AND #{enrollment_conditions(:include_completed => false)}
       ORDER BY #{Enrollment.type_rank_sql}
-      LIMIT 1
+      LIMIT 1)
     SQL
 
     # scopes MessageableUsers via associations with accounts, setting up the
@@ -500,9 +487,13 @@ class MessageableUser
     # if :strict_checks is false (default: true), all users will be included,
     # not just active users. (see MessageableUser.prepped)
     def account_user_scope(options={})
-      MessageableUser.prepped(options.slice(:strict_checks).merge(:common_course_column => 0, :common_role_column => HIGHEST_ENROLLMENT_SQL)).
-        scoped(:joins => "INNER JOIN user_account_associations ON user_account_associations.user_id=users.id",
-               :group => MessageableUser.connection.group_by(*MessageableUser::COLUMNS))
+      options = {
+        :common_course_column => 0,
+        :common_role_column => HIGHEST_ENROLLMENT_SQL
+      }.merge(options.slice(:strict_checks))
+
+      base_scope(options).scoped(
+        :joins => "INNER JOIN user_account_associations ON user_account_associations.user_id=users.id")
     end
 
     # further restricts the account user scope to users associated with
@@ -517,10 +508,13 @@ class MessageableUser
     # if :strict_checks is false (default: true), all users will be included,
     # not just active users. (see MessageableUser.prepped)
     def group_user_scope(options={})
-      MessageableUser.prepped(options.slice(:strict_checks).merge(:common_group_column => 'group_id')).scoped(
+      options = {
+        :common_group_column => 'group_id'
+      }.merge(options.slice(:strict_checks))
+
+      base_scope(options).scoped(
         :joins => "INNER JOIN group_memberships ON group_memberships.user_id=users.id",
-        :conditions => {'group_memberships.workflow_state' => 'accepted'},
-        :order => "LOWER(COALESCE(users.short_name, users.name)), users.id")
+        :conditions => {'group_memberships.workflow_state' => 'accepted'})
     end
 
     # further restricts the group user scope to users in groups for which I
