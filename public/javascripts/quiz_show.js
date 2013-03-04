@@ -97,7 +97,7 @@ $(document).ready(function () {
       url: $(this).attr('href'),
       message: deleteConfirmMessage,
       success: function() {
-        window.location.href = $('#context_quizzes_url').attr('href');
+        window.location.href = ENV.QUIZZES_URL;
       }
     });
   });

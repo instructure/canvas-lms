@@ -22,7 +22,7 @@
           <% end %>
 
           <% if @quiz.locked? %>
-            <% form_for @quiz, :url => context_url(@context, :context_quiz_url, @quiz.id, :id => 'quiz_unlock_form') do |f| %>
+            <% form_for @quiz, :url => context_url(@context, :context_quiz_url, @quiz.id), :html => { :id => 'quiz_unlock_form', :class => 'no-spacing' } do |f| %>
               <%= hidden_field_tag 'quiz[locked]', false %>
               <div id="unlock_for_how_long_dialog" title="<%= t('titles.unlock_for_how_long', "How long would you like to unlock the quiz for?") %>" style="display:none;">
                 <label style="float: left;" for="no_time_limit">
@@ -42,7 +42,7 @@
               </li>
             <% end %>
           <% else %>
-            <% form_for @quiz, :url => context_url(@context, :context_quiz_url, @quiz.id) do |f| %>
+            <% form_for @quiz, :url => context_url(@context, :context_quiz_url, @quiz.id), :html => { :class => 'no-spacing' } do |f| %>
               <%= hidden_field_tag 'quiz[locked]', true %>
               <li>
                 <a href="#" id="lock_this_quiz_now_link">
@@ -54,7 +54,9 @@
         <% elsif can_do(@quiz, @current_user, :review_grades) %>
           <% if @submitted_student_count && @submitted_student_count > 0 && @context.allows_speed_grader? %>
             <li>
-              <a href="<%= context_url(@context, :context_quiz_statistics_url, @quiz.id) %>" class="btn button-sidebar-wide"><i class="icon-stats"></i> <%= @quiz.survey? ? t('links.survey_statistics', "Survey Statistics") : t('links.quiz_statistics', "Quiz Statistics") %></a>
+              <a href="<%= context_url(@context, :context_quiz_statistics_url, @quiz.id) %>">
+                <i class="icon-stats"></i> <%= @quiz.survey? ? t('links.survey_statistics', "Survey Statistics") : t('links.quiz_statistics', "Quiz Statistics") %>
+              </a>
             </li>
           <% end %>
           <a href="<%= context_url(@context, :context_quiz_read_only_url, @quiz.id) %>">
@@ -102,31 +104,16 @@
       <%= render :partial => "quizzes/quiz_right_side", :locals => {:allow_take => false} %>
     <% else %>
       
-      <div class="rs-margin-lr rs-margin-top">
+      <div class="rs-margin-top">
         <% if @submission && @submission.completed? %>
           <%= render :partial => "quizzes/quiz_right_side", :locals => {:allow_take => !@locked} %>
         <% elsif @submission && @submission.untaken? %>
-          <div style="margin-left: 20px; margin-top: 20px; line-height: 1.3em;">
+          <div>
             <% if !@quiz.locked? %>
                 <%= @quiz.survey? ?
                             t(:survey_in_progress, "You're in the middle of taking this survey.") :
                             t(:quiz_in_progress, "You're in the middle of taking this quiz.") %><br/>
                 <%= link_to_resume_poll(:class => "btn") %>
-            <% end %>
-          </div>
-        <% end %>
-        <% if @quiz.for_assignment? %>
-          <div style="margin-top: 20px; display: none;">
-            <div style="margin-bottom: 5px;">
-              <%= @quiz.survey? ?
-                mt(:survey_for_assignment, "This survey is for the assignment **%{assignment}**", :assignment => @quiz.assignment.title) :
-                mt(:quiz_for_assignment, "This quiz is for the assignment **%{assignment}**", :assignment => @quiz.assignment.title) %>
-              <% if @quiz.assignment.points_possible %>
-                (<%= t(:points_possible, "pt", :count => @quiz.assignment.points_possible) %>)
-              <% end %>.
-            </div>
-            <% if can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :update) %>
-              <a href="<%= context_url(@context, :edit_context_assignment_url, @quiz.assignment_id, :return_to => request.url) %>" class="btn"><i class="icon-edit"></i> <%= t('links.edit_assignment_details', "Edit Assignment Details") %></a>
             <% end %>
           </div>
         <% end %>
@@ -137,8 +124,6 @@
 
 <% js_bundle :quiz_show %>
 <% jammit_css :quizzes, :learning_outcomes %>
-
-<a id="context_quizzes_url" style="display:none;" href="<%= context_url(@context, :context_quizzes_url) %>">&nbsp;<!-- This is needed by quiz_show.js --></a>
 
 <div id="quiz_show">
   <header class="quiz-header">

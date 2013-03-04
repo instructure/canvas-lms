@@ -159,6 +159,8 @@ describe QuizzesController do
       assigns[:submitted_student_count].should == 2
       assigns[:any_submissions_pending_review].should == true
 
+      controller.js_env.clear
+
       user_session @ta1
       get 'show', :course_id => @course.id, :id => @quiz.id
       assigns[:submitted_student_count].should == 1
@@ -309,29 +311,41 @@ describe QuizzesController do
       response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
     end
 
-    it "should render verification page if password required" do
-      course_with_student_logged_in(:active_all => true)
-      course_quiz(true)
-      @quiz.access_code = 'bacon'
-      @quiz.save!
-      post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
-      response.should render_template('access_code')
+    context 'verification' do
+      before do
+        course_with_student_logged_in(:active_all => true)
+        course_quiz(true)
+        @quiz.access_code = 'bacon'
+        @quiz.save!
+      end
 
-      # shouldn't let you in on a bad access code
-      post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1', :access_code => 'wrongpass'
-      response.should_not be_redirect
-      response.should render_template('access_code')
+      it "should render verification page if password required" do
+        post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+        response.should render_template('access_code')
+      end
 
-      post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1', :access_code => 'bacon'
-      response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
+      it "shouldn't let you in on a bad access code" do
+        post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1', :access_code => 'wrongpass'
+        response.should_not be_redirect
+        response.should render_template('access_code')
+      end
 
-      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
-      response.should_not be_redirect
-      response.should_not render_template('access_code')
+      it "should send you to take with the right access code" do
+        post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1', :access_code => 'bacon'
+        response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
+      end
 
-      # it should not ask for the access code again if you reload the quiz
-      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
-      response.should_not render_template('access_code')
+
+      it "should not ask for the access code again if you reload the quiz" do
+        get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1', :access_code => 'bacon'
+        response.should_not be_redirect
+        response.should_not render_template('access_code')
+
+        controller.js_env.clear
+
+        get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+        response.should_not render_template('access_code')
+      end
     end
 
     it "should not let them take the quiz if it's locked" do

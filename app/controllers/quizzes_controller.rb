@@ -98,9 +98,9 @@ class QuizzesController < ApplicationController
   end
 
   def edit
-    @assignment = @quiz.assignment
     if authorized_action(@quiz, @current_user, :update)
       add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
+      @assignment = @quiz.assignment
 
       @quiz.title = params[:title] if params[:title]
       @quiz.due_at = params[:due_at] if params[:due_at]
@@ -117,11 +117,13 @@ class QuizzesController < ApplicationController
       if @has_student_submissions = @quiz.has_student_submissions?
         flash[:notice] = t('notices.has_submissions_already', "Keep in mind, some students have already taken or started taking this quiz")
       end
-      js_env :ASSIGNMENT_OVERRIDES => (assignment_overrides_json(@quiz.overrides_visible_to(@current_user)))
-      js_env :QUIZ => (quiz_json(@quiz,@context,@current_user,session))
-      js_env :SECTION_LIST => @context.course_sections.active.map {|section|
-        {:id => section.id, :name => section.name }
-      }
+
+      sections = @context.course_sections.active
+      js_env :ASSIGNMENT_ID => @assigment.present? ? @assignment.id : nil,
+             :ASSIGNMENT_OVERRIDES => assignment_overrides_json(@quiz.overrides_visible_to(@current_user)),
+             :QUIZ => quiz_json(@quiz, @context, @current_user, session),
+             :SECTION_LIST => sections.map { |section| { :id => section.id, :name => section.name } },
+             :QUIZZES_URL => polymorphic_url([@context, :quizzes])
       render :action => "new"
     end
   end
@@ -178,6 +180,7 @@ class QuizzesController < ApplicationController
       @stored_params = (@submission.temporary_data rescue nil) if params[:take] && @submission && (@submission.untaken? || @submission.preview?)
       @stored_params ||= {}
       log_asset_access(@quiz, "quizzes", "quizzes")
+      js_env :QUIZZES_URL => polymorphic_url([@context, :quizzes])
       if params[:take] && can_take_quiz?
         # allow starting the quiz via a GET request, but only when using a lockdown browser
         if request.post? || (@quiz.require_lockdown_browser? && !quiz_submission_active?)

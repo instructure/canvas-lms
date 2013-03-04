@@ -979,9 +979,8 @@ define([
 
   function generateFormQuiz(quiz) {
     var data = {};
-    var quizAssignmentId = quizAssignmentId || null;
-    if (quizAssignmentId) {
-      data['quiz[assignment_id]'] = quizAssignmentId;
+    if (ENV.ASSIGNMENT_ID) {
+      data['quiz[assignment_id]'] = ENV.ASSIGNMENT_ID;
     }
     data['quiz[title]'] = quiz.quiz_name;
     for(var idx in quiz.questions) {
@@ -2594,6 +2593,15 @@ define([
     });
 
     $("#equations_dialog_tabs").tabs();
+
+    $(".delete_quiz_link").click(function(event) {
+      event.preventDefault();
+      $(this).parents(".quiz").confirmDelete({
+        message: I18n.t('confirms.delete_quiz', "Are you sure you want to delete this quiz?"),
+        url: $(this).attr('href'),
+        success: function() { window.location.replace(ENV.QUIZZES_URL); }
+      });
+    });
   });
 
   $.fn.multipleAnswerSetsQuestion = function() {
