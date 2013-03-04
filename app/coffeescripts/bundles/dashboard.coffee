@@ -3,14 +3,17 @@ require [
   'Backbone',
   'jquery',
   'i18n!dashboard'
+  'compiled/util/newCourseForm'
   'jquery.disableWhileLoading'
-], (_, {View}, $, I18n) ->
+], (_, {View}, $, I18n, newCourseForm) ->
 
   if ENV.DASHBOARD_SIDEBAR_URL
     rightSide = $('#right-side')
     rightSide.disableWhileLoading(
       $.get ENV.DASHBOARD_SIDEBAR_URL , (data) ->
-        rightSide.html data)
+        rightSide.html data
+        newCourseForm()
+    )
 
   class DashboardView extends View
 
