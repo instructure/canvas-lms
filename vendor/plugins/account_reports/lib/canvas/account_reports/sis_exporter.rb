@@ -19,7 +19,7 @@
 module Canvas::AccountReports
   class SisExporter
     include Api
-    include Canvas::ReportHelpers::DateHelper
+    include Canvas::AccountReports::ReportHelper
 
     SIS_CSV_REPORTS = ["users", "accounts", "terms", "courses", "sections", "enrollments", "groups", "group_membership", "xlist"]
 

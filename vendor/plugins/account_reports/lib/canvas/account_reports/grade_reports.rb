@@ -20,7 +20,7 @@ module Canvas::AccountReports
 
   class GradeReports
     include Api
-    include Canvas::ReportHelpers::DateHelper
+    include Canvas::AccountReports::ReportHelper
 
     def initialize(account_report)
       @account_report = account_report

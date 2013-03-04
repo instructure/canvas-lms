@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2012 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../../../spec/spec_helper')
 
-module ReportsSpecHelper
+module ReportSpecHelper
   def self.find_account_module_and_reports(account_id)
     Canvas::AccountReports::REPORTS.each do |(report_name, details)|
       details[:proc].should_not == nil
@@ -31,7 +31,7 @@ module ReportsSpecHelper
     account_report.parameters = {}
     account_report.parameters = parameters
     account_report.save
-    csv_report = Canvas::AccountReports::Default.send(report_type, account_report)
+    csv_report = Canvas::AccountReports.for_account(account)[report_type][:proc].call(account_report)
     if csv_report.is_a? Hash
       csv_report.inject({}) do |result, (key, csv)|
         all_parsed = FasterCSV.parse(csv).to_a

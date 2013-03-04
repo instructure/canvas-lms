@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Canvas::ReportHelpers::DateHelper
+module Canvas::AccountReports::ReportHelper
 
 # This function will take a datetime or a datetime string and convert into iso8601 for the @account's timezone
 # A string datetime needs to be in UTC
