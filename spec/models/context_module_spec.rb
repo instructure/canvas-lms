@@ -200,7 +200,7 @@ describe ContextModule do
       @progression.requirements_met.should_not be_empty
       @progression.requirements_met[0][:id].should eql(@tag.id)
     end
-    
+
     it "should return nothing if the user isn't a part of the context" do
       course_module
       @user = User.create!(:name => "some name")
@@ -209,6 +209,28 @@ describe ContextModule do
       @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
       @progression = @module.update_for(@user, :read, @tag)
       @progression.should be_nil
+    end
+
+    it "should not generate progressions for non-active modules" do
+      student_in_course :active_all => true
+      tehmod = @course.context_modules.create! :name => "teh module"
+      page = @course.wiki.wiki_pages.create! :title => "view this page"
+      tag = tehmod.add_item(:id => page.id, :type => 'wiki_page')
+      tehmod.completion_requirements = { tag.id => {:type => 'must_view'} }
+      tehmod.workflow_state = 'active'
+      tehmod.save!
+
+      othermods = %w(active unpublished deleted).collect do |state|
+        mod = @course.context_modules.build :name => "other module in state #{state}"
+        mod.workflow_state = state
+        mod.save!
+        mod
+      end
+
+      tehmod.update_for(@student, :read, tag)
+      mods_with_progressions = @student.context_module_progressions.collect(&:context_module_id)
+      mods_with_progressions.should_not be_include othermods[1].id
+      mods_with_progressions.should_not be_include othermods[2].id
     end
   end
 
