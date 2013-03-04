@@ -242,7 +242,7 @@ describe CalendarEvent do
       @teacher = user
       @course.enroll_teacher(@teacher).accept!
       course1 = @course
-      course_with_teacher(@teacher)
+      course_with_teacher(:user => @teacher)
       course2, @course = @course, course1
       g1 = AppointmentGroup.create!(:title => "foo", :contexts => [course1, course2])
       g1.publish!

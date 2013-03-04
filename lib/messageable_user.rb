@@ -22,22 +22,61 @@ class MessageableUser < User
   AVAILABLE_CONDITIONS = "users.workflow_state IN ('registered', 'pre_registered')"
 
   def self.build_select(options={})
-    common_course_column = options[:common_course_column] || 'NULL'
-    common_group_column = options[:common_group_column] || 'NULL'
-    common_roles_column = options[:common_role_column] ?
-      connection.func(:group_concat, options[:common_role_column].to_sym) :
-      'NULL'
-    "#{SELECT}, #{common_course_column} AS common_course_id, #{common_group_column} AS common_group_id, #{common_roles_column} AS common_roles"
+    options = {
+      :common_course_column => nil,
+      :common_group_column => nil,
+      :common_role_column => nil
+    }.merge(options)
+
+    common_course_sql =
+      if options[:common_role_column]
+        raise ArgumentError unless options[:common_course_column]
+        connection.func(:group_concat, connection.adapter_name =~ /postgres/i ?
+          :"#{options[:common_course_column]}::text || ':' || #{options[:common_role_column]}::text" :
+          :"#{options[:common_course_column]} || ':' || #{options[:common_role_column]}")
+      else
+        'NULL'
+      end
+
+    common_group_sql =
+      if options[:common_group_column].is_a?(String)
+        connection.func(:group_concat, options[:common_group_column].to_sym)
+      elsif options[:common_group_column]
+        options[:common_group_column].to_s
+      else
+        'NULL'
+      end
+
+    "#{SELECT}, #{common_course_sql} AS common_courses, #{common_group_sql} AS common_groups"
   end
 
-  named_scope :prepped, lambda{ |options|
-    select = MessageableUser.build_select(options)
-    if options.has_key?(:strict_checks) && !options[:strict_checks]
-      { :select => select }
-    else
-      { :select => select, :conditions => AVAILABLE_CONDITIONS }
+  def self.prepped(options={})
+    options = {:strict_checks => true}.merge(options)
+
+    # if either of our common course/group id columns are column names (vs.
+    # integers), they need to go in the group by. we turn the first element
+    # into an array and add them to that, so that both postgresql/mysql are
+    # happy (see the documentation on group_concat if you're curious about
+    # the gory details)
+    columns = COLUMNS.dup
+    if options[:common_course_column].is_a?(String) || options[:common_group_column].is_a?(String)
+      head = [columns.shift]
+      head << options[:common_course_column] if options[:common_course_column].is_a?(String)
+      head << options[:common_group_column] if options[:common_group_column].is_a?(String)
+      columns.unshift(head)
     end
-  }
+
+    scope = self.scoped(
+      :select => MessageableUser.build_select(options),
+      :group => MessageableUser.connection.group_by(*columns),
+      :order => 'LOWER(COALESCE(users.short_name, users.name)), users.id')
+
+    if options[:strict_checks]
+      scope.where(AVAILABLE_CONDITIONS)
+    else
+      scope
+    end
+  end
 
   def self.unfiltered(options={})
     prepped(options.merge(:strict_checks => false))
@@ -68,47 +107,33 @@ class MessageableUser < User
   # transpose to the current shard. additionally, any time you access these,
   # make sure you're still on the same shard where common_course_id and/or
   # common_group_id were queried
-  attr_writer :global_common_courses, :global_common_groups
+  attr_accessor :global_common_courses, :global_common_groups
 
-  def global_common_courses
-    unless @global_common_courses
-      @global_common_courses = {}
-      if global_common_course_id
-        @global_common_courses[global_common_course_id] = common_roles.to_s.split(',')
+  # this will be executed on the shard where the find was called (I think?).
+  # as such, we can correctly interpret local ids in the common_courses and
+  # common_groups
+  def after_find
+    @global_common_courses = {}
+    if common_courses = read_attribute(:common_courses)
+      common_courses.to_s.split(',').each do |common_course|
+        course_id, role = common_course.split(':')
+        course_id = Shard.global_id_for(course_id.to_i)
+        @global_common_courses[course_id] ||= []
+        @global_common_courses[course_id] << role
       end
     end
-    @global_common_courses
-  end
 
-  def global_common_groups
-    unless @global_common_groups
-      @global_common_groups = {}
-      if global_common_group_id
-        @global_common_groups[global_common_group_id.to_i] = ['Member']
+    @global_common_groups = {}
+    if common_groups = read_attribute(:common_groups)
+      common_groups.to_s.split(',').each do |group_id|
+        group_id = Shard.global_id_for(group_id.to_i)
+        @global_common_groups[group_id] ||= []
+        @global_common_groups[group_id] << 'Member'
       end
     end
-    @global_common_groups
   end
 
   private
-
-  def global_common_course_id
-    if common_course_id.nil?
-      nil
-    elsif common_course_id.to_i == 0
-      0
-    else
-      Shard.global_id_for(common_course_id.to_i)
-    end
-  end
-
-  def global_common_group_id
-    if common_group_id.nil?
-      nil
-    else
-      Shard.global_id_for(common_group_id.to_i)
-    end
-  end
 
   def common_contexts_on_current_shard(common_contexts)
     local_common_contexts = {}
