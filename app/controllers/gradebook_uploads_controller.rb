@@ -17,6 +17,8 @@
 #
 
 class GradebookUploadsController < ApplicationController
+  include GradebooksHelper
+
   before_filter :require_context
   def new
     if authorized_action(@context, @current_user, :manage_grades)
@@ -41,7 +43,7 @@ class GradebookUploadsController < ApplicationController
         respond_to do |format|
           if errored_csv
             flash[:error] = t('errors.invalid_file', "Invalid csv file, grades could not be updated")
-            format.html { redirect_to named_context_url(@context, :context_gradebook_url) }
+            format.html { redirect_to gradebook_url_for(@current_user, @context) }
           else
             format.html { render :action => "show" }
           end
@@ -49,7 +51,7 @@ class GradebookUploadsController < ApplicationController
       else
         respond_to do |format|
           flash[:error] = t('errors.upload_failed', 'File could not be uploaded.')
-          format.html { redirect_to named_context_url(@context, :context_gradebook_url) }
+          format.html { redirect_to gradebook_url_for(@current_user, @context) }
         end
       end
     end
@@ -120,7 +122,7 @@ class GradebookUploadsController < ApplicationController
         flash[:notice] = t('notices.updated', {:one => "Successfully updated 1 submission.", :other => "Successfully updated %{count} submissions."}, :count => submissions_updated_count)
       end
       respond_to do |format|
-        format.html { redirect_to named_context_url(@context, :context_gradebook_url) }
+        format.html { redirect_to gradebook_url_for(@current_user, @context) }
       end
     end
   end

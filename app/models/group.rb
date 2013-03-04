@@ -389,6 +389,12 @@ class Group < ActiveRecord::Base
   end
   private :can_participate?
 
+  # courses lock this down a bit, but in a group, the fact that you are a
+  # member is good enough
+  def user_can_manage_own_discussion_posts?(user)
+    true
+  end
+
   def file_structure_for(user)
     User.file_structure_for(self, user)
   end

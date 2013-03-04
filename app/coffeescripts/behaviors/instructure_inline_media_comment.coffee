@@ -28,6 +28,7 @@ define [
                      #{htmlEscape I18n.t 'links.minimize_embedded_kaltura_content', 'Minimize embedded content'}
                    </a>"
     $minimizer.appendTo($div).click preventDefault ->
+      $div.find('video,audio').data('mediaelementplayer')?.pause()
       $div.remove()
       $link.show()
       $.trackEvent('hide_embedded_content', 'hide_media')

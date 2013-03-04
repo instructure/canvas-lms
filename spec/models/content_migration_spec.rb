@@ -144,7 +144,7 @@ describe ContentMigration do
       @copy_from.license = "cc_by_nc_nd"
       @copy_from.locale = "es"
       @copy_from.tab_configuration = [{"id"=>0}, {"id"=>14}, {"id"=>8}, {"id"=>5}, {"id"=>6}, {"id"=>2}, {"id"=>3, "hidden"=>true}]
-      @copy_from.settings[:hide_final_grade] = true
+      @copy_from.hide_final_grades = true
       gs = make_grading_standard(@copy_from)
       @copy_from.grading_standard = gs
       @copy_from.grading_standard_enabled = true
@@ -156,7 +156,7 @@ describe ContentMigration do
       @copy_to.conclude_at.should == nil
       @copy_to.start_at.should == nil
       @copy_to.storage_quota.should == 444
-      @copy_to.settings[:hide_final_grade].should == true
+      @copy_to.hide_final_grades.should == true
       @copy_to.grading_standard_enabled.should == true
       gs_2 = @copy_to.grading_standards.find_by_migration_id(mig_id(gs))
       gs_2.data.should == gs.data

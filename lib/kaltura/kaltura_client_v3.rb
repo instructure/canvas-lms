@@ -84,7 +84,7 @@ module Kaltura
     }
 
     def media_sources(entryId)
-      cache_key = ['media_sources', entryId, @cache_play_list_seconds].cache_key
+      cache_key = ['media_sources2', entryId, @cache_play_list_seconds].cache_key
       sources = Rails.cache.read(cache_key)
       unless sources
         startSession(Kaltura::SessionType::ADMIN)
@@ -92,12 +92,18 @@ module Kaltura
         sources = []
         all_assets_are_done_converting = true
         assets.each do |asset|
-
           if ASSET_STATUSES[asset[:status]] == :READY
             hash = asset.slice :containerFormat, :width, :fileExt, :size, :bitrate, :height, :isOriginal
             hash[:url] = flavorAssetGetPlaylistUrl(entryId, asset[:id])
+            if hash[:content_type] = CONTENT_TYPES[asset[:fileExt]]
+              hash[:url] ||= flavorAssetGetDownloadUrl(asset[:id])
+            end
 
-            hash[:content_type] = CONTENT_TYPES[asset[:fileExt]]
+            if hash[:url].blank? || hash[:content_type].blank?
+              Rails.logger.warn "kaltura entry (#{entryId}) has an invalid asset (#{asset[:id]})"
+              next
+            end
+
             sources << hash
           else
             # if it was deleted or if it did not convert because it did not need to
@@ -123,10 +129,11 @@ module Kaltura
     end
 
     # Given an array of sources, it will sort them putting preferred file types at the front,
+    # preferring converted assets over the original (since they're likely to stream better)
     # and sorting by descending bitrate for identical file types.
     def sort_source_list(sources)
       sources.sort_by do |a|
-        [PREFERENCE.index(a[:fileExt]) || PREFERENCE.size + 1, 0 - a[:bitrate].to_i]
+        [a[:isOriginal] == '0' ? 0 : 1, PREFERENCE.index(a[:fileExt]) || PREFERENCE.size + 1, 0 - a[:bitrate].to_i]
       end
     end
 

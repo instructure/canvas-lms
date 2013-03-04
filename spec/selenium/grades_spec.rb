@@ -218,8 +218,7 @@ describe "grades" do
       end
 
       # but then prevent them at the course level
-      @course.settings = { :hide_distribution_graphs => true }
-      @course.save!
+      @course.update_attributes(:hide_distribution_graphs => true)
 
       get "/courses/#{@course.id}/grades"
       f("#grade_info_#{@first_assignment.id} .tooltip").should be_nil

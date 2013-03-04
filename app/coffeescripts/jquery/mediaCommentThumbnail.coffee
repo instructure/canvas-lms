@@ -42,7 +42,7 @@ define [
         $a = $link.clone().empty().removeClass('instructure_file_link')
         $holder = $link.parent(".instructure_file_link_holder")
         if $holder.length
-          $link.appendTo($holder)
+          $a.appendTo($holder)
         else
           $link.after($a)
       else

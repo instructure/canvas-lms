@@ -65,7 +65,7 @@ class GradebooksController < ApplicationController
             @assignments = @context.assignments.active.gradeable.find(:all, :include => [:assignment_overrides])
             @assignments.collect!{|a| a.overridden_for(@student)}.sort!
             groups_assignments =
-              groups_as_assignments(@groups, :out_of_final => true, :exclude_total => @context.settings[:hide_final_grade])
+              groups_as_assignments(@groups, :out_of_final => true, :exclude_total => @context.hide_final_grades?)
             @no_calculations = groups_assignments.empty?
             @assignments.concat(groups_assignments)
             @submissions = @context.submissions.all(
@@ -165,13 +165,24 @@ class GradebooksController < ApplicationController
 
   def show
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
+      if !@context.old_gradebook_visible? && request.format == :json
+        render :json => {:error => "gradebook is disabled for this course"},
+               :status => 404
+        return
+      end
       return submissions_json if params[:updated] && request.format == :json
       return gradebook_init_json if params[:init] && request.format == :json
+
       @context.require_assignment_group
 
       log_asset_access("gradebook:#{@context.asset_string}", "grades", "other")
       respond_to do |format|
         format.html {
+          unless @context.old_gradebook_visible?
+            redirect_to polymorphic_url([@context, 'gradebook2'])
+            return
+          end
+
           ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
             @groups = @context.assignment_groups.active
             @groups_order = {}
@@ -350,6 +361,11 @@ class GradebooksController < ApplicationController
   end
 
   def submissions_zip_upload
+    unless @context.allows_gradebook_uploads?
+      flash[:error] = t('errors.not_allowed', "This course does not allow score uploads.")
+      redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
+      return
+    end
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if !params[:submissions_zip] || params[:submissions_zip].is_a?(String)
       flash[:error] = t('errors.missing_file', "Could not find file to upload")

@@ -21,8 +21,9 @@ module Api::V1::Course
 
   def course_settings_json(course)
     settings = {}
-    settings[:allow_student_discussion_topics] = course.allow_student_discussion_topics
-    settings[:allow_student_forum_attachments] = course.allow_student_forum_attachments
+    settings[:allow_student_discussion_topics] = course.allow_student_discussion_topics?
+    settings[:allow_student_forum_attachments] = course.allow_student_forum_attachments?
+    settings[:allow_student_discussion_editing] = course.allow_student_discussion_editing?
     settings
   end
 

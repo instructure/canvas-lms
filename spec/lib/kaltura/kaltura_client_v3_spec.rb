@@ -108,13 +108,28 @@ describe "Kaltura::ClientV3" do
                       {:fileExt => 'flv', :bitrate => '100'},
               ]
     end
+    
+    it "should prefer converted assets to the original" do
+      @kaltura.sort_source_list(
+          [
+              {:fileExt => 'mp4', :bitrate => '200', :isOriginal => '1'},
+              {:fileExt => 'flv', :bitrate => '100', :isOriginal => '0'},
+              {:fileExt => 'mp3', :bitrate => '100', :isOriginal => '0'},
+              {:fileExt => 'mp4', :bitrate => '100', :isOriginal => '0'},
+          ]).should ==
+          [
+              {:fileExt => 'mp4', :bitrate => '100', :isOriginal => '0'},
+              {:fileExt => 'mp3', :bitrate => '100', :isOriginal => '0'},
+              {:fileExt => 'flv', :bitrate => '100', :isOriginal => '0'},
+              {:fileExt => 'mp4', :bitrate => '200', :isOriginal => '1'},
+          ]
+    end
   end
 
   describe "caching" do
     def create_config_with_mock(seconds)
       create_config('cache_play_list_seconds' => seconds)
-      @source = {:height => "240", :bitrate => "382", :isOriginal => "0", :width => "336", :content_type => "video/mp4",
-                                                   :containerFormat => "isom", :url => "https://kaltura.example.com/url", :size =>"204", :fileExt=>"mp4"}
+      @source = {:content_type => "video/mp4", :containerFormat => "isom", :url => "https://kaltura.example.com/url", :fileExt=>"mp4"}
       @kaltura.expects(:flavorAssetGetByEntryId).returns([@source.merge({:status => '2'})])
       @kaltura.expects(:flavorAssetGetPlaylistUrl).returns("https://kaltura.example.com/url")
     end
@@ -123,14 +138,14 @@ describe "Kaltura::ClientV3" do
       enable_cache do
         create_config_with_mock(0)
         @kaltura.media_sources('hi')
-        Rails.cache.read(['media_sources', 'hi', 0].cache_key).should be_nil
+        Rails.cache.read(['media_sources2', 'hi', 0].cache_key).should be_nil
       end
     end
 
     it "should cache for set length" do
       create_config_with_mock(2)
       m = mock()
-      m.expects(:write).with(['media_sources', 'hi', 2].cache_key, [@source], {:expires_in => 2})
+      m.expects(:write).with(['media_sources2', 'hi', 2].cache_key, [@source], {:expires_in => 2})
       m.expects(:read).returns(nil)
       Rails.stubs(:cache).returns(m)
       @kaltura.media_sources('hi')
@@ -139,12 +154,32 @@ describe "Kaltura::ClientV3" do
     it "should cache indefinitely" do
       create_config_with_mock(nil)
       m = mock()
-      m.expects(:write).with(['media_sources', 'hi', nil].cache_key, [@source])
+      m.expects(:write).with(['media_sources2', 'hi', nil].cache_key, [@source])
       m.expects(:read).returns(nil)
       Rails.stubs(:cache).returns(m)
       @kaltura.media_sources('hi')
     end
+  end
 
+  it "should skip empty urls" do
+    create_config
+    @source = {:content_type => "video/mp4", :containerFormat => "isom", :url => nil, :fileExt => "mp4", :status => '2', :id => "1"}
+    @kaltura.expects(:flavorAssetGetByEntryId).returns([@source, @source.merge({:fileExt => "wav", :id => '2'})])
+    @kaltura.stubs(:flavorAssetGetPlaylistUrl).returns(nil)
+    @kaltura.stubs(:flavorAssetGetDownloadUrl).returns(nil)
+
+    res = @kaltura.media_sources('hi')
+    res.should == []
+  end
+
+  it "should skip unknown types" do
+    create_config
+    @source = {:content_type => "video/mp4", :containerFormat => "isom", :url => nil, :fileExt => "wav", :status => '2', :id => "1"}
+    @kaltura.expects(:flavorAssetGetByEntryId).returns([@source])
+    @kaltura.stubs(:flavorAssetGetPlaylistUrl).returns(nil)
+
+    res = @kaltura.media_sources('hi')
+    res.should == []
   end
 
 end

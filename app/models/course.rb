@@ -37,6 +37,7 @@ class Course < ActiveRecord::Base
                   :public_description,
                   :allow_student_forum_attachments,
                   :allow_student_discussion_topics,
+                  :allow_student_discussion_editing,
                   :default_wiki_editing_roles,
                   :allow_student_organized_groups,
                   :course_code,
@@ -58,7 +59,7 @@ class Course < ActiveRecord::Base
                   :grading_standard_enabled,
                   :locale,
                   :hide_final_grades,
-                  :settings
+                  :hide_distribution_graphs
 
   serialize :tab_configuration
   serialize :settings, Hash
@@ -1066,6 +1067,14 @@ class Course < ActiveRecord::Base
     can :read_prior_roster
   end
 
+  def allows_gradebook_uploads?
+    !large_roster?
+  end
+
+  def old_gradebook_visible?
+    !large_roster?
+  end
+
   def enrollment_allows(user, session, permission)
     return false unless user && permission
 
@@ -1364,24 +1373,20 @@ class Course < ActiveRecord::Base
   end
 
   def gradebook_to_csv(options = {})
-    if options[:assignment_id]
-      assignments = [self.assignments.active.gradeable.find(options[:assignment_id])]
-    else
-      group_order = {}
-      self.assignment_groups.active.each_with_index{|group, idx| group_order[group.id] = idx}
-      assignments = self.assignments.active.gradeable.find(:all).sort_by{|a| [a.due_at ? 1 : 0, a.due_at || 0, group_order[a.assignment_group_id] || 0, a.position || 0, a.title || ""]}
-    end
-    single = assignments.length == 1
     includes = [:user, :course_section]
     includes = {:user => :pseudonyms, :course_section => []} if options[:include_sis_id]
     scope = options[:user] ? self.enrollments_visible_to(options[:user]) : self.student_enrollments
-    student_enrollments = scope.order_by_sortable_name(:include => includes)
-    # remove duplicate enrollments for students enrolled in multiple sections
-    seen_users = []
-    student_enrollments.reject! { |e| seen_users.include?(e.user_id) ? true : (seen_users << e.user_id; false) }
-    submissions = self.submissions.inject({}) { |h, sub|
-      h[[sub.user_id, sub.assignment_id]] = sub; h
-    }
+    student_enrollments = scope.order_by_sortable_name(:include => includes) # remove duplicate enrollments for students enrolled in multiple sections
+    student_enrollments = student_enrollments.all.uniq_by(&:user_id)
+
+    calc = GradeCalculator.new(student_enrollments.map(&:user_id), self,
+                               :ignore_muted => false)
+    grades = calc.compute_scores
+
+    submissions = {}
+    calc.submissions.each { |s| submissions[[s.user_id, s.assignment_id]] = s }
+    assignments = calc.assignments
+
     read_only = t('csv.read_only_field', '(read only)')
     t 'csv.student', 'Student'
     t 'csv.id', 'ID'
@@ -1398,38 +1403,36 @@ class Course < ActiveRecord::Base
       row = ["Student", "ID"]
       row.concat(["SIS User ID", "SIS Login ID"]) if options[:include_sis_id]
       row << "Section"
-      row.concat(assignments.map{|a| single ? [a.title_with_id, 'Comments'] : a.title_with_id})
+      row.concat assignments.map(&:title_with_id)
       row.concat(["Current Score", "Final Score"])
       row.concat(["Final Grade"]) if self.grading_standard_enabled?
-      csv << row.flatten
+      csv << row
 
       #Possible muted row
       if assignments.any?(&:muted)
         #This is is not translated since we look for this exact string when we upload to gradebook.
         row = ['', '', '']
         row.concat(['', '']) if options[:include_sis_id]
-        row.concat(assignments.map{|a| single ? [(a.muted ? 'Muted': ''), ''] : (a.muted ? 'Muted' : '')})
-        row.concat(['', ''])
-        row.concat(['']) if self.grading_standard_enabled?
-        csv << row.flatten
+        row.concat(assignments.map { |a| a.muted? ? 'Muted' : '' })
+        row.concat ['', '']
+        row.concat ['']  if self.grading_standard_enabled?
+        csv << row
       end
 
       #Second Row
       row = ["    Points Possible", "", ""]
       row.concat(["", ""]) if options[:include_sis_id]
-      row.concat(assignments.map{|a| single ? [a.points_possible, ''] : a.points_possible})
+      row.concat assignments.map(&:points_possible)
       row.concat([read_only, read_only])
       row.concat([read_only]) if self.grading_standard_enabled?
-      csv << row.flatten
+      csv << row
 
       student_enrollments.each do |student_enrollment|
         student = student_enrollment.user
         student_section = (student_enrollment.course_section.display_name rescue nil) || ""
         student_submissions = assignments.map do |a|
           submission = submissions[[student.id, a.id]]
-          score = submission && submission.score ? submission.score : ""
-          data = [score, ''] rescue ["", '']
-          single ? data : data[0]
+          submission.try(:score)
         end
         #Last Row
         row = [student.last_name_first, student.id]
@@ -1442,15 +1445,12 @@ class Course < ActiveRecord::Base
         row << student_section
         row.concat(student_submissions)
 
-        calc = GradeCalculator.new([student.id],
-                                   student_enrollment.course_id,
-                                   :ignore_muted => false)
-        current_score, final_score = calc.compute_scores.first
+        current_score, final_score = grades.shift
         row.concat [current_score, final_score]
         if self.grading_standard_enabled?
           row.concat([score_to_grade(final_score)])
         end
-        csv << row.flatten
+        csv << row
       end
     end
   end
@@ -1469,8 +1469,9 @@ class Course < ActiveRecord::Base
 
   def score_to_grade(score)
     return nil unless self.grading_standard_enabled? && score
-    scheme = self.grading_standard.try(:data) || GradingStandard.default_grading_standard
-    GradingStandard.score_to_grade(scheme, score)
+    @scheme ||= self.grading_standard.try(:data) ||
+                GradingStandard.default_grading_standard
+    GradingStandard.score_to_grade(@scheme, score)
   end
 
   def participants(include_observers=false)
@@ -1530,7 +1531,7 @@ class Course < ActiveRecord::Base
     user.try(:touch) unless opts[:skip_touch_user]
     user.try(:reload)
     e
- end
+  end
 
   def enroll_student(user, opts={})
     enroll_user(user, 'StudentEnrollment', opts)
@@ -1982,9 +1983,6 @@ class Course < ActiveRecord::Base
     if settings[:storage_quota] && ( migration.for_course_copy? || self.account.grants_right?(migration.user, nil, :manage_courses))
       self.storage_quota = settings[:storage_quota]
     end
-    [:hide_final_grade, :hide_distribution_graph].each do |setting|
-      self.settings[setting] = !!settings[setting] unless settings[setting].nil?
-    end
     atts = Course.clonable_attributes
     atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
     settings.slice(*atts.map(&:to_s)).each do |key, val|
@@ -2374,14 +2372,17 @@ class Course < ActiveRecord::Base
       :default_wiki_editing_roles, :allow_student_organized_groups,
       :default_view, :show_all_discussion_entries, :open_enrollment,
       :storage_quota, :tab_configuration, :allow_wiki_comments,
-      :turnitin_comments, :self_enrollment, :license, :indexed, :settings, :locale ]
+      :turnitin_comments, :self_enrollment, :license, :indexed, :locale,
+      :hide_final_grade, :hide_distribution_graphs,
+      :allow_student_discussion_topics ]
   end
 
+  # TODO: remove me? looks like only a single spec exercises this code (incidentally, no less)
   def clone_for(account, opts={})
     new_course = Course.new
     root_account = account.root_account
     self.attributes.delete_if{|k,v| [:id, :section, :account_id, :workflow_state, :created_at, :updated_at, :root_account_id, :enrollment_term_id, :sis_source_id, :sis_batch_id].include?(k.to_sym) }.each do |key, val|
-      new_course.send("#{key}=", val)
+      new_course.write_attribute(key, val)
     end
     new_course.workflow_state = 'created'
     new_course.name = opts[:name] if opts[:name]
@@ -2824,72 +2825,74 @@ class Course < ActiveRecord::Base
   cattr_accessor :settings_options
   self.settings_options = {}
 
-  def self.add_setting(setting, opts=nil)
-    self.settings_options[setting.to_sym] = opts || {}
-  end
-
-  # these settings either are or could be easily added to
-  # the course settings page
-  add_setting :hide_final_grade, :boolean => true
-  add_setting :hide_distribution_graphs, :boolean => true
-
-  def hide_final_grades
-    self.settings[:hide_final_grade]
-  end
-
-  def hide_final_grades=(hide_final_grade)
-    self.settings[:hide_final_grade] = hide_final_grade
-  end
-
-  def allow_student_discussion_topics
-    allow = self.settings[:allow_student_discussion_topics]
-    if allow.nil?
-      true
-    else
-      allow
+  def self.add_setting(setting, opts = {})
+    setting = setting.to_sym
+    settings_options[setting] = opts
+    cast_expression = "val.to_s"
+    if opts[:boolean]
+      opts[:default] ||= false
+      cast_expression = "Canvas::Plugin.value_to_boolean(val)"
+    end
+    class_eval <<-CODE
+      def #{setting}
+        if settings_frd[#{setting.inspect}].nil? && !@disable_setting_defaults
+          default = Course.settings_options[#{setting.inspect}][:default]
+          default.respond_to?(:call) ? default.call(self) : default
+        else
+          settings_frd[#{setting.inspect}]
+        end
+      end
+      def #{setting}=(val)
+        settings_frd[#{setting.inspect}] = #{cast_expression}
+      end
+    CODE
+    alias_method "#{setting}?", setting if opts[:boolean]
+    if opts[:alias]
+      alias_method opts[:alias], setting
+      alias_method "#{opts[:alias]}=", "#{setting}="
+      alias_method "#{opts[:alias]}?", "#{setting}?"
     end
   end
 
-  def allow_student_discussion_topics=(allow)
-    self.settings[:allow_student_discussion_topics] = Canvas::Plugin.value_to_boolean(allow)
+  # unfortunately we decided to pluralize this in the API after the fact...
+  # so now we pluralize it everywhere except the actual settings hash and
+  # course import/export :(
+  add_setting :hide_final_grade, :alias => :hide_final_grades, :boolean => true
+  add_setting :hide_distribution_graphs, :boolean => true
+  add_setting :allow_student_discussion_topics, :boolean => true, :default => true
+  add_setting :allow_student_discussion_editing, :boolean => true, :default => true
+  add_setting :large_roster, :boolean => true, :default => lambda { |c| c.root_account.large_course_rosters? }
+
+  def user_can_manage_own_discussion_posts?(user)
+    return true if allow_student_discussion_editing?
+    return true if user_is_instructor?(user)
+    false
   end
 
   def filter_attributes_for_user(hash, user, session)
-    hash.delete(:hide_final_grade) unless grants_right? user, :update
+    hash.delete(:hide_final_grades) unless grants_right? user, :update
     hash
   end
 
+  # DEPRECATED, use setting accessors instead
   def settings=(hash)
-    if hash.is_a?(Hash)
-      hash.each do |key, val|
-        if settings_options[key.to_sym]
-          opts = settings_options[key.to_sym]
-          if opts[:boolean]
-            settings[key.to_sym] = (val == true || val == 'true' || val == '1' || val == 'on')
-          elsif opts[:hash]
-            new_hash = {}
-            if val.is_a?(Hash)
-              val.each do |inner_key, inner_val|
-                if opts[:values].include?(inner_key.to_sym)
-                  new_hash[inner_key.to_sym] = inner_val.to_s
-                end
-              end
-            end
-            settings[key.to_sym] = new_hash.empty? ? nil : new_hash
-          else
-            settings[key.to_sym] = val.to_s
-          end
-        end
-      end
-    end
-    settings
+    write_attribute(:settings, hash)
   end
 
+  # frozen, because you should use setters
   def settings
-    result = self.read_attribute(:settings)
-    return result if result
-    return self.write_attribute(:settings, {}) unless frozen?
-    {}.freeze
+    settings_frd.dup.freeze
+  end
+
+  def settings_frd
+    read_attribute(:settings) || write_attribute(:settings, {})
+  end
+
+  def disable_setting_defaults
+    @disable_setting_defaults = true
+    yield
+  ensure
+    @disable_setting_defaults = nil
   end
 
   def reset_content

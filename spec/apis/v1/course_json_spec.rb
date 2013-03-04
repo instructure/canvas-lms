@@ -31,18 +31,18 @@ module Api
       describe '#include_total_scores' do
         let(:predicate) { course_json.include_total_scores }
         let(:course_settings) { Hash.new }
-        let(:course) { stub( :settings => course_settings ) }
+        let(:course) { stub( course_settings ) }
 
         describe 'when total scores key is set' do
           before { includes << :total_scores } 
           
           it 'is false if the final grade is hidden' do
-            course_settings[:hide_final_grade] = true 
+            course_settings[:hide_final_grades?] = true 
             predicate.should be_false
           end
 
           it 'is true if the course allows the grade to be seen' do
-            course_settings[:hide_final_grade] = false 
+            course_settings[:hide_final_grades?] = false 
             predicate.should be_true
           end
         end
@@ -51,12 +51,12 @@ module Api
           before { includes.clear }
 
           it 'is false if the final grade is hidden' do
-            course_settings[:hide_final_grade] = true
+            course_settings[:hide_final_grades?] = true
             predicate.should be_false
           end
 
           it 'is false even even if the final grade is NOT hidden' do
-            course_settings[:hide_final_grade] = false
+            course_settings[:hide_final_grades?] = false
             predicate.should be_false
           end
         end

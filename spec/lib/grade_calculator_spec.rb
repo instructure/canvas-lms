@@ -391,6 +391,22 @@ describe GradeCalculator do
     end
   end
 
+  it "should return grades in the order they are requested" do
+    course_with_student
+    @student1 = @student
+    student_in_course
+    @student2 = @student
+
+    a = @course.assignments.create! :points_possible => 100
+    a.grade_student @student1, :grade => 50
+    a.grade_student @student2, :grade => 100
+
+    calc = GradeCalculator.new([@student2.id, @student1.id], @course)
+    grades = calc.compute_scores
+    grades.shift.should == [100, 100]
+    grades.shift.should == [50, 50]
+  end
+
   # We should keep this in sync with GradeCalculatorSpec.coffee
   context "GradeCalculatorSpec.coffee examples" do
     before do

@@ -619,7 +619,7 @@ describe CoursesController, :type => :integration do
 
   it "should not include scores in course list, even if requested, if final grades are hidden" do
     @course2.grading_standard_enabled = true
-    @course2.settings[:hide_final_grade] = true
+    @course2.hide_final_grades = true
     @course2.save
     @course2.all_student_enrollments.update_all(:computed_current_score => 80, :computed_final_score => 70)
 
@@ -1279,7 +1279,8 @@ describe CoursesController, :type => :integration do
       })
       json.should == {
         'allow_student_discussion_topics' => true,
-        'allow_student_forum_attachments' => false
+        'allow_student_forum_attachments' => false,
+        'allow_student_discussion_editing' => true
       }
     end
 
@@ -1291,15 +1292,18 @@ describe CoursesController, :type => :integration do
         :format => 'json'
       }, {
         :allow_student_discussion_topics => false,
-        :allow_student_forum_attachments => true
+        :allow_student_forum_attachments => true,
+        :allow_student_discussion_editing => false
       })
       json.should == {
         'allow_student_discussion_topics' => false,
-        'allow_student_forum_attachments' => true
+        'allow_student_forum_attachments' => true,
+        'allow_student_discussion_editing' => false
       }
       @course.reload
       @course.allow_student_discussion_topics.should == false
       @course.allow_student_forum_attachments.should == true
+      @course.allow_student_discussion_editing.should == false
     end
 
   end

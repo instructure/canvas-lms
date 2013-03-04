@@ -309,7 +309,7 @@ class PageView < ActiveRecord::Base
       while todo > 0
         batch_size = [Setting.get_cached('page_view_queue_batch_size', '1000').to_i, todo].min
         redis.expire lock_key, lock_time
-        transaction do
+        self.transaction do
           process_cache_queue_batch(batch_size, redis)
         end
         todo -= batch_size
@@ -341,7 +341,18 @@ class PageView < ActiveRecord::Base
         self.create { |p| p.send(:attributes=, attrs, false) }
       end
     end
-  rescue ActiveRecord::StatementInvalid => e
+  rescue ActiveRecord::StatementInvalid
+  end
+
+  class << self
+    def transaction_with_cassandra_check(*args)
+      if self.cassandra?
+        yield
+      else
+        self.transaction_without_cassandra_check(*args) { yield }
+      end
+    end
+    alias_method_chain :transaction, :cassandra_check
   end
 
   def self.timeline_bucket_for_time(time, context_type)
