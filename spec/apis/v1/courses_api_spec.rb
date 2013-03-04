@@ -117,6 +117,36 @@ describe CoursesController, :type => :integration do
     @user.pseudonym.update_attribute(:sis_user_id, 'user1')
   end
 
+  describe "permissions for courses" do 
+    describe "undelete_courses" do 
+      before do
+        @path = "/api/v1/accounts/#{@course.account.id}/courses"
+        @params = { :controller => 'courses', :action => 'batch_update', :format => 'json', :account_id => Account.default.to_param }
+      end
+
+      context "given I have permission" do 
+        before do 
+          account_admin_user
+        end
+
+        it "returns 200 success" do 
+          api_call(:put, @path, @params, { :event => 'undelete', :course_ids => [@course.id] })
+        end
+      end
+
+      context "given I don't have permission" do 
+        before do 
+          user_model
+        end
+
+        it "returns 401 unauthorized access" do
+          api_call(:put, @path, @params, { :event => 'offer', :course_ids => [@course.id] },
+                   {}, {:expected_status => 401})
+        end
+      end
+    end
+  end
+
   it "should return course list" do
     json = api_call(:get, "/api/v1/courses.json",
             { :controller => 'courses', :action => 'index', :format => 'json' })

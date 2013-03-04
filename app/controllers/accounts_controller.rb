@@ -278,6 +278,19 @@ class AccountsController < ApplicationController
     end
   end
 
+  # Admin Tools page controls 
+  # => Log Auditing
+  # => Add/Change Quota
+  # = Restoring Content
+  def admin_tools
+    if !@account.can_see_admin_tools_tab?(@current_user)
+      return render_unauthorized_action(@account)
+    end
+
+    js_env :ACCOUNT_ID => @account.id
+    js_env :PERMISSIONS => {:restore_course => @account.grants_right?(@current_user, session, :undelete_courses) }
+  end
+
   def confirm_delete_user
     @root_account = @account.root_account
     if authorized_action(@root_account, @current_user, :manage_user_logins)

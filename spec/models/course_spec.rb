@@ -3444,4 +3444,14 @@ describe Course do
       DelayedMessage.where(:communication_channel_id => user1.communication_channels.first).count.should == 1
     end
   end
+
+  it "creates a scope the returns deleted courses" do 
+    @course1 = Course.create!
+    @course1.workflow_state = 'deleted'
+    @course1.save!
+    @course2 = Course.create!
+
+    Course.deleted.count.should == 1
+  end
+
 end

@@ -508,6 +508,8 @@ class Course < ActiveRecord::Base
     }
   }
 
+  named_scope :deleted, :conditions => ["workflow_state = ? ", 'deleted']
+
   set_broadcast_policy do |p|
     p.dispatch :grade_weight_changed
     p.to { participating_students }

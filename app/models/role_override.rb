@@ -459,6 +459,16 @@ class RoleOverride < ActiveRecord::Base
           'AccountAdmin'
         ]
       },
+      :undelete_courses => {
+        :label => lambda { t('permissions.undelete_courses', "Undelete courses") },
+        :admin_tool => true,
+        :account_only => true, 
+        :available_to => [
+          'AccountAdmin',
+          'AccountMembership'
+        ], 
+        :true_for => [ 'AccountAdmin' ]
+      },
       :read_question_banks => {
         :label => lambda { t('permissions.read_question_banks', "View and link to question banks") },
         :available_to => [

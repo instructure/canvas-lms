@@ -510,29 +510,49 @@ class RoleOverridesController < ApplicationController
     res
   end
 
-  # Returns a hash with the avalible permissions grouped by groups of permissions.
+  # Returns a hash with the avalible permissions grouped by groups of permissions. Permission hash looks like this
+  #
+  # ie: 
+  #   {
+  #     :group_name => "Example Name",
+  #     :group_permissions => [
+  #       {
+  #         :label => "Some Label"
+  #         :permission_name => "Some Permission Name"
+  #       }, 
+  #       {
+  #         :label => "Some Label"
+  #         :permission_name => "Some Permission Name"
+  #       }
+  #     ]
   # context - the current context
   def account_permissions(context)
+    # Add group_names
     site_admin = {:group_name => t('site_admin_permissions', "Site Admin Permissions"), :group_permissions => []}
     account = {:group_name => t('account_permissions', "Account Permissions"), :group_permissions => []}
     course = {:group_name => t('course_permissions',  "Course & Account Permissions"), :group_permissions => []}
+    admin_tools = {:group_name => t('admin_tools_permissions',  "Admin Tools"), :group_permissions => []}
  
+    # Add group_permissions
     RoleOverride.manageable_permissions(context).each do |p|
       hash = {:label => p[1][:label].call, :permission_name => p[0]}
       if p[1][:account_only]
         if p[1][:account_only] == :site_admin
           site_admin[:group_permissions] << hash
+        elsif p[1][:admin_tool]
+          admin_tools[:group_permissions] << hash
         else
           account[:group_permissions] << hash
         end
       else
         course[:group_permissions] << hash
-      end
+      end 
     end
  
     res = []
     res << site_admin if site_admin[:group_permissions].any?
     res << account if account[:group_permissions].any?
+    res << admin_tools if admin_tools[:group_permissions].any?
     res << course if course[:group_permissions].any?
  
     res.each{|pg| pg[:group_permissions] = pg[:group_permissions].sort_by{|p|p[:label]} }

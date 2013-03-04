@@ -1391,7 +1391,13 @@ class CoursesController < ApplicationController
   # @returns Progress
   def batch_update
     @account = Account.find(params[:account_id])
-    if authorized_action(@account, @current_user, :manage_courses)
+    if params[:event] == 'undelete'
+      permission = :undelete_courses
+    else
+      permission = :manage_courses
+    end
+
+    if authorized_action(@account, @current_user, permission)
       return render(:json => { :message => 'must specify course_ids[]' }, :status => :bad_request) unless params[:course_ids].is_a?(Array)
       @course_ids = Api.map_ids(params[:course_ids], Course, @domain_root_account)
       return render(:json => { :message => 'course batch size limit (500) exceeded' }, :status => :forbidden) if @course_ids.size > 500

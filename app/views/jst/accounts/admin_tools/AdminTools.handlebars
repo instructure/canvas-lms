@@ -1,0 +1,12 @@
+<div id="adminToolsTabs">
+  <ul id="adminToolsTabNav">
+    {{#if courseRestore}}
+    <li><a href="#restoreContentPane">{{#t "tab_labels.restore_course"}}Restore Courses{{/t}}</a></li>
+    {{/if}}
+  </ul>
+  <div id="adminToolsTabPanes">
+    {{#if courseRestore}}
+    <div id="restoreContentPane"></div>
+    {{/if}}
+  </div>
+</div>
