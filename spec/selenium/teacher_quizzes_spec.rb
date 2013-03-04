@@ -534,13 +534,14 @@ describe "quizzes" do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
       expect_new_page_load do
-        f('.al-trigger-inner').click
+        f('.al-trigger').click
         f('.delete_quiz_link').click
         accept_alert
       end
 
       # Confirm that we make it back to the quizzes index page
       f('#content').should include_text("Course Quizzes")
+      @quiz.reload.should be_deleted
     end
 
     it "creates assignment with default due date" do
