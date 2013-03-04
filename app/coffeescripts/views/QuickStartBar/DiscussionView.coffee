@@ -22,9 +22,7 @@ define [
       selector:
         baseData:
           type: 'course'
-        preparer: (postData, data, parent) ->
-          for row in data
-            row.noExpand = true
+        noExpand: true
         browser: false
 
 

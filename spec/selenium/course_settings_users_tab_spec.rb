@@ -29,7 +29,8 @@ describe "course settings" do
   describe "course users" do
     def select_from_auto_complete(text, input_id)
       fj(".token_input input:visible").send_keys(text)
-      keep_trying_until { driver.execute_script("return $('##{input_id}').data('token_input').selector.lastSearch") == text }
+      keep_trying_until { driver.execute_script("return $('##{input_id}').data('token_input').selector.list.query.search") == text }
+      wait_for_ajaximations
       elements = driver.execute_script("return $('.autocomplete_menu:visible .list').last().find('ul').last().find('li').toArray();").map { |e|
         [e, (e.find_element(:tag_name, :b).text rescue e.text)]
       }

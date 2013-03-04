@@ -18,20 +18,20 @@
 
 define [
   'jquery'
-  'jquery.ajaxJSON'
+  'underscore'
+  'compiled/widget/TokenSelectorList'
+  'compiled/collections/RecipientCollection'
   'jquery.instructure_misc_helpers'
-  'jquery.disableWhileLoading'
   'compiled/jquery/scrollIntoView'
-], ($) ->
+], ($, _, TokenSelectorList, RecipientCollection) ->
 
   class
 
     constructor: (@input, @url, @options={}) ->
       @stack = []
-      @fetchListAjaxRequests = []
-      @queryCache = {}
+      @cache = {}
       @$container = $('<div />').addClass('autocomplete_menu')
-      @$menu = $('<div />').append(@$list = @newList())
+      @$menu = $('<div />')
       @$container.append($('<div />').append(@$menu))
       @$container.css('top', 0).css('left', 0)
       @mode = 'input'
@@ -44,57 +44,54 @@ define [
       $(window).resize @reposition
       @close()
 
-    abortRunningRequests: ->
-      req.abort() for req in @fetchListAjaxRequests
-      @fetchListAjaxRequests = []
+    autoSelectFirst: (list=@list) =>
+      if list is @list and not @selection?
+        @select(list.first(), true)
 
     browse: (data) ->
-      unless @uiLocked
-        @input.val('')
-        @close()
-        @fetchList(data: data)
-        true
+      return if @uiLocked
+      # prevent pending searches
+      @clear()
+      @close()
+      @open()
+      @list = @listForQuery(@preparePost(data))
+      @list.appendTo(@$menu)
+      @autoSelectFirst()
+      true
 
-    newList: ->
-      $list = $('<div class="list"><ul class="heading"></ul><ul></ul></div>')
-      $list.find('ul')
-        .mousemove (e) =>
-          return if @uiLocked
-          $li = $(e.target).closest('li')
-          $li = null unless $li.hasClass('selectable')
-          @select($li)
-        .mousedown (e) =>
-          # sooper hacky... prevent the menu closing on scrollbar drag
-          setTimeout =>
-            @input.focus()
-          , 0
-        .click (e) =>
-          return if @uiLocked
-          $li = $(e.target).closest('li')
-          $li = null unless $li.hasClass('selectable')
-          @select($li)
-          if @selection
-            if $(e.target).closest('a.expand').length
-              if @selectionExpanded()
-                @collapse()
-              else
-                @expandSelection()
-            else if @selectionToggleable() and $(e.target).closest('a.toggle').length
-              @toggleSelection()
-            else
-              if @selectionExpanded()
-                @collapse()
-              else if @selectionExpandable()
-                @expandSelection()
-              else
-                @toggleSelection(on)
-                @clear()
-                @close()
-          @input.focus()
-      $uls = $list.find('ul')
-      $list.heading = $uls.first()
-      $list.body = $uls.last()
-      $list
+    mouseMove: (e) =>
+      return if @uiLocked
+      $li = $(e.target).closest('li')
+      $li = null unless $li.hasClass('selectable')
+      @select($li)
+
+    mouseDown: (e) =>
+      # sooper hacky... prevent the menu closing on scrollbar drag
+      setTimeout =>
+        @input.focus()
+      , 0
+
+    click: (e) =>
+      return if @uiLocked
+      @mouseMove(e)
+      if @selection
+        if $(e.target).closest('a.expand').length
+          if @selectionExpanded()
+            @collapse()
+          else
+            @expandSelection()
+        else if @selectionToggleable() and $(e.target).closest('a.toggle').length
+          @toggleSelection()
+        else
+          if @selectionExpanded()
+            @collapse()
+          else if @selectionExpandable()
+            @expandSelection()
+          else
+            @toggleSelection(on)
+            @clear()
+            @close()
+      @input.focus()
 
     captureKeyDown: (e) ->
       return true if @uiLocked
@@ -143,7 +140,7 @@ define [
             if @selectionExpanded() or @input.val() is ''
               @collapse()
             else
-              @select(@$list.find('li').first())
+              @select(@list.first())
             return true
         when 'Up', 38
           @selectPrev()
@@ -162,53 +159,8 @@ define [
             @toggleSelection(off)
             return true
       @mode = 'input'
-      @fetchList()
+      @updateSearch()
       false
-
-    fetchList: (options={}, @uiLocked=false) ->
-      clearTimeout @timeout
-      @timeout = setTimeout =>
-        postData = @preparePost(options.data ? {})
-        thisQuery = JSON.stringify(postData)
-        if postData.search is '' and not @listExpanded() and not options.data
-          @uiLocked = false
-          @close()
-          return
-        if thisQuery is @lastAppliedQuery
-          @uiLocked = false
-          return
-        else if @queryCache[thisQuery]
-          @lastAppliedQuery = thisQuery
-          @lastSearch = postData.search
-          @abortRunningRequests()
-          @renderList(@queryCache[thisQuery], options, postData)
-          return
-
-        @fetchListAjaxRequests.push @load $.ajaxJSON @url, 'GET', $.extend({}, postData),
-          (data) =>
-            @queryCache[thisQuery] = data
-            if JSON.stringify(@preparePost(options.data ? {})) is thisQuery # i.e. only if it hasn't subsequently changed (and thus triggered another call)
-              @lastAppliedQuery = thisQuery
-              @lastSearch = postData.search
-              @renderList(data, options, postData) if @$menu.is(":visible")
-            else
-              @uiLocked=false
-          ,
-          (data) =>
-            @uiLocked=false
-      , 100
-
-    addByUserId: (userId, fromConversationId) ->
-      success = (data) =>
-        @close()
-        user = data[0]
-        if user
-          @input.addToken
-            value: user.id
-            text: user.name
-            data: user
-
-      @load $.ajaxJSON( @url, 'GET', { user_id: userId, from_conversation_id: fromConversationId}, success, @close )
 
     open: ->
       @$container.show()
@@ -217,24 +169,28 @@ define [
     close: =>
       @uiLocked = false
       @$container.hide()
-      delete @lastAppliedQuery
-      for [$selection, $list, query, search], i in @stack
-        @$list.remove()
-        @$list = $list.css('height', 'auto')
-      @$list.find('ul').html('')
+      @list?.remove()
+      for [$selection, list], i in @stack
+        list.remove()
+      @list = null
       @stack = []
       @$menu.css('left', 0)
       @select(null)
       @input.selectorClosed()
 
     clear: ->
+      clearTimeout @timeout
       @input.val('')
+      @select(null)
 
     blur: ->
       @close()
 
     listExpanded: ->
       if @stack.length then true else false
+
+    parent: ->
+      if @listExpanded() then @stack[@stack.length - 1][0] else null
 
     selectionExpanded: ->
       @selection?.hasClass('expanded') ? false
@@ -247,20 +203,27 @@ define [
 
     expandSelection: ->
       return false unless @selectionExpandable() and not @selectionExpanded()
-      @stack.push [@selection, @$list, @lastAppliedQuery, @lastSearch]
+      @stack.push [@selection, @list]
       @clear()
       @$menu.css('width', ((@stack.length + 1) * 100) + '%')
-      @fetchList({expand: true}, true)
+      @uiLocked = true
+      list = @listForQuery(@preparePost())
+      list.insertAfter(@list)
+      @$menu.animate {left: '-=' + @$menu.parent().css('width')}, 'fast', =>
+        @list.hide =>
+          @list = list
+          @autoSelectFirst()
+          @uiLocked = false
 
     collapse: ->
       return false unless @listExpanded()
-      [$selection, $list, @lastAppliedQuery, @lastSearch] = @stack.pop()
+      [$selection, list] = @stack.pop()
       @uiLocked = true
-      $list.css('height', 'auto')
+      list.restore()
       @$menu.animate {left: '+=' + @$menu.parent().css('width')}, 'fast', =>
-        @input.val(@lastSearch)
-        @$list.remove()
-        @$list = $list
+        @list.remove()
+        @list = list
+        @input.val(@list.query.search)
         @select $selection
         @uiLocked = false
 
@@ -282,34 +245,16 @@ define [
 
     updateSelectAll: ($node, offset=0) ->
       selectAllToggled = $node.data('user_data').selectAll
-      $list = if offset then @stack[@stack.length - offset][1] else @$list
-      $selectAll = $list.selectAll
-      return unless $selectAll
-      $nodes = $list.body.find('li.toggleable').not($selectAll)
-      if selectAllToggled
-        if $selectAll.hasClass('on')
-          $nodes.addClass('on').each (i, node) =>
-            @toggleSelection off, $(node), true
-        else
-          $nodes.removeClass('on').each (i, node) =>
-            @toggleSelection off, $(node), true
-      else
-        $onNodes = $nodes.filter('.on')
-        if $onNodes.length < $nodes.length and $selectAll.hasClass('on')
-          $selectAll.removeClass('on')
-          @toggleSelection off, $selectAll, true
-          $onNodes.each (i, node) =>
-            @toggleSelection on, $(node), true
-        else if $onNodes.length == $nodes.length and not $selectAll.hasClass('on')
-          $selectAll.addClass('on')
-          @toggleSelection on, $selectAll, true
-          $onNodes.each (i, node) =>
-            @toggleSelection off, $(node), true
+      list = if offset then @stack[@stack.length - offset][1] else @list
+      return unless list.canSelectAll()
+      list.updateSelectAll selectAllToggled, (state, $node) =>
+        @toggleSelection state, $node, true
+
       if offset < @stack.length
         offset++
         $parentNode = @stack[@stack.length - offset][0]
         if @selectionToggleable($parentNode)
-          if $selectAll.hasClass('on')
+          if list.selectAllActive()
             $parentNode.addClass('on')
           else
             $parentNode.removeClass('on')
@@ -335,7 +280,7 @@ define [
         else
           null
       else
-        @$list.find('li:first')
+        @list.first()
       , preserveMode)
       @selectNext(preserveMode) if @selection?.hasClass('message')
 
@@ -348,86 +293,70 @@ define [
         else
           null
       else
-        @$list.find('li:last')
+        @list.last()
       )
       @selectPrev() if @selection?.hasClass('message')
 
-    populateRow: ($node, data, options={}) ->
-      if @options.populator
-        @options.populator(this, $node, data, options)
-      else
-        $node.data('id', data.text)
-        $node.text(data.text)
-      $node.addClass('first') if options.first
-      $node.addClass('last') if options.last
-
-    load: (deferred) ->
-      unless @$menu.is(":visible")
-        @open()
-        @$list.find('ul').last().append($('<li class="message first last"></li>'))
-      @$list.disableWhileLoading(deferred)
-      deferred
-
-    toggleableItems: (data) ->
-      return false unless data.length
-
-    renderList: (data, options={}, postData={}) ->
-      @open()
-
-      if options.expand
-        $list = @newList()
-      else
-        $list = @$list
-      $list.selectAll = null
-
-      @selection = null
-      $list.heading.html('')
-      $list.body.html('')
-      if data.length
-        parent = if @stack.length then @stack[@stack.length - 1][0] else null
-        ancestors = if @stack.length then (ancestor[0].data('id') for ancestor in @stack) else []
-        unless data.prepared
-          @options.preparer?(postData, data, parent)
-          data.prepared = true
-
-        for row, i in data
-          $li = $('<li />').addClass('selectable')
-          @populateRow($li, row, level: @stack.length, first: (i is 0), last: (i is data.length - 1), parent: parent, ancestors: ancestors)
-          $list.selectAll = $li if row.selectAll
-          $li.addClass('on') if $li.hasClass('toggleable') and @input.hasToken($li.data('id'))
-          $list.body.append($li)
-        $list.body.find('li.toggleable').addClass('on') if $list.selectAll?.hasClass?('on') or @stack.length and @stack[@stack.length - 1][0].hasClass?('on')
-      else
-        $message = $('<li class="message first last"></li>')
-        $message.text(@options.messages?.noResults ? '')
-        $list.body.append($message)
-      $list.toggleClass('with-toggles', @options.showToggles and $list.body.find('li.toggleable').length > 0)
-
-      if @listExpanded()
-        $li = @stack[@stack.length - 1][0].clone()
-        $li.addClass('expanded').removeClass('active first last')
-        $list.heading.append($li).show()
-      else
-        $list.heading.hide()
-
-      if options.expand
-        $list.insertAfter(@$list)
-        @$menu.animate {left: '-=' + @$menu.parent().css('width')}, 'fast', =>
-          @$list.animate height: '1px', 'fast', =>
-            @uiLocked = false
-          @$list = $list
-          @selectNext(true)
-      else
-        @selectNext(true) unless options.loading
-        @uiLocked = false
+    updateSearch: ->
+      # do it in a timeout both so (1) the triggering keystroke can make it
+      # into @input before we try and use it, and (2) a rapid sequence of keys
+      # only executes the block once at the end.
+      clearTimeout @timeout
+      @select(null)
+      @timeout = setTimeout =>
+        list = @listForQuery(@preparePost())
+        if list is @list
+          # no change
+        else if list.query.search is '' and not @listExpanded()
+          # changed to where we don't need the menu open anymore
+          @close() if @$menu.is(":visible")
+        else
+          # activate a new list for the updated search
+          if @list
+            list.insertAfter(@list)
+            @list.remove()
+          else
+            @open()
+            list.appendTo(@$menu)
+          @list = list
+          @autoSelectFirst()
+      , 100
 
     preparePost: (data) ->
-      postData = $.extend({}, @options.baseData ? {}, data, {search: @input.val().replace(/^\s+|\s+$/g, "")})
-      excludes = @input.baseExclude.concat(if @stack.length then [] else @input.tokenValues())
-      postData.exclude = if postData.exclude then postData.exclude.concat excludes else excludes
-      postData.context = @stack[@stack.length - 1][0].data('id') if @listExpanded()
+      postData = $.extend({}, @options.baseData ? {}, data ? {}, {search: @input.val().replace(/^\s+|\s+$/g, "")})
+      postData.exclude ?= []
+      postData.exclude = postData.exclude.concat @input.baseExclude
+      if @listExpanded()
+        postData.context = @parent().data('id')
+      else
+        postData.exclude = postData.exclude.concat @input.tokenValues()
       postData.per_page ?= @options.limiter?(level: @stack.length)
       postData
+
+    collectionForQuery: (query) ->
+      cacheKey = JSON.stringify(query)
+      unless @cache[cacheKey]?
+        collection = new RecipientCollection
+        collection.url = @url
+        collection.fetch data: query
+        @cache[cacheKey] = collection
+      @cache[cacheKey]
+
+    listForQuery: (query) ->
+      collection = @collectionForQuery(query)
+      list = new TokenSelectorList
+        selector: this
+        parent: @parent()
+        ancestors: (ancestor[0].data('id') for ancestor in @stack)
+        collection: collection
+        query: query
+      list.render()
+
+      unless collection.atLeastOnePageFetched
+        collection.on 'fetch', _.once =>
+          @autoSelectFirst list
+
+      list
 
     teardown: ->
       @$container.remove()

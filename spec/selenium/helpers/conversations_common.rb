@@ -33,7 +33,8 @@ shared_examples_for "conversations selenium tests" do
   def add_recipient(search, input_selector=".recipients")
     input = driver.execute_script("return $('#{input_selector}').data('token_input').$input[0]")
     input.send_keys(search)
-    keep_trying_until { driver.execute_script("return $('#{input_selector}').data('token_input').selector.lastSearch") == search }
+    keep_trying_until { driver.execute_script("return $('#{input_selector}').data('token_input').selector.list.query.search") == search }
+    wait_for_ajaximations
     input.send_keys(:return)
   end
 
@@ -105,15 +106,17 @@ shared_examples_for "conversations selenium tests" do
 
   def search(text, input_selector=".recipients")
     @input.send_keys(text)
-    keep_trying_until { driver.execute_script("return $('#{input_selector}').data('token_input').selector.lastSearch") == text }
+    keep_trying_until { driver.execute_script("return $('#{input_selector}').data('token_input').selector.list.query.search") == text }
+    wait_for_ajaximations
     @elements = nil
     yield
     @elements = nil
     if input_selector == ".recipients"
       @input.send_keys(*@input.attribute('value').size.times.map { :backspace })
       keep_trying_until do
-        driver.execute_script("return $('.autocomplete_menu:visible').toArray();").size == 0 || driver.execute_script("return $('#{input_selector}').data('token_input').selector.lastSearch") == ''
+        driver.execute_script("return $('.autocomplete_menu:visible').toArray();").size == 0 || driver.execute_script("return $('#{input_selector}').data('token_input').selector.list.query.search") == ''
       end
+      wait_for_ajaximations
     end
   end
 

@@ -41,7 +41,14 @@ define [
         # since it doesn't infer percentage widths, just whatever the current pixels are
         @tokenInput.$fakeInput.css('width', '100%')
         if @options.user_id
-          @tokenInput.selector.addByUserId(@options.user_id, @options.from_conversation_id)
+          query = { user_id: @options.user_id, from_conversation_id: @options.from_conversation_id }
+          $.ajaxJSON @tokenInput.selector.url, 'GET', query, (data) =>
+            if data.length
+              @tokenInput.addToken
+                value: data[0].id
+                text: data[0].name
+                data: data[0]
+
       @initializeActions()
       if !$(document.activeElement).filter(':input').length and window.location.hash isnt ''
         @$form.find(':input:visible:first').focus()

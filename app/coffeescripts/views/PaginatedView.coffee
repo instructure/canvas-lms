@@ -46,7 +46,11 @@ define [
       ret
 
     showPaginationLoader: ->
-      (@$paginationLoader ?= $(@paginationLoaderTemplate())).insertAfter @el
+      @$paginationLoader ?= $(@paginationLoaderTemplate())
+      @placePaginationLoader()
+
+    placePaginationLoader: ->
+      @$paginationLoader?.insertAfter @el
 
     hidePaginationLoader: ->
       @$paginationLoader?.remove()

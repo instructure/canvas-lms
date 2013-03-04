@@ -91,13 +91,19 @@ define [
       else
         @urls.top = oldUrls.top
 
-      perPage = parseInt(@urls.first.match(@perPageRegex)[1], 10)
-      (@options.params ?= {}).per_page = perPage
-      @totalPages = parseInt(@urls.last?.match(@pageRegex)[1], 10)
+      url = @urls.first ? @urls.next
+      if url?
+        perPage = parseInt(url.match(@perPageRegex)[1], 10)
+        (@options.params ?= {}).per_page = perPage
+
+      if @urls.last
+        @totalPages = parseInt(@urls.last.match(@pageRegex)[1], 10)
+
       @atLeastOnePageFetched = true
 
     _parsePageLinks: (xhr) ->
-      linkHeader = xhr.getResponseHeader('link').split(',')
+      linkHeader = xhr.getResponseHeader('link')?.split(',')
+      linkHeader ?= []
       _.reduce linkHeader, (links, link) =>
         key = link.match(@nameRegex)[1]
         val = link.match(@linkRegex)[1]
