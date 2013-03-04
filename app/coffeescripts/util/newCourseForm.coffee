@@ -1,9 +1,9 @@
-require [
+define [
   'jquery'
   'jquery.disableWhileLoading'
 ], ($) ->
-  $ ->
- 
+
+  newCourseForm = ->
     changeEvents = 'change keyup input'
     showCourseCodeIfNeeded = ->
       if $nameInput.val().trim().length > 20
