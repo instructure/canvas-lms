@@ -33,7 +33,7 @@ describe "conversations sent filter" do
     get_conversations.last.click
     get_messages(false)
 
-    submit_message_form(:message => first_message_text)
+    submit_message_form(:message => first_message_text, :existing_conversation => true)
 
     ff(".last_author").length.should == 2
     ff(".last_author")[0].should include_text(first_message_text)

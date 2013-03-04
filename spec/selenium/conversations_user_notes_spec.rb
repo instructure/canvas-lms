@@ -51,10 +51,15 @@ describe "conversations user notes" do
     new_conversation
     add_recipient("student bob")
     submit_message_form(:add_recipient => false)
+
+    expect_new_page_load { get "/conversations/sent" }
+    f(".conversations li").click
+    wait_for_ajaximations
+
     checkbox = f(".user_note")
     checkbox.should be_displayed
     checkbox.click
-    submit_message_form
+    submit_message_form(:existing_conversation => true)
     @the_student.user_notes.size.should == 1
   end
 end

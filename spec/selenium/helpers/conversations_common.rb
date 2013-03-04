@@ -122,6 +122,7 @@ shared_examples_for "conversations selenium tests" do
     opts[:attachments] ||= []
     opts[:add_recipient] = true unless opts.has_key?(:add_recipient)
     opts[:group_conversation] = true unless opts.has_key?(:group_conversation)
+    opts[:existing_conversation] = false unless opts.has_key?(:existing_conversation)
 
     if opts[:add_recipient] && browser = fj("#create_message_form .browser:visible")
       browser.click
@@ -165,7 +166,12 @@ shared_examples_for "conversations selenium tests" do
 
     if opts[:group_conversation]
       message = ConversationMessage.last
-      f("#message_#{message.id}").should_not be_nil
+      # whether the message should be visible depends on whether we were appending to an already visible conversation
+      if opts[:existing_conversation]
+        f("#message_#{message.id}").should_not be_nil
+      else
+        f("#message_#{message.id}").should be_nil
+      end
       message
     end
   end

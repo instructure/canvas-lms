@@ -308,7 +308,7 @@ class Conversation < ActiveRecord::Base
       messages = ConversationMessage.find_all_by_id(options[:forwarded_message_ids].map(&:to_i))
       conversation_ids = messages.select(&:forwardable?).map(&:conversation_id).uniq
       raise "can only forward one conversation at a time" if conversation_ids.size != 1
-      raise "user doesn't have permission to forward these messages" unless current_user.conversations.find_by_conversation_id(conversation_ids.first)
+      raise "user doesn't have permission to forward these messages" unless current_user.all_conversations.find_by_conversation_id(conversation_ids.first)
       # TODO: optimize me
       message.forwarded_message_ids = messages.map(&:id).join(',')
     end
@@ -429,7 +429,7 @@ class Conversation < ActiveRecord::Base
       # column is only viewed by the other participants and doesn't care about
       # what messages the author may have deleted
       updates = [
-        maybe_update_timestamp('last_message_at', message.created_at, update_for_skips ? [] : ["last_message_at IS NOT NULL"]),
+        maybe_update_timestamp('last_message_at', message.created_at, update_for_skips ? [] : ["last_message_at IS NOT NULL AND user_id NOT IN (?)", skip_ids]),
         maybe_update_timestamp('last_authored_at', message.created_at, ["user_id = ?", message.author_id]),
         maybe_update_timestamp('visible_last_authored_at', message.created_at, ["user_id = ?", message.author_id])
       ]

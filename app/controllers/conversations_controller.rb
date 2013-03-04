@@ -197,7 +197,7 @@ class ConversationsController < ApplicationController
       render :json => conversations.map{ |c| conversation_json(c, @current_user, session, :include_participant_avatars => false, :include_participant_contexts => false, :visible => visibility_map[c.conversation_id]) }, :status => :created
     else
       @conversation = @current_user.initiate_conversation(@recipients)
-      @conversation.add_message(message, :tags => @tags)
+      @conversation.add_message(message, :tags => @tags, :update_for_sender => false)
       render :json => [conversation_json(@conversation.reload, @current_user, session, :include_indirect_participants => true, :messages => [message])], :status => :created
     end
   end
@@ -523,7 +523,7 @@ class ConversationsController < ApplicationController
     get_conversation(true)
     if params[:body].present?
       message = build_message
-      @conversation.add_message message, :tags => @tags
+      @conversation.add_message message, :tags => @tags, :update_for_sender => false
       render :json => conversation_json(@conversation.reload, @current_user, session, :messages => [message])
     else
       render :json => {}, :status => :bad_request

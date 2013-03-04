@@ -104,14 +104,14 @@ class ConversationParticipant < ActiveRecord::Base
       :id => conversation_id,
       :workflow_state => workflow_state,
       :last_message => latest ? truncate_text(latest.body, :max_length => 100) : nil,
-      :last_message_at => latest ? latest.created_at : last_message_at,
+      :last_message_at => last_message_at,
       :last_authored_message => latest_authored ? truncate_text(latest_authored.body, :max_length => 100) : nil,
       :last_authored_message_at => latest_authored ? latest_authored.created_at : visible_last_authored_at,
       :message_count => message_count,
       :subscribed => subscribed?,
       :private => private?,
       :starred => starred,
-      :properties => properties(latest)
+      :properties => properties(latest || latest_authored)
     }.with_indifferent_access
   end
 
