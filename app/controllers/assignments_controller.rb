@@ -253,7 +253,7 @@ class AssignmentsController < ApplicationController
     @assignment.content_being_saved_by(@current_user)
     @assignment.assignment_group = group if group
     # if no due_at was given, set it to 11:59 pm in the creator's time zone
-    @assignment.infer_due_at
+    @assignment.infer_times
     if authorized_action(@assignment, @current_user, :create)
       respond_to do |format|
         if @assignment.save
@@ -283,7 +283,6 @@ class AssignmentsController < ApplicationController
   
   def edit
     @assignment ||= @context.assignments.active.find(params[:id])
-    @assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @current_user)
     if authorized_action(@assignment, @current_user, @assignment.new_record? ? :create : :update)
       @assignment.title = params[:title] if params[:title]
       @assignment.due_at = params[:due_at] if params[:due_at]

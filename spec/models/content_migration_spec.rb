@@ -770,7 +770,7 @@ describe ContentMigration do
     it "should copy a discussion topic when assignment is selected" do
       topic = @copy_from.discussion_topics.build(:title => "topic")
       assignment = @copy_from.assignments.build(:submission_types => 'discussion_topic', :title => topic.title)
-      assignment.infer_due_at
+      assignment.infer_times
       assignment.saved_by = :discussion_topic
       topic.assignment = assignment
       topic.save
@@ -789,7 +789,7 @@ describe ContentMigration do
     it "should not copy deleted assignment attached to topic" do
       topic = @copy_from.discussion_topics.build(:title => "topic")
       assignment = @copy_from.assignments.build(:submission_types => 'discussion_topic', :title => topic.title)
-      assignment.infer_due_at
+      assignment.infer_times
       assignment.saved_by = :discussion_topic
       topic.assignment = assignment
       topic.save!
@@ -1434,7 +1434,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
         @quiz.save!
         @topic = @copy_from.discussion_topics.build(:title => "topic")
         assignment = @copy_from.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
-        assignment.infer_due_at
+        assignment.infer_times
         assignment.saved_by = :discussion_topic
         assignment.copied = true
         assignment.freeze_on_copy = true

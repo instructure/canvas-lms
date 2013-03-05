@@ -215,15 +215,7 @@
     </tr>
   </thead>
 
-  <tbody>
-    <% presenter = OverrideListPresenter.new(@quiz, @current_user) %>
-    <% presenter.visible_due_dates.each do |due_date| %>
-      <tr>
-        <td><%= presenter.due_at(due_date) %></td>
-        <td><%= presenter.due_for(due_date) %></td>
-        <td><%= presenter.unlock_at(due_date) %></td>
-        <td><%= presenter.lock_at(due_date) %></td>
-      </tr>
-    <% end %>
-  </tbody>
+  <%= render 'shared/override_list', :assignment => @quiz, 
+    :user => @current_user %>
+
 </table>

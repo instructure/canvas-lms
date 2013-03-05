@@ -277,7 +277,7 @@ module Api::V1::Assignment
 
     assignment.updating_user = @current_user
     assignment.attributes = update_params
-    assignment.infer_due_at
+    assignment.infer_times
 
     assignment
   end

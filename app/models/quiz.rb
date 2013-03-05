@@ -73,8 +73,8 @@ class Quiz < ActiveRecord::Base
 
   def infer_times
     # set the time to 11:59 pm in the creator's time zone, if none given
-    self.due_at += ((60 * 60 * 24) - 60) if self.due_at && self.due_at.hour == 0 && self.due_at.min == 0
-    self.lock_at += ((60 * 60 * 24) - 60) if self.lock_at && self.lock_at.hour == 0 && self.lock_at.min == 0
+    self.due_at = CanvasTime.fancy_midnight(self.due_at)
+    self.lock_at = CanvasTime.fancy_midnight(self.lock_at)
   end
 
   def set_defaults

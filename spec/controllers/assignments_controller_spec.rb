@@ -273,6 +273,18 @@ describe AssignmentsController do
       get 'edit', :course_id => @course.id, :id => @assignment.id
       assigns[:assignment].should eql(@assignment)
     end
+
+    it "bootstraps the correct assignment info to js_env" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_assignment
+      get 'edit', :course_id => @course.id, :id => @assignment.id
+      assigns[:js_env][:ASSIGNMENT].should ==
+        subject.send(:assignment_json,@assignment,assigns[:current_user],session)
+      assigns[:js_env][:ASSIGNMENT_OVERRIDES].should ==
+        subject.send(:assignment_overrides_json,
+                     @assignment.overrides_visible_to(assigns[:current_user]))
+    end
+
   end
 
   describe "PUT 'update'" do

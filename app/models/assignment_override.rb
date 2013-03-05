@@ -171,6 +171,7 @@ class AssignmentOverride < ActiveRecord::Base
   override :lock_at
 
   def due_at=(new_due_at)
+    new_due_at = CanvasTime.fancy_midnight(new_due_at)
     new_all_day, new_all_day_date = Assignment.all_day_interpretation(
       :due_at => new_due_at,
       :due_at_was => read_attribute(:due_at),
@@ -182,12 +183,19 @@ class AssignmentOverride < ActiveRecord::Base
     write_attribute(:all_day_date, new_all_day_date)
   end
 
+  def lock_at=(new_lock_at)
+    write_attribute(:lock_at, CanvasTime.fancy_midnight(new_lock_at))
+  end
 
   def as_hash
     { :title => title,
       :due_at => due_at,
       :all_day => all_day,
+      :set_type => set_type,
+      :set_id => set_id,
       :all_day_date => all_day_date,
+      :lock_at => lock_at,
+      :unlock_at => unlock_at,
       :override => self }
   end
 

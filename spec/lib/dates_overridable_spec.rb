@@ -70,6 +70,49 @@ shared_examples_for "an object whose dates are overridable" do
     context "when it doesn't" do
       it { should be_false }
     end
+
+  end
+
+  describe "has_active_overrides?" do
+    context "has active overrides" do
+      before { override }
+      it "returns true" do
+        overridable.has_active_overrides?.should == true
+      end
+    end
+    context "when it has deleted overrides" do
+      it "returns false" do
+        override.delete
+        overridable.has_active_overrides?.should == false
+      end
+    end
+
+  end
+
+  describe "#all_dates_visible_to" do
+    let(:user) { stub }
+    it "only returns active overrides" do
+      override.delete
+      # include the default override
+      overridable.all_dates_visible_to(user).size.should == 1
+    end
+
+    it "returns each override represented using its as_hash method" do
+      all_dates = overridable.all_dates_visible_to(user)
+      overridable.active_assignment_overrides.map(&:as_hash).each do |o|
+        all_dates.should contain o
+      end
+    end
+
+    it "includes the overridable as a hash" do
+      all_dates = overridable.all_dates_visible_to(user)
+      last_hash = all_dates.last
+      overridable_hash =
+        overridable.without_overrides.due_date_hash.merge(:base => true)
+      overridable_hash.each do |k,v|
+        last_hash[k].should == v
+      end
+    end
   end
 
   describe "without_overrides" do
@@ -170,7 +213,12 @@ shared_examples_for "an object whose dates are overridable" do
     it "includes the base due date in the list of due dates" do
       _, as_instructor = overridable.due_dates_for(@teacher)
 
-      expected_params = { :base => true, :due_at => overridable.due_at }
+      expected_params = {
+        :base => true,
+        :due_at => overridable.due_at,
+        :lock_at => overridable.lock_at,
+        :unlock_at => overridable.lock_at
+      }
 
       if overridable.is_a?(Assignment)
         expected_params.merge!({
@@ -189,6 +237,10 @@ shared_examples_for "an object whose dates are overridable" do
         :due_at => override.due_at,
         :all_day => override.all_day,
         :all_day_date => override.all_day_date,
+        :lock_at => override.lock_at,
+        :set_id => override.set_id,
+        :set_type => override.set_type,
+        :unlock_at => override.unlock_at,
         :override => override
       })
     end
@@ -218,11 +270,20 @@ shared_examples_for "an object whose dates are overridable" do
   end
 
   describe "due_date_hash" do
-    it "returns the due at, all day, and all day date params" do
+    it "returns the due at, lock_at, unlock_at, all day, and all day fields" do
       due = 5.days.from_now
-      a = Assignment.new(:due_at => due)
-      a.due_date_hash.should == { :due_at => due, :all_day => false, :all_day_date => nil }
+      due_params = {:due_at => due, :lock_at => due, :unlock_at => due}
+      a = overridable.class.new(due_params)
+      if a.is_a?(Quiz)
+        a.assignment = Assignment.new(due_params)
+      end
+      a.due_date_hash[:due_at].should == due
+      a.due_date_hash[:lock_at].should == due
+      a.due_date_hash[:unlock_at].should == due
+      a.due_date_hash[:all_day].should == false
+      a.due_date_hash[:all_day_date].should == nil
     end
+
   end
 
   describe "observed_student_due_dates" do

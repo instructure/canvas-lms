@@ -33,22 +33,53 @@ describe Quiz do
   end
 
   it "should infer the times if none given" do
-    q = factory_with_protected_attributes(@course.quizzes, :title => "new quiz", :due_at => "Sep 3 2008 12:00am", :quiz_type => 'assignment', :workflow_state => 'available')
+    q = factory_with_protected_attributes(@course.quizzes,
+                                          :title => "new quiz",
+                                          :due_at => "Sep 3 2008 12:00am",
+                                          :lock_at => "Sep 3 2008 12:00am",
+                                          :unlock_at => "Sep 3 2008 12:00am",
+                                          :quiz_type => 'assignment',
+                                          :workflow_state => 'available')
+    due_at = q.due_at
     q.due_at.should == Time.parse("Sep 3 2008 12:00am UTC")
+    lock_at = q.lock_at
+    unlock_at = q.unlock_at
+    q.lock_at.should == Time.parse("Sep 3 2008 12:00am UTC")
     q.assignment.due_at.should == Time.parse("Sep 3 2008 12:00am UTC")
     q.infer_times
     q.save!
-    q.due_at.should == Time.parse("Sep 3 2008 11:59pm UTC")
-    q.assignment.due_at.should == Time.parse("Sep 3 2008 11:59pm UTC")
+    q.due_at.should == due_at.end_of_day
+    q.assignment.due_at.should == due_at.end_of_day
+    q.lock_at.should == lock_at.end_of_day
+    q.assignment.lock_at.should == lock_at.end_of_day
+    # Unlock at should not be fudged so teacher's can say this assignment
+    # is available at 12 am.
+    q.unlock_at.should == unlock_at.midnight
+    q.assignment.unlock_at.should == unlock_at.midnight
   end
 
   it "should set the due time to 11:59pm if only given a date" do
-    params = { :quiz => { :title => "Test Quiz", :due_at => Time.zone.today.to_s } }
+    params = { :quiz => {
+      :title => "Test Quiz",
+      :due_at => Time.zone.today.to_s,
+      :lock_at => Time.zone.today.to_s,
+      :unlock_at => Time.zone.today.to_s
+      }
+    }
     q = @course.quizzes.create!(params[:quiz])
+    q.infer_times
     q.due_at.should be_an_instance_of ActiveSupport::TimeWithZone
     q.due_at.time_zone.should == Time.zone
     q.due_at.hour.should eql 23
     q.due_at.min.should eql 59
+    q.lock_at.time_zone.should == Time.zone
+    q.lock_at.hour.should eql 23
+    q.lock_at.min.should eql 59
+    # Unlock at should not be fudged so teacher's can say this assignment
+    # is available at 12 am.
+    q.unlock_at.time_zone.should == Time.zone
+    q.unlock_at.hour.should eql 0
+    q.unlock_at.min.should eql 0
   end
 
   it "should not set the due time to 11:59pm if passed a time of midnight" do

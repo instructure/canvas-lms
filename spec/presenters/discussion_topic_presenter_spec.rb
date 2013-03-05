@@ -20,7 +20,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe DiscussionTopicPresenter do
   let (:topic)      { DiscussionTopic.new(:title => 'Test Topic', :assignment => assignment) }
-  let (:presenter)  { DiscussionTopicPresenter.new(topic, user_model) }
+  let (:user)       { user_model }
+  let (:presenter)  { DiscussionTopicPresenter.new(topic, user) }
   let (:course)     { course_model }
   let (:assignment) {
     Assignment.new(:title => 'Test Topic',
@@ -30,103 +31,136 @@ describe DiscussionTopicPresenter do
                    :submission_types => 'discussion_topic')
   }
 
-  it 'should override the topic assignment when given a user' do
-    topic.for_assignment?.should == 0
-    presenter.assignment.overridden_for_user.id.should == @user.id
-  end
-  
-  it 'should present an unoverridden copy' do
-    presenter.unoverridden.assignment.overridden_for_user.should be_nil
+  before do
+    AssignmentOverrideApplicator.stubs(:assignment_overridden_for).
+      with(topic.assignment,user).returns assignment
   end
 
-  context 'a topic with no overrides' do
-    context 'with dates' do
-      it 'should present lock_at' do
-        presenter.lock_at.should == presenter.datetime_string(assignment.lock_at)
-      end
-
-      it 'should present unlock_at' do
-        presenter.unlock_at.should == presenter.datetime_string(assignment.unlock_at)
-      end
-
-      it 'should present due_at' do
-        presenter.due_at.should == presenter.datetime_string(assignment.due_at)
-      end
-
-      context 'that are all day' do
-        before(:each) do
-          Time.zone = 'UTC'
-          Assignment.any_instance.stubs(:unlock_at).returns Time.zone.now.end_of_day
-          Assignment.any_instance.stubs(:lock_at).returns   Time.zone.now.end_of_day
-          Assignment.any_instance.stubs(:due_at).returns    Time.zone.now.end_of_day
-        end
-
-        it 'should present lock_at' do
-          presenter.lock_at.should == presenter.date_string(assignment.lock_at)
-        end
-
-        it 'should present unlock_at' do
-          presenter.unlock_at.should == presenter.date_string(assignment.unlock_at)
-        end
-
-        it 'should present due_at' do
-          presenter.due_at.should == presenter.date_string(assignment.due_at)
-        end
+  describe "#initialize" do
+    context "when no arguments passed" do
+      it "creates a discussion topic and current_user for you" do
+        presenter = DiscussionTopicPresenter.new
+        presenter.topic.is_a?(DiscussionTopic).should == true
+        presenter.user.is_a?(User).should == true
       end
     end
 
-    context 'with no dates' do
-      before(:each) do
-        Assignment.any_instance.stubs(:unlock_at).returns(nil)
-        Assignment.any_instance.stubs(:lock_at).returns(nil)
-        Assignment.any_instance.stubs(:due_at).returns(nil)
+    context "when discussion_topic and current_user args passed" do
+      it "returns the overridden assignment if topic is for assignment" do
+        AssignmentOverrideApplicator.expects(:assignment_overridden_for).
+          with(topic.assignment,user).returns assignment
+        presenter = DiscussionTopicPresenter.new(topic,user)
+        presenter.assignment.should == assignment
       end
 
-      it 'should present lock_at' do
-        presenter.lock_at.should == '-'
+      it "will have a nil assignment if topic not for grading" do
+        DiscussionTopicPresenter.new(
+          DiscussionTopic.new(:title => "no assignment")
+        ).assignment.should be_nil
       end
-
-      it 'should present unlock_at' do
-        presenter.unlock_at.should == '-'
-      end
-
-      it 'should present due_at' do
-        presenter.due_at.should == '-'
-      end
-
     end
   end
 
-  context 'a topic with overrides' do
-    let(:override) { assignment_override_model }
-
-    it 'should present lock_at' do
-      override.lock_at = Time.now + 2.weeks
-      presenter.lock_at(:override => override).should == presenter.datetime_string(override.lock_at)
+  describe "#has_attached_rubric?" do
+    it "returns true if assignment has a rubric association with a rubric" do
+      assignment.expects(:rubric_association).
+        returns stub(:try => stub(:rubric => stub))
+      presenter.has_attached_rubric?.should == true
     end
 
-    it 'should present unlock_at' do
-      override.unlock_at = Time.now + 2.weeks
-      presenter.unlock_at(:override => override).should == presenter.datetime_string(override.unlock_at)
+    it "returns false if assignment has nil rubric association" do
+      assignment.expects(:rubric_association).returns nil
+      presenter.has_attached_rubric?.should == false
     end
 
-    it 'should present due_at' do
-      override.due_at = Time.now + 2.weeks
-      presenter.due_at(:override => override).should == presenter.datetime_string(override.due_at)
+    it "returns false if assignment has a rubric association but no rubric" do
+      assignment.expects(:rubric_association).returns stub(:rubric => nil)
+      presenter.has_attached_rubric?.should == false
+    end
+  end
+
+  describe "#should_show_rubric?" do
+    it "returns false if no assignment on the topic" do
+        DiscussionTopicPresenter.new(
+          DiscussionTopic.new(:title => "no assignment")
+        ).should_show_rubric?(user).should == false
+    end
+
+    it "returns true if has_attached_rubric? is false" do
+      assignment.expects(:rubric_association).returns stub(:rubric => stub)
+      presenter.should_show_rubric?(user).should == true
+    end
+
+    context "no rubric association or rubric for the topic's assignment" do
+      before { assignment.stubs(:rubric_association).returns nil }
+
+      it "returns true when the assignment grants the user update privs" do
+        assignment.expects(:grants_right?).with(user,nil,:update).returns true
+        presenter.should_show_rubric?(user).should == true
+      end
+
+      it "returns false when the assignment grants the user update privs" do
+        assignment.expects(:grants_right?).with(user,nil,:update).returns false
+        presenter.should_show_rubric?(user).should == false
+      end
+    end
+
+  end
+
+  describe "#comments_diabled?" do
+    it "only returns true when topic is assignment, its context is a course, "+
+      "and the course settings lock all announcements" do
+      announcement = Announcement.new(:title => "Announcement")
+      announcement.context = Course.new(:name => "Canvas Yah Yeah")
+      announcement.context.expects(:settings).
+        returns({:lock_all_announcements => true })
+      DiscussionTopicPresenter.new(announcement).comments_disabled?.
+        should == true
+    end
+
+    it "returns false for announcements or other criteria not met" do
+      presenter.comments_disabled?.should == false
+      course = Course.new :name => "Canvas 101"
+      announcement = Announcement.new(:title => "b", :context => course)
+      DiscussionTopicPresenter.new(announcement).comments_disabled?.
+        should == false
     end
   end
 
-  context 'an announcement' do
-    let(:announcement) { course.announcements.new(:title => 'test', :message => 'body') }
-    let(:presenter)    { DiscussionTopicPresenter.new(announcement) }
-
-    it "should know if comments are not disabled" do
-      presenter.comments_disabled?.should be_false
+  describe "#large_roster?" do
+    it "returns true when context responds to large_roster and context " +
+      "has a large roster" do
+      topic.context = Course.new(:name => "Canvas")
+      topic.context.large_roster = true
+      presenter.large_roster?.should == true
     end
 
-    it "should know if comments are disabled" do
-      Course.any_instance.stubs(:settings).returns(:lock_all_announcements => true)
-      presenter.comments_disabled?.should be_true
+    it "returns false when context responds to large roster and context " +
+      "doesn't have a large roster" do
+      topic.context = Course.new(:name => "Canvas")
+      topic.context.large_roster = false
+      presenter.large_roster?.should == false
+    end
+
+    context "topic's context isn't a course" do
+
+      before do
+        @group = Group.new(:name => "Canvas")
+        topic.context = @group
+        @group.context = Course.new(:name => "Canvas")
+        @group.context.large_roster = true
+      end
+
+      it "returns false if topic's context's context is nil" do
+        @group.context = nil
+        presenter.large_roster?.should == false
+      end
+
+      it "returns true if topic's context's context has large_roster?" do
+        presenter.large_roster?.should == true
+      end
+
     end
   end
+
 end

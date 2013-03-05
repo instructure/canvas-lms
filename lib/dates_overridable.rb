@@ -30,6 +30,10 @@ module DatesOverridable
     assignment_overrides.count > 0
   end
 
+  def has_active_overrides?
+    assignment_overrides.active.count > 0
+  end
+
   def without_overrides
     @without_overrides || self
   end
@@ -84,6 +88,12 @@ module DatesOverridable
     all_dates << without_overrides.due_date_hash.merge(:base => true)
   end
 
+  def all_dates_visible_to(user)
+    all_dates = overrides_visible_to(user).active
+    all_dates = all_dates.map(&:as_hash)
+    all_dates << without_overrides.due_date_hash.merge(:base => true)
+  end
+
   def due_dates_visible_to(user)
     # Overrides
     overrides = overrides_visible_to(user).overriding_due_at
@@ -100,10 +110,11 @@ module DatesOverridable
   end
 
   def due_date_hash
-    hash = { :due_at => due_at }
-
+    hash = { :due_at => due_at, :unlock_at => unlock_at, :lock_at => lock_at }
     if self.is_a?(Assignment)
       hash.merge!({ :all_day => all_day, :all_day_date => all_day_date })
+    elsif self.assignment
+      hash.merge!({ :all_day => assignment.all_day, :all_day_date => assignment.all_day_date})
     end
 
     if @applied_overrides && override = @applied_overrides.find { |o| o.due_at == due_at }
