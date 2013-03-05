@@ -77,14 +77,17 @@ class ApplicationController < ActionController::Base
   #
   def js_env(hash = {})
     # set some defaults
-    @js_env ||= {
-      :current_user_id => @current_user.try(:id),
-      :current_user => user_display_json(@current_user, :profile),
-      :current_user_roles => @current_user.try(:roles),
-      :context_asset_string => @context.try(:asset_string),
-      :AUTHENTICITY_TOKEN => form_authenticity_token,
-      :files_domain => HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
-    }
+    unless @js_env
+      @js_env = {
+        :current_user_id => @current_user.try(:id),
+        :current_user => user_display_json(@current_user, :profile),
+        :current_user_roles => @current_user.try(:roles),
+        :context_asset_string => @context.try(:asset_string),
+        :AUTHENTICITY_TOKEN => form_authenticity_token,
+        :files_domain => HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
+      }
+      @js_env[:IS_LARGE_ROSTER] = true if @context.respond_to?(:large_roster?) && @context.large_roster?
+    end
 
     hash.each do |k,v|
       if @js_env[k]

@@ -144,6 +144,7 @@ define [
             readOnly: @readOnly(),
             native: @model.outcomeLink.outcome.context_id == @model.outcomeLink.context_id && @model.outcomeLink.outcome.context_type == @model.outcomeLink.context_type
             setQuizMastery: @setQuizMastery,
-            useForScoring: @useForScoring
+            useForScoring: @useForScoring,
+            isLargeRoster: ENV.IS_LARGE_ROSTER
       @$('input:first').focus()
       this

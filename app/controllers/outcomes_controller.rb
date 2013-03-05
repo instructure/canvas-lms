@@ -45,6 +45,12 @@ class OutcomesController < ApplicationController
   end
 
   def show
+    if @context.respond_to?(:large_roster?) && @context.large_roster?
+      flash[:notice] = t "#application.notices.page_disabled_for_course", "That page has been disabled for this course"
+      redirect_to named_context_url(@context, :context_outcomes_path)
+      return
+    end
+
     @outcome = @context.linked_learning_outcomes.find(params[:id])
     if authorized_action(@context, @current_user, :manage_outcomes)
       codes = [@context].map(&:asset_string)
