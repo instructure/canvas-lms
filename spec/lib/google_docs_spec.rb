@@ -101,6 +101,25 @@ describe GoogleDocs do
       root_folder.files.size.should == 10
     end
 
+    describe "#google_docs_list_with_extension_filter" do
+      it "should filter only if list of extensions given" do
+        prepare_mock_get xml_doc_list_one
+        list = lib.google_docs_list_with_extension_filter([])
+        document_id_list = list.files.map(&:document_id)
+        document_id_list.should == ["document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA"]
+
+        prepare_mock_get xml_doc_list_one
+        list = lib.google_docs_list_with_extension_filter(['doc'])
+        document_id_list = list.files.map(&:document_id)
+        document_id_list.should == ["document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA"]
+
+        prepare_mock_get xml_doc_list_one
+        list = lib.google_docs_list_with_extension_filter(['xls'])
+        document_id_list = list.files.map(&:document_id)
+        document_id_list.should == []
+      end
+    end
+
     it "can be created" do
       prepare_mock_post \
         xml_create_doc_request,

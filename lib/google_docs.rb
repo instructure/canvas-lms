@@ -173,7 +173,11 @@ module GoogleDocs
 
   def google_docs_list_with_extension_filter(extensions, access_token=nil)
     access_token ||= google_docs_retrieve_access_token
-    google_docs_list(access_token).select{ |e| extensions.include?(e.extension) }
+    list = google_docs_list(access_token)
+    if extensions.present?
+      list = list.select{ |e| extensions.include?(e.extension) }
+    end
+    list
   end
 
   def google_consumer(key = nil, secret = nil)
