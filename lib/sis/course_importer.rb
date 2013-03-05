@@ -157,10 +157,24 @@ module SIS
             end
             templated_course.sis_batch_id = @batch_id if @batch_id
             @course_ids_to_update_associations.add(templated_course.id) if templated_course.account_id_changed? || templated_course.root_account_id_changed?
-            templated_course.save_without_broadcasting!
+            if templated_course.valid?
+              templated_course.save_without_broadcasting!
+            else
+              msg = "A (templated) course did not pass validation "
+              msg += "(" + "course: #{course_id} / #{short_name}, error: " + 
+              msg += templated_course.errors.full_messages.join(",") + ")"
+              raise ImportError, msg
+            end
           end
           course.sis_batch_id = @batch_id if @batch_id
-          course.save_without_broadcasting!
+          if course.valid?
+            course.save_without_broadcasting!
+          else
+            msg = "A course did not pass validation "
+            msg += "(" + "course: #{course_id} / #{short_name}, error: " + 
+            msg += course.errors.full_messages.join(",") + ")"
+            raise ImportError, msg
+          end
           @course_ids_to_update_associations.add(course.id) if update_account_associations
         elsif @batch_id
           @courses_to_update_sis_batch_id << course.id

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'lib/sis/common'
+require_dependency 'lib/sis/common'
 
 module SIS
   module CSV
