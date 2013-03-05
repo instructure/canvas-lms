@@ -226,7 +226,16 @@ module SIS
             if enrollment.changed?
               @users_to_touch_ids.add(user.id)
               enrollment.sis_batch_id = @batch_id if @batch_id
-              enrollment.save_without_broadcasting
+              if enrollment.valid?
+                enrollment.save_without_broadcasting
+              else
+                msg = "An enrollment did not pass validation "
+                msg += "(" + "course: #{course_id}, section: #{section_id}, "
+                msg += "user: #{user_id}, role: #{role}, error: " + 
+                msg += enrollment.errors.full_messages.join(",") + ")"
+                @messages << msg
+                next
+              end
             elsif @batch_id
               @enrollments_to_update_sis_batch_ids << enrollment.id
             end

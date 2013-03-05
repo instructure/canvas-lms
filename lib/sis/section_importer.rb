@@ -103,7 +103,14 @@ module SIS
 
         if section.changed?
           section.sis_batch_id = @batch_id if @batch_id
-          section.save
+          if section.valid?
+            section.save
+          else
+            msg = "A section did not pass validation "
+            msg += "(" + "section: #{section_id} / #{name}, course: #{course_id}, error: "
+            msg += section.errors.full_messages.join(", ") + ")"
+            raise ImportError, msg
+          end
         elsif @batch_id
           @sections_to_update_sis_batch_ids << section.id
         end
