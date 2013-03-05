@@ -84,7 +84,7 @@ class ContextModulesController < ApplicationController
   def create
     if authorized_action(@context.context_modules.new, @current_user, :create)
       @module = @context.context_modules.build
-      @module.workflow_state = 'unpublished'
+      @module.workflow_state = 'active'
       @module.attributes = params[:context_module]
       respond_to do |format|
         if @module.save
