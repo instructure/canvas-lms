@@ -108,7 +108,6 @@ class ContextModule < ActiveRecord::Base
   named_scope :active, :conditions => ['context_modules.workflow_state = ?', 'active']
   named_scope :unpublished, :conditions => ['context_modules.workflow_state = ?', 'unpublished']
   named_scope :not_deleted, :conditions => ['context_modules.workflow_state != ?', 'deleted']
-  named_scope :include_tags_and_progressions, :include => [:content_tags, :context_module_progressions]
 
   def update_student_progressions(user=nil)
     # modules are ordered by position, so running through them in order will
@@ -400,7 +399,6 @@ class ContextModule < ActiveRecord::Base
   end
   
   def clear_cached_lookups
-    @cached_progressions = nil
     @cached_tags = nil
   end
   
@@ -447,8 +445,7 @@ class ContextModule < ActiveRecord::Base
     users = Array(users)
     users_hash = {}
     users.each{|u| users_hash[u.id] = u }
-    @cached_progressions ||= self.context_module_progressions
-    progressions = @cached_progressions.select{|p| users_hash[p.user_id] } #self.context_module_progressions.find_all_by_user_id(users.map(&:id))
+    progressions = self.context_module_progressions.find_all_by_user_id(users.map(&:id))
     progressions_hash = {}
     progressions.each{|p| progressions_hash[p.user_id] = p }
     newbies = users.select{|u| !progressions_hash[u.id] }

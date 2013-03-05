@@ -328,9 +328,6 @@ class ContentTag < ActiveRecord::Base
       {:conditions => ['content_tags.context_type = ? AND content_tags.context_id = ?', context.class.to_s, context.id]}
     end
   }
-  named_scope :include_progressions, lambda{
-    { :include => {:context_module => :context_module_progressions} }
-  }
   named_scope :learning_outcome_alignments, lambda{
     { :conditions => {:tag_type => 'learning_outcome'} }
   }

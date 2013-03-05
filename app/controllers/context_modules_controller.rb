@@ -27,7 +27,7 @@ class ContextModulesController < ApplicationController
       @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).scoped(:select => 'context_module_id, collapsed').select{|p| p.collapsed? }.map(&:context_module_id)
       if @context.grants_right?(@current_user, session, :participate_as_student)
         return unless tab_enabled?(@context.class::TAB_MODULES)
-        ContextModule.send(:preload_associations, @modules, [:context_module_progressions, :content_tags])
+        ContextModule.send(:preload_associations, @modules, [:content_tags])
         @modules.each{|m| m.evaluate_for(@current_user) }
         session[:module_progressions_initialized] = true
       end
@@ -36,11 +36,11 @@ class ContextModulesController < ApplicationController
 
   def item_redirect
     if authorized_action(@context, @current_user, :read)
-      @tag = @context.context_module_tags.active.include_progressions.find(params[:id])
+      @tag = @context.context_module_tags.active.find(params[:id])
 
       reevaluate_modules_if_locked(@tag)
       @progression = @tag.context_module.evaluate_for(@current_user) if @tag.context_module
-      @progression.uncollapse! if @progression && @progression.collapsed != false
+      @progression.uncollapse! if @progression && @progression.collapsed?
       content_tag_redirect(@context, @tag, :context_context_modules_url)
     end
   end
@@ -48,7 +48,7 @@ class ContextModulesController < ApplicationController
   def module_redirect
     if authorized_action(@context, @current_user, :read)
       @module = @context.context_modules.not_deleted.find(params[:context_module_id])
-      @tags = @module.content_tags.active.include_progressions
+      @tags = @module.content_tags.active
       if params[:last]
         @tags.pop while @tags.last && @tags.last.content_type == 'ContextModuleSubHeader'
       else
@@ -63,7 +63,7 @@ class ContextModulesController < ApplicationController
 
       reevaluate_modules_if_locked(@tag)
       @progression = @tag.context_module.evaluate_for(@current_user) if @tag && @tag.context_module
-      @progression.uncollapse! if @progression && @progression.collapsed != false
+      @progression.uncollapse! if @progression && @progression.collapsed?
       content_tag_redirect(@context, @tag, :context_context_modules_url)
     end
   end
