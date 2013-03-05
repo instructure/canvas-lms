@@ -231,10 +231,10 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     wait_for_animations
     f('.mathquill-editor').should be_displayed
     misc_tab = f('.mathquill-tab-bar > li:last-child a')
-    driver.action.move_to(misc_tab).perform
+    misc_tab.click
     f('#Misc_tab li:nth-child(35) a').click
     basic_tab = f('.mathquill-tab-bar > li:first-child a')
-    driver.action.move_to(basic_tab).perform
+    basic_tab.click
     f('#Basic_tab li:nth-child(27) a').click
     f('.ui-dialog-buttonset .btn-primary').click
     keep_trying_until do
@@ -287,6 +287,75 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     textarea.send_keys :arrow_right
     textarea.send_keys :arrow_right
     textarea.send_keys "\\text that. is. so. cool."
+    f('.ui-dialog-buttonset .btn-primary').click
+    wait_for_ajax_requests
+    in_frame "wiki_page_body_ifr" do
+      keep_trying_until { f('.equation_image').attribute('title').should == equation_text }
+
+      # currently there's an issue where the equation is double-escaped in the
+      # src, though it's correct after the redirect to codecogs. here we just
+      # want to confirm we redirect correctly. so when that bug is fixed, this
+      # spec should still pass.
+      src = f('.equation_image').attribute('src')
+      response = Net::HTTP.get_response(URI.parse(src))
+      response.code.should == "302"
+      response.header['location'].should include URI.encode(equation_text, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
+    end
+  end
+
+  it "should add an equation to the rce by using equation buttons in advanced view" do
+    get "/courses/#{@course.id}/wiki"
+
+    f('#wiki_page_body_instructure_equation').click
+    wait_for_animations
+    f('.mathquill-editor').should be_displayed
+    f('a.math-toggle-link').click
+    wait_for_animations
+    f('#mathjax-editor').should be_displayed
+    misc_tab = f('#mathjax-view .mathquill-tab-bar > li:last-child a')
+    misc_tab.click
+    f('#misc_tab li:nth-child(35) a').click
+    basic_tab = f('#mathjax-view .mathquill-tab-bar > li:first-child a')
+    basic_tab.click
+    f('#basic_tab li:nth-child(27) a').click
+    f('.ui-dialog-buttonset .btn-primary').click
+    keep_trying_until do
+      in_frame "wiki_page_body_ifr" do
+        f('#tinymce img.equation_image').should be_displayed
+      end
+    end
+
+    submit_form('#new_wiki_page')
+    wait_for_ajax_requests
+    get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
+    wait_for_ajax_requests
+
+    check_image(f('#wiki_body img'))
+  end
+
+  it "should add an equation to the rce by using the equation editor in advanced view" do
+    equation_text = '\\text{yay math stuff:}\\:\\frac{d}{dx}\\sqrt{x}=\\frac{d}{dx}x^{\\frac{1}{2}}= \\frac{1}{2}x^{-\\frac{1}{2}}=\\frac{1}{2\\sqrt{x}}\\text{that. is. so. cool.}'
+
+    get "/courses/#{@course.id}/wiki"
+    f('#wiki_page_body_instructure_equation').click
+    wait_for_animations
+    f('.mathquill-editor').should be_displayed
+    f('a.math-toggle-link').click
+    wait_for_animations
+    f('#mathjax-editor').should be_displayed
+    textarea = f('#mathjax-editor')
+    3.times do
+      textarea.send_keys(:backspace)
+    end
+
+    # "paste" some latex
+    driver.execute_script "$('#mathjax-editor').val('\\\\text{yay math stuff:}\\\\:\\\\frac{d}{dx}\\\\sqrt{x}=').trigger('paste')"
+
+
+    textarea.send_keys "\\frac{d}{dx}x^{\\frac{1}{2}}"
+    f('#mathjax-view .mathquill-toolbar a[title="="]').click
+    textarea.send_keys "\\frac{1}{2}x^{-\\frac{1}{2}}=\\frac{1}{2\\sqrt{x}}\\text{that. is. so. cool.}"
+
     f('.ui-dialog-buttonset .btn-primary').click
     wait_for_ajax_requests
     in_frame "wiki_page_body_ifr" do

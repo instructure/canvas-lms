@@ -17,15 +17,22 @@
        url(/font/Symbola.svg?v1#webfont7MzkO3xs) format("svg");
 }
 
+div.math-dialog > span {
+  padding: 0 !important;
+}
+
 .mathquill-editor {
   font-size: 1.5em;
   // the editable area gets an active blue glow so it looks wierd if there is white space between
   // it and the buttonpane
   margin-bottom: -5px;
+  min-height: 247px;
+  margin-left: 5px;
+  width: 96%;
 }
+
 //undo the padding added by .ui-dialog
 .mathquill-toolbar {
-  margin-top: -.5em !important;
   margin-left: -1em !important;
   margin-right: -1em !important;
 }
@@ -35,6 +42,7 @@
 }
 .mathquill-tab-pane li {
   background: #ccc url(/images/tinybutton.png) repeat-x top left;
+  font-size: 1.52em;
 }
 .mathquill-tab-pane li a:hover {
   text-decoration: none;
@@ -42,4 +50,27 @@
 
 .mathquill-editable .textarea textarea {
   z-index: inherit; /* so that jquery modal dialogs don't cancel its events */
+}
+
+#mathjax-editor {
+  width: 95%;
+  min-height: 100px;
+  margin: 0px 10px;
+}
+
+#mathjax-preview, .MathJax_Display {
+  min-height: 100px;
+}
+
+#mathjax-message {
+  min-height: 20px;
+}
+
+.math-toggle {
+  text-align: right;
+  padding-right: 10px;
+}
+
+#mathquill-view, #mathjax-view {
+  min-height: 403px;
 }
