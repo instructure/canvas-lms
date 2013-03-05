@@ -58,6 +58,7 @@ define [
       @$el.attr 'id', "entry-#{@model.get 'id'}"
       @model.on 'change:deleted', @toggleDeleted
       @model.on 'change:read_state', @toggleReadState
+      @model.on 'change:editor', @render
 
     handleDeclarativeEvent: (event) ->
       $el = $ event.currentTarget
@@ -116,6 +117,9 @@ define [
 
     toggleDeleted: (model, deleted) =>
       @$entryContent.toggleClass 'deleted-discussion-entry', deleted
+      if deleted
+        @model.set('updated_at', (new Date).toISOString())
+        @model.set('editor', ENV.current_user)
 
     afterRender: ->
       super

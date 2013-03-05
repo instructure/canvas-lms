@@ -85,7 +85,7 @@ module Api::V1::DiscussionTopics
         json = api_json(entry, user, session,
                         :only => %w(id user_id created_at updated_at parent_id))
         json[:user_name] = entry.user_name if includes.include?(:user_name)
-        json[:editor_id] = entry.editor_id if entry.editor_id && entry.editor_id != entry.user_id
+        json[:editor_id] = entry.editor_id if entry.editor_id
         json[:message] = api_user_content(entry.message, context, user)
         if entry.attachment
           json[:attachment] = attachment_json(entry.attachment, user, :host => HostUrl.context_host(context))

@@ -12,7 +12,7 @@ describe "threaded discussions" do
 
   it "should create a threaded discussion" do
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-    wait_for_ajax_requests
+    wait_for_ajaximations
 
     f('.discussion-title').text.should == @topic_title
   end
@@ -48,21 +48,49 @@ describe "threaded discussions" do
   end
 
   it "should edit a reply" do
-    pending("intermittently fails")
     edit_text = 'edit message '
     entry = @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply from student")
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     wait_for_ajax_requests
-
     edit_entry(entry, edit_text)
   end
 
   it "should delete a reply" do
-    pending("intermittently fails")
+    entry = @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply from student")
+    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    wait_for_ajaximations
+    delete_entry(entry)
+  end
+
+  it "should display editor name and timestamp after edit" do
+    edit_text = 'edit message '
     entry = @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply from student")
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     wait_for_ajax_requests
+    edit_entry(entry, edit_text)
+    f("#entry-#{entry.id} .discussion-fyi").text.should match("Edited by #{@teacher.name} on")
+  end
 
+  it "should support repeated editing" do
+    entry = @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply from student")
+    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    wait_for_ajaximations
+    edit_entry(entry, 'New text 1')
+    f("#entry-#{entry.id} .discussion-fyi").text.should match("Edited by #{@teacher.name} on")
+    # second edit
+    edit_entry(entry, 'New text 2')
+    entry.reload
+    entry.message.should match 'New text 2'
+  end
+
+  it "should display editor name and timestamp after delete" do
+    entry_text = 'new entry'
+    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    wait_for_ajax_requests
+
+    add_reply(entry_text)
+    entry = DiscussionEntry.last
     delete_entry(entry)
+    f("#entry-#{entry.id} .discussion-title").text.should match("Deleted by #{@teacher.name} on")
   end
 end
