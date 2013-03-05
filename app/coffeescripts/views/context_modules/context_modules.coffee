@@ -5,8 +5,8 @@ define [
   'jquery.loadingImg'
 ], (Backbone, $, I18n) -> 
   class ContextModules extends Backbone.View
-    events: 
-      'click .change-workflow-state-link' : 'toggleWorkflowState'
+    #events:
+    #  'click .change-workflow-state-link' : 'toggleWorkflowState'
 
     # Method Summary
     #   Toggles a module from "Published" to "Unpublished". This workes by 
@@ -40,7 +40,7 @@ define [
     #   back into the context modules div and add approprate styling for a published
     #   or unpublished module. 
     # @api private
-    success: (response) => 
+    success: (response) =>
       @$context_module.data 'workflow-state', response.context_module.workflow_state
       if response.context_module.workflow_state == 'unpublished'
         @addUnpublishAttributes()

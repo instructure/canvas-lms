@@ -745,7 +745,7 @@ define([
 
     $(".add_module_link").live('click', function(event) {
       event.preventDefault();
-      var $module = $("#context_module_blank").clone(true).attr('id', 'context_module_new').addClass('unpublished_module');
+      var $module = $("#context_module_blank").clone(true).attr('id', 'context_module_new');
       $("#context_modules").append($module);
         $module.find(".context_module_items").sortable(modules.sortable_module_options);
         $("#context_modules.ui-sortable").sortable('refresh');

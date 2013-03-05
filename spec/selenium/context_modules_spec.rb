@@ -67,12 +67,8 @@ describe "context_modules" do
       @course.save!
       get "/courses/#{@course.id}"
 
-      keep_trying_until do
-        f('.admin-links .al-trigger').click
-        hover_and_click('#context_modules .change-workflow-state-link')
-        wait_for_ajax_requests
-        f('.context_module').should have_class('published_module')
-      end
+      wait_for_ajaximations
+      f('.add_module_link').text.should_not be_nil
     end
 
     it "should show progressions link in modules home page" do
@@ -99,6 +95,7 @@ describe "context_modules" do
     end
 
     it "publishes an unpublished module" do
+      pending
       get "/courses/#{@course.id}/modules"
 
       add_module('New Module')
@@ -108,6 +105,7 @@ describe "context_modules" do
     end
 
     it "unpublishes a published module" do
+      pending
       get "/courses/#{@course.id}/modules"
 
       add_module('New Module')
@@ -120,6 +118,7 @@ describe "context_modules" do
     end
 
     it "add unpublished_module css class when creating new module" do
+      pending
       get "/courses/#{@course.id}/modules"
 
       add_module('New Module')
@@ -128,6 +127,7 @@ describe "context_modules" do
     end
 
     it "allows you to publish a newly created module without reloading the page" do
+      pending
       get "/courses/#{@course.id}/modules"
 
       add_module('New Module')

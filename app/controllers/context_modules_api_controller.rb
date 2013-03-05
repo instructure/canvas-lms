@@ -29,7 +29,7 @@
 #     {
 #       // the unique identifier for the module
 #       id: 123,
-#       // the state of the module: active, unpublished, deleted
+#       // the state of the module: active, deleted
 #       workflow_state: active,
 #
 #       // the position of this module in the course (1-based)
@@ -192,12 +192,12 @@ class ContextModulesApiController < ApplicationController
     end
   end
 
-  # @API Update modules
+  # @undocumented API Update modules
   #
   # Update multiple modules in an account.
   #
   # @argument module_ids[] List of ids of modules to update.
-  # @argument event The action to take on each module. Must be one of 'publish', 'unpublish', or 'delete'.
+  # @argument event The action to take on each module. Must be 'delete'.
   #
   # @response_field completed A list of IDs for modules that were updated.
   #
@@ -205,7 +205,7 @@ class ContextModulesApiController < ApplicationController
   #     curl https://<canvas>/api/v1/courses/<course_id>/modules \  
   #       -X PUT \ 
   #       -H 'Authorization: Bearer <token>' \ 
-  #       -d 'event=publish' \ 
+  #       -d 'event=delete' \
   #       -d 'module_ids[]=1' \ 
   #       -d 'module_ids[]=2' 
   #
