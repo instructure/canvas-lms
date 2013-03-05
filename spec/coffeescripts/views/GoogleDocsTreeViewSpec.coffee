@@ -1,7 +1,7 @@
 define ['compiled/views/GoogleDocsTreeView'], (GoogleDocsTreeView) ->
 
   file1 = { name: 'File 1', extension: 'tst', document_id: '12345', alternate_url: {href: '#'}}
-  fileData = { top_level_files: [file1] }
+  fileData = { files: [file1] }
   folderData = { folders: [ { name: 'Folder 1', files: [file1] } ] }
 
   module 'GoogleDocsTreeView',
