@@ -31,7 +31,9 @@ namespace :js do
     destination = coffee_destination(coffee_file).sub(%r{\.coffee$}, '.js')
     FileUtils.mkdir_p(File.dirname(destination))
     File.open(destination, 'wb') do |out|
-      out.write CoffeeScript.compile(File.open(coffee_file))
+      File.open(coffee_file) do |cfile|
+        out.write CoffeeScript.compile(cfile)
+      end
     end
   end
 
