@@ -399,7 +399,7 @@ describe "discussions" do
       @course.save!
       get "/courses/#{@course.id}/discussion_topics/"
       wait_for_ajax_requests
-      f('#new-discussion-button').should be_nil
+      f('#new-discussion-btn').should be_nil
     end
 
     it "should not show an empty gear menu to students who've created a discussion" do
@@ -437,7 +437,16 @@ describe "discussions" do
       f('.entry_content').should include_text('Since this is a group assignment')
     end
 
-    it "should create a discussion and validate that a student can see it and reply to it" do
+    it "should allow a student to create a discussion" do
+      get "/courses/#{@course.id}/discussion_topics/"
+      wait_for_ajax_requests
+      expect_new_page_load { f('#new-discussion-btn').click }
+      wait_for_ajax_requests
+
+      edit_topic("from a student", "tell me a story")
+    end
+
+    it "should validate that a student can see it and reply to a discussion" do
       new_student_entry_text = 'new student entry'
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       wait_for_ajax_requests
