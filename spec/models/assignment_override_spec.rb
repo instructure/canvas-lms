@@ -21,20 +21,21 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe AssignmentOverride do
   it "should soft-delete" do
     @override = assignment_override_model
+    @override.stubs(:assignment_override_students).once.returns stub(:destroy_all)
+    @override.expects(:save!).once
     @override.destroy
-    @override = AssignmentOverride.find_by_id(@override.id)
-    @override.should_not be_nil
+    AssignmentOverride.find_by_id(@override.id).should_not be_nil
     @override.workflow_state.should == 'deleted'
   end
 
   it "should default set_type to adhoc" do
-    @override = assignment_override_model
+    @override = AssignmentOverride.new
     @override.valid? # trigger bookkeeping
     @override.set_type.should == 'ADHOC'
   end
 
   it "should allow reading set_id and set when set_type is adhoc" do
-    @override = assignment_override_model
+    @override = AssignmentOverride.new
     @override.set_type = 'ADHOC'
     @override.set_id.should be_nil
     @override.set.should == []
@@ -308,7 +309,7 @@ describe AssignmentOverride do
     end
 
     before :each do
-      @override = assignment_override_model
+      @override = AssignmentOverride.new
     end
 
     it "should interpret 11:59pm as all day with no prior value" do
@@ -388,6 +389,37 @@ describe AssignmentOverride do
       @override.due_at = @override.due_at.in_time_zone('Baghdad') # 00:00:00 AST +03:00 today
       @override.all_day_date.should == Date.today - 1.day
     end
+
+    it "sets the date to 11:59 PM of the same day when the date is 12:00 am" do
+      @override.due_at = Date.today.in_time_zone('Alaska').midnight
+      @override.due_at.should == Date.today.in_time_zone('Alaska').end_of_day
+    end
+
+    it "sets the date to the date given when date is not 12:00 AM" do
+      expected_time = Date.today.in_time_zone('Alaska') - 11.hours
+      @override.unlock_at = expected_time
+      @override.unlock_at.should == expected_time
+    end
+  end
+
+  describe "#lock_at=" do
+    before do
+      @override = AssignmentOverride.new
+    end
+
+    it "sets the date to 11:59 PM of the same day when the date is 12:00 AM" do
+      @override.lock_at = Date.today.in_time_zone('Alaska').midnight
+      @override.lock_at.should == Date.today.in_time_zone('Alaska').end_of_day
+    end
+
+    it "sets the date to the date given when date is not 12:00 AM" do
+      expected_time = Date.today.in_time_zone('Alaska') - 11.hours
+      @override.lock_at = expected_time
+      @override.lock_at.should == expected_time
+      @override.lock_at = nil
+      @override.lock_at.should be_nil
+    end
+
   end
 
   describe "visible_to named scope" do
@@ -501,8 +533,6 @@ describe AssignmentOverride do
   end
 
   describe "default_values" do
-    subject { override }
-    
     let(:override) { AssignmentOverride.new }
     let(:quiz) { Quiz.new }
     let(:assignment) { Assignment.new }
@@ -562,6 +592,49 @@ describe AssignmentOverride do
       override = assignment_override_model
       override.expects(:send_later_if_production).with(:recompute_submission_lateness).never
       override.save
+    end
+  end
+
+  describe "as_hash" do
+    let(:due_at) { Time.utc(2013,1,10,12,30) }
+    let(:unlock_at) { Time.utc(2013,1,9,12,30) }
+    let(:lock_at) { Time.utc(2013,1,11,12,30) }
+    let(:title) { "My Wonderful VDD" }
+    let(:override) do
+      override = AssignmentOverride.new
+      override.title = title
+      override.due_at = due_at
+      override.all_day = due_at
+      override.all_day_date = due_at.to_date
+      override.lock_at = lock_at
+      override.unlock_at = unlock_at
+      override
+    end
+
+    let(:hash) { override.as_hash }
+
+    it "includes the title" do
+      hash[:title].should == title
+    end
+
+    it "includes the due_at" do
+      hash[:due_at].should == due_at
+    end
+
+    it "includes the all_day" do
+      hash[:all_day].should == override.all_day
+    end
+
+    it "includes the all_day_date" do
+      hash[:all_day_date].should == override.all_day_date
+    end
+
+    it "includes the unlock_at" do
+      hash[:unlock_at].should == unlock_at
+    end
+
+    it "includes the lock_at" do
+      hash[:lock_at].should == lock_at
     end
   end
 end

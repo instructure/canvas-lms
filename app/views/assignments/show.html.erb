@@ -125,17 +125,9 @@
         </tr>
       </thead>
 
-      <tbody>
-        <% presenter = OverrideListPresenter.new(@assignment, @current_user) %>
-        <% presenter.visible_due_dates.each do |due_date| %>
-          <tr>
-            <td><%= presenter.due_at(due_date) %></td>
-            <td><%= presenter.due_for(due_date) %></td>
-            <td><%= presenter.unlock_at(due_date) %></td>
-            <td><%= presenter.lock_at(due_date) %></td>
-          </tr>
-        <% end %>
-      </tbody>
+      <%= render 'shared/override_list', :assignment => @assignment, 
+        :user => @current_user %>
+
     </table>
 
     <% if can_do(@assignment, @current_user, :update) %>

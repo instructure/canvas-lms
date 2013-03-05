@@ -9,51 +9,7 @@ class DiscussionTopicPresenter
 
     if @topic.for_assignment?
       @assignment = AssignmentOverrideApplicator.assignment_overridden_for(@topic.assignment, @user)
-      @override_list = OverrideListPresenter.new(topic.assignment, user)
     end
-  end
-
-  # Public: Return a presenter using an unoverridden copy of the topic's assignment
-  #
-  # Returns a DiscussionTopicPresenter
-  def unoverridden
-    self.class.new(@topic, nil)
-  end
-  
-  # Public: Return a date string for the discussion assignment's lock at date.
-  #
-  # date_hash - A due date as a hash.
-  #
-  # Returns a date or date/time string.
-  def lock_at(date_hash = {})
-    override_list.lock_at(date_hash)
-  end
-
-  def unlock_at(date_hash = {})
-    override_list.unlock_at(date_hash)
-  end
-
-  def due_at(date_hash = {})
-    override_list.due_at(date_hash)
-  end
-
-  def due_for(due_hash = {})
-    override_list.due_for(due_hash)
-  end
-
-  # Public: Determine if multiple due dates are visible to user.
-  #
-  # Returns a boolean
-  def multiple_due_dates?
-    override_list.multiple_due_dates?
-  end
-  
-  # Public: Return all due dates visible to user, filtering out assignment info
-  #   if it isn't needed (e.g. if all sections have overrides).
-  #
-  # Returns an array of due date hashes.
-  def visible_due_dates
-    override_list.visible_due_dates
   end
 
   # Public: Determine if the given user has permissions to manage this discussion.
@@ -92,7 +48,7 @@ class DiscussionTopicPresenter
   #
   # Returns a boolean.
   def has_attached_rubric?
-    assignment.rubric_association.try(:rubric)
+    !!assignment.rubric_association.try(:rubric)
   end
 
   # Public: Determine if the given user can manage rubrics.
@@ -112,9 +68,9 @@ class DiscussionTopicPresenter
   #
   # Returns a boolean.
   def comments_disabled?
-    topic.is_a?(Announcement) &&
+    !!((topic.is_a?(Announcement) &&
       topic.context.is_a?(Course) &&
-      topic.context.settings[:lock_all_announcements]
+      topic.context.settings[:lock_all_announcements]))
   end
 
   # Public: Determine if the discussion's context has a large roster flag set.
@@ -124,7 +80,7 @@ class DiscussionTopicPresenter
     if topic.context.respond_to?(:large_roster?)
       topic.context.large_roster?
     else
-      topic.context.try(:context).try(:large_roster?)
+      !!topic.context.try(:context).try(:large_roster?)
     end
   end
 

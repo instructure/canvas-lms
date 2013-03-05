@@ -421,18 +421,22 @@ describe Assignment do
     @assignment.muted?.should eql false
   end
 
-  describe "infer_due_at" do
+  describe "infer_times" do
     it "should set to all_day" do
-      assignment_model(:due_at => "Sep 3 2008 12:00am")
+      assignment_model(:due_at => "Sep 3 2008 12:00am",
+                      :lock_at => "Sep 3 2008 12:00am",
+                      :unlock_at => "Sep 3 2008 12:00am")
       @assignment.all_day.should eql(false)
-      @assignment.infer_due_at
+      @assignment.infer_times
       @assignment.save!
       @assignment.all_day.should eql(true)
       @assignment.due_at.strftime("%H:%M").should eql("23:59")
+      @assignment.lock_at.strftime("%H:%M").should eql("23:59")
+      @assignment.unlock_at.strftime("%H:%M").should eql("00:00")
       @assignment.all_day_date.should eql(Date.parse("Sep 3 2008"))
     end
 
-    it "should not set to all_day without infer_due_at call" do
+    it "should not set to all_day without infer_times call" do
       assignment_model(:due_at => "Sep 3 2008 12:00am")
       @assignment.all_day.should eql(false)
       @assignment.due_at.strftime("%H:%M").should eql("00:00")

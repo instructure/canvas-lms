@@ -431,7 +431,8 @@ describe AssignmentsApiController, :type => :integration do
       end
 
       it "updates the assignment's due_at" do
-        @json['due_at'].should == "2011-01-01T23:59:00-07:00"
+        # fancy midnight
+        @json['due_at'].should == "2011-01-01T23:59:59-07:00"
       end
 
       it "updates the assignment's submission types" do

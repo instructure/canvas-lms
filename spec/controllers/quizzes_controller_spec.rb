@@ -749,6 +749,24 @@ describe QuizzesController do
         }
       quiz.reload.assignment_overrides.active.should be_empty
     end
+
+    it 'updates the quiz with the correct times for fancy midnight' do
+      time = Time.local(2013,3,13,0,0).in_time_zone
+      course_with_teacher_logged_in(:active_all => true)
+      quiz = @course.quizzes.build(:title => "Test that fancy midnight, baby!")
+      quiz.save!
+      post :update, :course_id => @course.id,
+        :id => quiz.id,
+        :quiz => {
+          :due_at => time,
+          :lock_at => time,
+          :unlock_at => time
+        }
+      quiz.reload
+      quiz.due_at.to_i.should == CanvasTime.fancy_midnight(time).to_i
+      quiz.lock_at.to_i.should == CanvasTime.fancy_midnight(time).to_i
+      quiz.unlock_at.to_i.should == time.to_i
+    end
   end
 
   describe "GET 'statistics'" do

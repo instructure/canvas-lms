@@ -720,9 +720,10 @@ class Assignment < ActiveRecord::Base
   end
   protected :set_old_assignment_group_id
 
-  def infer_due_at
-    # set to 11:59pm if it's 12:00am
-    self.due_at += ((60 * 60 * 24) - 60) if self.due_at && self.due_at.hour == 0 && self.due_at.min == 0
+  def infer_times
+    # set the time to 11:59 pm in the creator's time zone, if none given
+    self.due_at = CanvasTime.fancy_midnight(self.due_at)
+    self.lock_at = CanvasTime.fancy_midnight(self.lock_at)
   end
 
   def infer_all_day

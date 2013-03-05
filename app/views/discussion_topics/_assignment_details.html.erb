@@ -11,17 +11,15 @@
     </div>
 
     <div class="span6 right-align">
-      <% if @assignment.try(:due_at).present? %>
-        <div class="discussion-pubdate">
-          <% if @presenter.multiple_due_dates? %>
-            <a href="#" class="toggle_due_dates"><%= t(:show_due_dates, 'Show Due Dates') %></a>
+      <div class="discussion-pubdate">
+        <% if @assignment.has_active_overrides? %>
+          <a href="#" class="toggle_due_dates"><%= t(:show_due_dates, 'Show Due Dates') %></a>
 
-          <% else %>
-            <b><%= t(:due_date, 'due %{date}',
-                     :date => @presenter.due_at) %></b>
-          <% end %>
-        </div>
-      <% end %>
+        <% else %>
+          <b><%= t(:due_date, 'due %{date}',
+                   :date => @assignment.due_at) %></b>
+        <% end %>
+      </div>
     </div>
   </div>
 
@@ -41,31 +39,23 @@
     </p>
   <% end %>
 
-  <% if @assignment.present? %>
-    <div class="row-fluid">
-      <div class="span12 hidden due_date_wrapper">
-        <table class="discussion-topic-due-dates">
-          <thead>
-            <tr>
-              <th scope="col"><%= t(:due, 'Due') %></th>
-              <th scope="col"><%= t(:for, 'For') %></th>
-              <th scope="col"><%= t(:available_from, 'Available from') %></th>
-              <th scope="col"><%= t(:until, 'Until') %></th>
-            </tr>
-          </thead>
+  <div class="row-fluid">
+    <div class="span12 hidden due_date_wrapper">
+      <table class="discussion-topic-due-dates">
+        <thead>
+          <tr>
+            <th scope="col"><%= t(:due, 'Due') %></th>
+            <th scope="col"><%= t(:for, 'For') %></th>
+            <th scope="col"><%= t(:available_from, 'Available from') %></th>
+            <th scope="col"><%= t(:until, 'Until') %></th>
+          </tr>
+        </thead>
 
-          <tbody>
-            <% @presenter.visible_due_dates.each do |due_date| %>
-              <tr>
-                <td><%= @presenter.unoverridden.due_at(due_date) %></td>
-                <td><%= @presenter.due_for(due_date) %></td>
-                <td><%= @presenter.unoverridden.unlock_at(due_date) %></td>
-                <td><%= @presenter.unoverridden.lock_at(due_date) %></td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
+        <%= render 'shared/override_list', :assignment => @assignment, 
+          :user => @current_user %>
+
+      </table>
     </div>
-  <% end %>
+  </div>
+
 </div>

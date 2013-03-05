@@ -502,7 +502,7 @@ Spec::Runner.configure do |config|
 
     @topic = course.discussion_topics.build(:title => "topic")
     @assignment = course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :group_category => @group1.group_category)
-    @assignment.infer_due_at
+    @assignment.infer_times
     @assignment.saved_by = :discussion_topic
     @topic.assignment = @assignment
     @topic.save!

@@ -438,12 +438,13 @@ class QuizzesController < ApplicationController
               @quiz.save!
             end
           end
-          # TODO: We need to handle notifications better here. We want to send
-          # notifications if the "notify_of_update" field is passed, but *after*
-          # the assignment overrides have been created.
           @quiz.content_being_saved_by(@current_user)
           @quiz.with_versioning(false) do
-            @quiz.update_attributes!(params[:quiz])
+            # using attributes= here so we don't need to make an extra
+            # database call to get the times right after save!
+            @quiz.attributes = params[:quiz]
+            @quiz.infer_times
+            @quiz.save!
           end
           batch_update_assignment_overrides(@quiz,overrides) unless overrides.nil?
           @quiz.reload

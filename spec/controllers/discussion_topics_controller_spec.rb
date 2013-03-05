@@ -27,7 +27,7 @@ describe DiscussionTopicsController do
 
     if opts[:with_assignment]
       @topic.assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
-      @topic.assignment.infer_due_at
+      @topic.assignment.infer_times
       @topic.assignment.saved_by = :discussion_topic
     end
 
