@@ -13,13 +13,14 @@ define [
   'compiled/models/Assignment'
   'jquery'
   'compiled/fn/preventDefault'
+  'compiled/views/calendar/MissingDateDialogView'
   'compiled/tinymce'
   'tinymce.editor_box'
   'jquery.instructure_misc_helpers' # $.scrollSidebar
   'compiled/jquery.rails_flash_notifications' #flashMessage
 ], (I18n, ValidatedFormView, AssignmentGroupSelector, GradingTypeSelector,
 GroupCategorySelector, PeerReviewsSelector, _, template, wikiSidebar,
-htmlEscape, DiscussionTopic, Assignment, $, preventDefault) ->
+htmlEscape, DiscussionTopic, Assignment, $, preventDefault, MissingDateDialog) ->
 
   class EditView extends ValidatedFormView
 
@@ -164,7 +165,8 @@ htmlEscape, DiscussionTopic, Assignment, $, preventDefault) ->
           validationFn: -> sections
           labelFn: (section) -> section.get 'name'
           success: =>
-            @model.setNullDates()
+            missingDateDialog.$dialog.dialog('close').remove()
+            @model.get('assignment')?.setNullDates()
             ValidatedFormView::submit.call(this)
         missingDateDialog.cancel = (e) ->
           missingDateDialog.$dialog.dialog('close').remove()
