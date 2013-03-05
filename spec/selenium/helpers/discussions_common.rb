@@ -31,26 +31,29 @@ shared_examples_for "discussions selenium tests" do
   end
 
   def edit_entry(entry, text)
+    wait_for_ajaximations
     click_entry_option(entry, '.al-options:visible li:eq(1) a')
+    wait_for_ajaximations
     type_in_tiny 'textarea', text
     f('.edit-html-done').click
-    wait_for_ajax_requests
+    wait_for_ajaximations
     validate_entry_text(entry, text)
   end
 
   def delete_entry(entry)
-    keep_trying_until do
-      click_entry_option(entry, '.al-options:visible li:last-child a')
-      validate_entry_text(entry, "This entry has been deleted")
-      entry.save!
-      entry.reload
-      entry.workflow_state.should == 'deleted'
-    end
+    wait_for_ajaximations
+    click_entry_option(entry, '.al-options:visible li:last-child a')
+    confirm_dialog = driver.switch_to.alert
+    confirm_dialog.accept
+    wait_for_ajax_requests
+    entry.reload
+    entry.workflow_state.should == 'deleted'
   end
 
   def add_reply(message = 'message!', attachment = nil)
     @last_entry ||= f('#discussion_topic')
     @last_entry.find_element(:css, '.discussion-reply-label').click
+    wait_for_ajaximations
     type_in_tiny 'textarea', message
 
     if attachment.present?
@@ -83,6 +86,7 @@ shared_examples_for "discussions selenium tests" do
     fj(li_selector).should be_displayed
     fj("#{li_selector} .al-trigger").should be_displayed
     fj("#{li_selector} .al-trigger").click
+    wait_for_ajaximations
     menu_item = fj(menu_item_selector)
     menu_item.should be_displayed
     menu_item.click
