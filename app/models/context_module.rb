@@ -96,11 +96,11 @@ class ContextModule < ActiveRecord::Base
   end
   
   workflow do
-    state :unpublished do
-      event :publish, :transitions_to => :active
-    end
     state :active do
       event :unpublish, :transitions_to => :unpublished
+    end
+    state :unpublished do
+      event :publish, :transitions_to => :active
     end
     state :deleted
   end
