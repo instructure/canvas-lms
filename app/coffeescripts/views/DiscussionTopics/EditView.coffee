@@ -175,7 +175,8 @@ htmlEscape, DiscussionTopic, Assignment, $, preventDefault) ->
 
     validateBeforeSave: (data, errors) =>
       if @isTopic()
-        errors = @assignmentGroupSelector.validateBeforeSave(data, errors)
+        if @assignmentGroupSelector?
+          errors = @assignmentGroupSelector.validateBeforeSave(data, errors)
         unless ENV?.IS_LARGE_ROSTER
           errors = @groupCategorySelector.validateBeforeSave(data, errors)
       errors
