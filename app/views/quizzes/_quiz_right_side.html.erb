@@ -58,7 +58,7 @@
         <% if (@submission.attempt > 1 || (@submission.attempt == 1 && can_do(@quiz, @current_user, :update))) &&
             (can_do(@quiz, @current_user, :grade) || !@quiz.muted?) %>
           <%= t(:attempts_so_far, {:one => "1 Attempt so far", :other => "%{count} Attempts so far"}, :count => @submission.attempt) %><br/>
-          <a href="<%= context_url(@context, :context_quiz_history_url, @quiz) %>"><i class="icon-clock"></i> <%= t(:view_previous_attempts, "View Previous Attempts") %></a>
+          <a href="<%= context_url(@context, :context_quiz_history_url, @quiz) %>" class="icon-clock"><%= t(:view_previous_attempts, "View Previous Attempts") %></a>
           <br/>
         <% end %>
         <% if @quiz.unlimited_attempts? %>

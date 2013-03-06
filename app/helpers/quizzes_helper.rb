@@ -17,6 +17,10 @@
 #
 
 module QuizzesHelper
+  def needs_unpublished_warning?(quiz=@quiz)
+    !quiz.available? || quiz.unpublished_changes?
+  end
+
   def unpublished_quiz_warning
     I18n.t("#quizzes.warnings.unpublished_quiz",
       '*This quiz is unpublished* Only teachers can see the quiz until ' +
@@ -292,7 +296,7 @@ module QuizzesHelper
         :score => score_html,
         :points_possible => render_score(points_possible, options[:precision]))
   end
-  
+
   def link_to_take_quiz(link_body, opts={})
     opts = opts.with_indifferent_access
     class_array = (opts['class'] || "").split(" ")

@@ -143,7 +143,7 @@
 <div id="quiz_show">
   <header class="quiz-header">
     <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :manage) %>
-      <% if !@quiz.available? || @quiz.unpublished_changes? %>
+      <% if needs_unpublished_warning? %>
         <div class="alert">
           <div class='row-fluid'>
             <div class='span8'>
@@ -200,6 +200,15 @@
                     </a>
                   </li>
                   <a href="<%= context_url(@context, :context_rubrics_url) %>" class="icon-rubric" id="add_rubric_url" style="display:none">&nbsp;</a>
+                <% end %>
+
+                <% if !needs_unpublished_warning? %>
+                  <li>
+                    <a href="<%= polymorphic_path([@context, @quiz, :take], :preview => 1) %>" class="preview_link" data-method="post">
+                      <i class="icon-quiz"></i>
+                      <%= t('links.preview', "Preview") %>
+                    </a>
+                  </li>
                 <% end %>
 
                 <li>
