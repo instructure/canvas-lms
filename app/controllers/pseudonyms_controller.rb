@@ -123,6 +123,7 @@ class PseudonymsController < ApplicationController
       # channel is valid, so register the user and approve the channel.
       @cc.set_confirmation_code(true)
       @cc.confirm
+      @cc.save
       @pseudonym.user.register
 
       # reset the session id cookie to prevent session fixation.
