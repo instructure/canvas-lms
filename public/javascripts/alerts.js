@@ -70,7 +70,7 @@ define([
     }
 
     var createRecipient = function(recipient, element) {
-      $element = createElement(recipient, element, 'label', possible_alert_recipients);
+      $element = createElement(recipient, element, 'label', ENV.ALERTS.POSSIBLE_RECIPIENTS);
       if(element == 'li') {
         $element.prepend($("<input type='hidden' name='alert[recipients][]' />").attr('value', recipient));
       }
@@ -84,13 +84,13 @@ define([
         threshold = criterion.threshold;
         id = criterion.id;
       }
-      $element = createElement(criterion_type, element, element == 'li' ? 'label' : 'option', possible_alert_criteria)
+      $element = createElement(criterion_type, element, element == 'li' ? 'label' : 'option', ENV.ALERTS.POSSIBLE_CRITERIA)
       if (element == 'li') {
         if (!threshold) {
-          threshold = possible_alert_criteria[criterion_type].default_threshold;
+          threshold = ENV.ALERTS.POSSIBLE_CRITERIA[criterion_type].default_threshold;
         }
         $element.find('span').text(threshold);
-        $element.find('input').attr('value', threshold).attr('title', possible_alert_criteria[criterion_type].title);
+        $element.find('input').attr('value', threshold).attr('title', ENV.ALERTS.POSSIBLE_CRITERIA[criterion_type].title);
         $element.prepend($("<input type='hidden' name='alert[criteria][][criterion_type]' />").attr('value', criterion_type));
         if(id) {
           $element.prepend($("<input type='hidden' name='alert[criteria][][id]' />").attr('value', id));
@@ -122,8 +122,8 @@ define([
       }
     }
 
-    for(var idx in alert_data) {
-      var alert = alert_data[idx];
+    for(var idx in ENV.ALERTS.DATA) {
+      var alert = ENV.ALERTS.DATA[idx];
       restoreAlert($('#edit_alert_' + alert.id), alert);
     }
 
@@ -157,8 +157,8 @@ define([
       var $criteria_select = $alert.find('.add_criterion_link').prev();
       $criteria_select.empty();
       var count = 0;
-      for(var idx in possible_alert_criteria_order) {
-        var criterion = possible_alert_criteria_order[idx];
+      for(var idx in ENV.ALERTS.POSSIBLE_CRITERIA_ORDER) {
+        var criterion = ENV.ALERTS.POSSIBLE_CRITERIA_ORDER[idx];
         var found = -1;
         for(var jdx in data.criteria) {
           if(data.criteria[jdx].criterion_type == criterion) {
@@ -178,8 +178,8 @@ define([
       var $recipients_select = $alert.find('.add_recipient_link').prev();
       $recipients_select.empty();
       count = 0;
-      for(var idx in possible_alert_recipients_order) {
-        var recipient = possible_alert_recipients_order[idx];
+      for(var idx in ENV.ALERTS.POSSIBLE_RECIPIENTS_ORDER) {
+        var recipient = ENV.ALERTS.POSSIBLE_RECIPIENTS_ORDER[idx];
         if($.inArray(recipient, data.recipients) == -1) {
           $recipients_select.append(createRecipient(recipient, 'option'));
           count = count + 1;
