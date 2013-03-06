@@ -38,14 +38,6 @@ def add_file(file_fullpath)
   wait_for_js
 end
 
-def create_temp_file(filename)
-  path = "#{Rails.root}/tmp/#{filename}"
-  file = File.open!(path, 'w')
-  file.write filename
-  file.close
-  path
-end
-
 def get_file_elements
   file_elements = keep_trying_until do
     file_elements = ffj('#files_structure_list > .context > ul > .file > .name')
@@ -57,10 +49,9 @@ end
 
 def file_setup
   sleep 5
-
-  a_fullpath = create_temp_file(@a_filename = "a_file.txt")
-  b_fullpath = create_temp_file(@b_filename = "b_file.txt")
-  c_fullpath = create_temp_file(@c_filename = "c_file.txt")
+  @a_filename, a_fullpath, _, @a_tempfile = get_file("a_file.txt")
+  @b_filename, b_fullpath, _, @b_tempfile = get_file("b_file.txt")
+  @c_filename, c_fullpath, _, @c_tempfile = get_file("c_file.txt")
 
   add_file(a_fullpath)
   add_file(c_fullpath)
@@ -68,7 +59,7 @@ def file_setup
 end
 
 describe "common file behaviors" do
-  it_should_behave_like "forked server selenium tests"
+  it_should_behave_like "in-process server selenium tests"
 
   def add_file(file_fullpath)
     attachment_field = keep_trying_until do
@@ -148,10 +139,8 @@ describe "common file behaviors" do
 
     it "should ignore file name case when alphabetizing" do
       sleep 5 # page does a weird load twice which is causing selenium failures so we sleep and wait for the page
-
-      dog_fullpath = create_temp_file("Dog_file.txt")
-      amazing_fullpath = create_temp_file("amazing_file.txt")
-
+      amazing_filename, amazing_fullpath, _, amazing_tempfile = get_file("amazing_file.txt")
+      dog_filename, dog_fullpath, _, dog_tempfile = get_file("Dog_file.txt")
       file_paths = [dog_fullpath, amazing_fullpath]
       file_paths.each do
         |name| add_file(name)

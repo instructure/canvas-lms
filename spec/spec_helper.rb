@@ -785,18 +785,85 @@ Spec::Runner.configure do |config|
     JSON.parse(json_string.sub(%r{^while\(1\);}, ''))
   end
 
-  def s3_storage!
+  # inspired by http://blog.jayfields.com/2007/08/ruby-calling-methods-of-specific.html
+  module AttachmentStorageSwitcher
+    BACKENDS = %w{FileSystem S3}.map { |backend| Technoweenie::AttachmentFu::Backends.const_get(:"#{backend}Backend") }.freeze
+
+    class As #:nodoc:
+      private *instance_methods.select { |m| m !~ /(^__|^\W|^binding$)/ }
+
+      def initialize(subject, ancestor)
+        @subject = subject
+        @ancestor = ancestor
+      end
+
+      def method_missing(sym, *args, &blk)
+        @ancestor.instance_method(sym).bind(@subject).call(*args,&blk)
+      end
+    end
+
+    def self.included(base)
+      base.cattr_accessor :current_backend
+      base.current_backend = (base.ancestors & BACKENDS).first
+
+      # make sure we have all the backends
+      BACKENDS.each do |backend|
+        base.send(:include, backend) unless base.ancestors.include?(backend)
+      end
+      # remove the duplicate callbacks added by multiple backends
+      base.before_update.uniq!
+
+      BACKENDS.map(&:instance_methods).flatten.uniq.each do |method|
+        if method.to_s[-1..-1] == '='
+          base.class_eval <<-CODE
+          def #{method}(arg)
+            self.as(self.class.current_backend).#{method} arg
+          end
+          CODE
+        else
+          base.class_eval <<-CODE
+          def #{method}(*args, &block)
+            self.as(self.class.current_backend).#{method}(*args, &block)
+          end
+          CODE
+        end
+      end
+    end
+
+    def as(ancestor)
+      @__as ||= {}
+      unless r = @__as[ancestor]
+        r = (@__as[ancestor] = As.new(self, ancestor))
+      end
+      r
+    end
+  end
+
+  def s3_storage!(opts = {:stubs => true})
+    Attachment.send(:include, AttachmentStorageSwitcher) unless Attachment.ancestors.include?(AttachmentStorageSwitcher)
+    Attachment.stubs(:current_backend).returns(Technoweenie::AttachmentFu::Backends::S3Backend)
+
     Attachment.stubs(:s3_storage?).returns(true)
     Attachment.stubs(:local_storage?).returns(false)
-    conn = mock('AWS::S3::Connection')
-    AWS::S3::Base.stubs(:connection).returns(conn)
-    conn.stubs(:access_key_id).returns('stub_id')
-    conn.stubs(:secret_access_key).returns('stub_key')
+    if opts[:stubs]
+      conn = mock('HTTP Connection')
+      AWS::S3::Connection.any_instance.stubs(:create_connection).returns(conn)
+      AWS::S3::Connection.any_instance.stubs(:access_key_id).returns('stub_id')
+      AWS::S3::Connection.any_instance.stubs(:secret_access_key).returns('stub_key')
+      Attachment.any_instance.stubs(:s3_config).returns({:bucket_name => 'no-bucket'})
+    else
+      if Attachment.s3_config.blank? || Attachment.s3_config[:access_key_id] == 'access_key'
+        pending "Please put valid S3 credentials in config/amazon_s3.yml"
+      end
+    end
     Attachment.s3_storage?.should eql(true)
     Attachment.local_storage?.should eql(false)
   end
 
   def local_storage!
+    Attachment.send(:include, AttachmentStorageSwitcher) unless Attachment.ancestors.include?(AttachmentStorageSwitcher)
+    Attachment.stubs(:current_backend).returns(Technoweenie::AttachmentFu::Backends::FileSystemBackend)
+
     Attachment.stubs(:s3_storage?).returns(false)
     Attachment.stubs(:local_storage?).returns(true)
     Attachment.local_storage?.should eql(true)

@@ -122,7 +122,8 @@ module Technoweenie # :nodoc:
         class ConfigFileNotFoundError < StandardError; end
 
         def self.included(base) #:nodoc:
-          mattr_reader :bucket_name, :s3_config
+          mattr_reader :bucket_name, :instance_reader => false
+          mattr_reader :s3_config, :instance_reader => false
           
           begin
             require 'aws/s3'
@@ -132,8 +133,8 @@ module Technoweenie # :nodoc:
           end
 
           begin
-            @@s3_config_path = base.attachment_options[:s3_config_path] || (Rails.root+'config/amazon_s3.yml').to_s
-            @@s3_config = @@s3_config = YAML.load(ERB.new(File.read(@@s3_config_path)).result)[Rails.env].symbolize_keys
+            @@s3_config_path = base.attachment_options[:s3_config_path] || (Rails.root + 'config/amazon_s3.yml')
+            @@s3_config = YAML.load(ERB.new(File.read(@@s3_config_path)).result)[Rails.env].symbolize_keys
           #rescue
           #  raise ConfigFileNotFoundError.new('File %s not found' % @@s3_config_path)
           end
@@ -145,6 +146,17 @@ module Technoweenie # :nodoc:
           # Bucket.create(@@bucket_name)
 
           base.before_update :rename_file
+        end
+
+        def s3_config
+          return @s3_config if @s3_config
+          begin
+            plugin_settings = PluginSetting.settings_for_plugin('s3')
+          rescue Canvas::NoPluginError
+            # this might happen in specs when s3_storage? was false during initialization,
+            # but we later switch to it
+          end
+          @s3_config ||= (self.class.s3_config || {}).merge(plugin_settings || {})
         end
 
         def self.protocol
@@ -171,6 +183,10 @@ module Technoweenie # :nodoc:
           def s3_port_string
             Technoweenie::AttachmentFu::Backends::S3Backend.port_string
           end
+        end
+
+        def bucket_name
+          s3_config[:bucket_name]
         end
 
         # Overwrites the base filename writer in order to store the old filename

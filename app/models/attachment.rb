@@ -672,22 +672,12 @@ class Attachment < ActiveRecord::Base
     @s3_config ||= Setting.from_config('amazon_s3')
   end
 
-  def s3_config
-    @s3_config ||= (self.class.s3_config || {}).merge(PluginSetting.settings_for_plugin('s3').symbolize_keys || {})
-  end
-
   def self.file_store_config
     # Return existing value, even if nil, as long as it's defined
     @file_store_config ||= Setting.from_config('file_store')
     @file_store_config ||= { 'storage' => 'local' }
     @file_store_config['path_prefix'] ||= @file_store_config['path'] || 'tmp/files'
-    if Rails.env.test?
-      # yes, a rescue nil; the problem is that in an automated test environment, this may be
-      # in the auto-require path, before the DB is even created; obviously it hasn't been
-      # overridden yet
-      file_storage_test_override = Setting.get("file_storage_test_override", nil) rescue nil
-      return @file_store_config.merge({"storage" => file_storage_test_override}) if file_storage_test_override
-    end
+    @file_store_config['path_prefix'] = nil if @file_store_config['path_prefix'] == 'tmp/files' && @file_store_config['storage'] == 's3'
     return @file_store_config
   end
 
@@ -711,40 +701,13 @@ class Attachment < ActiveRecord::Base
 
   # Haaay... you're changing stuff here? Don't forget about the Thumbnail model
   # too, it cares about local vs s3 storage.
-  if local_storage?
-    has_attachment(
-        :path_prefix => file_store_config['path_prefix'],
-        :thumbnails => { :thumb => '128x128' },
-        :thumbnail_class => 'Thumbnail'
-    )
-    def authenticated_s3_url(*args)
-      return root_attachment.authenticated_s3_url(*args) if root_attachment
-      protocol = args[0].is_a?(Hash) && args[0][:protocol]
-      protocol ||= "#{HostUrl.protocol}://"
-      "#{protocol}#{HostUrl.context_host(context)}/#{context_type.underscore.pluralize}/#{context_id}/files/#{id}/download?verifier=#{uuid}"
-    end
-
-    alias_method :attachment_fu_filename=, :filename=
-    def filename=(val)
-      if self.new_record?
-        write_attribute(:filename, val)
-      else
-        self.attachment_fu_filename = val
-      end
-    end
-
-    def bucket_name; "no-bucket"; end
-  else
-    has_attachment(
-        :storage => :s3,
-        :s3_access => :private,
-        :thumbnails => { :thumb => '128x128' },
-        :thumbnail_class => 'Thumbnail'
-    )
-    def bucket_name
-      s3_config[:bucket_name]
-    end
-  end
+  has_attachment(
+      :storage => (local_storage? ? :file_system : :s3),
+      :path_prefix => file_store_config['path_prefix'],
+      :s3_access => :private,
+      :thumbnails => { :thumb => '128x128' },
+      :thumbnail_class => 'Thumbnail'
+  )
 
   def content_type_with_encoding
     encoding.blank? ? content_type : "#{content_type}; charset=#{encoding}"

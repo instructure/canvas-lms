@@ -253,7 +253,7 @@ describe "profile" do
 end
 
 shared_examples_for "profile pictures selenium tests" do
-  it_should_behave_like "forked server selenium tests"
+  it_should_behave_like "in-process server selenium tests"
 
   it "should successfully upload profile pictures" do
     pending("intermittently fails")
@@ -300,14 +300,14 @@ end
 
 describe "profile pictures local tests" do
   it_should_behave_like "profile pictures selenium tests"
-  prepend_before(:each) do
-    Setting.set("file_storage_test_override", "local")
+  before do
+    local_storage!
   end
 end
 
 describe "profile pictures s3 tests" do
   it_should_behave_like "profile pictures selenium tests"
-  prepend_before(:all) {
-    Setting.set("file_storage_test_override", "s3")
-  }
+  before do
+    s3_storage!(:stubs => false)
+  end
 end

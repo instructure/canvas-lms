@@ -358,9 +358,9 @@ shared_examples_for "file uploads api with folders" do
   end
 
   it "should allow renaming instead of overwriting duplicate files (s3 storage)" do
-    s3_storage!
     @folder = Folder.assert_path("test", context)
     a1 = Attachment.create!(:folder => @folder, :context => context, :filename => "test.txt", :uploaded_data => StringIO.new("first"))
+    s3_storage!
     json = preflight({ :name => "test.txt", :folder => "test", :on_duplicate => 'rename' })
 
     redir = json['upload_params']['success_action_redirect']

@@ -257,7 +257,7 @@ describe "eportfolios" do
 end
 
 describe "eportfolios file upload" do
-  it_should_behave_like "forked server selenium tests"
+  it_should_behave_like "in-process server selenium tests"
 
   before (:each) do
     @password = "asdfasdf"
@@ -272,7 +272,7 @@ describe "eportfolios file upload" do
   end
 
   it "should upload a file" do
-    login_as(@student.email, @password)
+    create_session(@student.pseudonym, false)
     get "/eportfolios/#{@eportfolio.id}"
     filename, fullpath, data = get_file("testfile5.zip")
     expect_new_page_load { f(".icon-arrow-right").click }

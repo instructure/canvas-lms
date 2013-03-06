@@ -115,9 +115,9 @@ describe Attachment do
   end
 
   context "authenticated_s3_url" do
-    prepend_before(:each) {
-      Setting.set("file_storage_test_override", "local")
-    }
+    before do
+      local_storage!
+    end
 
     it "should return http as the protocol by default" do
       course_model
@@ -917,28 +917,9 @@ describe Attachment do
     end
   end
 
-  context "s3" do
-    it "should support setting bucket via PluginSetting" do
-      Setting.set("file_storage_test_override", "s3")
-      Attachment.stubs(:s3_config).returns({:bucket_name => 'yml_bucket'})
-      ps = PluginSetting.create!(:name => 's3', :settings => { :bucket_name => 'pluginsetting_bucket' })
-      # if the test environment isn't configured for s3, the plugin never got created,
-      # and the settings will never be considered valid
-      ps.any_instantiation.stubs(:valid_settings?).returns(true)
-      Attachment.domain_namespace = nil
-      attachment_model
-      @attachment.s3_config[:bucket_name].should == 'pluginsetting_bucket'
-      # if local storage is configured, this will return "no-bucket"
-      @attachment.stubs(:bucket_name).returns('pluginsetting_bucket')
-
-      # thumbnails should use the same bucket as the attachment they are parented to
-      Thumbnail.new(:attachment => @attachment).bucket_name.should == 'pluginsetting_bucket'
-    end
-  end
-
   context "#change_namespace" do
     before do
-      Setting.set("file_storage_test_override", "s3")
+      s3_storage!
       @old_account = account_model
       Attachment.domain_namespace = @old_account.file_namespace
       @root = attachment_model

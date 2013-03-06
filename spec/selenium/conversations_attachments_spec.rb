@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/conversations_common')
 
 shared_examples_for "conversations attachments selenium tests" do
-  it_should_behave_like "forked server selenium tests"
+  it_should_behave_like "in-process server selenium tests"
   it_should_behave_like "conversations selenium tests"
 
   it "should be able to add an attachment" do
@@ -120,11 +120,8 @@ end
 
 describe "conversations attachments local tests" do
   it_should_behave_like "conversations attachments selenium tests"
-  prepend_before (:each) do
-    Setting.set("file_storage_test_override", "local")
-  end
-  prepend_before (:all) do
-    Setting.set("file_storage_test_override", "local")
+  before do
+    local_storage!
   end
 
   it "should save attachments on initial messages on new conversations" do
@@ -149,10 +146,7 @@ end
 
 describe "conversations attachments S3 tests" do
   it_should_behave_like "conversations attachments selenium tests"
-  prepend_before (:each) do
-    Setting.set("file_storage_test_override", "s3")
-  end
-  prepend_before (:all) do
-    Setting.set("file_storage_test_override", "s3")
+  before do
+    s3_storage!(:stubs => false)
   end
 end

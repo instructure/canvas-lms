@@ -44,11 +44,25 @@ module Technoweenie # :nodoc:
         def public_filename(thumbnail = nil)
           full_filename(thumbnail).gsub %r(^#{Regexp.escape(base_path)}), ''
         end
-      
-        def filename=(value)
-          @old_filename = full_filename unless filename.nil? || @old_filename
-          write_attribute :filename, sanitize_filename(value)
+
+
+        def authenticated_s3_url(*args)
+          return root_attachment.authenticated_s3_url(*args) if root_attachment
+          protocol = args[0].is_a?(Hash) && args[0][:protocol]
+          protocol ||= "#{HostUrl.protocol}://"
+          "#{protocol}#{HostUrl.context_host(context)}/#{context_type.underscore.pluralize}/#{context_id}/files/#{id}/download?verifier=#{uuid}"
         end
+
+        def filename=(value)
+          if self.new_record?
+            write_attribute(:filename, value)
+          else
+            @old_filename = full_filename unless filename.nil? || @old_filename
+            write_attribute :filename, sanitize_filename(value)
+          end
+        end
+
+        def bucket_name; "no-bucket"; end
 
         # Creates a temp file from the currently saved file.
         def create_temp_file

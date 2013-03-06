@@ -301,53 +301,6 @@ module SeleniumTestsHelperMethods
     js = CoffeeScript.compile(coffee_source, :bare => true)
     driver.execute_async_script(js)
   end
-
-  def self.start_forked_webrick_server
-    setup_host_and_port
-
-    domain_conf_path = File.expand_path(File.dirname(__FILE__) + '/../../config/domain.yml')
-    domain_conf = YAML.load_file(domain_conf_path)
-    domain_conf[Rails.env] ||= {}
-    old_domain = domain_conf[Rails.env]["domain"]
-    domain_conf[Rails.env]["domain"] = $app_host_and_port
-    File.open(domain_conf_path, 'w') { |f| YAML.dump(domain_conf, f) }
-    server_pid = fork do
-      base = File.expand_path(File.dirname(__FILE__))
-      STDOUT.reopen(File.open("/dev/null", "w"))
-      STDERR.reopen(File.open("#{base}/../../log/test-server.log", "a"))
-      ENV['SELENIUM_WEBRICK_SERVER'] = '1'
-      exec("#{base}/../../script/server", "-p", $server_port.to_s, "-e", Rails.env)
-    end
-    closed = false
-    shutdown = lambda do
-      unless closed
-        Process.kill 'KILL', server_pid
-        Process.wait server_pid
-        domain_conf[Rails.env]["domain"] = old_domain
-        File.open(domain_conf_path, 'w') { |f| YAML.dump(domain_conf, f) }
-        HostUrl.default_host = nil
-        HostUrl.file_host = nil
-        closed = true
-      end
-    end
-    at_exit { shutdown.call }
-    for i in 0..MAX_SERVER_START_TIME
-      begin
-        s = nil
-        Timeout::timeout(5) do
-          s = TCPSocket.open('127.0.0.1', $server_port) rescue nil
-          break if s
-        end
-        break if s
-      rescue Timeout::Error
-        puts "timeout error attempting to connect to forked webrick server"
-      end
-      sleep 1
-    end
-    raise "Failed starting script/server" unless s
-    s.close
-    return shutdown
-  end
 end
 
 shared_examples_for "all selenium tests" do
@@ -1098,16 +1051,7 @@ shared_examples_for "in-process server selenium tests" do
 end
 
 shared_examples_for "forked server selenium tests" do
-  it_should_behave_like "all selenium tests"
-  self.use_transactional_fixtures = false
-
-  prepend_before (:all) do
-    $in_proc_webserver_shutdown.try(:call)
-    $in_proc_webserver_shutdown = nil
-    @forked_webserver_shutdown = SeleniumTestsHelperMethods.start_forked_webrick_server
-  end
-
-  append_after(:all) do
-    @forked_webserver_shutdown.call
+  before do
+    pending "deprecated. please use in-process server"
   end
 end
