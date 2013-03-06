@@ -24,6 +24,8 @@ class AssignmentOverride < ActiveRecord::Base
 
   attr_accessible
 
+  attr_accessor :dont_touch_assignment
+
   belongs_to :assignment
   belongs_to :quiz
   belongs_to :set, :polymorphic => true
@@ -65,6 +67,7 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   after_save :recompute_submission_lateness_later
+  after_save :touch_assignment, :if => :assignment
 
   def recompute_submission_lateness_later
     if due_at_overridden_changed? || due_at_changed?
@@ -72,6 +75,12 @@ class AssignmentOverride < ActiveRecord::Base
     end
     true
   end
+
+  def touch_assignment
+    return true if assignment.nil? || dont_touch_assignment
+    assignment.touch
+  end
+  private :touch_assignment
 
   def assignment?; !!assignment; end
   def quiz?; !!quiz; end

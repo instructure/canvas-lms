@@ -179,7 +179,12 @@ class Assignment < ActiveRecord::Base
     if group_category_id_changed? 
       # needs to be .each(&:destroy) instead of .update_all(:workflow_state =>
       # 'deleted') so that the override gets versioned properly
-      active_assignment_overrides.scoped(:conditions => {:set_type => 'Group'}).each(&:destroy)
+      active_assignment_overrides.
+        scoped(:conditions => {:set_type => 'Group'}).
+        each { |o|
+          o.dont_touch_assignment = true
+          o.destroy
+        }
     end
   end
 
@@ -380,7 +385,7 @@ class Assignment < ActiveRecord::Base
       quiz.assignment_group_id = self.assignment_group_id
       quiz.workflow_state = 'created' if quiz.deleted?
       quiz.saved_by = :assignment
-      quiz.save
+      quiz.save if quiz.changed?
     elsif self.submission_types == "discussion_topic" && @saved_by != :discussion_topic
       topic = self.discussion_topic || self.context.discussion_topics.build(:user => @updating_user)
       topic.assignment_id = self.id
@@ -591,14 +596,13 @@ class Assignment < ActiveRecord::Base
   attr_accessor :saved_by
   def process_if_quiz
     if self.submission_types == "online_quiz"
-      self.points_possible = self.quiz.points_possible || 0.0 if self.quiz && self.quiz.available?
-      if self.quiz && @saved_by != :quiz # save initiated by assignment, not quiz
-        q = self.quiz
-        q.due_at = self.due_at
-        q.lock_at = self.lock_at
-        q.unlock_at = self.unlock_at
-        q.saved_by = :assignment
-        q.save
+      self.points_possible = quiz.points_possible if quiz && quiz.available?
+      copy_attrs = %w(due_at lock_at unlock_at)
+      if quiz && @saved_by != :quiz &&
+         copy_attrs.any? { |attr| changes[attr] }
+        copy_attrs.each { |attr| quiz.send "#{attr}=", send(attr) }
+        quiz.saved_by = :assignment
+        quiz.save
       end
       if self.submission_types_changed? && self.submission_types_was != 'online_quiz'
         self.before_quiz_submission_types = self.submission_types_was
