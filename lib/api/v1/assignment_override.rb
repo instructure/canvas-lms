@@ -244,6 +244,7 @@ module Api::V1::AssignmentOverride
         defunct_override_ids.delete(override.id)
       else
         override = assignment.assignment_overrides.build
+        override.dont_touch_assignment = true
       end
 
       # interpret and apply the data
