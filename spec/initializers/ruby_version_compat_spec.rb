@@ -23,6 +23,7 @@ describe 'ruby_version_compat' do
 
   describe "force_utf8_params" do
     it "should allow null filenames through" do
+      pending("ruby 1.9 only") if RUBY_VERSION < "1.9"
       testfile = ActionController::TestUploadedFile.new(File.join(File.dirname(__FILE__), "/../fixtures/scribd_docs/txt.txt"), "text/plain", true)
       testfile.instance_variable_set(:@original_filename, nil)
       controller = ApplicationController.new
