@@ -1,0 +1,37 @@
+SFU
+=====
+
+SFU Custom API for Canvas
+
+REST URLs available:
+http://<canvas_server>/sfu/api/course/<sis_id>
+  - Get course info for a given sis_id
+
+  Example; https://canvas.sfu.ca/sfu/api/course/1127-arch-331-d100
+
+    {
+        id: 20,
+        name: "D100 Fall12 Select Regions in World Archaeology II (WebCT)",
+        course_code: "ARCH331",
+        sis_source_id: "1127-arch-331-d100"
+    }
+
+http://<canvas_server>/sfu/api/user/<sfu_id>
+  - Get user info for a given SFU Computing ID
+
+  Example; https://canvas.sfu.ca/sfu/api/user/cdeadmin
+
+    {
+        id: 10,
+        name: "Code Administrator",
+        uuid: "HLFUeY1kFZZOKaxEZwCuXfHzqfdFBBuT29aiGdxR",
+        login_id: "cdeadmin",
+        sis_user_id: "000013453"
+    }
+
+
+Installation:
+ 1. Place under <canvas_install_dir>/vendor/plugins/sfu_api
+ 2. Restart Canvas
+
+Copyright (c) 2013 SFU / Ron Santos
