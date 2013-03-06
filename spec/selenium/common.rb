@@ -1075,9 +1075,25 @@ shared_examples_for "in-process server selenium tests" do
     HostUrl.stubs(:default_host).returns($app_host_and_port)
     HostUrl.stubs(:file_host).returns($app_host_and_port)
   end
+
+  # tricksy tricksy. grab the current connection, and then always return the same one
+  # (even if on a different thread - i.e. the server's thread), so that it will be in
+  # the same transaction and see the same data
   before do
-    conn = ActiveRecord::Base.connection
-    ActiveRecord::ConnectionAdapters::ConnectionPool.any_instance.stubs(:connection).returns(conn)
+    @db_connection = ActiveRecord::Base.connection
+
+    # synchronize the execute method since for a modicum of thread safety
+    if !@db_connection.respond_to?(:execute_without_synchronization)
+      @db_connection.class.class_eval do
+        def execute_with_synchronization(*args)
+          @mutex ||= Mutex.new
+          @mutex.synchronize { execute_without_synchronization(*args) }
+        end
+        alias_method_chain :execute, :synchronization
+      end
+    end
+
+    ActiveRecord::ConnectionAdapters::ConnectionPool.any_instance.stubs(:connection).returns(@db_connection)
   end
 end
 
