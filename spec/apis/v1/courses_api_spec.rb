@@ -132,7 +132,8 @@ describe CoursesController, :type => :integration do
         'hide_final_grades' => false,
         'start_at' => nil,
         'end_at' => nil,
-        'default_view' => 'feed'
+        'default_view' => 'feed',
+        'workflow_state' => 'available'
       },
       {
         'id' => @course2.id,
@@ -145,7 +146,8 @@ describe CoursesController, :type => :integration do
         'hide_final_grades' => false,
         'start_at' => nil,
         'end_at' => nil,
-        'default_view' => 'wiki'
+        'default_view' => 'wiki',
+        'workflow_state' => 'available'
       },
     ]
   end
@@ -620,7 +622,8 @@ describe CoursesController, :type => :integration do
             'default_view' => 'feed',
             'term' => {'id' => @course1.enrollment_term_id, 'name' => @course1.enrollment_term.name,
                        'start_at' => @course1.enrollment_term.start_at.strftime('%Y-%m-%dT%H:%M:%SZ'),
-                       'end_at' => @course1.enrollment_term.end_at.strftime('%Y-%m-%dT%H:%M:%SZ')}
+                       'end_at' => @course1.enrollment_term.end_at.strftime('%Y-%m-%dT%H:%M:%SZ')},
+            'workflow_state' => 'available'
         },
         {
             'id' => @course2.id,
@@ -637,7 +640,8 @@ describe CoursesController, :type => :integration do
             'default_view' => 'wiki',
             'term' => {'id' => @course2.enrollment_term_id, 'name' => @course2.enrollment_term.name,
                        'start_at' => @course2.enrollment_term.start_at.strftime('%Y-%m-%dT%H:%M:%SZ'),
-                       'end_at' => @course2.enrollment_term.end_at.strftime('%Y-%m-%dT%H:%M:%SZ')}
+                       'end_at' => @course2.enrollment_term.end_at.strftime('%Y-%m-%dT%H:%M:%SZ')},
+            'workflow_state' => 'available'
         },
     ]
   end
@@ -667,7 +671,8 @@ describe CoursesController, :type => :integration do
         'hide_final_grades' => false,
         'start_at' => nil,
         'end_at' => nil,
-        'default_view' => 'feed'
+        'default_view' => 'feed',
+        'workflow_state' => 'available'
       },
       {
         'id' => @course2.id,
@@ -684,7 +689,8 @@ describe CoursesController, :type => :integration do
         'hide_final_grades' => false,
         'start_at' => nil,
         'end_at' => nil,
-        'default_view' => 'wiki'
+        'default_view' => 'wiki',
+        'workflow_state' => 'available'
       },
     ]
   end
@@ -710,7 +716,8 @@ describe CoursesController, :type => :integration do
         'hide_final_grades' => false,
         'start_at' => nil,
         'end_at' => nil,
-        'default_view' => 'feed'
+        'default_view' => 'feed',
+        'workflow_state' => 'available'
       },
       {
         'id' => @course2.id,
@@ -723,7 +730,8 @@ describe CoursesController, :type => :integration do
         'hide_final_grades' => true,
         'start_at' => nil,
         'end_at' => nil,
-        'default_view' => 'wiki'
+        'default_view' => 'wiki',
+        'workflow_state' => 'available'
       }
     ]
   end
@@ -743,7 +751,8 @@ describe CoursesController, :type => :integration do
         'hide_final_grades' => false,
         'start_at' => nil,
         'end_at' => nil,
-        'default_view' => 'feed'
+        'default_view' => 'feed',
+        'workflow_state' => 'available'
       }
     ]
   end
@@ -1266,27 +1275,6 @@ describe CoursesController, :type => :integration do
     end
   end
 
-  it "should allow sis id in hex packed format" do
-    sis_id = 'This.Sis/Id\\Has Nasty?Chars'
-    # sis_id.unpack('H*').first
-    packed_sis_id = '546869732e5369732f49645c486173204e617374793f4368617273'
-    @course1.update_attribute(:sis_source_id, sis_id)
-    json = api_call(:get, "/api/v1/courses/hex:sis_course_id:#{packed_sis_id}.json",
-            { :controller => 'courses', :action => 'show', :id => "hex:sis_course_id:#{packed_sis_id}", :format => 'json' })
-    json['id'].should == @course1.id
-    json['sis_course_id'].should == sis_id
-  end
-
-  it "should not find courses in other root accounts" do
-    acct = account_model(:name => 'root')
-    acct.add_user(@user)
-    course(:account => acct)
-    @course.update_attribute('sis_source_id', 'OTHER-SIS')
-    raw_api_call(:get, "/api/v1/courses/sis_course_id:OTHER-SIS",
-                 :controller => "courses", :action => "show", :id => "sis_course_id:OTHER-SIS", :format => "json")
-    response.status.should == "404 Not Found"
-  end
-
   it "should return the needs_grading_count for all assignments" do
     @group = @course1.assignment_groups.create!({:name => "some group"})
     @assignment = @course1.assignments.create!(:title => "some assignment", :assignment_group => @group, :points_possible => 12)
@@ -1309,7 +1297,8 @@ describe CoursesController, :type => :integration do
         'hide_final_grades' => false,
         'start_at' => nil,
         'end_at' => nil,
-        'default_view' => 'feed'
+        'default_view' => 'feed',
+        'workflow_state' => 'available'
       },
     ]
   end
@@ -1324,11 +1313,113 @@ describe CoursesController, :type => :integration do
     end
   end
 
-  it "should get individual course data" do
-    json = api_call(:get, "/api/v1/courses/#{@course1.id}.json",
-            { :controller => 'courses', :action => 'show', :id => @course1.to_param, :format => 'json' })
-    json['id'].should == @course1.id
+  describe "#show" do
+    it "should get individual course data" do
+      json = api_call(:get, "/api/v1/courses/#{@course1.id}.json",
+              { :controller => 'courses', :action => 'show', :id => @course1.to_param, :format => 'json' })
+      json['id'].should == @course1.id
+    end
+
+    it "should allow sis id in hex packed format" do
+      sis_id = 'This.Sis/Id\\Has Nasty?Chars'
+      # sis_id.unpack('H*').first
+      packed_sis_id = '546869732e5369732f49645c486173204e617374793f4368617273'
+      @course1.update_attribute(:sis_source_id, sis_id)
+      json = api_call(:get, "/api/v1/courses/hex:sis_course_id:#{packed_sis_id}.json",
+                      {:controller => 'courses', :action => 'show', :id => "hex:sis_course_id:#{packed_sis_id}", :format => 'json'})
+      json['id'].should == @course1.id
+      json['sis_course_id'].should == sis_id
+    end
+
+    it "should not find courses in other root accounts" do
+      acct = account_model(:name => 'root')
+      acct.add_user(@user)
+      course(:account => acct)
+      @course.update_attribute('sis_source_id', 'OTHER-SIS')
+      raw_api_call(:get, "/api/v1/courses/sis_course_id:OTHER-SIS",
+                   :controller => "courses", :action => "show", :id => "sis_course_id:OTHER-SIS", :format => "json")
+      response.status.should == "404 Not Found"
+    end
+
+    context "when scoped to account" do
+      before do
+        @admin = account_admin_user(:account => @course.account, :active_all => true)
+        user_with_pseudonym(:user => @admin)
+        user_session(@admin)
+      end
+
+      it "should 401 for unauthorized users" do
+        other_account = Account.create!
+        json = api_call(:get, "/api/v1/accounts/#{other_account.id}/courses/0.json",
+                          {:controller => 'courses', :action => 'show', :id => '0', :format => 'json', :account_id => other_account.id.to_param},
+                          {}, {}, :expected_status => 401)
+      end
+
+      it "should 404 for bad account id" do
+        json = api_call(:get, "/api/v1/accounts/0/courses/#{@course.id}.json",
+                          {:controller => 'courses', :action => 'show', :id => @course.id.to_param, :format => 'json', :account_id => '0'},
+                          {}, {}, :expected_status => 404)
+      end
+
+      context "when course is active" do
+
+        it "should find the course" do
+          json = api_call(:get, "/api/v1/accounts/#{@course.account.id}/courses/#{@course.id}.json",
+              { :controller => 'courses', :action => 'show', :id => @course.to_param, :format => 'json', :account_id => @course.account.id.to_param })
+
+          json['id'].should == @course.id
+        end
+
+        it "should scope to specified account" do
+          other_account = Account.create!
+          c2 = other_account.courses.create!
+          json = api_call(:get, "/api/v1/accounts/#{@course.account.id}/courses/#{c2.id}.json",
+                          {:controller => 'courses', :action => 'show', :id => c2.to_param, :format => 'json', :account_id => @course.account.id.to_param},
+                          {}, {}, :expected_status => 404)
+        end
+
+        it "should find courses in sub accounts" do
+          sub_account = @course.account.sub_accounts.create!
+          c2 = sub_account.courses.create!
+          json = api_call(:get, "/api/v1/accounts/#{@course.account.id}/courses/#{c2.id}.json",
+                          {:controller => 'courses', :action => 'show', :id => c2.to_param, :format => 'json', :account_id => @course.account.id.to_param})
+          json['id'].should == c2.id
+        end
+
+        it "should not find courses in sibling accounts" do
+          sub = @course.account.sub_accounts.create!
+          c2 = sub.courses.create!
+          sub2 = @course.account.sub_accounts.create!
+          json = api_call(:get, "/api/v1/accounts/#{sub2.id}/courses/#{c2.id}.json",
+                          {:controller => 'courses', :action => 'show', :id => c2.to_param, :format => 'json', :account_id => sub2.id.to_param},
+                          {}, {}, :expected_status => 404)
+        end
+      end
+
+      context "when course is deleted" do
+        before do
+          @course.destroy
+        end
+
+        it "should return 404" do
+          json = api_call(:get, "/api/v1/accounts/#{@course.account.id}/courses/#{@course.id}.json",
+              { :controller => 'courses', :action => 'show', :id => @course.to_param, :format => 'json', :account_id => @course.account.id.to_param },
+                          {}, {}, :expected_status => 404)
+        end
+
+        it "should find a course if include all specified" do
+          json = api_call(:get, "/api/v1/accounts/#{@course.account.id}/courses/#{@course.id}.json?include[]=all_courses",
+              { :controller => 'courses', :action => 'show', :id => @course.to_param, :format => 'json', :account_id => @course.account.id.to_param, :include=>["all_courses"] })
+
+          json['id'].should == @course.id
+          json['workflow_state'].should == 'deleted'
+        end
+      end
+
+    end
+
   end
+
 
   context "course files" do
     it_should_behave_like "file uploads api with folders"

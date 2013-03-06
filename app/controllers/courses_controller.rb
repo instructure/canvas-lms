@@ -35,6 +35,9 @@ require 'set'
 #       // the course code
 #       course_code: "INSTCON12",
 #
+#       // the current status
+#       workflow_state: "available"
+#
 #       // the account associated with the course
 #       account_id: 81259,
 #
@@ -925,18 +928,31 @@ class CoursesController < ApplicationController
   # @API Get a single course
   # Return information on a single course.
   #
-  # Accepts the same include[] parameters as the list action, and returns a
-  # single course with the same fields as that action.
+  # Accepts the same include[] parameters as the list action plus:
+  #
+  # @argument include[] ["all_courses"] Also search recently deleted courses
   #
   # @returns Course
   def show
     if api_request?
-      @context = api_find(Course.active, params[:id])
-      if authorized_action(@context, @current_user, :read)
-        enrollments = @context.current_enrollments.all(:conditions => { :user_id => @current_user.id })
-        includes = Set.new(Array(params[:include]))
+      includes = Set.new(Array(params[:include]))
+
+      if params[:account_id]
+        @account = api_find(Account.active, params[:account_id])
+        scope = @account.all_courses
+      else
+        scope = Course
+      end
+
+      if !includes.member?("all_courses")
+        scope = scope.not_deleted
+      end
+      @course = api_find(scope, params[:id])
+
+      if authorized_action(@course, @current_user, :read)
+        enrollments = @course.current_enrollments.all(:conditions => { :user_id => @current_user.id })
         includes << :hide_final_grades
-        render :json => course_json(@context, @current_user, session, includes, enrollments)
+        render :json => course_json(@course, @current_user, session, includes, enrollments)
       end
       return
     end
