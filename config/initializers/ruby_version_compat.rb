@@ -151,7 +151,7 @@ else
       'Rubric'                   => %w[data],
       'RubricAssessment'         => %w[data],
       'SisBatch'                 => %w[processing_errors processing_warnings],
-      'StreamItem'               => %w[data],
+      'StreamItem'               => %w[data]
     }
 
     def unserialize_attribute_with_utf8_check(attr_name)

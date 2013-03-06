@@ -29,7 +29,8 @@ Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |fil
 
 # rspec aliases :describe to :context in a way that it's pretty much defined
 # globally on every object. :context is already heavily used in our application,
-# so we remove rspec's definition.
+# so we remove rspec's definition. This does not prevent 'context' from being
+# used within a 'describe' block.
 module Spec::DSL::Main
   remove_method :context if respond_to? :context
 end
