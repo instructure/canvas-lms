@@ -1394,4 +1394,48 @@ describe QuizSubmission do
       end
     end
   end
+
+  describe "update_submission_version" do
+    let(:submission) { QuizSubmission.new }
+
+    before do
+      submission.with_versioning(true) do |s|
+        s.score = 10
+        s.save_without_validation
+      end
+      submission.version_number.should == 1
+
+      submission.with_versioning(true) do |s|
+        s.score = 15
+        s.save_without_validation
+      end
+      submission.version_number.should == 2
+    end
+
+    it "updates a previous version given current attributes" do
+      vs = submission.versions
+      vs.size.should == 2
+
+      submission.score = 25
+      submission.update_submission_version(vs.last, [:score])
+      submission.versions.map{ |s| s.model.score }.should == [15, 25]
+    end
+
+    context "when loading UTF-8 data" do
+      it "should strip bad chars" do
+        vs = submission.versions
+
+        # inject bad byte into yaml
+        submission.submission_data = ["bad\x81byte"]
+        submission.update_submission_version(vs.last, [:submission_data])
+
+        # reload yaml by setting a different column
+        submission.score = 20
+        submission.update_submission_version(vs.last, [:score])
+
+        submission.versions.map{ |s| s.model.submission_data }.should == [nil, ["badbyte"]]
+      end
+    end
+
+  end
 end
