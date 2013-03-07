@@ -133,6 +133,10 @@ class PseudonymSessionsController < ApplicationController
     # reset the session id cookie to prevent session fixation.
     reset_session_for_login
 
+    if params[:pseudonym_session].blank? || params[:pseudonym_session][:password].blank?
+      return unsuccessful_login(t('errors.blank_password', "No password was given"))
+    end
+
     # Try to use authlogic's built-in login approach first
     @pseudonym_session = @domain_root_account.pseudonym_sessions.new(params[:pseudonym_session])
     @pseudonym_session.remote_ip = request.remote_ip

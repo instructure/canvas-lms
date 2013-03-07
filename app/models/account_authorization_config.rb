@@ -365,6 +365,8 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   end
 
   def ldap_bind_result(unique_id, password_plaintext)
+    return nil if password_plaintext.blank?
+
     if self.last_timeout_failure.present?
       failure_timeout = self.class.ldap_failure_wait_time.ago
       if self.last_timeout_failure >= failure_timeout
