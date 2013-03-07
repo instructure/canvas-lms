@@ -1050,9 +1050,3 @@ shared_examples_for "in-process server selenium tests" do
     ActiveRecord::ConnectionAdapters::ConnectionPool.any_instance.stubs(:connection).returns(@db_connection)
   end
 end
-
-shared_examples_for "forked server selenium tests" do
-  before do
-    pending "deprecated. please use in-process server"
-  end
-end
