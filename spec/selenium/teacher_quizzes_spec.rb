@@ -131,6 +131,7 @@ describe "quizzes" do
 
       get "/courses/#{@course.id}/quizzes/#{q.id}"
 
+      f('.al-trigger').click
       driver.find_element(:partial_link_text, "Message Students Who...").click
       wait_for_ajaximations
       dialog = ffj("#message_students_dialog:visible")
@@ -161,6 +162,7 @@ describe "quizzes" do
       q.save!
 
       get "/courses/#{@course.id}/quizzes/#{q.id}"
+      f('.al-trigger').click
       f('.quiz_details_link').click
       wait_for_ajaximations
       f('#quiz_details').should be_displayed
