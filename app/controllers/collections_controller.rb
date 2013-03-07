@@ -112,13 +112,13 @@ class CollectionsController < ApplicationController
     # make sure there is a default colleciton for the current user and all
     # communities to which they belong
     ensure_default_collection_for(@current_user)
-    current_communities = @current_user.current_groups.scoped(:joins => :group_category, :conditions => { :group_categories => { :role => 'communities' } }).all
+    current_communities = @current_user.current_groups.joins(:group_category).where(:group_categories => { :role => 'communities' }).all
     if current_communities.present?
       preload_groups_collections_counts(current_communities)
       current_communities.each{ |g| ensure_default_collection_for(g) }
     end
 
-    scope = Collection.active.newest_first.scoped(:conditions => [<<-SQL, @current_user.id, current_communities.map(&:id)])
+    scope = Collection.active.newest_first.where(<<-SQL, @current_user, current_communities)
       (context_type='User' AND context_id=?) OR (context_type='Group' AND context_id IN (?))
     SQL
 
@@ -265,7 +265,7 @@ class CollectionsController < ApplicationController
   def unfollow
     @collection = find_collection
     if authorized_action(@collection, @current_user, :follow)
-      user_follow = @current_user.user_follows.find(:first, :conditions => { :followed_item_id => @collection.id, :followed_item_type => 'Collection' })
+      user_follow = @current_user.user_follows.where(:followed_item_id => @collection, :followed_item_type => 'Collection').first
       user_follow.try(:destroy)
       render :json => { "ok" => true }
     end

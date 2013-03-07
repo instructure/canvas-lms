@@ -46,7 +46,7 @@ class PseudonymsController < ApplicationController
 
     if @context.is_a?(Account)
       return unless context_is_root_account?
-      scope = @context.pseudonyms.active.scoped(:conditions => { :user_id => @user.id })
+      scope = @context.pseudonyms.active.where(:user_id => @user)
       @pseudonyms = Api.paginate(
         scope,
         self, api_v1_account_pseudonyms_url)

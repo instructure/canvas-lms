@@ -271,8 +271,8 @@ class ProfileController < ApplicationController
         visible, invisible = params[:user_services].partition { |service,bool|
           value_to_boolean(bool)
         }
-        @user.user_services.update_all("visible = TRUE", :service => visible.map(&:first))
-        @user.user_services.update_all("visible = FALSE", :service => invisible.map(&:first))
+        @user.user_services.where(:service => visible.map(&:first)).update_all(:visible => true)
+        @user.user_services.where(:service => invisible.map(&:first)).update_all(:visible => false)
       end
 
       respond_to do |format|

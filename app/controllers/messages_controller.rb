@@ -24,7 +24,7 @@ class MessagesController < ApplicationController
   end
 
   def index
-    @messages = @context.messages.scoped(:order => 'created_at DESC').paginate(:page => params[:page], :per_page => 20)
+    @messages = @context.messages.order('created_at DESC').paginate(:page => params[:page], :per_page => 20)
   end
 
   def create

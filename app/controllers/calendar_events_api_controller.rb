@@ -412,9 +412,9 @@ class CalendarEventsApiController < ApplicationController
       get_all_pertinent_contexts
       ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
         @contexts.each do |context|
-          @assignments = context.assignments.active.find(:all) if context.respond_to?("assignments")
+          @assignments = context.assignments.active.all if context.respond_to?("assignments")
           # no overrides to apply without a current user
-          @events.concat context.calendar_events.active.find(:all)
+          @events.concat context.calendar_events.active.all
           @events.concat @assignments || []
         end
       end

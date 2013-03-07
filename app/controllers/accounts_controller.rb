@@ -79,7 +79,7 @@ class AccountsController < ApplicationController
         )
       end
     else
-      @accounts = @account.sub_accounts.scoped(:order => :id)
+      @accounts = @account.sub_accounts.order(:id)
     end
 
     @accounts = Api.paginate(@accounts, self, api_v1_sub_accounts_url,
@@ -112,7 +112,7 @@ class AccountsController < ApplicationController
       params[:state] -= %w{available}
     end
 
-    @courses = @account.associated_courses.scoped(:conditions => { :workflow_state => params[:state] })
+    @courses = @account.associated_courses.where(:workflow_state => params[:state])
     if params[:hide_enrollmentless_courses] || value_to_boolean(params[:with_enrollments])
       @courses = @courses.with_enrollments
     elsif !params[:with_enrollments].nil? && !value_to_boolean(params[:with_enrollments])
@@ -418,7 +418,7 @@ class AccountsController < ApplicationController
     if authorized_action(@account, @current_user, :manage_sis)
       return redirect_to account_settings_url(@account) if !@account.allow_sis_import || !@account.root_account?
       @current_batch = @account.current_sis_batch
-      @last_batch = @account.sis_batches.scoped(:order=>'created_at DESC', :limit=>1).first
+      @last_batch = @account.sis_batches.order('created_at DESC').first
       @terms = @account.enrollment_terms.active
       respond_to do |format|
         format.html
@@ -455,7 +455,7 @@ class AccountsController < ApplicationController
   
   def build_course_stats
     teachers = TeacherEnrollment.for_courses_with_user_name(@courses).admin.active
-    course_to_student_counts = StudentEnrollment.student_in_claimed_or_available.scoped(:conditions => { :course_id => @courses.map(&:id) }).count('DISTINCT user_id', :group => :course_id)
+    course_to_student_counts = StudentEnrollment.student_in_claimed_or_available.where(:course_id => @courses).group(:course_id).count(:user_id, :distinct => true)
     courses_to_teachers = teachers.inject({}) do |result, teacher|
       result[teacher.course_id] ||= []
       result[teacher.course_id] << teacher

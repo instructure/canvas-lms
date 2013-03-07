@@ -288,8 +288,8 @@ class ContextController < ApplicationController
   def mark_inbox_as_read
     flash[:notice] = t(:all_marked_read, "Inbox messages all marked as read")
     if @current_user
-      InboxItem.update_all({:workflow_state => 'read'}, {:user_id => @current_user.id})
-      User.update_all({:unread_inbox_items_count => (@current_user.inbox_items.unread.count rescue 0)}, {:id => @current_user.id})
+      InboxItem.where(:user_id => @current_user).update_all(:workflow_state => 'read')
+      User.where(:id => @current_user).update_all(:unread_inbox_items_count => (@current_user.inbox_items.unread.count rescue 0))
     end
     respond_to do |format|
       format.html { redirect_to inbox_url }
@@ -302,7 +302,7 @@ class ContextController < ApplicationController
     log_asset_access("roster:#{@context.asset_string}", 'roster', 'other')
 
     if @context.is_a?(Course)
-      sections = @context.course_sections(:select => 'id, name')
+      sections = @context.course_sections.select([:id, :name])
       all_roles = Role.custom_roles_and_counts_for_course(@context, @current_user)
       js_env({
         :ALL_ROLES => all_roles,
@@ -425,9 +425,9 @@ class ContextController < ApplicationController
       ]
       @deleted_items = []
       @item_types.each do |scope|
-        @deleted_items += scope.find(:all, :conditions => "workflow_state='deleted'", :limit => 25)
+        @deleted_items += scope.where(:workflow_state => 'deleted').limit(25).all
       end
-      @deleted_items += @context.attachments.find(:all, :conditions => "file_state='deleted'", :limit => 25)
+      @deleted_items += @context.attachments.where(:file_state => 'deleted').limit(25).all
       @deleted_items.sort_by{|item| item.read_attribute(:deleted_at) || item.created_at }.reverse
     end
   end

@@ -39,7 +39,7 @@ class QuizzesController < ApplicationController
       @surveys = @quizzes.select{|q| q.quiz_type == 'survey' || q.quiz_type == 'graded_survey' }
       @submissions_hash = {}
       @submissions_hash
-      @current_user && @current_user.quiz_submissions.scoped(:conditions => ['quizzes.context_id=? AND quizzes.context_type=?', @context.id, @context.class.to_s], :include => :quiz).each do |s|
+      @current_user && @current_user.quiz_submissions.where('quizzes.context_id=? AND quizzes.context_type=?', @context, @context.class.to_s).includes(:quiz).each do |s|
         if s.needs_grading?
           s.grade_submission(:finished_at => s.end_at)
           s.reload
@@ -81,7 +81,7 @@ class QuizzesController < ApplicationController
           add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
           add_crumb(t(:statistics_crumb, "Statistics"), named_context_url(@context, :context_quiz_statistics_url, @quiz))
           @statistics = @quiz.statistics(params[:all_versions] == '1')
-          user_ids = @quiz.quiz_submissions.find(:all, :select => 'user_id', :conditions => "workflow_state<>'settings_only'").map(&:user_id)
+          user_ids = @quiz.quiz_submissions.where("workflow_state<>'settings_only'").pluck(:user_id)
           @submitted_users = user_ids.empty? ? [] : User.find_all_by_id(user_ids).compact.uniq.sort_by(&:last_name_first)
         }
         format.csv {
@@ -195,7 +195,7 @@ class QuizzesController < ApplicationController
   def managed_quiz_data
     if authorized_action(@quiz, @current_user, [:grade, :read_statistics])
       students = @context.students_visible_to(@current_user).order_by_sortable_name.to_a
-      @submissions = @quiz.quiz_submissions.for_user_ids(students.map(&:id)).scoped(:conditions => "workflow_state<>'settings_only'").all
+      @submissions = @quiz.quiz_submissions.for_user_ids(students.map(&:id)).where("workflow_state<>'settings_only'").all
       submission_ids = {}
       @submissions.each{|s| submission_ids[s.user_id] = s.id }
       @submitted_students = students.select{|stu| submission_ids[stu.id] }
@@ -272,7 +272,7 @@ class QuizzesController < ApplicationController
         obj = groups.detect{|g| g.id == id.to_i} if id != 0 && name.match(/\Agroup/)
         items << obj if obj
       end
-      root_questions = @quiz.quiz_questions.find(:all, :conditions => 'quiz_group_id is null')
+      root_questions = @quiz.quiz_questions.where("quiz_group_id IS NULL").all
       items += root_questions
       items.uniq!
       question_updates = []
@@ -284,8 +284,8 @@ class QuizzesController < ApplicationController
           group_updates << "WHEN id=#{item.id} THEN #{idx + 1}"
         end
       end
-      QuizQuestion.update_all("quiz_group_id=NULL,position=CASE #{question_updates.join(" ")} ELSE NULL END", {:id => items.select{|i| i.is_a?(QuizQuestion)}.map(&:id)}) unless question_updates.empty?
-      QuizGroup.update_all("position=CASE #{group_updates.join(" ")} ELSE NULL END", {:id => items.select{|i| i.is_a?(QuizGroup)}.map(&:id)}) unless group_updates.empty?
+      QuizQuestion.where(:id => items.select{|i| i.is_a?(QuizQuestion)}).update_all("quiz_group_id=NULL,position=CASE #{question_updates.join(" ")} ELSE NULL END") unless question_updates.empty?
+      QuizGroup.where(:id => items.select{|i| i.is_a?(QuizGroup)}).update_all("position=CASE #{group_updates.join(" ")} ELSE NULL END") unless group_updates.empty?
       Quiz.mark_quiz_edited(@quiz.id)
       render :json => {:reorder => true}
     end
@@ -618,8 +618,10 @@ class QuizzesController < ApplicationController
 
   # counts of submissions queried in #managed_quiz_data
   def submission_counts
-    submitted_with_submissions = @context.students_visible_to(@current_user).scoped(:joins => :quiz_submissions, :conditions => ["quiz_submissions.quiz_id=? AND quiz_submissions.workflow_state<>'settings_only'", @quiz.id])
-    @submitted_student_count = submitted_with_submissions.count('DISTINCT users.id')
-    @any_submissions_pending_review = submitted_with_submissions.scoped(:conditions => "quiz_submissions.workflow_state = 'pending_review'").count > 0
+    submitted_with_submissions = @context.students_visible_to(@current_user).
+        joins(:quiz_submissions).
+        where("quiz_submissions.quiz_id=? AND quiz_submissions.workflow_state<>'settings_only'", @quiz)
+    @submitted_student_count = submitted_with_submissions.count(:id, :distinct => true)
+    @any_submissions_pending_review = submitted_with_submissions.where("quiz_submissions.workflow_state = 'pending_review'").count > 0
   end
 end

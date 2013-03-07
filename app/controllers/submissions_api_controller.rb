@@ -54,8 +54,7 @@ class SubmissionsApiController < ApplicationController
   def index
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @assignment = @context.assignments.active.find(params[:assignment_id])
-      @submissions = @assignment.submissions.all(
-        :conditions => { :user_id => visible_user_ids })
+      @submissions = @assignment.submissions.where(:user_id => visible_user_ids).all
 
       includes = Array(params[:include])
 
@@ -103,7 +102,7 @@ class SubmissionsApiController < ApplicationController
       assignment_scope = @context.assignments.active
       requested_assignment_ids = Array(params[:assignment_ids]).map(&:to_i)
       if requested_assignment_ids.present?
-        assignment_scope = assignment_scope.scoped(:conditions => { 'assignments.id' => requested_assignment_ids })
+        assignment_scope = assignment_scope.where('assignments.id' => requested_assignment_ids)
       end
       assignments = assignment_scope.all
       assignments_hash = {}
@@ -113,9 +112,9 @@ class SubmissionsApiController < ApplicationController
       Api.assignment_ids_for_students_api = assignments.map(&:id)
       sql_includes = { :user => [] }
       sql_includes[:user] << :submissions_for_given_assignments unless assignments.empty?
-      scope = (@section || @context).all_student_enrollments.scoped(
-        :include => sql_includes,
-        :conditions => { 'users.id' => student_ids })
+      scope = (@section || @context).all_student_enrollments.
+          includes(sql_includes).
+          where('users.id' => student_ids)
 
       result = scope.map do |enrollment|
         student = enrollment.user
@@ -314,7 +313,7 @@ class SubmissionsApiController < ApplicationController
   def get_user_considering_section(user_id)
     scope = @context.students_visible_to(@current_user)
     if @section
-      scope = scope.scoped(:conditions => { 'enrollments.course_section_id' => @section.id })
+      scope = scope.where(:enrollments => { :course_section_id => @section })
     end
     api_find(scope, user_id)
   end
@@ -324,6 +323,6 @@ class SubmissionsApiController < ApplicationController
       opts[:section_ids] = [@section.id]
     end
     scope = @context.enrollments_visible_to(@current_user, opts)
-    scope.all(:select => :user_id).map(&:user_id)
+    scope.pluck(:user_id)
   end
 end

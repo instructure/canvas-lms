@@ -206,10 +206,10 @@ class SectionsController < ApplicationController
       respond_to do |format|
         format.html do
           add_crumb(@section.name, named_context_url(@context, :context_section_url, @section))
-          @enrollments_count = @section.enrollments.not_fake.scoped(:conditions => { :workflow_state => 'active' }).count
-          @completed_enrollments_count = @section.enrollments.not_fake.scoped(:conditions => { :workflow_state => 'completed' }).count
-          @pending_enrollments_count = @section.enrollments.not_fake.scoped(:conditions => { :workflow_state => %w{invited pending} }).count
-          @student_enrollments_count = @section.enrollments.not_fake.scoped(:conditions => { :type => 'StudentEnrollment' }).count
+          @enrollments_count = @section.enrollments.not_fake.where(:workflow_state => 'active').count
+          @completed_enrollments_count = @section.enrollments.not_fake.where(:workflow_state => 'completed').count
+          @pending_enrollments_count = @section.enrollments.not_fake.where(:workflow_state => %w{invited pending}).count
+          @student_enrollments_count = @section.enrollments.not_fake.where(:type => 'StudentEnrollment').count
           js_env(
             :PERMISSIONS => {
               :manage_students => @context.grants_right?(@current_user, session, :manage_students) || @context.grants_right?(@current_user, session, :manage_admin_users),

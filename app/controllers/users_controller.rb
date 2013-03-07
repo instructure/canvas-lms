@@ -94,7 +94,7 @@ class UsersController < ApplicationController
     @user = User.find_by_id(params[:user_id]) if params[:user_id].present?
     @user ||= @current_user
     if authorized_action(@user, @current_user, :read)
-      current_active_enrollments = @user.current_enrollments.with_each_shard { |scope| scope.scoped(:include => :course) }
+      current_active_enrollments = @user.current_enrollments.with_each_shard { |scope| scope.includes(:course) }
 
       @presenter = GradesPresenter.new(current_active_enrollments)
 
@@ -239,7 +239,7 @@ class UsersController < ApplicationController
 
   before_filter :require_password_session, :only => [:masquerade]
   def masquerade
-    @user = User.find(:first, :conditions => {:id => params[:user_id]})
+    @user = User.find_by_id(params[:user_id])
     return render_unauthorized_action(@user) unless @user.can_masquerade?(@real_current_user || @current_user, @domain_root_account)
     if request.post?
       if @user == @real_current_user
@@ -594,11 +594,11 @@ class UsersController < ApplicationController
       # course_section and enrollment term will only be used if the enrollment dates haven't been cached yet;
       # maybe should just look at the first enrollment and check if it's cached to decide if we should include
       # them here
-      @enrollments = @user.enrollments.with_each_shard { |scope| scope.scoped(:conditions => "enrollments.workflow_state<>'deleted' AND courses.workflow_state<>'deleted'", :include => [{:course => { :enrollment_term => :enrollment_dates_overrides }}, :associated_user, :course_section]) }
+      @enrollments = @user.enrollments.with_each_shard { |scope| scope.where("enrollments.workflow_state<>'deleted' AND courses.workflow_state<>'deleted'").includes({:course => { :enrollment_term => :enrollment_dates_overrides }}, :associated_user, :course_section) }
       @enrollments = @enrollments.sort_by {|e| [e.state_sortable, e.rank_sortable, e.course.name] }
       # pre-populate the reverse association
       @enrollments.each { |e| e.user = @user }
-      @group_memberships = @user.current_group_memberships.scoped(:include => :group)
+      @group_memberships = @user.current_group_memberships.includes(:group)
 
       respond_to do |format|
         format.html
@@ -1106,7 +1106,7 @@ class UsersController < ApplicationController
 
       if params[:student_id]
         student = User.find(params[:student_id])
-        enrollments = student.student_enrollments.active.all(:include => :course)
+        enrollments = student.student_enrollments.active.includes(:course).all
         enrollments.each do |enrollment|
           should_include = enrollment.course.user_has_been_instructor?(@teacher) && 
                            enrollment.course.enrollments_visible_to(@teacher, :include_priors => true).find_by_id(enrollment.id) &&
@@ -1213,7 +1213,7 @@ class UsersController < ApplicationController
   def unfollow
     @user = api_find(User, params[:user_id])
     if authorized_action(@user, @current_user, :follow)
-      user_follow = @current_user.user_follows.find(:first, :conditions => { :followed_item_id => @user.id, :followed_item_type => 'User' })
+      user_follow = @current_user.user_follows.where(:followed_item_id => @user, :followed_item_type => 'User').first
       user_follow.try(:destroy)
       render :json => { "ok" => true }
     end
@@ -1227,28 +1227,31 @@ class UsersController < ApplicationController
     student_enrollments.each { |e| data[e.user.id] = { :enrollment => e, :ungraded => [] } }
 
     # find last interactions
-    last_comment_dates = SubmissionComment.for_context(course).maximum(
-      :created_at,
-      :group => 'recipient_id',
-      :conditions => ["author_id = ? AND recipient_id IN (?)", teacher.id, ids])
+    last_comment_dates = SubmissionComment.for_context(course).
+        group(:recipient_id).
+        where("author_id = ? AND recipient_id IN (?)", teacher, ids).
+        maximum(:created_at)
     last_comment_dates.each do |user_id, date|
       next unless student = data[user_id]
       student[:last_interaction] = [student[:last_interaction], date].compact.max
     end
-    last_message_dates = ConversationMessage.maximum(
-      :created_at,
-      :joins => 'INNER JOIN conversation_participants ON conversation_participants.conversation_id=conversation_messages.conversation_id',
-      :group => ['conversation_participants.user_id', 'conversation_messages.author_id'],
-      :conditions => [ 'conversation_messages.author_id = ? AND conversation_participants.user_id IN (?) AND NOT conversation_messages.generated', teacher.id, ids ])
+    scope = ConversationMessage.
+        joins('INNER JOIN conversation_participants ON conversation_participants.conversation_id=conversation_messages.conversation_id').
+        where('conversation_messages.author_id = ? AND conversation_participants.user_id IN (?) AND NOT conversation_messages.generated', teacher, ids)
+    # fake_arel can't pass an array in the group by through the scope
+    last_message_dates = Rails.version < '3.0' ?
+        scope.maximum(:created_at, :group => ['conversation_participants.user_id', 'conversation_messages.author_id']) :
+        scope.group(['conversation_participants.user_id', 'conversation_messages.author_id']).maximum(:created_at)
     last_message_dates.each do |key, date|
       next unless student = data[key.first.to_i]
       student[:last_interaction] = [student[:last_interaction], date].compact.max
     end
 
     # find all ungraded submissions in one query
-    ungraded_submissions = course.submissions.all(
-      :include => :assignment,
-      :conditions => ["user_id IN (?) AND #{Submission.needs_grading_conditions}", ids])
+    ungraded_submissions = course.submissions.
+        includes(:assignment).
+        where("user_id IN (?) AND #{Submission.needs_grading_conditions}", ids).
+        all
     ungraded_submissions.each do |submission|
       next unless student = data[submission.user_id]
       student[:ungraded] << submission
@@ -1257,10 +1260,10 @@ class UsersController < ApplicationController
     if course.root_account.enable_user_notes?
       data.each { |k,v| v[:last_user_note] = nil }
       # find all last user note times in one query
-      note_dates = UserNote.active.maximum(
-        :created_at,
-        :group => 'user_id',
-        :conditions => ["created_by_id = ? AND user_id IN (?)", teacher.id, ids])
+      note_dates = UserNote.active.
+          group(:user_id).
+          where("created_by_id = ? AND user_id IN (?)", teacher, ids).
+          maximum(:created_at)
       note_dates.each do |user_id, date|
         next unless student = data[user_id]
         student[:last_user_note] = date

@@ -47,7 +47,9 @@ class AssignmentsController < ApplicationController
         elsif @just_viewing_one_course && @context.assignments.new.grants_right?(@current_user, session, :update)
           format.html
         else
-          @current_user_submissions ||= @current_user && @current_user.submissions.scoped(:select => 'id, assignment_id, score, workflow_state', :conditions => {:assignment_id => @upcoming_assignments.map(&:id)}) 
+          @current_user_submissions ||= @current_user && @current_user.submissions.
+              select([:id, :assignment_id, :score, :workflow_state]).
+              where(:assignment_id => @upcoming_assignments)
           format.html { render :action => "student_index" }
         end
         # TODO: eager load the rubric associations
@@ -76,8 +78,8 @@ class AssignmentsController < ApplicationController
       @assignment.context_module_action(@current_user, :read) if @unlocked && !@assignment.new_record?
 
       if @assignment.grants_right?(@current_user, session, :grade)
-        visible_student_ids = @context.enrollments_visible_to(@current_user).find(:all, :select => 'user_id').map(&:user_id)
-        @current_student_submissions = @assignment.submissions.scoped(:conditions => "submissions.submission_type IS NOT NULL").select{|s| visible_student_ids.include?(s.user_id) }
+        visible_student_ids = @context.enrollments_visible_to(@current_user).pluck(:user_id)
+        @current_student_submissions = @assignment.submissions.where("submissions.submission_type IS NOT NULL").where(:user_id => visible_student_ids).all
       end
 
       if @assignment.grants_right?(@current_user, session, :read_own_submission) && @context.grants_right?(@current_user, session, :read_grades)
@@ -217,7 +219,7 @@ class AssignmentsController < ApplicationController
     active_tab = "Syllabus"
     if authorized_action(@context.assignments.new, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_SYLLABUS)
-      @groups = @context.assignment_groups.active.find(:all, :order => 'position, name')
+      @groups = @context.assignment_groups.active.order(:position, :name).all
       @assignment_groups = @groups
       @events = @context.events_for(@current_user)
       @undated_events = @events.select {|e| e.start_at == nil}

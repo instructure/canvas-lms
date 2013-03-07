@@ -60,7 +60,7 @@ class ContentMigrationsController < ApplicationController
   def index
     return unless authorized_action(@context, @current_user, :manage_content)
 
-    @migrations = Api.paginate(@context.content_migrations.scoped(:order => "id DESC"), self, api_v1_course_content_migration_list_url(@context))
+    @migrations = Api.paginate(@context.content_migrations.order("id DESC"), self, api_v1_course_content_migration_list_url(@context))
     render :json => content_migrations_json(@migrations, @current_user, session)
   end
 

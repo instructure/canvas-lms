@@ -24,7 +24,8 @@ class ContextModulesController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read)
       @modules = @context.modules_visible_to(@current_user)
-      @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).scoped(:select => 'context_module_id, collapsed').select{|p| p.collapsed? }.map(&:context_module_id)
+
+      @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).select([:context_module_id, :collapsed]).select{|p| p.collapsed? }.map(&:context_module_id)
       if @context.grants_right?(@current_user, session, :participate_as_student)
         return unless tab_enabled?(@context.class::TAB_MODULES)
         ContextModule.send(:preload_associations, @modules, [:content_tags])
@@ -139,7 +140,7 @@ class ContextModulesController < ApplicationController
   end
 
   def prerequisites_needing_finishing_for(mod, progression, before_tag=nil)
-    tags = mod.content_tags.active #.find(:all, :conditions => ['position <= ?', progression.current_position], :order => :position)
+    tags = mod.content_tags.active
     pres = []
     tags.each do |tag|
       if req = (mod.completion_requirements || []).detect{|r| r[:id] == tag.id }
@@ -181,7 +182,7 @@ class ContextModulesController < ApplicationController
     elsif @progression.locked?
       res[:locked] = true
       res[:modules] = []
-      previous_modules = @context.context_modules.active.find(:all, :conditions => ['position < ?', @module.position], :order => :position)
+      previous_modules = @context.context_modules.active.where('position<?', @module.position).order(:position).all
       previous_modules.reverse!
       valid_previous_modules = []
       prereq_ids = @module.prerequisites.select{|p| p[:type] == 'context_module' }.map{|p| p[:id] }
@@ -353,8 +354,8 @@ class ContextModulesController < ApplicationController
         if params[:user_id] && @user = @context.students.find(params[:user_id])
           @progressions = @context.context_modules.active.map{|m| m.evaluate_for(@user, true, true) }
         else
-          context_module_ids = @context.context_modules.active.scoped(:select => "id").map &:id
-          @progressions = ContextModuleProgression.scoped(:conditions => {:context_module_id => context_module_ids})
+          context_module_ids = @context.context_modules.active.pluck(:id)
+          @progressions = ContextModuleProgression.where(:context_module_id => context_module_ids)
         end
         render :json => @progressions.to_json
       else

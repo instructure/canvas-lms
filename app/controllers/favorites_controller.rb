@@ -48,7 +48,7 @@ class FavoritesController < ApplicationController
     includes = Set.new(Array(params[:include]))
     courses = Api.paginate(@current_user.menu_courses, self, api_v1_list_favorite_courses_url)
     render :json => courses.map { |course|
-      enrollments = course.current_enrollments.all(:conditions => { :user_id => @current_user.id })
+      enrollments = course.current_enrollments.where(:user_id => @current_user).all
       course_json(course, @current_user, session, includes, enrollments)
     }
   end
@@ -72,10 +72,7 @@ class FavoritesController < ApplicationController
     course = api_find(Course, params[:id])
     fave = nil
     Favorite.unique_constraint_retry do
-      fave = @current_user.favorites.find(:first, :conditions => {
-          :context_type => 'Course',
-          :context_id => course.id
-      })
+      fave = @current_user.favorites.where(:context_type => 'Course', :context_id => course).first
       fave ||= @current_user.favorites.create!(:context => course)
     end
     render :json => favorite_json(fave, @current_user, session)
@@ -98,10 +95,7 @@ class FavoritesController < ApplicationController
     # but also allow referencing by sis id, if possible
     courses = api_find_all(Course, [params[:id]])
     course_id = courses.any? ? courses.first.id : params[:id]
-    fave = @current_user.favorites.find(:first, :conditions => {
-       :context_type => 'Course',
-       :context_id => course_id
-    })
+    fave = @current_user.favorites.where(:context_type => 'Course', :context_id => course_id).first
     if fave
       result = favorite_json(fave, @current_user, session)
       fave.destroy

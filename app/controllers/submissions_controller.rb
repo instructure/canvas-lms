@@ -129,7 +129,7 @@ class SubmissionsController < ApplicationController
       end
       return
     end
-    @submission = @assignment.find_submission(@user) #_params[:.find(:first, :conditions => {:assignment_id => @assignment.id, :user_id => params[:id]})
+    @submission = @assignment.find_submission(@user)
     @submission ||= @context.submissions.build(:user => @user, :assignment_id => @assignment.id)
     @submission.grants_rights?(@current_user, session)
     @rubric_association = @assignment.rubric_association
@@ -509,7 +509,7 @@ class SubmissionsController < ApplicationController
   protected
 
   def submission_zip
-    @attachments = @assignment.attachments.find(:all, :conditions => ["display_name='submissions.zip' AND workflow_state IN ('to_be_zipped', 'zipping', 'zipped', 'errored') AND user_id=?", @current_user.id], :order => :created_at)
+    @attachments = @assignment.attachments.where(:display_name => 'submissions.zip', :workflow_state => ['to_be_zipped', 'zipping', 'zipped', 'errored'], :user_id => @current_user).order(:created_at).all
     @attachment = @attachments.pop
     @attachments.each{|a| a.destroy! }
     if @attachment && (@attachment.created_at < 1.hour.ago || @attachment.created_at < (@assignment.submissions.map{|s| s.submitted_at}.compact.max || @attachment.created_at))

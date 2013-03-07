@@ -86,7 +86,7 @@ class AccountReportsController < ApplicationController
       results = []
 
       available_reports.each do |key, value|
-        last_run = @account.account_reports.scoped(:conditions => { :report_type => key }, :order => 'created_at DESC').first
+        last_run = @account.account_reports.where(:report_type => key).order('created_at DESC').first
         last_run = account_report_json(last_run, @current_user, session) if last_run
         report = {
           :title => value[:title],
@@ -130,7 +130,7 @@ class AccountReportsController < ApplicationController
   end
 
   def type_scope
-    @context.account_reports.scoped(:conditions => { :report_type => params[:report]})
+    @context.account_reports.where(:report_type => params[:report])
   end
 
 # @API Index of Reports

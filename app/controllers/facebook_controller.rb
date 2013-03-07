@@ -63,7 +63,7 @@ class FacebookController < ApplicationController
     if @user
       @messages = @user.messages.to_facebook.to_a
       Facebook.dashboard_clear_count(@service) if @service
-      @domains = @user.pseudonyms.scoped({:include => :account}).to_a.once_per(&:account_id).map{|p| HostUrl.context_host(p.account) }.uniq
+      @domains = @user.pseudonyms.includes(:account).to_a.once_per(&:account_id).map{|p| HostUrl.context_host(p.account) }.uniq
     end
     respond_to do |format|
       format.html { render :action => 'index', :layout => 'facebook' }

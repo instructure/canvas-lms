@@ -479,9 +479,8 @@ class ApplicationController < ActionController::Base
   def badge_counts_for(context, user, enrollment=nil)
     badge_counts = {}
     ['Submission'].each do |type|
-      participation_count = context.content_participation_counts.find(:first, {
-        :conditions => { :user_id => user.id, :content_type => type },
-      })
+      participation_count = context.content_participation_counts.
+          where(:user_id => user.id, :content_type => type).first
       participation_count ||= ContentParticipationCount.create_or_update({
         :context => context,
         :user => user,
@@ -502,7 +501,7 @@ class ApplicationController < ActionController::Base
     @context = @courses.first
 
     if @just_viewing_one_course
-      @groups = @courses.first.assignment_groups.active.scoped(:include => :active_assignments)
+      @groups = @courses.first.assignment_groups.active.includes(:active_assignments)
       @assignments = @groups.map(&:active_assignments).flatten
     else
       @groups = AssignmentGroup.for_context_codes(@context_codes).active

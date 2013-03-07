@@ -94,7 +94,7 @@ class FilesController < ApplicationController
             else
               @current_attachments = @current_folder.visible_file_attachments.by_position_then_display_name
             end
-            @current_attachments = @current_attachments.scoped(:include => [:thumbnail, :media_object])
+            @current_attachments = @current_attachments.includes(:thumbnail, :media_object)
             render :json => @current_attachments.to_json(:methods => [:readable_size, :currently_locked, :thumbnail_url], :permissions => {:user => @current_user, :session => session})
           else
             render :json => @context.file_structure_for(@current_user).to_json(:permissions => {:user => @current_user}, :methods => [:readable_size, :mime_class, :currently_locked, :collaborator_ids])

@@ -359,8 +359,8 @@ class CoursesController < ApplicationController
       # that contains that user is returned.
       # We delete it from params so that it is not maintained in pagination links.
       user_id = params.delete(:user_id)
-      if user_id.present? && user = users.scoped(:conditions => ["users.id = ?", user_id]).first
-        position_scope = users.scoped(:conditions => ["#{User.sortable_name_order_by_clause}<=#{User.best_unicode_collation_key('?')}", user.sortable_name])
+      if user_id.present? && user = users.where(:users => { :id => user_id }).first
+        position_scope = users.where("#{User.sortable_name_order_by_clause}<=#{User.best_unicode_collation_key('?')}", user.sortable_name)
         position = position_scope.count(:select => "users.*", :distinct => true)
         per_page = Api.per_page_for(self)
         params[:page] = (position.to_f / per_page.to_f).ceil
@@ -426,7 +426,7 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read_reports)
       scope = User.for_course_with_last_login(@context, @context.root_account_id, 'StudentEnrollment')
-      scope = scope.scoped(:order => 'login_info_exists, last_login DESC')
+      scope = scope.order('login_info_exists, last_login DESC')
       users = Api.paginate(scope, self, api_v1_course_recent_students_url)
       user_json_preloads(users)
       render :json => users.map { |u| user_json(u, @current_user, session, ['last_login']) }
@@ -444,7 +444,7 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read_roster)
       users = @context.users_visible_to(@current_user)
-      users = users.scoped(:conditions => ['users.id = ?', params[:id]])
+      users = users.where(:users => { :id => params[:id]})
       includes = Array(params[:include])
       user_json_preloads(users, includes.include?('email'))
       if includes.include?('enrollments')
@@ -827,7 +827,7 @@ class CoursesController < ApplicationController
 
     # Look up the explicitly provided invitation
     unless params[:invitation].blank?
-      enrollment ||= @context.enrollments.find(:first, :conditions => ["enrollments.uuid=? AND enrollments.workflow_state IN ('invited', 'rejected')", params[:invitation]])
+      enrollment ||= @context.enrollments.where("enrollments.uuid=? AND enrollments.workflow_state IN ('invited', 'rejected')", params[:invitation]).first
     end
 
     enrollment
@@ -910,10 +910,8 @@ class CoursesController < ApplicationController
 
   def check_for_xlist
     return false unless @current_user.present? && @context_enrollment.blank?
-    xlist_enrollment = @current_user.enrollments.scoped({
-      :joins => :course_section,
-      :conditions => { :course_sections => { :nonxlist_course_id => @context.id } },
-    }).first
+    xlist_enrollment = @current_user.enrollments.joins(:course_section).
+      where(:course_sections => { :nonxlist_course_id => @context }).first
     if xlist_enrollment.present?
       redirect_params = {}
       redirect_params[:invitation] = params[:invitation] if params[:invitation].present?
@@ -949,7 +947,7 @@ class CoursesController < ApplicationController
       @course = api_find(scope, params[:id])
 
       if authorized_action(@course, @current_user, :read)
-        enrollments = @course.current_enrollments.all(:conditions => { :user_id => @current_user.id })
+        enrollments = @course.current_enrollments.where(:user_id => @current_user).all
         includes << :hide_final_grades
         render :json => course_json(@course, @current_user, session, includes, enrollments)
       end
@@ -1002,10 +1000,10 @@ class CoursesController < ApplicationController
       when 'modules'
         add_crumb(t('#crumbs.modules', "Modules"))
         @modules = @context.modules_visible_to(@current_user)
-        @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).scoped(:select => 'context_module_id, collapsed').select{|p| p.collapsed? }.map(&:context_module_id)
+        @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).select([:context_module_id, :collapsed]).select{|p| p.collapsed? }.map(&:context_module_id)
       when 'syllabus'
         add_crumb(t('#crumbs.syllabus', "Syllabus"))
-        @groups = @context.assignment_groups.active.find(:all, :order => 'position, name')
+        @groups = @context.assignment_groups.active.order(:position, :name).all
         @events = @context.calendar_events.active.to_a
         @events.concat @context.assignments.active.to_a
         @undated_events = @events.select {|e| e.start_at == nil}
@@ -1033,7 +1031,7 @@ class CoursesController < ApplicationController
   end
 
   def switch_role
-    @enrollments = @context.enrollments.scoped({:conditions => ['workflow_state = ?', 'active']}).for_user(@current_user)
+    @enrollments = @context.enrollments.where("workflow_state='active'").for_user(@current_user)
     @enrollment = @enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.first
     if params[:role] == 'revert'
       session.delete("role_course_#{@context.id}")
@@ -1212,9 +1210,9 @@ class CoursesController < ApplicationController
       respond_to do |format|
         # ensure user_id,section_id,type,associated_user_id is unique (this
         # will become a DB constraint eventually)
-        @possible_dup = @context.enrollments.find(:first, :conditions =>
-          ["id <> ? AND user_id = ? AND course_section_id = ? AND type = ? AND (associated_user_id IS NULL OR associated_user_id = ?)",
-          @enrollment.id, @enrollment.user_id, params[:course_section_id], @enrollment.type, @enrollment.associated_user_id])
+        @possible_dup = @context.enrollments.where(
+          "id<>? AND user_id=? AND course_section_id=? AND type=? AND (associated_user_id IS NULL OR associated_user_id=?)",
+          @enrollment, @enrollment.user_id, params[:course_section_id], @enrollment.type, @enrollment.associated_user_id).first
         if @possible_dup.present?
           format.json { render :json => @enrollment.to_json, :status => :forbidden }
         else
@@ -1334,8 +1332,8 @@ class CoursesController < ApplicationController
       lock_announcements = params[:course].delete(:lock_all_announcements)
       if value_to_boolean(lock_announcements)
         @course.lock_all_announcements = true
-        Announcement.update_all(['workflow_state = ?', 'locked'],
-          :context_type => 'Course', :context_id => @course.id, :workflow_state => 'active')
+        Announcement.where(:context_type => 'Course', :context_id => @course, :workflow_state => 'active').
+            update_all(:workflow_state => 'locked')
       elsif @course.lock_all_announcements
         @course.lock_all_announcements = false
       end

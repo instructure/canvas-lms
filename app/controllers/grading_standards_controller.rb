@@ -27,7 +27,7 @@ class GradingStandardsController < ApplicationController
   
   def index
     if authorized_action(@context, @current_user, :manage_grades)
-      @standards = GradingStandard.standards_for(@context).sorted.scoped(:limit => 100)
+      @standards = GradingStandard.standards_for(@context).sorted.limit(100)
       respond_to do |format|
         format.html { }
         format.json {

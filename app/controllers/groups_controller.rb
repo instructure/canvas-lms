@@ -149,7 +149,7 @@ class GroupsController < ApplicationController
       format.html do
         if @current_user
           @groups = @current_user.current_groups.
-            with_each_shard{ |scope| scope.scoped(:include => :group_category) }
+            with_each_shard{ |scope| scope.includes(:group_category) }
         else
           @groups = []
         end
@@ -182,8 +182,8 @@ class GroupsController < ApplicationController
   def context_index
     return unless authorized_action(@context, @current_user, :read_roster)
 
-    @groups      = @context.groups.active.scoped(:order => 'name, created_at')
-    @categories  = @context.group_categories.scoped(:order => "role <> 'student_organized', name")
+    @groups      = @context.groups.active.order(:name, :created_at)
+    @categories  = @context.group_categories.order("role <> 'student_organized'", :name)
     @user_groups = @current_user.group_memberships_for(@context) if @current_user
 
     unless api_request?
@@ -476,7 +476,7 @@ class GroupsController < ApplicationController
   def unfollow
     find_group
     if authorized_action(@group, @current_user, :follow)
-      user_follow = @current_user.user_follows.find(:first, :conditions => { :followed_item_id => @group.id, :followed_item_type => 'Group' })
+      user_follow = @current_user.user_follows.where(:followed_item_id => @group, :followed_item_type => 'Group').first
       user_follow.try(:destroy)
       render :json => { "ok" => true }
     end
@@ -509,7 +509,7 @@ class GroupsController < ApplicationController
   def accept_invitation
     require_user
     find_group
-    @membership = @group.group_memberships.scoped(:conditions => { :uuid => params[:uuid] }).first if @group
+    @membership = @group.group_memberships.where(:uuid => params[:uuid]).first if @group
     @membership.accept! if @membership.try(:invited?)
     if @membership.try(:active?)
       flash[:notice] = t('notices.welcome', "Welcome to the group %{group_name}!", :group_name => @group.name)

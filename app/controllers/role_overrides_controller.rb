@@ -104,7 +104,7 @@ class RoleOverridesController < ApplicationController
       states = %w(active) if states.empty?
       roles = []
       roles += Role.built_in_roles if states.include?('active')
-      roles += @context.roles.scoped(:conditions => {:workflow_state => states}, :order => :id).all
+      roles += @context.roles.where(:workflow_state => states).order(:id).all
       roles = Api.paginate(roles, self, route)
       render :json => roles.collect{|role| role_json(@context, role, @current_user, session)}
     end
@@ -292,7 +292,7 @@ class RoleOverridesController < ApplicationController
       return
     end
     # remove old role overrides that were associated with this role name
-    @context.role_overrides.scoped(:conditions => {:enrollment_type => @role}).delete_all
+    @context.role_overrides.where(:enrollment_type => @role).delete_all
 
     unless api_request?
       redirect_to named_context_url(@context, :context_permissions_url, :account_roles => params[:account_roles])

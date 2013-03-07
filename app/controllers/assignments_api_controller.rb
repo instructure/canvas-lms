@@ -254,9 +254,9 @@ class AssignmentsApiController < ApplicationController
   # @returns [Assignment]
   def index
     if authorized_action(@context, @current_user, :read)
-      @assignments = @context.active_assignments.find(:all,
-          :include => [:assignment_group, :rubric_association, :rubric],
-          :order => "assignment_groups.position, assignments.position")
+      @assignments = @context.active_assignments.
+          includes(:assignment_group, :rubric_association, :rubric).
+          reorder("assignment_groups.position, assignments.position")
 
       hashes = @assignments.map { |assignment|
         assignment_json(assignment, @current_user, session) }

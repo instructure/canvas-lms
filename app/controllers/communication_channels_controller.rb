@@ -243,7 +243,7 @@ class CommunicationChannelsController < ApplicationController
       else
         # Open registration and admin-created users are pre-registered, and have already claimed a CC, but haven't
         # set up a password yet
-        @pseudonym = @root_account.pseudonyms.active.find(:first, :conditions => {:password_auto_generated => true, :user_id => @user.id} ) if @user.pre_registered? || @user.creation_pending?
+        @pseudonym = @root_account.pseudonyms.active.where(:password_auto_generated => true, :user_id => @user).first if @user.pre_registered? || @user.creation_pending?
         # Users implicitly created via course enrollment or account admin creation are creation pending, and don't have a pseudonym yet
         @pseudonym ||= @root_account.pseudonyms.build(:user => @user, :unique_id => cc.path) if @user.creation_pending?
         # We create the pseudonym with unique_id = cc.path, but if that unique_id is taken, just nil it out and make the user come
