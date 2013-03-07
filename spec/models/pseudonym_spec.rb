@@ -206,7 +206,16 @@ describe Pseudonym do
     @pseudonym.sis_ssha = '{SSHA}garbage'
     @pseudonym.valid_ssha?('garbage').should be_false
   end
-  
+
+  it "should not attempt validating a blank password" do
+    pseudonym_model
+    @pseudonym.expects(:sis_ssha).never
+    @pseudonym.valid_ssha?('')
+
+    @pseudonym.expects(:ldap_bind_result).never
+    @pseudonym.valid_ldap_credentials?('')
+  end
+
   context "Needs a pseudonym with an active user" do
     before do
       user_model

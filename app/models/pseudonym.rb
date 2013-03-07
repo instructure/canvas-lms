@@ -285,6 +285,7 @@ class Pseudonym < ActiveRecord::Base
   
   def valid_arbitrary_credentials?(plaintext_password)
     return false if self.deleted?
+    return false if plaintext_password.blank?
     require 'net/ldap'
     account = self.account || Account.default
     res = false
@@ -323,7 +324,7 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def valid_ssha?(plaintext_password)
-    return false unless plaintext_password && self.sis_ssha
+    return false if plaintext_password.blank? || self.sis_ssha.blank?
     decoded = Base64::decode64(self.sis_ssha.sub(/\A\{SSHA\}/, ""))
     digest = decoded[0,40]
     salt = decoded[40..-1]
@@ -331,7 +332,7 @@ class Pseudonym < ActiveRecord::Base
     digested_password = Digest::SHA1.digest(plaintext_password + salt).unpack('H*').first
     digest == digested_password
   end
-  
+
   def ldap_bind_result(password_plaintext)
     self.account.account_authorization_configs.each do |config|
       res = config.ldap_bind_result(self.unique_id, password_plaintext)
@@ -339,7 +340,7 @@ class Pseudonym < ActiveRecord::Base
     end
     return nil
   end
-  
+
   def add_ldap_channel
     return nil unless managed_password?
     res = @ldap_result
@@ -357,6 +358,7 @@ class Pseudonym < ActiveRecord::Base
 
   attr_reader :ldap_result
   def valid_ldap_credentials?(password_plaintext)
+    return false if password_plaintext.blank?
     # try to authenticate against the LDAP server
     res = ldap_bind_result(password_plaintext)
     if res
