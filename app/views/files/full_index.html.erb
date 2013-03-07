@@ -153,17 +153,7 @@
     </div>
     <div class="clear"></div>
   </li>
-  <li class="folder_item collaboration">
-    <div class="header">
-      <%= image_tag "blank.png", :alt => '', :class => "item_icon" %><a href="#" class="name collaboration_url" target="_blank">&nbsp;</a>
-    </div>
-    <div class="links">
-      <a href="#" class="edit_collaboration_link no-hover collaboration_url" title="<%= t 'links.edit_collaboration', "Edit this Collaboration" %>"><%= image_tag "edit.png" %></a>
-      <a href="#" class="delete_item_link no-hover collaboration_url" title="<%= t 'links.delete_file', "Delete this File" %>"><%= image_tag "delete.png" %></a>
-    </div>
-    <div class="clear"></div>
-  </li>
-  <li id="file_panel" class="content_panel">
+  <li id="file_panel" class="content_panel clearfix">
     <div class="header">
       <a href="#" class="display_name download_item_link">&nbsp;</a> 
       <span class="display_name cant_download">&nbsp;</span>
@@ -209,51 +199,6 @@
     <%= t 'messages.no_preview_avaialble', "No Preview Available" %><br/>
     <a href="#"><%= t 'links.download_with_size', "download the file (%{size})", :size => '<span class="readable_size">&nbsp;</span>'.html_safe %></a>
   </li>
-  <li id="collaborations_panel" class="clearfix content_panel">
-    <div class="header">
-      <%= t 'titles.collaborations', "Collaborations for %{name}", :name => '<span class="name">&nbsp;</span>'.html_safe %>
-      <div class="breadcrumb">
-      </div>
-    </div>
-    <div class="links">
-      <a href="#" class="edit_collaboration_link no-hover"><%= image_tag "edit.png" %></a>
-      <a href="#" class="delete_collaboration_link no-hover"><%= image_tag "delete.png" %></a>
-      <div class="sub_links">
-        <% if [Course, Group].include?(@context.class) %>
-          <%= link_to t('links.manage_collaborations', 'Manage collaborations'), context_url(@context, :context_collaborations_path), :class => 'manage_collaborations' %>
-        <% end %>
-      </div>
-    </div>
-    <div class="clear"></div>
-  </li>
-  <li id="collaboration_panel" class="content_panel">
-    <div class="header">
-      <span class="name">&nbsp;</span>
-      <div class="breadcrumb">
-      </div>
-    </div>
-    <div class="links">
-      <a href="#" class="edit_collaboration_link no-hover attachment_url" title="<%= t 'links.rename_file', "Rename this File" %>"><%= image_tag "edit.png" %></a>
-      <a href="#" class="delete_collaboration_link no-hover attachment_url" title="<%= t 'links.delete_file', "Delete this File" %>"><%= image_tag "delete.png" %></a>
-      <div class="sub_links">
-        <a href="#" class="view_item_link"><%= t 'links.view_collaboration', "View this Collaboration" %></a>
-      </div>
-    </div>
-    <div class="clear"></div>
-  </li>
-  <li id="collaboration_sub_panel" class="content_panel with_subcontent">
-    <div class="subcontent">
-      <div style="font-size: 1.2em; margin-bottom: 20px;"><a href="#" class="view_item_link file_big"><%= t 'links.view_item', "Click here to view %{name}", :name => '<span class="name">&nbsp;</span>'.html_safe %></a></div>
-      <div class="google_docs_icon collaboration_icon"><%= image_tag "google_docs.png", :title => t('titles.created_by_google_docs', "This document was created using Google Docs.") %><span class="description">&nbsp;</span></div>
-      <div class="etherpad_icon collaboration_icon"><%= image_tag "ether_pad.png", :title => t('titles.created_by_etherpad', "This document was created using EtherPad.") %><span class="description">&nbsp;</span></div>
-      <div style="margin-top: 10px; font-size: 0.8em;">
-        <div><%= before_label :last_viewed, "Last Viewed" %><span class="updated_at"></span></div>
-        <div><span class="collaborator_count"></span> <%= t 'titles.collaborators', "Collaborators" %></div>
-        <ul class="collaborators unstyled_list" style="margin-top: 10px; margin-left: 20px; line-height: 1.5em; font-size: 1.2em;">
-        </ul>
-      </div>
-    </div>
-  </li>
   <li id="groups_panel" class="content_panel">
     <div class="header">
       <a href="#" class="name category_name groups_link">&nbsp;</a> for <span class="name context_name">&nbsp;</span>
@@ -261,8 +206,6 @@
       </div>
     </div>
     <div class="links">
-      <a href="#" class="edit_collaboration_link no-hover"><%= image_tag "edit.png" %></a>
-      <a href="#" class="delete_collaboration_link no-hover"><%= image_tag "delete.png" %></a>
       <div class="sub_links">
         <a href="#" class="groups_link">See all groups for <span class="context_name">&nbsp;</span></a>
       </div>
@@ -304,8 +247,6 @@
     <a href="<%= root_url %>/files" class="<%= context.asset_string %>_attachments_url">&nbsp;</a>
     <a href="<%= root_url %>/folders" class="<%= context.asset_string %>_folders_url">&nbsp;</a>
     <a href="<%= root_url %>/files/reorder" class="<%= context.asset_string %>_reorder_attachments_url">&nbsp;</a>
-    <a href="<%= root_url %>/collaborations" class="<%= context.asset_string %>_collaborations_url">&nbsp;</a>
-    <a href="<%= root_url %>/collaborations/{{ id }}" class="<%= context.asset_string %>_collaboration_url">&nbsp;</a>
     <a href="<%= root_url %>/groups" class="<%= context.asset_string %>_groups_url">&nbsp;</a>
     <a href="<%= root_url %>/files/{{ id }}" class="<%= context.asset_string %>_attachment_url">&nbsp;</a>
     <a href="<%= root_url %>/folders/{{ id }}" class="<%= context.asset_string %>_folder_url">&nbsp;</a>
@@ -315,17 +256,6 @@
     <a href="<%= context_url(context, :context_zip_file_import_url, "{{ id }}", :format => :json) %>" class="<%= context.asset_string %>_zip_import_status_url" style="display: none;">&nbsp;</a>
     <a href="<%= context_url(context, :context_file_inline_view_url, "{{ id }}") rescue '#' %>" class="<%= context.asset_string %>_inline_view_attachment_url">&nbsp;</a>
     <a href="<%= context_url(context, :context_import_files_url) rescue '#' %>" class="<%= context.asset_string %>_import_url">&nbsp;</a>
-    <% if can_do(context, @current_user, :read_roster) %>
-    <ul class="<%= context.asset_string %>_user_list unstyled_list">
-      <% context.users.uniq.each do |user| %>
-        <li class="collaborator collaborator_<%= user.id %>">
-          <%= check_box :user, "#{user.id}".to_sym, :value => user.id, :class => "#{context.asset_string}_user_#{user.id}" %>
-          <label for="<%= context.asset_string %>_user_<%= user.id %>"><%= context_user_name(context, user) %></label>
-          <span class="user_id" style="display: none;"><%= user.id %></span>
-        </li>
-      <% end %>
-    </ul>
-    <% end %>
   <% end %>
 </div>
 <div id="edit_content_dialog" style="display: none;" title="<%= t 'titles.edit_file_contents', "Edit File Contents" %>">
@@ -345,83 +275,6 @@
 <div style="display: none;" id="form_templates">
   <%= image_tag "blank.png", :alt => '', :id => "content_blank_icon" %>
   <%= image_tag "lock_for_file_folder.png", :id => "content_locked_icon" %>
-<div id="edit_collaboration_dialog">
-  <% form_for :collaboration, :url => "", :html => {:id => "edit_collaboration_form"} do |f| %>
-  <table class="formtable">
-    <tr class="add_collaboration">
-      <td style="white-space: nowrap;"><label for="collaboration_collaboration_type"><%= before_label :collaborate_using, "Collaborate Using" %></label></td>
-      <td><select id="collaboration_collaboration_type" name="collaboration[collaboration_type]">
-        <% Collaboration.collaboration_types.each do |collab_type| %>
-          <% if collab_type['type'] == 'google_docs' %>
-            <% if @domain_root_account && feature_and_service_enabled?(:google_docs) %>
-              <option value="<%= collab_type['name'] %>"><%= collab_type['name'] %></option>
-            <% end %>
-          <% elsif (Collaboration.collaboration_class(collab_type['type'].titleize.gsub(/\s/, "")).config rescue false) %>
-            <option value="<%= collab_type['name'] %>"><%= collab_type['name'] %></option>
-          <% end %>
-        <% end %>
-      </select></td>
-    </tr><tr id="google_docs_description" class="collaboration_description add_collaboration">
-      <td colspan="2" style="padding: 5px 20px 10px; font-size: 0.8em;">
-        <%= image_tag "google_docs_icon.png", :style => "float: left; margin-right: 5px;" %>
-        <%= t 'descriptions.google_docs', <<-HEREDOC
-        Google Docs are a great place to collaborate
-        on a group project.  It's like Microsoft Word, but lets you work together with others
-        on the same file without having to email it around.  You'll need a Google account
-        in order to participate in any Google Docs collaborations.
-HEREDOC
-        %>
-      </td>
-    </tr><tr id="etherpad_description" class="collaboration_description add_collaboration">
-      <td colspan="2" style="padding: 5px 20px 10px; font-size: 0.8em;">
-        <%= image_tag "ether_pad.png", :style => "float: left; margin-right: 5px; margin-top: 5px;" %>
-        <%= t 'descriptions.etherpad', <<-HEREDOC
-        EtherPad is a site that lets you quickly set
-        up shared documents.  It's fast enough that you can see what others are typing as they're
-        typing it -- although "pads" aren't protected by a password so anyone that knows about them
-        can edit them.  EtherPad might be better suited than Google Docs for things like taking
-        notes because it's so fast.
-HEREDOC
-        %>
-      </td>
-    </tr><tr>
-      <td style="white-space: nowrap;"><%= f.blabel :title, :en => "Document Name" %></td>
-      <td><%= f.text_field :title, :style => "width: 300px;" %></td>
-    </tr><tr>
-      <td><%= f.blabel :description, :en => "Description" %></td>
-      <td><%= f.text_area :description, :style => "width: 300px; height: 50px;" %></td>
-    </tr><tr>
-      <td colspan="2">
-        <div class="collaborate_data">
-          <div>
-            <%= before_label :collaborate_with, "Collaborate With" %>
-            <div style="margin-left: 10px; font-size: 0.8em;">
-              <a href="#" class="select_all_link"><%= t '#links.select_all', "Select All" %></a> |
-              <a href="#" class="deselect_all_link"><%= t '#links.deselect_all', "Deselect All" %></a>
-            </div>
-            <div class="collaborator_list" style="max-height: 100px; overflow: auto;">
-            </div>
-          </div>
-          <div class="button-container">
-            <button type="submit" class="btn button-default-action submit_button"><%= t 'buttons.add_collaboration', "Add Collaboration" %></button>
-            <button type="button" class="btn button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
-          </div>
-        </div>
-        <% if @current_user && !@current_user.user_services.map(&:service).include?("google_docs") %>
-        <div id="collaborate_authorize_google_docs" class="collaboration_authorization" style="display: none; margin: 20px;">
-          <%= t '#instructions.authorize_google_docs', "Before you can collaborate on documents, you need to authorize Canvas
-          to access your Google Docs account:" %>
-          <div class="button-container">
-            <a class="btn button-default-action" href="<%= oauth_url(:service => :google_docs, :return_to => (request.url + "#add_collaboration")) %>"><%= t '#buttons.authorize_google_docs', "Authorize Google Docs Access" %></a>
-            <button type="button" class="btn button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
-          </div>
-        </div>
-        <% end %>
-      </td>
-    </tr>
-  </table>
-  <% end %>
-</div>
 <div id="lock_item_dialog" style="display: none;">
   <% form_for :attachment, :url => "", :html => {:id => "lock_attachment_form", :method => :put} do |f| %>
     <%= image_tag "lock_closed.png", :style => "float: left;", :alt => "" %>
@@ -520,7 +373,7 @@ require([
   'vendor/scribd.view' /* scribd */
 ], function(INST, I18n, $) {
 
-window.contexts = <%= raw @contexts.to_json(:permissions => {:user => @current_user, :policies => [:create_collaborations,:manage_files,:update,:manage_grades,:read_roster]}, :methods => :asset_string, :include_root => false) %>;
+window.contexts = <%= raw @contexts.to_json(:permissions => {:user => @current_user, :policies => [:manage_files,:update,:manage_grades,:read_roster]}, :methods => :asset_string, :include_root => false) %>;
 
 INST.downloadFolderFiles = function(url) {
   var cancelled = false;
