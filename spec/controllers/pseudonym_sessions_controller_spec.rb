@@ -67,6 +67,14 @@ describe PseudonymSessionsController do
     response.should render_template('new')
   end
 
+  it "should re-render if no password given" do
+    user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty')
+    post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => ''}
+    response.status.should == '400 Bad Request'
+    response.should render_template('new')
+    flash[:error].should match(/no password/i)
+  end
+
   it "password auth should work" do
     user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty')
     post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwerty'}
