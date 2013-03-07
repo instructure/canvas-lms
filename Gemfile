@@ -4,10 +4,7 @@ ONE_NINE = RUBY_VERSION >= "1.9."
 
 gem 'rails',          '2.3.17'
 gem 'authlogic',      '2.1.3'
-#gem 'aws-s3',         '0.6.2',  :require => 'aws/s3'
-# use custom gem until pull request at https://github.com/marcel/aws-s3/pull/41
-# is merged into mainline. gem built from https://github.com/lukfugl/aws-s3
-gem "aws-s3-instructure", "0.6.2.1352914936",  :require => 'aws/s3'
+gem "aws-sdk",        '1.8.3.1'
 gem 'barby',          '0.5.0'
 gem 'bcrypt-ruby',    '3.0.1'
 gem 'builder',        '2.1.2'

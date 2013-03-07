@@ -106,9 +106,9 @@ shared_examples_for "file uploads api" do
 
     # step 2, upload
     # we skip the actual call and stub this out, since we can't hit s3 during specs
-    AWS::S3::S3Object.expects(:about).with(attachment.full_filename, attachment.bucket_name).returns({
-      'content-type' => 'application/msword',
-      'content-length' => 1234,
+    AWS::S3::S3Object.any_instance.expects(:head).returns({
+      :content_type => 'application/msword',
+      :content_length => 1234,
     })
 
     # step 3, confirmation
@@ -365,10 +365,10 @@ shared_examples_for "file uploads api with folders" do
 
     redir = json['upload_params']['success_action_redirect']
     attachment = Attachment.last(:order => :id)
-    AWS::S3::S3Object.expects(:about).with(attachment.full_filename, attachment.bucket_name).returns({
-      'content-type' => 'application/msword',
-      'content-length' => 1234,
-    })
+    AWS::S3::S3Object.any_instance.expects(:head).returns({
+                                      :content_type => 'application/msword',
+                                      :content_length => 1234,
+                                    })
 
     post redir, {}, { 'Authorization' => "Bearer #{access_token_for_user @user}" }
     response.should be_success

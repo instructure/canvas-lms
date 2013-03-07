@@ -73,10 +73,12 @@ describe "Files API", :type => :integration do
 
     it "should set the attachment to available (s3 storage)" do
       s3_storage!
-      AWS::S3::S3Object.expects(:about).with(@attachment.full_filename, @attachment.bucket_name).returns({
-        'content-type' => 'text/plain',
-        'content-length' => 1234,
-      })
+
+      AWS::S3::S3Object.any_instance.expects(:head).returns({
+                                          :content_type => 'text/plain',
+                                          :content_length => 1234,
+                                      })
+
       json = api_call(:post, "/api/v1/files/#{@attachment.id}/create_success?uuid=#{@attachment.uuid}",
                    { :controller => "files", :action => "api_create_success", :format => "json", :id => @attachment.to_param, :uuid => @attachment.uuid })
       @attachment.reload

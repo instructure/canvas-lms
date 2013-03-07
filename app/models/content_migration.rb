@@ -17,8 +17,6 @@
 #
 
 class ContentMigration < ActiveRecord::Base
-  require 'aws/s3'
-  include AWS::S3
   include Workflow
   belongs_to :context, :polymorphic => true
   belongs_to :user

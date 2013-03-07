@@ -48,7 +48,9 @@ module Technoweenie # :nodoc:
 
         def authenticated_s3_url(*args)
           return root_attachment.authenticated_s3_url(*args) if root_attachment
-          protocol = args[0].is_a?(Hash) && args[0][:protocol]
+          if args[0].is_a?(Hash) && !args[0][:secure].nil?
+            protocol = args[0][:secure] ? 'https://' : 'http://'
+          end
           protocol ||= "#{HostUrl.protocol}://"
           "#{protocol}#{HostUrl.context_host(context)}/#{context_type.underscore.pluralize}/#{context_id}/files/#{id}/download?verifier=#{uuid}"
         end

@@ -301,6 +301,7 @@ module SeleniumTestsHelperMethods
     js = CoffeeScript.compile(coffee_source, :bare => true)
     driver.execute_async_script(js)
   end
+
 end
 
 shared_examples_for "all selenium tests" do

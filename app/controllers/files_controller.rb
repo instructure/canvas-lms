@@ -213,7 +213,7 @@ class FilesController < ApplicationController
           @attachment ||= @submission.submission_history.map(&:versioned_attachments).flatten.find{|a| a.id == params[:download].to_i }
         end
         if @submission ? authorized_action(@submission, @current_user, :read) : authorized_action(@attachment, @current_user, :download)
-          render :json  => { :public_url => @attachment.authenticated_s3_url(:protocol => request.protocol) }
+          render :json  => { :public_url => @attachment.authenticated_s3_url(:secure => request.ssl?) }
         end
       end
     end
@@ -411,10 +411,9 @@ class FilesController < ApplicationController
     elsif redirect_to_s3
       redirect_to(inline ? attachment.cacheable_s3_inline_url : attachment.cacheable_s3_download_url)
     else
-      require 'aws/s3'
-      send_file_headers!( :length=>AWS::S3::S3Object.about(attachment.full_filename, attachment.bucket_name)["content-length"], :filename=>attachment.filename, :disposition => 'inline', :type => attachment.content_type_with_encoding)
+      send_file_headers!( :length=> attachment.s3object.content_length, :filename=>attachment.filename, :disposition => 'inline', :type => attachment.content_type_with_encoding)
       render :status => 200, :text => Proc.new { |response, output|
-        AWS::S3::S3Object.stream(attachment.full_filename, attachment.bucket_name) do |chunk|
+        attachment.s3object.read do |chunk|
          output.write chunk
         end
       }
@@ -534,7 +533,7 @@ class FilesController < ApplicationController
     if params[:id].present?
       @attachment = Attachment.find_by_id_and_workflow_state_and_uuid(params[:id], 'unattached', params[:uuid])
     end
-    details = AWS::S3::S3Object.about(@attachment.full_filename, @attachment.bucket_name) rescue nil
+    details = @attachment.s3object.head rescue nil
     if @attachment && details
       deleted_attachments = @attachment.handle_duplicates(params[:duplicate_handling])
       @attachment.process_s3_details!(details)
@@ -569,7 +568,7 @@ class FilesController < ApplicationController
     return unless check_quota_after_attachment(request)
     if Attachment.s3_storage?
       return render(:nothing => true, :status => :bad_request) unless @attachment.state == :unattached
-      details = AWS::S3::S3Object.about(@attachment.full_filename, @attachment.bucket_name)
+      details = @attachment.s3object.head
       @attachment.process_s3_details!(details)
     else
       @attachment.file_state = 'available'

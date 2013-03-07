@@ -472,10 +472,8 @@ class Attachment < ActiveRecord::Base
     write_attribute(:namespace, new_namespace)
 
     if Attachment.s3_storage?
-      AWS::S3::S3Object.rename(old_full_filename,
-                               self.full_filename,
-                               bucket_name,
-                               :access => attachment_options[:s3_access])
+      bucket.objects[old_full_filename].rename_to(self.full_filename,
+                                                  :acl => attachment_options[:s3_access])
     else
       FileUtils.mv old_full_filename, full_filename
     end
@@ -489,12 +487,12 @@ class Attachment < ActiveRecord::Base
       self.workflow_state = nil
       self.file_state = 'available'
     end
-    self.md5 = (details['etag'] || "").gsub(/\"/, '')
-    self.content_type = details['content-type']
-    self.size = details['content-length']
+    self.md5 = (details[:etag] || "").gsub(/\"/, '')
+    self.content_type = details[:content_type]
+    self.size = details[:content_length]
 
     if existing_attachment = find_existing_attachment_for_md5
-      AWS::S3::S3Object.delete(full_filename, bucket_name) rescue nil
+      s3object.delete rescue nil
       self.root_attachment = existing_attachment
       write_attribute(:filename, nil)
       clear_cached_urls
@@ -512,12 +510,12 @@ class Attachment < ActiveRecord::Base
   def ajax_upload_params(pseudonym, local_upload_url, s3_success_url, options = {})
     if Attachment.s3_storage?
       res = {
-        :upload_url => "#{options[:ssl] ? "https" : "http"}://#{bucket_name}.s3.amazonaws.com/",
+        :upload_url => "#{options[:ssl] ? "https" : "http"}://#{bucket.name}.#{bucket.config.s3_endpoint}/",
         :remote_url => true,
         :file_param => 'file',
         :success_url => s3_success_url,
         :upload_params => {
-          'AWSAccessKeyId' => AWS::S3::Base.connection.access_key_id
+          'AWSAccessKeyId' => bucket.config.access_key_id
         }
       }
     elsif Attachment.local_storage?
@@ -537,13 +535,15 @@ class Attachment < ActiveRecord::Base
     policy = {
       'expiration' => (options[:expiration] || S3_EXPIRATION_TIME).from_now.utc.iso8601,
       'conditions' => [
-        {'bucket' => bucket_name},
         {'key' => sanitized_filename},
         {'acl' => 'private'},
         ['starts-with', '$Filename', ''],
         ['content-length-range', 1, (options[:max_size] || CONTENT_LENGTH_RANGE)]
       ]
     }
+    if Attachment.s3_storage?
+      policy['conditions'].unshift({'bucket' => bucket.name})
+    end
     if res[:upload_params]['folder'].present?
       policy['conditions'] << ['starts-with', '$folder', '']
     end
@@ -568,7 +568,7 @@ class Attachment < ActiveRecord::Base
     policy_encoded = Base64.encode64(policy.to_json).gsub(/\n/, '')
     signature = Base64.encode64(
       OpenSSL::HMAC.digest(
-        OpenSSL::Digest::Digest.new('sha1'), Attachment.shared_secret, policy_encoded
+        OpenSSL::Digest::Digest.new('sha1'), shared_secret, policy_encoded
       )
     ).gsub(/\n/, '')
 
@@ -587,7 +587,7 @@ class Attachment < ActiveRecord::Base
   def self.decode_policy(policy_str, signature_str)
     return nil if policy_str.blank? || signature_str.blank?
     signature = Base64.decode64(signature_str)
-    return nil if OpenSSL::HMAC.digest(OpenSSL::Digest::Digest.new("sha1"), Attachment.shared_secret, policy_str) != signature
+    return nil if OpenSSL::HMAC.digest(OpenSSL::Digest::Digest.new("sha1"), self.shared_secret, policy_str) != signature
     policy = JSON.parse(Base64.decode64(policy_str))
     return nil unless Time.zone.parse(policy['expiration']) >= Time.now
     attachment = Attachment.find(policy['attachment_id'])
@@ -692,7 +692,12 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.shared_secret
-    self.s3_storage? ? AWS::S3::Base.connection.secret_access_key : "local_storage" + Canvas::Security.encryption_key
+    raise 'Cannot call Attachment.shared_secret when configured for s3 storage' if s3_storage?
+    "local_storage" + Canvas::Security.encryption_key
+  end
+
+  def shared_secret
+    self.class.s3_storage? ? bucket.config.secret_access_key : self.class.shared_secret
   end
 
   def downloadable?
@@ -747,7 +752,7 @@ class Attachment < ActiveRecord::Base
         File.open(self.full_filename, 'rb')
       end
     elsif block
-      AWS::S3::S3Object.stream(self.full_filename, self.bucket_name, &block)
+      s3object.read(&:block)
     else
       # TODO: !need_local_file -- net/http and thus AWS::S3::S3Object don't
       # natively support streaming the response, except when a block is given.
@@ -759,7 +764,7 @@ class Attachment < ActiveRecord::Base
       end
       tempfile = Tempfile.new(["attachment_#{self.id}", self.extension],
                               opts[:temp_folder].presence || Dir::tmpdir)
-      AWS::S3::S3Object.stream(self.full_filename, self.bucket_name) do |chunk|
+      s3object.read do |chunk|
         tempfile.write(chunk)
       end
       tempfile.rewind
@@ -965,8 +970,8 @@ class Attachment < ActiveRecord::Base
 
         # we need to have versions of the url for each content-disposition
         {
-          'inline' => authenticated_s3_url(:expires_in => 6.days, "response-content-disposition" => "inline; " + filename),
-          'attachment' => authenticated_s3_url(:expires_in => 6.days, "response-content-disposition" => "attachment; " + filename)
+          'inline' => authenticated_s3_url(:expires => 6.days, :response_content_disposition => "inline; " + filename),
+          'attachment' => authenticated_s3_url(:expires => 6.days, :response_content_disposition => "attachment; " + filename)
         }
       end
     end
@@ -1285,7 +1290,7 @@ class Attachment < ActiveRecord::Base
         upload_path = if Attachment.local_storage?
                  self.full_filename
                else
-                 self.authenticated_s3_url(:expires_in => 1.year)
+                 self.authenticated_s3_url(:expires => 1.year)
                end
         self.write_attribute(:scribd_doc, ScribdAPI.upload(upload_path, self.after_extension || self.scribd_mime_type.extension))
         self.cached_scribd_thumbnail = self.scribd_doc.thumbnail

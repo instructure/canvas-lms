@@ -128,7 +128,7 @@ describe Attachment do
     it "should return the protocol if specified" do
       course_model
       attachment_with_context(@course)
-      @attachment.authenticated_s3_url(:protocol => "https://").should match(/^https:\/\//)
+      @attachment.authenticated_s3_url(:secure => true).should match(/^https:\/\//)
     end
   end
 
@@ -767,8 +767,8 @@ describe Attachment do
     it "should include response-content-disposition" do
       attachment = attachment_with_context(@course, :display_name => 'foo')
       attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save
-      attachment.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => %(attachment; filename="foo"; filename*=UTF-8''foo)))
-      attachment.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => %(inline; filename="foo"; filename*=UTF-8''foo)))
+      attachment.expects(:authenticated_s3_url).with(has_entry(:response_content_disposition => %(attachment; filename="foo"; filename*=UTF-8''foo)))
+      attachment.expects(:authenticated_s3_url).with(has_entry(:response_content_disposition => %(inline; filename="foo"; filename*=UTF-8''foo)))
       attachment.cacheable_s3_inline_url
       attachment.cacheable_s3_download_url
     end
@@ -776,14 +776,14 @@ describe Attachment do
     it "should use the display_name, not filename, in the response-content-disposition" do
       attachment = attachment_with_context(@course, :filename => 'bar', :display_name => 'foo')
       attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save
-      attachment.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => %(attachment; filename="foo"; filename*=UTF-8''foo)))
+      attachment.expects(:authenticated_s3_url).with(has_entry(:response_content_disposition => %(attachment; filename="foo"; filename*=UTF-8''foo)))
       attachment.cacheable_s3_inline_url
     end
 
     it "should http quote the filename in the response-content-disposition if necessary" do
       attachment = attachment_with_context(@course, :display_name => 'fo"o')
       attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save
-      attachment.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => %(attachment; filename="fo\\"o"; filename*=UTF-8''fo%22o)))
+      attachment.expects(:authenticated_s3_url).with(has_entry(:response_content_disposition => %(attachment; filename="fo\\"o"; filename*=UTF-8''fo%22o)))
       attachment.cacheable_s3_inline_url
     end
 
@@ -791,14 +791,14 @@ describe Attachment do
       a = attachment_with_context(@course, :display_name => "糟糕.pdf")
       sanitized_filename = Iconv.conv("ASCII//TRANSLIT//IGNORE", "UTF-8", a.display_name)
       a.expects(:authenticated_s3_url).at_least(0)
-      a.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => %(attachment; filename="#{sanitized_filename}"; filename*=UTF-8''%E7%B3%9F%E7%B3%95.pdf)))
+      a.expects(:authenticated_s3_url).with(has_entry(:response_content_disposition => %(attachment; filename="#{sanitized_filename}"; filename*=UTF-8''%E7%B3%9F%E7%B3%95.pdf)))
       a.cacheable_s3_inline_url
     end
 
     it "should escape all non-alphanumeric characters in the utf-8 filename" do
       attachment = attachment_with_context(@course, :display_name => '"This file[0] \'{has}\' \# awesome `^<> chars 100%,|<-pipe"')
       attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save
-      attachment.expects(:authenticated_s3_url).with(has_entry('response-content-disposition' => %(attachment; filename="\\\"This file[0] '{has}' \\# awesome `^<> chars 100%,|<-pipe\\\""; filename*=UTF-8''%22This%20file%5B0%5D%20%27%7Bhas%7D%27%20%5C%23%20awesome%20%60%5E%3C%3E%20chars%20100%25%2C%7C%3C%2Dpipe%22)))
+      attachment.expects(:authenticated_s3_url).with(has_entry(:response_content_disposition => %(attachment; filename="\\\"This file[0] '{has}' \\# awesome `^<> chars 100%,|<-pipe\\\""; filename*=UTF-8''%22This%20file%5B0%5D%20%27%7Bhas%7D%27%20%5C%23%20awesome%20%60%5E%3C%3E%20chars%20100%25%2C%7C%3C%2Dpipe%22)))
       attachment.cacheable_s3_inline_url
     end
   end
@@ -928,14 +928,14 @@ describe Attachment do
     end
 
     it "should fail for non-root attachments" do
-      AWS::S3::S3Object.expects(:rename).never
+      AWS::S3::S3Object.any_instance.expects(:rename_to).never
       expect { @child.change_namespace(@new_account.file_namespace) }.to raise_error
       @root.reload.namespace.should == @old_account.file_namespace
       @child.reload.namespace.should == @root.reload.namespace
     end
 
     it "should rename root attachments and update children" do
-      AWS::S3::S3Object.expects(:rename).with(@root.full_filename, @root.full_filename.sub(@old_account.id.to_s, @new_account.id.to_s), @root.bucket_name, anything)
+      AWS::S3::S3Object.any_instance.expects(:rename_to).with(@root.full_filename.sub(@old_account.id.to_s, @new_account.id.to_s), anything)
       @root.change_namespace(@new_account.file_namespace)
       @root.namespace.should == @new_account.file_namespace
       @child.reload.namespace.should == @root.namespace

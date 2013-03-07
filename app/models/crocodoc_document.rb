@@ -35,7 +35,7 @@ class CrocodocDocument < ActiveRecord::Base
   def upload
     return if uuid.present?
 
-    url = attachment.authenticated_s3_url(:expires_in => 1.day)
+    url = attachment.authenticated_s3_url(:expires => 1.day)
 
     response = Canvas.timeout_protection("crocodoc") {
       crocodoc_api.upload(url)

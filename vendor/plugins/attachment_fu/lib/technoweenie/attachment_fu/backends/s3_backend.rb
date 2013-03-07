@@ -1,13 +1,13 @@
 module Technoweenie # :nodoc:
   module AttachmentFu # :nodoc:
     module Backends
-      # = AWS::S3 Storage Backend
+      # = AWS SDK Storage Backend
       #
       # Enables use of {Amazon's Simple Storage Service}[http://aws.amazon.com/s3] as a storage mechanism
       #
       # == Requirements
       #
-      # Requires the {AWS::S3 Library}[http://amazon.rubyforge.org] for S3 by Marcel Molina Jr. installed either
+      # Requires the {AWS SDK Library}[https://github.com/aws/aws-sdk-ruby] installed either
       # as a gem or a as a Rails plugin.
       #
       # == Configuration
@@ -48,7 +48,7 @@ module Technoweenie # :nodoc:
       #
       # == About bucket names
       #
-      # Bucket names have to be globaly unique across the S3 system. And you can only have up to 100 of them,
+      # Bucket names have to be globally unique across the S3 system. And you can only have up to 100 of them,
       # so it's a good idea to think of a bucket as being like a database, hence the correspondance in this
       # implementation to the development, test, and production environments.
       #
@@ -121,72 +121,33 @@ module Technoweenie # :nodoc:
         class RequiredLibraryNotFoundError < StandardError; end
         class ConfigFileNotFoundError < StandardError; end
 
+        mattr_reader :bucket
+
         def self.included(base) #:nodoc:
-          mattr_reader :bucket_name, :instance_reader => false
-          mattr_reader :s3_config, :instance_reader => false
-          
           begin
-            require 'aws/s3'
-            include AWS::S3
+            require 'aws-sdk'
           rescue LoadError
-            raise RequiredLibraryNotFoundError.new('AWS::S3 could not be loaded')
+            raise RequiredLibraryNotFoundError.new('AWS SDK could not be loaded')
           end
 
           begin
-            @@s3_config_path = base.attachment_options[:s3_config_path] || (Rails.root + 'config/amazon_s3.yml')
-            @@s3_config = YAML.load(ERB.new(File.read(@@s3_config_path)).result)[Rails.env].symbolize_keys
+            s3_config_path = base.attachment_options[:s3_config_path] || (Rails.root + 'config/amazon_s3.yml')
+            s3_config = YAML.load(ERB.new(File.read(s3_config_path)).result)[Rails.env].symbolize_keys
           #rescue
           #  raise ConfigFileNotFoundError.new('File %s not found' % @@s3_config_path)
           end
 
-          @@bucket_name = s3_config[:bucket_name]
+          # backcompat for AWS::S3 gem options
+          s3_config[:proxy_uri] = s3_config.delete(:proxy) if s3_config.key?(:proxy)
+          s3_config[:s3_endpoint] = s3_config.delete(:server) if s3_config.key?(:server)
 
-          Base.establish_connection!(s3_config.slice(:access_key_id, :secret_access_key, :server, :port, :use_ssl, :persistent, :proxy))
+          s3 = AWS::S3.new(s3_config)
 
-          # Bucket.create(@@bucket_name)
+          @@bucket = s3.buckets[s3_config[:bucket_name]]
+
+          # s3.create_bucket(s3_config[:bucket_name])
 
           base.before_update :rename_file
-        end
-
-        def s3_config
-          return @s3_config if @s3_config
-          begin
-            plugin_settings = PluginSetting.settings_for_plugin('s3')
-          rescue Canvas::NoPluginError
-            # this might happen in specs when s3_storage? was false during initialization,
-            # but we later switch to it
-          end
-          @s3_config ||= (self.class.s3_config || {}).merge(plugin_settings || {})
-        end
-
-        def self.protocol
-          @protocol ||= s3_config[:use_ssl] ? 'https://' : 'http://'
-        end
-        
-        def self.hostname
-          @hostname ||= s3_config[:server] || AWS::S3::DEFAULT_HOST
-        end
-        
-        def self.port_string
-          @port_string ||= (s3_config[:port].nil? || s3_config[:port] == (s3_config[:use_ssl] ? 443 : 80)) ? '' : ":#{s3_config[:port]}"
-        end
-
-        module ClassMethods
-          def s3_protocol
-            Technoweenie::AttachmentFu::Backends::S3Backend.protocol
-          end
-          
-          def s3_hostname
-            Technoweenie::AttachmentFu::Backends::S3Backend.hostname
-          end
-          
-          def s3_port_string
-            Technoweenie::AttachmentFu::Backends::S3Backend.port_string
-          end
-        end
-
-        def bucket_name
-          s3_config[:bucket_name]
         end
 
         # Overwrites the base filename writer in order to store the old filename
@@ -219,10 +180,17 @@ module Technoweenie # :nodoc:
         # The full path to the file relative to the bucket name
         # Example: <tt>:table_name/:id/:filename</tt>
         def full_filename(thumbnail = nil)
-          File.join(base_path, thumbnail_name_for(thumbnail))
+          # the old AWS::S3 gem would not encode +'s, causing S3 to interpret
+          # them as spaces. Continue that behavior.
+          basename = thumbnail_name_for(thumbnail).gsub('+', ' ')
+          File.join(base_path, basename)
         end
 
-        # All public objects are accessible via a GET request to the S3 servers. You can generate a 
+        def s3object(thumbnail = nil)
+          bucket.objects[full_filename(thumbnail)]
+        end
+
+        # All public objects are accessible via a GET request to the S3 servers. You can generate a
         # url for an object using the s3_url method.
         #
         #   @photo.s3_url
@@ -233,7 +201,7 @@ module Technoweenie # :nodoc:
         #
         # The optional thumbnail argument will output the thumbnail's filename (if any).
         def s3_url(thumbnail = nil)
-          File.join(s3_protocol + s3_hostname + s3_port_string, bucket_name, full_filename(thumbnail))
+          s3object(thumbnail).public_url
         end
         alias :public_filename :s3_url
 
@@ -242,21 +210,21 @@ module Technoweenie # :nodoc:
         #
         #   @photo.authenticated_s3_url
         #
-        # By default authenticated urls expire 5 minutes after they were generated.
+        # By default authenticated urls expire 1 hour after they were generated.
         #
         # Expiration options can be specified either with an absolute time using the <tt>:expires</tt> option,
-        # or with a number of seconds relative to now with the <tt>:expires_in</tt> option:
+        # or with a number of seconds relative to now with the <tt>:expires</tt> option:
         #
         #   # Absolute expiration date (October 13th, 2025)
         #   @photo.authenticated_s3_url(:expires => Time.mktime(2025,10,13).to_i)
         #   
         #   # Expiration in five hours from now
-        #   @photo.authenticated_s3_url(:expires_in => 5.hours)
+        #   @photo.authenticated_s3_url(:expires => 5.hours)
         #
-        # You can specify whether the url should go over SSL with the <tt>:use_ssl</tt> option.
+        # You can specify whether the url should go over SSL with the <tt>:secure</tt> option.
         # By default, the ssl settings for the current connection will be used:
         #
-        #   @photo.authenticated_s3_url(:use_ssl => true)
+        #   @photo.authenticated_s3_url(:secure => true)
         #
         # Finally, the optional thumbnail argument will output the thumbnail's filename (if any):
         #
@@ -264,7 +232,7 @@ module Technoweenie # :nodoc:
         def authenticated_s3_url(*args)
           thumbnail = args.first.is_a?(String) ? args.first : nil
           options   = args.last.is_a?(Hash)    ? args.last  : {}
-          S3Object.url_for(full_filename(thumbnail), bucket_name, options)
+          s3object(thumbnail).url_for(:read, options).to_s
         end
 
         def create_temp_file
@@ -272,19 +240,7 @@ module Technoweenie # :nodoc:
         end
 
         def current_data
-          S3Object.value full_filename, bucket_name
-        end
-
-        def s3_protocol
-          Technoweenie::AttachmentFu::Backends::S3Backend.protocol
-        end
-        
-        def s3_hostname
-          Technoweenie::AttachmentFu::Backends::S3Backend.hostname
-        end
-          
-        def s3_port_string
-          Technoweenie::AttachmentFu::Backends::S3Backend.port_string
+          s3object.read
         end
 
         protected
@@ -292,7 +248,7 @@ module Technoweenie # :nodoc:
           def destroy_file
             # Not confident that a monkey patch will always work for a plugin.  Changing inline.
             begin
-              S3Object.delete full_filename, bucket_name
+              s3object.delete
             rescue
               # full_filename will break if the transmission didn't work.
               true
@@ -317,12 +273,7 @@ module Technoweenie # :nodoc:
             # I've added some additional provisions in Attachment.rb, but
             # it looks like they're not always working for some reason
             begin
-              S3Object.rename(
-                old_full_filename,
-                full_filename,
-                bucket_name,
-                :access => attachment_options[:s3_access]
-              )
+              bucket.objects[old_full_filename].rename_to(full_filename, :acl => attachment_options[:s3_access])
             rescue => e
               filename = @old_filename
             end
@@ -333,13 +284,9 @@ module Technoweenie # :nodoc:
 
           def save_to_storage
             if save_attachment?
-              S3Object.store(
-                full_filename,
-                (temp_path ? File.open(temp_path, 'rb') : temp_data),
-                bucket_name,
-                :content_type => content_type,
-                :access => attachment_options[:s3_access]
-              )
+              s3object.write((temp_path ? File.open(temp_path, 'rb') : temp_data),
+                             :content_type => content_type,
+                             :acl => attachment_options[:s3_access])
             end
 
             @old_filename = nil

@@ -846,11 +846,11 @@ Spec::Runner.configure do |config|
     Attachment.stubs(:s3_storage?).returns(true)
     Attachment.stubs(:local_storage?).returns(false)
     if opts[:stubs]
-      conn = mock('HTTP Connection')
-      AWS::S3::Connection.any_instance.stubs(:create_connection).returns(conn)
-      AWS::S3::Connection.any_instance.stubs(:access_key_id).returns('stub_id')
-      AWS::S3::Connection.any_instance.stubs(:secret_access_key).returns('stub_key')
-      Attachment.any_instance.stubs(:s3_config).returns({:bucket_name => 'no-bucket'})
+      conn = mock('AWS::S3::Client')
+      AWS::S3::S3Object.any_instance.stubs(:client).returns(conn)
+      AWS::Core::Configuration.any_instance.stubs(:access_key_id).returns('stub_id')
+      AWS::Core::Configuration.any_instance.stubs(:secret_access_key).returns('stub_key')
+      AWS::S3::Bucket.any_instance.stubs(:name).returns('no-bucket')
     else
       if Attachment.s3_config.blank? || Attachment.s3_config[:access_key_id] == 'access_key'
         pending "Please put valid S3 credentials in config/amazon_s3.yml"

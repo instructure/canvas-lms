@@ -40,12 +40,12 @@ class Thumbnail < ActiveRecord::Base
                    :keep_profile => true
   end
 
-  def bucket_name
-    self.attachment.bucket_name
+  def bucket
+    self.attachment.bucket
   end
 
   def cached_s3_url
-    @cached_s3_url = authenticated_s3_url(:expires_in => 144.hours)
+    @cached_s3_url = authenticated_s3_url(:expires => 144.hours)
   end
 
   before_save :assign_uuid
