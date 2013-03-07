@@ -1320,4 +1320,68 @@ describe ConversationsController, :type => :integration do
     end
   end
 
+  describe "delete_for_all" do
+    it "should require site_admin with become_user permissions" do
+      cp = conversation(@me, @bob, @billy, @jane, @joe, @tommy, :sender => @me)
+      conv = cp.conversation
+      @joe.conversations.size.should eql 1
+
+      account_admin_user_with_role_changes(:account => Account.site_admin, :role_changes => { :become_user => false })
+      json = raw_api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
+        {:controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => conv.id.to_s},
+        {})
+      response.status.should eql "401 Unauthorized"
+
+      user_session(account_admin_user)
+      json = raw_api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
+        {:controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => conv.id.to_s},
+        {})
+      response.status.should eql "401 Unauthorized"
+
+      user_session(@me)
+      json = raw_api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
+        {:controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => conv.id.to_s},
+        {})
+      response.status.should eql "401 Unauthorized"
+
+      @me.all_conversations.size.should eql 1
+      @joe.conversations.size.should eql 1
+    end
+
+    it "should fail if conversation doesn't exist" do
+      user_session(site_admin_user)
+      json = raw_api_call(:delete, "/api/v1/conversations/0/delete_for_all",
+        {:controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => "0"},
+        {})
+      response.status.should eql "404 Not Found"
+    end
+
+    it "should delete the conversation for all participants" do
+      users = [@me, @bob, @billy, @jane, @joe, @tommy]
+      cp = conversation(*users, :sender => @me)
+      conv = cp.conversation
+      users.each do |user|
+        user.all_conversations.size.should eql 1
+        user.stream_item_instances.size.should eql 1 unless user.id == @me.id
+      end
+
+      user_session(site_admin_user)
+      json = api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
+        {:controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => conv.id.to_s},
+        {})
+
+      json.should eql({})
+
+      users.each do |user|
+        user.reload.all_conversations.size.should eql 0
+        user.stream_item_instances.size.should eql 0
+      end
+      ConversationParticipant.count.should eql 0
+      ConversationMessageParticipant.count.should eql 0
+      # should leave the conversation and its message in the database
+      Conversation.count.should eql 1
+      ConversationMessage.count.should eql 1 
+    end
+  end
+
 end

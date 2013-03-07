@@ -427,6 +427,24 @@ class ConversationsController < ApplicationController
     render :json => conversation_json(@conversation, @current_user, session, :visible => false)
   end
 
+  # internal api
+  # @example_request
+  #     curl https://<canvas>/api/v1/conversations/:id/delete_for_all \ 
+  #       -X DELETE \ 
+  #       -H 'Authorization: Bearer <token>'
+  def delete_for_all
+    return unless authorized_action(Account.site_admin, @current_user, :become_user)
+
+    conversation = Conversation.find(params[:id])
+    conversation.stream_item.stream_item_instances.destroy_all
+    conversation.conversation_participants.each do |cp|
+      cp.messages.clear
+      cp.destroy
+    end
+
+    render :json => {}
+  end
+
   # @API Add recipients
   # Add recipients to an existing group conversation. Response is similar to
   # the GET/show action, except that omits submissions and only includes the
