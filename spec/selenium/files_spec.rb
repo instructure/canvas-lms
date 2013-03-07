@@ -218,42 +218,6 @@ describe "files without s3 and forked tests" do
   end
 end
 
-
-describe "collaborations folder in files menu" do
-  it_should_behave_like "in-process server selenium tests"
-
-  before (:each) do
-    user_with_pseudonym(:active_user => true)
-    course_with_teacher(:user => @user, :active_course => true, :active_enrollment => true)
-    group_category = @course.group_categories.create(:name => "groupage")
-    @group = group_category.groups.create!(:name => "group1", :context => @course)
-  end
-
-  def load_collab_folder
-    get "/groups/#{@group.id}/files"
-    message_node = keep_trying_until do
-      f("li.collaborations span.name").click
-      f("ul.files_content li.message")
-    end
-    message_node.text
-  end
-
-  it "should show add collaboration paragraph to teacher of a course group" do
-    create_session(@pseudonym, false)
-    message = load_collab_folder
-    message.should include_text("New collaboration")
-  end
-
-  it "should show add collaboration paragraph to participating user" do
-    user_with_pseudonym(:active_user => true)
-    student_in_course(:user => @user, :active_enrollment => true)
-    create_session(@pseudonym, false)
-    @group.add_user(@user, 'accepted')
-    message = load_collab_folder
-    message.should include_text("New collaboration")
-  end
-end
-
 describe "course files" do
   it_should_behave_like "in-process server selenium tests"
 
