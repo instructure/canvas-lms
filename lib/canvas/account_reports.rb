@@ -41,8 +41,7 @@ module Canvas::AccountReports
 
   def self.generate_report(account_report)
     account_report.update_attribute(:workflow_state, 'running')
-    account_report.start_at ||= 2.months.ago
-    account_report.end_at ||= Time.now
+    account_report.start_at ||= Time.now
     begin
       REPORTS[account_report.report_type][:proc].call(account_report)
     rescue => e
@@ -105,15 +104,16 @@ module Canvas::AccountReports
     end
     if filename
       attachment = account.attachments.create!(
-              :uploaded_data => ActionController::TestUploadedFile.new(filepath, filetype, true),
-              :display_name => filename,
-              :user => user
+        :uploaded_data => ActionController::TestUploadedFile.new(filepath, filetype, true),
+        :display_name => filename,
+        :user => user
       )
     end
     account_report.message = message
     account_report.attachment = attachment
     account_report.workflow_state = csv ? 'complete' : 'error'
     account_report.update_attribute(:progress, 100)
+    account_report.end_at ||= Time.now
     account_report.save
     notification.create_message(account_report, [user])
     message

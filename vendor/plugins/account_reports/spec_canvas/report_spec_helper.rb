@@ -25,7 +25,7 @@ module ReportSpecHelper
     end
   end
 
-  def self.run_report(account,report_type, parameters = {}, sort_column_or_columns = 0)
+  def self.run_report(account,report_type, parameters = {}, sort_column_or_columns = [0,1])
     sort_columns = Array(sort_column_or_columns)
     account_report = AccountReport.new(:user => @admin, :account => account, :report_type => report_type)
     account_report.parameters = {}
