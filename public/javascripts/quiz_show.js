@@ -63,9 +63,30 @@ $(document).ready(function () {
       }
     });
   });
+  var hasOpenedQuizDetails = false;
   $(".quiz_details_link").click(function(event) {
     event.preventDefault();
+    var $quizResultsText = $('#quiz_results_text');
+    if (hasOpenedQuizDetails) {
+      if (ENV.IS_SURVEY) {
+        $quizResultsText.text(I18n.t('links.show_student_survey_results',
+                                     'Show Student Survey Results'));
+      } else {
+        $quizResultsText.text(I18n.t('links.show_student_quiz_results',
+                                     'Show Student Quiz Results'));
+      }
+    } else {
+      if (ENV.IS_SURVEY) {
+        $quizResultsText.text(I18n.t('links.hide_student_survey_results',
+                                     'Hide Student Survey Results'));
+      } else {
+        $quizResultsText.text(I18n.t('links.hide_student_quiz_results',
+                                     'Hide Student Quiz Results'));
+
+      }
+    }
     $("#quiz_details").slideToggle();
+    hasOpenedQuizDetails = !hasOpenedQuizDetails;
   });
   $(".message_students_link").click(function(event) {
     event.preventDefault();
