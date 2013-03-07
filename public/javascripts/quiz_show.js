@@ -132,11 +132,10 @@ $(document).ready(function () {
         'Unlock' : function(){
           var dateString = $(this).find('.datetime_suggest').text();
 
-          $link.closest('form')
+          $('#quiz_unlock_form')
             // append this back to the form since it got moved to be a child of body when we called .dialog('open')           
             .append($(this).dialog('destroy'))
-            .find('#quiz_lock_at')
-              .val(dateString).end()
+            .find('#quiz_lock_at').val(dateString).end()
             .submit();
         }
       }
@@ -146,7 +145,7 @@ $(document).ready(function () {
   $('#lock_this_quiz_now_link').ifExists(function($link) {
     $link.click(function(e) {
       e.preventDefault();
-      $link.closest('form').submit();
+      $('#quiz_lock_form').submit();
     })
   });
 
