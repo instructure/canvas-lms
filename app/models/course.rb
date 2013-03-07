@@ -425,7 +425,7 @@ class Course < ActiveRecord::Base
   end
 
   def associated_accounts
-    self.non_unique_associated_accounts.uniq
+    self.non_unique_associated_accounts.all.uniq
   end
 
   named_scope :recently_started, lambda {
@@ -1314,7 +1314,7 @@ class Course < ActiveRecord::Base
     # 'publish_final_grades'
 
     self.recompute_student_scores_without_send_later
-    enrollments = self.student_enrollments.not_fake.order_by_sortable_name(:include => [:user, :course_section])
+    enrollments = self.student_enrollments.not_fake.includes(:user, :course_section).order_by_sortable_name
 
     errors = []
     posts_to_make = []
@@ -1392,7 +1392,7 @@ class Course < ActiveRecord::Base
     includes = [:user, :course_section]
     includes = {:user => :pseudonyms, :course_section => []} if options[:include_sis_id]
     scope = options[:user] ? self.enrollments_visible_to(options[:user]) : self.student_enrollments
-    student_enrollments = scope.order_by_sortable_name(:include => includes) # remove duplicate enrollments for students enrolled in multiple sections
+    student_enrollments = scope.includes(includes).order_by_sortable_name # remove duplicate enrollments for students enrolled in multiple sections
     student_enrollments = student_enrollments.all.uniq_by(&:user_id)
 
     calc = GradeCalculator.new(student_enrollments.map(&:user_id), self,

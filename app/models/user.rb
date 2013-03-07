@@ -218,21 +218,28 @@ class User < ActiveRecord::Base
 
   named_scope :has_current_student_enrollments, :conditions =>  "EXISTS (SELECT * FROM enrollments JOIN courses ON courses.id = enrollments.course_id AND courses.workflow_state = 'available' WHERE enrollments.user_id = users.id AND enrollments.workflow_state IN ('active','invited') AND enrollments.type = 'StudentEnrollment')"
 
-  # NOTE: if :order is passed in, sortable name will be tacked onto the end
-  # rather than prepending or replacing it
   def self.order_by_sortable_name(options = {})
-    direction = options.delete(:direction) || :ascending
-    sort_clause = "#{sortable_name_order_by_clause} #{direction == :descending ? "DESC" : "ASC"}"
-    add_sort_key!(options, sort_clause)
-    uber_scope(options)
+    clause = sortable_name_order_by_clause
+    clause << " DESC" if options[:direction] == :descending
+    scope = self.order(clause)
+    if (scope.scope(:find, :select))
+      scope = scope.select(clause)
+    end
+    if scope.scope(:find, :group)
+      scope = scope.group(clause)
+    end
+    scope
   end
 
-  def self.by_top_enrollment(options = {})
-    options[:select] ||= "users.*"
-    options[:select] << ", MIN(#{Enrollment.type_rank_sql(:student)}) AS enrollment_rank"
-    options[:group] = User.connection.group_by(User)
-    options[:order] = "enrollment_rank"
-    order_by_sortable_name(options)
+  def self.by_top_enrollment
+    scope = self
+    if (!scope.scope(:find, :select))
+      scope = scope.select("users.*")
+    end
+    scope.select("MIN(#{Enrollment.type_rank_sql(:student)}) AS enrollment_rank").
+      group(User.connection.group_by(User)).
+      order("enrollment_rank").
+      order_by_sortable_name
   end
 
   named_scope :enrolled_in_course_between, lambda{|course_ids, start_at, end_at|

@@ -261,34 +261,26 @@ describe Api do
 
     it 'should try and make params when non-ar_id columns have returned with ar_id columns' do
       collection = mock()
-      object1 = mock()
-      object2 = mock()
       Api.expects(:sis_find_sis_mapping_for_collection).with(collection).returns({:lookups => {"id" => "test-lookup"}})
       Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}).returns({"test-lookup" => ["thing1", "thing2"], "other-lookup" => ["thing2", "thing3"]})
       Api.expects(:sis_make_params_for_sis_mapping_and_columns).with({"other-lookup" => ["thing2", "thing3"]}, {:lookups => {"id" => "test-lookup"}}, "test-root-account").returns({"find-params" => "test"})
-      collection.expects(:all).with({"find-params" => "test", :select => :id}).returns([object1, object2])
-      object1.expects(:id).returns("thing2")
-      object2.expects(:id).returns("thing3")
+      collection.expects(:scoped).with("find-params" => "test").returns(collection)
+      collection.expects(:pluck).with(:id).returns(["thing2", "thing3"])
       Api.map_ids("test-ids", collection, "test-root-account").should == ["thing1", "thing2", "thing3"]
     end
 
     it 'should try and make params when non-ar_id columns have returned without ar_id columns' do
       collection = mock()
-      object1 = mock()
-      object2 = mock()
       Api.expects(:sis_find_sis_mapping_for_collection).with(collection).returns({:lookups => {"id" => "test-lookup"}})
       Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}).returns({"other-lookup" => ["thing2", "thing3"]})
       Api.expects(:sis_make_params_for_sis_mapping_and_columns).with({"other-lookup" => ["thing2", "thing3"]}, {:lookups => {"id" => "test-lookup"}}, "test-root-account").returns({"find-params" => "test"})
-      collection.expects(:all).with({"find-params" => "test", :select => :id}).returns([object1, object2])
-      object1.expects(:id).returns("thing2")
-      object2.expects(:id).returns("thing3")
+      collection.expects(:scoped).with("find-params" => "test").returns(collection)
+      collection.expects(:pluck).with(:id).returns(["thing2", "thing3"])
       Api.map_ids("test-ids", collection, "test-root-account").should == ["thing2", "thing3"]
     end
 
     it 'should not try and make params when no non-ar_id columns have returned with ar_id columns' do
       collection = mock()
-      object1 = mock()
-      object2 = mock()
       Api.expects(:sis_find_sis_mapping_for_collection).with(collection).returns({:lookups => {"id" => "test-lookup"}})
       Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}).returns({"test-lookup" => ["thing1", "thing2"]})
       Api.expects(:sis_make_params_for_sis_mapping_and_columns).at_most(0)

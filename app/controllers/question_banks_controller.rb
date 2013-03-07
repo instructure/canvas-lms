@@ -24,7 +24,7 @@ class QuestionBanksController < ApplicationController
 
   def index
     if @context == @current_user || authorized_action(@context, @current_user, :manage_assignments)
-      @question_banks = @context.assessment_question_banks.active
+      @question_banks = @context.assessment_question_banks.active.all
       if params[:include_bookmarked] == '1'
         @question_banks += @current_user.assessment_question_banks.active
       end

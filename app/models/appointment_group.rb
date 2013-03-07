@@ -313,8 +313,9 @@ class AppointmentGroup < ActiveRecord::Base
 
   def participant_ids
     appointments_participants.
-      scoped(:select => 'context_id', :conditions => ["calendar_events.context_type = ?", participant_type]).
-      map(&:context_id)
+        except(:order).
+        where(:context_type => participant_type).
+        pluck(:context_id)
   end
 
   def participant_table

@@ -195,11 +195,10 @@ class UsersController < ApplicationController
         if @context && @context.is_a?(Account) && @query
           @users = @context.users_name_like(@query)
         elsif params[:enrollment_term_id].present? && @root_account == @context
-          @users = @context.fast_all_users.scoped({
-            :joins => :courses,
-            :conditions => ["courses.enrollment_term_id = ?", params[:enrollment_term_id]],
-            :group => @context.connection.group_by('users.id', 'users.name', 'users.sortable_name')
-          })
+          # fast_all_users already specifies a select for the distinct to work on
+          @users = @context.fast_all_users.joins(:courses).
+              where(:courses => { :enrollment_term_id => params[:enrollment_term_id] })
+          @users = @users.uniq
         elsif !api_request?
           @users = @context.fast_all_users
         end

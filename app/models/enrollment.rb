@@ -898,9 +898,13 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
-  def self.order_by_sortable_name(options = {})
-    add_sort_key!(options, User.sortable_name_order_by_clause('users'))
-    uber_scope(options)
+  def self.order_by_sortable_name
+    clause = User.sortable_name_order_by_clause('users')
+    scope = self.order(clause)
+    if scope.scope(:find, :select)
+      scope = scope.select(clause)
+    end
+    scope
   end
 
   def self.top_enrollment_by(key, rank_order = :default)

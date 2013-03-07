@@ -470,31 +470,6 @@ class ActiveRecord::Base
     result.map(&column.to_sym)
   end
 
-  named_scope :order, lambda { |order_by|
-    {:order => order_by}
-  }
-
-  named_scope :where, lambda { |conditions|
-    {:conditions => conditions}
-  }
-
-  # convenience method to add a (computed) field to :select/:order(/:group) all
-  # at once
-  def self.add_sort_key!(options, qualified_field)
-    unqualified_field = qualified_field.sub(/\s+(ASC|DESC)\s*$/, '')
-    direction = $1 == 'DESC' ? 'DESC' : 'ASC'
-    sort_clause = "#{unqualified_field} #{direction}, #{quoted_table_name}.id #{direction}"
-    options[:select] ||= "#{quoted_table_name}.*"
-    options[:select] << ", #{unqualified_field}"
-    if options[:order]
-      options[:order] << ", #{sort_clause}"
-    else
-      options[:order] = sort_clause
-    end
-    options[:group] << ", #{unqualified_field}" if options[:group]
-    options
-  end
-
   def self.generate_temp_table(options = {})
     Canvas::TempTable.new(connection, construct_finder_sql({}), options)
   end
@@ -528,39 +503,6 @@ class ActiveRecord::Base
     useful_find_in_batches(options) do |batch|
       batch.each { |row| yield row }
     end
-  end
-
-  # provides a way to override :order and :select in an association, while
-  # still just getting a scope (rather than doing an immediate find). primarily
-  # useful if you intend to paginate or otherwise use the scope multiple times.
-  # note that uber_scope still needs to be the last one in the chain
-  module UberScope
-    def find(*args)
-      super args.first, add_uber_options!(args.last.is_a?(::Hash) ? args.last : {})
-    end
-
-    def paginate(*args)
-      add_uber_options!(args.last)
-      super
-    end
-
-    def add_uber_options!(options)
-      options[:select] ||= uber_option(options, :select) || "#{proxy_scope.quoted_table_name}.*"
-      options[:order] ||= uber_option(options, :order)
-      options
-    end
-
-    def uber_option(options, key)
-      if @proxy_options && @proxy_options[key]
-        @proxy_options[key]
-      elsif (scope = scope(:find)) && scope[key]
-        scope[key]
-      end
-    end
-  end
-
-  def self.uber_scope(options)
-    scoped options.merge(:extend => UberScope)
   end
 
   # set up class-specific getters/setters for a polymorphic association, e.g.
@@ -960,14 +902,7 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
       execute "CREATE #{index_type} INDEX #{concurrently}#{quote_column_name(index_name)} ON #{quote_table_name(table_name)} (#{quoted_column_names})#{conditions}"
     end
   end
-end
 
-ActiveRecord::NamedScope::Scope.class_eval do
-  # returns a new scope, with just the order replaced
-  # does *not* support extended scopes
-  def reorder(new_order)
-    self.class.new(proxy_scope, proxy_options.merge(:order => new_order))
-  end
 end
 
 class ActiveRecord::Serialization::Serializer

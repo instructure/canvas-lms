@@ -223,17 +223,9 @@ class GradebooksController < ApplicationController
         params[:user_ids] ||= params[:user_id]
         user_ids = params[:user_ids].split(",").map(&:to_i) if params[:user_ids]
         assignment_ids = params[:assignment_ids].split(",").map(&:to_i) if params[:assignment_ids]
-        # you need to specify specifically which submission fields you want returned to the gradebook here
-        scope_options = {
-          :select => ["assignment_id", "attachment_id", "grade", "grade_matches_current_submission", "group_id", "has_rubric_assessment", "id", "score", "submission_comments_count", "submission_type", "submitted_at", "url", "user_id"].join(" ,")
-        }
-        if user_ids && assignment_ids
-          @submissions = @context.submissions.scoped(scope_options).find(:all, :conditions => {:user_id => user_ids, :assignment_id => assignment_ids})
-        elsif user_ids
-          @submissions = @context.submissions.scoped(scope_options).find(:all, :conditions => {:user_id => user_ids})
-        else
-          @submissions = @context.submissions.scoped(scope_options)
-        end
+        @submissions = @context.submissions
+        @submissions = @submissions.where(:user_id => user_ids) if user_ids
+        @submissions = @submissions.where(:assignment_id => assignment_ids) if assignment_ids
         render :json => @submissions.to_json(:include => [:attachments, :quiz_submission, :submission_comments])
       end
     end

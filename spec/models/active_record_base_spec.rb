@@ -495,53 +495,6 @@ describe ActiveRecord::Base do
     end
   end
 
-  context "uber_scope" do
-    before do
-      course(:active_all => true)
-      @students = []
-      @enrollments = []
-      ['asdf', 'qwerty', 'lolwut'].each do |name|
-        student_in_course(:user_name => name)
-        @students << @student
-        @enrollments << @enrollment
-      end
-    end
-
-    it "should override the default select" do
-      # has_many :through scopes normally don't let you override the select, but
-      # uber_scope is strong. so strong
-      @course.students.uber_scope(:select => "users.id").each do |u|
-        u.attributes.keys.should eql ["id"]
-      end
-      @course.students.uber_scope(:select => "users.id").paginate(:page => nil).each do |u|
-        u.attributes.keys.should eql ["id"]
-      end
-    end
-
-    it "should override an intermediate select" do
-      StudentEnrollment.scoped(:select => "user_id").uber_scope(:select => "id").each do |e|
-        e.attributes.keys.should eql ["id"]
-      end
-      StudentEnrollment.scoped(:select => "user_id").uber_scope(:select => "id").paginate(:page => nil).each do |e|
-        e.attributes.keys.should eql ["id"]
-      end
-    end
-
-    it "should override the default order" do
-      @course.students.uber_scope(:order => "id desc").map(&:id).
-        should eql @students.map(&:id).reverse
-      @course.students.uber_scope(:order => "id desc").paginate(:page => nil).map(&:id).
-        should eql @students.map(&:id).reverse
-    end
-
-    it "should override an intermediate order" do
-      StudentEnrollment.uber_scope(:order => "id desc").map(&:id).
-        should eql @enrollments.map(&:id).reverse
-      StudentEnrollment.uber_scope(:order => "id desc").paginate(:page => nil).map(&:id).
-        should eql @enrollments.map(&:id).reverse
-    end
-  end
-
   describe "find_by_asset_string" do
     it "should enforce type restrictions" do
       u = User.create!
@@ -579,18 +532,92 @@ describe ActiveRecord::Base do
     end
   end
 
-  describe "reorder" do
-    it "should discard previous order by options" do
-      @user1 = User.create!(:name => 'a')
-      @user2 = User.create!(:name => 'b')
-      scopeForward = User.order('name')
-      scopeForward.all.should == [@user1, @user2]
-      # AR method, doesn't work cause Rails just adds the order, instead of replacing
-      scopeBackward = scopeForward.order('name DESC')
-      scopeBackward.all.should == [@user1, @user2]
-      # our way, does work
-      scopeBackward = scopeForward.reorder('name DESC')
-      scopeBackward.all.should == [@user2, @user1]
+  context "fake arel extensions" do
+    before do
+      @user = User.create!(:name => 'a')
+      @cc = @user.communication_channels.create!(:path => 'nobody@example.com')
+    end
+
+    describe "scoped" do
+      it "should work on models, associations, and scopes" do
+        # all we care is that we can call it with no arguments
+        User.scoped
+        User.scoped.scoped
+        @user.communication_channels.scoped
+      end
+    end
+
+    describe "except" do
+      it "should work on models, associations, and scopes" do
+        User.except(:select).scope(:find, :select).should be_nil
+        User.scoped.select(:id).except(:select).scope(:find, :select).should be_nil
+        @user.communication_channels.except(:select).scope(:find, :select).should be_nil
+      end
+
+      it "should work for :includes (Rails 3 name, Rails 2 name is :include)" do
+        User.includes(:communication_channels).except(:includes).scope(:find, :include).should be_nil
+      end
+    end
+
+    describe "reorder" do
+      it "should work on models, associations, and scopes" do
+        User.reorder(:id).scope(:find, :order).should == 'id'
+        User.scoped.reorder(:id).scope(:find, :order).should == 'id'
+        @user.communication_channels.reorder(:id).scope(:find, :order).should == 'id'
+      end
+
+      it "should discard previous order by options" do
+        User.order(:id).reorder(:name).scope(:find, :order).should == 'name'
+      end
+    end
+
+    describe "uniq" do
+      it "should work on models, associations, and scopes" do
+        User.uniq.scope(:find, :select).should match /DISTINCT/
+        User.scoped.uniq.scope(:find, :select).should match /DISTINCT/
+        @user.communication_channels.uniq.scope(:find, :select).should match /DISTINCT/
+      end
+
+      it "should un-unique" do
+        User.uniq.uniq(false).scope(:find, :select).should_not match /DISTINCT/
+      end
+
+      it "should un-unique custom DISTINCT" do
+        select = User.select('DISTINCT id').uniq(false).scope(:find, :select)
+        select.should_not be_nil
+        select.should_not match /DISTINCT/
+        select.should match /id/
+      end
+    end
+
+    describe "select" do
+      it "should work on models, associations, and scopes" do
+        User.select(:id).scope(:find, :select).should == 'id'
+        User.scoped.select(:id).scope(:find, :select).should == 'id'
+        @user.communication_channels.select(:id).scope(:find, :select).should == 'id'
+      end
+    end
+
+    describe "pluck" do
+      it "should work on models, associations, and scopes" do
+        User.pluck(:id).should == [@user.id]
+        User.scoped.pluck(:id).should == [@user.id]
+        @user.communication_channels.pluck(:id).should == [@cc.id]
+      end
+    end
+
+    describe "scope chaining" do
+      it "should merge select" do
+        User.select(:id).select(:name).scope(:find, :select).should == 'id, name'
+      end
+
+      it "should merge order" do
+        User.order(:id).order(:name).scope(:find, :order).should == 'id, name'
+      end
+
+      it "should merge group" do
+        User.group(:id).group(:name).scope(:find, :group).should == 'id, name'
+      end
     end
   end
 end

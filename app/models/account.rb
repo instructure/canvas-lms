@@ -354,7 +354,7 @@ class Account < ActiveRecord::Base
   
   def fast_all_users(limit=nil)
     @cached_fast_all_users ||= {}
-    @cached_fast_all_users[limit] ||= self.all_users(limit).active.order_by_sortable_name.scoped(:select => "users.id, users.name, users.sortable_name")
+    @cached_fast_all_users[limit] ||= self.all_users(limit).active.select("users.id, users.name, users.sortable_name").order_by_sortable_name
   end
 
   def users_not_in_groups_sql(groups, opts={})

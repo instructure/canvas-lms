@@ -127,27 +127,27 @@ describe "MessageableUser" do
 
     it "should exclude creation_pending students with strict_checks true" do
       user(:user_state => 'creation_pending')
-      MessageableUser.prepped(:strict_checks => true).count.should == 0
+      MessageableUser.prepped(:strict_checks => true).length.should == 0
     end
 
     it "should exclude deleted students with strict_checks true" do
       user(:user_state => 'deleted')
-      MessageableUser.prepped(:strict_checks => true).count.should == 0
+      MessageableUser.prepped(:strict_checks => true).length.should == 0
     end
 
     it "should include creation_pending students with strict_checks false" do
       user(:user_state => 'creation_pending')
-      MessageableUser.prepped(:strict_checks => false).count.should == 1
+      MessageableUser.prepped(:strict_checks => false).length.should == 1
     end
 
     it "should include deleted students with strict_checks false" do
       user(:user_state => 'deleted')
-      MessageableUser.prepped(:strict_checks => false).count.should == 1
+      MessageableUser.prepped(:strict_checks => false).length.should == 1
     end
 
     it "should default strict_checks to true" do
       user(:user_state => 'creation_pending')
-      MessageableUser.prepped().count.should == 0
+      MessageableUser.prepped().length.should == 0
     end
   end
 
