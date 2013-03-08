@@ -95,11 +95,21 @@ class GroupMembership < ActiveRecord::Base
   end
   protected :ensure_mutually_exclusive_membership
   
+  def restricted_self_signup?
+    self.group.group_category && self.group.group_category.restricted_self_signup?
+  end
+
+  def has_common_section_with_me?
+    self.group.has_common_section_with_user?(user)
+  end
+
   def verify_section_homogeneity_if_necessary
-    return true unless self.group.group_category && self.group.group_category.restricted_self_signup?
-    return true if self.group.has_common_section_with_user?(self.user)
-    self.errors.add(:user_id, t('errors.not_in_group_section', "%{student} does not share a section with the other members of %{group}.", :student => self.user.name, :group => self.group.name))
-    return false
+    if new_record? && restricted_self_signup? && !has_common_section_with_me?
+      errors.add(:user_id, t('errors.not_in_group_section', "%{student} does not share a section with the other members of %{group}.", :student => self.user.name, :group => self.group.name))
+      false
+    else
+      true
+    end
   end
   protected :verify_section_homogeneity_if_necessary
   

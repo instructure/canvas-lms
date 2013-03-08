@@ -27,6 +27,32 @@ describe GroupMembership do
     @gm.expects(:ensure_mutually_exclusive_membership)
     @gm.save!
   end
+
+  context "section homogeneity" do
+    # can't use 'course' because it is defined in spec_helper, so use 'course1'
+    let(:course1) { course_with_teacher(:active_all => true); @course }
+    let(:student) { student = user_model; course1.enroll_student(student); student }
+    let(:group_category) { GroupCategory.student_organized_for(course1) }
+    let(:group) { course1.groups.create(:group_category => group_category) }
+    let(:group_membership) { group.group_memberships.create(:user => student) }
+
+    it "should have a validation error on new record" do
+      membership = GroupMembership.new
+      membership.stubs(:user).returns(mock(:name => 'test user'))
+      membership.stubs(:group).returns(mock(:name => 'test group'))
+      membership.stubs(:restricted_self_signup?).returns(true)
+      membership.stubs(:has_common_section_with_me?).returns(false)
+      membership.save.should_not be_true
+      membership.errors.size.should == 1
+      membership.errors.on(:user_id).should match(/test user does not share a section/)
+    end
+
+    it "should pass validation on update" do
+      lambda {
+        group_membership.save!
+      }.should_not raise_error(ActiveRecord::RecordInvalid)
+    end
+  end
   
   it "should dispatch a 'new_student_organized_group' message if the first membership in a student organized group" do
     course_with_teacher
