@@ -1195,13 +1195,13 @@ class UsersController < ApplicationController
       f.id = user_url(@context)
     end
     @entries = []
+    cutoff = 1.week.ago
     @context.courses.each do |context|
-      @entries.concat context.assignments.active
-      @entries.concat context.calendar_events.active
-      @entries.concat context.discussion_topics.active
-      @entries.concat context.wiki.wiki_pages.not_deleted
+      @entries.concat context.assignments.active.where("updated_at>?", cutoff)
+      @entries.concat context.calendar_events.active.where("updated_at>?", cutoff)
+      @entries.concat context.discussion_topics.active.where("updated_at>?", cutoff)
+      @entries.concat context.wiki.wiki_pages.not_deleted.where("updated_at>?", cutoff)
     end
-    @entries = @entries.select{|e| e.updated_at > 1.weeks.ago }
     @entries.each do |entry|
       feed.entries << entry.to_atom(:include_context => true, :context => @context)
     end

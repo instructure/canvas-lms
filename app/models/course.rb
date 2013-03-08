@@ -2186,7 +2186,7 @@ class Course < ActiveRecord::Base
         added_items << new_tool
       end
     end
-    course.assignments.no_graded_quizzes_or_topics.active.select{|a| a.assignment_group_id }.each do |assignment|
+    course.assignments.no_graded_quizzes_or_topics.active.where("assignment_group_id IS NOT NULL").each do |assignment|
       course_import.tick(15) if course_import
       if bool_res(options[:everything]) || bool_res(options[:all_assignments]) || bool_res(options[assignment.asset_string.to_sym])
         new_assignment = assignment.clone_for(self, nil, :migrate => false)
