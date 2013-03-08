@@ -1,0 +1,13 @@
+input[type=text].loading {
+  background-image: url('/images/ajax-reload-animated.gif');
+  background-repeat: no-repeat;
+  background-position: 98% center;
+}
+
+.paginatedLoadingIndicator {
+  background-image: url('/images/ajax-reload-animated.gif');
+  background-repeat: no-repeat;
+  background-position: center center;
+  height: 20px;
+}
+

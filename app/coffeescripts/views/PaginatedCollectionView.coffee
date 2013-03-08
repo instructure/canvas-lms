@@ -35,7 +35,7 @@ define [
     # Adds a loading indicator element
 
     els: _.extend({}, CollectionView::els,
-      '.loadingIndicator': '$loadingIndicator'
+      '.paginatedLoadingIndicator': '$loadingIndicator'
     )
 
     @optionProperty 'scrollContainer'
@@ -57,6 +57,7 @@ define [
 
     attachCollection: ->
       super
+      @collection.on 'reset', @attachScroll
       @collection.on 'fetched:last', @detachScroll
       @collection.on 'beforeFetch', @showLoadingIndicator
       @collection.on 'fetch', @hideLoadingIndicator
@@ -79,9 +80,11 @@ define [
     #
     # @api private
 
-    attachScroll: ->
-      event = "scroll.pagination:#{@cid}, resize.pagination:#{@cid}"
-      @scrollContainer.on event, @checkScroll
+    attachScroll: =>
+      scroll = "scroll.pagination:#{@cid}"
+      resize = "resize.pagination:#{@cid}"
+      @scrollContainer.on scroll, @checkScroll
+      @scrollContainer.on resize, @checkScroll
 
     ##
     # Removes the scoll event from scrollContainer
@@ -112,7 +115,6 @@ define [
     remove: ->
       @detachScroll()
       super
-
 
     ##
     # Hides the loading indicator after render
