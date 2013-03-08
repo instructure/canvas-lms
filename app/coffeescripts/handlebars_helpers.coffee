@@ -1,4 +1,5 @@
 define [
+  'compiled/util/enrollmentName'
   'vendor/handlebars.vm'
   'i18nObj'
   'jquery'
@@ -12,7 +13,7 @@ define [
   'jquery.instructure_date_and_time'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
-], (Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, mimeClass, convertApiUserContent, textHelper) ->
+], (enrollmentName, Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, mimeClass, convertApiUserContent, textHelper) ->
 
   Handlebars.registerHelper name, fn for name, fn of {
     t : (key, defaultValue, options) ->
@@ -294,5 +295,7 @@ define [
     truncate: ( string, max ) ->
       return textHelper.truncateText( string, { max: max } )
 
+
+    enrollmentName: enrollmentName
   }
   return Handlebars
