@@ -303,31 +303,14 @@ class ContextController < ApplicationController
 
     if @context.is_a?(Course)
       sections = @context.course_sections(:select => 'id, name')
-      js_env :SECTIONS => sections.map { |s| { :id => s.id, :name => s.name } }
-
       all_roles = Role.custom_roles_and_counts_for_course(@context, @current_user)
-      header_rosters = [
-          {:title => t('roster.students', 'Students'), :roles => ['StudentEnrollment'], :column => 'students'},
-          {:title => t('roster.teachers', 'Teachers'), :roles => ['TeacherEnrollment'], :column => 'teachers'},
-          {:title => t('roster.tas', 'TAs'), :roles => ['TaEnrollment'], :column => 'teachers'}
-      ]
-      @display_rosters = []
-
-      header_rosters.each do |hr|
-        base_roles = all_roles.select{|r| hr[:roles].include?(r[:base_role_name])}
-        @display_rosters << hr if base_roles.find{|br| br[:count] && br[:count] > 0}.present?
-
-        base_roles.each do |br|
-          br[:custom_roles].select{|cr| cr[:count] && cr[:count] > 0}.each do |cr|
-            @display_rosters << {:title => cr[:label], :roles => [cr[:name]], :column => hr[:column]}
-          end
-        end
-      end
-
+      js_env({
+        :ALL_ROLES => all_roles,
+        :SECTIONS => sections.map { |s| { :id => s.id, :name => s.name } }
+      })
     elsif @context.is_a?(Group)
       @users         = @context.participating_users.order_by_sortable_name.uniq
       @primary_users = { t('roster.group_members', 'Group Members') => @users }
-
       if course = @context.context.try(:is_a?, Course) && @context.context
         @secondary_users = { t('roster.teachers_and_tas', 'Teachers & TAs') => course.instructors.order_by_sortable_name.uniq }
       end

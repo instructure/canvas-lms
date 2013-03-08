@@ -9,21 +9,8 @@
 <% content_for :right_side, render(:partial => 'context/roster_right_side') %>
 
 <% if @context.is_a?(Course) %>
-  <div class="roster">
-    <div class="users-column-wrapper student_roster">
-    </div>
-    <div class="users-column-wrapper teacher_roster">
-    </div>
-  </div>
-
-  <% if @display_rosters.any? %>
-    <% jammit_css :roster %>
-    <% js_env :COURSE_ROSTERS => @display_rosters %>
-    <% js_bundle :roster %>
-  <% else %>
-    <%= t('roster.empty', 'No one is currently enrolled in this course.') %>
-  <% end %>
-
+  <% jammit_css :roster %>
+  <% js_bundle :roster %>
 <% else %>
   <% content_for :stylesheets do %>
     <style>
