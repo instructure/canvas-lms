@@ -319,14 +319,6 @@ module Instructure #:nodoc:
         fields  = opts[:fields] || []
         fields = [fields] unless fields.is_a?(Array)
 
-        # Come back to this to debug some of the notifications
-        # if fields == [:due_at]
-        #   require 'rubygems'
-        #   require 'ruby-debug'
-        #   debugger
-        #   1 + 1
-        # end
-
         begin
           fields.map {|field| self.prior_version.send(field) != self.send(field) }.include?(true) and
           self.workflow_state == state.to_s and
