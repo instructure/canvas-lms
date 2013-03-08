@@ -181,6 +181,7 @@ module Api::V1::Assignment
     turnitin_settings
     grading_standard_id
     freeze_on_copy
+    notify_of_update
   )
 
   API_ALLOWED_TURNITIN_SETTINGS = %w(
@@ -207,13 +208,10 @@ module Api::V1::Assignment
 
     if overrides
       assignment.transaction do
-        # TODO: We need to handle notifications better here. We want to send
-        # notifications if the "notify_of_update" field is passed, but *after*
-        # the assignment overrides have been created.
         assignment.save_without_broadcasting!
         batch_update_assignment_overrides(assignment, overrides)
       end
-      assignment.do_notifications!(old_assignment)
+      assignment.do_notifications!(old_assignment, assignment_params[:notify_of_update])
     else
       assignment.save!
     end

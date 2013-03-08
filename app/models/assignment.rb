@@ -430,7 +430,7 @@ class Assignment < ActiveRecord::Base
 
   # call this to perform notifications on an Assignment that is not being saved
   # (useful when a batch of overrides associated with a new assignment have been saved)
-  def do_notifications!(prior_version=nil)
+  def do_notifications!(prior_version=nil, notify=false)
     self.prior_version = prior_version
     @broadcasted = false
     # TODO: this will blow up if the group_category string is set on the
@@ -438,7 +438,9 @@ class Assignment < ActiveRecord::Base
     # and the association.  one more reason to drop the db column
     self.prior_version ||= self.versions.previous(self.current_version.number).try(:model)
     self.just_created = self.prior_version.nil?
+    self.notify_of_update = notify || false
     broadcast_notifications
+    remove_assignment_updated_flag
   end
 
   set_broadcast_policy do |p|
@@ -460,7 +462,7 @@ class Assignment < ActiveRecord::Base
     p.whenever { |record|
       !self.suppress_broadcast and
       !record.muted? and
-      record.created_at < Time.now - 30.minutes and
+      record.created_at < 30.minutes.ago and
       record.context.state == :available and [:available, :published].include?(record.state) and
       record.prior_version and (record.points_possible != record.prior_version.points_possible || @assignment_changed)
     }
@@ -504,7 +506,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def notify_of_update=(val)
-    @assignment_changed = (val == '1' || val == true)
+    @assignment_changed = Canvas::Plugin.value_to_boolean(val)
   end
 
   def notify_of_update
