@@ -304,16 +304,19 @@ module GoogleDocs
     access_token = google_docs_retrieve_access_token
     url          = "https://docs.google.com/feeds/acl/private/full/#{document_id}/batch"
 
+    Struct.new('UserStruct', :id, :gmail, :google_docs_address)
+    users.each_with_index do |user, idx|
+      if user.is_a? String
+        users[idx] = Struct::UserStruct.new(user, user)
+      end
+    end
+
     request_feed = Feed.new do |feed|
       feed.categories << Atom::Category.new{|category|
         category.scheme = "http://schemas.google.com/g/2005#kind"
         category.term = "http://schemas.google.com/acl/2007#accessRule"
       }
       users.each do |user|
-        if user.is_a?(String)
-          user = Struct.new(:id, :gmail, :google_docs_address).new(user, user)
-        end
-
         next unless user_identifier = user.google_docs_address || user.gmail
 
         feed.entries << Entry.new do |entry|
@@ -325,7 +328,7 @@ module GoogleDocs
       end
     end
 
-    response = access_token.post(url, request_feed.to_xml, {'Content-Type' => 'application/atom+xml'})
+    response = post_for_removal(access_token, url, request_feed.to_xml)
     feed     = Atom::Feed.load_feed(response.body)
     res      = []
 
@@ -335,6 +338,11 @@ module GoogleDocs
     end
 
     res
+  end
+
+  # method added to allow tests to mock properly
+  def post_for_removal(access_token, url, xml)
+    access_token.post(url, xml, {'Content-Type' => 'application/atom+xml'})
   end
 
   def google_docs_acl_add(document_id, users)
