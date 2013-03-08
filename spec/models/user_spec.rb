@@ -1617,6 +1617,49 @@ describe User do
         events.size.should eql 1
         events.first.title.should eql 'test appointment'
       end
+
+    end
+  end
+
+  describe "select_upcoming_assignments" do
+    it "filters based on assignment date for asignments the user cannot delete" do
+      time = Time.now + 1.day
+      assignments = [stub, stub, stub]
+      user = User.new
+      assignments.each do |assignment|
+        assignment.stubs(:due_at => time)
+        assignment.expects(:grants_right?).with(user,nil,:delete).returns false
+      end
+      user.select_upcoming_assignments(assignments,{:end_at => time}).should == assignments
+    end
+
+    it "returns assignments that have an override between now and end_at opt" do
+      assignments = [stub, stub, stub, stub]
+      Timecop.freeze(Time.utc(2013,3,13,0,0)) do
+        user = User.new
+        due_date1 = {:due_at => Time.now + 1.day}
+        due_date2 = {:due_at => Time.now + 1.week}
+        due_date3 = {:due_at => 2.weeks.from_now }
+        due_date4 = {:due_at => nil }
+        assignments.each do |assignment|
+          assignment.expects(:grants_right?).with(user,nil,:delete).returns true
+        end
+        assignments.first.expects(:all_dates_visible_to).with(user).
+          returns [due_date1]
+        assignments.second.expects(:all_dates_visible_to).with(user).
+          returns [due_date2]
+        assignments.third.expects(:all_dates_visible_to).with(user).
+          returns [due_date3]
+        assignments[3].expects(:all_dates_visible_to).with(user).
+          returns [due_date4]
+        upcoming_assignments = user.select_upcoming_assignments(assignments,{
+          :end_at => 1.week.from_now
+        })
+        upcoming_assignments.should include assignments.first
+        upcoming_assignments.should include assignments.second
+        upcoming_assignments.should_not include assignments.third
+        upcoming_assignments.should_not include assignments[3]
+      end
     end
   end
 

@@ -1810,22 +1810,36 @@ class User < ActiveRecord::Base
     context_codes = opts[:context_codes] || (opts[:contexts] ? setup_context_lookups(opts[:contexts]) : self.cached_context_codes)
     return [] if (!context_codes || context_codes.empty?)
 
+    now = Time.zone.now
+
     opts[:end_at] ||= 1.weeks.from_now
     opts[:limit] ||= 20
 
-    events = CalendarEvent.active.for_user_and_context_codes(self, context_codes).between(Time.now.utc, opts[:end_at]).scoped(:limit => opts[:limit]).reject(&:hidden?)
-    events += Assignment.
-      active.
-      for_context_codes(context_codes).
-      due_between_with_overrides(Time.now.utc, opts[:end_at]).
-      include_submitted_count.
-      map {|a| a.overridden_for(self)}.
-      select {|a| a.due_at && a.due_at >= Time.now.utc && a.due_at <= opts[:end_at]}.
+    events = CalendarEvent.active.for_user_and_context_codes(self, context_codes).between(now, opts[:end_at]).scoped(:limit => opts[:limit]).reject(&:hidden?)
+    events += select_upcoming_assignments(Assignment.
+        active.
+        for_context_codes(context_codes).
+        due_between_with_overrides(now, opts[:end_at]).
+        include_submitted_count.
+        map {|a| a.overridden_for(self)},opts.merge(:time => now)).
       first(opts[:limit])
-    appointment_groups = AppointmentGroup.manageable_by(self, context_codes).intersecting(Time.now.utc, opts[:end_at]).scoped(:limit => opts[:limit])
+    appointment_groups = AppointmentGroup.manageable_by(self, context_codes).intersecting(now, opts[:end_at]).scoped(:limit => opts[:limit])
     appointment_groups.each { |ag| ag.context = ag.contexts_for_user(self).first }
     events += appointment_groups
     events.sort_by{|e| [e.start_at, e.title] }.uniq.first(opts[:limit])
+  end
+
+  def select_upcoming_assignments(assignments,opts)
+    time = opts[:time] || Time.zone.now
+    assignments.select do |a|
+      if a.grants_right?(self, nil, :delete)
+        a.all_dates_visible_to(self).any? do |due_hash|
+          due_hash[:due_at] && due_hash[:due_at] >= time && due_hash[:due_at] <= opts[:end_at]
+        end
+      else
+        a.due_at && a.due_at >= time && a.due_at <= opts[:end_at]
+      end
+    end
   end
 
   def undated_events(opts={})
