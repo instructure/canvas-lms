@@ -45,6 +45,8 @@ describe GoogleDocs do
   let(:xml_doc_list_many)        { load_fixture("doc_list_many.xml") }
   let(:xml_create_doc_request)  { load_fixture("create_doc_request.xml") }
   let(:xml_create_doc_response) { load_fixture("create_doc_response.xml") }
+  let(:xml_remove_doc_request)  { load_fixture("remove_doc_request.xml") }
+  let(:xml_remove_doc_response) { load_fixture("remove_doc_response.xml") }
   let(:xml_delete_doc_request)  { load_fixture("delete_doc_request.xml") }
   let(:xml_delete_doc_response) { load_fixture("delete_doc_response.xml") }
 
@@ -127,6 +129,14 @@ describe GoogleDocs do
       new_document = lib.google_docs_create_doc "test document"
     end
 
+    it "can be removed" do
+      response = mock()
+      headers = {'Content-Type' => 'application/atom+xml'}
+      lib.expects(:post_for_removal).returns(response)
+      response.expects(:body).returns(xml_remove_doc_response)
+      lib.google_docs_acl_remove 'document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA',
+                                 [ 'user@example.com' ]
+    end
 
     it "can be deleted" do
       prepare_mock_post \
