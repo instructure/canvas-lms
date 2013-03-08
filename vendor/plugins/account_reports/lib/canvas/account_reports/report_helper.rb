@@ -124,7 +124,9 @@ module Canvas::AccountReports::ReportHelper
 
   def send_report(file = nil, account_report = @account_report)
     type = Canvas::AccountReports.for_account(account)[account_report.report_type][:title]
-    options = account_report.parameters["extra_text"]
+    if account_report.has_parameter? "extra_text"
+      options = account_report.parameters["extra_text"]
+    end
     Canvas::AccountReports.message_recipient(
       account_report,
       I18n.t(

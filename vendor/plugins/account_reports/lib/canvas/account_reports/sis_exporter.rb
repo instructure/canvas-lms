@@ -360,7 +360,8 @@ module Canvas::AccountReports
         else
           enrol = enrol.scoped(
             :conditions => "enrollments.workflow_state <> 'deleted'
-                            AND enrollments.workflow_state <> 'completed'")
+                            AND enrollments.workflow_state <> 'completed'
+                            AND pseudonyms.workflow_state <> 'deleted'")
         end
 
         if @sis_format
