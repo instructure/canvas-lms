@@ -54,6 +54,46 @@ describe DiscussionTopicsController do
       assert_unauthorized
     end
 
+    context "discussion topic with assignment with overrides" do
+      integrate_views
+
+      before :all do
+        course(:course_name => "I <3 Discussions")
+        course_topic(:with_assignment => true)
+        @section = @course.course_sections.create!(:name => "I <3 Discusions")
+        @override = assignment_override_model(:assignment => @topic.assignment,
+                                  :due_at => Time.now,
+                                  :set => @section)
+      end
+
+      it "doesn't show overrides to students" do
+        course_with_student_logged_in(:course => @course)
+        get 'show', :course_id => @course.id, :id => @topic.id
+        response.should be_success
+        response.body.should_not match 'discussion-topic-due-dates'
+        due_date = OverrideListPresenter.new.due_at(@topic.assignment)
+        response.body.should match "due #{due_date}"
+      end
+
+      it "doesn't show overrides for observers" do
+        course_with_observer_logged_in(:course => @course)
+        @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section)
+        get 'show', :course_id => @course.id, :id => @topic.id
+        response.should be_success
+        response.body.should_not match 'discussion-topic-due-dates'
+        due_date = OverrideListPresenter.new.due_at(@topic.assignment.overridden_for(@observer))
+        response.body.should match "due #{due_date}"
+      end
+
+      it "does show overrides to teachers" do
+        course_with_teacher_logged_in(:course => @course)
+        get 'show', :course_id => @course.id, :id => @topic.id
+        response.should be_success
+        response.body.should match 'discussion-topic-due-dates'
+      end
+
+    end
+
     it "should assign variables" do
       course_with_student_logged_in(:active_all => true)
       course_topic

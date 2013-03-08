@@ -4,7 +4,7 @@ class OverrideListPresenter
 
   include TextHelper
 
-  def initialize(assignment, user)
+  def initialize(assignment=nil, user=nil)
     @user = user
     if assignment.present?
       @assignment = AssignmentOverrideApplicator.assignment_overridden_for(assignment, user)

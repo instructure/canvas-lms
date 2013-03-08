@@ -24,7 +24,7 @@ class DiscussionTopicPresenter
   # user - The user whose permissions we're testing.
   #
   # Returns a boolean.
-  def can_grade?(user)
+  def can_grade?(user=@user)
     topic.for_assignment? &&
     (assignment.grants_right?(user, nil, :grade) ||
       assignment.context.grants_right?(user, nil, :manage_assignments))
