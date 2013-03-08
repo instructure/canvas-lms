@@ -150,6 +150,8 @@ button.single_item_done_button
   +reset_list
   max-height: 150px
   overflow-y: auto
+  label
+    margin-bottom: 0
 .ag_sections
   +reset_list
   padding-left: 35px
@@ -165,7 +167,7 @@ button.single_item_done_button
 
 .ag_contexts_done
   float: right
-
+  margin:  5px 5px 0 0
 
 .delete-block-link
   +hide-text
@@ -189,9 +191,19 @@ button.single_item_done_button
 .details-wrapper
   clear: both
 
+.splitter
+  input[type="number"], .split-link.btn
+    vertical-align: baseline
+  .split-link
+    margin-right: 3px
 .ag-options
   margin: 0
   padding: 0
+
+  input[type="checkbox"]
+    vertical-align: -2px
+  input[type="checkbox"] + label, input[type="number"]
+    vertical-align: baseline
 
 .ag-options li
   list-style-type: none
