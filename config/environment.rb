@@ -23,9 +23,6 @@ Rails::Initializer.run do |config|
   # :all can be used as a placeholder for all plugins not explicitly named
   # config.plugins = [ :exception_notification, :all ]
 
-  # Add additional load paths for your own custom dirs
-  # config.autoload_paths += %W( #{RAILS_ROOT}/extras )
-
   # Force all environments to use the same logger level
   # (by default production uses :info, the others :debug)
   # config.log_level = :info
@@ -70,9 +67,9 @@ Rails::Initializer.run do |config|
   # Activate observers that should always be running
   config.active_record.observers = [:cacher, :stream_item_cache]
 
-  config.autoload_paths += %W(#{RAILS_ROOT}/app/middleware
-                              #{RAILS_ROOT}/app/observers
-                              #{RAILS_ROOT}/app/presenters)
+  config.autoload_paths += %W(#{Rails.root}/app/middleware
+                              #{Rails.root}/app/observers
+                              #{Rails.root}/app/presenters)
 
   config.middleware.insert_after(ActionController::Base.session_store, 'SessionsTimeout')
   config.middleware.insert_before('ActionController::ParamsParser', 'LoadAccount')
@@ -142,7 +139,7 @@ YAML.whitelist.add(*%w[
 YAML.whitelist.add('tag:ruby.yaml.org,2002:object:Class') { |classname| Canvas::Migration.valid_converter_classes.include?(classname) }
 
 # Extend any base classes, even gem classes
-Dir.glob("#{RAILS_ROOT}/lib/ext/**/*.rb").each { |file| require file }
+Dir.glob("#{Rails.root}/lib/ext/**/*.rb").each { |file| require file }
 
 Canvas::Security.validate_encryption_key(ENV['UPDATE_ENCRYPTION_KEY_HASH'])
 

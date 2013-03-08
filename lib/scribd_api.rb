@@ -88,7 +88,7 @@ class ScribdAPI
     # Return existing value, even if nil, as long as it's defined
     return @config if defined?(@config)
     @config ||= Canvas::Plugin.find(:scribd).try(:settings)
-    @config ||= (YAML.load_file(RAILS_ROOT + "/config/scribd.yml")[RAILS_ENV] rescue nil)
+    @config ||= (YAML.load_file(Rails.root+"config/scribd.yml")[Rails.env] rescue nil)
   end
   
   def self.enabled?

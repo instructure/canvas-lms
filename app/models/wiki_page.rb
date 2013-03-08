@@ -477,7 +477,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   def self.comments_enabled?
-    ENV['RAILS_ENV'] != 'production'
+    !Rails.env.production?
   end
 
   def self.search(query)

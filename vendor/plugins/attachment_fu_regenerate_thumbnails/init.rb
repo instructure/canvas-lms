@@ -10,7 +10,7 @@ Technoweenie::AttachmentFu::InstanceMethods.module_eval do
       logger.warn("error when trying to make thumbnail for attachment_id: #{self.id} (the image probably doesn't exist on s3) error details: #{e.inspect}")
     end
     
-    FileUtils.rm_rf(Dir.glob(File.join(RAILS_ROOT, 'tmp', 'attachment_fu', '*')))
+    FileUtils.rm_rf(Dir.glob(Rails.root.join('tmp', 'attachment_fu', '*')))
     res
   end
 end

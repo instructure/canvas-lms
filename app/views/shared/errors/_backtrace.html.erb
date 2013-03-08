@@ -1,5 +1,5 @@
 <% exception ||= nil %>
-<% if ENV["RAILS_ENV"] != 'production' %>
+<% if !Rails.env.production? %>
   <div id="backtrace" style="width: 90%; margin: 10px auto; display: none;">
     <% if exception %>
       <%= h(exception.to_s).gsub(/\n/, "<br/>\n") %><br/><br/>

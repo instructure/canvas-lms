@@ -17,7 +17,7 @@
 #
 
 ENV["RAILS_ENV"] = 'test'
-require File.dirname(__FILE__) + "/../config/environment" unless defined?(RAILS_ROOT)
+require File.dirname(__FILE__) + "/../config/environment" unless defined?(Rails)
 require 'spec'
 # require 'spec/autorun'
 require 'spec/rails'
@@ -110,7 +110,7 @@ Spec::Runner.configure do |config|
   # in your config/boot.rb
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures  = false
-  config.fixture_path = RAILS_ROOT + '/spec/fixtures/'
+  config.fixture_path = Rails.root+'spec/fixtures/'
   config.mock_with :mocha
 
   config.include Webrat::Matchers, :type => :views

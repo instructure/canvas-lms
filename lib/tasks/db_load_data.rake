@@ -17,10 +17,10 @@ end
 namespace :db do
   desc "Generate security.yml key"
   task :generate_security_key do
-    security_conf_path = File.expand_path(File.join(RAILS_ROOT, 'config', 'security.yml'))
+    security_conf_path = Rails.root.join('config', 'security.yml')
     security_conf = YAML.load_file(security_conf_path)
-    if security_conf[RAILS_ENV]["encryption_key"].to_s.length < 20
-      security_conf[RAILS_ENV]["encryption_key"] = ActiveSupport::SecureRandom.hex(64)
+    if security_conf[Rails.env]["encryption_key"].to_s.length < 20
+      security_conf[Rails.env]["encryption_key"] = ActiveSupport::SecureRandom.hex(64)
       File.open(security_conf_path, 'w') { |f| YAML.dump(security_conf, f) }
     end
   end
@@ -89,7 +89,7 @@ namespace :db do
   end
   desc "Make sure all message templates have notifications in the db"
   task :evaluate_notification_templates => :load_environment do
-    Dir.glob(File.join(RAILS_ROOT, 'app', 'messages', '*.erb')) do |filename|
+    Dir.glob(Rails.root.join('app', 'messages', '*.erb')) do |filename|
       filename = File.split(filename)[1]
       name = filename.split(".")[0]
       unless name[0,1] == "_"
@@ -98,7 +98,7 @@ namespace :db do
       end
     end
     Notification.all.each do |n|
-      puts "No notification files found for #{n.name}" if Dir.glob(File.join(RAILS_ROOT, 'app', 'messages', "#{n.name.downcase.gsub(/\s/, '_')}.*.erb")).empty?
+      puts "No notification files found for #{n.name}" if Dir.glob(Rails.root.join('app', 'messages', "#{n.name.downcase.gsub(/\s/, '_')}.*.erb")).empty?
     end
   end
   

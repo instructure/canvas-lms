@@ -468,7 +468,7 @@ class Account < ActiveRecord::Base
   def account_chain(opts = {})
     res = [self]
 
-    if ActiveRecord::Base.configurations[RAILS_ENV]['adapter'] == 'postgresql'
+    if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
       self.shard.activate do
         res.concat Account.find_by_sql(<<-SQL) if self.parent_account_id
             WITH RECURSIVE t AS (
@@ -506,7 +506,7 @@ class Account < ActiveRecord::Base
   # named scope, so we pass the limit and offset into the method instead and
   # build our own query string
   def sub_accounts_recursive(limit, offset)
-    if ActiveRecord::Base.configurations[RAILS_ENV]['adapter'] == 'postgresql'
+    if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
       Account.find_by_sql([<<-SQL, self.id, limit.to_i, offset.to_i])
           WITH RECURSIVE t AS (
             SELECT * FROM accounts WHERE parent_account_id = ?
@@ -721,7 +721,7 @@ class Account < ActiveRecord::Base
   end
   
   def context_code
-    raise "DONT USE THIS, use .short_name instead" unless ENV['RAILS_ENV'] == "production"
+    raise "DONT USE THIS, use .short_name instead" unless Rails.env.production?
   end
   
   def short_name

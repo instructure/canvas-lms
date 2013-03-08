@@ -136,7 +136,7 @@ class Notification < ActiveRecord::Base
       )
       delayed_message.context = asset
       @delayed_messages_to_save << delayed_message
-      delayed_message.save! if ENV['RAILS_ENV'] == 'test'
+      delayed_message.save! if Rails.env.test?
       list << delayed_message
     end
   end

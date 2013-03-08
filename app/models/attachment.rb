@@ -681,7 +681,7 @@ class Attachment < ActiveRecord::Base
     @file_store_config ||= Setting.from_config('file_store')
     @file_store_config ||= { 'storage' => 'local' }
     @file_store_config['path_prefix'] ||= @file_store_config['path'] || 'tmp/files'
-    if RAILS_ENV == "test"
+    if Rails.env.test?
       # yes, a rescue nil; the problem is that in an automated test environment, this may be
       # in the auto-require path, before the DB is even created; obviously it hasn't been
       # overridden yet

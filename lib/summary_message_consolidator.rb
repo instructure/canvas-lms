@@ -22,7 +22,7 @@ class SummaryMessageConsolidator
   end
 
   def initialize(n=nil)
-    @logger = RAILS_DEFAULT_LOGGER
+    @logger = Rails.logger
   end
 
   def process

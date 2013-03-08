@@ -181,9 +181,9 @@ describe GoogleDocs do
   # ----------------------------
 
   def google_doc_settings
-    path = RAILS_ROOT + "/config/google_docs.yml"
+    path = Rails.root+"config/google_docs.yml"
     if File.exists?(path)
-      YAML.load_file(path)[RAILS_ENV]
+      YAML.load_file(path)[Rails.env]
     else
       {
         'test_user_token' => 'u_token',

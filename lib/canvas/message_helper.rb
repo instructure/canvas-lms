@@ -18,7 +18,7 @@
 
 module Canvas::MessageHelper
   def self.default_message_path(filename)
-    File.join(RAILS_ROOT, 'app', 'messages', filename)
+    File.join(Rails.root.to_s, 'app', 'messages', filename)
   end
 
   def self.add_message_path(path)

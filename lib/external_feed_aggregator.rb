@@ -26,7 +26,7 @@ class ExternalFeedAggregator
   end
   
   def initialize
-    @logger = RAILS_DEFAULT_LOGGER
+    @logger = Rails.logger
   end
   
   def process

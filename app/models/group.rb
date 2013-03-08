@@ -113,7 +113,7 @@ class Group < ActiveRecord::Base
   end
 
   def context_code
-    raise "DONT USE THIS, use .short_name instead" unless ENV['RAILS_ENV'] == "production"
+    raise "DONT USE THIS, use .short_name instead" unless Rails.env.production?
   end
 
   def appointment_context_codes

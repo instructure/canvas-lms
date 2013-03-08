@@ -1,5 +1,5 @@
 def in_memory_database?
-  ENV["RAILS_ENV"] == "test" and
+  Rails.env.test? and
     ENV["IN_MEMORY_DB"] and
     Rails::Configuration.new.database_configuration.has_key?('test-in-memory') and
     Rails::Configuration.new.database_configuration['test-in-memory']['database'] == ':memory:'

@@ -35,8 +35,8 @@ class ActiveRecord::Base
 
   def self.models_from_files
     @from_files ||= Dir[
-      "#{RAILS_ROOT}/app/models/*",
-      "#{RAILS_ROOT}/vendor/plugins/*/app/models/*"
+      "#{Rails.root}/app/models/*",
+      "#{Rails.root}/vendor/plugins/*/app/models/*"
     ].collect { |file|
       model = File.basename(file, ".*").camelize.constantize
       next unless model < ActiveRecord::Base
@@ -158,7 +158,7 @@ class ActiveRecord::Base
   end
 
   def cached_context_grants_right?(user, session, *permissions)
-    @@cached_contexts = nil if ENV['RAILS_ENV'] == "test"
+    @@cached_contexts = nil if Rails.env.test?
     @@cached_contexts ||= {}
     context_key = "#{self.context_type}_#{self.context_id}" if self.respond_to?(:context_type)
     context_key ||= "Course_#{self.course_id}"
@@ -166,7 +166,7 @@ class ActiveRecord::Base
     @@cached_contexts[context_key] ||= self.course
     @@cached_permissions ||= {}
     key = [context_key, (user ? user.id : nil)].join
-    @@cached_permissions[key] = nil if ENV['RAILS_ENV'] == "test"
+    @@cached_permissions[key] = nil if Rails.env.test?
     @@cached_permissions[key] = nil if session && session[:session_affects_permissions]
     @@cached_permissions[key] ||= @@cached_contexts[context_key].grants_rights?(user, session, nil).keys
     (@@cached_permissions[key] & Array(permissions).flatten).any?
@@ -329,7 +329,7 @@ class ActiveRecord::Base
   end
 
   def self.best_unicode_collation_key(col)
-    if ActiveRecord::Base.configurations[RAILS_ENV]['adapter'] == 'postgresql'
+    if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
       # For PostgreSQL, we can't trust a simple LOWER(column), with any collation, since
       # Postgres just defers to the C library which is different for each platform. The best
       # choice is the collkey function from pg_collkey which uses ICU to get a full unicode sort.
@@ -448,7 +448,7 @@ class ActiveRecord::Base
     column = column.to_s
     options = {:include_nil => false}.merge(options)
 
-    result = if ActiveRecord::Base.configurations[RAILS_ENV]['adapter'] == 'postgresql'
+    result = if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
       sql = ''
       sql << "SELECT NULL AS #{column} WHERE EXISTS(SELECT * FROM #{table_name} WHERE #{column} IS NULL) UNION ALL (" if options[:include_nil]
       sql << <<-SQL

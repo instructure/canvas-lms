@@ -18,7 +18,7 @@
 
 require 'fileutils'
 
-migration_dir = File.join(RAILS_ROOT, 'db', 'migrate')
+migration_dir = Rails.root.join('db', 'migrate')
 FileUtils.cp(
   File.dirname(__FILE__)+'/db/migrate/20101206150923_install_custom_fields.rb',
-  migration_dir+'/20101206150923_install_custom_fields.rb')
+  migration_dir+'20101206150923_install_custom_fields.rb')

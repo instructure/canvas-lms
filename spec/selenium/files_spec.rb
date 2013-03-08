@@ -39,7 +39,7 @@ def add_file(file_fullpath)
 end
 
 def create_temp_file(filename)
-  path = "#{RAILS_ROOT}/tmp/#{filename}"
+  path = "#{Rails.root}/tmp/#{filename}"
   file = File.open!(path, 'w')
   file.write filename
   file.close

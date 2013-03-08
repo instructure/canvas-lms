@@ -29,7 +29,7 @@ class ContentZipper
   end
   
   def self.send_later_if_production(*args)
-    if ENV['RAILS_ENV'] == 'production'
+    if Rails.env.production?
       send_later(*args)
     else
       send(*args)
@@ -37,7 +37,7 @@ class ContentZipper
   end
   
   def send_later_if_production(*args)
-    if ENV['RAILS_ENV'] == 'production'
+    if Rails.env.production?
       send_later(*args)
     else
       send(*args)
@@ -222,11 +222,11 @@ class ContentZipper
           zip_attachment.file_state = ((idx + 1).to_f / count.to_f * 100).to_i
           zip_attachment.save!
         end
-        if css = File.open(File.join(RAILS_ROOT, 'public', 'stylesheets', 'static', 'eportfolio_static.css')) rescue nil
+        if css = File.open(Rails.root.join('public', 'stylesheets', 'static', 'eportfolio_static.css')) rescue nil
           content = css.read
           zipfile.get_output_stream("eportfolio.css") {|f| f.puts content } if content
         end
-        content = File.open(File.join(RAILS_ROOT, 'public', 'images', 'logo.png'), 'rb').read rescue nil
+        content = File.open(Rails.root.join('public', 'images', 'logo.png'), 'rb').read rescue nil
         zipfile.get_output_stream("logo.png") {|f| f.write content } if content
       end
       @logger.debug("data zipped!")

@@ -26,9 +26,8 @@ describe Message do
       HostUrl.stubs(:protocol).returns("https")
       au = AccountUser.create(:account => account_model)
       msg = generate_message(:account_user_notification, :email, au)
-      file_path = File.expand_path(File.join(RAILS_ROOT, 'app', 'messages', 'alert.email.erb'))
-      template = msg.get_template(file_path)
-      template.should match(%r{Account Admin Notification})
+      template = msg.get_template('alert.email.erb')
+      template.should match(%r{An alert has been triggered})
     end
   end
 

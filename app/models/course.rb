@@ -789,7 +789,7 @@ class Course < ActiveRecord::Base
   end
 
   def context_code
-    raise "DONT USE THIS, use .short_name instead" unless ENV['RAILS_ENV'] == "production"
+    raise "DONT USE THIS, use .short_name instead" unless Rails.env.production?
   end
 
   def allow_media_comments?
@@ -891,7 +891,7 @@ class Course < ActiveRecord::Base
 
   def require_assignment_group
     has_group = Rails.cache.read(['has_assignment_group', self].cache_key)
-    return if has_group && ENV['RAILS_ENV'] == 'production'
+    return if has_group && Rails.env.production?
     if self.assignment_groups.active.empty?
       self.assignment_groups.create(:name => t('#assignment_group.default_name', "Assignments"))
     end

@@ -86,11 +86,11 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
 
     desc "Run all specs in spec directory with RCov (excluding plugin specs)"
     Spec::Rake::SpecTask.new(:rcov) do |t|
-      t.spec_opts = ['--options', "\"#{RAILS_ROOT}/spec/spec.opts\""]
+      t.spec_opts = ['--options', "\"#{Rails.root}/spec/spec.opts\""]
       t.spec_files = FileList['vendor/plugins/*/spec_canvas/**/*_spec.rb'].exclude('vendor/plugins/*/spec_canvas/selenium/*_spec.rb') + FileList['spec/**/*_spec.rb'].exclude('spec/selenium/**/*_spec.rb')
       t.rcov = true
       t.rcov_opts = lambda do
-        IO.readlines("#{RAILS_ROOT}/spec/rcov.opts").map { |l| l.chomp.split " " }.flatten
+        IO.readlines("#{Rails.root}/spec/rcov.opts").map { |l| l.chomp.split " " }.flatten
       end
     end
 
@@ -109,21 +109,21 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
     [:models, :controllers, :views, :helpers, :lib, :selenium].each do |sub|
       desc "Run the code examples in spec/#{sub}"
       Spec::Rake::SpecTask.new(sub) do |t|
-        t.spec_opts = ['--options', "\"#{RAILS_ROOT}/spec/spec.opts\""]
+        t.spec_opts = ['--options', "\"#{Rails.root}/spec/spec.opts\""]
         t.spec_files = FileList["spec/#{sub}/**/*_spec.rb"]
       end
     end
 
     desc "Run the code examples in vendor/plugins (except RSpec's own)"
     Spec::Rake::SpecTask.new(:plugins) do |t|
-      t.spec_opts = ['--options', "\"#{RAILS_ROOT}/spec/spec.opts\""]
+      t.spec_opts = ['--options', "\"#{Rails.root}/spec/spec.opts\""]
       t.spec_files = FileList['vendor/plugins/**/spec/**/*/*_spec.rb'].exclude('vendor/plugins/rspec/*').exclude("vendor/plugins/rspec-rails/*")
     end
 
     namespace :plugins do
       desc "Runs the examples for rspec_on_rails"
       Spec::Rake::SpecTask.new(:rspec_on_rails) do |t|
-        t.spec_opts = ['--options', "\"#{RAILS_ROOT}/spec/spec.opts\""]
+        t.spec_opts = ['--options', "\"#{Rails.root}/spec/spec.opts\""]
         t.spec_files = FileList['vendor/plugins/rspec-rails/spec/**/*/*_spec.rb']
       end
     end
@@ -162,7 +162,7 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
     end
 
     namespace :server do
-      daemonized_server_pid = File.expand_path("#{RAILS_ROOT}/tmp/pids/spec_server.pid")
+      daemonized_server_pid = File.expand_path("#{Rails.root}/tmp/pids/spec_server.pid")
 
       desc "start spec_server."
       task :start do

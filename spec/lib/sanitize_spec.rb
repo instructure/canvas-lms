@@ -87,7 +87,7 @@ describe Sanitize do
     res.should == str
   end
 
-  Dir.glob(File.join(RAILS_ROOT, 'spec', 'fixtures', 'xss', '*.xss')) do |filename|
+  Dir.glob(Rails.root.join('spec', 'fixtures', 'xss', '*.xss')) do |filename|
     name = File.split(filename).last
     it "should sanitize xss attempts for #{name}" do
       f = File.open(filename)
