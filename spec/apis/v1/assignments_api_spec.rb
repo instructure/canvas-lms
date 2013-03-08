@@ -513,6 +513,51 @@ describe AssignmentsApiController, :type => :integration do
       end
     end
 
+    context "broadcasting while updating overrides" do
+      before :all do
+        @notification = Notification.create! :name => "Assignment Changed"
+        course_with_teacher(:active_all => true)
+        student_in_course(:course => @course, :active_all => true)
+        @student.communication_channels.create(:path => "student@instructure.com").confirm!
+        @student.email_channel.notification_policies.
+          find_or_create_by_notification_id(@notification.id).
+          update_attribute(:frequency, 'immediately')
+        @assignment = @course.assignments.create!
+        Assignment.update_all({:created_at => Time.zone.now - 1.day}, {:id => @assignment.id})
+        @adhoc_due_at = 5.days.from_now
+        @section_due_at = 7.days.from_now
+        @user = @teacher
+        @params = {
+          'name' => 'Assignment With Overrides',
+          'assignment_overrides' => {
+            '0' => {
+              'student_ids' => [@student.id],
+              'title' => 'adhoc override',
+              'due_at' => @adhoc_due_at.iso8601
+            },
+            '1' => {
+              'course_section_id' => @course.default_section.id,
+              'due_at' => @section_due_at.iso8601
+            }
+          }
+        }
+      end
+
+      after(:all) do
+        truncate_all_tables
+      end
+
+      it "should not send assignment_changed if notify_of_update is not set" do
+        api_update_assignment_call(@course,@assignment,@params)
+        @student.messages.detect{|m| m.notification_id == @notification.id}.should be_nil
+      end
+
+      it "should send assignment_changed if notify_of_update is set" do
+        api_update_assignment_call(@course,@assignment,@params.merge({:notify_of_update => true}))
+        @student.messages.detect{|m| m.notification_id == @notification.id}.should be_present
+      end
+    end
+
     context "when turnitin is enabled on the context" do
       before do
         course_with_teacher(:active_all => true)
