@@ -21,8 +21,14 @@ define ['Backbone'], ({View}, _) ->
     defaults:
       onInputDelay: 200
 
+    initialize: ->
+      super
+      @lastValue = @el.value
+
     onInput: =>
-      @trigger 'input', @el.value
+      if @el.value isnt @lastValue
+        @trigger 'input', @el.value
+      @lastValue = @el.value
 
     onEnter: ->
       @el.select()
@@ -35,3 +41,4 @@ define ['Backbone'], ({View}, _) ->
       null
 
     change: @::keyup
+
