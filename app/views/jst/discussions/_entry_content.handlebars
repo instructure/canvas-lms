@@ -7,7 +7,7 @@
         <span class="screenreader-only">{{#t "manage_discussion_entry"}}Manage Discussion Entry{{/t}}</span></a>
       <ul class="al-options">
         {{#if parent_id}}
-          <li><a data-pushstate href="#entry-{{parent_id}}"><span class="ui-icon ui-icon-arrowreturnthick-1-w" />{{#t "go_to_parent"}}Go To Parent{{/t}}</a></li>
+          <li><a data-pushstate href="#entry-{{parent_id}}"><i class="icon-replied"></i> {{#t "go_to_parent"}}Go To Parent{{/t}}</a></li>
         {{else}}
           <li><a href="#content"><i class="icon-discussion"></i> {{#t "go_to_topic"}}Go To Topic{{/t}}</a></li>
         {{/if}}
