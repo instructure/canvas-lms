@@ -12,12 +12,12 @@
 
     <div class="span6 right-align">
       <div class="discussion-pubdate">
-        <% if @assignment.has_active_overrides? %>
+        <% if @assignment.has_active_overrides? && @presenter.can_grade?  %>
           <a href="#" class="toggle_due_dates"><%= t(:show_due_dates, 'Show Due Dates') %></a>
 
         <% else %>
           <b><%= t(:due_date, 'due %{date}',
-                   :date => @assignment.due_at) %></b>
+                   :date => OverrideListPresenter.new.due_at(@assignment)) %>
         <% end %>
       </div>
     </div>
@@ -39,23 +39,25 @@
     </p>
   <% end %>
 
-  <div class="row-fluid">
-    <div class="span12 hidden due_date_wrapper">
-      <table class="discussion-topic-due-dates">
-        <thead>
-          <tr>
-            <th scope="col"><%= t(:due, 'Due') %></th>
-            <th scope="col"><%= t(:for, 'For') %></th>
-            <th scope="col"><%= t(:available_from, 'Available from') %></th>
-            <th scope="col"><%= t(:until, 'Until') %></th>
-          </tr>
-        </thead>
+  <% if @presenter.can_grade? %>
+    <div class="row-fluid">
+      <div class="span12 hidden due_date_wrapper">
+        <table class="discussion-topic-due-dates">
+          <thead>
+            <tr>
+              <th scope="col"><%= t(:due, 'Due') %></th>
+              <th scope="col"><%= t(:for, 'For') %></th>
+              <th scope="col"><%= t(:available_from, 'Available from') %></th>
+              <th scope="col"><%= t(:until, 'Until') %></th>
+            </tr>
+          </thead>
 
-        <%= render 'shared/override_list', :assignment => @assignment, 
-          :user => @current_user %>
+          <%= render 'shared/override_list', :assignment => @assignment, 
+            :user => @current_user %>
 
-      </table>
+        </table>
+      </div>
     </div>
-  </div>
+  <% end %>
 
 </div>
