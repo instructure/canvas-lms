@@ -781,6 +781,68 @@ describe QuizzesController do
       quiz.lock_at.to_i.should == CanvasTime.fancy_midnight(time).to_i
       quiz.unlock_at.to_i.should == time.to_i
     end
+
+    context 'notifications' do
+      before do
+        @notification = Notification.create(:name => 'Assignment Due Date Changed')
+
+        course_with_teacher_logged_in(:active_all => true)
+        @section = @course.course_sections.create!
+
+        student_in_course(:active_all => true)
+        @student.communication_channels.create(:path => "student@instructure.com").confirm!
+        @student.email_channel.notification_policies.
+          find_or_create_by_notification_id(@notification.id).
+          update_attribute(:frequency, 'immediately')
+
+        course_quiz
+        @quiz.generate_quiz_data
+        @quiz.workflow_state = 'available'
+        @quiz.published_at = Time.now
+        @quiz.save!
+
+        @quiz.update_attribute(:created_at, 1.day.ago)
+        @quiz.assignment.update_attribute(:created_at, 1.day.ago)
+
+      end
+
+      it "should send due date changed if notify_of_update is set" do
+        course_due_date = 2.days.from_now
+        section_due_date = 3.days.from_now
+        post 'update', :course_id => @course.id,
+          :id => @quiz.id,
+          :quiz => {
+            :title => "overridden quiz",
+            :due_at => course_due_date.iso8601,
+            :assignment_overrides => [{
+              :course_section_id => @section.id,
+              :due_at => section_due_date.iso8601,
+              :due_at_overridden => true
+            }],
+            :notify_of_update => true
+          }
+
+        @student.messages.detect{|m| m.notification_id == @notification.id}.should_not be_nil
+      end
+
+      it "should not send due date changed if notify_of_update is not set" do
+        course_due_date = 2.days.from_now
+        section_due_date = 3.days.from_now
+        post 'update', :course_id => @course.id,
+          :id => @quiz.id,
+          :quiz => {
+            :title => "overridden quiz",
+            :due_at => course_due_date.iso8601,
+            :assignment_overrides => [{
+              :course_section_id => @section.id,
+              :due_at => section_due_date.iso8601,
+              :due_at_overridden => true
+            }]
+          }
+
+        @student.messages.detect{|m| m.notification_id == @notification.id}.should be_nil
+      end
+    end
   end
 
   describe "GET 'statistics'" do

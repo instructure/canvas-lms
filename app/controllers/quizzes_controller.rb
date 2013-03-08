@@ -431,9 +431,6 @@ class QuizzesController < ApplicationController
         @quiz.transaction do
           overrides = delete_override_params
           if params[:activate]
-            # TODO: We need to handle notifications better here. We want to send
-            # notifications if the "notify_of_update" field is passed, but *after*
-            # the assignment overrides have been created.
             @quiz.with_versioning(true) do
               @quiz.generate_quiz_data
               @quiz.workflow_state = 'available'
@@ -441,15 +438,32 @@ class QuizzesController < ApplicationController
               @quiz.save!
             end
           end
-          @quiz.content_being_saved_by(@current_user)
+
+          notify_of_update = value_to_boolean(params[:quiz][:notify_of_update])
+          params[:quiz][:notify_of_update] = false
+
+          old_assignment = nil
+          if @quiz.assignment.present?
+            old_assignment = @quiz.assignment.clone
+            old_assignment.id = @quiz.assignment.id
+          end
+
           @quiz.with_versioning(false) do
             # using attributes= here so we don't need to make an extra
             # database call to get the times right after save!
             @quiz.attributes = params[:quiz]
             @quiz.infer_times
+            @quiz.content_being_saved_by(@current_user)
             @quiz.save!
           end
+
           batch_update_assignment_overrides(@quiz,overrides) unless overrides.nil?
+
+          # quiz.rb restricts all assignment broadcasts if notify_of_update is
+          # false, so we do the same here
+          if @quiz.assignment.present? && notify_of_update
+            @quiz.assignment.do_notifications!(old_assignment, notify_of_update)
+          end
           @quiz.reload
           @quiz.update_quiz_submission_end_at_times if params[:quiz][:time_limit].present?
         end
