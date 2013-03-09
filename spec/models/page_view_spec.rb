@@ -88,6 +88,35 @@ describe PageView do
         # can't find in cassandra
         expect { PageView.find(pv.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
       end
+
+      it "should handle default shard ids through redis" do
+        pending("needs redis") unless Canvas.redis_enabled?
+
+        @pv_user = user_model
+        id = @shard1.activate do
+          @user2 = User.create! { |u| u.id = @user.local_id }
+          course_model
+          pv = page_view_model
+          pv.user = @pv_user
+          pv.context = @course
+          pv.store
+
+          PageView.process_cache_queue
+          pv.request_id
+        end
+
+        pv = PageView.find(id)
+        pv.user.should == @pv_user
+        pv.context.should == @course
+
+        @pv_user.page_views.paginate(:page => 1, :per_page => 1).first.should == pv
+        @user2.page_views.paginate(:page => 1, :per_page => 1).should be_empty
+
+        @shard1.activate do
+          @pv_user.page_views.paginate(:page => 1, :per_page => 1).first.should == pv
+          @user2.page_views.paginate(:page => 1, :per_page => 1).should be_empty
+        end
+      end
     end
 
     it "should paginate with a willpaginate-like array" do
