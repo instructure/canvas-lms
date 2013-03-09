@@ -3,9 +3,10 @@
    for_context ||= false
    context = @context
    context = context.context if context.is_a?(Group)
+   show_grading = !@assignment || @assignment.submission_types != 'online_quiz' 
 %>
 <% rubric_association = assessment.rubric_association if assessment %>
-<% cache(['rubric_render', (rubric.cache_key rescue 'no_rubric'), (rubric.cache_key rescue context.asset_string), (rubric_association.cache_key rescue 'no_association'), (assessment.cache_key rescue 'no_assessment'), editable, edit_view, assessing].join('/')) do %>
+<% cache(['rubric_render2', (rubric.cache_key rescue 'no_rubric'), (rubric.cache_key rescue context.asset_string), (rubric_association.cache_key rescue 'no_association'), (assessment.cache_key rescue 'no_assessment'), editable, edit_view, assessing, show_grading].join('/')) do %>
 <table class="rubric <%= "assessing" if assessing %> <%= "for_grading" if (rubric.use_for_grading rescue false) %>" id="<%= rubric ? "rubric_#{rubric.id}" : "default_rubric" %>" style="<%= hidden unless rubric %>">
 <thead>
   <tr class="rubric_title">
@@ -108,7 +109,7 @@
           <input type="checkbox" id="rubric_custom_rating" class="rubric_custom_rating" <%= 'checked' if rubric && rubric.free_form_criterion_comments %>/>
           <label for="rubric_custom_rating"><%= t 'labels.custom_rating', "I'll write free-form comments when assessing students" %></label>
         </div>
-        <% if !@assignment || @assignment.submission_types != 'online_quiz' %>
+        <% if show_grading %>
           <div class="rubric_grading" style="<%= hidden unless @assignment %>">
             <input type="checkbox" id="grading_rubric" class="grading_rubric_checkbox" <%= 'checked' if rubric_association && rubric_association.use_for_grading %>/>
             <label for="grading_rubric"><%= t 'labels.grading_rubric', "Use this rubric for assignment grading" %></label>
