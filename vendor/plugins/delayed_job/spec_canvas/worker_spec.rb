@@ -198,6 +198,19 @@ shared_examples_for 'Delayed::Worker' do
       @job.run_at.should > Delayed::Job.db_time_now - 10.minutes
       @job.run_at.should < Delayed::Job.db_time_now + 10.minutes
     end
+
+    it "should notify jobs on failure" do
+      ErrorJob.failure_runs = 0
+      @worker.perform(@job)
+      ErrorJob.failure_runs.should == 1
+    end
+
+    it "should notify jobs on permanent failure" do
+      (Delayed::Worker.max_attempts - 1).times { @job.reschedule }
+      ErrorJob.permanent_failure_runs = 0
+      @worker.perform(@job)
+      ErrorJob.permanent_failure_runs.should == 1
+    end
   end
   
   context "reschedule" do
