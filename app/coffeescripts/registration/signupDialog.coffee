@@ -18,6 +18,7 @@ define [
     return unless templates[id]
     $node = $nodes[id] ?= $('<div />')
     $node.html templates[id](
+      form_url: ENV.FORM_URL
       terms_url: "http://www.instructure.com/terms-of-use"
       privacy_url: "http://www.instructure.com/privacy-policy"
     )
