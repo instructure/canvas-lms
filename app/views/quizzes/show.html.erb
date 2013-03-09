@@ -206,7 +206,7 @@
                       </a>
                     </li>
                 <% end %>
-                </li>
+                </ul>
             </div>
             <div class="list-view border border-trbl">
               <% if @quiz.survey? && @quiz.anonymous_submissions %>
@@ -237,13 +237,14 @@
                   </li>
                   <% end %>
                 </ul>
-            <% end %>
+              <% end %>
             </div>
 
             <div style="clear: left;"></div>
           </div>
         </div>
       <% end %>
+    <% end %>
 
     <div class='row-fluid'>
       <div class='span9'>
@@ -308,7 +309,7 @@
       <%= render :partial => 'quiz_show_student' %>
     <% end %>
 
-
+    <% if @quiz.available? %>
       <% if !@submission || !@submission.completed? || @quiz.unlimited_attempts? || (@submission.completed? && @submission.attempts_left > 0) %>
         <% if @locked && !can_do(@quiz, @current_user, :update) %>
           <div class="lock_explanation">
