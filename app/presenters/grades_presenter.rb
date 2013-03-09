@@ -5,7 +5,7 @@ class GradesPresenter
 
   def student_enrollments
     @student_enrollments ||= begin
-      current_enrollments.select { |e| e.student? }.index_by(&:course)
+      current_enrollments.select { |e| e.student? }.index_by { |e| e.course }
     end
   end
 
