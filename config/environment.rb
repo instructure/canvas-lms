@@ -137,6 +137,7 @@ YAML.whitelist.add(*%w[
   tag:ruby.yaml.org,2002:object:Mime::Type
   tag:ruby.yaml.org,2002:object:URI::HTTP
   tag:ruby.yaml.org,2002:object:URI::HTTPS
+  tag:ruby.yaml.org,2002:object:OpenObject
 ])
 YAML.whitelist.add('tag:ruby.yaml.org,2002:object:Class') { |classname| Canvas::Migration.valid_converter_classes.include?(classname) }
 

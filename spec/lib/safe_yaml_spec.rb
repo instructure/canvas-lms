@@ -80,6 +80,9 @@ https: !ruby/object:URI::HTTPS
 ab: !ruby/object:Class AcademicBenchmark::Converter
 qt: !ruby/object:Class Qti::Converter
 verbose_symbol: !ruby/symbol blah
+oo: !ruby/object:OpenObject
+  table:
+    :a: 1
 YAML
     result = YAML.load yaml
 
@@ -119,5 +122,8 @@ YAML
     result['qt'].should == Qti::Converter
 
     result['verbose_symbol'].should == :blah
+
+    oo = verify(result, 'oo', OpenObject)
+    oo.a.should == 1
   end
 end
