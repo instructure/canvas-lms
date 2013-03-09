@@ -295,8 +295,12 @@ define([
       var $form = $tr.find("#edit_rubric_form");
       $rubric.append($tr);
       $form.attr('method', 'POST').attr('action', $("#add_rubric_url").attr('href'));
+      // I believe this should only be visible on the assignment page (not
+      // rubric page or quiz page) but we need to audit uses of the add rubric
+      // dialog before we make it that restrictive
       var $assignPoints = $("#assignment_show .points_possible,#rubrics.rubric_dialog .assignment_points_possible")
-      $form.find(".rubric_grading").showIf($assignPoints.length > 0);
+      var $quizPage = $("#quiz_show,#quiz_edit_wrapper")
+      $form.find(".rubric_grading").showIf($assignPoints.length > 0 && $quizPage.length === 0);
       return $rubric;
     },
     editRubric: function($original_rubric, url) {

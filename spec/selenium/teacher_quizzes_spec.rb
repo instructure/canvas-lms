@@ -595,6 +595,20 @@ describe "quizzes" do
       other_override.due_at.strftime('%b %-d, %y').
           should == other_section_due.to_date.strftime('%b %-d, %y')
     end
+
+    it "should not show 'use for grading' as an option in rubrics" do
+      course_with_teacher_logged_in
+      @context = @course
+      q = quiz_model
+      q.generate_quiz_data
+      q.workflow_state = 'available'
+      q.save!
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+      f('.al-trigger').click
+      f('.show_rubric_link').click
+      wait_for_ajaximations
+      fj('#rubrics .add_rubric_link:visible').click
+      fj('.rubric_grading:visible').should be_nil
+    end
   end
 end
-
