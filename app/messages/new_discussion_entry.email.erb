@@ -8,7 +8,7 @@
 
 <%= t :body, "%{user} posted a new comment on the thread %{discussion_topic} for %{course}:", :user => asset.user.short_name, :discussion_topic => asset.title, :course => asset.context.name %>
 
-<%= strip_tags(asset.message) %>
+<%= html_to_text(asset.message) %>
 
 <%= t :details, "Join the conversation here:" %>
 <%= content :link %>

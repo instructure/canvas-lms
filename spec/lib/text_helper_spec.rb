@@ -258,6 +258,14 @@ describe TextHelper do
     it "should insert newlines for ps and brs" do
       th.html_to_text("Ohai<br>Text <p>paragraph of text.</p>End").should == "Ohai\n\nText paragraph of text.\n\nEnd"
     end
+
+    it "should return a string with no html back unchanged" do
+      th.html_to_text('String without HTML').should == 'String without HTML'
+    end
+
+    it "should return an empty string if passed a nil value" do
+      th.html_to_text(nil).should == ''
+    end
   end
 
   context "markdown" do
