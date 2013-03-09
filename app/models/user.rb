@@ -922,11 +922,13 @@ class User < ActiveRecord::Base
 
     given do |user|
       user && (
-        # this means that the user we are given is an administrator of an account of one of the courses that this user is enrolled in
+        # by default this means that the user we are given is an administrator
+        # of an account of one of the courses that this user is enrolled in, or
+        # an admin (teacher/ta/designer) in the course
         self.all_courses.any? { |c| c.grants_right?(user, nil, :read_reports) }
       )
     end
-    can :rename and can :remove_avatar and can :view_statistics
+    can :rename and can :remove_avatar and can :read_reports
 
     given do |user|
       user && self.all_courses.any? { |c| c.grants_right?(user, nil, :manage_user_notes) }
@@ -950,7 +952,7 @@ class User < ActiveRecord::Base
         self.associated_accounts.any? {|a| a.grants_right?(user, nil, :manage_students) }
       )
     end
-    can :manage_user_details and can :update_avatar and can :remove_avatar and can :rename and can :view_statistics and can :read
+    can :manage_user_details and can :update_avatar and can :remove_avatar and can :rename and can :view_statistics and can :read and can :read_reports
 
     given do |user|
       user && (
@@ -958,7 +960,7 @@ class User < ActiveRecord::Base
         self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_user_logins)  }
       )
     end
-    can :view_statistics and can :read
+    can :view_statistics and can :read and can :read_reports
 
     given do |user|
       user && (

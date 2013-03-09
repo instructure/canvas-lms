@@ -38,7 +38,7 @@
       <% end %>
     </span>
   </a>
-  <% if enrollment.admin? && can_do(enrollment.user, @current_user, :view_statistics) %>
+  <% if enrollment.admin? && can_do(enrollment.user, @current_user, :read_reports) %>
     <div style='clear:left'>
       <%= link_to(t('links.teacher_activity', 'See Student Interactions Report'), user_course_teacher_activity_url(enrollment.user_id, enrollment.course_id)) %>
     </div>
