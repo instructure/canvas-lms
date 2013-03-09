@@ -127,18 +127,18 @@
 
 <div id="quiz_show">
   <header class="quiz-header">
-    <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :manage) %>
-      <% if needs_unpublished_warning? %>
-        <div class="alert">
-          <div class='row-fluid'>
-            <div class='span8'>
-              <% if !@quiz.available? %>
-                <%= unpublished_quiz_warning %>
-              <% else %>
-                <%= unpublished_changes_warning %>
-              <% end %>
-            </div>
-            <div class='span4 actions'>
+    <% if needs_unpublished_warning? %>
+      <div class="alert">
+        <div class='row-fluid'>
+          <div class='span8 unpublished_warning'>
+            <% if !@quiz.available? %>
+              <%= unpublished_quiz_warning %>
+            <% else %>
+              <%= unpublished_changes_warning %>
+            <% end %>
+          </div>
+          <div class='span4 actions'>
+            <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :manage) %>
               <% link_to context_url(@context, :context_quiz_take_url, @quiz, :preview => 1), :method => :post, :class => 'btn', :id => 'preview_quiz_button' do %><%= t('links.preview', "Preview") %><% end %>
               <% form_tag context_url(@context, :context_quiz_url, @quiz.id), {:method => :put, :style => 'display:inline', :id => 'publish_quiz_form'} do %>
                 <input type="hidden" name="activate" value="true"/>
@@ -150,10 +150,10 @@
                   <% end %>
                 </button>
               <% end %>
-            </div>
+            <% end %>
           </div>
         </div>
-      <% end %>
+      </div>
     <% end %>
 
     <div class='row-fluid'>
