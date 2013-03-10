@@ -33,9 +33,12 @@ define [
     ##
     # Sets the model data from the form and saves it. Called when the form
     # submits, or can be called programatically.
-    # set @saveOpts in your vew to to pass opts to Backbone.sync (like multipart: true if you have
+    # set @saveOpts in your view to to pass opts to Backbone.sync (like multipart: true if you have
     # a file attachment).  if you want the form not to be re-enabled after save success (because you
     # are navigating to a new page, set dontRenableAfterSaveSuccess to true on your view)
+    #
+    # NOTE: If you are uploading a file attachment, be careful! our
+    # syncWithMultipart extension doesn't call toJSON on your model!
     #
     # @api public
     # @returns jqXHR
