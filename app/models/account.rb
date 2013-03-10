@@ -248,8 +248,9 @@ class Account < ActiveRecord::Base
   
   def ensure_defaults
     self.uuid ||= AutoHandle.generate_securish_uuid
+    self.lti_guid ||= self.uuid if self.respond_to?(:lti_guid)
   end
-  
+
   def verify_unique_sis_source_id
     return true unless self.sis_source_id
     if self.root_account?
