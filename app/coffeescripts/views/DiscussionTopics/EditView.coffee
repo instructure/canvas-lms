@@ -128,9 +128,20 @@ htmlEscape, DiscussionTopic, Assignment, $, preventDefault, MissingDateDialog) -
       assign_data = data.assignment
       delete data.assignment
 
-      data.set_assignment = assign_data?.set_assignment?
-      if assign_data?.set_assignment?
+      if assign_data?.set_assignment
+        data.set_assignment = true
         data.assignment = @updateAssignment(assign_data)
+      else
+        # Announcements don't have assignments.
+        # DiscussionTopics get a model created for them in their
+        # constructor. Delete it so the API doesn't automatically
+        # create assignments unless the user checked "Use for Grading".
+        # We're doing this here because syncWithMultipart doesn't call
+        # the model's toJSON method unfortunately, so assignment params
+        # would be sent in the response, creating an assignment.
+        # The controller checks for set_assignment on the assignment model,
+        # so we can't make it undefined here for the case of discussion topics.
+        data.assignment = {set_assignment: false}
 
       # these options get passed to Backbone.sync in ValidatedFormView
       @saveOpts = multipart: !!data.attachment
@@ -176,9 +187,11 @@ htmlEscape, DiscussionTopic, Assignment, $, preventDefault, MissingDateDialog) -
         super
 
     validateBeforeSave: (data, errors) =>
-      if @isTopic()
+      if @isTopic() && data.set_assignment
         if @assignmentGroupSelector?
           errors = @assignmentGroupSelector.validateBeforeSave(data, errors)
         unless ENV?.IS_LARGE_ROSTER
           errors = @groupCategorySelector.validateBeforeSave(data, errors)
+      else
+        @model.set 'assignment', {set_assignment: false}
       errors
