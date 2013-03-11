@@ -88,7 +88,6 @@ class Course < ActiveRecord::Base
   has_many :all_real_enrollments, :class_name => 'Enrollment', :conditions => ["enrollments.workflow_state != 'deleted' AND enrollments.type <> 'StudentViewEnrollment'"], :include => :user
   has_many :all_real_students, :through => :all_real_student_enrollments, :source => :user
   has_many :all_real_student_enrollments, :class_name => 'StudentEnrollment', :conditions => ["enrollments.workflow_state != ?", 'deleted'], :include => :user
-  has_many :detailed_enrollments, :class_name => 'Enrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => {:user => {:pseudonym => :communication_channel}}
   has_many :teachers, :through => :teacher_enrollments, :source => :user
   has_many :teacher_enrollments, :class_name => 'TeacherEnrollment', :conditions => ["enrollments.workflow_state != 'deleted' AND enrollments.type = 'TeacherEnrollment'"], :include => :user
   has_many :tas, :through => :ta_enrollments, :source => :user
@@ -3083,5 +3082,12 @@ class Course < ActiveRecord::Base
     progress.delayed_job_id = job.id
     progress.save!
     progress
+  end
+
+  def re_send_invitations!
+    # TODO: except(:includes); we don't want the course included.
+    self.enrollments.invited.scoped(:include => {:user => :communication_channels}).find_each do |e|
+      e.re_send_confirmation! if e.invited?
+    end
   end
 end
