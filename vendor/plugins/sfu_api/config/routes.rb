@@ -1,3 +1,3 @@
 ActionController::Routing::Routes.draw do |map|
-  map.sfu_api
+  map.api_urls
 end
