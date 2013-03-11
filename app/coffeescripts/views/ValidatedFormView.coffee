@@ -114,4 +114,3 @@ define [
     #   }
     parseErrorResponse: (response) ->
       $.parseJSON(response).errors
-
