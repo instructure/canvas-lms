@@ -1618,6 +1618,30 @@ describe User do
         events.first.title.should eql 'test appointment'
       end
 
+      it "handles assignments where the applied due_at is nil" do
+        course_with_teacher_logged_in(:active_all => true)
+        assignment = @course.assignments.create!(:title => "Should not throw",
+                                                 :due_at => 1.days.from_now)
+        assignment2 = @course.assignments.create!(:title => "Should not throw2",
+                                                  :due_at => 1.days.from_now)
+        section = @course.course_sections.create!(:name => "VDD Section")
+        override = assignment.assignment_overrides.build
+        override.set = section
+        override.due_at = nil
+        override.due_at_overridden = true
+        override.save!
+
+        events = []
+        # handles comparison of nil due dates if that is what applies to the
+        # user instead of failing.
+        expect do
+          events = @user.upcoming_events(:end_at => 1.week.from_now)
+        end.to_not raise_error 
+
+        events.first.should == assignment2
+        events.second.should == assignment
+      end
+
     end
   end
 
