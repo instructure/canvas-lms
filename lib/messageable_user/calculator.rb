@@ -59,7 +59,7 @@ class MessageableUser
     # having full visibility in that context for the purpose of checking
     # messageability and loading common contexts.
     #
-    # the :from_conversation_id option allows specifying a conversation to look
+    # the :conversation_id option allows specifying a conversation to look
     # for users in. ignored if the viewing user is not already be a participant
     # in the conversation. any other user participating in that conversation is
     # considered messageable.
@@ -103,8 +103,8 @@ class MessageableUser
           user.id != @user.id
         end
 
-        if questionable.present? && options[:conversation_id]
-          participants = participants_in_conversation([@user, *questionable], options[:conversation_id])
+        if questionable.present? && options[:conversation_id].present?
+          participants = participants_in_conversation([@user, *questionable], options[:conversation_id].to_i)
           if participants.detect{ |user| user == @user }
             questionable -= participants
           end
