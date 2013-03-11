@@ -59,8 +59,10 @@
           <%= t(:question_count, "Question", :count => q.question_count) %>
         <% end %>
       </div>
-      <% if q.due_at %>
-        <%= before_label(:quiz_due, "Due") %> <%= datetime_string(q.due_at) %><br/>
+      <% if q.multiple_due_dates_apply_to?(@current_user) %>
+        <%= before_label(:quiz_due, "Due") %> <%= t(:quiz_multiple_due_dates, "Multiple Dates") %><br/>
+      <% elsif due_at = q.overridden_for(@current_user).due_at %>
+        <%= before_label(:quiz_due, "Due") %> <%= datetime_string(due_at) %><br/>
       <% end %>
       <% if q.time_limit %>
         <%= before_label(:quiz_time_limit, "Time Limit") %> <%= duration_in_minutes(q.time_limit.minutes) %><br/>

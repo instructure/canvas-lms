@@ -74,7 +74,8 @@
 .ui-state-disabled, .ui-widget-content .ui-state-disabled, .ui-widget-header .ui-state-disabled { @include opacity(.35); background-image: none; }
 
 // instructure additions
-.ui-state-success, .ui-state-warning {
+.ui-state-success, .ui-state-warning,
+.dialog-warning .ui-dialog-titlebar, .dialog-success .ui-dialog-titlebar {
   border-width: 1px;
   border-style: solid;
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
@@ -82,10 +83,10 @@
   color: $white;
   text-shadow: 0 -1px 0 rgba(0,0,0,.25);
 }
-.ui-state-success {
+.ui-state-success, .dialog-success .ui-dialog-titlebar {
   @include vertical-gradient($btnSuccessBackground, $btnSuccessBackgroundHighlight);
 }
-.ui-state-warning {
+.ui-state-warning, .dialog-warning .ui-dialog-titlebar {
   @include vertical-gradient($btnWarningBackground, $btnWarningBackgroundHighlight);
 }
 

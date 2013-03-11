@@ -55,6 +55,10 @@ class SearchController < ApplicationController
   # @argument type ["user"|"context"] Limit the search just to users or contexts (groups/courses).
   # @argument user_id [Integer] Search for a specific user id. This ignores the other above parameters, and will never return more than one result.
   # @argument from_conversation_id [Integer] When searching by user_id, only users that could be normally messaged by this user will be returned. This parameter allows you to specify a conversation that will be referenced for a shared context -- if both the current user and the searched user are in the conversation, the user will be returned. This is used to start new side conversations.
+  # @argument permissions[] Array of permission strings to be checked for each
+  #   matched context (e.g. "send_messages"). This argument determines which
+  #   permissions may be returned in the response; it won't prevent contexts
+  #   from being returned if they don't grant the permission(s)
   #
   # @example_response
   #   [
@@ -77,12 +81,16 @@ class SearchController < ApplicationController
   #   enrollment types for each course to show what they share with this user
   # @response_field common_groups Only set for users. Hash of group ids and
   #   enrollment types for each group to show what they share with this user
+  # @response_field permissions[] Only set for contexts. Mapping of requested
+  #   permissions that the context grants the current user, e.g.
+  #   { send_messages: true }
   def recipients
 
     # admins may not be able to see the course listed at the top level (since
     # they aren't enrolled in it), but if they search within it, we want
     # things to work, so we set everything up here
-    load_all_contexts :context => get_admin_search_context(params[:context])
+    load_all_contexts :context => get_admin_search_context(params[:context]),
+                      :permissions => params[:permissions]
 
     types = (params[:types] || [] + [params[:type]]).compact
     types |= [:course, :section, :group] if types.delete('context')
@@ -109,17 +117,22 @@ class SearchController < ApplicationController
 
     recipients = []
     if params[:user_id]
-      recipients = matching_participants(:ids => [params[:user_id]], :conversation_id => params[:from_conversation_id])
+      recipient = @current_user.load_messageable_user(params[:user_id], :conversation_id => params[:from_conversation_id], :admin_context => @admin_context)
+      if recipient
+        recipients = conversation_users_json([recipient], @current_user, session)
+      else
+        recipients = []
+      end
     elsif (params[:context] || params[:search])
       options = {:search => params[:search], :context => params[:context], :limit => limit, :offset => offset, :synthetic_contexts => params[:synthetic_contexts]}
 
       rank_results = params[:search].present?
       contexts = types[:context] ? matching_contexts(options.merge(:rank_results => rank_results,
                                                                    :include_inactive => params[:include_inactive],
-                                                                   :exclude_ids => exclude.grep(User::MESSAGEABLE_USER_CONTEXT_REGEX),
+                                                                   :exclude_ids => MessageableUser.context_recipients(exclude),
                                                                    :search_all_contexts => params[:search_all_contexts],
                                                                    :types => types[:context])) : []
-      participants = types[:user] && !@skip_users ? matching_participants(options.merge(:rank_results => rank_results, :exclude_ids => exclude.grep(/\A\d+\z/).map(&:to_i), :skip_visibility_checks => params[:skip_visibility_checks])) : []
+      participants = types[:user] && !@skip_users ? matching_participants(options.merge(:rank_results => rank_results, :exclude_ids => MessageableUser.individual_recipients(exclude), :skip_visibility_checks => params[:skip_visibility_checks])) : []
       if max_results
         if types[:user] ^ types[:context]
           recipients = contexts + participants
@@ -153,7 +166,7 @@ class SearchController < ApplicationController
   private
 
   def matching_participants(options)
-    conversation_users_json(@current_user.messageable_users(options.merge(:admin_context => @admin_context)), @current_user, session, options.merge(:include_participant_avatars => true, :include_participant_contexts => true))
+    conversation_users_json(@current_user.deprecated_search_messageable_users(options.merge(:admin_context => @admin_context)), @current_user, session, options.merge(:include_participant_avatars => true, :include_participant_contexts => true))
   end
 
   def matching_contexts(options)
@@ -179,9 +192,8 @@ class SearchController < ApplicationController
                end
     elsif options[:synthetic_contexts]
       if context_name =~ /\Acourse_(\d+)(_(groups|sections))?\z/ && (course = @contexts[:courses][$1.to_i]) && messageable_context_states[course[:state]]
-        course = Course.find_by_id(course[:id])
-        sections = @contexts[:sections].values.select{ |section| section[:parent] == {:course => course.id} }
-        groups = @contexts[:groups].values.select{ |group| group[:parent] == {:course => course.id} }
+        sections = @contexts[:sections].values.select{ |section| section[:parent] == {:course => course[:id]} }
+        groups = @contexts[:groups].values.select{ |group| group[:parent] == {:course => course[:id]} }
         case context_name
           when /\Acourse_\d+\z/
             if terms.present? || options[:search_all_contexts] # search all groups and sections (and users)
@@ -203,8 +215,7 @@ class SearchController < ApplicationController
         if terms.present? # we'll just search the users
           result = []
         else
-          section = CourseSection.find_by_id(section[:id])
-          return synthetic_contexts_for(section.course, context_name)
+          return synthetic_contexts_for(course_for_section(section), context_name)
         end
       end
     end
@@ -227,8 +238,16 @@ class SearchController < ApplicationController
         :name => context[:name],
         :avatar_url => avatar_url,
         :type => :context,
-        :user_count => user_counts[context[:type]][context[:id]]
+        :user_count => user_counts[context[:type]][context[:id]],
+        :permissions => context[:permissions] || {}
       }
+      if context[:type] == :section
+        # TODO: have load_all_contexts actually return section-level
+        # permissions. but before we do that, sections will need to grant many
+        # more permission (possibly inherited from the course, like
+        # :send_messages_all)
+        ret[:permissions] = course_for_section(context)[:permissions]
+      end
       ret[:context_name] = context[:context_name] if context[:context_name] && context_name.nil?
       ret
     }
@@ -240,24 +259,29 @@ class SearchController < ApplicationController
     options[:limit] ? result[offset, offset + options[:limit]] : result
   end
 
+  def course_for_section(section)
+    @contexts[:courses][section[:parent][:course]]
+  end
+
   def synthetic_contexts_for(course, context)
     @skip_users = true
     # TODO: move the aggregation entirely into the DB. we only select a little
     # bit of data per user, but this still isn't ideal
-    users = @current_user.messageable_users(:context => context)
+    users = @current_user.messageable_users_in_context(context)
     enrollment_counts = {:all => users.size}
     users.each do |user|
-      user.common_courses[course.id].uniq.each do |role|
+      user.common_courses[course[:id]].uniq.each do |role|
         enrollment_counts[role] ||= 0
         enrollment_counts[role] += 1
       end
     end
     avatar_url = avatar_url_for_group(blank_fallback)
     result = []
-    result << {:id => "#{context}_teachers", :name => t(:enrollments_teachers, "Teachers"), :user_count => enrollment_counts['TeacherEnrollment'], :avatar_url => avatar_url, :type => :context} if enrollment_counts['TeacherEnrollment'].to_i > 0
-    result << {:id => "#{context}_tas", :name => t(:enrollments_tas, "Teaching Assistants"), :user_count => enrollment_counts['TaEnrollment'], :avatar_url => avatar_url, :type => :context} if enrollment_counts['TaEnrollment'].to_i > 0
-    result << {:id => "#{context}_students", :name => t(:enrollments_students, "Students"), :user_count => enrollment_counts['StudentEnrollment'], :avatar_url => avatar_url, :type => :context} if enrollment_counts['StudentEnrollment'].to_i > 0
-    result << {:id => "#{context}_observers", :name => t(:enrollments_observers, "Observers"), :user_count => enrollment_counts['ObserverEnrollment'], :avatar_url => avatar_url, :type => :context} if enrollment_counts['ObserverEnrollment'].to_i > 0
+    synthetic_context = {:avatar_url => avatar_url, :type => :context, :permissions => course[:permissions]}
+    result << synthetic_context.merge({:id => "#{context}_teachers", :name => t(:enrollments_teachers, "Teachers"), :user_count => enrollment_counts['TeacherEnrollment']}) if enrollment_counts['TeacherEnrollment'].to_i > 0
+    result << synthetic_context.merge({:id => "#{context}_tas", :name => t(:enrollments_tas, "Teaching Assistants"), :user_count => enrollment_counts['TaEnrollment']}) if enrollment_counts['TaEnrollment'].to_i > 0
+    result << synthetic_context.merge({:id => "#{context}_students", :name => t(:enrollments_students, "Students"), :user_count => enrollment_counts['StudentEnrollment']}) if enrollment_counts['StudentEnrollment'].to_i > 0
+    result << synthetic_context.merge({:id => "#{context}_observers", :name => t(:enrollments_observers, "Observers"), :user_count => enrollment_counts['ObserverEnrollment']}) if enrollment_counts['ObserverEnrollment'].to_i > 0
     result
   end
 

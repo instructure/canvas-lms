@@ -318,67 +318,109 @@ describe User do
     user.associated_root_accounts.should eql [account2]
   end
 
-  it "should support incrementally adding to account associations" do
-    user = User.create!
-    user.user_account_associations.should == []
-    account1, account2, account3 = Account.create!, Account.create!, Account.create!
+  describe "update_account_associations" do
+    it "should support incrementally adding to account associations" do
+      user = User.create!
+      user.user_account_associations.should == []
+      account1, account2, account3 = Account.create!, Account.create!, Account.create!
 
-    sort_account_associations = lambda { |a, b| a.keys.first <=> b.keys.first }
+      sort_account_associations = lambda { |a, b| a.keys.first <=> b.keys.first }
 
-    User.update_account_associations([user], :incremental => true, :precalculated_associations => {account1.id => 0})
-    user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.should == [{account1.id => 0}]
+      User.update_account_associations([user], :incremental => true, :precalculated_associations => {account1.id => 0})
+      user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.should == [{account1.id => 0}]
 
-    User.update_account_associations([user], :incremental => true, :precalculated_associations => {account2.id => 1})
-    user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.sort(&sort_account_associations).should == [{account1.id => 0}, {account2.id => 1}].sort(&sort_account_associations)
+      User.update_account_associations([user], :incremental => true, :precalculated_associations => {account2.id => 1})
+      user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.sort(&sort_account_associations).should == [{account1.id => 0}, {account2.id => 1}].sort(&sort_account_associations)
 
-    User.update_account_associations([user], :incremental => true, :precalculated_associations => {account3.id => 1, account1.id => 2, account2.id => 0})
-    user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.sort(&sort_account_associations).should == [{account1.id => 0}, {account2.id => 0}, {account3.id => 1}].sort(&sort_account_associations)
-  end
+      User.update_account_associations([user], :incremental => true, :precalculated_associations => {account3.id => 1, account1.id => 2, account2.id => 0})
+      user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.sort(&sort_account_associations).should == [{account1.id => 0}, {account2.id => 0}, {account3.id => 1}].sort(&sort_account_associations)
+    end
 
-  it "should not have account associations for creation_pending or deleted" do
-    user = User.create! { |u| u.workflow_state = 'creation_pending' }
-    user.should be_creation_pending
-    course = Course.create!
-    course.offer!
-    enrollment = course.enroll_student(user)
-    enrollment.should be_invited
-    user.user_account_associations.should == []
-    Account.default.add_user(user)
-    user.user_account_associations(true).should == []
-    user.pseudonyms.create!(:unique_id => 'test@example.com')
-    user.user_account_associations(true).should == []
-    user.update_account_associations
-    user.user_account_associations(true).should == []
-    user.register!
-    user.user_account_associations(true).map(&:account).should == [Account.default]
-    user.destroy
-    user.user_account_associations(true).should == []
-  end
+    it "should not have account associations for creation_pending or deleted" do
+      user = User.create! { |u| u.workflow_state = 'creation_pending' }
+      user.should be_creation_pending
+      course = Course.create!
+      course.offer!
+      enrollment = course.enroll_student(user)
+      enrollment.should be_invited
+      user.user_account_associations.should == []
+      Account.default.add_user(user)
+      user.user_account_associations(true).should == []
+      user.pseudonyms.create!(:unique_id => 'test@example.com')
+      user.user_account_associations(true).should == []
+      user.update_account_associations
+      user.user_account_associations(true).should == []
+      user.register!
+      user.user_account_associations(true).map(&:account).should == [Account.default]
+      user.destroy
+      user.user_account_associations(true).should == []
+    end
 
-  it "should not create/update account associations for student view student" do
-    account1 = account_model
-    account2 = account_model
-    course_with_teacher(:active_all => true)
-    @fake_student = @course.student_view_student
-    @fake_student.reload.user_account_associations.should be_empty
+    it "should not create/update account associations for student view student" do
+      account1 = account_model
+      account2 = account_model
+      course_with_teacher(:active_all => true)
+      @fake_student = @course.student_view_student
+      @fake_student.reload.user_account_associations.should be_empty
 
-    @course.account_id = account1.id
-    @course.save!
-    @fake_student.reload.user_account_associations.should be_empty
+      @course.account_id = account1.id
+      @course.save!
+      @fake_student.reload.user_account_associations.should be_empty
 
-    account1.parent_account = account2
-    account1.save!
-    @fake_student.reload.user_account_associations.should be_empty
+      account1.parent_account = account2
+      account1.save!
+      @fake_student.reload.user_account_associations.should be_empty
 
-    @course.complete!
-    @fake_student.reload.user_account_associations.should be_empty
+      @course.complete!
+      @fake_student.reload.user_account_associations.should be_empty
 
-    @fake_student = @course.reload.student_view_student
-    @fake_student.reload.user_account_associations.should be_empty
+      @fake_student = @course.reload.student_view_student
+      @fake_student.reload.user_account_associations.should be_empty
 
-    @section2 = @course.course_sections.create!(:name => "Other Section")
-    @fake_student = @course.reload.student_view_student
-    @fake_student.reload.user_account_associations.should be_empty
+      @section2 = @course.course_sections.create!(:name => "Other Section")
+      @fake_student = @course.reload.student_view_student
+      @fake_student.reload.user_account_associations.should be_empty
+    end
+
+    context "sharding" do
+      it_should_behave_like "sharding"
+
+      it "should create associations for a user in multiple shards" do
+        user
+        Account.site_admin.add_user(@user)
+        @user.user_account_associations.map(&:account).should == [Account.site_admin]
+
+        @shard1.activate do
+          @account = Account.create!
+          au = @account.add_user(@user)
+          @user.user_account_associations.with_each_shard.map(&:account).sort_by(&:id).should ==
+              [Account.site_admin, @account].sort_by(&:id)
+          @account.user_account_associations.map(&:user).should == [@user]
+
+          au.destroy
+
+          @user.user_account_associations.with_each_shard.map(&:account).should == [Account.site_admin]
+          @account.reload.user_account_associations.map(&:user).should == []
+
+          @account.add_user(@user)
+
+          @user.user_account_associations.with_each_shard.map(&:account).sort_by(&:id).should ==
+              [Account.site_admin, @account].sort_by(&:id)
+          @account.reload.user_account_associations.map(&:user).should == [@user]
+
+          UserAccountAssociation.delete_all
+        end
+        UserAccountAssociation.delete_all
+
+        @shard2.activate do
+          @user.update_account_associations
+
+          @user.user_account_associations.with_each_shard.map(&:account).sort_by(&:id).should ==
+              [Account.site_admin, @account].sort_by(&:id)
+          @account.reload.user_account_associations.map(&:user).should == [@user]
+        end
+      end
+    end
   end
 
   def create_course_with_student_and_assignment
@@ -515,401 +557,6 @@ describe User do
     @user.workflow_state.should == "deleted"
   end
 
-  context "move_to_user" do
-    it "should delete the old user" do
-      @user1 = user_model
-      @user2 = user_model
-      @user2.move_to_user(@user1)
-      @user1.reload
-      @user2.reload
-      @user1.should_not be_deleted
-      @user2.should be_deleted
-    end
-
-    it "should move pseudonyms to the new user" do
-      @user1 = user_model
-      @user2 = user_model
-      @user2.pseudonyms.create!(:unique_id => 'sam@yahoo.com')
-      @user2.move_to_user(@user1)
-      @user2.reload
-      @user2.pseudonyms.should be_empty
-      @user1.reload
-      @user1.pseudonyms.map(&:unique_id).should be_include('sam@yahoo.com')
-    end
-
-    it "should move submissions to the new user (but only if they don't already exist)" do
-      @user1 = user_model
-      @user2 = user_model
-      @a1 = assignment_model
-      s1 = @a1.find_or_create_submission(@user1)
-      s2 = @a1.find_or_create_submission(@user2)
-      @a2 = assignment_model
-      s3 = @a2.find_or_create_submission(@user2)
-      @user2.submissions.length.should eql(2)
-      @user1.submissions.length.should eql(1)
-      @user2.move_to_user(@user1)
-      @user2.reload
-      @user1.reload
-      @user2.submissions.length.should eql(1)
-      @user2.submissions.first.id.should eql(s2.id)
-      @user1.submissions.length.should eql(2)
-      @user1.submissions.map(&:id).should be_include(s1.id)
-      @user1.submissions.map(&:id).should be_include(s3.id)
-    end
-
-    it "should move ccs to the new user (but only if they don't already exist)" do
-      @user1 = user_model
-      @user2 = user_model
-      # unconfirmed => active conflict
-      @user1.communication_channels.create!(:path => 'a@instructure.com')
-      @user2.communication_channels.create!(:path => 'A@instructure.com') { |cc| cc.workflow_state = 'active' }
-      # active => unconfirmed conflict
-      @user1.communication_channels.create!(:path => 'b@instructure.com') { |cc| cc.workflow_state = 'active' }
-      @user2.communication_channels.create!(:path => 'B@instructure.com')
-      # active => active conflict
-      @user1.communication_channels.create!(:path => 'c@instructure.com') { |cc| cc.workflow_state = 'active' }
-      @user2.communication_channels.create!(:path => 'C@instructure.com') { |cc| cc.workflow_state = 'active' }
-      # unconfirmed => unconfirmed conflict
-      @user1.communication_channels.create!(:path => 'd@instructure.com')
-      @user2.communication_channels.create!(:path => 'D@instructure.com')
-      # retired => unconfirmed conflict
-      @user1.communication_channels.create!(:path => 'e@instructure.com') { |cc| cc.workflow_state = 'retired' }
-      @user2.communication_channels.create!(:path => 'E@instructure.com')
-      # unconfirmed => retired conflict
-      @user1.communication_channels.create!(:path => 'f@instructure.com')
-      @user2.communication_channels.create!(:path => 'F@instructure.com') { |cc| cc.workflow_state = 'retired' }
-      # retired => active conflict
-      @user1.communication_channels.create!(:path => 'g@instructure.com') { |cc| cc.workflow_state = 'retired' }
-      @user2.communication_channels.create!(:path => 'G@instructure.com') { |cc| cc.workflow_state = 'active' }
-      # active => retired conflict
-      @user1.communication_channels.create!(:path => 'h@instructure.com') { |cc| cc.workflow_state = 'active' }
-      @user2.communication_channels.create!(:path => 'H@instructure.com') { |cc| cc.workflow_state = 'retired' }
-      # retired => retired conflict
-      @user1.communication_channels.create!(:path => 'i@instructure.com') { |cc| cc.workflow_state = 'retired' }
-      @user2.communication_channels.create!(:path => 'I@instructure.com') { |cc| cc.workflow_state = 'retired' }
-      # <nothing> => active
-      @user2.communication_channels.create!(:path => 'j@instructure.com') { |cc| cc.workflow_state = 'active' }
-      # active => <nothing>
-      @user1.communication_channels.create!(:path => 'k@instructure.com') { |cc| cc.workflow_state = 'active' }
-      # <nothing> => unconfirmed
-      @user2.communication_channels.create!(:path => 'l@instructure.com')
-      # unconfirmed => <nothing>
-      @user1.communication_channels.create!(:path => 'm@instructure.com')
-      # <nothing> => retired
-      @user2.communication_channels.create!(:path => 'n@instructure.com') { |cc| cc.workflow_state = 'retired' }
-      # retired => <nothing>
-      @user1.communication_channels.create!(:path => 'o@instructure.com') { |cc| cc.workflow_state = 'retired' }
-
-      @user1.move_to_user(@user2)
-      @user1.reload
-      @user2.reload
-      @user2.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort.should == [
-          ['A@instructure.com', 'active'],
-          ['B@instructure.com', 'retired'],
-          ['C@instructure.com', 'active'],
-          ['D@instructure.com', 'unconfirmed'],
-          ['E@instructure.com', 'unconfirmed'],
-          ['F@instructure.com', 'retired'],
-          ['G@instructure.com', 'active'],
-          ['H@instructure.com', 'retired'],
-          ['I@instructure.com', 'retired'],
-          ['a@instructure.com', 'retired'],
-          ['b@instructure.com', 'active'],
-          ['c@instructure.com', 'retired'],
-          ['d@instructure.com', 'retired'],
-          ['e@instructure.com', 'retired'],
-          ['f@instructure.com', 'unconfirmed'],
-          ['g@instructure.com', 'retired'],
-          ['h@instructure.com', 'active'],
-          ['i@instructure.com', 'retired'],
-          ['j@instructure.com', 'active'],
-          ['k@instructure.com', 'active'],
-          ['l@instructure.com', 'unconfirmed'],
-          ['m@instructure.com', 'unconfirmed'],
-          ['n@instructure.com', 'retired'],
-          ['o@instructure.com', 'retired']
-      ]
-      @user1.communication_channels.should be_empty
-    end
-
-    it "should move and uniquify enrollments" do
-      @user1 = user_model
-      @user2 = user_model
-      course(:active_all => 1)
-      @enrollment1 = @course.enroll_user(@user1)
-      @enrollment2 = @course.enroll_user(@user2, 'StudentEnrollment', :enrollment_state => 'active')
-      @enrollment3 = StudentEnrollment.create!(:course => @course, :course_section => @course.course_sections.create!, :user => @user1)
-      @enrollment4 = @course.enroll_teacher(@user1)
-
-      @user1.move_to_user(@user2)
-      @enrollment1.reload
-      @enrollment1.user.should == @user2
-      @enrollment1.should be_deleted
-      @enrollment2.reload
-      @enrollment2.should be_active
-      @enrollment2.user.should == @user2
-      @enrollment3.reload
-      @enrollment3.should be_invited
-      @enrollment4.reload
-      @enrollment4.user.should == @user2
-      @enrollment4.should be_invited
-
-      @user1.reload
-      @user1.enrollments.should be_empty
-    end
-
-    it "should move and uniquify observee enrollments" do
-      @user1 = user_model
-      @course1 = course(:active_all => 1)
-      @enrollment1 = @course1.enroll_user(@user1)
-      @user2 = user_model
-      @course2 = course(:active_all => 1)
-      @enrollment2 = @course1.enroll_user(@user2)
-
-      @observer1 = user_model
-      @observer2 = user_model
-      @user1.observers << @observer1 << @observer2
-      @user2.observers << @observer2
-      ObserverEnrollment.count.should eql 3
-
-      @user1.move_to_user(@user2)
-
-      @user1.observee_enrollments.should be_empty
-      @user2.observee_enrollments.size.should eql 3 # 1 deleted
-      @user2.observee_enrollments.active_or_pending.size.should eql 2
-      @observer1.observer_enrollments.active_or_pending.size.should eql 1
-      @observer2.observer_enrollments.active_or_pending.size.should eql 1
-    end
-
-    it "should move and uniquify observers" do
-      @user1 = user_model
-      @user2 = user_model
-      @observer1 = user_model
-      @observer2 = user_model
-      @user1.observers << @observer1 << @observer2
-      @user2.observers << @observer2
-
-      @user1.move_to_user(@user2)
-
-      @user1.reload
-      @user1.observers.should be_empty
-      @user2.reload
-      @user2.observers.sort_by(&:id).should eql [@observer1, @observer2]
-    end
-
-    it "should move and uniquify observed users" do
-      @user1 = user_model
-      @user2 = user_model
-      @student1 = user_model
-      @student2 = user_model
-      @user1.observed_users << @student1 << @student2
-      @user2.observed_users << @student2
-
-      @user1.move_to_user(@user2)
-
-      @user1.reload
-      @user1.observed_users.should be_empty
-      @user2.reload
-      @user2.observed_users.sort_by(&:id).should eql [@student1, @student2]
-    end
-
-    it "should update account associations" do
-      @account1 = account_model
-      @account2 = account_model
-      @pseudo1 = (@user1 = user_with_pseudonym :account => @account1).pseudonym
-      @pseudo2 = (@user2 = user_with_pseudonym :account => @account2).pseudonym
-      @subsubaccount1 = (@subaccount1 = @account1.sub_accounts.create!).sub_accounts.create!
-      @subsubaccount2 = (@subaccount2 = @account2.sub_accounts.create!).sub_accounts.create!
-      course_with_student(:account => @subsubaccount1, :user => @user1)
-      course_with_student(:account => @subsubaccount2, :user => @user2)
-
-      @user1.associated_accounts.map(&:id).sort.should == [@account1, @subaccount1, @subsubaccount1].map(&:id).sort
-      @user2.associated_accounts.map(&:id).sort.should == [@account2, @subaccount2, @subsubaccount2].map(&:id).sort
-
-      @pseudo1.user.should == @user1
-      @pseudo2.user.should == @user2
-
-      @user1.move_to_user @user2
-
-      @pseudo1, @pseudo2 = [@pseudo1, @pseudo2].map{|p| Pseudonym.find(p.id)}
-      @user1, @user2 = [@user1, @user2].map{|u| User.find(u.id)}
-
-      @pseudo1.user.should == @pseudo2.user
-      @pseudo1.user.should == @user2
-
-      @user1.associated_accounts.map(&:id).sort.should == []
-      @user2.associated_accounts.map(&:id).sort.should == [@account1, @account2, @subaccount1, @subaccount2, @subsubaccount1, @subsubaccount2].map(&:id).sort
-    end
-
-    it "should move conversations to the new user" do
-      @user1 = user_model
-      @user2 = user_model
-      c1 = @user1.initiate_conversation([user.id, user.id]) # group conversation
-      c1.add_message("hello")
-      c1.update_attribute(:workflow_state, 'unread')
-      c2 = @user1.initiate_conversation([user.id]) # private conversation
-      c2.add_message("hello")
-      c2.update_attribute(:workflow_state, 'unread')
-      old_private_hash = c2.conversation.private_hash
-
-      @user1.move_to_user @user2
-
-      c1.reload.user_id.should eql @user2.id
-      c1.conversation.participant_ids.should_not include(@user1.id)
-      @user1.reload.unread_conversations_count.should eql 0
-
-      c2.reload.user_id.should eql @user2.id
-      c2.conversation.participant_ids.should_not include(@user1.id)
-      c2.conversation.private_hash.should_not eql old_private_hash
-      @user2.reload.unread_conversations_count.should eql 2
-    end
-
-    it "should point other user's observers to the new user" do
-      @user1 = user_model
-      @user2 = user_model
-      @observer = user_model
-      course
-      @course.enroll_student(@user1)
-      @oe = @course.enroll_user(@observer, 'ObserverEnrollment')
-      @oe.update_attribute(:associated_user_id, @user1.id)
-      @user1.move_to_user(@user2)
-      @oe.reload.associated_user_id.should == @user2.id
-    end
-
-    context "sharding" do
-      it_should_behave_like "sharding"
-
-      it "should merge a user across shards" do
-        @user1 = user_with_pseudonym(:username => 'user1@example.com', :active_all => 1)
-        @p1 = @pseudonym
-        @cc1 = @cc
-        @shard1.activate do
-          account = Account.create!
-          @user2 = user_with_pseudonym(:username => 'user2@example.com', :active_all => 1, :account => account)
-          @p2 = @pseudonym
-        end
-
-        @shard2.activate do
-          @user1.move_to_user(@user2)
-        end
-
-        @user1.should be_deleted
-        @p1.reload.user.should == @user2
-        @cc1.reload.should be_retired
-        @user2.communication_channels.all.map(&:path).sort.should == ['user1@example.com', 'user2@example.com']
-        @user2.all_pseudonyms.should == [@p2, @p1]
-        @user2.associated_shards.should == [@shard1, Shard.default]
-      end
-
-      it "should move ccs to the new user (but only if they don't already exist)" do
-        @user1 = user_model
-        @shard1.activate do
-          @user2 = user_model
-        end
-
-        # unconfirmed => active conflict
-        @user1.communication_channels.create!(:path => 'a@instructure.com')
-        @user2.communication_channels.create!(:path => 'A@instructure.com') { |cc| cc.workflow_state = 'active' }
-        # active => unconfirmed conflict
-        @user1.communication_channels.create!(:path => 'b@instructure.com') { |cc| cc.workflow_state = 'active' }
-        @user2.communication_channels.create!(:path => 'B@instructure.com')
-        # active => active conflict
-        @user1.communication_channels.create!(:path => 'c@instructure.com') { |cc| cc.workflow_state = 'active' }
-        @user2.communication_channels.create!(:path => 'C@instructure.com') { |cc| cc.workflow_state = 'active' }
-        # unconfirmed => unconfirmed conflict
-        @user1.communication_channels.create!(:path => 'd@instructure.com')
-        @user2.communication_channels.create!(:path => 'D@instructure.com')
-        # retired => unconfirmed conflict
-        @user1.communication_channels.create!(:path => 'e@instructure.com') { |cc| cc.workflow_state = 'retired' }
-        @user2.communication_channels.create!(:path => 'E@instructure.com')
-        # unconfirmed => retired conflict
-        @user1.communication_channels.create!(:path => 'f@instructure.com')
-        @user2.communication_channels.create!(:path => 'F@instructure.com') { |cc| cc.workflow_state = 'retired' }
-        # retired => active conflict
-        @user1.communication_channels.create!(:path => 'g@instructure.com') { |cc| cc.workflow_state = 'retired' }
-        @user2.communication_channels.create!(:path => 'G@instructure.com') { |cc| cc.workflow_state = 'active' }
-        # active => retired conflict
-        @user1.communication_channels.create!(:path => 'h@instructure.com') { |cc| cc.workflow_state = 'active' }
-        @user2.communication_channels.create!(:path => 'H@instructure.com') { |cc| cc.workflow_state = 'retired' }
-        # retired => retired conflict
-        @user1.communication_channels.create!(:path => 'i@instructure.com') { |cc| cc.workflow_state = 'retired' }
-        @user2.communication_channels.create!(:path => 'I@instructure.com') { |cc| cc.workflow_state = 'retired' }
-        # <nothing> => active
-        @user2.communication_channels.create!(:path => 'j@instructure.com') { |cc| cc.workflow_state = 'active' }
-        # active => <nothing>
-        @user1.communication_channels.create!(:path => 'k@instructure.com') { |cc| cc.workflow_state = 'active' }
-        # <nothing> => unconfirmed
-        @user2.communication_channels.create!(:path => 'l@instructure.com')
-        # unconfirmed => <nothing>
-        @user1.communication_channels.create!(:path => 'm@instructure.com')
-        # <nothing> => retired
-        @user2.communication_channels.create!(:path => 'n@instructure.com') { |cc| cc.workflow_state = 'retired' }
-        # retired => <nothing>
-        @user1.communication_channels.create!(:path => 'o@instructure.com') { |cc| cc.workflow_state = 'retired' }
-
-        @shard2.activate do
-          @user1.move_to_user(@user2)
-        end
-
-        @user1.reload
-        @user2.reload
-        @user2.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort.should == [
-            ['A@instructure.com', 'active'],
-            ['B@instructure.com', 'retired'],
-            ['C@instructure.com', 'active'],
-            ['D@instructure.com', 'unconfirmed'],
-            ['E@instructure.com', 'unconfirmed'],
-            ['F@instructure.com', 'retired'],
-            ['G@instructure.com', 'active'],
-            ['H@instructure.com', 'retired'],
-            ['I@instructure.com', 'retired'],
-            ['b@instructure.com', 'active'],
-            ['f@instructure.com', 'unconfirmed'],
-            ['h@instructure.com', 'active'],
-            ['i@instructure.com', 'retired'],
-            ['j@instructure.com', 'active'],
-            ['k@instructure.com', 'active'],
-            ['l@instructure.com', 'unconfirmed'],
-            ['m@instructure.com', 'unconfirmed'],
-            ['n@instructure.com', 'retired'],
-            ['o@instructure.com', 'retired']
-        ]
-        # on cross shard merges, the deleted user retains all CCs (pertinent ones were
-        # duplicated over to the surviving shard)
-        @user1.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort.should == [
-            ['a@instructure.com', 'retired'],
-            ['b@instructure.com', 'retired'],
-            ['c@instructure.com', 'retired'],
-            ['d@instructure.com', 'retired'],
-            ['e@instructure.com', 'retired'],
-            ['f@instructure.com', 'retired'],
-            ['g@instructure.com', 'retired'],
-            ['h@instructure.com', 'retired'],
-            ['i@instructure.com', 'retired'],
-            ['k@instructure.com', 'retired'],
-            ['m@instructure.com', 'retired'],
-            ['o@instructure.com', 'retired']
-        ]
-      end
-
-      it "should not fail copying retired sms channels" do
-        @user1 = User.create!
-        @shard1.activate do
-          @user2 = User.create!
-        end
-
-        @cc = @user2.communication_channels.sms.create!(:path => 'abc')
-        @cc.retire!
-
-        @user2.move_to_user(@user1)
-        @user1.communication_channels.reload.length.should == 1
-        cc = @user1.communication_channels.first
-        cc.path.should == 'abc'
-        cc.workflow_state.should == 'retired'
-      end
-    end
-  end
-
   describe "can_masquerade?" do
     it "should allow self" do
       @user = user_with_pseudonym(:username => 'nobody1@example.com')
@@ -985,6 +632,34 @@ describe User do
     end
   end
 
+  describe '#has_subset_of_account_permissions?' do
+    let(:user) { User.new }
+    let(:other_user) { User.new }
+
+    it 'returns true for self' do
+      user.has_subset_of_account_permissions?(user, nil).should be_true
+    end
+
+    it 'is false if the account is not a root account' do
+      user.has_subset_of_account_permissions?(other_user, stub(:root_account? => false)).should be_false
+    end
+
+    it 'is true if there are no account users for this root account' do
+      account = stub(:root_account? => true, :all_account_users_for => [])
+      user.has_subset_of_account_permissions?(other_user, account).should be_true
+    end
+
+    it 'is true when all account_users for current user are subsets of target user' do
+      account = stub(:root_account? => true, :all_account_users_for => [stub(:is_subset_of? => true)])
+      user.has_subset_of_account_permissions?(other_user, account).should be_true
+    end
+
+    it 'is false when any account_user for current user is not a subset of target user' do
+      account = stub(:root_account? => true, :all_account_users_for => [stub(:is_subset_of? => false)])
+      user.has_subset_of_account_permissions?(other_user, account).should be_false
+    end
+  end
+
   context "permissions" do
     it "should not allow account admin to modify admin privileges of other account admins" do
       RoleOverride.readonly_for(Account.default, :manage_role_overrides, AccountUser::BASE_ROLE_NAME, 'AccountAdmin').should be_true
@@ -993,7 +668,7 @@ describe User do
     end
   end
 
-  context "messageable_users" do
+  context "deprecated_search_messageable_users" do
     before(:each) do
       @admin = user_model
       @student = user_model
@@ -1026,28 +701,28 @@ describe User do
     end
 
     it "should include yourself even when not enrolled in courses" do
-      @student.messageable_users(:ids => [@student.id]).should eql [@student]
+      @student.deprecated_search_messageable_users(:ids => [@student.id]).should eql [@student]
     end
 
     it "should only return users from the specified context and type" do
       set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
-      @student.messageable_users(:context => "course_#{@course.id}").map(&:id).sort.
+      @student.deprecated_search_messageable_users(:context => "course_#{@course.id}").map(&:id).sort.
         should eql [@student, @this_section_user, @this_section_teacher, @other_section_user, @other_section_teacher].map(&:id).sort
       @student.enrollment_visibility[:user_counts][@course.id].should eql 5
 
-      @student.messageable_users(:context => "course_#{@course.id}_students").map(&:id).sort.
+      @student.deprecated_search_messageable_users(:context => "course_#{@course.id}_students").map(&:id).sort.
         should eql [@student, @this_section_user, @other_section_user].map(&:id).sort
 
-      @student.messageable_users(:context => "group_#{@group.id}").map(&:id).sort.
+      @student.deprecated_search_messageable_users(:context => "group_#{@group.id}").map(&:id).sort.
         should eql [@this_section_user].map(&:id).sort
       @student.group_membership_visibility[:user_counts][@group.id].should eql 1
 
-      @student.messageable_users(:context => "section_#{@other_section.id}").map(&:id).sort.
+      @student.deprecated_search_messageable_users(:context => "section_#{@other_section.id}").map(&:id).sort.
         should eql [@other_section_user, @other_section_teacher].map(&:id).sort
 
-      @student.messageable_users(:context => "section_#{@other_section.id}_teachers").map(&:id).sort.
+      @student.deprecated_search_messageable_users(:context => "section_#{@other_section.id}_teachers").map(&:id).sort.
         should eql [@other_section_teacher].map(&:id).sort
     end
 
@@ -1056,15 +731,15 @@ describe User do
       enrollment = @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
       # we currently force limit_privileges_to_course_section to be false for students; override it in the db
       Enrollment.update_all({ :limit_privileges_to_course_section => true }, :id => enrollment.id)
-      messageable_users = @student.messageable_users.map(&:id)
+      messageable_users = @student.deprecated_search_messageable_users.map(&:id)
       messageable_users.should include @this_section_user.id
       messageable_users.should_not include @other_section_user.id
 
-      messageable_users = @student.messageable_users(:context => "course_#{@course.id}").map(&:id)
+      messageable_users = @student.deprecated_search_messageable_users(:context => "course_#{@course.id}").map(&:id)
       messageable_users.should include @this_section_user.id
       messageable_users.should_not include @other_section_user.id
 
-      messageable_users = @student.messageable_users(:context => "section_#{@other_section.id}").map(&:id)
+      messageable_users = @student.deprecated_search_messageable_users(:context => "section_#{@other_section.id}").map(&:id)
       messageable_users.should be_empty
     end
 
@@ -1072,7 +747,7 @@ describe User do
       set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
-      @student.messageable_users(:context => "course_#{@course.id}").map(&:id).sort.
+      @student.deprecated_search_messageable_users(:context => "course_#{@course.id}").map(&:id).sort.
         should eql [@student, @this_section_user, @this_section_teacher, @other_section_user, @other_section_teacher].map(&:id).sort
     end
 
@@ -1083,32 +758,32 @@ describe User do
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
       # can only message self or the admins
-      @student.messageable_users(:context => "course_#{@course.id}").map(&:id).sort.
+      @student.deprecated_search_messageable_users(:context => "course_#{@course.id}").map(&:id).sort.
         should eql [@student, @this_section_teacher, @other_section_teacher].map(&:id).sort
     end
 
     it "should not include deleted users" do
       set_up_course_with_users
-      @student.messageable_users.map(&:id).should_not include(@deleted_user.id)
-      @student.messageable_users(:search => @deleted_user.name).map(&:id).should be_empty
-      @student.messageable_users(:ids => [@deleted_user.id]).map(&:id).should be_empty
-      @student.messageable_users(:skip_visibility_checks => true).map(&:id).should_not include(@deleted_user.id)
-      @student.messageable_users(:skip_visibility_checks => true, :search => @deleted_user.name).map(&:id).should be_empty
+      @student.deprecated_search_messageable_users.map(&:id).should_not include(@deleted_user.id)
+      @student.deprecated_search_messageable_users(:search => @deleted_user.name).map(&:id).should be_empty
+      @student.deprecated_search_messageable_users(:ids => [@deleted_user.id]).map(&:id).should be_empty
+      @student.deprecated_search_messageable_users(:skip_visibility_checks => true).map(&:id).should_not include(@deleted_user.id)
+      @student.deprecated_search_messageable_users(:skip_visibility_checks => true, :search => @deleted_user.name).map(&:id).should be_empty
     end
 
     it "should include deleted iff skip_visibility_checks=true && ids are given" do
       set_up_course_with_users
-      @student.messageable_users(:skip_visibility_checks => true, :ids => [@deleted_user.id]).map(&:id).should == [@deleted_user.id]
+      @student.deprecated_search_messageable_users(:skip_visibility_checks => true, :ids => [@deleted_user.id]).map(&:id).should == [@deleted_user.id]
     end
 
     it "should only include users from the specified section" do
       set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
-      messageable_users = @student.messageable_users(:context => "section_#{@course.default_section.id}").map(&:id)
+      messageable_users = @student.deprecated_search_messageable_users(:context => "section_#{@course.default_section.id}").map(&:id)
       messageable_users.should include @this_section_user.id
       messageable_users.should_not include @other_section_user.id
 
-      messageable_users = @student.messageable_users(:context => "section_#{@other_section.id}").map(&:id)
+      messageable_users = @student.deprecated_search_messageable_users(:context => "section_#{@other_section.id}").map(&:id)
       messageable_users.should_not include @this_section_user.id
       messageable_users.should include @other_section_user.id
     end
@@ -1116,7 +791,7 @@ describe User do
     it "should include users from all sections if visibility is not limited to sections" do
       set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
-      messageable_users = @student.messageable_users.map(&:id)
+      messageable_users = @student.deprecated_search_messageable_users.map(&:id)
       messageable_users.should include @this_section_user.id
       messageable_users.should include @other_section_user.id
     end
@@ -1125,9 +800,9 @@ describe User do
       set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
-      @this_section_user.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
+      @this_section_user.deprecated_search_messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
       # student can see it too, even though he's not in the group (since he can view the roster)
-      @student.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
+      @student.deprecated_search_messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
     end
 
     it "should respect section visibility when returning users for a specified group" do
@@ -1138,10 +813,10 @@ describe User do
 
       @group.users << @other_section_user
 
-      @this_section_user.messageable_users(:context => "group_#{@group.id}").map(&:id).sort.should eql [@this_section_user.id, @other_section_user.id]
+      @this_section_user.deprecated_search_messageable_users(:context => "group_#{@group.id}").map(&:id).sort.should eql [@this_section_user.id, @other_section_user.id]
       @this_section_user.group_membership_visibility[:user_counts][@group.id].should eql 2
       # student can only see people in his section
-      @student.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
+      @student.deprecated_search_messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
       @student.group_membership_visibility[:user_counts][@group.id].should eql 1
     end
 
@@ -1156,7 +831,7 @@ describe User do
       enrollment.associated_user_id = @student.id
       enrollment.save
 
-      messageable_users = observer.messageable_users.map(&:id)
+      messageable_users = observer.deprecated_search_messageable_users.map(&:id)
       messageable_users.should include @admin.id
       messageable_users.should include @student.id
       messageable_users.should_not include @this_section_user.id
@@ -1175,9 +850,9 @@ describe User do
       enrollment.associated_user_id = student1.id
       enrollment.save
 
-      student1.messageable_users.map(&:id).should include observer.id
+      student1.deprecated_search_messageable_users.map(&:id).should include observer.id
       student1.enrollment_visibility[:user_counts][@course.id].should eql 8
-      student2.messageable_users.map(&:id).should_not include observer.id
+      student2.deprecated_search_messageable_users.map(&:id).should_not include observer.id
       student2.enrollment_visibility[:user_counts][@course.id].should eql 7
     end
 
@@ -1193,7 +868,7 @@ describe User do
       # other_section_user is a teacher in one course, student in another
       @other_course.enroll_user(@other_section_user, 'TeacherEnrollment', :enrollment_state => 'active')
 
-      messageable_users = @admin.messageable_users
+      messageable_users = @admin.deprecated_search_messageable_users
       this_section_user = messageable_users.detect{|u| u.id == @this_section_user.id}
       this_section_user.common_courses.keys.should include @first_course.id
       this_section_user.common_courses[@first_course.id].sort.should eql ['StudentEnrollment', 'TaEnrollment']
@@ -1206,8 +881,8 @@ describe User do
     end
 
     it "should include users with no shared contexts iff admin" do
-      @admin.messageable_users(:ids => [@student.id]).should_not be_empty
-      @student.messageable_users(:ids => [@admin.id]).should be_empty
+      @admin.deprecated_search_messageable_users(:ids => [@student.id]).should_not be_empty
+      @student.deprecated_search_messageable_users(:ids => [@admin.id]).should be_empty
     end
 
     it "should not do admin catch-all if specific contexts requested" do
@@ -1224,9 +899,9 @@ describe User do
       enrollment.workflow_state = 'active'
       enrollment.save
 
-      @admin.messageable_users(:context => "course_#{course1.id}", :ids => [@student.id]).should be_empty
-      @admin.messageable_users(:context => "course_#{course2.id}", :ids => [@student.id]).should_not be_empty
-      @student.messageable_users(:context => "course_#{course2.id}", :ids => [@admin.id]).should_not be_empty
+      @admin.deprecated_search_messageable_users(:context => "course_#{course1.id}", :ids => [@student.id]).should be_empty
+      @admin.deprecated_search_messageable_users(:context => "course_#{course2.id}", :ids => [@student.id]).should_not be_empty
+      @student.deprecated_search_messageable_users(:context => "course_#{course2.id}", :ids => [@admin.id]).should_not be_empty
     end
 
     it "should return names with shared contexts" do
@@ -1249,7 +924,7 @@ describe User do
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
       # ordered by name (all the same), then id
-      @student.messageable_users.map(&:id).
+      @student.deprecated_search_messageable_users.map(&:id).
         should eql [@student.id, @this_section_teacher.id, @this_section_user.id, @other_section_user.id, @other_section_teacher.id]
     end
 
@@ -1258,7 +933,7 @@ describe User do
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
       # ordered by rank, then name (all the same), then id
-      @student.messageable_users(:rank_results => true).map(&:id).
+      @student.deprecated_search_messageable_users(:rank_results => true).map(&:id).
         should eql [@this_section_user.id] + # two contexts (course and group)
                    [@student.id, @this_section_teacher.id, @other_section_user.id, @other_section_teacher.id] # just the course
     end
@@ -1269,8 +944,8 @@ describe User do
         @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
         @this_section_user_enrollment.conclude
 
-        @this_section_user.messageable_users.map(&:id).should include @this_section_user.id
-        @student.messageable_users.map(&:id).should include @this_section_user.id
+        @this_section_user.deprecated_search_messageable_users.map(&:id).should include @this_section_user.id
+        @student.deprecated_search_messageable_users.map(&:id).should include @this_section_user.id
       end
 
       it "should not return concluded student enrollments in the course" do # when browsing a course you should not see concluded enrollments
@@ -1278,12 +953,12 @@ describe User do
         @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
         @course.complete!
 
-        @this_section_user.messageable_users(:context => "course_#{@course.id}").map(&:id).should_not include @this_section_user.id
+        @this_section_user.deprecated_search_messageable_users(:context => "course_#{@course.id}").map(&:id).should_not include @this_section_user.id
         # if the course was a concluded, a student should be able to browse it and message an admin (if if the admin's enrollment concluded too)
-        @this_section_user.messageable_users(:context => "course_#{@course.id}").map(&:id).should include @this_section_teacher.id
+        @this_section_user.deprecated_search_messageable_users(:context => "course_#{@course.id}").map(&:id).should include @this_section_teacher.id
         @this_section_user.enrollment_visibility[:user_counts][@course.id].should eql 2 # just the admins
-        @student.messageable_users(:context => "course_#{@course.id}").map(&:id).should_not include @this_section_user.id
-        @student.messageable_users(:context => "course_#{@course.id}").map(&:id).should include @this_section_teacher.id
+        @student.deprecated_search_messageable_users(:context => "course_#{@course.id}").map(&:id).should_not include @this_section_user.id
+        @student.deprecated_search_messageable_users(:context => "course_#{@course.id}").map(&:id).should include @this_section_teacher.id
         @student.enrollment_visibility[:user_counts][@course.id].should eql 2
       end
 
@@ -1292,9 +967,9 @@ describe User do
         @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
         @this_section_user_enrollment.conclude
 
-        @this_section_user.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
+        @this_section_user.deprecated_search_messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
         @this_section_user.group_membership_visibility[:user_counts][@group.id].should eql 1
-        @student.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
+        @student.deprecated_search_messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
         @student.group_membership_visibility[:user_counts][@group.id].should eql 1
       end
 
@@ -1307,10 +982,10 @@ describe User do
         @group.users << @other_section_user
         @this_section_user_enrollment.conclude
 
-        @this_section_user.messageable_users(:context => "group_#{@group.id}").map(&:id).sort.should eql [@this_section_user.id, @other_section_user.id]
+        @this_section_user.deprecated_search_messageable_users(:context => "group_#{@group.id}").map(&:id).sort.should eql [@this_section_user.id, @other_section_user.id]
         @this_section_user.group_membership_visibility[:user_counts][@group.id].should eql 2
         # student can only see people in his section
-        @student.messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
+        @student.deprecated_search_messageable_users(:context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
         @student.group_membership_visibility[:user_counts][@group.id].should eql 1
       end
     end
@@ -1322,17 +997,17 @@ describe User do
       end
 
       it "should find users in the course" do
-        @admin.messageable_users(:context => @course.asset_string, :admin_context => @course).map(&:id).sort.should ==
+        @admin.deprecated_search_messageable_users(:context => @course.asset_string, :admin_context => @course).map(&:id).sort.should ==
           [@this_section_teacher.id, @this_section_user.id, @other_section_user.id, @other_section_teacher.id]
       end
 
       it "should find users in the section" do
-        @admin.messageable_users(:context => "section_#{@course.default_section.id}", :admin_context => @course.default_section).map(&:id).sort.should ==
+        @admin.deprecated_search_messageable_users(:context => "section_#{@course.default_section.id}", :admin_context => @course.default_section).map(&:id).sort.should ==
           [@this_section_teacher.id, @this_section_user.id]
       end
 
       it "should find users in the group" do
-        @admin.messageable_users(:context => @group.asset_string, :admin_context => @group).map(&:id).sort.should ==
+        @admin.deprecated_search_messageable_users(:context => @group.asset_string, :admin_context => @group).map(&:id).sort.should ==
           [@this_section_user.id]
       end
     end
@@ -1341,14 +1016,14 @@ describe User do
       it "should optionally show invited enrollments" do
         course(:active_all => true)
         student_in_course(:user_state => 'creation_pending')
-        @teacher.messageable_users(:skip_visibility_checks => true).map(&:id).should include @student.id
+        @teacher.deprecated_search_messageable_users(:skip_visibility_checks => true).map(&:id).should include @student.id
       end
 
       it "should optionally show pending enrollments in unpublished courses" do
         course()
         teacher_in_course(:active_user => true)
         student_in_course()
-        @teacher.messageable_users(:skip_visibility_checks => true, :admin_context => @course).map(&:id).should include @student.id
+        @teacher.deprecated_search_messageable_users(:skip_visibility_checks => true, :admin_context => @course).map(&:id).should include @student.id
       end
     end
   end
@@ -1942,6 +1617,49 @@ describe User do
         events.size.should eql 1
         events.first.title.should eql 'test appointment'
       end
+
+    end
+  end
+
+  describe "select_upcoming_assignments" do
+    it "filters based on assignment date for asignments the user cannot delete" do
+      time = Time.now + 1.day
+      assignments = [stub, stub, stub]
+      user = User.new
+      assignments.each do |assignment|
+        assignment.stubs(:due_at => time)
+        assignment.expects(:grants_right?).with(user,nil,:delete).returns false
+      end
+      user.select_upcoming_assignments(assignments,{:end_at => time}).should == assignments
+    end
+
+    it "returns assignments that have an override between now and end_at opt" do
+      assignments = [stub, stub, stub, stub]
+      Timecop.freeze(Time.utc(2013,3,13,0,0)) do
+        user = User.new
+        due_date1 = {:due_at => Time.now + 1.day}
+        due_date2 = {:due_at => Time.now + 1.week}
+        due_date3 = {:due_at => 2.weeks.from_now }
+        due_date4 = {:due_at => nil }
+        assignments.each do |assignment|
+          assignment.expects(:grants_right?).with(user,nil,:delete).returns true
+        end
+        assignments.first.expects(:all_dates_visible_to).with(user).
+          returns [due_date1]
+        assignments.second.expects(:all_dates_visible_to).with(user).
+          returns [due_date2]
+        assignments.third.expects(:all_dates_visible_to).with(user).
+          returns [due_date3]
+        assignments[3].expects(:all_dates_visible_to).with(user).
+          returns [due_date4]
+        upcoming_assignments = user.select_upcoming_assignments(assignments,{
+          :end_at => 1.week.from_now
+        })
+        upcoming_assignments.should include assignments.first
+        upcoming_assignments.should include assignments.second
+        upcoming_assignments.should_not include assignments.third
+        upcoming_assignments.should_not include assignments[3]
+      end
     end
   end
 
@@ -2295,6 +2013,46 @@ describe User do
       @ta.assignments_needing_grading_total_count.should eql(22)
       @ta.assignments_needing_grading.size.should < 22
     end
+
+    context "sharding" do
+      it_should_behave_like "sharding"
+
+      before do
+        @shard1.activate do
+          @account = Account.create!
+          @course3 = @account.courses.create!
+          @course3.offer!
+          @course3.enroll_teacher(@teacher).accept!
+          @course3.enroll_student(@studentA).accept!
+          @course3.enroll_student(@studentB).accept!
+          @assignment3 = @course3.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
+          @assignment3.submit_homework @studentA, :submission_type => "online_text_entry", :body => "submission for A"
+        end
+      end
+
+      it "should find assignments from all shards" do
+        @teacher.assignments_needing_grading_total_count.should == 3
+        @teacher.assignments_needing_grading.sort_by(&:id).should ==
+            [@course1.assignments.first, @course2.assignments.first, @assignment3].sort_by(&:id)
+      end
+
+      it "should honor ignores for a separate shard" do
+        @teacher.ignore_item!(@assignment3, 'grading')
+        @teacher.assignments_needing_grading_total_count.should == 2
+        @teacher.assignments_needing_grading.sort_by(&:id).should ==
+            [@course1.assignments.first, @course2.assignments.first].sort_by(&:id)
+
+        @shard1.activate do
+          @assignment3.submit_homework @studentB, :submission_type => "online_text_entry", :body => "submission for B"
+        end
+        @teacher = User.find(@teacher)
+        @teacher.assignments_needing_grading_total_count.should == 3
+      end
+
+      it "should apply a global limit" do
+        @teacher.assignments_needing_grading(:limit => 1).length.should == 1
+      end
+    end
   end
 
   describe ".initial_enrollment_type_from_type" do
@@ -2407,6 +2165,13 @@ describe User do
   end
 
   describe '#grants_right?' do
+    let(:subaccount) do
+      account = Account.create!
+      account.root_account_id = Account.default.id
+      account.save!
+      account
+    end
+
     let(:site_admin) do
       user = User.create!
       Account.site_admin.add_user(user)
@@ -2417,8 +2182,16 @@ describe User do
     let(:local_admin) do
       user = User.create!
       Account.default.add_user(user)
+      subaccount.add_user(user)
       user
     end
+
+    let(:user) do
+      user = User.create!
+      subaccount.add_user(user)
+      user
+    end
+
 
     it 'allows site admins to manage their own logins' do
       site_admin.grants_right?(site_admin, :manage_logins).should be_true
@@ -2435,6 +2208,65 @@ describe User do
     it 'forbids local admins from managing site admins logins' do
       site_admin.grants_right?(local_admin, :manage_logins).should be_false
     end
+
+    it 'only considers root accounts when checking subset permissions' do
+      user.grants_right?(local_admin, :manage_logins).should be_true
+    end
   end
 
+  describe "#conversation_context_codes" do
+    before do
+      @user = user(:active_all => true)
+    end
+
+    it "should include courses" do
+      course_with_student(:user => @user, :active_all => true)
+      @user.conversation_context_codes.should include(@course.asset_string)
+    end
+
+    it "should include concluded courses" do
+      course_with_student(:user => @user, :active_all => true)
+      @enrollment.workflow_state = 'completed'
+      @enrollment.save!
+      @user.conversation_context_codes.should include(@course.asset_string)
+    end
+
+    it "should include groups" do
+      group_with_user(:user => @user, :active_all => true)
+      @user.conversation_context_codes.should include(@group.asset_string)
+    end
+
+    context "sharding" do
+      it_should_behave_like "sharding"
+
+      before do
+        @shard1_account = @shard1.activate{ Account.create! }
+      end
+
+      it "should include courses on other shards" do
+        course_with_student(:account => @shard1_account, :user => @user, :active_all => true)
+        @user.conversation_context_codes.should include(@course.asset_string)
+      end
+
+      it "should include concluded courses on other shards" do
+        course_with_student(:account => @shard1_account, :user => @user, :active_all => true)
+        @enrollment.workflow_state = 'completed'
+        @enrollment.save!
+        @user.conversation_context_codes.should include(@course.asset_string)
+      end
+
+      it "should include groups on other shards" do
+        # course is just to associate the get shard1 in @user's associated shards
+        course_with_student(:account => @shard1_account, :user => @user, :active_all => true)
+        @shard1.activate{ group_with_user(:user => @user, :active_all => true) }
+        @user.conversation_context_codes.should include(@group.asset_string)
+      end
+
+      it "should include the default shard version of the asset string" do
+        course_with_student(:account => @shard1_account, :user => @user, :active_all => true)
+        default_asset_string = @course.asset_string
+        @shard1.activate{ @user.conversation_context_codes.should include(default_asset_string) }
+      end
+    end
+  end
 end

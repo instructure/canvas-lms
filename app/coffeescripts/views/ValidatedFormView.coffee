@@ -1,11 +1,12 @@
 define [
   'Backbone'
   'jquery'
+  'underscore'
   'compiled/fn/preventDefault'
   'jquery.toJSON'
   'jquery.disableWhileLoading'
   'jquery.instructure_forms'
-], (Backbone, $, preventDefault) ->
+], (Backbone, $, _, preventDefault) ->
 
   ##
   # Sets model data from a form, saves it, and displays errors returned in a
@@ -32,33 +33,48 @@ define [
     ##
     # Sets the model data from the form and saves it. Called when the form
     # submits, or can be called programatically.
-    # set @saveOpts in your vew to to pass opts to Backbone.sync (like multipart: true if you have
+    # set @saveOpts in your view to to pass opts to Backbone.sync (like multipart: true if you have
     # a file attachment).  if you want the form not to be re-enabled after save success (because you
     # are navigating to a new page, set dontRenableAfterSaveSuccess to true on your view)
+    #
+    # NOTE: If you are uploading a file attachment, be careful! our
+    # syncWithMultipart extension doesn't call toJSON on your model!
     #
     # @api public
     # @returns jqXHR
     submit: preventDefault ->
+      @$el.hideErrors()
+
       data = @getFormData()
+      errors = @validateBeforeSave data, {}
 
-      disablingDfd = new $.Deferred()
-      saveDfd = @model
-        .save(data, @saveOpts)
-        .then(@onSaveSuccess, @onSaveFail)
-        .fail -> disablingDfd.reject()
+      if _.keys(errors).length == 0
+        disablingDfd = new $.Deferred()
+        saveDfd = @model
+          .save(data, @saveOpts)
+          .then(@onSaveSuccess, @onSaveFail)
+          .fail -> disablingDfd.reject()
 
-      unless @dontRenableAfterSaveSuccess
-        saveDfd.done -> disablingDfd.resolve()
+        unless @dontRenableAfterSaveSuccess
+          saveDfd.done -> disablingDfd.resolve()
 
-      @$el.disableWhileLoading disablingDfd
-      @trigger 'submit'
-      saveDfd
+        @$el.disableWhileLoading disablingDfd
+        @trigger 'submit'
+        saveDfd
+      else
+        @showErrors errors
+        null
 
     ##
     # Converts the form to an object. Override this if the form's input names
     # don't match the model/API fields
     getFormData: ->
       @$el.toJSON()
+
+    ##
+    # Override this to perform pre-save validations.  Return errors that can
+    # show with the showErrors format below
+    validateBeforeSave: -> {}
 
     onSaveSuccess: =>
       @trigger 'success', arguments...

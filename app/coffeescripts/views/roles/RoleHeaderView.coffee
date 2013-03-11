@@ -26,6 +26,15 @@ define [
     events: 
       "click a" : "removeRole"
 
+    initialize: -> 
+      @model.on 'destroying', @addLoadingHeader
+
+    # Method Summary
+    #   Replace the Roles header with a deleting indicator
+    # @api private
+    addLoadingHeader: => 
+      @$el.find('a').replaceWith('<img class="loading-icon" src="/images/ajax-reload-animated.gif">')
+
     # Method Summary
     #   Are you abled to delete this role? You can delete
     #   a role if it's not one of the static roles.
@@ -40,7 +49,8 @@ define [
     toJSON: -> 
       json = super
       json['deletable'] = @deletable()
-      json['showBaseRoleType'] = @showBaseRoleType()
+      if @showBaseRoleType()
+        json['baseRoleTip'] = I18n.t('based_on_type', "Based on %{base_type}", {base_type: this.model.get("base_role_type_label")})
       json
 
     # Method Summary
@@ -52,11 +62,14 @@ define [
     #  Make sure the user knows that if there are any enrollments on this role
     #  it will be frozen.
     # @api private
-    removeRole: -> 
+    removeRole: (event) -> 
+      event.preventDefault()
+
       if confirm I18n.t "role.remove_role_confirmation", "If there are any users with this role, they will keep the current permissions but you will not be able to create new users with this role. Click ok to continue deleting this role."
         @model.destroy
-          error: (model, response) -> 
+          error: (model, response) => 
             alert "#{model.role} could not be remove, contact your site admin if this continues."
+            @removeLoadingIcon()
           wait: true
 
     # Method Summary
@@ -65,8 +78,8 @@ define [
     #   we hide because it's implied. This gets used in the template to determin
     #   what should be shown.
     # @api private
-    showBaseRoleType: -> 
-      !_.contains ["AccountAdmin", "NoPermissions", "AccountMembership"], @model.get('base_role_type')
+    showBaseRoleType: ->
+      !_.contains @staticRoles, @model.get('role')
 
     # Method Summary
     #   This is called after render to ensure column header is set for accessiblity.
@@ -74,6 +87,9 @@ define [
     afterRender: ->
       @$el.attr('role', 'columnheader')
 
-
-
+    # Method Summary
+    #   Remove the loading icon
+    # @api private
+    removeLoadingIcon: -> 
+      @$el.find(".loading-icon").remove()
 

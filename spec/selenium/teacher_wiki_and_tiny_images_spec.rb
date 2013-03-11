@@ -1,7 +1,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe "Wiki pages and Tiny WYSIWYG editor Images" do
   it_should_behave_like "wiki and tiny selenium tests"
+  it_should_behave_like "quizzes selenium tests"
 
   context "wiki and tiny images as a teacher" do
 
@@ -165,7 +167,9 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       f(".new-quiz-link").click
       keep_trying_until { f(".mce_instructure_embed").should be_displayed }
       add_flickr_image(driver)
-      f(".add_question_link").click
+
+      click_questions_tab
+      click_new_question_button
       wait_for_animations
       add_flickr_image(f("#question_content_0_parent"))
       in_frame "quiz_description_ifr" do

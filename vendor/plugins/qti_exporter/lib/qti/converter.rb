@@ -8,7 +8,10 @@ class Converter < Canvas::Migration::Migrator
   QTI_2_0_URL = 'http://www.imsglobal.org/xsd/imsqti_v2p0'
   QTI_2_0_ITEM_URL = 'http://www.imsglobal.org/xsd/imsqti_item_v2p0'
   QTI_2_1_ITEM_URL = 'http://www.imsglobal.org/xsd/imsqti_item_v2p1'
-  QTI_2_REGEX = %r{http://www.imsglobal.org/xsd/(?:imsqti_v2p0|imsqti_item_v2p0|imsqti_v2p1|imsqti_item_v2p1)}
+  QTI_2_NAMESPACES = %w[
+    http://www.imsglobal.org/xsd/imsqti_v2p0
+    http://www.imsglobal.org/xsd/imsqti_v2p1
+  ]
   IMS_MD = "http://www.imsglobal.org/xsd/imsmd_v1p2"
   QTI_2_OUTPUT_PATH = "qti_2_1"
 
@@ -50,9 +53,8 @@ class Converter < Canvas::Migration::Migrator
 
   def self.is_qti_2(manifest_path)
     if File.exists?(manifest_path)
-      File.open(manifest_path) do |io|
-        io.each { |line| return true if line =~ QTI_2_REGEX }
-      end
+      xml = Nokogiri::XML(File.open(manifest_path))
+      return xml.namespaces.values.any? { |v| QTI_2_NAMESPACES.include?(v) }
     end
     false
   end

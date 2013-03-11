@@ -676,8 +676,8 @@ describe EnrollmentsApiController, :type => :integration do
         }
       end
 
-      it "should not display grades when hide_final_grade is true for the course" do
-        @course.settings[:hide_final_grade] = true
+      it "should not display grades when hide_final_grades is true for the course" do
+        @course.hide_final_grades = true
         @course.save
 
         json = api_call(:get, @user_path, @user_params)

@@ -20,7 +20,7 @@ define [
     ##
     # @param {EntryView} view
     constructor: (@view) ->
-      super @view.$('.message:first'), switchViews: true
+      super @getEditingElement(), switchViews: true
       @cancelButton = @createCancelButton()
       @done.addClass 'btn-small'
 
@@ -33,6 +33,12 @@ define [
       super
       @cancelButton.detach()
       if opts?.cancel isnt true
+        # empty replies b/c (1) their references back to the parent create
+        # a circular JSON structure, and (2) we aren't saving them here
+        # anyway.
+        @view.model.set('replies', [])
+        @view.model.set('updated_at', (new Date).toISOString())
+        @view.model.set('editor', ENV.current_user)
         @view.model.save
           messageNotification: I18n.t('saving', 'Saving...')
           message: @content
@@ -49,8 +55,16 @@ define [
         .click => @display cancel: true
 
     edit: ->
+      @editingElement(@getEditingElement())
       super
       @cancelButton.insertAfter @done
+
+    ##
+    # Get the jQueryEl element on the discussion entry to edit.
+    #
+    # @api private
+    getEditingElement: ->
+      @view.$('.message:first')
 
     ##
     # Overrides EditorToggle::getContent to get the content from the model

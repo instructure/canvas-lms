@@ -4,8 +4,97 @@ $backgroundColor: #dfe9f0
 $borderColor: #AAA
 $questionHeaderBackground: #F5F5F5
 
-#content
-  background-color: $backgroundColor
+#quiz_show
+  .alert
+    padding-right: 14px
+    .actions
+      text-align: right
+      line-height: 36px
+    .publish_quiz_button
+      width: 90px
+    #preview_quiz_button
+      font-weight: normal
+      color: #333333
+    .unpublished_quiz_warning
+      display: block
+
+
+  .admin-links
+    text-align: left
+    margin-left: 10px
+    .al-options
+      min-width: 125px
+
+  .description.teacher-version
+    padding: 15px
+    overflow-y: auto
+    height: 200px
+    border: 1px solid #AAA
+    resize: vertical
+
+  .lock_explanation
+    text-align: left
+    margin-top: 20px
+
+  .take_quiz_button
+    text-align: center
+    margin-top: 20px
+    font-size: 1.3em
+
+  #quiz_details
+    display: none
+    clear: both
+
+    td
+      vertical-align: top
+
+  .control-group
+    margin-bottom: 0px
+
+    .control-label
+      font-weight: bold
+      width: 33.3%
+
+    .controls 
+      margin-left: 35%
+      .value
+        display: block
+        padding-top: 5px
+
+  .assignment_dates
+    border-collapse: collapse
+    width: 100%
+    margin-bottom: 1em
+
+    tr
+      th
+        font-weight: bold
+        padding: 0.25em 0.5em
+
+      td
+        border-top: 1px solid #BBB
+        border-bottom: 1px solid #BBB
+        padding: 0.25em 0.5em
+
+  ul#quiz_student_details
+    list-style: none
+    padding: 0
+    border-top: 1px solid #BBB
+    border-bottom: 1px solid #BBB
+    width: 100%
+    font-size: 1.1em
+    padding: 0.5em 0.25em
+    margin: 0 0 1em
+
+    li
+      display: inline-block
+
+      .label
+        font-weight: bold
+        margin-right: 2px
+
+      .value
+        padding-right: 2.5em
 
 
 #wrapper-container
@@ -440,7 +529,9 @@ div#content
   &.marked,&.marked:hover
     .flag_question
       :background-position -48px -17px
-  .no-touch &.hover
+
+  .no-touch &.hover,
+  .touch    &
     .move
       :background-color #fff
       .move_icon
@@ -742,10 +833,61 @@ ul#quiz_versions
   .quiz_version
     &.selected
       :font-weight bold
-      
-#quiz_options_form
-  td
-    vertical-align: top
+
+
+
+#quiz_edit_wrapper
+  #quiz_title
+    margin-left: 0
+    margin-top: 5px
+    padding: 0.1em 0.1em 0.1em 0.3em
+  padding: 1em
+  background-color: #ffffff
+  #student_submissions_warning,
+  #unpublished_changes_message
+    padding: 12px
+    border-width: 1px
+  #quiz_display_points_possible
+    line-height: 40px
+    font-size: 1.2em
+    text-align: right
+  .admin-links
+    line-height: 40px
+    margin-left: 10px
+    .al-options
+      min-width: 125px
+  #quiz_tabs
+    margin-top: 0.7em
+    #questions_tab
+      background: $backgroundColor
+      #show_question_details_wrap
+        width: 80%
+        min-width: 415px
+        margin: 1em auto
+    #quiz_options_form
+      margin: 0 auto
+      td
+        vertical-align: top
+      label.checkbox
+        margin-bottom: 10px
+      .inline
+        display: inline-block
+        &.checkbox
+          margin-bottom: 10px
+        &.nowrap
+          white-space: nowrap
+      #keep_score_select,
+      #quiz_access_code,
+      #quiz_ip_filter,
+      #quiz_allowed_attempts
+        margin-left: 10px
+      #quiz_allowed_attempts
+        width: 20px
+        margin-bottom: 5px
+      #keep_score_select
+        width: 100px
+  
+        
 .options_header
   font-weight: bold
   font-size: 1.2em
@@ -1177,5 +1319,11 @@ ul#quiz_versions
 
 .form-actions
   border: 1px solid #999
-  margin: 18px -1px -1px
+  margin: 18px 0 -1px
   @include background-image(linear-gradient(#f3f3f3, #e3e3e3))
+
+.quiz_results_list
+  li
+    padding: 4px 12px !important
+  li.student
+    padding: 4px 12px !important

@@ -37,7 +37,6 @@ require([
     });
     if($group.val() == "new") {
       $group[0].selectedIndex = 0;
-      //    $group.val($("#full_assignment .group_id").text());
     }
   }
   $(document).ready(function() {

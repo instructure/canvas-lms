@@ -130,7 +130,6 @@ describe ContentMigration do
       @copy_from.course_code = 'something funny'
       @copy_from.publish_grades_immediately = false
       @copy_from.allow_student_wiki_edits = true
-      @copy_from.allow_student_assignment_edits = true
       @copy_from.show_public_context_messages = false
       @copy_from.allow_student_forum_attachments = false
       @copy_from.default_wiki_editing_roles = 'teachers'
@@ -145,7 +144,7 @@ describe ContentMigration do
       @copy_from.license = "cc_by_nc_nd"
       @copy_from.locale = "es"
       @copy_from.tab_configuration = [{"id"=>0}, {"id"=>14}, {"id"=>8}, {"id"=>5}, {"id"=>6}, {"id"=>2}, {"id"=>3, "hidden"=>true}]
-      @copy_from.settings[:hide_final_grade] = true
+      @copy_from.hide_final_grades = true
       gs = make_grading_standard(@copy_from)
       @copy_from.grading_standard = gs
       @copy_from.grading_standard_enabled = true
@@ -157,7 +156,7 @@ describe ContentMigration do
       @copy_to.conclude_at.should == nil
       @copy_to.start_at.should == nil
       @copy_to.storage_quota.should == 444
-      @copy_to.settings[:hide_final_grade].should == true
+      @copy_to.hide_final_grades.should == true
       @copy_to.grading_standard_enabled.should == true
       gs_2 = @copy_to.grading_standards.find_by_migration_id(mig_id(gs))
       gs_2.data.should == gs.data
@@ -270,6 +269,21 @@ describe ContentMigration do
       tag_to = mod1_to.content_tags.first
       page_to = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page))
       page_to.body.should == body % [@copy_to.id, tag_to.id]
+    end
+
+    it "should copy unpublished modules" do
+      cm = @copy_from.context_modules.create!(:name => "some module")
+      cm.publish
+      cm2 = @copy_from.context_modules.create!(:name => "another module")
+      cm2.unpublish
+
+      run_course_copy
+
+      @copy_to.context_modules.count.should == 2
+      cm_2 = @copy_to.context_modules.find_by_migration_id(mig_id(cm))
+      cm_2.workflow_state.should == 'active'
+      cm2_2 = @copy_to.context_modules.find_by_migration_id(mig_id(cm2))
+      cm2_2.workflow_state.should == 'unpublished'
     end
 
     it "should find and fix wiki links by title or id" do
@@ -756,7 +770,7 @@ describe ContentMigration do
     it "should copy a discussion topic when assignment is selected" do
       topic = @copy_from.discussion_topics.build(:title => "topic")
       assignment = @copy_from.assignments.build(:submission_types => 'discussion_topic', :title => topic.title)
-      assignment.infer_due_at
+      assignment.infer_times
       assignment.saved_by = :discussion_topic
       topic.assignment = assignment
       topic.save
@@ -775,7 +789,7 @@ describe ContentMigration do
     it "should not copy deleted assignment attached to topic" do
       topic = @copy_from.discussion_topics.build(:title => "topic")
       assignment = @copy_from.assignments.build(:submission_types => 'discussion_topic', :title => topic.title)
-      assignment.infer_due_at
+      assignment.infer_times
       assignment.saved_by = :discussion_topic
       topic.assignment = assignment
       topic.save!
@@ -885,6 +899,16 @@ describe ContentMigration do
       new_attachment.full_path.should == "course files/dummy.txt"
       new_attachment.folder.should == to_root
       @copy_to.syllabus_body.should == %{<a href="/courses/#{@copy_to.id}/files/#{new_attachment.id}/download?wrap=1">link</a>}
+    end
+
+    it "should add a warning instead of failing when trying to copy an invalid file" do
+      att = Attachment.create!(:filename => 'dummy.txt', :uploaded_data => StringIO.new('fakety'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      Attachment.update_all({:filename => nil}, {:id => att.id})
+
+      att.reload
+      att.should_not be_valid
+
+      run_course_copy(["Couldn't copy file \"dummy.txt\""])
     end
 
     it "should preserve media comment links" do
@@ -1121,57 +1145,76 @@ describe ContentMigration do
 
     end
 
-    it "should copy time correctly across daylight savings shift MST to MDT" do
-      Time.use_zone('America/Denver') do
-        asmnt = @copy_from.assignments.new
-        asmnt.title = "Nothing Assignment"
-        asmnt.description = 'oi'
-        asmnt.due_at = Time.zone.at(1325876400) # Fri, 06 Jan 2012 12:00:00 MST -07:00
-        asmnt.save!
+    context "should copy time correctly across daylight saving shift" do
+      let(:local_time_zone) { ActiveSupport::TimeZone.new 'America/Denver' }
 
-        @cm.migration_settings[:migration_ids_to_import] = {
-                :copy => {
-                        :everything => true,
-                        :shift_dates => true,
-                        :old_start_date => 'Jan 1, 2012',
-                        :old_end_date => 'Jan 15, 2012',
-                        :new_start_date => 'Jun 2, 2012',
-                        :new_end_date => 'Jun 16, 2012'
-                }
-        }
-        @cm.save!
+      def copy_assignment(options = {})
+        account = @copy_to.account
 
-        run_course_copy
+        old_time_zone = account.default_time_zone
+        account.default_time_zone = options.include?(:account_time_zone) ? options[:account_time_zone].name : 'UTC'
+        account.save!
 
-        asmnt_2 = @copy_to.assignments.find_by_migration_id(mig_id(asmnt))
-        asmnt_2.due_at.to_i.should == Time.zone.at(1339178400).to_i # Fri, 08 Jun 2012 12:00:00 MDT -06:00
+        Time.use_zone('UTC') do
+          assignment = @copy_from.assignments.create! :title => 'Assignment', :due_at => old_date
+          assignment.save!
+
+          migration_settings = {
+            :copy => {
+              :everything => true,
+              :shift_dates => true,
+              :old_start_date => old_start_date,
+              :old_end_date => old_end_date,
+              :new_start_date => new_start_date,
+              :new_end_date => new_end_date
+            }
+          }
+          migration_settings[:copy][:time_zone] = options[:time_zone].name if options.include?(:time_zone)
+          @cm.migration_settings[:migration_ids_to_import] = migration_settings
+          @cm.save!
+
+          run_course_copy
+
+          assignment2 = @copy_to.assignments.find_by_migration_id(mig_id(assignment))
+          assignment2.due_at.in_time_zone(local_time_zone)
+        end
+      ensure
+        account.default_time_zone = old_time_zone
+        account.save!
       end
-    end
 
-    it "should copy time correctly across daylight savings shift MDT to MST" do
-      Time.use_zone('America/Denver') do
-        asmnt = @copy_from.assignments.new
-        asmnt.title = "Nothing Assignment"
-        asmnt.description = 'oi'
-        asmnt.due_at = Time.zone.at(1339178400) # Fri, 08 Jun 2012 12:00:00 MDT -06:00
-        asmnt.save!
+      context "from MST to MDT" do
+        let(:old_date)       { local_time_zone.local(2012, 1, 6, 12, 0) } # 6 Jan 2012 12:00
+        let(:new_date)       { local_time_zone.local(2012, 4, 6, 12, 0) } # 6 Apr 2012 12:00
+        let(:old_start_date) { 'Jan 1, 2012' }
+        let(:old_end_date)   { 'Jan 15, 2012' }
+        let(:new_start_date) { 'Apr 1, 2012' }
+        let(:new_end_date)   { 'Apr 15, 2012' }
 
-        @cm.migration_settings[:migration_ids_to_import] = {
-                :copy => {
-                        :everything => true,
-                        :shift_dates => true,
-                        :old_start_date => 'Jun 2, 2012',
-                        :old_end_date => 'Jun 16, 2012',
-                        :new_start_date => 'Jan 4, 2013',
-                        :new_end_date => 'Jan 18, 2013'
-                }
-        }
-        @cm.save!
+        it "using an explicit time zone" do
+          new_date.should == copy_assignment(:time_zone => local_time_zone)
+        end
 
-        run_course_copy
+        it "using the account time zone" do
+          new_date.should == copy_assignment(:account_time_zone => local_time_zone)
+        end
+      end
 
-        asmnt_2 = @copy_to.assignments.find_by_migration_id(mig_id(asmnt))
-        asmnt_2.due_at.to_i.should == Time.zone.at(1357326000).to_i # Fri, 04 Jan 2013 12:00:00 MST -07:00
+      context "from MDT to MST" do
+        let(:old_date)       { local_time_zone.local(2012, 9, 6, 12, 0) }  # 6 Sep 2012 12:00
+        let(:new_date)       { local_time_zone.local(2012, 12, 6, 12, 0) } # 6 Dec 2012 12:00
+        let(:old_start_date) { 'Sep 1, 2012' }
+        let(:old_end_date)   { 'Sep 15, 2012' }
+        let(:new_start_date) { 'Dec 1, 2012' }
+        let(:new_end_date)   { 'Dec 15, 2012' }
+
+        it "using an explicit time zone" do
+          new_date.should == copy_assignment(:time_zone => local_time_zone)
+        end
+
+        it "using the account time zone" do
+          new_date.should == copy_assignment(:account_time_zone => local_time_zone)
+        end
       end
     end
 
@@ -1391,7 +1434,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
         @quiz.save!
         @topic = @copy_from.discussion_topics.build(:title => "topic")
         assignment = @copy_from.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
-        assignment.infer_due_at
+        assignment.infer_times
         assignment.saved_by = :discussion_topic
         assignment.copied = true
         assignment.freeze_on_copy = true

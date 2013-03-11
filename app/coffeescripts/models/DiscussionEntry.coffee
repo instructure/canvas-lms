@@ -4,7 +4,7 @@ define [
   'i18n!discussions'
 ], (_, Backbone, I18n) ->
 
-  UNKOWN_AUTHOR =
+  UNKNOWN_AUTHOR =
     avatar_image_url: null
     display_name: I18n.t 'unknown_author', 'Unknown Author'
     id: null
@@ -25,5 +25,5 @@ define [
       else if user_id is ENV.current_user?.id
         ENV.current_user
       else
-        UNKOWN_AUTHOR
+        UNKNOWN_AUTHOR
 

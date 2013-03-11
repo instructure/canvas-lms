@@ -67,9 +67,11 @@ class FoldersController < ApplicationController
   def api_index
     folder = Folder.find(params[:id])
     if authorized_action(folder, @current_user, :read_contents)
+      can_manage_files = folder.context.grants_right?(@current_user, session, :manage_files)
+
       scope = folder.active_sub_folders
-      if !folder.grants_right?(@current_user, session, :update)
-        scope = scope.not_hidden
+      unless can_manage_files
+        scope = scope.not_hidden.not_locked
       end
       if params[:sort_by] == 'position'
         scope = scope.by_position
@@ -77,7 +79,6 @@ class FoldersController < ApplicationController
         scope = scope.by_name
       end
       @folders = Api.paginate(scope, self, api_v1_list_folders_url(@context))
-      can_manage_files = folder.context.grants_right?(@current_user, session, :manage_files)
       render :json => folders_json(@folders, @current_user, session, :can_manage_files => can_manage_files)
     end
   end
@@ -122,16 +123,22 @@ class FoldersController < ApplicationController
       else
         respond_to do |format|
           format.html { redirect_to named_context_url(@context, :context_files_url, :folder_id => @folder.id) }
-          files = if @context.grants_right?(@current_user, session, :manage_files)
-                    @folder.active_file_attachments.by_position_then_display_name
-                  else
-                    @folder.visible_file_attachments.by_position_then_display_name
-                  end
+          can_manage_files = @context.grants_right?(@current_user, session, :manage_files)
+
+          files = if can_manage_files
+            @folder.active_file_attachments.by_position_then_display_name
+          else
+            @folder.visible_file_attachments.not_hidden.not_locked.by_position_then_display_name
+          end
           files_options = {:permissions => {:user => @current_user}, :methods => [:currently_locked, :mime_class, :readable_size, :scribdable?], :only => [:id, :comments, :content_type, :context_id, :context_type, :display_name, :folder_id, :position, :media_entry_id, :scribd_doc, :filename]}
           folders_options = {:permissions => {:user => @current_user}, :methods => [:currently_locked, :mime_class], :only => [:id, :context_id, :context_type, :lock_at, :last_lock_at, :last_unlock_at, :name, :parent_folder_id, :position, :unlock_at]}
+          sub_folders_scope = @folder.active_sub_folders
+          unless can_manage_files
+            sub_folders_scope = sub_folders_scope.not_hidden.not_locked
+          end
           res = {
             :actual_folder => @folder.as_json(folders_options),
-            :sub_folders => @folder.active_sub_folders.by_position.map { |f| f.as_json(folders_options) },
+            :sub_folders => sub_folders_scope.by_position.map { |f| f.as_json(folders_options) },
             :files => files.map { |f| f.as_json(files_options)}
           }
           format.json { render :json => res }

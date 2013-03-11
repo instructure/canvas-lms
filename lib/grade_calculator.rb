@@ -17,14 +17,19 @@
 #
 
 class GradeCalculator
+  attr_accessor :submissions, :assignments
   
-  def initialize(user_ids, course_id, opts = {})
+  def initialize(user_ids, course, opts = {})
     opts = opts.reverse_merge(:ignore_muted => true)
 
-    @course_id = course_id
-    @course = Course.find(course_id)
-    @groups = @course.assignment_groups.active
-    @assignments = @course.assignments.active.only_graded
+    @course = course.is_a?(Course) ?
+      @course = course :
+      @course = Course.find(course)
+    @course_id = @course.id
+    @groups = @course.assignment_groups.active.scoped(:include => :assignments)
+    @assignments = @groups.map(&:assignments).flatten.select { |a|
+      a.graded? && a.active?
+    }
     @user_ids = Array(user_ids).map(&:to_i)
     @current_updates = []
     @final_updates = []
@@ -39,11 +44,12 @@ class GradeCalculator
 
   # recomputes the scores and saves them to each user's Enrollment
   def compute_scores
-    all_submissions = @course.submissions.for_user(@user_ids).to_a
+    @submissions = @course.submissions.for_user(@user_ids)
+    submissions_by_user = @submissions.group_by(&:user_id)
     @user_ids.map do |user_id|
-      submissions = all_submissions.select { |submission| submission.user_id == user_id }
-      current = calculate_current_score(user_id, submissions)
-      final = calculate_final_score(user_id, submissions)
+      user_submissions = submissions_by_user[user_id] || []
+      current = calculate_current_score(user_id, user_submissions)
+      final = calculate_final_score(user_id, user_submissions)
       [current, final]
     end
   end
@@ -206,6 +212,10 @@ class GradeCalculator
         q_high = q_mid :
         q_low  = q_mid
       q_mid = (q_low + q_high) / 2
+
+      # bail if we can't can't ever satisfy the threshold (floats!)
+      break if q_mid == q_high || q_mid == q_low
+
       x, kept = big_f_blk.call(q_mid, submissions, cant_drop, keep)
     end
 

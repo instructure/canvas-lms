@@ -79,7 +79,8 @@ module SIS
         raise ImportError, "No course_id or section_id given for an enrollment" if course_id.blank? && section_id.blank?
         raise ImportError, "No user_id given for an enrollment" if user_id.blank?
         raise ImportError, "Improper status \"#{status}\" for an enrollment" unless status =~ /\Aactive|\Adeleted|\Acompleted|\Ainactive/i
-        @enrollment_batch << [course_id, section_id, user_id, role, status, start_date, end_date, associated_user_id]
+
+        @enrollment_batch << [course_id.to_s, section_id.to_s, user_id.to_s, role, status, start_date, end_date, associated_user_id]
         process_batch if @enrollment_batch.size >= @updates_every
       end
 
@@ -122,11 +123,11 @@ module SIS
               next
             end
 
-            if section_id && !@section
+            if section_id.present? && !@section
               @messages << "An enrollment referenced a non-existent section #{section_id}"
               next
             end
-            if course_id && !@course
+            if course_id.present? && !@course
               @messages << "An enrollment referenced a non-existent course #{course_id}"
               next
             end
@@ -187,7 +188,7 @@ module SIS
               enrollment.root_account = @root_account
             end
             enrollment.user = user
-            enrollment.sis_source_id = [course_id, user_id, role, @section.name].compact.join(":")
+            enrollment.sis_source_id = [course_id, user_id, role, @section.name].compact.join(":")[0..254]
             enrollment.type = type
             enrollment.associated_user_id = associated_enrollment.try(:user_id)
             enrollment.role_name = custom_role.try(:name)
@@ -225,7 +226,16 @@ module SIS
             if enrollment.changed?
               @users_to_touch_ids.add(user.id)
               enrollment.sis_batch_id = @batch_id if @batch_id
-              enrollment.save_without_broadcasting
+              if enrollment.valid?
+                enrollment.save_without_broadcasting
+              else
+                msg = "An enrollment did not pass validation "
+                msg += "(" + "course: #{course_id}, section: #{section_id}, "
+                msg += "user: #{user_id}, role: #{role}, error: " + 
+                msg += enrollment.errors.full_messages.join(",") + ")"
+                @messages << msg
+                next
+              end
             elsif @batch_id
               @enrollments_to_update_sis_batch_ids << enrollment.id
             end

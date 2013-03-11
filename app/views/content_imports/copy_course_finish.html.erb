@@ -96,10 +96,10 @@ HEREDOC
         <% end %>
       </ul>
     <% end %>
-    <% if @context.context_modules.active.length > 0 %>
+    <% if @context.context_modules.not_deleted.length > 0 %>
       <h3><%= image_tag 'ball.png' %> <%= t('labels.modules', "Modules for %{course}", :course => @context.name) %></h3>
       <ul class="unstyled_list root_asset_list">
-        <% @context.context_modules.active.each do |mod| %>
+        <% @context.context_modules.not_deleted.each do |mod| %>
           <li class="<%= 'added' if @copies.include?(mod.asset_string) %>"><%= mod.name %></li>
         <% end %>
       </ul>

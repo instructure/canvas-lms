@@ -41,7 +41,7 @@ class ContextModuleProgression < ActiveRecord::Base
   
   def uncollapse!
     return if self.collapsed == false
-    progressions = self.context_module.context.context_modules.include_tags_and_progressions.map(&:context_module_progressions).flatten
+    progressions = self.context_module.context.context_modules.active.include_tags_and_progressions.map(&:context_module_progressions).flatten
     progressions = progressions.select{|p| p.collapsed == false && self.user_id == p.user_id && p != self }
     ContextModuleProgression.connection.execute("UPDATE context_module_progressions SET collapsed=NULL WHERE id IN (#{progressions.map(&:id).join(',')})") unless progressions.empty?
     self.collapsed = false

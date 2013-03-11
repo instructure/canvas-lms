@@ -219,10 +219,9 @@
       <a href="#" class="edit_collaboration_link no-hover"><%= image_tag "edit.png" %></a>
       <a href="#" class="delete_collaboration_link no-hover"><%= image_tag "delete.png" %></a>
       <div class="sub_links">
-        <a href="#" class="add_collaboration_link"><%= t 'links.new_collaboration', "New Collaboration" %></a>
-        <span class="view_collaborations">
-          | <a href="#" class="collaborations_link"><%= t 'links.all_collaborations', "ALL Collaborations" %></a>
-        </span>
+        <% if [Course, Group].include?(@context.class) %>
+          <%= link_to t('links.manage_collaborations', 'Manage collaborations'), context_url(@context, :context_collaborations_path), :class => 'manage_collaborations' %>
+        <% end %>
       </div>
     </div>
     <div class="clear"></div>

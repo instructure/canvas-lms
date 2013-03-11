@@ -38,7 +38,7 @@ describe UsersController do
       get user_student_teacher_activity_url(@teacher, @e1.user)
       Nokogiri::HTML(response.body).at_css('table.report tr:first td:nth(2)').text.should match(/never/)
 
-      @conversation = Conversation.initiate([@e1.user_id, @teacher.id], false)
+      @conversation = Conversation.initiate([@e1.user, @teacher], false)
       @conversation.add_message(@teacher, "hello")
 
       get user_student_teacher_activity_url(@teacher, @e1.user)
@@ -144,6 +144,23 @@ describe UsersController do
       body = Nokogiri::HTML(response.body)
       body.css("#user_#{@fake_student.id}").should be_empty
       body.at_css('.users').text.should_not match(/Test Student/)
+    end
+  end
+
+  describe "#show" do
+    it "should allow admins to view users in their account" do
+      @admin = account_admin_user
+      user_session(@admin)
+
+      course
+      student_in_course(:course => @course)
+      get "/users/#{@student.id}"
+      response.should be_success
+
+      course(:account => account_model)
+      student_in_course(:course => @course)
+      get "/users/#{@student.id}"
+      response.status.should == "401 Unauthorized"
     end
   end
 

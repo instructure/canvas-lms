@@ -35,8 +35,9 @@ def init
     sections :layout, [:diskfile]
   elsif options[:all_resources]
     sections :layout, [T('topic')]
+    sections[:layout].push(T('appendix')) if DOC_OPTIONS[:all_resource_appendixes]
   elsif options[:controllers]
-    sections :layout, [T('topic')]
+    sections :layout, [T('topic'), T('appendix')]
   else
     sections :layout, [:contents]
   end

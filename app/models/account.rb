@@ -64,6 +64,7 @@ class Account < ActiveRecord::Base
   has_many :assessment_question_banks, :as => :context, :include => [:assessment_questions, :assessment_question_bank_users]
   has_many :roles
   has_many :all_roles, :class_name => 'Role', :foreign_key => 'root_account_id'
+  has_many :progresses, :as => :context
   def inherited_assessment_question_banks(include_self = false, *additional_contexts)
     sql = []
     conds = []
@@ -165,6 +166,7 @@ class Account < ActiveRecord::Base
   # invitation.
   add_setting :allow_invitation_previews, :boolean => true, :root_only => true, :default => false
   add_setting :self_registration, :boolean => true, :root_only => true, :default => false
+  add_setting :large_course_rosters, :boolean => true, :root_only => true, :default => false
 
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -245,8 +247,9 @@ class Account < ActiveRecord::Base
   
   def ensure_defaults
     self.uuid ||= AutoHandle.generate_securish_uuid
+    self.lti_guid ||= self.uuid if self.respond_to?(:lti_guid)
   end
-  
+
   def verify_unique_sis_source_id
     return true unless self.sis_source_id
     if self.root_account?
@@ -381,7 +384,7 @@ class Account < ActiveRecord::Base
 
   def self_enrollment_course_for(code)
     all_courses.
-      where(:self_enrollment => true, :self_enrollment_code => code).
+      where(:self_enrollment_code => code).
       first
   end
 
@@ -460,19 +463,21 @@ class Account < ActiveRecord::Base
     return nil unless self.turnitin_salt && self.turnitin_crypted_secret
     Canvas::Security.decrypt_password(self.turnitin_crypted_secret, self.turnitin_salt, 'instructure_turnitin_secret_shared')
   end
-  
+
   def account_chain(opts = {})
     res = [self]
 
     if ActiveRecord::Base.configurations[RAILS_ENV]['adapter'] == 'postgresql'
-      res.concat Account.find_by_sql(<<-SQL) if self.parent_account_id
-          WITH RECURSIVE t AS (
-            SELECT * FROM accounts WHERE id=#{self.parent_account_id}
-            UNION
-            SELECT accounts.* FROM accounts INNER JOIN t ON accounts.id=t.parent_account_id
-          )
-          SELECT * FROM t
-        SQL
+      self.shard.activate do
+        res.concat Account.find_by_sql(<<-SQL) if self.parent_account_id
+            WITH RECURSIVE t AS (
+              SELECT * FROM accounts WHERE id=#{self.parent_account_id}
+              UNION
+              SELECT accounts.* FROM accounts INNER JOIN t ON accounts.id=t.parent_account_id
+            )
+            SELECT * FROM t
+          SQL
+      end
     else
       account = self
       while account.parent_account
@@ -492,6 +497,31 @@ class Account < ActiveRecord::Base
     if self.parent_account.account_chain_ids.include?(self.id)
       errors.add(:parent_account_id,
                  "Setting account #{self.sis_source_id || self.id}'s parent to #{self.parent_account.sis_source_id || self.parent_account_id} would create a loop")
+    end
+  end
+
+  # returns all sub_accounts recursively as far down as they go, in id order
+  # because this uses a custom sql query for postgresql, we can't use a normal
+  # named scope, so we pass the limit and offset into the method instead and
+  # build our own query string
+  def sub_accounts_recursive(limit, offset)
+    if ActiveRecord::Base.configurations[RAILS_ENV]['adapter'] == 'postgresql'
+      Account.find_by_sql([<<-SQL, self.id, limit.to_i, offset.to_i])
+          WITH RECURSIVE t AS (
+            SELECT * FROM accounts WHERE parent_account_id = ?
+            UNION
+            SELECT accounts.* FROM accounts INNER JOIN t ON accounts.parent_account_id = t.id
+          )
+          SELECT * FROM t ORDER BY parent_account_id, id LIMIT ? OFFSET ?
+      SQL
+    else
+      account_descendents = lambda do |id|
+        as = Account.where(:parent_account_id => id).order(:id)
+        as.empty? ?
+          [] :
+          as << as.map { |a| account_descendents.call(a.id) }
+      end
+      account_descendents.call(id).flatten[offset, limit]
     end
   end
 
@@ -821,16 +851,18 @@ class Account < ActiveRecord::Base
 
   # Updates account associations for all the courses and users associated with this account
   def update_account_associations
-    account_chain_cache = {}
-    all_user_ids = []
-    all_user_ids += Course.update_account_associations(self.associated_courses, :skip_user_account_associations => true, :account_chain_cache => account_chain_cache)
+    self.shard.activate do
+      account_chain_cache = {}
+      all_user_ids = []
+      all_user_ids += Course.update_account_associations(self.associated_courses, :skip_user_account_associations => true, :account_chain_cache => account_chain_cache)
 
-    # Make sure we have all users with existing account associations.
-    # (This should catch users with Pseudonyms associated with the account.)
-    all_user_ids += UserAccountAssociation.scoped(:select => 'user_id', :conditions => { :account_id => self.id }).map(&:user_id)
+      # Make sure we have all users with existing account associations.
+      # (This should catch users with Pseudonyms associated with the account.)
+      all_user_ids += UserAccountAssociation.scoped(:select => 'user_id', :conditions => { :account_id => self.id }).map(&:user_id)
 
-    # Update the users' associations as well
-    User.update_account_associations(all_user_ids.uniq, :account_chain_cache => account_chain_cache)
+      # Update the users' associations as well
+      User.update_account_associations(all_user_ids.uniq, :account_chain_cache => account_chain_cache)
+    end
   end
   
   # this will take an account and make it a sub_account of
@@ -944,6 +976,7 @@ class Account < ActiveRecord::Base
       tabs = []
       tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :css_class => 'users', :href => :account_users_path } if user && self.grants_right?(user, nil, :read_roster)
       tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_permissions_path } if user && self.grants_right?(user, nil, :manage_role_overrides)
+      tabs << { :id => TAB_SUB_ACCOUNTS, :label => t('#account.tab_sub_accounts', "Sub-Accounts"), :css_class => 'sub_accounts', :href => :account_sub_accounts_path } if manage_settings
       tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :css_class => 'authentication', :href => :account_account_authorization_configs_path } if manage_settings
       tabs << { :id => TAB_PLUGINS, :label => t("#account.tab_plugins", "Plugins"), :css_class => "plugins", :href => :plugins_path, :no_args => true } if self.grants_right?(user, nil, :manage_site_settings)
       tabs << { :id => TAB_JOBS, :label => t("#account.tab_jobs", "Jobs"), :css_class => "jobs", :href => :jobs_path, :no_args => true } if self.grants_right?(user, nil, :view_jobs)

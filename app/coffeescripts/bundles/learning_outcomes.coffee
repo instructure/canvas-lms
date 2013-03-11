@@ -26,6 +26,8 @@ require [
   'jst/outcomes/mainInstructions'
 ], (ToolbarView, SidebarView, ContentView, FindDialog, OutcomeGroup, browserTemplate, instructionsTemplate) ->
 
+  renderInstructions = ENV.PERMISSIONS.manage_outcomes
+
   $el = $ '#outcomes'
   $el.html browserTemplate
     canManageOutcomes: ENV.PERMISSIONS.manage_outcomes
@@ -37,11 +39,13 @@ require [
   sidebar = new SidebarView
     el: $el.find('.outcomes-sidebar .wrapper')
     rootOutcomeGroup: new OutcomeGroup ENV.ROOT_OUTCOME_GROUP
+    selectFirstItem: !renderInstructions
   sidebar.$el.data('view', sidebar)
 
   content = new ContentView
     el: $el.find('.outcomes-content')
     instructionsTemplate: instructionsTemplate
+    renderInstructions: renderInstructions
 
   # toolbar events
   toolbar.on 'goBack', sidebar.goBack

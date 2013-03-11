@@ -222,7 +222,7 @@
                      answer_classes << 'no_answer' if hash_get(user_answer, :text).blank?
                   %>
                   <div class='answer <%= answer_classes.compact.join(' ') %>'>
-                    <%= h(hash_get(user_answer, :text) || t(:you_left_this_blank, "(You left this blank)")) %>
+                    <%= hash_get(user_answer, :text) || t(:you_left_this_blank, "(You left this blank)") %>
                     <% if matched_answer && comment_get(matched_answer, :comments).present? %>
                       <div class="hide_right_arrow <%= "correct_answer" if display_correct_answers %>">
                         <div class="quiz_comment">

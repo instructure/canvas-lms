@@ -61,16 +61,18 @@ shared_examples_for "quizzes selenium tests" do
   end
 
   def add_quiz_question(points)
+    click_questions_tab
     @points_total += points.to_i
     @question_count += 1
-    f('.add_question_link').click
+    click_new_question_button
     question = fj('.question_form:visible')
     replace_content(question.find_element(:css, "input[name='question_points']"), points)
     submit_form(question)
     wait_for_ajax_requests
     questions = ffj(".question_holder:visible")
     questions.length.should == @question_count
-    f("#right-side .points_possible").text.should == @points_total.to_s
+    click_settings_tab
+    f(".points_possible").text.should == @points_total.to_s
   end
 
   def quiz_with_new_questions
@@ -92,13 +94,30 @@ shared_examples_for "quizzes selenium tests" do
     @q
   end
 
+  def click_settings_tab
+    fj('#quiz_tabs ul:first a:eq(0)').click
+  end
+
+  def click_questions_tab
+    fj('#quiz_tabs ul:first a:eq(1)').click
+  end
+
+  def click_new_question_button
+    driver.find_element(:link_text, 'New Question').click
+  end
+
+  def click_save_settings_button
+    f('.save_quiz_button').click
+  end
+
   def start_quiz_question
     get "/courses/#{@course.id}/quizzes"
     expect_new_page_load {
       f('.new-quiz-link').click
     }
 
-    f('.add_question_link').click
+    click_questions_tab
+    click_new_question_button
     wait_for_animations
     Quiz.last
   end
@@ -147,7 +166,14 @@ shared_examples_for "quizzes selenium tests" do
 
   def save_settings
     f('.save_quiz_button').click
-    wait_for_ajax_requests
+    wait_for_ajaximations
+  end
+
+  def edit_quiz
+    expect_new_page_load {
+      wait_for_ajaximations
+      f('.quiz-edit-button').click
+    }
   end
 
   def edit_first_multiple_choice_answer(text)
@@ -171,7 +197,8 @@ shared_examples_for "quizzes selenium tests" do
   ##
   # creates a question group through the browser
   def create_question_group
-    f('.add_question_group_link').click
+    click_questions_tab
+    driver.find_element(:link_text, 'New Question Group').click
     submit_form('#group_top_new form')
     wait_for_ajax_requests
     @group = QuizGroup.last

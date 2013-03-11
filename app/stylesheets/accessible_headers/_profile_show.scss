@@ -1,0 +1,18 @@
+.h1{
+  font-size: $h1-font-size;
+  font-weight: normal;
+}
+
+.h2{
+  font-size: $h2-font-size;
+}
+
+.right-side-h2-border{
+  color: $gray;
+  border-bottom: solid 1px $borderGray;
+  box-shadow: 0 1px 0 white;
+  margin: $right_side_margin 0 0;
+  overflow: hidden;
+}
+
+

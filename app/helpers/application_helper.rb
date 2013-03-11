@@ -103,27 +103,44 @@ module ApplicationHelper
       end
     elsif hash[:context_module]
       obj = hash[:context_module].is_a?(ContextModule) ? hash[:context_module] : OpenObject.new(hash[:context_module])
-      html = case type
-        when "quiz"
-          I18n.t('messages.quiz_locked_module', "This quiz is part of the module *%{module}* and hasn't been unlocked yet.",
-            :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
-        when "assignment"
-          I18n.t('messages.assignment_locked_module', "This assignment is part of the module *%{module}* and hasn't been unlocked yet.",
-            :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
-        when "topic"
-          I18n.t('messages.topic_locked_module', "This topic is part of the module *%{module}* and hasn't been unlocked yet.",
-            :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
-        when "file"
-          I18n.t('messages.file_locked_module', "This file is part of the module *%{module}* and hasn't been unlocked yet.",
-            :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
-        when "page"
-          I18n.t('messages.page_locked_module', "This page is part of the module *%{module}* and hasn't been unlocked yet.",
-            :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
-        else
-          I18n.t('messages.content_locked_module', "This content is part of the module *%{module}* and hasn't been unlocked yet.",
-            :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
+      html = if obj.workflow_state == 'unpublished'
+        case type
+          when "quiz"
+            I18n.t('messages.quiz_unpublished_module', "This quiz is part of an unpublished module and is not available yet.")
+          when "assignment"
+            I18n.t('messages.assignment_unpublished_module', "This assignment is part of an unpublished module and is not available yet.")
+          when "topic"
+            I18n.t('messages.topic_unpublished_module', "This topic is part of an unpublished module and is not available yet.")
+          when "file"
+            I18n.t('messages.file_unpublished_module', "This file is part of an unpublished module and is not available yet.")
+          when "page"
+            I18n.t('messages.page_unpublished_module', "This page is part of an unpublished module and is not available yet.")
+          else
+            I18n.t('messages.content_unpublished_module', "This content is part of an unpublished module and is not available yet.")
         end
-      if context
+      else
+        case type
+          when "quiz"
+            I18n.t('messages.quiz_locked_module', "This quiz is part of the module *%{module}* and hasn't been unlocked yet.",
+              :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
+          when "assignment"
+            I18n.t('messages.assignment_locked_module', "This assignment is part of the module *%{module}* and hasn't been unlocked yet.",
+              :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
+          when "topic"
+            I18n.t('messages.topic_locked_module', "This topic is part of the module *%{module}* and hasn't been unlocked yet.",
+              :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
+          when "file"
+            I18n.t('messages.file_locked_module', "This file is part of the module *%{module}* and hasn't been unlocked yet.",
+              :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
+          when "page"
+            I18n.t('messages.page_locked_module', "This page is part of the module *%{module}* and hasn't been unlocked yet.",
+              :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
+          else
+            I18n.t('messages.content_locked_module', "This content is part of the module *%{module}* and hasn't been unlocked yet.",
+              :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
+        end
+      end
+      if context && (obj.workflow_state != 'unpublished')
         html << "<br/>".html_safe
         html << I18n.t('messages.visit_modules_page', "*Visit the course modules page for information on how to unlock this content.*",
           :wrapper => "<a href='#{context_url(context, :context_context_modules_url)}'>\\1</a>")
@@ -225,7 +242,7 @@ module ApplicationHelper
   end
 
   def hidden(include_style=false)
-    include_style ? "style='display:none;'" : "display: none;"
+    include_style ? "style='display:none;'".html_safe : "display: none;"
   end
 
   # Helper for easily checking vender/plugins/adheres_to_policy.rb
@@ -280,7 +297,13 @@ module ApplicationHelper
     includes.each{|i| @wiki_sidebar_data[i] ||= [] }
     @wiki_sidebar_data[:wiki_pages] = @context.wiki.wiki_pages.active.scoped(:order => 'title', :limit => 150) if @context.respond_to?(:wiki)
     @wiki_sidebar_data[:wiki_pages] ||= []
-    @wiki_sidebar_data[:root_folders] = Folder.root_folders(@context)
+    if can_do(@context, @current_user, :manage_files)
+      @wiki_sidebar_data[:root_folders] = Folder.root_folders(@context)
+    elsif @context.is_a?(Course) && !@context.tab_hidden?(Course::TAB_FILES)
+      @wiki_sidebar_data[:root_folders] = Folder.root_folders(@context).reject{|folder| folder.locked? || folder.hidden}
+    else
+      @wiki_sidebar_data[:root_folders] = []
+    end
     @wiki_sidebar_data
   end
 
@@ -406,7 +429,7 @@ module ApplicationHelper
           hide = tab[:hidden] || tab[:hidden_unused]
           class_name = tab[:css_class].to_css_class
           class_name += ' active' if @active_tab == tab[:css_class]
-          html << "<li class='section #{"hidden" if hide }'>" + link_to(content_tag(:span, tab[:label]), path, :class => class_name) + "</li>" if tab[:href]
+          html << "<li class='section #{"hidden" if hide }'>" + link_to(tab[:label], path, :class => class_name) + "</li>" if tab[:href]
         end
         html << "</ul></nav>"
         html.join("")
@@ -525,6 +548,25 @@ module ApplicationHelper
 
   def nbsp
     raw("&nbsp;")
+  end
+
+  def dataify(obj, *attributes)
+    hash = obj.respond_to?(:to_hash) && obj.to_hash
+    res = ""
+    if !attributes.empty?
+      attributes.each do |attribute|
+        res << %Q{ data-#{h attribute}="#{h(hash ? hash[attribute] : obj.send(attribute))}"}
+      end
+    elsif hash
+      res << hash.map { |key, value| %Q{data-#{h key}="#{h value}"} }.join(" ")
+    end
+    raw(" #{res} ")
+  end
+
+  def inline_media_comment_link(comment=nil)
+    if comment && comment.media_comment_id
+      raw %Q{<a href="#" class="instructure_inline_media_comment no-underline" #{dataify(comment, :media_comment_id, :media_comment_type)} >&nbsp;</a>}
+    end
   end
 
   # translate a URL intended for an iframe into an alternative URL, if one is

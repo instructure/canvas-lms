@@ -12,8 +12,5 @@ define([
   'compiled/backbone-ext/View',
   'compiled/backbone-ext/Collection'
 ], function (Backbone) {
-
-  // grab backbone from the global namespace,
-  // make it not global, and return itself
-  return Backbone.noConflict();
+  return Backbone;
 });

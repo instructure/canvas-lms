@@ -23,14 +23,17 @@ define [
       @lock_explanation = @object.lock_explanation
       @addClass "group_#{@contextCode()}"
       @description = data.description
-      @start = if data.due_at then $.parseFromISO(data.due_at, "due_date").time else null
+      @start = @parseStartDate()
+      @originalStartDate = new Date(@start) if @start
 
       super
 
     fullDetailsURL: () ->
       @assignment.html_url
 
-    startDate: () ->
+    startDate: () -> @originalStartDate
+
+    parseStartDate: () ->
       if @assignment.due_at then $.parseFromISO(@assignment.due_at, 'due_date').time else null
 
     displayTimeString: () ->

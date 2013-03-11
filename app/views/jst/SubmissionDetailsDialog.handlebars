@@ -1,7 +1,9 @@
 <div class="submission_details_dialog">
   <h1 class="assignment-name">{{assignment.name}}</h1>
   <section class="submission-details">
-    <a class="more-details-link" target="_blank" href="{{speedGraderUrl}}">{{#t "more_details_in_the_speedgrader"}}More details in the SpeedGrader{{/t}}</a>
+    {{#if speedGraderUrl }}
+      <a class="more-details-link" target="_blank" href="{{speedGraderUrl}}">{{#t "more_details_in_the_speedgrader"}}More details in the SpeedGrader{{/t}}</a>
+    {{/if}}
     <div>
       <h2>
         {{#if moreThanOneSubmission}}

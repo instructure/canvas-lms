@@ -28,10 +28,12 @@ describe GradebooksHelper do
 
   describe "gradebook_url_for" do
     let(:user) { User.new }
-    let(:context) { Course.new }
+    let(:context) { course }
     let(:assignment) { nil }
 
-    subject { helper.gradebook_url_for(user, context, assignment) }
+    subject {
+      helper.gradebook_url_for(user, context, assignment)
+    }
 
     before do
       context.stubs(:id => 1)

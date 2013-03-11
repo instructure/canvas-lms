@@ -246,10 +246,10 @@ module Delayed
       def deserialize(source)
         handler = nil
         begin
-          handler = YAML.load(source)
+          handler = YAML.unsafe_load(source)
         rescue TypeError
           attempt_to_load_from_source(source)
-          handler = YAML.load(source)
+          handler = YAML.unsafe_load(source)
         end
 
         return handler if handler.respond_to?(:perform)

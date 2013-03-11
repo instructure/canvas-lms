@@ -70,7 +70,7 @@
 <div id="no_changes_detected" style="display:none;">
   <h2><%= t('headers.no_changes', "There were no changes detected in the gradebook you uploaded.") %></h2>
   <p>
-    <%= link_to(t('links.back', "Go back to Gradebook"), context_url(@context, :context_gradebook_url) ) %>
+  <%= link_to(t('links.back', "Go back to Gradebook"), gradebook_url_for(@current_user,@context)) %>
   </p>
   
 </div>

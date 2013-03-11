@@ -4,6 +4,7 @@ require [
   'supercalc'
   'quiz_rubric'
 ], (CreateQuizArrows) ->
+
   $('#show_question_details').on 'click', (e)->
     # Create the quiz arrows
     if $(this).is(':checked')

@@ -40,6 +40,8 @@ module SIS
       end
 
       def add_group_membership(user_id, group_id, status)
+        user_id = user_id.to_s
+        group_id = group_id.to_s
         @logger.debug("Processing Group User #{[user_id, group_id, status].inspect}")
         raise ImportError, "No group_id given for a group user" if group_id.blank?
         raise ImportError, "No user_id given for a group user" if user_id.blank?
@@ -68,7 +70,14 @@ module SIS
           group_membership.workflow_state = 'deleted'
         end
 
-        group_membership.save
+        if group_membership.valid?
+          group_membership.save
+        else
+          msg = "A group user did not pass validation "
+          msg += "(" + "user: #{user_id}, group: #{group_id}, error: "
+          msg += group_membership.errors.full_messages.join(", ") + ")"
+          raise ImportError, msg
+        end
         @success_count += 1
       end
 

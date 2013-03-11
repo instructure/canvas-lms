@@ -18,7 +18,7 @@
 module CC
   module ModuleMeta
     def create_module_meta(document=nil)
-      return nil unless @course.context_modules.active.count > 0
+      return nil unless @course.context_modules.not_deleted.count > 0
       
       if document
         meta_file = nil
@@ -36,7 +36,7 @@ module CC
               "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
               "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
       ) do |mods_node|
-        @course.context_modules.active.each do |cm|
+        @course.context_modules.not_deleted.each do |cm|
           next unless export_object?(cm)
           mod_migration_id = CCHelper.create_key(cm)
           # context modules are in order and a pre-req can only reference
@@ -45,6 +45,7 @@ module CC
           
           mods_node.module(:identifier=>mod_migration_id) do |m_node|
             m_node.title cm.name
+            m_node.workflow_state cm.workflow_state
             m_node.position cm.position
             m_node.unlock_at CCHelper::ims_datetime(cm.unlock_at) if cm.unlock_at
             m_node.start_at CCHelper::ims_datetime(cm.start_at) if cm.start_at

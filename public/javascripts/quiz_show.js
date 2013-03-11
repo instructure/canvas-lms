@@ -63,9 +63,30 @@ $(document).ready(function () {
       }
     });
   });
+  var hasOpenedQuizDetails = false;
   $(".quiz_details_link").click(function(event) {
     event.preventDefault();
+    var $quizResultsText = $('#quiz_results_text');
+    if (hasOpenedQuizDetails) {
+      if (ENV.IS_SURVEY) {
+        $quizResultsText.text(I18n.t('links.show_student_survey_results',
+                                     'Show Student Survey Results'));
+      } else {
+        $quizResultsText.text(I18n.t('links.show_student_quiz_results',
+                                     'Show Student Quiz Results'));
+      }
+    } else {
+      if (ENV.IS_SURVEY) {
+        $quizResultsText.text(I18n.t('links.hide_student_survey_results',
+                                     'Hide Student Survey Results'));
+      } else {
+        $quizResultsText.text(I18n.t('links.hide_student_quiz_results',
+                                     'Hide Student Quiz Results'));
+
+      }
+    }
     $("#quiz_details").slideToggle();
+    hasOpenedQuizDetails = !hasOpenedQuizDetails;
   });
   $(".message_students_link").click(function(event) {
     event.preventDefault();
@@ -120,6 +141,27 @@ $(document).ready(function () {
         }
       }
     }).find('.datetime_field').datetime_field();
+  });
+
+  $('#lock_this_quiz_now_link').ifExists(function($link) {
+    $link.click(function(e) {
+      e.preventDefault();
+      $link.closest('form').submit();
+    })
+  });
+
+  if ($('ul.page-action-list').find('li').length > 0) {
+    $('ul.page-action-list').show();
+  }
+
+  $('#publish_quiz_form').formSubmit({
+    beforeSubmit: function(data) {
+      $(this).find('button').attr('disabled', true).text(I18n.t('buttons.publishing', "Publishing..."));
+    },
+    success: function(data) {
+      $(this).find('button').text(I18n.t('buttons.published', "Published!"));
+      location.reload();
+    }
   });
 
 });

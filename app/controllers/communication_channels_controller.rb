@@ -209,7 +209,7 @@ class CommunicationChannelsController < ApplicationController
           @current_user.transaction do
             cc.confirm
             @enrollment.accept if @enrollment
-            @user.move_to_user(@current_user) if @user != @current_user
+            UserMerge.from(@user).into(@current_user) if @user != @current_user
             # create a new pseudonym if necessary and possible
             pseudonym = @current_user.find_or_initialize_pseudonym_for_account(@root_account, @domain_root_account)
             pseudonym.save! if pseudonym && pseudonym.changed?

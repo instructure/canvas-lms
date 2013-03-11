@@ -328,4 +328,24 @@ describe SubmissionsController do
       assigns[:visible_rubric_assessments].should == [@assessment]
     end
   end
+
+  describe 'GET turnitin_report' do
+
+    it 'returns 400 if submission_id is not integer' do
+      assignment = assignment_model
+      get 'turnitin_report', :course_id => assignment.context_id, :assignment_id => assignment.id, :submission_id => '{{ user_id }}', :asset_string => '123'
+      response.response_code.should == 400
+    end
+
+  end
+
+  describe 'POST resubmit_to_turnitin' do
+
+    it 'returns 400 if submission_id is not integer' do
+      assignment = assignment_model
+      post 'resubmit_to_turnitin', :course_id => assignment.context_id, :assignment_id => assignment.id, :submission_id => '{{ user_id }}'
+      response.response_code.should == 400
+    end
+
+  end
 end

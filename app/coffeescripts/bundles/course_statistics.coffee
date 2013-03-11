@@ -27,6 +27,7 @@ require [
 
     recentStudentCollection = new UserCollection
     recentStudentCollection.url = ENV.RECENT_STUDENTS_URL
+    recentStudentCollection.course_id = ENV.context_asset_string.split('_')[1]
     recentStudentCollection.fetch()
 
     window.app = studentsTab: {}

@@ -29,7 +29,7 @@ describe AppointmentGroupsController, :type => :integration do
 
   expected_fields = [
     'appointments_count', 'context_codes', 'created_at', 'description',
-    'end_at', 'id', 'location_address', 'location_name',
+    'end_at', 'html_url', 'id', 'location_address', 'location_name',
     'max_appointments_per_participant', 'min_appointments_per_participant',
     'participant_type', 'participant_visibility',
     'participants_per_appointment', 'requiring_action', 'start_at',

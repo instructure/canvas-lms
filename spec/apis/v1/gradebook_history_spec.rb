@@ -1,0 +1,215 @@
+
+require File.expand_path('../../spec_helper', File.dirname(__FILE__))
+
+
+module Api::V1
+  class GradebookHistoryHarness
+    include GradebookHistory
+
+    def course_assignment_url(course, assignment)
+      'http://www.example.com'
+    end
+  end
+
+  describe GradebookHistory do
+    let(:course) { stub }
+    let(:controller) { stub(:params => {} , :request => stub(:query_parameters => {}), :response => stub(:headers => {}) )}
+    let(:path) { '' }
+    let(:user) { ::User.new }
+    let(:session) { stub }
+    let(:api_context) { ApiContext.new(controller, path, user, session) }
+    let(:gradebook_history) { GradebookHistoryHarness.new }
+    let(:now) { Time.now.in_time_zone }
+    let(:yesterday) { (now - 24.hours).in_time_zone }
+
+    def submit(assignment, student, day, grader)
+      submission = assignment.submit_homework(student)
+      submission.update_attributes!(:graded_at => day, :grader_id => grader.try(:id))
+      submission
+    end
+
+    describe '#days_json' do
+      let!(:course) { ::Course.create! }
+
+      before(:all) do
+        students = (1..3).inject([]) do |memo, idx|
+          student = ::User.create!
+          course.enroll_student(student)
+          memo << student
+        end
+        @grader1 = ::User.create!(:name => 'grader 1')
+        @grader2 = ::User.create!(:name => 'grader 2')
+        @assignment1 = course.assignments.create!(:title => "some assignment")
+        @assignment2 = course.assignments.create!(:title => "another assignment")
+        submit(@assignment1, students[0], now, @grader1)
+        submit(@assignment1, students[1], now, @grader2)
+        submit(@assignment1, students[2], yesterday, @grader2)
+        submit(@assignment2, students[0], yesterday, @grader2)
+        @days = GradebookHistoryHarness.new.days_json(course, api_context)
+      end
+
+      after(:all) { truncate_all_tables }
+
+      it 'has a top level key for each day represented' do
+        dates = @days.map{|d| d[:date] }
+        dates.size.should == 2
+        dates.should include(now.to_date.as_json)
+        dates.should include(24.hours.ago.in_time_zone.to_date.as_json)
+      end
+
+      it 'has a hash of graders for each day keyed by id' do
+        graders_hash = @days.select{|d| d[:date] == yesterday.to_date.as_json }.first[:graders]
+        grader = graders_hash.first
+        grader[:id].should == @grader2.id
+        grader[:name].should == @grader2.name
+      end
+
+      it 'puts an assignment list under each grader' do
+        graders = @days.select{|d| d[:date] == yesterday.to_date.as_json }.first[:graders]
+        grader2_assignments = graders.select { |g| g[:id] == @grader2.id }.first[:assignments]
+        ids = grader2_assignments.map { |assignment| assignment['id'] }
+        ids.should include(@assignment1.id)
+        ids.should include(@assignment2.id)
+      end
+
+      it 'paginates' do
+        api_context.per_page = 2
+        api_context.page = 2
+        days = GradebookHistoryHarness.new.days_json(course, api_context)
+        days.map { |d| d[:date] }.first.should == yesterday.to_date.as_json
+      end
+
+    end
+
+    describe '#json_for_date' do
+      before(:all) do
+        course = ::Course.create!
+        student1 = ::User.create!
+        course.enroll_student(student1)
+        student2 = ::User.create!
+        course.enroll_student(student2)
+        @grader1 = ::User.create!(:name => 'grader 1')
+        @grader2 = ::User.create!(:name => 'grader 2')
+        @assignment = course.assignments.create!(:title => "some assignment")
+        submit(@assignment, student1, now, @grader1)
+        submit(@assignment, student2, now, @grader2)
+        @day_hash = GradebookHistoryHarness.new.json_for_date(now, course, api_context)
+      end
+
+      after(:all) { truncate_all_tables }
+
+      it 'returns a grader hash for that day' do
+        @day_hash.map{|g| g[:id] }.sort.should == [@grader1.id, @grader2.id].sort
+      end
+
+      it 'includes assignment data' do
+        assignment_hash = @day_hash.select{|g| g[:id] == @grader1.id}.first[:assignments].first
+        assignment_hash['id'].should == @assignment.id
+        assignment_hash['name'].should == @assignment.title
+      end
+    end
+
+    describe '#submissions_for' do
+      before do
+        @course = ::Course.create!
+        student1 = ::User.create!
+        @course.enroll_student(student1)
+        grader1 = ::User.create!(:name => 'grader 1')
+        grader2 = ::User.create!(:name => 'grader 2')
+        @assignment = @course.assignments.create!(:title => "some assignment")
+        @submission = submit(@assignment, student1, now, grader1)
+        @submission.score = 90
+        @submission.grade = '90'
+        @submission.grader = grader2
+        @submission.save!
+        @submissions_hash = GradebookHistoryHarness.new.submissions_for(@course, api_context, now, grader2.id, @assignment.id)
+      end
+
+      it 'should be an array of submissions' do
+        @submissions_hash.first[:submission_id].should == @submission.id
+      end
+
+      it 'has the version hash' do
+        version1 = @submissions_hash.first[:versions].first
+        version1[:assignment_id].should == @assignment.id
+        version1[:current_grade].should == "90"
+        version1[:current_grader].should == 'grader 2'
+        version1[:new_grade].should == "90"
+        version1[:previous_grader].should == 'grader 1'
+      end
+
+      it 'can find submissions with no grader' do
+        student2 = ::User.create!
+        @course.enroll_student(student2)
+        submission = submit(@assignment, student2, now, nil)
+        # yes, this is crazy.  autograded submissions have the grader_id of (quiz_id x -1)
+        submission.grader_id = -987
+        submission.save!
+        submissions = GradebookHistoryHarness.new.submissions_for(@course, api_context, now, 0, @assignment.id)
+        submissions.first[:submission_id].should == submission.id
+      end
+    end
+
+
+    describe '#day_string_for' do
+      it 'builds a formatted date' do
+        submission = stub(:graded_at => now)
+        gradebook_history.day_string_for(submission).should =~ /\d{4}-\d{2}-\d{2}/
+      end
+
+      it 'gives a empty string if there is no time' do
+        submission = stub(:graded_at => nil)
+        gradebook_history.day_string_for(submission).should == ''
+      end
+    end
+
+    describe '#submissions' do
+      let!(:course) { ::Course.create! }
+      let!(:assignment) { course.assignments.create! }
+      let!(:student) { ::User.create! }
+      let(:submissions) { gradebook_history.submissions_set(course, api_context) }
+
+      before do
+        course.enroll_student(student)
+        @submission = assignment.submit_homework(student)
+      end
+
+      context 'when the submission has been graded' do
+        before do
+          @submission.graded_at = Time.now.in_time_zone
+          @submission.save!
+        end
+
+        def add_submission
+          other_student = ::User.create!
+          course.enroll_student(other_student)
+          other_submission = assignment.submit_homework(other_student)
+          other_submission.graded_at = 2.hours.ago.in_time_zone
+          other_submission.save!
+        end
+
+        it 'includes the submission' do
+          submissions.should include(@submission)
+        end
+
+        it 'orders submissions by graded timestamp' do
+          add_submission
+          submissions.first.should == @submission
+        end
+
+        it 'accepts a date option' do
+          add_submission
+          gradebook_history.submissions_set(course, api_context, :date => 3.days.ago.in_time_zone).should be_empty
+          gradebook_history.submissions_set(course, api_context, :date => Time.now.in_time_zone).should_not be_empty
+        end
+
+      end
+
+      it 'does not include ungraded submissions' do
+        submissions.should_not include(@submission)
+      end
+    end
+
+  end
+end
+

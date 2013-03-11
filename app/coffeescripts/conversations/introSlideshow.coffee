@@ -21,7 +21,7 @@ define [
 
     introSlideshow.addSlide I18n.t('titles.slide3', 'Slide 3'), (slide) ->
       slide.addImage('/images/conversations/intro/image3.png', 'screenshot')
-      slide.addParagraph(I18n.t('slide3.paragraph1', 'Conversations can be marked as read/unread, archived, or labeled by color using the "actions" button on the message.'))
+      slide.addParagraph(I18n.t('slide3.paragraph1', 'Conversations can be marked as read/unread, starred, or archived using the "actions" button on the message.'))
       slide.addParagraph(I18n.t('slide3.paragraph2', 'Archived messages aren\'t deleted, they\'re just moved out of your inbox, so you can access them again if needed.'))
 
     introSlideshow.addSlide I18n.t('titles.slide4', 'Slide 4'), (slide) ->

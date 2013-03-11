@@ -36,19 +36,19 @@ class DeveloperKey < ActiveRecord::Base
     self.tool_id = nil if tool_id.blank?
     self.icon_url = nil if icon_url.blank?
   end
-  
+
   def generate_api_key(overwrite=false)
     self.api_key = AutoHandle.generate(nil, 64) if overwrite || !self.api_key
   end
-  
+
   def self.default
     get_special_key("User-Generated")
   end
-  
+
   def account_name
     account.try(:name)
   end
-  
+
   def self.get_special_key(default_key_name)
     Shard.default.activate do
       @special_keys ||= {}

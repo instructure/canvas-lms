@@ -5,7 +5,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 shared_examples_for "outcome tests" do
   it_should_behave_like "in-process server selenium tests"
   before (:each) do
-    who_to_login == 'teacher' ? course_with_teacher_logged_in : course_with_admin_logged_in
+    case who_to_login
+      when 'teacher'; course_with_teacher_logged_in
+      when 'student'; course_with_student_logged_in
+      when 'admin';   course_with_admin_logged_in
+    end
   end
 
   def import_account_level_outcomes

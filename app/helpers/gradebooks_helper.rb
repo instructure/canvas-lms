@@ -32,7 +32,7 @@ module GradebooksHelper
 
   def gradebook_url_for(user, context, assignment=nil)
     if context
-      gradebook_version = (user.nil? || user.prefers_gradebook2?) ? 'gradebook2' : 'gradebook'
+      gradebook_version = get_gradebook_version(user, context)
       gradebook_url = polymorphic_url([context, gradebook_version])
 
       if assignment && gradebook_version == 'gradebook'
@@ -41,5 +41,13 @@ module GradebooksHelper
     end
 
     gradebook_url
+  end
+
+  def get_gradebook_version(user, context)
+    if !context.old_gradebook_visible? || user.nil? || user.prefers_gradebook2?
+      'gradebook2'
+    else
+      'gradebook'
+    end
   end
 end

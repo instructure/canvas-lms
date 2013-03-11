@@ -176,6 +176,9 @@ define [
           else
             qLow = qMid
           qMid = (qLow + qHigh) / 2
+
+          break if qMid == qHigh || qMid == qLow
+
           [x, kept] = bigF(qMid, submissions)
 
         kept

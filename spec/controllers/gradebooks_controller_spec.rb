@@ -190,6 +190,19 @@ describe GradebooksController do
       assigns[:submissions_by_assignment].values.map(&:count).should == [1,1]
     end
 
+    it "should assign an empty submissions_by_assignment for MOOCs" do
+      course_with_teacher_logged_in(:active_all => true)
+      @course.settings = { :large_roster => true }
+      student_in_course(:active_all => true)
+      assignment1 = @course.assignments.create(:title => "Assignment 1")
+      submission1 = assignment1.submit_homework(@student)
+      assignment2 = @course.assignments.create(:title => "Assignment 2")
+      submission2 = assignment2.submit_homework(@student)
+
+      get 'grade_summary', :course_id => @course.id, :id => @student.id
+      assigns[:submissions_by_assignment].should == {}
+    end
+    
     it "should assign values for grade calculator to ENV" do
       course_with_teacher_logged_in(:active_all => true)
       student_in_course(:active_all => true)
@@ -377,6 +390,34 @@ describe GradebooksController do
       response.should redirect_to(:controller => 'gradebook2', :action => 'show')
     end
 
+    context "large roster courses" do
+      before do
+        course_with_teacher_logged_in(:active_all => true)
+        @user.preferences[:use_gradebook2] = false
+        @user.save!
+        @user.prefers_gradebook2?.should == false
+        @course.large_roster = true
+        @course.save!
+        @course.reload
+        @course.large_roster?.should == true
+      end
+
+      it 'should use gradebook2 always for large_roster courses even if user prefers gradebook 1' do
+        get 'grade_summary', :course_id => @course.id
+        response.should be_redirect
+        response.should redirect_to(:controller => 'gradebook2', :action => 'show')
+      end
+
+      it 'should not render gb1 json' do
+        get 'show', :course_id => @course.id, :format => :json
+        response.status.to_i.should == 404
+      end
+
+      it 'should not prevent you from getting gradebook.csv' do
+        get 'show', :course_id => @course.id, :format => 'csv'
+        response.should be_success
+      end
+    end
   end
 
   describe "POST 'update_submission'" do
@@ -444,6 +485,17 @@ describe GradebooksController do
     it "should have a route for speed_grader" do
       params_from(:get, "/courses/20/gradebook/speed_grader").should ==
         {:controller => "gradebooks", :action => "speed_grader", :course_id => "20"}
+    end
+
+    it "should redirect user if course's large_roster? setting is true" do
+      course_with_teacher_logged_in(:active_all => true)
+      assignment = @course.assignments.create!(:title => 'some assignment')
+
+      Course.any_instance.stubs(:large_roster?).returns(true)
+
+      get 'speed_grader', :course_id => @course.id, :assignment_id => assignment.id
+      response.should be_redirect
+      response.flash[:notice].should == 'SpeedGrader is disabled for this course'
     end
   end
 

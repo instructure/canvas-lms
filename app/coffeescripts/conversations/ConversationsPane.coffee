@@ -18,7 +18,7 @@ define [
       @initializeActions()
 
     initializeActions: ->
-      $('#conversations').on 'click', 'a.action_delete_all', (e) =>
+      $('#menu-wrapper').on 'click', 'a.action_delete_all', (e) =>
         e.preventDefault()
         if confirm I18n.t('confirm.delete_conversation', "Are you sure you want to delete your copy of this conversation? This action cannot be undone.")
           @action($(e.currentTarget), method: 'DELETE')

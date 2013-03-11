@@ -43,10 +43,14 @@ class Quiz < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   belongs_to :assignment
   belongs_to :cloned_item
+  belongs_to :assignment_group
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   validates_presence_of :context_id
   validates_presence_of :context_type
+  validate :validate_quiz_type, :if => :quiz_type_changed?
+  validate :validate_ip_filter, :if => :ip_filter_changed?
+  validate :validate_hide_results, :if => :hide_results_changed?
 
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
   copy_authorized_links(:description) { [self.context, nil] }
@@ -54,16 +58,23 @@ class Quiz < ActiveRecord::Base
   before_save :set_defaults
   after_save :update_assignment
   after_save :touch_context
-  after_save :link_assignment_overrides, :if => :new_assignment_id?
 
   serialize :quiz_data
 
   simply_versioned
+  # This callback is listed here in order for the :link_assignment_overrides
+  # method to be called after the simply_versioned callbacks. We want the
+  # overrides to reflect the most recent version of the quiz.
+  # If we placed this before simply_versioned, the :link_assignment_overrides
+  # method would fire first, meaning that the overrides would reflect the
+  # last version of the assignment, because the next callback would be a
+  # simply_versioned callback updating the version.
+  after_save :link_assignment_overrides, :if => :assignment_id_changed?
 
   def infer_times
     # set the time to 11:59 pm in the creator's time zone, if none given
-    self.due_at += ((60 * 60 * 24) - 60) if self.due_at && self.due_at.hour == 0 && self.due_at.min == 0
-    self.lock_at += ((60 * 60 * 24) - 60) if self.lock_at && self.lock_at.hour == 0 && self.lock_at.min == 0
+    self.due_at = CanvasTime.fancy_midnight(self.due_at)
+    self.lock_at = CanvasTime.fancy_midnight(self.lock_at)
   end
 
   def set_defaults
@@ -97,11 +108,27 @@ class Quiz < ActiveRecord::Base
   end
 
   def link_assignment_overrides
-    collections = [assignment_overrides, assignment_override_students]
-    collections += [assignment.assignment_overrides, assignment.assignment_override_students] if assignment
+    override_students = [assignment_override_students]
+    overrides = [assignment_overrides]
+    overrides_params = {:quiz_id => id, :quiz_version => version_number}
 
-    collections.each do |collection|
-      collection.update_all({ :assignment_id => assignment_id, :quiz_id => id })
+    if assignment
+      override_students += [assignment.assignment_override_students]
+      overrides += [assignment.assignment_overrides]
+      overrides_params[:assignment_version] = assignment.version_number
+      overrides_params[:assignment_id] = assignment_id
+    end
+
+    fields = [:assignment_version, :assignment_id, :quiz_version, :quiz_id]
+    overrides.flatten.each do |override|
+      fields.each do |field|
+        override.send(:"#{field}=", overrides_params[field])
+      end
+      override.save!
+    end
+
+    override_students.each do |collection|
+      collection.update_all({:assignment_id => assignment_id,:quiz_id => id})
     end
   end
 
@@ -736,6 +763,38 @@ class Quiz < ActiveRecord::Base
     end
     self.quiz_data = data
   end
+
+  def validate_quiz_type
+    return if self.quiz_type.blank?
+    unless valid_quiz_type_values.include?(self.quiz_type)
+      errors.add(:invalid_quiz_type, t('errors.invalid_quiz_type', "Quiz type is not valid" ))
+    end
+  end
+
+  def valid_quiz_type_values
+    %w[practice_quiz assignment graded_survey survey]
+  end
+
+  def validate_ip_filter
+    return if self.ip_filter.blank?
+    require 'ipaddr'
+    begin
+      self.ip_filter.split(/,/).each { |filter| IPAddr.new(filter) }
+    rescue
+      errors.add(:invalid_ip_filter, t('errors.invalid_ip_filter', "IP filter is not valid"))
+    end
+  end
+
+  def validate_hide_results
+    return if self.hide_results.blank?
+    unless valid_hide_results_values.include?(self.hide_results)
+      errors.add(:invalid_hide_results, t('errors.invalid_hide_results', "Hide results is not valid" ))
+    end
+  end
+
+  def valid_hide_results_values
+    %w[always until_after_last_attempt]
+  end
   
   attr_accessor :clone_updated
   def clone_for(context, original_dup=nil, options={}, retrying = false)
@@ -1201,6 +1260,11 @@ class Quiz < ActiveRecord::Base
             assessment[:assignment][:id] = Quiz.find(item_id.to_i).try(:assignment_id)
           end
         end
+        if assessment['assignment_migration_id']
+          if assignment = data['assignments'].find{|a| a['migration_id'] == assessment['assignment_migration_id']}
+            assignment['quiz_migration_id'] = migration_id
+          end
+        end
         begin
           assessment[:migration] = migration
           Quiz.import_from_migration(assessment, migration.context, question_data, nil, allow_update)
@@ -1379,5 +1443,18 @@ class Quiz < ActiveRecord::Base
 
   def self.shuffleable_question_type?(question_type)
     !non_shuffled_questions.include?(question_type)
+  end
+
+  def access_code_key_for_user(user)
+    "quiz_#{id}_#{user.id}_entered_access_code"
+  end
+
+  def group_category_id
+    assignment.try(:group_category_id)
+  end
+
+  def publish!
+    self.workflow_state = 'available'
+    save!
   end
 end

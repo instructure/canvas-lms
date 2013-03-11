@@ -369,7 +369,7 @@ class ContextController < ApplicationController
       @services_hash = @services.to_a.clump_per{|s| s.service }
     end
   end
-  
+
   def roster_user_usage
     if authorized_action(@context, @current_user, :read_reports)
       @user = @context.users.find(params[:user_id])
@@ -380,17 +380,16 @@ class ContextController < ApplicationController
       end
     end
   end
-  
+
   def roster_user
     if authorized_action(@context, @current_user, :read_roster)
       if @context.is_a?(Course)
         @membership = @context.enrollments.find_by_user_id(params[:id])
-        log_asset_access(@enrollment, "roster", "roster")
+        log_asset_access(@membership, "roster", "roster")
       elsif @context.is_a?(Group)
         @membership = @context.group_memberships.find_by_user_id(params[:id])
       end
-      @enrollment ||= @membership
-      @user = @context.users.find(params[:id]) rescue nil
+      @user = @membership.user rescue nil
       if !@user
         if @context.is_a?(Course)
           flash[:error] = t('no_user.course', "That user does not exist or is not currently a member of this course")
@@ -400,7 +399,7 @@ class ContextController < ApplicationController
         redirect_to named_context_url(@context, :context_users_url)
         return
       end
-       
+
       @topics = @context.discussion_topics.active.reject{|a| a.locked_for?(@current_user, :check_policies => true) }
       @entries = []
       @topics.each do |topic|
@@ -425,7 +424,7 @@ class ContextController < ApplicationController
       true
     end
   end
-    
+
   def undelete_index
     if authorized_action(@context, @current_user, :manage_content)
       @item_types = [
@@ -447,7 +446,7 @@ class ContextController < ApplicationController
       @deleted_items.sort_by{|item| item.read_attribute(:deleted_at) || item.created_at }.reverse
     end
   end
-  
+
   def undelete_item
     if authorized_action(@context, @current_user, :manage_content)
       type = params[:asset_string].split("_")

@@ -26,3 +26,8 @@ define [
   class SectionCollection extends Collection
 
     model: Section
+
+    ids: => @pluck 'id'
+
+    comparator: ( section ) -> section.id
+

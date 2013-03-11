@@ -76,9 +76,13 @@
 </div>
 <% end %>
 <% if @assignment.expects_submission? && can_do(@assignment, @current_user, :submit) %>
-  <div class="rs-margin-lr">
-    <a href="#" class="submit_assignment_link resubmit_link add <%= 'late' if @current_user_submission && @current_user_submission.late? %>">
-      <%= @current_user_submission.has_submission? ? t('links.resubmit', "Re-submit Assignment") : t('links.submit', "Submit Assignment") %>
-    </a><br/>
-  </div>
+  <ul class="page-action-list">
+    <li>
+      <% late = @current_user_submission && @current_user_submission.late? ? 'late' : '' %>
+      <% submit_text = @current_user_submission.has_submission? ? t('links.resubmit', "Re-submit Assignment") : t('links.submit', "Submit Assignment") %>
+      <a href="#" class="submit_assignment_link resubmit_link <%= late %>">
+        <i class='icon-add'></i> <%= submit_text %>
+      </a>
+    </li>
+  </ul>
 <% end %>

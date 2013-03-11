@@ -92,8 +92,7 @@ define [
         # Add the headers to the group
         permission_group_header = """
                                     <tr class="toolbar">
-                                      <th>#{permission_group.group_name.toUpperCase()}</th>
-                                      <td colspan="#{@collection.length}"></td>
+                                      <th colspan="#{@collection.length + 1}">#{permission_group.group_name.toUpperCase()}</th>
                                     </tr>
                                   """
 

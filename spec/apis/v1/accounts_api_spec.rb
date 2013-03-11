@@ -51,6 +51,40 @@ describe "Accounts API", :type => :integration do
     ]
   end
 
+  describe 'sub_accounts' do
+    before do
+      root = @a1
+      a1 = root.sub_accounts.create! :name => "Account 1"
+      a2 = root.sub_accounts.create! :name => "Account 2"
+      a1.sub_accounts.create! :name => "Account 1.1"
+      a1_2 = a1.sub_accounts.create! :name => "Account 1.2"
+      a1.sub_accounts.create! :name => "Account 1.2.1"
+      3.times.each { |i|
+        a2.sub_accounts.create! :name => "Account 2.#{i+1}"
+      }
+    end
+
+    it "should return child accounts" do
+      json = api_call(:get,
+        "/api/v1/accounts/#{@a1.id}/sub_accounts",
+        {:controller => 'accounts', :action => 'sub_accounts',
+         :account_id => @a1.id.to_s, :format => 'json'})
+      json.map { |j| j['name'] }.should == ['subby', 'implicit-access',
+        'Account 1', 'Account 2']
+    end
+
+    it "should return sub accounts recursively" do
+      json = api_call(:get,
+        "/api/v1/accounts/#{@a1.id}/sub_accounts?recursive=1",
+        {:controller => 'accounts', :action => 'sub_accounts',
+         :account_id => @a1.id.to_s, :recursive => "1", :format => 'json'})
+
+      json.map { |j| j['name'] }.sort.should == ['subby', 'implicit-access',
+        'Account 1', 'Account 1.1', 'Account 1.2', 'Account 1.2.1',
+        'Account 2', 'Account 2.1', 'Account 2.2', 'Account 2.3'].sort
+    end
+  end
+
   it "should return an individual account" do
     # by id
     json = api_call(:get, "/api/v1/accounts/#{@a1.id}",
@@ -62,6 +96,58 @@ describe "Accounts API", :type => :integration do
         'root_account_id' => nil,
         'parent_account_id' => nil
       }
+  end
+
+  it "should update the name for an account" do
+    new_name = 'root2'
+    json = api_call(:put, "/api/v1/accounts/#{@a1.id}",
+                    { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' },
+                    { :account => {:name => new_name} })
+    expected =
+        {
+            'id' => @a1.id,
+            'name' => new_name
+        }
+
+    (expected.to_a - json.to_a).should be_empty
+
+    @a1.reload
+    @a1.name.should == new_name
+  end
+
+  it "should not update with a blank name" do
+    @a1.name = "blah"
+    @a1.save!
+    json = api_call(:put, "/api/v1/accounts/#{@a1.id}",
+      { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' },
+      { :account => {:name => ""} }, {}, :expected_status => 400)
+
+    json["errors"]["name"].first["message"].should == "The account name cannot be blank"
+
+    json = api_call(:put, "/api/v1/accounts/#{@a1.id}",
+      { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' },
+      { :account => {:name => nil} }, {}, :expected_status => 400)
+
+    json["errors"]["name"].first["message"].should == "The account name cannot be blank"
+
+    @a1.reload
+    @a1.name.should == "blah"
+  end
+
+  it "should not update other attributes (yet)" do
+    json = api_call(:put, "/api/v1/accounts/#{@a1.id}",
+                    { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' },
+                    { :account => {:settings => {:setting => 'set'}}} )
+
+    expected =
+      {
+        'id' => @a1.id,
+        'name' => @a1.name
+      }
+
+    (expected.to_a - json.to_a).should be_empty
+    @a1.reload
+    @a1.settings.should be_empty
   end
 
   it "should find accounts by sis in only this root account" do
@@ -324,5 +410,30 @@ describe "Accounts API", :type => :integration do
     Setting.set('api_max_per_page', '5')
     api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?per_page=12", :controller => "accounts", :action => "courses_api", :account_id => @a1.to_param, :format => 'json', :per_page => '12').size.should == 5
   end
-end
 
+  context "account api extension" do
+    module MockPlugin
+      def self.extend_account_json(hash, account, user, session, includes)
+        hash[:extra_thing] = "something"
+      end
+    end
+
+    module BadMockPlugin
+      def self.not_the_right_method
+      end
+    end
+
+    include Api::V1::Account
+
+    it "should allow a plugin to extend the account_json method" do
+      Api::V1::Account.register_extension(BadMockPlugin).should be_false
+      Api::V1::Account.register_extension(MockPlugin).should be_true
+
+      begin
+        account_json(@a1, @me, @session, [])[:extra_thing].should == "something"
+      ensure
+        Api::V1::Account.deregister_extension(MockPlugin)
+      end
+    end
+  end
+end

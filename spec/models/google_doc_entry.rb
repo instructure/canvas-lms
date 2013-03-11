@@ -23,6 +23,23 @@ def load_fixture_entry(filename)
 end
 
 describe GoogleDocEntry do
+  context "to_hash" do
+    let(:entry) { load_fixture_entry("spreadsheet_document_id_only_entry.xml") }
+    let(:hash) { entry.to_hash }
+    it "should use the display name" do
+      hash['name'].should == entry.display_name
+    end
+
+    it "should have document_id, extension" do
+      hash['document_id'].should_not be_empty
+      hash['extension'].should_not be_empty
+    end
+
+    it "should have alternate_url" do
+      hash['alternate_url'].should == 'http://docs.google.com'
+    end
+  end
+
   context "extension" do
     it "should be nil if no document_id or content type" do
       entry = load_fixture_entry("blank_entry.xml")

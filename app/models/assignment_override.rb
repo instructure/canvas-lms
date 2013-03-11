@@ -20,7 +20,7 @@ class AssignmentOverride < ActiveRecord::Base
   include Workflow
   include TextHelper
 
-  simply_versioned :keep => 5
+  simply_versioned :keep => 10
 
   attr_accessible
 
@@ -37,7 +37,10 @@ class AssignmentOverride < ActiveRecord::Base
   concrete_set = lambda{ |override| ['CourseSection', 'Group'].include?(override.set_type) }
 
   validates_presence_of :set, :set_id, :if => concrete_set
-  validates_uniqueness_of :set_id, :scope => [:assignment_id, :set_type, :workflow_state], :if => lambda{ |override| override.active? && concrete_set.call(override) }
+  validates_uniqueness_of :set_id, :scope => [:assignment_id, :set_type, :workflow_state],
+    :if => lambda{ |override| override.assignment? && override.active? && concrete_set.call(override) }
+  validates_uniqueness_of :set_id, :scope => [:quiz_id, :set_type, :workflow_state],
+    :if => lambda{ |override| override.quiz? && override.active? && concrete_set.call(override) }
   validate :if => concrete_set do |record|
     if record.set && record.assignment
       case record.set
@@ -70,6 +73,9 @@ class AssignmentOverride < ActiveRecord::Base
     true
   end
 
+  def assignment?; !!assignment; end
+  def quiz?; !!quiz; end
+
   def recompute_submission_lateness    
     if (users = applies_to_students) && assignment
       submissions = assignment.submissions.where(:user_id => users.map(&:id))
@@ -80,7 +86,6 @@ class AssignmentOverride < ActiveRecord::Base
     end
     true
   end
-  private :recompute_submission_lateness
 
   workflow do
     state :active
@@ -101,7 +106,6 @@ class AssignmentOverride < ActiveRecord::Base
   before_validation :default_values
   def default_values
     self.set_type ||= 'ADHOC'
-    
     if assignment
       self.assignment_version = assignment.version_number
       self.quiz = assignment.quiz
@@ -167,6 +171,7 @@ class AssignmentOverride < ActiveRecord::Base
   override :lock_at
 
   def due_at=(new_due_at)
+    new_due_at = CanvasTime.fancy_midnight(new_due_at)
     new_all_day, new_all_day_date = Assignment.all_day_interpretation(
       :due_at => new_due_at,
       :due_at_was => read_attribute(:due_at),
@@ -178,12 +183,19 @@ class AssignmentOverride < ActiveRecord::Base
     write_attribute(:all_day_date, new_all_day_date)
   end
 
+  def lock_at=(new_lock_at)
+    write_attribute(:lock_at, CanvasTime.fancy_midnight(new_lock_at))
+  end
 
   def as_hash
     { :title => title,
       :due_at => due_at,
       :all_day => all_day,
+      :set_type => set_type,
+      :set_id => set_id,
       :all_day_date => all_day_date,
+      :lock_at => lock_at,
+      :unlock_at => unlock_at,
       :override => self }
   end
 
@@ -254,6 +266,12 @@ class AssignmentOverride < ActiveRecord::Base
     scopes << course.sections_visible_to(admin).scoped(
       :select => "assignment_overrides.id",
       :joins => "INNER JOIN assignment_overrides ON assignment_overrides.set_type='CourseSection' AND course_sections.id=assignment_overrides.set_id"
+    )
+
+    # section overrides for visible students
+    scopes << course.enrollments_visible_to(admin).scoped(
+      :select => "assignment_overrides.id",
+      :joins => "INNER JOIN assignment_overrides ON assignment_overrides.set_type='CourseSection' AND enrollments.course_section_id=assignment_overrides.set_id"
     )
 
     # union the visible override subselects and join against them

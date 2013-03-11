@@ -58,7 +58,8 @@
       </div>
 
       <div class="data assignment_due">
-        <div class="date_text" style="<%= hidden unless assignment && assignment.due_at %>">
+        <div class="date_text"
+          style="<%= hidden unless assignment && (assignment.multiple_due_dates? || assignment.due_at) %>">
           <% if assignment.multiple_due_dates? %>
             <%= multiple_due_dates(assignment) %>
           <% else %>
@@ -97,13 +98,11 @@
           <span class="id"><%= assignment.id || nbsp %></span>
           <span class="position"><%= assignment.position %></span>
           <span class="assignment_group_id"><%= assignment.assignment_group_id %></span>
+          <span class="multiple_due_dates">
+            <%= assignment.multiple_due_dates? %>
+          </span>
         </div>
 
-        <a href="<%= assignment_url %>" class="preview_assignment_link no-hover" style="<%= hidden unless false %>">
-          <%= image_tag 'preview.png', :alt => t('links.preview_assignment', 'Preview Assignment'),
-                                       :title => t('links.preview_assignment', 'Preview Assignment'),
-                                       :style => 'display: none;' %>
-        </a>
         <% if assignment.new_record? || (assignment && !assignment.frozen_for_user?(@current_user)) %>
           <a href="<%= assignment_url %>/edit" rel="nofollow" class="edit_assignment_link no-hover">
             <i class="icon-edit standalone-icon"></i><span class="screen-reader-text"><%= t('links.edit_assignment', "Edit") %></span>

@@ -32,7 +32,7 @@ class AddCassandraPageViewTables < ActiveRecord::Migration
         participated          boolean,
         summarized            boolean,
         account_id            bigint,
-        real_user_id          bigint,
+        real_user_id          bigint
       ) WITH
         compression_parameters:sstable_compression='DeflateCompressor';
     }

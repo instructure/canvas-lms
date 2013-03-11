@@ -287,4 +287,5 @@ describe AccountsController do
       @account.admins_can_change_passwords?.should be_true
     end
   end
+
 end

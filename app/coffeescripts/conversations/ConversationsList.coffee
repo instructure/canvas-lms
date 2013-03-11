@@ -22,13 +22,15 @@ define [
         baseUrl: '/conversations?include_all_conversation_ids=1'
         noAutoLoad: true
 
-      @$list.on 'click', 'a.standard_action', (e) =>
-        e.preventDefault()
-        @pane.action($(e.currentTarget), method: 'PUT')
-
+      $('#menu-wrapper').on('click', 'a.standard_action', @triggerConversationAction)
+      @$list.on('click', 'li[data-id] > a.standard_action', @triggerConversationAction)
       @$list.on('click', 'button.al-trigger', @pane.filterMenu.bind(@pane))
 
       $(window).unload(=> clearTimeout(@markAsUnread))
+
+    triggerConversationAction: (e) =>
+      e.preventDefault()
+      @pane.action($(e.currentTarget), method: 'PUT')
 
     baseData: ->
       {scope: @scope, filter: @filters}

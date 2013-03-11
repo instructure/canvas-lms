@@ -102,6 +102,9 @@
 #       // URL for this appointment group (to update, delete, etc.)
 #       url: "https://example.com/api/v1/appointment_groups/543",
 #
+#       // URL for a user to view this appointment group
+#       html_url: "http://example.com/appointment_groups/1",
+#
 #       // When the appointment group was created
 #       created_at: "2012-07-13T10:55:20-06:00",
 #
@@ -126,6 +129,7 @@ class AppointmentGroupsController < ApplicationController
   # the current user.
   #
   # @argument scope [Optional, "reservable"|"manageable"] Defaults to "reservable"
+  # @argument context_codes[] [Optional] Array of context codes used to limit returned results.
   # @argument include_past_appointments [Optional] Boolean, defaults to false.
   #   If true, includes past appointment groups
   # @argument include[] [Optional] Array of additional information to include.
@@ -138,11 +142,13 @@ class AppointmentGroupsController < ApplicationController
       return redirect_to calendar2_url(:anchor => anchor)
     end
 
+    contexts = params[:context_codes] if params.include?(:context_codes)
+
     if params[:scope] == 'manageable'
-      scope = AppointmentGroup.manageable_by(@current_user)
+      scope = AppointmentGroup.manageable_by(@current_user, contexts)
       scope = scope.current_or_undated unless value_to_boolean(params[:include_past_appointments])
     else
-      scope = AppointmentGroup.reservable_by(@current_user)
+      scope = AppointmentGroup.reservable_by(@current_user, contexts)
       scope = scope.current unless value_to_boolean(params[:include_past_appointments])
     end
     groups = Api.paginate(

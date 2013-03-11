@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entry xmlns="http://www.w3.org/2005/Atom">
+  <title>test document</title>
+  <category label="document" scheme="http://schemas.google.com/g/2005#kind" term="http://schemas.google.com/docs/2007#document"/>
+</entry>

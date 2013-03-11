@@ -1,0 +1,162 @@
+{{!
+  TODO: Replace this with new styelguide forms once the
+  upgrade to bootstrap is complete. The needed change would
+  be to add class="well form-horizontal bootstrap-form".
+}}
+<form id="assignment_turnitin_settings">
+  <div class="control-group">
+    <div class="controls">
+      <label for="settings_originality_report_visibility"
+      class="control-label">
+        {{#t "turnitin_settings.originality_report_visibility"}}
+          Students Can See the Originality Report
+        {{/t}}
+      </label>
+      <select id="settings_originality_report_visibility"
+        name="originality_report_visibility">
+        <option value="immediate"
+        {{selectedIf originalityReportVisibility "immediate"}} >
+          {{#t "turnitin_settings.originality_report_visible_immediately"}}
+            Immediately
+          {{/t}}
+        </option>
+        <option value="after_grading"
+        {{selectedIf originalityReportVisibility "after_grading"}} >
+          {{#t "turnitin_settings.originality_report_visible_after_grading"}}
+            After the assignment is graded
+          {{/t}}
+        </option>
+        <option value="after_due_date"
+        {{selectedIf originalityReportVisibility "after_due_date"}} >
+          {{#t "turnitin_settings.originality_report_visible_after_due_date"}}
+            After the Due Date
+          {{/t}}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <fieldset>
+    <legend>
+      {{#t "turnitin_settings.labels.compare_against"}}
+        Compare Against
+      {{/t}}
+    </legend>
+    <div class="control-group">
+      <div class="controls">
+        <label class="checkbox">
+          <input id="s_paper_check"
+            name="s_paper_check"
+            {{checkedIf sPaperCheck}}
+            type="checkbox"/>
+            {{#t "turnitin_settings.labels.student_paper_check"}}
+              Other Student Papers
+            {{/t}}
+        </label>
+      </div>
+
+      <div class="controls">
+        <label class="checkbox">
+          <input id="internet_check"
+          name="internet_check"
+            {{checkedIf internetCheck}}
+            type="checkbox"/>
+            {{#t "turnitin_settings.labels.internet_check"}}
+              Internet Database
+            {{/t}}
+        </label>
+      </div>
+
+      <div class="controls">
+        <label class="checkbox">
+          <input id="journal_check"
+            name="journal_check"
+            type="checkbox"
+            {{checkedIf journalCheck}}/>
+            {{#t "turnitin_settings.labels.journal_check"}}
+              Journals, Periodicals, and Publications
+            {{/t}}
+        </label>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>
+      {{#t "turnitin_settings.labels.do_not_consider"}}
+        Do Not Consider
+      {{/t}}
+    </legend>
+    <div class="control-group">
+      <div class="controls">
+        <label class="checkbox">
+          <input id="exclude_biblio"
+            name="exclude_biblio"
+            type="checkbox"
+            {{checkedIf excludeBiblio}}/>
+            {{#t "turnitin_settings.labels.exclude_biblio"}}
+              Bibliographic Material
+            {{/t}}
+        </label>
+      </div>
+      <div class="controls">
+        <label class="checkbox">
+          <input id="exclude_quoted"
+            name="exclude_quoted"
+            type="checkbox"
+            {{checkedIf excludeQuoted}}/>
+            {{#t "turnitin_settings.labels.exclude_quoted"}}
+              Quoted Material
+            {{/t}}
+        </label>
+      </div>
+
+      <div class="controls">
+        <label class="checkbox">
+          <input id="exclude_small_matches"
+            name="exclude_small_matches"
+            type="checkbox"
+            {{checkedIf excludesSmallMatches}}/>
+            {{#t "assignments.turnitin_settings.labels.exclude_small_matches"}}
+              Small Matches
+            {{/t}}
+        </label>
+        <div class="controls js-exclude-small-matches-options"
+          style="{{hiddenUnless excludesSmallMatches}}">
+
+          <label class="control-label" style="display: block;">
+            <input id="exclude_small_matches_type"
+              name="exclude_small_matches_type"
+              type="radio"
+              {{checkedIf excludeSmallMatchesType "words"}}
+              value="words"/>
+              {{#t "turnitin_settings.settings_exclude_fewer_than_count"}}
+                fewer than {{{wordsInput}}} words
+              {{/t}}
+          </label>
+
+          <label class="control-label">
+            <input id="exclude_small_matches_type"
+              type="radio"
+              name="exclude_small_matches_type"
+              {{checkedIf excludeSmallMatchesType "percent"}}
+              value="percent"/>
+              {{#t "turnitin_settings.settings_exclude_less_than_percent"}}
+                less than {{{percentInput}}} of the document
+              {{/t}}
+          </label>
+        </div>
+      </div>
+    </div>
+
+  </fieldset>
+
+  <div class="button-container">
+    <button type="submit" class="btn btn-primary">
+      {{#t "buttons.update_settings"}}
+        Update Settings
+      {{/t}}
+    </button>
+  </div>
+
+</form>

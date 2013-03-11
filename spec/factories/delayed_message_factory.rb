@@ -21,11 +21,12 @@ def delayed_message_model(opts={})
 end
 
 def delayed_message_valid_attributes(opts={})
-  notification = Notification.create!
+  opts[:notification] ||= @notification
+  opts[:notification] ||= notification_model
   cc = opts.delete(:cc) || CommunicationChannel.create!(:path => "delayed_message@example.com")
-  np = cc.notification_policies.create!(:notification => notification)
+  np = cc.notification_policies.create!(:notification => opts[:notification])
   {
-    :notification_id => notification.id,
+    :notification_id => opts[:notification].id,
     :notification_policy_id => np.id,
     :context_id => cc.id,
     :context_type => "CommunicationChannel",

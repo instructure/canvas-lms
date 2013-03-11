@@ -89,7 +89,7 @@ module Instructure #:nodoc:
         'col'        => ['span', 'width'],
         'colgroup'   => ['span', 'width'],
         'img'        => ['align', 'alt', 'height', 'src', 'title', 'width'],
-        'iframe'     => ['src', 'width', 'height', 'name', 'align', 'frameborder', 'scrolling'],
+        'iframe'     => ['src', 'width', 'height', 'name', 'align', 'frameborder', 'scrolling', 'sandbox'],
         'ol'         => ['start', 'type'],
         'q'          => ['cite'],
         'table'      => ['summary', 'width', 'border', 'cellpadding', 'cellspacing', 'center', 'frame', 'rules', 'dir', 'lang'],

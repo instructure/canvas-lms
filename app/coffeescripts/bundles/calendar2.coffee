@@ -17,5 +17,5 @@ require [
     calendar2Only: ENV.CALENDAR.CAL2_ONLY, 
     showScheduler: ENV.CALENDAR.SHOW_SCHEDULER)
   new MiniCalendar("#minical", @calendar)
-  new UndatedEventsList("#undated-events", @eventDataSource)
+  new UndatedEventsList("#undated-events", @eventDataSource, @calendar)
   drawSidebar(ENV.CALENDAR.CONTEXTS, ENV.CALENDAR.SELECTED_CONTEXTS, @eventDataSource)

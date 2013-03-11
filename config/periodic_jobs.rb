@@ -75,7 +75,9 @@ if PageView.redis_queue?
   Delayed::Periodic.cron 'PageView.process_cache_queue', '*/1 * * * *' do
     Shard.with_each_shard do
       unless Shard.current.settings[:process_page_view_queue] == false
-        PageView.send_later_enqueue_args(:process_cache_queue, :singleton => "PageView.process_cache_queue:#{Shard.current.id}")
+        PageView.send_later_enqueue_args(:process_cache_queue,
+                                         :singleton => "PageView.process_cache_queue:#{Shard.current.id}",
+                                         :max_attempts => 1)
       end
     end
   end
@@ -105,6 +107,12 @@ end
 Delayed::Periodic.cron 'Attachment.do_notifications', '*/10 * * * *', :priority => Delayed::LOW_PRIORITY do
   Shard.with_each_shard do
     Attachment.do_notifications
+  end
+end
+
+Delayed::Periodic.cron 'Ignore.cleanup', '45 23 * * *' do
+  Shard.with_each_shard do
+    Ignore.send_later_enqueue_args(:cleanup, :singleton => "Ignore.cleanup:#{Shard.current.id}")
   end
 end
 

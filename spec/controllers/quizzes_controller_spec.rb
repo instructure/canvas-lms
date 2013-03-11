@@ -164,7 +164,7 @@ describe QuizzesController do
     end
   end
 
-  describe "GET 'moderate''" do
+  describe "GET 'moderate'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
       course_quiz
@@ -301,9 +301,9 @@ describe QuizzesController do
       response.should_not be_redirect
       response.should_not render_template('access_code')
 
-      # it should ask for the access code again if you reload the quiz
+      # it should not ask for the access code again if you reload the quiz
       get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
-      response.should render_template('access_code')
+      response.should_not render_template('access_code')
     end
 
     it "should not let them take the quiz if it's locked" do
@@ -612,6 +612,27 @@ describe QuizzesController do
       assigns[:quiz].title.should eql("some quiz")
       response.should be_success
     end
+
+    it "creates quizzes with overrides" do
+      course_with_teacher_logged_in(:active_all => true)
+      section = @course.course_sections.create!
+      course_due_date = 3.days.from_now.iso8601
+      section_due_date = 5.days.from_now.iso8601
+      post 'create', :course_id => @course.id,
+        :quiz => {
+          :title => "overridden quiz",
+          :due_at => course_due_date,
+          :assignment_overrides => [{
+            :course_section_id => section.id,
+            :due_at => section_due_date,
+          }]
+        }
+      response.should be_success
+      quiz = assigns[:quiz].overridden_for(@user)
+      overrides = quiz.overrides_visible_to(@user)
+      overrides.length.should == 1
+      overrides.first[:due_at].iso8601.should == section_due_date
+    end
   end
 
   describe "PUT 'update'" do
@@ -653,6 +674,71 @@ describe QuizzesController do
       @quiz.reload
       @quiz.assignment.should_not be_nil
     end
+
+    it "updates overrides for a quiz" do
+      course_with_teacher_logged_in(:active_all => true)
+      quiz = @course.quizzes.build( :title => "Update Overrides Quiz")
+      quiz.save!
+      section = @course.course_sections.build
+      section.save!
+      course_due_date = 3.days.from_now.iso8601
+      section_due_date = 5.days.from_now.iso8601
+      quiz.save!
+      post 'update', :course_id => @course.id,
+        :id => quiz.id,
+        :quiz => {
+          :title => "overridden quiz",
+          :due_at => course_due_date,
+          :assignment_overrides => [{
+            :course_section_id => section.id,
+            :due_at => section_due_date,
+            :due_at_overridden => true
+          }]
+        }
+      quiz = quiz.reload.overridden_for(@user)
+      overrides = quiz.overrides_visible_to(@user)
+      overrides.length.should == 1
+    end
+
+    it "deletes overrides for a quiz if assignment_overrides params is 'false'" do
+      course_with_teacher_logged_in(:active_all => true)
+      quiz = @course.quizzes.build(:title => "Delete overrides!")
+      quiz.save!
+      section = @course.course_sections.create!(:name => "VDD Course Section")
+      override = AssignmentOverride.new
+      override.set_type = 'CourseSection'
+      override.set = section
+      override.due_at = Time.zone.now
+      override.quiz = quiz
+      override.save!
+      course_due_date = 3.days.from_now.iso8601
+      post 'update', :course_id => @course.id,
+        :id => quiz.id,
+        :quiz => {
+          :title => "overridden quiz",
+          :due_at => course_due_date,
+          :assignment_overrides => "false"
+        }
+      quiz.reload.assignment_overrides.active.should be_empty
+    end
+
+    it 'updates the quiz with the correct times for fancy midnight' do
+      time = Time.local(2013,3,13,0,0).in_time_zone
+      course_with_teacher_logged_in(:active_all => true)
+      quiz = @course.quizzes.build(:title => "Test that fancy midnight, baby!")
+      quiz.save!
+      post :update, :course_id => @course.id,
+        :id => quiz.id,
+        :quiz => {
+          :due_at => time,
+          :lock_at => time,
+          :unlock_at => time
+        }
+      quiz.reload
+      quiz.due_at.to_i.should == CanvasTime.fancy_midnight(time).to_i
+      quiz.lock_at.to_i.should == CanvasTime.fancy_midnight(time).to_i
+      quiz.unlock_at.to_i.should == time.to_i
+    end
   end
 
   describe "GET 'statistics'" do
@@ -667,6 +753,16 @@ describe QuizzesController do
       get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
       response.should be_success
       response.should render_template('statistics')
+    end
+
+    it "should redirect to the quiz show page if the course is a MOOC" do
+      course_with_teacher_logged_in(:active_all => true)
+      @course.large_roster = true
+      @course.save!
+      course_quiz
+      get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
+      flash[:notice].should == "That page has been disabled for this course"
+      response.should redirect_to course_quiz_url(@course.id, @quiz.id)
     end
   end
 

@@ -874,7 +874,7 @@ describe SIS::CSV::UserImporter do
       @pseudo2 = @account.pseudonyms.find_by_sis_user_id('user_1')
       @pseudo2.user.user_account_associations.map { |uaa| uaa.account_id }.sort.should == [@account.id, Account.find_by_sis_source_id('A102').id, Account.find_by_sis_source_id('A101').id].sort
 
-      @pseudo1.user.move_to_user @pseudo2.user
+      UserMerge.from(@pseudo1.user).into(@pseudo2.user)
       @user = @account1.pseudonyms.find_by_sis_user_id('user_1').user
       @account2.pseudonyms.find_by_sis_user_id('user_1').user.should == @user
 

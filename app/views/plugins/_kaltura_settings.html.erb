@@ -82,5 +82,17 @@ TEXT
       <td><%= f.blabel :upload_ui_conf, :en => "Uploader UI Conf ID" %></td>
       <td><%= f.text_field :upload_ui_conf %></td>
     </tr>
+    <tr>
+      <td colspan="2" class="sub">
+        <h3><%= t('headers.canvas_settings', "Canvas Settings") %></h3>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <%= f.blabel :cache_play_list_seconds, :en => "Seconds to cache playlist URL" %>
+        <p style="font-size: 0.8em;"><%= t(:cache_explanation, "Empty means cache indefinitely, 0 means don't cache.") %></p>
+      </td>
+      <td><%= f.text_field :cache_play_list_seconds %></td>
+    </tr>
   </table>
 <% end %>

@@ -252,7 +252,7 @@ $context_module_bg_color: #f2f3f4
     .locked_title 
       display: none
   width: 100%
-  .move_item_link 
+  .move_item_link, .links a
     visibility: hidden
     
   .locked_module & 
@@ -272,14 +272,13 @@ $context_module_bg_color: #f2f3f4
       display: inline-block
       font-weight: bold
       color: #888
-  .links 
-    visibility: hidden
+  .links
     width: 80px
     vertical-align: top
     padding-top: 2px
   &.context_module_item_hover, &:hover 
     background-color: darken($context_module_bg_color, 2.5%)
-    .move_item_link, .links, .links a 
+    .move_item_link, .links a
       visibility: visible
 
   td.points_possible_display, td.due_date_display

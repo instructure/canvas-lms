@@ -63,6 +63,7 @@ describe "assignments" do
 
     it "should highlight mini-calendar dates where stuff is due" do
       get "/courses/#{@course.id}/assignments/syllabus"
+      wait_for_ajaximations
       f(".mini_calendar_day.date_#{@due_date.strftime("%m_%d_%Y")}").should have_class('has_event')
     end
 
@@ -106,7 +107,7 @@ describe "assignments" do
       get "/courses/#{new_course.id}/assignments/#{assignment.id}"
 
       f('.ui-state-error').should be_displayed
-      f('#full_assignment_holder').should be_nil
+      f('#assignment_show').should be_nil
     end
 
     it "should verify student creatable group creation" do
@@ -149,7 +150,7 @@ describe "assignments" do
       get "/courses/#{@course.id}/assignments/#{@fourth_assignment.id}"
 
       driver.current_url.should match %r{/courses/\d+/discussion_topics/\d+}
-      f('h1.discussion-title').should include_text(@fourth_assignment.title)
+      f('div.discussion-title').should include_text(@fourth_assignment.title)
     end
 
     it "should validate an assignment created with the type of external tool" do
@@ -191,7 +192,6 @@ describe "assignments" do
         expected_unlock = datetime_string(@override.unlock_at).gsub(/\s+/, ' ')
         expected_lock_at = datetime_string(@override.lock_at).gsub(/\s+/, ' ')
         f('#content').should include_text "locked until #{expected_unlock}."
-        f('#sidebar_content').should include_text "only unlocked from #{expected_unlock} to #{expected_lock_at}"
       end
 
       it "should allow submission when within override locks" do
@@ -280,7 +280,6 @@ describe "assignments" do
         expected_unlock = datetime_string(@override.unlock_at).gsub(/\s+/, ' ')
         expected_lock_at = datetime_string(@override.lock_at).gsub(/\s+/, ' ')
         f('#content').should include_text "locked until #{expected_unlock}."
-        f('#sidebar_content').should include_text "only unlocked from #{expected_unlock} to #{expected_lock_at}"
       end
 
       context "with multiple section enrollments in same course" do
@@ -292,7 +291,6 @@ describe "assignments" do
           expected_unlock = datetime_string(@override.unlock_at).gsub(/\s+/, ' ')
           expected_lock_at = datetime_string(@assignment.lock_at).gsub(/\s+/, ' ')   # later than section2
           f('#content').should include_text "locked until #{expected_unlock}."
-          f('#sidebar_content').should include_text "only unlocked from #{expected_unlock} to #{expected_lock_at}"
         end
       end
     end
@@ -310,7 +308,6 @@ describe "assignments" do
         expected_unlock = datetime_string(@override.unlock_at).gsub(/\s+/, ' ')
         expected_lock_at = datetime_string(@override.lock_at).gsub(/\s+/, ' ')
         f('#content').should include_text "locked until #{expected_unlock}."
-        f('#sidebar_content').should include_text "only unlocked from #{expected_unlock} to #{expected_lock_at}"
       end
 
       context "overridden lock_at" do
@@ -325,7 +322,6 @@ describe "assignments" do
           expected_unlock = datetime_string(@override.unlock_at).gsub(/\s+/, ' ')
           expected_lock_at = datetime_string(@override.lock_at).gsub(/\s+/, ' ')
           f('#content').should include_text "locked until #{expected_unlock}."
-          f('#sidebar_content').should include_text "only unlocked from #{expected_unlock} to #{expected_lock_at}"
         end
       end
     end

@@ -52,5 +52,26 @@ describe WikiPagesController do
     test_page("/groups/#{@group.id}/wiki/hello")
     test_page("/groups/#{@group.id}/wiki/hello/revisions")
   end
+
+  it "should permit the student to view the page history if they have permissions" do
+    @wiki_page = @course.wiki.wiki_pages.create :title => "Some random wiki page",
+                                                :body => "this is the content of the wikipage body asdfasdf",
+                                                :editing_roles => "teachers,students",
+                                                :hide_from_students => false
+    student = user()
+    enrollment = @course.enroll_student(student)
+    enrollment.accept!
+    @course.reload
+    user_session(student)
+    get course_wiki_page_url(@course, @wiki_page)
+    html = Nokogiri::HTML(response.body)
+    html.css("#page_history").should_not be_empty
+
+    @wiki_page.editing_roles = "teachers"
+    @wiki_page.save
+    get course_wiki_page_url(@course, @wiki_page)
+    html = Nokogiri::HTML(response.body)
+    html.css("#page_history").should be_empty
+  end
 end
 

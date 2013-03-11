@@ -10,7 +10,7 @@
   <div id="no_students_message" style="padding: 10px 30px; font-size: 1.2em;">
     <div><%= t(:no_students, "No Students are enrolled in the course.") %></div>
     <% if can_do @context, @current_user, :manage_students %>
-      <a href="<%= context_url(@context, :context_details_url) %>#add_students" class="btn"><%= image_tag "add.png" %> <%= t('links.add_students', "Add Students to the Course") %></a>
+      <a href="<%= context_url(@context, :context_details_url) %>#add_students" class="btn add_students"><%= image_tag "add.png" %> <%= t('links.add_students', "Add Students to the Course") %></a>
     <% end %>
   </div>
 <% end %>

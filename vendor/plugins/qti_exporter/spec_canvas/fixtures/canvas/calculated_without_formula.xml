@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: qmd_itemtype now replaced by qtiMetadata.interactionType in manifest
+Converting proprietary canvas metadata field points_possible = 10
+Converting proprietary canvas metadata field assessment_question_identifierref = ib784da0ea554753689c41d0d58121fe8
+Warning: numeric fibtype does not match enclosing <response_str>, assuming string
+Warning: min/max constraint on outcome will generate additional rules in responseProcessing
+Warning: titles on respconditions no longer supported, ignored "correct"
+Warning: replacing <other/> with the base value true - what did you want me to do??
+Warning: titles on respconditions no longer supported, ignored "incorrect"
+	-->
+<assessmentItem xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="if0e253c3d288b8033db6673a656539df" title="Question" adaptive="false" timeDependent="false">
+  <instructureMetadata>
+    <instructureField name="assessment_question_identifierref" value="ib784da0ea554753689c41d0d58121fe8"/>
+    <instructureField name="points_possible" value="10"/>
+    <instructureField name="bb_question_type" value="Calculated"/>
+    <instructureField name="question_type" value="Calculated"/>
+  </instructureMetadata>
+  <responseDeclaration identifier="response1" cardinality="single" baseType="string"/>
+  <outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float"/>
+  <itemBody>
+    <div class="html">&lt;div&gt;Ingrid has a credit card balance of $2200 on a card that charges 22 percent interest compounded monthly. Her bill says that her minimum payment is $155.00 What is her APY? Round your answer to the nearest hundreth of a percent.&lt;/div&gt;</div>
+    <extendedTextInteraction responseIdentifier="response1"/>
+  </itemBody>
+  <responseProcessing>
+    <responseCondition>
+      <responseIf><baseValue baseType="boolean">true</baseValue>
+        <setOutcomeValue identifier="SCORE"><baseValue baseType="float">100</baseValue></setOutcomeValue>
+      </responseIf>
+      <responseElseIf><not><baseValue baseType="boolean">true</baseValue></not>
+        <setOutcomeValue identifier="SCORE"><baseValue baseType="float">0</baseValue></setOutcomeValue>
+      </responseElseIf>
+    </responseCondition>
+    <responseCondition>
+      <responseIf><gt><variable identifier="SCORE"/><baseValue baseType="float">100.0</baseValue></gt>
+        <setOutcomeValue identifier="SCORE"><baseValue baseType="float">100.0</baseValue></setOutcomeValue>
+      </responseIf>
+    </responseCondition>
+  </responseProcessing>
+  <itemproc_extension>
+    <calculated>
+      <answer_tolerance type="None">0</answer_tolerance>
+      <vars>
+      </vars>
+      <var_sets><var_set ident="4082">
+        <answer>24.36</answer>
+      </var_set>
+      </var_sets>
+    </calculated>
+  </itemproc_extension>
+</assessmentItem>

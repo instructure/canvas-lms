@@ -20,17 +20,17 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "courses/_settings_sidebar.html.erb" do
-  describe "End this course button" do
-    before do
-      course_with_teacher(:active_all => true)
-      @course.sis_source_id = "so_special_sis_id"
-      @course.workflow_state = 'claimed'
-      @course.save!
-      assigns[:context] = @course
-      assigns[:user_counts] = {}
-      assigns[:all_roles] = Role.custom_roles_and_counts_for_course(@course, @user)
-    end
+  before do
+    course_with_teacher(:active_all => true)
+    @course.sis_source_id = "so_special_sis_id"
+    @course.workflow_state = 'claimed'
+    @course.save!
+    assigns[:context] = @course
+    assigns[:user_counts] = {}
+    assigns[:all_roles] = Role.custom_roles_and_counts_for_course(@course, @user)
+  end
 
+  describe "End this course button" do
     it "should not display if the course or term end date has passed" do
       @course.stubs(:soft_concluded?).returns(true)
       view_context(@course, @user)
@@ -45,6 +45,16 @@ describe "courses/_settings_sidebar.html.erb" do
       assigns[:current_user] = @user
       render
       response.body.should match(/Conclude this Course/)
+    end
+  end
+
+  describe "Reset course content" do
+    it "should not display the dialog contents under the button" do
+      view_context(@course, @user)
+      assigns[:current_user] = @user
+      render
+      doc = Nokogiri::HTML.parse(response.body)
+      doc.at_css('#reset_course_content_dialog')['style'].should == 'display:none;'
     end
   end
 end

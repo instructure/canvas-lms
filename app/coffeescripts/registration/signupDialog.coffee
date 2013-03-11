@@ -19,6 +19,7 @@ define [
     $node = $nodes[id] ?= $('<div />')
     $node.html templates[id](
       terms_url: "http://www.instructure.com/terms-of-use"
+      privacy_url: "http://www.instructure.com/privacy-policy"
     )
     $node.find('.date-field').datetime_field()
 
@@ -41,14 +42,6 @@ define [
       formErrors: false
       error: (errors) ->
         promise.reject()
-        if _.any(errors.user.birthdate ? [], (e) -> e.type is 'too_young')
-          $node.find('.registration-dialog').text I18n.t('too_young_error_join_code', 'You must be at least %{min_years} years of age to use Canvas without a course join code.', min_years: ENV.USER.MIN_AGE)
-          $node.dialog buttons: [
-            text: I18n.t('ok', "OK")
-            click: -> $node.dialog('close')
-            class: 'btn-primary'
-          ]
-          return
         $form.formErrors registrationErrors(errors)
 
     $node.dialog

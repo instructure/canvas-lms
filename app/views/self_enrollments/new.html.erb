@@ -14,7 +14,9 @@
   <% if !@embedded_view %>
     <h2><%= t :course_enrollment, "Course Enrollment" %></h2>
   <% end %>
-  <% if @current_user && @course.user_is_student?(@current_user, :include_future => true) %>
+  <% if !@course.self_enrollment? %>
+    <%= render :partial => 'enrollment_closed' %>
+  <% elsif @current_user && @course.user_is_student?(@current_user, :include_future => true) %>
     <% if params[:enrolled] %>
       <%= render :partial => 'successfully_enrolled' %>
     <% else %>

@@ -104,6 +104,13 @@ describe "course rubrics" do
       rubric.data.first[:ratings].map { |r| r[:points] }.should == @outcome.data[:rubric_criterion][:ratings].map { |c| c[:points] }
     end
 
+    it "should not show 'use for grading' as an option" do
+      course_with_teacher_logged_in
+      get "/courses/#{@course.id}/rubrics"
+      f('.add_rubric_link').click
+      fj('.rubric_grading:hidden').should_not be_nil
+    end
+
     context "importing" do
 
       it "should create a allow immediate editing when adding an imported rubric to a new assignment" do
@@ -118,7 +125,7 @@ describe "course rubrics" do
         @assignment = @course.assignments.create!(assignment_valid_attributes.merge({:title => "New Course Assignment"}))
 
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        f("#right-side-wrapper .add_rubric_link").click
+        f(".add_rubric_link").click
         fj(".find_rubric_link:visible").click
         wait_for_ajaximations
         fj(".select_rubric_link:visible").click

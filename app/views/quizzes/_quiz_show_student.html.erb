@@ -1,0 +1,10 @@
+<%= render :partial => "quiz_details" %>
+
+<% if !@locked || @locked_reason[:lock_at] %>
+  <% if @quiz.description.present? %>
+    <h4>Instructions</h4>
+    <div class="description user_content student-version">
+      <%= user_content(@quiz.description) %>
+    </div>
+  <% end %>
+<% end %>

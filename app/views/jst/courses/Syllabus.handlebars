@@ -1,0 +1,71 @@
+<div id="syllabus_links">
+  {{#if overrides_present}}
+    <a id="toggle_special_dates_in_syllabus" class="shown" href="#">
+      <span class="hide">{{#t "syllabus.hide_specific_dates"}}Hide section, group, and person specific dates{{/t}}</span>
+      <span class="show">{{#t "syllabus.show_specific_dates"}}Show section, group, and person specific dates{{/t}}</span>
+    </a>
+  {{else}}
+    &nbsp;
+  {{/if}}
+</div>
+<table id="syllabus">
+  <thead>
+    <tr>
+      <th scope="col" style="width: 10%;">{{#t "headers.date"}}Date{{/t}}</th>
+      <th scope="col" style="width: 10%;">{{#t "headers.day"}}Day{{/t}}</th>
+      <th scope="col" style="width: 80%;">
+      <div style="float: right;"></div>
+      {{#t "headers.details"}}Details{{/t}}
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each dates}}
+    <tr class="date{{#if passed}} date_passed{{/if}}{{#if date}} events_{{strftime date "%Y_%m_%d"}}{{/if}}">
+      <th scope="row" class="day_date" data-date="{{#if date}}{{strftime date "%Y_%m_%d"}}{{/if}}" title="{{#if date}}{{tDateToString date "short_weekday"}}{{else}}{{#t "syllabus.other_day"}}Other{{/t}}{{/if}}">
+        {{#if date}}
+          {{tDateToString date "short"}}
+        {{/if}}
+      </th>
+      <th scope="row">{{#if date}}{{tDateToString date "short_weekday"}}{{else}}{{#t "syllabus.other_day"}}Other{{/t}}{{/if}}</th>
+      <td class="details">
+        <table class="detail_list">
+          {{#each events}}
+          <tr class="syllabus_{{type}} related-{{related_id}}{{#if override}} special_date{{/if}}">
+            <td class="name{{#unless last}} not_last{{/unless}}">
+              {{#if html_url}}
+                <a href="{{html_url}}">{{title}}</a>
+              {{else}}
+                {{title}}
+              {{/if}}
+              {{#if override}}
+                <div class="special_date_title">({{override.title}})</div>
+              {{/if}}
+            </td>
+            <td class="dates{{#unless last}} not_last{{/unless}}">
+              {{#if start_at}}
+                {{#if due_at}}
+                  due by {{tTimeHours due_at}}
+                {{else}}
+                  {{tTimeHours start_at}}
+                  {{#unless same_time}}
+                    to
+                    {{#if same_day}}
+                      {{tTimeHours end_at}}
+                    {{else}}
+                      {{tEventToString end_at}}
+                    {{/if}}
+                  {{/unless}}
+                {{/if}}
+              {{else}}
+                &nbsp;
+              {{/if}}
+            </td>
+          </tr>
+          {{/each}}
+        </table>
+      </td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>

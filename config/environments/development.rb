@@ -40,8 +40,14 @@ Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].eac
 
 # allow debugging only in development environment by default
 # ruby-debug is currently broken in 1.9.3
-if RUBY_VERSION < "1.9."
-  require "ruby-debug"
-else
-  require "debugger"
+#
+# Option to DISABLE_RUBY_DEBUGGING is helpful IDE-based debugging.
+# The ruby debug gems conflict with the IDE-based debugger gem.
+# Set this option in your dev environment to disable.
+unless ENV['DISABLE_RUBY_DEBUGGING']
+  if RUBY_VERSION < "1.9."
+    require "ruby-debug"
+  else
+    require "debugger"
+  end
 end
