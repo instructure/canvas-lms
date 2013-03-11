@@ -2,7 +2,8 @@ define [
   'use!vendor/backbone'
   'underscore'
   'str/htmlEscape'
-], (Backbone, _, htmlEscape) ->
+  'compiled/util/mixin'
+], (Backbone, _, htmlEscape, mixin) ->
 
   ##
   # Extends Backbone.View on top of itself to be 100X more useful
@@ -92,6 +93,9 @@ define [
       @$el.data 'view', this
       @model.view = this if @model
       @collection.view = this if @collection
+      # magic from mixin
+      fn.call this for fn in @__initialize__ if @__initialize__
+      @attach()
       this
 
     ##
@@ -158,6 +162,23 @@ define [
     # @api private
 
     afterRender: ->
+      # magic from `mixin`
+      fn.call this for fn in @__afterRender__ if @__afterRender__
+
+    ##
+    # Define in subclasses to attach your collection/model events
+    #
+    # Example:
+    #
+    #   class SomeView extends Backbone.View
+    #     attach: ->
+    #       @model.on 'change', @render
+    #
+    # @api public
+
+    attach: ->
+      # magic from `mixin`
+      fn.call this for fn in @__attach__ if @__attach__
 
     ##
     # Defines the locals for the template with intelligent defaults.
@@ -256,13 +277,7 @@ define [
     # @api public
 
     @mixin: (mixins...) ->
-      for mixin in mixins
-        for key, prop of mixin
-          # don't blow away old events, merge them
-          if key is 'events'
-            _.extend @::[key], prop
-          else
-            @::[key] = prop
+      mixin this, mixins...
 
     ##
     # DEPRECATED - don't use views option, use `child` constructor method

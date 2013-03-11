@@ -1,4 +1,7 @@
-define ['Backbone'], ({View}, _) ->
+define [
+  'Backbone'
+  'vendor/jquery.placeholder'
+], ({View}) ->
 
   ##
   # Makes an input field that emits `input` and `select` events, and
@@ -41,4 +44,7 @@ define ['Backbone'], ({View}, _) ->
       null
 
     change: @::keyup
+
+    afterRender: ->
+      @$el.placeholder()
 
