@@ -1,8 +1,62 @@
+<ul class='page-action-list'>
+  <h2><%= t 'titles.related_items', "Related Items" %></h2>
+  <% if @context.allows_speed_grader? %>
+    <li>
+      <a target="_blank" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @assignment.id) %>"
+        class="icon-speed-grader">
+        SpeedGrader&trade;
+      </a>
+    </li>
+  <% end %>
+
+  <% if @current_student_submissions.present? %>
+    <% if @assignment.submission_types && @assignment.submission_types.match(/(online_upload|online_text_entry|online_url)/)%>
+      <div>
+        <%= render :partial => 'submissions/submission_download' %>
+        <a href="<%= context_url(@context, :context_assignment_submissions_url, @assignment.id, :zip => 1) %>"
+          id="download_submission_button"
+          class="download_submissions_link icon-download">
+          <%= t 'links.download_submissions', "Download Submissions" %>
+        </a>
+        <a href="#" class="upload_submissions_link icon-upload" style="<%= hidden unless @assignment.submissions_downloaded? %>">
+          <%= t 'links.reupload_submissions', "Re-Upload Submissions" %>
+        </a>
+        <% form_tag context_url(@context, :context_gradebook_submissions_upload_url, @assignment.id), {:id => "re_upload_submissions_form", :multipart => true, :style => "margin-top: 10px; display: none;"} do %>
+          <div style="font-size: 0.8em;">
+            <%= mt :reupload_instructions, <<-EOT
+If you made changes to the student submission files you downloaded
+before, just zip them back up and upload the zip with the form below.
+Students will see the modified files in their comments for the submission.
+
+*Make sure you don't change the names of the submission files so we can recognize them.*
+              EOT
+            %>
+          </div>
+          <div>
+            <input type="file" name="submissions_zip"/>
+            <div class="button-container">
+              <button type="submit" class="btn"><%= t 'buttons.upload_files', "Upload Files" %></button>
+            </div>
+          </div>
+        <% end %>
+      </li>
+    <% end %>
+  <% end %>
+
+  <% if @assignment.has_peer_reviews? %>
+    <li>
+      <a href="<%= context_url(@context, :context_assignment_peer_reviews_url, @assignment.id) %>"
+        class="assignment_peer_reviews_link icon-peer-review">
+        <%= t 'links.peer_reviews', "Peer Reviews" %>
+      </a>
+    </li>
+  <% end %>
+</ul>
+
 <% if @current_student_submissions.present? %>
 
-  <h2><%= t 'titles.submission', "Submissions" %></h2>
   <% subs = @current_student_submissions %>
-  <div style="margin-bottom: 0px;">
+  <div style="margin-top: 10px;">
     <% graded = subs.select(&:graded?).length # this includes resubmissions that were previously graded %>
     <% resubmitted = subs.select(&:needs_regrading?).length %>
     <% submitted = subs.length %>
@@ -17,65 +71,3 @@
   </div>
 
 <% end %>
-
-<ul class='page-action-list'>
-  <% if @context.allows_speed_grader? %>
-    <li>
-      <a target="_blank" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @assignment.id) %>">
-        <i class="icon-speed-grader"></i> SpeedGrader&trade;
-      </a>
-    </li>
-  <% end %>
-
-  <% if @current_student_submissions.present? %>
-    <h2><%= t 'titles.submission', "Submissions" %></h2>
-    <div class="rs-margin-lr">
-      <% subs = @current_student_submissions %>
-      <div style="margin-bottom: 0px;">
-        <% graded = subs.select(&:graded?).length # this includes resubmissions that were previously graded %>
-        <% resubmitted = subs.select(&:needs_regrading?).length %>
-        <% submitted = subs.length %>
-        <span class="graded_count" id="ratio_of_submissions_graded" style="<%= 'font-weight: bold;' if graded < submitted %>">
-          <%= t :graded_count, "%{graded_count} *out of* %{total} Submissions Graded",
-                :graded_count => graded, :total => submitted,
-                :wrapper => '<span style="font-size: 0.8em;">\1</span>' %>
-        </span>
-        <% if resubmitted > 0 %>
-          <b><br /><%= t :resubmission_count, { :one => "1 Ungraded Re-submission", :other => "%{count} Ungraded Re-submissions" }, :count => resubmitted %></b>
-        <% end %>
-      </div>
-      <a target="_blank" class="btn button-sidebar-wide" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @assignment.id) %>"><i class="icon-speed-grader"></i> SpeedGrader&trade;</a><br/>
-      <% if @assignment.submission_types && @assignment.submission_types.match(/(online_upload|online_text_entry|online_url)/)%>
-        <div>
-          <%= render :partial => 'submissions/submission_download' %>
-          <a class="download_submissions_link icon-download" id="download_submission_button" href="<%= context_url(@context, :context_assignment_submissions_url, @assignment.id, :zip => 1) %>"><%= t 'links.download_submissions', "Download Submissions" %></a><br/>
-          <a href="#" class="upload_submissions_link icon-upload" style="<%= hidden unless @assignment.submissions_downloaded? %>"><%= t 'links.reupload_submissions', "Re-Upload Submissions" %></a>
-          <% form_tag context_url(@context, :context_gradebook_submissions_upload_url, @assignment.id), {:id => "re_upload_submissions_form", :multipart => true, :style => "margin-top: 10px; display: none;"} do %>
-            <div style="font-size: 0.8em;">
-              <%= mt :reupload_instructions, <<-EOT
-If you made changes to the student submission files you downloaded
-before, just zip them back up and upload the zip with the form below.
-Students will see the modified files in their comments for the submission.
-
-*Make sure you don't change the names of the submission files so we can recognize them.*
-                EOT
-            %>
-          </div>
-          <div>
-            <input type="file" name="submissions_zip"/>
-            <div class="button-container">
-              <button type="submit" class="btn"><%= t 'buttons.upload_files', "Upload Files" %></button>
-            </div>
-          </div>
-        <% end %>
-      </li>
-    <% end %>
-  <% end %>
-
-  <li style="<%= hidden unless @assignment.has_peer_reviews? %>">
-    <a href="<%= context_url(@context, :context_assignment_peer_reviews_url, @assignment.id) %>"
-      class="assignment_peer_reviews_link">
-      <i class="icon-peer-review"></i> <%= t 'links.peer_reviews', "Peer Reviews" %>
-    </a>
-  </li>
-</ul>
