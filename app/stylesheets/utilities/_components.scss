@@ -1,5 +1,5 @@
 .toolbar {
-  @extend .ui-widget-header;
+  @include ui-widget-header-bg-and-text;
   padding: $contentBoxPadding / 2;
   font-size: $baseFontSize;
   line-height: $baseLineHeight;
