@@ -529,7 +529,12 @@ describe "MessageableUser::Calculator" do
 
   describe "public api" do
     describe "load_messageable_users" do
-      it "should have specs"
+      it "should not break when given an otherwise unmessageable user and a non-nil but empty conversation_id" do
+        other_user = User.create!
+        lambda{ @calculator.load_messageable_users([other_user], :conversation_id => '') }.should_not raise_exception
+      end
+
+      it "should have more specs"
     end
 
     describe "messageable_users_in_context" do
