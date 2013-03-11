@@ -1197,36 +1197,6 @@ class User < ActiveRecord::Base
     (Canvas::Security.hmac_sha1(user_id.to_s)[0, 10] == sig) ? user_id : nil
   end
 
-  # Returns the LTI membership based on the LTI specs here: http://www.imsglobal.org/LTI/v1p1pd/ltiIMGv1p1pd.html#_Toc309649701
-  def lti_role_types(context=nil)
-    memberships = []
-    if context.is_a?(Course)
-      memberships += current_enrollments.find_all_by_course_id(context.id).uniq
-    end
-    if context.respond_to?(:account_chain) && !context.account_chain_ids.empty?
-      memberships += account_users.find_all_by_membership_type_and_account_id('AccountAdmin', context.account_chain_ids).uniq
-    end
-    return ["urn:lti:sysrole:ims/lis/None"] if memberships.empty?
-    memberships.map{|membership|
-      case membership
-      when StudentEnrollment, StudentViewEnrollment
-        'Learner'
-      when TeacherEnrollment
-        'Instructor'
-      when TaEnrollment
-        'Instructor'
-      when DesignerEnrollment
-        'ContentDeveloper'
-      when ObserverEnrollment
-        'urn:lti:instrole:ims/lis/Observer'
-      when AccountUser
-        'urn:lti:instrole:ims/lis/Administrator'
-      else
-        'urn:lti:instrole:ims/lis/Observer'
-      end
-    }.uniq
-  end
-
   AVATAR_SETTINGS = ['enabled', 'enabled_pending', 'sis_only', 'disabled']
   def avatar_url(size=nil, avatar_setting=nil, fallback=nil, request=nil)
     return fallback if avatar_setting == 'disabled'

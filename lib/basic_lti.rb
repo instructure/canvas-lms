@@ -52,6 +52,39 @@ module BasicLTI
     BasicLTI::ToolLaunch.new(*args).generate
   end
 
+  # Returns the LTI membership based on the LTI specs here: http://www.imsglobal.org/LTI/v1p1pd/ltiIMGv1p1pd.html#_Toc309649701
+  def self.user_lti_data(user, context=nil)
+    data = {}
+    memberships = []
+    if context.is_a?(Course)
+      memberships += user.current_enrollments.find_all_by_course_id(context.id).uniq
+      data['enrollment_state'] = memberships.any?{|membership| membership.state_based_on_date == :active} ? 'active' : 'inactive'
+    end
+    if context.respond_to?(:account_chain) && !context.account_chain_ids.empty?
+      memberships += user.account_users.find_all_by_membership_type_and_account_id('AccountAdmin', context.account_chain_ids).uniq
+    end
+    data['role_types'] = memberships.map{|membership|
+      case membership
+        when StudentEnrollment, StudentViewEnrollment
+          'Learner'
+        when TeacherEnrollment
+          'Instructor'
+        when TaEnrollment
+          'Instructor'
+        when DesignerEnrollment
+          'ContentDeveloper'
+        when ObserverEnrollment
+          'urn:lti:instrole:ims/lis/Observer'
+        when AccountUser
+          'urn:lti:instrole:ims/lis/Administrator'
+        else
+          'urn:lti:instrole:ims/lis/Observer'
+      end
+    }.uniq
+    data['role_types'] = ["urn:lti:sysrole:ims/lis/None"] if memberships.empty?
+    data
+  end
+
   class ToolLaunch < Struct.new(:url, :tool, :user, :context, :link_code, :return_url, :resource_type, :hash)
 
     def initialize(options)
@@ -84,7 +117,10 @@ module BasicLTI
       hash['resource_link_title'] = tool.name
       hash['user_id'] = user.opaque_identifier(:asset_string)
       hash['user_image'] = user.avatar_url
-      hash['roles'] = user.lti_role_types(context).join(',') # AccountAdmin, Student, Faculty or Observer
+      user_data = BasicLTI.user_lti_data(user, context)
+      hash['roles'] = user_data['role_types'].join(',') # AccountAdmin, Student, Faculty or Observer
+      hash['custom_canvas_enrollment_state'] = user_data['enrollment_state'] if user_data['enrollment_state']
+
       if tool.include_name?
         hash['lis_person_name_given'] = user.first_name
         hash['lis_person_name_family'] = user.last_name

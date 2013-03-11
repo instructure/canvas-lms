@@ -1028,49 +1028,6 @@ describe User do
     end
   end
 
-  context "lti_role_types" do
-    it "should return the correct role types" do
-      course_model
-      @course.offer
-      teacher = user_model
-      designer = user_model
-      student = user_model
-      nobody = user_model
-      admin = user_model
-      @course.root_account.add_user(admin)
-      @course.enroll_teacher(teacher).accept
-      @course.enroll_designer(designer).accept
-      @course.enroll_student(student).accept
-      teacher.lti_role_types(@course).should == ['Instructor']
-      designer.lti_role_types(@course).should == ['ContentDeveloper']
-      student.lti_role_types(@course).should == ['Learner']
-      nobody.lti_role_types(@course).should == ['urn:lti:sysrole:ims/lis/None']
-      admin.lti_role_types(@course).should == ['urn:lti:instrole:ims/lis/Administrator']
-    end
-
-    it "should return multiple role types if applicable" do
-      course_model
-      @course.offer
-      teacher = user_model
-      @course.root_account.add_user(teacher)
-      @course.enroll_teacher(teacher).accept
-      @course.enroll_student(teacher).accept
-      teacher.lti_role_types(@course).sort.should == ['Instructor','Learner','urn:lti:instrole:ims/lis/Administrator'].sort
-    end
-
-    it "should not return role types from other contexts" do
-      @course1 = course_model
-      @course2 = course_model
-      @course.offer
-      teacher = user_model
-      student = user_model
-      @course1.enroll_teacher(teacher).accept
-      @course1.enroll_student(student).accept
-      teacher.lti_role_types(@course2).should == ['urn:lti:sysrole:ims/lis/None']
-      student.lti_role_types(@course2).should == ['urn:lti:sysrole:ims/lis/None']
-    end
-  end
-
   context "tabs_available" do
     it "should not include unconfigured external tools" do
       tool = Account.default.context_external_tools.new(:consumer_key => 'bob', :shared_secret => 'bob', :name => 'bob', :domain => "example.com")

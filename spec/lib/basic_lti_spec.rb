@@ -192,7 +192,7 @@ describe BasicLTI do
       course_with_teacher(:active_all => true)
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :custom_fields => {'custom_bob' => 'bob', 'custom_fred' => 'fred', 'john' => 'john', '@$TAA$#$#' => 123}, :name => 'tool')
       hash = BasicLTI.generate(:url => 'http://www.yahoo.com', :tool => @tool, :user => @user, :context => @course, :link_code => '123456', :return_url => 'http://www.yahoo.com')
-      hash.keys.select{|k| k.match(/^custom_/) }.sort.should == ['custom___taa____', 'custom_bob', 'custom_fred', 'custom_john']
+      hash.keys.select{|k| k.match(/^custom_/) }.sort.should == ['custom___taa____', 'custom_bob', 'custom_canvas_enrollment_state', 'custom_fred', 'custom_john']
       hash['custom_bob'].should eql('bob')
       hash['custom_fred'].should eql('fred')
       hash['custom_john'].should eql('john')
@@ -285,6 +285,49 @@ describe BasicLTI do
       course.should == @course
       assignment.should == @assignment
       user.should == @user
+    end
+  end
+
+  context "lti_role_types" do
+    it "should return the correct role types" do
+      course_model
+      @course.offer
+      teacher = user_model
+      designer = user_model
+      student = user_model
+      nobody = user_model
+      admin = user_model
+      @course.root_account.add_user(admin)
+      @course.enroll_teacher(teacher).accept
+      @course.enroll_designer(designer).accept
+      @course.enroll_student(student).accept
+      BasicLTI.user_lti_data(teacher, @course)['role_types'].should == ['Instructor']
+      BasicLTI.user_lti_data(designer, @course)['role_types'].should == ['ContentDeveloper']
+      BasicLTI.user_lti_data(student, @course)['role_types'].should == ['Learner']
+      BasicLTI.user_lti_data(nobody, @course)['role_types'].should == ['urn:lti:sysrole:ims/lis/None']
+      BasicLTI.user_lti_data(admin, @course)['role_types'].should == ['urn:lti:instrole:ims/lis/Administrator']
+    end
+
+    it "should return multiple role types if applicable" do
+      course_model
+      @course.offer
+      teacher = user_model
+      @course.root_account.add_user(teacher)
+      @course.enroll_teacher(teacher).accept
+      @course.enroll_student(teacher).accept
+      BasicLTI.user_lti_data(teacher, @course)['role_types'].sort.should == ['Instructor','Learner','urn:lti:instrole:ims/lis/Administrator'].sort
+    end
+
+    it "should not return role types from other contexts" do
+      @course1 = course_model
+      @course2 = course_model
+      @course.offer
+      teacher = user_model
+      student = user_model
+      @course1.enroll_teacher(teacher).accept
+      @course1.enroll_student(student).accept
+      BasicLTI.user_lti_data(teacher, @course2)['role_types'].should == ['urn:lti:sysrole:ims/lis/None']
+      BasicLTI.user_lti_data(student, @course2)['role_types'].should == ['urn:lti:sysrole:ims/lis/None']
     end
   end
 end
