@@ -184,12 +184,13 @@ describe QuizzesController do
 
       user_session @teacher
       get 'managed_quiz_data', :course_id => @course.id, :quiz_id => @quiz.id
-      assigns[:submissions].sort_by(&:id).should ==[@sub1, @sub2].sort_by(&:id)
+      assigns[:submissions][@sub1.user_id].should == @sub1
+      assigns[:submissions][@sub2.user_id].should == @sub2
       assigns[:submitted_students].sort_by(&:id).should == [@user1, @user2].sort_by(&:id)
 
       user_session @ta1
       get 'managed_quiz_data', :course_id => @course.id, :quiz_id => @quiz.id
-      assigns[:submissions].should ==[@sub1]
+      assigns[:submissions][@sub1.user_id].should == @sub1
       assigns[:submitted_students].should == [@user1]
     end
   end

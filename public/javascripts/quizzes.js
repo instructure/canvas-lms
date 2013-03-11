@@ -1167,7 +1167,7 @@ define([
       });
       if (!$dialog.hasClass('loaded')) {
         $dialog.find(".searching_message").text(I18n.t('retrieving_filters', "Retrieving Filters..."));
-        var url = $("#quiz_urls .filters_url").attr('href');
+        var url = ENV.QUIZZES_URL;
         $.ajaxJSON(url, 'GET', {}, function(data) {
           $dialog.addClass('loaded');
           if (data.length) {

@@ -78,20 +78,76 @@ module QuizzesHelper
     end
   end
 
-  def render_unsubmitted_students(student_count)
-    I18n.t('#quizzes.headers.unsubmitted_students_count',
-      { :one => "1 student hasn't taken the survey",
-        :other => "%{count} students haven't taken the survey" },
+  def submitted_students_title(quiz, students)
+    if quiz.survey?
+      submitted_students_survey_title(students.length)
+    else
+      submitted_students_quiz_title(students.length)
+    end
+  end
+
+  def submitted_students_quiz_title(student_count)
+    I18n.t('#quizzes.headers.submitted_students_quiz_title',
+      { :zero => "Students who have taken the quiz",
+        :one => "Students who have taken the quiz (%{count})",
+        :other => "Students who have taken the quiz (%{count})" },
       { :count => student_count })
   end
 
+  def submitted_students_survey_title(student_count)
+    I18n.t('#quizzes.headers.submitted_students_survey_title',
+      { :zero => "Students who have taken the survey",
+        :one => "Students who have taken the survey (%{count})",
+        :other => "Students who have taken the survey (%{count})" },
+      { :count => student_count })
+  end
+
+  def no_submitted_students_msg(quiz)
+    if quiz.survey?
+      t('#quizzes.messages.no_submitted_students_survey', "No Students have taken the survey yet")
+    else
+      t('#quizzes.messages.no_submitted_students_quiz', "No Students have taken the quiz yet")
+    end
+  end
+
+  def unsubmitted_students_title(quiz, students)
+    if quiz.survey?
+      unsubmitted_students_survey_title(students.length)
+    else
+      unsubmitted_students_quiz_title(students.length)
+    end
+  end
+
+  def unsubmitted_students_quiz_title(student_count)
+    I18n.t('#quizzes.headers.unsubmitted_students_quiz_title',
+      { :zero => "Student who haven't taken the quiz",
+        :one => "Students who haven't taken the quiz (%{count})",
+        :other => "Students who haven't taken the quiz (%{count})" },
+      { :count => student_count })
+  end
+
+  def unsubmitted_students_survey_title(student_count)
+    I18n.t('#quizzes.headers.unsubmitted_students_survey_title',
+      { :zero => "Student who haven't taken the survey",
+        :one => "Students who haven't taken the survey (%{count})",
+        :other => "Students who haven't taken the survey (%{count})" },
+      { :count => student_count })
+  end
+
+  def no_unsubmitted_students_msg(quiz)
+    if quiz.survey?
+      t('#quizzes.messages.no_unsubmitted_students_survey', "All Students have taken the survey")
+    else
+      t('#quizzes.messages.no_unsubmitted_students_quiz', "All Students have taken the quiz")
+    end
+  end
+
   QuestionType = Struct.new(:question_type,
-                          :entry_type,
-                          :display_answers,
-                          :answer_type,
-                          :multiple_sets,
-                          :unsupported
-                         )
+                            :entry_type,
+                            :display_answers,
+                            :answer_type,
+                            :multiple_sets,
+                            :unsupported)
 
   def answer_type(question)
     return QuestionType.new unless question

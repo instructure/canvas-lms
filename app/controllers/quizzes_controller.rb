@@ -202,17 +202,24 @@ class QuizzesController < ApplicationController
     if authorized_action(@quiz, @current_user, [:grade, :read_statistics])
       students = @context.students_visible_to(@current_user).order_by_sortable_name.to_a.uniq
       @submissions = @quiz.quiz_submissions.for_user_ids(students.map(&:id)).where("workflow_state<>'settings_only'").all
-      submission_ids = {}
-      @submissions.each{|s| submission_ids[s.user_id] = s.id }
-      @submitted_students = students.select{|stu| submission_ids[stu.id] }
-      if @quiz.survey? && @quiz.anonymous_submissions
-        @submitted_students = @submitted_students.sort_by{|stu| submission_ids[stu.id] }
+      @submissions = Hash[@submissions.map { |s| [s.user_id,s] }]
+      @submitted_students, @unsubmitted_students = students.partition do |stud|
+        @submissions[stud.id]
       end
-      @unsubmitted_students = students.reject{|stu| submission_ids[stu.id] }
-      submitted_students_json = @submitted_students.map { |u| user_json(u, @current_user, session) }
-      unsubmitted_students_json = @unsubmitted_students.map { |u| user_json(u, @current_user, session) }
-      @quiz_submission_list = {:UNSUBMITTED_STUDENTS => unsubmitted_students_json,
-                                         :SUBMITTED_STUDENTS => submitted_students_json}.to_json
+
+      if @quiz.anonymous_survey?
+        @submitted_students = @submitted_students.sort_by do |student|
+          @submissions[student.id].id
+        end
+        submitted_students_json = @submitted_students.map &:id
+        unsubmitted_students_json = @unsubmitted_students.map &:id
+      else
+        submitted_students_json = @submitted_students.map { |u| user_json(u, @current_user, session) }
+        unsubmitted_students_json = @unsubmitted_students.map { |u| user_json(u, @current_user, session) }
+      end
+
+      @quiz_submission_list = { :UNSUBMITTED_STUDENTS => unsubmitted_students_json,
+                                :SUBMITTED_STUDENTS => submitted_students_json }.to_json
       render :layout => false
     end
   end

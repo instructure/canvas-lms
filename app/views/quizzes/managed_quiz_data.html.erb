@@ -1,74 +1,51 @@
-<div id="quiz_details" class="clearfix">
-  <div class="student_list">
-    <div class="list-view border border-trbl submitted_list">
-        <header>
-          <% if @quiz.survey? %>
-            <%= t('headers.submitted_students_survey', "Students who have taken the survey") %>
-          <% else %>
-            <%= t('headers.submitted_students_quiz', "Students who have taken the quiz") %>
-          <% end %>
-        </header>
-        <ul class="quiz_results_list">
-          <% if @submitted_students.empty? %>
-            <li>
-              <span class="name">
-                <%= @quiz.survey? ?
-                  t(:survey_no_submissions, "No Students have taken the survey yet") :
-                  t(:quiz_no_submissions, "No Students have taken the quiz yet")
-                %>
-              </span>
-            </li>
-          <% end %>
-          <% @submitted_students.each_with_index do |s, idx| %>
-            <% submission = @submissions.find{|qs| qs.user_id == s.id} %>
-            <li class="student" data-id="<%= s.id %>">
-              <a href="<%= context_url(@context, :context_quiz_history_url, @quiz, :quiz_submission_id => submission.id) %>" class="name">
-                <% if submission.pending_review? %>
-                  <i class="icon-warning" title="<%= t('titles.submission_needs_review', "This submission needs review") %>"></i>
-                <% end %>
-                <% if @quiz.survey? && @quiz.anonymous_submissions %>
-                <%= t(:anonymous_student, "Student %{n}", :n => idx + 1) %>
-                <% else %>
-                <%= s.name %>
-                <% end %>
-              </a>
-            </li>
-        <% end %>
-        </ul>
-    </div>
-    <div class="list-view border border-trbl">
-      <% if @quiz.survey? && @quiz.anonymous_submissions %>
-        <header>
-          <%= render_unsubmitted_students(@unsubmitted_students.length) %>
-        </header>
-      <% else %>
-        <header>
-          <% if @quiz.survey? %>
-          <%= t('headers.survey_unsubmitted_students', "Students who haven't taken the survey") %>
-          <% else %>
-          <%= t('headers.quiz_unsubmitted_students', "Students who haven't taken the quiz") %>
-          <% end %>
-        </header>
-        <ul class="student_list">
-          <% if @unsubmitted_students.empty? && !@submitted_students.empty? %>
-            <li><span class="name">
-            <% if @quiz.survey? %>
-            <%= t(:survey_all_students_submitted, "All Students have taken the survey") %>
-            <% else %>
-            <%= t(:quiz_all_students_submitted, "All Students have taken the quiz") %>
+<div id="quiz_details">
+  <table class="table">
+    <thead>
+      <th>
+        <%= submitted_students_title(@quiz, @submitted_students) %>
+      </th>
+      <th>
+        <%= unsubmitted_students_title(@quiz, @unsubmitted_students) %>
+      </th>
+    </thead>
+    <tbody>
+      <%
+        [@submitted_students.size, @unsubmitted_students.size, 1].max.times do |index|
+          student = @submitted_students[index]
+          unsubmitted_student = @unsubmitted_students[index]
+          submission = student.present? ? @submissions[student.id] : nil
+      %>
+      <tr>
+        <td>
+          <% if @submitted_students.empty? && index == 0 %>
+            <%= no_submitted_students_msg(@quiz) %>
+          <% elsif student.present? && submission.present? %>
+            <% if submission.pending_review? %>
+              <% warn_msg = t('titles.submission_needs_review', "This submission needs review") %>
+              <i class="icon-warning" title="<%= warn_msg %>"></i>
             <% end %>
-          </span></li>
+          <a href="<%= polymorphic_path([@context, @quiz, :history], :quiz_submission_id => submission.id) %>" class="name">
+            <% if @quiz.anonymous_survey? %>
+              <%= t(:anonymous_student, "Student %{n}", :n => index + 1) %>
+            <% else %>
+              <%= student.name %>
+            <% end %>
+          </a>
           <% end %>
-          <% @unsubmitted_students.each do |s| %>
-          <li class="student" data-id="<%= s.id %>">
-            <span class="name"><%= s.name %></span>
-          </li>
-          <% end %>
-        </ul>
+        </td>
+        <td>
+          <span>
+            <% if @unsubmitted_students.empty? && !@submitted_students.empty? && index == 0 %>
+              <%= no_unsubmitted_students_msg(@quiz) %>
+            <% elsif unsubmitted_student.present? && !@quiz.anonymous_survey? %>
+              <%= unsubmitted_student.name %>
+            <% end %>
+          </span>
+        </td>
+      </tr>
       <% end %>
-    </div>
-
-  </div>
+    </tbody>
+  </table>
 </div>
 
 <script>
