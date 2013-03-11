@@ -253,6 +253,10 @@ describe ConversationsController, :type => :integration do
         it "should recognize filter on the default shard" do
           verify_filter(@alex.asset_string)
         end
+
+        it "should recognize filter on an unrelated shard" do
+          @shard2.activate{ verify_filter(@alex.asset_string) }
+        end
       end
 
       context "tag user on non-default shard" do
@@ -268,8 +272,16 @@ describe ConversationsController, :type => :integration do
           @conversations << @shard1.activate{ conversation(@alex) }
         end
 
+        it "should recognize filter on the default shard" do
+          verify_filter(@alex.asset_string)
+        end
+
         it "should recognize filter on the user's shard" do
           @shard1.activate{ verify_filter(@alex.asset_string) }
+        end
+
+        it "should recognize filter on an unrelated shard" do
+          @shard2.activate{ verify_filter(@alex.asset_string) }
         end
       end
     end

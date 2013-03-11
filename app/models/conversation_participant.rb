@@ -60,28 +60,98 @@ class ConversationParticipant < ActiveRecord::Base
     {:conditions => ["conversation_participants.root_account_ids <> '' AND " + like_condition('?', root_account_id_matcher, false), id_string]}
   }
 
+  # Produces a subscope for conversations in which the given users are
+  # participants (either all or any, depending on options[:mode]).
+  #
+  # The execution of subqueries and general complexity is due to the fact that
+  # the existence of a CP for any given user can only be guaranteed on the
+  # user's shard and the conversation's shard. To get a condition that can be
+  # applied on a single shard (for the scope being constructed) we basically
+  # have to execute this condition immediately and then just limit on the
+  # resulting ids into the scope we're building.
+  #
+  # Performance assumptions:
+  #
+  # * number of unique shards among given user tags is small (there will be one
+  #   query per such shard)
+  # * the number of unique shards on which those users have conversations is
+  #   relatively small (there will be one query per such shard)
+  # * number of found conversations is relatively small (each will be
+  #   instantiated to get id)
+  #
   tagged_scope_handler(/\Auser_(\d+)\z/) do |tags, options|
-    user_ids = tags.map{ |t| t.sub(/\Auser_/, '').to_i }
-    conditions = if options[:mode] == :or || tags.size == 1
-      [<<-SQL, user_ids]
-      EXISTS (
-        SELECT *
-        FROM conversation_participants cp
-        WHERE cp.conversation_id = conversation_participants.conversation_id
-        AND user_id IN (?)
-      )
-      SQL
-    else
-      [<<-SQL, user_ids, user_ids.size]
-      (
-        SELECT COUNT(*)
-        FROM conversation_participants cp
-        WHERE cp.conversation_id = conversation_participants.conversation_id
-        AND user_id IN (?)
-      ) = ?
-      SQL
+    scope_shard = scope(:find, :shard)
+    exterior_user_ids = tags.map{ |t| t.sub(/\Auser_/, '').to_i }
+
+    # which users have conversations on which shards?
+    users_by_conversation_shard =
+      ConversationParticipant.users_by_conversation_shard(exterior_user_ids)
+
+    # invert the map (to get shards-for-each-user rather than
+    # users-for-each-shard), then combine the keys (shards) according to mode.
+    # i.e. if we want conversations with all given users participating,
+    # intersect the set of shards; otherwise union them.
+    conversation_shards_by_user = {}
+    exterior_user_ids.each do |user_id|
+      conversation_shards_by_user[user_id] ||= Set.new
     end
-    sanitize_sql conditions
+    users_by_conversation_shard.each do |shard, user_ids|
+      user_ids.each do |user_id|
+        user_id = shard.relative_id_for(user_id)
+        conversation_shards_by_user[user_id] << shard
+      end
+    end
+    combinator = (options[:mode] == :or) ? :| : :&
+    conversation_shards =
+      conversation_shards_by_user.values.inject(combinator).to_a
+
+    # which conversations from those shards include any/all of the given users
+    # as participants?
+    conditions = Shard.with_each_shard(conversation_shards) do
+      user_ids = users_by_conversation_shard[Shard.current]
+
+      shard_conditions = if options[:mode] == :or || user_ids.size == 1
+        [<<-SQL, user_ids]
+        EXISTS (
+          SELECT *
+          FROM conversation_participants cp
+          WHERE cp.conversation_id = conversations.id
+          AND user_id IN (?)
+        )
+        SQL
+      else
+        [<<-SQL, user_ids, user_ids.size]
+        (
+          SELECT COUNT(*)
+          FROM conversation_participants cp
+          WHERE cp.conversation_id = conversations.id
+          AND user_id IN (?)
+        ) = ?
+        SQL
+      end
+
+      # return arrays because with each shard is gonna try and Array() it
+      # anyways, and 1.8.7 would split up the multiline strings.
+      if Shard.current == scope_shard
+        [sanitize_sql(shard_conditions)]
+      else
+        conversation_ids = Conversation.where(shard_conditions).map do |c|
+          Shard.relative_id_for(c.id, scope_shard)
+        end
+        [sanitize_sql(:conversation_id => conversation_ids)]
+      end
+    end
+
+    # tagged will flatten a [single_condition] or [] into the list of
+    # conditions it's building up, but if we've got multiple conditions here,
+    # we want to make sure they're combined with OR regardless of
+    # options[:mode], since they're results per shard that we want to combine;
+    # each individual condition already takes options[:mode] into account)
+    if conditions.size > 1
+      "(#{conditions.join(' OR ')})"
+    else
+      conditions
+    end
   end
 
   tagged_scope_handler(/\A(course|group|section)_(\d+)\z/) do |tags, options|
@@ -376,7 +446,10 @@ class ConversationParticipant < ActiveRecord::Base
     self.find(:all, :select => 'conversation_id', :order => order).map(&:conversation_id)
   end
 
-  
+  def self.users_by_conversation_shard(user_ids)
+    { Shard.current => user_ids }
+  end
+
   def update_one(update_params)
     case update_params[:event]
 

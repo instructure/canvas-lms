@@ -25,6 +25,7 @@ module SimpleTags
         tags.map{ |tag|
           wildcard(quoted_table_name + '.tags', tag, :delimiter => ',')
         }
+      conditions << sanitize_sql(['?', false]) if conditions.empty?
       scoped({:conditions => conditions.join(options[:mode] == :or ? " OR " : " AND ")})
     end
 

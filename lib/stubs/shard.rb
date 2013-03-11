@@ -109,6 +109,12 @@ ActiveRecord::Base.class_eval do
 end
 
 module ActiveRecord::Associations
+  AssociationProxy.class_eval do
+    def shard
+      Shard.default
+    end
+  end
+
   %w{HasManyAssociation HasManyThroughAssociation}.each do |klass|
     const_get(klass).class_eval do
       def with_each_shard(*shards_or_options)
