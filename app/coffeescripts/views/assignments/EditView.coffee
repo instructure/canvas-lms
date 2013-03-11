@@ -10,6 +10,8 @@ define [
   'compiled/views/assignments/TurnitinSettingsDialog'
   'compiled/fn/preventDefault'
   'compiled/views/calendar/MissingDateDialogView'
+  'compiled/views/assignments/AssignmentGroupSelector'
+  'compiled/views/assignments/GroupCategorySelector'
   'compiled/tinymce'
   'tinymce.editor_box'
   'jqueryui/dialog'
@@ -18,7 +20,7 @@ define [
   'compiled/jquery/toggleAccessibly',
 ], (INST, I18n, ValidatedFormView, _, $, wikiSidebar, template,
 TurnitinSettings, TurnitinSettingsDialog, preventDefault, MissingDateDialog,
-toggleAccessibly) ->
+AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
 
   class EditView extends ValidatedFormView
 
@@ -245,8 +247,11 @@ toggleAccessibly) ->
 
     # -- Pre-Save Validations --
 
-    fieldSelectors:
-      assignmentToggleAdvancedOptions: '#assignment_toggle_advanced_options'
+    fieldSelectors: _.extend(
+      { assignmentToggleAdvancedOptions: '#assignment_toggle_advanced_options' },
+      AssignmentGroupSelector::fieldSelectors,
+      GroupCategorySelector::fieldSelectors
+    )
 
     validateBeforeSave: (data, errors) =>
       errors = @_validateTitle data, errors

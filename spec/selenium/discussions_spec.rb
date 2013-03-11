@@ -331,6 +331,21 @@ describe "discussions" do
           other_override = overrides.detect{ |o| o.set_id == sec2.id }
           other_override.due_at.strftime('%b %-d, %y').should == due_at2.to_date.strftime('%b %-d, %y')
         end
+
+        it "should validate that a group category is selected" do
+          get "/courses/#{@course.id}/discussion_topics/new"
+          wait_for_ajaximations
+
+          f('input[type=checkbox][name="assignment[set_assignment]"]').click
+          f('#assignment_has_group_category').click
+          close_visible_dialog
+          f('.btn-primary[type=submit]').click
+          wait_for_ajaximations
+
+          errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
+          visBoxes, hidBoxes = errorBoxes.partition { |eb| eb.displayed? }
+          visBoxes.first.text.should == "Please select a group set for this assignment"
+        end
       end
     end
   end

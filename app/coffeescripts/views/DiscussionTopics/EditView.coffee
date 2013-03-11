@@ -186,6 +186,11 @@ htmlEscape, DiscussionTopic, Assignment, $, preventDefault, MissingDateDialog) -
       else
         super
 
+    fieldSelectors: _.extend({},
+      AssignmentGroupSelector::fieldSelectors,
+      GroupCategorySelector::fieldSelectors
+    )
+
     validateBeforeSave: (data, errors) =>
       if @isTopic() && data.set_assignment
         if @assignmentGroupSelector?
