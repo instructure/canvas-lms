@@ -1374,6 +1374,7 @@ class ApplicationController < ActionController::Base
   def flash_notices
     @notices ||= begin
       notices = []
+      notices << {:type => 'warning', :content => unsupported_browser, :classes => 'no_close'} if !browser_supported?
       if error = flash.delete(:error)
         notices << {:type => 'error', :content => error}
       end
@@ -1387,6 +1388,15 @@ class ApplicationController < ActionController::Base
     end
   end
   helper_method :flash_notices
+
+  def unsupported_browser
+    t("#application.warnings.unsupported_browser", "Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Guides* for a complete list of supported browsers.", :wrapper => @template.link_to('\1', 'http://guides.instructure.com/s/2204/m/4214/l/41056-which-browsers-does-canvas-support'))
+  end
+
+  def browser_supported?
+    session[:browser_supported] = Browser.supported?(request.user_agent) unless session.key?(:browser_supported)
+    session[:browser_supported]
+  end
 
   def profile_data(profile, viewer, session, includes)
     extend Api::V1::UserProfile
