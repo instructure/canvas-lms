@@ -728,17 +728,14 @@ Spec::Runner.configure do |config|
   end
 
   # enforce forgery protection, so we can verify usage of the authenticity token
-  def enable_forgery_protection(enable = nil)
-    if enable != false
-      ActionController::Base.class_eval { alias_method :_old_protect, :allow_forgery_protection; def allow_forgery_protection; true; end }
-    end
+  def enable_forgery_protection(enable = true)
+    old_value = ActionController::Base.allow_forgery_protection
+    ActionController::Base.stubs(:allow_forgery_protection).including_subclasses.returns(enable)
 
     yield if block_given?
 
   ensure
-    if enable != true
-      ActionController::Base.class_eval { alias_method :allow_forgery_protection, :_old_protect }
-    end
+    ActionController::Base.stubs(:allow_forgery_protection).including_subclasses.returns(old_value) if block_given?
   end
 
   def start_test_http_server(requests=1)

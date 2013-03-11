@@ -609,12 +609,8 @@ describe FilesController do
       course_with_teacher(:active_all => true, :user => user_with_pseudonym)
       @attachment = factory_with_protected_attributes(Attachment, :context => @course, :file_state => 'deleted', :workflow_state => 'unattached', :filename => 'test.txt', :content_type => 'text')
       @content = StringIO.new("test file")
-      enable_forgery_protection true
       request.env['CONTENT_TYPE'] = 'multipart/form-data'
-    end
-
-    after do
-      enable_forgery_protection false
+      enable_forgery_protection
     end
 
     it "should accept the upload data if the policy and attachment are acceptable" do

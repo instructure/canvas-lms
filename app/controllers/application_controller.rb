@@ -774,12 +774,12 @@ class ApplicationController < ActionController::Base
         @page_view_update = true
       end
       if @page_view && !request.xhr? && request.get? && (response.content_type || "").match(/html/)
-        @page_view.context ||= @context rescue nil
-        @page_view.account_id = @domain_root_account.id
         @page_view.render_time ||= (Time.now.utc - @page_before_render) rescue nil
         @page_view_update = true
       end
       if @page_view && @page_view_update
+        @page_view.context = @context if !@page_view.context_id
+        @page_view.account_id = @domain_root_account.id
         @page_view.store
       end
     else

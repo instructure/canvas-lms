@@ -35,7 +35,7 @@ class PageView < ActiveRecord::Base
   attr_accessible :url, :user, :controller, :action, :session_id, :developer_key, :user_agent, :real_user, :context
 
   def self.generate(request, attributes={})
-    returning self.new(attributes) do |p|
+    self.new(attributes).tap do |p|
       p.url = request.url[0,255]
       p.http_method = request.method.to_s
       p.controller = request.path_parameters['controller']

@@ -17,7 +17,7 @@
 #
 
 class PseudonymSessionsController < ApplicationController
-  protect_from_forgery :except => [:create, :destroy, :saml_consume, :oauth2_token]
+  protect_from_forgery :except => [:create, :destroy, :saml_consume, :oauth2_token, :oauth2_logout]
   before_filter :forbid_on_files_domain, :except => [ :clear_file_session ]
   before_filter :require_password_session, :only => [ :otp_login, :disable_otp_login ]
   before_filter :require_user, :only => [ :otp_login ]

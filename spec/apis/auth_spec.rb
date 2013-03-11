@@ -26,6 +26,7 @@ describe "API Authentication", :type => :integration do
     @client_id = @key.id
     @client_secret = @key.api_key
     ActionController::Base.consider_all_requests_local = false
+    enable_forgery_protection
   end
 
   after do
@@ -294,7 +295,7 @@ describe "API Authentication", :type => :integration do
         get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob'
         response.should redirect_to(login_url)
 
-        get response['Location']
+        follow_redirect!
         response.should be_success
 
         user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
@@ -304,7 +305,10 @@ describe "API Authentication", :type => :integration do
         # step 2
         response.should be_redirect
         response['Location'].should match(%r{/login/oauth2/confirm$})
-        post "/login/oauth2/accept", { :authenticity_token => session[:_csrf_token] }
+        follow_redirect!
+        response.should be_success
+
+        post "/login/oauth2/accept", { :authenticity_token => controller.send(:form_authenticity_token) }
 
         code = response['Location'].match(/code=([^\?&]+)/)[1]
         code.should be_present
