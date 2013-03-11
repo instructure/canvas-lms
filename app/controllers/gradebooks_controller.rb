@@ -22,10 +22,10 @@ class GradebooksController < ApplicationController
   include Api::V1::AssignmentGroup
   include Api::V1::Submission
 
-  before_filter :require_context, :except => :public_feed
+  before_filter :require_context
   batch_jobs_in_actions :only => :update_submission, :batch => { :priority => Delayed::LOW_PRIORITY }
 
-  add_crumb("Grades", :except => :public_feed) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grades_url }
+  add_crumb(proc { t '#crumbs.grades', "Grades" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grades_url }
   before_filter { |c| c.active_tab = "grades" }
 
   def grade_summary
@@ -371,23 +371,6 @@ class GradebooksController < ApplicationController
   def blank_submission
     @headers = false
     render :action => "blank_submission"
-  end
-
-  def public_feed
-    return unless get_feed_context(:only => [:course])
-
-    respond_to do |format|
-      feed = Atom::Feed.new do |f|
-        f.title = t('titles.feed_for_course', "%{course} Gradebook Feed", :course => @context.name)
-        f.links << Atom::Link.new(:href => course_gradebook_url(@context), :rel => 'self')
-        f.updated = Time.now
-        f.id = course_gradebook_url(@context)
-      end
-      @context.submissions.each do |e|
-        feed.entries << e.to_atom
-      end
-      format.atom { render :text => feed.to_xml }
-    end
   end
 
   def change_gradebook_version
