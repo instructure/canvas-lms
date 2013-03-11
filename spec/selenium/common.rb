@@ -901,16 +901,12 @@ shared_examples_for "all selenium tests" do
     driver.manage.timeouts.implicit_wait = 3
     driver.manage.timeouts.script_timeout = 60
     EncryptedCookieStore.any_instance.stubs(:secret).returns(ActiveSupport::SecureRandom.hex(64))
+    enable_forgery_protection
   end
 
   append_before (:all) do
     $selenium_driver ||= setup_selenium
     default_url_options[:host] = $app_host_and_port
-    enable_forgery_protection(true)
-  end
-
-  append_after(:all) do
-    enable_forgery_protection(false)
   end
 
   append_before (:all) do
