@@ -145,4 +145,3 @@ define [
       if $el.data('rich_text')
         $el = $el.next('.mceEditor').find(".mceIframeContainer")
       $el
-

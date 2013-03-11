@@ -65,13 +65,21 @@ define [
         data.grade_group_students_individually = false
       data
 
+    fieldSelectors:
+      groupCategorySelector: '#assignment_group_category_id'
+
     validateBeforeSave: (data, errors) =>
       errors = @_validateGroupCategoryID data, errors
       errors
 
     _validateGroupCategoryID: (data, errors) =>
-      if data.group_category_id == 'new'
-        errors["'group_category_id'"] = [
-          message: I18n.t 'group_assignment_must_have_category', 'Please select a group set for this assignment'
+      gcid = if @nested
+        data.assignment.groupCategoryId()
+      else
+        data.group_category_id
+
+      if gcid == 'new'
+        errors["groupCategorySelector"] = [
+          message: I18n.t 'group_assignment_must_have_group_set', 'Please select a group set for this assignment'
         ]
       errors

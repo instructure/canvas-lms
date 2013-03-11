@@ -339,9 +339,9 @@ describe "assignments" do
     it "should show a more errors errorBox if any invalid fields are hidden" do
       assignment_name = 'first test assignment'
       @assignment = @course.assignments.create({
-                                                   :name => assignment_name,
-                                                   :assignment_group => @course.assignment_groups.create!(:name => "default")
-                                               })
+        :name => assignment_name,
+        :assignment_group => @course.assignment_groups.create!(:name => "default")
+      })
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
       f('#assignment_toggle_advanced_options').click # show advanced options
@@ -361,6 +361,25 @@ describe "assignments" do
       errorBoxes.size.should == 1 # the more_options_link one has now been removed from the DOM
       errorBoxes.first.text.should == 'Please choose at least one submission type'
       errorBoxes.first.should be_displayed
+    end
+
+    it "should validate that a group category is selected" do
+      assignment_name = 'first test assignment'
+      @assignment = @course.assignments.create({
+        :name => assignment_name,
+        :assignment_group => @course.assignment_groups.create!(:name => "default")
+      })
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+      f('#assignment_toggle_advanced_options').click # show advanced options
+      f('#assignment_has_group_category').click
+      close_visible_dialog
+      f('.btn-primary[type=submit]').click
+      wait_for_ajaximations
+
+      errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
+      visBoxes, hidBoxes = errorBoxes.partition { |eb| eb.displayed? }
+      visBoxes.first.text.should == "Please select a group set for this assignment"
     end
 
     it "should create an assignment with more options" do
