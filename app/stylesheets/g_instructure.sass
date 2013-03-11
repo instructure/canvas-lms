@@ -48,14 +48,19 @@
     width: 400px
     &.static_message
       width: auto
+    a
+      text-decoration: underline
+      color: inherit
     a.close_link
       position: absolute
       right: 10px
       top: 50%
+      width: 20px
+      height: 20px
+      overflow: hidden
       margin-top: -11px
       color: white
-      &:before
-        vertical-align: top
+      text-decoration: none
     i
       display: inline-block
       vertical-align: middle
@@ -70,17 +75,6 @@
     &.no_close
       a.close_link
         display: none
-    &.xlarge
-      font-size: 1.5em
-      padding: 8px 40px 8px 8px
-      min-height: 42px
-      i
-        width: 40px
-        height: 40px
-        background-image: url(/images/check_36.png)
-      &.ui-state-error, &.ui-state-warning
-        i
-          background-image: url(/images/warning_36.png)
 
 #unauthorized_message
   border: 1px solid #000
