@@ -61,6 +61,7 @@ gem 'rubyzip',        '0.9.5',  :require => 'zip/zip'
 gem 'safe_yaml-instructure', '0.8.0',  :require => false
 gem 'sanitize',       '2.0.3'
 gem 'tzinfo',         '0.3.35'
+gem 'useragent',      '0.4.16'
 gem 'uuid',           '2.3.2'
 gem 'will_paginate',  '2.3.15'
 gem 'xml-simple',     '1.0.12', :require => 'xmlsimple'

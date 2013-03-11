@@ -825,24 +825,21 @@ shared_examples_for "all selenium tests" do
 
   def assert_flash_notice_message(okay_message_regex)
     keep_trying_until do
-      text = f("#flash_message_holder .ui-state-success").text rescue ''
-      raise "server error" if text =~ /The last request didn't work out/
+      text = ff("#flash_message_holder .ui-state-success").map(&:text).join("\n") rescue ''
       text =~ okay_message_regex
     end
   end
 
-  def assert_flash_warning_message(okay_message_regex)
+  def assert_flash_warning_message(warn_message_regex)
     keep_trying_until do
-      text = f("#flash_message_holder .ui-state-warning").text rescue ''
-      raise "server error" if text =~ /The last request didn't work out/
-      text =~ okay_message_regex
+      text = ff("#flash_message_holder .ui-state-warning").map(&:text).join("\n") rescue ''
+      text =~ warn_message_regex
     end
   end
 
   def assert_flash_error_message(fail_message_regex)
     keep_trying_until do
-      text = f("#flash_message_holder .ui-state-error").text rescue ''
-      raise "server error" if text =~ /The last request didn't work out/
+      text = ff("#flash_message_holder .ui-state-error").map(&:text).join("\n") rescue ''
       text =~ fail_message_regex
     end
   end
