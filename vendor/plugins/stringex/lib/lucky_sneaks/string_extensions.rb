@@ -41,7 +41,10 @@ module LuckySneaks
     # Performs multiple text manipulations. Essentially a shortcut for typing them all. View source
     # below to see which methods are run.
     def remove_formatting
-      strip_html_tags.convert_accented_entities.convert_misc_entities.convert_misc_characters.to_ascii.collapse
+      # the second call to convert_misc_characters (after to_ascii) takes care of 
+      # transliterated stuff from to_ascii (e.g., '¼' -> '1/4').
+      # see https://github.com/rsl/stringex/commit/e2fdbc11579e646956ca269a32445059dc2d7724
+      strip_html_tags.convert_accented_entities.convert_misc_entities.convert_misc_characters.to_ascii.convert_misc_characters.collapse
     end
 
     # Removes HTML tags from text. This code is simplified from Tobias Luettke's regular expression
