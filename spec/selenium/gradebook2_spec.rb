@@ -605,4 +605,5 @@ describe "gradebook2" do
       test_n_students @page_size * 2 + 1
     end
   end
+
 end

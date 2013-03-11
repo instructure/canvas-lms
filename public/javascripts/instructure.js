@@ -219,8 +219,7 @@ define([
             width: 400,
             height: "auto",
             open: function() {
-              $("li", this).attr("tabindex", "0");
-              $(".ui-dialog").focus();
+              $(".navigation_list:first").focus();
             },
             close: function() {
               $("li", this).attr("tabindex", ""); // prevents chrome bsod
@@ -380,6 +379,7 @@ define([
             .addClass('external')
             .html('<span>' + $(this).html() + '</span>')
             .attr('target', '_blank')
+            .attr('aria-label', htmlEscape(I18n.t('titles.external_link', 'Links to an external site.')))
             .append('<span class="ui-icon ui-icon-extlink ui-icon-inline" title="' + htmlEscape(I18n.t('titles.external_link', 'Links to an external site.')) + '"/>');
         }).end()
         .find("a.instructure_file_link").each(function() {
@@ -882,6 +882,9 @@ define([
 
               if (!data[label + '_item']) {
                 tag.title = tag.title || tag.name;
+                if( tag.workflow_state === "unpublished" ){
+                  tag.title += " (" + I18n.t("draft", "Draft") + ")"
+                }
                 tag.text = (label == 'previous' ?
                   I18n.t('buttons.previous_module', "Previous Module") :
                   I18n.t('buttons.next_module', "Next Module"));
@@ -975,7 +978,7 @@ define([
 
     // this is for things like the to-do, recent items and upcoming, it
     // happend a lot so rather than duplicating it everywhere I stuck it here
-    $(".more_link").click(function(event) {
+    $("#right-side").delegate(".more_link", "click", function(event) {
       var $this = $(this);
       var $children = $this.parents("ul").children().show();
       $this.closest('li').remove();
@@ -990,7 +993,7 @@ define([
       }
       return false;
     });
-    $(".to-do-list, #topic_list").delegate('.disable_item_link', 'click', function(event) {
+    $("#right-side, #topic_list").delegate('.disable_item_link', 'click', function(event) {
       event.preventDefault();
       var $item = $(this).parents("li, div.topic_message");
       var url = $(this).data('api-href');

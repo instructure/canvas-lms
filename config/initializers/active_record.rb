@@ -93,7 +93,8 @@ class ActiveRecord::Base
   end
 
   def asset_string
-    @asset_string ||= "#{self.class.base_ar_class.name.underscore}_#{id}"
+    @asset_string ||= {}
+    @asset_string[Shard.current] ||= "#{self.class.base_ar_class.name.underscore}_#{id}"
   end
 
   def global_asset_string
@@ -492,6 +493,23 @@ class ActiveRecord::Base
     end
     options[:group] << ", #{unqualified_field}" if options[:group]
     options
+  end
+
+  def self.generate_temp_table(options = {})
+    Canvas::TempTable.new(connection, construct_finder_sql({}), options)
+  end
+
+  def self.find_in_batches_with_temp_table(options = {})
+    generate_temp_table(options).execute! do |table|
+      table.find_in_batches(options) { |batch| yield batch }
+    end
+  end
+
+  def self.find_each_with_temp_table(options = {})
+    find_in_batches_with_temp_table(options) do |batch|
+      batch.each { |record| yield record }
+    end
+    self
   end
 
   def self.useful_find_in_batches(options = {})

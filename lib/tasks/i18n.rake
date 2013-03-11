@@ -186,6 +186,11 @@ namespace :i18n do
     file_translations = {}
 
     locales = I18n.available_locales - [:en]
+    # allow passing of extra, empty locales by including a comma-separated
+    # list of abbreviations in the LOCALES environment variable. e.g.
+    #
+    # LOCALES=hi,ja,pt,zh-hans rake i18n:generate_js
+    locales = locales + ENV['LOCALES'].split(',') if ENV['LOCALES']
     all_translations = I18n.backend.send(:translations)
     flat_translations = all_translations.flatten_keys
 
@@ -282,7 +287,7 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
           if $?.exitstatus == 0
             if ret.include?(base_filename)
               `git checkout #{arg}`
-              if previous = YAML.load(File.read(base_filename)).flatten_keys rescue nil
+              if previous = YAML.safe_load(File.read(base_filename)).flatten_keys rescue nil
                 last_export = {:type => :commit, :data => previous}
               else
                 $stderr.puts "Unable to load en.yml file"
@@ -297,7 +302,7 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
         else
           puts "Loading previous export..."
           if File.exist?(arg)
-            if previous = YAML.load(File.read(arg)).flatten_keys rescue nil
+            if previous = YAML.safe_load(File.read(arg)).flatten_keys rescue nil
               last_export = {:type => :file, :data => previous}
             else
               $stderr.puts "Unable to load yml file"
@@ -319,7 +324,7 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
       Rake::Task["i18n:generate"].invoke
 
       puts "Exporting #{last_export[:data] ? "new/changed" : "all"} en translations..."
-      current_strings = YAML.load(File.read(base_filename)).flatten_keys
+      current_strings = YAML.safe_load(File.read(base_filename)).flatten_keys
       new_strings = last_export[:data] ?
         current_strings.inject({}){ |h, (k, v)|
           h[k] = v unless last_export[:data][k] == v
@@ -360,7 +365,6 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
   task :import => :environment do
     require 'ya2yaml'
     Hash.send :include, HashExtensions
-    YAML.send :include, I18nExtraction::SafeYAML
 
     def placeholders(str)
       str.scan(/%h?\{[^\}]+\}/).sort
@@ -385,7 +389,7 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
     begin
       puts "Enter path to original en.yml file:"
       arg = $stdin.gets.strip
-      source_translations = File.exist?(arg) && YAML.load(File.read(arg)) rescue nil
+      source_translations = File.exist?(arg) && YAML.safe_load(File.read(arg)) rescue nil
     end until source_translations
     raise "Source does not have any English strings" unless source_translations.keys.include?('en')
     source_translations = source_translations['en'].flatten_keys
@@ -393,7 +397,7 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
     begin
       puts "Enter path to translated file:"
       arg = $stdin.gets.strip
-      new_translations = File.exist?(arg) && YAML.load(File.read(arg)) rescue nil
+      new_translations = File.exist?(arg) && YAML.safe_load(File.read(arg)) rescue nil
     end until new_translations
     raise "Translation file contains multiple languages" if new_translations.size > 1
     language = new_translations.keys.first

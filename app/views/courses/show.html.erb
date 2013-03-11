@@ -46,8 +46,6 @@
   <% if @course_home_view == 'wiki' %>
     <% js_bundle :wiki %>
     <%= render :partial => "wiki_pages/wiki_right_side", :locals => {:course_home => true} %>
-  <% elsif @course_home_view == 'modules' %>
-    <%= render :partial => "context_modules/context_module_right_side", :locals => {:course_home => true} %>
   <% elsif @course_home_view == 'assignments' %>
     <%= render :partial => 'assignments/assignments_list_right_side', :locals => {:course_home => true} %>
   <% elsif @course_home_view == 'syllabus' %>
@@ -236,7 +234,7 @@ This layout is probably best for courses that aren't based on a specific schedul
   <div class="clear"></div>
 </div>
 <div id="course_home_content">
-  <div style="float: right; text-align: left;" class="floating_links">
+  <div style="float: right; text-align: left;" class="floating_links clearfix">
     <% if can_do(@context, @current_user, :manage_content) || @course_home_view != 'feed' %>
       <div style="font-size: 0.9em;">
         <% if can_do(@context, @current_user, :manage_content) %>

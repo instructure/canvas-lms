@@ -1589,7 +1589,7 @@ class Attachment < ActiveRecord::Base
     end
   end
 
-  class OverQuotaError < Exception; end
+  class OverQuotaError < StandardError; end
 
   def clone_url(url, duplicate_handling, check_quota)
     begin

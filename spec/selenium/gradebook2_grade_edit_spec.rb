@@ -145,7 +145,7 @@ describe "edititing grades" do
     end
     set_value(grade_input, 3)
     a1.send_keys(:tab)
-    wait_for_ajax_requests
+    wait_for_ajaximations
     f(assignment_1_sel)['class'].should_not include 'dropped'
     f(assignment_2_sel)['class'].should include 'dropped'
   end

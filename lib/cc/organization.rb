@@ -40,7 +40,7 @@ module CC
         ) do |org|
           org.item(:identifier=>"LearningModules") do |root_item|
             @root_item = root_item
-            @course.context_modules.active.each do |cm|
+            @course.context_modules.not_deleted.each do |cm|
               next unless @manifest.export_object?(cm)
               add_module(cm)
             end

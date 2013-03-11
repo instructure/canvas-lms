@@ -25,20 +25,78 @@ describe "context_modules" do
       get "/courses/#{@course.id}/modules"
     end
 
-    def create_modules(number_to_create)
+    def create_modules(number_to_create, workflow_state = "unpublished")
 
       modules = []
 
       number_to_create.times do |i|
         m = @course.context_modules.create!(:name => "module #{i}")
+        m.workflow_state = workflow_state
         modules << m
       end
       modules
     end
 
+    it "should render as course home page" do
+      create_modules(1)
+      @course.default_view = 'modules'
+      @course.save!
+      get "/courses/#{@course.id}"
+
+      f('.add_module_link').should_not be_nil
+    end
+
+    it "publishes an unpublished module" do
+      pending
+      create_modules(1, "unpublished")
+      get "/courses/#{@course.id}/modules"
+
+      keep_trying_until do
+        f('.admin-links button').click
+        hover_and_click('#context_modules .change-workflow-state-link')
+        wait_for_ajax_requests
+        f('.context_module').should have_class('published_module')
+      end
+    end
+
+    it "unpublishes a published module" do
+      pending
+      # Active modules means they are published.
+      create_modules(1, "active")
+      get "/courses/#{@course.id}/modules"
+
+      keep_trying_until do
+        f('.admin-links button').click
+        hover_and_click('#context_modules .change-workflow-state-link')
+        wait_for_ajax_requests
+        f('.context_module').should have_class('unpublished_module')
+      end
+    end
+
+    it "add unpublished_module css class when creating new module" do
+      pending
+      add_module('New Module')
+      f('.context_module').should have_class('unpublished_module')
+      @course.context_modules.first.workflow_state.should == "unpublished"
+    end
+
+    it "allows you to publish a newly created module without reloading the page" do
+      pending
+      add_module('New Module')
+      f('.context_module').should have_class('unpublished_module')
+      @course.context_modules.first.workflow_state.should == "unpublished"
+
+      keep_trying_until do
+        f('.admin-links button').click
+        hover_and_click('#context_modules .change-workflow-state-link')
+        wait_for_ajax_requests
+        f('.context_module').should have_class('published_module')
+      end
+    end
+
     it "should display all available modules in course through student progression" do
       new_student = student_in_course.user
-      modules = create_modules(2)
+      modules = create_modules(2, "active")
 
       #attach 1 assignment to module 1 and 2 assignments to module 2
       modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
@@ -47,6 +105,8 @@ describe "context_modules" do
 
       get "/courses/#{@course.id}/modules"
 
+      # button appears after ajax requests
+      wait_for_ajaximations
       f('.module_progressions_link').click
       wait_for_ajaximations
       f(".student_list").should be_displayed
@@ -61,7 +121,7 @@ describe "context_modules" do
 
     it "should refresh student progression page and display as expected" do
       new_student = student_in_course.user
-      modules = create_modules(2)
+      modules = create_modules(2, "active")
 
       #attach 1 assignment to module 1 and 2 assignments to module 2
       @tag_1 = modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
@@ -78,6 +138,7 @@ describe "context_modules" do
       get "/courses/#{@course.id}/modules"
 
       #opens the student progression link and validates all modules have no information"
+      wait_for_ajaximations
       f('.module_progressions_link').click
       wait_for_ajaximations
 
@@ -106,7 +167,7 @@ describe "context_modules" do
     new_student = student_in_course.user
     new_student2 = student_in_course.user
 
-    modules = create_modules(2)
+    modules = create_modules(2, "active")
 
     #attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
     @tag_1 = modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
@@ -137,7 +198,7 @@ describe "context_modules" do
   end
 
   it "should rearrange child objects in same module" do
-    modules = create_modules(1)
+    modules = create_modules(1, "active")
 
     #attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
     modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
@@ -161,7 +222,7 @@ describe "context_modules" do
 
   it "should rearrange child object to new module" do
       pending('drag and drop selenium not working')
-    modules = create_modules(2)
+    modules = create_modules(2, "active")
 
     #attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
     modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
@@ -211,6 +272,7 @@ describe "context_modules" do
     refresh_page
 
     keep_trying_until do
+      f('.admin-links button').click
       hover_and_click('#context_modules .edit_module_link')
       wait_for_ajax_requests
       f('#add_context_module_form').should be_displayed
@@ -239,6 +301,7 @@ describe "context_modules" do
   it "should delete a module" do
     add_module('Delete Module')
     driver.execute_script("$('.context_module').addClass('context_module_hover')")
+    f('.admin-links button').click
     f('.delete_module_link').click
     driver.switch_to.alert.should_not be_nil
     driver.switch_to.alert.accept
@@ -252,6 +315,7 @@ describe "context_modules" do
     add_module('Edit Module')
     context_module = f('.context_module')
     driver.action.move_to(context_module).perform
+    f('.admin-links button').click
     f('.edit_module_link').click
     f('.ui-dialog').should be_displayed
     edit_form = f('#add_context_module_form')
@@ -268,6 +332,7 @@ describe "context_modules" do
     # add completion criterion
     context_module = f('.context_module')
     driver.action.move_to(context_module).perform
+    f('.admin-links button').click
     f('.edit_module_link').click
     f('.ui-dialog').should be_displayed
     edit_form = f('#add_context_module_form')
@@ -288,6 +353,7 @@ describe "context_modules" do
 
     # delete the criterion, then cancel the form
     driver.action.move_to(context_module).perform
+    f('.admin-links button').click
     f('.edit_module_link').click
     f('.ui-dialog').should be_displayed
     edit_form = f('#add_context_module_form')
@@ -299,6 +365,7 @@ describe "context_modules" do
     # now delete the criterion frd
     # (if the previous step did even though it shouldn't have, this will error)
     driver.action.move_to(context_module).perform
+    f('.admin-links button').click
     f('.edit_module_link').click
     f('.ui-dialog').should be_displayed
     edit_form = f('#add_context_module_form')
@@ -313,6 +380,7 @@ describe "context_modules" do
 
     # and also make sure the form remembers that it's gone (#8329)
     driver.action.move_to(context_module).perform
+    f('.admin-links button').click
     f('.edit_module_link').click
     f('.ui-dialog').should be_displayed
     edit_form = f('#add_context_module_form')
@@ -392,6 +460,7 @@ describe "context_modules" do
     add_module('TestModule')
 
     # add a text header
+    f('.admin-links button').click
     f('.add_module_item_link').click
     select_module_item('#add_module_item_select', 'Text Header')
     wait_for_ajaximations
@@ -402,6 +471,7 @@ describe "context_modules" do
     tag1 = ContentTag.last
 
     # and another one
+    f('.admin-links button').click
     f('.add_module_item_link').click
     select_module_item('#add_module_item_select', 'Text Header')
     wait_for_ajaximations
@@ -445,6 +515,7 @@ describe "context_modules" do
   it "should add a text header to a module" do
     header_text = 'new header text'
     add_module('Text Header Module')
+    f('.admin-links button').click
     f('.add_module_item_link').click
     select_module_item('#add_module_item_select', 'Text Header')
     keep_trying_until do
@@ -468,6 +539,7 @@ describe "context_modules" do
 
   it "should not save an invalid external tool" do
     add_module 'Test module'
+    f('.admin-links button').click
     f('.add_module_item_link').click
     select_module_item('#add_module_item_select', 'External Tool')
     find_with_jquery('.add_item_button:visible').click
@@ -483,10 +555,8 @@ describe "context_modules" do
   end
 
   it "should add 2 modules with the first one as a prerequisite" do
-    pending("Bug 6711 - Prerequisite module doesn't save when creating and saving module in one step") do
       first_module_name = 'First Module'
       second_module_name = 'Second Module'
-
       add_module(first_module_name)
       #adding second module - can't use add_module method because a prerequisite needs to be added to this module
       add_form = new_module_form
@@ -500,13 +570,13 @@ describe "context_modules" do
       db_module = ContextModule.last
       context_module = f("#context_module_#{db_module.id}")
       driver.action.move_to(context_module).perform
+      f("#context_module_#{db_module.id} .admin-links button").click
       f("#context_module_#{db_module.id} .edit_module_link").click
       f('.ui-dialog').should be_displayed
       wait_for_ajaximations
       prereq_select = fj('.criterion select')
       option = first_selected_option(prereq_select)
       option.text.should == 'the module, ' + first_module_name
-    end
   end
 
   it "should rearrange modules" do
@@ -544,7 +614,7 @@ describe "context_modules" do
 
     driver.execute_script("$('#context_module_item_#{tag.id} .indent_item_link').hover().click()")
     wait_for_ajaximations
-    f("#context_module_item_#{tag.id}").attribute(:class).should include("indent_1")
+    f("#context_module_item_#{tag.id}").should have_class('indent_1')
 
     tag.reload
     tag.indent.should == 1
@@ -558,7 +628,7 @@ describe "context_modules" do
     click_option("#content_tag_indent_select", "Indent 1 Level")
     submit_form("#edit_item_form")
     wait_for_ajaximations
-    f("#context_module_item_#{tag.id}").attribute(:class).should include("indent_1")
+    f("#context_module_item_#{tag.id}").should have_class('indent_1')
 
     tag.reload
     tag.indent.should == 1
@@ -599,7 +669,7 @@ describe "context_modules" do
     end
 
     it "should indicate when course sections have multiple due dates" do
-      modules = create_modules(1)
+      modules = create_modules(1, "active")
       modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
 
       cs1 = @course.default_section
@@ -616,7 +686,7 @@ describe "context_modules" do
 
     it "should not indicate multiple due dates if the sections' dates are the same" do
       pending("needs to ignore base if all visible sections are overridden")
-      modules = create_modules(1)
+      modules = create_modules(1, "active")
       modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
 
       cs1 = @course.default_section
@@ -634,7 +704,7 @@ describe "context_modules" do
     end
 
     it "should use assignment due date if there is no section override" do
-      modules = create_modules(1)
+      modules = create_modules(1, "active")
       modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
 
       cs1 = @course.default_section
@@ -654,7 +724,7 @@ describe "context_modules" do
 
     it "should only use the sections the user is restricted to" do
       pending("needs to ignore base if all visible sections are overridden")
-      modules = create_modules(1)
+      modules = create_modules(1, "active")
       modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
 
       cs1 = @course.default_section
@@ -685,6 +755,7 @@ describe "context_modules" do
     # add completion criterion
     context_module = f('.context_module')
     driver.action.move_to(context_module).perform
+    f('.admin-links button').click
     f('.edit_module_link').click
     edit_form = f('#add_context_module_form')
     f('.add_completion_criterion_link', edit_form).click

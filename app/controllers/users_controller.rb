@@ -298,13 +298,20 @@ class UsersController < ApplicationController
       return redirect_to(dashboard_url, :status => :moved_permanently)
     end
     disable_page_views if @current_pseudonym && @current_pseudonym.unique_id == "pingdom@instructure.com"
-    if @show_recent_feedback = (@current_user.student_enrollments.active.size > 0)
-      @recent_feedback = (@current_user && @current_user.recent_feedback) || []
-    end
+
+    js_env :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
     @pending_invitations = @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]).select { |e| e.invited? }
     @stream_items = @current_user.try(:cached_recent_stream_items) || []
+  end
+
+  def dashboard_sidebar
+    if @show_recent_feedback = (@current_user.student_enrollments.active.size > 0)
+      @recent_feedback = (@current_user && @current_user.recent_feedback) || []
+    end
+
+    render :layout => false
   end
 
   def toggle_dashboard
@@ -637,10 +644,9 @@ class UsersController < ApplicationController
     @resource_title = @tool.label_for(:user_navigation)
     @resource_url = @tool.settings[:user_navigation][:url]
     @opaque_id = @current_user.opaque_identifier(:asset_string)
-    @context = @current_user.profile
     @resource_type = 'user_navigation'
     @return_url = user_profile_url(@current_user, :include_host => true)
-    @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @context, :link_code => @opaque_id, :return_url => @return_url, :resource_type => @resource_type)
+    @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @domain_root_account, :link_code => @opaque_id, :return_url => @return_url, :resource_type => @resource_type)
     @tool_settings = @launch.generate
     @active_tab = @tool.asset_string
     add_crumb(@current_user.short_name, user_profile_path(@current_user))
@@ -713,8 +719,6 @@ class UsersController < ApplicationController
       @user.require_presence_of_name = true
       @user.require_self_enrollment_code = self_enrollment
       @user.validation_root_account = @domain_root_account
-      # min age may also be enforced, depending on require_self_enrollment_code
-      @user.require_birthdate = (@user.initial_enrollment_type == 'student')
     end
     
     @observee = nil
@@ -1129,7 +1133,7 @@ class UsersController < ApplicationController
 
   def teacher_activity
     @teacher = User.find(params[:user_id])
-    if @teacher == @current_user || authorized_action(@teacher, @current_user, :view_statistics)
+    if @teacher == @current_user || authorized_action(@teacher, @current_user, :read_reports)
       @courses = {}
 
       if params[:student_id]

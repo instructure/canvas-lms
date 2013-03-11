@@ -19,7 +19,7 @@
     </li>
   {{/each}}
   <li>
-    <a href="#" class="element_toggler" aria-controls="add_external_feed_form">
+    <a href="#" class="element_toggler add_external_feed_link" aria-controls="add_external_feed_form">
       <i class="icon-rss-add"></i>
       {{#t "links.add_external_feed"}}Add External Feed{{/t}}
     </a>
@@ -49,12 +49,14 @@
     </select>
   </div>
   <label class="checkbox">
-    <input class="element_toggler"
+    <input id="external_feed_enable_header_match"
+           class="element_toggler"
            aria-controls="header_match_container"
            type="checkbox"> {{#t "labels.match_phrase_checkbox"}}Only add posts with a specific phrase in the title{{/t}}
   </label>
   <div id="header_match_container" style="display:none">
-    <input type="text"
+    <input id="external_feed_header_match"
+           type="text"
            name="header_match"
            style="width: 98%"
            placeholder="{{#t "phrase_to_look_for"}}Phrase to look for{{/t}}">

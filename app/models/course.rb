@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -59,7 +59,8 @@ class Course < ActiveRecord::Base
                   :grading_standard_enabled,
                   :locale,
                   :hide_final_grades,
-                  :hide_distribution_graphs
+                  :hide_distribution_graphs,
+                  :lock_all_announcements
 
   serialize :tab_configuration
   serialize :settings, Hash
@@ -241,6 +242,14 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def modules_visible_to(user)
+    if self.grants_right?(user, :manage_content)
+      self.context_modules.not_deleted
+    else
+      self.context_modules.active
+    end
+  end
+
   def verify_unique_sis_source_id
     return true unless self.sis_source_id
     infer_root_account unless self.root_account_id
@@ -334,7 +343,7 @@ class Course < ActiveRecord::Base
         course_ids = courses.map(&:id)
       else
         course_ids = courses_or_course_ids
-        courses = Course.find(:all, :conditions => {:id => course_ids }, :include => { :course_sections => :nonxlist_course })
+        courses = Course.find(:all, :conditions => {:id => course_ids }, :include => { :course_sections => [:course, :nonxlist_course] })
       end
       course_ids_to_update_user_account_associations = []
       CourseAccountAssociation.transaction do
@@ -342,8 +351,9 @@ class Course < ActiveRecord::Base
         to_delete = []
         CourseAccountAssociation.find(:all, :conditions => { :course_id => course_ids }).each do |aa|
           key = [aa.course_section_id, aa.account_id]
-          # duplicates
           current_course_associations = current_associations[aa.course_id] ||= {}
+          # duplicates. the unique index prevents these now, but this code
+          # needs to hang around for the migration itself
           if current_course_associations.has_key?(key)
             to_delete << aa.id
             next
@@ -359,7 +369,7 @@ class Course < ActiveRecord::Base
           (course.course_sections + [nil]).each do |section|
             next if section && !section.active?
             section.course = course if section
-            starting_account_ids = [course.account_id, section.try(:account_id), section.try(:nonxlist_course).try(:account_id)].compact.uniq
+            starting_account_ids = [course.account_id, section.try(:course).try(:account_id), section.try(:nonxlist_course).try(:account_id)].compact.uniq
 
             account_ids_with_depth = User.calculate_account_associations_from_accounts(starting_account_ids, account_chain_cache).map
 
@@ -703,6 +713,7 @@ class Course < ActiveRecord::Base
     end
 
     if self.root_account_id_changed?
+      CourseSection.update_all({:root_account_id => self.root_account_id}, :course_id => self.id)
       Enrollment.update_all({:root_account_id => self.root_account_id}, :course_id => self.id)
     end
 
@@ -745,10 +756,6 @@ class Course < ActiveRecord::Base
       update_attribute :self_enrollment_code, code
     end
     code
-  end
-
-  # can be overridden via plugin
-  def self_enrollment_min_age
   end
 
   def self_enrollment_limit_met?
@@ -1071,8 +1078,18 @@ class Course < ActiveRecord::Base
     !large_roster?
   end
 
-  def old_gradebook_visible?
+  # Public: Determine if SpeedGrader is enabled for the Course.
+  #
+  # Returns a boolean.
+  def allows_speed_grader?
     !large_roster?
+  end
+
+  def old_gradebook_visible?
+    !(large_roster? || (
+      student_count = Rails.cache.fetch(['student_count', self].cache_key) { students.count }
+      student_count > Setting.get_cached('gb1_max', '250').to_i)
+    )
   end
 
   def enrollment_allows(user, session, permission)
@@ -1528,7 +1545,10 @@ class Course < ActiveRecord::Base
     end
     e.user = user
     self.claim if self.created? && e && e.admin?
-    user.try(:touch) unless opts[:skip_touch_user]
+    unless opts[:skip_touch_user]
+      e.associated_user.try(:touch)
+      user.try(:touch)
+    end
     user.try(:reload)
     e
   end
@@ -1651,7 +1671,7 @@ class Course < ActiveRecord::Base
       section = course_sections.build
       section.default_section = true
       section.course = self
-      section.root_account = self.root_account
+      section.root_account_id = self.root_account_id
       section.save unless new_record?
     end
     section
@@ -2374,7 +2394,7 @@ class Course < ActiveRecord::Base
       :storage_quota, :tab_configuration, :allow_wiki_comments,
       :turnitin_comments, :self_enrollment, :license, :indexed, :locale,
       :hide_final_grade, :hide_distribution_graphs,
-      :allow_student_discussion_topics ]
+      :allow_student_discussion_topics, :lock_all_announcements ]
   end
 
   # TODO: remove me? looks like only a single spec exercises this code (incidentally, no less)
@@ -2414,38 +2434,43 @@ class Course < ActiveRecord::Base
     result[:new_start_date] = Date.parse(options[:new_start_date]) rescue self.real_start_date
     result[:new_end_date] = Date.parse(options[:new_end_date]) rescue self.real_end_date
     result[:day_substitutions] = options[:day_substitutions]
+    result[:time_zone] = options[:time_zone]
+    result[:time_zone] ||= course.account.default_time_zone unless course.account.nil?
     result
   end
 
   def shift_date(time, options={})
     return nil unless time
-    time = ActiveSupport::TimeWithZone.new(time.utc, Time.zone)
-    old_date = time.to_date
-    new_date = old_date.clone
-    old_start_date = options[:old_start_date]
-    old_end_date = options[:old_end_date]
-    new_start_date = options[:new_start_date]
-    new_end_date = options[:new_end_date]
-    return time unless old_start_date && old_end_date && new_start_date && new_end_date
-    old_full_diff = old_end_date - old_start_date
-    old_event_diff = old_date - old_start_date
-    old_event_percent = old_full_diff > 0 ? old_event_diff.to_f / old_full_diff.to_f : 0
-    new_full_diff = new_end_date - new_start_date
-    new_event_diff = (new_full_diff.to_f * old_event_percent).to_i
-    new_date = new_start_date + new_event_diff
-    options[:day_substitutions] ||= {}
-    options[:day_substitutions][old_date.wday.to_s] ||= old_date.wday.to_s
-    if options[:day_substitutions] && options[:day_substitutions][old_date.wday.to_s]
-      if new_date.wday != options[:day_substitutions][old_date.wday.to_s].to_i
-        new_date += (options[:day_substitutions][old_date.wday.to_s].to_i - new_date.wday) % 7
-        new_date -= 7 unless new_date - 7 < new_start_date
+    time_zone = options[:time_zone] || Time.zone
+    Time.use_zone time_zone do
+      time = ActiveSupport::TimeWithZone.new(time.utc, Time.zone)
+      old_date = time.to_date
+      new_date = old_date.clone
+      old_start_date = options[:old_start_date]
+      old_end_date = options[:old_end_date]
+      new_start_date = options[:new_start_date]
+      new_end_date = options[:new_end_date]
+      return time unless old_start_date && old_end_date && new_start_date && new_end_date
+      old_full_diff = old_end_date - old_start_date
+      old_event_diff = old_date - old_start_date
+      old_event_percent = old_full_diff > 0 ? old_event_diff.to_f / old_full_diff.to_f : 0
+      new_full_diff = new_end_date - new_start_date
+      new_event_diff = (new_full_diff.to_f * old_event_percent).to_i
+      new_date = new_start_date + new_event_diff
+      options[:day_substitutions] ||= {}
+      options[:day_substitutions][old_date.wday.to_s] ||= old_date.wday.to_s
+      if options[:day_substitutions] && options[:day_substitutions][old_date.wday.to_s]
+        if new_date.wday != options[:day_substitutions][old_date.wday.to_s].to_i
+          new_date += (options[:day_substitutions][old_date.wday.to_s].to_i - new_date.wday) % 7
+          new_date -= 7 unless new_date - 7 < new_start_date
+        end
       end
-    end
 
-    new_time = Time.utc(new_date.year, new_date.month, new_date.day, (time.hour rescue 0), (time.min rescue 0)).in_time_zone
-    new_time -= new_time.utc_offset
-    log_merge_result("Events for #{old_date.to_s} moved to #{new_date.to_s}")
-    new_time
+      new_time = Time.utc(new_date.year, new_date.month, new_date.day, (time.hour rescue 0), (time.min rescue 0)).in_time_zone
+      new_time -= new_time.utc_offset
+      log_merge_result("Events for #{old_date.to_s} moved to #{new_date.to_s}")
+      new_time
+    end
   end
 
   def real_start_date
@@ -2529,7 +2554,7 @@ class Course < ActiveRecord::Base
     unless visibilities.any?{|v|v[:admin]}
       scope = scope.scoped(:conditions => "enrollments.type != 'StudentViewEnrollment'")
     end
-    # See also Users#messageable_users (same logic used to get users across multiple courses)
+    # See also MessageableUser::Calculator (same logic used to get users across multiple courses) (should refactor)
     case enrollment_visibility_level_for(user, visibilities)
       when :full then scope
       when :sections then scope.scoped(:conditions => ["enrollments.course_section_id IN (?) OR (enrollments.limit_privileges_to_course_section=? AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'))", visibilities.map{|s| s[:course_section_id]}, false])
@@ -2541,7 +2566,7 @@ class Course < ActiveRecord::Base
   def users_visible_to(user, include_priors=false)
     visibilities = section_visibilities_for(user)
     scope = include_priors ? users : current_users
-    # See also Users#messageable_users (same logic used to get users across multiple courses)
+    # See also MessageableUsers (same logic used to get users across multiple courses) (should refactor)
     case enrollment_visibility_level_for(user, visibilities)
       when :full then scope
       when :sections then scope.scoped({:conditions => "enrollments.course_section_id IN (#{visibilities.map{|s| s[:course_section_id]}.join(",")})"})
@@ -2861,6 +2886,7 @@ class Course < ActiveRecord::Base
   add_setting :hide_distribution_graphs, :boolean => true
   add_setting :allow_student_discussion_topics, :boolean => true, :default => true
   add_setting :allow_student_discussion_editing, :boolean => true, :default => true
+  add_setting :lock_all_announcements, :boolean => true, :default => false
   add_setting :large_roster, :boolean => true, :default => lambda { |c| c.root_account.large_course_rosters? }
 
   def user_can_manage_own_discussion_posts?(user)
@@ -3026,48 +3052,24 @@ class Course < ActiveRecord::Base
   end
 
   def self.do_batch_update(progress, user, course_ids, update_params)
-    begin
-      account = progress.context
-      progress.start!
-      update_every = [course_ids.size / 20, 4].max
-      completed_count = failed_count = 0
-      errors = {}
-      course_ids.each_slice(update_every) do |batch|
-        batch.each do |course_id|
-          course = account.associated_courses.find_by_id(course_id)
-          begin
-            raise t('course_not_found', "The course was not found") unless course
-            raise t('access_denied', "Access was denied") unless course.grants_right? user, :update
-            course.update_one(update_params)
-            completed_count += 1
-          rescue Exception => e
-            message = e.message
-            (errors[message] ||= []) << course_id
-            failed_count += 1
-          end
-        end
-        progress.update_completion! 100.0 * (completed_count + failed_count) / course_ids.size
-      end
-      progress.completion = 100.0
-      progress.message = t('batch_update_message', {
+    account = progress.context
+    progress_runner = ProgressRunner.new(progress)
+
+    progress_runner.completed_message do |completed_count|
+      t('batch_update_message', {
           :one => "1 course processed",
           :other => "%{count} courses processed"
         },
         :count => completed_count)
-      errors.each do |message, ids|
-        progress.message += t('batch_update_error', "\n%{error}: %{ids}", :error => message, :ids => ids.join(', '))
-      end
-      if completed_count > 0
-        progress.complete!
-      else
-        progress.fail!
-      end
-      progress.save
-    rescue Exception => e
-      progress.message = e.message
-      progress.fail!
-      progress.save
     end
+
+    progress_runner.do_batch_update(course_ids) do |course_id|
+      course = account.associated_courses.find_by_id(course_id)
+      raise t('course_not_found', "The course was not found") unless course
+      raise t('access_denied', "Access was denied") unless course.grants_right? user, :update
+      course.update_one(update_params)
+    end
+
   end
 
   def self.batch_update(account, user, course_ids, update_params)

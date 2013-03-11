@@ -310,12 +310,6 @@ interface, this is called the SIS ID.</td>
 <td>date</td>
 <td>The section end date The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ</td>
 </tr>
-<tr>
-<td>account_id</td>
-<td>text</td>
-<td>The account identifier from accounts.csv, if none is specified the course will be attached
-to the root account</td>
-</tr>
 </table>
 
 <p>If the start_date is set, it will override the course and term start dates. If the end_date is

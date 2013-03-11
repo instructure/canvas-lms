@@ -53,6 +53,15 @@ describe Course do
     @course.should_not be_soft_concluded
   end
 
+  context "#old_gradebook_visible?" do
+    it "should always return false when enrollment count is large enough" do
+        @course.large_roster = false
+        @course.old_gradebook_visible?.should be_true
+        @course.students.stubs(:count).returns(251)
+        @course.old_gradebook_visible?.should be_false
+    end
+  end
+
   describe "allow_student_discussion_topics" do
 
     it "should default true" do
@@ -2751,10 +2760,12 @@ describe Course, "enrollments" do
     @course.save!
 
     @course.student_enrollments.map(&:root_account_id).should eql [a1.id]
+    @course.course_sections.reload.map(&:root_account_id).should eql [a1.id]
 
     @course.root_account = a2
     @course.save!
     @course.student_enrollments(true).map(&:root_account_id).should eql [a2.id]
+    @course.course_sections.reload.map(&:root_account_id).should eql [a2.id]
   end
 end
 
@@ -3085,7 +3096,8 @@ describe Course do
     it "should properly return site admin permissions from another shard" do
       enable_cache do
         @shard1.activate do
-          course_with_student(:active_all => 1)
+          acct = Account.create!
+          course_with_student(:active_all => 1, :account => acct)
         end
         @site_admin = user
         site_admin = Account.site_admin

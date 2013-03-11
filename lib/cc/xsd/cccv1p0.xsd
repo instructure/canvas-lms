@@ -150,6 +150,7 @@
           <xs:complexType>
             <xs:all minOccurs="0">
               <xs:element name="title" type="xs:string" minOccurs="1"/>
+              <xs:element name="workflow_state" type="xs:string" minOccurs="1"/>
               <xs:element name="position" type="xs:integer" minOccurs="0"/>
               <xs:element name="start_at" type="xs:dateTime" minOccurs="0"/>
               <xs:element name="end_at" type="xs:dateTime" minOccurs="0"/>

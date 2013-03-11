@@ -18,7 +18,10 @@
 
 # @API Assignments
 class AssignmentsController < ApplicationController
+  include Api::V1::Section
   include Api::V1::Assignment
+  include Api::V1::AssignmentOverride
+  include Api::V1::AssignmentGroup
   include Api::V1::Outcome
 
   include GoogleDocs
@@ -64,21 +67,19 @@ class AssignmentsController < ApplicationController
     end
     if authorized_action(@assignment, @current_user, :read)
       @assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @current_user)
-      @context.require_assignment_group
+      @assignment.ensure_assignment_group
       js_env :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session)
-      @assignment_groups = @context.assignment_groups.active
-      if !@assignment.new_record? && !@assignment_groups.map(&:id).include?(@assignment.assignment_group_id)
-        @assignment.assignment_group = @assignment_groups.first
-        @assignment.save
-      end
+
       @locked = @assignment.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
       @unlocked = !@locked || @assignment.grants_rights?(@current_user, session, :update)[:update]
       @assignment_module = ContextModuleItem.find_tag_with_preferred([@assignment], params[:module_item_id])
       @assignment.context_module_action(@current_user, :read) if @unlocked && !@assignment.new_record?
+
       if @assignment.grants_right?(@current_user, session, :grade)
         visible_student_ids = @context.enrollments_visible_to(@current_user).find(:all, :select => 'user_id').map(&:user_id)
         @current_student_submissions = @assignment.submissions.scoped(:conditions => "submissions.submission_type IS NOT NULL").select{|s| visible_student_ids.include?(s.user_id) }
       end
+
       if @assignment.grants_right?(@current_user, session, :read_own_submission) && @context.grants_right?(@current_user, session, :read_grades)
         @current_user_submission = @assignment.submissions.find_by_user_id(@current_user.id) if @current_user
         @current_user_submission = nil if @current_user_submission && !@current_user_submission.grade && !@current_user_submission.submission_type
@@ -86,26 +87,22 @@ class AssignmentsController < ApplicationController
         @current_user_submission.send_later(:context_module_action) if @current_user_submission
       end
 
-      # prevent masquerading users from accessing google docs
-      if @assignment.allow_google_docs_submission? && @real_current_user.blank?
-        # TODO: make this happen asynchronously via ajax, and only if the user selects the google docs tab
-        @google_docs = google_doc_list(nil, @assignment.allowed_extensions) rescue nil
-      end
 
-      if @assignment.new_record?
-        add_crumb(t('crumbs.new_assignment', "New Assignment"), request.url)
-      else
-        add_crumb(@assignment.title, named_context_url(@context, :context_assignment_url, @assignment))
-      end
-      log_asset_access(@assignment, "assignments", @assignment_group) unless @assignment.new_record?
+      begin
+        @google_docs_token = google_docs_retrieve_access_token
+      rescue RuntimeError => ex; end
+
+      add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
+      log_asset_access(@assignment, "assignments", @assignment.assignment_group)
+
       respond_to do |format|
-        if @assignment.submission_types == 'online_quiz' && @assignment.quiz && !@editing
+        if @assignment.submission_types == 'online_quiz' && @assignment.quiz
           format.html { redirect_to named_context_url(@context, :context_quiz_url, @assignment.quiz.id) }
-        elsif @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic && !@editing && @assignment.discussion_topic.grants_right?(@current_user, session, :read)
+        elsif @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic && @assignment.discussion_topic.grants_right?(@current_user, session, :read)
           format.html { redirect_to named_context_url(@context, :context_discussion_topic_url, @assignment.discussion_topic.id) }
-        elsif @assignment.submission_types == 'attendance' && !@editing
+        elsif @assignment.submission_types == 'attendance'
           format.html { redirect_to named_context_url(@context, :context_attendance_url, :anchor => "assignment/#{@assignment.id}") }
-        elsif @assignment.submission_types == 'external_tool' && !@editing && @assignment.external_tool_tag && @unlocked
+        elsif @assignment.submission_types == 'external_tool' && @assignment.external_tool_tag && @unlocked
           format.html { content_tag_redirect(@context, @assignment.external_tool_tag, :context_url) }
         else
           format.html { render :action => 'show' }
@@ -114,7 +111,30 @@ class AssignmentsController < ApplicationController
       end
     end
   end
-  
+
+  def list_google_docs
+    assignment ||= @context.assignments.find(params[:id])
+    # prevent masquerading users from accessing google docs
+    if assignment.allow_google_docs_submission? && @real_current_user.blank?
+      begin
+        docs = google_docs_list_with_extension_filter(assignment.allowed_extensions)
+      rescue => e
+        ErrorReport.log_exception(:oauth, e)
+        raise e
+      end
+      respond_to do |format|
+        format.json { render :json => docs.to_hash }
+      end
+    else
+      error_object = {:errors =>
+        {:base => t('errors.google_docs_masquerade_rejected', "Unable to connect to Google Docs as a masqueraded user.")}
+      }
+      respond_to do |format|
+        format.json { render :json => error_object.to_json, :status => :bad_request }
+      end
+    end
+  end
+
   def rubric
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @root_outcome_group = outcome_group_json(@context.root_outcome_group, @current_user, session).to_json
@@ -224,24 +244,6 @@ class AssignmentsController < ApplicationController
     end
   end
 
-  def new
-    @assignment ||= Assignment.new(:context => @context)
-    @assignment.title = params[:title]
-    @assignment.due_at = params[:due_at]
-    @assignment.points_possible = params[:points_possible]
-    @assignment.assignment_group_id = params[:assignment_group_id]
-    @assignment.submission_types = params[:submission_types]
-    if authorized_action(@assignment, @current_user, :create)
-      @assignment.title = params[:title]
-      @assignment.due_at = params[:due_at]
-      @assignment.assignment_group_id = params[:assignment_group_id]
-      @assignment.submission_types = params[:submission_types]
-      @editing = true
-      params[:redirect_to] ||= named_context_url(@context, :context_assignments_url)
-      show
-    end
-  end
-  
   def create
     params[:assignment][:time_zone_edited] = Time.zone.name if params[:assignment]
     group = get_assignment_group(params[:assignment])
@@ -251,7 +253,7 @@ class AssignmentsController < ApplicationController
     @assignment.content_being_saved_by(@current_user)
     @assignment.assignment_group = group if group
     # if no due_at was given, set it to 11:59 pm in the creator's time zone
-    @assignment.infer_due_at
+    @assignment.infer_times
     if authorized_action(@assignment, @current_user, :create)
       respond_to do |format|
         if @assignment.save
@@ -266,16 +268,57 @@ class AssignmentsController < ApplicationController
     end
   end
   
+  def new
+    @assignment ||= @context.assignments.new
+    add_crumb t :create_new_crumb, "Create new"
+
+    if params[:submission_types] == 'online_quiz'
+      redirect_to new_polymorphic_url([@context, :quiz], index_edit_params)
+    elsif params[:submission_types] == 'discussion_topic'
+      redirect_to new_polymorphic_url([@context, :discussion_topic], index_edit_params)
+    else
+      edit
+    end
+  end
+  
   def edit
-    @assignment = @context.assignments.active.find(params[:id])
-    if authorized_action(@assignment, @current_user, :update)
-      @editing = true
-      params[:return_to] = nil
+    @assignment ||= @context.assignments.active.find(params[:id])
+    if authorized_action(@assignment, @current_user, @assignment.new_record? ? :create : :update)
       @assignment.title = params[:title] if params[:title]
       @assignment.due_at = params[:due_at] if params[:due_at]
+      @assignment.points_possible = params[:points_possible] if params[:points_possible]
       @assignment.submission_types = params[:submission_types] if params[:submission_types]
       @assignment.assignment_group_id = params[:assignment_group_id] if params[:assignment_group_id]
-      show
+      @assignment.ensure_assignment_group(false)
+
+      if @assignment.submission_types == 'online_quiz' && @assignment.quiz
+        return redirect_to edit_polymorphic_url([@context, @assignment.quiz], index_edit_params)
+      elsif @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic
+        return redirect_to edit_polymorphic_url([@context, @assignment.discussion_topic], index_edit_params)
+      end
+
+      assignment_groups = @context.assignment_groups.active
+      group_categories = @context.group_categories.
+        select { |c| !c.student_organized? }.
+        map { |c| { :id => c.id, :name => c.name } }
+
+      hash = {
+        :ASSIGNMENT_GROUPS => assignment_groups.map{|g| assignment_group_json(g, @current_user, session) },
+        :GROUP_CATEGORIES => group_categories,
+        :KALTURA_ENABLED => !!feature_enabled?( :kaltura ),
+        :SECTION_LIST => (@context.course_sections.active.map { |section|
+          {:id => section.id, :name => section.name }
+        }),
+        :ASSIGNMENT_OVERRIDES =>
+          (assignment_overrides_json(@assignment.overrides_visible_to(@current_user)))
+      }
+      hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session)
+      hash[:IS_LARGE_ROSTER] = @context.large_roster?
+      hash[:URL_ROOT] = polymorphic_url([:api_v1, @context, :assignments])
+      hash[:CANCEL_TO] = @assignment.new_record? ? polymorphic_url([@context, :assignments]) : polymorphic_url([@context, @assignment])
+      hash[:CONTEXT_ID] = @context.id
+      js_env(hash)
+      render :action => "edit"
     end
   end
 
@@ -356,4 +399,9 @@ class AssignmentsController < ApplicationController
       group = @context.assignment_groups.find(group_id)
     end
   end
+
+  def index_edit_params
+    params.slice(*[:title, :due_at, :points_possible, :assignment_group_id])
+  end
+
 end

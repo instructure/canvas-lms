@@ -376,7 +376,7 @@ class ApplicationController < ActionController::Base
         params[:context_type] = "Group"
         @context_enrollment = @context.group_memberships.find_by_user_id(@current_user.id) if @context && @current_user      
         @context_membership = @context_enrollment
-      elsif params[:user_id]
+      elsif params[:user_id] || (self.is_a?(UsersController) && params[:user_id] = params[:id])
         case params[:user_id]
         when 'self'
           @context = @current_user
@@ -511,7 +511,8 @@ class ApplicationController < ActionController::Base
     @submissions = @current_user.try(:submissions).to_a
     @submissions.each{ |s| s.mute if s.muted_assignment? }
 
-    sorted_by_vdd = SortsAssignments.by_varied_due_date({
+    @assignments.map! {|a| a.overridden_for(@current_user)}
+    sorted = SortsAssignments.by_due_date({
       :assignments => @assignments,
       :user => @current_user,
       :session => session,
@@ -519,12 +520,12 @@ class ApplicationController < ActionController::Base
       :submissions => @submissions
     })
 
-    @past_assignments = sorted_by_vdd.past
-    @undated_assignments = sorted_by_vdd.undated
-    @ungraded_assignments = sorted_by_vdd.ungraded
-    @upcoming_assignments = sorted_by_vdd.upcoming
-    @future_assignments = sorted_by_vdd.future
-    @overdue_assignments = sorted_by_vdd.overdue
+    @past_assignments = sorted.past
+    @undated_assignments = sorted.undated
+    @ungraded_assignments = sorted.ungraded
+    @upcoming_assignments = sorted.upcoming
+    @future_assignments = sorted.future
+    @overdue_assignments = sorted.overdue
 
     condense_assignments if requesting_main_assignments_page?
 
@@ -978,6 +979,7 @@ class ApplicationController < ActionController::Base
         flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
         redirect_to named_context_url(context, error_redirect_symbol)
       else
+        return unless require_user
         @return_url = named_context_url(@context, :context_external_tool_finished_url, @tool.id, :include_host => true)
         @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @context, :link_code => @opaque_id, :return_url => @return_url)
         if @assignment && @context.includes_student?(@current_user)
@@ -1383,7 +1385,7 @@ class ApplicationController < ActionController::Base
     includes ||= []
     data = user_profile_json(profile, viewer, session, includes, profile)
     data[:can_edit] = viewer == profile.user
-    known_user = viewer.messageable_users(:ids => [profile.user.id]).first
+    known_user = viewer.load_messageable_user(profile.user)
     common_courses = []
     common_groups = []
     if viewer != profile.user

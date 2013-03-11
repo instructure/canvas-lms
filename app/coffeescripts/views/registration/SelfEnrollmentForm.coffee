@@ -87,9 +87,6 @@ define [
 
     enrollError: (errors) =>
       @enrollErrorOnce?(errors)
-      if @hasError(errors.user?.birthdate, 'too_young')
-        errors = []
-        @$el.text I18n.t('too_young_error', 'You must be at least %{min_years} years of age to enroll in this course.', min_years: ENV.USER.MIN_AGE)
       @error registrationErrors(errors)
 
     enrollSuccess: (data) =>

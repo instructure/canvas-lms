@@ -437,12 +437,15 @@ describe AssignmentOverridesController, :type => :integration do
         expect_error("unknown section id \"#{@course.default_section.id}\"")
       end
 
-      it "should error if the assignment is a group assignment" do
+      it "should not error if the assignment is a group assignment" do
         @assignment.group_category = @course.group_categories.create!
         @assignment.save!
 
-        raw_api_create_override(@course, @assignment, :assignment_override => { :course_section_id => @course.default_section.id })
-        expect_error('course_section_id is not valid for group assignments')
+        api_create_override(@course, @assignment, :assignment_override => { :course_section_id => @course.default_section.id })
+
+        @override = @assignment.assignment_overrides(true).first
+        @override.should_not be_nil
+        @override.set.should == @course.default_section
       end
     end
 

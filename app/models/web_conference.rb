@@ -247,7 +247,11 @@ class WebConference < ActiveRecord::Base
   end
   
   def running_time
-    [ended_at - started_at, 60].max
+    if ended_at.present? && started_at.present?
+      [ended_at - started_at, 60].max
+    else
+      0
+    end
   end
   
   def conference_status

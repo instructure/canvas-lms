@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  http://<%= HostUrl.context_host(asset.contexts.first) %>/appointment_groups/<%= asset.id %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.contexts.first) %>/appointment_groups/<%= asset.id %>
 <% end %>
 
 <%= t :message, 'Time slots have been added to "%{appointment_name}" and are available for signup.', :appointment_name => asset.title %><br>

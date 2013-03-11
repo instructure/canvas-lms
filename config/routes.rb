@@ -219,7 +219,7 @@ ActionController::Routing::Routes.draw do |map|
     course.old_calendar 'calendar', :controller => 'calendars', :action => 'show'
     course.locks 'locks', :controller => 'courses', :action => 'locks'
     add_discussions(course)
-    course.resources :assignments, :collection => {:syllabus => :get, :submissions => :get}, :member => {:update_submission => :any} do |assignment|
+    course.resources :assignments, :collection => {:syllabus => :get, :submissions => :get}, :member => {:list_google_docs => :get, :update_submission => :any} do |assignment|
       assignment.resources :submissions do |submission|
         submission.resubmit_to_turnitin 'turnitin/resubmit', :controller => 'submissions', :action => 'resubmit_to_turnitin', :conditions => {:method => :post}
         submission.turnitin_report 'turnitin/:asset_string', :controller => 'submissions', :action => 'turnitin_report'
@@ -562,6 +562,7 @@ ActionController::Routing::Routes.draw do |map|
 
   # dashboard_url is / , not /dashboard
   map.dashboard '', :controller => 'users', :action => 'user_dashboard', :conditions => {:method => :get}
+  map.dashboard_sidebar 'dashboard-sidebar', :controller => 'users', :action => 'dashboard_sidebar', :conditions => {:method => :get}
   map.toggle_dashboard 'toggle_dashboard', :controller => 'users', :action => 'toggle_dashboard', :conditions => {:method => :post}
   map.styleguide 'styleguide', :controller => 'info', :action => 'styleguide', :conditions => {:method => :get}
   map.root :dashboard
@@ -736,6 +737,12 @@ ActionController::Routing::Routes.draw do |map|
       submissions_api(submissions, "section")
     end
 
+    api.with_options(:controller => :gradebook_history_api) do |gradebook_history|
+      gradebook_history.get "courses/:course_id/gradebook_history/days", :action => :days, :path_name => 'gradebook_history'
+      gradebook_history.get "courses/:course_id/gradebook_history/:date", :action =>:day_details, :path_name => 'gradebook_history_for_day'
+      gradebook_history.get "courses/:course_id/gradebook_history/:date/graders/:grader_id/assignments/:assignment_id/submissions", :action => :submissions, :path_name => 'gradebook_history_submissions'
+    end
+
     api.get 'courses/:course_id/assignment_groups', :controller => :assignment_groups, :action => :index, :path_name => 'course_assignment_groups'
 
     api.with_options(:controller => :discussion_topics) do |topics|
@@ -839,6 +846,7 @@ ActionController::Routing::Routes.draw do |map|
       accounts.get 'accounts/:id', :action => :show
       accounts.put 'accounts/:id', :action => :update
       accounts.get 'accounts/:account_id/courses', :action => :courses_api, :path_name => 'account_courses'
+      accounts.get 'accounts/:account_id/sub_accounts', :action => :sub_accounts, :path_name => 'sub_accounts'
     end
 
     api.with_options(:controller => :role_overrides) do |roles|
@@ -860,6 +868,8 @@ ActionController::Routing::Routes.draw do |map|
 
     api.with_options(:controller => :admins) do |admins|
       admins.post 'accounts/:account_id/admins', :action => :create
+      admins.delete 'accounts/:account_id/admins/:user_id', :action => :destroy
+      admins.get 'accounts/:account_id/admins', :action => :index, :path_name => 'account_admins'
     end
 
     api.with_options(:controller => :account_authorization_configs) do |authorization_configs|
@@ -893,6 +903,7 @@ ActionController::Routing::Routes.draw do |map|
       conversations.post 'conversations/:id/add_message', :action => :add_message
       conversations.post 'conversations/:id/add_recipients', :action => :add_recipients
       conversations.post 'conversations/:id/remove_messages', :action => :remove_messages
+      conversations.put 'conversations', :action => :batch_update
     end
 
     api.with_options(:controller => :communication_channels) do |channels|
@@ -1020,6 +1031,7 @@ ActionController::Routing::Routes.draw do |map|
       context_modules.get "courses/:course_id/modules/:module_id/items", :action => :list_module_items, :path_name => 'course_context_module_items'
       context_modules.get "courses/:course_id/modules/:module_id/items/:id", :action => :show_module_item, :path_name => 'course_context_module_item'
       context_modules.get "courses/:course_id/module_item_redirect/:id", :action => :module_item_redirect, :path_name => 'course_context_module_item_redirect'
+      context_modules.put "courses/:course_id/modules", :action => :batch_update
     end
 
     api.with_options(:controller => :quizzes_api) do |quizzes|

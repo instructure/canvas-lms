@@ -217,6 +217,9 @@ describe "Default Account Reports" do
       @user4 = user_with_managed_pseudonym(:active_all => true, :username => 'jason@donovan.com',
                                            :name => 'Jason Donovan', :account => @account,
                                            :sis_user_id => "user_sis_id_04")
+      @user5 = user_with_managed_pseudonym(:active_all => true,:username => 'john@smith.com',
+                                           :name => 'John Smith', :sis_user_id => "user_sis_id_05",
+                                           :account => @account)
 
       @course1 = Course.new(:name => 'English 101', :course_code => 'ENG101', :account => @account)
       @course1.workflow_state = 'available'
@@ -239,6 +242,8 @@ describe "Default Account Reports" do
       @enrollment5 = @course2.enroll_user(@user4, 'StudentEnrollment', :enrollment_state => :active)
       @enrollment5.computed_final_score = 99
       @enrollment5.save!
+      @enrollment6 = @course1.enroll_user(@user5,'TeacherEnrollment',:enrollment_state => :active)
+      @enrollment7 = @course2.enroll_user(@user5,'TaEnrollment',:enrollment_state => :active)
     end
 
     it "should run grade export for a term" do

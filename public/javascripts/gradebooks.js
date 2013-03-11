@@ -47,6 +47,7 @@ define([
   var grading_scheme = window.grading_scheme;
   var readOnlyGradebook = window.readOnlyGradebook;
   var gradebook = window.gradebook;
+  var speedGraderEnabled = ENV.speed_grader_enabled;
 
   var $loading_gradebook_progressbar = $("#loading_gradebook_progressbar"),
       $default_grade_form = $("#default_grade_form"),
@@ -436,9 +437,11 @@ define([
                 .find(".assignment_link").attr('href', data.url);
             });
           }
-          addOption('newwin', I18n.t('speed_grader', 'SpeedGrader'), function() {
-            window.location.href = extendedGradebookURL;
-          });
+          if (speedGraderEnabled) {
+            addOption('newwin', I18n.t('speed_grader', 'SpeedGrader'), function() {
+              window.location.href = extendedGradebookURL;
+            });
+          }
 
           var muteLink = {
             elements: {
@@ -1589,8 +1592,10 @@ define([
     
     url = $.replaceTags(url, 'assignment_id', submission.assignment_id);
     url = $.replaceTags(url, 'user_id', submission.user_id);
-    $view.append($("#submission_view_image").clone(true).removeAttr('id'));
-    $view.append($(" <a href='" + url + "'>" + I18n.t('links.submission_details', "Submission Details") + "</a>"));
+    if (speedGraderEnabled) {
+      $view.append($("#submission_view_image").clone(true).removeAttr('id'));
+      $view.append($(" <a href='" + url + "'>" + I18n.t('links.submission_details', "Submission Details") + "</a>"));
+    }
 
     $type.css({textAlign: "center", fontWeight: "bold", fontSize: "1.2em", marginTop: 5});
     if(submission.submission_type && submission.submission_type != "online_quiz") {

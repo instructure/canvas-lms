@@ -18,6 +18,7 @@
 
 module Api::V1::Quiz
   include Api::V1::Json
+  include Api::V1::AssignmentOverride
 
   API_ALLOWED_QUIZ_OUTPUT_FIELDS = {
     :only => %w(

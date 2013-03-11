@@ -88,28 +88,28 @@ describe AssignmentsController do
       rescue_action_in_public!
       #controller.use_rails_error_handling!
       course_with_student_logged_in(:active_all => true)
-      
+
       get 'show', :course_id => @course.id, :id => 5
       response.status.should eql('404 Not Found')
     end
-    
+
     it "should return unauthorized if not enrolled" do
       course_with_student(:active_all => true)
       course_assignment
-      
+
       get 'show', :course_id => @course.id, :id => @assignment.id
       assert_unauthorized
     end
-    
+
     it "should assign variables" do
       course_with_student_logged_in(:active_all => true)
       a = @course.assignments.create(:title => "some assignment")
-      
+
       get 'show', :course_id => @course.id, :id => a.id
-      assigns[:assignment_groups].should_not be_blank
+      @course.reload.assignment_groups.should_not be_empty
       assigns[:unlocked].should_not be_nil
     end
-    
+
     it "should assign submission variable if current user and submitted" do
       course_with_student_logged_in(:active_all => true)
       course_assignment
@@ -162,8 +162,29 @@ describe AssignmentsController do
       # in normal cases we redirect to the assignment's external_tool_tag.
       response.rendered[:template].should eql 'assignments/show.html.erb'
     end
+
+    it "should require login for external tools in a public course" do
+      course_with_student(:active_all => true)
+      @course.update_attribute(:is_public, true)
+      @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'test tool', :domain => 'example.com')
+      course_assignment
+      @assignment.submission_types = 'external_tool'
+      @assignment.build_external_tool_tag(:url => "http://example.com/test")
+      @assignment.save!
+
+      get 'show', :course_id => @course.id, :id => @assignment.id
+      assert_require_login
+    end
+
+    it 'should not error out when google docs is not configured' do
+      GoogleDocs.stubs(:config).returns nil
+      course_with_student_logged_in(:active_all => true)
+      a = @course.assignments.create(:title => "some assignment")
+      get 'show', :course_id => @course.id, :id => a.id
+      GoogleDocs.unstub(:config)
+    end
   end
-  
+
   describe "GET 'syllabus'" do
     it "should require authorization" do
       course_with_student
@@ -252,6 +273,18 @@ describe AssignmentsController do
       get 'edit', :course_id => @course.id, :id => @assignment.id
       assigns[:assignment].should eql(@assignment)
     end
+
+    it "bootstraps the correct assignment info to js_env" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_assignment
+      get 'edit', :course_id => @course.id, :id => @assignment.id
+      assigns[:js_env][:ASSIGNMENT].should ==
+        subject.send(:assignment_json,@assignment,assigns[:current_user],session)
+      assigns[:js_env][:ASSIGNMENT_OVERRIDES].should ==
+        subject.send(:assignment_overrides_json,
+                     @assignment.overrides_visible_to(assigns[:current_user]))
+    end
+
   end
 
   describe "PUT 'update'" do

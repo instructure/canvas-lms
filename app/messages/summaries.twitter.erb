@@ -1,6 +1,6 @@
 <% define_content :link do %>
-  http://<%= HostUrl.context_host(delayed_messages.first.try(:context)) %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(delayed_messages.first.try(:context)) %>
 <% end %>
 <%= t :tweet, "Canvas Alert - %{notification_count} new notifications", :notification_count => delayed_messages.length %>
 
-http://<%= HostUrl.context_host(delayed_messages.first.try(:context)) %>
+<%= HostUrl.protocol %>://<%= HostUrl.context_host(delayed_messages.first.try(:context)) %>

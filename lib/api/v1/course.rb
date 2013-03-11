@@ -18,6 +18,7 @@
 
 module Api::V1::Course
   include Api::V1::Json
+  include Api::V1::EnrollmentTerm
 
   def course_settings_json(course)
     settings = {}
@@ -30,6 +31,7 @@ module Api::V1::Course
   def course_json(course, user, session, includes, enrollments)
     Api::V1::CourseJson.to_hash(course, user, includes, enrollments) do |builder, allowed_attributes, methods|
       hash = api_json(course, user, session, :only => allowed_attributes, :methods => methods)
+      hash['term'] = enrollment_term_json(course.enrollment_term, user, session, {}) if includes.include?('term')
       add_helper_dependant_entries(hash, course, builder)
     end
   end

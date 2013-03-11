@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -36,7 +36,7 @@ class ConversationParticipant < ActiveRecord::Base
   named_scope :sent, :conditions => "visible_last_authored_at IS NOT NULL", :order => "visible_last_authored_at DESC, conversation_id DESC"
   named_scope :for_masquerading_user, lambda { |user|
     # site admins can see everything
-    return {} if Account.site_admin.grants_right?(user, :become_user)
+    return {} if user.account_users.map(&:account_id).include?(Account.site_admin.id)
 
     # we need to ensure that the user can access *all* of each conversation's
     # accounts (and that each conversation has at least one account). so given
@@ -141,7 +141,6 @@ class ConversationParticipant < ActiveRecord::Base
       :include_indirect_participants => false
     }.merge(options)
 
-    context_info = {}
     participants = conversation.participants
     if options[:include_indirect_participants]
       user_ids =
@@ -150,20 +149,12 @@ class ConversationParticipant < ActiveRecord::Base
           |m| m.submission.submission_comments.map(&:author_id) if m.submission
         }.compact.flatten
       user_ids -= participants.map(&:id)
-      participants += User.find(:all, :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_courses, NULL AS common_groups", :conditions => {:id => user_ids})
+      participants += MessageableUser.available.where(:id => user_ids).all
     end
     return participants unless options[:include_participant_contexts]
+
     # we do this to find out the contexts they share with the user
-    user.messageable_users(:ids => participants.map(&:id), :skip_visibility_checks => true).each { |user|
-      context_info[user.id] = user
-    }
-    participants.each { |user|
-      # normally context_info should have found the results, but messageable_users
-      # is not shard aware/safe yet, so sometimes it won't find all the results
-      # so for now, just pretend it didn't find anything instead of failing
-      user.common_courses = user.id == self.user_id ? {} : context_info[user.id].try(:common_courses) || {}
-      user.common_groups = user.id == self.user_id ? {} : context_info[user.id].try(:common_groups) || {}
-    }
+    user.load_messageable_users(participants, :strict_checks => false)
   end
   memoize :participants
 
@@ -373,6 +364,56 @@ class ConversationParticipant < ActiveRecord::Base
     order = 'last_message_at DESC' unless scope[:order]
     self.find(:all, :select => 'conversation_id', :order => order).map(&:conversation_id)
   end
+
+  
+  def update_one(update_params)
+    case update_params[:event]
+
+    when 'mark_as_read'
+      self.workflow_state = 'read'
+    when 'mark_as_unread'
+      self.workflow_state = 'unread'
+    when 'archive'
+      self.workflow_state = 'archived'
+
+    when 'star'
+      self.starred = true
+    when 'unstar'
+      self.starred = false
+
+    when 'destroy'
+      self.remove_messages(:all)
+
+    end
+    self.save!
+  end
+
+  def self.do_batch_update(progress, user, conversation_ids, update_params)
+    progress_runner = ProgressRunner.new(progress)
+    progress_runner.completed_message do |completed_count|
+      t('batch_update_message', {
+          :one => "1 conversation processed",
+          :other => "%{count} conversations processed"
+        },
+        :count => completed_count)
+    end
+
+    progress_runner.do_batch_update(conversation_ids) do |conversation_id|
+      participant = user.all_conversations.find_by_conversation_id(conversation_id)
+      raise t('not_participating', 'The user is not participating in this conversation') unless participant
+      participant.update_one(update_params)
+    end
+  end
+
+  def self.batch_update(user, conversation_ids, update_params)
+    progress = user.progresses.create! :tag => "conversation_batch_update", :completion => 0.0
+    job = ConversationParticipant.send_later(:do_batch_update, progress, user, conversation_ids, update_params)
+    progress.user_id = user.id
+    progress.delayed_job_id = job.id
+    progress.save!
+    progress
+  end
+
 
   protected
   def message_tags

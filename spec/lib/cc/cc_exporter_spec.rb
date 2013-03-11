@@ -397,5 +397,11 @@ describe "Common Cartridge exporting" do
       @manifest_doc.at_css('resource[href="course_settings/canvas_export.txt"]').should_not be_nil
       @zip_file.find_entry('course_settings/canvas_export.txt').should_not be_nil
     end
+
+    it "should not error if the course name is too long" do
+      @course.name = "a" * Course.maximum_string_length
+
+      run_export
+    end
   end
 end

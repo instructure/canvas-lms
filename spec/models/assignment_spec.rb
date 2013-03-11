@@ -421,18 +421,22 @@ describe Assignment do
     @assignment.muted?.should eql false
   end
 
-  describe "infer_due_at" do
+  describe "infer_times" do
     it "should set to all_day" do
-      assignment_model(:due_at => "Sep 3 2008 12:00am")
+      assignment_model(:due_at => "Sep 3 2008 12:00am",
+                      :lock_at => "Sep 3 2008 12:00am",
+                      :unlock_at => "Sep 3 2008 12:00am")
       @assignment.all_day.should eql(false)
-      @assignment.infer_due_at
+      @assignment.infer_times
       @assignment.save!
       @assignment.all_day.should eql(true)
       @assignment.due_at.strftime("%H:%M").should eql("23:59")
+      @assignment.lock_at.strftime("%H:%M").should eql("23:59")
+      @assignment.unlock_at.strftime("%H:%M").should eql("00:00")
       @assignment.all_day_date.should eql(Date.parse("Sep 3 2008"))
     end
 
-    it "should not set to all_day without infer_due_at call" do
+    it "should not set to all_day without infer_times call" do
       assignment_model(:due_at => "Sep 3 2008 12:00am")
       @assignment.all_day.should eql(false)
       @assignment.due_at.strftime("%H:%M").should eql("00:00")
@@ -1381,14 +1385,6 @@ describe Assignment do
       @topic.reload
       @topic.state.should eql(:active)
     end
-
-    it "should clear the lock_at date when converted to a graded topic" do
-      assignment_model
-      @a.lock_at = 10.days.from_now
-      @a.submission_types = "discussion_topic"
-      @a.save!
-      @a.lock_at.should be_nil
-    end
   end
 
   context "broadcast policy" do
@@ -2135,10 +2131,6 @@ describe Assignment do
 
       it "should be frozen for nil user" do
         @asmnt.frozen_for_user?(nil).should == true
-      end
-
-      it "is not frozen for teacher when some attributes are not frozen" do
-        @asmnt.frozen_for_user?(@teacher).should == false
       end
 
       it "should not be frozen for admin" do

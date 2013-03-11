@@ -41,8 +41,8 @@ describe Instructure::BroadcastPolicy, "set_broadcast_policy" do
   end
 
   it "should allow multiple blocks" do
-    foo = Canvas::MessageHelper.create_notification('Foo', 'Foo', 0, '', 'Foo')
-    bar = Canvas::MessageHelper.create_notification('Bar', 'Bar', 0, '', 'Bar')
+    foo = Canvas::MessageHelper.create_notification(:name => 'Foo', :category => 'Foo')
+    bar = Canvas::MessageHelper.create_notification(:name => 'Bar', :category => 'Bar')
 
     class AnotherModel
       has_a_broadcast_policy
@@ -66,8 +66,8 @@ describe Instructure::BroadcastPolicy, "set_broadcast_policy" do
   end
 
   it "should allow overwriting of the current block w/ set_broadcast_policy!" do
-    foo = Canvas::MessageHelper.create_notification('Foo', 'Foo', 0, '', 'Foo')
-    bar = Canvas::MessageHelper.create_notification('Bar', 'Bar', 0, '', 'Bar')
+    foo = Canvas::MessageHelper.create_notification(:name => 'Foo', :category => 'Foo')
+    bar = Canvas::MessageHelper.create_notification(:name => 'Bar', :category => 'Bar')
 
     class Parent < AnotherModel
       has_a_broadcast_policy

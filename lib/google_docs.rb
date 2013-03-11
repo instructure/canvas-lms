@@ -22,6 +22,7 @@ module GoogleDocs
 
   def google_docs_retrieve_access_token
     consumer = google_consumer
+    return nil unless consumer
     if google_docs_user
       service_token, service_secret = Rails.cache.fetch(['google_docs_tokens', google_docs_user].cache_key) do
         service = google_docs_user.user_services.find_by_service("google_docs")
@@ -94,7 +95,7 @@ module GoogleDocs
 
   def google_docs_download(document_id)
     access_token = google_docs_retrieve_access_token
-    entry = google_doc_list(access_token).files.find{|e| e.document_id == document_id}
+    entry = google_doc_fetch_list(access_token).entries.map{|e| GoogleDocEntry.new(e) }.find{|e| e.document_id == document_id}
     if entry
       response = access_token.get(entry.download_url)
       response = access_token.get(response['Location']) if response.is_a?(Net::HTTPFound)
@@ -104,36 +105,88 @@ module GoogleDocs
     end
   end
 
-  def google_doc_list(access_token = nil, only_extensions = nil)
-    access_token ||= google_docs_retrieve_access_token
-    docs = Atom::Feed.load_feed(access_token.get('https://docs.google.com/feeds/documents/private/full').body)
-    folders, entries = [[], []]
+  class Folder
+    attr_reader :name, :folders, :files
 
-    docs.entries.each do |entry|
-      folder = entry.categories.find do |category|
-        category.scheme.match(%r{\Ahttp://schemas.google.com/docs/2007/folders})
-      end
-
-      folders << folder.label if folder
-      entries << GoogleDocEntry.new(entry)
+    def initialize(name, folders=[], files=[])
+      @name = name
+      # File objects are GoogleDocEntry objects
+      @folders, @files = folders, files
     end
 
-    folders = folders.uniq.sort
-    res     = Struct.new(:files, :folders).new
-
-    if only_extensions.present?
-      entries.reject! do |entry|
-        !only_extensions.include?(entry.extension)
-      end
+    def add_file(file)
+      @files << file
     end
 
-    res.files   = entries
-    res.folders = folders
+    def add_folder(folder)
+      @folders << folder
+    end
 
-    res
+    def select(&block)
+      Folder.new(@name,
+        @folders.map{ |f| f.select(&block) }.select{ |f| !f.files.empty? },
+        @files.select(&block))
+    end
+
+    def map(&block)
+      @folders.map{ |f| f.map(&block) }.flatten +
+        @files.map(&block)
+    end
+
+    def to_hash
+      {
+        "name" => @name,
+        "folders" => @folders.map{ |sf| sf.to_hash },
+        "files" => @files.map{ |f| f.to_hash }
+      }
+    end
   end
 
-  def google_consumer(key = GoogleDocs.config['api_key'], secret = GoogleDocs.config['secret_key'])
+  def google_doc_fetch_list(access_token)
+    response = access_token.get('https://docs.google.com/feeds/documents/private/full')
+    Atom::Feed.load_feed(response.body)
+  end
+
+  def google_doc_folderize_list(docs)
+    root = Folder.new('/')
+    folders = { nil => root }
+
+    docs.entries.each do |entry|
+      entry = GoogleDocEntry.new(entry)
+      if !folders.has_key?(entry.folder)
+        folder = Folder.new(entry.folder)
+        root.add_folder folder
+        folders[entry.folder] = folder
+      else
+        folder = folders[entry.folder]
+      end
+      folder.add_file entry
+    end
+
+    return root
+  end
+
+  def google_docs_list(access_token=nil)
+    access_token ||= google_docs_retrieve_access_token
+    google_doc_folderize_list(google_doc_fetch_list(access_token))
+  end
+
+  def google_docs_list_with_extension_filter(extensions, access_token=nil)
+    access_token ||= google_docs_retrieve_access_token
+    list = google_docs_list(access_token)
+    if extensions.present?
+      list = list.select{ |e| extensions.include?(e.extension) }
+    end
+    list
+  end
+
+  def google_consumer(key = nil, secret = nil)
+    if key.nil? || secret.nil?
+      return nil if GoogleDocs.config.nil?
+      key ||= GoogleDocs.config['api_key']
+      secret ||= GoogleDocs.config['secret_key']
+    end
+
     require 'oauth'
     require 'oauth/consumer'
 

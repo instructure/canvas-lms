@@ -5,7 +5,7 @@
       <td><%= f.blabel :name, :en => "Name" %></td>
       <td><%= f.text_field :name, :style => " width:90%;" %></td>
     </tr>
-    <tr class="weight_assignment_groups" style="<%= hidden unless (@context.weight_assignment_groups rescue false) %>">
+    <tr class="weight_assignment_groups" style="<%= hidden unless (@context.group_weighting_scheme rescue false) %>">
       <td><%= f.blabel :group_weight, :en => "Weight" %></td>
       <td><%= t :percent_of_grade, "%{percent} % of grade", :percent => f.text_field(:group_weight, :size => 4) %></td>
     </tr><tr>

@@ -1,65 +1,73 @@
-    <table class="summary" style="margin-left: auto; margin-right: auto; margin-top: 10px; font-size: 1.1em;">
-      <thead>
-      <tr>
-        <th><%= t('headers.questions', "Questions") %></th>
-        <th><%= t('headers.limits', "Limits") %></th>
-        <th style="<%= hidden if @quiz.quiz_type == 'survey' %>"><%= t('headers.points', "Points") %></th>
-        <th><%= t('headers.due', 'Due Date') %></th>
-        <th><%= t('headers.availability', "Availability") %></th>
-      </tr>
-      </thead>
-      <tr>
-        <td style="padding: 5px 10px; white-space: nowrap;">
-          <%= t(:question_count,
-                { :zero => "No Questions",
-                  :one => "1 Question",
-                  :other => "%{count} Questions" },
-                :count => @question_count) %>
-        </td>
-        <td style="padding: 5px 10px; white-space: nowrap;">
-          <% if @quiz.time_limit %>
-            <%= t(:time_limit, "Minute", :count => @quiz.time_limit + ((@submission && @submission.extra_time) || 0)) %>
-          <% else %>
-            <%= t(:no_time_limit, "No Time Limit") %>
-          <% end %>
-          <div>
-            <% if @quiz.allowed_attempts && @quiz.allowed_attempts != 1 %>
-              <% if @quiz.allowed_attempts > 0 %>
-                <%= before_label(:allowed_attempts, "Allowed Attempts") %> <%= ((@submission && @submission.extra_attempts) || 0) + @quiz.allowed_attempts %><br/>
-              <% else %>
-                <%= t(:unlimited_attempts, "Unlimited Attempts") %><br/>
-              <% end %>
-            <% end %>
-          </div>
-        </td>
-        <td style="padding: 5px 10px; white-space: nowrap; <%= hidden if @quiz.quiz_type == 'survey' %>">
-          <%= t(:points_possible, "%{points_possible} pts possible", :points_possible => @quiz.points_possible || 0) %>
-        </td>
-        <td style="padding: 5px 10px;">
-          <% if @quiz.multiple_due_dates_apply_to?(@current_user) %>
-            <%=  t(:multiple_due_dates, 'Multiple Due Dates') %>
-          <% elsif due_at = @quiz.overridden_for(@current_user).due_at %>
-            <%= datetime_string(due_at) %>
-          <% else %>
-            <%= t(:no_due_date, 'No due date.') %>
-          <% end %>
-        </td>
-        <td style="padding: 5px 10px;">
-          <% if @quiz.lock_at || @quiz.unlock_at %>
-            <% if @quiz.lock_at && @quiz.unlock_at %>
-              <%= mt(:quiz_availabile_through, "%{start_time} through  \n%{end_time}", :start_time => datetime_string(@quiz.unlock_at), :end_time => datetime_string(@quiz.lock_at)) %>
-              <div style="font-size: 0.8em;"><%= time_ago_in_words(Time.now + (@quiz.lock_at - @quiz.unlock_at)) rescue "" %></div>
-            <% elsif @quiz.lock_at %>
-              <%= t(:quiz_available_until, "until %{end_time}", :end_time => datetime_string(@quiz.lock_at)) %>
-            <% else %>
-              <%= t(:quiz_available_after, "after %{start_time}", :start_time => datetime_string(@quiz.unlock_at)) %>
-            <% end %>
-          <% else %>
-            <%= t(:quiz_available_always, "Always available") %>
-          <% end %>
-          <% if @quiz.require_lockdown_browser %>
-            <br /><%= t(:requires_lockdown, "Requires Respondus LockDown Browser") %>
-          <% end %>
-        </td>
-      </tr>
-    </table>
+<ul id="quiz_student_details">
+  <li>
+    <span class="label"><%= t('headers.due', 'Due') %></span>
+    <span class="value">
+      <% if @quiz.multiple_due_dates_apply_to?(@current_user) %>
+        <%=  t(:multiple_due_dates, 'Multiple Due Dates') %>
+      <% elsif due_at = @quiz.overridden_for(@current_user).due_at %>
+        <%= datetime_string(due_at) %>
+      <% else %>
+        <%= t(:no_due_date, 'No due date') %>
+      <% end %>
+    </span>
+  </li>
+
+  <li style="<%= hidden if @quiz.quiz_type == 'survey' %>">
+    <span class="label"><%= t('headers.points', "Points") %></span>
+    <span class="value"><%= @quiz.points_possible || 0 %></span>
+  </li>
+
+  <li>
+    <%= raw t(:question_count,
+          { :zero => "No Questions",
+            :one => "<span class='label'>Questions</span> <span class='value'>%{count}</span>",
+            :other => "<span class='label'>Questions</span> <span class='value'>%{count}</span>" },
+          :count => @question_count) %>
+  </li>
+
+  <% if @quiz.lock_at || @quiz.unlock_at %>
+    <li>
+      <span class="label"><%= t('headers.available', "Available") %></span>
+      <span class="value">
+        <% if @quiz.lock_at && @quiz.unlock_at %>
+          <%= mt(:quiz_availabile_through, "%{start_time} - %{end_time}", :start_time => datetime_string(@quiz.unlock_at), :end_time => datetime_string(@quiz.lock_at)) %>
+          <span style="font-size: 0.8em;"><%= time_ago_in_words(Time.now + (@quiz.lock_at - @quiz.unlock_at)) rescue "" %></span>
+        <% elsif @quiz.lock_at %>
+          <%= t(:quiz_available_until, "until %{end_time}", :end_time => datetime_string(@quiz.lock_at)) %>
+        <% else %>
+          <%= t(:quiz_available_after, "after %{start_time}", :start_time => datetime_string(@quiz.unlock_at)) %>
+        <% end %>
+      </span>
+    </li>
+  <% end %>
+
+  <li>
+    <span class="label"><%= t('headers.time_limit', "Time Limit") %></span>
+    <span class="value">
+      <% if @quiz.time_limit %>
+        <%= t(:time_limit, "Minute", :count => @quiz.time_limit + ((@submission && @submission.extra_time) || 0)) %>
+      <% else %>
+        <%= t(:none, "None") %>
+      <% end %>
+    </span>
+  </li>
+
+  <% if @quiz.allowed_attempts && @quiz.allowed_attempts != 1 %>
+    <li>
+      <span class="label"><%= t(:allowed_attempts, "Allowed Attempts") %></span>
+      <span class="value">
+        <% if @quiz.allowed_attempts > 0 %>
+          <%= ((@submission && @submission.extra_attempts) || 0) + @quiz.allowed_attempts %>
+        <% else %>
+          <%= t(:unlimited, "Unlimited") %>
+        <% end %>
+      </span>
+    </li>
+  <% end %>
+
+  <% if @quiz.require_lockdown_browser %>
+    <li>
+      <span class="value"><%= t(:requires_lockdown, "Requires Respondus LockDown Browser") %></span>
+    </li>
+  <% end %>
+</ul>

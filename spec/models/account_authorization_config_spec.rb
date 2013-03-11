@@ -43,14 +43,24 @@ describe AccountAuthorizationConfig do
       end
     end
   end
-  
+
+  context "#ldap_bind_result" do
+    it "should not attempt to bind with a blank password" do
+      aac = AccountAuthorizationConfig.new
+      aac.auth_type = 'ldap'
+      aac.ldap_filter = 'bob'
+      aac.expects(:ldap_connection).never
+      aac.ldap_bind_result('test', '')
+    end
+  end
+
   it "should replace empty string with nil" do
     @account = Account.new
     config = @account.account_authorization_configs.build
     config.change_password_url = ""
     config.change_password_url.should be_nil
   end
-  
+
   context "SAML settings" do
     before(:each) do
       @account = Account.create!(:name => "account")

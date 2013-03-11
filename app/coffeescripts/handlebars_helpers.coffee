@@ -46,6 +46,10 @@ define [
       return unless datetime?
       new Handlebars.SafeString "<time title='#{datetime}' datetime='#{datetime.toISOString()}' #{'pubdate' if pubdate}>#{datetime.toString(format)}</time>"
 
+    # IMPORTANT: this handlebars helper "fudges", or adjusts the time for the
+    # user's timezone chosen in their preferences using
+    # $.fudgeDateForProfileTimezone. If you use this helper, you need to use
+    # $.unfudgeDateForProfileTimezone before sending to the server!
     datetimeFormatted : (isoString) ->
       return '' unless isoString
       isoString = $.parseFromISO(isoString) unless isoString.datetime
@@ -61,7 +65,27 @@ define [
 
     # convert a date to a string, using the given i18n format in the date.formats namespace
     tDateToString : (date = '', i18n_format) ->
-      I18n.l("date.formats.#{i18n_format}", date)
+      I18n.l "date.formats.#{i18n_format}", date
+
+    # convert a date to a time string, using the given i18n format in the time.formats namespace
+    tTimeToString : (date = '', i18n_format) ->
+      I18n.l "time.formats.#{i18n_format}", date
+
+    tTimeHours : (date = '') ->
+      if date.getMinutes() == 0 and date.getSeconds() == 0
+        I18n.l "time.formats.tiny_on_the_hour", date
+      else
+        I18n.l "time.formats.tiny", date
+
+    # convert an event date and time to a string using the given date and time format specifiers
+    tEventToString : (date = '', i18n_date_format = 'short', i18n_time_format = 'tiny') ->
+      I18n.t 'time.event',
+        date: I18n.l "date.formats.#{i18n_date_format}", date
+        time: I18n.l "time.formats.#{i18n_time_format}", date
+
+    # formats a date as a string, using the given i18n format string
+    strftime : (date = '', fmtstr) ->
+      I18n.strftime date, fmtstr
 
     mimeClass: mimeClass
 
@@ -72,6 +96,8 @@ define [
 
     newlinesToBreak : (string) ->
       new Handlebars.SafeString htmlEscape(string).replace(/\n/g, "<br />")
+
+    not: (arg) -> !arg
 
     # runs block if all arguments are === to each other
     # usage:
@@ -221,5 +247,47 @@ define [
 
     toPercentage: (number) ->
       parseInt(100 * number) + "%"
+
+    checkedIf: ( thing, thingToCompare, hash ) ->
+      if arguments.length == 3
+        if thing == thingToCompare
+          'checked'
+        else
+          ''
+      else
+        if thing then 'checked' else ''
+
+    selectedIf: ( thing, thingToCompare, hash ) ->
+      if arguments.length == 3
+        if thing == thingToCompare
+          'selected'
+        else
+          ''
+      else
+        if thing then 'selected' else ''
+
+    disabledIf: ( thing, hash ) ->
+      if thing then 'disabled' else ''
+
+    checkedUnless: ( thing ) ->
+      if thing then '' else 'checked'
+
+    join: ( array, separator = ',', hash ) ->
+      return '' unless array
+      array.join(separator)
+
+    ifIncludes: ( array, thing, options ) ->
+      return false unless array
+      if thing in array
+        options.fn( this )
+      else
+        options.inverse( this )
+
+    disabledIfIncludes: ( array, thing ) ->
+      return '' unless array
+      if thing in array
+        'disabled'
+      else
+        ''
   }
   return Handlebars

@@ -183,6 +183,7 @@ module Canvas::AccountReports
                     enrollments.computed_final_score",
         :joins => Pseudonym.send(:sanitize_sql, ["INNER JOIN users u ON pseudonyms.user_id = u.id
                                                   INNER JOIN enrollments ON pseudonyms.user_id = enrollments.user_id
+                                                    AND enrollments.type = 'StudentEnrollment'
                                                   INNER JOIN courses ON courses.id = enrollments.course_id
                                                   INNER JOIN course_sections ON enrollments.course_section_id = course_sections.id
                                                   INNER JOIN enrollment_terms ON courses.enrollment_term_id = enrollment_terms.id", parameters]))

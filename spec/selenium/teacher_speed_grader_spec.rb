@@ -195,7 +195,7 @@ describe "speed grader" do
     f('#rubric_summary_container').should include_text(@rubric.title)
     f('#rubric_summary_container .rubric_total').should include_text('8')
     wait_for_ajaximations
-    f('#grade_container input').attribute(:value).should == "8"
+    f('#grade_container input').should have_attribute(:value, '8')
   end
 
   it "should create a comment on assignment" do
@@ -433,7 +433,7 @@ describe "speed grader" do
     wait_for_ajaximations
 
     @submission.reload.score.should == 3
-    f("#grade_container input[type=text]").attribute(:value).should == '3'
+    f("#grade_container input[type=text]").should have_attribute(:value, '3')
     f("#rubric_summary_container tr:nth-child(1) .editing").should be_displayed
     f("#rubric_summary_container tr:nth-child(1) .ignoring").should_not be_displayed
     f("#rubric_summary_container tr:nth-child(3) .editing").should_not be_displayed
@@ -443,7 +443,7 @@ describe "speed grader" do
     # check again that initial page load has the same data.
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
-    f("#grade_container input[type=text]").attribute(:value).should == '3'
+    f("#grade_container input[type=text]").should have_attribute(:value, '3')
     f("#rubric_summary_container tr:nth-child(1) .editing").should be_displayed
     f("#rubric_summary_container tr:nth-child(1) .ignoring").should_not be_displayed
     f("#rubric_summary_container tr:nth-child(3) .editing").should_not be_displayed

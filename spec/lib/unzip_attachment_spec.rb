@@ -153,6 +153,11 @@ describe UnzipAttachment do
         Attachment.stubs(:get_quota).returns({:quota => 5000, :quota_used => 0})
         lambda{ unzipper.process }.should raise_error(Attachment::OverQuotaError, "Zip file would exceed quota limit")
       end
+
+      it 'should be able to rescue the file quota error' do
+        Attachment.stubs(:get_quota).returns({:quota => 5000, :quota_used => 0})
+        unzipper.process rescue nil
+      end
     end
 
   end

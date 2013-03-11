@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -24,7 +24,6 @@ class CourseSection < ActiveRecord::Base
   belongs_to :course
   belongs_to :nonxlist_course, :class_name => 'Course'
   belongs_to :root_account, :class_name => 'Account'
-  belongs_to :account
   has_many :enrollments, :include => :user, :conditions => ['enrollments.workflow_state != ?', 'deleted'], :dependent => :destroy
   has_many :all_enrollments, :class_name => 'Enrollment'
   has_many :students, :through => :student_enrollments, :source => :user
@@ -98,17 +97,19 @@ class CourseSection < ActiveRecord::Base
   end
 
   def set_update_account_associations_if_changed
-    @should_update_account_associations = self.account_id_changed? || self.course_id_changed? || self.nonxlist_course_id_changed?
-    @should_update_account_associations = false if self.new_record? && self.account_id.nil?
+    @should_update_account_associations = self.course_id_changed? || self.nonxlist_course_id_changed?
     true
   end
 
   def update_account_associations_if_changed
-    send_later_if_production(:update_account_associations) if @should_update_account_associations && !Course.skip_updating_account_associations?
+    if @should_update_account_associations && !Course.skip_updating_account_associations?
+      Course.send_later_if_production(:update_account_associations,
+                                      [self.course_id, self.course_id_was, self.nonxlist_course_id, self.nonxlist_course_id_was].compact.uniq)
+    end
   end
 
   def update_account_associations
-    Course.update_account_associations([self.course, self.nonxlist_course].compact)
+    Course.update_account_associations([self.course_id, self.nonxlist_course_id].compact)
   end
 
   def verify_unique_sis_source_id
@@ -128,7 +129,6 @@ class CourseSection < ActiveRecord::Base
 
   def infer_defaults
     self.root_account_id ||= (self.course.root_account_id rescue nil) || Account.default.id
-    self.assert_course unless self.course
     raise "Course required" unless self.course
     self.root_account_id = self.course.root_account_id || Account.default.id
     # This is messy, and I hate it.
@@ -158,10 +158,6 @@ class CourseSection < ActiveRecord::Base
   # enrollments within a course
   def display_name
     @section_display_name ||= self.name || self.section_code
-  end
-
-  def assert_course
-    self.course ||= Course.create!(:name => self.name || self.section_code, :root_account => self.root_account)
   end
 
   def move_to_course(course, *opts)

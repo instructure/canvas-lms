@@ -334,11 +334,11 @@ class PageView < ActiveRecord::Base
       if attrs['is_update']
         page_view = self.find_some([attrs['request_id']], {}).first
         return unless page_view
-        page_view.do_update(attrs)
+        activate_shard_for_cache_read { page_view.do_update(attrs) }
         page_view.save
       else
         # bypass mass assignment protection
-        self.create { |p| p.send(:attributes=, attrs, false) }
+        activate_shard_for_cache_read { self.create { |p| p.send(:attributes=, attrs, false) } }
       end
     end
   rescue ActiveRecord::StatementInvalid
@@ -353,6 +353,14 @@ class PageView < ActiveRecord::Base
       end
     end
     alias_method_chain :transaction, :cassandra_check
+
+    def activate_shard_for_cache_read
+      if self.cassandra?
+        Shard.default.activate { yield }
+      else
+        yield
+      end
+    end
   end
 
   def self.timeline_bucket_for_time(time, context_type)

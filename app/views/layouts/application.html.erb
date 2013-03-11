@@ -130,14 +130,14 @@
         <%= left_side %>
       <% else %>
         <% if @context.try(:short_name) %>
-          <h2 id="section-tabs-header">
+          <h1 id="section-tabs-header">
             <%= @context.short_name %>
             <% if @context && @context.respond_to?(:context)  %>
               <a href="<%= url_for(@context.context) %>" id="section-tabs-header-subtitle" class="ellipsis"><%= @context.context.name %></a>
             <% elsif @context && @context.respond_to?(:enrollment_term) && !@context.enrollment_term.default_term? %>
               <span id="section-tabs-header-subtitle" class="ellipsis"><%= @context.enrollment_term.name %></span>
             <% end %>
-          </h2>
+          </h1>
         <% end %>
         <%= section_tabs %>
       <% end %>

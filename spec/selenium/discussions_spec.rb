@@ -53,7 +53,7 @@ describe "discussions" do
       it "should validate closing the discussion for comments" do
         create_and_go_to_topic
         f("#discussion-toolbar .al-trigger-inner").click
-        expect_new_page_load { f("#ui-id-4").click }
+        expect_new_page_load { f("#ui-id-3").click }
         f('.discussion-fyi').text.should == 'This topic is closed for comments'
         ff('.discussion-reply-label').should be_empty
         DiscussionTopic.last.workflow_state.should == 'locked'
@@ -62,7 +62,7 @@ describe "discussions" do
       it "should validate reopening the discussion for comments" do
         create_and_go_to_topic('closed discussion', 'side_comment', true)
         f("#discussion-toolbar .al-trigger-inner").click
-        expect_new_page_load { f("#ui-id-4").click }
+        expect_new_page_load { f("#ui-id-3").click }
         ff('.discussion-reply-label').should_not be_empty
         DiscussionTopic.last.workflow_state.should == 'active'
       end
@@ -90,6 +90,14 @@ describe "discussions" do
         fj('.showMore').click
         wait_for_ajaximations
         ffj('.comment_attachments').count.should == @replies.count
+      end
+
+      it "should hide the speedgrader in large courses" do
+        Course.any_instance.stubs(:large_roster?).returns(true)
+        @topic = @course.discussion_topics.create!(:title => 'discussion', :user => @user, :assignment => @course.assignments.create!(:name => 'assignment'))
+        go_to_topic
+        f('.al-trigger').click
+        f('.al-options').text.should_not match(/Speed Grader/)
       end
 
       it "should show only 10 root replies per page"
@@ -185,6 +193,7 @@ describe "discussions" do
     context "editing" do
       it "should save and display all changes" do
         @topic = @course.discussion_topics.create!(:title => "topic", :user => @user)
+        @course.require_assignment_group
 
         def confirm(state)
           checkbox_state = state == :on ? 'true' : nil
@@ -208,7 +217,7 @@ describe "discussions" do
           f('input[type=checkbox][name=podcast_has_student_posts]').click if state == :on
           f('input[type=checkbox][name="assignment[set_assignment]"]').click
 
-          f('.form-actions button[type=submit]').click
+          expect_new_page_load { f('.form-actions button[type=submit]').click }
           wait_for_ajaximations
         end
 
@@ -217,6 +226,111 @@ describe "discussions" do
         confirm(:on)
         toggle(:off)
         confirm(:off)
+      end
+
+      context "graded" do
+        before do
+          @topic = @course.discussion_topics.build(:title => "topic", :user => @user)
+          @topic.assignment = @course.assignments.build
+          @topic.save!
+        end
+
+        it "should allow editing the assignment group" do
+          assign_group_2 = @course.assignment_groups.create!(:name => "Group 2")
+
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+          wait_for_ajaximations
+
+          click_option("#assignment_group_id", assign_group_2.name)
+
+          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          @topic.reload.assignment.assignment_group_id.should == assign_group_2.id
+        end
+
+        it "should allow editing the grading type" do
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+          wait_for_ajaximations
+
+          click_option("#assignment_grading_type", "Letter Grade")
+
+          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          @topic.reload.assignment.grading_type.should == "letter_grade"
+        end
+
+        it "should allow editing the group category" do
+          group_cat = @course.group_categories.create!(:name => "Groupies")
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+          wait_for_ajaximations
+
+          f("#assignment_has_group_category").click
+          click_option("#assignment_group_category_id", group_cat.name)
+
+          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          @topic.reload.assignment.group_category_id.should == group_cat.id
+        end
+
+        it "should allow editing the peer review" do
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+          wait_for_ajaximations
+
+          f("#assignment_peer_reviews").click
+
+          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          @topic.reload.assignment.peer_reviews.should == true
+        end
+
+        it "should allow editing the due dates" do
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+          wait_for_ajaximations
+
+          due_at = Time.zone.now + 3.days
+          unlock_at = Time.zone.now + 2.days
+          lock_at = Time.zone.now + 4.days
+
+          # set due_at, lock_at, unlock_at
+          f('.due-date-overrides [name="due_at"]').send_keys(due_at.strftime('%b %-d, %y'))
+          f('.due-date-overrides [name="unlock_at"]').send_keys(unlock_at.strftime('%b %-d, %y'))
+          f('.due-date-overrides [name="lock_at"]').send_keys(lock_at.strftime('%b %-d, %y'))
+
+          expect_new_page_load { f('.form-actions button[type=submit]').click }
+
+          a = DiscussionTopic.last.assignment
+          a.due_at.strftime('%b %-d, %y').should == due_at.to_date.strftime('%b %-d, %y')
+          a.unlock_at.strftime('%b %-d, %y').should == unlock_at.to_date.strftime('%b %-d, %y')
+          a.lock_at.strftime('%b %-d, %y').should == lock_at.to_date.strftime('%b %-d, %y')
+        end
+
+        it "should allow creating multiple due dates" do
+          sec1 = @course.default_section
+          sec2 = @course.course_sections.create!(:name => "Section 2")
+
+          get "/courses/#{@course.id}/discussion_topics/new"
+          wait_for_ajaximations
+
+          f('input[type=checkbox][name="assignment[set_assignment]"]').click
+
+          due_at1 = Time.zone.now + 3.days
+          due_at2 = Time.zone.now + 4.days
+
+          click_option('.due-date-row:first select', sec1.name)
+          fj('.due-date-overrides:first [name="due_at"]').send_keys(due_at1.strftime('%b %-d, %y'))
+
+          f('#add_due_date').click
+          wait_for_animations
+
+          click_option('.due-date-row:last select', sec2.name)
+          ff('.due-date-overrides [name="due_at"]')[1].send_keys(due_at2.strftime('%b %-d, %y'))
+
+          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          topic = DiscussionTopic.last
+
+          overrides = topic.assignment.assignment_overrides
+          overrides.count.should == 2
+          default_override = overrides.detect{ |o| o.set_id == sec1.id }
+          default_override.due_at.strftime('%b %-d, %y').should == due_at1.to_date.strftime('%b %-d, %y')
+          other_override = overrides.detect{ |o| o.set_id == sec2.id }
+          other_override.due_at.strftime('%b %-d, %y').should == due_at2.to_date.strftime('%b %-d, %y')
+        end
       end
     end
   end
@@ -286,7 +400,15 @@ describe "discussions" do
       @course.save!
       get "/courses/#{@course.id}/discussion_topics/"
       wait_for_ajax_requests
-      f('#new-discussion-button').should be_nil
+      f('#new-discussion-btn').should be_nil
+    end
+
+    it "should not show an empty gear menu to students who've created a discussion" do
+      @student_topic = @course.discussion_topics.create!(:user => @student, :message => 'student topic', :discussion_type => 'side_comment')
+      @student_entry = @student_topic.discussion_entries.create!(:user => @student, :message => 'student entry')
+      get "/courses/#{@course.id}/discussion_topics/#{@student_topic.id}"
+      wait_for_ajax_requests
+      f('.headerBar .admin-links').should be_nil
     end
 
     it "should allow students to reply to a discussion even if they cannot create a topic" do
@@ -316,7 +438,16 @@ describe "discussions" do
       f('.entry_content').should include_text('Since this is a group assignment')
     end
 
-    it "should create a discussion and validate that a student can see it and reply to it" do
+    it "should allow a student to create a discussion" do
+      get "/courses/#{@course.id}/discussion_topics/"
+      wait_for_ajax_requests
+      expect_new_page_load { f('#new-discussion-btn').click }
+      wait_for_ajax_requests
+
+      edit_topic("from a student", "tell me a story")
+    end
+
+    it "should validate that a student can see it and reply to a discussion" do
       new_student_entry_text = 'new student entry'
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       wait_for_ajax_requests

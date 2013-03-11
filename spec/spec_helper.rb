@@ -27,9 +27,6 @@ require File.dirname(__FILE__) + '/mocha_extensions'
 
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
 
-# deprecated
-ALL_MODELS = ActiveRecord::Base.all_models
-
 # rspec aliases :describe to :context in a way that it's pretty much defined
 # globally on every object. :context is already heavily used in our application,
 # so we remove rspec's definition.
@@ -157,8 +154,6 @@ Spec::Runner.configure do |config|
     Canvas.redis_used = false
   end
 
-  def use_remote_services; ENV['ACTUALLY_TALK_TO_REMOTE_SERVICES'].to_i > 0; end
-
   def account_with_cas(opts={})
     @account = opts[:account]
     @account ||= Account.create!
@@ -182,15 +177,18 @@ Spec::Runner.configure do |config|
   end
 
   def course(opts={})
-    @course = Course.create!(:name => opts[:course_name], :account => opts[:account])
-    @course.offer! if opts[:active_course] || opts[:active_all]
-    if opts[:active_all]
-      u = User.create!
-      u.register!
-      e = @course.enroll_teacher(u)
-      e.workflow_state = 'active'
-      e.save!
-      @teacher = u
+    account = opts[:account] || Account.default
+    account.shard.activate do
+      @course = Course.create!(:name => opts[:course_name], :account => account)
+      @course.offer! if opts[:active_course] || opts[:active_all]
+      if opts[:active_all]
+        u = User.create!
+        u.register!
+        e = @course.enroll_teacher(u)
+        e.workflow_state = 'active'
+        e.save!
+        @teacher = u
+      end
     end
     @course
   end
@@ -207,9 +205,12 @@ Spec::Runner.configure do |config|
   end
 
   def account_admin_user(opts={:active_user => true})
-    @user = opts[:user] || user(opts)
+    account = opts[:account] || Account.default
+    @user = opts[:user] || account.shard.activate{ user(opts) }
     @admin = @user
-    @user.account_users.create(:account => opts[:account] || Account.default, :membership_type => opts[:membership_type] || 'AccountAdmin')
+    account_user = @user.account_users.build(:account => account, :membership_type => opts[:membership_type] || 'AccountAdmin')
+    account_user.shard = account.shard
+    account_user.save!
     @user
   end
 
@@ -221,7 +222,7 @@ Spec::Runner.configure do |config|
   end
 
   def user(opts={})
-    @user = User.create!(:name => opts[:name])
+    @user = User.create!(opts.slice(:name, :short_name))
     @user.register! if opts[:active_user] || opts[:active_all]
     @user.update_attribute :workflow_state, opts[:user_state] if opts[:user_state]
     @user
@@ -289,7 +290,7 @@ Spec::Runner.configure do |config|
 
   def course_with_user(enrollment_type, opts={})
     @course = opts[:course] || course(opts)
-    @user = opts[:user] || user(opts)
+    @user = opts[:user] || @course.shard.activate{ user(opts) }
     @enrollment = @course.enroll_user(@user, enrollment_type, opts)
     @enrollment.course = @course # set the reverse association
     if opts[:active_enrollment] || opts[:active_all]
@@ -500,7 +501,7 @@ Spec::Runner.configure do |config|
 
     @topic = course.discussion_topics.build(:title => "topic")
     @assignment = course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :group_category => @group1.group_category)
-    @assignment.infer_due_at
+    @assignment.infer_times
     @assignment.saved_by = :discussion_topic
     @topic.assignment = @assignment
     @topic.save!

@@ -21,6 +21,7 @@ define [
       templateLocals =
         assignmentUrl: "#{@gradebook.options.context_url}/assignments/#{@assignment.id}"
         speedGraderUrl: "#{@gradebook.options.context_url}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      templateLocals.speedGraderUrl = null unless @gradebook.options.speed_grader_enabled
       @$menu = $(gradebookHeaderMenuTemplate(templateLocals)).insertAfter(@$trigger)
       @$trigger.kyleMenu(noButton:true)
       @$menu

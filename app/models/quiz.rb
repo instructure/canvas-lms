@@ -43,6 +43,7 @@ class Quiz < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   belongs_to :assignment
   belongs_to :cloned_item
+  belongs_to :assignment_group
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   validates_presence_of :context_id
@@ -57,16 +58,23 @@ class Quiz < ActiveRecord::Base
   before_save :set_defaults
   after_save :update_assignment
   after_save :touch_context
-  after_save :link_assignment_overrides, :if => :new_assignment_id?
 
   serialize :quiz_data
 
   simply_versioned
+  # This callback is listed here in order for the :link_assignment_overrides
+  # method to be called after the simply_versioned callbacks. We want the
+  # overrides to reflect the most recent version of the quiz.
+  # If we placed this before simply_versioned, the :link_assignment_overrides
+  # method would fire first, meaning that the overrides would reflect the
+  # last version of the assignment, because the next callback would be a
+  # simply_versioned callback updating the version.
+  after_save :link_assignment_overrides, :if => :assignment_id_changed?
 
   def infer_times
     # set the time to 11:59 pm in the creator's time zone, if none given
-    self.due_at += ((60 * 60 * 24) - 60) if self.due_at && self.due_at.hour == 0 && self.due_at.min == 0
-    self.lock_at += ((60 * 60 * 24) - 60) if self.lock_at && self.lock_at.hour == 0 && self.lock_at.min == 0
+    self.due_at = CanvasTime.fancy_midnight(self.due_at)
+    self.lock_at = CanvasTime.fancy_midnight(self.lock_at)
   end
 
   def set_defaults
@@ -100,11 +108,27 @@ class Quiz < ActiveRecord::Base
   end
 
   def link_assignment_overrides
-    collections = [assignment_overrides, assignment_override_students]
-    collections += [assignment.assignment_overrides, assignment.assignment_override_students] if assignment
+    override_students = [assignment_override_students]
+    overrides = [assignment_overrides]
+    overrides_params = {:quiz_id => id, :quiz_version => version_number}
 
-    collections.each do |collection|
-      collection.update_all({ :assignment_id => assignment_id, :quiz_id => id })
+    if assignment
+      override_students += [assignment.assignment_override_students]
+      overrides += [assignment.assignment_overrides]
+      overrides_params[:assignment_version] = assignment.version_number
+      overrides_params[:assignment_id] = assignment_id
+    end
+
+    fields = [:assignment_version, :assignment_id, :quiz_version, :quiz_id]
+    overrides.flatten.each do |override|
+      fields.each do |field|
+        override.send(:"#{field}=", overrides_params[field])
+      end
+      override.save!
+    end
+
+    override_students.each do |collection|
+      collection.update_all({:assignment_id => assignment_id,:quiz_id => id})
     end
   end
 
@@ -1423,5 +1447,14 @@ class Quiz < ActiveRecord::Base
 
   def access_code_key_for_user(user)
     "quiz_#{id}_#{user.id}_entered_access_code"
+  end
+
+  def group_category_id
+    assignment.try(:group_category_id)
+  end
+
+  def publish!
+    self.workflow_state = 'available'
+    save!
   end
 end

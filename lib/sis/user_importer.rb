@@ -160,14 +160,14 @@ module SIS
               User.transaction(:requires_new => true) do
                 if user.changed?
                   user_touched = true
-                  raise user.errors.first.join(" ") if !user.save_without_broadcasting && user.errors.size > 0
+                  raise ImportError, user.errors.first.join(" ") if !user.save_without_broadcasting && user.errors.size > 0
                 elsif @batch_id
                   @users_to_set_sis_batch_ids << user.id
                 end
                 pseudo.user_id = user.id
                 if pseudo.changed?
                   pseudo.sis_batch_id = @batch_id if @batch_id
-                  raise pseudo.errors.first.join(" ") if !pseudo.save_without_broadcasting && pseudo.errors.size > 0
+                  raise ImportError, pseudo.errors.first.join(" ") if !pseudo.save_without_broadcasting && pseudo.errors.size > 0
                 end
               end
             rescue => e
@@ -210,7 +210,14 @@ module SIS
               cc.workflow_state = status_is_active ? 'active' : 'retired'
               newly_active = cc.path_changed? || (cc.active? && cc.workflow_state_changed?)
               if cc.changed?
-                cc.save_without_broadcasting
+                if cc.valid?
+                  cc.save_without_broadcasting
+                else
+                  msg = "An email did not pass validation "
+                  msg += "(" + "#{email}, error: "
+                  msg += cc.errors.full_messages.join(", ") + ")"
+                  raise ImportError, msg
+                end
                 user.touch unless user_touched
               end
               pseudo.sis_communication_channel_id = pseudo.communication_channel_id = cc.id
@@ -226,12 +233,20 @@ module SIS
 
             if pseudo.changed?
               pseudo.sis_batch_id = @batch_id if @batch_id
-              pseudo.save_without_broadcasting
+              if pseudo.valid?
+                pseudo.save_without_broadcasting
+                @success_count += 1
+              else
+                msg = "A user did not pass validation "
+                msg += "(" + "user: #{user_id}, error: "
+                msg += pseudo.errors.full_messages.join(", ") + ")"
+                raise ImportError, msg
+              end
             elsif @batch_id && pseudo.sis_batch_id != @batch_id
               @pseudos_to_set_sis_batch_ids << pseudo.id
+              @success_count += 1
             end
 
-            @success_count += 1
           end
         end
       end

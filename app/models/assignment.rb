@@ -159,8 +159,7 @@ class Assignment < ActiveRecord::Base
                 :process_if_quiz,
                 :default_values,
                 :update_submissions_if_details_changed,
-                :maintain_group_category_attribute,
-                :process_if_topic
+                :maintain_group_category_attribute
 
   after_save    :update_grades_if_details_changed,
                 :touch_assignment_group,
@@ -295,7 +294,7 @@ class Assignment < ActiveRecord::Base
     self.infer_all_day
 
     if !self.assignment_group || (self.assignment_group.deleted? && !self.deleted?)
-      self.assignment_group = self.context.assignment_groups.active.first || self.context.assignment_groups.create!
+      ensure_assignment_group(false)
     end
     self.mastery_score = [self.mastery_score, self.points_possible].min if self.mastery_score && self.points_possible
     self.submission_types ||= "none"
@@ -308,6 +307,15 @@ class Assignment < ActiveRecord::Base
     self.points_possible = nil if self.submission_types == 'not_graded'
   end
   protected :default_values
+
+  def ensure_assignment_group(do_save = true)
+    self.context.require_assignment_group
+    assignment_groups = self.context.assignment_groups.active
+    if !assignment_groups.map(&:id).include?(self.assignment_group_id)
+      self.assignment_group = assignment_groups.first
+      save! if do_save
+    end
+  end
 
   def attendance?
     submission_types == 'attendance'
@@ -422,11 +430,17 @@ class Assignment < ActiveRecord::Base
 
   # call this to perform notifications on an Assignment that is not being saved
   # (useful when a batch of overrides associated with a new assignment have been saved)
-  def do_notifications!
+  def do_notifications!(prior_version=nil, notify=false)
+    self.prior_version = prior_version
     @broadcasted = false
-    self.prior_version = self.versions.previous(self.current_version.number).try(:model)
+    # TODO: this will blow up if the group_category string is set on the
+    # previous version, because it gets confused between the db string field
+    # and the association.  one more reason to drop the db column
+    self.prior_version ||= self.versions.previous(self.current_version.number).try(:model)
     self.just_created = self.prior_version.nil?
+    self.notify_of_update = notify || false
     broadcast_notifications
+    remove_assignment_updated_flag
   end
 
   set_broadcast_policy do |p|
@@ -448,7 +462,7 @@ class Assignment < ActiveRecord::Base
     p.whenever { |record|
       !self.suppress_broadcast and
       !record.muted? and
-      record.created_at < Time.now - 30.minutes and
+      record.created_at < 30.minutes.ago and
       record.context.state == :available and [:available, :published].include?(record.state) and
       record.prior_version and (record.points_possible != record.prior_version.points_possible || @assignment_changed)
     }
@@ -492,7 +506,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def notify_of_update=(val)
-    @assignment_changed = (val == '1' || val == true)
+    @assignment_changed = Canvas::Plugin.value_to_boolean(val)
   end
 
   def notify_of_update
@@ -594,15 +608,6 @@ class Assignment < ActiveRecord::Base
     end
   end
   protected :process_if_quiz
-
-  def process_if_topic
-    if self.submission_types == "discussion_topic"
-      #8569: discussion topics don't have lock-after date, so clear this on conversion 
-      self.lock_at = nil
-    end
-    self
-  end
-  protected :process_if_topic
 
   def grading_scheme
     if self.grading_standard
@@ -717,9 +722,10 @@ class Assignment < ActiveRecord::Base
   end
   protected :set_old_assignment_group_id
 
-  def infer_due_at
-    # set to 11:59pm if it's 12:00am
-    self.due_at += ((60 * 60 * 24) - 60) if self.due_at && self.due_at.hour == 0 && self.due_at.min == 0
+  def infer_times
+    # set the time to 11:59 pm in the creator's time zone, if none given
+    self.due_at = CanvasTime.fancy_midnight(self.due_at)
+    self.lock_at = CanvasTime.fancy_midnight(self.lock_at)
   end
 
   def infer_all_day
@@ -1460,6 +1466,8 @@ class Assignment < ActiveRecord::Base
                      {:now => Time.zone.now}]}
   }
 
+  named_scope :order_by_base_due_at, :order => 'assignments.due_at ASC'
+
   def needs_publishing?
     self.due_at && self.due_at < 1.week.ago && self.available?
   end
@@ -1818,8 +1826,7 @@ class Assignment < ActiveRecord::Base
   # them
   def frozen_for_user?(user)
     return true if user.blank?
-    (frozen? && !self.context.grants_right?(user, :manage_frozen_assignments))&&
-    (frozen_attributes_for_user(user).length == FREEZABLE_ATTRIBUTES.length)
+    frozen? && !self.context.grants_right?(user, :manage_frozen_assignments)
   end
 
   def frozen_attributes_for_user(user)
@@ -1896,7 +1903,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def recompute_submission_lateness
-    submissions.each do |s|
+    submissions.find_each do |s|
       s.compute_lateness
       s.save!
     end

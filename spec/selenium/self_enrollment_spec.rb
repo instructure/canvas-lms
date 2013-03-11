@@ -27,9 +27,6 @@ describe "self enrollment" do
       f("#student_email").send_keys('new@example.com')
       f('#user_type_new').click
       f("#student_name").send_keys('new guy')
-      f("#enroll_form select[name='user[birthdate(1i)]'] option[value='#{Time.now.year - 20}']").click
-      f("#enroll_form select[name='user[birthdate(2i)]'] option[value='1']").click
-      f("#enroll_form select[name='user[birthdate(3i)]'] option[value='1']").click
       f('#enroll_form input[name="user[terms_of_use]"]').click
       expect_new_page_load {
         submit_form("#enroll_form")

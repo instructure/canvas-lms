@@ -23,23 +23,63 @@ describe Quiz do
     course
   end
 
+  describe "#publish!" do
+    it "sets the workflow state to available and save!s the quiz" do
+      quiz = Quiz.new(:title => "hello")
+      quiz.expects(:save!).once
+      quiz.publish!
+      quiz.workflow_state.should == 'available'
+    end
+  end
+
   it "should infer the times if none given" do
-    q = factory_with_protected_attributes(@course.quizzes, :title => "new quiz", :due_at => "Sep 3 2008 12:00am", :quiz_type => 'assignment', :workflow_state => 'available')
+    q = factory_with_protected_attributes(@course.quizzes,
+                                          :title => "new quiz",
+                                          :due_at => "Sep 3 2008 12:00am",
+                                          :lock_at => "Sep 3 2008 12:00am",
+                                          :unlock_at => "Sep 3 2008 12:00am",
+                                          :quiz_type => 'assignment',
+                                          :workflow_state => 'available')
+    due_at = q.due_at
     q.due_at.should == Time.parse("Sep 3 2008 12:00am UTC")
+    lock_at = q.lock_at
+    unlock_at = q.unlock_at
+    q.lock_at.should == Time.parse("Sep 3 2008 12:00am UTC")
     q.assignment.due_at.should == Time.parse("Sep 3 2008 12:00am UTC")
     q.infer_times
     q.save!
-    q.due_at.should == Time.parse("Sep 3 2008 11:59pm UTC")
-    q.assignment.due_at.should == Time.parse("Sep 3 2008 11:59pm UTC")
+    q.due_at.should == due_at.end_of_day
+    q.assignment.due_at.should == due_at.end_of_day
+    q.lock_at.should == lock_at.end_of_day
+    q.assignment.lock_at.should == lock_at.end_of_day
+    # Unlock at should not be fudged so teacher's can say this assignment
+    # is available at 12 am.
+    q.unlock_at.should == unlock_at.midnight
+    q.assignment.unlock_at.should == unlock_at.midnight
   end
 
   it "should set the due time to 11:59pm if only given a date" do
-    params = { :quiz => { :title => "Test Quiz", :due_at => Time.zone.today.to_s } }
+    params = { :quiz => {
+      :title => "Test Quiz",
+      :due_at => Time.zone.today.to_s,
+      :lock_at => Time.zone.today.to_s,
+      :unlock_at => Time.zone.today.to_s
+      }
+    }
     q = @course.quizzes.create!(params[:quiz])
+    q.infer_times
     q.due_at.should be_an_instance_of ActiveSupport::TimeWithZone
     q.due_at.time_zone.should == Time.zone
     q.due_at.hour.should eql 23
     q.due_at.min.should eql 59
+    q.lock_at.time_zone.should == Time.zone
+    q.lock_at.hour.should eql 23
+    q.lock_at.min.should eql 59
+    # Unlock at should not be fudged so teacher's can say this assignment
+    # is available at 12 am.
+    q.unlock_at.time_zone.should == Time.zone
+    q.unlock_at.hour.should eql 0
+    q.unlock_at.min.should eql 0
   end
 
   it "should not set the due time to 11:59pm if passed a time of midnight" do
@@ -970,6 +1010,21 @@ describe Quiz do
     end
   end
 
+  describe "#group_category_id" do
+
+    it "returns the assignment's group category id if it has an assignment" do
+      quiz = Quiz.new(:title => "Assignment Group Category Quiz")
+      quiz.expects(:assignment).returns stub(:group_category_id => 1)
+      quiz.group_category_id.should == 1
+    end
+
+    it "returns nil if it doesn't have an assignment" do
+      quiz = Quiz.new(:title => "Quiz w/o assignment")
+      quiz.group_category_id.should be_nil
+    end
+
+  end
+
   describe "linking overrides with assignments" do
     let(:course) { course_model }
     let(:quiz) { quiz_model(:course => course, :due_at => 5.days.from_now).reload }
@@ -1014,6 +1069,7 @@ describe Quiz do
         quiz.save
         override.reload
         override_student.reload
+        quiz.assignment.reload
       end
 
       context "override" do
@@ -1024,6 +1080,15 @@ describe Quiz do
         it "has the quiz's assignment" do
           override.assignment.should == quiz.assignment
         end
+
+        it "has the quiz's assignment's version number" do
+          override.assignment_version.should == quiz.assignment.version_number
+        end
+
+        it "has the quiz's version number" do
+          override.quiz_version.should == quiz.version_number
+        end
+
       end
 
       context "override student" do
@@ -1047,6 +1112,18 @@ describe Quiz do
         quiz.save
       end
     end
+
+    context "when the assignment ID changes" do
+      it "links overrides" do
+        quiz.expects(:link_assignment_overrides).once
+        quiz.workflow_state = 'available'
+        quiz.save!
+        quiz.expects(:link_assignment_overrides).once
+        quiz.assignment = nil
+        quiz.assignment_id = 345
+        quiz.save!
+      end
+    end
   end
 
   context "custom validations" do
@@ -1055,7 +1132,7 @@ describe Quiz do
         quiz = @course.quizzes.create! :title => "test quiz"
         quiz.quiz_type = "totally_invalid_quiz_type"
         quiz.save.should be_false
-        quiz.errors.any?{|e| e =~ /quiz_type/}.should be_true
+        quiz.errors["invalid_quiz_type"].should be_present
       end
 
       it "should not validate quiz_type if not changed" do
@@ -1073,7 +1150,7 @@ describe Quiz do
         quiz = @course.quizzes.create! :title => "test quiz"
         quiz.ip_filter = "999.999.1942.489"
         quiz.save.should be_false
-        quiz.errors.any?{|e| e =~ /ip_filter/}.should be_true
+        quiz.errors["invalid_ip_filter"].should be_present
       end
 
       it "should not validate ip_filter if not changed" do
@@ -1091,7 +1168,7 @@ describe Quiz do
         quiz = @course.quizzes.create! :title => "test quiz"
         quiz.hide_results = "totally_invalid_value"
         quiz.save.should be_false
-        quiz.errors.any?{|e| e =~ /hide_results/}.should be_true
+        quiz.errors["invalid_hide_results"].should be_present
       end
 
       it "should not validate hide_results if not changed" do

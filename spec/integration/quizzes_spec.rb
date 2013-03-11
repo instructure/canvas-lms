@@ -83,41 +83,90 @@ describe QuizzesController do
   end
 
   context "#show" do
+    before :each do
+      course_with_teacher_logged_in(:active_all => true)
+      assignment_model(:course => @course)
+      quiz_model(:course => @course, :assignment_id => @assignment.id)
+      @quiz.update_attribute :due_at, 5.days.from_now
+      @cs1 = @course.default_section
+      @cs2 = @course.course_sections.create!
+    end
+
     context "with overridden due dates" do
       include TextHelper
 
-      before :each do
-        course_with_teacher_logged_in(:active_all => true)
-        assignment_model(:course => @course)
-        quiz_model(:course => @course, :assignment_id => @assignment.id)
+      context "with no overrides" do
+        it "should show a due date for 'Everyone'" do
+          get "courses/#{@course.id}/quizzes/#{@quiz.id}"
+
+          doc = Nokogiri::HTML(response.body)
+          doc.css(".assignment_dates").text.should include "Everyone"
+          doc.css(".assignment_dates").text.should_not include "Everyone else"
+        end
       end
 
-      it "should show an overridden due date for student" do
-        cs1 = @course.default_section
+      context "with some sections overridden" do
+        before do
+          @due_at = 3.days.from_now
+          create_section_override(@cs1, @due_at)
+        end
 
-        due_at = 3.days.from_now
-        create_section_override(cs1, due_at)
+        it "should show an overridden due date for student" do
+          @course.enroll_user(user, 'StudentEnrollment')
+          user_session(@user)
 
-        @course.enroll_user(user, 'StudentEnrollment')
-        user_session(@user)
+          get "courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-        get "courses/#{@course.id}/quizzes/#{@quiz.id}"
+          doc = Nokogiri::HTML(response.body)
+          doc.css("#quiz_student_details .value").first.text.should include(datetime_string(@due_at))
+        end
 
-        doc = Nokogiri::HTML(response.body)
-        doc.css("td:nth-child(4)").text.include?(datetime_string(due_at)).should be_true
+        it "should show 'Everyone else' when some sections have a due date override" do
+          get "courses/#{@course.id}/quizzes/#{@quiz.id}"
+
+          doc = Nokogiri::HTML(response.body)
+          doc.css(".assignment_dates").text.should include "Everyone else"
+        end
       end
 
-      it "should indicate multiple due dates" do
-        cs1 = @course.default_section
-        cs2 = @course.course_sections.create!
+      context "with all sections overridden" do
+        before do
+          @due_at1, @due_at2 = 3.days.from_now, 4.days.from_now
+          create_section_override(@cs1, @due_at1)
+          create_section_override(@cs2, @due_at2)
+        end
 
-        create_section_override(cs1, 3.days.from_now)
-        create_section_override(cs2, 4.days.from_now)
+        it "should show multiple due dates to teachers" do
+          get "courses/#{@course.id}/quizzes/#{@quiz.id}"
 
+          doc = Nokogiri::HTML(response.body)
+          doc.css(".assignment_dates tbody tr").count.should be 2
+          doc.css(".assignment_dates tbody tr > td:first-child").text.
+            should include(datetime_string(@due_at1), datetime_string(@due_at2))
+        end
+
+        it "should not show a date for 'Everyone else'" do
+          get "courses/#{@course.id}/quizzes/#{@quiz.id}"
+
+          doc = Nokogiri::HTML(response.body)
+          doc.css(".assignment_dates").text.should_not include "Everyone"
+        end
+      end
+    end
+
+    context "SpeedGrader" do
+      it "should link to SpeedGrader when not large_roster" do
+        @course.large_roster = false
+        @course.save!
         get "courses/#{@course.id}/quizzes/#{@quiz.id}"
+        response.body.should match(%r{SpeedGrader})
+      end
 
-        doc = Nokogiri::HTML(response.body)
-        doc.css("td:nth-child(4)").text.include?("Multiple Due Dates").should be_true
+      it "should not link to SpeedGrader when large_roster" do
+        @course.large_roster = true
+        @course.save!
+        get "courses/#{@course.id}/quizzes/#{@quiz.id}"
+        response.body.should_not match(%r{SpeedGrader})
       end
     end
   end

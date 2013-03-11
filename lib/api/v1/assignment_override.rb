@@ -139,20 +139,15 @@ module Api::V1::AssignmentOverride
     end
 
     if !set_type && data.has_key?(:course_section_id)
-      if assignment.group_category_id
-        # don't recognize course_section_id for group assignments
-        errors << "course_section_id is not valid for group assignments"
-      else
-        set_type = 'CourseSection'
+      set_type = 'CourseSection'
 
-        # look up the section
-        begin
-          section = find_section(assignment.context, data[:course_section_id])
-        rescue ActiveRecord::RecordNotFound
-          errors << "unknown section id #{data[:course_section_id].inspect}"
-        end
-        override_data[:section] = section
+      # look up the section
+      begin
+        section = find_section(assignment.context, data[:course_section_id])
+      rescue ActiveRecord::RecordNotFound
+        errors << "unknown section id #{data[:course_section_id].inspect}"
       end
+      override_data[:section] = section
     end
 
     errors << "one of student_ids, group_id, or course_section_id is required" if !set_type && errors.empty?
@@ -165,7 +160,7 @@ module Api::V1::AssignmentOverride
     # collect override values
     [:due_at, :unlock_at, :lock_at].each do |field|
       if data.has_key?(field)
-        if data[field].empty?
+        if data[field].blank?
           # override value of nil/'' is meaningful
           override_data[field] = nil
         elsif value = Time.zone.parse(data[field].to_s)
@@ -276,4 +271,16 @@ module Api::V1::AssignmentOverride
     # save the new/kept overrides
     overrides.each{ |override| override.save! }
   end
+
+  def deserialize_overrides( overrides )
+    if overrides.is_a?(Hash)
+      return unless overrides.keys.all?{ |k| k.to_i.to_s == k.to_s }
+      indices = overrides.keys.sort_by(&:to_i)
+      return unless indices.map(&:to_i) == (0...indices.size).to_a
+      overrides = indices.map{ |index| overrides[index] }
+    else
+      overrides
+    end
+  end
+
 end

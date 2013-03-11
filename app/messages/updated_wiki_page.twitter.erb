@@ -1,5 +1,5 @@
 <% define_content :link do %>
-    http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context.id %>/wiki/<%= asset.url %>
+    <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context.id %>/wiki/<%= asset.url %>
 <% end %>
 <%=  t :tweet, "Canvas Alert - Page Updated: %{title}, %{user}.", :title => asset.title, :user => asset.context.name %>
 <%= strip_and_truncate(asset.body, :max_length => 50) %>

@@ -147,6 +147,23 @@ describe UsersController do
     end
   end
 
+  describe "#show" do
+    it "should allow admins to view users in their account" do
+      @admin = account_admin_user
+      user_session(@admin)
+
+      course
+      student_in_course(:course => @course)
+      get "/users/#{@student.id}"
+      response.should be_success
+
+      course(:account => account_model)
+      student_in_course(:course => @course)
+      get "/users/#{@student.id}"
+      response.status.should == "401 Unauthorized"
+    end
+  end
+
   describe "#avatar_image_url" do
     before do
       course_with_student_logged_in(:active_all => true)

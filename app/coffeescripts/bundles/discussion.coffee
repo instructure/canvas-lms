@@ -24,9 +24,9 @@ require [
   router        = new Backbone.Router
 
   @data         = if ENV.DISCUSSION.THREADED
-                    new MaterializedDiscussionTopic
+                    new MaterializedDiscussionTopic root_url: ENV.DISCUSSION.ROOT_URL
                   else
-                    new SideCommentDiscussionTopic
+                    new SideCommentDiscussionTopic root_url: ENV.DISCUSSION.ROOT_URL
 
   entries       = new EntryCollection null, {perPage}
 

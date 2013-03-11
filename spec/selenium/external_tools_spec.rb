@@ -71,7 +71,9 @@ describe "editing external tools" do
 
     keep_trying_until { driver.execute_script("return window.modules.refreshed == true") }
 
+    f("#context_module_#{@module.id} .admin-links button").click
     f("#context_module_#{@module.id} .add_module_item_link").click
+
     f("#add_module_item_select option[value='context_external_tool']").click
     f("#external_tool_create_url").send_keys("http://www.example.com")
     f("#external_tool_create_title").send_keys("Example")
@@ -103,7 +105,9 @@ describe "editing external tools" do
 
     keep_trying_until { driver.execute_script("return window.modules.refreshed == true") }
 
+    f("#context_module_#{@module.id} .admin-links button").click
     f("#context_module_#{@module.id} .add_module_item_link").click
+
     f("#add_module_item_select option[value='context_external_tool']").click
 
     keep_trying_until { ff("#context_external_tools_select .tool .name").length > 0 }
@@ -122,7 +126,9 @@ describe "editing external tools" do
 
     keep_trying_until { driver.execute_script("return window.modules.refreshed == true") }
 
+    f("#context_module_#{@module.id} .admin-links button").click
     f("#context_module_#{@module.id} .add_module_item_link").click
+
     f("#add_module_item_select option[value='context_external_tool']").click
     keep_trying_until { ff("#context_external_tools_select .tools .tool").length > 0 }
     ff("#context_external_tools_select .tools .tool")[1].click
@@ -142,7 +148,9 @@ describe "editing external tools" do
     @tag.url.should == @tool1.url
     @tag.content.should == @tool1
 
+    f("#context_module_#{@module.id} .admin-links button").click
     f("#context_module_#{@module.id} .add_module_item_link").click
+
     f("#add_module_item_select option[value='context_external_tool']").click
     ff("#context_external_tools_select .tools .tool")[1].click
     f("#external_tool_create_url").should have_value @tool2.url
@@ -173,7 +181,9 @@ describe "editing external tools" do
 
     keep_trying_until { driver.execute_script("return window.modules.refreshed == true") }
 
+    f("#context_module_#{@module.id} .admin-links button").click
     f("#context_module_#{@module.id} .add_module_item_link").click
+
     f("#add_module_item_select option[value='context_external_tool']").click
     wait_for_ajax_requests
     ff("#context_external_tools_select .tools .tool").length > 0
@@ -214,6 +224,7 @@ describe "editing external tools" do
 
     keep_trying_until { driver.execute_script("return window.modules.refreshed == true") }
 
+    f("#context_module_#{@module.id} .admin-links button").click
     f("#context_module_#{@module.id} .add_module_item_link").click
     f("#add_module_item_select option[value='context_external_tool']").click
     wait_for_ajax_requests
@@ -274,6 +285,7 @@ describe "editing external tools" do
 
     keep_trying_until { driver.execute_script("return window.modules.refreshed == true") }
 
+    f("#context_module_#{@module.id} .admin-links button").click
     f("#context_module_#{@module.id} .add_module_item_link").click
     f("#add_module_item_select option[value='context_external_tool']").click
 

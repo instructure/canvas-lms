@@ -68,6 +68,16 @@ class GoogleDocEntry
     @entry.content.src
   end
 
+  def to_hash
+    {
+      "name" => display_name,
+      "document_id" => @document_id,
+      "extension" => extension,
+      "alternate_url" => alternate_url
+    }
+  end
+
+
   private
 
   def set_document_id_from(entry)

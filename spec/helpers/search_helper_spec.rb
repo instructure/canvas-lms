@@ -33,5 +33,26 @@ describe SearchHelper do
       load_all_contexts(:permissions => [:manage_assignments])
       @contexts[:courses][@course.id][:permissions][:manage_assignments].should be_true
     end
+
+    describe "sharding" do
+      it_should_behave_like "sharding"
+
+      before do
+        @current_user = @shard1.activate{ user(:active_all => true) }
+        @shard2.activate{ course_with_teacher(:account => Account.create!, :user => @current_user, :active_all => true) }
+      end
+
+      it "should include courses from shards other than the user's native shard" do
+        load_all_contexts
+        @contexts[:courses].should have_key(@course.id)
+      end
+
+      it "should include sections from shards other than the user's native shard" do
+        # needs at least two sections for any sections to show up
+        second_section = @course.course_sections.create!(:name => 'second section')
+        load_all_contexts
+        @contexts[:sections].should have_key(second_section.id)
+      end
+    end
   end
 end

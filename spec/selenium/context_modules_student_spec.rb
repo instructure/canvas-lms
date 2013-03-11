@@ -112,6 +112,15 @@ describe "context_modules" do
       f('#module_prerequisites_list').should be_displayed
     end
 
+    it "should validate that a student can't get to an unpublished context module" do
+      @module_2.workflow_state = 'unpublished'
+      @module_2.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment_2.id}"
+      f('#content').should include_text("is not available yet")
+      f('#module_prerequisites_list').should be_nil
+    end
+
     it "should allow a student view student to progress through module content" do
       course_with_teacher_logged_in(:course => @course, :active_all => true)
       @fake_student = @course.student_view_student

@@ -70,6 +70,13 @@ describe "Converting Canvas QTI" do
     hash[:answers].each { |a| a.delete(:id) }
     hash.should == CanvasExpected::CALCULATED_SIMPLE
   end
+
+  it "should convert calculated questions missing formulas (e.g., imported from blackboard)" do
+    manifest_node=get_manifest_node('calculated_without_formula', :question_type=>'calculated_question', :interaction_type => 'extendedTextInteraction')
+    hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
+    hash[:answers].each { |a| a.delete(:id) }
+    hash.should == CanvasExpected::CALCULATED_WITHOUT_FORMULA
+  end
   
   it "should convert calculated questions (complex)" do
     manifest_node=get_manifest_node('calculated', :question_type=>'calculated_question', :interaction_type => 'extendedTextInteraction')
@@ -323,7 +330,19 @@ module CanvasExpected
                        :incorrect_comments=>"",
                        :formulas=>[{:formula=>"1 + x"}],
                        :question_name=>"Formula question"}
-  
+
+  CALCULATED_WITHOUT_FORMULA = {:variables => [],
+                                :incorrect_comments => "",
+                                :correct_comments => "",
+                                :assessment_question_migration_id => "ib784da0ea554753689c41d0d58121fe8",
+                                :question_text => "<div>Ingrid has a credit card balance of $2200 on a card that charges 22 percent interest compounded monthly. Her bill says that her minimum payment is $155.00 What is her APY? Round your answer to the nearest hundreth of a percent.</div>",
+                                :question_name => "Question",
+                                :answer_tolerance => 0,
+                                :answers => [{:variables => [], :weight => 100, :answer => 24.36}],
+                                :formulas => [],
+                                :migration_id => "if0e253c3d288b8033db6673a656539df",
+                                :question_type => "calculated_question",
+                                :points_possible => 10}
   
   CALCULATED_COMPLEX = {:migration_id=>"i0ee13510954fd805d707623ee2c46729",
           :question_type=>"calculated_question",

@@ -11,7 +11,7 @@ end
 
 
 # <% define_content :link do %>
-#   http://<%= HostUrl.context_host(asset.context) %>/accounts/<%= asset.account_id %>/files/<%= asset.attachment_id %>/download
+#   <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/accounts/<%= asset.account_id %>/files/<%= asset.attachment_id %>/download
 # <% end %>
 #   
 # <% define_content :subject do %>

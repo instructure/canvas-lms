@@ -349,6 +349,8 @@ describe AssignmentsApiController, :type => :integration do
         @assignment.group_category = @assignment.context.group_categories.create!
         @assignment.save!
 
+        @new_grading_standard = grading_standard_for(@course)
+
         # make sure we can assign a custom field during update
         CustomField.create!(:name => 'test_custom',
                             :field_type => 'boolean',
@@ -364,6 +366,7 @@ describe AssignmentsApiController, :type => :integration do
             }
           },
           'peer_reviews' => false,
+          'grading_standard_id' => @new_grading_standard.id,
           'group_category_id' => nil,
           'description' => 'assignment description',
           'grading_type' => 'points',
@@ -428,7 +431,8 @@ describe AssignmentsApiController, :type => :integration do
       end
 
       it "updates the assignment's due_at" do
-        @json['due_at'].should == "2011-01-01T23:59:00-07:00"
+        # fancy midnight
+        @json['due_at'].should == "2011-01-01T23:59:59-07:00"
       end
 
       it "updates the assignment's submission types" do
@@ -452,6 +456,11 @@ describe AssignmentsApiController, :type => :integration do
 
       it "updates custom fields" do
         @assignment.get_custom_field_value('test_custom').true?.should == true
+      end
+
+      it "updates the grading standard" do
+        @assignment.grading_standard_id.should == @new_grading_standard.id
+        @json['grading_standard_id'].should == @new_grading_standard.id
       end
     end
 
@@ -501,6 +510,51 @@ describe AssignmentsApiController, :type => :integration do
         @section_override.set.should == @course.default_section
         @section_override.due_at_overridden.should be_true
         @section_override.due_at.to_i.should == @section_due_at.to_i
+      end
+    end
+
+    context "broadcasting while updating overrides" do
+      before :all do
+        @notification = Notification.create! :name => "Assignment Changed"
+        course_with_teacher(:active_all => true)
+        student_in_course(:course => @course, :active_all => true)
+        @student.communication_channels.create(:path => "student@instructure.com").confirm!
+        @student.email_channel.notification_policies.
+          find_or_create_by_notification_id(@notification.id).
+          update_attribute(:frequency, 'immediately')
+        @assignment = @course.assignments.create!
+        Assignment.update_all({:created_at => Time.zone.now - 1.day}, {:id => @assignment.id})
+        @adhoc_due_at = 5.days.from_now
+        @section_due_at = 7.days.from_now
+        @user = @teacher
+        @params = {
+          'name' => 'Assignment With Overrides',
+          'assignment_overrides' => {
+            '0' => {
+              'student_ids' => [@student.id],
+              'title' => 'adhoc override',
+              'due_at' => @adhoc_due_at.iso8601
+            },
+            '1' => {
+              'course_section_id' => @course.default_section.id,
+              'due_at' => @section_due_at.iso8601
+            }
+          }
+        }
+      end
+
+      after(:all) do
+        truncate_all_tables
+      end
+
+      it "should not send assignment_changed if notify_of_update is not set" do
+        api_update_assignment_call(@course,@assignment,@params)
+        @student.messages.detect{|m| m.notification_id == @notification.id}.should be_nil
+      end
+
+      it "should send assignment_changed if notify_of_update is set" do
+        api_update_assignment_call(@course,@assignment,@params.merge({:notify_of_update => true}))
+        @student.messages.detect{|m| m.notification_id == @notification.id}.should be_present
       end
     end
 
@@ -576,47 +630,28 @@ describe AssignmentsApiController, :type => :integration do
       end
     end
 
-    context "when a non-admin tries to update a completely frozen assignment" do
-      it "doesn't allow the non-admin to update the frozen assignment" do
+    context "when a non-admin tries to update a frozen assignment" do
+      before do
         course_with_teacher(:active_all => true)
-        PluginSetting.stubs(:settings_for_plugin).
-          returns(fully_frozen_settings).at_least_once
+        PluginSetting.stubs(:settings_for_plugin).returns({"title" => "yes"}).at_least_once
         @assignment = create_frozen_assignment_in_course(@course)
+      end
+
+      it "doesn't allow the non-admin to update a frozen attribute" do
         title_before_update = @assignment.title
         raw_api_update_assignment(@course,@assignment,{
           :name => "should not change!"
         })
         response.code.should eql '400'
-        json = JSON.parse(response.body)
-        json['message'].should =~ /You do not have permission to edit frozen/i
-        a = @course.assignments.first
-        a.title.should == title_before_update
-      end
-    end
-
-    context "when a non-admin tries to update a partially frozen assignment" do
-      it "allows the non-admin to update the fields that are not frozen" do
-        course_with_teacher(:active_all => true)
-        PluginSetting.stubs(:settings_for_plugin).returns({"title" => "yes"}).
-         at_least_once #enable plugin
-        @assignment = create_frozen_assignment_in_course(@course)
-        raw_api_update_assignment(@course,@assignment,{
-          'description' => "This is updated!"
-        })
-        response.code.to_i.should eql 201
+        @assignment.reload.title.should == title_before_update
       end
 
-      it "doesn't allow the non-admin to update fields that are frozen" do
-        course_with_teacher(:active_all => true)
-        PluginSetting.stubs(:settings_for_plugin).returns({"title" => "yes"}).
-         at_least_once #set frozen field 'title'
-        @assignment = create_frozen_assignment_in_course(@course)
-        raw_api_update_assignment(@course,@assignment,{
-          # name is translated to the 'title' attribute.
-          :name => "not the old name"
+      it "does allow editing a non-frozen attribute" do
+        raw_api_update_assignment(@course, @assignment, {
+          :points_possible => 15
         })
-        response.body.should =~ /error/
-        response.code.should eql '400'
+        response.code.should eql '201'
+        @assignment.reload.points_possible.should == 15
       end
     end
 
@@ -683,188 +718,230 @@ describe AssignmentsApiController, :type => :integration do
 
   describe "GET /courses/:course_id/assignments/:id (#show)" do
 
-    before :all do
-      course_with_student(:active_all => true)
-      @assignment = @course.assignments.create!(
-        :title => "Locked Assignment",
-        :description => "secret stuff"
-      )
-      @assignment.any_instantiation.expects(:locked_for?).returns(
-        {:asset_string => '', :unlock_at => 1.hour.from_now }
-      ).at_least_once
-      @json = api_get_assignment_in_course(@assignment,@course)
-    end
+    describe 'with a normal assignment' do
 
-    after(:all) do
-      truncate_all_tables
-    end
-
-    it "does not return the assignment's description if locked for user" do
-      @json['description'].should be_nil
-    end
-
-    it "returns the mute status of the assignment" do
-      @json["muted"].should eql false
-    end
-
-    it "translates assignment descriptions" do
-      course_with_teacher(:active_all => true)
-      should_translate_user_content(@course) do |content|
-        assignment = @course.assignments.create!(:description => content)
-        json = api_get_assignment_in_course(assignment,@course)
-        json['description']
-      end
-    end
-
-    it "returns the discussion topic url" do
-      course_with_teacher(:active_all => true)
-      @context = @course
-      @assignment = factory_with_protected_attributes(
-        @course.assignments,
-        {
-          :title => 'assignment1',
-          :submission_types => 'discussion_topic',
-          :discussion_topic => discussion_topic_model}
-      )
-      json = api_get_assignment_in_course(@assignment,@course)
-      json['discussion_topic'].should == {
-        'author' => {},
-        'id' => @topic.id,
-        'title' => 'assignment1',
-        'message' => nil,
-        'posted_at' => @topic.posted_at.as_json,
-        'last_reply_at' => @topic.last_reply_at.as_json,
-        'require_initial_post' => nil,
-        'discussion_subentry_count' => 0,
-        'assignment_id' => @assignment.id,
-        'delayed_post_at' => nil,
-        'user_name' => @topic.user_name,
-        'topic_children' => [],
-        'locked' => false,
-        'root_topic_id' => @topic.root_topic_id,
-        'podcast_url' => nil,
-        'podcast_has_student_posts' => nil,
-        'read_state' => 'unread',
-        'unread_count' => 0,
-        'url' => 
-          "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-        'html_url' => 
-          "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-        'attachments' => [],
-        'permissions' => {'delete' => true, 'attach' => true, 'update' => true},
-        'discussion_type' => 'side_comment',
-      }
-    end
-
-    it "fulfills module progression requirements" do
-      course_with_student(:active_all => true)
-      @assignment = @course.assignments.create!(
-        :title => "Test Assignment",
-        :description => "public stuff"
-      )
-      mod = @course.context_modules.create!(:name => "some module")
-      tag = mod.add_item(:id => @assignment.id, :type => 'assignment')
-      mod.completion_requirements = { tag.id => {:type => 'must_view'} }
-      mod.save!
-
-      # index should not affect anything
-      api_call(:get,
-               "/api/v1/courses/#{@course.id}/assignments.json",
-               {
-                 :controller => 'assignments_api',
-                 :action => 'index',
-                 :format => 'json',
-                 :course_id => @course.id.to_s
-               })
-      mod.evaluate_for(@user).should be_unlocked
-
-      # show should count as a view
-      json = api_get_assignment_in_course(@assignment,@course)
-      json['description'].should_not be_nil
-      mod.evaluate_for(@user).should be_completed
-    end
-
-    it "does not fulfill requirements when description isn't returned" do
-      course_with_student(:active_all => true)
-      @assignment = @course.assignments.create!(
-        :title => "Locked Assignment",
-        :description => "locked!"
-      )
-      @assignment.any_instantiation.expects(:locked_for?).returns({
-        :asset_string => '',
-        :unlock_at => 1.hour.from_now
-      }).at_least(1)
-
-      mod = @course.context_modules.create!(:name => "some module")
-      tag = mod.add_item(:id => @assignment.id, :type => 'assignment')
-      mod.completion_requirements = { tag.id => {:type => 'must_view'} }
-      mod.save!
-      json = api_get_assignment_in_course(@assignment,@course)
-      json['description'].should be_nil
-      mod.evaluate_for(@user).should be_unlocked
-    end
-
-    context "AssignmentFreezer plugin disabled" do
-
-      before do
-        course_with_teacher(:active_all => true)
-        @assignment = create_frozen_assignment_in_course(@course)
-        PluginSetting.stubs(:settings_for_plugin).returns {}
+      before :all do
+        course_with_student(:active_all => true)
+        @assignment = @course.assignments.create!(
+          :title => "Locked Assignment",
+          :description => "secret stuff"
+        )
+        @assignment.any_instantiation.expects(:locked_for?).returns(
+          {:asset_string => '', :unlock_at => 1.hour.from_now }
+        ).at_least_once
         @json = api_get_assignment_in_course(@assignment,@course)
       end
 
-      it "excludes a field indicating whether the assignment is frozen" do
-        @json.has_key?( 'frozen' ).should == false
+      after(:all) do
+        truncate_all_tables
       end
 
-      it "excludes a field listing frozen attributes" do
-        @json.has_key?( 'frozen_attributes' ).should == false
+      it "does not return the assignment's description if locked for user" do
+        @json['description'].should be_nil
       end
-    end
 
-    context "AssignmentFreezer plugin enabled" do
+      it "returns the mute status of the assignment" do
+        @json["muted"].should eql false
+      end
 
-      context "assignment frozen" do
+      it "translates assignment descriptions" do
+        course_with_teacher(:active_all => true)
+        should_translate_user_content(@course) do |content|
+          assignment = @course.assignments.create!(:description => content)
+          json = api_get_assignment_in_course(assignment,@course)
+          json['description']
+        end
+      end
+
+      it "returns the discussion topic url" do
+        course_with_teacher(:active_all => true)
+        @context = @course
+        @assignment = factory_with_protected_attributes(
+          @course.assignments,
+          {
+            :title => 'assignment1',
+            :submission_types => 'discussion_topic',
+            :discussion_topic => discussion_topic_model}
+        )
+        json = api_get_assignment_in_course(@assignment,@course)
+        json['discussion_topic'].should == {
+          'author' => {},
+          'id' => @topic.id,
+          'title' => 'assignment1',
+          'message' => nil,
+          'posted_at' => @topic.posted_at.as_json,
+          'last_reply_at' => @topic.last_reply_at.as_json,
+          'require_initial_post' => nil,
+          'discussion_subentry_count' => 0,
+          'assignment_id' => @assignment.id,
+          'delayed_post_at' => nil,
+          'user_name' => @topic.user_name,
+          'topic_children' => [],
+          'locked' => false,
+          'root_topic_id' => @topic.root_topic_id,
+          'podcast_url' => nil,
+          'podcast_has_student_posts' => nil,
+          'read_state' => 'unread',
+          'unread_count' => 0,
+          'url' => 
+            "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+          'html_url' => 
+            "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+          'attachments' => [],
+          'permissions' => {'delete' => true, 'attach' => true, 'update' => true},
+          'discussion_type' => 'side_comment',
+        }
+      end
+
+      it "fulfills module progression requirements" do
+        course_with_student(:active_all => true)
+        @assignment = @course.assignments.create!(
+          :title => "Test Assignment",
+          :description => "public stuff"
+        )
+        mod = @course.context_modules.create!(:name => "some module")
+        tag = mod.add_item(:id => @assignment.id, :type => 'assignment')
+        mod.completion_requirements = { tag.id => {:type => 'must_view'} }
+        mod.save!
+
+        # index should not affect anything
+        api_call(:get,
+                 "/api/v1/courses/#{@course.id}/assignments.json",
+                 {
+                   :controller => 'assignments_api',
+                   :action => 'index',
+                   :format => 'json',
+                   :course_id => @course.id.to_s
+                 })
+        mod.evaluate_for(@user).should be_unlocked
+
+        # show should count as a view
+        json = api_get_assignment_in_course(@assignment,@course)
+        json['description'].should_not be_nil
+        mod.evaluate_for(@user).should be_completed
+      end
+
+      it "does not fulfill requirements when description isn't returned" do
+        course_with_student(:active_all => true)
+        @assignment = @course.assignments.create!(
+          :title => "Locked Assignment",
+          :description => "locked!"
+        )
+        @assignment.any_instantiation.expects(:locked_for?).returns({
+          :asset_string => '',
+          :unlock_at => 1.hour.from_now
+        }).at_least(1)
+
+        mod = @course.context_modules.create!(:name => "some module")
+        tag = mod.add_item(:id => @assignment.id, :type => 'assignment')
+        mod.completion_requirements = { tag.id => {:type => 'must_view'} }
+        mod.save!
+        json = api_get_assignment_in_course(@assignment,@course)
+        json['description'].should be_nil
+        mod.evaluate_for(@user).should be_unlocked
+      end
+
+      context "AssignmentFreezer plugin disabled" do
+
         before do
           course_with_teacher(:active_all => true)
-          PluginSetting.stubs(:settings_for_plugin).returns({"title" => "yes"})
           @assignment = create_frozen_assignment_in_course(@course)
+          PluginSetting.stubs(:settings_for_plugin).returns {}
           @json = api_get_assignment_in_course(@assignment,@course)
         end
 
-        it "tells the consumer that the assignment is frozen" do
-          @json['frozen'].should == true 
+        it "excludes a field indicating whether the assignment is frozen" do
+          @json.has_key?('frozen').should == false
         end
 
-        it "returns an list of frozen attributes" do
-          @json['frozen_attributes'].should == ["title"]
+        it "excludes a field listing frozen attributes" do
+          @json.has_key?('frozen_attributes').should == false
         end
 
-        it "returns an empty list when no frozen attributes" do
-          PluginSetting.stubs(:settings_for_plugin).returns({})
-          json = api_get_assignment_in_course(@assignment,@course)
-          json['frozen_attributes'].should == []
+        it "excludes a field listing frozen attributes" do
+          @json.has_key?('frozen_attributes').should == false
         end
       end
 
-      context "assignment not frozen" do
+      context "AssignmentFreezer plugin enabled" do
+
+        context "assignment frozen" do
+          before do
+            course_with_teacher(:active_all => true)
+            PluginSetting.stubs(:settings_for_plugin).returns({"title" => "yes"})
+            @assignment = create_frozen_assignment_in_course(@course)
+            @json = api_get_assignment_in_course(@assignment,@course)
+          end
+
+          it "tells the consumer that the assignment is frozen" do
+            @json['frozen'].should == true 
+          end
+
+          it "returns an list of frozen attributes" do
+            @json['frozen_attributes'].should == ["title"]
+          end
+
+          it "tells the consumer that the assignment will be frozen when copied" do
+            @json['freeze_on_copy'].should be_true
+          end
+
+          it "returns an empty list when no frozen attributes" do
+            PluginSetting.stubs(:settings_for_plugin).returns({})
+            json = api_get_assignment_in_course(@assignment,@course)
+            json['frozen_attributes'].should == []
+          end
+        end
+
+        context "assignment not frozen" do
+          before do
+            course_with_teacher(:active_all => true)
+            PluginSetting.stubs(:settings_for_plugin).returns({"title" => "yes"}) #enable plugin
+            @assignment = @course.assignments.create!({
+              :title => "Frozen",
+              :description => "frozen!"
+            })
+            @assignment.any_instantiation.expects(:frozen?).at_least_once.returns false
+            @json = api_get_assignment_in_course(@assignment,@course)
+          end
+
+          it "tells the consumer that the assignment is not frozen" do
+            @json['frozen'].should == false
+          end
+
+          it "gives the consumer an empty list for frozen attributes" do
+            @json['frozen_attributes'].should == []
+          end
+
+          it "tells the consumer that the assignment will not be frozen when copied" do
+            @json['freeze_on_copy'].should == false
+          end
+        end
+      end
+
+      context "external tool assignment" do
+
         before do
-          course_with_teacher(:active_all => true)
-          PluginSetting.stubs(:settings_for_plugin).returns({"title" => "yes"}) #enable plugin
-          @assignment = @course.assignments.create!({
-            :title => "Frozen",
-            :description => "frozen!"
-          })
-          @assignment.any_instantiation.expects(:frozen?).at_least_once.returns false
-          @json = api_get_assignment_in_course(@assignment,@course)
+          course_with_student(:active_all => true)
+          assignment = @course.assignments.create!
+          @tool_tag = ContentTag.new({:url => 'http://www.example.com', :new_tab=>false})
+          @tool_tag.context = assignment
+          @tool_tag.save!
+          assignment.submission_types = 'external_tool'
+          assignment.save!
+          assignment.external_tool_tag.should_not be_nil
+          @json = api_get_assignment_in_course(assignment, @course)
         end
 
-        it "tells the consumer that the assignment is not frozen" do
-          @json['frozen'].should == false
+        it 'has the external tool submission type' do
+          @json['submission_types'].should == ['external_tool']
         end
 
-        it "gives the consumer an empty list for frozen attributes" do
-          @json['frozen_attributes'].should == []
+        it 'includes the external tool attributes' do
+          @json['external_tool_tag_attributes'].should == {
+            'url' => 'http://www.example.com',
+            'new_tab' => false,
+            'resource_link_id' => @tool_tag.opaque_identifier(:asset_string)
+          }
         end
       end
     end
@@ -908,8 +985,10 @@ def api_get_assignments_index_from_course(course)
 end
 
 def create_frozen_assignment_in_course(course)
-    assignment = @course.assignments.create!(:title => "some assignment",
-                                              :freeze_on_copy => true)
+    assignment = @course.assignments.create!({
+      :title => "some assignment",
+      :freeze_on_copy => true
+    })
     assignment.copied = true
     assignment.save!
     assignment

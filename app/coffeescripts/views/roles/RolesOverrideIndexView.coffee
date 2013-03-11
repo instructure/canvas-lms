@@ -3,9 +3,11 @@ define [
   'underscore'
   'Backbone'
   'jst/roles/rolesOverrideIndex'
-], ($, _, Backbone, template) -> 
+], ($, _, Backbone, template) ->
   class RolesOverrideIndexView extends Backbone.View
+
     template: template
+
     els:
       "#role_tabs": "$roleTabs"
 

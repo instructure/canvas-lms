@@ -19,4 +19,5 @@ define [
       ret
 
     renderUser: (user) =>
+      user.set('course_id', @collection.course_id, silent: true)
       @$el.append (new RecentStudentView model: user).render().el

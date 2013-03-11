@@ -212,6 +212,10 @@ class GradeCalculator
         q_high = q_mid :
         q_low  = q_mid
       q_mid = (q_low + q_high) / 2
+
+      # bail if we can't can't ever satisfy the threshold (floats!)
+      break if q_mid == q_high || q_mid == q_low
+
       x, kept = big_f_blk.call(q_mid, submissions, cant_drop, keep)
     end
 
