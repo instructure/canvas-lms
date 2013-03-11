@@ -8,12 +8,6 @@
   </p>
 <% else %>
 
-<% content_for :auto_discovery do %>
-  <% if @context_enrollment %>
-    <%= auto_discovery_link_tag(:atom, feeds_gradebook_url(@context_enrollment.feed_code), {:title => t('titles.feed', "Course Gradebook Atom Feed")}) %>
-  <% end %>
-<% end %>
-
 <a style="display: none;" title="POST" href="<%= context_url(@context, :update_submission_context_gradebook_url) %>" class="update_submission_grade_url">&nbsp;</a>
 <ul id="gradebook-history">
 <% @days.each do |day| %>
