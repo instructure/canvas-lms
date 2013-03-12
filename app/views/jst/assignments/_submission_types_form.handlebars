@@ -56,9 +56,9 @@
       {{#if kalturaEnabled}}
         <label class="checkbox">
           <input id="assignment_media_recording"
-            name="online_submission_types[online_media_recording]"
+            name="online_submission_types[media_recording]"
             type="checkbox"
-            {{checkedIf acceptsOnlineMediaRecording}}
+            {{checkedIf acceptsMediaRecording}}
             {{disabledIfIncludes frozenAttributes "submission_types"}}/>
           {{#t "labels.allow_media_recordings"}}Allow Media Recordings{{/t}}
         </label>
