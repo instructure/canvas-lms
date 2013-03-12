@@ -947,6 +947,14 @@ class User < ActiveRecord::Base
 
     given do |user|
       user && (
+      Account.site_admin.grants_right?(user, :view_statistics) ||
+          self.associated_accounts.any?{|a| a.grants_right?(user, nil, :view_statistics)  }
+      )
+    end
+    can :view_statistics
+
+    given do |user|
+      user && (
         # or, if the user we are given is an admin in one of this user's accounts
         Account.site_admin.grants_right?(user, :manage_students) ||
         self.associated_accounts.any? {|a| a.grants_right?(user, nil, :manage_students) }
