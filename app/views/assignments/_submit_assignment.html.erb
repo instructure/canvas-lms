@@ -44,7 +44,7 @@
         <td>
           <a href="#" class="add add_another_file_link"> <%= t 'links.add_another_file', "Add Another File" %> </a>
           <div id="submission_attachment_blank" class="submission_attachment" style="display: none;">
-            <input type="file" name="attachments[-1][uploaded_data]"/>
+            <input type="file" name="attachments[-1][uploaded_data]" class="input-file"/>
             <a href="#" class="remove_attachment_link no-hover" style="display: none;"><%= image_tag "delete_circle.png" %></a>
             <% if @assignment.allowed_extensions.present? -%>
               <div class='bad_ext_msg error_message' style="display: none">
