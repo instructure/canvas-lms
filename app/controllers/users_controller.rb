@@ -623,7 +623,6 @@ class UsersController < ApplicationController
 
   def new
     return redirect_to(root_url) if @current_user
-    js_env[:FORM_URL] ||= '/users' # can be overridden in a plugin
     render :layout => 'bare'
   end
 
