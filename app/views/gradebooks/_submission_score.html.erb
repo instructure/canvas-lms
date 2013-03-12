@@ -24,8 +24,8 @@
       <% end %>
     <% elsif submission.assignment.grading_type == "percent" %>
       <%= grade %>
-    <% elsif grade.to_f == score %>
-      <%= grade %>
+    <% elsif grade.to_f.round(2) == score.to_f.round(2) %>
+      <%= grade.to_f.round(2) %>
     <% end %>
   <% elsif submission && submission.submission_type %>
     <%= @submission_score_lookup[submission.submission_type] ? image_tag(@submission_score_lookup[submission.submission_type], :class => "submission_icon") : ' - ' %>
