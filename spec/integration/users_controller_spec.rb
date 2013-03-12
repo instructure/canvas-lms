@@ -152,6 +152,30 @@ describe UsersController do
       get "/users/#{@student.id}"
       response.status.should == "401 Unauthorized"
     end
+
+    it "should show user to account users that have the view_statistics permission" do
+      account_model
+      student_in_course(:account => @account)
+      RoleOverride.create!(:context => @account, :permission => 'view_statistics',
+                           :enrollment_type => 'AccountMembership', :enabled => true)
+      @account.add_user(user, 'AccountMembership')
+      user_session(@user)
+
+      get "/users/#{@student.id}"
+      response.should be_success
+    end
+
+    it "should show course user to account users that have the read_roster permission" do
+      account_model
+      student_in_course(:account => @account)
+      RoleOverride.create!(:context => @account, :permission => 'read_roster',
+                           :enrollment_type => 'AccountMembership', :enabled => true)
+      @account.add_user(user, 'AccountMembership')
+      user_session(@user)
+
+      get "/courses/#{@course.id}/users/#{@student.id}"
+      response.should be_success
+    end
   end
 
   describe "#avatar_image_url" do
