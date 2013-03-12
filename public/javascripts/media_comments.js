@@ -230,7 +230,7 @@ define([
       $dialog.dialog({
         title: I18n.t('titles.record_upload_media_comment', "Record/Upload Media Comment"),
         width: 560,
-        height: 460,
+        height: 475,
         modal: false
       });
       $dialog.dialog('option', 'close', function() {
