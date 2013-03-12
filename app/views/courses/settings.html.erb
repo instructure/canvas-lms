@@ -193,7 +193,7 @@ TEXT
       </tr>
       <tr>
         <th scope="row" style="width: 10%;">
-          <%= before_label('grading_scheme', %{Grading Scheme}) %>
+          <label><%= before_label('grading_scheme', %{Grading Scheme}) %></label>
         </th>
         <td>
           <span class="course_info grading_scheme_set">
@@ -218,7 +218,7 @@ TEXT
           <span class="course_info readable_license"><%= @context.readable_license %></span>
         </td>
       </tr><tr>
-        <th scope="row" style="vertical-align: top; width: 10%;"><%= before_label('course_visibility', %{Visibility}) %></th>
+        <th scope="row" style="vertical-align: top; width: 10%;"><label><%= before_label('course_visibility', %{Visibility}) %></label></th>
         <td colspan="3">
           <span class="course_form">
             <%= f.check_box :is_public, :class => "is_public_checkbox" %>
