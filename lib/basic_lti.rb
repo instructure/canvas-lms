@@ -85,7 +85,7 @@ module BasicLTI
     data
   end
 
-  class ToolLaunch < Struct.new(:url, :tool, :user, :context, :link_code, :return_url, :resource_type, :hash)
+  class ToolLaunch < Struct.new(:url, :tool, :user, :context, :link_code, :return_url, :resource_type, :root_account, :hash)
 
     def initialize(options)
       self.url = options[:url]                     || raise("URL required for generating Basic LTI content")
@@ -95,6 +95,13 @@ module BasicLTI
       self.link_code = options[:link_code]         || raise("Link Code required for generating Basic LTI content")
       self.return_url = options[:return_url]       || raise("Return URL required for generating Basic LTI content")
       self.resource_type = options[:resource_type]
+      if self.context.respond_to? :root_account
+        self.root_account = context.root_account
+      elsif self.tool.context.respond_to? :root_account
+        self.root_account = tool.context.root_account
+      end
+      root_account || raise("Root account required for generating Basic LTI content")
+
       self.hash = {}
     end
 
@@ -131,11 +138,7 @@ module BasicLTI
       end
       if tool.public?
         hash['custom_canvas_user_id'] = user.id
-        if context.respond_to?(:root_account)
-          pseudo = user.sis_pseudonym_for(context)
-        elsif tool.context && tool.context.respond_to?(:root_account)
-          pseudo = user.sis_pseudonym_for(tool.context)
-        end
+        pseudo = user.sis_pseudonym_for(self)
         if pseudo
           hash['lis_person_sourcedid'] = pseudo.sis_user_id if pseudo.sis_user_id
           hash['custom_canvas_user_login_id'] = pseudo.unique_id
@@ -147,6 +150,7 @@ module BasicLTI
           hash['custom_canvas_account_id'] = context.id
           hash['custom_canvas_account_sis_id'] = context.sis_source_id if context.sis_source_id
         end
+        hash['custom_canvas_api_domain'] = root_account.domain
       end
 
       # need to set the locale here (instead of waiting for the first call to
@@ -162,9 +166,8 @@ module BasicLTI
       hash['launch_presentation_width'] = 600
       hash['launch_presentation_height'] = 400
       hash['launch_presentation_return_url'] = return_url
-      root_context = (context.respond_to?(:root_account) && context.root_account) || context
-      hash['tool_consumer_instance_guid'] = root_context.respond_to?(:lti_guid) ? root_context.lti_guid : root_context.uuid
-      hash['tool_consumer_instance_name'] = root_context.name
+      hash['tool_consumer_instance_guid'] = root_account.lti_guid
+      hash['tool_consumer_instance_name'] = root_account.name
       hash['tool_consumer_instance_contact_email'] = HostUrl.outgoing_email_address # TODO: find a better email address to use here
       hash['tool_consumer_info_product_family_code'] = 'canvas'
       hash['tool_consumer_info_version'] = 'cloud'

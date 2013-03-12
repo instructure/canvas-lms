@@ -123,6 +123,7 @@ describe BasicLTI do
       hash['custom_canvas_user_id'].should == @user.id.to_s
       hash['custom_canvas_user_login_id'].should == @user.pseudonyms.first.unique_id
       hash['custom_canvas_course_id'].should == @course.id.to_s
+      hash['custom_canvas_api_domain'].should == @course.root_account.domain
       hash['lis_course_offering_sourcedid'].should == 'coursesis'
       hash['lis_person_contact_email_primary'].should == 'nobody@example.com'
       hash['lis_person_name_full'].should == 'A Name'
@@ -134,7 +135,7 @@ describe BasicLTI do
       hash['launch_presentation_width'].should == '600'
       hash['launch_presentation_height'].should == '400'
       hash['launch_presentation_return_url'].should == 'http://www.google.com'
-      hash['tool_consumer_instance_guid'].should == @course.root_account.uuid
+      hash['tool_consumer_instance_guid'].should == @course.root_account.lti_guid
       hash['tool_consumer_instance_name'].should == @course.root_account.name
       hash['tool_consumer_instance_contact_email'].should == HostUrl.outgoing_email_address
       hash['tool_consumer_info_product_family_code'].should == 'canvas'
@@ -174,6 +175,7 @@ describe BasicLTI do
       hash['custom_canvas_account_sis_id'] = 'accountsis'
       hash['lis_person_sourcedid'].should == 'testfun'
       hash['custom_canvas_user_id'].should == @user.id.to_s
+      hash['tool_consumer_instance_guid'].should == sub_account.root_account.lti_guid
     end
     
     it "should include URI query parameters" do
