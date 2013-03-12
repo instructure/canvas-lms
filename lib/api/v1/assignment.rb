@@ -229,6 +229,10 @@ module Api::V1::Assignment
     end
 
     if update_params["submission_types"].is_a? Array
+      update_params["submission_types"] = update_params["submission_types"].map do |type|
+        # TODO: remove. this was temporary backward support for a hotfix
+        type == "online_media_recording" ? "media_recording" : type
+      end
       update_params["submission_types"] = update_params["submission_types"].join(',')
     end
 
