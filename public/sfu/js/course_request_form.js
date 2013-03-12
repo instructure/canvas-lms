@@ -57,17 +57,18 @@
         });
 
         $("#update_course_list").click(function() {
-            var sfuid = username();
+            var sfu_id = username();
             $("#enroll_me_div").hide();
             $("#course_list").html("<h5>Retrieving course list...</h5>");
             $("#course_list").spin(spinnerOpts);
 
             $.ajax({
-              url: "/sfu/user/" + sfuid,
+              url: "/sfu/api/user/" + sfu_id,
               dataType: "json",
               success: function(data) {
-                if (data.login_id !== null && data.login_id !== undefined){
-                    course_list(sfuid);
+                //if (data.id !== null && data.id !== undefined){
+                  if (data.id > 0){
+                    course_list(sfu_id);
                 } else {
                     $("#course_list").html("<h5>Invalid SFU Computing ID</h5>");
                 }
@@ -96,10 +97,10 @@
 
     function course_list() {
         toggle_enroll_me();
-        var sfuid = $("#username").val();
+        var sfu_id = $("#username").val();
 
         $.ajax({
-          url: "/sfu/terms/" + sfuid,
+          url: "/sfu/api/user/" + sfu_id + "/terms",
           dataType: "json",
           success: function(data) {
             $("#course_list").html("");
@@ -107,9 +108,9 @@
             $.each(data, function (index, term) {
                 $("#course_list").append('<div id="' + term.peopleSoftCode + '"><h4>' + term.formatted1 + '</h4><div id="' + term.peopleSoftCode + '_courses"></div></div>');
                 $("#"+term.peopleSoftCode+"_courses").html("<label> Retrieving courses... </label>");
-                courses_for_terms(sfuid, term.peopleSoftCode);
+                courses_for_terms(sfu_id, term.peopleSoftCode);
             });
-           sandbox_course(sfuid);
+           sandbox_course(sfu_id);
           },
           error: function(xhr) {
             var statusCode = xhr.status;
@@ -122,10 +123,10 @@
         })
     }
 
-    function courses_for_terms(sfuid, term) {
+    function courses_for_terms(sfu_id, term) {
         $("#" + term + "_courses").spin(spinnerOpts);
         $.ajax({
-            url: "/sfu/courses/" + sfuid + "/" + term,
+            url: "/sfu/api/courses/teaching/" + sfu_id + "/" + term,
             dataType: 'json',
             success: function(data) {
                 var num = 1;
@@ -214,13 +215,14 @@
         }
     }
 
-    function sandbox_course(sfuid) {
-        var title = "Sandbox - " + sfuid;
+    function sandbox_course(sfu_id) {
+        var title = "Sandbox - " + sfu_id;
+        var sis_id = "sandbox-" + sfu_id + "-1";
         $.ajax({
-            url: "/sfu/sandbox/" + sfuid,
+            url: "/sfu/api/course/" + sis_id,
             dataType: 'json',
             success: function(data) {
-                if (data.sis_source_id != "sandbox-" + sfuid + "-1") {
+                if (data.sis_source_id != sis_id) {
                     $("#course_list").append("<div id='sandbox'><h4>Other</h4></div>");
                     var checkbox_html = '<label class="checkbox"><input type="checkbox" name="selected_course_sandbox" id="selected_course_sandbox" value="sandbox">'+ title +'</label>';
                     $("#sandbox").append(checkbox_html);

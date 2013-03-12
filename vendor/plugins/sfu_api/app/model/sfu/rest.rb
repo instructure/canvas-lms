@@ -1,10 +1,10 @@
 module SFU
 
-  module Rest
+  module REST
     extend self
 
     def canvas_server
-      "http://localhost"
+      "http://localhost:3000"
     end
 
     def rest_server
