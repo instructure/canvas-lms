@@ -26,15 +26,14 @@ describe StreamItemInstance do
   end
 
   describe ".update_all_with_invalidation" do
-    # TODO: uncomment when this bug is fixed https://github.com/freerange/mocha/issues/99
-    # it "invalidates stream item cache keys and runs update_all (the original)" do
-    #   # expect
-    #   StreamItemCache.expects(:invalidate_context_stream_item_key).twice
-    #   updates, conditions, options = ['updates', {:conditions => ''}, {:options => ''}]
-    #   StreamItemInstance.expects(:original_update_all).with(updates, conditions, options)
-    #   # when
-    #   StreamItemInstance.update_all_with_invalidation(['code_1', 'code_2'],
-    #                                                   updates, conditions, options)
-    # end
+     it "invalidates stream item cache keys and runs update_all (the original)" do
+       # expect
+       StreamItemCache.expects(:invalidate_context_stream_item_key).twice
+       updates, conditions, options = ['updates', {:conditions => ''}, {:options => ''}]
+       StreamItemInstance.expects(:original_update_all).with(updates, conditions, options)
+       # when
+       StreamItemInstance.update_all_with_invalidation(['code_1', 'code_2'],
+                                                       updates, conditions, options)
+     end
   end
 end

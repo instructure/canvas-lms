@@ -1,6 +1,6 @@
 require File.join( File.dirname( __FILE__ ), 'test_helper' )
 
-require 'mocha'
+require 'mocha/api'
 
 class Aardvark < ActiveRecord::Base
   simply_versioned :keep => 3
