@@ -4,7 +4,7 @@ module SFU
     extend self
 
     def canvas_server
-      "http://localhost:3000"
+      "http://localhost"
     end
 
     def rest_server
