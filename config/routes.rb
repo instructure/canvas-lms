@@ -365,8 +365,6 @@ ActionController::Routing::Routes.draw do |map|
     feed.forum_format "forums/:feed_code.:format", :controller => "discussion_topics", :action => "public_feed"
     feed.topic "topics/:discussion_topic_id/:feed_code", :controller => "discussion_entries", :action => "public_feed"
     feed.topic_format "topics/:discussion_topic_id/:feed_code.:format", :controller => "discussion_entries", :action => "public_feed"
-    feed.files "files/:feed_code", :controller => "files", :action => "public_feed"
-    feed.files_format "files/:feed_code.:format", :controller => "files", :action => "public_feed"
     feed.announcements "announcements/:feed_code", :controller => "announcements", :action => "public_feed"
     feed.announcements_format "announcements/:feed_code.:format", :controller => "announcements", :action => "public_feed"
     feed.course "courses/:feed_code", :controller => "courses", :action => "public_feed"

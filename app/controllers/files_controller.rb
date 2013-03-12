@@ -38,7 +38,7 @@
 #     }
 class FilesController < ApplicationController
   before_filter :require_user, :only => :create_pending
-  before_filter :require_context, :except => [:public_feed,:full_index,:assessment_question_show,:image_thumbnail,:show_thumbnail,:preflight,:create_pending,:s3_success,:show,:api_create,:api_create_success,:api_show,:api_index,:destroy,:api_update,:api_file_status]
+  before_filter :require_context, :except => [:full_index,:assessment_question_show,:image_thumbnail,:show_thumbnail,:preflight,:create_pending,:s3_success,:show,:api_create,:api_create_success,:api_show,:api_index,:destroy,:api_update,:api_file_status]
   before_filter :check_file_access_flags, :only => [:show_relative, :show]
   prepend_around_filter :load_pseudonym_from_policy, :only => :create
   skip_before_filter :verify_authenticity_token, :only => :api_create
@@ -794,25 +794,6 @@ class FilesController < ApplicationController
       send_file thumbnail.full_filename, :content_type => thumbnail.content_type
     else
       image_thumbnail
-    end
-  end
-
-  def public_feed
-    return unless get_feed_context
-    feed = Atom::Feed.new do |f|
-      f.title = t :feed_title, "%{course_or_group} Files Feed", :course_or_group => @context.name
-      f.links << Atom::Link.new(:href => polymorphic_url([@context, :files]), :rel => 'self')
-      f.updated = Time.now
-      f.id = polymorphic_url([@context, :files])
-    end
-    @entries = []
-    @entries.concat @context.attachments.active
-    @entries = @entries.sort_by{|e| e.updated_at}
-    @entries.each do |entry|
-      feed.entries << entry.to_atom
-    end
-    respond_to do |format|
-      format.atom { render :text => feed.to_xml }
     end
   end
 
