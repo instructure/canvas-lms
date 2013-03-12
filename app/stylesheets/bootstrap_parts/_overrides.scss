@@ -62,6 +62,14 @@ input[type=radio] + label {
   vertical-align: -4px;
 }
 
+// align inline form buttons to prevent staggering
+.form-inline {
+  input[type=checkbox] + label,
+  input[type=radio] + label {
+    vertical-align: middle;
+  }
+}
+
 // all the browsers render this differently, remove line-height so the text doesn't
 // get ridiculously misaligned.
 input[type=file] {
