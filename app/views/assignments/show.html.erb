@@ -36,7 +36,7 @@
     </h2>
     <ul class='student-assignment-overview'>
       <li>
-        <span class='label'><%= t :due_at, 'Due' %></span>
+        <span class='title'><%= t :due_at, 'Due' %></span>
         <span class='value'>
           <% if @assignment.due_at %>
             <% ot(:date_time_by, "%{date} by %{time}", :date => capture { %>
@@ -48,18 +48,18 @@
         </span>
       </li>
       <li>
-        <span class='label'><%= t :points, 'Points' %></span>
+        <span class='title'><%= t :points, 'Points' %></span>
         <span class='value'><%= @assignment.points_possible || t(:no_points, 'None') %></span>
       </li>
       <% if @assignment.expects_submission? %>
         <% turnitin_text = @assignment.turnitin_enabled? ? ' ' + t(:turnitin_enabled_short, '(Turnitin enabled)') : '' %>
         <li>
-          <span class='label'><%= t :submitting, 'Submitting' %></span>
+          <span class='title'><%= t :submitting, 'Submitting' %></span>
           <span class='value'><%= @assignment.readable_submission_types + turnitin_text %></span>
         </li>
         <% if @assignment.submission_types =~ /online_upload/ && !@assignment.allowed_extensions.blank? -%>
           <li>
-            <span class='label'><%= t :submission_types, 'File Types' %></span>
+            <span class='title'><%= t :submission_types, 'File Types' %></span>
             <span class='value'><%= @assignment.allowed_extensions.to_sentence %></span>
           </li>
         <% end %>
