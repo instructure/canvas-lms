@@ -95,8 +95,8 @@ define [
     acceptsOnlineURL: =>
       !! _.include @_submissionTypes(), 'online_url'
 
-    acceptsOnlineMediaRecording: =>
-      !! _.include @_submissionTypes(), 'online_media_recording'
+    acceptsMediaRecording: =>
+      !! _.include @_submissionTypes(), 'media_recording'
 
     acceptsOnlineTextEntries: =>
       !! _.include @_submissionTypes(), 'online_text_entry'
@@ -104,7 +104,7 @@ define [
     isOnlineSubmission: =>
       _.any @_submissionTypes(), (thing) ->
           thing in ['online', 'online_text_entry',
-            'online_media_recording', 'online_url', 'online_upload']
+            'media_recording', 'online_url', 'online_upload']
 
     peerReviews: ( peerReviewBoolean ) =>
       return @get 'peer_reviews' unless arguments.length > 0
@@ -184,7 +184,7 @@ define [
         'name', 'dueAt','description','pointsPossible', 'lockAt', 'unlockAt',
         'gradingType', 'notifyOfUpdate', 'peerReviews', 'automaticPeerReviews',
         'peerReviewCount', 'peerReviewsAssignAt',
-        'acceptsOnlineUpload','acceptsOnlineMediaRecording', 'submissionType',
+        'acceptsOnlineUpload','acceptsMediaRecording', 'submissionType',
         'acceptsOnlineTextEntries', 'acceptsOnlineURL', 'allowedExtensions',
         'restrictFileExtensions', 'isOnlineSubmission', 'isNotGraded',
         'isExternalTool', 'externalToolUrl', 'externalToolNewTab',
