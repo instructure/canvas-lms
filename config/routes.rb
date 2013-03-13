@@ -933,6 +933,10 @@ ActionController::Routing::Routes.draw do |map|
       channels.delete 'users/:user_id/communication_channels/:id', :action => :destroy
     end
 
+    api.with_options(:controller => :comm_messages_api) do |comm_messages|
+      comm_messages.get 'comm_messages', :action => :index, :path_name => 'comm_messages'
+    end
+
     api.with_options(:controller => :services_api) do |services|
       services.get 'services/kaltura', :action => :show_kaltura_config
       services.post 'services/kaltura_session', :action => :start_kaltura_session

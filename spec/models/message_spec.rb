@@ -138,5 +138,21 @@ describe Message do
         @message.deliver.should == false
       end
     end
+
+    describe "infer_defaults" do
+      it "should not break if there is no context" do
+        message_model.root_account_id.should be_nil
+      end
+
+      it "should not break if the context does not have an account" do
+        user_model
+        message_model(:context => @user).root_account_id.should be_nil
+      end
+
+      it "should populate root_account_id if the context can chain back to a root account" do
+        message_model(:context => course_model).root_account_id.should eql Account.default.id
+      end
+    end
+
   end
 end

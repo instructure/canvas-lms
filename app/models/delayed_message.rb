@@ -21,10 +21,11 @@ class DelayedMessage < ActiveRecord::Base
   belongs_to :notification_policy
   belongs_to :context, :polymorphic => true
   belongs_to :communication_channel
-  attr_accessible :notification, :notification_policy, :frequency, :communication_channel, :linked_name, :name_of_topic,
-                  :link, :summary, :notification_id, :notification_policy_id, :context_id, :context_type, :communication_channel_id,
-                  :context, :workflow_state
-  
+  attr_accessible :notification, :notification_policy, :frequency,
+    :communication_channel, :linked_name, :name_of_topic, :link, :summary,
+    :notification_id, :notification_policy_id, :context_id, :context_type,
+    :communication_channel_id, :context, :workflow_state, :root_account_id
+
   validates_length_of :summary, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :communication_channel_id
 
@@ -72,13 +73,6 @@ class DelayedMessage < ActiveRecord::Base
   scope :next_to_summarize, lambda {
     where(:workflow_state => 'pending').order(:send_at).limit(1)
   }
-  
-  def self.ids_for_messages_with_communication_channel_id(cc_id)
-    dm_ids = DelayedMessage.connection.select_values(
-      "SELECT id
-         FROM delayed_messages
-        WHERE workflow_state = 'pending' AND send_at <= '#{Time.now.to_s(:db)}' AND communication_channel_id = #{cc_id}")
-  end
   
   include Workflow
   
@@ -131,6 +125,7 @@ class DelayedMessage < ActiveRecord::Base
     message.delayed_messages = delayed_messages
     message.context = context
     message.asset_context = context.context(user) rescue context
+    message.root_account_id = delayed_messages.first.try(:root_account_id)
     message.delay_for = 0
     message.parse!
     message.save

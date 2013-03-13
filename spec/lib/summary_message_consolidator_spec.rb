@@ -32,4 +32,27 @@ describe "SummaryMessageConsolidator" do
     queued = created_jobs.map { |j| j.payload_object.jobs.map { |j| j.payload_object.args } }.flatten
     queued.map(&:to_i).sort.should == messages.map(&:id).sort
   end
+
+  it "should send summaries from different accounts in separate messages" do
+    users = (0..3).map { user_with_communication_channel }
+    dms = []
+    account_ids = [1, 2, 3]
+    delayed_messages_per_account = 2
+    account_id_iter = (account_ids * delayed_messages_per_account).sort
+    users.each do |u|
+      account_id_iter.each do |rai|
+        dms << delayed_message_model(
+          :cc => u.communication_channels.first,
+          :root_account_id => rai,
+          :send_at => 1.day.ago)
+      end
+    end
+
+    SummaryMessageConsolidator.process
+    dm_summarize_expectation = DelayedMessage.expects(:summarize)
+    dms.each_slice(delayed_messages_per_account) do |dms|
+      dm_summarize_expectation.with(dms.map(&:id))
+    end
+    run_jobs
+  end
 end

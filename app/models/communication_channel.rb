@@ -260,13 +260,6 @@ class CommunicationChannel < ActiveRecord::Base
   def can_notify?
     self.notification_policies.any? { |np| np.frequency == 'never' } ? false : true
   end
- 
-  def self.ids_with_pending_delayed_messages
-    CommunicationChannel.connection.select_values(
-      "SELECT distinct communication_channel_id
-         FROM delayed_messages
-        WHERE workflow_state = 'pending' AND send_at <= '#{Time.now.to_s(:db)}'")
-  end
   
   def move_to_user(user, migrate=true)
     return unless user

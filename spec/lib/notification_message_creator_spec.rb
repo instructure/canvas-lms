@@ -171,7 +171,7 @@ describe NotificationMessageCreator do
       cc = u1.communication_channels.create(:path => "active@example.com")
       cc.confirm!
 
-      @a = Assignment.create
+      @a = assignment_model
       messages = NotificationMessageCreator.new(@notification, @a, :to_list => u1).create_message
       messages.should_not be_empty
       messages.length.should eql(1)
@@ -180,6 +180,7 @@ describe NotificationMessageCreator do
       DelayedMessage.last.should_not be_nil
       DelayedMessage.last.notification_id.should eql(@notification.id)
       DelayedMessage.last.communication_channel_id.should eql(cc.id)
+      DelayedMessage.last.root_account_id.should eql Account.default.id
       DelayedMessage.last.send_at.should > Time.now.utc
     end
 
