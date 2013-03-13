@@ -19,7 +19,7 @@
 require 'quiz_question_link_migrator'
 
 class QuizQuestion < ActiveRecord::Base
-  attr_accessible :quiz, :quiz_group, :assessment_question, :question_data, :assessment_question_version, :quiz_group, :quiz
+  attr_accessible :quiz, :quiz_group, :assessment_question, :question_data, :assessment_question_version
   attr_readonly :quiz_id
   belongs_to :quiz
   belongs_to :assessment_question
@@ -44,7 +44,7 @@ class QuizQuestion < ActiveRecord::Base
   protected :infer_defaults
   
   def update_quiz
-    Quiz.update_all({:last_edited_at => Time.now.utc}, {:id => self.quiz_id})
+    Quiz.mark_quiz_edited(self.quiz_id)
   end
   
   def question_data=(data)
