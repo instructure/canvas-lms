@@ -996,7 +996,8 @@ describe PseudonymSessionsController do
   end
 
   describe 'GET oauth2_auth' do
-    let(:key) { DeveloperKey.create! }
+    let(:key) { DeveloperKey.create! :redirect_uri => 'https://example.com' }
+    let(:user) { User.create! }
 
     it 'renders a 400 when there is no client_id' do
       get :oauth2_auth
@@ -1071,9 +1072,21 @@ describe PseudonymSessionsController do
     before { user_session user }
 
     it 'uses the global id of the user for generating the code' do
-      Canvas::Oauth::Token.expects(:generate_code_for).with(user.global_id, key.id).returns('code')
+      Canvas::Oauth::Token.expects(:generate_code_for).with(user.global_id, key.id, {:scopes => nil, :remember_access => nil}).returns('code')
       oauth_accept
       response.should redirect_to(oauth2_auth_url(:code => 'code'))
+    end
+
+    it 'saves the requested scopes with the code' do
+      scopes = 'userinfo'
+      session_hash[:oauth2][:scopes] = scopes
+      Canvas::Oauth::Token.expects(:generate_code_for).with(user.global_id, key.id, {:scopes => scopes, :remember_access => nil}).returns('code')
+      oauth_accept
+    end
+
+    it 'remembers the users access preference with the code' do
+      Canvas::Oauth::Token.expects(:generate_code_for).with(user.global_id, key.id, {:scopes => nil, :remember_access => '1'}).returns('code')
+      post :oauth2_accept, {:remember_access => '1'}, session_hash
     end
 
     it 'removes oauth session info after code generation' do
@@ -1081,7 +1094,6 @@ describe PseudonymSessionsController do
       oauth_accept
       controller.session.should == {}
     end
-
   end
 
 end
