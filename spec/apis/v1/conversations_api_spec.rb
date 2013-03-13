@@ -1358,7 +1358,7 @@ describe ConversationsController, :type => :integration do
 
     it "should delete the conversation for all participants" do
       users = [@me, @bob, @billy, @jane, @joe, @tommy]
-      cp = conversation(*users, :sender => @me)
+      cp = conversation(*users)
       conv = cp.conversation
       users.each do |user|
         user.all_conversations.size.should eql 1
