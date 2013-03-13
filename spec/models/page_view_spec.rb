@@ -89,6 +89,32 @@ describe PageView do
         expect { PageView.find(pv.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
       end
 
+      it "should respect the per-shard setting" do
+        pending("needs redis") unless Canvas.redis_enabled?
+
+        begin
+          Shard.default.settings[:page_view_method] = :db
+          Shard.default.save!
+
+          @shard1.activate do
+            course_model
+            pv = page_view_model
+            pv.user = @user
+            pv.context = @course
+            pv.store
+
+            PageView.process_cache_queue
+            pv = PageView.find(pv.request_id)
+            pv.should be_present
+            pv.user.should == @user
+            pv.context.should == @course
+          end
+        ensure
+          Shard.default.settings.delete(:page_view_method)
+          Shard.default.save!
+        end
+      end
+
       it "should handle default shard ids through redis" do
         pending("needs redis") unless Canvas.redis_enabled?
 
@@ -105,7 +131,7 @@ describe PageView do
           pv.request_id
         end
 
-        pv = PageView.find(id)
+        pv = @shard1.activate { PageView.find(id) }
         pv.user.should == @pv_user
         pv.context.should == @course
 

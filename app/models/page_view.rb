@@ -337,8 +337,14 @@ class PageView < ActiveRecord::Base
         activate_shard_for_cache_read { page_view.do_update(attrs) }
         page_view.save
       else
-        # bypass mass assignment protection
-        activate_shard_for_cache_read { self.create { |p| p.send(:attributes=, attrs, false) } }
+        create_in_cassandra = self.cassandra?
+        activate_shard_for_cache_read do
+          self.create do |p|
+            p.page_view_method = :cassandra if create_in_cassandra
+            # bypass mass assignment protection
+            p.send(:attributes=, attrs, false)
+          end
+        end
       end
     end
   rescue ActiveRecord::StatementInvalid
