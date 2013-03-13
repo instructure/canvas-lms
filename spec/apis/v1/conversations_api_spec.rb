@@ -173,6 +173,7 @@ describe ConversationsController, :type => :integration do
       end
 
       def verify_filter(filter)
+        @user = @me
         json = api_call(:get, "/api/v1/conversations.json?filter=#{filter}",
                 { :controller => 'conversations', :action => 'index', :format => 'json', :filter => filter })
         json.size.should == @conversations.size
@@ -234,6 +235,41 @@ describe ConversationsController, :type => :integration do
 
         it "should recognize explicitly global filter on the context's shard" do
           @shard1.activate{ verify_filter(@course.global_asset_string) }
+        end
+      end
+
+      context "tag user on default shard" do
+        before do
+          Shard.default.activate do
+            account = Account.create!
+            course_with_teacher(:account => account, :active_course => true, :active_enrollment => true, :user => @me)
+            @course.update_attribute(:name, "another course")
+            @alex = student_in_course(:name => "alex")
+          end
+
+          @conversations << conversation(@alex)
+        end
+
+        it "should recognize filter on the default shard" do
+          verify_filter(@alex.asset_string)
+        end
+      end
+
+      context "tag user on non-default shard" do
+        before do
+          @shard1.activate do
+            account = Account.create!
+            course_with_teacher(:account => account, :active_course => true, :active_enrollment => true)
+            @course.update_attribute(:name, "the course 2")
+            @alex = student_in_course(:name => "alex")
+            @me = @teacher
+          end
+
+          @conversations << @shard1.activate{ conversation(@alex) }
+        end
+
+        it "should recognize filter on the user's shard" do
+          @shard1.activate{ verify_filter(@alex.asset_string) }
         end
       end
     end
