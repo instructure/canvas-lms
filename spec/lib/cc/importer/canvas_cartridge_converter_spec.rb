@@ -503,7 +503,7 @@ describe "Canvas Cartridge importing" do
     mod3_2.content_tags.length.should == 2
     mod3_2.content_tags[0].url.should == "http://a.example.com/"
     mod3_2.content_tags[1].url.should == "http://b.example.com/"
-    @migration.migration_settings[:warnings].first.first.should == %{Couldn't import the module item "Example 3" in the module "url module"}
+    @migration.old_warnings_format.first.first.should == %{Couldn't import the module item "Example 3" in the module "url module"}
     
     mod4_2 = @copy_to.context_modules.find_by_migration_id(CC::CCHelper.create_key(mod4))
     mod4_2.content_tags.first.title.should == att_tag.title

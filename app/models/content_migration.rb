@@ -25,6 +25,7 @@ class ContentMigration < ActiveRecord::Base
   belongs_to :exported_attachment, :class_name => 'Attachment'
   belongs_to :source_course, :class_name => 'Course'
   has_one :content_export
+  has_many :migration_issues
   has_a_broadcast_policy
   serialize :migration_settings
   before_save :infer_defaults
@@ -183,23 +184,66 @@ class ContentMigration < ActiveRecord::Base
     end
   end
 
-  # add a non-fatal error/warning to the import. user_message is what will be
-  # displayed to the end user. exception_or_info can be either an Exception
-  # object or any other information on the error.
-  def add_warning(user_message, exception_or_info='')
-    migration_settings[:warnings] ||= []
-    if exception_or_info.is_a?(Exception)
-      er = ErrorReport.log_exception(:content_migration, exception_or_info)
-      migration_settings[:warnings] << [user_message, "ErrorReport:#{er.id}"]
-    else
-      migration_settings[:warnings] << [user_message, exception_or_info]
+  # add todo/error/warning issue to the import. user_message is what will be
+  # displayed to the end user. 
+  # type must be one of: :todo, :warning, :error 
+  #
+  # The possible opts keys are:
+  #
+  # error_message - an admin-only error message
+  # exception - an exception object
+  # error_report_id - the id to an error report
+  # fix_issue_html_url - the url to send the user to to fix problem
+  # 
+  def add_issue(user_message, type, opts={})
+    mi = self.migration_issues.build(:issue_type => type.to_s, :description => user_message)
+    if opts[:error_report_id]
+      mi.error_report_id = opts[:error_report_id]
+    elsif opts[:exception]
+      er = ErrorReport.log_exception(:content_migration, opts[:exception])
+      mi.error_report_id = er.id
+    end
+    mi.error_message = opts[:error_message]
+    mi.fix_issue_html_url = opts[:fix_issue_html_url]
+    mi.save!
+    
+    mi
+  end
+  
+  def add_todo(user_message, opts={})
+    add_issue(user_message, :todo, opts)
+  end
+  
+  def add_error(user_message, opts={})
+    add_issue(user_message, :error, opts)
+  end
+  
+  def add_warning(user_message, opts={})
+    if !opts.is_a? Hash
+      # convert deprecated behavior to new
+      exception_or_info = opts
+      opts={}
+      if exception_or_info.is_a?(Exception)
+        opts[:exception] = exception_or_info
+      else
+        opts[:error_message] = exception_or_info
+      end
+    end
+    add_issue(user_message, :warning, opts)
+  end
+
+  # deprecated warning format
+  def old_warnings_format
+    self.migration_issues.map do |mi|
+      message = mi.error_report_id ? "ErrorReport:#{mi.error_report_id}" : mi.error_message
+      [mi.description, message]
     end
   end
 
   def warnings
-    (migration_settings[:warnings] || []).map(&:first)
+    old_warnings_format.map(&:first)
   end
-
+  
   def export_content
     check_quiz_id_prepender
     plugin = Canvas::Plugin.find(migration_settings['migration_type'])

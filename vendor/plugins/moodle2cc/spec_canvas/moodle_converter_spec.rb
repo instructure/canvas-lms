@@ -22,7 +22,7 @@ describe Moodle::Converter do
 
   it "should successfully import the course" do
     @course.import_from_migration(@course_data, nil, @cm)
-    @cm.migration_settings[:warnings].should be_nil
+    @cm.old_warnings_format.should == []
   end
 
   context "discussion topics" do

@@ -1582,7 +1582,7 @@ describe ContentImportsController, :type => :integration do
 
     run_jobs
     cm.reload
-    cm.migration_settings[:warnings].should == nil
+    cm.old_warnings_format.should == []
     cm.content_export.error_messages.should == []
 
     api_call(:get, status_url, { :controller => 'content_imports', :action => 'copy_course_status', :course_id => @copy_to.to_param, :id => data['id'].to_param, :format => 'json' })

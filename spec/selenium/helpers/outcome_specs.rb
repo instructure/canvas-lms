@@ -44,7 +44,7 @@ shared_examples_for "outcome tests" do
     @cm.export_content
     run_jobs
     @cm.reload
-    @cm.migration_settings[:warnings].should be_nil
+    @cm.old_warnings_format.should == []
     @cm.migration_settings[:last_error].should be_nil
     @cm.workflow_state.should == 'imported'
   end

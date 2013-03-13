@@ -98,7 +98,7 @@ describe AcademicBenchmark::Converter do
     @cm.export_content
     run_jobs
     @cm.reload
-    @cm.migration_settings[:warnings].should be_nil
+    @cm.old_warnings_format.should == []
     @cm.migration_settings[:last_error].should be_nil
     @cm.workflow_state.should == 'imported'
 
@@ -125,7 +125,7 @@ describe AcademicBenchmark::Converter do
     run_jobs
     @cm.reload
 
-    @cm.migration_settings[:warnings].should == [["No outcome file or authority given", ""]]
+    @cm.old_warnings_format.should == [["No outcome file or authority given", ""]]
     @cm.migration_settings[:last_error].should_not be_nil
     @cm.workflow_state.should == 'failed'
   end
@@ -144,7 +144,7 @@ describe AcademicBenchmark::Converter do
       run_jobs
       @cm.reload
 
-      @cm.migration_settings[:warnings].should be_nil
+      @cm.old_warnings_format.should == []
       @cm.migration_settings[:last_error].should be_nil
       @cm.workflow_state.should == 'imported'
 
@@ -160,7 +160,7 @@ describe AcademicBenchmark::Converter do
       run_jobs
       @cm.reload
 
-      @cm.migration_settings[:warnings].should == [["An API key is required to use Academic Benchmarks", ""]]
+      @cm.old_warnings_format.should == [["An API key is required to use Academic Benchmarks", ""]]
       @cm.migration_settings[:last_error].should_not be_nil
       @cm.workflow_state.should == 'failed'
     end
@@ -206,7 +206,7 @@ describe AcademicBenchmark::Converter do
       @cm.reload
 
       er = ErrorReport.last
-      @cm.migration_settings[:warnings].should == [["Couldn't update standards for authority CC.", "ErrorReport:#{er.id}"]]
+      @cm.old_warnings_format.should == [["Couldn't update standards for authority CC.", "ErrorReport:#{er.id}"]]
       @cm.migration_settings[:last_error].should be_nil
       @cm.workflow_state.should == 'imported'
     end
