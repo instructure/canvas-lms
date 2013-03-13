@@ -91,17 +91,6 @@ describe "account admin question bank" do
     add_multiple_choice_question
   end
 
-  it "should delete a multiple choice question" do
-    hover_and_click("#question_#{@question.id} .delete_question_link")
-    driver.switch_to.alert.accept
-    wait_for_ajaximations
-    @question.reload
-    keep_trying_until do
-      @question.workflow_state.should == "deleted"
-      fj("#questions .question_name").should be_nil
-    end
-  end
-
   it "should edit a multiple choice question" do
     new_name = "question 2"
     new_question_text = "what is the answer to #{new_name}?"
@@ -160,6 +149,17 @@ describe "account admin question bank" do
     wait_for_ajaximations
     @question_bank.reload
     keep_trying_until { @question_bank.workflow_state.should == "deleted" }
+  end
+
+  it "should delete a multiple choice question" do
+    hover_and_click("#question_#{@question.id} .delete_question_link")
+    driver.switch_to.alert.accept
+    wait_for_ajaximations
+    @question.reload
+    keep_trying_until do
+      @question.workflow_state.should == "deleted"
+      fj("#questions .question_name").should be_nil
+    end
   end
 
   context "moving multiple questions" do

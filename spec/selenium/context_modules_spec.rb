@@ -646,11 +646,15 @@ describe "context_modules" do
 
       add_module 'Test module'
       f('.admin-links .al-trigger').click
+      wait_for_ajaximations
       f('.add_module_item_link').click
-      select_module_item('#add_module_item_select', 'External Tool')
-      find_with_jquery('.add_item_button:visible').click
-      ff('.alert.alert-error').length.should == 1
-      find_with_jquery('.alert.alert-error:visible').text.should == "An external tool can't be saved without a URL."
+      wait_for_ajaximations
+      keep_trying_until do
+        select_module_item('#add_module_item_select', 'External Tool')
+        fj('.add_item_button:visible').click
+        ff('.alert.alert-error').length.should == 1
+      end
+      fj('.alert.alert-error:visible').text.should == "An external tool can't be saved without a URL."
     end
 
     it "should hide module contents" do

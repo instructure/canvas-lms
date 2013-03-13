@@ -168,6 +168,7 @@ describe "eportfolios" do
         before(:each) do
           @html_content="<b>student</b>"
           f(".add_html_link").click
+          wait_for_ajaximations
           f("#edit_page_section_1").send_keys(@html_content)
         end
 
@@ -187,7 +188,7 @@ describe "eportfolios" do
           f(comment_public).click
           is_checked(comment_public).should be_true
           submit_form(".form_content")
-          wait_for_ajax_requests
+          wait_for_ajaximations
           f(".section_content b").text.should == "student"
           entry_verifier ({:section_type => "html", :content => @html_content})
           refresh_page

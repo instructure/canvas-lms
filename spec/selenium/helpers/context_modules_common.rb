@@ -72,7 +72,9 @@ shared_examples_for "context module tests" do
   def add_new_external_item(module_name, url_text, page_name_text)
     add_module(module_name + 'Module')
     f('.admin-links .al-trigger').click
+    wait_for_ajaximations
     f('.add_module_item_link').click
+    wait_for_ajaximations
     select_module_item('#add_module_item_select', module_name)
     wait_for_ajaximations
     url_input = fj('input[name="url"]:visible')
