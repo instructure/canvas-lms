@@ -1023,6 +1023,16 @@ describe PseudonymSessionsController do
 
   describe 'GET oauth2_token' do
     let(:key) { DeveloperKey.create! }
+    let(:user) { User.create! }
+    let(:valid_code) {"thecode"}
+    let(:valid_code_redis_key) {"#{Canvas::Oauth::Token::REDIS_PREFIX}#{valid_code}"}
+    let(:redis) do
+      redis = stub('Redis')
+      redis.stubs(:get)
+      redis.stubs(:get).with(valid_code_redis_key).returns(%Q{{"client_id": #{key.id}, "user": #{user.id}}})
+      redis.stubs(:del).with(valid_code_redis_key).returns(%Q{{"client_id": #{key.id}, "user": #{user.id}}})
+      redis
+    end
 
     it 'renders a 400 if theres no client_id' do
       get :oauth2_token
@@ -1037,16 +1047,16 @@ describe PseudonymSessionsController do
     end
 
     it 'renders a 400 if the provided code does not match a token' do
-      Canvas.stubs(:redis => stub(:get => nil))
+      Canvas.stubs(:redis => redis)
       get :oauth2_token, :client_id => key.id, :client_secret => key.api_key, :code => "NotALegitCode"
       response.status.should == '400 Bad Request'
       response.body.should =~ /invalid code/
     end
 
     it 'outputs the token json if everything checks out' do
-      user = User.create!
-      Canvas.stubs(:redis => stub(:get => %Q{{"client_id": #{key.id}, "user": #{user.id}}}))
-      get :oauth2_token, :client_id => key.id, :client_secret => key.api_key, :code => "thecode"
+      redis.expects(:del).with(valid_code_redis_key).at_least_once
+      Canvas.stubs(:redis => redis)
+      get :oauth2_token, :client_id => key.id, :client_secret => key.api_key, :code => valid_code
       response.should be_success
       JSON.parse(response.body).keys.sort.should == ['access_token', 'user']
     end
