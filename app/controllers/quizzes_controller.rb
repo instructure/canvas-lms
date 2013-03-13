@@ -286,6 +286,7 @@ class QuizzesController < ApplicationController
       end
       QuizQuestion.update_all("quiz_group_id=NULL,position=CASE #{question_updates.join(" ")} ELSE NULL END", {:id => items.select{|i| i.is_a?(QuizQuestion)}.map(&:id)}) unless question_updates.empty?
       QuizGroup.update_all("position=CASE #{group_updates.join(" ")} ELSE NULL END", {:id => items.select{|i| i.is_a?(QuizGroup)}.map(&:id)}) unless group_updates.empty?
+      Quiz.mark_quiz_edited(@quiz.id)
       render :json => {:reorder => true}
     end
   end

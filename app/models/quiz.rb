@@ -1457,4 +1457,9 @@ class Quiz < ActiveRecord::Base
     self.workflow_state = 'available'
     save!
   end
+
+  # marks a quiz as having unpublished changes
+  def self.mark_quiz_edited(id)
+    update_all({:last_edited_at => Time.now.utc}, {:id => id})
+  end
 end
