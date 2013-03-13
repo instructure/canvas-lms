@@ -84,6 +84,17 @@ class ConversationParticipant < ActiveRecord::Base
     sanitize_sql conditions
   end
 
+  tagged_scope_handler(/\A(course|group|section)_(\d+)\z/) do |tags, options|
+    tags.map do |tag|
+      # tags in the database use the id relative to the default shard. ids in
+      # the filters are assumed relative to the current shard and need to be
+      # cast to an id relative to the default shard before use in queries.
+      type, id = ActiveRecord::Base.parse_asset_string(tag)
+      id = Shard.relative_id_for(id, Shard.default)
+      wildcard('conversation_participants.tags', "#{type.underscore}_#{id}", :delimiter => ',')
+    end
+  end
+
   cacheable_method :user
   cacheable_method :conversation
 
