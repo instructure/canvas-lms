@@ -438,7 +438,11 @@ class QuizSubmission < ActiveRecord::Base
   end
 
   def latest_submitted_version
-    self.submitted_versions.last
+    if completed?
+      self
+    else
+      submitted_versions.last
+    end
   end
   
   def attempts_left

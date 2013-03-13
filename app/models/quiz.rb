@@ -184,7 +184,7 @@ class Quiz < ActiveRecord::Base
     # TODO: this is hacky, but we don't want callbacks to run because we're in an after_save. Refactor.
     Quiz.update_all({ :unpublished_question_count => cnt }, { :id => self.id })
     self.unpublished_question_count = cnt
-  rescue => e
+  rescue
   end
   
   def for_assignment?
@@ -503,7 +503,6 @@ class Quiz < ActiveRecord::Base
   def find_or_create_submission(user, temporary=false, state=nil)
     s = nil
     state ||= 'untaken'
-    attempts = 0
     if temporary || !user.is_a?(User)
       user_code = "#{user.to_s}"
       user_code = "user_#{user.id}" if user.is_a?(User)
@@ -879,13 +878,16 @@ class Quiz < ActiveRecord::Base
   def submissions_for_statistics(include_all_versions=true)
     ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
       for_users = context.student_ids
-      self.quiz_submissions.scoped(:include => [:versions], :conditions => { :user_id => for_users }).
-        map { |qs| if include_all_versions then qs.submitted_versions else qs.latest_submitted_version end }.
-        flatten.
-        compact.
-        select{ |s| s.completed? && s.submission_data.is_a?(Array) }.
-        sort_by(&:updated_at).
-        reverse
+      includes = include_all_versions ? [:versions] : []
+      quiz_submissions.scoped(:include => includes).
+        where(:user_id => for_users).
+        map { |qs|
+          include_all_versions ?
+            qs.submitted_versions :
+            qs.latest_submitted_version
+        }.flatten.
+        select{ |s| s && s.completed? && s.submission_data.is_a?(Array) }.
+        sort { |a,b| b.updated_at <=> a.updated_at }
     end
   end
 
@@ -1001,24 +1003,27 @@ class Quiz < ActiveRecord::Base
 
   def statistics(include_all_versions=true)
     submissions = submissions_for_statistics(include_all_versions)
-    questions = (self.quiz_data || []).map{|q| q[:questions] ? q[:questions] : [q] }.flatten
+    questions = Hash[
+      (quiz_data || []).map { |q| q[:questions] || q }.
+        flatten.
+        select { |q| q[:answers] }.
+        map { |q| [q[:id], q] }
+    ]
     stats = {}
     found_ids = {}
     score_counter = Stats::Counter.new
-    question_ids = []
     questions_hash = {}
     stats[:questions] = []
     stats[:multiple_attempts_exist] = submissions.any?{|s| s.attempt && s.attempt > 1 }
     stats[:multiple_attempts_included] = include_all_versions
-    stats[:submission_user_ids] = []
-    stats[:submission_count] = 0
+    stats[:submission_user_ids] = Set.new
     stats[:submission_score_tally] = 0
-    stats[:submission_incorrect_tally] = 0
     stats[:unique_submission_count] = 0
     stats[:submission_correct_tally] = 0
+    stats[:submission_incorrect_tally] = 0
     stats[:submission_duration_tally] = 0
+    stats[:submission_count] = submissions.size
     submissions.each do |sub|
-      stats[:submission_count] += 1
       stats[:submission_user_ids] << sub.user_id if sub.user_id > 0
       if !found_ids[sub.id]
         stats[:unique_submission_count] += 1
@@ -1033,7 +1038,6 @@ class Quiz < ActiveRecord::Base
       stats[:submission_correct_tally] += answers.count{|a| a[:correct] == true }
       stats[:submission_duration_tally] += ((sub.finished_at - sub.started_at).to_i rescue 30)
       sub.quiz_data.each do |question|
-        question_ids << question[:id]
         questions_hash[question[:id]] ||= question
       end
     end
@@ -1044,37 +1048,55 @@ class Quiz < ActiveRecord::Base
     stats[:submission_score_stdev] = score_counter.standard_deviation
     stats[:submission_incorrect_count_average] = stats[:submission_count] > 0 ? stats[:submission_incorrect_tally].to_f / stats[:submission_count].to_f : 0
     stats[:submission_correct_count_average] = stats[:submission_count] > 0 ? stats[:submission_correct_tally].to_f / stats[:submission_count].to_f : 0
-    assessment_questions = question_ids.empty? ? [] : AssessmentQuestion.find_all_by_id(question_ids).compact
-    question_ids.uniq.each do |id|
-      obj = questions.detect{|q| q[:answers] && q[:id] == id }
-      if !obj && questions_hash[id]
+
+    assessment_questions = if questions_hash.any? { |_,q| q[:assessment_question_id] }
+                             Hash[
+                               AssessmentQuestion.where(:id => questions_hash.keys).
+                               map { |aq| [aq.id, aq] }
+                             ]
+                           else
+                             {}
+                           end
+    responses_for_question = {}
+    submissions.each do |s|
+      s.submission_data.each do |a|
+        q_id = a[:question_id]
+        a[:user_id] = s.user_id
+        responses_for_question[q_id] ||= []
+        responses_for_question[q_id] << a
+      end
+    end
+
+    questions_hash.keys.each do |id|
+      obj = questions[id]
+      unless obj
         obj = questions_hash[id]
-        aq_name = assessment_questions.detect{|q| q.id == obj[:assessment_question_id] }.try(:name)
-        obj[:name] = aq_name || obj[:name]
+        if obj[:assessment_question_id]
+          aq_name = assessment_questions[obj[:assessment_question_id]].try(:name)
+          obj[:name] = aq_name if aq_name
+        end
       end
       if obj[:answers] && obj[:question_type] != 'text_only_question'
-        stat = stats_for_question(obj, submissions)
+        stat = stats_for_question(obj, responses_for_question[obj[:id]])
         stats[:questions] << ['question', stat]
       end
     end
-    stats[:last_submission_at] = submissions.map{|s| s.finished_at }.compact.max || self.created_at
+    stats[:last_submission_at] = submissions.map(&:finished_at).compact.max || self.created_at
     stats
   end
 
-  def stats_for_question(question, submissions)
+  def stats_for_question(question, responses)
     res = question
     res[:responses] = 0
     res[:response_values] = []
     res[:unexpected_response_values] = []
     res[:user_ids] = []
-    res[:answers] = question[:answers].map{|a| 
-      answer = a
-      answer[:responses] = 0
-      answer[:user_ids] = []
-      answer
+    res[:answers].each { |a|
+      a[:responses] = 0
+      a[:user_ids] = []
     }
     strip_html_answers(res)
-    res[:multiple_responses] = true if question[:question_type] == 'calculated_question'
+    res[:multiple_responses] = question[:question_type] == 'calculated_question'
     if question[:question_type] == 'numerical_question'
       res[:answers].each do |answer|
         if answer[:numerical_answer_type] == 'exact_answer'
@@ -1113,102 +1135,100 @@ class Quiz < ActiveRecord::Base
       end
       res[:answer_sets] = answers
     end
-    submissions.each do |submission|
-      answers = submission.submission_data || []
-      response = answers.detect{|a| a[:question_id] == question[:id] }
-      if response
-        res[:responses] += 1
-        res[:response_values] << response[:text]
-        res[:user_ids] << submission.user_id
-        if question[:question_type] == 'matching_question'
-          res[:multiple_answers] = true
-          res[:answers].each_with_index do |answer, idx|
-            res[:answers][idx][:responses] += 1 if response[:correct]
-            (res[:matches] || res[:answers]).each_with_index do |right, jdx|
-              if response["answer_#{answer[:id]}".to_sym].to_i == right[:match_id]
-                res[:answers][idx][:answer_matches][jdx][:responses] += 1
-                res[:answers][idx][:answer_matches][jdx][:user_ids] << submission.user_id
-              end
-            end
-          end
-        elsif question[:question_type] == 'fill_in_multiple_blanks_question'
-          res[:multiple_answers] = true
-          res[:answer_sets].each_with_index do |answer, idx|
-            found = false
-            response_hash_id = Digest::MD5.hexdigest(response["answer_for_#{answer[:blank_id]}".to_sym].strip) if !response["answer_for_#{answer[:blank_id]}".to_sym].try(:strip).blank?
-            res[:answer_sets][idx][:responses] += 1 if response[:correct]
-            res[:answer_sets][idx][:answer_matches].each_with_index do |right, jdx|
-              if response["answer_for_#{answer[:blank_id]}".to_sym] == right[:text]
-                found = true
-                res[:answer_sets][idx][:answer_matches][jdx][:responses] += 1
-                res[:answer_sets][idx][:answer_matches][jdx][:user_ids] << submission.user_id
-              end
-            end
-            if !found
-              if response_hash_id
-                answer = {:id => response_hash_id, :responses => 1, :user_ids => [submission.user_id], :text => response["answer_for_#{answer[:blank_id]}".to_sym]}
-                res[:answer_sets][idx][:answer_matches] << answer
-              end
-            end
-          end
-        elsif question[:question_type] == 'multiple_dropdowns_question'
-          res[:multiple_answers] = true
-          res[:answer_sets].each_with_index do |answer, idx|
-            res[:answer_sets][idx][:responses] += 1 if response[:correct]
-            res[:answer_sets][idx][:answer_matches].each_with_index do |right, jdx|
-              if response["answer_id_for_#{answer[:blank_id]}".to_sym] == right[:id]
-                res[:answer_sets][idx][:answer_matches][jdx][:responses] += 1
-                res[:answer_sets][idx][:answer_matches][jdx][:user_ids] << submission.user_id
-              end
-            end
-          end
-        elsif question[:question_type] == 'multiple_answers_question'
-          res[:answers].each_with_index do |answer, idx|
-            if response["answer_#{answer[:id]}".to_sym] == '1'
-              res[:answers][idx][:responses] += 1
-              res[:answers][idx][:user_ids] << submission.user_id
-            end
-          end
-        elsif question[:question_type] == 'calculated_question'
-          found = false
-          response_hash_id = Digest::MD5.hexdigest(response[:text].strip.to_f.to_s) if !response[:text].try(:strip).blank?
-          res[:answers].each_with_index do |answer, idx|
-            if res[:answers][idx][:id] == response[:answer_id] || res[:answers][idx][:id] == response_hash_id
-              found = true
-              res[:answers][idx][:numbers] ||= {}
-              res[:answers][idx][:numbers][response[:text].to_f] ||= {:responses => 0, :user_ids => [], :correct => true}
-              res[:answers][idx][:numbers][response[:text].to_f][:responses] += 1
-              res[:answers][idx][:numbers][response[:text].to_f][:user_ids] << submission.user_id
-              res[:answers][idx][:responses] += 1
-              res[:answers][idx][:user_ids] << submission.user_id
-            end
-          end
-          if !found
-            if ['numerical_question', 'short_answer_question'].include?(question[:question_type]) && response_hash_id
-              answer = {:id => response_hash_id, :responses => 1, :user_ids => [submission.user_id], :text => response[:text].to_f.to_s}
-              res[:answers] << answer
-            end
-          end
-        elsif question[:question_type] == 'text_only_question'
-        elsif question[:question_type] == 'essay_question'
-          res[:essay_responses] ||= []
-          res[:essay_responses] << {:user_id => submission.user_id, :text => response[:text].strip}
-        else
-          found = false
-          response_hash_id = Digest::MD5.hexdigest(response[:text].strip) if !response[:text].try(:strip).blank?
-          res[:answers].each_with_index do |answer, idx|
-            if answer[:id] == response[:answer_id] || answer[:id] == response_hash_id
-              found = true
-              res[:answers][idx][:responses] += 1
-              res[:answers][idx][:user_ids] << submission.user_id
-            end
-          end
-          if !found
+    res[:user_ids] = responses.map { |r| r[:user_id] }
+    res[:response_values] = responses.map { |r| r[:text] }
+    res[:responses] = responses.size
 
-            if ['numerical_question', 'short_answer_question'].include?(question[:question_type]) && response_hash_id
-              answer = {:id => response_hash_id, :responses => 1, :user_ids => [submission.user_id], :text => response[:text]}
-              res[:answers] << answer
+    # TODO: instead of doing all this found/user_ids bullcrap for answers in
+    # here, do it outside of the responses loop
+    responses.each do |response|
+      if question[:question_type] == 'matching_question'
+        res[:multiple_answers] = true
+        res[:answers].each_with_index do |answer, idx|
+          res[:answers][idx][:responses] += 1 if response[:correct]
+          (res[:matches] || res[:answers]).each_with_index do |right, jdx|
+            if response["answer_#{answer[:id]}".to_sym].to_i == right[:match_id]
+              res[:answers][idx][:answer_matches][jdx][:responses] += 1
+              res[:answers][idx][:answer_matches][jdx][:user_ids] << response[:user_id]
             end
+          end
+        end
+      elsif question[:question_type] == 'fill_in_multiple_blanks_question'
+        res[:multiple_answers] = true
+        res[:answer_sets].each_with_index do |answer, idx|
+          found = false
+          response_hash_id = Digest::MD5.hexdigest(response["answer_for_#{answer[:blank_id]}".to_sym].strip) if !response["answer_for_#{answer[:blank_id]}".to_sym].try(:strip).blank?
+          res[:answer_sets][idx][:responses] += 1 if response[:correct]
+          res[:answer_sets][idx][:answer_matches].each_with_index do |right, jdx|
+            if response["answer_for_#{answer[:blank_id]}".to_sym] == right[:text]
+              found = true
+              res[:answer_sets][idx][:answer_matches][jdx][:responses] += 1
+              res[:answer_sets][idx][:answer_matches][jdx][:user_ids] << response[:user_id]
+            end
+          end
+          if !found
+            if response_hash_id
+              answer = {:id => response_hash_id, :responses => 1, :user_ids => [response[:user_id]], :text => response["answer_for_#{answer[:blank_id]}".to_sym]}
+              res[:answer_sets][idx][:answer_matches] << answer
+            end
+          end
+        end
+      elsif question[:question_type] == 'multiple_dropdowns_question'
+        res[:multiple_answers] = true
+        res[:answer_sets].each_with_index do |answer, idx|
+          res[:answer_sets][idx][:responses] += 1 if response[:correct]
+          res[:answer_sets][idx][:answer_matches].each_with_index do |right, jdx|
+            if response["answer_id_for_#{answer[:blank_id]}".to_sym] == right[:id]
+              res[:answer_sets][idx][:answer_matches][jdx][:responses] += 1
+              res[:answer_sets][idx][:answer_matches][jdx][:user_ids] << response[:user_id]
+            end
+          end
+        end
+      elsif question[:question_type] == 'multiple_answers_question'
+        res[:answers].each_with_index do |answer, idx|
+          if response["answer_#{answer[:id]}".to_sym] == '1'
+            res[:answers][idx][:responses] += 1
+            res[:answers][idx][:user_ids] << response[:user_id]
+          end
+        end
+      elsif question[:question_type] == 'calculated_question'
+        found = false
+        response_hash_id = Digest::MD5.hexdigest(response[:text].strip.to_f.to_s) if !response[:text].try(:strip).blank?
+        res[:answers].each_with_index do |answer, idx|
+          if res[:answers][idx][:id] == response[:answer_id] || res[:answers][idx][:id] == response_hash_id
+            found = true
+            res[:answers][idx][:numbers] ||= {}
+            res[:answers][idx][:numbers][response[:text].to_f] ||= {:responses => 0, :user_ids => [], :correct => true}
+            res[:answers][idx][:numbers][response[:text].to_f][:responses] += 1
+            res[:answers][idx][:numbers][response[:text].to_f][:user_ids] << response[:user_id]
+            res[:answers][idx][:responses] += 1
+            res[:answers][idx][:user_ids] << response[:user_id]
+          end
+        end
+        if !found
+          if ['numerical_question', 'short_answer_question'].include?(question[:question_type]) && response_hash_id
+            answer = {:id => response_hash_id, :responses => 1, :user_ids => [response[:user_id]], :text => response[:text].to_f.to_s}
+            res[:answers] << answer
+          end
+        end
+      elsif question[:question_type] == 'essay_question'
+        res[:essay_responses] ||= []
+        res[:essay_responses] << {:user_id => response[:user_id], :text => response[:text].strip}
+      else
+        found = false
+        response_hash_id = Digest::MD5.hexdigest(response[:text].strip) if !response[:text].try(:strip).blank?
+        res[:answers].each_with_index do |answer, idx|
+          if answer[:id] == response[:answer_id] || answer[:id] == response_hash_id
+            found = true
+            res[:answers][idx][:responses] += 1
+            res[:answers][idx][:user_ids] << response[:user_id]
+          end
+        end
+        if !found
+
+          if ['numerical_question', 'short_answer_question'].include?(question[:question_type]) && response_hash_id
+            answer = {:id => response_hash_id, :responses => 1, :user_ids => [response[:user_id]], :text => response[:text]}
+            res[:answers] << answer
           end
         end
       end
