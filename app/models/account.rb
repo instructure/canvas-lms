@@ -96,8 +96,6 @@ class Account < ActiveRecord::Base
   
   serialize :settings, Hash
 
-  scopes_custom_fields
-
   validates_locale :default_locale, :allow_nil => true
   validate :account_chain_loop, :if => :parent_account_id_changed?
   validate :validate_auth_discovery_url

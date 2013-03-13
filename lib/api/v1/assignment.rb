@@ -176,7 +176,6 @@ module Api::V1::Assignment
     automatic_peer_reviews
     external_tool_tag_attributes
     grade_group_students_individually
-    set_custom_field_values
     turnitin_enabled
     turnitin_settings
     grading_standard_id

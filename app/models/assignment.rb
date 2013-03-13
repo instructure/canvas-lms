@@ -33,8 +33,8 @@ class Assignment < ActiveRecord::Base
     :peer_review_count, :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
     :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
     :notify_of_update, :time_zone_edited, :turnitin_enabled, :turnitin_settings,
-    :set_custom_field_values, :context, :position, :allowed_extensions,
-    :external_tool_tag_attributes, :freeze_on_copy, :assignment_group_id
+    :context, :position, :allowed_extensions, :external_tool_tag_attributes,
+    :freeze_on_copy, :assignment_group_id
     
   attr_accessor :original_id, :updating_user, :copying
 
@@ -123,8 +123,6 @@ class Assignment < ActiveRecord::Base
   simply_versioned :keep => 5
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
   copy_authorized_links( :description) { [self.context, nil] }
-
-  has_custom_fields :scopes => %w(root_account)
 
   def root_account
     context && context.root_account
