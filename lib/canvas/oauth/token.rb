@@ -49,5 +49,8 @@ module Canvas::Oauth
       return code
     end
 
+    def self.expire_code(code)
+      Canvas.redis.del "#{REDIS_PREFIX}#{code}"
+    end
   end
 end

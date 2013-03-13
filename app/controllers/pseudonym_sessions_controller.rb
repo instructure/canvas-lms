@@ -617,6 +617,8 @@ class PseudonymSessionsController < ApplicationController
     token = provider.token_for(params[:code])
     return render(:status => 400, :json => { :message => "invalid code" }) unless token.is_for_valid_code?
 
+    Canvas::Oauth::Token.expire_code(params[:code])
+
     render :json => token.to_json
   end
 
