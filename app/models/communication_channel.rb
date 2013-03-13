@@ -259,42 +259,7 @@ class CommunicationChannel < ActiveRecord::Base
   def can_notify?
     self.notification_policies.any? { |np| np.frequency == 'never' } ? false : true
   end
-  
-  # This is the re-worked find_for_all.  It is created to get all
-  # communication channels that have a specific, valid notification policy
-  # setup for it, or the default communication channel for a user.  This,
-  # of course, doesn't hold for registration, since no policy is expected
-  # to intervene.  All registration notices go to the passed-in
-  # communication channel.  That information is being handed to us from
-  # the context of the notification policy being fired. 
-  def self.find_all_for(user=nil, notification=nil, cc=nil, frequency='immediately')
-    return [] unless user && notification
-    return [cc] if cc and notification.registration?
-    return [] unless user.registered?
-    policy_matches_frequency = {}
-    policy_for_channel = {}
-    can_notify = {}
-    NotificationPolicy.for(user).for(notification).each do |policy|
-      policy_matches_frequency[policy.communication_channel_id] = true if policy.frequency == frequency
-      policy_for_channel[policy.communication_channel_id] = true
-      can_notify[policy.communication_channel_id] = false if policy.frequency == 'never'
-    end
-    all_channels = user.communication_channels.active
-    communication_channels = all_channels.select{|cc| policy_matches_frequency[cc.id] }
-    all_channels = all_channels.select{|cc| policy_for_channel[cc.id] }
-
-    # The trick here is that if the user has ANY policies defined for this notification
-    # then we shouldn't overwrite it with the default channel -- but we only want to
-    # return the list of channels for immediate dispatch.
-    communication_channels = [user.email_channel] if all_channels.empty? && notification.default_frequency == 'immediately'
-    communication_channels.compact!
-
-    # Remove ALL channels if one is 'never'?  No, I think we should just remove any paths that are set to 'never'
-    # User can say NEVER email me, but SMS me right away.
-    communication_channels.reject!{|cc| can_notify[cc] == false}
-    communication_channels
-  end
-  
+ 
   def self.ids_with_pending_delayed_messages
     CommunicationChannel.connection.select_values(
       "SELECT distinct communication_channel_id
