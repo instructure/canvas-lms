@@ -1,6 +1,6 @@
 define [
   'Backbone'
-  'jst/courses/rosterUserView'
+  'jst/courses/roster/rosterUser'
 ], (Backbone, template) ->
 
   class UserView extends Backbone.View

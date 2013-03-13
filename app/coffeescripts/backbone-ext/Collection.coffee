@@ -74,16 +74,18 @@ define [
     setParam: (name, value) ->
       @options.params ?= {}
       @options.params[name] = value
+      @trigger 'setParam', name, value
 
     ##
     # Deletes a parameter from @options.params
     deleteParam: (name) ->
       delete @options.params?[name]
+      @trigger 'deleteParam', name
 
     fetch: (options = {}) ->
       # TODO: we might want to merge options.data and options.params here instead
       options.data = @options.params if !options.data? and @options.params?
-      super options
+      super(options).fail (xhr) => @trigger 'fetch:fail', xhr
 
     url: -> @_defaultUrl()
 

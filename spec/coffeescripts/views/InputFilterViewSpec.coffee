@@ -1,8 +1,9 @@
 define [
+  'Backbone'
   'jquery'
   'compiled/views/InputFilterView'
   'helpers/jquery.simulate'
-], ($, InputFilterView) ->
+], (Backbone, $, InputFilterView) ->
 
   view = null
   clock = null
@@ -16,6 +17,7 @@ define [
 
     teardown: ->
       clock.restore()
+      view.remove()
 
   setValue = (term) ->
     view.el.value = term
@@ -39,4 +41,46 @@ define [
     simulateKeyup()
     simulateKeyup()
     ok spy.calledOnce
+
+  test 'updates the model attribute', ->
+    view.model = new Backbone.Model
+    setValue 'foo'
+    simulateKeyup()
+    equal view.model.get('filter'), 'foo'
+
+  test 'updates the collection parameter', ->
+    view.collection = new Backbone.Collection
+    setValue 'foo'
+    simulateKeyup()
+    actual = view.collection.options.params.filter
+    equal actual, 'foo'
+
+  test 'gets modelAttribute from input name', ->
+    input = $('<input name="couch">').appendTo $('#fixtures')
+    view = new InputFilterView
+      el: input[0]
+    equal view.modelAttribute, 'couch'
+
+  test 'sets model attribute to empty string with empty value', ->
+    view.model = new Backbone.Model
+    setValue 'foo'
+    simulateKeyup()
+    setValue ''
+    simulateKeyup()
+    equal view.model.get('filter'), ''
+
+  test 'deletes collection paramater on empty value', ->
+    view.collection = new Backbone.Collection
+    setValue 'foo'
+    simulateKeyup()
+    equal view.collection.options.params.filter, 'foo'
+    setValue ''
+    simulateKeyup()
+    strictEqual view.collection.options.params.filter, undefined
+
+  test 'does nothing with model/collection when the value is less than the minLength', ->
+    view.model = new Backbone.Model filter: 'foo'
+    setValue 'ab'
+    simulateKeyup()
+    equal view.model.get('filter'), 'foo', 'filter attribute did not change'
 

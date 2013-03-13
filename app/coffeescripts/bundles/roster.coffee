@@ -16,41 +16,41 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 require [
-  'jst/courses/rosterSearch'
-  'jst/courses/rosterUsers'
+  'compiled/views/SelectView'
+  'jst/courses/roster/rosterUsers'
   'compiled/collections/RosterUserCollection'
   'compiled/collections/SectionCollection'
   'compiled/views/InputFilterView'
   'compiled/views/PaginatedCollectionView'
   'compiled/views/courses/RosterUserView'
-  'compiled/views/SearchView'
+  'compiled/views/courses/RosterView'
   'jquery'
-], (rosterSearchTemplate, rosterUsersTemplate, UserCollection, SectionCollection, InputFilterView, PaginatedCollectionView, RosterUserView, SearchView, $) ->
+], (SelectView, rosterUsersTemplate, RosterUserCollection, SectionCollection, InputFilterView, PaginatedCollectionView, RosterUserView, RosterView, $) ->
 
   fetchOptions =
     include: ['avatar_url', 'enrollments', 'email']
     per_page: 50
-  users = new UserCollection null,
+  users = new RosterUserCollection null,
     course_id: ENV.context_asset_string.split('_')[1]
     sections: new SectionCollection ENV.SECTIONS
     params: fetchOptions
-  inputView = new InputFilterView
+  inputFilterView = new InputFilterView
+    collection: users
   usersView = new PaginatedCollectionView
     collection: users
     itemView: RosterUserView
     buffer: 1000
     template: rosterUsersTemplate
-  searchView = new SearchView
-    collectionView: usersView
-    inputFilterView: inputView
-    template: rosterSearchTemplate
+  roleSelectView = new SelectView
+    collection: users
+  @app = new RosterView
+    usersView: usersView
+    inputFilterView: inputFilterView
+    roleSelectView: roleSelectView
+    collection: users
+    roles: ENV.ALL_ROLES
 
-  users.on 'beforeFetch', =>
-    inputView.$el.addClass 'loading'
-  users.on 'fetch', =>
-    inputView.$el.removeClass 'loading'
-
-  searchView.render()
-  searchView.$el.appendTo $('#content')
+  @app.render()
+  @app.$el.appendTo $('#content')
   users.fetch()
 

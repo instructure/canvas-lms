@@ -63,3 +63,12 @@ define [
     equal collection.url(), '/api/v1/courses/1/discussion_topics',
       'used conventional URL with specific contextAssetString'
 
+  test 'triggers setParam event', ->
+    collection = new Backbone.Collection
+    spy = sinon.spy()
+    collection.on 'setParam', spy
+    collection.setParam 'foo', 'bar'
+    ok spy.calledOnce, 'event triggered'
+    equal spy.args[0][0], 'foo'
+    equal spy.args[0][1], 'bar'
+
