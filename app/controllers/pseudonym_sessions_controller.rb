@@ -575,33 +575,38 @@ class PseudonymSessionsController < ApplicationController
       return render()
     end
 
-    provider = Canvas::Oauth::Provider.new(params[:client_id], params[:redirect_uri])
+    scopes =  params[:scopes].split(',') if params.key? :scopes
+    scopes ||= []
+
+    provider = Canvas::Oauth::Provider.new(params[:client_id], params[:redirect_uri], scopes)
 
     return render(:status => 400, :json => { :message => "invalid client_id" }) unless provider.has_valid_key?
     return render(:status => 400, :json => { :message => "invalid redirect_uri" }) unless provider.has_valid_redirect?
     session[:oauth2] = provider.session_hash
+    session[:oauth2][:state] = params[:state] if params.key?(:state)
 
     if @current_pseudonym
-      redirect_to oauth2_auth_confirm_url
+      if provider.authorized_token? @current_user
+        final_oauth2_redirect(session[:oauth2][:redirect_uri], final_oauth2_redirect_params)
+      elsif
+        redirect_to oauth2_auth_confirm_url
+      end
     else
       redirect_to login_url(:canvas_login => params[:canvas_login])
     end
   end
 
   def oauth2_confirm
-    @provider = Canvas::Oauth::Provider.new(session[:oauth2][:client_id])
+    @provider = Canvas::Oauth::Provider.new(session[:oauth2][:client_id], session[:oauth2][:redirect_uri], session[:oauth2][:scopes])
   end
 
   def oauth2_accept
-    # now generate the temporary code, and respond/redirect
-    code = Canvas::Oauth::Token.generate_code_for(@current_user.global_id, session[:oauth2][:client_id])
-    final_oauth2_redirect(session[:oauth2][:redirect_uri], :code => code)
-    session.delete(:oauth2)
+    redirect_params = final_oauth2_redirect_params(:remember_access => params[:remember_access])
+    final_oauth2_redirect(session[:oauth2][:redirect_uri], redirect_params)
   end
 
   def oauth2_deny
     final_oauth2_redirect(session[:oauth2][:redirect_uri], :error => "access_denied")
-    session.delete(:oauth2)
   end
 
   def oauth2_token
@@ -628,6 +633,12 @@ class PseudonymSessionsController < ApplicationController
     render :json => {}
   end
 
+  def final_oauth2_redirect_params(options = {})
+    options = {:scopes => session[:oauth2][:scopes], :remember_access => options[:remember_access]}
+    code = Canvas::Oauth::Token.generate_code_for(@current_user.global_id, session[:oauth2][:client_id], options)
+    redirect_params = { :code => code }
+  end
+
   def final_oauth2_redirect(redirect_uri, opts = {})
     if Canvas::Oauth::Provider.is_oob?(redirect_uri)
       redirect_to oauth2_auth_url(opts)
@@ -635,5 +646,7 @@ class PseudonymSessionsController < ApplicationController
       has_params = redirect_uri =~ %r{\?}
       redirect_to(redirect_uri + (has_params ? "&" : "?") + opts.to_query)
     end
+
+    session.delete(:oauth2)
   end
 end

@@ -73,6 +73,19 @@ an authenticated request to the following endpoint:
 
 </div>
 
+Oauth2 Based Identity Service
+-----------------------------
+Your application can rely on canvas for a user's identity.  During step 1 of
+the web application flow below, specify the optional scopes parameter as
+scopes=/auth/userinfo.  When the user is asked to grant your application
+access in step 2 of the web application flow, they will also be given an
+option to remember their authorization.  If they grant access and remember
+the authorization, Canvas will skip step 2 of the request flow for future requests.
+
+Canvas will not give a token back as part of a userinfo request.  It will only
+provide the current user's name and id.
+
+
 OAuth2 Token Request Flow
 -------------------------
 
@@ -126,6 +139,16 @@ currently supported value is <code>code</code>.
 authorization. The domain of this URL must match the domain of the
 redirect_uri stored on the developer key, or it must be a subdomain of
 that domain.
+    </div>
+  </li>
+  <li>
+    <span class="name">scopes</span>
+    <div class="inline">
+      optional. This can be used to specify what information the access token
+      will provide access to.  By default an access token will have access to
+      all api calls that a user can make.  The only other accepted value
+      for this at present is '/auth/userinfo', which can be used to obtain
+      the current canvas user's identity
     </div>
   </li>
 </ul>

@@ -78,7 +78,7 @@ class DeveloperKey < ActiveRecord::Base
   def redirect_domain_matches?(redirect_uri)
     self_domain = URI.parse(self.redirect_uri).host
     other_domain = URI.parse(redirect_uri).host
-    return self_domain.present? && (self_domain == other_domain || other_domain.end_with?(".#{self_domain}"))
+    return self_domain.present? && other_domain.present? && (self_domain == other_domain || other_domain.end_with?(".#{self_domain}"))
   rescue URI::InvalidURIError
     return false
   end
