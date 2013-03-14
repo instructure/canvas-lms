@@ -218,6 +218,7 @@ define [
     renderChildViews: ->
       return unless @constructor.__childViews__
       for {name, selector} in @constructor.__childViews__
+        console?.warn?("I need a child view '#{name}' but one was not provided") unless @[name]?
         target = @$ selector
         @[name].setElement target
         @[name].render()

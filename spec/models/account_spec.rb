@@ -412,7 +412,8 @@ describe Account do
     end
 
     limited_access = [ :read, :manage, :update, :delete, :read_outcomes ]
-    full_access = RoleOverride.permissions.keys + limited_access
+    account_enabled_access = [ :view_notifications ]
+    full_access = RoleOverride.permissions.keys + limited_access - account_enabled_access
     index = full_access.index(:manage_courses)
     full_access = full_access[0..index] + [:create_courses] + full_access[index+1..-1]
     full_root_access = full_access - RoleOverride.permissions.select { |k, v| v[:account_only] == :site_admin }.map(&:first)

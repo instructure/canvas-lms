@@ -132,6 +132,8 @@ stylesheets:
   account_settings:
     - public/stylesheets/compiled/account_settings.css
     - public/stylesheets/compiled/external_tools.css
+  account_admin_tools:
+    - public/stylesheets/compiled/account_admin_tools.css
   select_content_dialog:
     - public/stylesheets/compiled/select_content_dialog.css
   conversations:

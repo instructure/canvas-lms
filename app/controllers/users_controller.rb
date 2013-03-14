@@ -602,6 +602,9 @@ class UsersController < ApplicationController
 
       respond_to do |format|
         format.html
+        format.json {
+          render :json => user_json(@user, @current_user, session, %w{locale avatar_url},
+                                    @current_user.pseudonym.account) }
       end
     end
   end

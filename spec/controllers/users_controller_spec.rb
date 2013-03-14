@@ -686,5 +686,17 @@ describe UsersController do
         assigns[:enrollments].sort_by(&:id).should == [@enrollment, @e2]
       end
     end
+
+    it "should respond to JSON request" do
+      account = Account.create!
+      course_with_student(:active_all => true, :account => account)
+      account_admin_user(:account => account)
+      user_with_pseudonym(:user => @admin, :account => account)
+      user_session(@admin)
+      get 'show', :id  => @student.id, :format => 'json'
+      response.should be_success
+      user = json_parse
+      user['name'].should == @student.name
+    end
   end
 end

@@ -93,7 +93,8 @@ describe CommMessagesApiController, :type => :integration do
       context "without permission" do
         before do
           @test_user = user(:active_all => true)
-          account_admin_user_with_role_changes(:account => Account.site_admin, :role_changes => {:read_messages => false})
+          account_admin_user_with_role_changes(:account => Account.site_admin,
+                                               :role_changes => {:read_messages => false})
           user_session(@admin)
         end
 
@@ -110,11 +111,23 @@ describe CommMessagesApiController, :type => :integration do
       context "with permission" do
         before do
           @test_user = user(:active_all => true)
-          account_admin_user_with_role_changes(:account => Account.default, :role_changes => {:read_messages => true})
+          account_admin_user_with_role_changes(:account => Account.default,
+                                               :role_changes => {:view_notifications => true})
           user_session(@admin)
         end
 
+        it "should receive unauthorized if account setting disabled" do
+          Account.default.settings[:admins_can_view_notifications] = false
+          Account.default.save!
+          raw_api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}", {
+              :controller => 'comm_messages_api', :action => 'index', :format => 'json',
+              :user_id => @test_user.to_param })
+          response.code.should eql '401'
+        end
+
         it "should only be able to see associated account's messages" do
+          Account.default.settings[:admins_can_view_notifications] = true
+          Account.default.save!
           Message.create!(:user => @test_user, :body => "site admin message", :root_account_id => Account.site_admin.id)
           Message.create!(:user => @test_user, :body => "account message", :root_account_id => Account.default.id)
           json = api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}", {
@@ -128,7 +141,8 @@ describe CommMessagesApiController, :type => :integration do
       context "without permission" do
         before do
           @test_user = user(:active_all => true)
-          account_admin_user_with_role_changes(:account => Account.default, :role_changes => {:read_messages => false})
+          account_admin_user_with_role_changes(:account => Account.default,
+                                               :role_changes => {:view_notifications => false})
           user_session(@admin)
         end
 

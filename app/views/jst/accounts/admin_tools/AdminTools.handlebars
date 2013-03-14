@@ -3,10 +3,16 @@
     {{#if courseRestore}}
     <li><a href="#restoreContentPane">{{#t "tab_labels.restore_course"}}Restore Courses{{/t}}</a></li>
     {{/if}}
+    {{#if viewMessages}}
+    <li class="notifications"><a href="#commMessagesPane">{{#t "view_messages"}}View Notifications{{/t}}</a></li>
+    {{/if}}
   </ul>
   <div id="adminToolsTabPanes">
     {{#if courseRestore}}
     <div id="restoreContentPane"></div>
+    {{/if}}
+    {{#if viewMessages}}
+    <div id="commMessagesPane"></div>
     {{/if}}
   </div>
 </div>

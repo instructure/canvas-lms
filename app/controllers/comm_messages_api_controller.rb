@@ -68,7 +68,7 @@ class CommMessagesApiController < ApplicationController
   # @argument user_id The user id for whom you want to retrieve CommMessages
   #
   # @argument start_time [optional] The beginning of the time range you want to
-  #   retrieve meesage from.
+  #   retrieve message from.
   #
   # @argument end_time [optional] The end of the time range you want to retrieve
   #   messages for.
@@ -82,7 +82,8 @@ class CommMessagesApiController < ApplicationController
     conditions = case
       when Account.site_admin.grants_right?(@current_user, :read_messages)
         {} # No further restrictions, site admins see all
-      when @domain_root_account.grants_right?(@current_user, :read_messages)
+      when @domain_root_account.settings[:admins_can_view_notifications] &&
+            @domain_root_account.grants_right?(@current_user, :view_notifications)
         { :root_account_id => @domain_root_account.id }
       else
         return render_unauthorized_action

@@ -2,6 +2,7 @@ define [
   'Backbone'
   'jquery'
   'jst/accounts/admin_tools/AdminTools'
+  'jqueryui/tabs'
 ], (Backbone,$, template) -> 
   # This is the main container view that holds 
   # all of the tabs on the admin tools page.
@@ -9,11 +10,13 @@ define [
   # look like this
   # tabs: 
   #   courseRestore  : true
-  #   enotherTabName : true
+  #   viewMessages   : true
+  #   anotherTabName : true
   class AdminToolsView extends Backbone.View
     # Define children that use this backbone template.
     # @api custom backbone
     @child 'restoreContentPaneView', '#restoreContentPane'
+    @child 'messageContentPaneView', '#commMessagesPane'
     @optionProperty 'tabs'
 
     template: template
@@ -29,5 +32,6 @@ define [
     toJSON: (json) -> 
       json = super
       json.courseRestore = @tabs.courseRestore
+      json.viewMessages = @tabs.viewMessages
       json
 
