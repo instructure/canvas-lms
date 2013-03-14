@@ -45,6 +45,7 @@ class ApiController < ApplicationController
 
   def courses
     course_array = []
+    exclude_sectionCode = ["STL", "LAB", "TUT"]
 
     if params[:term].nil?
       courses = SFU::Course.for_instructor params[:sfuid]
@@ -85,7 +86,7 @@ class ApiController < ApplicationController
         course_hash["key"].concat ":::" + course_hash["sectionTutorials"].downcase.delete(" ") unless course_hash["sectionTutorials"].empty?
 
         # hide course if already exists in Canvas or is a Tutorial/Lab
-        course_array.push course_hash unless course_exists? course_hash["sis_source_id"] unless c["course"].first["sectionCode"].to_s == "STL" unless c["course"].first["sectionCode"].to_s == "LAB"
+        course_array.push course_hash unless course_exists? course_hash["sis_source_id"] unless exclude_sectionCode.include? c["course"].first["sectionCode"].to_s
       end
     end
 

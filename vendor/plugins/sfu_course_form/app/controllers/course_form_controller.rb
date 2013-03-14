@@ -28,9 +28,9 @@ class CourseFormController < ApplicationController
       end
     end
 
-    course_array = ["course_id,short_name,long_name,account_id,term_id,status"]
-    section_array = ["section_id,course_id,name,status,start_date,end_date"]
-    enrollment_array = ["course_id,user_id,role,section_id,status"]
+    course_array = ["\"course_id\",\"short_name\",\"long_name\",\"account_id\",\"term_id\",\"status\""]
+    section_array = ["\"section_id\",\"course_id\",\"name\",\"status\",\"start_date\",\"end_date\""]
+    enrollment_array = ["\"course_id\",\"user_id\",\"role\",\"section_id\",\"status\""]
 
     unless cross_list
 
@@ -83,17 +83,17 @@ class CourseFormController < ApplicationController
 
       # create course csv
       course_id.concat "::course"
-      course_array.push "#{course_id},#{short_name[0..-4]},#{long_name[0..-4]},#{account_id},#{term},active"
+      course_array.push "\"#{course_id}\",\"#{short_name[0..-4]}\",\"#{long_name[0..-4]}\",\"#{account_id}\",\"#{term}\",\"active\""
 
       # create section csv
       sections.compact.uniq.each do  |section|
         section_info = section.first.split(":_:")
-        section_array.push "#{section_info[0]},#{course_id},#{section_info[1]},active,,,"
+        section_array.push "\"#{section_info[0]}\",\"#{course_id}\",\"#{section_info[1]}\",\"active\",\"\",\"\","
       end
 
       # create enrollment csv to default section
-      enrollment_array.push "#{course_id},#{teacher_sis_user_id},teacher,,active\n"
-      enrollment_array.push "#{course_id},#{teacher2_sis_user_id},teacher,,active\n" unless teacher2_sis_user_id.nil?
+      enrollment_array.push "\"#{course_id}\",\"#{teacher_sis_user_id}\",\"teacher\",\"\",\"active\"\n"
+      enrollment_array.push "\"#{course_id}\",\"#{teacher2_sis_user_id}\",\"teacher\",\"\",\"active\"\n" unless teacher2_sis_user_id.nil?
 
     end
 
@@ -141,9 +141,9 @@ class CourseFormController < ApplicationController
     # Default Section set D100, D200, E300, G800 or if only 1 section (i.e. no section tutorials)
     course["default_section_id"] = course["section_id"] if course["section_name"].end_with? "00" || course["section_tutorials"].nil?
 
-    course["course_csv"] = "#{course["course_id"]},#{course["short_name"]},#{course["long_name"]},#{account_id},#{course["term"]},active"
-    course["enrollment_csv_1"] = "#{course["course_id"]},#{teacher1},teacher,#{course["default_section_id"]},active"
-    course["enrollment_csv_2"] = "#{course["course_id"]},#{teacher2},teacher,#{course["default_section_id"]},active" unless teacher2.nil?
+    course["course_csv"] = "\"#{course["course_id"]}\",\"#{course["short_name"]}\",\"#{course["long_name"]}\",\"#{account_id}\",\"#{course["term"]}\",\"active\""
+    course["enrollment_csv_1"] = "\"#{course["course_id"]}\",\"#{teacher1}\",\"teacher\",\"#{course["default_section_id"]}\",\"active\""
+    course["enrollment_csv_2"] = "\"#{course["course_id"]}\",\"#{teacher2}\",\"teacher\",\"#{course["default_section_id"]}\",\"active\"" unless teacher2.nil?
 
     sections.push "#{course["section_id"]}:_:#{course["name"].upcase}#{course["number"]} #{course["section_name"].upcase}"
 
@@ -167,9 +167,9 @@ class CourseFormController < ApplicationController
     sandbox["short_long_name"] = "Sandbox - #{username}"
     sandbox["default_section_id"] = ""
 
-    sandbox["csv"] = "#{sandbox["course_id"]},#{sandbox["short_long_name"]},#{sandbox["short_long_name"]},#{account_id},,active"
-    sandbox["enrollment_csv_1"] = "#{sandbox["course_id"]},#{teacher1},teacher,#{sandbox["default_section_id"]},active"
-    sandbox["enrollment_csv_1"] = "#{sandbox["course_id"]},#{teacher2},teacher,#{sandbox["default_section_id"]},active" unless teacher2.nil?
+    sandbox["csv"] = "\"#{sandbox["course_id"]}\",\"#{sandbox["short_long_name"]}\",\"#{sandbox["short_long_name"]}\",\"#{account_id}\",\"\",\"active\""
+    sandbox["enrollment_csv_1"] = "\"#{sandbox["course_id"]}\",\"#{teacher1}\",\"teacher\",\"#{sandbox["default_section_id"]}\",\"active\""
+    sandbox["enrollment_csv_1"] = "\"#{sandbox["course_id"]}\",\"#{teacher2}\",\"teacher\",\"#{sandbox["default_section_id"]}\",\"active\"" unless teacher2.nil?
     sandbox
   end
 

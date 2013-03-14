@@ -222,7 +222,7 @@
             url: "/sfu/api/course/" + sis_id,
             dataType: 'json',
             success: function(data) {
-                if (data.sis_source_id != sis_id) {
+                if (!data.id) {
                     $("#course_list").append("<div id='sandbox'><h4>Other</h4></div>");
                     var checkbox_html = '<label class="checkbox"><input type="checkbox" name="selected_course_sandbox" id="selected_course_sandbox" value="sandbox">'+ title +'</label>';
                     $("#sandbox").append(checkbox_html);
