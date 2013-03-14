@@ -714,6 +714,10 @@ class Attachment < ActiveRecord::Base
       :thumbnail_class => 'Thumbnail'
   )
 
+  def local_storage_path
+    "#{HostUrl.context_host(context)}/#{context_type.underscore.pluralize}/#{context_id}/files/#{id}/download?verifier=#{uuid}"
+  end
+
   def content_type_with_encoding
     encoding.blank? ? content_type : "#{content_type}; charset=#{encoding}"
   end

@@ -25,19 +25,16 @@ class Thumbnail < ActiveRecord::Base
   # this is because on the servers we are actually using graphics_magic not image_magic's mogrify and graphics_magick doesn't
   # support -strip. you'd get something like:
   # MiniMagick::Error (Command ("mogrify -strip -resize \"200x50\" \"/tmp/mini_magick23816-1\"") failed: {:status_code=>1, :output=>"mogrify: Unrecognized option (-strip).\n"}):#012
-  if Attachment.local_storage?
-    has_attachment :content_type => :image,
-                   :path_prefix => (Attachment.file_store_config['path_prefix'] || 'tmp/files'),
-                   :keep_profile => true
+  has_attachment(
+      :content_type => :image,
+      :storage => (Attachment.local_storage? ? :file_system : :s3),
+      :path_prefix => Attachment.file_store_config['path_prefix'],
+      :s3_access => :private,
+      :keep_profile => true
+  )
 
-    def authenticated_s3_url(*args)
-      "#{HostUrl.protocol}://#{HostUrl.context_host(attachment.context)}/images/thumbnails/show/#{id}/#{uuid}"
-    end
-  else
-    has_attachment :content_type => :image,
-                   :storage => :s3,
-                   :s3_access => :private,
-                   :keep_profile => true
+  def local_storage_path
+    "#{HostUrl.context_host(attachment.context)}/images/thumbnails/show/#{id}/#{uuid}"
   end
 
   def bucket

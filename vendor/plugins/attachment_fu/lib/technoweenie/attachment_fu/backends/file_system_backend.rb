@@ -47,12 +47,12 @@ module Technoweenie # :nodoc:
 
 
         def authenticated_s3_url(*args)
-          return root_attachment.authenticated_s3_url(*args) if root_attachment
+          return root_attachment.authenticated_s3_url(*args) if self.respond_to?(:root_attachment) && root_attachment
           if args[0].is_a?(Hash) && !args[0][:secure].nil?
             protocol = args[0][:secure] ? 'https://' : 'http://'
           end
           protocol ||= "#{HostUrl.protocol}://"
-          "#{protocol}#{HostUrl.context_host(context)}/#{context_type.underscore.pluralize}/#{context_id}/files/#{id}/download?verifier=#{uuid}"
+          "#{protocol}#{local_storage_path}"
         end
 
         def filename=(value)
