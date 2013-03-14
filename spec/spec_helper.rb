@@ -17,13 +17,13 @@
 #
 
 ENV["RAILS_ENV"] = 'test'
-require File.dirname(__FILE__) + "/../config/environment" unless defined?(Rails)
+require File.expand_path(File.dirname(__FILE__) + "/../config/environment") unless defined?(Rails)
 require 'spec'
 # require 'spec/autorun'
 require 'spec/rails'
 require 'webrat'
 require 'mocha/api'
-require File.dirname(__FILE__) + '/mocha_extensions'
+require File.expand_path(File.dirname(__FILE__) + '/mocha_extensions')
 
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
 

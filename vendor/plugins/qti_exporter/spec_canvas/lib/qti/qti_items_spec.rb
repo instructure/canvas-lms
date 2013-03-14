@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../../qti_helper'
+require File.expand_path(File.dirname(__FILE__) + '/../../qti_helper')
 if Qti.migration_executable
 describe "Converting QTI items" do
   it "should convert an item with empty leading <div />" do
