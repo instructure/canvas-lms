@@ -1350,8 +1350,9 @@ describe CoursesController, :type => :integration do
 
       it "should 401 for unauthorized users" do
         other_account = Account.create!
-        json = api_call(:get, "/api/v1/accounts/#{other_account.id}/courses/0.json",
-                          {:controller => 'courses', :action => 'show', :id => '0', :format => 'json', :account_id => other_account.id.to_param},
+        other_course = other_account.courses.create!
+        json = api_call(:get, "/api/v1/accounts/#{other_account.id}/courses/#{other_course.id}.json",
+                          {:controller => 'courses', :action => 'show', :id => other_course.to_param, :format => 'json', :account_id => other_account.id.to_param},
                           {}, {}, :expected_status => 401)
       end
 
