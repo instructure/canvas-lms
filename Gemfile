@@ -43,7 +43,7 @@ gem 'icalendar',      '1.1.5'
 gem 'jammit',         '0.6.0'
 gem 'json',           '1.5.5'
 # native xml parsing, diigo
-gem 'libxml-ruby',    '2.3.2',  :require => 'xml/libxml'
+gem 'libxml-ruby',    '2.6.0',  :require => 'xml/libxml'
 gem 'macaddr',        '1.0.0'  # macaddr 1.2.0 tries to require 'systemu' which isn't a dependency
 if ONE_NINE
   gem 'mail', CANVAS_RAILS3 ? '2.2.19' : '2.5.3'
@@ -56,7 +56,7 @@ gem 'mime-types',     '1.17.2',   :require => 'mime/types'
 # with mini_magick 3.1
 gem 'mini_magick',    '1.3.2'
 gem 'netaddr',        '1.5.0'
-gem 'nokogiri',       '1.5.5'
+gem 'nokogiri',       '1.5.6'
 # oauth gem, with rails3 fixes rolled in
 gem 'oauth-instructure', '0.4.9', :require => 'oauth'
 gem 'rack',           CANVAS_RAILS3 ? '1.2.5' : '1.1.3'
