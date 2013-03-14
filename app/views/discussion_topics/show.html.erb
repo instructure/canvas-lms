@@ -197,11 +197,11 @@
           <% if @topic.podcast_enabled %>
             <% if @context_enrollment %>
               <div class="discussion-fyi">
-                <a class="feed" href="<%= feeds_topic_format_path(@topic.id, @context_enrollment.feed_code, :rss) %>"><%= t :topic_podcast_feed_link, "Topic Podcast Feed" %></a>
+                <a class="icon-rss" href="<%= feeds_topic_format_path(@topic.id, @context_enrollment.feed_code, :rss) %>"><%= t :topic_podcast_feed_link, "Topic Podcast Feed" %></a>
               </div>
             <% elsif @context.available? %>
               <div class="discussion-fyi">
-                <a class="feed" href="<%= feeds_topic_format_path(@topic.id, @context.feed_code, :rss) %>"><%= t :topic_podcast_feed_link, "Topic Podcast Feed" %></a>
+                <a class="icon-rss" href="<%= feeds_topic_format_path(@topic.id, @context.feed_code, :rss) %>"><%= t :topic_podcast_feed_link, "Topic Podcast Feed" %></a>
               </div>
             <% end %>
           <% end %>
