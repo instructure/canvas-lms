@@ -1012,6 +1012,19 @@ Spec::Runner.configure do |config|
       self['content-type']
     end
   end
+
+  def intify_timestamps(object)
+    case object
+    when Time
+      object.to_i
+    when Hash
+      object.inject({}) { |memo, (k, v)| memo[intify_timestamps(k)] = intify_timestamps(v); memo }
+    when Array
+      object.map { |v| intify_timestamps(v) }
+    else
+      object
+    end
+  end
 end
 
 Dir[Rails.root+'vendor/plugins/*/spec_canvas/spec_helper.rb'].each do |f|

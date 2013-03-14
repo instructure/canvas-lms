@@ -232,7 +232,7 @@ shared_examples_for "an object whose dates are overridable" do
 
     it "includes visible due date overrides in the list of due dates" do
       _, as_instructor = overridable.due_dates_for(@teacher)
-      as_instructor.should include({
+      intify_timestamps(as_instructor).should include(intify_timestamps({
         :title => @course.default_section.name,
         :due_at => override.due_at,
         :all_day => override.all_day,
@@ -242,7 +242,7 @@ shared_examples_for "an object whose dates are overridable" do
         :set_type => override.set_type,
         :unlock_at => override.unlock_at,
         :override => override
-      })
+      }))
     end
 
     it "excludes visible overrides that don't override due_at from the list of due dates" do
