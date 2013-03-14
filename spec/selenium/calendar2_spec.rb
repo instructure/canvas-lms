@@ -48,6 +48,7 @@ describe "calendar2" do
 
   def create_calendar_event(event_title, should_add_date = false)
     middle_number = find_middle_day.find_element(:css, '.fc-day-number').text
+    find_middle_day.click
     edit_event_dialog = f('#edit_event_tabs')
     edit_event_dialog.should be_displayed
     edit_event_form = edit_event_dialog.find_element(:id, 'edit_calendar_event_form')
@@ -173,13 +174,11 @@ describe "calendar2" do
 
       def create_middle_day_event(name = 'new event')
         get "/calendar2"
-        find_middle_day.click
         create_calendar_event(name)
       end
 
       def create_middle_day_assignment(name = 'new assignment')
         get "/calendar2"
-        find_middle_day.click
         create_assignment_event(name)
       end
 
@@ -246,7 +245,7 @@ describe "calendar2" do
         wait_for_ajaximations
         driver.execute_script("$('.delete_event_link').hover().click()")
         wait_for_ajaximations
-        driver.execute_script("$('.ui-dialog .btn-primary').hover().click()")
+        driver.execute_script("$('.ui-dialog:visible .btn-primary').hover().click()")
         wait_for_ajaximations
         fj('.fc-event:visible').should be_nil
         # make sure it was actually deleted and not just removed from the interface
@@ -260,7 +259,7 @@ describe "calendar2" do
         fj('.fc-event').click
         driver.execute_script("$('.delete_event_link').hover().click()")
         wait_for_ajaximations
-        driver.execute_script("$('.ui-dialog .btn-primary').hover().click()")
+        driver.execute_script("$('.ui-dialog:visible .btn-primary').hover().click()")
         wait_for_ajaximations
         fj('.fc-event').should be_nil
         # make sure it was actually deleted and not just removed from the interface

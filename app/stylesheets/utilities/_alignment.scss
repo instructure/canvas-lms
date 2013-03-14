@@ -1,4 +1,11 @@
-.align-right {
+// You should no longer use .align-right and instead use .text-right
+// because Bootstrap 2.3 includes these styles by default
+.align-right, .text-right {
   text-align: right;
 }
-
+.text-left {
+  text-align: left;
+}
+.text-center {
+  text-align: center;
+}

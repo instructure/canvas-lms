@@ -74,8 +74,11 @@
     {{/if}}
   </div>
   <div class="popover-links-holder event-details-footer">
+    {{#if can_edit }}
+      <a href="#" class="event_button edit_event_link btn btn-primary btn-small pull-right">{{#t "links.edit"}}Edit{{/t}}</a>
+    {{/if}}
     {{#if can_delete }}
-      <a href="#" class="btn button-secondary delete_event_link">{{#t "links.delete"}}Delete{{/t}}</a>
+      <a href="#" class="event_button btn button-secondary btn-small delete_event_link pull-right">{{#t "links.delete"}}Delete{{/t}}</a>
     {{/if}}
     <div class="event-details-links">
       {{#if can_reserve }}
@@ -83,9 +86,6 @@
       {{/if}}
       {{#if can_unreserve }}
         <a href="#" class="unreserve_event_link">{{#t "links.unreserve"}}Un-reserve{{/t}}</a>
-      {{/if}}
-      {{#if can_edit }}
-        <a href="#" class="edit_event_link">{{#t "links.edit"}}Edit{{/t}}</a>
       {{/if}}
       {{#if reservations }}
         <a href="#" class="message_students">

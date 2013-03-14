@@ -24,7 +24,7 @@
   
     <%= render :partial => 'calendars/mini_calendar', :locals => {:current => current, :first_day => first_day } %>
     <hr />
-    <div style="text-align: right; font-size: 0.8em;">
+    <div class="text-right" style="font-size: 0.8em;">
       <%= t :calendars_count, { :one => "1 calendar, %{open_count} open", :other => "%{count} calendars, %{open_count} open" },
             :count => @contexts.length, :open_count => '<span class="calendars_open_count"></span>'.html_safe %>
     </div>
@@ -59,7 +59,7 @@
           <%= render :partial => 'event', :collection => @undated_events %>
         </div>
       </div>
-      <div style="text-align: right; font-size: 0.8em;">
+      <div class="text-right" style="font-size: 0.8em;">
         <a href="#" class="add_event_link add-small"><%= t 'links.add_event', "Add Event" %></a>
       </div>
     </div>
@@ -95,7 +95,7 @@
   <table class="calendar_month">
     <tr>
       <td colspan="7" class="month_title">
-        <div style="position: relative; text-align: center;">
+        <div class="text-right" style="position: relative;">
           <span style="display: none;" class="month_number"><%= @current.month %></span>
           <a href="#" class="prev_month_link no-hover"><%= image_tag "arrow_left.png", :alt => t('alts.previous', "Previous") %></a>
           <span id="month_and_year">
@@ -191,10 +191,8 @@
           </select>
         </td>
       </tr><tr>
-        <td></td>
-        <td><a href="#" class="more_options_link"><%= t 'links.more_options', "more options" %></a></td>
-      </tr><tr>
-        <td colspan="2">
+        <td colspan="2" class="text-right">
+          <a href="#" class="btn btn-secondary more_options_link"><%= t 'links.more_options', "More Options" %></a>
           <button type="submit" class="btn btn-primary"><%= t '#buttons.submit', "Submit" %></button>
         </td>
       </tr>
@@ -224,10 +222,8 @@
         <td class="assignment_group_select">
         </td>
       </tr><tr>
-        <td></td>
-        <td><a href="#" class="more_options_link"><%= t 'links.more_options', "more options" %></a></td>
-      </tr><tr>
-        <td colspan="2">
+        <td colspan="2" class="text-right">
+          <a href="#" class="btn btn-secondary more_options_link"><%= t 'links.more_options', "More Options" %></a>
           <button type="submit" class="btn btn-primary"><%= t '#buttons.submit', "Submit" %></button>
         </td>
       </tr>
