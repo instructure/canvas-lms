@@ -121,7 +121,7 @@ describe "conversations" do
   context 'messages' do
     before(:each) do
       @me = @user
-      conversation(user, @me, :workflow_state => 'unread')
+      conversation(@me, user, :workflow_state => 'unread')
       get '/conversations'
       f('.unread').click
       wait_for_ajaximations
@@ -135,15 +135,10 @@ describe "conversations" do
       wait_for_ajaximations
       f('.selectable').click
       f('#forward_body').send_keys(forward_body_text)
-      f('.btn-primary').click
+      f('.ui-dialog-buttonset > .btn-primary').click
       wait_for_ajaximations
-
       expect_new_page_load { get '/conversations/sent' }
-      f('.conversations li').click
-      wait_for_ajaximations
-      keep_trying_until {
-        f('.messages .message').should include_text(forward_body_text)
-      }
+      f('.conversations li.read').should include_text(forward_body_text)
     end
 
     it "should delete a message" do
