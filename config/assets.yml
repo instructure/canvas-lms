@@ -72,6 +72,8 @@ stylesheets:
   discussions:
     - public/stylesheets/compiled/ui.selectmenu.css
     - public/stylesheets/compiled/discussions.css
+  discussions_list:
+    - public/stylesheets/compiled/discussions_list.css
   full_files:
     - public/stylesheets/compiled/full_files.css
   datagrid:
