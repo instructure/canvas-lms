@@ -97,6 +97,7 @@ Example Request:
          -F 'Policy=some_opaque_string' \ 
          -F 'Signature=another_opaque_string' \ 
          -F 'Content-Type=image/jpeg' \ 
+         -F '<any other fields returned in upload_params>' \
          -F 'file=@my_local_file.jpg'
 
 The access token is not sent with this request.
