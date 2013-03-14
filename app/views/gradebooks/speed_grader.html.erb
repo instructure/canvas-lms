@@ -33,7 +33,7 @@
       </div>
     </div>
     <div class="right">
-      <a data-muted="<%= @assignment.muted? ? "true" : "false" %>" id="mute_link" href="#"><span class="ui-icon ui-icon-volume-<%= @assignment.muted? ? "on" : "off" %>"></span><span class="label"><%= @assignment.muted? ? t("gradebook.unmute_assignment", "Unmute Assignment") : t("gradebook.mute_assignment", "Mute Assignment") %></span></a>
+      <a data-muted="<%= @assignment.muted? ? "true" : "false" %>" id="mute_link" href="#"><span class="ui-icon ui-icon-volume-<%= @assignment.muted? ? "on" : "off" %>"></span><span><%= @assignment.muted? ? t("gradebook.unmute_assignment", "Unmute Assignment") : t("gradebook.mute_assignment", "Mute Assignment") %></span></a>
       <a id="settings_link" href="#"><span class="ui-icon ui-icon-wrench"></span><%= t('links.settings', "Settings") %></a>
       <% if help_link %>
         | <%= help_link %>
