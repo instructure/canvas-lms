@@ -15,10 +15,11 @@ define [
         lock_at: @date.toISOString()
         unlock_at: @date.toISOString()
       @dueDateView = new DueDateView model: @override
-      $('#fixtures').append @dueDateView.$el
       @dueDateView.render()
+      $('#fixtures').append @dueDateView.$el
 
     teardown: ->
+      @dueDateView.remove()
       $('#fixtures').empty()
 
   test "#getFormValues unfudges for user timezone offset", ->
@@ -26,4 +27,36 @@ define [
     strictEqual formValues.due_at.toUTCString(), @date.toUTCString()
     strictEqual formValues.lock_at.toUTCString(), @date.toUTCString()
     strictEqual formValues.unlock_at.toUTCString(), @date.toUTCString()
+
+  test "#validateBeforeSave validates dates", ->
+    day1 = Date.parse "August 14, 2013"
+    day2 = Date.parse "August 15, 2013"
+    day3 = Date.parse "August 16, 2013"
+
+    data =
+        {due_at: day2, lock_at: day1}
+    errors = {}
+
+    errs = @dueDateView.validateBeforeSave(data,errors,false)
+    error = errs.assignmentOverrides.lock_at
+    strictEqual error, 'Lock date cannot be before due date'
+    @dueDateView.$el.hideErrors()
+
+    errors = {}
+    data =
+      {due_at: day2, unlock_at: day3}
+
+    errs = @dueDateView.validateBeforeSave(data,errors,false)
+    error = errs.assignmentOverrides.unlock_at
+    strictEqual error, 'Unlock date cannot be after due date'
+    @dueDateView.$el.hideErrors()
+
+    errors = {}
+    data =
+      {lock_at: day1, unlock_at:day3}
+
+    errs = @dueDateView.validateBeforeSave(data,errors,false)
+    error = errs.assignmentOverrides.unlock_at
+    strictEqual error, 'Unlock date cannot be after lock date'
+    @dueDateView.$el.hideErrors()
 

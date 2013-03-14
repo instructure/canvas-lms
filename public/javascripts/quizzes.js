@@ -17,6 +17,7 @@
  */
 define([
   'i18n!quizzes',
+  'underscore',
   'jquery' /* $ */,
   'calcCmd',
   'str/htmlEscape',
@@ -47,7 +48,7 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n,$, calcCmd, htmlEscape, pluralize, wikiSidebar,
+], function(I18n,_,$,calcCmd, htmlEscape, pluralize, wikiSidebar,
             DueDateListView, DueDateOverrideView, Quiz, DueDateList,SectionList,
             MissingDateDialog,MultipleChoiceToggle,TextHelper){
 
@@ -1258,7 +1259,21 @@ define([
         data.allowed_attempts = attempts;
         data['quiz[allowed_attempts]'] = attempts;
         overrideView.updateOverrides();
-        if (overrideView.containsSectionsWithoutOverrides() && !hasCheckedOverrides) {
+        var overrides = overrideView.getOverrides();
+        var quizData = overrideView.getDefaultDueDate();
+        if (quizData) {
+          quizData = quizData.toJSON().assignment_override;
+        } else {
+          quizData = {};
+        }
+        var validationData = {
+          assignment_overrides: overrideView.getAllDates(quizData)
+        };
+        var errs = overrideView.validateBeforeSave(validationData,{});
+        if (_.keys(errs).length > 0) {
+          return false;
+        }
+        else if (overrideView.containsSectionsWithoutOverrides() && !hasCheckedOverrides) {
           sections = overrideView.sectionsWithoutOverrides();
           var missingDateView = new MissingDateDialog({
             validationFn: function(){ return sections },
@@ -1289,7 +1304,6 @@ define([
             data['quiz[unlock_at]'] = "";
             data['quiz[lock_at]'] = "";
           }
-          var overrides = overrideView.getOverrides();
           adjustOverridesForFormParams(overrides);
           if (overrides.length === 0) { overrides = false; }
           data['quiz[assignment_overrides]'] = overrides;

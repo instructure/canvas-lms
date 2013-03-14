@@ -7,8 +7,8 @@ describe "assignment groups" do
 
   context "as a teacher" do
 
-    let(:due_at) { Time.zone.now + 3.days }
-    let(:unlock_at) { Time.zone.now + 2.days }
+    let(:due_at) { Time.zone.now }
+    let(:unlock_at) { Time.zone.now - 1.day }
     let(:lock_at) { Time.zone.now + 4.days }
 
     before(:each) do
@@ -43,7 +43,6 @@ describe "assignment groups" do
       assignment = create_assignment!
       visit_assignment_edit_page(assignment)
       toggle_advanced_options
-      due_at = Time.zone.now + 1.days
 
       # set due_at, lock_at, unlock_at
       first_due_at_element.clear
