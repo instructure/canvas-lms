@@ -602,6 +602,7 @@ class PseudonymSessionsController < ApplicationController
 
   def oauth2_accept
     redirect_params = final_oauth2_redirect_params(:remember_access => params[:remember_access])
+    redirect_params[:state] = session[:oauth2][:state] if session[:oauth2][:state]
     final_oauth2_redirect(session[:oauth2][:redirect_uri], redirect_params)
   end
 

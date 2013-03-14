@@ -1094,6 +1094,13 @@ describe PseudonymSessionsController do
       oauth_accept
       controller.session.should == {}
     end
-  end
 
+    it 'forwards the oauth state if it was provided' do
+      session_hash[:oauth2][:state] = '1234567890'
+      Canvas::Oauth::Token.stubs(:generate_code_for => 'code')
+      oauth_accept
+      response.should redirect_to(oauth2_auth_url(:code => 'code', :state => '1234567890'))
+    end
+
+  end
 end
