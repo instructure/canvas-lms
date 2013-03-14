@@ -1163,6 +1163,28 @@ describe Attachment do
       quota[:quota_used].should == Attachment.minimum_size_for_quota
     end
   end
+
+  context "#open" do
+    context "s3_storage" do
+      before do
+        s3_storage!
+        attachment_model
+        @attachment.s3object.class.any_instance.expects(:read).yields("test")
+      end
+
+      it "should stream data to the block given" do
+        callback = false
+        @attachment.open { |data| data.should == "test"; callback = true }
+        callback.should == true
+      end
+
+      it "should stream to a tempfile without a block given" do
+        file = @attachment.open
+        file.should be_a(Tempfile)
+        file.read.should == "test"
+      end
+    end
+  end
 end
 
 def processing_model

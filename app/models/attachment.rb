@@ -752,7 +752,7 @@ class Attachment < ActiveRecord::Base
         File.open(self.full_filename, 'rb')
       end
     elsif block
-      s3object.read(&:block)
+      s3object.read(&block)
     else
       # TODO: !need_local_file -- net/http and thus AWS::S3::S3Object don't
       # natively support streaming the response, except when a block is given.
