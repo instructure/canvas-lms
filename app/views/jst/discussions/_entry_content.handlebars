@@ -2,9 +2,9 @@
   {{>avatar author}}
   <div class="discussion-header-content right-of-avatar">
     <div class="admin-links hide-if-collapsed">
-      <a class="al-trigger dim-till-hover" data-kyle-menu-options='{"appendMenuTo": "body"}'>
-        <i class="icon-settings standalone-icon"></i><i class="icon-mini-arrow-down standalone-icon"></i>
-        <span class="screenreader-only">{{#t "manage_discussion_entry"}}Manage Discussion Entry{{/t}}</span></a>
+      <a class="al-trigger dim-till-hover" data-kyle-menu-options='{"appendMenuTo": "body"}'><i
+          class="icon-settings standalone-icon"></i><i class="icon-mini-arrow-down standalone-icon"></i><span
+          class="screenreader-only">{{#t "manage_discussion_entry"}}Manage Discussion Entry{{/t}}</span></a>
       <ul class="al-options">
         {{#if parent_id}}
           <li><a data-pushstate href="#entry-{{parent_id}}"><i class="icon-replied"></i> {{#t "go_to_parent"}}Go To Parent{{/t}}</a></li>
