@@ -283,20 +283,20 @@
       <%= render :partial => "quizzes/question_group", :object => nil %>
       <%= render :partial => "quizzes/find_question_from_bank" %>
       <div style="text-align: center; margin: -1px 1px 1px" class="add_question question_editing">
+        <a href="#" class="add_question_link btn">
+          <i class="icon-add"></i>
+          <%= t('links.new_question', "New Question") %>
+        </a>
+        <a href="#" class="add_question_group_link btn" style="margin-left: 20px; margin-right: 20px;">
+          <i class="icon-add"></i>
+          <%= t('links.new_question_group', "New Question Group") %>
+        </a>
         <% if feature_enabled?(:question_banks) %>
           <a href="#" class="find_question_link btn">
             <i class="icon-search"></i>
             <%= t('links.find_questions', "Find Questions") %>
           </a>
         <% end %>
-        <a href="#" class="add_question_group_link btn" style="margin-left: 20px; margin-right: 20px;">
-          <i class="icon-add"></i>
-          <%= t('links.new_question_group', "New Question Group") %>
-        </a>
-        <a href="#" class="add_question_link btn">
-          <i class="icon-add"></i>
-          <%= t('links.new_question', "New Question") %>
-        </a>
       </div>
     </div>
   </div>
