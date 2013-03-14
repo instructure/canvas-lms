@@ -832,7 +832,8 @@ class Account < ActiveRecord::Base
         # TODO i18n
         t '#account.default_site_administrator_account_name', 'Site Admin'
         t '#account.default_account_name', 'Default Account'
-        account = @special_accounts[special_account_type] = Account.create!(:name => default_account_name)
+        account = @special_accounts[special_account_type] = Account.new(:name => default_account_name)
+        account.save!
         Setting.set("#{special_account_type}_account_id", account.id)
         @special_account_ids[special_account_type] = account.id
       end
