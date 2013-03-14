@@ -313,8 +313,7 @@ class ContentMigration < ActiveRecord::Base
       @zip_file = Zip::ZipFile.open(@exported_data_zip.path)
       @exported_data_zip.close
       data = JSON.parse(@zip_file.read('course_export.json'), :max_nesting => 50)
-      data = data.with_indifferent_access if data.is_a? Hash
-      data['all_files_export'] ||= {}
+      data = prepare_data(data)
 
       if @zip_file.find_entry('all_files.zip')
         # the file importer needs an actual file to process
@@ -341,6 +340,13 @@ class ContentMigration < ActiveRecord::Base
     end
   end
   handle_asynchronously :import_content, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
+
+  def prepare_data(data)
+    data = data.with_indifferent_access if data.is_a? Hash
+    TextHelper.recursively_strip_invalid_utf8!(data, true) if RUBY_VERSION >= "1.9"
+    data['all_files_export'] ||= {}
+    data
+  end
 
   def copy_options
     self.migration_settings[:copy_options]

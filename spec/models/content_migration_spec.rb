@@ -1616,6 +1616,18 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
   end
 
+  context "#prepare_data" do
+    it "should strip invalid utf8" do
+      pending("Ruby 1.9 only") if RUBY_VERSION < "1.9"
+      data = {
+        'assessment_questions' => [{
+          'question_name' => "hai\xfbabcd"
+        }]
+      }
+      ContentMigration.new.prepare_data(data)[:assessment_questions][0][:question_name].should == "haiabcd"
+    end
+  end
+
   context "import_object?" do
     before do
       @cm = ContentMigration.new
