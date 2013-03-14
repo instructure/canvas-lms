@@ -1,46 +1,45 @@
 <form action='#' id='edit_calendar_event_form' style='padding: 5px; width: 400px'>
-  <table class="formtable" style="width: 100%;">
-    <tr>
-      <td style="vertical-align: top;">{{#t "title"}}Title:{{/t}}</td>
-      <td>
-        {{#if lockedTitle}}
-          {{title}}
-        {{else}}
-          <input id="calendar_event_title" name="calendar_event[title]" size="30" maxlength="255" style="width: 150px;" type="text" value="{{title}}"/>
-        {{/if}}
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">{{#t "date"}}Date:{{/t}}</td>
-      <td><input type="text" name="date" style="width: 100px;" class="date_field"/></td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">{{#t "from"}}From:{{/t}}</td>
-      <td>
-        <div style="float: left;"><input type="text" name="start_time" style="width: 60px;" class="time_field start_time"/></div>
-        {{#t "timespan_separator"}}<div style="float: left; margin: 5px"> to </div>{{/t}}
-        <div style="float: left;"><input type="text" name="end_time" style="width: 60px;" class="time_field end_time"/></div>
-        <div class="clear"></div>
-      </td>
-    </tr>
-    <tr class="context_select">
-      <td>{{#t "calendar"}}Calendar:{{/t}}</td>
-      <td>
-        <select class="context_id" name="calendar_event[context_code]">
-          {{#each contexts}}
-            {{#if can_create_calendar_events}}
-              <option value="{{asset_string}}">{{name}}</option>
-            {{/if}}
-          {{/each}}
-        </select>
-      </td>
-    </tr><tr>
-      <td></td>
-      <td><a href="#" class="more_options_link">{{#t "links.more_options"}}more options{{/t}}</a></td>
-    </tr><tr>
-      <td colspan="2" class="button-container" style="text-align: right">
-        <button type="submit" class="btn">{{#t "#buttons.submit"}}Submit{{/t}}</button>
-      </td>
-    </tr>
-  </table>
+  <div class="event-details-content">
+    <table class="formtable" style="width: 100%;">
+      <tr>
+        <td style="vertical-align: top;">{{#t "title"}}Title:{{/t}}</td>
+        <td>
+          {{#if lockedTitle}}
+            {{title}}
+          {{else}}
+            <input id="calendar_event_title" name="calendar_event[title]" size="30" maxlength="255" style="width: 150px;" type="text" value="{{title}}"/>
+          {{/if}}
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">{{#t "date"}}Date:{{/t}}</td>
+        <td><input type="text" name="date" style="width: 100px;" class="date_field"/></td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">{{#t "from"}}From:{{/t}}</td>
+        <td>
+          <div style="float: left;"><input type="text" name="start_time" style="width: 60px;" class="time_field start_time"/></div>
+          {{#t "timespan_separator"}}<div style="float: left; margin: 5px"> to </div>{{/t}}
+          <div style="float: left;"><input type="text" name="end_time" style="width: 60px;" class="time_field end_time"/></div>
+          <div class="clear"></div>
+        </td>
+      </tr>
+      <tr class="context_select">
+        <td>{{#t "calendar"}}Calendar:{{/t}}</td>
+        <td>
+          <select class="context_id" name="calendar_event[context_code]">
+            {{#each contexts}}
+              {{#if can_create_calendar_events}}
+                <option value="{{asset_string}}">{{name}}</option>
+              {{/if}}
+            {{/each}}
+          </select>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div class="popover-links-holder event-details-footer">
+    <button type="submit" class="event_button btn btn-primary pull-right">{{#t "#buttons.submit"}}Submit{{/t}}</button>
+    <a href="#" class="event_button btn btn-secondary pull-right more_options_link">{{#t "links.more_options"}}More Options{{/t}}</a>
+  </div>
 </form>
