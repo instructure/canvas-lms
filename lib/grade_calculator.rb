@@ -55,7 +55,7 @@ class GradeCalculator
   end
 
   def save_scores
-    raise "Can't save scores when ignore_muted is set" unless @ignore_muted
+    raise "Can't save scores when ignore_muted is false" unless @ignore_muted
 
     Course.update_all({:updated_at => Time.now.utc}, {:id => @course.id})
     if !@current_updates.empty? || !@final_updates.empty?
