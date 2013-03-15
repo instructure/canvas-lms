@@ -132,11 +132,12 @@
     <td colspan="2"><a href="#" class="more_options_link" style="display: none;"><%= t('links.more_options', "more options") %></a></td>
   </tr>
 -->
-<!-- End section two: CANVAS-158 remove password change field - mstanger
-  <!-- omit Delete My Account - mstanger - JIRA CANVAS-117
+<!-- End section two: CANVAS-158 remove password change field - mstanger -->
   <tr class="edit_data_row" style="display: none;">
     <td colspan="2">
-      <p><a style="font-size: 0.9em" href="<%= user_delete_url(@user.id) %>" class="admin"><%= t('links.delete_account', "Delete My Account") %> </a></p>
+      <%# omit Delete My Account - mstanger - JIRA CANVAS-117 %>
+      <% if false %><p><a style="font-size: 0.9em" href="<%= user_delete_url(@user.id) %>" class="admin"><%= t('links.delete_account', "Delete My Account") %> </a></p><% end %>
+      <%# end of CANVAS-117 %>
       <div class="form-actions">
         <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
         <button type="submit" class="btn btn-primary"><%= t('buttons.update_settings', "Update Settings") %></button>
@@ -144,8 +145,6 @@
 
     </td>
   </tr>
---> 
-<!-- end of CANVAS-117 -->
 </table>
 <% end %>
 <% if @current_user.registered? %>
