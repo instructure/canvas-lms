@@ -207,12 +207,12 @@
             </div>
           </div>
           <div style="padding: 10px; <%= hidden unless can_do(@submission, @current_user, :comment) %>" id="add_comment_form">
-            <%= before_label('add_a_comment', 'Add a Comment') %>
-            <span style="font-size: 0.9em;"><br/><%= t('teachers_notified_of_comments', 'Teachers and submitter will be notified of all comments.') %></span>
+            <strong><%= before_label('add_a_comment', 'Add a Comment') %></strong>
+            <span><br/><%= t('teachers_notified_of_comments', 'Teachers and submitter will be notified of all comments.') %></span>
             <textarea style="width: 95%;" class="grading_comment"></textarea>
             <div class="comment_attachments">
             </div>
-            <div style="text-align: right;">
+            <div class="clearfix" style="text-align: right;">
               <% if feature_enabled?(:kaltura) %>
                 <a href="#" style="float: left;" class="media_comment_link media-comment"><%= t('media_comment', 'Media Comment') %></a>
               <% end %>
@@ -220,12 +220,13 @@
               <div class="clear"></div>
             </div>
             <% if @assignment.has_group_category? && can_do(@submission, @current_user, :make_group_comment) %>
-              <br/>
-              <input type="checkbox" name="group_comment" id="submission_group_comment"/>
-              <label for="submission_group_comment"><%= t('sent_to_whole_group', 'Send Comment to the Whole Group') %></label>
+              <label class="checkbox" for="submission_group_comment">
+                <input type="checkbox" name="group_comment" id="submission_group_comment"/>
+                <%= t('sent_to_whole_group', 'Send Comment to the Whole Group') %>
+              </label>
             <% end %>
             <div class="button-container">
-              <button type="button" class="btn save_comment_button"><%= t('buttons.save', 'Save') %></button>
+              <button type="button" class="btn btn-small save_comment_button"><%= t('buttons.save', 'Save') %></button>
             </div>
           </div>
         </div>
