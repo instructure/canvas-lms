@@ -20,6 +20,7 @@ define([
   'jquery' /* $ */,
   'quiz_timing',
   'compiled/behaviors/autoBlurActiveInput',
+  'underscore',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* friendlyDatetime, friendlyDate */,
   'jquery.instructure_forms' /* getFormData, errorBox */,
@@ -30,9 +31,10 @@ define([
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'compiled/behaviors/quiz_selectmenu'
-], function(I18n, $, timing, autoBlurActiveInput) {
+], function(I18n, $, timing, autoBlurActiveInput, _) {
 
   var lastAnswerSelected = null;
+  var lastSuccessfulSubmissionData = null;
   var quizSubmission = (function() {
     var timeMod = 0,
         started_at =  $(".started_at"),
@@ -90,52 +92,68 @@ define([
           });
         }
         else {
-          $.ajaxJSON(url, 'PUT', data,
-            // Success callback
-            function(data) {
-              $last_saved.text(I18n.t('saved_at', 'Quiz saved at %{t}', { t: $.friendlyDatetime(new Date()) }));
+          (function(submissionData) {
+            // Need a shallow clone of the data here because $.ajaxJSON modifies in place
+            var thisSubmissionData = _.clone(submissionData);
+            // If this is a timeout-based submission and the data is the same as last time,
+            // palliate the server by skipping the data submission
+            if (repeat && _.isEqual(submissionData, lastSuccessfulSubmissionData)) {
               quizSubmission.currentlyBackingUp = false;
-              if(repeat) {
-                setTimeout(function() {quizSubmission.updateSubmission(true) }, 30000);
-              }
-              if(data && data.end_at) {
-                var endAtFromServer     = Date.parse(data.end_at),
-                    submissionEndAt     = Date.parse(quizSubmission.end_at.text()),
-                    serverEndAtTime     = endAtFromServer.getTime(),
-                    submissionEndAtTime = submissionEndAt.getTime();
-
-                quizSubmission.referenceDate = null;
-
-                // if the new end_at from the server is different than our current end_at, then notify
-                // the user that their time limit's changed and let updateTime do the rest.
-                if (serverEndAtTime !== submissionEndAtTime) {
-                  serverEndAtTime > submissionEndAtTime ?
-                    $.flashMessage(I18n.t('notices.extra_time', 'You have been given extra time on this attempt')) :
-                    $.flashMessage(I18n.t('notices.less_time', 'Your time for this quiz has been reduced.'));
-
-                  quizSubmission.end_at.text(data.end_at);
-                  endAtText   = data.end_at;
-                  endAtParsed = new Date(data.end_at);
-                }
-              }
-            },
-            // Error callback
-            function() {
-            var current_user_id = $("#identity .user_id").text() || "none";
-            quizSubmission.currentlyBackingUp = false;
-            $.ajaxJSON(
-                location.protocol + '//' + location.host + "/simple_response.json?user_id=" + current_user_id + "&rnd=" + Math.round(Math.random() * 9999999),
-                'GET', {},
-                function() {},
-                function() {
-                  $.flashError(I18n.t('errors.connection_lost', "Connection to %{host} was lost.  Please make sure you're connected to the Internet before continuing.", {'host': location.host}));
-                }
-            );
-
-            if(repeat) {
-              setTimeout(function() {quizSubmission.updateSubmission(true) }, 30000);
+              setTimeout(function() { console.log('timed out'); quizSubmission.updateSubmission(true) }, 30000);
+              return;
             }
-          }, {timeout: 5000 });
+            $.ajaxJSON(url, 'PUT', submissionData,
+              // Success callback
+              function(data) {
+                lastSuccessfulSubmissionData = thisSubmissionData;
+                $last_saved.text(I18n.t('saved_at', 'Quiz saved at %{t}', { t: $.friendlyDatetime(new Date()) }));
+                quizSubmission.currentlyBackingUp = false;
+                if(repeat) {
+                  setTimeout(function() {quizSubmission.updateSubmission(true) }, 30000);
+                }
+                if(data && data.end_at) {
+                  var endAtFromServer     = Date.parse(data.end_at),
+                      submissionEndAt     = Date.parse(quizSubmission.end_at.text()),
+                      serverEndAtTime     = endAtFromServer.getTime(),
+                      submissionEndAtTime = submissionEndAt.getTime();
+
+                  quizSubmission.referenceDate = null;
+
+                  // if the new end_at from the server is different than our current end_at, then notify
+                  // the user that their time limit's changed and let updateTime do the rest.
+                  if (serverEndAtTime !== submissionEndAtTime) {
+                    serverEndAtTime > submissionEndAtTime ?
+                      $.flashMessage(I18n.t('notices.extra_time', 'You have been given extra time on this attempt')) :
+                      $.flashMessage(I18n.t('notices.less_time', 'Your time for this quiz has been reduced.'));
+
+                    quizSubmission.end_at.text(data.end_at);
+                    endAtText   = data.end_at;
+                    endAtParsed = new Date(data.end_at);
+                  }
+                }
+              },
+              // Error callback
+              function() {
+                var current_user_id = $("#identity .user_id").text() || "none";
+                quizSubmission.currentlyBackingUp = false;
+                $.ajaxJSON(
+                    location.protocol + '//' + location.host + "/simple_response.json?user_id=" + current_user_id + "&rnd=" + Math.round(Math.random() * 9999999),
+                    'GET', {},
+                    function() {},
+                    function() {
+                      $.flashError(I18n.t('errors.connection_lost', "Connection to %{host} was lost.  Please make sure you're connected to the Internet before continuing.", {'host': location.host}));
+                    }
+                );
+
+                if(repeat) {
+                  setTimeout(function() {quizSubmission.updateSubmission(true) }, 30000);
+                }
+              },
+              {
+                timeout: 5000
+              }
+            );
+          })(data);
         }
       },
 
