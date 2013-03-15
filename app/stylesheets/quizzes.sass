@@ -123,6 +123,9 @@ div#content
 .add_question
   border: none
 
+.multiple_dropdowns_question .ui-selectmenu
+  margin: 0.25em 0
+  
 #submit_quiz_form
   .question_holder
     overflow: hidden
@@ -131,21 +134,23 @@ div#content
   .button-container
     padding-right: 10%
     padding-left: 10%
+    .previous-question,
+    .next-question
+      position: relative
+      i
+        position: absolute
+        top: 5px
+    .previous-question
+      i
+        left: 5px
     .next-question
       float: right
-    .next-question:after, .previous-question:before
-      position: absolute
-      font-size: 10px
+      i
+        right: 5px
     .btn-secondary.next-question:after, .btn-secondary.previous-question:before
       color: #666
     .btn-primary.next-question:after, .btn-primary.previous-question:before
       color: #fff
-    .next-question:after
-      content: '▶'
-      right: 5px
-    .previous-question:before
-      content: '◀'
-      left: 5px
 
 #sort_questions
   :max-height 250px
