@@ -13,7 +13,7 @@
   headless_param = {:headless => 1} if link_to_headless
  %>
 <% cache([
-    'entry_message_render',
+    'entry_message_render_2_',
     entry_key,
     out_of_context,
     skip_sub_entries,
@@ -23,7 +23,7 @@
     link_to_headless
   ].join('/')) do %>
 <div class="discussion_entry communication_message can_be_marked_as_read <%= read_state %>" <%= hidden(true) unless entry_exists %> id="entry_<%= entry_exists ? entry.id : "blank" %>" data-mark-read-url="<%= entry_exists && entry_id && context_url(entry_context, :api_v1_context_discussion_topic_discussion_entry_mark_read_url, discussion_topic_id, entry_id) %>">
-  <div class="header">
+  <div class="header clearfix">
     <% if entry && entry.new_record? && entry.new_record_header %>
       <%= entry.new_record_header %>
     <% else %>
