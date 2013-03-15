@@ -97,15 +97,17 @@
     </tr>
   <% end %>
   <% if !@password_pseudonyms.empty? %>
-  <!-- CANVAS-158 - remove password change field (section one) - mstanger 
+  <%# CANVAS-158 - remove password change field (section one) - mstanger %>
+  <% if false %>
   <tr class="edit_data_row select_change_password_row" style="display: none;">
     <td><%= before_label(:password, "Password") %></td>
     <td><input type="checkbox" id="change_password_checkbox" name="pseudonym[change_password]" value="1"/><label for="change_password_checkbox"><%= t('labels.change_password', "Change Password") %></label></td>
   </tr>
---> 
-<!-- End section one: CANVAS-158 remove password change field - mstanger 
   <% end %>
-  <!-- CANVAS-158 - remove password change field (section two) - mstanger 
+  <%# End section one: CANVAS-158 remove password change field - mstanger %>
+  <% end %>
+  <%# CANVAS-158 - remove password change field (section two) - mstanger %>
+  <% if false %>
   <tr class="change_password_row" style="display: none;">
     <td class="nobr"><label for="profile_pseudonym_id"><%= before_label(:password_for, "Password For") %></label></td>
     <td>
@@ -131,8 +133,8 @@
   <tr class="edit_data_row more_options_link_row" style="display: none;">
     <td colspan="2"><a href="#" class="more_options_link" style="display: none;"><%= t('links.more_options', "more options") %></a></td>
   </tr>
--->
-<!-- End section two: CANVAS-158 remove password change field - mstanger -->
+  <% end %>
+  <%# End section two: CANVAS-158 remove password change field - mstanger %>
   <tr class="edit_data_row" style="display: none;">
     <td colspan="2">
       <%# omit Delete My Account - mstanger - JIRA CANVAS-117 %>
