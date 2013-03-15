@@ -153,4 +153,6 @@ stylesheets:
     - public/stylesheets/compiled/messages.css
   content_imports:
     - public/stylesheets/compiled/content_imports.css
+  user_notes:
+    - public/stylesheets/compiled/user_notes.css
   <%= plugin_assets.anchors_yml %>
