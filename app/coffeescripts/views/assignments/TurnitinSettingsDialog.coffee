@@ -37,10 +37,10 @@ define [
       json = super
       _.extend json,
         wordsInput: """
-          <input id="exclude_small_matches_words_value" name="words" value="#{json.words}" type="text"/>
+          <input class="span1" id="exclude_small_matches_words_value" name="words" value="#{json.words}" type="text"/>
         """
         percentInput: """
-          <input id="exclude_small_matches_percent_value" name="percent" value="#{json.percent}" type="text"/>
+          <input class="span1" id="exclude_small_matches_percent_value" name="percent" value="#{json.percent}" type="text"/>
         """
 
     renderEl: =>

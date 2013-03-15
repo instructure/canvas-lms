@@ -12,6 +12,7 @@
           Students Can See the Originality Report
         {{/t}}
       </label>
+      <br/>
       <select id="settings_originality_report_visibility"
         name="originality_report_visibility">
         <option value="immediate"
@@ -37,11 +38,11 @@
   </div>
 
   <fieldset>
-    <legend>
+    <h5>
       {{#t "turnitin_settings.labels.compare_against"}}
         Compare Against
       {{/t}}
-    </legend>
+    </h5>
     <div class="control-group">
       <div class="controls">
         <label class="checkbox">
@@ -82,11 +83,11 @@
   </fieldset>
 
   <fieldset>
-    <legend>
+    <h5>
       {{#t "turnitin_settings.labels.do_not_consider"}}
         Do Not Consider
       {{/t}}
-    </legend>
+    </h5>
     <div class="control-group">
       <div class="controls">
         <label class="checkbox">
@@ -124,25 +125,25 @@
         <div class="controls js-exclude-small-matches-options"
           style="{{hiddenUnless excludesSmallMatches}}">
 
-          <label class="control-label" style="display: block;">
+          <label class="control-label radio" style="display: block;">
             <input id="exclude_small_matches_type"
               name="exclude_small_matches_type"
               type="radio"
               {{checkedIf excludeSmallMatchesType "words"}}
               value="words"/>
               {{#t "turnitin_settings.settings_exclude_fewer_than_count"}}
-                fewer than {{{wordsInput}}} words
+                Fewer than {{{wordsInput}}} words
               {{/t}}
           </label>
 
-          <label class="control-label">
+          <label class="control-label radio">
             <input id="exclude_small_matches_type"
               type="radio"
               name="exclude_small_matches_type"
               {{checkedIf excludeSmallMatchesType "percent"}}
               value="percent"/>
               {{#t "turnitin_settings.settings_exclude_less_than_percent"}}
-                less than {{{percentInput}}} of the document
+                Less than {{{percentInput}}} of the document
               {{/t}}
           </label>
         </div>
