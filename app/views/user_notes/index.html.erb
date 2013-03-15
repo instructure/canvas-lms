@@ -2,6 +2,7 @@
    add_crumb(@user.name, user_path(@user) )
    add_crumb t('crumbs.faculty_journal', "Faculty Journal")
    js_bundle :user_notes
+   jammit_css :user_notes
 %>
 <% content_for :page_title do %><%= t :page_title, "Faculty Journal" %><% end %>
 
@@ -16,30 +17,19 @@
 <% if can_do(@user, @current_user, :create_user_notes) %>
   <% content_for :right_side do %>
     <div class="rs-margin-lr rs-margin-top">
-      <a id="new_user_note_button" class="new btn button-sidebar-wide" href="#"><%= image_tag "add.png" %>
-        <%= t 'links.create_new_entry', "Create a New Entry" %></a>
+      <a id="new_user_note_button" class="new btn button-sidebar-wide icon-add" href="#"><%= t 'links.create_new_entry', "Create a New Entry" %></a>
     </div>
   <% end %>
 <% end %>
 
-<style type="text/css">
-.user_note .header .delete_user_note_link {
-  opacity: 0.3;
-}
-.user_note:hover .header .delete_user_note_link {
-  opacity: 1;
-}
-</style>
-
-<h2><%= t 'titles.journal_for', "Faculty Journal for %{user}", :user => @user.name %><span id="proccessing">&nbsp;</span></h2>
+<h2 class="page-header"><%= t 'titles.journal_for', "Faculty Journal for %{user}", :user => @user.name %><span id="proccessing">&nbsp;</span></h2>
 <div id="create_entry" style="display: none; margin-bottom: 10px;">
   <% form_for(@user_note, :url => user_user_notes_path, :html=>{:id=>'add_entry_form'}) do |f| %>
     <%= f.error_messages %>
     <%= f.hidden_field :user_id, :value=>@user.id %>
     <table class="formtable" style="width: 100%;">
       <tr>
-        <td style="font-weight: bold"><%= before_label :title, "Title" %></td>
-        <td><%= f.text_field :title, :class => "title" %></td>
+        <td><%= f.text_field :title, :class => "title", :style => "width: 98%;", :placeholder => t(:title, "Title") %></td>
       </tr>
       <tr>
         <td colspan="2">
@@ -48,10 +38,9 @@
       </tr>
       <tr>
         <td colspan="2">
-          <div class="button-container">
-            <button type="submit" class="btn send_button"><%= t 'buttons.create', "Create Entry" %>
-            </button>
-            <button type="button" class="cancel_button btn button-secondary"><%= t '#buttons.cancel', "Cancel" %></button>
+          <div class="button-container clearfix">
+            <button type="submit" class="pull-right btn btn-primary send_button" style="margin-left: 3px;"><%= t 'buttons.create', "Create Entry" %></button>
+            <button type="button" class="pull-right cancel_button btn button-secondary"><%= t '#buttons.cancel', "Cancel" %></button>
           </div>
         </td>
       </tr>
