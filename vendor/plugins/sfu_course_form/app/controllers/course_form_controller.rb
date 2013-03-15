@@ -151,7 +151,7 @@ class CourseFormController < ApplicationController
     unless course["section_tutorials"].nil?
       course["section_tutorials"].split(",").compact.uniq.each do |tutorial_name|
         section_id = "#{course["term"]}-#{course["name"]}-#{course["number"]}-#{tutorial_name.downcase}:::section"
-        sections.push "#{section_id}:_:#{tutorial_name.upcase}"
+        sections.push "#{section_id}:_:#{course["name"].upcase}#{course["number"]} #{tutorial_name.upcase}"
       end
     end
 
