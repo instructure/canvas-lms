@@ -403,20 +403,6 @@ class ActiveRecord::Base
     end
   end
 
-  def self.merge_includes(first, second)
-    result = (safe_to_array(first) + safe_to_array(second)).uniq
-    result.each_with_index do |item, index|
-      if item.is_a?(Hash) && item.has_key?(:exclude)
-        exclude = item[:exclude]
-        item.delete :exclude
-        result.delete_at(index) if item.empty?
-        result = (result - safe_to_array(exclude))
-        break
-      end
-    end
-    result
-  end
-
   def self.rank_sql(ary, col)
     ary.each_with_index.inject('CASE '){ |string, (values, i)|
       string << "WHEN #{col} IN (" << Array(values).map{ |value| connection.quote(value) }.join(', ') << ") THEN #{i} "
