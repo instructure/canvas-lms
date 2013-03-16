@@ -1024,6 +1024,16 @@ Spec::Runner.configure do |config|
       object
     end
   end
+
+  def web_conference_plugin_mock(id, settings)
+    mock = mock("WebConferencePlugin")
+    mock.stubs(:id).returns(id)
+    mock.stubs(:settings).returns(settings)
+    mock.stubs(:valid_settings?).returns(true)
+    mock.stubs(:enabled?).returns(true)
+    mock.stubs(:base).returns(nil)
+    mock
+  end
 end
 
 Dir[Rails.root+'vendor/plugins/*/spec_canvas/spec_helper.rb'].each do |f|

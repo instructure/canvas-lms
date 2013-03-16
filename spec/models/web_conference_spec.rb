@@ -19,20 +19,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe WebConference do
-  before(:all) do
-    WebConference.instance_eval do
-      def plugins
-        [OpenObject.new(:id => "dim_dim", :settings => {:domain => "dimdim.instructure.com"}, :valid_settings? => true, :enabled? => true),
-         OpenObject.new(:id => "big_blue_button", :settings => {:domain => "bbb.instructure.com", :secret_dec => "secret"}, :valid_settings? => true, :enabled? => true),
-         OpenObject.new(:id => "wimba", :settings => {:domain => "wimba.test"}, :valid_settings? => true, :enabled? => true),
-         OpenObject.new(:id => "broken_plugin", :settings => {:foo => :bar}, :valid_settings? => true, :enabled? => true)]
-      end
-    end
-  end
-  after(:all) do
-    WebConference.instance_eval do
-      def plugins; Canvas::Plugin.all_for_tag(:web_conferencing); end
-    end
+  before do
+    WebConference.stubs(:plugins).returns(
+        [web_conference_plugin_mock("dim_dim", {:domain => "dimdim.instructure.com"}),
+         web_conference_plugin_mock("big_blue_button", {:domain => "bbb.instructure.com", :secret_dec => "secret"}),
+         web_conference_plugin_mock("wimba", {:domain => "wimba.test"}),
+         web_conference_plugin_mock("broken_plugin", {:foor => :bar})]
+    )
   end
 
   context "broken_plugin" do

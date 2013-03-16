@@ -40,7 +40,7 @@ describe "shared files tests" do
   context "as a teacher" do
 
     before (:each) do
-      Setting.set("file_storage_test_override", "local")
+      local_storage!
       user_with_pseudonym :username => "nobody2@example.com",
                           :password => "asdfasdf2"
       course_with_teacher_logged_in :user => @user
@@ -173,8 +173,9 @@ describe "shared files tests" do
   end
 
   describe "files S3 tests" do
-    prepend_before(:each) { Setting.set("file_storage_test_override", "s3") }
-    prepend_before(:all) { Setting.set("file_storage_test_override", "s3") }
+    before do
+      s3_storage!
+    end
 
     it "should make folders in the menu droppable s3" do
       should_make_folders_in_the_menu_droppable

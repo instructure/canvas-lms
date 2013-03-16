@@ -319,7 +319,7 @@ describe AssignmentsApiController, :type => :integration do
 
   describe "PUT /courses/:course_id/assignments/:id (#update)" do
     context "without overrides or frozen attributes" do
-      before(:all) do
+      before do
         course_with_teacher(:active_all => true)
         @start_group = @course.assignment_groups.create!({:name => "start group"})
         @group = @course.assignment_groups.create!({:name => "new group"})
@@ -353,10 +353,6 @@ describe AssignmentsApiController, :type => :integration do
           'muted' => true
         })
         @assignment.reload
-      end
-
-      after(:all) do
-        truncate_all_tables
       end
 
       it "returns, but does not update, the assignment's id" do
@@ -410,7 +406,7 @@ describe AssignmentsApiController, :type => :integration do
 
       it "updates the assignment's due_at" do
         # fancy midnight
-        @json['due_at'].should == "2011-01-01T23:59:59-07:00"
+        @json['due_at'].should == "2011-01-01T23:59:59Z"
       end
 
       it "updates the assignment's submission types" do
@@ -439,7 +435,7 @@ describe AssignmentsApiController, :type => :integration do
     end
 
     context "when updating assignment overrides on the assignment" do
-      before :all do
+      before do
         course_with_teacher(:active_all => true)
         student_in_course(:course => @course, :active_enrollment => true)
         @assignment = @course.assignments.create!
@@ -461,10 +457,6 @@ describe AssignmentsApiController, :type => :integration do
           }
         })
         @assignment.reload
-      end
-
-      after(:all) do
-        truncate_all_tables
       end
 
       it "updates any ADHOC overrides" do
@@ -691,7 +683,7 @@ describe AssignmentsApiController, :type => :integration do
 
     describe 'with a normal assignment' do
 
-      before :all do
+      before do
         course_with_student(:active_all => true)
         @assignment = @course.assignments.create!(
           :title => "Locked Assignment",
@@ -701,10 +693,6 @@ describe AssignmentsApiController, :type => :integration do
           {:asset_string => '', :unlock_at => 1.hour.from_now }
         ).at_least_once
         @json = api_get_assignment_in_course(@assignment,@course)
-      end
-
-      after(:all) do
-        truncate_all_tables
       end
 
       it "does not return the assignment's description if locked for user" do

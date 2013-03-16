@@ -265,10 +265,9 @@ describe Attachment do
   end
 
   context "submit_to_scribd!" do
-    before(:all) do
+    before do
       ScribdAPI.stubs(:set_user).returns(true)
       ScribdAPI.stubs(:upload).returns(UUIDSingleton.instance.generate)
-      Canvas::Crocodoc.instance_variable_set :@settings, nil
     end
 
     describe "submit_to_scribd job" do
