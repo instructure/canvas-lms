@@ -824,6 +824,8 @@ Spec::Runner.configure do |config|
       base.before_update.uniq!
 
       BACKENDS.map(&:instance_methods).flatten.uniq.each do |method|
+        # overridden by Attachment anyway; don't re-overwrite it
+        next if Attachment.instance_method(method).owner == Attachment
         if method.to_s[-1..-1] == '='
           base.class_eval <<-CODE
           def #{method}(arg)
