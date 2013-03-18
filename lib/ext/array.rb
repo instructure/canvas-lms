@@ -32,7 +32,13 @@ class Array
   end
   
   def cache_key
-    @cache_key ||= self.collect{|element| ActiveSupport::Cache.expand_cache_key(element) }.to_param
+    if @cache_key
+      @cache_key
+    else
+      value = self.collect{|element| ActiveSupport::Cache.expand_cache_key(element) }.to_param
+      @cache_key = value unless self.frozen?
+      value
+    end
   end
   
   def once_per(&block)
