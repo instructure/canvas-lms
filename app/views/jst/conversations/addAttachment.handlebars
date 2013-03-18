@@ -1,6 +1,18 @@
-<li class="attachment" title="{{#t "titles.attachment"}}File to attach{{/t}}">
-  <img src="/images/messages/attach-gray.png">
-  <input type="file" class="file_input" name="attachments[]">
-  <a href="#" class="remove_link icon-end black" style="float: right;" title="{{#t "titles.remove_attachment"}}Remove attachment{{/t}}"></a>
-  <div class="clear"></div>
+<li class="attachment clearfix"
+    title="{{#t "titles.attachment"}}File to attach{{/t}}">
+  <div class="row-fluid">
+    <div class="span8">
+      <i class="icon-paperclip"></i>
+
+      <input type="file"
+             class="file_input"
+             name="attachments[]">
+    </div>
+
+    <div class="span1 offset3">
+      <a href="#"
+         class="remove_link icon-end black pull-right"
+         title="{{#t "titles.remove_attachment"}}Remove attachment{{/t}}"></a>
+    </div>
+  </div>
 </li>
