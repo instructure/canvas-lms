@@ -21,7 +21,7 @@
     <input name="quiz_group[question_points]" type="text" style="width: 20px;" class="group_edit" value="<%= hash_get(group, :question_points, 1) %>"/> 
     pts per question
     <% if !group %>
-      <div class="group_edit" style="margin-left: 20px;">
+      <div class="group_edit">
         <a href="#" class="icon-search find_bank_link"><%= t('links.link_to_a_question_bank', "Link to a Question Bank") %></a>
       </div>
     <% end %>
@@ -37,8 +37,8 @@
   </div>
   <div class="clear"></div>
   <div class="button-container">
-    <button type="submit" class="group_edit submit_button btn btn-small"><%= t('buttons.update', "Update") %></button>
-    <button type="button" class="group_edit cancel_button btn button-secondary"/><%= t('#buttons.cancel', "Cancel") %></button>
+    <button type="button" class="group_edit cancel_button btn btn-small"/><%= t('#buttons.cancel', "Cancel") %></button>
+    <button type="submit" class="group_edit submit_button btn btn-small btn-primary"><%= t('buttons.update', "Update") %></button>
   </div>
   <div style="display: none;">
     <a href="<%= context_url(@context, :context_quiz_quiz_group_url, @quiz.id, hash_get(group, :id, "{{ id }}")) %>" class="update_group_url">&nbsp;</a>
