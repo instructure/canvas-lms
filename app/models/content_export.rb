@@ -179,7 +179,7 @@ class ContentExport < ActiveRecord::Base
   
   def fast_update_progress(val)
     self.progress = val
-    ContentExport.update_all({:progress=>val}, "id=#{self.id}")
+    ContentExport.where(:id => self).update_all(:progress=>val)
   end
   
   named_scope :active, {:conditions => ['workflow_state != ?', 'deleted']}

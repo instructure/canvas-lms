@@ -113,7 +113,7 @@ class StreamItem < ActiveRecord::Base
   end
 
   def self.delete_all_for(root_asset, asset)
-    item = StreamItem.find(:first, :conditions => { :asset_type => root_asset.first, :asset_id => root_asset.last })
+    item = StreamItem.where(:asset_type => root_asset.first, :asset_id => root_asset.last).first
     # if this is a sub-message, regenerate instead of deleting
     if root_asset != asset
       item.try(:regenerate!)
@@ -233,10 +233,7 @@ class StreamItem < ActiveRecord::Base
       stream_item_id = res.id
 
       #find out what the current largest stream item instance is so that we can delete them all once the new ones are created
-      greatest_existing_instance = StreamItemInstance.find(:first,
-                                                 :order => 'id DESC', :limit => 1, :select => 'id',
-                                                 :conditions => ['stream_item_id = ? AND user_id in (?)', stream_item_id, user_ids_subset])
-      greatest_existing_id = greatest_existing_instance.present? ? greatest_existing_instance.id : 0
+      greatest_existing_id = StreamItemInstance.where(:stream_item_id => stream_item_id, :user_id => user_ids_subset).maximum(:id) || 0
 
       inserts = user_ids_subset.map do |user_id|
         {
@@ -260,9 +257,8 @@ class StreamItem < ActiveRecord::Base
       # This won't actually delete StreamItems out of the table, it just deletes
       # the join table entries.
       # Old stream items are deleted in a periodic job.
-      StreamItemInstance.delete_all(
-            ["user_id in (?) AND stream_item_id = ? AND id <= ?",
-            user_ids_subset, stream_item_id, greatest_existing_id])
+      StreamItemInstance.where("user_id in (?) AND stream_item_id = ? AND id <= ?",
+            user_ids_subset, stream_item_id, greatest_existing_id).delete_all
     end
 
 
@@ -277,7 +273,11 @@ class StreamItem < ActiveRecord::Base
     # the teacher's comment even if it is farther down.
 
     # touch all the users to invalidate the cache
-    User.update_all({:updated_at => Time.now.utc}, {:id => user_ids})
+    if Rails.version < '3.0'
+      User.update_all({:updated_at => Time.now.utc}, {:id => user_ids})
+    else
+      User.where(:id => user_ids).update_all(:updated_at => Time.now.utc)
+    end
 
     return [res]
   end
@@ -348,7 +348,11 @@ class StreamItem < ActiveRecord::Base
 
     unless user_ids.empty?
       # touch all the users to invalidate the cache
-      User.update_all({:updated_at => Time.now.utc}, {:id => user_ids.to_a})
+      if Rails.version < '3.0'
+        User.update_all({:updated_at => Time.now.utc}, {:id => user_ids.to_a})
+      else
+        User.where(:id => user_ids.to_a).update_all(:updated_at => Time.now.utc)
+      end
     end
 
     count
@@ -403,6 +407,7 @@ class StreamItem < ActiveRecord::Base
   end
 
   def destroy_stream_item_instances
-    self.stream_item_instances.with_each_shard { |scope| scope.scoped({}).delete_all; nil }
+    # bare scoped call avoid Rails 2 HasManyAssociation loading all objects
+    self.stream_item_instances.with_each_shard { |scope| scope.scoped.delete_all; nil }
   end
 end

@@ -183,8 +183,8 @@ class SubmissionComment < ActiveRecord::Base
 
   def update_submission
     return nil if hidden?
-    comments_count = SubmissionComment.count(:conditions => { :submission_id => submission_id, :hidden => false })
-    Submission.update_all({ :submission_comments_count => comments_count }, { :id => submission_id }) rescue nil
+    comments_count = SubmissionComment.where(:submission_id => submission_id, :hidden => false).count
+    Submission.where(:id => submission_id).update_all(:submission_comments_count => comments_count) rescue nil
   end
 
   def formatted_body(truncate=nil)

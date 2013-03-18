@@ -41,7 +41,7 @@ class UserService < ActiveRecord::Base
       cc.save!
     end
     if self.user_id && self.service
-      UserService.delete_all(['user_id=? AND service=? AND id != ?', self.user_id, self.service, self.id]) rescue nil
+      UserService.where(:user_id => self.user_id, :service => self.service).where("id<>?", self).delete_all
     end
     true
   end

@@ -30,7 +30,7 @@ class Collaboration < ActiveRecord::Base
   has_many :groups, :through => :collaborators
   has_many :users,  :through => :collaborators
 
-  before_destroy { |record| Collaborator.destroy_all("collaboration_id = #{record.id}") }
+  before_destroy { |record| Collaborator.where(:collaboration_id => record).destroy_all }
 
   before_save :generate_document
   before_save :assign_uuid
@@ -59,12 +59,11 @@ class Collaboration < ActiveRecord::Base
       !self.new_record? &&
         (self.user_id == user.id ||
          self.users.include?(user) ||
-         Collaborator.count(
-           :limit => 1,
-           :joins => 'INNER JOIN group_memberships ON collaborators.group_id = group_memberships.group_id',
-           :conditions => ['collaborators.group_id IS NOT NULL AND
+         Collaborator.
+             joins('INNER JOIN group_memberships ON collaborators.group_id = group_memberships.group_id').
+             where('collaborators.group_id IS NOT NULL AND
                             group_memberships.user_id = ? AND
-                            collaborators.collaboration_id = ?', user.id, self.id]) == 1)
+                            collaborators.collaboration_id = ?', user, self).exists?)
     }
     can :read
 
@@ -192,7 +191,7 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns nothing.
   def include_author_as_collaborator
-    author = collaborators.first(:conditions => { :user_id => self.user_id })
+    author = collaborators.where(:user_id => self.user_id).first
 
     unless author
       collaborator = Collaborator.new(:collaboration => self)
@@ -215,7 +214,7 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns a comma-seperated list of collaborator user IDs.
   def collaborator_ids
-    self.collaborators.map(&:user_id).join(',')
+    self.collaborators.pluck(:user_id).join(',')
   end
 
   # Public: Return the title for this collaboration.
@@ -262,10 +261,11 @@ class Collaboration < ActiveRecord::Base
     users << user if user.present? && !users.include?(user)
     update_user_collaborators(users)
     update_group_collaborators(group_ids)
-    group_users_to_add = User.all(:select => 'DISTINCT users.*',
-      :joins => :group_memberships,
-      :include => :communication_channels,
-      :conditions => { 'group_memberships.group_id' => group_ids })
+    group_users_to_add = User.
+        uniq.
+        joins(:group_memberships).
+        includes(:communication_channels).
+        where('group_memberships.group_id' => group_ids).all
     add_users_to_document((users + group_users_to_add).uniq)
   end
 
@@ -294,11 +294,12 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns nothing.
   def update_user_collaborators(users)
-    users_to_remove = User.all(:select => 'DISTINCT users.*',
-      :joins => 'LEFT JOIN group_memberships ON users.id = group_memberships.user_id
-                 RIGHT JOIN collaborators ON users.id = collaborators.user_id',
-      :conditions => ['collaborators.collaboration_id = ? OR
-                       group_memberships.group_id IN (?)', self.id, self.groups.map(&:id)])
+    users_to_remove = User.
+        uniq.
+        joins('LEFT JOIN group_memberships ON users.id = group_memberships.user_id
+               RIGHT JOIN collaborators ON users.id = collaborators.user_id').
+        where('collaborators.collaboration_id = ? OR
+               group_memberships.group_id IN (?)', self, self.groups).all
     remove_users_from_document(users_to_remove)
     remove_users_from_collaborators(users)
     add_users_to_collaborators(users)
@@ -322,13 +323,13 @@ class Collaboration < ActiveRecord::Base
   # Returns nothing.
   def remove_groups_from_collaborators(group_ids)
     if group_ids.empty?
-      Collaborator.destroy_all(['group_id IS NOT NULL AND
-                                 collaboration_id = ?', self.id])
+      Collaborator.where('group_id IS NOT NULL AND
+                                 collaboration_id=?', self).destroy_all
     else
-      Collaborator.destroy_all(['group_id IS NOT NULL AND
+      Collaborator.where('group_id IS NOT NULL AND
                                  group_id NOT IN (?) AND
-                                 collaboration_id = ?',
-                                 group_ids, self.id])
+                                 collaboration_id=?',
+                                 group_ids, self).destroy_all
     end
   end
   protected :remove_groups_from_collaborators
@@ -340,13 +341,13 @@ class Collaboration < ActiveRecord::Base
   # Returns nothing.
   def remove_users_from_collaborators(users)
     if users.empty?
-      Collaborator.destroy_all(['user_id IS NOT NULL AND
-                                 collaboration_id = ?', self.id])
+      Collaborator.where('user_id IS NOT NULL AND
+                                 collaboration_id = ?', self).destroy_all
     else
-      Collaborator.destroy_all(['user_id IS NOT NULL AND
+      Collaborator.where('user_id IS NOT NULL AND
                                  user_id NOT IN (?) AND
                                  collaboration_id = ?',
-                                 users.map(&:id), self.id])
+                                 users, self).destroy_all
     end
   end
   protected :remove_users_from_collaborators
@@ -358,8 +359,7 @@ class Collaboration < ActiveRecord::Base
   # Returns nothing.
   def add_groups_to_collaborators(group_ids)
     if group_ids.length > 0
-      existing_groups = collaborators.scoped(:select => 'group_id',
-        :conditions => { :group_id => group_ids }).map(&:group_id)
+      existing_groups = collaborators.where(:group_id => group_ids).pluck(:group_id)
       (group_ids - existing_groups).each do |g|
         collaborator = collaborators.build
         collaborator.group_id = g
@@ -376,8 +376,7 @@ class Collaboration < ActiveRecord::Base
   # Returns nothing.
   def add_users_to_collaborators(users)
     if users.length > 0
-      existing_users = collaborators.scoped(:select => 'user_id',
-        :conditions => { :user_id => users.map(&:id) }).map(&:user_id)
+      existing_users = collaborators.where(:user_id => users).pluck(:user_id)
       users.select { |u| !existing_users.include?(u.id) }.each do |u|
         collaborators.create(:user => u, :authorized_service_user_id => u.gmail)
       end

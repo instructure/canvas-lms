@@ -98,7 +98,7 @@ class Rubric < ActiveRecord::Base
   
   alias_method :destroy!, :destroy
   def destroy
-    RubricAssociation.update_all({:bookmarked => false, :updated_at => Time.now.utc}, {:rubric_id => self.id})
+    RubricAssociation.where(:rubric_id => self).update_all(:bookmarked => false, :updated_at => Time.now.utc)
     self.workflow_state = 'deleted'
     self.save
   end
@@ -114,8 +114,9 @@ class Rubric < ActiveRecord::Base
   # a rubric_association are 'grading' and 'bookmark'.  Confusing,
   # I know.
   def destroy_for(context)
-    RubricAssociation.update_all({:bookmarked => false, :updated_at => Time.now.utc}, {:rubric_id => self.id, :context_id => context.id, :context_type => context.class.to_s})
-    if RubricAssociation.scoped(:conditions => {:rubric_id => self.id, :bookmarked => true}).count == 0
+    RubricAssociation.where(:rubric_id => self, :context_id => context, :context_type => context.class.to_s).
+        update_all(:bookmarked => false, :updated_at => Time.now.utc)
+    unless RubricAssociation.where(:rubric_id => self, :bookmarked => true).exists?
       self.destroy
     end
   end

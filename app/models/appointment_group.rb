@@ -390,17 +390,17 @@ class AppointmentGroup < ActiveRecord::Base
     desc = changed.delete :description
 
     if changed.present?
-      appointments.update_all changed
+      appointments.update_all(changed)
       changed.delete(:effective_context_code)
     end
 
     if changed.present?
-      CalendarEvent.update_all changed, {:parent_calendar_event_id => appointments.map(&:id), :workflow_state => ['active', 'locked']}
+      CalendarEvent.where(:parent_calendar_event_id => appointments, :workflow_state => ['active', 'locked']).update_all(changed)
     end
 
     if desc
-      appointments.update_all({:description => desc}, :description => description_was)
-      CalendarEvent.update_all({:description => desc}, :parent_calendar_event_id => appointments.map(&:id), :workflow_state => ['active', 'locked'], :description => description_was)
+      appointments.where(:description => description_was).update_all(:description => desc)
+      CalendarEvent.where(:parent_calendar_event_id => appointments, :workflow_state => ['active', 'locked'], :description => description_was).update_all(:description => desc)
     end
 
     @new_appointments.each(&:reload) if @new_appointments.present?
@@ -451,8 +451,8 @@ class AppointmentGroup < ActiveRecord::Base
 
   def contexts_for_user(user)
     context_codes = context_codes_for_user(user)
-    course_ids = appointment_group_contexts.all(:conditions => {:context_code => context_codes}).map(&:context_id)
-    Course.all(:conditions => {:id => course_ids})
+    course_ids = appointment_group_contexts.where(:context_code => context_codes).pluck(:context_id)
+    Course.where(:id => course_ids).all
   end
 
   def context_codes_for_user(user)

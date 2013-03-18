@@ -126,7 +126,7 @@ class Pseudonym < ActiveRecord::Base
   end
   
   def communication_channel
-    self.user.communication_channels.by_path(self.unique_id).find(:first)
+    self.user.communication_channels.by_path(self.unique_id).first
   end
   
   def confirmation_code
@@ -315,8 +315,8 @@ class Pseudonym < ActiveRecord::Base
     end
     self.save
     if old_user_id
-      CommunicationChannel.update_all({:user_id => user.id}, {:path => self.unique_id, :user_id => old_user_id})
-      User.update_all({:updated_at => Time.now.utc}, {:id => [old_user_id, user.id]})
+      CommunicationChannel.where(:path => self.unique_id, :user_id => old_user_id).update_all(:user_id => user)
+      User.where(:id => [old_user_id, user]).update_all(:update_at => Time.now.utc)
     end
     if User.find(old_user_id).pseudonyms.empty? && migrate
       UserMerge.from(old_user).into(user)
@@ -389,7 +389,7 @@ class Pseudonym < ActiveRecord::Base
       active.
         by_unique_id(credentials[:unique_id]).
         where(:account_id => account_ids).
-        all(:include => :user).
+        includes(:user).
         select { |p|
           valid = p.valid_arbitrary_credentials?(credentials[:password])
           too_many_attempts = true if p.audit_login(remote_ip, valid) == :too_many_attempts

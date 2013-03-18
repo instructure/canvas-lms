@@ -139,10 +139,10 @@ class Attachment < ActiveRecord::Base
         iconv.iconv(nil)
       end
       self.encoding = 'UTF-8'
-      Attachment.update_all({:encoding => 'UTF-8'}, {:id => self.id})
+      Attachment.where(:id => self).update_all(:encoding => 'UTF-8')
     rescue Iconv::Failure
       self.encoding = ''
-      Attachment.update_all({:encoding => ''}, {:id => self.id})
+      Attachment.where(:id => self).update_all(:encoding => '')
       return
     end
   end
@@ -286,7 +286,7 @@ class Attachment < ActiveRecord::Base
         ScribdAPI.instance.set_user(self.scribd_account)
         self.cached_scribd_thumbnail = self.scribd_doc.thumbnail(options)
         # just update the cached_scribd_thumbnail column of this attachment without running callbacks
-        Attachment.update_all({:cached_scribd_thumbnail => self.cached_scribd_thumbnail}, {:id => self.id})
+        Attachment.where(:id => self).update_all(:cached_scribd_thumbnail => self.cached_scribd_thumbnail)
         self.cached_scribd_thumbnail
       else
         Rails.cache.fetch(['scribd_thumb', self, options].cache_key) do
@@ -479,7 +479,7 @@ class Attachment < ActiveRecord::Base
     end
 
     self.save
-    Attachment.update_all({ :namespace => new_namespace }, { :root_attachment_id => self.id })
+    Attachment.where(:root_attachment_id => self).update_all(:namespace => new_namespace)
   end
 
   def process_s3_details!(details)
@@ -642,7 +642,7 @@ class Attachment < ActiveRecord::Base
     elsif method == :overwrite
       self.folder.active_file_attachments.find_all_by_display_name(self.display_name).reject {|a| a.id == self.id }.each do |a|
         # update content tags to refer to the new file
-        ContentTag.update_all({:content_id => self.id}, {:content_id => a.id, :content_type => 'Attachment'})
+        ContentTag.where(:content_id => a, :content_type => 'Attachment').update_all(:content_id => self)
 
         # delete the overwritten file (unless the caller is queueing them up)
         a.destroy unless opts[:caller_will_destroy]
@@ -866,8 +866,8 @@ class Attachment < ActiveRecord::Base
       break if file_batches.empty?
       file_batches.each do |count, attachment_id, last_updated_at, context_id, context_type|
         # clear the need_notify flag for this batch
-        Attachment.update_all("need_notify = NULL",
-            ["need_notify AND updated_at <= ? AND context_id = ? AND context_type = ?", last_updated_at, context_id, context_type])
+        Attachment.where("need_notify AND updated_at <= ? AND context_id = ? AND context_type = ?", last_updated_at, context_id, context_type).
+            update_all(:need_notify => nil)
 
         # skip the notification if this batch is too old to be timely
         next if last_updated_at.to_time < discard_older_than
@@ -1224,7 +1224,7 @@ class Attachment < ActiveRecord::Base
     self.file_state = 'deleted' #destroy
     self.deleted_at = Time.now
     ContentTag.delete_for(self)
-    MediaObject.update_all({:workflow_state => 'deleted', :updated_at => Time.now.utc}, {:attachment_id => self.id}) if self.id && delete_media_object
+    MediaObject.where(:attachment_id => self).update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc) if self.id && delete_media_object
     save!
     # if the attachment being deleted belongs to a user and the uuid (hash of file) matches the avatar_image_url
     # then clear the avatar_image_url value.

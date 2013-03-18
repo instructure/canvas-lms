@@ -72,7 +72,7 @@ class Group < ActiveRecord::Base
 
   def participating_users(user_ids = nil)
     user_ids ?
-      participating_users_association.scoped(:conditions => {:id => user_ids}) :
+      participating_users_association.where(:id =>user_ids) :
       participating_users_association
   end
 
@@ -185,9 +185,8 @@ class Group < ActiveRecord::Base
 
   def close_memberships_if_deleted
     return unless self.deleted?
-    memberships = self.group_memberships
-    User.update_all({:updated_at => Time.now.utc}, {:id => memberships.map(&:user_id).uniq})
-    GroupMembership.update_all({:workflow_state => 'deleted'}, {:id => memberships.map(&:id).uniq})
+    User.where(:id => group_memberships.pluck(:user_id)).update_all(:updated_at => Time.now.utc)
+    group_memberships.update_all(:workflow_state => 'deleted')
   end
 
   named_scope :active, :conditions => ['groups.workflow_state != ?', 'deleted']
@@ -252,7 +251,7 @@ class Group < ActiveRecord::Base
 
   def peer_groups
     return [] if !self.context || !self.group_category || self.group_category.allows_multiple_memberships?
-    self.group_category.groups.find(:all, :conditions => ["id != ?", self.id])
+    self.group_category.groups.where("id<>?", self).all
   end
 
   def migrate_content_links(html, from_course)
@@ -556,9 +555,9 @@ class Group < ActiveRecord::Base
     def self.restrict_scope(scope, pager)
       if bookmark = pager.current_bookmark
         comparison = (pager.include_bookmark ? 'groups.id >= ?' : 'groups.id > ?')
-        scope = scope.scoped(:conditions => [comparison, bookmark])
+        scope = scope.where(comparison, bookmark)
       end
-      scope.scoped(:order => "groups.id ASC")
+      scope.order("groups.id ASC")
     end
   end
 end

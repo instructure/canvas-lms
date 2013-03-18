@@ -92,7 +92,7 @@ class GroupMembership < ActiveRecord::Base
     return unless self.group
     return if self.deleted?
     peer_groups = self.group.peer_groups.map(&:id)
-    GroupMembership.active.find(:all, :conditions => { :group_id => peer_groups, :user_id => self.user_id }).each {|gm| gm.destroy }
+    GroupMembership.active.where(:group_id => peer_groups, :user_id => self.user_id).destroy_all
   end
   protected :ensure_mutually_exclusive_membership
   
@@ -125,7 +125,7 @@ class GroupMembership < ActiveRecord::Base
     if (self.id_changed? || self.workflow_state_changed?) && self.active?
       UserFollow.create_follow(self.user, self.group)
     elsif self.destroyed? || (self.workflow_state_changed? && self.deleted?)
-      user_follow = self.user.shard.activate { self.user.user_follows.find(:first, :conditions => { :followed_item_id => self.group_id, :followed_item_type => 'Group' }) }
+      user_follow = self.user.shard.activate { self.user.user_follows.where(:followed_item_id => self.group_id, :followed_item_type => 'Group').first }
       user_follow.try(:destroy)
     end
   end
@@ -133,7 +133,7 @@ class GroupMembership < ActiveRecord::Base
   def touch_groups
     groups_to_touch = [ self.group_id ]
     groups_to_touch << self.old_group_id if self.old_group_id
-    Group.update_all({ :updated_at => Time.now.utc }, { :id => groups_to_touch })
+    Group.where(:id => groups_to_touch).update_all(:updated_at => Time.now.utc)
   end
   protected :touch_groups
   

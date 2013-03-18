@@ -79,7 +79,7 @@ class LearningOutcome < ActiveRecord::Base
       tag.position = idx + 1
       updates << "WHEN id=#{tag.id} THEN #{idx + 1}"
     end
-    ContentTag.connection.execute("UPDATE content_tags SET position=CASE #{updates.join(" ")} ELSE position END WHERE id IN (#{tags.map(&:id).join(",")})")
+    ContentTag.where(:id => tags).update_all("position=CASE #{updates.join(" ")} ELSE position END")
     self.touch
     tags
   end
@@ -96,7 +96,7 @@ class LearningOutcome < ActiveRecord::Base
 
     defunct_outcome_ids = old_outcome_ids - new_outcome_ids
     unless defunct_outcome_ids.empty?
-      asset.learning_outcome_alignments.update_all({:workflow_state => 'deleted'}, {:learning_outcome_id => defunct_outcome_ids})
+      asset.learning_outcome_alignments.where(:learning_outcome_id => defunct_outcome_ids).update_all(:workflow_state => 'deleted')
     end
 
     missing_outcome_ids = new_outcome_ids - old_outcome_ids
@@ -161,14 +161,14 @@ class LearningOutcome < ActiveRecord::Base
     # triggered by ContentTag#destroy and the checks have already run, we don't
     # need to do it again. in case of console, we don't care to force the
     # checks. so just an update_all of workflow_state will do.
-    ContentTag.learning_outcome_links.active.update_all({:workflow_state => 'deleted'}, {:content_id => self.id})
+    ContentTag.learning_outcome_links.active.where(:content_id => self).update_all(:workflow_state => 'deleted')
 
     # in case this got called in a console, delete the alignments also. the UI
     # won't (shouldn't) allow deleting the outcome if there are still
     # alignments, so this will be a no-op in that case. either way, these are
     # not outcome links, so ContentTag#destroy is just changing the
     # workflow_state; use update_all for efficiency.
-    ContentTag.learning_outcome_alignments.active.update_all({:workflow_state => 'deleted'}, {:learning_outcome_id => self.id})
+    ContentTag.learning_outcome_alignments.active.where(:learning_outcome_id => self).update_all(:workflow_state => 'deleted')
 
     self.workflow_state = 'deleted'
     save!
@@ -184,7 +184,7 @@ class LearningOutcome < ActiveRecord::Base
       if @tied_context == context
         codes = "all"
       else
-        codes = @tied_context.all_courses.scoped({:select => 'id'}).map(&:asset_string)
+        codes = @tied_context.all_courses.select(:id).map(&:asset_string)
       end
     end
     self.learning_outcome_results.for_context_codes(codes).count
@@ -208,7 +208,7 @@ class LearningOutcome < ActiveRecord::Base
     ids.each do |id|
       to_delete << id unless tags.any?{|t| t.content_id == id }
     end
-    LearningOutcome.update_all({:workflow_state => 'deleted', :updated_at => Time.now.utc}, {:id => to_delete})
+    LearningOutcome.where(:id => to_delete).update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
   end
   
   def self.process_migration(data, migration)

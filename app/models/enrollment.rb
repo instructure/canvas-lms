@@ -277,9 +277,8 @@ class Enrollment < ActiveRecord::Base
     section = CourseSection.find(self.course_section_id_was)
 
     # ok, consider groups the user is in from the abandoned section's course
-    self.user.groups.scoped(:include => :group_category, :conditions =>
-      ['context_type=? AND context_id=?',
-       'Course', section.course_id]).each do |group|
+    self.user.groups.includes(:group_category).where(
+      :context_type => 'Course', :context_id => section.course_id).each do |group|
 
       # don't bother unless the group's category has section restrictions or
       # the enrollment was deleted
@@ -335,11 +334,11 @@ class Enrollment < ActiveRecord::Base
   def linked_enrollment_for(observer)
     # there should really only ever be one, but due to SIS or legacy data there
     # could be multiple. we'll use the best match (based on workflow_state)
-    enrollment = observer.observer_enrollments.find :first, :conditions => {
+    enrollment = observer.observer_enrollments.where(
       :associated_user_id => user_id,
       :course_id => course_id,
-      :course_section_id => course_section_id_was
-    }, :order => self.class.state_rank_sql
+      :course_section_id => course_section_id_was).
+      order(self.class.state_rank_sql).first
     # we don't want to "undelete" observer enrollments that have been
     # explicitly deleted 
     return nil if enrollment && enrollment.deleted? && workflow_state_was != 'deleted'
@@ -505,9 +504,8 @@ class Enrollment < ActiveRecord::Base
 
   def accept(force = false)
     return false unless force || invited?
-    ids = nil
-    ids = self.user.dashboard_messages.find_all_by_context_id_and_context_type(self.id, 'Enrollment', :select => "id").map(&:id) if self.user
-    Message.delete_all({:id => ids}) if ids && !ids.empty?
+    ids = self.user.dashboard_messages.where(:context_id => self, :context_type => 'Enrollment').pluck(:id) if self.user
+    Message.where(:id => ids).delete_all if ids.present?
     update_attribute(:workflow_state, 'active')
     touch_user
   end
@@ -778,12 +776,6 @@ class Enrollment < ActiveRecord::Base
     self.course.score_to_grade(self.computed_final_score)
   end
 
-  def self.students(opts={})
-    with_scope :find => opts do
-      find(:all, :conditions => {:type => 'Student'}).map(&:user).compact
-    end
-  end
-
   def self.typed_enrollment(type)
     return nil unless ['StudentEnrollment', 'StudentViewEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment', 'DesignerEnrollment'].include?(type)
     type.constantize
@@ -929,7 +921,7 @@ class Enrollment < ActiveRecord::Base
 
   def self.limit_privileges_to_course_section!(course, user, limit)
     course.shard.activate do
-      Enrollment.update_all({:limit_privileges_to_course_section => !!limit}, {:course_id => course.id, :user_id => user.id})
+      Enrollment.where(:course_id => course, :user_id => user).update_all(:limit_privileges_to_course_section => !!limit)
     end
     user.touch
   end
@@ -973,9 +965,10 @@ class Enrollment < ActiveRecord::Base
           HAVING count(*) > 1 LIMIT 50000")
       break if pairs.empty?
       pairs.each do |(user_id, course_section_id, type, associated_user_id)|
-        scope = self.scoped(:conditions => { :user_id => user_id, :course_section_id => course_section_id, :type => type, :associated_user_id => associated_user_id }).scoped(:conditions => "sis_source_id IS NOT NULL")
-        keeper = scope.first(:select => "id, workflow_state", :order => 'sis_batch_id desc')
-        deleted += scope.delete_all(["id<>?", keeper.id]) if keeper
+        scope = self.where(:user_id => user_id, :course_section_id => course_section_id, :type => type, :associated_user_id => associated_user_id).
+            where("sis_source_id IS NOT NULL")
+        keeper = scope.select([:id, :workflow_state]).order(:sis_batch_id).last
+        deleted += scope.where("id<>?", keeper).delete_all if keeper
       end
     end
     return deleted
@@ -1056,7 +1049,7 @@ class Enrollment < ActiveRecord::Base
   def record_recent_activity(as_of = Time.zone.now,
                              threshold = record_recent_activity_threshold)
     if record_recent_activity_worthwhile?(as_of, threshold)
-      self.class.update_all({:last_activity_at => as_of}, {:id => self.id})
+      self.class.where(:id => self).update_all(:last_activity_at => as_of)
       self.last_activity_at = as_of
     end
   end

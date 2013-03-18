@@ -283,9 +283,9 @@ class CalendarEvent < ActiveRecord::Base
     events = child_events(true)
 
     if events.present?
-      CalendarEvent.update_all({:start_at => events.map(&:start_at).min,
-                                :end_at => events.map(&:end_at).max
-                               }, ["id = ?", id])
+      CalendarEvent.where(:id => self).
+          update_all(:start_at => events.map(&:start_at).min,
+                     :end_at => events.map(&:end_at).max)
       reload
     end
   end
@@ -426,7 +426,7 @@ class CalendarEvent < ActiveRecord::Base
       participant.lock! # in case two people try to make a reservation for the same participant
 
       if options[:cancel_existing]
-        context.reservations_for(participant).scoped(:lock => true).each do |reservation|
+        context.reservations_for(participant).lock.each do |reservation|
           reservation.updating_user = user
           reservation.destroy
         end
@@ -499,10 +499,6 @@ class CalendarEvent < ActiveRecord::Base
 
   def to_ics(in_own_calendar=true)
     return CalendarEvent::IcalEvent.new(self).to_ics(in_own_calendar)
-  end
-
-  def self.search(query)
-    find(:all, :conditions => wildcard('title', 'description', query))
   end
 
   attr_accessor :clone_updated

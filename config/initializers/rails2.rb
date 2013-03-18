@@ -111,7 +111,8 @@ ActiveRecord::Base.class_eval do
     def pluck(column)
       new_options = (scope(:find) || {}).dup
       new_options[:select] = "#{quoted_table_name}.#{column}"
-      with_exclusive_scope(:find => new_options) { all.map(&column) }
+      includes = new_options.delete(:include)
+      with_exclusive_scope(:find => new_options) { joins(includes).all.map(&column) }
     end
   end
 

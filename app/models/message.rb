@@ -248,12 +248,12 @@ class Message < ActiveRecord::Base
     stage if state == :created
 
     if dashboard?
-      messages = Message.in_state(:dashboard).scoped(:conditions => {
+      messages = Message.in_state(:dashboard).where(
         :notification_id => notification_id,
         :context_id => context_id,
         :context_type => context_type,
         :user_id => user_id
-      })
+      )
 
       (messages - [self]).each(&:close)
     end

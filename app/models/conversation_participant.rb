@@ -201,17 +201,17 @@ class ConversationParticipant < ActiveRecord::Base
       if self.conversation.shard == self.shard
         # use a slightly more forgiving backcompat query (since the migration may not have
         # fully filled in user_id yet)
-        ConversationMessage.scoped(:shard => self.conversation.shard,
-          :select => "conversation_messages.*, conversation_message_participants.tags",
-          :joins => :conversation_message_participants,
-          :conditions => ["conversation_id=? AND (user_id=? OR (conversation_participant_id=? AND user_id IS NULL))", self.conversation_id, self.user_id, self.id],
-          :order => "created_at DESC, id DESC")
+        ConversationMessage.shard(self.conversation.shard).
+          select("conversation_messages.*, conversation_message_participants.tags").
+          joins(:conversation_message_participants).
+          where("conversation_id=? AND (user_id=? OR (conversation_participant_id=? AND user_id IS NULL))", self.conversation_id, self.user_id, self).
+          order("created_at DESC, id DESC")
       else
-        ConversationMessage.scoped(:shard => self.conversation.shard,
-          :select => "conversation_messages.*, conversation_message_participants.tags",
-          :joins => :conversation_message_participants,
-          :conditions => ["conversation_id=? AND user_id=?", self.conversation_id, self.user_id],
-          :order => "created_at DESC, id DESC")
+        ConversationMessage.shard(self.conversation.shard).
+          select("conversation_messages.*, conversation_message_participants.tags").
+          joins(:conversation_message_participants).
+          where("conversation_id=? AND user_id=?", self.conversation_id, self.user_id).
+          order("created_at DESC, id DESC")
       end
     end
   end
@@ -261,17 +261,16 @@ class ConversationParticipant < ActiveRecord::Base
 
   def remove_messages(*to_delete)
     self.conversation.shard.activate do
-      scope = ConversationMessageParticipant.scoped(
-          :joins => :conversation_message,
-          :conditions => {'conversation_messages.conversation_id' => self.conversation_id,
-                          :user_id => self.user_id})
+      scope = ConversationMessageParticipant.joins(:conversation_message).
+          where(:conversation_messages => { :conversation_id => self.conversation_id },
+                          :user_id => self.user_id)
       if to_delete == [:all]
         scope.delete_all
       else
-        scope.delete_all(:conversation_message_id => to_delete.map(&:id))
+        scope.where(:conversation_message_id => to_delete).delete_all
         # if the only messages left are generated ones, e.g. "added
         # bob to the conversation", delete those too
-        return remove_messages(:all) if messages.count(:all, :conditions => {:generated => false}) == 0
+        return remove_messages(:all) unless messages.where(:generated => false).exists?
       end
     end
     unless @destroyed
@@ -289,7 +288,7 @@ class ConversationParticipant < ActiveRecord::Base
   end
 
   def recent_messages
-    messages.scoped(:limit => 10)
+    messages.limit(10)
   end
 
   def subscribed=(value)
@@ -401,13 +400,14 @@ class ConversationParticipant < ActiveRecord::Base
     self.class.send :with_exclusive_scope do
       conversation.shard.activate do
         old_shard = self.user.shard
-        conversation.conversation_messages.update_all(["author_id = ?", new_user.id], ["author_id = ?", user_id])
-        if existing = conversation.conversation_participants.find_by_user_id(new_user.id)
+        conversation.conversation_messages.where(:author_id => user_id).update_all(:author_id => new_user)
+        if existing = conversation.conversation_participants.find_by_user_id(new_user)
           existing.update_attribute(:workflow_state, workflow_state) if unread? || existing.archived?
           destroy
         else
-          ConversationMessageParticipant.scoped(:joins => :conversation_message).update_all({:user_id => new_user.id},
-            'conversation_messages.conversation_id' => self.conversation_id, :user_id => self.user_id)
+          ConversationMessageParticipant.joins(:conversation_message).
+              where(:conversation_messages => { :conversation_id => self.conversation_id }, :user_id => self.user_id).
+              update_all(:user_id => new_user)
           update_attribute :user, new_user
           existing = self
         end
@@ -440,10 +440,9 @@ class ConversationParticipant < ActiveRecord::Base
   end
 
   def self.conversation_ids
-    scope = current_scoped_methods && current_scoped_methods[:find]
-    raise "conversation_ids needs to be scoped to a user" unless scope && scope[:conditions] =~ /user_id = \d+/
-    order = 'last_message_at DESC' unless scope[:order]
-    self.find(:all, :select => 'conversation_id', :order => order).map(&:conversation_id)
+    raise "conversation_ids needs to be scoped to a user" unless scope(:find, :conditions) =~ /user_id = \d+/
+    order = 'last_message_at DESC' unless scoped?(:find, :order)
+    self.order(order).pluck(:conversation_id)
   end
 
   def self.users_by_conversation_shard(user_ids)
@@ -512,8 +511,8 @@ class ConversationParticipant < ActiveRecord::Base
   end
 
   def update_unread_count(direction=:up, user_id=self.user_id)
-    User.update_all "unread_conversations_count = unread_conversations_count #{direction == :up ? '+' : '-'} 1, updated_at = '#{Time.now.to_s(:db)}'",
-                    :id => user_id
+    User.where(:id => user_id).
+        update_all(["unread_conversations_count = unread_conversations_count + ?, updated_at = ?", direction == :up ? 1 : -1, Time.now.utc])
   end
 
   def update_unread_count_for_update

@@ -155,7 +155,7 @@ class Notification < ActiveRecord::Base
   def self.dashboard_categories(user = nil)
     seen_types = {}
     res = []
-    Notification.find(:all).each do |n|
+    Notification.all.each do |n|
       if !seen_types[n.category] && (user.nil? || n.relevant_to_user?(user))
         seen_types[n.category] = true
         res << n if n.category && n.dashboard?

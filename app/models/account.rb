@@ -75,7 +75,7 @@ class Account < ActiveRecord::Base
       conds += [c.class.to_s, c.id]
     }
     conds.unshift(sql.join(" OR "))
-    AssessmentQuestionBank.scoped :conditions => conds
+    AssessmentQuestionBank.where(conds)
   end
   
   include LearningOutcomeContext
@@ -340,7 +340,7 @@ class Account < ActiveRecord::Base
     associated_courses = associated_courses.with_enrollments if opts[:hide_enrollmentless_courses]
     associated_courses = associated_courses.for_term(opts[:term]) if opts[:term].present?
     associated_courses = yield associated_courses if block_given?
-    associated_courses.limit(opts[:limit]).active_first.find(:all, :select => columns, :group => columns)
+    associated_courses.limit(opts[:limit]).active_first.except(:select).select(columns).group(columns).all
   end
 
   def fast_all_courses(opts={})
@@ -350,7 +350,7 @@ class Account < ActiveRecord::Base
 
   def all_users(limit=250)
     @cached_all_users ||= {}
-    @cached_all_users[limit] ||= User.of_account(self).scoped(:limit=>limit)
+    @cached_all_users[limit] ||= User.of_account(self).limit(limit)
   end
   
   def fast_all_users(limit=nil)
@@ -570,7 +570,7 @@ class Account < ActiveRecord::Base
   end
 
   def has_role?(role_name)
-    roles.not_deleted.scoped(:conditions => ["roles.name = ?", role_name]).any?
+    !!roles.not_deleted.where(:roles => { :name => role_name}).first
   end
 
   def find_role(role_name)
@@ -595,7 +595,7 @@ class Account < ActiveRecord::Base
   end
   
   def self_and_all_sub_accounts
-    @self_and_all_sub_accounts ||= Account.connection.select_all("SELECT id FROM accounts WHERE accounts.root_account_id = #{self.id} OR accounts.parent_account_id = #{self.id}").map{|ref| ref['id'].to_i}.uniq + [self.id]
+    @self_and_all_sub_accounts ||= Account.where("root_account_id=? OR parent_account_id=?", self, self).pluck(:id).uniq + [self.id]
   end
   
   def default_time_zone
@@ -620,7 +620,7 @@ class Account < ActiveRecord::Base
         if account_chain_ids == [Account.site_admin.id]
           Account.site_admin.account_users_for(user)
         else
-          AccountUser.find(:all, :conditions => { :account_id => account_chain_ids, :user_id => user.id })
+          AccountUser.where(:account_id => account_chain_ids, :user_id => user).all
         end
       end
     end
@@ -632,8 +632,7 @@ class Account < ActiveRecord::Base
   def all_account_users_for(user)
     raise "must be a root account" unless self.root_account?
     Shard.partition_by_shard([self, Account.site_admin].uniq) do |accounts|
-      ids = accounts.map(&:id)
-      AccountUser.find(:all, :include => :account, :joins => :account, :conditions => ["user_id=? AND (root_account_id IN (?) OR account_id IN (?))", user.id, ids, ids])
+      AccountUser.includes(:account).joins(:account).where("user_id=? AND (root_account_id IN (?) OR account_id IN (?))", user, accounts, accounts)
     end
   end
 
@@ -647,8 +646,8 @@ class Account < ActiveRecord::Base
       next unless details[:account_only]
       ((details[:available_to] | details[:true_for]) & enrollment_types).each do |role|
         given { |user| user && RoleOverride.permission_for(self, permission, role)[:enabled] &&
-          self.course_account_associations.find(:first, :joins => 'INNER JOIN enrollments ON course_account_associations.course_id=enrollments.course_id',
-            :conditions => ["enrollments.type=? AND enrollments.workflow_state IN ('active', 'completed') AND user_id=?", role, user.id]) &&
+          self.course_account_associations.joins('INNER JOIN enrollments ON course_account_associations.course_id=enrollments.course_id').
+            where("enrollments.type=? AND enrollments.workflow_state IN ('active', 'completed') AND user_id=?", role, user).first &&
           (!details[:if] || send(details[:if])) }
         can permission
       end
@@ -658,21 +657,16 @@ class Account < ActiveRecord::Base
     can :read and can :manage and can :update and can :delete and can :read_outcomes
 
     given { |user|
-      root_account = self.root_account
       result = false
-      site_admin = self.site_admin?
 
-      if !site_admin && user && root_account.teachers_can_create_courses?
-        count = user.enrollments.scoped(:select=>'id', :conditions=>"enrollments.type IN ('TeacherEnrollment', 'DesignerEnrollment') AND (enrollments.workflow_state != 'deleted') AND root_account_id = #{root_account.id}").count
-        result = true if count > 0
-      end
-      if !site_admin && user && !result && root_account.students_can_create_courses?
-        count = user.enrollments.scoped(:select=>'id', :conditions=>"enrollments.type IN ('StudentEnrollment', 'ObserverEnrollment') AND (enrollments.workflow_state != 'deleted') AND root_account_id = #{root_account.id}").count
-        result = true if count > 0
-      end
-      if !site_admin && user && !result && root_account.no_enrollments_can_create_courses?
-        count = user.enrollments.scoped(:select=>'id', :conditions=>"enrollments.workflow_state != 'deleted' AND root_account_id = #{root_account.id}").count
-        result = true if count == 0
+      if !site_admin? && user
+        scope = user.enrollments.where(:root_account_id => root_account).where("enrollments.workflow_state<>'deleted'")
+        result = root_account.teachers_can_create_courses? &&
+            scope.where(:type => ['TeacherEnrollment', 'DesignerEnrollment']).exists?
+        result ||= root_account.students_can_create_courses? &&
+            scope.where(:type => ['StudentEnrollment', 'ObserverEnrollment']).exists?
+        result ||= root_account.no_enrollments_can_create_courses? &&
+            scope.exists?
       end
 
       result
@@ -862,7 +856,7 @@ class Account < ActiveRecord::Base
 
       # Make sure we have all users with existing account associations.
       # (This should catch users with Pseudonyms associated with the account.)
-      all_user_ids += UserAccountAssociation.scoped(:select => 'user_id', :conditions => { :account_id => self.id }).map(&:user_id)
+      all_user_ids += self.user_account_associations.pluck(:user_id)
 
       # Update the users' associations as well
       User.update_account_associations(all_user_ids.uniq, :account_chain_cache => account_chain_cache)

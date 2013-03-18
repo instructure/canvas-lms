@@ -104,13 +104,10 @@ class QuizSubmission < ActiveRecord::Base
     return questions, [] if bank_ids.empty?
 
     # equivalent to AssessmentQuestionBank#learning_outcome_alignments, but for multiple banks at once
-    return questions, ContentTag.learning_outcome_alignments.active.scoped(
-      :conditions => {
-        :content_type => 'AssessmentQuestionBank',
-        :content_id => bank_ids
-      },
-      :include => [:learning_outcome, :context]
-    ).all
+    return questions, ContentTag.learning_outcome_alignments.active.where(
+          :content_type => 'AssessmentQuestionBank',
+          :content_id => bank_ids).
+        includes(:learning_outcome, :context).all
   end
 
   def track_outcomes(attempt)
@@ -451,7 +448,7 @@ class QuizSubmission < ActiveRecord::Base
   end
   
   def mark_completed
-    QuizSubmission.update_all({ :workflow_state => 'complete' }, { :id => self.id })
+    QuizSubmission.where(:id => self).update_all(:workflow_state => 'complete')
   end
   
   def grade_submission(opts={})

@@ -170,7 +170,7 @@ class GradingStandard < ActiveRecord::Base
   def self.standards_for(context)
     context_codes = [context.asset_string]
     context_codes.concat Account.all_accounts_for(context).map(&:asset_string)
-    GradingStandard.active.scoped(:conditions => { :context_code => context_codes.uniq })
+    GradingStandard.active.where(:context_code => context_codes.uniq)
   end
   
   def standard_data=(params={})

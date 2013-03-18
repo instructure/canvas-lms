@@ -181,7 +181,7 @@ class GroupCategory < ActiveRecord::Base
         end
       end
     end
-    Group.update_all({:updated_at => Time.now.utc}, :id => touched_groups.to_a) unless touched_groups.empty?
+    Group.where(:id => touched_groups.to_a).update_all(:updated_at => Time.now.utc) unless touched_groups.empty?
     return new_memberships
   end
 

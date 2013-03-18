@@ -68,7 +68,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def pseudonym
-    user.pseudonyms.first(:conditions => { :unique_id => path }) if user
+    user.pseudonyms.where(:unique_id => path).first if user
   end
 
   set_broadcast_policy do |p|
@@ -128,7 +128,7 @@ class CommunicationChannel < ActiveRecord::Base
       conditions.first << " AND id<>?"
       conditions << id
     end
-    if self.class.exists?(conditions)
+    if self.class.where(conditions).exists?
       self.errors.add(:path, :taken, :value => path)
     end
   end
@@ -146,7 +146,7 @@ class CommunicationChannel < ActiveRecord::Base
   # Returns a boolean.
   def imported?
     id.present? &&
-      Pseudonym.first(:conditions => { :sis_communication_channel_id => id }).present?
+      Pseudonym.where(:sis_communication_channel_id => self).exists?
   end
 
   # Return the 'path' for simple communication channel types like email and sms. For
@@ -247,8 +247,9 @@ class CommunicationChannel < ActiveRecord::Base
     # Add facebook and twitter (in that order) if the user's account is setup for them.
     rank_order << TYPE_FACEBOOK unless user.user_services.for_service(CommunicationChannel::TYPE_FACEBOOK).empty?
     rank_order << TYPE_TWITTER if twitter_service
-    self.unretired.scoped(:conditions => ['communication_channels.path_type IN (?)', rank_order]).
-      find(:all, :order => "#{self.rank_sql(rank_order, 'communication_channels.path_type')} ASC, communication_channels.position asc")
+    self.unretired.where('communication_channels.path_type IN (?)', rank_order).
+      order("#{self.rank_sql(rank_order, 'communication_channels.path_type')} ASC, communication_channels.position asc").
+      all
   end
 
   named_scope :include_policies, :include => :notification_policies
@@ -276,8 +277,8 @@ class CommunicationChannel < ActiveRecord::Base
       self.user_id = user.id
       self.save!
       if old_user_id
-        Pseudonym.update_all({:user_id => user.id}, {:user_id => old_user_id, :unique_id => self.path})
-        User.update_all({:updated_at => Time.now.utc}, {:id => [old_user_id, user.id]})
+        Pseudonym.where(:user_id => old_user_id, :unique_id => self.path).update_all(:user_id => user)
+        User.where(:id => [old_user_id, user]).update_all(:updated_at => Time.now.utc)
       end
     end
   end
@@ -343,7 +344,7 @@ class CommunicationChannel < ActiveRecord::Base
     shards ||= [self.shard]
     scope = CommunicationChannel.active.by_path(self.path).of_type(self.path_type)
     Shard.with_each_shard(shards) do
-      scope.find(:all, :conditions => ["user_id<>?", self.user_id], :include => :user).map(&:user)
+      scope.where("user_id<>?", self.user_id).includes(:user).map(&:user)
     end.uniq.select { |u| u.all_active_pseudonyms.length != 0 }
   end
 end

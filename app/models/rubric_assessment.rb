@@ -132,7 +132,7 @@ class RubricAssessment < ActiveRecord::Base
   
   def update_artifact
     if self.artifact_type == 'Submission' && self.artifact
-      Submission.update_all({:has_rubric_assessment => true}, {:id => self.artifact.id})
+      Submission.where(:id => self.artifact).update_all(:has_rubric_assessment => true)
       if self.rubric_association && self.rubric_association.use_for_grading && self.artifact.score != self.score
         if self.rubric_association.association.grants_right?(self.assessor, nil, :grade)
           # TODO: this should go through assignment.grade_student to 

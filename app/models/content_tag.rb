@@ -68,13 +68,13 @@ class ContentTag < ActiveRecord::Base
   end
   
   def self.touch_context_modules(ids=[])
-    ContextModule.update_all({:updated_at => Time.now.utc}, {:id => ids}) unless ids.empty?
+    ContextModule.where(:id => ids).update_all(:updated_at => Time.now.utc) unless ids.empty?
     true
   end
   
   def touch_context_if_learning_outcome
     if (self.tag_type == 'learning_outcome_association' || self.tag_type == 'learning_outcome') && skip_touch.blank?
-      self.context_type.constantize.update_all({:updated_at => Time.now.utc}, {:id => self.context_id}) 
+      self.context_type.constantize.where(:id => self.context_id).update_all(:updated_at => Time.now.utc)
     end
   end
   
@@ -110,7 +110,7 @@ class ContentTag < ActiveRecord::Base
     content_ids.each do |type, ids|
       klass = type.constantize
       if klass.new.respond_to?(:could_be_locked=)
-        klass.update_all({ :could_be_locked => true }, { :id => ids })
+        klass.where(:id => ids).update_all(:could_be_locked => true)
       end
     end
   end
@@ -186,8 +186,8 @@ class ContentTag < ActiveRecord::Base
       # and there are no other links to the same outcome in the same context...
       outcome = self.content
       other_link = ContentTag.learning_outcome_links.active.
-        scoped(:conditions => {:context_type => self.context_type, :context_id => self.context_id, :content_id => outcome.id}).
-        scoped(:conditions => ["id != ?", self.id]).first
+        where(:context_type => self.context_type, :context_id => self.context_id, :content_id => outcome).
+        where("id<>?", self).first
       if !other_link
         # and there are alignments to the outcome (in the link's context for
         # foreign links, in any context for native links)
@@ -197,7 +197,7 @@ class ContentTag < ActiveRecord::Base
           alignment_conditions[:context_id] = self.context_id
           alignment_conditions[:context_type] = self.context_type
         end
-        alignment = ContentTag.learning_outcome_alignments.scoped(:conditions => alignment_conditions).first
+        alignment = ContentTag.learning_outcome_alignments.where(alignment_conditions).first
         # then don't let them delete the link
         raise LastLinkToOutcomeNotDestroyed.new(alignment) if alignment
       end
@@ -226,7 +226,7 @@ class ContentTag < ActiveRecord::Base
   end
   
   def self.update_for(asset)
-    tags = ContentTag.find(:all, :conditions => ['content_id = ? AND content_type = ?', asset.id, asset.class.to_s], :select => 'id, tag_type, content_type, context_module_id')
+    tags = ContentTag.where(:content_id => asset, :content_type => asset.class.to_s).select([:id, :tag_type, :content_type, :context_module_id]).all
     tag_ids = tags.select{|t| t.sync_title_to_asset_title? }.map(&:id)
     module_ids = tags.select{|t| t.context_module_id }.map(&:context_module_id)
     attr_hash = {:updated_at => Time.now.utc}
@@ -234,7 +234,7 @@ class ContentTag < ActiveRecord::Base
       attr_hash[val] = asset.send(attr) if asset.respond_to?(attr)
     end
     attr_hash[:workflow_state] = 'deleted' if asset.respond_to?(:workflow_state) && asset.workflow_state == 'deleted'
-    ContentTag.update_all(attr_hash, {:id => tag_ids})
+    ContentTag.where(:id => tag_ids).update_all(attr_hash)
     ContentTag.touch_context_modules(module_ids)
   end
   
@@ -340,24 +340,7 @@ class ContentTag < ActiveRecord::Base
     best_unicode_collation_key("learning_outcomes.short_description")
   end
 
-  module OutcomeTitleExtension
-    # only works with scopes i.e. named_scopes and scoped()
-    def find(*args)
-      options = args.last.is_a?(::Hash) ? args.last : {}
-      scope = scope(:find)
-      select = if options[:select]
-                 options[:select]
-               elsif scope[:select]
-                 scope[:select]
-               else
-                 "#{proxy_scope.quoted_table_name}.*"
-               end
-      options[:select] = select + ', ' + ContentTag.outcome_title_order_by_clause
-      super args.first, options
-    end
-  end
-
   def self.order_by_outcome_title
-    scoped(:include => :learning_outcome_content, :order => outcome_title_order_by_clause, :extend => OutcomeTitleExtension)
+    includes(:learning_outcome_content).order(outcome_title_order_by_clause)
   end
 end

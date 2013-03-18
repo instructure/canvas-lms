@@ -128,7 +128,7 @@ class Quiz < ActiveRecord::Base
     end
 
     override_students.each do |collection|
-      collection.update_all({:assignment_id => assignment_id,:quiz_id => id})
+      collection.update_all(:assignment_id => assignment_id, :quiz_id => id)
     end
   end
 
@@ -182,7 +182,7 @@ class Quiz < ActiveRecord::Base
     end
 
     # TODO: this is hacky, but we don't want callbacks to run because we're in an after_save. Refactor.
-    Quiz.update_all({ :unpublished_question_count => cnt }, { :id => self.id })
+    Quiz.where(:id => self).update_all(:unpublished_question_count => cnt)
     self.unpublished_question_count = cnt
   rescue
   end
@@ -276,7 +276,7 @@ class Quiz < ActiveRecord::Base
       self.context_module_tags.each { |tag| tag.confirm_valid_module_requirements }
     end
     if !self.graded? && (@old_assignment_id || self.last_assignment_id)
-      Assignment.update_all({:workflow_state => 'deleted', :updated_at => Time.now.utc}, {:id => [@old_assignment_id, self.last_assignment_id].compact, :submission_types => 'online_quiz'})
+      Assignment.where(:id => [@old_assignment_id, self.last_assignment_id].compact, :submission_types => 'online_quiz').update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
       self.quiz_submissions.each do |qs|
         submission = qs.submission
         qs.submission = nil
@@ -290,7 +290,7 @@ class Quiz < ActiveRecord::Base
     if self.assignment && (@assignment_id_set || self.for_assignment?) && @saved_by != :assignment
       if !self.graded? && @old_assignment_id
       else
-        Quiz.update_all({:workflow_state => 'deleted', :assignment_id => nil, :updated_at => Time.now.utc}, ["assignment_id = ? AND id != ?", self.assignment_id, self.id]) if self.assignment_id
+        Quiz.where("assignment_id=? AND id<>?", self.assignment_id, self).update_all(:workflow_state => 'deleted', :assignment_id => nil, :updated_at => Time.now.utc) if self.assignment_id
         a = self.assignment
         a.points_possible = self.points_possible
         a.description = self.description
@@ -307,7 +307,7 @@ class Quiz < ActiveRecord::Base
           @notify_of_update ? a.save : a.save_without_broadcasting!
         end
         self.assignment_id = a.id
-        Quiz.update_all({:assignment_id => a.id}, {:id => self.id})
+        Quiz.where(:id => self).update_all(:assignment_id => a)
       end
     end
   end
@@ -340,7 +340,7 @@ class Quiz < ActiveRecord::Base
       #{update_sql} > end_at
     END
 
-    QuizSubmission.update_all(["end_at = #{update_sql}", new_end_at], [where_clause, self.id, new_end_at]);
+    QuizSubmission.where(where_clause, self, new_end_at).update_all(["end_at = #{update_sql}", new_end_at])
   end
 
   workflow do
@@ -878,15 +878,14 @@ class Quiz < ActiveRecord::Base
   def submissions_for_statistics(include_all_versions=true)
     ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
       for_users = context.student_ids
-      includes = include_all_versions ? [:versions] : []
-      quiz_submissions.scoped(:include => includes).
-        where(:user_id => for_users).
-        map { |qs|
-          include_all_versions ?
+      scope = self.quiz_submissions.where(:user_id => for_users)
+      scope = scope.includes(:versions) if include_all_versions
+      scope.map { |qs|
+        include_all_versions ?
             qs.submitted_versions :
-            qs.latest_submitted_version
-        }.flatten.
-        select{ |s| s && s.completed? && s.submission_data.is_a?(Array) }.
+            [qs.latest_submitted_version].compact
+      }.flatten.
+        select{ |s| s.completed? && s.submission_data.is_a?(Array) }.
         sort { |a,b| b.updated_at <=> a.updated_at }
     end
   end
@@ -1252,7 +1251,7 @@ class Quiz < ActiveRecord::Base
       hash[:questions] ||= []
 
       if question_data[:qq_data]
-        questions_to_update = item.quiz_questions.scoped(:conditions => {:migration_id => question_data[:qq_data].keys})
+        questions_to_update = item.quiz_questions.where(:migration_id => question_data[:qq_data].keys)
         questions_to_update.each do |question_to_update|
           question_data[:qq_data].values.find{|q| q['migration_id'].eql?(question_to_update.migration_id)}['quiz_question_id'] = question_to_update.id
         end
@@ -1356,8 +1355,7 @@ class Quiz < ActiveRecord::Base
   end
 
   def self.batch_migrate_file_links(ids)
-    quizzes = Quiz.find(:all, :conditions => ['id in (?)', ids])
-    quizzes.each do |quiz|
+    Quiz.where(:id => ids).each do |quiz|
       if quiz.migrate_file_links
         quiz.save
       end
@@ -1401,6 +1399,6 @@ class Quiz < ActiveRecord::Base
 
   # marks a quiz as having unpublished changes
   def self.mark_quiz_edited(id)
-    update_all({:last_edited_at => Time.now.utc}, {:id => id})
+    where(:id =>id).update_all(:last_edited_at => Time.now.utc)
   end
 end

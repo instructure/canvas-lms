@@ -23,7 +23,7 @@ class AccessToken < ActiveRecord::Base
   before_create :generate_token
 
   def self.authenticate(token_string)
-    token = self.first(:conditions => ["crypted_token = ?", hashed_token(token_string)])
+    token = self.where(:crypted_token => hashed_token(token_string)).first
     token = nil unless token.try(:usable?)
     token
   end

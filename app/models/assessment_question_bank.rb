@@ -36,7 +36,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
     given{|user, session| cached_context_grants_right?(user, session, :manage_assignments) }
     can :read and can :create and can :update and can :delete and can :manage
     
-    given{|user, session| user && self.assessment_question_bank_users.exists?(:user_id => user.id) }
+    given{|user, session| user && self.assessment_question_bank_users.where(:user_id => user).exists? }
     can :read
   end
 
@@ -83,7 +83,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
       learning_outcome_alignments.update_all(:workflow_state => 'deleted')
     else
       learning_outcome_alignments.
-        scoped(:conditions => ["learning_outcome_id NOT IN (?)", outcomes.map(&:id)]).
+        where("learning_outcome_id NOT IN (?)", outcomes).
         update_all(:workflow_state => 'deleted')
     end
 
@@ -102,7 +102,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
       question_bank_user = self.assessment_question_bank_users.find_by_user_id(user.id)
       question_bank_user ||= self.assessment_question_bank_users.create(:user => user)
     else
-      AssessmentQuestionBankUser.delete_all({:user_id => user.id, :assessment_question_bank_id => self.id})
+      AssessmentQuestionBankUser.where(:user_id => user, :assessment_question_bank_id => self).delete_all
     end
   end
   
@@ -111,7 +111,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
   end
   
   def select_for_submission(count, exclude_ids=[])
-    ids = self.assessment_questions.find(:all, :select => 'id', :conditions => "workflow_state<>'deleted'").map(&:id)
+    ids = self.assessment_questions.active.pluck(:id)
     ids = (ids - exclude_ids).sort_by{rand}[0...count]
     ids.empty? ? [] : AssessmentQuestion.find_all_by_id(ids)
   end

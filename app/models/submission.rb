@@ -868,7 +868,7 @@ class Submission < ActiveRecord::Base
   end
 
   def conversation_message_data
-    latest = visible_submission_comments.scoped(:conditions => ["author_id IN (?)", possible_participants_ids]).last or return
+    latest = visible_submission_comments.where(:author_id => possible_participants_ids).last or return
     {
       :created_at => latest.created_at,
       :author => latest.author,
@@ -1198,7 +1198,7 @@ class Submission < ActiveRecord::Base
     return state if state.present?
     return "read" if (assignment.deleted? || assignment.muted? || !self.user_id)
     return "unread" if (self.grade || self.score)
-    return "unread" if self.submission_comments.scoped(:conditions => ["author_id <> ?", user_id]).first.present?
+    return "unread" if self.submission_comments.where("author_id<>?", user_id).exists?
     return "read"
   end
 

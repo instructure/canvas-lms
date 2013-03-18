@@ -120,7 +120,7 @@ class SisBatch < ActiveRecord::Base
 
   def self.process_all_for_account(account)
     loop do
-      batches = account.sis_batches.needs_processing.all(:limit => 1000, :order => :created_at)
+      batches = account.sis_batches.needs_processing.limit(1000).order(:created_at).all
       break if batches.empty?
       batches.each { |batch| batch.process_without_send_later }
     end
@@ -128,7 +128,7 @@ class SisBatch < ActiveRecord::Base
 
   def fast_update_progress(val)
     self.progress = val
-    SisBatch.update_all({:progress=>val}, "id=#{self.id}")
+    SisBatch.where(:id => self).update_all(:progress=>val)
   end
   
   def importing?
@@ -174,17 +174,18 @@ class SisBatch < ActiveRecord::Base
 
     if data[:supplied_batches].include?(:course)
       # delete courses that weren't in this batch, in the selected term
-      scope = Course.active.for_term(self.batch_mode_term).scoped(:conditions => ["courses.root_account_id = ?", self.account.id])
-      scope.scoped(:conditions => ["sis_batch_id is not null and sis_batch_id <> ?", self.id]).find_each do |course|
+      scope = Course.active.for_term(self.batch_mode_term).where(:root_account_id => self.account)
+      scope.where("sis_batch_id IS NOT NULL AND sis_batch_id<>?", self).find_each do |course|
         course.clear_sis_stickiness(:workflow_state)
+        course.skip_broadcasts = true
         course.destroy
       end
     end
 
     if data[:supplied_batches].include?(:section)
       # delete sections who weren't in this batch, whose course was in the selected term
-      scope = CourseSection.scoped(:conditions => ["course_sections.workflow_state = ? and course_sections.root_account_id = ? and course_sections.sis_batch_id is not null and course_sections.sis_batch_id <> ?", 'active', self.account.id, self.id])
-      scope = scope.scoped(:include => :course, :select => "course_sections.*", :conditions => ["courses.enrollment_term_id = ?", self.batch_mode_term.id])
+      scope = CourseSection.where("course_sections.workflow_state='active' AND course_sections.root_account_id=? AND course_sections.sis_batch_id IS NOT NULL AND course_sections.sis_batch_id<>?", self.account, self)
+      scope = scope.includes(:course).select("course_sections.*").where(:courses => { :enrollment_term_id => self.batch_mode_term })
       scope.find_each do |section|
         section.destroy
       end
@@ -192,8 +193,8 @@ class SisBatch < ActiveRecord::Base
 
     if data[:supplied_batches].include?(:enrollment)
       # delete enrollments for courses that weren't in this batch, in the selected term
-      scope = Enrollment.active.scoped(:include => :course, :select => "enrollments.*", :conditions => ["courses.root_account_id = ? and enrollments.sis_batch_id is not null and enrollments.sis_batch_id <> ?", self.account.id, self.id])
-      scope = scope.scoped(:conditions => ["courses.enrollment_term_id = ?", self.batch_mode_term.id])
+      scope = Enrollment.active.includes(:course).select("enrollments.*").where("courses.root_account_id=? AND enrollments.sis_batch_id IS NOT NULL AND enrollments.sis_batch_id<>?", self.account, self)
+      scope = scope.where(:courses =>  { :enrollment_term_id => self.batch_mode_term })
       scope.find_each do |enrollment|
         Enrollment.send(:with_exclusive_scope) do
           enrollment.destroy

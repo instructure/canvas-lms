@@ -86,7 +86,7 @@ class CollectionItem < ActiveRecord::Base
 
     if increment != 0
       data.shard.activate do
-        data.class.update_all(['post_count = post_count + ?', increment], :id => data.id)
+        data.class.where(:id => data).update_all(['post_count = post_count + ?', increment])
       end
     end
   end

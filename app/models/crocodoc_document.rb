@@ -93,7 +93,7 @@ class CrocodocDocument < ActiveRecord::Base
 
     submissions = attachment.attachment_associations.
       where(:context_type => 'Submission').
-      scoped(:include => :context).
+      includes(:context).
       map(&:context)
 
     return opts unless submissions
@@ -125,7 +125,7 @@ class CrocodocDocument < ActiveRecord::Base
 
   def self.update_process_states
     bs = Setting.get('crocodoc_status_check_batch_size', '45').to_i
-    CrocodocDocument.find_in_batches(:conditions => { :process_state => %w(QUEUED PROCESSING) }) do |docs|
+    CrocodocDocument.where(:process_state => %w(QUEUED PROCESSING)).find_in_batches do |docs|
       statuses = []
       docs.each_slice(bs) do |sub_docs|
         statuses.concat CrocodocDocument.crocodoc_api.status(sub_docs.map(&:uuid))
@@ -133,10 +133,9 @@ class CrocodocDocument < ActiveRecord::Base
 
       statuses.each do |status|
         uuid, state = status['uuid'], status['status']
-        CrocodocDocument.update_all(
-          {:process_state => status['status']},
-          {:uuid => status['uuid']}
-        )
+        CrocodocDocument.
+            where(:uuid => status['uuid']).
+            update_all(:process_state => status['status'])
         if status['status'] == 'ERROR'
           error = status['error'] || 'No explanation given'
           ErrorReport.log_error 'crocodoc', :message => error

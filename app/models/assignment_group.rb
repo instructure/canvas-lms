@@ -94,7 +94,7 @@ class AssignmentGroup < ActiveRecord::Base
       # time that this group was last modified, that assignment was deleted
       # along with this group. This might help avoid undeleting assignments that
       # were deleted earlier.
-      to_restore = to_restore.scoped(:conditions => ['updated_at >= ?', self.updated_at.utc])
+      to_restore = to_restore.where('updated_at >= ?', self.updated_at.utc)
     end
     self.workflow_state = 'available'
     self.save

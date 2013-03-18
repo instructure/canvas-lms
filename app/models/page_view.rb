@@ -234,7 +234,7 @@ class PageView < ActiveRecord::Base
         page_view_history(user, pager)
       end
     else
-      self.scoped(:conditions => { :user_id => user.id }, :order => 'created_at desc')
+      self.where(:user_id => user).order('created_at desc')
     end
   end
 
@@ -423,9 +423,9 @@ class PageView < ActiveRecord::Base
       self.logger = Rails.logger
 
       if skip_deleted_accounts
-        account_ids = Set.new(Account.root_accounts.all(:select => :id, :conditions => { :workflow_state => 'active' }).map(&:id))
+        account_ids = Set.new(Account.root_accounts.active.pluck(:id))
       else
-        account_ids = Set.new(Account.root_accounts.all(:select => :id).map(&:id))
+        account_ids = Set.new(Account.root_accounts.pluck(:id))
       end
 
       load_migration_data(account_ids)
@@ -461,9 +461,8 @@ class PageView < ActiveRecord::Base
 
       # this could run into problems if one account gets more than
       # batch_size page views created in the second on this boundary
-      finder_sql = PageView.scoped(:conditions => ["account_id = ? AND created_at >= ?", account_id, last_created_at],
-                                   :order => "created_at asc",
-                                   :limit => batch_size).construct_finder_sql({})
+      finder_sql = PageView.where("account_id = ? AND created_at >= ?", account_id, last_created_at).
+          order("created_at asc").limit(batch_size).to_sql
 
       # query just the raw attributes, don't instantiate AR objects
       rows = PageView.connection.execute(finder_sql).to_a

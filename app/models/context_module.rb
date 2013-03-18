@@ -76,7 +76,7 @@ class ContextModule < ActiveRecord::Base
   def destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now
-    ContentTag.update_all({:workflow_state => 'deleted', :updated_at => Time.now.utc}, {:context_module_id => self.id})
+    ContentTag.where(:context_module_id => self).update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
     self.send_later_if_production(:update_downstreams, self.position)
     save!
     true
@@ -113,8 +113,8 @@ class ContextModule < ActiveRecord::Base
     # modules are ordered by position, so running through them in order will
     # automatically handle issues with dependencies loading in the correct
     # order
-    modules = ContextModule.find(:all, :order => :position, :conditions => {
-        :context_type => self.context_type, :context_id => self.context_id, :workflow_state => 'active'})
+    modules = ContextModule.order(:position).where(
+        :context_type => self.context_type, :context_id => self.context_id, :workflow_state => 'active')
     students = user ? [user] : self.context.students
     modules.each do |mod|
       mod.re_evaluate_for(students, true)
@@ -394,7 +394,7 @@ class ContextModule < ActiveRecord::Base
   def active_prerequisites
     return [] unless self.prerequisites.any?
     prereq_ids = self.prerequisites.select{|pre|pre[:type] == 'context_module'}.map{|pre| pre[:id] }
-    active_ids = self.context.context_modules.active.scoped(:select => :id, :conditions => {:id => prereq_ids}).map(&:id)
+    active_ids = self.context.context_modules.active.where(:id => prereq_ids).pluck(:id)
     self.prerequisites.select{|pre| pre[:type] == 'context_module' && active_ids.member?(pre[:id])}
   end
   

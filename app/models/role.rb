@@ -36,7 +36,7 @@ class Role < ActiveRecord::Base
   end
 
   def ensure_no_name_conflict_with_different_base_role_type
-    if self.root_account.all_roles.not_deleted.scoped(:conditions => ["name = ? AND base_role_type <> ?", self.name, self.base_role_type]).any?
+    if self.root_account.all_roles.not_deleted.where("name = ? AND base_role_type <> ?", self.name, self.base_role_type).any?
       self.errors.add(:name, 'is already taken by a different type of Role in the same root account')
     end
   end

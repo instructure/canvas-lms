@@ -26,7 +26,7 @@ class WikiPageComment < ActiveRecord::Base
   attr_accessible :comments, :user_name
   
   def update_wiki_page_comments_count
-    WikiPage.update_all({:wiki_page_comments_count => self.wiki_page.wiki_page_comments.count}, {:id => self.wiki_page_id})
+    WikiPage.where(:id => self.wiki_page_id).update_all(:wiki_page_comments_count => self.wiki_page.wiki_page_comments.count)
   end
   
   workflow do

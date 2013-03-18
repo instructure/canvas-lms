@@ -180,7 +180,7 @@ class Assignment < ActiveRecord::Base
       # needs to be .each(&:destroy) instead of .update_all(:workflow_state =>
       # 'deleted') so that the override gets versioned properly
       active_assignment_overrides.
-        scoped(:conditions => {:set_type => 'Group'}).
+        where(:set_type => 'Group').
         each { |o|
           o.dont_touch_assignment = true
           o.destroy
@@ -208,7 +208,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def touch_assignment_group
-    AssignmentGroup.update_all({:updated_at => Time.now.utc}, {:id => self.assignment_group_id}) if self.assignment_group_id
+    AssignmentGroup.where(:id => self.assignment_group_id).update_all(:updated_at => Time.now.utc) if self.assignment_group_id
     true
   end
 
@@ -330,7 +330,7 @@ class Assignment < ActiveRecord::Base
 
   def clear_unannounced_grading_changes_if_just_unpublished
     if @workflow_state_was == 'published' && self.available?
-      Submission.update_all({:changed_since_publish => false}, {:assignment_id => self.id})
+      Submission.where(:assignment_id => self).update_all(:changed_since_publish => false)
     end
     true
   end
@@ -847,10 +847,6 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def self.search(query)
-    find(:all, :conditions => wildcard('title', 'description', query))
-  end
-
   def grade_distribution(submissions = nil)
     submissions ||= self.submissions
     tally = 0
@@ -895,7 +891,7 @@ class Assignment < ActiveRecord::Base
     end
 
     changed_since_publish = !!self.available?
-    Submission.update_all({:score => score, :grade => grade, :published_score => score, :published_grade => grade, :changed_since_publish => changed_since_publish, :workflow_state => 'graded', :graded_at => Time.now.utc}, {:id => submissions_to_save.map(&:id)} ) unless submissions_to_save.empty?
+    Submission.where(:id => submissions_to_save).update_all(:score => score, :grade => grade, :published_score => score, :published_grade => grade, :changed_since_publish => changed_since_publish, :workflow_state => 'graded', :graded_at => Time.now.utc) unless submissions_to_save.empty?
 
     self.context.recompute_student_scores
     student_ids = context.student_ids
@@ -929,7 +925,7 @@ class Assignment < ActiveRecord::Base
     if self.has_group_category?
       group = self.group_category.group_for(student)
       if group
-        students = group.users.scoped(:joins => "INNER JOIN enrollments ON enrollments.user_id=users.id").
+        students = group.users.joins("INNER JOIN enrollments ON enrollments.user_id=users.id").
           where(:enrollments => { :course_id => self.context}).
           where(Course.reflections[:student_enrollments].options[:conditions]).all
       end
@@ -1079,7 +1075,7 @@ class Assignment < ActiveRecord::Base
       opts.delete(k) unless [:body, :url, :attachments, :submission_type, :comment, :media_comment_id, :media_comment_type, :group_comment].include?(k.to_sym)
     }
     raise "Student Required" unless original_student
-    raise "User must be enrolled in the course as a student to submit homework" unless context.student_enrollments.find(:first, :conditions => { :user_id => original_student.id })
+    raise "User must be enrolled in the course as a student to submit homework" unless context.student_enrollments.except(:includes).where(:user_id => original_student).exists?
     comment = opts.delete(:comment)
     group_comment = opts.delete(:group_comment)
     group, students = group_students(original_student)
@@ -1181,7 +1177,7 @@ class Assignment < ActiveRecord::Base
     res[:context][:enrollments] = context.enrollments_visible_to(user).
       map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
     res[:context][:quiz] = self.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
-    res[:submissions] = submissions.scoped(:conditions => {:user_id => visible_students.map(&:id)}).map{|s|
+    res[:submissions] = submissions.where(:user_id => visible_students).map{|s|
       json = s.as_json(:include_root => false,
         :include => {
           :submission_comments => {
@@ -1881,9 +1877,8 @@ class Assignment < ActiveRecord::Base
           when :full
             self.needs_grading_count
           when :sections
-            self.submissions.count('DISTINCT submissions.id',
-              :joins => "INNER JOIN enrollments e ON e.user_id = submissions.user_id",
-              :conditions => [<<-SQL, self.id, self.context.id, vis.map {|v| v[:course_section_id]}])
+            self.submissions.joins("INNER JOIN enrollments e ON e.user_id = submissions.user_id").
+                where(<<-SQL, self, self.context, vis.map {|v| v[:course_section_id]}).count(:id, :distinct => true)
               submissions.assignment_id = ?
                 AND e.course_id = ?
                 AND e.course_section_id in (?)

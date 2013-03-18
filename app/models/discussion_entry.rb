@@ -86,7 +86,9 @@ class DiscussionEntry < ActiveRecord::Base
 
   on_create_send_to_streams do
     if self.root_entry_id.nil?
-      recent_entries = DiscussionEntry.active.find(:all, :select => 'user_id', :conditions => ['discussion_entries.discussion_topic_id=? AND discussion_entries.created_at > ?', self.discussion_topic_id, 2.weeks.ago])
+      recent_entries = DiscussionEntry.active.
+          where('discussion_topic_id=? AND created_at > ?', self.discussion_topic_id, 2.weeks.ago).
+          select(:user_id).all
       # If the topic has been going for more than two weeks and it suddenly
       # got "popular" again, move it back up in user streams
       if !self.discussion_topic.for_assignment? && self.created_at && self.created_at > self.discussion_topic.created_at + 2.weeks && recent_entries.select{|e| e.created_at && e.created_at > 24.hours.ago }.length > 10
@@ -188,10 +190,10 @@ class DiscussionEntry < ActiveRecord::Base
 
   def update_topic_submission
     if self.discussion_topic.for_assignment?
-      entries = self.discussion_topic.discussion_entries.scoped(:conditions => {:user_id => self.user_id, :workflow_state => 'active'})
-      submission = self.discussion_topic.assignment.submissions.scoped(:conditions => {:user_id => self.user_id}).first
+      entries = self.discussion_topic.discussion_entries.where(:user_id => self.user_id, :workflow_state => 'active')
+      submission = self.discussion_topic.assignment.submissions.where(:user_id => self.user_id).first
       if entries.any?
-        submission_date = entries.scoped(:order => 'created_at').first.created_at
+        submission_date = entries.order(:created_at).limit(1).pluck(:created_at).first
         if submission_date > self.created_at
           submission.submitted_at = submission_date
           submission.save!
@@ -227,7 +229,7 @@ class DiscussionEntry < ActiveRecord::Base
   def update_topic
     if self.discussion_topic
       last_reply_at = [self.discussion_topic.last_reply_at, self.created_at].max
-      DiscussionTopic.update_all({:last_reply_at => last_reply_at, :updated_at => Time.now.utc}, {:id => self.discussion_topic_id})
+      DiscussionTopic.where(:id => self.discussion_topic_id).update_all(:last_reply_at => last_reply_at, :updated_at => Time.now.utc)
     end
   end
 
@@ -364,9 +366,9 @@ class DiscussionEntry < ActiveRecord::Base
 
   def create_participants
     transaction do
-      dtp_conditions = sanitize_sql(["discussion_topic_id = ?", self.discussion_topic_id])
-      dtp_conditions = sanitize_sql(["discussion_topic_id = ? AND user_id <> ?", self.discussion_topic_id, self.user_id]) if self.user
-      DiscussionTopicParticipant.update_all("unread_entry_count = unread_entry_count + 1", dtp_conditions)
+      scope = DiscussionTopicParticipant.where(:discussion_topic_id => self.discussion_topic_id)
+      scope = scope.where("user_id<>?", self.user) if self.user
+      scope.update_all("unread_entry_count = unread_entry_count + 1")
 
       if self.user
         my_entry_participant = self.discussion_entry_participants.create(:user => self.user, :workflow_state => "read")
@@ -386,8 +388,7 @@ class DiscussionEntry < ActiveRecord::Base
   def read_state(current_user = nil)
     current_user ||= self.current_user
     return "read" unless current_user # default for logged out users
-    uid = current_user.is_a?(User) ? current_user.id : current_user
-    discussion_entry_participants.find_by_user_id(uid).try(:workflow_state) || "unread"
+    discussion_entry_participants.find_by_user_id(current_user).try(:workflow_state) || "unread"
   end
 
   def read?(current_user = nil)
@@ -420,7 +421,7 @@ class DiscussionEntry < ActiveRecord::Base
     entry_participant = nil
     DiscussionEntry.uncached do
       DiscussionEntry.unique_constraint_retry do
-        entry_participant = self.discussion_entry_participants.find(:first, :conditions => ['user_id = ?', current_user.id])
+        entry_participant = self.discussion_entry_participants.where(:user_id => current_user).first
         entry_participant ||= self.discussion_entry_participants.build(:user => current_user, :workflow_state => "unread")
         entry_participant.workflow_state = opts[:new_state] if opts[:new_state]
         entry_participant.save

@@ -70,7 +70,7 @@ class DelayedNotification < ActiveRecord::Base
     lookups.each do |klass, ids|
       includes = []
       includes = [:user] if klass == CommunicationChannel
-      res += klass.find(:all, :conditions => {:id => ids}, :include => includes) rescue []
+      res += klass.where(:id => ids).includes(includes).all rescue []
     end
     res.uniq
   end

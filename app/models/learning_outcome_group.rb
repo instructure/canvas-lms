@@ -213,7 +213,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
     transaction do
       # delete the children of the group, both links and subgroups, then delete
       # the group itself
-      self.child_outcome_links.active.scoped(:include => :content).each{ |outcome_link| outcome_link.destroy }
+      self.child_outcome_links.active.includes(:content).each{ |outcome_link| outcome_link.destroy }
       self.child_outcome_groups.active.each{ |outcome_group| outcome_group.destroy }
       self.workflow_state = 'deleted'
       save!
@@ -310,24 +310,9 @@ class LearningOutcomeGroup < ActiveRecord::Base
     best_unicode_collation_key(col)
   end
 
-  module TitleExtension
-    # only works with scopes i.e. named_scopes and scoped()
-    def find(*args)
-      options = args.last.is_a?(::Hash) ? args.last : {}
-      scope = scope(:find)
-      select = if options[:select]
-                 options[:select]
-               elsif scope[:select]
-                 scope[:select]
-               else
-                 "#{proxy_scope.quoted_table_name}.*"
-               end
-      options[:select] = select + ', ' + LearningOutcomeGroup.title_order_by_clause
-      super args.first, options
-    end
-  end
-
   def self.order_by_title
-    scoped(:order => title_order_by_clause, :extend => TitleExtension)
+    scope = self
+    scope = scope.select("learning_outcome_groups.*") if !scoped?(:find, :select)
+    scope.select(title_order_by_clause).order(title_order_by_clause)
   end
 end

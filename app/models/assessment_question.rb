@@ -460,7 +460,7 @@ class AssessmentQuestion < ActiveRecord::Base
     end
     if migration.to_import('assessment_questions') != false || (to_import && !to_import.empty?)
 
-      questions_to_update = migration.context.assessment_questions.scoped(:conditions => {:migration_id => questions.collect{|q| q['migration_id']}})
+      questions_to_update = migration.context.assessment_questions.where(:migration_id => questions.collect{|q| q['migration_id']})
       questions_to_update.each do |question_to_update|
         questions.find{|q| q['migration_id'].eql?(question_to_update.migration_id)}['assessment_question_id'] = question_to_update.id
       end

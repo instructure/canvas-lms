@@ -24,7 +24,7 @@ class ObserverEnrollment < Enrollment
   # returns a hash mapping students to arrays of enrollments
   def self.observed_students(context, current_user)
     context.shard.activate do
-      observer_enrollments = context.observer_enrollments.find(:all, :conditions => ["user_id=? AND associated_user_id IS NOT NULL", current_user.id])
+      observer_enrollments = context.observer_enrollments.where("user_id=? AND associated_user_id IS NOT NULL", current_user)
       observed_students = {}
       observer_enrollments.each do |e|
         student_enrollment = StudentEnrollment.active.find_by_user_id_and_course_id(e.associated_user_id, e.course_id)

@@ -95,8 +95,7 @@ class InboxItem < ActiveRecord::Base
 
   def update_user_inbox_items_count
     new_unread_count = user.inbox_items.unread.count rescue 0
-    User.update_all({ :unread_inbox_items_count => new_unread_count },
-      { :id => user_id })
+    User.where(:id => user_id).update_all(:unread_inbox_items_count => new_unread_count)
   end
 
   def context_type_plural

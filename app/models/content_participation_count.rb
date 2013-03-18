@@ -32,10 +32,7 @@ class ContentParticipationCount < ActiveRecord::Base
     participant = nil
     context.shard.activate do
       unique_constraint_retry do
-        participant = context.content_participation_counts.find(:first, {
-          :conditions => { :user_id => user.id, :content_type => type },
-          :lock => true
-        })
+        participant = context.content_participation_counts.where(:user_id => user, :content_type => type).lock.first
         if participant.blank?
           participant ||= context.content_participation_counts.build({
             :user => user,
@@ -68,10 +65,7 @@ class ContentParticipationCount < ActiveRecord::Base
   def self.unread_submission_count_for(context, user, enrollment = nil)
     unread_count = 0
     if context.is_a?(Course)
-      enrollment ||= context.enrollments.find(:first, {
-        :conditions => { :user_id => user.id },
-        :order => "#{Enrollment.state_rank_sql}, #{Enrollment.type_rank_sql}"
-      })
+      enrollment ||= context.enrollments.where(:user_id => user).order(Enrollment.state_rank_sql, Enrollment.type_rank_sql).first
       if enrollment.try(:student?)
         submission_conditions = sanitize_sql_for_conditions([<<-SQL, user.id, context.class.to_s, context.id])
           submissions.user_id = ? AND
@@ -80,27 +74,25 @@ class ContentParticipationCount < ActiveRecord::Base
           assignments.workflow_state <> 'deleted' AND
           (assignments.muted IS NULL OR NOT assignments.muted)
         SQL
-        subs_with_grades = Submission.graded.scoped({
-          :select => "submissions.id",
-          :joins => :assignment,
-          :conditions => "submissions.score IS NOT NULL AND #{submission_conditions}",
-        }).map(&:id)
-        subs_with_comments = SubmissionComment.scoped({
-          :select => "submissions.id",
-          :joins => { :submission => :assignment },
-          :conditions => [<<-SQL, user.id],
+        subs_with_grades = Submission.graded.
+            joins(:assignment).
+            where(submission_conditions).
+            where("submissions.score IS NOT NULL").
+            pluck(:id)
+        subs_with_comments = SubmissionComment.
+            joins(:submission => :assignment).
+            where(submission_conditions).
+            where(<<-SQL, user).pluck(:id)
             (submission_comments.hidden IS NULL OR NOT submission_comments.hidden)
             AND submission_comments.author_id <> ?
-            AND #{submission_conditions}
             SQL
-        }).map(&:id)
         potential_ids = (subs_with_grades + subs_with_comments).uniq
-        already_read_count = ContentParticipation.scoped(:conditions => {
+        already_read_count = ContentParticipation.where(
           :content_type => "Submission",
           :content_id => potential_ids,
-          :user_id => user.id,
-          :workflow_state => "read",
-        }).count
+          :user_id => user,
+          :workflow_state => "read"
+        ).count
         unread_count = potential_ids.size - already_read_count
       end
     end
