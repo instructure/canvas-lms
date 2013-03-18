@@ -667,7 +667,9 @@ class CalendarEvent < ActiveRecord::Base
         event.end = event.start
         event.end.ical_params = {"VALUE"=>["DATE"]}
       end
+
       event.summary = @event.title
+      
       if @event.description
         html = api_user_content(@event.description, @event.context)
         event.description html_to_text(html)
@@ -704,6 +706,21 @@ class CalendarEvent < ActiveRecord::Base
         end
       end
 
+      # make an effort to find an associated course without diving too deep down the rabbit hole
+      associated_course = nil
+      if @event.is_a?(CalendarEvent)
+        if @event.effective_context.is_a?(Course)
+          associated_course = @event.effective_context
+        elsif @event.effective_context.respond_to?(:context) && @event.effective_context.context.is_a?(Course)
+          associated_course = @event.effective_context.context
+        end
+      elsif @event.respond_to?(:context) && @event.context_type == "Course"
+        associated_course = @event.context
+      end
+
+      event.summary += " [#{associated_course.course_code}]" if associated_course
+     
+ 
       event = nil unless start_at
       return event unless in_own_calendar
 

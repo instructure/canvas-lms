@@ -1186,7 +1186,7 @@ describe Assignment do
       assignment_model(:due_at => "Sep 3 2008 11:55am", :title => "assignment title")
       ev = @a.to_ics(false)
       ev.uid.should == "event-assignment-#{@a.id}"
-      ev.summary.should == "#{@a.title}"
+      ev.summary.should == "#{@a.title} [#{@a.context.course_code}]"
       # TODO: ev.url.should == ?
     end
 
@@ -1201,7 +1201,7 @@ describe Assignment do
       assignment = AssignmentOverrideApplicator.assignment_with_overrides(@a, [@override])
       ev = assignment.to_ics(false)
       ev.uid.should == "event-assignment-override-#{@override.id}"
-      ev.summary.should == "#{@a.title} (#{@override.title})"
+      ev.summary.should == "#{@a.title} (#{@override.title}) [#{assignment.context.course_code}]"
       #TODO: ev.url.should == ?
     end
 
@@ -1216,7 +1216,7 @@ describe Assignment do
       assignment = AssignmentOverrideApplicator.assignment_with_overrides(@a, [@override])
       ev = assignment.to_ics(false)
       ev.uid.should == "event-assignment-#{@a.id}"
-      ev.summary.should == "#{@a.title}"
+      ev.summary.should == "#{@a.title} [#{@a.context.course_code}]"
     end
 
   end
