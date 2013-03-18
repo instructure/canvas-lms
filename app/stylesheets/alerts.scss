@@ -36,6 +36,10 @@
       float: right
     }
   }
+  .add_criteria_line select, .add_recipients_line select, .repetition_group input[type="text"] {
+    vertical-align: baseline;
+  }
+  
 }
 
 .alert.blank {

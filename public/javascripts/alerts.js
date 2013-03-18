@@ -215,6 +215,7 @@ define([
       }
       return false;
     }).delegate('.cancel_button', 'click', function() {
+      $(this).parent().hideErrors();
       var $alert = $(this).parents('.alert');
       if($alert.hasClass('new')) {
         $alert.slideUp(function() {
