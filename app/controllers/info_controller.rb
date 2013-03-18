@@ -81,7 +81,7 @@ class InfoController < ApplicationController
     Account.connection.select_value("SELECT 1")
     Rails.cache.read 'heartbeat'
     Canvas.redis.get('heartbeat') if Canvas.redis_enabled?
-    Tempfile.new("heartbeat").tap { |f| f.write("heartbeat"); f.flush }
+    Tempfile.open("heartbeat", ENV['TMPDIR'] || Dir.tmpdir) { |f| f.write("heartbeat"); f.flush }
 
     respond_to do |format|
       format.html { render :text => 'canvas ok' }
