@@ -186,8 +186,8 @@ describe NotificationMessageCreator do
     it "should make a delayed message for each user policy with a delayed frequency" do
       notification_set
       NotificationPolicy.delete_all
-      3.times do
-        communication_channel_model(:user_id => @user).confirm!
+      3.times do |i|
+        communication_channel_model(:user_id => @user, :path => "user#{i}@example.com").confirm!
         %w(immediately never daily weekly).each do |frequency|
           notification_policy_model(:notification => @notification,
                                     :communication_channel => @communication_channel,
