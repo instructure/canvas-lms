@@ -28,8 +28,8 @@
   <div class="labelled_region">
     <span class="alert-label"><%= before_label :repetition, "Repetition" %></span>
     <div class="repetition_group">
-      <input type="radio" class="editing" name="repetition" value="none" checked="checked" id="repetition_none_<%= alert_counter %>" /><label for="repetition_none_<%= alert_counter %>" class="no_repetition"><%= t('no_repetition_description', "Do not re-send alert") %></label><br class="editing"/>
-      <input type="radio" class="editing" name="repetition" value="value" id="repetition_repetition_<%= alert_counter %>" /><label for="repetition_repetition_<%= alert_counter %>" class="repetition" style="display:none;"><%= t('repetition_description', "Re-send alert every %{count} days until resolved", :count => "<span class='displaying'></span><input type='text' name='alert[repetition]' class='editing' size='2' />".html_safe) %></label>
+      <input type="radio" class="editing" name="repetition" value="none" checked="checked" id="repetition_none_<%= alert_counter %>" /> <label for="repetition_none_<%= alert_counter %>" class="no_repetition"><%= t('no_repetition_description', "Do not re-send alert") %></label><br class="editing"/>
+      <input type="radio" class="editing" name="repetition" value="value" id="repetition_repetition_<%= alert_counter %>" /> <label for="repetition_repetition_<%= alert_counter %>" class="repetition" style="display:none;"><%= t('repetition_description', "Re-send alert every %{count} days until resolved", :count => "<span class='displaying'></span><input type='text' name='alert[repetition]' class='editing' size='2' />".html_safe) %></label>
     </div>
   </div>
 
