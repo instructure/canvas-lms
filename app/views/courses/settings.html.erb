@@ -39,7 +39,7 @@
   <div id="tab-details">
     <h2><%= t('headings.details', %{Course Details}) %></h2>
     <% form_for @context, :html => {:id => "course_form"} do |f| %>
-    <table class="formtable">
+    <table class="coursesettings">
       <tr>
         <th scope="row"><%= f.blabel :name, :course_name, :en => "Name" %></th>
         <td class="nobr">
@@ -125,52 +125,48 @@
           <span class="course_info term_name"><%= @context.enrollment_term.name %></span>
         </td>
       </tr><tr>
-        <th scope="row" style="width: 10%;"><%= f.blabel :start_at, :en => "Starts" %></th>
+        <th scope="row"><%= f.blabel :start_at, :en => "Starts" %></th>
         <td class="nobr">
           <span class="course_form"><%= f.text_field :start_at, :class => "date_entry", :value => date_string(@context.start_at, :long) %></span>
           <span class="course_info start_at"><%= datetime_string(@context.start_at) || t('no_date', "No Date Set") %></span>
         </td>
       </tr><tr>
-        <th scope="row" style="width: 10%;"><%= f.blabel :conclude_at, :en => "Ends" %></th>
+        <th scope="row"><%= f.blabel :conclude_at, :en => "Ends" %></th>
         <td class="nobr">
           <span class="course_form"><%= f.text_field :conclude_at, :class => "date_entry", :value => date_string(@context.conclude_at, :long) %></span>
           <span class="course_info conclude_at"><%= datetime_string(@context.conclude_at) || t('no_date', "No Date Set") %></span>
-        </td>
-      </tr><tr>
-        <td></td>
-        <td>
           <div class="course_form">
             <%= f.check_box :restrict_enrollments_to_course_dates %>
             <%= f.label :restrict_enrollments_to_course_dates, :en => "Users can only participate in the course between these dates" %>
-            <div style="font-size: 0.8em; padding-left: 25px;">
+            <div class="aside palign">
               <%= t('course_overrides_term', %{This will override any term availability settings.}) %>
             </div>
           </div>
-          <div class="course_info restrict_dates uneditable" style="font-size: 0.8em;">
+          <div class="course_info restrict_dates uneditable aside">
             <%= @context.restrict_enrollments_to_course_dates ? t('date_restricted', "Users can only participate in the course between these dates") : t('not_date_restricted', "These dates will not affect course availability") %>
           </div>
         </td>
       <% if available_locales.size > 1 %>
       </tr><tr>
-        <th scope="row" style="width: 10%;"><%= f.blabel :locale, :language, :en => "Language" %></th>
+        <th scope="row"><%= f.blabel :locale, :language, :en => "Language" %></th>
         <td>
           <div class="course_form">
             <% no_language = t(:no_language_preference, "Not set (user-configurable, defaults to %{language})", :language => available_locales[infer_locale(:context => @context.account)]) %>
             <%= f.select :locale, [[no_language, nil]] + available_locales.invert.sort, :selected => @context.locale %>
-            <span><%= mt :transifex_message, <<-TEXT, :transifex_url => "https://www.transifex.com/projects/p/canvas-lms/"
+            <span> <%= mt :transifex_message, <<-TEXT, :transifex_url => "https://www.transifex.com/projects/p/canvas-lms/"
 Join the [Canvas Translation Community](%{transifex_url})
 TEXT
             %>
             </span>
           </div>
-          <div style="font-size: 0.8em;">
-              <%= t('language_overrides_preferences', "This will override any user/system language preferences. This is only recommended for foreign language courses") %>
-          </div>
           <span class="course_info locale"><%= @context.locale ? available_locales[@context.locale] : no_language %></span>
+          <div class="aside palign">
+            <%= t('language_overrides_preferences', "This will override any user/system language preferences. This is only recommended for foreign language courses") %>
+          </div>
         </td>
       <% end %>
       </tr><tr>
-        <th scope="row" style="width: 10%;"><%= f.blabel :storage_quota_mb, :storage_quota, :en => "File Storage" %></th>
+        <th scope="row"><%= f.blabel :storage_quota_mb, :storage_quota, :en => "File Storage" %></th>
         <td>
           <span class="course_form">
             <% if can_do(@context.account, @current_user, :manage_courses) %>
@@ -184,15 +180,15 @@ TEXT
         </td>
       <% if @context.turnitin_enabled? %>
       </tr><tr>
-        <th scope="row" style="width: 10%;"><%= f.blabel :turnitin_comments, :en => "Turnitin Comments" %></th>
+        <th scope="row"><%= f.blabel :turnitin_comments, :en => "Turnitin Comments" %></th>
         <td class="nobr">
-          <span class="course_form"><span style="font-size: 0.8em;"><%= t('turnitin', %{these comments will be shown to students when submitting a Turnitin-enabled assignment}) %></span><br/><%= f.text_area :turnitin_comments, :style => "width: 90%; height: 50px;" %></span>
+          <span class="course_form"><span class="aside"><%= t('turnitin', %{these comments will be shown to students when submitting a Turnitin-enabled assignment}) %></span><br/><%= f.text_area :turnitin_comments, :style => "width: 90%; height: 50px;" %></span>
           <span class="course_info turnitin_comments"><%= @context.turnitin_comments %></span>
         </td>
       <% end %>
       </tr>
       <tr>
-        <th scope="row" style="width: 10%;">
+        <th scope="row">
           <label><%= before_label('grading_scheme', %{Grading Scheme}) %></label>
         </th>
         <td>
@@ -209,7 +205,7 @@ TEXT
         </td>
       </tr>
       <tr>
-        <th scope="row" style="vertical-align: top; width: 10%;"><%= f.blabel :license, :en => "License" %></th>
+        <th scope="row"><%= f.blabel :license, :en => "License" %></th>
         <td colspan="3">
           <span class="course_form">
             <%= f.select :license, Course.licenses.map { |id, attrs| [attrs[:readable_license], id] }%>
@@ -218,12 +214,12 @@ TEXT
           <span class="course_info readable_license"><%= @context.readable_license %></span>
         </td>
       </tr><tr>
-        <th scope="row" style="vertical-align: top; width: 10%;"><label><%= before_label('course_visibility', %{Visibility}) %></label></th>
+        <th scope="row"><label><%= before_label('course_visibility', %{Visibility}) %></label></th>
         <td colspan="3">
           <span class="course_form">
             <%= f.check_box :is_public, :class => "is_public_checkbox" %>
             <%= f.label :is_public, :en => "Make this course publicly visible" %>
-            <span style='font-size: 0.8em; padding-left: 5px;'><%= t('help.public_course', %{(student data will remain private)}) %></span>
+            <span class="aside checklabelfix"><%= t('help.public_course', %{(student data will remain private)}) %></span>
           </span>
           <span class="course_info is_public"><%= @context.is_public ? t('public_course', 'Public') : t('private_course', 'Private') %></span>
           <div class="public_options">
@@ -272,11 +268,11 @@ TEXT
             <%= f.label :hide_distribution_graphs, :en => "Hide grade distribution graphs from students" %><br/>
             <%= f.check_box :lock_all_announcements %>
             <%= label_tag :course_lock_all_announcements, :en => 'Disable comments on announcements' %><br />
+            <%= f.select :default_wiki_editing_roles, [
+              [t('#course.wiki_permissions.only_teachers', "Only Teachers"), "teachers"],
+              [t('#course.wiki_permissions.teachers_students', "Teacher and Students"), "teachers,students"],
+              [t('#course.wiki_permissions.all', "Anyone"), "teachers,students,public"]] %>
             <label for="course_default_wiki_editing_roles">
-              <%= f.select :default_wiki_editing_roles, [
-                [t('#course.wiki_permissions.only_teachers', "Only Teachers"), "teachers"],
-                [t('#course.wiki_permissions.teachers_students', "Teacher and Students"), "teachers,students"],
-                [t('#course.wiki_permissions.all', "Anyone"), "teachers,students,public"]] %>
               <%= t('wiki_editing_roles', %{can edit course wiki pages by default}) %>
             </label><br/>
             <div class="changed_default_wiki_editing_roles" style="display: none; padding-left: 20px; font-size: 0.8em;">

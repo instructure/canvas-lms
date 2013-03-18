@@ -10,7 +10,6 @@
   .course_info, .edit_course_link, .move_course_link
     display: none
 
-
 #course_form .date_entry
   width: 100px
 
@@ -222,3 +221,27 @@ ul.user_list div.enrollment_type.pending
 #right-side table.summary
   margin-top: 20px
 
+#course_form table.coursesettings
+  th
+    text-align: left
+    vertical-align: top
+    padding-top: 3px
+    width: 10%
+  .aside
+    font-size: 0.9em
+  .checklabelfix
+    vertical-align: -4px
+  .license_help_link img, #course_locale, #course_default_wiki_editing_roles 
+    vertical-align: baseline
+  #course_locale
+    width: 360px
+  .palign
+    line-height: 100%
+    margin-bottom: 10px
+  select#course_locale + span
+    white-space: nowrap
+
+#course_form.editing table.coursesettings
+  th
+    vertical-align: top
+    padding-top: 5px
