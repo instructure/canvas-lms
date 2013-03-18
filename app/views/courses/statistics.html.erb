@@ -8,15 +8,16 @@
 <div style="padding: 0 20px;" id="stats">
 <h2><%= t 'headings.stats', 'Statistics for %{course}', :course => @context.name %></h2>
 
-<% active_students = @context.participating_students.scoped(:conditions => "enrollments.type != 'StudentViewEnrollment'").enrolled_before(@range_end).length %>
+<% active_students = @context.participating_students.where("enrollments.type<>'StudentViewEnrollment'").enrolled_before(@range_end).count %>
 <% inactive_students = @context.student_enrollments.before(@range_end).select{|e| e.invited? }.length %>
 
-<% total_topics = @context.discussion_topics.active.before(@range_end).count %>
-<% total_entries = DiscussionEntry.active.scoped(:conditions => {:discussion_topic_id => @context.discussion_topics.active.before(@range_end).map(&:id)}).count %>
+<% active_topics =  @context.discussion_topics.active.before(@range_end).pluck(:id) %>
+<% total_topics = active_topics.length %>
+<% total_entries = DiscussionEntry.active.where(:discussion_topic_id => active_topics).count %>
 <% new_topics = @context.discussion_topics.active.before(@range_end).select{|t| t.created_at > @range_start}.length %>
-<% new_entries = DiscussionEntry.active.after(@range_start).scoped(:conditions => {:discussion_topic_id => @context.discussion_topics.active.before(@range_end).map(&:id)}).count %>
+<% new_entries = DiscussionEntry.active.after(@range_start).where(:discussion_topic_id => active_topics).count %>
 <% new_assignments = @context.assignments.active.before(@range_end).select{|a| a.expects_submission? && a.created_at > @range_start }.length %>
-<% new_submissions = @context.submissions.before(@range_end).having_submission.scoped(:conditions => ['submitted_at > ?', @range_start]).count %>
+<% new_submissions = @context.submissions.before(@range_end).having_submission.where('submitted_at > ?', @range_start).count %>
 <% total_assignments = @context.assignments.active.before(@range_end).select{|a| a.expects_submission? }.length %>
 <% total_submissions = @context.submissions.before(@range_end).having_submission.count %>
 
@@ -99,23 +100,23 @@
       <tr>
         <td><%= t('file_upload', %{File Upload}) %></td>
         <td><%= @context.assignments.active.before(@range_end).select{|a| a.submission_types.match(/online_upload/) }.length %></td>
-        <td><%= @context.submissions.before(@range_end).scoped(:conditions => {:submission_type => 'online_upload' }).count %></td>
+        <td><%= @context.submissions.before(@range_end).where(:submission_type => 'online_upload').count %></td>
       </tr><tr>
         <td><%= t('text_entry', %{Text Entry}) %></td>
         <td><%= @context.assignments.active.before(@range_end).select{|a| a.submission_types.match(/online_text_entry/) }.length %></td>
-        <td><%= @context.submissions.before(@range_end).scoped(:conditions => {:submission_type => 'online_text_entry' }).count %></td>
+        <td><%= @context.submissions.before(@range_end).where(:submission_type => 'online_text_entry').count %></td>
       </tr><tr>
         <td><%= t('website_url', %{Website URL}) %></td>
         <td><%= @context.assignments.active.before(@range_end).select{|a| a.submission_types.match(/online_url/) }.length %></td>
-        <td><%= @context.submissions.before(@range_end).scoped(:conditions => {:submission_type => 'online_url' }).count %></td>
+        <td><%= @context.submissions.before(@range_end).where(:submission_type => 'online_url').count %></td>
       </tr><tr>
         <td><%= t('quiz', %{Quiz}) %></td>
         <td><%= @context.assignments.active.before(@range_end).select{|a| a.submission_types.match(/online_quiz/) }.length %></td>
-        <td><%= @context.submissions.before(@range_end).scoped(:conditions => {:submission_type => 'online_quiz' }).count %></td>
+        <td><%= @context.submissions.before(@range_end).where(:submission_type => 'online_quiz').count %></td>
       </tr><tr>
         <td><%= t('discussion_topic', %{Discussion Topic}) %></td>
         <td><%= @context.assignments.active.before(@range_end).select{|a| a.submission_types.match(/discussion_topic/) }.length %></td>
-        <td><%= @context.submissions.before(@range_end).scoped(:conditions => {:submission_type => 'discussion_topic' }).count %></td>
+        <td><%= @context.submissions.before(@range_end).where(:submission_type => 'discussion_topic').count %></td>
       </tr>
       </tbody>
     </table>
