@@ -70,13 +70,6 @@
 // Tablets to regular desktops
 @import "bootstrap/responsive-768px-979px";
 
-// I am enabling this for now to see how it goes, this might cause more problems then it helps
-// so we might want to turn this off. If we do, we also need to remove the part about it in
-// _overrides.scss -RS
-// Phones to portrait tablets and narrow desktops
-@import "bootstrap/responsive-767px-max";
-
-
 // RESPONSIVE NAVBAR
 // ------------------
 
