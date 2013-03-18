@@ -96,6 +96,7 @@ module Api::V1::Assignment
     end
 
     if assignment.quiz
+      hash['quiz_id'] = assignment.quiz.id
       hash['anonymous_submissions'] = !!(assignment.quiz.anonymous_submissions)
     end
 
