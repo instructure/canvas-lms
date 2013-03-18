@@ -46,7 +46,7 @@ define [
 
   toggleRegion = ($region, showRegion) ->
     showRegion ?= ($region.is(':ui-dialog:hidden') || ($region.attr('aria-expanded') != 'true'))
-    $allElementsControllingRegion = $("[aria-controls=#{$region.attr('id')}]")
+    $allElementsControllingRegion = $("[aria-controls*=#{$region.attr('id')}]")
 
     # hide/un-hide .element_toggler's that point to this $region that were hidden because they have
     # the data-hide-while-target-shown attribute
@@ -93,5 +93,5 @@ define [
     $parent = $this.closest('.user_content')
     $parent = $(document.body) unless $parent.length
 
-    $region = $parent.find("##{$this.attr('aria-controls')}")
+    $region = $parent.find("##{$this.attr('aria-controls').replace(/\s/g, ', #')}")
     toggleRegion($region, force) if $region.length
