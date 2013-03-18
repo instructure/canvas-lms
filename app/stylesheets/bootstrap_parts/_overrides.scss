@@ -82,26 +82,6 @@ input[type=file] {
   @include header-text;
 }
 
-@media (max-width: 767px) {
-  // "bootstrap/responsive-767px-max" expects that the main content of the page will be from
-  // edge to edge, we still have a left and right nav, so need to undo the padding it adds
-  body {
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  // if you have a page where the stuff in the #right-side is not needed or relevant on a mobile device,
-  // you can do: '@body_classes << "right-side-optional"' to hide the #right-side on on small screens.
-  // If there is something on the #right-side that is still useful on a small screen but you want to
-  // get rid of the #right-side to make it easier to focus on the #content, copy it to the main page
-  // and give it the class '.visible-phone'
-  .right-side-optional {
-    min-width: auto !important;
-    #right-side-wrapper { display: none !important }
-    #main { margin-right: 0 !important }
-  }
-}
-
 // gets rid of ugly border
 iframe#tool_content {
   border: none;
