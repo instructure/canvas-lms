@@ -134,7 +134,7 @@ class NotificationMessageCreator
                                          :link => message.url,
                                          :summary => message.body)
     delayed_message.context = @asset
-    delayed_message.save! if ENV['RAILS_ENV'] == 'test'
+    delayed_message.save! if Rails.env.test?
     delayed_message
   end
 
