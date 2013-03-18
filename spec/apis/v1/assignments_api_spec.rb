@@ -875,6 +875,24 @@ describe AssignmentsApiController, :type => :integration do
             @json['freeze_on_copy'].should == false
           end
         end
+
+        context "assignment with quiz" do
+          before do
+            course_with_teacher(:active_all => true)
+            @quiz = Quiz.create!(:title => 'Quiz Name', :context => @course)
+            @quiz.did_edit!
+            @quiz.offer!
+            assignment = @quiz.assignment
+            @json = api_get_assignment_in_course(assignment, @course)
+          end
+
+          it "should have quiz information" do
+            @json['quiz_id'].should == @quiz.id
+            @json['anonymous_submissions'].should == false
+            @json['name'].should == @quiz.title
+            @json['submission_types'].should include 'online_quiz'
+          end
+        end
       end
 
       context "external tool assignment" do
