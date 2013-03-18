@@ -96,6 +96,14 @@ else
     def respond_to_missing?(meth, incl_priv)
       false
     end
+
+    # Get rid of the warnings in Rails 2.3 + Ruby 1.9 about unicode
+    # normalization not being supported.
+    module ActiveSupport::Inflector
+      def transliterate(string)
+        I18n.transliterate(string)
+      end
+    end
   end
 
   # This makes it so all parameters get converted to UTF-8 before they hit your

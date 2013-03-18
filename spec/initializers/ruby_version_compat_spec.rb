@@ -50,4 +50,17 @@ describe 'ruby_version_compat' do
       stderr.should == ''
     end
   end
+
+  describe "ActiveSupport::Inflector#transliterate" do
+    it "should be silent and return equivalent strings" do
+      pending("ruby 1.9+ only") if RUBY_VERSION < "1.9."
+      stdout, stderr = capture_io do
+        ActiveSupport::Inflector.transliterate("a string").should == "a string"
+        complex = ERB::Util.html_escape("test ßå")
+        ActiveSupport::Inflector.transliterate(complex).should == "test ssa"
+      end
+      stdout.should == ''
+      stderr.should == ''
+    end
+  end
 end
