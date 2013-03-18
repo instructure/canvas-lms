@@ -99,7 +99,7 @@
   <% if !@password_pseudonyms.empty? %>
   <tr class="edit_data_row select_change_password_row" style="display: none;">
     <td><%= before_label(:password, "Password") %></td>
-    <td><label for="change_password_checkbox"><input type="checkbox" id="change_password_checkbox" name="pseudonym[change_password]" value="1"/> <%= t('labels.change_password', "Change Password") %></label></td>
+    <td><input type="checkbox" id="change_password_checkbox" name="pseudonym[change_password]" value="1"/> <label for="change_password_checkbox"><%= t('labels.change_password', "Change Password") %></label></td>
   </tr>
   <% end %>
   <tr class="change_password_row" style="display: none;">
@@ -176,7 +176,7 @@ you already use.  Click any of the services in "Other Services" to see what we m
 TEXT
 %></p>
 <p>
-<label for="show_user_services"><input type="checkbox" id="show_user_services" <%= 'checked' if @user.show_user_services %>/> <%= t('labels.show_user_services', "Let fellow course/group members see which services I've linked to my profile") %></label>
+<input type="checkbox" id="show_user_services" <%= 'checked' if @user.show_user_services %>/> <label for="show_user_services"><%= t('labels.show_user_services', "Let fellow course/group members see which services I've linked to my profile") %></label>
 </p>
 <table style="width: 100%;"><tr>
   <td style="vertical-align: top; width: 50%; padding-right: 20px;">
