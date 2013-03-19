@@ -87,7 +87,7 @@
               <td>
                 <% no_language = t(:no_language_preference, "Not set (defaults to %{language})", :language => available_locales[infer_locale(:context => @context.parent_account)]) %>
                 <%= f.select :default_locale, [[no_language, nil]] + available_locales.invert.sort, :selected => @context.default_locale %>
-                <span><%= mt :transifex_message, <<-TEXT, :transifex_url => "https://www.transifex.com/projects/p/canvas-lms/"
+                <span class="unbreakable"><%= mt :transifex_message, <<-TEXT, :transifex_url => "https://www.transifex.com/projects/p/canvas-lms/"
 Join the [Canvas Translation Community](%{transifex_url})
 TEXT
                 %>
@@ -157,14 +157,14 @@ TEXT
               "list of addresses, or an address followed by a mask " +
               "(\"192.168.217.1/24\" or \"192.168.217.1/255.255.255.0\").\"") %>
             </div>
-            <table>
+            <table class="formtable">
               <tbody id="ip_filters">
                 <% ((@account.settings[:ip_filters] || {}).sort_by(&:first) << [nil, nil]).each do |name, filter| %>
                   <tr class="ip_filter <%= raw ' blank" style="display: none;' if name.nil? %>">
                     <td><%= before_label(t(:ip_filter_name_label, "Name")) %></td>
-                    <td><input class="name" value="<%= name %>"/></td>
+                    <td><input type="text" class="name" value="<%= name %>"/></td>
                     <td><%= before_label(t(:ip_filter_filter_label, "Filter")) %></td>
-                    <td><input class="value" value="<%= filter %>" maxlength="255"/></td>
+                    <td><input type="text" class="value" value="<%= filter %>" maxlength="255"/></td>
                     <td>
                       <a href="#" class="delete_filter_link"><i class="icon-end standalone-icon"></i></a>
                     </td>
