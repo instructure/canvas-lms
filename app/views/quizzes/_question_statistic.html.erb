@@ -111,7 +111,7 @@
                           </div>
                           <% if @quiz.graded? && !@quiz.anonymous_submissions? %>
                             <div class="user_name" style="text-align: right; font-style: italic;">
-                              <%= context_user_name(@context, response[:user_id]) %>
+                              <%= @users[response[:user_id]].short_name %>
                             </div>
                           <% end %>
                         </div>

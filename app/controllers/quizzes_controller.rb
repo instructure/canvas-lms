@@ -70,7 +70,7 @@ class QuizzesController < ApplicationController
 
   def statistics
     if authorized_action(@quiz, @current_user, :read_statistics)
-      if !@context.allows_speed_grader?
+      if @context.large_roster?
         flash[:notice] = t "#application.notices.page_disabled_for_course", "That page has been disabled for this course"
         redirect_to named_context_url(@context, :context_quiz_url, @quiz)
         return
@@ -81,8 +81,11 @@ class QuizzesController < ApplicationController
           add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
           add_crumb(t(:statistics_crumb, "Statistics"), named_context_url(@context, :context_quiz_statistics_url, @quiz))
           @statistics = @quiz.statistics(params[:all_versions] == '1')
-          user_ids = @quiz.quiz_submissions.where("workflow_state<>'settings_only'").pluck(:user_id)
-          @submitted_users = user_ids.empty? ? [] : User.find_all_by_id(user_ids).compact.uniq.sort_by(&:last_name_first)
+          user_ids = @statistics[:submission_user_ids]
+          @submitted_users = User.where(:id => user_ids.to_a).order_by_sortable_name
+          @users = Hash[
+            @submitted_users.map { |u| [u.id, u] }
+          ]
         }
         format.csv {
           cancel_cache_buster
