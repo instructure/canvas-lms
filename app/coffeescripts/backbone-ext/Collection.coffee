@@ -77,6 +77,14 @@ define [
       @trigger 'setParam', name, value
 
     ##
+    # Sets multiple params at once and triggers setParams event
+    #
+    # @param {Object} params
+    setParams: (params) ->
+      @setParam name, value for name, value of params
+      @trigger 'setParams', params
+
+    ##
     # Deletes a parameter from @options.params
     deleteParam: (name) ->
       delete @options.params?[name]

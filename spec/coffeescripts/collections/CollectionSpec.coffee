@@ -72,3 +72,22 @@ define [
     equal spy.args[0][0], 'foo'
     equal spy.args[0][1], 'bar'
 
+  test 'setParams', ->
+    collection = new Backbone.Collection
+    ok !collection.options.params, 'no params'
+    collection.setParams
+      foo: 'bar'
+      baz: 'qux'
+    deepEqual collection.options.params, foo: 'bar', baz: 'qux'
+
+  test 'triggers setParams event', ->
+    collection = new Backbone.Collection
+    spy = sinon.spy()
+    collection.on 'setParams', spy
+    params =
+      foo: 'bar'
+      baz: 'qux'
+    collection.setParams params
+    ok spy.calledOnce, 'event triggered'
+    equal spy.args[0][0], params
+
