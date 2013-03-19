@@ -293,9 +293,9 @@ module ApplicationHelper
     logger.warn "database lookups happening in view code instead of controller code for wiki sidebar (load_wiki_sidebar)"
     @wiki_sidebar_data = {}
     includes = [:active_assignments, :active_discussion_topics, :active_quizzes, :active_context_modules]
-    includes.each{|i| @wiki_sidebar_data[i] = @context.send(i).scoped({:limit => 150}) if @context.respond_to?(i) }
+    includes.each{|i| @wiki_sidebar_data[i] = @context.send(i).limit(150) if @context.respond_to?(i) }
     includes.each{|i| @wiki_sidebar_data[i] ||= [] }
-    @wiki_sidebar_data[:wiki_pages] = @context.wiki.wiki_pages.active.scoped(:order => 'title', :limit => 150) if @context.respond_to?(:wiki)
+    @wiki_sidebar_data[:wiki_pages] = @context.wiki.wiki_pages.active.order(:title).limit(150) if @context.respond_to?(:wiki)
     @wiki_sidebar_data[:wiki_pages] ||= []
     if can_do(@context, @current_user, :manage_files)
       @wiki_sidebar_data[:root_folders] = Folder.root_folders(@context)
@@ -532,7 +532,7 @@ module ApplicationHelper
     contexts += @context.account_chain if @context.respond_to?(:account_chain)
     contexts << @domain_root_account if @domain_root_account
     Rails.cache.fetch((['editor_buttons_for'] + contexts.uniq).cache_key) do
-      tools = ContextExternalTool.active.having_setting('editor_button').scoped(:conditions => contexts.map{|context| "(context_type='#{context.class.base_class.to_s}' AND context_id=#{context.id})"}.join(" OR "))
+      tools = ContextExternalTool.active.having_setting('editor_button').where(contexts.map{|context| "(context_type='#{context.class.base_class.to_s}' AND context_id=#{context.id})"}.join(" OR "))
       tools.sort_by(&:id).map do |tool|
         {
           :name => tool.label_for(:editor_button, nil),
