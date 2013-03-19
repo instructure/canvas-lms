@@ -2,8 +2,8 @@ class RemoveUnusedNotificationPolicies < ActiveRecord::Migration
   tag :postdeploy
 
   def self.up
-    ids = Notification.find(:all, :select => 'id', :conditions => { :category => ['Student Message', 'Files']}).map(&:id)
-    NotificationPolicy.delete_all(:notification_id => ids)
+    ids = Notification.where(:category => ['Student Message', 'Files']).pluck(:id)
+    NotificationPolicy.where(:notification_id => ids).delete_all
   end
 
   def self.down

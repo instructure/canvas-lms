@@ -1,6 +1,6 @@
 class LabelsToStars < ActiveRecord::Migration
   def self.up
-    ConversationParticipant.update_all("label = 'starred'", "label IS NOT NULL")
+    ConversationParticipant.where("label IS NOT NULL").update_all(:label => 'starred')
   end
 
   def self.down

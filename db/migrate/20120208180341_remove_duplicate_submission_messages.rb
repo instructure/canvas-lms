@@ -3,7 +3,7 @@ class RemoveDuplicateSubmissionMessages < ActiveRecord::Migration
 
   def self.up
     # destroy rather than delete so that callbacks happen
-    ConversationMessage.destroy_all(<<-CONDITIONS)
+    ConversationMessage.where(<<-CONDITIONS).destroy_all
       asset_id IS NOT NULL
       AND id NOT IN (
         SELECT MIN(id)

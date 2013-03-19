@@ -24,16 +24,16 @@ class GroupCategoriesCleanupMigration < ActiveRecord::Migration
   def self.update_records_for_record(record)
     return unless record.context.present? and record.group_category_name.present?
     category_column = (record.class == Group ? 'category' : 'group_category')
-    records = record.class.scoped(:conditions => ["context_id=? AND context_type=? AND #{category_column}=? AND group_category_id IS NULL",
+    records = record.class.where("context_id=? AND context_type=? AND #{category_column}=? AND group_category_id IS NULL",
       record.context_id,
       record.context_type,
-      record.group_category_name])
-    records.update_all({:group_category_id => group_category_id_for(record)})
+      record.group_category_name)
+    records.update_all(:group_category_id => group_category_id_for(record))
   end
 
   def self.up
-    Assignment.find(:all, :select => "DISTINCT context_id, context_type, group_category",
-      :conditions => ['context_id IS NOT NULL AND group_category IS NOT NULL AND group_category_id IS NULL']).each do |record|
+    Assignment.select([:context_id, :context_type, :group_category]).uniq.
+      where('context_id IS NOT NULL AND group_category IS NOT NULL AND group_category_id IS NULL').each do |record|
       update_records_for_record(record)
     end
   end

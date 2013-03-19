@@ -9,8 +9,8 @@ class UniquifyWikis < ActiveRecord::Migration
       wikis = connection.select_rows("SELECT wiki_id FROM wiki_namespaces WHERE namespace='default' AND context_type='#{context_type}' AND context_id=#{context_id}").map(&:first).map(&:to_i)
       to_keep = context.wiki_id
       wikis.delete(to_keep)
-      WikiPage.update_all({:wiki_id => to_keep}, {:wiki_id => wikis})
-      Wiki.delete_all(:id => wikis)
+      WikiPage.where(:wiki_id => wikis).update_all(:wiki_id => to_keep)
+      Wiki.where(:id => wikis).delete_all
       connection.execute("DELETE FROM wiki_namespaces WHERE wiki_id IN (#{wikis.join(',')})")
     end
   end
