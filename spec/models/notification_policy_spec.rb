@@ -171,7 +171,7 @@ describe NotificationPolicy do
     
     it "should find all daily and weekly policies for the user, communication_channel, and notification" do
       user_model
-      communication_channel_model(:user_id => @user.id)
+      communication_channel_model
       notification_model
 
       NotificationPolicy.delete_all
@@ -200,7 +200,7 @@ describe NotificationPolicy do
   describe "setup_for" do
     it "should not fail when params does not include a user, and the account doesn't allow scores in e-mails" do
       user_model
-      communication_channel_model(:user_id => @user.id)
+      communication_channel_model
       notify1 = notification_model(:name => 'Setting 1', :category => 'MultiCategory')
       params = { :channel_id => @communication_channel.id }
       params[:root_account] = Account.default
@@ -210,7 +210,7 @@ describe NotificationPolicy do
 
     it "should set all notification entries within the same category" do
       user_model
-      communication_channel_model(:user_id => @user.id)
+      communication_channel_model
       notify1 = notification_model(:name => 'Setting 1', :category => 'MultiCategory')
       notify2 = notification_model(:name => 'Setting 2', :category => 'MultiCategory')
 
@@ -233,7 +233,7 @@ describe NotificationPolicy do
   describe "setup_with_default_policies" do
     before :each do
       user_model
-      communication_channel_model(:user_id => @user.id)
+      communication_channel_model
       @announcement = notification_model(:name => 'Setting 1', :category => 'Announcement')
     end
 
@@ -263,7 +263,7 @@ describe NotificationPolicy do
       NotificationPolicy.delete_all
       # Setup the second channel (higher position)
       primary_channel   = @user.communication_channel
-      secondary_channel = communication_channel_model(:user_id => @user.id, :path => 'secondary@example.com')
+      secondary_channel = communication_channel_model(:path => 'secondary@example.com')
       # start out with 0 on primary and secondary
       primary_channel.notification_policies.count.should == 0
       secondary_channel.notification_policies.count.should == 0
@@ -278,7 +278,7 @@ describe NotificationPolicy do
       NotificationPolicy.delete_all
       # Setup the second channel (higher position)
       primary_channel   = @user.communication_channel
-      secondary_channel = communication_channel_model(:user_id => @user.id, :path => 'secondary@example.com')
+      secondary_channel = communication_channel_model(:path => 'secondary@example.com')
       secondary_channel.notification_policies.create!(:notification => @notification, :frequency => Notification::FREQ_NEVER)
       NotificationPolicy.setup_with_default_policies(@user, [@announcement])
       # Primary should have 1 created and secondary should be left alone.
@@ -298,7 +298,7 @@ describe NotificationPolicy do
       it "should find user categories accross shards" do
         @shard1.activate {
           @shard_user = user_model
-          @channel = communication_channel_model(:user_id => @shard_user.id)
+          @channel = communication_channel_model(:user => @shard_user)
           NotificationPolicy.delete_all
           @policy = @channel.notification_policies.create!(:notification => @notification, :frequency => Notification::FREQ_NEVER)
           NotificationPolicy.setup_with_default_policies(@shard_user, [@announcement])

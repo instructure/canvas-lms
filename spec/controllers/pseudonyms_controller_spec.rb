@@ -90,7 +90,7 @@ describe PseudonymsController do
       it "should use case insensitive match for CommunicationChannel email" do
         # Setup user with communication channel that has mixed case email
         user_with_pseudonym
-        @cc = communication_channel_model(:user_id => @user.id, :workflow_state => 'active', :path => 'Victoria.Silvstedt@example.com')
+        @cc = communication_channel_model(:workflow_state => 'active', :path => 'Victoria.Silvstedt@example.com')
         get 'forgot_password', :pseudonym_session => {:unique_id_forgot => 'victoria.silvstedt@example.com'}
         response.should be_redirect
         assigns[:ccs].should include(@cc)

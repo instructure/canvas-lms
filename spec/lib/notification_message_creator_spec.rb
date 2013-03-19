@@ -26,7 +26,7 @@ def notification_set(opts = {})
   assignment_model
   notification_model({:subject => "<%= t :subject, 'This is 5!' %>", :name => "Test Name"}.merge(notification_opts))
   user_model({:workflow_state => 'registered'}.merge(user_opts))
-  communication_channel_model(:user_id => @user).confirm!
+  communication_channel_model.confirm!
   notification_policy_model(:notification => @notification,
                             :communication_channel => @communication_channel)
 
@@ -68,10 +68,10 @@ describe NotificationMessageCreator do
     it "should only send messages to active communication channels" do
       assignment_model
       user_model(:workflow_state => 'registered')
-      a = communication_channel_model(:user_id => @user.id, :workflow_state => 'active')
-      b = communication_channel_model(:user_id => @user.id, :workflow_state => 'active', :path => "path2@example.com")
-      c = communication_channel_model(:user_id => @user.id, :workflow_state => 'active', :path => "path3@example.com")
-      d = communication_channel_model(:user_id => @user.id, :path => "path4@example.com")
+      a = communication_channel_model(:workflow_state => 'active')
+      b = communication_channel_model(:workflow_state => 'active', :path => "path2@example.com")
+      c = communication_channel_model(:workflow_state => 'active', :path => "path3@example.com")
+      d = communication_channel_model(:path => "path4@example.com")
       notification_model
       [a, b, c, d].each do |channel|
         notification_policy_model(:communication_channel => channel,
@@ -89,18 +89,18 @@ describe NotificationMessageCreator do
     
     it "should use the default channel if no policies apply" do
       assignment_model
-      @u = user_model(:workflow_state => 'registered')
-      a = communication_channel_model(:user_id => @u.id, :workflow_state => 'active')
-      b = communication_channel_model(:user_id => @u.id, :path => "path2@example.com")
-      c = communication_channel_model(:user_id => @u.id, :path => "path3@example.com")
+      user_model(:workflow_state => 'registered')
+      a = communication_channel_model(:workflow_state => 'active')
+      b = communication_channel_model(:path => "path2@example.com")
+      c = communication_channel_model(:path => "path3@example.com")
       a.should be_active
       a.should 
       
       @n = Notification.create(:name => "New Notification")
       a.notification_policies.create!(:notification => @n)
-      messages = NotificationMessageCreator.new(@n, @assignment, :to_list => @u).create_message
+      messages = NotificationMessageCreator.new(@n, @assignment, :to_list => @user).create_message
       messages.count.should eql(1)
-      messages.first.communication_channel.should eql(@u.communication_channel)
+      messages.first.communication_channel.should eql(@user.communication_channel)
     end
 
     it "should not use the default if a policy does apply" do
@@ -187,7 +187,7 @@ describe NotificationMessageCreator do
       notification_set
       NotificationPolicy.delete_all
       3.times do |i|
-        communication_channel_model(:user_id => @user, :path => "user#{i}@example.com").confirm!
+        communication_channel_model(:path => "user#{i}@example.com").confirm!
         %w(immediately never daily weekly).each do |frequency|
           notification_policy_model(:notification => @notification,
                                     :communication_channel => @communication_channel,
@@ -200,7 +200,7 @@ describe NotificationMessageCreator do
 
     it "should make a delayed message for the default channel based on the notification's default frequency when there is no policy on any channel for the notification" do
       notification_set # we get one channel here
-      communication_channel_model(:user_id => @user, :path => 'this one gets a delayed policy').confirm! # this gives us a total of two channels
+      communication_channel_model(:path => 'this one gets a delayed policy').confirm! # this gives us a total of two channels
       NotificationPolicy.delete_all
       @notification.category = 'Discussion' # default frequency of 'Never'
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 0
@@ -301,7 +301,7 @@ describe NotificationMessageCreator do
 
     it "should not use notification policies for unconfirmed communication channels" do
       notification_set
-      cc = communication_channel_model(:user_id => @user.id, :workflow_state => 'unconfirmed', :path => "nope")
+      cc = communication_channel_model(:workflow_state => 'unconfirmed', :path => "nope")
       notification_policy_model(:communication_channel_id => cc.id, :notification_id => @notification.id)
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
       messages.size.should == 2

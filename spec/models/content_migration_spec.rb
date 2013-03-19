@@ -1510,7 +1510,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       end
 
       it "should send notifications immediately" do
-        communication_channel_model(:user_id => @user).confirm!
+        communication_channel_model.confirm!
         @cm.source_course = nil # so that it's not a course copy
         @cm.save!
 

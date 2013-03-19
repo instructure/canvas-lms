@@ -26,7 +26,7 @@ def notification_set(opts = {})
   assignment_model
   notification_model({:subject => "<%= t :subject, 'This is 5!' %>", :name => "Test Name"}.merge(notification_opts))
   user_model({:workflow_state => 'registered'}.merge(user_opts))
-  communication_channel_model(:user_id => @user).confirm!
+  communication_channel_model.confirm!
   notification_policy_model(:notification => @notification,
     :communication_channel => @communication_channel)
 
