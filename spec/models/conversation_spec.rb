@@ -617,6 +617,23 @@ describe Conversation do
         u2.conversations.first.tags.should eql [@course1.asset_string] # just the one, since it was explicit
         u3.conversations.first.tags.should eql [@course2.asset_string] # not in course1, so fall back to common ones (i.e. course2)
       end
+
+      context "sharding" do
+        it_should_behave_like "sharding"
+
+        it "should set all tags on the other shard's participants" do
+          course1 = @shard1.activate{ course(:account => Account.create!, :active_all => true) }
+          course2 = @shard2.activate{ course(:account => Account.create!, :active_all => true) }
+          user1 = student_in_course(:course => course1, :active_all => true).user
+          user2 = student_in_course(:course => course2, :active_all => true).user
+          student_in_course(:course => course2, :user => user1, :active_all => true)
+          student_in_course(:course => course1, :user => user2, :active_all => true)
+          conversation = Conversation.initiate([user1, user2], false)
+          conversation.add_message(user1, 'test')
+          user1.conversations.first.tags.sort.should eql [course1.asset_string, course2.asset_string].sort
+          user2.conversations.first.tags.sort.should eql [course1.asset_string, course2.asset_string].sort
+        end
+      end
     end
 
     context "deletion" do

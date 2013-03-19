@@ -353,7 +353,7 @@ class Conversation < ActiveRecord::Base
             cp.update_attribute :tags, cp.tags | new_tags
             if cp.user.shard != self.shard
               cp.user.shard.activate do
-                ConversationParticipant.update_all({:tags => cp.tags}, :conversation_id => self.id, :user_id => cp.user_id)
+                ConversationParticipant.update_all({:tags => serialized_tags(cp.tags)}, :conversation_id => self.id, :user_id => cp.user_id)
               end
             end
           end
