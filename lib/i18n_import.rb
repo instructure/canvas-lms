@@ -6,6 +6,7 @@ class I18nImport
   def initialize(source_translations, new_translations)
     @source_translations = init_source(source_translations)
     @language = init_language(new_translations)
+    TextHelper.recursively_strip_invalid_utf8!(new_translations, true) if RUBY_VERSION >= "1.9"
     @new_translations = new_translations[language].flatten_keys
   end
 

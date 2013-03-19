@@ -334,21 +334,30 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
   end
 
   desc "Validates and imports new translations"
-  task :import => :environment do
+  task :import, [:source_file, :translated_file] => :environment do |t, args|
     require 'ya2yaml'
+    require 'open-uri'
     Hash.send(:include, I18n::HashExtensions) unless Hash.new.kind_of?(I18n::HashExtensions)
 
-    begin
-      puts "Enter path to original en.yml file:"
-      arg = $stdin.gets.strip
-      source_translations = File.exist?(arg) && YAML.safe_load(File.read(arg)) rescue nil
-    end until source_translations
+    if args[:source_file]
+      source_translations = YAML.safe_load(open(args[:source_file]))
+    else
+      begin
+        puts "Enter path to original en.yml file:"
+        arg = $stdin.gets.strip
+        source_translations = File.exist?(arg) && YAML.safe_load(File.read(arg)) rescue nil
+      end until source_translations
+    end
 
-    begin
-      puts "Enter path to translated file:"
-      arg = $stdin.gets.strip
-      new_translations = File.exist?(arg) && YAML.safe_load(File.read(arg)) rescue nil
-    end until new_translations
+    if args[:translated_file]
+      new_translations = YAML.safe_load(open(args[:translated_file]))
+    else
+      begin
+        puts "Enter path to translated file:"
+        arg = $stdin.gets.strip
+        new_translations = File.exist?(arg) && YAML.safe_load(File.read(arg)) rescue nil
+      end until new_translations
+    end
 
     import = I18nImport.new(source_translations, new_translations)
 
