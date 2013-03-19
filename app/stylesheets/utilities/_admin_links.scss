@@ -1,20 +1,28 @@
+
 /*
-give the parent box that when you hover over, the trigger should appear the class 'admin-link-hover-area'
+@styleguide Admin Links (Cogs)
 
-sample markup:
+```html
+<a class="al-trigger btn">
+  <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+  <span class="screenreader-only">Discussion Settings</span>
+</a>
+<ul class="al-options">
+  <li><a href="#">Delete</a></li>
+  <li><a href="#">Save</a></li>
+</ul>
+```
 
-<div class="admin-link-hover-area">
-  <div class="admin-links">
-    <button class="al-trigger btn"><span class="screenreader-only">Manage (will be accessibly hidden)</span></button>
-    <ul class="al-options">
-      <li><a href="#"><span class="ui-icon ui-icon-pencil" />Edit</a></li>
-      <li><a href="#"><span class="ui-icon ui-icon-trash" />Delete (from database)</a></li>
-      <li><a href="#"><span class="ui-icon ui-icon-close" />Hide from this screen</a></li>
-      <li><a href="#">an option with no icon</a></li>
-    </ul>
-  </div>
-  put all of the content here
-</div>
+### Notes
+
+Generally used in a toolbar. Make sure its the right-most item in
+your UI. The `admin-links` behavior will make it work.
+
+**TODO:**
+
+- Make a new icon that has both the cog and the arrow
+- Rename this because "admin links" is too specific
+
 */
 
 .admin-links {
@@ -27,6 +35,7 @@ sample markup:
     display: block;
   }
 }
+
 .al-options {
   background-color: transparent;
   border: none;

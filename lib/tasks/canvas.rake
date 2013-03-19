@@ -99,6 +99,7 @@ namespace :canvas do
 
     puts "--> Compiling static assets [css]"
     Rake::Task['css:generate'].invoke
+    Rake::Task['css:styleguide'].invoke
 
     puts "--> Compiling static assets [jammit]"
     output = `bundle exec jammit 2>&1`

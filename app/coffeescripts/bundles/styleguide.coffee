@@ -8,6 +8,12 @@ require [
   'jquery.instructure_date_and_time'
 ], ($, preventDefault) ->
 
+  do ->
+    dialog = $('#dialog-buttons-dialog').dialog(autoOpen: false).data('dialog')
+    $('#show-dialog-buttons-dialog').click -> dialog.open()
+
+
+  ## OLD STYLEGUIDE ##
 
   iconEventsMap =
     mouseover: -> $(this).addClass "hover"

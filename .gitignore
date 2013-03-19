@@ -12,6 +12,7 @@
 
 /.bundle/
 /.yardoc/
+/app/views/info/styleguide.html.erb
 /config/*.yml
 /config/build.js
 /config/environments/*-local.rb

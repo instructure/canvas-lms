@@ -90,6 +90,7 @@ gem 'crocodoc-ruby',  '0.0.1', :require => 'crocodoc'
 
 group :assets do
   gem 'compass-rails', '1.0.3'
+  gem 'dress_code', '1.0.1'
 end
 
 group :mysql do
@@ -128,6 +129,7 @@ end
 
 group :development do
   gem 'guard', '1.6.0'
+  gem 'guard-shell'
   gem 'rb-inotify', '~>0.9.0', :require => false
   gem 'rb-fsevent', :require => false
   gem 'rb-fchange', :require => false
