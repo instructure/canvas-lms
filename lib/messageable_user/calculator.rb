@@ -284,9 +284,9 @@ class MessageableUser
 
         scope =
           case course_visibility(course)
-          when :full then enrollment_scope.where(full_visibility_clause([course]))
-          when :sections then enrollment_scope.where(section_visibility_clause([course]))
-          when :restricted then enrollment_scope.where(restricted_visibility_clause([course]))
+          when :full then enrollment_scope(:include_completed => false).where(full_visibility_clause([course]))
+          when :sections then enrollment_scope(:include_completed => false).where(section_visibility_clause([course]))
+          when :restricted then enrollment_scope(:include_completed => false).where(restricted_visibility_clause([course]))
           end
         scope = scope.where(observer_restriction_clause) if student_courses.present?
         scope = scope.where('enrollments.type' => enrollment_types) if enrollment_types
@@ -311,7 +311,7 @@ class MessageableUser
           section_visible_courses.include?(course) &&
           visible_section_ids_in_courses([course]).include?(section_id)
 
-        scope = enrollment_scope.where('enrollments.course_section_id' => section_id)
+        scope = enrollment_scope(:include_completed => false).where('enrollments.course_section_id' => section_id)
         scope = scope.where(observer_restriction_clause) if student_courses.present?
         scope = scope.where('enrollments.type' => enrollment_types) if enrollment_types
         scope.all
