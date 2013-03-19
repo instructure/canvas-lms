@@ -228,7 +228,7 @@ describe "context_modules" do
       modules[1].save!
 
       #updates new_student module state by completing @assignment
-      modules[0].update_for(new_student2, :read, @tag_1)
+      modules[0].update_for(new_student, :read, @tag_1)
 
       get "/courses/#{@course.id}/modules"
 
