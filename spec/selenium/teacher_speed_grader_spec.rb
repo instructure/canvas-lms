@@ -227,7 +227,9 @@ describe "speed grader" do
     f('#comments > .comment').should include_text('grader comment')
 
     #make sure gradebook link works
-    f('#x_of_x_students a').click
+    expect_new_page_load do
+      f('#speed_grader_gradebook_link').click
+    end
     fj('body.grades').should be_displayed
   end
 

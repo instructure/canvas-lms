@@ -28,7 +28,9 @@
       <a href="#" class="next"><%= t('links.next', "Next") %></a>
       <div id='x_of_x_students'>
         (<%= t(:student_index_of_total, "student %{index} of %{total_students}", :index => raw('<span>???</span>'), :total_students => @assignment.context.students_visible_to(@current_user).count(:id, :distinct => true)) %>)<br />
-        <a href="<%= gradebook_url_for(@current_user, @context, @assignment) %>"><%= t('links.gradebook', "Gradebook") %></a> | 
+        <a href="<%= gradebook_url_for(@current_user, @context, @assignment) %>" id="speed_grader_gradebook_link">
+          <%= t('links.gradebook', "Gradebook") %>
+        </a>
         <a href="<%= context_url(@context, :context_url) %>"><%= t('links.course_home', "Course Home") %></a>
       </div>
     </div>
