@@ -21,20 +21,14 @@ module ApplicationHelper
   include TextHelper
   include LocaleSelection
 
-  # Admins of the given context can see the User.name attribute,
-  # but everyone else sees the User.short_name attribute.
-  def context_user_name(context, user, last_name_first=false)
+  def context_user_name(context, user)
     return nil unless user
     return user.short_name if !context && user.respond_to?(:short_name)
-    context_code = context
-    context_code = context.asset_string if context.respond_to?(:asset_string)
-    context_code ||= "no_context"
     user_id = user
     user_id = user.id if user.is_a?(User) || user.is_a?(OpenObject)
-    Rails.cache.fetch(['context_user_name', context_code, user_id, last_name_first].cache_key, {:expires_in=>15.minutes}) do
-      user = User.find_by_id(user_id)
-      res = user.short_name || user.name
-      res
+    Rails.cache.fetch(['context_user_name', context, user_id].cache_key, {:expires_in=>15.minutes}) do
+      user = user.respond_to?(:short_name) ? user : User.find(user_id)
+      user.short_name || user.name
     end
   end
 

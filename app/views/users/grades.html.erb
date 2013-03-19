@@ -40,7 +40,7 @@
 <table class="course_details observer_grades">
 <% @presenter.observed_enrollments.each do |enrollment| %>
   <tr>
-    <td class="course"><a href="<%= course_student_grades_path(enrollment.course_id, enrollment.user_id) %>"><%= context_user_name(nil, enrollment.user_id) %>, <%= enrollment.course.name %></a></td>
+    <td class="course"><a href="<%= course_student_grades_path(enrollment.course_id, enrollment.user_id) %>"><%= context_user_name(enrollment.course, enrollment.user_id) %>, <%= enrollment.course.name %></a></td>
     <td class="percent">
       <% if enrollment.course.hide_final_grades? %>
         --
