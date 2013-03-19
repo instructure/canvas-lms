@@ -622,6 +622,7 @@ class UsersController < ApplicationController
 
   def new
     return redirect_to(root_url) if @current_user
+    js_env :HIDDEN_FIELDS => @domain_root_account.tracking_fields(params)
     render :layout => 'bare'
   end
 
