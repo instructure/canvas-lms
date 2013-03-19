@@ -121,11 +121,8 @@ module ActiveRecord::Associations
 
   %w{HasManyAssociation HasManyThroughAssociation}.each do |klass|
     const_get(klass).class_eval do
-      def with_each_shard(*shards_or_options)
-        options = shards_or_options.pop if shards_or_options.last.is_a?(Hash)
+      def with_each_shard(*shards)
         scope = self
-        # XXX: Rails3 -- fake_arel should help with fixing this and maintaining rails 2 compat
-        scope = self.scoped(options) if options
         scope = yield(scope) if block_given?
         Array(scope)
       end

@@ -91,8 +91,8 @@ class ContentZipper
     filename = assignment_zip_filename(assignment)
     submissions = assignment.submissions
     if zip_attachment.user && assignment.context.enrollment_visibility_level_for(zip_attachment.user) != :full
-      visible_student_ids = assignment.context.enrollments_visible_to(zip_attachment.user).find(:all, :select => 'user_id').map(&:user_id)
-      submissions = submissions.scoped(:conditions => { :user_id => visible_student_ids})
+      visible_student_ids = assignment.context.enrollments_visible_to(zip_attachment.user).pluck(:user_id)
+      submissions = submissions.where(:user_id => visible_student_ids)
     end
     make_zip_tmpdir(filename) do |zip_name|
       @logger.debug("creating #{zip_name}")

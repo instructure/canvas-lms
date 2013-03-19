@@ -36,15 +36,15 @@ module SIS
         end
       end
       @logger.debug("Raw enrollments took #{Time.now - start} seconds")
-      Enrollment.update_all({:sis_batch_id => @batch_id}, {:id => i.enrollments_to_update_sis_batch_ids}) if @batch_id && !i.enrollments_to_update_sis_batch_ids.empty?
+      Enrollment.where(:id => i.enrollments_to_update_sis_batch_ids).update_all(:sis_batch_id => @batch_id) if @batch_id && !i.enrollments_to_update_sis_batch_ids.empty?
       # We batch these up at the end because we don't want to keep touching the same course over and over,
       # and to avoid hitting other callbacks for the course (especially broadcast_policy)
-      Course.update_all({:updated_at => Time.now.utc}, {:id => i.courses_to_touch_ids.to_a}) unless i.courses_to_touch_ids.empty?
+      Course.where(:id => i.courses_to_touch_ids.to_a).update_all(:updated_at => Time.now.utc) unless i.courses_to_touch_ids.empty?
       # We batch these up at the end because normally a user would get several enrollments, and there's no reason
       # to update their account associations on each one.
       i.incrementally_update_account_associations
       User.update_account_associations(i.update_account_association_user_ids.to_a, :account_chain_cache => i.account_chain_cache)
-      User.update_all({:updated_at => Time.now.utc}, {:id => i.users_to_touch_ids.to_a}) unless i.users_to_touch_ids.empty?
+      User.where(:id => i.users_to_touch_ids.to_a).update_all(:updated_at => Time.now.utc) unless i.users_to_touch_ids.empty?
       @logger.debug("Enrollments with batch operations took #{Time.now - start} seconds")
       return i.success_count
     end
@@ -182,7 +182,7 @@ module SIS
               next
             end
 
-            enrollment = @section.all_enrollments.find(:first, :conditions => { :user_id => user.id, :type => type, :associated_user_id => associated_enrollment.try(:user_id), :role_name => custom_role.try(:name) })
+            enrollment = @section.all_enrollments.where(:user_id => user, :type => type, :associated_user_id => associated_enrollment.try(:user_id), :role_name => custom_role.try(:name)).first
             unless enrollment
               enrollment = Enrollment.new
               enrollment.root_account = @root_account

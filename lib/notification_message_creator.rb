@@ -111,7 +111,7 @@ class NotificationMessageCreator
   
   def build_fallback_for(user)
     fallback_channel = immediate_channels_for(user).sort_by(&:path_type).first
-    fallback_policy = fallback_channel.notification_policies.by('daily').find(:first, :conditions => { :notification_id => nil })
+    fallback_policy = fallback_channel.notification_policies.by('daily').where(:notification_id => nil).first
     fallback_policy ||= NotificationPolicy.new(:communication_channel => fallback_channel,
                                                :frequency => 'daily')
 
@@ -309,9 +309,9 @@ class NotificationMessageCreator
         user_id, category = id.split(/_/)
       end
       messages = Rails.cache.fetch(['recent_messages_for', id].cache_key, :expires_in => 1.hour) do
-        lookup = Message.scoped(:conditions => ['dispatch_at > ? AND user_id = ? AND to_email = ?', 24.hours.ago, user_id, true])
+        lookup = Message.where("dispatch_at>? AND user_id=? AND to_email=?", 24.hours.ago, user_id, true)
         if category
-          lookup = lookup.scoped(:conditions => ['notification_category = ?', category.gsub(/_/, " ")])
+          lookup = lookup.where(:notification_category => category.gsub(/_/, " "))
         end
         lookup.count
       end

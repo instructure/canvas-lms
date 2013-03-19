@@ -82,13 +82,13 @@ module Api::V1
     end
 
     def submissions_set(course, api_context, options = {})
-      collection = ::Submission.for_course(course).scoped(:order => 'graded_at DESC')
+      collection = ::Submission.for_course(course).order("graded_at DESC")
 
       if options[:date]
         date = options[:date]
-        collection = collection.scoped(:conditions => ["graded_at < ? and graded_at > ?", date.end_of_day, date.beginning_of_day])
+        collection = collection.where("graded_at<? AND graded_at>?", date.end_of_day, date.beginning_of_day)
       else
-        collection = collection.scoped(:conditions => 'graded_at IS NOT NULL')
+        collection = collection.where("graded_at IS NOT NULL")
       end
 
       if assignment_id = options[:assignment_id]
@@ -98,7 +98,7 @@ module Api::V1
       if grader_id = options[:grader_id]
         if grader_id.to_s == '0'
           # yes, this is crazy.  autograded submissions have the grader_id of (quiz_id x -1)
-          collection = collection.scoped(:conditions => 'submissions.grader_id <= 0')
+          collection = collection.where("submissions.grader_id<=0")
         else
           collection = collection.scoped_by_grader_id(grader_id)
         end

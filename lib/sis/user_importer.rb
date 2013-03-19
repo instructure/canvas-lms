@@ -34,7 +34,7 @@ module SIS
       end
       User.update_account_associations(importer.users_to_add_account_associations, :incremental => true, :precalculated_associations => {@root_account.id => 0})
       User.update_account_associations(importer.users_to_update_account_associations)
-      Pseudonym.update_all({:sis_batch_id => @batch_id}, {:id => importer.pseudos_to_set_sis_batch_ids}) if @batch && !importer.pseudos_to_set_sis_batch_ids.empty?
+      Pseudonym.where(:id => importer.pseudos_to_set_sis_batch_ids).update_all(:sis_batch_id => @batch_id) if @batch && !importer.pseudos_to_set_sis_batch_ids.empty?
       @logger.debug("Users took #{Time.now - start} seconds")
       return importer.success_count
     end
@@ -125,7 +125,7 @@ module SIS
             if !status_is_active && !user.new_record?
               # if this user is deleted, we're just going to make sure the user isn't enrolled in anything in this root account and
               # delete the pseudonym.
-              if 0 < user.enrollments.scoped(:conditions => ["root_account_id = ? AND workflow_state <> ?", @root_account.id, 'deleted']).update_all(:workflow_state => 'deleted')
+              if 0 < user.enrollments.where("root_account_id=? AND workflow_state<>?", @root_account, 'deleted').update_all(:workflow_state => 'deleted')
                 should_update_account_associations = true
               end
             end
@@ -182,7 +182,7 @@ module SIS
               # find all CCs for this user, and active conflicting CCs for all users
               # unless we're deleting this user, then only find CCs for this user
               if status_is_active
-                ccs = CommunicationChannel.scoped(:conditions => ["workflow_state='active' OR user_id=?", user.id])
+                ccs = CommunicationChannel.where("workflow_state='active' OR user_id=?", user)
               else
                 ccs = user.communication_channels
               end
@@ -224,7 +224,7 @@ module SIS
 
               if newly_active
                 other_ccs = ccs.reject { |other_cc| other_cc.user_id == user.id || other_cc.user.nil? || other_cc.user.pseudonyms.active.count == 0 ||
-                  !other_cc.user.pseudonyms.active.scoped(:conditions => ['account_id=? AND sis_user_id IS NOT NULL', @root_account.id]).empty? }
+                  !other_cc.user.pseudonyms.active.where("account_id=? AND sis_user_id IS NOT NULL", @root_account).empty? }
                 unless other_ccs.empty?
                   cc.send_merge_notification!
                 end

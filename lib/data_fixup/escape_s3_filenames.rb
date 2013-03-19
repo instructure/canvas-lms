@@ -25,7 +25,7 @@ module DataFixup::EscapeS3Filenames
     end
 
     # A more efficient query could be done using a regular expression, but this should be db agnostic
-    Attachment.active.find_in_batches(:conditions => "filename LIKE '%[%' or filename like '%]%' or filename like '%\"%'") do |batch|
+    Attachment.active.where("filename LIKE '%[%' or filename like '%]%' or filename like '%\"%'").find_in_batches do |batch|
       batch.each do |attachment|
         # Be paranoid...
         next unless attachment.filename =~ /[\[\]"]/

@@ -30,11 +30,10 @@ describe StreamItemInstance do
        pending("mocha class method bug") if RUBY_VERSION < "1.9"
        # expect
        StreamItemCache.expects(:invalidate_context_stream_item_key).twice
-       updates, conditions, options = ['updates', {:conditions => ''}, {:options => ''}]
-       StreamItemInstance.expects(:original_update_all).with(updates, conditions, options)
+       StreamItemInstance.expects(:original_update_all).with('updates')
        # when
        StreamItemInstance.update_all_with_invalidation(['code_1', 'code_2'],
-                                                       updates, conditions, options)
+                                                       'updates')
      end
   end
 end

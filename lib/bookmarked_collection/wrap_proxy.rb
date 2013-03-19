@@ -17,10 +17,9 @@
 #
 
 class BookmarkedCollection::WrapProxy < BookmarkedCollection::Proxy
-  def initialize(bookmarker, base_scope, options={})
+  def initialize(bookmarker, base_scope)
     super bookmarker, lambda{ |pager|
       scope = base_scope
-      scope = scope.scoped(options) if options.present?
       scope = bookmarker.restrict_scope(scope, pager)
       scope = yield scope if block_given?
       scope.paginate(:page => 1, :per_page => pager.per_page)

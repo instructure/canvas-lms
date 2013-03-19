@@ -2333,7 +2333,7 @@ class User < ActiveRecord::Base
   # mfa settings for a user are the most restrictive of any pseudonyms the user has
   # a login for
   def mfa_settings
-    result = self.all_pseudonyms(:include => :account).map(&:account).uniq.map do |account|
+    result = self.pseudonyms.with_each_shard { |scope| scope.includes(:account) }.map(&:account).uniq.map do |account|
       case account.mfa_settings
         when :disabled
           0
@@ -2419,19 +2419,19 @@ class User < ActiveRecord::Base
   end
 
   def accounts
-    self.account_users.with_each_shard(:include => :account).map(&:account).uniq
+    self.account_users.with_each_shard { |scope| scope.includes(:account) }.map(&:account).uniq
   end
   memoize :accounts
 
-  def all_pseudonyms(options = {})
-    self.pseudonyms.with_each_shard(options)
+  def all_pseudonyms
+    self.pseudonyms.with_each_shard
   end
   memoize :all_pseudonyms
 
-  def all_active_pseudonyms(*args)
-    args.unshift(:conditions => {:workflow_state => 'active'})
-    all_pseudonyms(*args)
+  def all_active_pseudonyms
+    self.pseudonyms.with_each_shard { |scope| scope.active }
   end
+  memoize :all_active_pseudonyms
 
   def prefers_gradebook2?
     preferences[:use_gradebook2] != false

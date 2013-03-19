@@ -158,8 +158,7 @@ class GroupsController < ApplicationController
       format.json do
         @groups = BookmarkedCollection.with_each_shard(
           Group::Bookmarker,
-          @current_user.current_groups,
-          :include => :group_category)
+          @current_user.current_groups) { |scope| scope.includes(:group_category) }
         @groups = Api.paginate(@groups, self, api_v1_current_user_groups_url)
         render :json => @groups.map { |g| group_json(g, @current_user, session) }
       end

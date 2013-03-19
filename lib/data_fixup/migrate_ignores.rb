@@ -1,6 +1,6 @@
 module DataFixup::MigrateIgnores
   def self.run
-    User.scoped(:conditions => "preferences LIKE '%ignore%'").find_each do |user|
+    User.where("preferences LIKE '%ignore%'").find_each do |user|
       user.preferences[:ignore].each do |purpose, assets|
         assets.each do |asset, details|
           begin

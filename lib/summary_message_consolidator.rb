@@ -37,8 +37,8 @@ class SummaryMessageConsolidator
     end
 
     dm_id_batches.in_groups_of(Setting.get('summary_message_consolidator_batch_size', '500').to_i, false) do |batches|
-      DelayedMessage.update_all({ :batched_at => Time.now.utc, :workflow_state => 'sent', :updated_at => Time.now.utc },
-                                { :id => batches.flatten })
+      DelayedMessage.where(:id => batches.flatten).
+          update_all(:batched_at => Time.now.utc, :workflow_state => 'sent', :updated_at => Time.now.utc)
 
       Delayed::Batch.serial_batch do
         batches.each do |dm_ids|

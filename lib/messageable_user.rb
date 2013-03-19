@@ -69,10 +69,10 @@ class MessageableUser < User
       columns.unshift(head)
     end
 
-    scope = self.scoped(
-      :select => MessageableUser.build_select(options),
-      :group => MessageableUser.connection.group_by(*columns),
-      :order => 'LOWER(COALESCE(users.short_name, users.name)), users.id')
+    scope = self.
+      select(MessageableUser.build_select(options)).
+      group(MessageableUser.connection.group_by(*columns)).
+      order("LOWER(COALESCE(users.short_name, users.name)), users.id")
 
     if options[:strict_checks]
       scope.where(AVAILABLE_CONDITIONS)

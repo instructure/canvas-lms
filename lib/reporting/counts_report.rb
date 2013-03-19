@@ -69,12 +69,12 @@ class CountsReport
             data[:media_files_size] = 0
           else
             timespan = Setting.get('recently_logged_in_timespan', 30.days.to_s).to_i.seconds
-            enrollment_scope = Enrollment.active.not_fake.scoped(
-              :joins => {:user => :active_pseudonyms},
-              :conditions => ["course_id IN (?) AND pseudonyms.last_request_at > ?", course_ids, timespan.ago])
+            enrollment_scope = Enrollment.active.not_fake.
+              joins(:user => :active_pseudonyms).
+              where("course_id IN (?) AND pseudonyms.last_request_at>?", course_ids, timespan.ago)
 
-            data[:teachers] = enrollment_scope.count(:user_id, :distinct => true, :conditions => { :type => 'TeacherEnrollment' })
-            data[:students] = enrollment_scope.count(:user_id, :distinct => true, :conditions => { :type => 'StudentEnrollment' })
+            data[:teachers] = enrollment_scope.where(:type => 'TeacherEnrollment').count(:user_id, :distinct => true)
+            data[:students] = enrollment_scope.where(:type => 'StudentEnrollment').count(:user_id, :distinct => true)
             data[:users] = enrollment_scope.count(:user_id, :distinct => true)
 
             # ActiveRecord::Base.calculate doesn't support multiple calculations in account single pass
@@ -213,13 +213,13 @@ class CountsReport
   end
 
   def self.last_activity(account_id)
-    PageView.maximum(:created_at, :conditions => { :account_id => account_id })
+    PageView.where(:account_id => account_id).maximum(:created_at)
   end
 
   def get_course_ids(account)
     is_default_account = account.external_status == ExternalStatuses.default_external_status.to_s
     course_ids = []
-    account.all_courses.scoped(:conditions => { :workflow_state => 'available' }, :select => 'id, updated_at').find_in_batches do |batch|
+    account.all_courses.where(:workflow_state => 'available').select([:id, :updated_at]).find_in_batches do |batch|
       course_ids.concat batch.select { |course| !is_default_account || should_use_default_account_course(course) }.map(&:id)
     end
     course_ids

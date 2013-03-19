@@ -2079,18 +2079,6 @@ describe User do
 
       @user.all_pseudonyms.should == [@p1, @p2]
     end
-
-    it "should allow conditions to be passed" do
-      user_with_pseudonym(:active_all => 1)
-      @p1 = @pseudonym
-      @shard1.activate do
-        account = Account.create!
-        @p2 = account.pseudonyms.create!(:user => @user, :unique_id => 'abcd')
-      end
-      @p1.destroy
-
-      @user.all_pseudonyms(:conditions => { :workflow_state => 'active' }).should == [@p2]
-    end
   end
 
   describe "active_pseudonyms" do

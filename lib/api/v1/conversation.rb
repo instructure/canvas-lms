@@ -34,7 +34,7 @@ module Api::V1::Conversation
     unless interleave_submissions
       result['message_count'] = result[:submissions] ?
         result['message_count'] - result[:submissions].size :
-        conversation.messages.human.scoped(:conditions => "asset_id IS NULL").size
+        conversation.messages.human.where(:asset_id => nil).count
     end
     result[:audience] = audience.map(&:id)
     result[:audience_contexts] = contexts_for(audience, conversation.local_context_tags)

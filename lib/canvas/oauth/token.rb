@@ -60,8 +60,7 @@ module Canvas::Oauth
     end
 
     def self.find_userinfo_access_token(user, developer_key, scopes)
-      conditions = ["remember_access = ? AND developer_key_id = ?", true,  developer_key.id]
-      user.access_tokens.active.scoped(:conditions => conditions).all.find do |token|
+      user.access_tokens.active.where(:remember_access => true, :developer_key_id => developer_key).detect do |token|
         token.scoped_to?(scopes) && token.scoped_to?(['userinfo'])
       end
     end

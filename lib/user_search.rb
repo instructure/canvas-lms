@@ -36,13 +36,13 @@ module UserSearch
     users = course.users_visible_to(searcher).uniq.order_by_sortable_name
 
     if enrollment_role
-      users = users.scoped(:conditions => ["COALESCE(enrollments.role_name, enrollments.type) IN (?) ", enrollment_role])
+      users = users.where("COALESCE(enrollments.role_name, enrollments.type) IN (?) ", enrollment_role)
     elsif enrollment_type
       enrollment_type = enrollment_type.map { |e| "#{e.capitalize}Enrollment" }
       if enrollment_type.any?{ |et| !Enrollment::READABLE_TYPES.keys.include?(et) }
         raise ArgumentError, 'Invalid Enrollment Type'
       end
-      users = users.scoped(:conditions => ["enrollments.type IN (?) ", enrollment_type])
+      users = users.where(:enrollments => { :type => enrollment_type })
     end
     users
   end

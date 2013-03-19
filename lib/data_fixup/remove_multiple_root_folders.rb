@@ -3,10 +3,8 @@ module DataFixup::RemoveMultipleRootFolders
 
     limit = opts[:limit] || 1000
 
-    while (folders = Folder.find(
-      :all, :conditions => ["workflow_state != ? AND parent_folder_id IS NULL", 'deleted'],
-      :select => "context_id, context_type", :having => "count(*) > 1", :group => "context_id, context_type", :limit => limit
-      )
+    while (folders = Folder.where("workflow_state<>'deleted' AND parent_folder_id IS NULL").
+      select([:context_id, :context_type]).having("COUNT(*) > 1").group(:context_id, :context_type).limit(limit).all
     ).any? do
 
       context_types = folders.map(&:context_type).uniq
@@ -23,10 +21,10 @@ module DataFixup::RemoveMultipleRootFolders
 
         context_ids = folders.select{|f| f.context_type == context_type}.map(&:context_id)
 
-        root_folders = Folder.find(:all, :conditions => [
-          "context_type = ? AND context_id IN (?) AND workflow_state != ? AND parent_folder_id IS NULL",
-          context_type, context_ids, 'deleted'
-        ])
+        root_folders = Folder.where(
+          "context_type=? AND context_id IN (?) AND workflow_state<>'deleted' AND parent_folder_id IS NULL",
+          context_type, context_ids
+        ).all
 
         context_ids.each do |context_id|
 
@@ -52,9 +50,9 @@ module DataFixup::RemoveMultipleRootFolders
               unless folder.id == main_root_folder.id
                 Folder.transaction do
                   if folder.attachments.count > 0 || folder.sub_folders.count > 0
-                    Folder.update_all({:parent_folder_id => main_root_folder.id}, {:id => folder.id})
+                    Folder.where(:id => folder).update_all(:parent_folder_id => main_root_folder)
                   else
-                    Folder.update_all({:workflow_state => 'deleted'}, {:id => folder.id})
+                    Folder.where(:id => folder).update_all(:workflow_state => 'deleted')
                   end
                 end
               end

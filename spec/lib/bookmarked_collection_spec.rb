@@ -88,14 +88,6 @@ describe "BookmarkedCollection" do
       collection.paginate(:per_page => 1).should == [bookmarked_scope.first]
     end
 
-    it "should apply any options given to the scope" do
-      course = @scope.scoped(:order => 'courses.id').last
-      course.update_attributes(:name => 'Matching Name')
-
-      collection = BookmarkedCollection.wrap(IDBookmarker, @scope, :conditions => {:name => course.name})
-      collection.paginate(:per_page => 1).should == [course]
-    end
-
     it "should apply any restriction block given to the scope" do
       course = @scope.order("courses.id").last
       course.update_attributes(:name => 'Matching Name')

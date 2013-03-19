@@ -397,7 +397,7 @@ class MessageableUser
         ConversationParticipant.where(
           :user_id => user_ids,
           :conversation_id => conversation.id
-        ).all(:select => 'user_id').map{ |cp| reverse_lookup[cp.user_id] }
+        ).pluck(:user_id).map{ |user_id| reverse_lookup[user_id] }
       end
     end
 
@@ -561,7 +561,7 @@ class MessageableUser
     end
 
     def base_scope(options={})
-      MessageableUser.prepped(options).scoped(:shard => Shard.current)
+      MessageableUser.prepped(options).shard(Shard.current)
     end
 
     # scopes MessageableUsers via enrollments in courses, setting up the common
@@ -586,12 +586,11 @@ class MessageableUser
         :common_role_column => 'enrollments.type'
       }.merge(options)
 
-      base_scope(options).scoped(
-        :joins => <<-SQL,
+      base_scope(options).
+        joins(<<-SQL).where(self.class.enrollment_conditions(options))
           INNER JOIN enrollments ON enrollments.user_id=users.id
           INNER JOIN courses ON courses.id=enrollments.course_id
         SQL
-        :conditions => self.class.enrollment_conditions(options))
     end
 
     # further restricts the enrollment scope to users whose enrollment is
@@ -684,8 +683,8 @@ class MessageableUser
         :common_role_column => HIGHEST_ENROLLMENT_SQL
       }.merge(options)
 
-      base_scope(options).scoped(
-        :joins => "INNER JOIN user_account_associations ON user_account_associations.user_id=users.id")
+      base_scope(options).
+        joins("INNER JOIN user_account_associations ON user_account_associations.user_id=users.id")
     end
 
     # further restricts the account user scope to users associated with
@@ -704,9 +703,9 @@ class MessageableUser
         :common_group_column => 'group_id'
       }.merge(options)
 
-      base_scope(options).scoped(
-        :joins => "INNER JOIN group_memberships ON group_memberships.user_id=users.id",
-        :conditions => {'group_memberships.workflow_state' => 'accepted'})
+      base_scope(options).
+        joins("INNER JOIN group_memberships ON group_memberships.user_id=users.id").
+        where(:group_memberships => { :workflow_state => 'accepted' })
     end
 
     # further restricts the group user scope to users in groups for which I
@@ -759,7 +758,7 @@ class MessageableUser
       # already in a with_each_shard from shard_cached, so we can restrict it
       # to this shard
       @user.observee_enrollments.with_each_shard(Shard.current) do |scope|
-        scope.scoped(:include => :user).map{ |e| Shard.global_id_for(e.user_id) }
+        scope.includes(:user).map{ |e| Shard.global_id_for(e.user_id) }
       end
     end
 
@@ -783,9 +782,7 @@ class MessageableUser
     end
 
     def uncached_group_ids_in_courses(courses)
-      Group.active.scoped(
-        :select => 'id',
-        :conditions => {:context_type => 'Course', :context_id => courses.map(&:id)}).map(&:id)
+      Group.active.where(:context_type => 'Course', :context_id => courses).pluck(:id)
     end
 
     def uncached_messageable_sections
@@ -793,8 +790,8 @@ class MessageableUser
         where(:course_id => fully_visible_courses)
 
       section_visible = CourseSection.
-        scoped(:joins => :enrollments, :conditions => {'enrollments.user_id' => @user.id}).
-        where(:course_id => section_visible_courses)
+        joins(:enrollments).
+        where(:course_id => section_visible_courses, :enrollments => { :user_id => @user })
 
       (fully_visible + section_visible).
         group_by(&:course_id).values.
@@ -802,20 +799,22 @@ class MessageableUser
     end
 
     def uncached_messageable_groups
-      fully_visible_scope = GroupMembership.scoped(
-        :select => 'DISTINCT group_memberships.group_id AS group_id',
-        :joins => <<-SQL).
+      fully_visible_scope = GroupMembership.
+        select("group_memberships.group_id AS group_id").
+        uniq.
+        joins(<<-SQL).
           INNER JOIN users ON users.id=group_memberships.user_id
           INNER JOIN groups ON groups.id=group_memberships.group_id
         SQL
         where(:workflow_state => 'accepted').
-        where("groups.workflow_state != 'deleted'").
+        where("groups.workflow_state<>'deleted'").
         where(MessageableUser::AVAILABLE_CONDITIONS).
         where(:group_id => fully_visible_group_ids)
 
-      section_visible_scope = GroupMembership.scoped(
-        :select => 'DISTINCT group_memberships.group_id AS group_id',
-        :joins => <<-SQL).
+      section_visible_scope = GroupMembership.
+        select("group_memberships.group_id AS group_id").
+        uniq.
+        joins(<<-SQL).
           INNER JOIN users ON users.id=group_memberships.user_id
           INNER JOIN groups ON groups.id=group_memberships.group_id
           INNER JOIN enrollments ON
@@ -824,11 +823,11 @@ class MessageableUser
           INNER JOIN courses ON courses.id=enrollments.course_id
         SQL
         where(:workflow_state => 'accepted').
-        where("groups.workflow_state != 'deleted'").
+        where("groups.workflow_state<>'deleted'").
         where(MessageableUser::AVAILABLE_CONDITIONS).
-        where('groups.context_type' => 'Course').
+        where(:groups => { :context_type => 'Course' }).
         where(self.class.enrollment_conditions).
-        where('enrollments.course_section_id' => visible_section_ids_in_courses(recent_section_visible_courses))
+        where(:enrollments => { :course_section_id => visible_section_ids_in_courses(recent_section_visible_courses) })
 
       if student_courses.present?
         section_visible_scope = section_visible_scope.

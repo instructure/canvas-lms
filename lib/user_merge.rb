@@ -80,18 +80,18 @@ class UserMerge
       from_user.user_services.delete_all
     else
       from_user.shard.activate do
-        CommunicationChannel.update_all({:workflow_state => 'retired'}, :id => to_retire_ids) unless to_retire_ids.empty?
+        CommunicationChannel.where(:id => to_retire_ids).update_all(:workflow_state => 'retired') unless to_retire_ids.empty?
       end
-      from_user.communication_channels.update_all("user_id=#{target_user.id}, position=position+#{max_position}") unless from_user.communication_channels.empty?
+      from_user.communication_channels.update_all(["user_id=?, position=position+?", target_user, max_position]) unless from_user.communication_channels.empty?
     end
 
     Shard.with_each_shard(from_user.associated_shards) do
-      max_position = Pseudonym.find(:last, :conditions => { :user_id => target_user.id }, :order => 'position').try(:position) || 0
-      Pseudonym.update_all("position=position+#{max_position}, user_id=#{target_user.id}", :user_id => from_user.id)
+      max_position = Pseudonym.where(:user_id => target_user).order(:position).last.try(:position) || 0
+      Pseudonym.where(:user_id => from_user).update_all(["user_id=?, position=position+?", target_user, max_position])
 
       to_delete_ids = []
-      target_user_enrollments = Enrollment.find(:all, :conditions => { :user_id => target_user.id })
-      Enrollment.scoped(:conditions => { :user_id => from_user.id }).each do |enrollment|
+      target_user_enrollments = Enrollment.where(:user_id => target_user).all
+      Enrollment.where(:user_id => from_user).each do |enrollment|
         source_enrollment = enrollment
         # non-deleted enrollments should be unique per [course_section, type]
         target_enrollment = target_user_enrollments.detect { |enrollment| enrollment.course_section_id == source_enrollment.course_section_id && enrollment.type == source_enrollment.type && !['deleted', 'inactive', 'rejected'].include?(enrollment.workflow_state) }
@@ -170,7 +170,7 @@ class UserMerge
 
         to_delete_ids << to_delete.id if to_delete && !['deleted', 'inactive', 'rejected'].include?(to_delete.workflow_state)
       end
-      Enrollment.update_all({:workflow_state => 'deleted'}, :id => to_delete_ids) unless to_delete_ids.empty?
+      Enrollment.where(:id => to_delete_ids).update_all(:workflow_state => 'deleted') unless to_delete_ids.empty?
 
       [
         [:quiz_id, :quiz_submissions],
@@ -183,7 +183,7 @@ class UserMerge
           # a conflict.
           already_there_ids = table.to_s.classify.constantize.find_all_by_user_id(target_user.id).map(&unique_id)
           already_there_ids = [0] if already_there_ids.empty?
-          table.to_s.classify.constantize.update_all({:user_id => target_user.id}, "user_id=#{from_user.id} AND #{unique_id} NOT IN (#{already_there_ids.join(',')})")
+          table.to_s.classify.constantize.where("user_id=? AND #{unique_id} NOT IN (?)", from_user, already_there_ids).update_all(:user_id => target_user)
         rescue => e
           logger.error "migrating #{table} column user_id failed: #{e.to_s}"
         end
@@ -221,10 +221,10 @@ class UserMerge
 
         # delete duplicate observers/observees, move the rest
         from_user.user_observees.where(:user_id => target_user.user_observees.map(&:user_id)).delete_all
-        from_user.user_observees.update_all(:observer_id => target_user.id)
+        from_user.user_observees.update_all(:observer_id => target_user)
         xor_observer_ids = (Set.new(from_user.user_observers.map(&:observer_id)) ^ target_user.user_observers.map(&:observer_id)).to_a
         from_user.user_observers.where(:observer_id => target_user.user_observers.map(&:observer_id)).delete_all
-        from_user.user_observers.update_all(:user_id => target_user.id)
+        from_user.user_observers.update_all(:user_id => target_user)
         # for any observers not already watching both users, make sure they have
         # any missing observer enrollments added
         target_user.user_observers.where(:observer_id => xor_observer_ids).each(&:create_linked_enrollments)
