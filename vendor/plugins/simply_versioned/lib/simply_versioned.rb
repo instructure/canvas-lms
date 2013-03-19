@@ -204,19 +204,19 @@ module SoftwareHeretics
         
         # Get the first Version corresponding to this model.
         def first_version
-          find( :first, :order => 'number ASC' )
+          reorder( 'number ASC' ).first
         end
         alias_method :first, :first_version
 
         # Get the current Version corresponding to this model.
         def current_version
-          find( :first, :order => 'number DESC' )
+          reorder( 'number DESC' ).first
         end
         alias_method :current, :current_version
         
         # If the model instance has more versions than the limit specified, delete all excess older versions.
         def clean_old_versions( versions_to_keep )
-          find( :all, :conditions => [ 'number <= ?', self.maximum( :number ) - versions_to_keep ] ).each do |version|
+          where( 'number <= ?', self.maximum( :number ) - versions_to_keep ).each do |version|
             version.destroy
           end
         end
@@ -224,13 +224,13 @@ module SoftwareHeretics
         
         # Return the Version for this model with the next higher version
         def next_version( number )
-          find( :first, :order => 'number ASC', :conditions => [ "number > ?", number ] )
+          reorder( 'number ASC' ).where( "number > ?", number ).first
         end
         alias_method :next, :next_version
         
         # Return the Version for this model with the next lower version
         def previous_version( number )
-          find( :first, :order => 'number DESC', :conditions => [ "number < ?", number ] )
+          reorder( 'number DESC' ).where( "number < ?", number ).first
         end
         alias_method :previous, :previous_version
       end

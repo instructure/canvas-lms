@@ -398,8 +398,8 @@ module Technoweenie # :nodoc:
 
       def find_existing_attachment_for_md5
         if self.md5.present? && ns = self.infer_namespace
-          scope = Attachment.scoped(:conditions => ["md5 = ? AND namespace = ? AND root_attachment_id IS NULL AND content_type = ?", md5, ns, content_type])
-          scope = scope.scoped(:conditions => ["id <> ?", id]) unless new_record?
+          scope = Attachment.where(:md5 => md5, :namespace => ns, :root_attachment_id => nil, :content_type => content_type)
+          scope = scope.where("id<>?", self) unless new_record?
           scope.first
         end
       end

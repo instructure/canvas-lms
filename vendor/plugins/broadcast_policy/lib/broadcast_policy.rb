@@ -45,8 +45,8 @@
 #   }
 # end
 #
-# u = User.find(:first)
-# a = Account.find(:first)
+# u = User.first
+# a = Account.first
 # a.check_policy(u)
 
 module Instructure #:nodoc:

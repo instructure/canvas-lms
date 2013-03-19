@@ -88,19 +88,19 @@ module Delayed
 
         # When a worker is exiting, make sure we don't have any locked jobs.
         def self.clear_locks!(worker_name)
-          update_all("locked_by = null, locked_at = null", ["locked_by = ?", worker_name])
+          where(:locked_by => worker_name).update_all(:locked_by => nil, :locked_at => nil)
         end
 
         def self.unlock_expired_jobs(max_run_time = Delayed::Worker.max_run_time)
-          update_all("locked_by = null, locked_at = null", ["locked_by <> 'on hold' AND locked_at < ?", db_time_now - max_run_time])
+          where("locked_by<>'on hold' AND locked_at<?", db_time_now - max_run_time).update_all(:locked_by => nil, :locked_at => nil)
         end
 
         def self.strand_size(strand)
-          self.scoped(:conditions => { :strand => strand }).count
+          self.where(:strand => strand).count
         end
 
         def self.running_jobs()
-          self.running.scoped(:order => "locked_at asc")
+          self.running.order(:locked_at)
         end
 
         def self.scope_for_flavor(flavor, query)
@@ -112,16 +112,16 @@ module Delayed
           when 'failed'
             Delayed::Job::Failed
           when 'strand'
-            self.scoped(:conditions => { :strand => query })
+            self.where(:strand => query)
           when 'tag'
-            self.scoped(:conditions => { :tag => query })
+            self.where(:tag => query)
           else
             raise ArgumentError, "invalid flavor: #{flavor.inspect}"
           end
 
           if %w(current future).include?(flavor.to_s)
             queue = query.presence || Delayed::Worker.queue
-            scope = scope.scoped(:conditions => { :queue => queue })
+            scope = scope.where(:queue => queue)
           end
 
           scope
@@ -140,7 +140,7 @@ module Delayed
                            query = nil)
           scope = self.scope_for_flavor(flavor, query)
           order = flavor.to_s == 'future' ? 'run_at' : 'id desc'
-          scope.all(:order => order, :limit => limit, :offset => offset)
+          scope.order(order).limit(limit).offset(offset).all
         end
 
         # get the total job count for the given flavor
@@ -160,14 +160,14 @@ module Delayed
             raise("Can't bulk update failed jobs") if opts[:flavor].to_s == 'failed'
             self.scope_for_flavor(opts[:flavor], opts[:query])
           elsif opts[:ids]
-            self.scoped(:conditions => { :id => opts[:ids] })
+            self.where(:id => opts[:ids])
           end
 
           return 0 unless scope
 
           case action.to_s
           when 'hold'
-            scope.update_all({ :locked_by => ON_HOLD_LOCKED_BY, :locked_at => db_time_now, :attempts => ON_HOLD_COUNT })
+            scope.update_all(:locked_by => ON_HOLD_LOCKED_BY, :locked_at => db_time_now, :attempts => ON_HOLD_COUNT)
           when 'unhold'
             now = db_time_now
             scope.update_all(["locked_by = NULL, locked_at = NULL, attempts = 0, run_at = (CASE WHEN run_at > ? THEN run_at ELSE ? END), failed_at = NULL", now, now])
@@ -190,7 +190,10 @@ module Delayed
               self
             end
 
-          scope.count(:group => 'tag', :limit => limit, :offset => offset, :order => 'count(tag) desc', :select => 'tag').map { |t,c| { :tag => t, :count => c } }
+          scope = scope.group(:tag).offset(offset).limit(limit)
+          (Rails.version < "3.0" ?
+              scope.count(:tag, :order => "COUNT(tag) DESC") :
+              scope.order("COUNT(tag) DESC").count).map { |t,c| { :tag => t, :count => c } }
         end
 
         def self.get_and_lock_next_available(worker_name,
@@ -222,7 +225,7 @@ module Delayed
                                 queue = Delayed::Worker.queue,
                                 min_priority = nil,
                                 max_priority = nil)
-          all_available(queue, min_priority, max_priority).all(:limit => limit)
+          all_available(queue, min_priority, max_priority).limit(limit).all
         end
 
         def self.all_available(queue = Delayed::Worker.queue,
@@ -234,11 +237,9 @@ module Delayed
           check_queue(queue)
           check_priorities(min_priority, max_priority)
 
-          scope = self.ready_to_run
-          scope = scope.scoped(:conditions => ['priority >= ?', min_priority])
-          scope = scope.scoped(:conditions => ['priority <= ?', max_priority])
-          scope = scope.scoped(:conditions => ['queue = ?', queue])
-          scope.by_priority
+          self.ready_to_run.
+              where(:priority => min_priority..max_priority, :queue => queue).
+              by_priority
         end
 
         # used internally by create_singleton to take the appropriate lock
@@ -279,7 +280,7 @@ module Delayed
         def self.create_singleton(options)
           strand = options[:strand]
           transaction_for_singleton(strand) do
-            job = self.first(:conditions => ["strand = ? AND locked_at IS NULL", strand], :order => :id)
+            job = self.where(:strand => strand, :locked_at => nil).order(:id).first
             job || self.create(options)
           end
         end
@@ -293,7 +294,7 @@ module Delayed
         def lock_exclusively!(worker)
           now = self.class.db_time_now
           # We don't own this job so we will update the locked_by name and the locked_at
-          affected_rows = self.class.update_all(["locked_at = ?, locked_by = ?", now, worker], ["id = ? and locked_at is null and run_at <= ?", id, now])
+          affected_rows = self.class.where("id=? AND locked_at IS NULL AND run_at<=?", self, now).update_all(:locked_at => now, :locked_by => worker)
           if affected_rows == 1
             mark_as_locked!(now, worker)
             return true
