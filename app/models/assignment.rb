@@ -416,17 +416,11 @@ class Assignment < ActiveRecord::Base
 
   def context_module_tag_info(user)
     tag_info = {:points_possible => self.points_possible}
-
     if self.multiple_due_dates_apply_to?(user)
-      as_student, as_instructor = self.due_dates_for(user)
-      tag_info[:due_dates] = as_instructor.map{|hash| {
-          :title => hash[:title],
-          :due_date => (hash[:due_at].utc.iso8601 rescue nil)}
-      }
+      tag_info[:vdd_tooltip] = OverrideTooltipPresenter.new(self, user).as_json
     else
       tag_info[:due_date] = self.overridden_for(user).due_at.utc.iso8601 rescue nil
     end
-
     tag_info
   end
 

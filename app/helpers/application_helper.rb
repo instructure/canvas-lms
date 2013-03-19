@@ -809,6 +809,13 @@ module ApplicationHelper
     end
   end
 
+  # render a link with a tooltip containing a summary of due dates
+  def multiple_due_date_tooltip(assignment, user, opts={})
+    user ||= @current_user
+    presenter = OverrideTooltipPresenter.new(assignment, user, opts)
+    render 'shared/vdd_tooltip', :presenter => presenter
+  end
+
   require 'digest'
 
   # create a checksum of an array of objects' cache_key values.

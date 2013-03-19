@@ -1,0 +1,20 @@
+<a title class="vdd_tooltip_link"
+  data-tooltip-selector="#vdd_tooltip_content_<%=presenter.selector%>"
+  <% if presenter.link_href.present? %>href="<%= presenter.link_href %>"<% end %>
+  ><%= presenter.link_text %></a>
+
+<div id="vdd_tooltip_content_<%=presenter.selector%>" style="display:none">
+  <dl class="vdd_tooltip_content dl-horizontal">
+    <% presenter.due_date_summary.each do |due_date| %>
+      <div class="clearfix">
+        <dt><%= due_date[:due_for] %></dt>
+        <dd><%= due_date[:due_at] %></dd>
+      </div>
+    <% end %>
+    <% if presenter.more_message.present? %>
+      <div class="clearfix">
+        <dd><%= presenter.more_message %></dd>
+      </div>
+    <% end %>
+  </dl>
+</div>
