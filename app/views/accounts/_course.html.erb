@@ -19,7 +19,7 @@
         <% end %>
       </div>
       <% teacher_names_new = teacher_names[0, 2] %>
-      <% teacher_names_new << t(:more_count, "more", :count => teacher_names.length - 2) if teacher_names.length > 2 %>
+      <% teacher_names_new << t(:more_count, { :one => "1 more", :other => "%{count} more" }, :count => teacher_names.length - 2) if teacher_names.length > 2 %>
       <span style="display: inline-block; min-width: 80px;"><%= t(:student_count, { :one => "1 Student", :other => "%{count} Students" }, :count => student_count || 0) %></span>
       <%= before_label(t(:teachers_label, "Teachers")) %> <%= teacher_names.blank? ? t(:none, 'none') : teacher_names_new.to_sentence %>
     </div>

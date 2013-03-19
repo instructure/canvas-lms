@@ -315,7 +315,7 @@ es:
       course_unpublished_tooltip: "Sin publicar"
       homepage_link: "Página de Inicio"
       more_count: 
-        one: más
+        one: 1 más
         other: "%{count} más"
       none: ninguno
       settings_link: Configuraciones

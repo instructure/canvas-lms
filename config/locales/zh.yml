@@ -314,8 +314,8 @@ zh:
       course_unpublished_tooltip: 已取消发布
       homepage_link: 主页
       more_count: 
-        one: "还有 %{count} 个"
-        other: "还有 1 个"
+        one: "还有 1 个"
+        other: "还有 %{count} 个"
       none: 无
       settings_link: 设置
       sis_id_label: "SIS ID"
