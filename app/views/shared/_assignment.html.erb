@@ -61,7 +61,7 @@
         <div class="date_text"
           style="<%= hidden unless assignment && (assignment.multiple_due_dates? || assignment.due_at) %>">
           <% if assignment.multiple_due_dates? %>
-            <%= multiple_due_dates(assignment) %>
+            <%= multiple_due_date_tooltip(assignment, @current_user, :href => assignment_url) %>
           <% else %>
             <% ot(:due_at, '%{date} at %{time}', :date => capture { %>
             <span class="due_date"><%= date_string(assignment.due_at) || nbsp %></span><% }, :time => capture { %>

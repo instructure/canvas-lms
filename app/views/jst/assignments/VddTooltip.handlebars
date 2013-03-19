@@ -1,0 +1,20 @@
+<a title class="vdd_tooltip_link"
+  data-tooltip-selector="#vdd_tooltip_{{selector}}"
+  {{#if link_href}}href="{{link_href}}"{{/if}}
+  >{{link_text}}</a>
+
+<div id="vdd_tooltip_{{selector}}" style="display:none;">
+  <dl class="vdd_tooltip_content dl-horizontal">
+    {{#each due_dates}}
+      <div class="clearfix">
+        <dt>{{due_for}}</dt>
+        <dd>{{due_at}}</dd>
+      </div>
+    {{/each}}
+    {{#if more_message}}
+      <div class="clearfix">
+        <dd>{{more_message}}</dd>
+      </div>
+    {{/if}}
+  </dl>
+</div>

@@ -85,5 +85,14 @@ module AssignmentOverridesSeleniumHelper
     wait_for_animations
   end
 
+  def add_due_date_override(assignment)
+    new_section = @course.course_sections.create!(:name => 'New Section')
+    override = assignment.assignment_overrides.build
+    override.set = new_section
+    override.due_at = Time.zone.now + 1.day
+    override.due_at_overridden = true
+    override.save!
+  end
+
 end
 

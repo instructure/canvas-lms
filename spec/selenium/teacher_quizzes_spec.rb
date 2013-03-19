@@ -28,6 +28,21 @@ describe "quizzes" do
       @course.reload
     end
 
+    it "should show a summary of due dates if there are multiple" do
+      create_quiz_with_default_due_dates
+      get "/courses/#{@course.id}/quizzes"
+      f('.quiz_list .description').should_not include_text "Multiple Dates"
+      add_due_date_override(@quiz)
+
+      get "/courses/#{@course.id}/quizzes"
+      f('.quiz_list .description').should include_text "Multiple Dates"
+      driver.mouse.move_to f('.quiz_list .description a')
+      wait_for_animations
+      tooltip = fj('.vdd_tooltip_content:visible')
+      tooltip.should include_text 'New Section'
+      tooltip.should include_text 'Everyone else'
+    end
+
     it "should allow a teacher to create a quiz from the quizzes tab directly" do
       get "/courses/#{@course.id}/quizzes"
       expect_new_page_load { f(".new-quiz-link").click }

@@ -60,7 +60,11 @@
         <% end %>
       </div>
       <% if q.multiple_due_dates_apply_to?(@current_user) %>
-        <%= before_label(:quiz_due, "Due") %> <%= t(:quiz_multiple_due_dates, "Multiple Dates") %><br/>
+        <%= before_label(:quiz_due, "Due") %>
+        <%= multiple_due_date_tooltip(q, @currentuser,
+            :text => t(:quiz_multiple_due_dates, "Multiple Dates"),
+            :href => context_url(@context, :context_quiz_url, q)) %>
+        <br/>
       <% elsif due_at = q.overridden_for(@current_user).due_at %>
         <%= before_label(:quiz_due, "Due") %> <%= datetime_string(due_at) %><br/>
       <% end %>

@@ -20,7 +20,9 @@ define([
   'INST' /* INST */,
   'i18n!context_modules',
   'jquery' /* $ */,
-  'compiled/views/context_modules/context_modules', /* handles the publish/unpublish state */
+  'compiled/views/context_modules/context_modules' /* handles the publish/unpublish state */,
+  'compiled/util/vddTooltip',
+  'jst/assignments/VddTooltip',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* parseFromISO, time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors, errorBox */,
@@ -34,7 +36,7 @@ define([
   'vendor/date' /* Date.parse */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/sortable' /* /\.sortable/ */
-], function(INST, I18n, $, ContextModulesView) {
+], function(INST, I18n, $, ContextModulesView, vddTooltip, vddTooltipView) {
 
   // TODO: AMD don't export global, use as module
   window.modules = (function() {
@@ -172,17 +174,20 @@ define([
       updateAssignmentData: function() {
         $.ajaxJSON($(".assignment_info_url").attr('href'), 'GET', {}, function(data) {
           $.each(data, function(id, info) {
+            $context_module_item = $("#context_module_item_" + id);
             var data = {};
             if (info["points_possible"] != null) {
               data["points_possible_display"] = I18n.t('points_possible_short', '%{points} pts', { 'points': "<span class='points_possible_block'>" + info["points_possible"] + "</span>" });
             }
             if (info["due_date"] != null) {
               data["due_date_display"] = $.parseFromISO(info["due_date"]).date_formatted
-            } else if (info["due_dates"] != null) {
-              data["due_date_display"] = I18n.t('multiple_due_dates', 'Multiple Due Dates');
+            } else if (info["vdd_tooltip"] != null) {
+              info['vdd_tooltip']['link_href'] = $context_module_item.find('a.title').attr('href');
+              $context_module_item.find('.due_date_display').html(vddTooltipView(info["vdd_tooltip"]));
             }
-            $("#context_module_item_" + id).fillTemplateData({data: data, htmlValues: ['points_possible_display']})
+            $context_module_item.fillTemplateData({data: data, htmlValues: ['points_possible_display']})
           });
+          vddTooltip();
         }, function() {
         });
       },
