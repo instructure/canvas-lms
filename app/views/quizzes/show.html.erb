@@ -221,6 +221,9 @@
       </h3>
     <% end %>
 
+    <% if @quiz.available? %>
+      <div id="quiz_details_wrapper" data-url="<%= course_quiz_managed_quiz_data_url(@context.id, @quiz.id) %>" data-submitted-count="<%= @submitted_student_count %>"></div>
+    <% end %>
     <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :manage) %>
       <%= render :partial => 'quiz_show_teacher' %>
     <% else %>
@@ -228,7 +231,6 @@
     <% end %>
 
     <% if @quiz.available? %>
-      <div id="quiz_details_wrapper" data-url="<%= course_quiz_managed_quiz_data_url(@context.id, @quiz.id) %>" data-submitted-count="<%= @submitted_student_count %>"></div>
 
       <% if !@submission || !@submission.completed? || @quiz.unlimited_attempts? || (@submission.completed? && @submission.attempts_left > 0) %>
         <% if @locked && !can_do(@quiz, @current_user, :update) %>
