@@ -194,7 +194,7 @@ class QuizzesController < ApplicationController
 
   def managed_quiz_data
     if authorized_action(@quiz, @current_user, [:grade, :read_statistics])
-      students = @context.students_visible_to(@current_user).order_by_sortable_name.to_a
+      students = @context.students_visible_to(@current_user).order_by_sortable_name.to_a.uniq
       @submissions = @quiz.quiz_submissions.for_user_ids(students.map(&:id)).where("workflow_state<>'settings_only'").all
       submission_ids = {}
       @submissions.each{|s| submission_ids[s.user_id] = s.id }

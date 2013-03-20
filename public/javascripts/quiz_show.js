@@ -101,11 +101,31 @@ $(document).ready(function () {
       }
     });
   });
+  var hasOpenedQuizDetails = false;
   $(".quiz_details_link").click(function(event) {
     event.preventDefault();
-    $(this).disableWhileLoading(
+    $("#quiz_details_wrapper").disableWhileLoading(
       ensureStudentsLoaded(function() {
+        var $quizResultsText = $('#quiz_results_text');
         $("#quiz_details").slideToggle();
+        if (hasOpenedQuizDetails) {
+          if (ENV.IS_SURVEY) {
+            $quizResultsText.text(I18n.t('links.show_student_survey_results',
+                                         'Show Student Survey Results'));
+          } else {
+            $quizResultsText.text(I18n.t('links.show_student_quiz_results',
+                                         'Show Student Quiz Results'));
+          }
+        } else {
+          if (ENV.IS_SURVEY) {
+            $quizResultsText.text(I18n.t('links.hide_student_survey_results',
+                                         'Hide Student Survey Results'));
+          } else {
+            $quizResultsText.text(I18n.t('links.hide_student_quiz_results',
+                                         'Hide Student Quiz Results'));
+          }
+        }
+        hasOpenedQuizDetails = !hasOpenedQuizDetails;
       })
     );
   });

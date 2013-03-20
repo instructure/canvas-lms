@@ -39,11 +39,20 @@ $questionHeaderBackground: #F5F5F5
     font-size: 1.3em
 
   #quiz_details
+    // display: none so jquery ui toggles correctly
     display: none
-    clear: both
+    margin: 0 auto 10px auto
+    max-height: 500px
+    overflow: auto
 
-    td
-      vertical-align: top
+    .submitted_list
+      float: left
+      width: 50%
+
+    .name
+      display: block
+      padding: 4px 12px
+      border-top: 1px solid white
 
   .control-group
     margin-bottom: 0px
@@ -825,15 +834,6 @@ ul#question_list
     :font-size 1.2em
     :font-weight bold
     :color #444
-table#quiz_details 
-  :margin-top 10px
-  h3
-    :font-weight bold
-    :font-size 0.9em
-  ul.student_list
-    :max-height 300px
-    :overflow auto
-    :margin-top 5px     
 
 ul#quiz_versions
   :margin-top 5px
