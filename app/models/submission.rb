@@ -78,24 +78,25 @@ class Submission < ActiveRecord::Base
             }
   }
 
-  named_scope :needs_grading, :conditions => <<-SQL
-    submissions.submission_type IS NOT NULL 
-    AND (submissions.workflow_state = 'pending_review'
-      OR (submissions.workflow_state = 'submitted' 
-        AND (submissions.score IS NULL OR NOT submissions.grade_matches_current_submission)
-      )
-    )
-  SQL
-
   named_scope :for_course, lambda{ |course|
     { :conditions => ["submissions.assignment_id IN (SELECT assignments.id FROM assignments WHERE assignments.context_id = ? AND assignments.context_type = 'Course')", course.id] }
   }
 
   def self.needs_grading_conditions(prefix = nil)
-    conditions = needs_grading.proxy_options[:conditions].gsub(/\s+/, ' ')
+    conditions = <<-SQL
+      submissions.submission_type IS NOT NULL 
+      AND (submissions.workflow_state = 'pending_review'
+        OR (submissions.workflow_state = 'submitted' 
+          AND (submissions.score IS NULL OR NOT submissions.grade_matches_current_submission)
+        )
+      )
+    SQL
+    conditions.gsub!(/\s+/, ' ')
     conditions.gsub!("submissions.", prefix + ".") if prefix
     conditions
   end
+
+  named_scope :needs_grading, :conditions => needs_grading_conditions
 
 
   sanitize_field :body, Instructure::SanitizeField::SANITIZE

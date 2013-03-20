@@ -28,8 +28,10 @@
 /public/javascripts/translations/
 /public/optimized/
 /public/stylesheets/compiled/
+/RAILS3
 /spec/javascripts/
 /tmp/
+/vendor/plugins/rails_upgrade
 
 # generated plugin stuff
 /app/coffeescripts/plugins/

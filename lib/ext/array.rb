@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'csv_compat'
+
 class Array
   def to_csv(options = {})
     if all? { |e| e.respond_to?(:to_row) }

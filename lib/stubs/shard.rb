@@ -86,8 +86,10 @@ class Shard
 end
 
 ActiveRecord::Base.class_eval do
-  class << self
-    VALID_FIND_OPTIONS << :shard
+  if Rails.version < "3.0"
+    class << self
+      VALID_FIND_OPTIONS << :shard
+    end
   end
 
   def shard
@@ -120,6 +122,7 @@ module ActiveRecord::Associations
       def with_each_shard(*shards_or_options)
         options = shards_or_options.pop if shards_or_options.last.is_a?(Hash)
         scope = self
+        # XXX: Rails3 -- fake_arel should help with fixing this and maintaining rails 2 compat
         scope = self.scoped(options) if options
         scope = yield(scope) if block_given?
         Array(scope)

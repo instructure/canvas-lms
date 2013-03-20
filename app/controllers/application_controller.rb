@@ -831,7 +831,11 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
+  if Rails.version < "3.0"
+    rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
+  else
+    ActionDispatch::ShowExceptions.rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
+  end
 
   def rescue_action_in_api(exception, error_report)
     status_code = response_code_for_rescue(exception) || 500
@@ -900,9 +904,8 @@ class ApplicationController < ActionController::Base
     params[request_forgery_protection_token] = token if token
 
     if    protect_against_forgery? &&
-          request.method != :get &&
-          !api_request? &&
-          verifiable_request_format?
+          !request.get? &&
+          !api_request?
       if session[:_csrf_token].nil? && session.empty? && !request.xhr? && !api_request?
         # the session should have the token stored by now, but doesn't? sounds
         # like the user doesn't have cookies enabled.

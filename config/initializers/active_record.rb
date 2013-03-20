@@ -1,15 +1,20 @@
 class ActiveRecord::Base
+  # XXX: Rails3 There are lots of issues with these patches in Rails3 still
+
   extend ActiveSupport::Memoizable # used for a lot of the reporting queries
 
-  class ProtectedAttributeAssigned < Exception; end
-  def log_protected_attribute_removal_with_raise(*attributes)
-    if Canvas.protected_attribute_error == :raise
-      raise ProtectedAttributeAssigned, "Can't mass-assign these protected attributes for class #{self.class.name}: #{attributes.join(', ')}"
-    else
-      log_protected_attribute_removal_without_raise(*attributes)
+  if Rails.version < "3.0"
+    # this functionality is built into rails 3
+    class ProtectedAttributeAssigned < Exception; end
+    def log_protected_attribute_removal_with_raise(*attributes)
+      if Canvas.protected_attribute_error == :raise
+        raise ProtectedAttributeAssigned, "Can't mass-assign these protected attributes for class #{self.class.name}: #{attributes.join(', ')}"
+      else
+        log_protected_attribute_removal_without_raise(*attributes)
+      end
     end
+    alias_method_chain :log_protected_attribute_removal, :raise
   end
-  alias_method_chain :log_protected_attribute_removal, :raise
 
   def feed_code
     id = self.uuid rescue self.id

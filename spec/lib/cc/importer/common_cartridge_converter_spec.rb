@@ -11,6 +11,11 @@ describe "Standard Common Cartridge importing" do
     @course_data = @converter.course.with_indifferent_access
     @course_data['all_files_export'] ||= {}
     @course_data['all_files_export']['file_path'] = @course_data['all_files_zip']
+
+    @course = course
+    @migration = ContentMigration.create(:context => @course)
+    @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
+    @course.import_from_migration(@course_data, nil, @migration)
   end
   
   after(:all) do
@@ -18,13 +23,7 @@ describe "Standard Common Cartridge importing" do
     if File.exists?(@export_folder)
       FileUtils::rm_rf(@export_folder)
     end
-  end
-
-  before(:each) do
-    @course = course
-    @migration = ContentMigration.create(:context => @course)
-    @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
-    @course.import_from_migration(@course_data, nil, @migration)
+    truncate_all_tables
   end
 
   it "should import webcontent" do

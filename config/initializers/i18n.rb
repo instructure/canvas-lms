@@ -163,8 +163,19 @@ I18n.class_eval do
 end
 
 ActionView::Base.class_eval do
-  def i18n_scope
-    "#{template.base_path}.#{template.name.sub(/\A_/, '')}"
+  if Rails.version < "3.0"
+    def i18n_scope
+      "#{template.base_path}.#{template.name.sub(/\A_/, '')}"
+    end
+  else
+    def _render_template_with_assign(template, *a)
+      @current_template = template
+      _render_template_without_assign(template, *a)
+    end
+    alias_method_chain :_render_template, :assign
+    def i18n_scope
+      @current_template.virtual_path.sub(/\/_/, '/').gsub('/', '.')
+    end
   end
 
   def translate(key, default, options = {})
@@ -227,7 +238,9 @@ ActionMailer::Base.class_eval do
   alias :t :translate
 end
 
-ActiveSupport::CoreExtensions::Array::Conversions.class_eval do
+require 'active_support/core_ext/array/conversions'
+
+class Array
   def to_sentence_with_simple_or(options = {})
     if options == :or
       to_sentence_without_simple_or(:two_words_connector => I18n.t('support.array.or.two_words_connector'),

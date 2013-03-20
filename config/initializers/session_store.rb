@@ -37,8 +37,12 @@ when :redis_session_store
   config[:db] ||= config[:database]
 end
 
-ActionController::Base.session = config
-ActionController::Base.session_store = session_store
+if Rails.version < "3.0"
+  ActionController::Base.session = config
+  ActionController::Base.session_store = session_store
+else
+  CanvasRails::Application.config.session_store(session_store, config)
+end
 
 ActionController::Flash::FlashHash.class_eval do
   def store(session, key = "flash")

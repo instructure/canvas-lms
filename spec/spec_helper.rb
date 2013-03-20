@@ -17,7 +17,8 @@
 #
 
 ENV["RAILS_ENV"] = 'test'
-require File.expand_path(File.dirname(__FILE__) + "/../config/environment") unless defined?(Rails)
+
+require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
 require 'spec'
 # require 'spec/autorun'
 require 'spec/rails'
