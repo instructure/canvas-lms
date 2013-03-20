@@ -66,11 +66,7 @@ describe DelayedMessage do
       @delayed_message.save!
       DelayedMessage.for(@assignment).should eql([@delayed_message])
     end
-    
-    # named_scope :in_state, lambda { |state|
-    #   { :context => ["workflow_state = ?", state.to_s]}
-    # }
-    
+
     it "should have a scope to order the messages by a field" do
       notification = notification_model
       cc = CommunicationChannel.create!(:path => 'path@example.com')

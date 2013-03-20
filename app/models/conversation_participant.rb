@@ -28,15 +28,15 @@ class ConversationParticipant < ActiveRecord::Base
   has_many :conversation_message_participants
   after_destroy :destroy_conversation_message_participants
 
-  named_scope :visible, :conditions => "last_message_at IS NOT NULL"
-  named_scope :default, :conditions => "workflow_state IN ('read', 'unread')"
-  named_scope :unread, :conditions => "workflow_state = 'unread'"
-  named_scope :archived, :conditions => "workflow_state = 'archived'"
-  named_scope :starred, :conditions => "label = 'starred'"
-  named_scope :sent, :conditions => "visible_last_authored_at IS NOT NULL", :order => "visible_last_authored_at DESC, conversation_id DESC"
-  named_scope :for_masquerading_user, lambda { |user|
+  scope :visible, where("last_message_at IS NOT NULL")
+  scope :default, where(:workflow_state => ['read', 'unread'])
+  scope :unread, where(:workflow_state => 'unread')
+  scope :archived, where(:workflow_state => 'archived')
+  scope :starred, where(:label => 'starred')
+  scope :sent, where("visible_last_authored_at IS NOT NULL").order("visible_last_authored_at DESC, conversation_id DESC")
+  scope :for_masquerading_user, lambda { |user|
     # site admins can see everything
-    return {} if user.account_users.map(&:account_id).include?(Account.site_admin.id)
+    return scoped if user.account_users.map(&:account_id).include?(Account.site_admin.id)
 
     # we need to ensure that the user can access *all* of each conversation's
     # accounts (and that each conversation has at least one account). so given
@@ -57,7 +57,7 @@ class ConversationParticipant < ActiveRecord::Base
     end
     id_string = "[" + own_root_account_ids.sort.join("][") + "]"
     root_account_id_matcher = "'%[' || REPLACE(conversation_participants.root_account_ids, ',', ']%[') || ']%'"
-    {:conditions => ["conversation_participants.root_account_ids <> '' AND " + like_condition('?', root_account_id_matcher, false), id_string]}
+    where("conversation_participants.root_account_ids <> '' AND " + like_condition('?', root_account_id_matcher, false), id_string)
   }
 
   # Produces a subscope for conversations in which the given users are

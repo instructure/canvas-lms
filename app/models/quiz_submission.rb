@@ -626,15 +626,9 @@ class QuizSubmission < ActiveRecord::Base
     return result
   end
 
-  named_scope :before, lambda{|date|
-    {:conditions => ['quiz_submissions.created_at < ?', date]}
+  scope :before, lambda { |date| where("quiz_submissions.created_at<?", date) }
+  scope :updated_after, lambda { |date|
+    date ? where("quiz_submissions.updated_at>?", date) : scoped
   }
-  named_scope :updated_after, lambda{|date|
-    if date
-      {:conditions => ['quiz_submissions.updated_at > ?', date]}
-    end
-  }
-  named_scope :for_user_ids, lambda{|user_ids|
-    {:conditions => {:user_id => user_ids} }
-  }
+  scope :for_user_ids, lambda { |user_ids| where(:user_id => user_ids) }
 end

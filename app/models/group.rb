@@ -189,7 +189,7 @@ class Group < ActiveRecord::Base
     group_memberships.update_all(:workflow_state => 'deleted')
   end
 
-  named_scope :active, :conditions => ['groups.workflow_state != ?', 'deleted']
+  scope :active, where("groups.workflow_state<>'deleted'")
 
   def full_name
     res = before_label(self.name) + " "

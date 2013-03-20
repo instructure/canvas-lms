@@ -62,13 +62,7 @@ class WikiPageComment < ActiveRecord::Base
     can :read
   end
   
-  named_scope :active, lambda{
-    {:conditions => ['workflow_state != ?', 'deleted'] }
-  }
-  named_scope :current, lambda{
-    {:conditions => {:workflow_state => :current} }
-  }
-  named_scope :current_first, lambda{
-    {:order => 'workflow_state'}
-  }
+  scope :active, where("workflow_state<>'deleted'")
+  scope :current, where(:workflow_state => :current)
+  scope :current_first, order(:workflow_state)
 end

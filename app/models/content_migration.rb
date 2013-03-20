@@ -429,14 +429,12 @@ class ContentMigration < ActiveRecord::Base
   end
   handle_asynchronously :copy_course, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
   
-  named_scope :for_context, lambda{|context|
-    {:conditions => {:context_id => context.id, :context_type => context.class.to_s} }
-  }
-  
-  named_scope :successful, :conditions=>"workflow_state = 'imported'"
-  named_scope :running, :conditions=>"workflow_state IN ('exporting', 'importing')"
-  named_scope :waiting, :conditions=>"workflow_state IN ('exported')"
-  named_scope :failed, :conditions=>"workflow_state IN ('failed', 'pre_process_error')"
+  scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }
+
+  scope :successful, where(:workflow_state => 'imported')
+  scope :running, where(:workflow_state => ['exporting', 'importing'])
+  scope :waiting, where(:workflow_state => 'exported')
+  scope :failed, where(:workflow_state => ['failed', 'pre_process_error'])
 
   def complete?
     %w[imported failed pre_process_error].include?(workflow_state)

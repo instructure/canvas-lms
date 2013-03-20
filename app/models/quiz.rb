@@ -1337,18 +1337,10 @@ class Quiz < ActiveRecord::Base
     given { |user, session| self.available? && self.cached_context_grants_right?(user, session, :participate_as_student) }#students.include?(user) }
     can :read and can :submit
   end
-  named_scope :include_assignment, lambda{
-    { :include => :assignment }
-  }
-  named_scope :before, lambda{|date|
-    {:conditions => ['quizzes.created_at < ?', date]}
-  }
-  named_scope :active, lambda{
-    {:conditions => ['quizzes.workflow_state != ?', 'deleted'] }
-  }
-  named_scope :not_for_assignment, lambda{
-    {:conditions => ['quizzes.assignment_id IS NULL'] }
-  }
+  scope :include_assignment, includes(:assignment)
+  scope :before, lambda { |date| where("quizzes.created_at<?", date) }
+  scope :active, where("quizzes.workflow_state<>'deleted'")
+  scope :not_for_assignment, where(:assignment_id => nil)
 
   def migrate_file_links
     QuizQuestionLinkMigrator.migrate_file_links_in_quiz(self)

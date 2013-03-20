@@ -30,30 +30,23 @@ class NotificationPolicy < ActiveRecord::Base
   # This is for choosing a policy for another context, so:
   # NotificationPolicy.for(notification) or
   # communication_channel.notification_policies.for(notification)
-  named_scope :for, lambda { |context| 
+  scope :for, lambda { |context|
     case context
     when User
-      { :joins => :communication_channel,
-        :conditions => ["communication_channels.user_id = ? AND communication_channels.workflow_state <> 'retired'", context.id] }
+      joins(:communication_channel).
+          where("communication_channels.user_id=? AND communication_channels.workflow_state<>'retired'", context)
     when Notification
-      { :conditions => ['notification_policies.notification_id = ?', context.id] }
+      where(:notification_id => context)
     else
-      {}
+      scoped
     end
   }
   
-  # TODO: the named_scope name should be self-explanatory... change this to
+  # TODO: the scope name should be self-explanatory... change this to
   # by_frequency or something This is for choosing a policy by frequency
-  named_scope :by, lambda { |freq| 
-    case freq
-    when Array
-      { :conditions => { :frequency => freq.map{|f| f.to_s} } }
-    else
-      { :conditions => ['notification_policies.frequency = ?', freq.to_s] }
-    end
-  }
-  
-  named_scope :in_state, lambda { |state| { :conditions => ["notification_policies.workflow_state = ?", state.to_s] } }
+  scope :by, lambda { |freq| where(:frequency => Array(freq).map(&:to_s)) }
+
+  scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
 
   def infer_frequency
     self.frequency ||= "immediately"

@@ -51,8 +51,8 @@ class GradingStandard < ActiveRecord::Base
     state :deleted
   end
   
-  named_scope :active, :conditions => ['grading_standards.workflow_state != ?', 'deleted']
-  named_scope :sorted, :order => "usage_count >= 3 DESC, title ASC"
+  scope :active, where("grading_standards.workflow_state<>'deleted'")
+  scope :sorted, order("usage_count >= 3 DESC, title ASC")
 
   VERSION = 2
 

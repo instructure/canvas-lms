@@ -207,8 +207,8 @@ class DiscussionEntry < ActiveRecord::Base
     end
   end
 
-  named_scope :active, :conditions => ['discussion_entries.workflow_state != ?', 'deleted']
-  named_scope :deleted, :conditions => ['discussion_entries.workflow_state = ?', 'deleted']
+  scope :active, where("discussion_entries.workflow_state<>'deleted'")
+  scope :deleted, where(:workflow_state => 'deleted')
 
   def user_name
     self.user.name rescue t :default_user_name, "User Name"
@@ -274,28 +274,12 @@ class DiscussionEntry < ActiveRecord::Base
     can :create
   end
 
-  named_scope :for_user, lambda{|user|
-    {:conditions => ['discussion_entries.user_id = ?', (user.is_a?(User) ? user.id : user)], :order => 'discussion_entries.created_at'}
-  }
-  named_scope :for_users, lambda{|users|
-    user_ids = users.map{ |u| u.is_a?(User) ? u.id : u }
-    {:conditions => ['discussion_entries.user_id IN (?)', user_ids]}
-  }
-  named_scope :after, lambda{|date|
-    {:conditions => ['created_at > ?', date] }
-  }
-  named_scope :include_subentries, lambda{
-    {:include => discussion_subentries}
-  }
-  named_scope :top_level_for_topics, lambda {|topics|
-    topic_ids = topics.map{ |t| t.is_a?(DiscussionTopic) ? t.id : t }
-    {:conditions => ['discussion_entries.root_entry_id IS NULL AND discussion_entries.discussion_topic_id IN (?)', topic_ids]}
-  }
-  named_scope :all_for_topics, lambda { |topics|
-    topic_ids = topics.map{ |t| t.is_a?(DiscussionTopic) ? t.id : t }
-    {:conditions => ['discussion_entries.discussion_topic_id IN (?)', topic_ids]}
-  }
-  named_scope :newest_first, :order => 'discussion_entries.created_at DESC'
+  scope :for_user, lambda { |user| where(:user_id => user).order("discussion_entries.created_at") }
+  scope :for_users, lambda { |users| where(:user_id => users) }
+  scope :after, lambda { |date| where("created_at>?", date) }
+  scope :top_level_for_topics, lambda {|topics| where(:root_entry_id => nil, :discussion_topic_id => topics) }
+  scope :all_for_topics, lambda { |topics| where(:discussion_topic_id => topics) }
+  scope :newest_first, order("discussion_entries.created_at DESC")
 
   def to_atom(opts={})
     author_name = self.user.present? ? self.user.name : t('atom_no_author', "No Author")

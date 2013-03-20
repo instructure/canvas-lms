@@ -110,7 +110,7 @@ class AssignmentOverride < ActiveRecord::Base
     end
   end
 
-  named_scope :active, :conditions => { :workflow_state => 'active' }
+  scope :active, where(:workflow_state => 'active')
 
   before_validation :default_values
   def default_values
@@ -172,7 +172,7 @@ class AssignmentOverride < ActiveRecord::Base
       true
     end
 
-    named_scope "overriding_#{field}", :conditions => { "#{field}_overridden" => true }
+    scope "overriding_#{field}", where("#{field}_overridden" => true)
   end
 
   override :due_at
@@ -256,7 +256,7 @@ class AssignmentOverride < ActiveRecord::Base
     p.whenever { |record| record.notify_change? }
   end
 
-  named_scope :visible_to, lambda{ |admin, course|
+  scope :visible_to, lambda { |admin, course|
     scopes = []
 
     # adhoc overrides for visible students
@@ -281,7 +281,12 @@ class AssignmentOverride < ActiveRecord::Base
         joins("INNER JOIN assignment_overrides ON assignment_overrides.set_type='CourseSection' AND enrollments.course_section_id=assignment_overrides.set_id")
 
     # union the visible override subselects and join against them
-    subselect = scopes.map{ |scope| scope.construct_finder_sql({}) }.join(' UNION ')
-    { :joins => "INNER JOIN (#{subselect}) AS visible_overrides ON visible_overrides.id=assignment_overrides.id", :readonly => false }
+    subselect = scopes.map{ |scope| scope.to_sql }.join(' UNION ')
+    join_clause = "INNER JOIN (#{subselect}) AS visible_overrides ON visible_overrides.id=assignment_overrides.id"
+    if Rails.version < '3'
+      { :joins => join_clause, :readonly => false }
+    else
+      joins(join_clause).readonly(false)
+    end
   }
 end

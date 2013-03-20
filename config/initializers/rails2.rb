@@ -114,6 +114,23 @@ ActiveRecord::Base.class_eval do
       includes = new_options.delete(:include)
       with_exclusive_scope(:find => new_options) { joins(includes).all.map(&column) }
     end
+
+    # allow defining scopes Rails 3 style (scope, not named_scope)
+    # scope is still a Rails 2 method, so we have to call the correct method
+    # depending on the argument types
+    def scope_with_named_scope(*args, &block)
+      if args.length == 2
+        case args[1]
+        when String, Symbol
+          scope_without_named_scope(*args)
+        else
+          named_scope *args, &block
+        end
+      else
+        scope_without_named_scope(*args)
+      end
+    end
+    alias_method_chain :scope, :named_scope
   end
 
   # support 0 arguments
@@ -141,6 +158,14 @@ ActiveRecord::NamedScope::Scope.class_eval do
       self.scoped(:select => Array.wrap(value).join(','))
     end
   end
+
+  # fake_arel does this in a really complicated way, trying to reproduce
+  # with_scope's merging rules. It has bugs merging select clauses.
+  # Instead, just take the easy way out and let with_scope do all
+  # the hard work
+  def unspin
+    with_exclusive_scope { self.scope(:find) }
+ end
 end
 
 ActiveRecord::Associations::AssociationCollection.class_eval do

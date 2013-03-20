@@ -79,17 +79,11 @@ class Collaboration < ActiveRecord::Base
     can :read and can :update and can :delete
   end
 
-  named_scope :active, lambda {
-    { :conditions => ['collaborations.workflow_state != ?', 'deleted'] }
-  }
+  scope :active, where("collaborations.workflow_state<>'deleted'")
 
-  named_scope :after, lambda { |date|
-    { :conditions => ['collaborations.updated_at > ?', date] }
-  }
+  scope :after, lambda { |date| where("collaborations.updated_at>?", date) }
 
-  named_scope :for_context_codes, lambda { |context_codes|
-    { :conditions => { :context_code => context_codes } }
-  }
+  scope :for_context_codes, lambda { |context_codes| where(:context_code => context_codes) }
 
   # These methods should be implemented in child classes.
 

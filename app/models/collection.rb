@@ -34,8 +34,8 @@ class Collection < ActiveRecord::Base
   before_save :handle_visibility_change
   after_create :check_auto_follow_users
 
-  named_scope :public, :conditions => { :visibility => 'public' }
-  named_scope :newest_first, { :order => "id desc" }
+  scope :public, where(:visibility => 'public')
+  scope :newest_first, order("id DESC")
 
   def public?
     self.visibility == 'public'
@@ -46,7 +46,7 @@ class Collection < ActiveRecord::Base
     state :deleted
   end
 
-  named_scope :active, { :conditions => { :workflow_state => 'active' } }
+  scope :active, where(:workflow_state => 'active')
 
   def destroy
     self.workflow_state = 'deleted'

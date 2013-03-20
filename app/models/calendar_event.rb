@@ -105,23 +105,21 @@ class CalendarEvent < ActiveRecord::Base
     effective_context_code && ActiveRecord::Base.find_by_asset_string(effective_context_code) || context
   end
 
-  named_scope :order_by_start_at, :order => :start_at
+  scope :order_by_start_at, order(:start_at)
 
-  named_scope :active, :conditions => ['calendar_events.workflow_state != ?', 'deleted']
-  named_scope :locked, :conditions => ["calendar_events.workflow_state = 'locked'"]
-  named_scope :unlocked, :conditions => ['calendar_events.workflow_state NOT IN (?)', ['deleted', 'locked']]
+  scope :active, where("calendar_events.workflow_state<>'deleted'")
+  scope :locked, where(:workflow_state => 'locked')
+  scope :unlocked, where("calendar_events.workflow_state NOT IN ('deleted', 'locked')")
 
   # controllers/apis/etc. should generally use for_user_and_context_codes instead
-  named_scope :for_context_codes, lambda { |codes|
-    {:conditions => ['calendar_events.context_code IN (?)', codes] }
-  }
+  scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
 
   # appointments and appointment_participants have the appointment_group and
   # the user as the context, respectively. we are actually interested in
   # grouping them under the effective context (i.e. appointment_group.context).
   # it's the responsibility of the caller to ensure the user has rights to the
   # specified codes (e.g. using User#appointment_context_codes)
-  named_scope :for_user_and_context_codes, lambda { |user, *args|
+  scope :for_user_and_context_codes, lambda { |user, *args|
     codes = args.shift
     section_codes = args.shift || user.section_context_codes(codes)
     effectively_courses_codes = [user.asset_string] + section_codes
@@ -135,7 +133,7 @@ class CalendarEvent < ActiveRecord::Base
     }.join(" OR ")
     codes_conditions = self.connection.quote(false) if codes_conditions.blank?
 
-    {:conditions => [<<-SQL, all_codes, codes, group_codes, effectively_courses_codes]}
+    where(<<-SQL, all_codes, codes, group_codes, effectively_courses_codes)
       calendar_events.context_code IN (?)
       AND (
         ( -- explicit contexts (e.g. course_123)
@@ -153,22 +151,20 @@ class CalendarEvent < ActiveRecord::Base
     SQL
   }
 
-  named_scope :undated, :conditions => {:start_at => nil, :end_at => nil}
+  scope :undated, where(:start_at => nil, :end_at => nil)
 
-  named_scope :between, lambda { |start, ending|
-    { :conditions => { :start_at => (start)..(ending) } }
-  }
-  named_scope :current, lambda {
-    { :conditions => ['calendar_events.end_at >= ?', Time.zone.today.to_datetime.utc] }
-  }
-  named_scope :updated_after, lambda { |*args|
+  scope :between, lambda { |start, ending| where(:start_at => start..ending) }
+  scope :current, lambda { where("calendar_events.end_at>=?", Time.zone.now.midnight) }
+  scope :updated_after, lambda { |*args|
     if args.first
-      { :conditions => [ "calendar_events.updated_at IS NULL OR calendar_events.updated_at > ?", args.first ] }
+      where("calendar_events.updated_at IS NULL OR calendar_events.updated_at>?", args.first)
+    else
+      scoped
     end
   }
 
-  named_scope :events_without_child_events, :conditions => "NOT EXISTS (SELECT 1 FROM calendar_events children WHERE children.parent_calendar_event_id = calendar_events.id AND children.workflow_state <> 'deleted')"
-  named_scope :events_with_child_events, :conditions => "EXISTS (SELECT 1 FROM calendar_events children WHERE children.parent_calendar_event_id = calendar_events.id AND children.workflow_state <> 'deleted')"
+  scope :events_without_child_events, where("NOT EXISTS (SELECT 1 FROM calendar_events children WHERE children.parent_calendar_event_id = calendar_events.id AND children.workflow_state<>'deleted')")
+  scope :events_with_child_events, where("EXISTS (SELECT 1 FROM calendar_events children WHERE children.parent_calendar_event_id = calendar_events.id AND children.workflow_state<>'deleted')")
 
   def validate_context!
     @validate_context = true

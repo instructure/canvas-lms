@@ -73,25 +73,13 @@ class RubricAssociation < ActiveRecord::Base
     }
   end
   
-  named_scope :bookmarked, lambda {
-    {:conditions => {:bookmarked => true} }
-  }
-  named_scope :for_purpose, lambda {|purpose|
-    {:conditions => {:purpose => purpose} }
-  }
-  named_scope :for_grading, lambda {
-    {:conditions => {:purpose => 'grading'}}
-  }
-  named_scope :for_context_codes, lambda{|codes|
-    {:conditions => {:context_code => codes} }
-  }
-  named_scope :include_rubric, lambda{
-    {:include => :rubric}
-  }
-  named_scope :before, lambda{|date|
-    {:conditions => ['rubric_associations.created_at < ?', date]}
-  }
-  
+  scope :bookmarked, where(:bookmarked => true)
+  scope :for_purpose, lambda { |purpose| where(:purpose => purpose) }
+  scope :for_grading, where(:purpose => 'grading')
+  scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
+  scope :include_rubric, includes(:rubric)
+  scope :before, lambda { |date| where("rubric_associations.created_at<?", date) }
+
   def assert_uniqueness
     if purpose == 'grading'
       RubricAssociation.find_all_by_association_id_and_association_type_and_purpose(association_id, association_type, 'grading').each do |ra|

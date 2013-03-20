@@ -209,10 +209,8 @@ class PageView < ActiveRecord::Base
     end
   end
 
-  named_scope :for_context, proc { |ctx| { :conditions => { :context_type => ctx.class.name, :context_id => ctx.id } } }
-  named_scope :for_users, lambda{ |users|
-    { :conditions => {:user_id => users} }
-  }
+  scope :for_context, proc { |ctx| where(:context_type => ctx.class.name, :context_id => ctx) }
+  scope :for_users, lambda { |users| where(:user_id => users) }
 
   module CassandraBookmarker
     def self.bookmark_for(item)

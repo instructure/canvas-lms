@@ -121,64 +121,39 @@ class Message < ActiveRecord::Base
   end
 
   # Named scopes
-  named_scope :for_asset_context_codes, lambda { |context_codes|
-    { :conditions => { :asset_context_code => context_codes } }
+  scope :for_asset_context_codes, lambda { |context_codes| where(:asset_context_code => context_codes) }
+
+  scope :for, lambda { |context| where(:context_type => context.class.base_ar_class.to_s, :context_id => context) }
+
+  scope :after, lambda { |date| where("messages.created_at>?", date) }
+
+  scope :to_dispatch, lambda {
+    where("messages.workflow_state='staged' AND messages.dispatch_at<=? AND 'messages.to'<>'dashboard'", Time.now.utc)
   }
 
-  named_scope :for, lambda { |context|
-    { :conditions => ['messages.context_type = ? and messages.context_id = ?',
-      context.class.base_ar_class.to_s, context.id] }
-  }
+  scope :to_email, where(:path_type => ['email', 'sms'])
 
-  named_scope :after, lambda { |date|
-    { :conditions => ['messages.created_at > ?', date] }
-  }
+  scope :to_facebook, where(:path_type => 'facebook', :workflow_state => 'sent').order("sent_at DESC").limit(25)
 
-  named_scope :to_dispatch, lambda {
-    { :conditions => ["messages.workflow_state = ? and messages.dispatch_at <= ? and 'messages.to' != ?",
-      'staged', Time.now.utc, 'dashboard'] }
-  }
+  scope :not_to_email, where("messages.path_type NOT IN ('email', 'sms')")
 
-  named_scope :to_email, { :conditions =>
-    ['messages.path_type = ? OR messages.path_type = ?', 'email', 'sms'] }
+  scope :by_name, lambda { |notification_name| where(:notification_name => notification_name) }
 
-  named_scope :to_facebook, { :conditions =>
-    ['messages.path_type = ? AND messages.workflow_state = ?',
-     'facebook', 'sent'], :order => 'sent_at DESC', :limit => 25 }
+  scope :before, lambda { |date| where("messages.created_at<?", date) }
 
-  named_scope :not_to_email, { :conditions => 
-    ['messages.path_type != ? AND messages.path_type != ?', 'email', 'sms'] }
-
-  named_scope :by_name, lambda { |notification_name|
-    { :conditions => ['messages.notification_name = ?', notification_name] }
-  }
-
-  named_scope :before, lambda { |date|
-    { :conditions => ['messages.created_at < ?', date] }
-  }
-
-  named_scope :for_user, lambda { |user|
-    { :conditions => {:user_id => user} }
-  }
+  scope :for_user, lambda { |user| where(:user_id => user)}
 
   # messages that can be moved to the 'cancelled' state. dashboard messages
   # can be closed by calling 'cancel', but aren't included
-  named_scope :cancellable, { :conditions =>
-    { :workflow_state => ['created', 'staged', 'sending'] }
-  }
-  
+  scope :cancellable, where(:workflow_state => ['created', 'staged', 'sending'])
+
   # For finding a very particular message:
   # Message.for(context).by_name(name).directed_to(to).for_user(user), or
   # messages.for(context).by_name(name).directed_to(to).for_user(user)
   # Where user can be a User or id, name needs to be the Notification name.
-  named_scope :staged, lambda {
-    { :conditions => ['messages.workflow_state = ? and messages.dispatch_at > ?',
-      'staged', DateTime.now.utc.to_s(:db) ]}
-  }
+  scope :staged, lambda { where("messages.workflow_state='staged' AND messages.dispatch_at>?", Time.now.utc) }
 
-  named_scope :in_state, lambda { |state|
-    { :conditions => { :workflow_state => Array(state).map { |f| f.to_s } } }
-  }
+  scope :in_state, lambda { |state| where(:workflow_state => Array(state).map(&:to_s)) }
 
   # Public: Helper to generate a URI for the given subject. Overrides Rails'
   # built-in ActionController::PolymorphicRoutes#polymorphic_url method because

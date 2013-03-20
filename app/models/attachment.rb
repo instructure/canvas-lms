@@ -1204,17 +1204,15 @@ class Attachment < ActiveRecord::Base
     state :unattached_temporary
   end
 
-  named_scope :to_be_zipped, lambda{
-    {:conditions => ['attachments.workflow_state = ? AND attachments.scribd_attempts < ?', 'to_be_zipped', 10], :order => 'created_at' }
-  }
+  scope :to_be_zipped, where("attachments.workflow_state='to_be_zipped' AND attachments.scribd_attempts<10").order(:created_at)
 
-  named_scope :active, lambda {
-    { :conditions => ['attachments.file_state != ?', 'deleted'] }
-  }
+  scope :active, where("attachments.file_state<>'deleted'")
 
-  named_scope :not_hidden, :conditions => ['attachments.file_state != ?', 'hidden']
-  named_scope :not_locked, lambda {{:conditions => ['(attachments.locked IS NULL OR attachments.locked = ?) AND ((attachments.lock_at IS NULL) OR
-    (attachments.lock_at > ? OR (attachments.unlock_at IS NOT NULL AND attachments.unlock_at < ?)))', false, Time.now, Time.now]}}
+  scope :not_hidden, where("attachments.file_state<>'hidden'")
+  scope :not_locked, lambda {
+    where("(attachments.locked IS NULL OR attachments.locked=?) AND ((attachments.lock_at IS NULL) OR
+      (attachments.lock_at>? OR (attachments.unlock_at IS NOT NULL AND attachments.unlock_at<?)))", false, Time.now.utc, Time.now.utc)
+  }
 
   alias_method :destroy!, :destroy
   # file_state is like workflow_state, which was already taken
@@ -1484,14 +1482,14 @@ class Attachment < ActiveRecord::Base
   cattr_accessor :skip_thumbnails
 
 
-  named_scope :scribdable?, :conditions => ['scribd_mime_type_id is not null']
-  named_scope :recyclable, :conditions => ['attachments.scribd_attempts < ? AND attachments.workflow_state = ?', MAX_SCRIBD_ATTEMPTS, 'errored']
-  named_scope :needing_scribd_conversion_status, :conditions => ['attachments.workflow_state = ? AND attachments.updated_at < ?', 'processing', 30.minutes.ago], :limit => 50
-  named_scope :uploadable, :conditions => ['workflow_state = ?', 'pending_upload']
-  named_scope :active, :conditions => ['file_state = ?', 'available']
-  named_scope :thumbnailable?, :conditions => {:content_type => Technoweenie::AttachmentFu.content_types}
-  named_scope :by_display_name, :order => display_name_order_by_clause('attachments')
-  named_scope :by_position_then_display_name, :order => "attachments.position, #{display_name_order_by_clause('attachments')}"
+  scope :scribdable?, where("scribd_mime_type_id IS NOT NULL")
+  scope :recyclable, where("attachments.scribd_attempts<? AND attachments.workflow_state='errored'", MAX_SCRIBD_ATTEMPTS)
+  scope :needing_scribd_conversion_status, lambda { where("attachments.workflow_state='processing' AND attachments.updated_at<?", 30.minutes.ago).limit(50) }
+  scope :uploadable, where(:workflow_state => 'pending_upload')
+  scope :active, where(:file_state => 'available')
+  scope :thumbnailable?, where(:content_type => Technoweenie::AttachmentFu.content_types)
+  scope :by_display_name, order(display_name_order_by_clause('attachments'))
+  scope :by_position_then_display_name, order("attachments.position, #{display_name_order_by_clause('attachments')}")
   def self.serialization_excludes; [:uuid, :namespace]; end
   def set_serialization_options
     if self.scribd_doc

@@ -166,10 +166,8 @@ class RubricAssessment < ActiveRecord::Base
     can :update
   end
   
-  named_scope :of_type, lambda {|type|
-    {:conditions => ['rubric_assessments.assessment_type = ?', type.to_s]}
-  }
-  
+  scope :of_type, lambda { |type| where(:assessment_type => type.to_s) }
+
   def methods_for_serialization(*methods)
     @serialization_methods = methods
   end

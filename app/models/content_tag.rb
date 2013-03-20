@@ -58,9 +58,7 @@ class ContentTag < ActiveRecord::Base
     state :deleted
   end
   
-  named_scope :active, lambda{
-    {:conditions => ['content_tags.workflow_state != ?', 'deleted'] }
-  }
+  scope :active, where("content_tags.workflow_state<>'deleted'")
 
   attr_accessor :skip_touch
   def touch_context_module
@@ -308,14 +306,12 @@ class ContentTag < ActiveRecord::Base
     dup
   end
   
-  named_scope :for_tagged_url, lambda{|url, tag|
-    {:conditions => ['content_tags.url = ? AND content_tags.tag = ?', url, tag] }
-  }
-  named_scope :for_context, lambda{|context|
+  scope :for_tagged_url, lambda { |url, tag| where(:url => url, :tag => tag) }
+  scope :for_context, lambda { |context|
     case context
     when Account
-      { :select => 'content_tags.*',
-        :joins => "INNER JOIN (
+      select("content_tags.*").
+          joins("INNER JOIN (
             SELECT DISTINCT ct.id AS content_tag_id FROM content_tags AS ct
             INNER JOIN course_account_associations AS caa ON caa.course_id = ct.context_id
               AND ct.context_type = 'Course'
@@ -323,17 +319,13 @@ class ContentTag < ActiveRecord::Base
           UNION
             SELECT ct.id AS content_tag_id FROM content_tags AS ct
             WHERE ct.context_id = #{context.id} AND context_type = 'Account')
-          AS related_content_tags ON related_content_tags.content_tag_id = content_tags.id" }
+          AS related_content_tags ON related_content_tags.content_tag_id = content_tags.id")
     else
-      {:conditions => ['content_tags.context_type = ? AND content_tags.context_id = ?', context.class.to_s, context.id]}
+      where(:context_type => context.class.to_s, :context_id => context)
     end
   }
-  named_scope :learning_outcome_alignments, lambda{
-    { :conditions => {:tag_type => 'learning_outcome'} }
-  }
-  named_scope :learning_outcome_links, lambda{
-    { :conditions => {:tag_type => 'learning_outcome_association', :associated_asset_type => 'LearningOutcomeGroup', :content_type => 'LearningOutcome'} }
-  }
+  scope :learning_outcome_alignments, where(:tag_type => 'learning_outcome')
+  scope :learning_outcome_links, where(:tag_type => 'learning_outcome_association', :associated_asset_type => 'LearningOutcomeGroup', :content_type => 'LearningOutcome')
 
   # only intended for learning outcome links
   def self.outcome_title_order_by_clause

@@ -116,7 +116,7 @@ class SisBatch < ActiveRecord::Base
     self.save
   end
 
-  named_scope :needs_processing, :conditions => { :workflow_state => 'created' }, :order => :created_at
+  scope :needs_processing, where(:workflow_state => 'created').order(:created_at)
 
   def self.process_all_for_account(account)
     loop do

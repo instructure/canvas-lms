@@ -1227,15 +1227,12 @@ class Account < ActiveRecord::Base
     :closed
   end
 
-  named_scope :root_accounts, :conditions => {:root_account_id => nil}
-  named_scope :processing_sis_batch, :conditions => ['accounts.current_sis_batch_id IS NOT NULL'], :order => :updated_at
-  named_scope :name_like, lambda { |name|
-    { :conditions => wildcard('accounts.name', name) }
+  scope :root_accounts, where(:root_account_id => nil)
+  scope :processing_sis_batch, where("accounts.current_sis_batch_id IS NOT NULL").order(:updated_at)
+  scope :name_like, lambda { |name|
+    where(wildcard('accounts.name', name))
   }
-  named_scope :active, :conditions => ['accounts.workflow_state != ?', 'deleted']
-  named_scope :limit, lambda {|limit|
-    {:limit => limit}
-  }
+  scope :active, where("accounts.workflow_state<>'deleted'")
 
   def canvas_network_enabled?
     false

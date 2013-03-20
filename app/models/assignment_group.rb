@@ -122,17 +122,11 @@ class AssignmentGroup < ActiveRecord::Base
     self.assignments.map{|a| a.points_possible || 0}.sum
   end
   
-  named_scope :include_active_assignments, lambda{
-    {:include => :active_assignments}
-  }
-  named_scope :active, :conditions => ['assignment_groups.workflow_state != ?', 'deleted']
-  named_scope :before, lambda{|date|
-    {:conditions => ['assignment_groups.created_at < ?', date]}
-  }
-  named_scope :for_context_codes, lambda {|codes|
-    {:conditions => ['assignment_groups.context_code IN (?) and assignment_groups.workflow_state != ?', codes, 'deleted'], :order => :position }
-  }
-  
+  scope :include_active_assignments, includes(:active_assignments)
+  scope :active, where("assignment_groups.workflow_state<>'deleted'")
+  scope :before, lambda { |date| where("assignment_groups.created_at<?", date) }
+  scope :for_context_codes, lambda { |codes| active.where(:context_code => codes).order(:position) }
+
   def group_weight_changed
     @group_weight_changed = self.group_weight_changed?
     true

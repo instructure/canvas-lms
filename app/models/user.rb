@@ -185,39 +185,27 @@ class User < ActiveRecord::Base
     PageView.for_user(self)
   end
 
-  named_scope :of_account, lambda { |account|
-    {
-      :joins => :user_account_associations,
-      :conditions => ['user_account_associations.account_id = ?', account.id]
-    }
+  scope :of_account, lambda { |account| joins(:user_account_associations).where(:user_account_associations => { :account_id => account }) }
+  scope :recently_logged_in, lambda {
+    includes(:pseudonyms).
+        where("pseudonyms.current_login_at>?", 1.month.ago).
+        order("pseudonyms.current_login_at DESC").
+        limit(25)
   }
-  named_scope :recently_logged_in, lambda{
-    {
-      :include => :pseudonyms,
-      :conditions => ['pseudonyms.current_login_at > ?', 1.month.ago],
-      :order => 'pseudonyms.current_login_at DESC',
-      :limit => 25
-    }
-  }
-  named_scope :include_pseudonym, lambda{
-    {:include => :pseudonym }
-  }
-  named_scope :restrict_to_sections, lambda{|sections|
-    section_ids = Array(sections).map{|s| s.is_a?(Fixnum) ? s : s.id }
-    if section_ids.empty?
-      {:conditions => {}}
+  scope :include_pseudonym, includes(:pseudonym)
+  scope :restrict_to_sections, lambda { |sections|
+    if sections.empty?
+      scoped
     else
-      {:conditions => ["enrollments.limit_privileges_to_course_section IS NULL OR enrollments.limit_privileges_to_course_section != ? OR enrollments.course_section_id IN (?)", true, section_ids]}
+      where("enrollments.limit_privileges_to_course_section IS NULL OR enrollments.limit_privileges_to_course_section<>? OR enrollments.course_section_id IN (?)", true, sections)
     end
   }
-  named_scope :name_like, lambda { |name|
-    { :conditions => ["(", wildcard('users.name', 'users.short_name', name), " OR exists (select 1 from pseudonyms where ", wildcard('pseudonyms.sis_user_id', 'pseudonyms.unique_id', name), " and pseudonyms.user_id = users.id and (", User.send(:sanitize_sql_array, Pseudonym.active.proxy_options[:conditions]), ")))"].join }
+  scope :name_like, lambda { |name|
+    where("#{wildcard('users.name', 'users.short_name', name)} OR EXISTS (#{Pseudonym.select("1").where(wildcard('pseudonyms.sis_user_id', 'pseudonyms.unique_id', name)).where("pseudonyms.user_id=users.id").active.to_sql})")
   }
-  named_scope :active, lambda {
-    { :conditions => ["users.workflow_state != ?", 'deleted'] }
-  }
+  scope :active, where("users.workflow_state<>'deleted'")
 
-  named_scope :has_current_student_enrollments, :conditions =>  "EXISTS (SELECT * FROM enrollments JOIN courses ON courses.id = enrollments.course_id AND courses.workflow_state = 'available' WHERE enrollments.user_id = users.id AND enrollments.workflow_state IN ('active','invited') AND enrollments.type = 'StudentEnrollment')"
+  scope :has_current_student_enrollments, where("EXISTS (SELECT * FROM enrollments JOIN courses ON courses.id=enrollments.course_id AND courses.workflow_state='available' WHERE enrollments.user_id=users.id AND enrollments.workflow_state IN ('active','invited') AND enrollments.type='StudentEnrollment')")
 
   def self.order_by_sortable_name(options = {})
     clause = sortable_name_order_by_clause
@@ -243,30 +231,20 @@ class User < ActiveRecord::Base
       order_by_sortable_name
   end
 
-  named_scope :enrolled_in_course_between, lambda{|course_ids, start_at, end_at|
-    ids_string = course_ids.join(",")
-    {
-      :joins => :enrollments,
-      :conditions => ["enrollments.course_id in (#{ids_string}) AND enrollments.created_at > ? AND enrollments.created_at < ?", start_at, end_at]
-    }
-  }
+  scope :enrolled_in_course_between, lambda { |course_ids, start_at, end_at| joins(:enrollments).where(:enrollments => { :course_id => course_ids, :created_at => start_at..end_at }) }
 
-  named_scope :for_course_with_last_login, lambda {|course, root_account_id, enrollment_type|
-    course_id = course.is_a?(Course) ? course.id : course
-    enrollment_conditions = sanitize_sql(['enrollments.course_id = ? AND enrollments.workflow_state != ?', course_id, 'deleted'])
-    enrollment_conditions += sanitize_sql(['AND enrollments.type = ?', enrollment_type]) if enrollment_type
-    {
-      # add a field to each user that is the aggregated max from current_login_at and last_login_at from their pseudonyms
-      :select => 'users.*, MAX(current_login_at) as last_login, MAX(current_login_at) IS NULL as login_info_exists',
+  scope :for_course_with_last_login, lambda { |course, root_account_id, enrollment_type|
+    # add a field to each user that is the aggregated max from current_login_at and last_login_at from their pseudonyms
+    scope = select("users.*, MAX(current_login_at) as last_login, MAX(current_login_at) IS NULL as login_info_exists").
       # left outer join ensures we get the user even if they don't have a pseudonym
-      :joins => sanitize_sql([<<-SQL, root_account_id]),
+      joins(sanitize_sql([<<-SQL, root_account_id])).where(:enrollments => { :course_id => course })
         LEFT OUTER JOIN pseudonyms ON pseudonyms.user_id = users.id AND pseudonyms.account_id = ?
         INNER JOIN enrollments ON enrollments.user_id = users.id
       SQL
-      :conditions => enrollment_conditions,
-      # the trick to get unique users
-      :group => 'users.id'
-    }
+    scope = scope.where("enrollments.workflow_state<>'deleted'")
+    scope = scope.where(:enrollments => { :type => enrollment_type }) if enrollment_type
+    # the trick to get unique users
+    scope.group("users.id")
   }
 
   has_a_broadcast_policy
@@ -567,16 +545,11 @@ class User < ActiveRecord::Base
   end
   protected :assign_uuid
 
-  named_scope :with_service, lambda { |service|
-    if service.is_a?(UserService)
-      {:include => :user_services, :conditions => ['user_services.service = ?', service.service]}
-    else
-      {:include => :user_services, :conditions => ['user_services.service = ?', service.to_s]}
-    end
+  scope :with_service, lambda { |service|
+    service = service.service if service.is_a?(UserService)
+    includes(:user_services).where(:user_services => { :service => service.to_s })
   }
-  named_scope :enrolled_before, lambda{|date|
-    {:conditions => ['enrollments.created_at < ?', date]}
-  }
+  scope :enrolled_before, lambda { |date| where("enrollments.created_at<?", date) }
 
   def group_memberships_for(context)
     groups.where('groups.context_id' => context,
@@ -1263,17 +1236,12 @@ class User < ActiveRecord::Base
     end
   end
 
-  named_scope :with_avatar_state, lambda{|state|
+  scope :with_avatar_state, lambda { |state|
+    scope = where("avatar_image_url IS NOT NULL").order("avatar_image_updated_at DESC")
     if state == 'any'
-      {
-        :conditions =>['avatar_image_url IS NOT NULL AND avatar_state IS NOT NULL AND avatar_state != ?', 'none'],
-        :order => 'avatar_image_updated_at DESC'
-      }
+      scope.where("avatar_state IS NOT NULL AND avatar_state<>'none'")
     else
-      {
-        :conditions => ['avatar_image_url IS NOT NULL AND avatar_state = ?', state],
-        :order => 'avatar_image_updated_at DESC'
-      }
+      scope.where(:avatar_state => state)
     end
   }
 

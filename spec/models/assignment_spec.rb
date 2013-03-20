@@ -2178,7 +2178,7 @@ describe Assignment do
 
   end
 
-  context "not_locked named_scope" do
+  context "not_locked scope" do
     before :each do
       course_with_student_logged_in(:active_all => true)
       assignment_quiz([], :course => @course, :user => @user)

@@ -8,7 +8,7 @@ class ConversationBatch < ActiveRecord::Base
   before_save :serialize_conversation_message_ids
   after_create :queue_delivery
 
-  named_scope :in_progress, :conditions => {:workflow_state => ['created', 'sending']}
+  scope :in_progress, where(:workflow_state => ['created', 'sending'])
 
   attr_accessible
   attr_accessor :mode

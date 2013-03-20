@@ -92,7 +92,7 @@ ActiveRecord::Base.class_eval do
     end
   end
 
-  named_scope :shard, lambda { |shard| {} }
+  scope :shard, lambda { |shard| scoped }
 
   def shard(shard = nil)
     Shard.default

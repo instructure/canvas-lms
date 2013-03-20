@@ -105,9 +105,9 @@ class ContextModule < ActiveRecord::Base
     state :deleted
   end
   
-  named_scope :active, :conditions => ['context_modules.workflow_state = ?', 'active']
-  named_scope :unpublished, :conditions => ['context_modules.workflow_state = ?', 'unpublished']
-  named_scope :not_deleted, :conditions => ['context_modules.workflow_state != ?', 'deleted']
+  scope :active, where(:workflow_state => 'active')
+  scope :unpublished, where(:workflow_state => 'unpublished')
+  scope :not_deleted, where("context_modules.workflow_state<>'deleted'")
 
   def update_student_progressions(user=nil)
     # modules are ordered by position, so running through them in order will

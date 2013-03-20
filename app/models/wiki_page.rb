@@ -71,7 +71,7 @@ class WikiPage < ActiveRecord::Base
     end
     # make stringex scoping a little more useful/flexible... in addition to
     # the normal constructed attribute scope(s), it also supports paramater-
-    # less named_scopeds. note that there needs to be an instance_method of
+    # less scopeds. note that there needs to be an instance_method of
     # the same name for this to work
     scopes = self.class.scope_for_url ? Array(self.class.scope_for_url) : []
     base_scope = self.class
@@ -156,23 +156,18 @@ class WikiPage < ActiveRecord::Base
     self.versions.map(&:model)
   end
 
-  named_scope :active, lambda{
-    {:conditions => ['wiki_pages.workflow_state = ?', 'active'] }
-  }
+  scope :active, where(:workflow_state => 'active')
 
-  named_scope :deleted_last, lambda{
-    {:order => "workflow_state = 'deleted'" }
-  }
+  scope :deleted_last, order("workflow_state='deleted'")
 
-  named_scope :not_deleted, lambda{
-    {:conditions => ['wiki_pages.workflow_state <> ?', 'deleted'] }
-  }
+  scope :not_deleted, where("wiki_pages.workflow_state<>'deleted'")
+
   def not_deleted
     !deleted?
   end
 
-  named_scope :visible_to_students, :conditions => { :hide_from_students => false }
-  named_scope :order_by_id, :order => "id"
+  scope :visible_to_students, where(:hide_from_students => false)
+  scope :order_by_id, order(:id)
 
   def locked_for?(context, user, opts={})
     return false unless self.could_be_locked

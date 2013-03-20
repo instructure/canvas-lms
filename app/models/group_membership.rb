@@ -39,10 +39,10 @@ class GroupMembership < ActiveRecord::Base
   
   has_a_broadcast_policy
   
-  named_scope :include_user, :include => :user
+  scope :include_user, includes(:user)
   
-  named_scope :active, :conditions => ['group_memberships.workflow_state != ?', 'deleted']
-  named_scope :moderators, :conditions => { :moderator => true }
+  scope :active, where("group_memberships.workflow_state<>'deleted'")
+  scope :moderators, where(:moderator => true)
 
   alias_method :context, :group
   

@@ -358,12 +358,8 @@ class StreamItem < ActiveRecord::Base
     count
   end
 
-  named_scope :before, lambda {|id|
-    {:conditions => ['id < ?', id], :order => 'updated_at DESC', :limit => 21 }
-  }
-  named_scope :after, lambda {|start_at| 
-    {:conditions => ['updated_at > ?', start_at], :order => 'updated_at DESC', :limit => 21 }
-  }
+  scope :before, lambda { |id| where("id<?", id).order("updated_at DESC").limit(21) }
+  scope :after, lambda { |start_at| where("updated_at>?", start_at).order("updated_at DESC").limit(21) }
 
   def associated_shards
     if self.context.try(:respond_to?, :associated_shards)

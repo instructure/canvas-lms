@@ -71,25 +71,15 @@ class UserService < ActiveRecord::Base
     state :failed
   end
   
-  named_scope :of_type, lambda { |type| 
-    { :conditions => ['user_services.type = ?', type.to_s]}
+  scope :of_type, lambda { |type| where(:type => type.to_s) }
+
+  scope :to_be_polled, lambda { where("refresh_at<", Time.now.utc).order(:refresh_at).limit(1) }
+  scope :for_user, lambda { |user| where(:user_id => user) }
+  scope :for_service, lambda { |service|
+    service = service.service if service.is_a?(UserService)
+    where(:service => service.to_s)
   }
-  
-  named_scope :to_be_polled, lambda {
-    { :conditions => ['refresh_at < ?', Time.now.utc], :order => :refresh_at, :limit => 1 }
-  }
-  named_scope :for_user, lambda{|user|
-    users = Array(user)
-    {:conditions => {:user_id => users.map(&:id)} }
-  }
-  named_scope :for_service, lambda { |service|
-    if(service.is_a?(UserService))
-      { :conditions => ['user_services.service = ?', service.service]}
-    else
-      { :conditions => ['user_services.service = ?', service.to_s]}
-    end
-  }
-  named_scope :visible, {:conditions => 'visible'}
+  scope :visible, where("visible")
   
   def service_name
     self.service.titleize rescue ""

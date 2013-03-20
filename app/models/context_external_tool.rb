@@ -445,10 +445,8 @@ class ContextExternalTool < ActiveRecord::Base
     nil
   end
   
-  named_scope :having_setting, lambda{|setting|
-    {:conditions => {"has_#{setting.to_s}" => true} }
-  }
-  
+  scope :having_setting, lambda { |setting| where("has_#{setting.to_s}" => true) }
+
   def self.find_for(id, context, type)
     tool = context.context_external_tools.having_setting(type).find_by_id(id)
     if !tool && context.is_a?(Group)
@@ -462,7 +460,7 @@ class ContextExternalTool < ActiveRecord::Base
     raise ActiveRecord::RecordNotFound if !tool
     tool
   end
-  named_scope :active, :conditions => ['context_external_tools.workflow_state != ?', 'deleted']
+  scope :active, where("context_external_tools.workflow_state<>'deleted'")
   
   def self.find_all_for(context, type)
     tools = []

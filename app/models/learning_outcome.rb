@@ -121,10 +121,8 @@ class LearningOutcome < ActiveRecord::Base
     state :deleted
   end
   
-  named_scope :active, lambda{
-    {:conditions => ['workflow_state != ?', 'deleted'] }
-  }
-  
+  scope :active, where("workflow_state<>'deleted'")
+
   def cached_context_short_name
     @cached_context_name ||= Rails.cache.fetch(['short_name_lookup', self.context_code].cache_key) do
       self.context.short_name rescue ""
@@ -295,21 +293,14 @@ class LearningOutcome < ActiveRecord::Base
 
     item
   end
-  
-  named_scope :for_context_codes, lambda{|codes| 
-    {:conditions => {:context_code => Array(codes)} }
-  }
-  named_scope :active, lambda{
-    {:conditions => ['learning_outcomes.workflow_state != ?', 'deleted'] }
-  }
-  named_scope :has_result_for, lambda{|user|
-    {:joins => [:learning_outcome_results],
-     :conditions => ['learning_outcomes.id = learning_outcome_results.learning_outcome_id AND learning_outcome_results.user_id = ?', user.id],
-     :order => 'short_description'
-    }
+
+  scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
+  scope :active, where("learning_outcomes.workflow_state<>'deleted'")
+  scope :has_result_for, lambda { |user|
+    joins(:learning_outcome_results).
+        where("learning_outcomes.id=learning_outcome_results.learning_outcome_id AND learning_outcome_results.user_id=?", user).
+        order(:short_description)
   }
 
-  named_scope :global, lambda{
-    {:conditions => {:context_id => nil} }
-  }
+  scope :global, where(:context_id => nil)
 end

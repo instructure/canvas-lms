@@ -36,35 +36,33 @@ class DelayedMessage < ActiveRecord::Base
     end
   end
   
-  named_scope :for, lambda { |context|
+  scope :for, lambda { |context|
     case context
     when :daily
-      { :conditions => { :frequency => 'daily' } }
+      where(:frequency => 'daily')
     when :weekly
-      { :conditions => { :frequency => 'weekly' } }
+      where(:frequency => 'weekly')
     when Notification
-      { :conditions => { :notification_id => context.id} }
+      where(:notification_id => context)
     when NotificationPolicy
-      { :conditions => { :notification_policy_id => context.id} }
+      where(:notification_policy_id => context)
     when CommunicationChannel
-      { :conditions => { :communication_channel_id => context.id} }
+      where(:communication_channel_id => context)
     else
-      { :conditions => { :context_id => context.id, :context_type => context.class.base_ar_class.to_s } }
+      where(:context_id => context, :context_type => context.class.base_ar_class.to_s)
     end
   }
   
-  named_scope :by, lambda {|field| { :order => field } }
+  scope :by, lambda { |field| order(field) }
   
-  named_scope :in_state, lambda { |state|
-    { :conditions => ["workflow_state = ?", state.to_s]}
+  scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
+
+  scope :to_summarize, lambda {
+    where("delayed_messages.workflow_state='pending' and delayed_messages.send_at<=?", Time.now.utc)
   }
   
-  named_scope :to_summarize, lambda {
-    { :conditions => ['delayed_messages.workflow_state = ? and delayed_messages.send_at <= ?', 'pending', Time.now.utc ] }
-  }
-  
-  named_scope :next_to_summarize, lambda {
-    { :conditions => ['delayed_messages.workflow_state = ?', 'pending'], :order => :send_at, :limit => 1 }
+  scope :next_to_summarize, lambda {
+    where(:workflow_state => 'pending').order(:send_at).limit(1)
   }
   
   def self.ids_for_messages_with_communication_channel_id(cc_id)

@@ -76,7 +76,7 @@ class DelayedNotification < ActiveRecord::Base
   end
   memoize :to_list
   
-  named_scope :to_be_processed, lambda {|limit|
-    {:conditions => ['delayed_notifications.workflow_state = ?', 'to_be_processed'], :limit => limit, :order => 'delayed_notifications.created_at'}
+  scope :to_be_processed, lambda { |limit|
+    where(:workflow_state => 'to_be_processed').limit(limit).order("delayed_notifications.created_at")
   }
 end

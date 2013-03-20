@@ -182,12 +182,12 @@ class ContentExport < ActiveRecord::Base
     ContentExport.where(:id => self).update_all(:progress=>val)
   end
   
-  named_scope :active, {:conditions => ['workflow_state != ?', 'deleted']}
-  named_scope :not_for_copy, {:conditions => ['workflow_state != ?', 'exported_for_course_copy']}
-  named_scope :common_cartridge, {:conditions => ['export_type == ?', COMMON_CARTRIDGE]}
-  named_scope :qti, {:conditions => ['export_type == ?', QTI]}
-  named_scope :course_copy, {:conditions => ['export_type == ?', COURSE_COPY]}
-  named_scope :running, {:conditions => ['workflow_state IN (?)', ['created', 'exporting']]}
+  scope :active, where("workflow_state<>'deleted'")
+  scope :not_for_copy, where("workflow_state<>'exported_for_course_copy'")
+  scope :common_cartridge, where(:export_type => COMMON_CARTRIDGE)
+  scope :qti, where(:export_type => QTI)
+  scope :course_copy, where(:export_type => COURSE_COPY)
+  scope :running, where(:workflow_state => ['created', 'exporting'])
 
   private
 

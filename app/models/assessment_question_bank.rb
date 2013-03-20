@@ -129,7 +129,5 @@ class AssessmentQuestionBank < ActiveRecord::Base
     quiz_groups.destroy_all
   end
   
-  named_scope :active, lambda {
-    {:conditions => ['assessment_question_banks.workflow_state != ?', 'deleted'] }
-  }
+  scope :active, where("assessment_question_banks.workflow_state<>'deleted'")
 end

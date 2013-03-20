@@ -270,17 +270,11 @@ class LearningOutcomeGroup < ActiveRecord::Base
     item
   end
   
-  named_scope :active, lambda{
-    {:conditions => ['learning_outcome_groups.workflow_state != ?', 'deleted'] }
-  }
+  scope :active, where("learning_outcome_groups.workflow_state<>'deleted'")
 
-  named_scope :global, lambda{
-    {:conditions => {:context_id => nil} }
-  }
+  scope :global, where(:context_id => nil)
 
-  named_scope :root, lambda{
-    {:conditions => {:learning_outcome_group_id => nil} }
-  }
+  scope :root, where(:learning_outcome_group_id => nil)
 
   def self.for_context(context)
     context ? context.learning_outcome_groups : LearningOutcomeGroup.global

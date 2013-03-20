@@ -206,33 +206,33 @@ class CommunicationChannel < ActiveRecord::Base
     end
   end
   
-  named_scope :for, lambda { |context| 
+  scope :for, lambda { |context|
     case context
     when User
-      { :conditions => ['communication_channels.user_id = ?', context.id] }
+      where(:user_id => context)
     when Notification
-      { :include => [:notification_policies], :conditions => ['notification_policies.notification_id = ?', context.id] }
+      includes(:notification_policies).where(:notification_policies => { :notification_id => context })
     else
-      {}
+      scoped
     end
   }
 
-  named_scope :by_path, lambda { |path|
+  scope :by_path, lambda { |path|
     if %{mysql mysql2}.include?(connection_pool.spec.config[:adapter])
-      { :conditions => {:path => path } }
+      where(:path => path)
     else
-      { :conditions => ["LOWER(communication_channels.path)=?", path.try(:downcase)]}
+      where("LOWER(communication_channels.path)=?", path.try(:downcase))
     end
   }
 
-  named_scope :email, :conditions => { :path_type => TYPE_EMAIL }
-  named_scope :sms, :conditions => { :path_type => TYPE_SMS }
+  scope :email, where(:path_type => TYPE_EMAIL)
+  scope :sms, where(:path_type => TYPE_SMS)
 
-  named_scope :active, :conditions => { :workflow_state => 'active' }
-  named_scope :unretired, :conditions => ['communication_channels.workflow_state<>?', 'retired']
+  scope :active, where(:workflow_state => 'active')
+  scope :unretired, where("communication_channels.workflow_state<>'retired'")
 
-  named_scope :for_notification_frequency, lambda {|notification, frequency|
-    { :include => [:notification_policies], :conditions => ['notification_policies.notification_id = ? and notification_policies.frequency = ?', notification.id, frequency] }
+  scope :for_notification_frequency, lambda { |notification, frequency|
+    includes(:notification_policies).where(:notification_policies => { :notification_id => notification, :frequency => frequency })
   }
 
   # Get the list of communication channels that overrides an association's default order clause.
@@ -252,10 +252,10 @@ class CommunicationChannel < ActiveRecord::Base
       all
   end
 
-  named_scope :include_policies, :include => :notification_policies
+  scope :include_policies, includes(:notification_policies)
 
-  named_scope :in_state, lambda { |state| { :conditions => ["communication_channels.workflow_state = ?", state.to_s]}}
-  named_scope :of_type, lambda {|type| { :conditions => ['communication_channels.path_type = ?', type] } }
+  scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
+  scope :of_type, lambda {|type| where(:path_type => type) }
   
   def can_notify?
     self.notification_policies.any? { |np| np.frequency == 'never' } ? false : true

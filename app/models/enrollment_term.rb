@@ -131,7 +131,5 @@ class EnrollmentTerm < ActiveRecord::Base
     save!
   end
   
-  named_scope :active, lambda {
-    { :conditions => ['enrollment_terms.workflow_state != ?', 'deleted'] }
-  }
+  scope :active, where("enrollment_terms.workflow_state<>'deleted'")
 end

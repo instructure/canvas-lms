@@ -64,27 +64,33 @@ module Delayed
           end
         end
 
-        named_scope :current, lambda {
-          { :conditions => ["run_at <= ?", db_time_now] }
-        }
+        def self.current
+          where("run_at<=?", db_time_now)
+        end
 
-        named_scope :future, lambda {
-          { :conditions => ["run_at > ?", db_time_now] }
-        }
+        def self.future
+          where("run_at>?", db_time_now)
+        end
 
-        named_scope :failed, :conditions => ["failed_at IS NOT NULL"]
+        def self.failed
+          where("failed_at IS NOT NULL")
+        end
 
-        named_scope :running, :conditions => ["locked_at is NOT NULL AND locked_by <> 'on hold'"]
+        def self.running
+          where("locked_at IS NOT NULL AND locked_by<>'on hold'")
+        end
 
         # a nice stress test:
         # 10_000.times { |i| Kernel.send_later_enqueue_args(:system, { :strand => 's1', :run_at => (24.hours.ago + (rand(24.hours.to_i))) }, "echo #{i} >> test1.txt") }
         # 500.times { |i| "ohai".send_later_enqueue_args(:reverse, { :run_at => (12.hours.ago + (rand(24.hours.to_i))) }) }
         # then fire up your workers
         # you can check out strand correctness: diff test1.txt <(sort -n test1.txt)
-        named_scope :ready_to_run, lambda {
-          { :conditions => ["run_at <= ? AND locked_at IS NULL AND next_in_strand = ?", db_time_now, true] }
-        }
-        named_scope :by_priority, :order => 'priority ASC, run_at ASC'
+         def self.ready_to_run
+           where("run_at<=? AND locked_at IS NULL AND next_in_strand=?", db_time_now, true)
+         end
+        def self.by_priority
+          order("priority ASC, run_at ASC")
+        end
 
         # When a worker is exiting, make sure we don't have any locked jobs.
         def self.clear_locks!(worker_name)

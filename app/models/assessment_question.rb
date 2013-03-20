@@ -564,7 +564,5 @@ class AssessmentQuestion < ActiveRecord::Base
     hash
   end
   
-  named_scope :active, lambda {
-    {:conditions => ['assessment_questions.workflow_state != ?', 'deleted'] }
-  }
+  scope :active, where("assessment_questions.workflow_state<>'deleted'")
 end

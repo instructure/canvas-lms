@@ -161,7 +161,7 @@ class AppointmentGroup < ActiveRecord::Base
   end
 
   # complements :reserve permission
-  named_scope :reservable_by, lambda { |*options|
+  scope :reservable_by, lambda { |*options|
     user = options.shift
     restrict_to_codes = options.shift
 
@@ -170,13 +170,12 @@ class AppointmentGroup < ActiveRecord::Base
       codes[:full] &= restrict_to_codes
       codes[:limited] &= restrict_to_codes
     end
-    {
-      :select => "DISTINCT appointment_groups.*",
-      :joins => "JOIN appointment_group_contexts agc " \
-                "ON appointment_groups.id = agc.appointment_group_id " \
-                "LEFT JOIN appointment_group_sub_contexts sc " \
-                "ON appointment_groups.id = sc.appointment_group_id",
-      :conditions => [<<-COND, codes[:primary], codes[:secondary]]
+    uniq.
+        joins("JOIN appointment_group_contexts agc " \
+              "ON appointment_groups.id = agc.appointment_group_id " \
+              "LEFT JOIN appointment_group_sub_contexts sc " \
+              "ON appointment_groups.id = sc.appointment_group_id").
+        where(<<-COND, codes[:primary], codes[:secondary])
         workflow_state = 'active'
         AND agc.context_code IN (?)
         AND (
@@ -184,10 +183,9 @@ class AppointmentGroup < ActiveRecord::Base
           OR sc.sub_context_code IN (?)
         )
         COND
-    }
   }
   # complements :manage permission
-  named_scope :manageable_by, lambda { |*options|
+  scope :manageable_by, lambda { |*options|
     user = options.shift
     restrict_to_codes = options.shift
 
@@ -196,13 +194,12 @@ class AppointmentGroup < ActiveRecord::Base
       codes[:full] &= restrict_to_codes
       codes[:limited] &= restrict_to_codes
     end
-    {
-      :select => "DISTINCT appointment_groups.*",
-      :joins => "JOIN appointment_group_contexts agc " \
-                "ON appointment_groups.id = agc.appointment_group_id " \
-                "LEFT JOIN appointment_group_sub_contexts sc " \
-                "ON appointment_groups.id = sc.appointment_group_id",
-      :conditions => [<<-COND, codes[:full] + codes[:limited], codes[:full], codes[:secondary]]
+    uniq.
+        joins("JOIN appointment_group_contexts agc " \
+              "ON appointment_groups.id = agc.appointment_group_id " \
+              "LEFT JOIN appointment_group_sub_contexts sc " \
+              "ON appointment_groups.id = sc.appointment_group_id").
+        where(<<-COND, codes[:full] + codes[:limited], codes[:full], codes[:secondary])
         workflow_state <> 'deleted'
         AND agc.context_code IN (?)
         AND (
@@ -210,17 +207,10 @@ class AppointmentGroup < ActiveRecord::Base
           OR sc.sub_context_code IN (?)
         )
         COND
-    }
   }
-  named_scope :current, lambda {
-    {:conditions => ["end_at >= ?", Time.zone.today.to_datetime.utc]}
-  }
-  named_scope :current_or_undated, lambda {
-    {:conditions => ["end_at >= ? OR end_at IS NULL", Time.zone.today.to_datetime.utc]}
-  }
-  named_scope :intersecting, lambda { |start_date, end_date|
-    {:conditions => ["start_at < ? AND end_at > ?", end_date, start_date]}
-  }
+  scope :current, lambda { where("end_at>=?", Time.zone.now.midnight) }
+  scope :current_or_undated, lambda { where("end_at>=? OR end_at IS NULL", Time.zone.now.midnight) }
+  scope :intersecting, lambda { |start_date, end_date| where("start_at<? AND end_at>?", end_date, start_date) }
 
   set_policy do
     given { |user, session|

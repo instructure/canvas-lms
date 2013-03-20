@@ -33,19 +33,11 @@ class Rubric < ActiveRecord::Base
   serialize :data
   simply_versioned
   
-  named_scope :publicly_reusable, lambda {
-    {:conditions => {:reusable => true}, :order => :title}
-  }
-  named_scope :matching, lambda {|search|
-    {:order => 'rubrics.association_count DESC', :conditions => wildcard('rubrics.title', search)}
-  }
-  named_scope :before, lambda{|date|
-    {:conditions => ['rubrics.created_at < ?', date]}
-  }
-  named_scope :active, lambda{
-    {:conditions => ['workflow_state != ?', 'deleted'] }
-  }
-  
+  scope :publicly_reusable, where(:reusable => true).order(:title)
+  scope :matching, lambda { |search| where(wildcard('rubrics.title', search)).order("rubrics.association_count DESC") }
+  scope :before, lambda { |date| where("rubrics.created_at<?", date) }
+  scope :active, where("workflow_state<>'deleted'")
+
   set_policy do
     given {|user, session| self.cached_context_grants_right?(user, session, :manage_rubrics)}
     can :read and can :create and can :delete_associations

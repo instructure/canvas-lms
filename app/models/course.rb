@@ -428,43 +428,21 @@ class Course < ActiveRecord::Base
     self.non_unique_associated_accounts.all.uniq
   end
 
-  named_scope :recently_started, lambda {
-    {:conditions => ['start_at < ? and start_at > ?', Time.now.utc, 1.month.ago], :order => 'start_at DESC', :limit => 10}
-  }
-  named_scope :recently_ended, lambda {
-    {:conditions => ['conclude_at < ? and conclude_at > ?', Time.now.utc, 1.month.ago], :order => 'start_at DESC', :limit => 10}
-  }
-  named_scope :recently_created, lambda {
-    {:conditions => ['created_at > ?', 1.month.ago], :order => 'created_at DESC', :limit => 50, :include => :teachers}
-  }
-  named_scope :for_term, lambda {|term|
-    term ? {:conditions => ['courses.enrollment_term_id = ?', term.id]} : {}
-  }
-  named_scope :active_first, lambda {
-    {:order => "CASE WHEN courses.workflow_state='available' THEN 0 ELSE 1 END, name"}
-  }
-  named_scope :limit, lambda {|limit|
-    {:limit => limit }
-  }
-  named_scope :name_like, lambda { |name|
-    { :conditions => wildcard('courses.name', 'courses.sis_source_id', 'courses.course_code', name) }
-  }
-  named_scope :needs_account, lambda{|account, limit|
-    {:conditions => {:account_id => nil, :root_account_id => account.id}, :limit => limit }
-  }
-  named_scope :active, lambda{
-    {:conditions => ['courses.workflow_state != ?', 'deleted'] }
-  }
-  named_scope :least_recently_updated, lambda{|limit|
-    {:order => 'updated_at', :limit => limit }
-  }
-  named_scope :manageable_by_user, lambda{ |*args|
+  scope :recently_started, lambda { where(:start_at => 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
+  scope :recently_ended, lambda { where(:conclude_at => 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
+  scope :recently_created, lambda { where("created_at>?", 1.month.ago).order("created_at DESC").limit(50).includes(:teachers) }
+  scope :for_term, lambda {|term| term ? where(:enrollment_term_id => term) : scoped }
+  scope :active_first, order("CASE WHEN courses.workflow_state='available' THEN 0 ELSE 1 END, name")
+  scope :name_like, lambda { |name| where(wildcard('courses.name', 'courses.sis_source_id', 'courses.course_code', name)) }
+  scope :needs_account, lambda { |account, limit| where(:account_id => nil, :root_account_id => account).limit(limit) }
+  scope :active, where("courses.workflow_state<>'deleted'")
+  scope :least_recently_updated, lambda { |limit| order(:updated_at).limit(limit) }
+  scope :manageable_by_user, lambda { |*args|
     # args[0] should be user_id, args[1], if true, will include completed
     # enrollments as well as active enrollments
     user_id = args[0]
     workflow_states = (args[1].present? ? %w{'active' 'completed'} : %w{'active'}).join(', ')
-    { :select => 'DISTINCT courses.*',
-      :joins => "INNER JOIN (
+    uniq.joins("INNER JOIN (
          SELECT caa.course_id, au.user_id FROM course_account_associations AS caa
          INNER JOIN accounts AS a ON a.id = caa.account_id AND a.workflow_state = 'active'
          INNER JOIN account_users AS au ON au.account_id = a.id AND au.user_id = #{user_id.to_i}
@@ -472,43 +450,38 @@ class Course < ActiveRecord::Base
          INNER JOIN enrollments AS e ON e.course_id = courses.id AND e.user_id = #{user_id.to_i}
            AND e.workflow_state IN(#{workflow_states}) AND e.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment')
          WHERE courses.workflow_state <> 'deleted') as course_users
-       ON course_users.course_id = courses.id"
-    }
+       ON course_users.course_id = courses.id")
   }
-  named_scope :not_deleted, {:conditions => ['workflow_state != ?', 'deleted']}
+  scope :not_deleted, where("workflow_state<>'deleted'")
 
-  named_scope :with_enrollments, lambda {
-    { :conditions => ["exists (#{Enrollment.active.send(:construct_finder_sql, {:select => "1", :conditions => ["enrollments.course_id = courses.id"]})})"] }
+  scope :with_enrollments, lambda {
+    where("EXISTS (#{Enrollment.active.select("1").where("enrollments.course_id=courses.id").to_sql})")
   }
-  named_scope :without_enrollments, lambda {
-    { :conditions => ["NOT EXISTS (#{Enrollment.active.send(:construct_finder_sql, {:select => "1", :conditions => ["enrollments.course_id = courses.id"]})})"] }
+  scope :without_enrollments, lambda {
+    where("NOT EXISTS (#{Enrollment.active.select("1").where("enrollments.course_id=courses.id").to_sql})")
   }
-  named_scope :completed, lambda {
-    { :joins => :enrollment_term,
-      :conditions => ["courses.workflow_state = 'completed' or courses.conclude_at < ? or enrollment_terms.end_at < ?", Time.now.utc, Time.now.utc]
-    }
+  scope :completed, lambda {
+    joins(:enrollment_term).
+        where("courses.workflow_state='completed' OR courses.conclude_at<? OR enrollment_terms.end_at<?", Time.now.utc, Time.now.utc)
   }
-  named_scope :not_completed, lambda {
-    { :joins => :enrollment_term,
-      :conditions => [%{courses.workflow_state <> 'completed' AND
-                        (courses.conclude_at IS NULL OR courses.conclude_at >= ?) AND
-                        (enrollment_terms.end_at IS NULL OR enrollment_terms.end_at >= ?)}, Time.now.utc, Time.now.utc]
-    }
+  scope :not_completed, lambda {
+    joins(:enrollment_term).
+        where("courses.workflow_state<>'completed' AND
+          (courses.conclude_at IS NULL OR courses.conclude_at>=?) AND
+          (enrollment_terms.end_at IS NULL OR enrollment_terms.end_at>=?)", Time.now.utc, Time.now.utc)
   }
-  named_scope :by_teachers, lambda{ |teacher_ids|
-    teacher_ids.empty? ? { :conditions => "1 = 0" } :
-    { :conditions => ["EXISTS (#{Enrollment.active.send(:construct_finder_sql, {:select => "1",
-        :conditions => ["enrollments.course_id = courses.id AND enrollments.type = 'TeacherEnrollment' AND enrollments.user_id IN (#{teacher_ids.join(',')})"]})})"]
-    }
+  scope :by_teachers, lambda { |teacher_ids|
+    teacher_ids.empty? ?
+      where("?", false) :
+      where("EXISTS (#{Enrollment.active.select("1").where("enrollments.course_id=courses.id AND enrollments.type='TeacherEnrollment' AND enrollments.user_id IN (?)", teacher_ids).to_sql})")
   }
-  named_scope :by_associated_accounts, lambda{ |account_ids|
-    account_ids.empty? ? { :conditions => "1 = 0" } :
-    { :conditions => ["EXISTS (#{CourseAccountAssociation.send(:construct_finder_sql, {:select => "1",
-        :conditions => ["course_account_associations.course_id = courses.id AND course_account_associations.account_id IN (#{account_ids.join(',')})"]})})"]
-    }
+  scope :by_associated_accounts, lambda{ |account_ids|
+    account_ids.empty? ?
+      where("?", false) :
+      where("EXISTS (#{CourseAccountAssociation.select("1").where("course_account_associations.course_id=courses.id AND course_account_associations.account_id IN (?)", account_ids).to_sql})")
   }
 
-  named_scope :deleted, :conditions => ["workflow_state = ? ", 'deleted']
+  scope :deleted, where(:workflow_state => 'deleted')
 
   set_broadcast_policy do |p|
     p.dispatch :grade_weight_changed

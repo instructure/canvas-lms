@@ -23,13 +23,9 @@ class GroupCategory < ActiveRecord::Base
   has_many :assignments, :dependent => :nullify
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
 
-  named_scope :active, lambda {
-    { :conditions => ['group_categories.deleted_at is null'] }
-  }
+  scope :active, where(:deleted_at => nil)
 
-  named_scope :other_than, lambda{ |cat|
-    { :conditions => ['group_categories.id != ?', cat.id || 0] }
-  }
+  scope :other_than, lambda { |cat| where("group_categories.id<>?", cat.id || 0) }
 
   class << self
     def protected_name_for_context?(name, context)

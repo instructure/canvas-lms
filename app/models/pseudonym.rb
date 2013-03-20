@@ -103,11 +103,11 @@ class Pseudonym < ActiveRecord::Base
     @send_confirmation = false
   end
 
-  named_scope :by_unique_id, lambda { |unique_id|
+  scope :by_unique_id, lambda { |unique_id|
     if %w{mysql mysql2}.include?(connection_pool.spec.config[:adapter])
-      { :conditions => {:unique_id => unique_id } }
+      where(:unique_id => unique_id)
     else
-      { :conditions => ["LOWER(#{quoted_table_name}.unique_id)=?", unique_id.mb_chars.downcase] }
+      where("LOWER(#{quoted_table_name}.unique_id)=?", unique_id.mb_chars.downcase)
     end
   }
 
@@ -374,10 +374,7 @@ class Pseudonym < ActiveRecord::Base
     nil
   end
 
-  named_scope :account_unique_ids, lambda{|account, *unique_ids|
-    {:conditions => {:account_id => account.id, :unique_id => unique_ids}, :order => :unique_id}
-  }
-  named_scope :active, :conditions => ['pseudonyms.workflow_state IS NULL OR pseudonyms.workflow_state != ?', 'deleted']
+  scope :active, where("pseudonyms.workflow_state IS NULL OR pseudonyms.workflow_state<>'deleted'")
 
   def self.serialization_excludes; [:crypted_password, :password_salt, :reset_password_token, :persistence_token, :single_access_token, :perishable_token, :sis_ssha]; end
 

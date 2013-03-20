@@ -31,8 +31,8 @@ class UserNote < ActiveRecord::Base
     state :deleted
   end
   
-  named_scope :active, :conditions => ['workflow_state != ?', 'deleted']
-  named_scope :desc_by_date, :order => 'created_at DESC'
+  scope :active, where("workflow_state<>'deleted'")
+  scope :desc_by_date, order('created_at DESC')
   
   set_policy do
     given { |user| self.creator == user }

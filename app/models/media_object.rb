@@ -299,17 +299,11 @@ class MediaObject < ActiveRecord::Base
     save!
   end
 
-  named_scope :active, lambda{
-    {:conditions => ['media_objects.workflow_state != ?', 'deleted'] }
-  }
+  scope :active, where("media_objects.workflow_state<>'deleted'")
 
-  named_scope :by_media_id, lambda { |media_id|
-    { :conditions => [ 'media_objects.media_id = ? OR media_objects.old_media_id = ?', media_id, media_id ] }
-  }
+  scope :by_media_id, lambda { |media_id| where("media_objects.media_id=? OR media_objects.old_media_id=?", media_id, media_id) }
 
-  named_scope :by_media_type, lambda { |media_type|
-    { :conditions => [ 'media_objects.media_type = ?', media_type ]}
-  }
+  scope :by_media_type, lambda { |media_type| where(:media_type => media_type) }
 
   workflow do
     state :active

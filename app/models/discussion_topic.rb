@@ -310,28 +310,18 @@ class DiscussionTopic < ActiveRecord::Base
     topic_participant
   end
 
-  named_scope :recent, lambda{
-    {:conditions => ['discussion_topics.last_reply_at > ?', 2.weeks.ago], :order => 'discussion_topics.last_reply_at DESC'}
+  scope :recent, lambda { where("discussion_topics.last_reply_at>?", 2.weeks.ago).order("discussion_topics.last_reply_at DESC") }
+  scope :only_discussion_topics, where(:type => nil)
+  scope :for_subtopic_refreshing, where("discussion_topics.subtopics_refreshed_at IS NOT NULL AND discussion_topics.subtopics_refreshed_at<discussion_topics.updated_at").order("discussion_topics.subtopics_refreshed_at")
+  scope :for_delayed_posting, lambda {
+    where("discussion_topics.workflow_state='post_delayed' AND discussion_topics.delayed_post_at<?", Time.now.utc).order("discussion_topics.delayed_post_at")
   }
-  named_scope :only_discussion_topics, lambda {
-    {:conditions => ['discussion_topics.type IS NULL'] }
-  }
-  named_scope :for_subtopic_refreshing, lambda {
-    {:conditions => ['discussion_topics.subtopics_refreshed_at IS NOT NULL AND discussion_topics.subtopics_refreshed_at < discussion_topics.updated_at'], :order => 'discussion_topics.subtopics_refreshed_at' }
-  }
-  named_scope :for_delayed_posting, lambda {
-    {:conditions => ['discussion_topics.workflow_state = ? AND discussion_topics.delayed_post_at < ?', 'post_delayed', Time.now.utc], :order => 'discussion_topics.delayed_post_at'}
-  }
-  named_scope :active, :conditions => ['discussion_topics.workflow_state != ?', 'deleted']
-  named_scope :for_context_codes, lambda {|codes|
-    {:conditions => ['discussion_topics.context_code IN (?)', codes] }
-  }
+  scope :active, where("discussion_topics.workflow_state<>'deleted'")
+  scope :for_context_codes, lambda {|codes| where(:context_code => codes) }
 
-  named_scope :before, lambda {|date|
-    {:conditions => ['discussion_topics.created_at < ?', date]}
-  }
+  scope :before, lambda { |date| where("discussion_topics.created_at<?", date) }
 
-  named_scope :by_position, :order => "discussion_topics.position DESC, discussion_topics.created_at DESC"
+  scope :by_position, order("discussion_topics.position DESC, discussion_topics.created_at DESC")
 
   def try_posting_delayed
     if self.post_delayed? && Time.now >= self.delayed_post_at

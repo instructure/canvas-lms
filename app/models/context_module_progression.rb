@@ -95,14 +95,9 @@ class ContextModuleProgression < ActiveRecord::Base
     self.save if orig_reqs != new_reqs
   end
   
-  named_scope :for_user, lambda{|user|
-    {:conditions => {:user_id => user && user.id} }
-  }
-  named_scope :for_modules, lambda{|mods|
-    mods = Array(mods)
-    {:conditions => {:context_module_id => mods.map(&:id) } }
-  }
-  
+  scope :for_user, lambda { |user| where(:user_id => user) }
+  scope :for_modules, lambda { |mods| where(:context_module_id => mods) }
+
   workflow do
     state :locked
     state :unlocked
