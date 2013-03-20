@@ -604,7 +604,7 @@ describe Quiz do
       qs = q.generate_submission(@student)
 
       stats = q.statistics(false)
-      stats[:submission_count].should == 1
+      stats[:multiple_attempts_exist].should be_false
     end
 
     context 'csv' do

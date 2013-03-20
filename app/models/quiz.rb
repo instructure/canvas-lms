@@ -1001,8 +1001,32 @@ class Quiz < ActiveRecord::Base
     end
   end
 
+  # returns a blob of stats junk like this:
+  # {
+  #   :multiple_attempts_exist=>false,
+  #   :submission_user_ids=>#<Set: {2, ...}>,
+  #   :unique_submission_count=>50,
+  #   :submission_score_average=>5,
+  #   :submission_score_high=>10,
+  #   :submission_score_low=>0,
+  #   :submission_duration_average=>124,
+  #   :submission_score_stdev=>0,
+  #   :submission_incorrect_count_average=>3,
+  #   :submission_correct_count_average=>1,
+  #   :questions=>
+  #     [output of stats_for_question for every question in submission_data]
   def statistics(include_all_versions=true)
     submissions = submissions_for_statistics(include_all_versions)
+    # questions: questions from quiz#quiz_data
+    #{1022=>
+    # {"id"=>1022,
+    #  "points_possible"=>1,
+    #  "question_type"=>"numerical_question",
+    #  "question_name"=>"Really Hard Question",
+    #  "name"=>"Really Hard Question",
+    #  "answers"=> [{"id"=>6782},...],
+    #  "assessment_question_id"=>1022,
+    # }, ...}
     questions = Hash[
       (quiz_data || []).map { |q| q[:questions] || q }.
         flatten.
@@ -1015,14 +1039,9 @@ class Quiz < ActiveRecord::Base
     questions_hash = {}
     stats[:questions] = []
     stats[:multiple_attempts_exist] = submissions.any?{|s| s.attempt && s.attempt > 1 }
-    stats[:multiple_attempts_included] = include_all_versions
     stats[:submission_user_ids] = Set.new
-    stats[:submission_score_tally] = 0
     stats[:unique_submission_count] = 0
-    stats[:submission_correct_tally] = 0
-    stats[:submission_incorrect_tally] = 0
-    stats[:submission_duration_tally] = 0
-    stats[:submission_count] = submissions.size
+    correct_cnt = incorrect_cnt = total_duration = 0
     submissions.each do |sub|
       stats[:submission_user_ids] << sub.user_id if sub.user_id > 0
       if !found_ids[sub.id]
@@ -1033,10 +1052,9 @@ class Quiz < ActiveRecord::Base
       next unless answers.is_a?(Array)
       points = answers.map{|a| a[:points] }.sum
       score_counter << points
-      stats[:submission_score_tally] += points
-      stats[:submission_incorrect_tally] += answers.count{|a| a[:correct] == false }
-      stats[:submission_correct_tally] += answers.count{|a| a[:correct] == true }
-      stats[:submission_duration_tally] += ((sub.finished_at - sub.started_at).to_i rescue 30)
+      correct_cnt += answers.count{|a| a[:correct] == true }
+      incorrect_cnt += answers.count{|a| a[:correct] == false }
+      total_duration += ((sub.finished_at - sub.started_at).to_i rescue 30)
       sub.quiz_data.each do |question|
         questions_hash[question[:id]] ||= question
       end
@@ -1044,10 +1062,16 @@ class Quiz < ActiveRecord::Base
     stats[:submission_score_average] = score_counter.mean
     stats[:submission_score_high] = score_counter.max
     stats[:submission_score_low] = score_counter.min
-    stats[:submission_duration_average] = stats[:submission_count] > 0 ? stats[:submission_duration_tally].to_f / stats[:submission_count].to_f : 0
     stats[:submission_score_stdev] = score_counter.standard_deviation
-    stats[:submission_incorrect_count_average] = stats[:submission_count] > 0 ? stats[:submission_incorrect_tally].to_f / stats[:submission_count].to_f : 0
-    stats[:submission_correct_count_average] = stats[:submission_count] > 0 ? stats[:submission_correct_tally].to_f / stats[:submission_count].to_f : 0
+    if submissions.size > 0
+      stats[:submission_correct_count_average]   = correct_cnt.to_f / submissions.size
+      stats[:submission_incorrect_count_average] = incorrect_cnt.to_f / submissions.size
+      stats[:submission_duration_average] = total_duration.to_f / submissions.size
+    else
+      stats[:submission_correct_count_average] =
+        stats[:submission_incorrect_count_average] =
+        stats[:submission_duration_average] = 0
+    end
 
     assessment_questions = if questions_hash.any? { |_,q| q[:assessment_question_id] }
                              Hash[
@@ -1081,7 +1105,6 @@ class Quiz < ActiveRecord::Base
         stats[:questions] << ['question', stat]
       end
     end
-    stats[:last_submission_at] = submissions.map(&:finished_at).compact.max || self.created_at
     stats
   end
 
