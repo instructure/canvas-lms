@@ -114,6 +114,9 @@ ActiveRecord::Base.class_eval do
       with_exclusive_scope(:find => new_options) { all.map(&column) }
     end
   end
+
+  # support 0 arguments
+  named_scope :lock, lambda { |*lock| lock = [true] if lock.empty?; {:lock => lock.first} }
 end
 
 ActiveRecord::NamedScope::ClassMethods.module_eval do
