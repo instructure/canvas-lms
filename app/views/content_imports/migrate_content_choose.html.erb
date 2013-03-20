@@ -1,28 +1,7 @@
 <% add_crumb t('crumbs.migrate', "Migrate From Another System"),  context_url(@context, :context_import_migrate_url) %>
 <% content_for :page_title do %><%= t :page_title, "Migrate from Another System" %><% end %>
-<% content_for :stylesheets do %>
-<style>
-.root_asset_list {
-  margin-top: 10px;
-  margin-bottom: 5px;
-  margin-left: 30px;
-}
-.root_asset_list > li {
-  margin-bottom: 10px;
-}
-.root_asset_list h4 {
-  margin: 0;
-}
-.asset_list {
-  margin-top: 10px;
-  margin-bottom: 5px;
-  margin-left: 30px;
-}
-#copy_context_form h3 {
-  color: #444;
-}
-</style>
-<% end %>
+
+<% jammit_css :content_imports %>
 
 <div>
   <div id="copy_context_form_loading">
@@ -40,7 +19,7 @@
       <%= image_tag 'ajax-loader-bar.gif' %>
     </div>
   </div>
-  <% form_tag context_url(@context, :context_import_migrate_execute_url, @content_migration.id), :id => "copy_context_form", :style => "width: 600px; margin: 10px auto; display: none;" do %>
+  <% form_tag context_url(@context, :context_import_migrate_execute_url, @content_migration.id), :id => "copy_context_form", :style => "width: 600px; margin: 10px auto; display: none;", :class => 'form-inline' do %>
     <%= hidden_field :copy, :content_migration_id, :value => @content_migration.id %>
     <div style="display: none;" class="content_migration_id"><%= @content_migration.id %></div>
     <h2><%= t 'titles.copy_from', "Copy From %{course}", :course => '<span class="course_name">...</span>'.html_safe %></h2>

@@ -151,4 +151,6 @@ stylesheets:
     - public/javascripts/tinymce/jscripts/tiny_mce/plugins/inlinepopups/skins/clearlooks2/window.css
   messages:
     - public/stylesheets/compiled/messages.css
+  content_imports:
+    - public/stylesheets/compiled/content_imports.css
   <%= plugin_assets.anchors_yml %>
