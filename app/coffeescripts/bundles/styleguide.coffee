@@ -9,7 +9,10 @@ require [
 ], ($, preventDefault) ->
 
   do ->
-    dialog = $('#dialog-buttons-dialog').dialog(autoOpen: false).data('dialog')
+    dialog = $('#dialog-buttons-dialog').dialog({
+      autoOpen: false
+      height: 200
+    }).data('dialog')
     $('#show-dialog-buttons-dialog').click -> dialog.open()
 
 

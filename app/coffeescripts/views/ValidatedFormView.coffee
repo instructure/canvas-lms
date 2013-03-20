@@ -7,7 +7,7 @@ define [
   'jquery.toJSON'
   'jquery.disableWhileLoading'
   'jquery.instructure_forms'
-], (Backbone, ValidatedMixin, $, _, preventDefault) ->
+], (Backbone, ValidatedMixin, $, _) ->
 
   ##
   # Sets model data from a form, saves it, and displays errors returned in a
@@ -45,7 +45,8 @@ define [
     #
     # @api public
     # @returns jqXHR
-    submit: preventDefault ->
+    submit: (event) ->
+      event?.preventDefault()
       @$el.hideErrors()
 
       data = @getFormData()

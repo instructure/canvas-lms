@@ -63,33 +63,59 @@ We want to deprecate this in favor of `form-horizontal`.
   }
 }
 
-/* @styleguide Forms: Dialog Buttons
+/* @styleguide Forms: Dialog Form
 
-Elements with the `.form-controls` class in dialogs will be displayed properly,
-no need to use `fixDialogButtons` on them.
+Add the class `form-dialog` to get the `form-controls` to display properly in a
+dialog form and proper overflow scrolling of content. No need to use
+`$.fn.fixDialogButtons`.
+
+**Note**: You must wrap your content in `.form-dialog-content` and use the
+height option for jQuery UI dialog. To get the scrolling and fixed form
+controls on the bottom required this.
 
 ```html
 <button id="show-dialog-buttons-dialog" class="btn">Show Dialog</button>
-<div id="dialog-buttons-dialog">
-  <form class="form-inline">
-    <p>Aren't the form controls beautiful?</p>
-    <div class="form-controls">
-      <button class="btn btn-primary" type="button">Submit</button>
-    </div>
-  </form>
-</div>
+<form id="dialog-buttons-dialog" class="form-dialog">
+  <div class="form-dialog-content">
+    <p style="height: 1000px;">Aren't the form controls beautiful?<br> Scroll down ↓</p>
+    <p>Hooray for scrolling</p>
+  </div>
+  <div class="form-controls">
+    <button class="btn btn-primary" type="button">Submit</button>
+  </div>
+</form>
 ```
 
 */
 
-.ui-dialog .form-controls {
-  padding: 10px;
-  margin: 0 -1em !important;
-  background-color: #EFEFEF;
-  border-top: 1px solid #DDD;
-  box-shadow: inset 0 1px 0 white;
-  text-align: right;
-  position: relative;
-  bottom: -26px;
+.form-dialog {
+  padding-bottom: 70px !important;
+  margin-bottom: 0;
+
+  .form-controls {
+    padding: 10px;
+    margin: 0;
+    background-color: #EFEFEF;
+    border-top: 1px solid #DDD;
+    box-shadow: inset 0 1px 0 white;
+    text-align: right;
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+  }
+
+  .form-dialog-content {
+    // jQuery UI handles overflow on its own, but our buttons are inside the
+    // default scroll area, this gives us our own scrollable content area
+    // while still allowing us to use the height option in $.fn.dialog
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 51px;
+    overflow: auto;
+    padding: 20px;
+  }
 }
 

@@ -126,6 +126,34 @@ class Role < ActiveRecord::Base
     @enrollment_types
   end
 
+  def self.manageable_roles_by_user(user, course)
+    manageable = ['ObserverEnrollment', 'DesignerEnrollment']
+    if course.grants_right?(user, :manage_students)
+      manageable << 'StudentEnrollment'
+    end
+    if course.grants_right?(user, :manage_admin_users)
+      manageable << 'TeacherEnrollment'
+      manageable << 'TaEnrollment'
+    elsif course.teacherless?
+      manageable << 'TeacherEnrollment'
+    end
+    manageable.sort
+  end
+
+  def self.role_data(course, user, include_inactive=false)
+    manageable = Role.manageable_roles_by_user(user, course)
+    self.custom_roles_and_counts_for_course(course, user, include_inactive).inject([]) { |roles, role|
+      is_manageable = manageable.include?(role[:base_role_name])
+      role[:manageable_by_user] = is_manageable
+      roles << role
+      role[:custom_roles].each do |custom_role|
+        custom_role[:manageable_by_user] = is_manageable
+        roles << custom_role
+      end
+      roles
+    }
+  end
+
   def self.built_in_role_names
     @built_in_role_names ||= %w(AccountAdmin) + Enrollment.valid_types
   end

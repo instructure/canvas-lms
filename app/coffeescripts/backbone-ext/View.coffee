@@ -141,12 +141,12 @@ define [
     _afterRender: ->
       @cacheEls()
       @createBindings()
-      @afterRender()
       # TODO: remove this when `options.views` is removed
       @renderViews() if @options.views
-      # renderChildViews must come last! so we don't cache all the
+      # renderChildViews must come after cacheEls so we don't cache all the
       # child views elements, bind them to model data, etc.
       @renderChildViews()
+      @afterRender()
 
     ##
     # Define in subclasses to add behavior to your view, ie. creating
@@ -294,6 +294,10 @@ define [
       view.setElement target
       view.render()
       @[selector] ?= view
+
+    hide: -> @$el.hide()
+    show: -> @$el.show()
+    toggle: -> @$el.toggle()
 
   Backbone.View
 

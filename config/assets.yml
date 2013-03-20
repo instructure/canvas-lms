@@ -102,9 +102,6 @@ stylesheets:
     - public/stylesheets/compiled/grading_standards.css
   login:
     - public/stylesheets/compiled/login.css
-  roster:
-    - public/stylesheets/compiled/course_settings.css
-    - public/stylesheets/compiled/roster.css
   roster_user:
     - public/stylesheets/compiled/roster_user.css
   learning_outcomes:
