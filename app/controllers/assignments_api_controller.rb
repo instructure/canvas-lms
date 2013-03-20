@@ -302,10 +302,9 @@ class AssignmentsApiController < ApplicationController
   #   allowed submission types:
   #
   #     "online_upload"
-  #     "online_media_recording"
   #     "online_text_entry"
   #     "online_url"
-  #     "online_media_recording" Only valid when the Kaltura plugin is enabled.
+  #     "media_recording" (Only valid when the Kaltura plugin is enabled)
   #
   # @argument assignment[allowed_extensions] [Array]
   #   Allowed extensions if submission_types includes "online_upload"

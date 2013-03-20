@@ -86,6 +86,7 @@ class QuizGroupsController < ApplicationController
         updates << "WHEN id=#{item.id} THEN #{idx + 1}"
       end
       QuizQuestion.update_all("quiz_group_id=#{@group.id}, position=CASE #{updates.join(" ")} ELSE id END", {:id => items.map(&:id)})
+      Quiz.mark_quiz_edited(@quiz.id)
       render :json => {:reorder => true}
     end
   end

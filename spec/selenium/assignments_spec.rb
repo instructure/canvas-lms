@@ -256,6 +256,73 @@ describe "assignments" do
       ff("fieldset#assignment_peer_reviews_fields div").should == []
     end
 
+    it "should show a more errors errorBox if any invalid fields are hidden" do
+      assignment_name = 'first test assignment'
+      @assignment = @course.assignments.create({
+        :name => assignment_name,
+        :assignment_group => @course.assignment_groups.create!(:name => "default")
+      })
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+      f('#assignment_toggle_advanced_options').click # show advanced options
+      click_option('#assignment_submission_type', "Online") # setup an error state (online with no types)
+      f('#assignment_toggle_advanced_options').click # hide advanced options
+      f('.btn-primary[type=submit]').click
+      wait_for_ajaximations
+
+      errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
+      errorBoxes.size.should == 2 # the inivisible one and the 'advanced options' one
+      visBoxes, hidBoxes = errorBoxes.partition { |eb| eb.displayed? }
+      visBoxes.first.text.should == "There were errors on one or more advanced options"
+
+      f('#assignment_toggle_advanced_options').click
+      wait_for_ajaximations
+      errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
+      errorBoxes.size.should == 1 # the more_options_link one has now been removed from the DOM
+      errorBoxes.first.text.should == 'Please choose at least one submission type'
+      errorBoxes.first.should be_displayed
+    end
+
+    it "should validate that a group category is selected" do
+      assignment_name = 'first test assignment'
+      @assignment = @course.assignments.create({
+        :name => assignment_name,
+        :assignment_group => @course.assignment_groups.create!(:name => "default")
+      })
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+      f('#assignment_toggle_advanced_options').click # show advanced options
+      f('#assignment_has_group_category').click
+      close_visible_dialog
+      f('.btn-primary[type=submit]').click
+      wait_for_ajaximations
+
+      errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
+      visBoxes, hidBoxes = errorBoxes.partition { |eb| eb.displayed? }
+      visBoxes.first.text.should == "Please select a group set for this assignment"
+    end
+
+    it "should create an assignment with more options" do
+      enable_cache do
+        expected_text = "Assignment 1"
+
+        get "/courses/#{@course.id}/assignments"
+        group = @course.assignment_groups.first
+        AssignmentGroup.update_all({:updated_at => 1.hour.ago}, {:id => group.id})
+        first_stamp = group.reload.updated_at.to_i
+        f('.add_assignment_link').click
+        wait_for_ajaximations
+        expect_new_page_load { f('.more_options_link').click }
+        submit_assignment_form
+        @course.assignments.count.should == 1
+        get "/courses/#{@course.id}/assignments"
+        f('.no_assignments_message').should_not be_displayed
+        f('#groups').should include_text(expected_text)
+        group.reload
+        group.updated_at.to_i.should_not == first_stamp
+      end
+    end
+
     context "frozen assignments" do
 
       append_before(:each) do

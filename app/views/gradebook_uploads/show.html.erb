@@ -1,11 +1,5 @@
 <% content_for :page_title do %><%= join_title t(:page_title, "Gradebook"), @context.name %><% end %>
 
-<% content_for :auto_discovery do %>
-  <% if @context_enrollment %>
-    <%= auto_discovery_link_tag(:atom, feeds_gradebook_url(@context_enrollment.feed_code), {:title => t('titles.feed', "Course Gradebook Atom Feed")}) %>
-  <% end %>
-<% end %>
-
 <% 
   jammit_css :gradebook_uploads
   js_bundle :gradebook_uploads 

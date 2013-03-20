@@ -250,12 +250,12 @@ define [
     assignment.set 'submission_types', []
     deepEqual assignment.acceptsOnlineURL(), false
 
-  module "Assignment#acceptsOnlineMediaRecording"
+  module "Assignment#acceptsMediaRecording"
 
   test "returns true if submission types includes media recordings", ->
     assignment = new Assignment name: 'foo'
-    assignment.set 'submission_types', [ 'online_media_recording' ]
-    deepEqual assignment.acceptsOnlineMediaRecording(), true
+    assignment.set 'submission_types', [ 'media_recording' ]
+    deepEqual assignment.acceptsMediaRecording(), true
 
   module "Assignment#acceptsOnlineTextEntries"
 
@@ -381,9 +381,9 @@ define [
 
   test "includes whether or not assignment accepts media recordings", ->
     assignment = new Assignment name: 'foo'
-    assignment.set 'submission_types', [ 'online_media_recording' ]
+    assignment.set 'submission_types', [ 'media_recording' ]
     json = assignment.toView()
-    deepEqual json.acceptsOnlineMediaRecording, true
+    deepEqual json.acceptsMediaRecording, true
 
   test "includes submissionType", ->
     assignment = new Assignment name: 'foo'

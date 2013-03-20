@@ -25,6 +25,8 @@ class QuizGroup < ActiveRecord::Base
   before_save :infer_position
   validates_presence_of :quiz_id
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
+  before_destroy :update_quiz
+  after_save :update_quiz
   
   def infer_position
     if !self.position && self.quiz
@@ -130,5 +132,9 @@ class QuizGroup < ActiveRecord::Base
     end
     
     item
+  end
+
+  def update_quiz
+    Quiz.mark_quiz_edited(self.quiz_id)
   end
 end

@@ -447,7 +447,30 @@ describe CoursesController, :type => :integration do
         run_jobs
         [@course1, @course2, @course3].each { |c| c.reload.should be_available }
       end
-
+      
+      it 'should undelete courses' do
+        [@course1, @course2].each { |c| c.destroy }
+        api_call(:put, @path, @params, { :event => 'undelete', :course_ids => [@course1.id, 'sis_course_id:course2'] })
+        run_jobs
+        [@course1, @course2].each { |c| c.reload.should be_claimed }
+      end
+      
+      it "should not conclude deleted courses" do
+        @course1.destroy
+        api_call(:put, @path, @params, { :event => 'conclude', :course_ids => [@course1.id, @course2.id] })
+        run_jobs
+        @course1.reload.should be_deleted
+        @course2.reload.should be_completed
+      end
+      
+      it "should not publish deleted courses" do
+        @course1.destroy
+        api_call(:put, @path, @params, { :event => 'offer', :course_ids => [@course1.id, @course2.id] })
+        run_jobs
+        @course1.reload.should be_deleted
+        @course2.reload.should be_available
+      end
+      
       it "should update progress" do
         json = api_call(:put, @path, @params, { :event => 'conclude', :course_ids => ['sis_course_id:course1', 'sis_course_id:course2', 'sis_course_id:course3']})
         progress = Progress.find(json['id'])

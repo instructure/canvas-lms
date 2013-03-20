@@ -305,7 +305,7 @@ class AssignmentsController < ApplicationController
       hash = {
         :ASSIGNMENT_GROUPS => assignment_groups.map{|g| assignment_group_json(g, @current_user, session) },
         :GROUP_CATEGORIES => group_categories,
-        :KALTURA_ENABLED => !!feature_enabled?( :kaltura ),
+        :KALTURA_ENABLED => !!feature_enabled?(:kaltura),
         :SECTION_LIST => (@context.course_sections.active.map { |section|
           {:id => section.id, :name => section.name }
         }),
