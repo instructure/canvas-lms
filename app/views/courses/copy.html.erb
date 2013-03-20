@@ -17,11 +17,11 @@
     </tr>
     <tr>
       <td><%= f.label :start_at, :en => "Start Date" %></td>
-      <td><div><%= f.text_field :start_at, :class => 'datetime_field', :style => "width: 120px;", :value => @context.start_at %></div></td>
+      <td><div><%= f.text_field :start_at, :class => 'datetime_field', :style => "width: 165px;", :value => @context.start_at %></div></td>
     </tr>
     <tr>
       <td><%= f.label :conclude_at, :en => "End Date" %></td>
-      <td><div><%= f.text_field :conclude_at, :class => 'datetime_field', :style => "width: 120px;", :value => @context.conclude_at %></div></td>
+      <td><div><%= f.text_field :conclude_at, :class => 'datetime_field', :style => "width: 165px;", :value => @context.conclude_at %></div></td>
     </tr>
     <% if can_do(@context.account, @current_user, :manage_courses) %>
       <tr>
