@@ -99,7 +99,7 @@ define([
             // palliate the server by skipping the data submission
             if (repeat && _.isEqual(submissionData, lastSuccessfulSubmissionData)) {
               quizSubmission.currentlyBackingUp = false;
-              setTimeout(function() { console.log('timed out'); quizSubmission.updateSubmission(true) }, 30000);
+              setTimeout(function() { quizSubmission.updateSubmission(true) }, 30000);
               return;
             }
             $.ajaxJSON(url, 'PUT', submissionData,
@@ -133,17 +133,43 @@ define([
                 }
               },
               // Error callback
-              function() {
+              function(resp, ec) {
                 var current_user_id = $("#identity .user_id").text() || "none";
                 quizSubmission.currentlyBackingUp = false;
-                $.ajaxJSON(
-                    location.protocol + '//' + location.host + "/simple_response.json?user_id=" + current_user_id + "&rnd=" + Math.round(Math.random() * 9999999),
-                    'GET', {},
-                    function() {},
-                    function() {
-                      $.flashError(I18n.t('errors.connection_lost', "Connection to %{host} was lost.  Please make sure you're connected to the Internet before continuing.", {'host': location.host}));
-                    }
-                );
+
+                // has the user logged out?
+                // TODO: support this redirect in LDB, by getting out of high security mode.
+                if (!ENV.LOCKDOWN_BROWSER && (ec.status == 401 || resp['status'] == 'unauthorized')) {
+                  var $dialog = $("#deauthorized_dialog");
+                  if ($dialog.is(':data(dialog)')) {
+                    if (!$dialog.dialog("isOpen")) { $dialog.dialog("open"); }
+                  } else {
+                    $dialog.dialog({
+                      modal: true,
+                      buttons: [{
+                        text: I18n.t("#buttons.cancel", "Cancel"),
+                        'class': "dialog_closer",
+                        click: function() { $(this).dialog("close"); }
+                      }, {
+                        text: I18n.t("#buttons.login", "Login"),
+                        'class': "btn-primary relogin_button button_type_submit",
+                        click: function() {
+                          quizSubmission.navigatingToRelogin = true;
+                          $('#deauthorized_dialog').submit();
+                        }
+                      }]
+                    });
+                  }
+                } else {
+                  $.ajaxJSON(
+                      location.protocol + '//' + location.host + "/simple_response.json?user_id=" + current_user_id + "&rnd=" + Math.round(Math.random() * 9999999),
+                      'GET', {},
+                      function() {},
+                      function() {
+                        $.flashError(I18n.t('errors.connection_lost', "Connection to %{host} was lost.  Please make sure you're connected to the Internet before continuing.", {'host': location.host}));
+                      }
+                  );
+                }
 
                 if(repeat) {
                   setTimeout(function() {quizSubmission.updateSubmission(true) }, 30000);
@@ -278,9 +304,11 @@ define([
 
     if($("#preview_mode_link").length == 0) {
       window.onbeforeunload = function() {
-        quizSubmission.updateSubmission(false, true);
-        if(!quizSubmission.submitting && !quizSubmission.alreadyAcceptedNavigatingAway) {
-          return I18n.t('confirms.unfinished_quiz', "You're about to leave the quiz unfinished.  Continue anyway?");
+        if (!quizSubmission.navigatingToRelogin) {
+          quizSubmission.updateSubmission(false, true);
+          if(!quizSubmission.submitting && !quizSubmission.alreadyAcceptedNavigatingAway) {
+            return I18n.t('confirms.unfinished_quiz', "You're about to leave the quiz unfinished.  Continue anyway?");
+          }
         }
       };
       $(document).delegate('a', 'click', function(event) {

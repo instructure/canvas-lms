@@ -22,7 +22,7 @@ class QuizzesController < ApplicationController
   before_filter :require_context
   add_crumb(proc { t(:top_level_crumb, "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
-  before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :filters, :read_only, :managed_quiz_data]
+  before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :filters, :read_only, :managed_quiz_data, :handle_logout]
 
   # The number of questions that can display "details". After this number, the "Show details" option is disabled
   # and the data is not even loaded.
@@ -187,9 +187,10 @@ class QuizzesController < ApplicationController
       @stored_params = (@submission.temporary_data rescue nil) if params[:take] && @submission && (@submission.untaken? || @submission.preview?)
       @stored_params ||= {}
       log_asset_access(@quiz, "quizzes", "quizzes")
-      js_env({:QUIZZES_URL => polymorphic_url([@context, :quizzes]),
-              :IS_SURVEY => @quiz.survey?,
-              :QUIZ => quiz_json(@quiz,@context,@current_user,session)})
+      js_env :QUIZZES_URL => polymorphic_url([@context, :quizzes]),
+             :IS_SURVEY => @quiz.survey?,
+             :QUIZ => quiz_json(@quiz,@context,@current_user,session),
+             :LOCKDOWN_BROWSER => @quiz.require_lockdown_browser?
       if params[:take] && can_take_quiz?
         # allow starting the quiz via a GET request, but only when using a lockdown browser
         if request.post? || (@quiz.require_lockdown_browser? && !quiz_submission_active?)
@@ -534,6 +535,11 @@ class QuizzesController < ApplicationController
         format.json { render :json => @submissions.to_json(:include_root => false, :except => [:submission_data, :quiz_data], :methods => ['extendable?', :finished_in_words, :attempts_left]) }
       end
     end
+  end
+
+  def handle_logout
+    session[:return_to] = polymorphic_path([@context, @quiz])
+    redirect_to login_path
   end
 
   protected

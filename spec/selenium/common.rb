@@ -318,22 +318,23 @@ shared_examples_for "all selenium tests" do
 
   alias_method :driver, :selenium_driver
 
+  def fill_in_login_form(username, password)
+    user_element = f('#pseudonym_session_unique_id')
+    user_element.send_keys(username)
+    password_element = f('#pseudonym_session_password')
+    password_element.send_keys(password)
+    password_element.submit
+  end
+
   def login_as(username = "nobody@example.com", password = "asdfasdf", expect_success = true)
     # log out (just in case)
     driver.navigate.to(app_host + '/logout')
 
-    log_in = lambda do
-      user_element = f('#pseudonym_session_unique_id')
-      user_element.send_keys(username)
-      password_element = f('#pseudonym_session_password')
-      password_element.send_keys(password)
-      password_element.submit
-    end
     if expect_success
-      expect_new_page_load &log_in
+      expect_new_page_load { fill_in_login_form(username, password) }
       f('#identity .logout').should be_present
     else
-      log_in.call
+      fill_in_login_form(username, password)
     end
   end
 
@@ -347,6 +348,16 @@ shared_examples_for "all selenium tests" do
       PseudonymSession.any_instance.stubs(:record).returns { pseudonym.reload }
       PseudonymSession.any_instance.stubs(:used_basic_auth?).returns(false)
       # PseudonymSession.stubs(:find).returns(@pseudonym_session)
+    end
+  end
+
+  def destroy_session(pseudonym, real_login)
+    if real_login
+      driver.navigate.to(app_host + '/logout')
+    else
+      PseudonymSession.any_instance.unstub :session_credentials
+      PseudonymSession.any_instance.unstub :record
+      PseudonymSession.any_instance.unstub :used_basic_auth?
     end
   end
 

@@ -275,6 +275,7 @@ ActionController::Routing::Routes.draw do |map|
 
       quiz.moderate "moderate", :controller => "quizzes", :action => "moderate"
       quiz.lockdown_browser_required "lockdown_browser_required", :controller => "quizzes", :action => "lockdown_browser_required"
+      quiz.handle_logout "handle_logout", :controller => "quizzes", :action => "handle_logout"
     end
 
     course.resources :collaborations
