@@ -1,0 +1,5 @@
+stylesheets:
+  datatables:
+    - public/stylesheets/compiled/datatables.css
+  sfustats:
+    - public/stylesheets/compiled/sfustats.css
