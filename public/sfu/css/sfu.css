@@ -7,12 +7,17 @@
     background: #494950 url(../images/bg-small.png) -70px 0 no-repeat;
 }
 
-#header-logo {
+#header-logo, #header.no-user #header-logo {
     background: url(../images/sfu-canvas-logo@2x.png) 0 0 no-repeat;
     background-size: 140px 50px;
     width: 140px;
     height: 50px;
     bottom: 0;
+}
+
+#header.no-user #header-logo {
+    top: 16px;
+    left: 16px;
 }
 
 .ie8 #header-logo {
