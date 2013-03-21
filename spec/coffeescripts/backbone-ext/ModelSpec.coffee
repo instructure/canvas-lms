@@ -1,6 +1,7 @@
 define ['Backbone'], ({Model}) ->
 
-  module 'Backbone.Model'
+  module 'Backbone.Model',
+    setup: -> @model = new Model
 
   test '@mixin', ->
     initSpy = sinon.spy()
@@ -29,3 +30,8 @@ define ['Backbone'], ({Model}) ->
     model.decrement 'count', 7
     equal model.get('count'), 3
 
+  test '#deepGet returns nested attributes', -> 
+    @model.attributes = {foo: {bar: {zing: 'cats'}}}
+
+    value = @model.deepGet 'foo.bar.zing'
+    equal value, 'cats', 'gets a nested attribute'

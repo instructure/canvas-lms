@@ -1,0 +1,14 @@
+<label class="control-label">{{#t "question_bank_label"}}Question bank{{/t}}</label>
+<div class="controls">
+  <select class="questionBank">
+    <option value="" >{{#t "select_question_bank"}}Select question bank{{/t}}</option>
+    <option value="new_question_bank" id="createQuestion">{{#t "create_new_question"}}-- Create new question bank --{{/t}}</option>
+    {{#each questionBanks}}
+    <option value={{assessment_question_bank.id}}>{{assessment_question_bank.title}}</option>
+    {{/each}}
+  </select>
+</div>
+<br />
+<div class="controls">
+  <input placeholder="Question bank name" type="text" style="display:none" id="createQuestionInput"/>
+</div>

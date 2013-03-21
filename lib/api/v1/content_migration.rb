@@ -28,6 +28,7 @@ module Api::V1::ContentMigration
 
   def content_migration_json(migration, current_user, session, attachment_preflight=nil)
     json = api_json(migration, current_user, session, :only => %w(id user_id workflow_state started_at finished_at migration_type))
+    json[:created_at] = migration.created_at
     if json[:workflow_state] == 'created'
       json[:workflow_state] = 'pre_processing'
     elsif json[:workflow_state] == 'pre_process_error'

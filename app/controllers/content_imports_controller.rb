@@ -94,7 +94,7 @@ class ContentImportsController < ApplicationController
         end
       else
         @plugins = ContentMigration.migration_plugins(true)
-        @select_options = @plugins.map{|p|[p.metadata(:select_text), p.id]}
+        @select_options = @plugins.select{|p| p.settings[:migration_partial].present? }.map{|p|[p.metadata(:select_text), p.id]}
         @pending_migrations = ContentMigration.find_all_by_context_id(@context.id).any?
         render
       end

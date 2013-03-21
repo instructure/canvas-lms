@@ -531,7 +531,7 @@ class ContentMigration < ActiveRecord::Base
     if val == 100
       job_progress.completion = 100
       job_progress.workflow_state = 'completed'
-      job_progress.save
+      job_progress.save!
     else
       job_progress.update_completion!(val)
     end

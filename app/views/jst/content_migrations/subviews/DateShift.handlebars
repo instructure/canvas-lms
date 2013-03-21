@@ -1,0 +1,30 @@
+<div class="control-group">
+  <label class="control-label"><input type="checkbox" id="dateShiftCheckbox"></label>
+  <div class="controls controlMargin">
+     {{#t "checkbox_label"}}Adjust events and due dates{{/t}}
+  </div>
+</div>
+
+<div class="dateShiftContent control-group" style="display:none">
+  <label class="control-label">Future course date range</label>
+  <div class="controls">
+    <div class="pull-left"> from <input type="text" id="oldStartDate"></div>
+    <div class="pull-left">&nbsp;to <input type="text" id="oldEndDate"></div>
+  </div>
+</div>
+
+<div class="dateShiftContent control-group" style="display:none">
+  <label class="control-label">This course date range</label>
+  <div class="controls">
+    <div class="pull-left"> from <input type="text" id="newStartDate"></div>
+    <div class="pull-left">&nbsp;to <input type="text" id="newEndDate"></div>
+  </div>
+</div>
+
+<div class="dateShiftContent control-group" style="display:none">
+  <div class="controls">
+    <p>You can also explicitly define day substitutions to adjust for changing class schedules (i.e. move everything that was on Mondays to now happen on Tuesdays)</p>
+    <a href="#" id='addDaySubstitution' class="add_substitution_link add">Define a day substitution</a>
+    <div id="daySubstitution"></div>
+  </div>
+</div>

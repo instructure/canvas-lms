@@ -331,6 +331,7 @@ ActionController::Routing::Routes.draw do |map|
     course.student_view 'student_view', :controller => 'courses', :action => 'student_view', :conditions => {:method => :post}
     course.student_view 'student_view', :controller => 'courses', :action => 'leave_student_view', :conditions => {:method => :delete}
     course.test_student 'test_student', :controller => 'courses', :action => 'reset_test_student', :conditions => {:method => :delete}
+    course.content_migrations 'content_migrations', :controller => 'content_migrations', :action => 'index', :conditions => {:method => :get}
   end
 
   map.connect '/submissions/:submission_id/attachments/:attachment_id/crocodoc_sessions',

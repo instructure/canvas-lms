@@ -16,6 +16,8 @@ css_compressor_options:
 javascripts:
 
 stylesheets:
+  content_migrations: 
+    - public/stylesheets/compiled/content_migrations.css
   common:
     - public/stylesheets/compiled/g_base.css
     - public/stylesheets/static/mediaelementplayer.css

@@ -580,7 +580,7 @@ class FilesController < ApplicationController
     if @attachment.context.respond_to?(:file_upload_success_callback)
       @attachment.context.file_upload_success_callback(@attachment)
     end
-    
+
     json = attachment_json(@attachment,@current_user)
     # render as_text for IE, otherwise it'll prompt
     # to download the JSON response

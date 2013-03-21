@@ -93,7 +93,22 @@ class ContentMigrationsController < ApplicationController
     return unless authorized_action(@context, @current_user, :manage_content)
 
     @migrations = Api.paginate(@context.content_migrations.order("id DESC"), self, api_v1_course_content_migration_list_url(@context))
-    render :json => content_migrations_json(@migrations, @current_user, session)
+    content_migration_json_hash = content_migrations_json(@migrations, @current_user, session)
+
+    if api_request?
+      render :json => content_migration_json_hash
+    else
+      @plugins = ContentMigration.migration_plugins(true)
+
+      options = @plugins.map{|p| {:label => p.metadata(:select_text), :id => p.id}}
+
+      js_env :UPLOAD_LIMIT => @context.storage_quota
+      js_env :SELECT_OPTIONS => options
+      js_env :QUESTION_BANKS => @context.assessment_question_banks.except(:include).select([:title, :id]).active
+      js_env :COURSES => @context.account.courses.active.all
+      js_env :COURSE_ID => @context.id
+      js_env :CONTENT_MIGRATIONS => content_migration_json_hash
+    end
   end
 
   # @API Get a content migration

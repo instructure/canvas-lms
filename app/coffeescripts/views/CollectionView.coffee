@@ -56,6 +56,7 @@ define [
     render: =>
       super
       @renderItems() if @collection.length
+      this
 
     ##
     # @api public

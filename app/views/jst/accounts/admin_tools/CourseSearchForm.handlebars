@@ -6,4 +6,16 @@
   <input type="submit" class="btn btn-primary span2" id="courseSearchBtn" value="Find">
 </div>
 
+<div>or</div>
+
+<label class="control-label" for="courseSelect">{{#t "select_label"}}Select a course{{/t}}</label>
+<div class="controls">
+  <select id="courseSelect">
+    <option value="default">{{#t "select_default"}}Select a course{{/t}}</option>
+    {{#each courses}}
+    <option value={{course.id}}>{{course.name}}</option>
+    {{/each}}
+  </select>
+</div>
+
 

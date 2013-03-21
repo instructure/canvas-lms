@@ -1,0 +1,23 @@
+<h2>{{#t "header"}}Import Content{{/t}}</h2>
+<p>{{#t "subtext"}}This will help you import content you may already have, such as files, assignments, and quizzes, from other course management systems into Canvas.{{/t}}</p>
+<div class="control-group">
+  <label class="control-label" for="chooseMigrationConverter">Import content from</label>
+  <div class="controls">
+    <select id="chooseMigrationConverter" class="span6">
+      <option value="none">{{#t "default_option"}}Choose the system you want to migrate from{{/t}}</option>
+      {{#each selectOptions}}
+        <option value="{{id}}">{{label}}</option>
+      {{/each}}
+    </select>
+  </div>
+</div>
+
+<div id="converter"></div>
+
+<div class="form-actions" style="display: none">
+  <div class="controls">
+    <input id="submitMigration" type="submit" value="Start Migration" class="btn btn-primary" />
+  </div>
+</div>
+
+<div id="progress" class="span10"></div>

@@ -54,4 +54,3 @@ define ['Backbone'], ({Model}) ->
       else
         @pollDfd.resolve()
         @trigger 'complete'
-
