@@ -294,7 +294,7 @@ class Account < ActiveRecord::Base
   def settings
     result = self.read_attribute(:settings)
     return result if result
-    return self.write_attribute(:settings, {}) unless frozen?
+    return write_attribute(:settings, {}) unless frozen?
     {}.freeze
   end
   

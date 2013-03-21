@@ -19,9 +19,13 @@
 ENV["RAILS_ENV"] = 'test'
 
 require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
-require 'spec'
-# require 'spec/autorun'
-require 'spec/rails'
+if CANVAS_RAILS3
+  require 'rspec/rails'
+else
+  require 'spec'
+  # require 'spec/autorun'
+  require 'spec/rails'
+end
 require 'webrat'
 require 'mocha/api'
 require File.expand_path(File.dirname(__FILE__) + '/mocha_extensions')
@@ -32,8 +36,10 @@ Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |fil
 # globally on every object. :context is already heavily used in our application,
 # so we remove rspec's definition. This does not prevent 'context' from being
 # used within a 'describe' block.
-module Spec::DSL::Main
-  remove_method :context if respond_to? :context
+if defined?(Spec::DSL::Main)
+  module Spec::DSL::Main
+    remove_method :context if respond_to? :context
+  end
 end
 
 def truncate_table(model)

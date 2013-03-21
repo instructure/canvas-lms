@@ -40,6 +40,8 @@ environment_configuration(defined?(config) && config) do |config|
   # eval <env>-local.rb if it exists
   Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read) }
 
+  # XXX: Rails3 NullStore wasn't added until Rails 3.2, but can replace our custom NilStore
+  #config.cache_store = :null
   require_dependency 'nil_store'
   config.cache_store = NilStore.new
 

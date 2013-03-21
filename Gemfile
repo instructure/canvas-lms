@@ -22,7 +22,7 @@ if !CANVAS_RAILS3
   gem 'canvas_connect', '0.0.8'
 end
 gem 'daemons',        '1.1.0'
-gem 'diff-lcs',       '1.1.2',  :require => 'diff/lcs'
+gem 'diff-lcs',       '1.1.3',  :require => 'diff/lcs'
 if !CANVAS_RAILS3
   gem 'encrypted_cookie_store-instructure', '1.0.2', :require => 'encrypted_cookie_store'
 end
@@ -57,7 +57,8 @@ gem 'mime-types',     '1.17.2',   :require => 'mime/types'
 gem 'mini_magick',    '1.3.2'
 gem 'netaddr',        '1.5.0'
 gem 'nokogiri',       '1.5.5'
-gem 'oauth',          '0.4.5'
+# oauth gem, with rails3 fixes rolled in
+gem 'oauth-instructure', '0.4.9', :require => 'oauth'
 gem 'rack',           CANVAS_RAILS3 ? '1.2.5' : '1.1.3'
 gem 'rake',           '10.0.3'
 gem 'rdoc',           '3.12'
@@ -109,8 +110,12 @@ group :test do
   gem 'mocha',        :git => 'git://github.com/ccutrer/mocha.git', :require => false
   gem 'parallelized_specs', '0.4.28'
   gem 'rcov',         '0.9.9'
-  gem 'rspec',        '1.3.2'
-  gem 'rspec-rails',  '1.3.4'
+  if CANVAS_RAILS3
+    gem 'rspec-rails',  '2.13.0'
+  else
+    gem 'rspec',        '1.3.2'
+    gem 'rspec-rails',  '1.3.4'
+  end
   gem 'selenium-webdriver', '2.31.0'
   gem 'webrat',       '0.7.3'
   gem 'yard',         '0.8.0'

@@ -35,7 +35,7 @@ module BasicLTI
                 :timestamp        => @timestamp,
                 :nonce            => @nonce
               }
-    request = consumer.create_signed_request(:post, path, nil, options, params)
+    request = consumer.create_signed_request(:post, path, nil, options, params.stringify_keys)
 
     # the request is made by a html form in the user's browser, so we
     # want to revert the escapage and return the hash of post parameters ready

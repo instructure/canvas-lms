@@ -17,6 +17,5 @@ if CANVAS_RAILS3
   CanvasRails::Application.load_tasks
 else
   require 'tasks/rails'
+  begin; require 'parallelized_specs/tasks'; rescue LoadError; end
 end
-
-begin; require 'parallelized_specs/tasks'; rescue LoadError; end
