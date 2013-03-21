@@ -1027,19 +1027,21 @@ shared_examples_for "in-process server selenium tests" do
   # (even if on a different thread - i.e. the server's thread), so that it will be in
   # the same transaction and see the same data
   before do
-    @db_connection = ActiveRecord::Base.connection
+    if self.use_transactional_fixtures
+      @db_connection = ActiveRecord::Base.connection
 
-    # synchronize the execute method since for a modicum of thread safety
-    if !@db_connection.respond_to?(:execute_without_synchronization)
-      @db_connection.class.class_eval do
-        def execute_with_synchronization(*args)
-          @mutex ||= Mutex.new
-          @mutex.synchronize { execute_without_synchronization(*args) }
+      # synchronize the execute method for a modicum of thread safety
+      if !@db_connection.respond_to?(:execute_without_synchronization)
+        @db_connection.class.class_eval do
+          def execute_with_synchronization(*args)
+            @mutex ||= Mutex.new
+            @mutex.synchronize { execute_without_synchronization(*args) }
+          end
+          alias_method_chain :execute, :synchronization
         end
-        alias_method_chain :execute, :synchronization
       end
-    end
 
-    ActiveRecord::ConnectionAdapters::ConnectionPool.any_instance.stubs(:connection).returns(@db_connection)
+      ActiveRecord::ConnectionAdapters::ConnectionPool.any_instance.stubs(:connection).returns(@db_connection)
+    end
   end
 end
