@@ -123,6 +123,37 @@ class QuizQuestion::Base
 
     user_answer
   end
+
+  def stats(responses)
+    answers = @question_data[:answers]
+
+    responses.each do |response|
+      found = nil
+      if response[:text].try(:strip).present?
+        answer_md5 = Digest::MD5.hexdigest(response[:text].strip)
+      end
+      answers.each do |answer|
+        if answer[:id] == response[:answer_id] || answer[:id] == answer_md5
+          found = true
+          answer[:responses] += 1
+          answer[:user_ids] << response[:user_id]
+        end
+      end
+
+      if !found && answer_md5 &&
+        %w(numerical_question
+           short_answer_question).include?(@question_data[:question_type])
+        answers << {
+          :id => answer_md5,
+          :responses => 1,
+          :user_ids => [response[:user_id]],
+          :text => response[:text]
+        }
+      end
+
+    end
+    @question_data
+  end
 end
 
 Dir[Rails.root + "app/models/quiz_question/*_question.rb"].each { |f| require_dependency f }

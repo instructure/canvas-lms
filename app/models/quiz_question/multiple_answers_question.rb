@@ -53,4 +53,19 @@ class QuizQuestion::MultipleAnswersQuestion < QuizQuestion::Base
     return nil if total_answers == 0
     return correct_answers
   end
+
+  def stats(responses)
+    answers = @question_data[:answers]
+
+    responses.each do |response|
+      answers.each do |answer|
+        if response[:"answer_#{answer[:id]}"] == '1'
+          answer[:responses] += 1
+          answer[:user_ids] << response[:user_id]
+        end
+      end
+    end
+
+    @question_data
+  end
 end

@@ -57,4 +57,72 @@ class QuizQuestion::FillInMultipleBlanksQuestion < QuizQuestion::Base
       answer && answer[:weight] == 100 && !variables.empty?
     end
   end
+
+  def stats(responses)
+    stats = {:multiple_responses => true}
+
+    answer_keys = {}
+    answers = []
+    @question_data[:answers].each do |answer|
+      unless answer_keys[answer[:blank_id]]
+        answers << {
+          :id => answer[:blank_id],
+          :text => answer[:blank_id],
+          :blank_id => answer[:blank_id],
+          :answer_matches => [],
+          :responses => 0,
+          :user_ids => []
+        }
+        answer_keys[answer[:blank_id]] = answers.length - 1
+      end
+    end
+    answers.each do |found_answer|
+      @question_data[:answers].select { |a|
+        a[:blank_id] == found_answer[:blank_id]
+      }.each do |sub_answer|
+        correct = sub_answer[:weight] == 100
+        match = {
+          :responses => 0,
+          :text => sub_answer[:text],
+          :user_ids => [],
+          :id => @question_data[:question_type] == 'fill_in_multiple_blanks_question' ? found_answer[:blank_id] : sub_answer[:id],
+          :correct => correct
+        }
+        found_answer[:answer_matches] << match
+      end
+    end
+    stats[:answer_sets] = answers
+
+    if @question_data[:question_type] == 'fill_in_multiple_blanks_question'
+      responses.each do |response|
+        answers.each do |answer|
+          found = false
+          if (txt = response[:"answer_for_#{answer[:blank_id]}"].try(:strip)).present?
+            answer_md5 = Digest::MD5.hexdigest(txt)
+          end
+          answer[:responses] += 1 if response[:correct]
+          answer[:answer_matches].each do |right|
+            if response["answer_for_#{answer[:blank_id]}".to_sym] == right[:text]
+              found = true
+              right[:responses] += 1
+              right[:user_ids] << response[:user_id]
+            end
+          end
+          if !found
+            if answer_md5
+              answer = {
+                :id => answer_md5,
+                :responses => 1,
+                :user_ids => [response[:user_id]],
+                :text => response["answer_for_#{answer[:blank_id]}".to_sym]
+              }
+              answer[:answer_matches] << answer
+            end
+          end
+        end
+      end
+    end
+
+    @question_data.merge stats
+  end
 end

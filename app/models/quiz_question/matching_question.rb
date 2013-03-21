@@ -44,4 +44,41 @@ class QuizQuestion::MatchingQuestion < QuizQuestion::Base
 
     correct_answers
   end
+
+  def stats(responses)
+    stats = {:multiple_answers => true}
+
+    answers = @question_data[:answers]
+    matches = @question_data[:matches]
+
+    answers.each_with_index do |answer, i|
+      answers[i][:answer_matches] = []
+      (matches || answers).each do |right|
+        match_answer = answers.find { |a|
+          a[:match_id].to_i == right[:match_id].to_i
+        }
+        match = {
+          :responses => 0,
+          :text => (right[:right] || right[:text]),
+          :user_ids => [],
+          :id => match_answer ? match_answer[:id] : right[:match_id]
+        }
+        answers[i][:answer_matches] << match
+      end
+    end
+
+    responses.each do |response|
+      answers.each do |answer|
+        answer[:responses] += 1 if response[:correct]
+        (matches || answers).each_with_index do |right, j|
+          if response[:"answer_#{answer[:id]}"].to_i == right[:match_id]
+            answer[:answer_matches][j][:responses] += 1
+            answer[:answer_matches][j][:user_ids] << response[:user_id]
+          end
+        end
+      end
+    end
+
+    @question_data.merge stats
+  end
 end
