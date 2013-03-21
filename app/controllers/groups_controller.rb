@@ -86,6 +86,9 @@
 #
 #       // The ID of the group's category.
 #       group_category_id: 4,
+#
+#       // the storage quota for the group, in megabytes
+#       storage_quota_mb: 50
 #     }
 #
 class GroupsController < ApplicationController
@@ -96,7 +99,7 @@ class GroupsController < ApplicationController
   include Api::V1::Group
   include Api::V1::UserFollow
 
-  SETTABLE_GROUP_ATTRIBUTES = %w(name description join_level is_public group_category avatar_attachment)
+  SETTABLE_GROUP_ATTRIBUTES = %w(name description join_level is_public group_category avatar_attachment storage_quota_mb)
 
   include TextHelper
 
@@ -286,13 +289,18 @@ class GroupsController < ApplicationController
   # Creates a new group. Groups created using the "/api/v1/groups/"
   # endpoint will be community groups.
   #
-  # @argument name
-  # @argument description
-  # @argument is_public
-  # @argument join_level
+  # @argument name the name of the group
+  # @argument description a description of the group
+  # @argument is_public whether the group is public (applies only to
+  #   community groups)
+  # @argument join_level parent_context_auto_join, parent_context_request,
+  #   or invitation_only
+  # @argument storage_quota_mb The allowed file storage for the group,
+  #   in megabytes. This parameter is ignored if the caller does not have
+  #   the manage_storage_quotas permission.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/groups/<group_id> \ 
+  #     curl https://<canvas>/api/v1/groups \ 
   #          -F 'name=Math Teachers' \ 
   #          -F 'description=A place to gather resources for our classes.' \ 
   #          -F 'is_public=true' \ 
@@ -324,6 +332,7 @@ class GroupsController < ApplicationController
     end
 
     attrs = api_request? ? params : params[:group]
+    attrs.delete :storage_quota_mb unless @context.grants_right? @current_user, session, :manage_storage_quotas
     @group = @context.groups.new(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
 
     if authorized_action(@group, @current_user, :create)
@@ -357,6 +366,9 @@ class GroupsController < ApplicationController
   # @argument join_level
   # @argument avatar_id The id of the attachment previously uploaded to the
   #   group that you would like to use as the avatar image for this group.
+  # @argument storage_quota_mb The allowed file storage for the group,
+  #   in megabytes. This parameter is ignored if the caller does not have
+  #   the manage_storage_quotas permission.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/groups/<group_id> \ 
@@ -375,6 +387,7 @@ class GroupsController < ApplicationController
       params[:group][:group_category] = group_category
     end
     attrs = api_request? ? params : params[:group]
+    attrs.delete :storage_quota_mb unless @group.context.grants_right? @current_user, session, :manage_storage_quotas
 
     if avatar_id = (params[:avatar_id] || (params[:group] && params[:group][:avatar_id]))
       attrs[:avatar_attachment] = @group.active_images.find_by_id(avatar_id)

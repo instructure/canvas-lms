@@ -22,7 +22,7 @@ module Api::V1::Group
 
   API_GROUP_JSON_OPTS = {
     :only => %w(id name description is_public join_level group_category_id),
-    :methods => %w(members_count),
+    :methods => %w(members_count storage_quota_mb),
   }
 
   API_GROUP_MEMBERSHIP_JSON_OPTS = {
@@ -36,7 +36,7 @@ module Api::V1::Group
     hash['followed_by_user'] = !!followed.include?(group)
     image = group.avatar_attachment
     hash['avatar_url'] = image && thumbnail_image_url(image, image.uuid)
-    hash['role'] = group.group_category.role
+    hash['role'] = group.group_category.role if group.group_category
     include = options[:include] || []
     if include.include?('users')
       # TODO: this should be switched to user_display_json

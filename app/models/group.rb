@@ -22,7 +22,7 @@ class Group < ActiveRecord::Base
   include CustomValidations
   include UserFollow::FollowedItem
 
-  attr_accessible :name, :context, :max_membership, :group_category, :join_level, :default_view, :description, :is_public, :avatar_attachment
+  attr_accessible :name, :context, :max_membership, :group_category, :join_level, :default_view, :description, :is_public, :avatar_attachment, :storage_quota_mb
   validates_allowed_transitions :is_public, false => true
 
   has_many :group_memberships, :dependent => :destroy, :conditions => ['group_memberships.workflow_state != ?', 'deleted']
@@ -423,6 +423,14 @@ class Group < ActiveRecord::Base
     self.storage_quota || Setting.get_cached('group_default_quota', 50.megabytes.to_s).to_i
   end
 
+  def storage_quota_mb
+    quota / 1.megabyte
+  end
+  
+  def storage_quota_mb=(val)
+    self.storage_quota = val.try(:to_i).try(:megabytes)
+  end
+  
   TAB_HOME, TAB_PAGES, TAB_PEOPLE, TAB_DISCUSSIONS, TAB_CHAT, TAB_FILES,
     TAB_CONFERENCES, TAB_ANNOUNCEMENTS, TAB_PROFILE, TAB_SETTINGS, TAB_COLLABORATIONS = *1..20
   def tabs_available(user=nil, opts={})
