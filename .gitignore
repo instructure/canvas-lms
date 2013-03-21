@@ -21,6 +21,7 @@
 /exports/
 /Gemfile.lock
 /log/
+/public/app/
 /public/assets/
 /public/doc/api/
 /public/javascripts/compiled/
