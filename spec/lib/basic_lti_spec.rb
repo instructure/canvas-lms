@@ -299,15 +299,18 @@ describe BasicLTI do
       student = user_model
       nobody = user_model
       admin = user_model
+      ta = user_model
       @course.root_account.add_user(admin)
       @course.enroll_teacher(teacher).accept
       @course.enroll_designer(designer).accept
       @course.enroll_student(student).accept
+      @course.enroll_ta(ta).accept
       BasicLTI.user_lti_data(teacher, @course)['role_types'].should == ['Instructor']
       BasicLTI.user_lti_data(designer, @course)['role_types'].should == ['ContentDeveloper']
       BasicLTI.user_lti_data(student, @course)['role_types'].should == ['Learner']
       BasicLTI.user_lti_data(nobody, @course)['role_types'].should == ['urn:lti:sysrole:ims/lis/None']
       BasicLTI.user_lti_data(admin, @course)['role_types'].should == ['urn:lti:instrole:ims/lis/Administrator']
+      BasicLTI.user_lti_data(ta, @course)['role_types'].should == ['urn:lti:role:ims/lis/TeachingAssistant']
     end
 
     it "should return multiple role types if applicable" do

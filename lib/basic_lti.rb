@@ -70,7 +70,7 @@ module BasicLTI
         when TeacherEnrollment
           'Instructor'
         when TaEnrollment
-          'Instructor'
+          'urn:lti:role:ims/lis/TeachingAssistant'
         when DesignerEnrollment
           'ContentDeveloper'
         when ObserverEnrollment
