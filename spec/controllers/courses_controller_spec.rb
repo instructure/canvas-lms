@@ -980,4 +980,99 @@ describe CoursesController do
       response.status.to_i.should == 200
     end
   end
+  
+  describe "quotas" do
+    context "with :manage_storage_quotas" do
+      before do
+        @account = Account.default
+        account_admin_user :account => @account
+        user_session @user
+      end
+      
+      describe "create" do
+        it "should set storage_quota" do
+          post 'create', { :account_id => @account.id, :course =>
+              { :name => 'xyzzy', :storage_quota => 111.megabytes } }
+          @course = @account.courses.find_by_name('xyzzy')
+          @course.storage_quota.should == 111.megabytes
+        end
+
+        it "should set storage_quota_mb" do
+          post 'create', { :account_id => @account.id, :course =>
+              { :name => 'xyzpdq', :storage_quota_mb => 111 } }
+          @course = @account.courses.find_by_name('xyzpdq')
+          @course.storage_quota_mb.should == 111
+        end
+      end
+      
+      describe "update" do
+        before do
+          @course = @account.courses.create!
+        end
+        
+        it "should set storage_quota" do
+          post 'update', { :id => @course.id, :course =>
+            { :storage_quota => 111.megabytes } }
+          @course.reload.storage_quota.should == 111.megabytes
+        end
+
+        it "should set storage_quota_mb" do
+          post 'update', { :id => @course.id, :course =>
+            { :storage_quota_mb => 111 } }
+          @course.reload.storage_quota_mb.should == 111
+        end
+      end
+    end
+
+    context "without :manage_storage_quotas" do
+      describe "create" do
+        before do
+          @account = Account.default
+          custom_account_role 'lamer', :account => @account
+          @account.role_overrides.create! :permission => 'manage_courses', :enabled => true,
+                                          :enrollment_type => 'lamer'
+          user
+          @account.add_user @user, 'lamer'
+          user_session @user
+        end
+        
+        it "should ignore storage_quota" do
+          post 'create', { :account_id => @account.id, :course =>
+              { :name => 'xyzzy', :storage_quota => 111.megabytes } }
+          @course = @account.courses.find_by_name('xyzzy')
+          @course.storage_quota.should == @account.default_storage_quota
+        end
+
+        it "should ignore storage_quota_mb" do
+          post 'create', { :account_id => @account.id, :course =>
+              { :name => 'xyzpdq', :storage_quota_mb => 111 } }
+          @course = @account.courses.find_by_name('xyzpdq')
+          @course.storage_quota_mb.should == @account.default_storage_quota / 1.megabyte
+        end
+      end
+
+      describe "update" do
+        before do
+          @account = Account.default
+          course_with_teacher_logged_in(:account => @account, :active_all => true)
+        end
+        
+        it "should ignore storage_quota" do
+          post 'update', { :id => @course.id, :course =>
+              { :public_description => 'wat', :storage_quota => 111.megabytes } }
+          @course.reload
+          @course.public_description.should == 'wat'
+          @course.storage_quota.should == @account.default_storage_quota
+        end
+
+        it "should ignore storage_quota_mb" do
+          post 'update', { :id => @course.id, :course =>
+              { :public_description => 'wat', :storage_quota_mb => 111 } }
+          @course.reload
+          @course.public_description.should == 'wat'
+          @course.storage_quota_mb.should == @account.default_storage_quota / 1.megabyte
+        end
+      end
+    end
+  end
 end

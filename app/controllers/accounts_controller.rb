@@ -192,7 +192,10 @@ class AccountsController < ApplicationController
 
         enable_user_notes = params[:account].delete :enable_user_notes
         allow_sis_import = params[:account].delete :allow_sis_import
-        params[:account].delete :default_user_storage_quota_mb unless @account.root_account? && !@account.site_admin? 
+        params[:account].delete :default_user_storage_quota_mb unless @account.root_account? && !@account.site_admin?
+        unless @account.grants_right? @current_user, :manage_storage_quotas
+          [:storage_quota, :default_storage_quota, :default_storage_quota_mb, :default_user_storage_quota_mb].each { |key| params[:account].delete key }
+        end
         if params[:account][:services]
           params[:account][:services].slice(*Account.services_exposed_to_ui_hash.keys).each do |key, value|
             @account.set_service_availability(key, value == '1')

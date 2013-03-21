@@ -259,6 +259,44 @@ describe CoursesController, :type => :integration do
         new_course = Course.find(json['id'])
         new_course.sis_source_id.should == '9999'
       end
+      
+      it "should set the storage quota" do
+        json = api_call(:post, @resource_path,
+                        @resource_params,
+                        { :account_id => @account.id, :course => { :storage_quota_mb => 12345 } }
+        )
+        new_course = Course.find(json['id'])
+        new_course.storage_quota_mb.should == 12345
+      end
+      
+      context "without :manage_storage_quotas" do
+        before do
+          custom_account_role 'lamer', :account => @account
+          @account.role_overrides.create! :permission => 'manage_courses', :enabled => true,
+                                          :enrollment_type => 'lamer'
+          user
+          @account.add_user @user, 'lamer'
+          user_session @user
+        end
+        
+        it "should ignore storage_quota" do
+          json = api_call(:post, @resource_path,
+                          @resource_params,
+                          { :account_id => @account.id, :course => { :storage_quota => 12345 } }
+          )
+          new_course = Course.find(json['id'])
+          new_course.storage_quota.should == @account.default_storage_quota
+        end
+        
+        it "should ignore storage_quota_mb" do
+          json = api_call(:post, @resource_path,
+                          @resource_params,
+                          { :account_id => @account.id, :course => { :storage_quota_mb => 12345 } }
+          )
+          new_course = Course.find(json['id'])
+          new_course.storage_quota_mb.should == @account.default_storage_quota_mb
+        end
+      end
     end
 
     context "a user without permissions" do
@@ -356,6 +394,12 @@ describe CoursesController, :type => :integration do
         @course.reload
         @course.workflow_state.should == "available"
       end
+      
+      it "should be able to update the storage_quota" do
+        json = api_call(:put, @path, @params, :course => { :storage_quota_mb => 123 })
+        @course.reload
+        @course.storage_quota_mb.should == 123
+      end
     end
 
     context "a teacher" do
@@ -376,6 +420,18 @@ describe CoursesController, :type => :integration do
         json['default_view'].should eql @new_values['course']['default_view']
       end
 
+      it "should not be able to update the storage quota (bytes)" do
+        json = api_call(:put, @path, @params, :course => { :storage_quota => 123.megabytes })
+        @course.reload
+        @course.storage_quota.should == @course.account.default_storage_quota
+      end
+
+      it "should not be able to update the storage quota (mb)" do
+        json = api_call(:put, @path, @params, :course => { :storage_quota_mb => 123 })
+        @course.reload
+        @course.storage_quota_mb.should == @course.account.default_storage_quota_mb
+      end
+      
       it "should not be able to update the sis id" do
         original_sis = @course.sis_source_id
         raw_api_call(:put, @path, @params, @new_values.merge(:sis_course_id => 'NEW123'))

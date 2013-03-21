@@ -213,6 +213,11 @@ class CoursesController < ApplicationController
                      :conclude_at
                    end
 
+      unless @account.grants_right? @current_user, session, :manage_storage_quotas
+        params[:course].delete :storage_quota
+        params[:course].delete :storage_quota_mb
+      end
+      
       @course = (@sub_account || @account).courses.build(params[:course])
       @course.sis_source_id = sis_course_id if api_request? && @account.grants_right?(@current_user, :manage_sis)
       respond_to do |format|
@@ -1312,9 +1317,11 @@ class CoursesController < ApplicationController
         params[:course].delete :account_id
         params[:course].delete :enrollment_term_id
       end
-      if !@course.account.grants_right?(@current_user, session, :manage_courses)
+      unless @course.account.grants_right? @current_user, session, :manage_storage_quotas
         params[:course].delete :storage_quota
         params[:course].delete :storage_quota_mb
+      end
+      if !@course.account.grants_right?(@current_user, session, :manage_courses)
         if @course.root_account.settings[:prevent_course_renaming_by_teachers]
           params[:course].delete :name
           params[:course].delete :course_code

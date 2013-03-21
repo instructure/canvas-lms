@@ -67,19 +67,24 @@
                 </td>
               </tr>
             <% end %>
+            <% has_manage_quotas = can_do(@context, @current_user, :manage_storage_quotas) %>
             <tr>
               <td>
                 <%= f.blabel :default_course_storage_quota, :en => "Default Course File Quota" %>
               </td>
-              <td><%= t(:megabytes_field, "%{text_field} megabytes", :text_field => f.text_field(:default_storage_quota_mb, :id => 'account_default_course_storage_quota', :style => "width: 50px;", :title => t(:megabytes_tooltip, "megabytes"))) %></td>
+              <td><%= t(:megabytes_field, "%{text_field} megabytes", :text_field => (has_manage_quotas ?
+                      f.text_field(:default_storage_quota_mb, :id => 'account_default_course_storage_quota', :style => "width: 50px;", :title => t(:megabytes_tooltip, "megabytes")) :
+                      @account.default_storage_quota_mb.to_s)) %></td>
             </tr>
             <% if @account.root_account? && !@account.site_admin? %>
-            <tr>
-              <td>
-                <%= f.blabel :default_user_storage_quota, :en => "Default User File Quota" %>
-              </td>
-              <td><%= t(:megabytes_field, "%{text_field} megabytes", :text_field => f.text_field(:default_user_storage_quota_mb, :id => 'account_default_user_storage_quota', :style => "width: 50px;", :title => t(:megabytes_tooltip, "megabytes"))) %></td>
-            </tr>
+              <tr>
+                <td>
+                  <%= f.blabel :default_user_storage_quota, :en => "Default User File Quota" %>
+                </td>
+                <td><%= t(:megabytes_field, "%{text_field} megabytes", :text_field => (has_manage_quotas ?
+                        f.text_field(:default_user_storage_quota_mb, :id => 'account_default_user_storage_quota', :style => "width: 50px;", :title => t(:megabytes_tooltip, "megabytes")) :
+                        @account.default_user_storage_quota_mb.to_s)) %></td>
+              </tr>
             <% end %>
             <% if available_locales.size > 1 %>
             <tr>

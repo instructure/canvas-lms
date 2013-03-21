@@ -169,7 +169,7 @@ TEXT
         <th scope="row"><%= f.blabel :storage_quota_mb, :storage_quota, :en => "File Storage" %></th>
         <td>
           <span class="course_form">
-            <% if can_do(@context.account, @current_user, :manage_courses) %>
+            <% if can_do(@context.account, @current_user, :manage_storage_quotas) %>
               <%= f.text_field :storage_quota_mb, :style => "width: 50px;", :title => t('megabytes', "megabytes"), :value => @context.storage_quota_mb %>
             <% else %>
               <%= @context.storage_quota_mb %>

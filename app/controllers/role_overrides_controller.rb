@@ -199,6 +199,7 @@ class RoleOverridesController < ApplicationController
   #     manage_global_outcomes           -- Manage learning outcomes
   #     manage_jobs                      -- Manage background jobs
   #     manage_role_overrides            -- Manage permissions
+  #     manage_storage_quotas            -- Set storage quotas for courses, groups, and users
   #     manage_sis                       -- Import and manage SIS data
   #     manage_site_settings             -- Manage site-wide and plugin settings
   #     manage_user_logins               -- Modify login details for users
