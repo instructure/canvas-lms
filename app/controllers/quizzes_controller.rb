@@ -183,7 +183,9 @@ class QuizzesController < ApplicationController
       @stored_params = (@submission.temporary_data rescue nil) if params[:take] && @submission && (@submission.untaken? || @submission.preview?)
       @stored_params ||= {}
       log_asset_access(@quiz, "quizzes", "quizzes")
-      js_env :QUIZZES_URL => polymorphic_url([@context, :quizzes])
+      js_env({:QUIZZES_URL => polymorphic_url([@context, :quizzes]),
+              :IS_SURVEY => @quiz.survey?,
+              :QUIZ => quiz_json(@quiz,@context,@current_user,session)})
       if params[:take] && can_take_quiz?
         # allow starting the quiz via a GET request, but only when using a lockdown browser
         if request.post? || (@quiz.require_lockdown_browser? && !quiz_submission_active?)
@@ -196,6 +198,7 @@ class QuizzesController < ApplicationController
   end
 
   def managed_quiz_data
+    extend Api::V1::User
     if authorized_action(@quiz, @current_user, [:grade, :read_statistics])
       students = @context.students_visible_to(@current_user).order_by_sortable_name.to_a.uniq
       @submissions = @quiz.quiz_submissions.for_user_ids(students.map(&:id)).where("workflow_state<>'settings_only'").all
@@ -206,6 +209,10 @@ class QuizzesController < ApplicationController
         @submitted_students = @submitted_students.sort_by{|stu| submission_ids[stu.id] }
       end
       @unsubmitted_students = students.reject{|stu| submission_ids[stu.id] }
+      submitted_students_json = @submitted_students.map { |u| user_json(u, @current_user, session) }
+      unsubmitted_students_json = @unsubmitted_students.map { |u| user_json(u, @current_user, session) }
+      @quiz_submission_list = {:UNSUBMITTED_STUDENTS => unsubmitted_students_json,
+                                         :SUBMITTED_STUDENTS => submitted_students_json}.to_json
       render :layout => false
     end
   end

@@ -70,3 +70,10 @@
 
   </div>
 </div>
+
+<script>
+<%# Doing this here instead of js_env because js_env doesn't get called
+  with render :layout => false %>
+window.ENV = window.ENV || {};
+window.ENV.QUIZ_SUBMISSION_LIST = <%= raw(@quiz_submission_list) %>;
+</script>

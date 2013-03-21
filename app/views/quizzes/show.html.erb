@@ -187,7 +187,10 @@
                       <% if @any_submissions_pending_review %>
                         <i class="icon-warning"></i>
                       <% end %>
-                      <i class="icon-group"></i> <%= @quiz.survey? ? t('links.show_student_survey_results', "Show Student Survey Results") : t('links.show_student_quiz_results', "Show Student Quiz Results") %>
+                      <i class="icon-group"></i> 
+                      <span id="quiz_details_text">
+                        <%= @quiz.survey? ? t('links.show_student_survey_results', "Show Student Survey Results") : t('links.show_student_quiz_results', "Show Student Quiz Results") %>
+                      </span>
                       <div style="font-size: 0.8em; padding-left: 20px;">(<%= t(:students_submitted_so_far, {:one => "1 student submitted so far", :other => "%{count} students submitted so far"}, :count => @submitted_student_count) %>)</div>
                     </a>
                   </li>

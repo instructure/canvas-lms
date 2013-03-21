@@ -120,41 +120,6 @@ describe "quizzes" do
       f('#main .description').should include_text(test_text)
     end
 
-    it "message students who... should do something" do
-      @context = @course
-      q = quiz_model
-      q.generate_quiz_data
-      q.save!
-      # add a student to the course
-      student = student_in_course(:active_enrollment => true).user
-      student.conversations.size.should == 0
-
-      get "/courses/#{@course.id}/quizzes/#{q.id}"
-
-      f('.al-trigger').click
-      driver.find_element(:partial_link_text, "Message Students Who...").click
-      wait_for_ajaximations
-      dialog = ffj("#message_students_dialog:visible")
-      dialog.length.should == 1
-      dialog = dialog.first
-
-      click_option('.message_types', 'Have taken the quiz')
-      students = ffj(".student_list > .student:visible")
-
-      students.length.should == 0
-
-      click_option('.message_types', 'Have NOT taken the quiz')
-      students = ffj(".student_list > .student:visible")
-      students.length.should == 1
-
-      dialog.find_element(:css, 'textarea#body').send_keys('This is a test message.')
-
-      submit_dialog(dialog)
-      wait_for_ajax_requests
-
-      student.conversations.size.should == 1
-    end
-
     it "should asynchronously load student quiz results" do
       @context = @course
       q = quiz_model
