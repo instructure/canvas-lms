@@ -2,28 +2,25 @@
   <%= registration_summary || content_tag(:p, mt(:getting_started, "You are enrolling in **%{course}**.", :course => @course.name)) %>
   <p><%= t(:enter_email, "Please enter your email address:") %></p>
   <input type="hidden" name="user[initial_enrollment_type]" value="student">
-  <input type="hidden" name="self_enrollment" value="1">
-  <input type="hidden" name="self_enrollment_mode" value="email">
-  <input type="hidden" name="user[self_enrollment_code]" value="<%= params[:self_enrollment_code] %>">
   <div class="control-group" id="email_info">
     <label class="control-label" for="student_email"><%= t "labels.email", "Email" %></label>
     <div class="controls">
       <input type="text" id="student_email" name="pseudonym[unique_id]">
     </div>
   </div>
-  <div class="control-group" id="user_type">
+  <div class="control-group" id="initial_action">
     <div class="controls">
       <label class="radio">
-        <input type="radio" name="user_type" value="new" id="user_type_new">
+        <input type="radio" name="initial_action" value="create">
         <%= t "new_user", "I am a new user" %>
       </label>
       <label class="radio">
-        <input type="radio" name="user_type" value="existing" id="user_type_existing">
+        <input type="radio" name="initial_action" value="log_in">
         <%= t "existing_user", "I already have a %{institution_name} login", :institution_name => @domain_root_account.short_name %>
       </label>
     </div>
   </div>
-  <div class="user_info" id="existing_user_info" style="<%= hidden %>">
+  <div class="user_info" id="log_in_user_info" style="<%= hidden %>">
     <div class="control-group">
       <label class="control-label" for="student_password"><%= t "labels.password", "Password" %></label>
       <div class="controls">
@@ -31,7 +28,7 @@
       </div>
     </div>
   </div>
-  <div class="user_info" id="new_user_info" style="<%= hidden %>">
+  <div class="user_info" id="create_user_info" style="<%= hidden %>">
     <div class="control-group">
       <label class="control-label" for="student_name"><%= t "labels.name", "Full Name" %></label>
       <div class="controls">
@@ -50,7 +47,7 @@
   <div class="control-group embedded-footer">
     <a href="http://www.instructure.com/privacy-policy" target="_blank" class="footer-info"><%= t '#site.view_privacy_policy', 'View Privacy Policy' %></a>
     <div class="controls">
-      <button class="btn btn-primary" style="visibility: hidden" id="submit_button" type="submit"><%= t "buttons.enroll_in_course", "Enroll in Course" %></button>
+      <button class="btn btn-primary" style="visibility: hidden" id="submit_button" type="submit"><%= @confirm_enrollment_url ? t("buttons.next", "Next") : t("buttons.enroll_in_course", "Enroll in Course") %></button>
     </div>
   </div>
 </form>

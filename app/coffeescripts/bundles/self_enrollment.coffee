@@ -3,4 +3,5 @@ require [
   'compiled/views/registration/SelfEnrollmentForm'
 ], ($, SelfEnrollmentForm) ->
 
-  new SelfEnrollmentForm el: '#enroll_form'
+  options = $.extend {}, ENV.SELF_ENROLLMENT_OPTIONS ? {}, el: '#enroll_form'
+  new SelfEnrollmentForm options

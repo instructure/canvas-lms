@@ -561,6 +561,7 @@ class PseudonymSessionsController < ApplicationController
         end
       end
       format.json do
+        @pseudonym_session ||= @domain_root_account.pseudonym_sessions.new
         @pseudonym_session.errors.add('base', message)
         render :json => @pseudonym_session.errors.to_json, :status => :bad_request
       end
