@@ -41,11 +41,10 @@ shared_examples_for "conversations attachments selenium tests" do
     add_recipient("student1")
     add_recipient("student2")
     add_recipient("student3")
-    enable_jobs do
-      expect {
-        submit_message_form(:attachments => [fullpath], :add_recipient => false, :group_conversation => false)
-      }.to change(Attachment, :count).by(1)
-    end
+    ConversationBatch.any_instance.stubs(:mode).returns(:sync)
+    expect {
+      submit_message_form(:attachments => [fullpath], :add_recipient => false, :group_conversation => false)
+    }.to change(Attachment, :count).by(1)
   end
 
   it "should save attachments on new messages on existing conversations" do

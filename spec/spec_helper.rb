@@ -897,19 +897,6 @@ Spec::Runner.configure do |config|
     end
   end
 
-  def enable_jobs
-    job_thread = Thread.new do
-      Thread.current[:done] = false
-      while !Thread.current[:done]
-        run_jobs
-        sleep 1
-      end
-    end
-    yield
-    job_thread[:done] = true
-    job_thread.join
-  end
-
   def track_jobs
     @jobs_tracking = Delayed::JobTracking.track { yield }
   end
