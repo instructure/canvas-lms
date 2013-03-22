@@ -6,10 +6,11 @@ environment_configuration(defined?(config) && config) do |config|
   config.cache_classes = true
 
   # Full error reports are disabled and caching is turned on
-  if Rails.version < "3.0"
-    config.action_controller.consider_all_requests_local = true
+  if CANVAS_RAILS3
+    config.consider_all_requests_local = false
   else
-    config.consider_all_requests_local = true
+    config.action_controller.consider_all_requests_local = false
+    config.action_view.cache_template_loading            = true
   end
   config.action_controller.perform_caching = true
 
@@ -26,7 +27,7 @@ environment_configuration(defined?(config) && config) do |config|
   # eval <env>-local.rb if it exists
   Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read) }
 
-  if Rails.version >= "3.0"
+  if CANVAS_RAILS3
     # Specifies the header that your server uses for sending files
     config.action_dispatch.x_sendfile_header = "X-Sendfile"
 
