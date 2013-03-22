@@ -120,7 +120,7 @@
       border-bottom-width: 0px;
     }
     .content {
-      padding-top: 3px;
+      padding-top: 9px;
     }
     .details {
       display: block;
@@ -185,12 +185,10 @@
       &.assignment_due {
         width: 30%;
         font-size: 1em;
-        padding-top: 0.5em;
         display: block;
       }
       &.assignment_points {
-        font-size: 0.9em;
-        padding-top: 0.5em;
+        font-size: 1em;
       }
       &.links {
         display: none;
@@ -286,12 +284,10 @@
         &.assignment_due {
           width: 30%;
           font-size: 0.8em;
-          padding-top: 0.5em;
           display: block;
         }
         &.assignment_points {
           font-size: 0.8em;
-          padding-top: 0.5em;
         }
         &.buttons {
           float: right;
