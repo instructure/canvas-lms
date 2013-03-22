@@ -1,7 +1,16 @@
+require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/calendar2_common')
 
 describe "calendar2" do
-  it_should_behave_like "calendar2 selenium tests"
+  it_should_behave_like "in-process server selenium tests"
+
+  before (:each) do
+    Account.default.tap do |a|
+      a.settings[:enable_scheduler] = true
+      a.settings[:show_scheduler] = true
+      a.save!
+    end
+  end
 
   def make_event(params = {})
     opts = {
@@ -635,7 +644,7 @@ describe "calendar2" do
         # click the event in the calendar
         fj('.fc-event').click
         fj("#popover-0").should be_displayed
-        expect_new_page_load  { driver.execute_script("$('.view_event_link').hover().click()") }
+        expect_new_page_load { driver.execute_script("$('.view_event_link').hover().click()") }
 
         page_title = f('.title')
         page_title.should be_displayed

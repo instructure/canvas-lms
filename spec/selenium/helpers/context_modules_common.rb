@@ -1,8 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
-shared_examples_for "context module tests" do
-  it_should_behave_like "in-process server selenium tests"
-
   def io
     require 'action_controller'
     require 'action_controller/test_process.rb'
@@ -102,4 +99,3 @@ shared_examples_for "context module tests" do
     submit_form(edit_form)
     wait_for_ajaximations
   end
-end

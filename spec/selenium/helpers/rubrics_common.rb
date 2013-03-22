@@ -1,11 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
-shared_examples_for "rubric tests" do
-  it_should_behave_like "in-process server selenium tests"
-  before (:each) do
-    who_to_login == 'teacher' ? course_with_teacher_logged_in : course_with_admin_logged_in
-  end
-
   def create_rubric_with_criterion_points(points)
     get rubric_url
 
@@ -35,7 +29,7 @@ shared_examples_for "rubric tests" do
     JS
   end
 
-  it "should delete a rubric" do
+  def should_delete_a_rubric
     create_rubric_with_criterion_points "5"
     f('.delete_rubric_link').click
     driver.switch_to.alert.accept
@@ -44,7 +38,7 @@ shared_examples_for "rubric tests" do
     ff('#rubrics .rubric').each { |rubric| rubric.should_not be_displayed }
   end
 
-  it "should edit a rubric" do
+def should_edit_a_rubric
     edit_title = 'edited rubric'
     create_rubric_with_criterion_points "5"
     rubric = Rubric.last
@@ -57,18 +51,18 @@ shared_examples_for "rubric tests" do
     f('.rubric_title .title').text.should == edit_title
   end
 
-  it "should allow fractional points" do
+  def should_allow_fractional_points
     create_rubric_with_criterion_points "5.5"
     fj(".rubric .criterion:visible .display_criterion_points").text.should == '5.5'
     fj(".rubric .criterion:visible .rating .points").text.should == '5.5'
   end
 
-  it "should round to 2 decimal places" do
+  def should_round_to_2_decimal_places
     create_rubric_with_criterion_points "5.249"
     fj(".rubric .criterion:visible .display_criterion_points").text.should == '5.25'
   end
 
-  it "should round to an integer when splitting" do
+  def should_round_to_an_integer_when_splitting
     create_rubric_with_criterion_points "5.5"
     edit_rubric_after_updating
 
@@ -77,7 +71,7 @@ shared_examples_for "rubric tests" do
     ffj(".rubric .criterion:visible .rating .points")[1].text.should == '3'
   end
 
-  it "should pick the lower value when splitting without room for an integer" do
+  def should_pick_the_lower_value_when_splitting_without_room_for_an_integer
     create_rubric_with_criterion_points "0.5"
     edit_rubric_after_updating
 
@@ -86,4 +80,3 @@ shared_examples_for "rubric tests" do
     ffj(".rubric .criterion:visible .rating .points").count.should == 3
     ffj(".rubric .criterion:visible .rating .points")[1].text.should == '0'
   end
-end

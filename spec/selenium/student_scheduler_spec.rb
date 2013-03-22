@@ -3,20 +3,18 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/calendar2_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/scheduler_common')
 
 describe "scheduler" do
-  it_should_behave_like "calendar2 selenium tests"
-  it_should_behave_like "scheduler selenium tests"
-
+  it_should_behave_like "in-process server selenium tests"
   context "as a student" do
 
     before (:each) do
-      #set_native_events("false")
+      Account.default.tap do |a|
+        a.settings[:enable_scheduler] = true
+        a.settings[:show_scheduler] = true
+        a.save!
+      end
       course_with_student_logged_in
       make_full_screen
     end
-
-    #after(:all) do
-    #  set_native_events("true")
-    #end
 
     def reserve_appointment_manual(n)
       ffj('.fc-event')[n].click

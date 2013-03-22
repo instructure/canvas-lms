@@ -1,9 +1,38 @@
-require File.expand_path(File.dirname(__FILE__) + '/helpers/rubrics_specs')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/rubrics_common')
 
-describe "shared rubric specs" do
+
+describe "teacher shared rubric specs" do
+  it_should_behave_like "in-process server selenium tests"
   let(:rubric_url) { "/courses/#{@course.id}/rubrics" }
   let(:who_to_login) { 'teacher' }
-  it_should_behave_like "rubric tests"
+
+  before (:each) do
+    course_with_teacher_logged_in
+  end
+
+  it "should delete a rubric" do
+    should_delete_a_rubric
+  end
+
+  it "should edit a rubric" do
+    should_edit_a_rubric
+  end
+
+  it "should allow fractional points" do
+    should_allow_fractional_points
+  end
+
+  it "should round to 2 decimal places" do
+    should_round_to_2_decimal_places
+  end
+
+  it "should round to an integer when splitting" do
+    should_round_to_an_integer_when_splitting
+  end
+
+  it "should pick the lower value when splitting without room for an integer" do
+    should_pick_the_lower_value_when_splitting_without_room_for_an_integer
+  end
 end
 
 describe "course rubrics" do
@@ -11,41 +40,11 @@ describe "course rubrics" do
 
   context "as a teacher" do
 
-    it "should display free-form comments to the student" do
-      assignment_model
-      rubric_model(:context => @course, :free_form_criterion_comments => true)
-      course_with_student(:course => @course, :active_all => true)
-      @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
-      comment = "Hi, please see www.example.com.\n\nThanks."
-      @assessment = @association.assess({
-                                            :user => @student,
-                                            :assessor => @teacher,
-                                            :artifact => @assignment.find_or_create_submission(@student),
-                                            :assessment => {
-                                                :assessment_type => 'grading',
-                                                :criterion_crit1 => {
-                                                    :points => 5,
-                                                    :comments => comment,
-                                                }
-                                            }
-                                        })
-      user_logged_in(:user => @student)
-
-      get "/courses/#{@course.id}/grades"
-      f('.toggle_rubric_assessments_link').click
-      wait_for_animations
-      f('.rubric .criterion .custom_rating_comments').text.should == comment
-      f('.rubric .criterion .custom_rating_comments a').should have_attribute('href', 'http://www.example.com/')
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
-      f('.assess_submission_link').click
-      wait_for_animations
-      f('.rubric .criterion .custom_rating_comments').text.should == comment
-      f('.rubric .criterion .custom_rating_comments a').should have_attribute('href', 'http://www.example.com/')
+    before(:each) do
+      course_with_teacher_logged_in
     end
 
     it "should ignore outcome rubric lines when calculating total" do
-      course_with_teacher_logged_in
       outcome_with_rubric
       @assignment = @course.assignments.create(:name => 'assignment with rubric')
       @association = @rubric.associate_with(@assignment, @course, :use_for_grading => true, :purpose => 'grading')
@@ -71,7 +70,6 @@ describe "course rubrics" do
     end
 
     it "should not display the edit form more than once" do
-      course_with_teacher_logged_in
       rubric_association_model(:user => @user, :context => @course, :purpose => "grading")
 
       get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
@@ -81,7 +79,6 @@ describe "course rubrics" do
     end
 
     it "should import a rubric outcome row" do
-      course_with_teacher_logged_in
       rubric_association_model(:user => @user, :context => @course, :purpose => "grading")
       outcome_model(:context => @course)
 
@@ -117,7 +114,6 @@ describe "course rubrics" do
     context "importing" do
 
       it "should create a allow immediate editing when adding an imported rubric to a new assignment" do
-        course_with_teacher_logged_in
         rubric_association_model(:user => @user, :context => @course, :purpose => "grading")
 
         @old_course = @course
@@ -142,5 +138,38 @@ describe "course rubrics" do
         ffj(".custom_ratings:visible").size.should == 1
       end
     end
+  end
+
+  it "should display free-form comments to the student" do
+    assignment_model
+    rubric_model(:context => @course, :free_form_criterion_comments => true)
+    course_with_student(:course => @course, :active_all => true)
+    @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
+    comment = "Hi, please see www.example.com.\n\nThanks."
+    @assessment = @association.assess({
+                                          :user => @student,
+                                          :assessor => @teacher,
+                                          :artifact => @assignment.find_or_create_submission(@student),
+                                          :assessment => {
+                                              :assessment_type => 'grading',
+                                              :criterion_crit1 => {
+                                                  :points => 5,
+                                                  :comments => comment,
+                                              }
+                                          }
+                                      })
+    user_logged_in(:user => @student)
+
+    get "/courses/#{@course.id}/grades"
+    f('.toggle_rubric_assessments_link').click
+    wait_for_animations
+    f('.rubric .criterion .custom_rating_comments').text.should == comment
+    f('.rubric .criterion .custom_rating_comments a').should have_attribute('href', 'http://www.example.com/')
+
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
+    f('.assess_submission_link').click
+    wait_for_animations
+    f('.rubric .criterion .custom_rating_comments').text.should == comment
+    f('.rubric .criterion .custom_rating_comments a').should have_attribute('href', 'http://www.example.com/')
   end
 end
