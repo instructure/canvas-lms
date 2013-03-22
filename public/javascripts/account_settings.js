@@ -103,6 +103,12 @@ define([
       $('#account_settings_external_notification_warning').val($(this).prop('checked') ? 1 : 0);
     });
 
+    $(".custom_help_link .delete").click(function(event) {
+      event.preventDefault();
+      $(this).parents(".custom_help_link").find(".custom_help_link_state").val('deleted');
+      $(this).parents(".custom_help_link").hide();
+    });
+
     var $blankCustomHelpLink = $('.custom_help_link.blank').detach().removeClass('blank'),
         uniqueCounter = 1000;
     $(".add_custom_help_link").click(function(event) {
@@ -116,10 +122,6 @@ define([
           return previous.replace(/\d+/, newId);
         });
       });
-    });
-    $(".custom_help_link .delete").click(function(event) {
-      event.preventDefault();
-      $(this).parents(".custom_help_link").remove();
     });
 
     $(".remove_account_user_link").click(function(event) {

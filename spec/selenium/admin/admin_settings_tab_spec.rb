@@ -337,4 +337,74 @@ describe "admin settings tab" do
       check_box_verifier("#account_settings_students_can_create_courses", :students_can_create_courses)
     end
   end
+
+  context "custom help links" do
+    def set_checkbox(checkbox, checked)
+      selector = "##{checkbox['id']}"
+      checkbox.click if is_checked(selector) != checked
+    end
+
+    it 'should add and delete custom help links' do
+      Setting.set('show_feedback_link', 'true')
+      get "/accounts/#{Account.default.id}/settings"
+
+      f('.add_custom_help_link').click
+      f('.add_custom_help_link').click
+      f('.add_custom_help_link').click
+
+      inputs = ff('.custom_help_link:nth-child(1) .formtable input')
+      inputs.find{|e| e['id'].ends_with?('_text')}.send_keys('text')
+      inputs.find{|e| e['id'].ends_with?('_subtext')}.send_keys('subtext')
+      inputs.find{|e| e['id'].ends_with?('_url')}.send_keys('http://www.example.com/example')
+
+      set_checkbox(inputs.find{|e| e['id'].ends_with?('_available_to_user')}, true)
+      set_checkbox(inputs.find{|e| e['id'].ends_with?('_available_to_student')}, true)
+      set_checkbox(inputs.find{|e| e['id'].ends_with?('_available_to_teacher')}, true)
+      set_checkbox(inputs.find{|e| e['id'].ends_with?('_available_to_admin')}, false)
+
+      f('.custom_help_link:nth-child(2) .delete').click
+      f('.custom_help_link:nth-child(2)').should_not be_displayed
+
+      inputs = ff('.custom_help_link:nth-child(3) .formtable input')
+      inputs.find{|e| e['id'].ends_with?('_text')}.send_keys('text2')
+      inputs.find{|e| e['id'].ends_with?('_subtext')}.send_keys('subtext2')
+      inputs.find{|e| e['id'].ends_with?('_url')}.send_keys('http://www.example.com/example2')
+
+      set_checkbox(inputs.find{|e| e['id'].ends_with?('_available_to_user')}, false)
+      set_checkbox(inputs.find{|e| e['id'].ends_with?('_available_to_student')}, true)
+      set_checkbox(inputs.find{|e| e['id'].ends_with?('_available_to_teacher')}, false)
+      set_checkbox(inputs.find{|e| e['id'].ends_with?('_available_to_admin')}, true)
+
+      click_submit
+      Account.default.settings[:custom_help_links].should == [
+        {"text"=>"text", "subtext"=>"subtext", "url"=>"http://www.example.com/example", "available_to"=>["user", "student", "teacher"]},
+        {"text"=>"text2", "subtext"=>"subtext2", "url"=>"http://www.example.com/example2", "available_to"=>["student", "admin"]}
+      ]
+
+      f('.custom_help_link:nth-child(1) .delete').click
+      f('.custom_help_link:nth-child(1)').should_not be_displayed
+
+      click_submit
+      Account.default.settings[:custom_help_links].should == [
+          {"text"=>"text2", "subtext"=>"subtext2", "url"=>"http://www.example.com/example2", "available_to"=>["student", "admin"]}
+      ]
+    end
+
+    it "should not delete all of the pre-existing custom help links if notifications tab is submitted" do
+      Account.default.settings[:custom_help_links] = [
+          {"text"=>"text", "subtext"=>"subtext", "url"=>"http://www.example.com/example", "available_to"=>["user", "student", "teacher"]}]
+      Account.default.save!
+
+      Setting.set('show_feedback_link', 'true')
+      get "/accounts/#{Account.default.id}/settings"
+
+      f("#tab-notifications-link").click
+      submit_form("#account_settings_notifications")
+      wait_for_ajax_requests
+
+      Account.default.settings[:custom_help_links].should == [
+        {"text"=>"text", "subtext"=>"subtext", "url"=>"http://www.example.com/example", "available_to"=>["user", "student", "teacher"]}
+      ]
+    end
+  end
 end

@@ -26,8 +26,8 @@
 <div id="account_settings_tabs" style="display:none;" class="ui-tabs-minimal">
   <ul>
     <% if can_do(@context, @current_user, :manage_account_settings) %>
-    <li><a href="#tab-settings"><%= t(:tab_settings, "Settings") %></a></li>
-    <li><a href="#tab-notifications"><%= t(:tab_notifications, "Notifications") %></a></li>
+    <li><a href="#tab-settings" id="tab-settings-link"><%= t(:tab_settings, "Settings") %></a></li>
+    <li><a href="#tab-notifications" id="tab-notifications-link"><%= t(:tab_notifications, "Notifications") %></a></li>
     <% end %>
     <li><a href="#tab-users" id="tab-users-link"><%= t(:tab_admins, "Admins") %></a></li>
     <% if @account.root_account? %>
@@ -322,6 +322,7 @@ TEXT
                 <% ((@account.settings[:custom_help_links] || []) << {}).each_with_index do |help_link, i| %>
                   <div class="custom_help_link <%= raw ' blank" style="display: none;' if help_link.empty? %>">
                     <a href="#" class="delete" title="<%= t(:delete, "delete") %>">&nbsp;</a>
+                    <input type="hidden" name="account[custom_help_links][<%= i %>][state]" value="<%= help_link[:state] || 'active' %>" id="custom_help_links_<%= i %>_state" class="custom_help_link_state"/>
                     <table class="formtable">
                       <tr>
                         <td><label for="custom_help_links_<%= i %>_text"><%= before_label :help_link_text, "Text to display for link" %></label></td>

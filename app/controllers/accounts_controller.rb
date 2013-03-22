@@ -165,7 +165,7 @@ class AccountsController < ApplicationController
     if authorized_action(@account, @current_user, :manage_account_settings)
       if api_request?
         account_params = params[:account] || {}
-        account_params.reject{|k, v| ![:name, :default_time_zone].include?(k.to_sym)}
+        account_params.reject!{|k, v| ![:name, :default_time_zone].include?(k.to_sym)}
 
         @account.errors.add(:name, "The account name cannot be blank") if account_params.has_key?(:name) && account_params[:name].blank?
         @account.errors.add(:default_time_zone, "'#{account_params[:default_time_zone]}' is not a recognized time zone") if account_params.has_key?(:default_time_zone) && ActiveSupport::TimeZone.new(account_params[:default_time_zone]).nil?
@@ -181,13 +181,12 @@ class AccountsController < ApplicationController
 
         custom_help_links = params[:account].delete :custom_help_links
         if custom_help_links
-          @account.settings[:custom_help_links] = custom_help_links.sort.map do |index_with_hash|
+          @account.settings[:custom_help_links] = custom_help_links.select{|k, h| h['state'] != 'deleted'}.sort.map do |index_with_hash|
             hash = index_with_hash[1]
+            hash.delete('state')
             hash.assert_valid_keys ["text", "subtext", "url", "available_to"]
             hash
           end
-        elsif @account.settings[:custom_help_links].present?
-          @account.settings.delete :custom_help_links
         end
 
         enable_user_notes = params[:account].delete :enable_user_notes
