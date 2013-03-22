@@ -58,6 +58,10 @@ class Shard
     "default"
   end
 
+  def relative_id_for(any_id, target_shard = nil)
+    any_id
+  end
+
   def self.global_id_for(any_id)
     any_id
   end
