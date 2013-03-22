@@ -25,13 +25,13 @@ class GroupMembership < ActiveRecord::Base
 
   attr_accessible :group, :user, :workflow_state, :moderator
   
-  before_save :ensure_mutually_exclusive_membership
   before_save :assign_uuid
   before_save :auto_join
   before_save :capture_old_group_id
 
   before_validation :verify_section_homogeneity_if_necessary
 
+  after_save :ensure_mutually_exclusive_membership
   after_save :touch_groups
   after_save :check_auto_follow_group
   after_destroy :touch_groups
@@ -90,6 +90,7 @@ class GroupMembership < ActiveRecord::Base
 
   def ensure_mutually_exclusive_membership
     return unless self.group
+    return if self.deleted?
     peer_groups = self.group.peer_groups.map(&:id)
     GroupMembership.active.find(:all, :conditions => { :group_id => peer_groups, :user_id => self.user_id }).each {|gm| gm.destroy }
   end
