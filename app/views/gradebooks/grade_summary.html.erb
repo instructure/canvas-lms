@@ -38,7 +38,7 @@
     <div style="margin-top: 10px;">
       <%= render :partial => "courses/sidebar_weighting", :object => @presenter.groups %>
       <% unless @presenter.no_calculations? %>
-        <div style="font-size: 0.8em;">
+        <div id="only_consider_graded_assignments_wrapper">
           <label class="checkbox" for="only_consider_graded_assignments"><%= t('labels.only_graded', "Calculate based only on graded assignments") %>
             <input type="checkbox" id="only_consider_graded_assignments" checked="true"/>
           </label>
