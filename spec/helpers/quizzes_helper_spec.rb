@@ -50,6 +50,44 @@ describe QuizzesHelper do
     end
   end
 
+  context 'render_quiz_type' do
+    it 'should render a humanized quiz type string' do
+      render_quiz_type('practice_quiz').should == "Practice Quiz"
+      render_quiz_type('assignment').should == "Graded Quiz"
+      render_quiz_type('graded_survey').should == "Graded Survey"
+      render_quiz_type('survey').should == "Ungraded Survey"
+    end
+
+    it 'should return nil for an unrecognized quiz_type' do
+      render_quiz_type(nil).should be_nil
+      render_quiz_type('made_up_quiz_type').should be_nil
+    end
+  end
+
+  context 'render_score_to_keep' do
+    it 'should render which score to keep when passed in a scoring_policy option' do
+      render_score_to_keep('keep_highest').should == "Highest"
+      render_score_to_keep('keep_latest').should == "Latest"
+    end
+
+    it 'should return nil for an unrecognized scoring_policy' do
+      render_score_to_keep(nil).should be_nil
+      render_score_to_keep('made_up_scoring_policy').should be_nil
+    end
+  end
+
+  context 'render_show_responses' do
+    it "should answer 'Let Students See Quiz Responses?' when passed a hide_results option" do
+      render_show_responses('always').should == "No"
+      render_show_responses('until_after_last_attempt').should == "After Last Attempt"
+      render_show_responses(nil).should == "Always"
+    end
+
+    it "should return nil for an unrecognized hide_results value" do
+      render_show_responses('made_up_hide_results').should be_nil
+    end
+  end
+
   context 'score_out_of_points_possible' do
     it 'should show single digit scores' do
       score_out_of_points_possible(1, 5).should == "1 out of 5"
@@ -75,6 +113,21 @@ describe QuizzesHelper do
     it 'should work in russian when count == 1' do
       I18n.locale = "ru"
       duration_in_minutes(60.6).should == "1 минута"
+    end
+  end
+
+  context 'fill_in_multiple_blanks_question' do
+    it 'should sanitize user input' do
+      def user_content(stuff); stuff; end
+
+      question_text = %q|<input name="question_1" 'value={{question_1}}' />|
+      html = fill_in_multiple_blanks_question(
+        :question => {:question_text => question_text},
+        :answer_list => [%q|'><script>alert('ha!')</script><img|],
+        :answers => []
+      )
+
+      html.should == %q|<input name="question_1" 'value=&#39;&gt;&lt;script&gt;alert(&#39;ha!&#39;)&lt;/script&gt;&lt;img' readonly="readonly" />|
     end
   end
 end

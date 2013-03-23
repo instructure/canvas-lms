@@ -110,7 +110,8 @@ class UnzipAttachment
         # Hyphenate the path.  So, /some/file/path becomes some-file-path
         # Since Tempfile guarantees that the names are unique, we don't
         # have to worry about what this name actually is.
-        Tempfile.open(filename) do |f|
+        # NOTE: strip leading ~ as workaround for https://bugs.ruby-lang.org/issues/7547
+        Tempfile.open(filename.sub(/^~/, '')) do |f|
           begin
             entry.extract(f.path) { true }
             # This is where the attachment actually happens.  See file_in_context.rb

@@ -47,6 +47,13 @@ describe PageView do
       expect { PageView.find("junk") }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
+    it "should not start a db transaction on save" do
+      PageView.expects(:transaction_without_cassandra_check).never
+      PageView.new { |p| p.send(:attributes=, { :user => @user, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcdef", :interaction_seconds => 5 }, false) }.store
+      PageView.process_cache_queue
+      PageView.find("abcdef").should be_present
+    end
+
     describe "sharding" do
       it_should_behave_like "sharding"
 
@@ -80,6 +87,35 @@ describe PageView do
         end
         # can't find in cassandra
         expect { PageView.find(pv.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+
+      it "should handle default shard ids through redis" do
+        pending("needs redis") unless Canvas.redis_enabled?
+
+        @pv_user = user_model
+        id = @shard1.activate do
+          @user2 = User.create! { |u| u.id = @user.local_id }
+          course_model
+          pv = page_view_model
+          pv.user = @pv_user
+          pv.context = @course
+          pv.store
+
+          PageView.process_cache_queue
+          pv.request_id
+        end
+
+        pv = PageView.find(id)
+        pv.user.should == @pv_user
+        pv.context.should == @course
+
+        @pv_user.page_views.paginate(:page => 1, :per_page => 1).first.should == pv
+        @user2.page_views.paginate(:page => 1, :per_page => 1).should be_empty
+
+        @shard1.activate do
+          @pv_user.page_views.paginate(:page => 1, :per_page => 1).first.should == pv
+          @user2.page_views.paginate(:page => 1, :per_page => 1).should be_empty
+        end
       end
     end
 
@@ -200,7 +236,7 @@ describe PageView do
       PageView.new { |p| p.send(:attributes=, { :user => @user, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcdefg", :interaction_seconds => 5 }, false) }.store
       PageView.count.should == 0
       Setting.set('page_view_queue_batch_size', '2')
-      PageView.expects(:transaction).at_least(5).yields # 5 times, because 2 outermost transactions, then rails starts a "transaction" for each save (which runs as a no-op, since we're already in a transaction)
+      PageView.connection.expects(:transaction).at_least(5).yields # 5 times, because 2 outermost transactions, then rails starts a "transaction" for each save (which runs as a no-op, since we're already in a transaction)
       PageView.process_cache_queue
       PageView.count.should == 3
     end
@@ -315,6 +351,5 @@ describe PageView do
     its(:created_at) { should_not be_nil }
     its(:updated_at) { should_not be_nil }
     its(:http_method) { should == 'get' }
-
   end
 end

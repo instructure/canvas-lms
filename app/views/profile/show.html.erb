@@ -9,7 +9,7 @@
       <button data-event="cancelEditProfile" class="show-if-editing btn button-sidebar-wide"><i class="icon-edit"></i> <%= t('cancel_editing', 'Cancel Editing') %></button>
     <% end %>
     <% if can_do(@domain_root_account, @current_user, :manage) %>
-      <h2><%= t :administration, 'Administration' %></h2>
+      <h1 class="h2 right-side-h2-border"><%= t :administration, 'Administration' %></h1>
       <div><a href="<%= user_path(@user.id) %>"><%= t('links.user_account_details', %{Account Details}) %></a></div>
       <% if @user != @current_user %>
         <div><a href="<%= context_url(@user.profile, :context_url, :become_user_id => @user.id) %>"> <%= t('become', 'Become') %></a></div>

@@ -43,7 +43,14 @@ define [
       _.each @_directPropertyOptions, (prop) => @[prop] = @options[prop]
       super
 
+    ##
+    # Sets a paramter on @options.params that will be used in `fetch`
+    setParam: (name, value) ->
+      @options.params ?= {}
+      @options.params[name] = value
+
     fetch: (options = {}) ->
+      # TODO: we might want to merge options.data and options.params here instead
       options.data = @options.params if !options.data? and @options.params?
       super options
 

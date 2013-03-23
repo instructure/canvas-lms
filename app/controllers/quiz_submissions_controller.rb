@@ -17,7 +17,7 @@
 #
 
 class QuizSubmissionsController < ApplicationController
-  protect_from_forgery :except => [:create, :backup]
+  protect_from_forgery :except => [:create, :backup, :record_answer]
   before_filter :require_context
   batch_jobs_in_actions :only => [:update, :create], :batch => { :priority => Delayed::LOW_PRIORITY }
 
@@ -30,6 +30,9 @@ class QuizSubmissionsController < ApplicationController
   def create
     redirect_params = {}
     @quiz = @context.quizzes.find(params[:quiz_id])
+    if @quiz.access_code.present?
+      session.delete(@quiz.access_code_key_for_user(@current_user))
+    end
     if @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
       flash[:error] = t('errors.protected_quiz', "This quiz is protected and is only available from certain locations.  The computer you are currently using does not appear to be at a valid location for taking this quiz.")
     elsif @quiz.grants_right?(@current_user, :submit)

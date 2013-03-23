@@ -17,6 +17,8 @@
 #
 module CC
   class CCExporter
+    include TextHelper
+
     ZIP_DIR = 'zip_dir'
     
     attr_accessor :course, :user, :export_dir, :manifest, :zip_file, :for_course_copy
@@ -134,10 +136,11 @@ module CC
     end
 
     def create_zip_file
+      name = truncate_text(@course.name.to_url, {:max_length => 200, :ellipsis => ''})
       if @qti_only_export
-        @zip_name = "#{@course.name.to_url}-quiz-export.zip"
+        @zip_name = "#{name}-quiz-export.zip"
       else
-        @zip_name = "#{@course.name.to_url}-export.#{CCHelper::CC_EXTENSION}"
+        @zip_name = "#{name}-export.#{CCHelper::CC_EXTENSION}"
       end
       FileUtils::mkdir_p File.join(@export_dir, ZIP_DIR)
       @zip_path = File.join(@export_dir, ZIP_DIR, @zip_name)

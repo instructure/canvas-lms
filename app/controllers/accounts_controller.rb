@@ -33,9 +33,6 @@ class AccountsController < ApplicationController
     respond_to do |format|
       format.html
       format.json do
-        # TODO: what would be more useful, include sub-accounts here
-        # that you implicitly have access to, or have a separate method
-        # to get the sub-accounts of an account?
         @accounts = Api.paginate(@accounts, self, api_v1_accounts_url)
         render :json => @accounts.map { |a| account_json(a, @current_user, session, []) }
       end
@@ -58,6 +55,38 @@ class AccountsController < ApplicationController
       end
       format.json { render :json => account_json(@account, @current_user, session, []) }
     end
+  end
+
+  # @API Get the sub-accounts of an account
+  #
+  # List accounts that are sub-accounts of the given account.
+  #
+  # @argument recursive [optional] If true, the entire account tree underneath
+  #   this account will be returned (though still paginated). If false, only
+  #   direct sub-accounts of this account will be returned. Defaults to false.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/accounts/<account_id>/sub_accounts \ 
+  #          -H 'Authorization: Bearer <token>'
+  def sub_accounts
+    return unless authorized_action(@account, @current_user, :read)
+    recursive = value_to_boolean(params[:recursive])
+    if recursive
+      @accounts = PaginatedCollection.build do |pager|
+        per_page = pager.per_page
+        current_page = pager.current_page.to_i
+        pager.replace(
+          @account.sub_accounts_recursive(per_page, current_page * per_page)
+        )
+      end
+    else
+      @accounts = @account.sub_accounts.scoped(:order => :id)
+    end
+
+    @accounts = Api.paginate(@accounts, self, api_v1_sub_accounts_url,
+                             :without_count => recursive)
+
+    render :json => @accounts.map { |a| account_json(a, @current_user, session, []) }
   end
 
   include Api::V1::Course
@@ -112,8 +141,40 @@ class AccountsController < ApplicationController
     render :json => @courses.map { |c| course_json(c, @current_user, session, [], nil) }
   end
 
+  # @API Update an account
+  # Update an existing account.
+  #
+  # @argument account[name] [optional] Updates the account name
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/accounts/<account_id> \ 
+  #     -X PUT \ 
+  #     -H 'Authorization: Bearer <token>' \ 
+  #     -d 'account[name]=New account name'
+  #
+  # @example_response
+  #   {
+  #     "id": "1",
+  #     "name": "New account name",
+  #     "parent_account_id": null,
+  #     "root_account_id": null
+  #   }
   def update
     if authorized_action(@account, @current_user, :manage_account_settings)
+      if api_request?
+        account_params = params[:account] || {}
+        account_params.reject{|k, v| ![:name].include?(k.to_sym)}
+
+        @account.errors.add(:name, "The account name cannot be blank") if account_params.has_key?(:name) && account_params[:name].blank?
+
+        if @account.errors.empty? && @account.update_attributes(account_params)
+          render :json => account_json(@account, @current_user, session, params[:includes] || [])
+        else
+          render :json => @account.errors, :status => :bad_request
+        end
+        return
+      end
+
       respond_to do |format|
 
         custom_help_links = params[:account].delete :custom_help_links

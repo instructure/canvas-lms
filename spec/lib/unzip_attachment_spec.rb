@@ -131,6 +131,13 @@ describe UnzipAttachment do
       end
     end
 
+    it "should not fall over when facing a filename starting with ~" do
+      filename = fixture_filename('tilde.zip')
+      ua = UnzipAttachment.new(:course => @course, :filename => filename)
+      lambda { ua.process }.should_not raise_error
+      @course.attachments.map(&:display_name).should == ['~tilde']
+    end
+
     describe 'validations' do
 
       let(:filename) { fixture_filename('huge_zip.zip') }
@@ -145,6 +152,11 @@ describe UnzipAttachment do
       it 'errors when the file quotas push the context over its quota' do
         Attachment.stubs(:get_quota).returns({:quota => 5000, :quota_used => 0})
         lambda{ unzipper.process }.should raise_error(Attachment::OverQuotaError, "Zip file would exceed quota limit")
+      end
+
+      it 'should be able to rescue the file quota error' do
+        Attachment.stubs(:get_quota).returns({:quota => 5000, :quota_used => 0})
+        unzipper.process rescue nil
       end
     end
 

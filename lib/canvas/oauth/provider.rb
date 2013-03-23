@@ -13,6 +13,15 @@ module Canvas::Oauth
       key.present?
     end
 
+    def client_id_is_valid?
+      return false unless @client_id.present?
+      begin
+        !!Integer(@client_id)
+      rescue ArgumentError
+        false
+      end
+    end
+
     def is_authorized_by?(secret)
       secret == key.api_key
     end
@@ -26,7 +35,7 @@ module Canvas::Oauth
     end
 
     def key
-      return nil unless @client_id
+      return nil unless client_id_is_valid?
       @key ||= DeveloperKey.find_by_id(@client_id)
     end
 
@@ -54,5 +63,7 @@ module Canvas::Oauth
     def default_app_name
       I18n.translate('pseudonym_sessions.default_app_name', 'Third-Party Application')
     end
+
+   
   end
 end

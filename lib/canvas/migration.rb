@@ -14,6 +14,10 @@ module Canvas::Migration
   def logger
     Rails.logger
   end
+
+  def self.valid_converter_classes
+    @converter_classes ||= Canvas::Plugin.all_for_tag(:export_system).map {|p| p.meta["settings"]["provides"].try(:values) }.flatten.compact.uniq.map(&:name)
+  end
 end
 
 require_dependency 'canvas/migration/migrator'

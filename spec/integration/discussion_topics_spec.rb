@@ -46,7 +46,7 @@ describe "discussion_topics" do
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     response.should be_success
     doc = Nokogiri::XML(response.body)
-    doc.at_css('.speedgrader').should_not be_nil
+    doc.at_css('.admin-links .icon-speed-grader').should_not be_nil
   end
 
   it "should show peer reviews button" do
@@ -58,7 +58,7 @@ describe "discussion_topics" do
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     response.should be_success
     doc = Nokogiri::XML(response.body)
-    doc.at_css('.assignment_peer_reviews_link').should_not be_nil
+    doc.at_css('.admin-links .icon-peer-review').should_not be_nil
   end
 
 end

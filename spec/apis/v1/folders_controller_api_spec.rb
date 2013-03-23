@@ -145,8 +145,7 @@ describe "Folders API", :type => :integration do
 
       student_in_course(:course => @course, :active_all => true)
       json = api_call(:get, @folders_path + "/#{@root.id}/folders", @folders_path_options, {})
-      json[0]["locked"].should == true
-      json[0]["locked_for_user"].should == true
+      json.should be_empty
     end
 
     describe "folder in context" do

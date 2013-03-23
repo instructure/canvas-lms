@@ -3,7 +3,17 @@ require [
   'Backbone',
   'jquery',
   'i18n!dashboard'
-], (_, {View}, $, I18n) ->
+  'compiled/util/newCourseForm'
+  'jquery.disableWhileLoading'
+], (_, {View}, $, I18n, newCourseForm) ->
+
+  if ENV.DASHBOARD_SIDEBAR_URL
+    rightSide = $('#right-side')
+    rightSide.disableWhileLoading(
+      $.get ENV.DASHBOARD_SIDEBAR_URL , (data) ->
+        rightSide.html data
+        newCourseForm()
+    )
 
   class DashboardView extends View
 
@@ -11,7 +21,7 @@ require [
 
     events:
       'click .stream_header': 'expandDetails'
-      'click .stream_header .links': 'stopPropagation'
+      'click .stream_header .links a': 'stopPropagation'
       'click .stream-details': 'handleDetailsClick'
       'beforeremove': 'updateCategoryCounts' # ujsLinks event
 

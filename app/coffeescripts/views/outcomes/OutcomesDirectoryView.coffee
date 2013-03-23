@@ -68,6 +68,8 @@ define [
         @$el.disableWhileLoading(dfd = @groups.fetch())
         dfd.done(@focusFirstOutcome)
 
+      @loadDfd.done(@selectFirstOutcome) if opts.selectFirstItem
+
     initDroppable: ->
       @$el.droppable
         scope: 'outcomes'
@@ -148,6 +150,9 @@ define [
         $li.focus()
       else
         @$el.prev().find('[tabindex=0]').focus()
+
+    selectFirstOutcome: =>
+      $('ul.outcome-level li:first').click()
 
     # Overriding
     paginationLoaderTemplate: ->

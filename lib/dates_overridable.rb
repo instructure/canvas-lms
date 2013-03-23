@@ -1,5 +1,6 @@
 module DatesOverridable
   attr_accessor :applied_overrides, :overridden_for_user, :overridden
+  attr_writer :without_overrides
 
   def self.included(base)
     base.has_many :assignment_overrides, :dependent => :destroy
@@ -29,6 +30,14 @@ module DatesOverridable
     assignment_overrides.count > 0
   end
 
+  def has_active_overrides?
+    assignment_overrides.active.count > 0
+  end
+
+  def without_overrides
+    @without_overrides || self
+  end
+
   # returns two values indicating which due dates for this assignment apply
   # and/or are visible to the user.
   #
@@ -45,12 +54,12 @@ module DatesOverridable
   # course is affected by that due date, and an 'override' key referencing the
   # override itself. for the original due date, it will instead have a 'base'
   # flag (value true).
-  def due_dates_for(user, opts={})
+  def due_dates_for(user)
     as_student, as_admin = nil, nil
     return nil, nil if context.nil?
 
     if user.nil?
-      return self.due_date_hash, nil
+      return self.without_overrides.due_date_hash, nil
     end
 
     if context.user_has_been_student?(user)
@@ -71,22 +80,18 @@ module DatesOverridable
       as_admin = all_due_dates
     end
 
-    if opts[:exclude_base_if_all_sections_overridden] && as_admin
-      # Don't include the assignment base due date if all the sections are overridden
-      overridden_section_ids = as_admin.select{|hash| hash[:override] &&
-          hash[:override].set_type == 'CourseSection'}.map{|hash| hash[:override].set_id}
-      section_ids = context.sections_visible_to(user).map(&:id)
-      if section_ids.sort == overridden_section_ids.sort
-        as_admin.delete_if{|hash| hash[:base]}
-      end
-    end
-
     return as_student, as_admin
   end
 
   def all_due_dates
     all_dates = assignment_overrides.overriding_due_at.map(&:as_hash)
-    all_dates << due_date_hash.merge(:base => true)
+    all_dates << without_overrides.due_date_hash.merge(:base => true)
+  end
+
+  def all_dates_visible_to(user)
+    all_dates = overrides_visible_to(user).active
+    all_dates = all_dates.map(&:as_hash)
+    all_dates << without_overrides.due_date_hash.merge(:base => true)
   end
 
   def due_dates_visible_to(user)
@@ -95,7 +100,7 @@ module DatesOverridable
     list = overrides.map(&:as_hash)
 
     # Base
-    list << self.due_date_hash.merge(:base => true)
+    list << without_overrides.due_date_hash.merge(:base => true)
   end
 
   def observed_student_due_dates(user)
@@ -105,10 +110,11 @@ module DatesOverridable
   end
 
   def due_date_hash
-    hash = { :due_at => due_at }
-
+    hash = { :due_at => due_at, :unlock_at => unlock_at, :lock_at => lock_at }
     if self.is_a?(Assignment)
       hash.merge!({ :all_day => all_day, :all_day_date => all_day_date })
+    elsif self.assignment
+      hash.merge!({ :all_day => assignment.all_day, :all_day_date => assignment.all_day_date})
     end
 
     if @applied_overrides && override = @applied_overrides.find { |o| o.due_at == due_at }
@@ -175,7 +181,7 @@ module DatesOverridable
 
       as_instructor << {
         :base => true,
-        :unlock_at => self.unlock_at
+        :unlock_at => self.without_overrides.unlock_at
       }
     end
 
@@ -204,7 +210,7 @@ module DatesOverridable
 
       as_instructor << {
         :base => true,
-        :lock_at => self.lock_at
+        :lock_at => self.without_overrides.lock_at
       }
     end
 

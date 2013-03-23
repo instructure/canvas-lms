@@ -118,7 +118,7 @@ class SubmissionsController < ApplicationController
     if @context_enrollment && @context_enrollment.is_a?(ObserverEnrollment) && @context_enrollment.associated_user_id
       id = @context_enrollment.associated_user_id
     else
-      id = @current_user.id
+      id = @current_user.try(:id)
     end
     @user = @context.all_students.find(params[:id]) rescue nil
     if !@user
@@ -400,8 +400,10 @@ class SubmissionsController < ApplicationController
       end
     end
   end
-  
+
   def turnitin_report
+    return render(:nothing => true, :status => 400) unless params_are_integers?(:assignment_id, :submission_id)
+
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @submission = @assignment.submissions.find_by_user_id(params[:submission_id])
     @asset_string = params[:asset_string]
@@ -417,12 +419,14 @@ class SubmissionsController < ApplicationController
   end
 
   def resubmit_to_turnitin
+    return render(:nothing => true, :status => 400) unless params_are_integers?(:assignment_id, :submission_id)
+
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @assignment = @context.assignments.active.find(params[:assignment_id])
       @submission = @assignment.submissions.find_by_user_id(params[:submission_id])
       @submission.resubmit_to_turnitin
       respond_to do |format|
-        format.html { 
+        format.html {
           flash[:notice] = t('resubmitted_to_turnitin', "Successfully resubmitted to turnitin.")
           redirect_to named_context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id)
         }
@@ -430,7 +434,7 @@ class SubmissionsController < ApplicationController
       end
     end
   end
-  
+
   def update
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @user = @context.all_students.find(params[:id])

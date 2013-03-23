@@ -347,7 +347,7 @@ class AssessmentQuestion < ActiveRecord::Base
       end
     elsif question[:question_type] == "calculated_question"
       question[:formulas] = []
-      qdata[:formulas].sort_by(&:first).each do |key, formula|
+      (qdata[:formulas] || []).sort_by(&:first).each do |key, formula|
         question[:formulas] << {
           :formula => check_length(formula[0..1024], 'formula', min_size)
         }

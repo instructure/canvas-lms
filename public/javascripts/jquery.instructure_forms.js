@@ -67,6 +67,8 @@ define([
   $.fn.formSubmit = function(options) {
     this.submit(function(event) {
       var $form = $(this); //this is to handle if bind to a template element, then it gets cloned the original this would not be the same as the this inside of here.
+       // disableWhileLoading might need to wrap this, so we don't want to modify the original
+      var onSubmit = options.onSubmit;
       if($form.data('submitting')) { return; }
       $form.data('trigger_event', event);
       $form.hideErrors();
@@ -103,17 +105,17 @@ define([
       }
 
       if (options.disableWhileLoading) {
-        var oldOnSubmit = options.onSubmit || function(){};
-        options.onSubmit = function(loadingPromise) {
+        var oldOnSubmit = onSubmit;
+        onSubmit = function(loadingPromise) {
           $form.disableWhileLoading(loadingPromise);
-          oldOnSubmit.apply(this, arguments);
+          if (oldOnSubmit) oldOnSubmit.apply(this, arguments);
         }
       }
 
-      if (options.onSubmit) {
+      if (onSubmit) {
         var loadingPromise = $.Deferred(),
             oldHandlers = {};
-        options.onSubmit(loadingPromise, formData);
+        onSubmit(loadingPromise, formData);
         $.each(['success', 'error'], function(i, successOrError){
           oldHandlers[successOrError] = options[successOrError];
           options[successOrError] = function() {

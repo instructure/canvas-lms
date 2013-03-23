@@ -68,13 +68,21 @@ define [
 
       [ method, url ] = @methodAndURLForSave()
 
+      @forceMinimumDuration() # so short events don't look squished while waiting for ajax
       $.publish "CommonEvent/eventSaving", this
       $.ajaxJSON url, method, params, onSuccess, onError
 
     isDueAtMidnight: () ->
-      @midnightFudged || @start && @start.getHours() == 23 && @start.getMinutes() == 59
+      @start && (@midnightFudged || (@start.getHours() == 23 && @start.getMinutes() == 59))
 
     copyDataFromObject: (data) ->
       if @isDueAtMidnight()
         @midnightFudged = true
         @start.setMinutes(30)
+      @forceMinimumDuration()
+
+    forceMinimumDuration: () ->
+      minimumDuration = 30 * 60 * 1000 # 30 minutes
+      if @end && (@end.getTime() - @start.getTime()) < minimumDuration
+        # new date so we don't mutate the original
+        @end = new Date(@start.getTime() + minimumDuration)

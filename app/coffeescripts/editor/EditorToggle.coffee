@@ -1,9 +1,10 @@
 define [
+  'underscore'
   'i18n!editor'
   'jquery'
   'compiled/fn/preventDefault'
   'tinymce.editor_box'
-], (I18n, $, preventDefault) ->
+], (_, I18n, $, preventDefault) ->
 
   ##
   # Toggles an element between a rich text editor and itself
@@ -20,7 +21,8 @@ define [
     ##
     # @param {jQueryEl} @el - the element containing html to edit
     # @param {Object} options
-    constructor: (@el, options) ->
+    constructor: (elem, options) ->
+      @editingElement(elem)
       @options = $.extend {}, @options, options
       @textArea = @createTextArea()
       @switchViews = @createSwitchViews() if @options.switchViews
@@ -50,6 +52,7 @@ define [
         opts = tinyOptions: {aria_label: @options.editorBoxLabel}
       @textArea.editorBox opts
       @editing = true
+      @trigger 'edit'
 
     ##
     # Converts the editor to an element
@@ -67,6 +70,15 @@ define [
       # so tiny doesn't hang on to this instance
       @textArea.attr 'id', ''
       @editing = false
+      @trigger 'display'
+
+    ##
+    # Assign/re-assign the jQuery element to to edit.
+    #
+    # @param {jQueryEl} @el - the element containing html to edit
+    # @api public
+    editingElement: (elem)->
+      @el = elem
 
     ##
     # method to get the content for the editor
@@ -93,7 +105,7 @@ define [
         .attr('href', '#')
         .addClass('btn edit-html-done edit_html_done')
         .attr('title', I18n.t('done.title', 'Click to finish editing the rich text area'))
-        .click => @display()
+        .click preventDefault => @display()
 
     ##
     # create the switch views link to go between rich text and a textarea
@@ -103,3 +115,7 @@ define [
         .text(I18n.t('switch_views', 'Switch Views'))
         .click preventDefault => @textArea.editorBox('toggle')
 
+
+  _.extend(EditorToggle.prototype, Backbone.Events)
+
+  EditorToggle

@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  http://<%= HostUrl.context_host(asset.group.context) %>/<%= asset.group.context.class.to_s.downcase.pluralize %>/<%= asset.group.context_id %>/groups
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.group.context) %>/<%= asset.group.context.class.to_s.downcase.pluralize %>/<%= asset.group.context_id %>/groups
 <% end %>
 <% if asset.group.context.class.to_s == 'Account' %>
 <%= mt('account_group', "Your request to join the group **[%{group_name}](%{group_url})** for the account %{account_name} has been rejected.", :group_name => asset.group.name, :group_url => content(:link), :account_name => asset.group.context.name) %>

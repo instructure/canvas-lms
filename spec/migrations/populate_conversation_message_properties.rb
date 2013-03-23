@@ -25,20 +25,20 @@ describe 'DataFixup::PopulateConversationMessageProperties' do
       student_in_course
       u = @user
 
-      c1 = u.initiate_conversation([User.create.id])
+      c1 = u.initiate_conversation([User.create])
       m1 = c1.add_message("no attachment")
 
-      c2 = u.initiate_conversation([User.create.id])
+      c2 = u.initiate_conversation([User.create])
       a = attachment_model(:context => u, :folder => u.conversation_attachments_folder)
       m2 = c2.add_message("attachment!", :attachment_ids => [a.id])
 
-      c3 = u.initiate_conversation([User.create.id])
+      c3 = u.initiate_conversation([User.create])
       m3 = c3.add_message("forwarded attachment!", :forwarded_message_ids => [m2.id])
 
-      c4 = u.initiate_conversation([User.create.id])
+      c4 = u.initiate_conversation([User.create])
       m4 = c4.add_message("doubly forwarded attachment!", :forwarded_message_ids => [m3.id])
 
-      c5 = u.initiate_conversation([User.create.id])
+      c5 = u.initiate_conversation([User.create])
       mc = MediaObject.new
       mc.media_type = 'audio'
       mc.media_id = 'asdf'
@@ -46,10 +46,10 @@ describe 'DataFixup::PopulateConversationMessageProperties' do
       mc.save
       m5 = c5.add_message("media_comment!", :media_comment => mc)
 
-      c6 = u.initiate_conversation([User.create.id])
+      c6 = u.initiate_conversation([User.create])
       m6 = c6.add_message("forwarded media_comment!", :forwarded_message_ids => [m5.id])
 
-      c7 = u.initiate_conversation([User.create.id])
+      c7 = u.initiate_conversation([User.create])
       m7 = c7.add_message("doubly forwarded media_comment!", :forwarded_message_ids => [m6.id])
 
       ConversationParticipant.update_all("has_attachments = (id = #{c2.id}), has_media_objects = (id = #{c5.id})")

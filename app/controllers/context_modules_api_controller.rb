@@ -29,6 +29,8 @@
 #     {
 #       // the unique identifier for the module
 #       id: 123,
+#       // the state of the module: active, deleted
+#       workflow_state: active,
 #
 #       // the position of this module in the course (1-based)
 #       position: 2,
@@ -109,7 +111,7 @@ class ContextModulesApiController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read)
       route = polymorphic_url([:api_v1, @context, :context_modules])
-      scope = @context.context_modules.active
+      scope = @context.modules_visible_to(@current_user)
       modules = Api.paginate(scope, self, route)
       modules_and_progressions = if @context.grants_right?(@current_user, session, :participate_as_student)
         modules.map { |m| [m, m.evaluate_for(@current_user)] }
@@ -131,7 +133,7 @@ class ContextModulesApiController < ApplicationController
   # @returns Module
   def show
     if authorized_action(@context, @current_user, :read)
-      mod = @context.context_modules.active.find(params[:id])
+      mod = @context.modules_visible_to(@current_user).find(params[:id])
       prog = @context.grants_right?(@current_user, session, :participate_as_student) ? mod.evaluate_for(@current_user) : nil
       render :json => module_json(mod, @current_user, session, prog)
     end
@@ -148,7 +150,7 @@ class ContextModulesApiController < ApplicationController
   # @returns [Module Item]
   def list_module_items
     if authorized_action(@context, @current_user, :read)
-      mod = @context.context_modules.active.find(params[:module_id])
+      mod = @context.modules_visible_to(@current_user).find(params[:module_id])
       route = polymorphic_url([:api_v1, @context, mod, :items])
       scope = mod.content_tags.active
       items = Api.paginate(scope, self, route)
@@ -168,7 +170,7 @@ class ContextModulesApiController < ApplicationController
   # @returns Module Item
   def show_module_item
     if authorized_action(@context, @current_user, :read)
-      mod = @context.context_modules.active.find(params[:module_id])
+      mod = @context.modules_visible_to(@current_user).find(params[:module_id])
       item = mod.content_tags.active.find(params[:id])
       prog = @context.grants_right?(@current_user, session, :participate_as_student) ? mod.evaluate_for(@current_user) : nil
       render :json => module_item_json(item, @current_user, session, mod, prog)
@@ -187,6 +189,55 @@ class ContextModulesApiController < ApplicationController
       else
         return render(:status => 400, :json => { :message => "incorrect module item type" })
       end
+    end
+  end
+
+  # @undocumented API Update modules
+  #
+  # Update multiple modules in an account.
+  #
+  # @argument module_ids[] List of ids of modules to update.
+  # @argument event The action to take on each module. Must be 'delete'.
+  #
+  # @response_field completed A list of IDs for modules that were updated.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/courses/<course_id>/modules \  
+  #       -X PUT \ 
+  #       -H 'Authorization: Bearer <token>' \ 
+  #       -d 'event=delete' \
+  #       -d 'module_ids[]=1' \ 
+  #       -d 'module_ids[]=2' 
+  #
+  # @example_response
+  #    {
+  #      "completed": [1, 2]
+  #    }
+  def batch_update
+    if authorized_action(@context, @current_user, :manage_content)
+      event = params[:event]
+      return render(:json => { :message => 'need to specify event' }, :status => :bad_request) unless event.present?
+      return render(:json => { :message => 'invalid event' }, :status => :bad_request) unless %w(publish unpublish delete).include? event
+      return render(:json => { :message => 'must specify module_ids[]' }, :status => :bad_request) unless params[:module_ids].present?
+
+      module_ids = Api.map_non_sis_ids(Array(params[:module_ids]))
+      modules = @context.context_modules.not_deleted.find_all_by_id(module_ids)
+      return render(:json => { :message => 'no modules found' }, :status => :not_found) if modules.empty?
+
+      completed_ids = []
+      modules.each do |mod|
+        case event
+          when 'publish'
+            mod.publish unless mod.active?
+          when 'unpublish'
+            mod.unpublish unless mod.unpublished?
+          when 'delete'
+            mod.destroy
+        end
+        completed_ids << mod.id
+      end
+
+      render :json => { :completed => completed_ids }
     end
   end
 

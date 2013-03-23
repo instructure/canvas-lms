@@ -40,7 +40,7 @@ define([
   'compiled/jquery.rails_flash_notifications',
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'compiled/jquery/fixDialogButtons',
-  'media_comments' /* mediaComment, mediaCommentThumbnail */,
+  'compiled/jquery/mediaCommentThumbnail',
   'tinymce.editor_box' /* editorBox */,
   'vendor/date' /* Date.parse */,
   'vendor/jquery.ba-tinypubsub' /* /\.publish\(/ */,
@@ -202,13 +202,32 @@ define([
       }
     });
 
+    var activeElement;
+    $(document).keypress(function(e) {
+      var commaOrQuestionMark = e.which == '44' || e.which == '63';
 
-    $(document).keycodes("shift+/", function(event) {
-      $("#keyboard_navigation").dialog({
-        title: I18n.t('titles.keyboard_shortcuts', "Keyboard Shortcuts"),
-        width: 400,
-        height: "auto"
-      });
+      if(commaOrQuestionMark && !$(e.target).is(":input")) {
+        if($("#keyboard_navigation").is(":visible")) {
+          $("#keyboard_navigation").dialog("close");
+          if(activeElement) { $(activeElement).focus(); }
+        }
+        else {
+          activeElement = document.activeElement;
+
+          $("#keyboard_navigation").dialog({
+            title: I18n.t('titles.keyboard_shortcuts', "Keyboard Shortcuts"),
+            width: 400,
+            height: "auto",
+            open: function() {
+              $(".navigation_list:first").focus();
+            },
+            close: function() {
+              $("li", this).attr("tabindex", ""); // prevents chrome bsod
+              if(activeElement) { $(activeElement).focus(); }
+            }
+          });
+        }        
+      }
     });
 
     $("#switched_role_type").ifExists(function(){
@@ -264,35 +283,6 @@ define([
       var control = $dialog.data('searchControl');
       if(control) {
         control.execute($("title").text());
-      }
-    });
-
-    $("a.instructure_inline_media_comment").live('click', function(event) {
-      event.preventDefault();
-      if(INST.kalturaSettings) {
-        var $link = $(this),
-            $div = $("<span><span></span></span>"),
-            mediaType = 'video',
-            id = $link.data('media_comment_id') || $link.find(".media_comment_id:first").text();
-        $div.css('display', 'block');
-
-        if(!id && $link.attr('id') && $link.attr('id').match(/^media_comment_/)) {
-          id = $link.attr('id').substring(14);
-        }
-        $link.after($div);
-        $link.hide(); //remove();
-        if($link.data('media_comment_type') === 'audio' || $link.is('.audio_playback, .audio_comment, .instructure_audio_link')) { mediaType = 'audio'; }
-        $div.children("span").mediaComment('show_inline', id, mediaType, $link.attr('href'));
-        $div.append("<br/><a href='#' style='font-size: 0.8em;' class='hide_flash_embed_link'>" + I18n.t('links.minimize_embedded_kaltura_content', "Minimize Embedded Content") + "</a>");
-        $div.find(".hide_flash_embed_link").click(function(event) {
-          event.preventDefault();
-          $div.remove();
-          $link.show();
-          $.trackEvent('hide_embedded_content', 'hide_media');
-        });
-        $.trackEvent('show_embedded_content', 'show_media');
-      } else {
-        alert(I18n.t('alerts.kaltura_disabled', "Kaltura has been disabled for this Canvas site"));
       }
     });
 
@@ -389,6 +379,7 @@ define([
             .addClass('external')
             .html('<span>' + $(this).html() + '</span>')
             .attr('target', '_blank')
+            .attr('aria-label', htmlEscape(I18n.t('titles.external_link', 'Links to an external site.')))
             .append('<span class="ui-icon ui-icon-extlink ui-icon-inline" title="' + htmlEscape(I18n.t('titles.external_link', 'Links to an external site.')) + '"/>');
         }).end()
         .find("a.instructure_file_link").each(function() {
@@ -891,6 +882,9 @@ define([
 
               if (!data[label + '_item']) {
                 tag.title = tag.title || tag.name;
+                if( tag.workflow_state === "unpublished" ){
+                  tag.title += " (" + I18n.t("draft", "Draft") + ")"
+                }
                 tag.text = (label == 'previous' ?
                   I18n.t('buttons.previous_module', "Previous Module") :
                   I18n.t('buttons.next_module', "Next Module"));
@@ -984,7 +978,7 @@ define([
 
     // this is for things like the to-do, recent items and upcoming, it
     // happend a lot so rather than duplicating it everywhere I stuck it here
-    $(".more_link").click(function(event) {
+    $("#right-side").delegate(".more_link", "click", function(event) {
       var $this = $(this);
       var $children = $this.parents("ul").children().show();
       $this.closest('li').remove();
@@ -999,7 +993,7 @@ define([
       }
       return false;
     });
-    $(".to-do-list, #topic_list").delegate('.disable_item_link', 'click', function(event) {
+    $("#right-side, #topic_list").delegate('.disable_item_link', 'click', function(event) {
       event.preventDefault();
       var $item = $(this).parents("li, div.topic_message");
       var url = $(this).data('api-href');

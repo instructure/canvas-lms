@@ -232,14 +232,14 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user| self.user && self.user == user && !self.discussion_topic.locked? }
-    can :update and can :reply and can :read
-
     given { |user| self.user && self.user == user }
     can :read
 
     given { |user| self.user && self.user == user && !self.discussion_topic.locked? }
-    can :delete
+    can :reply
+
+    given { |user| self.user && self.user == user && !self.discussion_topic.locked? && context.user_can_manage_own_discussion_posts?(user) }
+    can :update and can :delete
 
     given { |user, session| self.cached_context_grants_right?(user, session, :read_forum) }
     can :read

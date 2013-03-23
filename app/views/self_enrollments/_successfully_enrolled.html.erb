@@ -1,7 +1,8 @@
 <div class="form-horizontal bootstrap-form" id="enroll_form">
   <p><%= mt :already_enrolled, "You have successfully enrolled in **%{course}**.", :course => @course.name %></p>
 
-  <% if @course.available? %>
+  <% if @course.user_is_student?(@current_user) 
+       # i.e. *current* student, the course has started %>
     <%= registration_summary %>
     <div class="control-group embedded-footer">
       <div class="controls">

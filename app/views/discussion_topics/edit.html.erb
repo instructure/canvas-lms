@@ -2,5 +2,14 @@
   content_for :page_title, t(:edit_topic, "Edit Discussion Topic")
   content_for :right_side, render(:partial => "shared/wiki_sidebar")
   js_bundle :discussion_topics_edit
-  jammit_css :tinymce
+  jammit_css :tinymce, :grading_standards
 %>
+
+<% if @context.is_a?(Course) %>
+<%= render :partial => "groups/add_group_category" %>
+<div id="edit_letter_grades_form" style="display: none;">
+  <%= render "shared/grading_standard", :object => @topic.assignment.try(:grading_standard) %>
+  <a href="<%= context_url(@context, :context_grading_standards_url) %>" style="display: none;" class="create_grading_standard_url">&nbsp;</a>
+  <a href="<%= context_url(@context, :context_grading_standard_url, "{{ id }}") %>" style="display: none;" id="update_grading_standard_url">&nbsp;</a>
+</div>
+<% end %>

@@ -11,7 +11,7 @@ define [
   'compiled/arr/erase'
 ], (I18n, {each}, Backbone, BackoffPoller, walk, erase) ->
 
-  UNKOWN_AUTHOR =
+  UNKNOWN_AUTHOR =
     avatar_image_url: null
     display_name: I18n.t 'uknown_author', 'Unknown Author'
     id: null
@@ -24,10 +24,11 @@ define [
       new_entries: []
       unread_entries: []
 
-    url: ENV.DISCUSSION.ROOT_URL + '?include_new_entries=1'
+    url: ->
+      "#{@get 'root_url'}?include_new_entries=1"
 
     fetch: (options = {}) ->
-      loader = new BackoffPoller @url, (data, xhr) =>
+      loader = new BackoffPoller @url(), (data, xhr) =>
         return 'continue' if xhr.status is 503
         return 'abort' if xhr.status isnt 200
         @set(@parse(data, 200, xhr))
@@ -65,19 +66,22 @@ define [
       for participant in @data.participants
         @participants[participant.id] = participant
 
+    setEntryAuthor: (entry) ->
+      if entry.user_id?
+        entry.author = @participants[entry.user_id]
+      else
+        entry.author = UNKNOWN_AUTHOR
+
     parseEntry: (entry) =>
       @flattened[entry.id] = entry
       parent = @flattened[entry.parent_id]
       entry.parent = parent
       entry.read_state = 'unread' if entry.id in @data.unread_entries
 
-      if entry.user_id?
-        entry.author = @participants[entry.user_id]
-      else
-        entry.author = UNKOWN_AUTHOR
+      @setEntryAuthor(entry)
 
       if entry.editor_id?
-        entry.editor = @participants[entry.user_id]
+        entry.editor = @participants[entry.editor_id]
 
       if entry.parent_id?
         entry.root_entry = @lastRoot
@@ -92,6 +96,9 @@ define [
     parseNewEntry: (entry) =>
       @flattened[entry.id] = entry
       parent = @flattened[entry.parent_id]
+
+      @setEntryAuthor(entry)
+
       if parent?
         (parent.replies ?= []).push entry
         entry.parent = parent

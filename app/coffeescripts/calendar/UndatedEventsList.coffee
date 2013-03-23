@@ -9,7 +9,7 @@ define [
 ], ($, undatedEventsTemplate, EventDataSource, ShowEventDetailsDialog) ->
 
   class UndatedEventsList
-    constructor: (selector, @dataSource) ->
+    constructor: (selector, @dataSource, @calendar) ->
       @div = $(selector).html undatedEventsTemplate({})
       @hidden = true
       @visibleContextList = []
@@ -49,7 +49,8 @@ define [
           revert: 'invalid'
           revertDuration: 0
           helper: 'clone'
-          start: ->
+          start: =>
+            @calendar.closeEventPopups()
             $(this).hide()
           stop: (e, ui) ->
             # Only show the element after the drag stops if it doesn't have a start date now

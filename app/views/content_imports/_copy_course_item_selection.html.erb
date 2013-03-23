@@ -24,10 +24,10 @@
   </ul>
 <% end %>
 
-<% if @source_course.context_modules.active.length > 0 %>
+<% if @source_course.context_modules.not_deleted.length > 0 %>
   <h3><%= check_box :copy, :all_context_modules, :class => "copy_all", :checked => true %><%= label :copy, :all_context_modules, image_tag('ball.png') + " " + t('labels.modules', "Modules for %{course}", :course => @source_course.name) %></h3>
   <ul class="unstyled_list root_asset_list">
-    <% @source_course.context_modules.active.each do |mod| %>
+    <% @source_course.context_modules.not_deleted.each do |mod| %>
       <li>
         <%= check_box "copy[context_modules]", mig_id(mod) %>
         <%= label "copy[context_modules]", mig_id(mod), mod.name %>

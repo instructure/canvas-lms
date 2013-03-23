@@ -1,0 +1,100 @@
+SFU
+=====
+
+Description
+
+SFU Custom API for Canvas
+
+
+
+Usage
+
+REST URLs available:
+http://<canvas_server>/sfu/api/course/<sis_id>/[id]
+  - Get course info for a given sis_id
+  Example; http://<canvas_server>/sfu/api/course/1127-arch-331-d100
+
+    returns:
+      {
+        id: 20,
+        name: "D100 Fall12 Select Regions in World Archaeology II (WebCT)",
+        course_code: "ARCH331",
+      }
+
+  - Optional to just retrieve the Course.id by appending '/id' to the URL
+  Example; http://<canvas_server>/sfu/api/course/1127-arch-331-d100/id
+
+    returns:
+      20
+
+
+http://<canvas_server>/sfu/api/user/<sfu_id>/[uuid|terms]
+  - Get user info for a given SFU Computing ID
+  Example; http://<canvas_server>/sfu/api/user/cdeadmin
+
+    returns;
+      {
+        id: 10,
+        name: "Code Administrator",
+        uuid: "HLFUeY1kFZZOKaxEZwCuXfHzqfdFBBuT29aiGdxR",
+     }
+
+  - Optional to just retrieve the User.uuid by appending '/uuid' to the URL
+  Example; http://<canvas_server>/sfu/api/user/cdeadmin/uuid
+
+    returns;
+        "HLFUeY1kFZZOKaxEZwCuXfHzqfdFBBuT29aiGdxR"
+
+  - Get list of terms an instructor is teaching, by appending '/terms/ to the URL
+  Example; http://<canvas_server>/sfu/api/user/cdeadmin/terms
+
+    returns;
+      [
+        {
+          key: 20141,
+          formatted1: "2014 Spring",
+          peopleSoftCode: "1141"
+        },
+        {
+          key: 20133,
+          formatted1: "2013 Fall",
+          peopleSoftCode: "1137"
+        },
+      ]
+
+http://<canvas_server>/sfu/api/courses/teaching/<sfu_id>/[term]
+    - Get list of courses taught by the given SFU Computing ID
+    Example; http://<canvas_server>/sfu/api/courses/teaching/cdeadmin
+
+      returns
+      [
+          {
+              name: "CMNS",
+              title: "Introduction to Information Technology: The New Media",
+              number: "253W",
+              section: "C100",
+              peopleSoftCode: "1141",
+              sis_source_id: "1141-cmns-253W-c100",
+              sectionTutorials: "",
+              sectionCode: "SEC",
+              key: "1141:::cmns:::253W:::c100:::Introduction to Information Technology: The New Media"
+          },
+          {
+              name: "CMNS",
+              title: "Issues in the Information Society",
+              number: "453",
+              section: "C100",
+              peopleSoftCode: "1141",
+              sis_source_id: "1141-cmns-453-c100",
+              sectionTutorials: "",
+              sectionCode: "SEC",
+              key: "1141:::cmns:::453:::c100:::Issues in the Information Society"
+          }
+      ]
+
+Installation:
+ 1. Place under <canvas_install_dir>/vendor/plugins/sfu_api
+ 2. Run 'bundle install'
+ 3. Restart Canvas
+
+Copyright (c) 2013 SFU / Ron Santos

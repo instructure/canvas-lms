@@ -24,7 +24,7 @@ describe "accounts/settings.html.erb" do
     before do
       @account = Account.default.sub_accounts.create!
       @account.sis_source_id = "so_special_sis_id"
-      @account.save
+      @account.save!
       
       assigns[:context] = @account
       assigns[:account] = @account

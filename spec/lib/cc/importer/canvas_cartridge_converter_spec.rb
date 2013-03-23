@@ -892,4 +892,65 @@ XML
     q.assignment_group_id.should == ag.id
   end
 
+  it "should import quizzes' assignment from a migration id" do
+    assignment = @copy_from.assignments.build
+    assignment.title = "Don't care"
+    assignment.points_possible = 13.37
+    assignment.due_at = 1.week.from_now
+    assignment.migration_id = "hurpdurp"
+    assignment.save
+
+    quiz_hash = {
+      "lock_at"=>nil,
+      "questions"=>[],
+      "title"=>"Assignment Quiz",
+      "available"=>true,
+      "assignment_migration_id" => "assignmentmigrationid",
+      "migration_id"=>"quizmigrationid",
+      "question_count"=>19,
+      "scoring_policy"=>"keep_highest",
+      "shuffle_answers"=>true,
+      "quiz_name"=>"Assignment Quiz",
+      "unlock_at"=>nil,
+      "quiz_type"=>"assignment",
+      "points_possible"=>0,
+      "description"=>"",
+      "time_limit"=>nil,
+      "allowed_attempts"=>-1,
+      "due_at"=>1305805680000,
+      "could_be_locked"=>true,
+      "anonymous_submissions"=>false,
+      "show_correct_answers"=>true
+    }.with_indifferent_access
+
+    assignment_hash = {
+      "position"=>2,
+      "rubric_migration_id"=>nil,
+      "title"=>"Assignment Quiz",
+      "grading_standard_migration_id"=>nil,
+      "migration_id"=>"assignmentmigrationid",
+      "points_possible"=>0,
+      "all_day_date"=>1305698400000,
+      "peer_reviews_assigned"=>false,
+      "peer_review_count"=>0,
+      "automatic_peer_reviews"=>false,
+      "grading_type"=>"points",
+      "due_at"=>1305805680000,
+      "peer_reviews"=>false,
+      "all_day"=>false
+    }.with_indifferent_access
+
+    data = {"assignments" => [assignment_hash], "assessments" => {"assessments" => [quiz_hash]}}
+
+    migration = ContentMigration.create(:context => @copy_to)
+    migration.migration_settings[:migration_ids_to_import] = {:copy => {"everything" => 1}}
+    @copy_to.import_from_migration(data, nil, migration)
+
+    q = @copy_to.quizzes.find_by_migration_id("quizmigrationid")
+    a = @copy_to.assignments.find_by_migration_id("assignmentmigrationid")
+
+    q.assignment_id.should == a.id
+    a.submission_types.should == "online_quiz"
+  end
+
 end

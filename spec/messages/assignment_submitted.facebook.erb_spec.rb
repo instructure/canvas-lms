@@ -10,7 +10,7 @@ end
 
 
 # <% define_content :link do %>
-#   http://<%= HostUrl.context_host(asset.assignment.context) %>/<%= asset.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.assignment.context_id %>/assignments/<%= asset.assignment_id %>/submissions/<%= asset.user_id %>
+#   <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.assignment.context) %>/<%= asset.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.assignment.context_id %>/assignments/<%= asset.assignment_id %>/submissions/<%= asset.user_id %>
 # <% end %>
 # 
 # <b><%= asset.user.name %></b> has just turned in a submission for <b><%= asset.assignment.title %></b> in the course <%= asset.assignment.context.name %>. 

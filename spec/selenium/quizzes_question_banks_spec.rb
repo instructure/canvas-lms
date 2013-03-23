@@ -26,11 +26,14 @@ describe "quizzes question banks" do
     harder.save!
     get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
     find_questions_link = f('.find_question_link')
+    click_questions_tab
     keep_trying_until {
       find_questions_link.click
       f(".select_all_link")
     }.click
     submit_dialog("div#find_question_dialog", '.submit_button')
+    wait_for_ajaximations
+    click_settings_tab
     keep_trying_until { fj("#quiz_display_points_possible .points_possible").text.should == "17" }
   end
 
@@ -42,6 +45,7 @@ describe "quizzes question banks" do
     bank.assessment_questions << assessment_question_model
 
     get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
+    click_questions_tab
 
     keep_trying_until {
       f('.find_question_link').click
@@ -51,8 +55,11 @@ describe "quizzes question banks" do
     }
     f(".select_all_link").click
     submit_dialog("div#find_question_dialog", '.submit_button')
+    wait_for_ajaximations
+    click_settings_tab
     keep_trying_until { fj("#quiz_display_points_possible .points_possible").text.should == "1" }
 
+    click_questions_tab
     f(".add_question_group_link").click
     f('.find_bank_link').click
     keep_trying_until {
@@ -60,6 +67,8 @@ describe "quizzes question banks" do
     }.click
     submit_dialog("#find_bank_dialog", '.submit_button')
     submit_form(".quiz_group_form")
+    wait_for_ajaximations
+    click_settings_tab
     keep_trying_until { fj("#quiz_display_points_possible .points_possible").text.should == "2" }
   end
 
@@ -72,6 +81,7 @@ describe "quizzes question banks" do
     @user.assessment_question_banks << bank
 
     get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
+    click_questions_tab
 
     keep_trying_until {
       f('.find_question_link').click
@@ -81,8 +91,11 @@ describe "quizzes question banks" do
     }
     f(".select_all_link").click
     submit_dialog("#find_question_dialog", '.submit_button')
+    wait_for_ajaximations
+    click_settings_tab
     keep_trying_until { fj("#quiz_display_points_possible .points_possible").text.should == "1" }
 
+    click_questions_tab
     f(".add_question_group_link").click
     f(".find_bank_link").click
     keep_trying_until {
@@ -90,6 +103,8 @@ describe "quizzes question banks" do
     }.click
     submit_dialog("#find_bank_dialog", '.submit_button')
     submit_form(".quiz_group_form")
+    wait_for_ajaximations
+    click_settings_tab
     keep_trying_until { fj("#quiz_display_points_possible .points_possible").text.should == "2" }
   end
 
@@ -106,6 +121,7 @@ describe "quizzes question banks" do
     account_bank.assessment_questions << assessment_question_model
 
     get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
+    click_questions_tab
 
     keep_trying_until {
       f('.find_question_link').click
@@ -127,6 +143,7 @@ describe "quizzes question banks" do
 
   it "should import questions from a question bank" do
     get "/courses/#{@course.id}/quizzes/new"
+    click_questions_tab
 
     f('.add_question_group_link').click
     group_form = f('#group_top_new .quiz_group_form')

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -430,7 +430,7 @@ class Enrollment < ActiveRecord::Base
 
   def assert_section
     self.course_section ||= self.course.default_section if self.course
-    self.root_account_id = self.course_section.root_account_id rescue nil
+    self.root_account_id = self.course.root_account_id rescue nil
   end
 
   def infer_privileges
@@ -922,7 +922,9 @@ class Enrollment < ActiveRecord::Base
   end
 
   def self.limit_privileges_to_course_section!(course, user, limit)
-    Enrollment.update_all({:limit_privileges_to_course_section => !!limit}, {:course_id => course.id, :user_id => user.id})
+    course.shard.activate do
+      Enrollment.update_all({:limit_privileges_to_course_section => !!limit}, {:course_id => course.id, :user_id => user.id})
+    end
     user.touch
   end
 
@@ -1020,5 +1022,20 @@ class Enrollment < ActiveRecord::Base
 
   def role
     self.role_name || self.type
+  end
+
+  # DO NOT TRUST
+  # This is only a convenience method to assist in identifying which enrollment
+  # goes to which user when users have accidentally been merged together
+  # This is the *only* reason the sis_source_id column has not been dropped
+  def sis_user_id
+    return @sis_user_id if @sis_user_id
+    sis_source_id_parts = sis_source_id ? sis_source_id.split(':') : []
+    if sis_source_id_parts.length == 4
+      @sis_user_id = sis_source_id_parts[1]
+    else
+      @sis_user_id = sis_source_id_parts[0]
+    end
+    @sis_user_id
   end
 end

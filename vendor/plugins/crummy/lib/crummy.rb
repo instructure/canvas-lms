@@ -18,18 +18,20 @@ module Crummy
         raise ArgumentError, "Need more arguments" unless name or options[:record] or block_given?
         raise ArgumentError, "Cannot pass url and use block" if url && block_given?
         before_filter(options) do |instance|
-          url = yield instance if block_given?
-          url = instance.send url if url.is_a? Symbol
-          name = instance.instance_eval(&name) if name.is_a? Proc
-          name = instance.instance_variable_get("@#{name}") if name.is_a? Symbol
-          record = instance.instance_variable_get("@#{name}") unless url or block_given?
+          url_value = url
+          url_value = yield instance if block_given?
+          url_value = instance.send url_value if url_value.is_a? Symbol
+          name_value = name
+          name_value = instance.instance_eval(&name_value) if name_value.is_a? Proc
+          name_value = instance.instance_variable_get("@#{name_value}") if name_value.is_a? Symbol
+          record = instance.instance_variable_get("@#{name_value}") unless url_value or block_given?
           if record and record.respond_to? :to_param
-            name, url = record.to_s, instance.url_for(record)
+            name_value, url_value = record.to_s, instance.url_for(record)
           end
         
-          # FIXME: url = instance.url_for(name) if name.respond_to?("to_param") && url.nil?
-          # FIXME: Add ||= for the name, url above
-          instance.add_crumb(name, url, html_options)
+          # FIXME: url_value = instance.url_for(name_value) if name_value.respond_to?("to_param") && url_value.nil?
+          # FIXME: Add ||= for the name_value, url_value above
+          instance.add_crumb(name_value, url_value, html_options)
         end
       end
     end

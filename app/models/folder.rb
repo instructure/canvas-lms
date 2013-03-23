@@ -90,6 +90,8 @@ class Folder < ActiveRecord::Base
   
   named_scope :active, :conditions => ['folders.workflow_state != ?', 'deleted']
   named_scope :not_hidden, :conditions => ['folders.workflow_state != ?', 'hidden']
+  named_scope :not_locked, lambda {{:conditions => ['(folders.locked IS NULL OR folders.locked = ?) AND ((folders.lock_at IS NULL) OR
+    (folders.lock_at > ? OR (folders.unlock_at IS NOT NULL AND folders.unlock_at < ?)))', false, Time.now, Time.now]}}
   named_scope :by_position, :order => 'position'
   named_scope :by_name, :order => name_order_by_clause('folders')
 
@@ -111,9 +113,10 @@ class Folder < ActiveRecord::Base
   def default_values
     self.last_unlock_at = self.unlock_at if self.unlock_at
     self.last_lock_at = self.lock_at if self.lock_at
-    # You can't lock or hide root folders
-    if !self.parent_folder_id && (self.locked? || self.hidden? || self.protected?)
-      self.workflow_state = 'visible'
+
+    if self.parent_folder_id.blank? && ![ROOT_FOLDER_NAME, MY_FILES_FOLDER_NAME, 'files'].include?(self.name)
+      root_folder = Folder.root_folders(context).first
+      self.parent_folder_id = root_folder.id
     end
   end
   
@@ -245,25 +248,22 @@ class Folder < ActiveRecord::Base
   end
 
   def self.root_folders(context)
-    root_folders = []
-    root_folders = context.folders.active.find_all_by_parent_folder_id(nil)
     if context.is_a? Course
-      if root_folders.select{|f| f.name == ROOT_FOLDER_NAME }.empty?
-        root_folders << context.folders.create(:name => ROOT_FOLDER_NAME, :full_name => ROOT_FOLDER_NAME, :workflow_state => "visible")
-      end
+      name = ROOT_FOLDER_NAME
     elsif context.is_a? User
-      # TODO i18n 
-      t :my_files_folder_name, 'my files'
-      if root_folders.select{|f| f.name == MY_FILES_FOLDER_NAME }.empty?
-        root_folders << context.folders.create(:name => MY_FILES_FOLDER_NAME, :full_name => MY_FILES_FOLDER_NAME, :workflow_state => "visible")
-      end
+      name = MY_FILES_FOLDER_NAME
     else
-      # TODO i18n 
-      t :files_folder_name, 'files'
-      if root_folders.select{|f| f.name == "files" }.empty?
-        root_folders << context.folders.create(:name => "files", :full_name => "files", :workflow_state => "visible")
-      end
+      name = "files"
     end
+
+    root_folders = []
+
+    Folder.unique_constraint_retry do
+      root_folder = context.folders.active.find_by_parent_folder_id_and_name(nil, name)
+      root_folder ||= context.folders.create(:name => name, :full_name => name, :workflow_state => "visible")
+      root_folders = [root_folder]
+    end
+
     root_folders
   end
   
@@ -364,7 +364,7 @@ class Folder < ActiveRecord::Base
     given { |user, session| self.visible? && self.cached_context_grants_right?(user, session, :read) }#students.include?(user) }
     can :read
 
-    given { |user, session| self.visible? && !self.locked? && self.cached_context_grants_right?(user, session, :read) }#students.include?(user) }
+    given { |user, session| self.visible? && !self.locked? && self.cached_context_grants_right?(user, session, :read) && !(self.context.is_a?(Course) && self.context.tab_hidden?(Course::TAB_FILES)) }#students.include?(user) }
     can :read_contents
 
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_files) }#admins.include?(user) }

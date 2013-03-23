@@ -25,8 +25,15 @@ class Mailer < ActionMailer::Base
     bcc m.bcc if m.bcc
     cc m.cc if m.cc
     from ("#{m.from_name || HostUrl.outgoing_email_default_name} <" + HostUrl.outgoing_email_address + ">")
-    reply_to m.reply_to_address
+    reply_to ReplyToAddress.new(m).address
     subject m.subject
-    body m.body
+    if m.html_body
+      content_type 'multipart/alternative'
+
+      part :content_type => 'text/plain; charset=utf-8', :body => m.body
+      part :content_type => 'text/html; charset=utf-8',  :body => m.html_body
+    else
+      body m.body
+    end
   end
 end

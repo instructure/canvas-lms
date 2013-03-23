@@ -233,39 +233,6 @@ describe "profile" do
       wait_for_ajaximations
       f('#access_tokens').should_not be_displayed
     end
-
-    it "should set the birthdate" do
-      get "/profile/settings"
-      edit_form = click_edit
-      click_option('#user_birthdate_1i', '1980')
-      click_option('#user_birthdate_2i', 'January')
-      click_option('#user_birthdate_3i', '31')
-      submit_form(edit_form)
-      wait_for_ajaximations
-      @user.reload
-      @user.birthdate.should == Time.utc(1980, 1, 31)
-    end
-
-    it "should not accept a partial birthdate" do
-      get "/profile/settings"
-      edit_form = click_edit
-      click_option('#user_birthdate_1i', '')
-      click_option('#user_birthdate_2i', 'February')
-      click_option('#user_birthdate_3i', '2')
-      submit_form(edit_form)
-      wait_for_ajaximations
-      edit_form.should be_displayed # not dismissed
-      @user.reload
-      @user.birthdate.should be_nil # no default year assumed
-    end
-
-    it "should not allow the birthdate to be un-set" do
-      @user.birthdate = Time.utc(1980, 1, 1)
-      @user.save!
-      get "/profile/settings"
-      edit_form = click_edit
-      lambda { click_option('#user_birthdate_1i', '') }.should raise_error(Selenium::WebDriver::Error::NoSuchElementError)
-    end
   end
 
   context "services test" do

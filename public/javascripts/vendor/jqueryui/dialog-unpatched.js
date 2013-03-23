@@ -324,7 +324,8 @@ $.widget("ui.dialog", {
 					return;
 				}
 
-				var tabbables = $( ":tabbable", this ),
+				// ! 328 patched from https://github.com/larowlan/jquery-ui/blob/bb2c897f128e42dc8ad485719ee260d86e56befe/ui/jquery.ui.dialog.js
+				var tabbables = $( ":tabbable", this.uiDialog ),
 					first = tabbables.filter( ":first" ),
 					last  = tabbables.filter( ":last" );
 

@@ -170,6 +170,7 @@ namespace :db do
   end
 
   namespace :test do
+    desc "Drop and regenerate the test db by running migrations"
     task :reset => [:environment, :load_config] do
       raise "Run with RAILS_ENV=test" unless Rails.env.test?
       config = ActiveRecord::Base.configurations['test']

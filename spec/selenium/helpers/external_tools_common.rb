@@ -23,7 +23,7 @@ shared_examples_for "external tools tests" do
     end
     submit_form("#external_tools_dialog")
     wait_for_ajax_requests
-    ContextExternalTool.count > 0
+   # ContextExternalTool.count.should != 0
     tool = ContextExternalTool.last
     tool.name.should == name
     tool.consumer_key.should == key
@@ -51,6 +51,8 @@ shared_examples_for "external tools tests" do
       f("#external_tool_#{tool.id} .account_navigation").should be_displayed
       f("#external_tool_#{tool.id} .readable_state").text.should == "Public"
       f("#external_tool_#{tool.id} .description").text.should == "Description"
+      f("#external_tool_#{tool.id} .vendor_help_link").should be_displayed
+      f("#external_tool_#{tool.id} .vendor_help_link").text.should == tool.vendor_help_link
     elsif opts.include? :url
       url = "https://lti-examples.heroku.com/tool_redirect"
       kitten_text = "pictures of kittens to your site"
@@ -123,7 +125,7 @@ shared_examples_for "external tools tests" do
   end
 
   def add_url
-    url = "https://lti-examples.heroku.com/config/editor_button2.xml"
+    url = 'http://localhost:4567/lti_url'
     f("#external_tool_config_type option[value='by_url']").click
     f("#external_tool_form .config_type.manual").should_not be_displayed
     f("#external_tool_config_xml").should_not be_displayed
@@ -157,6 +159,7 @@ shared_examples_for "external tools tests" do
     <blti:launch_url>http://example.com/other_url</blti:launch_url>
     <blti:extensions platform="canvas.instructure.com">
       <lticm:property name="privacy_level">public</lticm:property>
+      <lticm:property name="vendor_help_link">http://example.com/help</lticm:property>
       <lticm:options name="editor_button">
         <lticm:property name="url">http://example.com/editor</lticm:property>
         <lticm:property name="icon_url">http://example.com/icon.png</lticm:property>

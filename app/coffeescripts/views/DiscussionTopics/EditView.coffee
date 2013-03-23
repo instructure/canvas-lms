@@ -1,18 +1,26 @@
 define [
   'i18n!discussion_topics'
   'compiled/views/ValidatedFormView'
+  'compiled/views/assignments/AssignmentGroupSelector'
+  'compiled/views/assignments/GradingTypeSelector'
+  'compiled/views/assignments/GroupCategorySelector'
+  'compiled/views/assignments/PeerReviewsSelector'
   'underscore'
   'jst/DiscussionTopics/EditView'
   'wikiSidebar'
   'str/htmlEscape'
   'compiled/models/DiscussionTopic'
+  'compiled/models/Assignment'
   'jquery'
   'compiled/fn/preventDefault'
+  'compiled/views/calendar/MissingDateDialogView'
   'compiled/tinymce'
   'tinymce.editor_box'
   'jquery.instructure_misc_helpers' # $.scrollSidebar
   'compiled/jquery.rails_flash_notifications' #flashMessage
-], (I18n, ValidatedFormView, _, template, wikiSidebar, htmlEscape, DiscussionTopic, $, preventDefault) ->
+], (I18n, ValidatedFormView, AssignmentGroupSelector, GradingTypeSelector,
+GroupCategorySelector, PeerReviewsSelector, _, template, wikiSidebar,
+htmlEscape, DiscussionTopic, Assignment, $, preventDefault, MissingDateDialog) ->
 
   class EditView extends ValidatedFormView
 
@@ -28,18 +36,27 @@ define [
       'click .removeAttachment' : 'removeAttachment'
     )
 
-    initialize: ->
-      @permissions = @options.permissions
+    @optionProperty 'permissions'
+
+    initialize: (options) ->
+      @assignment = @model.get("assignment")
+      @dueDateOverrideView = options.views['js-assignment-overrides']
       @model.on 'sync', -> window.location = @get 'html_url'
       super
 
+    isTopic: => @model.constructor is DiscussionTopic
+
     toJSON: ->
-      _.extend super, @options,
+      json = _.extend super, @options,
         showAssignment: !!@assignmentGroupCollection
-        isTopic: @model.constructor is DiscussionTopic
+        useForGrading: @model.get('assignment')?
+        isTopic: @isTopic()
         contextIsCourse: @options.contextType is 'courses'
         canAttach: @permissions.CAN_ATTACH
         canModerate: @permissions.CAN_MODERATE
+        isLargeRoster: ENV?.IS_LARGE_ROSTER || false
+      json.assignment = json.assignment.toView()
+      json
 
     render: =>
       super
@@ -58,37 +75,123 @@ define [
       if @assignmentGroupCollection
         (@assignmentGroupFetchDfd ||= @assignmentGroupCollection.fetch()).done @renderAssignmentGroupOptions
 
+      _.defer(@renderGradingTypeOptions)
+      _.defer(@renderGroupCategoryOptions)
+      _.defer(@renderPeerReviewOptions)
+
       @$(".datetime_field").datetime_field()
 
       this
 
-    # I am sad that this code even had to be written, we should abstract away
-    # handling a 'remoteSelect' for a collection
     renderAssignmentGroupOptions: =>
-      html = @assignmentGroupCollection.map (ag) ->
-        "<option value='#{ag.id}'>#{htmlEscape ag.get('name')}</option>"
-      .join('')
+      @assignmentGroupSelector = new AssignmentGroupSelector
+        el: '#assignment_group_options'
+        assignmentGroups: @assignmentGroupCollection.toJSON()
+        parentModel: @assignment
+        nested: true
 
-      @$('[name="assignment[assignment_group_id]"]')
-        .html(html)
-        .prop('disabled', false)
-        .val @model.get('assignment')?.assignment_group_id
+      @assignmentGroupSelector.render()
+
+    renderGradingTypeOptions: =>
+      @gradingTypeSelector = new GradingTypeSelector
+        el: '#grading_type_options'
+        parentModel: @assignment
+        nested: true
+        preventNotGraded: true
+
+      @gradingTypeSelector.render()
+
+    renderGroupCategoryOptions: =>
+      @groupCategorySelector = new GroupCategorySelector
+        el: '#group_category_options'
+        parentModel: @assignment
+        groupCategories: ENV.GROUP_CATEGORIES
+        nested: true
+
+      @groupCategorySelector.render()
+
+    renderPeerReviewOptions: =>
+      @peerReviewSelector = new PeerReviewsSelector
+        el: '#peer_review_options'
+        parentModel: @assignment
+        nested: true
+
+      @peerReviewSelector.render()
 
     getFormData: ->
       data = super
       data.title ||= I18n.t 'default_discussion_title', 'No Title'
       data.delayed_post_at = '' unless data.delay_posting
       data.discussion_type = if data.threaded then 'threaded' else 'side_comment'
-      delete data.assignment unless data.assignment?.set_assignment?
       data.podcast_has_student_posts = false unless data.podcast_enabled
+
+      assign_data = data.assignment
+      delete data.assignment
+
+      if assign_data?.set_assignment
+        data.set_assignment = true
+        data.assignment = @updateAssignment(assign_data)
+      else
+        # Announcements don't have assignments.
+        # DiscussionTopics get a model created for them in their
+        # constructor. Delete it so the API doesn't automatically
+        # create assignments unless the user checked "Use for Grading".
+        # We're doing this here because syncWithMultipart doesn't call
+        # the model's toJSON method unfortunately, so assignment params
+        # would be sent in the response, creating an assignment.
+        # The controller checks for set_assignment on the assignment model,
+        # so we can't make it undefined here for the case of discussion topics.
+        data.assignment = {set_assignment: false}
 
       # these options get passed to Backbone.sync in ValidatedFormView
       @saveOpts = multipart: !!data.attachment
 
       data
 
+    updateAssignment: (data) =>
+      unless ENV?.IS_LARGE_ROSTER
+        data = @groupCategorySelector.filterFormData data
+      @dueDateOverrideView.updateOverrides()
+      defaultDate = @dueDateOverrideView.getDefaultDueDate()
+      data.lock_at = defaultDate?.get('lock_at') or null
+      data.unlock_at = defaultDate?.get('unlock_at') or null
+      data.due_at = defaultDate?.get('due_at') or null
+
+      assignment = @model.get('assignment')
+      assignment or= new Assignment
+      assignment.set(data)
+
     removeAttachment: ->
       @model.set 'attachments', []
       @$el.append '<input type="hidden" name="remove_attachment" >'
       @$('.attachmentRow').remove()
       @$('[name="attachment"]').show()
+
+    submit: (event) =>
+      event.preventDefault()
+      event.stopPropagation()
+      if @dueDateOverrideView.containsSectionsWithoutOverrides()
+        sections = @dueDateOverrideView.sectionsWithoutOverrides()
+        missingDateDialog = new MissingDateDialog
+          validationFn: -> sections
+          labelFn: (section) -> section.get 'name'
+          success: =>
+            missingDateDialog.$dialog.dialog('close').remove()
+            @model.get('assignment')?.setNullDates()
+            ValidatedFormView::submit.call(this)
+        missingDateDialog.cancel = (e) ->
+          missingDateDialog.$dialog.dialog('close').remove()
+
+        missingDateDialog.render()
+      else
+        super
+
+    validateBeforeSave: (data, errors) =>
+      if @isTopic() && data.set_assignment
+        if @assignmentGroupSelector?
+          errors = @assignmentGroupSelector.validateBeforeSave(data, errors)
+        unless ENV?.IS_LARGE_ROSTER
+          errors = @groupCategorySelector.validateBeforeSave(data, errors)
+      else
+        @model.set 'assignment', {set_assignment: false}
+      errors

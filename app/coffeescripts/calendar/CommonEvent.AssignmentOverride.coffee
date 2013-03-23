@@ -31,7 +31,8 @@ define [
       @assignment = assignment
       @lock_explanation = @assignment.lock_explanation
       @description = @assignment.description
-      @start = if @assignment.due_at then $.parseFromISO(@assignment.due_at, "due_date").time else null
+      @start = @parseStartDate()
+      @originalStartDate = new Date(@start) if @start
 
     copyDataFromOverride: (override) ->
       @override = override
@@ -41,8 +42,10 @@ define [
     fullDetailsURL: () ->
       @assignment.html_url
 
-    startDate: () ->
-      @start or null
+    startDate: () -> @originalStartDate
+
+    parseStartDate: () ->
+      if @assignment.due_at then $.parseFromISO(@assignment.due_at, 'due_date').time else null
 
     displayTimeString: () ->
       if !@start

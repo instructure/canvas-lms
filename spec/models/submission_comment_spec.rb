@@ -258,7 +258,7 @@ This text has a http://www.google.com link in it...
         end
 
         it "should reuse an existing private conversation, but not change its state for teacher" do
-          convo = Conversation.initiate([@teacher1.id, @student1.id], true)
+          convo = Conversation.initiate([@teacher1, @student1], true)
           convo.add_message(@teacher1, 'direct message')
           @teacher1.conversations.count.should == 1
           convo = @teacher1.conversations.first
@@ -328,12 +328,12 @@ This text has a http://www.google.com link in it...
             @student1.conversations.unread.count.should == 1
           end
           it "should not block direct message from student" do
-            convo = Conversation.initiate([@student1.id, @teacher.id], false)
+            convo = Conversation.initiate([@student1, @teacher], false)
             convo.add_message(@student1, 'My direct message')
             @teacher.conversations.unread.count.should == 1
           end
           it "should add submission comments to existing conversations" do
-            convo = Conversation.initiate([@student1.id, @teacher1.id], true)
+            convo = Conversation.initiate([@student1, @teacher1], true)
             convo.add_message(@student1, 'My direct message')
             c = @teacher1.conversations.unread.first
             c.should_not be_nil
@@ -430,7 +430,7 @@ This text has a http://www.google.com link in it...
       end
 
       it "should reuse an existing private conversation, but not change its state for teacher on unmute" do
-        convo = Conversation.initiate([@teacher1.id, @student1.id], true)
+        convo = Conversation.initiate([@teacher1, @student1], true)
         convo.add_message(@teacher1, 'direct message')
         @teacher1.conversations.count.should == 1
         convo = @teacher1.conversations.first
@@ -537,9 +537,9 @@ This text has a http://www.google.com link in it...
       end
 
       it "should only create messages where conversations already exist" do
-        convo1 = @student1.initiate_conversation([@teacher1.id])
+        convo1 = @student1.initiate_conversation([@teacher1])
         convo1.add_message('ohai')
-        convo2 = @student1.initiate_conversation([@teacher2.id])
+        convo2 = @student1.initiate_conversation([@teacher2])
         convo2.add_message('hey', :update_for_sender => false) # like if the student did a bulk private message
         @student1.conversations.size.should eql 1 # second one is not visible to student
         @student1.conversations.first.messages.size.should eql 1
@@ -565,7 +565,7 @@ This text has a http://www.google.com link in it...
       end
 
       it "should not change any unread count/status" do
-        convo = @student1.initiate_conversation([@teacher1.id])
+        convo = @student1.initiate_conversation([@teacher1])
         convo.add_message('ohai')
         @student1.conversations.size.should eql 1
         convo.messages.size.should eql 1
@@ -588,7 +588,7 @@ This text has a http://www.google.com link in it...
       end
 
       it "should update last_message_at, message_count and last_authored_at" do
-        convo = @student1.initiate_conversation([@teacher1.id])
+        convo = @student1.initiate_conversation([@teacher1])
         convo.add_message('ohai')
         tconvo = @teacher1.conversations.first
         raw_comment(@submission1, @student1, "hello", Time.now.utc + 1.day)
@@ -608,7 +608,7 @@ This text has a http://www.google.com link in it...
       end
 
       it "should skip submissions with no participant comments" do
-        convo = @student1.initiate_conversation([@teacher1.id])
+        convo = @student1.initiate_conversation([@teacher1])
         message = convo.add_message('ohai').reload
         tconvo = @teacher1.conversations.first
         raw_comment(@submission1, user, "ohai im in ur group", Time.now.utc + 1.day)

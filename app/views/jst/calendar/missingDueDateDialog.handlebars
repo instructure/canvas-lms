@@ -1,0 +1,13 @@
+<div>
+  <p>
+    {{#toSentence sections}}<b>{{this}}</b>{{/toSentence}}
+    {{description}}
+  <p>
+  {{#t "modal.chooseDueDate"}}Do you want to go back and select a due date?{{/t}}
+  </p>
+
+  <div class="button-container form-actions">
+    <button type="button" class="btn">{{#t "buttons.noDueDate"}}No Due Date{{/t}}</button>
+    <button type="button" class="btn btn-primary">{{#t "buttons.goBack"}}Go Back{{/t}}</button>
+  </div>
+</div>

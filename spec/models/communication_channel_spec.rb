@@ -53,8 +53,8 @@ describe CommunicationChannel do
       a = communication_channel_model(:user_id => @user.id, :workflow_state => 'active')
       d = communication_channel_model(:user_id => @user.id, :path => "path4@example.com")
       notification_model
-      notification_policy_model(:communication_channel_id => a.id, :notification_id => @notification.id )
-      notification_policy_model(:communication_channel_id => d.id, :notification_id => @notification.id )
+      notification_policy_model(:communication_channel_id => a.id, :notification => @notification )
+      notification_policy_model(:communication_channel_id => d.id, :notification => @notification )
       @user.reload
       channels = CommunicationChannel.find_all_for(@user, @notification)
       channels.should include(a)
@@ -381,6 +381,25 @@ describe CommunicationChannel do
         pending if CommunicationChannel.associated_shards('jt@instructure.com') == [Shard.default]
 
         cc1.merge_candidates.should == [@user2]
+      end
+
+      it "should search a non-default shard *only*" do
+        Enrollment.stubs(:cross_shard_invitations?).returns(false)
+        user1 = User.create!
+        cc1 = user1.communication_channels.create!(:path => 'jt@instructure.com')
+        cc1.confirm!
+        Account.default.pseudonyms.create!(:user => user1, :unique_id => 'user1')
+
+        @shard1.activate do
+          @user2 = User.create!
+          @cc2 = @user2.communication_channels.create!(:path => 'jt@instructure.com')
+          @cc2.confirm!
+          account = Account.create!
+          account.pseudonyms.create!(:user => @user2, :unique_id => 'user2')
+        end
+
+        cc1.merge_candidates.should == []
+        @cc2.merge_candidates.should == []
       end
     end
   end

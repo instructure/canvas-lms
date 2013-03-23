@@ -38,6 +38,10 @@ class Shard
     Array(yield)
   end
 
+  def self.shard_for(object)
+    default
+  end
+
   def activate
     yield
   end
@@ -52,6 +56,14 @@ class Shard
 
   def id
     "default"
+  end
+
+  def self.global_id_for(any_id)
+    any_id
+  end
+
+  def self.relative_id_for(any_id, target_shard = nil)
+    any_id
   end
 
   yaml_as "tag:instructure.com,2012:Shard"
@@ -70,6 +82,10 @@ class Shard
 end
 
 ActiveRecord::Base.class_eval do
+  class << self
+    VALID_FIND_OPTIONS << :shard
+  end
+
   def shard
     Shard.default
   end
@@ -91,7 +107,8 @@ end
 module ActiveRecord::Associations
   %w{HasManyAssociation HasManyThroughAssociation}.each do |klass|
     const_get(klass).class_eval do
-      def with_each_shard(options = nil)
+      def with_each_shard(*shards_or_options)
+        options = shards_or_options.pop if shards_or_options.last.is_a?(Hash)
         scope = self
         scope = self.scoped(options) if options
         scope = yield(scope) if block_given?

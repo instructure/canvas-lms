@@ -161,8 +161,15 @@ class AppointmentGroup < ActiveRecord::Base
   end
 
   # complements :reserve permission
-  named_scope :reservable_by, lambda { |user|
-    codes = user.appointment_context_codes
+  named_scope :reservable_by, lambda { |*options|
+    user = options.shift
+    restrict_to_codes = options.shift
+
+    codes = user.appointment_context_codes.dup
+    if restrict_to_codes
+      codes[:full] &= restrict_to_codes
+      codes[:limited] &= restrict_to_codes
+    end
     {
       :select => "DISTINCT appointment_groups.*",
       :joins => "JOIN appointment_group_contexts agc " \

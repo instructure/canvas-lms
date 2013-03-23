@@ -46,7 +46,7 @@ describe "announcements" do
 
     login_as(student.primary_pseudonym.unique_id, password)
     get "/courses/#{@course.id}/announcements/#{announcement.id}"
-    f('#discussion_subentries h2').text.should == "Replies are only visible to those who have posted at least one reply."
+    f('#discussion_subentries span').text.should == "Replies are only visible to those who have posted at least one reply."
     ff('.discussion_entry').each { |entry| entry.should_not include_text(student_2_entry) }
     f('.discussion-reply-label').click
     type_in_tiny('.reply-textarea', 'reply')
@@ -140,19 +140,21 @@ describe "announcements" do
 
     it "should add and remove an external feed to announcements" do
       get "/courses/#{@course.id}/announcements"
+      wait_for_ajaximations
 
       #add external feed to announcements
       feed_name = 'http://www.google.com'
 
-      keep_trying_until do
-      driver.execute_script("$('#add_external_feed_form').css('display', 'block')")
-        f("#external_feed_url").should be_displayed
-      end
+      f(".add_external_feed_link").click
+      wait_for_animations
+      f("#external_feed_url").should be_displayed
+      f('#external_feed_url').send_keys(feed_name)
 
-      fj('#external_feed_url').send_keys(feed_name)
-      fj('input[aria-controls=header_match_container]').click
-      fj('input[name=header_match]').send_keys('blah')
-      #using fj to avoid selenium caching
+      f('#external_feed_enable_header_match').click
+      wait_for_animations
+      f('#external_feed_header_match').should be_displayed
+      f('#external_feed_header_match').send_keys('blah')
+
       expect {
         submit_form(f('#add_external_feed_form'))
         wait_for_ajaximations
@@ -161,11 +163,10 @@ describe "announcements" do
       #delete external feed
       f(".external_feed").should include_text('feed')
       expect {
-        fj('.external_feed .close').click
+        f('.external_feed .close').click
         wait_for_ajax_requests
         element_exists('.external_feed').should be_false
       }.to change(ExternalFeed, :count).by(-1)
-      ExternalFeed.count.should == 0
     end
 
     it "should show announcements to student view student" do

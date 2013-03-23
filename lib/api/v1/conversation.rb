@@ -37,7 +37,7 @@ module Api::V1::Conversation
         conversation.messages.human.scoped(:conditions => "asset_id IS NULL").size
     end
     result[:audience] = audience.map(&:id)
-    result[:audience_contexts] = contexts_for(audience, conversation.context_tags)
+    result[:audience_contexts] = contexts_for(audience, conversation.local_context_tags)
     result[:avatar_url] = avatar_url_for(conversation, explicit_participants)
     result[:participants] = conversation_users_json(participants, current_user, session, options)
     result[:visible] = options.key?(:visible) ? options[:visible] : @set_visibility && infer_visibility(conversation)
@@ -78,9 +78,10 @@ module Api::V1::Conversation
     result = api_json batch,
                       current_user,
                       session,
-                      :only => %w{id workflow_state tags},
+                      :only => %w{id workflow_state},
                       :methods => %w{completion recipient_count}
     result[:message] = conversation_message_json(batch.root_conversation_message, current_user, session)
+    result[:tags] = batch.local_tags
     result
   end
 end

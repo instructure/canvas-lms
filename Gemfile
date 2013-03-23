@@ -1,8 +1,8 @@
-source :rubygems
+source 'https://rubygems.org/'
 
 ONE_NINE = RUBY_VERSION >= "1.9."
 
-gem 'rails',          '2.3.15'
+gem 'rails',          '2.3.17'
 gem 'authlogic',      '2.1.3'
 #gem 'aws-s3',         '0.6.2',  :require => 'aws/s3'
 # use custom gem until pull request at https://github.com/marcel/aws-s3/pull/41
@@ -11,7 +11,7 @@ gem "aws-s3-instructure", "0.6.2.1352914936",  :require => 'aws/s3'
 gem 'barby',          '0.5.0'
 gem 'bcrypt-ruby',    '3.0.1'
 gem 'builder',        '2.1.2'
-gem 'canvas_connect'
+gem 'canvas_connect', '0.0.8'
 gem 'daemons',        '1.1.0'
 gem 'diff-lcs',       '1.1.2',  :require => 'diff/lcs'
 gem 'encrypted_cookie_store-instructure', '1.0.2', :require => 'encrypted_cookie_store'
@@ -27,12 +27,13 @@ gem 'highline',       '1.6.1'
 gem 'i18n',           '0.6.0'
 gem 'icalendar',      '1.1.5'
 gem 'jammit',         '0.6.0'
-gem 'json',           '1.5.2'
+gem 'json',           '1.5.5'
 # native xml parsing, diigo
 gem 'libxml-ruby',    '2.3.2',  :require => 'xml/libxml'
 gem 'macaddr',        '1.0.0'  # macaddr 1.2.0 tries to require 'systemu' which isn't a dependency
-if !ONE_NINE
-  # mail gem v2.5.* introduces a failure on 1.8 with bad unicode in headers
+if ONE_NINE
+  gem 'mail', '2.5.3'
+else
   gem 'mail', '2.4.4'
 end
 gem 'mailman',        '0.5.3'
@@ -57,10 +58,12 @@ gem 'rotp',           '1.4.1'
 gem 'rqrcode',        '0.4.2'
 gem 'rscribd',        '1.2.0'
 gem 'net-ldap',       '0.3.1',  :require => 'net/ldap'
-gem 'ruby-saml-mod',  '0.1.19'
+gem 'ruby-saml-mod',  '0.1.20'
 gem 'rubycas-client', '2.2.1'
 gem 'rubyzip',        '0.9.5',  :require => 'zip/zip'
+gem 'safe_yaml-instructure', '0.8.0',  :require => false
 gem 'sanitize',       '2.0.3'
+gem 'tzinfo',         '0.3.35'
 gem 'uuid',           '2.3.2'
 gem 'will_paginate',  '2.3.15'
 gem 'xml-simple',     '1.0.12', :require => 'xmlsimple'
@@ -88,7 +91,7 @@ end
 
 group :test do
   gem 'bluecloth',    '2.0.10' # for generating api docs
-  gem 'parallelized_specs', '0.3.89'
+  gem 'parallelized_specs', '0.4.16'
   gem 'mocha',        '0.12.3', :require => 'mocha_standalone'
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.2'
@@ -96,6 +99,8 @@ group :test do
   gem 'selenium-webdriver', '2.27.2'
   gem 'webrat',       '0.7.3'
   gem 'yard',         '0.8.0'
+  gem 'yard-appendix',  '>=0.1.8'
+  gem 'timecop',      '0.5.9.1'
   if ONE_NINE
     gem 'test-unit',  '1.2.3'
   end
@@ -103,14 +108,19 @@ end
 
 group :development do
   gem 'guard', '1.6.0'
-  gem 'rb-inotify', :require => false
+  gem 'rb-inotify', '~>0.8.8', :require => false
   gem 'rb-fsevent', :require => false
   gem 'rb-fchange', :require => false
 
-  if ONE_NINE
-    gem 'debugger',     '1.1.3'
-  else
-    gem 'ruby-debug',   '0.10.4'
+  # Option to DISABLE_RUBY_DEBUGGING is helpful IDE-based debugging.
+  # The ruby debug gems conflict with the IDE-based debugger gem.
+  # Set this option in your dev environment to disable.
+  unless ENV['DISABLE_RUBY_DEBUGGING']
+    if ONE_NINE
+      gem 'debugger',     '1.1.3'
+    else
+      gem 'ruby-debug',   '0.10.4'
+    end
   end
 end
 

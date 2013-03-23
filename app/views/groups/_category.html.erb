@@ -10,8 +10,8 @@
     <div class="links">
       <a href="#" class="add_group_link no-hover" title="<%= t 'buttons.add_group', "Add Another Group" %>"><i class="icon-add standalone-icon"></i></a>
       <% unless protected_category %>
-        <a href="<%= context_url(@context, :update_category_context_groups_url, :category_id => category ? category.id : "{{ category_id }}") %>" class="edit_category_link no-hover" title="<%= t 'buttons.edit_category', "Edit This Set of Groups" %>"><i class="icon-edit standalone-icon"></i></a>
-        <a href="<%= context_url(@context, :delete_category_context_groups_url, :category_id => category ? category.id : "{{ category_id }}") %>" class="delete_category_link no-hover" title="<%= t 'buttons.delete_category', "Remove This Set of Groups" %>"><i class="icon-end standalone-icon"></i></a>
+        <a href="<%= context_url(@context, :context_group_category_url, :id => category ? category.id : "{{ category_id }}") %>" class="edit_category_link no-hover" title="<%= t 'buttons.edit_category', "Edit This Set of Groups" %>"><i class="icon-edit standalone-icon"></i></a>
+        <a href="<%= context_url(@context, :context_group_category_url, :id => category ? category.id : "{{ category_id }}") %>" class="delete_category_link no-hover" title="<%= t 'buttons.delete_category', "Remove This Set of Groups" %>"><i class="icon-end standalone-icon"></i></a>
       <% end %>
     </div>
     <h3 class="category_name"><%= category_name %></h3>

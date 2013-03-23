@@ -130,26 +130,31 @@ describe "varied due dates" do
   end
 
   context "on the dashboard" do
+    def wrap_partial(response)
+      response.body = "<html id='right-side'>#{response.body}</html>"
+      response
+    end
+
     context "as a student" do
       context "in the base section" do
         it "shows the course due date in 'todo'" do
           create_student_todo_assignment
           login_as(@student1.pseudonym.login, 'asdfasdf')
-          get '/'
-          assert_todo_due_date response, @student_todo_course_due_at
+          get '/dashboard-sidebar'
+          assert_todo_due_date wrap_partial(response), @student_todo_course_due_at
         end
 
         it "shows the course due date in 'coming up'" do
           login_as(@student1.pseudonym.login, 'asdfasdf')
-          get "/"
-          assert_coming_up_due_date response, @course_due_date
+          get '/dashboard-sidebar'
+          assert_coming_up_due_date wrap_partial(response), @course_due_date
         end
 
         it "shows the course due date in 'recent feedback'" do
           create_recent_feedback @student1
           login_as(@student1.pseudonym.login, 'asdfasdf')
-          get "/"
-          assert_recent_feedback_due_date response, @course_due_date
+          get '/dashboard-sidebar'
+          assert_recent_feedback_due_date wrap_partial(response), @course_due_date
         end
       end
 
@@ -157,21 +162,21 @@ describe "varied due dates" do
         it "shows the section due date in 'todo'" do
           create_student_todo_assignment
           login_as(@student2.pseudonym.login, 'asdfasdf')
-          get '/'
-          assert_todo_due_date response, @student_todo_section_due_at
+          get '/dashboard-sidebar'
+          assert_todo_due_date wrap_partial(response), @student_todo_section_due_at
         end
 
         it "shows the section due date in 'coming up" do
           login_as(@student2.pseudonym.login, 'asdfasdf')
-          get "/"
-          assert_coming_up_due_date response, @section_due_date
+          get '/dashboard-sidebar'
+          assert_coming_up_due_date wrap_partial(response), @section_due_date
         end
 
         it "shows the section due date in 'recent feedback'" do
           create_recent_feedback @student2
           login_as(@student2.pseudonym.login, 'asdfasdf')
-          get "/"
-          assert_recent_feedback_due_date response, @section_due_date
+          get '/dashboard-sidebar'
+          assert_recent_feedback_due_date wrap_partial(response), @section_due_date
         end
       end
     end
@@ -179,15 +184,15 @@ describe "varied due dates" do
     context "as the teacher" do
       it "shows multiple due dates in 'coming up'" do
         login_as(@teacher.pseudonym.login, 'asdfasdf')
-        get "/"
-        assert_coming_up_due_date response, multiple_due_dates
+        get '/dashboard-sidebar'
+        assert_coming_up_due_date wrap_partial(response), multiple_due_dates
       end
 
       it "shows multiple due dates in 'todo'" do
         create_teacher_todo_assignment
         login_as(@teacher.pseudonym.login, 'asdfasdf')
-        get "/"
-        assert_todo_due_date response, multiple_due_dates
+        get '/dashboard-sidebar'
+        assert_todo_due_date wrap_partial(response), multiple_due_dates
       end
     end
   end

@@ -30,7 +30,7 @@ define [
   # It uses OutcomeView and OutcomeGroupView to render
   class ContentView extends Backbone.View
 
-    initialize: ({@readOnly, @setQuizMastery, @useForScoring, @instructionsTemplate}) ->
+    initialize: ({@readOnly, @setQuizMastery, @useForScoring, @instructionsTemplate, @renderInstructions}) ->
       @render()
 
     # accepts: Outcome and OutcomeGroup
@@ -59,7 +59,7 @@ define [
       @attachEvents()
       @$el.html if @innerView
           @innerView.render().el
-        else
+        else if @renderInstructions
           @instructionsTemplate()
       this
 

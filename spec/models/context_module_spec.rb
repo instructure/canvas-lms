@@ -40,6 +40,16 @@ describe ContextModule do
       @module2.prerequisites.should_not be_empty
       @module2.prerequisites[0][:id].should eql(@module.id)
     end
+
+    it "should add prereqs to new module" do
+      course_module
+      @module2 = @course.context_modules.build(:name => "next module")
+      @module2.prerequisites = "module_#{@module.id}"
+      @module2.save!
+      @module2.prerequisites.should be_is_a(Array)
+      @module2.prerequisites.should_not be_empty
+      @module2.prerequisites[0][:id].should eql(@module.id)
+    end
       
     it "should remove invalid prerequisites" do
       course_module
@@ -201,6 +211,73 @@ describe ContextModule do
       @progression.should be_nil
     end
   end
+
+  describe "prerequisites_satisfied?" do
+    before do
+      @course = course(:active_all => true)
+      @module = @course.context_modules.create!(:name => "some module")
+
+      @assignment = @course.assignments.create!(:title => "some assignment")
+      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
+      @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
+      @module.workflow_state = 'unpublished'
+      @module.save!
+
+      @module2 = @course.context_modules.create!(:name => "another module")
+      @module2.publish
+      @module2.prerequisites = "module_#{@module.id}"
+      @module2.save!
+
+      @module3 = @course.context_modules.create!(:name => "another module again")
+      @module3.publish
+      @module3.save!
+
+      @user = User.create!(:name => "some name")
+      @course.enroll_student(@user)
+    end
+
+    it "should correctly ignore already-calculated context_module_prerequisites" do
+      mp = @user.context_module_progressions.create!(:context_module => @module2)
+      mp.workflow_state = 'locked'
+      mp.save!
+      mp2 = @user.context_module_progressions.create!(:context_module => @module)
+      mp2.workflow_state = 'locked'
+      mp2.save!
+
+      @module2.prerequisites_satisfied?(@user, true).should == true
+    end
+
+    it "should be satisfied if no prereqs" do
+      @module3.prerequisites_satisfied?(@user, true).should == true
+    end
+
+    it "should be satisfied if prereq is unpublished" do
+      @module2.prerequisites_satisfied?(@user, true).should == true
+    end
+
+    it "should be satisfied if prereq's prereq is unpublished" do
+      @module3.prerequisites = "module_#{@module2.id}"
+      @module3.save!
+      @module3.prerequisites_satisfied?(@user, true).should == true
+    end
+
+    it "should be satisfied if dependant on both a published and unpublished module" do
+      @module3.prerequisites = "module_#{@module.id}"
+      @module3.prerequisites = [{:type=>"context_module", :id=>@module.id}, {:type=>"context_module", :id=>@module2.id}]
+      @module3.save!
+      @module3.reload
+      @module3.prerequisites.count.should == 2
+
+      @module3.prerequisites_satisfied?(@user, true).should == true
+    end
+
+    it "should update when publishing or unpublishing" do
+      @module.publish
+      @module2.prerequisites_satisfied?(@user, true).should == false
+      @module.unpublish
+      @module2.prerequisites_satisfied?(@user, true).should == true
+    end
+  end
   
   describe "evaluate_for" do
     it "should create a completed progression for no prerequisites and no requirements" do
@@ -233,11 +310,7 @@ describe ContextModule do
       @module.save!
       @user = User.create!(:name => "some name")
       @course.enroll_student(@user)
-      # @progression = @module.evaluate_for(@user, true)
-      # @progression.should_not be_nil
-      # @progression.should be_unlocked
-      # @progression.destroy
-      
+
       @module2 = @course.context_modules.create!(:name => "another module")
       @module2.prerequisites = "module_#{@module.id}"
       @module2.save!
@@ -250,6 +323,33 @@ describe ContextModule do
       @progression = @module2.evaluate_for(@user, true)
       @progression.should_not be_nil
       @progression.should be_locked
+    end
+
+    it "should create an unlocked progression if prerequisites is unpublished" do
+      course_module
+      @assignment = @course.assignments.create!(:title => "some assignment")
+      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
+      @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
+      @module.workflow_state = 'unpublished'
+      @module.save!
+
+      @user = User.create!(:name => "some name")
+      @course.enroll_student(@user)
+
+      @module2 = @course.context_modules.create!(:name => "another module")
+      @module2.publish
+      @module2.prerequisites = "module_#{@module.id}"
+      @module2.save!
+      @module2.prerequisites.should_not be_nil
+      @module2.prerequisites.should_not be_empty
+
+      @progression = @module2.evaluate_for(@user, true)
+      @progression.should_not be_nil
+      @progression.should_not be_locked
+      @progression.destroy
+      @progression = @module2.evaluate_for(@user, true)
+      @progression.should_not be_nil
+      @progression.should_not be_locked
     end
 
     describe "multi-items" do

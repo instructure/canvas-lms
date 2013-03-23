@@ -43,13 +43,12 @@ describe SelfEnrollmentsController do
       }.should raise_exception(ActiveRecord::RecordNotFound)
     end
 
-    it "should not render if self_enrollment is disabled" do
+    it "should render even if self_enrollment is disabled" do
       code = @course.self_enrollment_code
       @course.update_attribute(:self_enrollment, false)
 
-      lambda {
-        get 'new', :self_enrollment_code => code
-      }.should raise_exception(ActiveRecord::RecordNotFound)
+      get 'new', :self_enrollment_code => code
+      response.should be_success
     end
   end
 
@@ -94,9 +93,8 @@ describe SelfEnrollmentsController do
       user
       user_session(@user)
 
-      lambda {
-        post 'create', :self_enrollment_code => code
-      }.should raise_exception(ActiveRecord::RecordNotFound)
+      post 'create', :self_enrollment_code => code
+      response.status.should =~ /400 Bad Request/
       @user.enrollments.length.should == 0
     end
 

@@ -391,6 +391,22 @@ describe GradeCalculator do
     end
   end
 
+  it "should return grades in the order they are requested" do
+    course_with_student
+    @student1 = @student
+    student_in_course
+    @student2 = @student
+
+    a = @course.assignments.create! :points_possible => 100
+    a.grade_student @student1, :grade => 50
+    a.grade_student @student2, :grade => 100
+
+    calc = GradeCalculator.new([@student2.id, @student1.id], @course)
+    grades = calc.compute_scores
+    grades.shift.should == [100, 100]
+    grades.shift.should == [50, 50]
+  end
+
   # We should keep this in sync with GradeCalculatorSpec.coffee
   context "GradeCalculatorSpec.coffee examples" do
     before do
@@ -533,6 +549,15 @@ describe GradeCalculator do
       rules = "drop_lowest:1\nnever_drop:#{@assignments[2].id}" # 103.8/100
       @group.update_attribute(:rules, rules)
       check_grades(104.7, 104.7)
+    end
+
+    it "grade dropping should work even in ridiculous circumstances" do
+      set_grades [[nil, 20], [3, 10], [nil, 10],
+                  [nil, 100000000000000007629769841091887003294964970946560],
+                  [nil, nil]]
+
+      @group.update_attribute(:rules, 'drop_lowest:2')
+      check_grades(30, 15)
     end
 
     context "assignment groups with 0 points possible" do

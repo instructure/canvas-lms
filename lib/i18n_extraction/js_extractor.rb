@@ -224,7 +224,7 @@ module I18nExtraction
         sub_key = k ? "#{key}.#{k}" : key
         str.scan(INTERPOLATION_KEY) do |match|
           if $& =~ /\A\{\{/
-            $stderr.puts "Warning: deprecated interpolation syntax used on line #{offset} of #{options[:filename]}"
+            raise "unsupported interpolation syntax used on line #{offset} of #{options[:filename]}"
           end
           i_key = (match[0] || match[1]).to_sym
           unless call_options && call_options.include?(i_key)

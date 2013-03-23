@@ -41,6 +41,7 @@ define [
     # options must include rootOutcomeGroup or directoryView
     initialize: (opts) ->
       @readOnly = opts.readOnly
+      @selectFirstItem = opts.selectFirstItem
       @directories = []
       @cachedDirectories = {}
       @$sidebar = @$el.parent()
@@ -65,7 +66,8 @@ define [
       else
         parent = _.last @directories
         directoryClass = outcomeGroup.get('directoryClass') || OutcomesDirectoryView
-        dir = new directoryClass {outcomeGroup, parent, @readOnly}
+        dir = new directoryClass {outcomeGroup, parent, @readOnly, selectFirstItem: @selectFirstItem}
+        @firstDir = false
       @addDir dir
 
     # Adds a directory view.

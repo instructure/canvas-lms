@@ -99,6 +99,7 @@ module Api::V1::CalendarEvent
       }
     end
     hash['url'] = api_v1_calendar_event_url(event) if options.has_key?(:url_override) ? options[:url_override] || hash['own_reservation'] : event.grants_right?(user, session, :read)
+    hash['html_url'] = calendar_url_for(event.effective_context, :event => event) if event.grants_right?(user, session, :read)
     hash
   end
 
@@ -110,6 +111,7 @@ module Api::V1::CalendarEvent
     hash['context_code'] = assignment.context_code
     hash['start_at'] = hash['end_at'] = assignment.due_at
     hash['url'] = api_v1_calendar_event_url("assignment_#{assignment.id}")
+    hash['html_url'] = hash['assignment']['html_url'] if hash['assignment'].include?('html_url')
     if assignment.applied_overrides.present?
       hash['assignment_overrides'] = assignment.applied_overrides.map { |o| assignment_override_json(o) }
     end
@@ -134,6 +136,7 @@ module Api::V1::CalendarEvent
     hash['appointments_count'] = group.appointments.size
     hash['participant_type'] = group.participant_type
     hash['url'] = api_v1_appointment_group_url(group)
+    hash['html_url'] = appointment_group_url(hash['id'])
     hash
   ensure
     @context = orig_context

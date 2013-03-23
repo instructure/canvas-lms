@@ -21,13 +21,51 @@ require File.expand_path(File.dirname(__FILE__) + '/../messages/messages_helper'
 
 describe Message do
 
+  describe "#get_template" do
+    it "should get the template with an existing file path" do
+      HostUrl.stubs(:protocol).returns("https")
+      au = AccountUser.create(:account => account_model)
+      msg = generate_message(:account_user_notification, :email, au)
+      file_path = File.expand_path(File.join(RAILS_ROOT, 'app', 'messages', 'alert.email.erb'))
+      template = msg.get_template(file_path)
+      template.should match(%r{Account Admin Notification})
+    end
+  end
+
+  describe '#populate body' do
+    it 'should generate a body' do
+      HostUrl.stubs(:protocol).returns('https')
+      user = user(:active_all => true)
+      au   = AccountUser.create(:account => account_model, :user => user)
+      msg  = generate_message(:account_user_notification, :email, au)
+      msg.populate_body('this is a test', 'email', msg.send(:binding))
+      msg.body.should eql('this is a test')
+    end
+
+    it 'should not save an html body by default' do
+      user         = user(:active_all => true)
+      account_user = AccountUser.create!(:account => account_model, :user => user)
+      message      = generate_message(:account_user_notification, :email, account_user)
+
+      message.html_body.should be_nil
+    end
+
+    it 'should save an html body if a template exists' do
+      Message.any_instance.expects(:load_html_template).returns('template')
+      user         = user(:active_all => true)
+      account_user = AccountUser.create!(:account => account_model, :user => user)
+      message      = generate_message(:account_user_notification, :email, account_user)
+
+      message.html_body.should == 'template'
+    end
+  end
+
   describe "parse!" do
     it "should use https when the domain is configured as ssl" do
-      pending("switch messages to use url writing, rather than hard-coded strings")
       HostUrl.stubs(:protocol).returns("https")
       @au = AccountUser.create(:account => account_model)
       msg = generate_message(:account_user_notification, :email, @au)
-      msg.body.should match(%r{https://www.example.com})
+      msg.body.should include('Account Admin')
     end
   end
 
@@ -85,6 +123,23 @@ describe Message do
         Mailer.expects(:deliver_message).never
         @message.deliver.should be_nil
         @message.reload.state.should == :cancelled
+      end
+
+      it "should log errors and raise based on error type" do
+        message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
+        Mailer.expects(:deliver_message).raises("something went wrong")
+        ErrorReport.expects(:log_exception)
+        expect { @message.deliver }.to raise_exception("something went wrong")
+
+        message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
+        Mailer.expects(:deliver_message).raises(Timeout::Error.new)
+        ErrorReport.expects(:log_exception).never
+        expect { @message.deliver }.to raise_exception(Timeout::Error)
+
+        message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
+        Mailer.expects(:deliver_message).raises("450 recipient address rejected")
+        ErrorReport.expects(:log_exception).never
+        @message.deliver.should == false
       end
     end
   end

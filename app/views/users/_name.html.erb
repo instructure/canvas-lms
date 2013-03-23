@@ -57,7 +57,7 @@
           <% end %>
           <% if @user.associated_root_accounts.active.any?{|a| can_do(a, @current_user, :manage_user_logins) }  %>
             | 
-            <a href="<%= user_admin_merge_url(@user.id) %>"><%= t('merge_with_another_user', 'Merge with Another User') %></a>
+            <a class="merge_user_link" href="<%= user_admin_merge_url(@user.id) %>"><%= t('merge_with_another_user', 'Merge with Another User')%></a>
           <% end %>
           <% if ((@context.is_a?(User) || @context.is_a?(Account)) && root_account) && @user.grants_right?(@current_user, session, :manage_logins) %>
             |

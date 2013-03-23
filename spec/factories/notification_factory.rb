@@ -24,7 +24,6 @@ def notification_valid_attributes
   {
     :name => "Show In Feed",
     :subject => "value for subject",
-    :body => "value for body",
     :category => "TestImmediately"
   }
 end

@@ -23,7 +23,7 @@ describe 'conversation_message.email' do
   it "should render" do
     course_with_teacher
     student_in_course
-    conversation = @teacher.initiate_conversation([@user.id])
+    conversation = @teacher.initiate_conversation([@user])
     message = conversation.add_message("some message")
     generate_message(:conversation_message, :email, message)
   end

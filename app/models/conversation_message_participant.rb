@@ -20,6 +20,8 @@ class ConversationMessageParticipant < ActiveRecord::Base
   include SimpleTags
 
   belongs_to :conversation_message
+  belongs_to :user
+  # deprecated
   belongs_to :conversation_participant
   delegate :author, :author_id, :generated, :body, :to => :conversation_message
 

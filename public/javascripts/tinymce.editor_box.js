@@ -166,7 +166,7 @@ define([
       theme_advanced_resizing : true,
       theme_advanced_blockformats : "p,h2,h3,h4,pre",
       theme_advanced_more_colors: false,
-      extended_valid_elements : "iframe[src|width|height|name|align|style|class]",
+      extended_valid_elements : "iframe[src|width|height|name|align|style|class|sandbox]",
       content_css: "/stylesheets/compiled/instructure_style.css,/stylesheets/compiled/tinymce.editor_box.css",
       editor_css: editor_css,
 

@@ -199,6 +199,16 @@ define ['compiled/grade_calculator', 'underscore'], (GradeCalculator, _) ->
     assertGrade result, 'current', 209.45, 200
     assertDropped result.group_sums[0].current.submissions, [101.9,100]
 
+  test "grade dropping in ridiculous circumstances", ->
+    @setup_grades @group, [[null, 20], [3, 10], [null, 10],
+      [null, 100000000000000007629769841091887003294964970946560],
+      [null, null]]
+
+    @group.rules = drop_lowest: 2
+    result = GradeCalculator.calculate @submissions, [@group]
+    assertGrade result, 'current', 3, 10
+    assertGrade result, 'final', 3, 20
+
   test "assignment groups with 0 points possible", ->
     @submissions = []
     @group1 = @group

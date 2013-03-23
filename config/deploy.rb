@@ -14,10 +14,12 @@ set :use_sudo,      false
 set :deploy_env,    "production"
 set :bundle_dir,    "/opt/ruby-enterprise-1.8.7-2012.02/lib/ruby/gems/1.8"
 set :bundle_without, []
+set :stats_server,	"stats.tier2.sfu.ca"
 default_run_options[:pty] = true
 
 if (ENV.has_key?('gateway') && ENV['gateway'].downcase == "true")
   set :gateway, "welcome.its.sfu.ca"
+  set :stats_server, "stats.its.sfu.ca"
 end
 
 disable_log_formatters;
@@ -68,7 +70,7 @@ namespace :canvas do
     desc "Compile static assets"
     task :compile_assets, :on_error => :continue do
       # On remote: bundle exec rake canvas:compile_assets
-      run "cd #{latest_release} && #{rake} RAILS_ENV=#{rails_env} canvas:compile_assets --quiet"
+      run "cd #{latest_release} && #{rake} RAILS_ENV=#{rails_env} canvas:compile_assets[false] --quiet"
       run "cd #{latest_release} && chown -R canvasuser:canvasuser ."
     end
 
@@ -86,7 +88,7 @@ namespace :canvas do
     desc "Log the deploy to graphite"
     task :log_deploy do
       ts = Time.now.to_i
-      cmd = "echo 'stats.canvas.#{stage}.deploys 1 #{ts}' | nc stats.tier2.sfu.ca 2003"
+      cmd = "echo 'stats.canvas.#{stage}.deploys 1 #{ts}' | nc #{stats_server} 2003"
       puts cmd
       puts run_locally cmd
     end

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe RoleOverride do
   it "should retain the prior permission when it encounters the first explicit override" do
@@ -373,6 +373,19 @@ describe RoleOverride do
         check_permission(AccountUser::BASE_ROLE_NAME, 'AccountAdmin', false)
       end
     end
+
+    context "sharding" do
+      it_should_behave_like "sharding"
+
+      it "should find role overrides on a non-current shard" do
+        @shard1.activate do
+          @account = Account.create!
+          @account.role_overrides.create!(:permission => 'become_user', :enabled => false,
+                                          :enrollment_type => 'AccountAdmin')
+        end
+        RoleOverride.permission_for(@account, :become_user, AccountUser::BASE_ROLE_NAME, 'AccountAdmin')[:enabled].should == nil
+      end
+    end
   end
 
   describe "enabled_for?" do
@@ -399,7 +412,7 @@ describe RoleOverride do
       # applying to Site Admin, should be enabled
       RoleOverride.enabled_for?(Account.site_admin, Account.site_admin, :manage_role_overrides, 'AccountMembership', 'role').should == [:self]
       # applying to Default Account, should be disabled
-      RoleOverride.enabled_for?(Account.site_admin, Account.default, :manage_role_overrides, 'AccountMembership', 'role').should == nil
+      RoleOverride.enabled_for?(Account.site_admin, Account.default, :manage_role_overrides, 'AccountMembership', 'role').should == []
     end
   end
 end

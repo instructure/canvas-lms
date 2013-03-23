@@ -1,0 +1,2 @@
+gem "rest-client"
+gem "httpclient"

@@ -35,7 +35,7 @@ describe "/gradebooks/grade_summary" do
 
   it "should not show totals if configured so" do
     course_with_student
-    @course.settings[:hide_final_grade] = true
+    @course.hide_final_grades = true
     view_context
     a = @course.assignments.create!(:title => "some assignment")
     assigns[:student] = @user

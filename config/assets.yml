@@ -19,6 +19,7 @@ stylesheets:
   common:
     - public/stylesheets/compiled/g_reset.css
     - public/stylesheets/compiled/g_base.css
+    - public/stylesheets/static/mediaelementplayer.css
     - public/stylesheets/compiled/g_instructure.css
     - public/stylesheets/compiled/ellipsis.css
     - public/stylesheets/compiled/g_util_misc.css
@@ -42,6 +43,8 @@ stylesheets:
     - public/stylesheets/compiled/g_mini_calendar.css
     - public/stylesheets/compiled/helpDialog.css
     - public/stylesheets/compiled/print.css
+  context_modules: 
+    - public/stylesheets/compiled/context_modules.css
   collection_item_save:
     - public/stylesheets/compiled/collection_item_save.css
   collections_app:
@@ -106,8 +109,8 @@ stylesheets:
     - public/stylesheets/compiled/ui.selectmenu.css
   moderate_quiz:
     - public/stylesheets/compiled/moderate_quiz.css
-  full_assignment:
-    - public/stylesheets/compiled/full_assignment.css
+  assignments:
+    - public/stylesheets/compiled/assignments.css
     - public/stylesheets/compiled/grading_standards.css
     - public/stylesheets/static/embed_content.css
   grading_standards:

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe FilesController do
   def course_folder
@@ -164,6 +164,27 @@ describe FilesController do
       group_with_user_logged_in(:group_context => Account.default)
       get 'index', :group_id => @group.id
       response.should be_success
+    end
+
+    describe 'across shards' do
+      it_should_behave_like 'sharding'
+
+      before do
+        @shard2.activate do
+          user(:active_all => true)
+        end
+        user_session(@user)
+      end
+
+      it "authorizes users on a remote shard" do
+        get 'index', :user_id => @user.global_id
+        response.should be_success
+      end
+
+      it "authorizes users on a remote shard for JSON data" do
+        get 'index', :user_id => @user.global_id, :format => :json
+        response.should be_success
+      end
     end
   end
 

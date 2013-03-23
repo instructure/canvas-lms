@@ -37,7 +37,7 @@ module Api::V1
       @hash['enrollments'] = extract_enrollments( @enrollments )
       @hash['needs_grading_count'] = needs_grading_count(@enrollments, @course) 
       @hash['public_description'] = description(@course)
-      @hash['hide_final_grades'] = (@course.hide_final_grades.to_s == 'true')
+      @hash['hide_final_grades'] = @course.hide_final_grades?
       clear_unneeded_fields(@hash)
     end
 
@@ -88,7 +88,7 @@ module Api::V1
     end
     
     def include_total_scores 
-      @includes.include?(:total_scores) && !@course.settings[:hide_final_grade]
+      @includes.include?(:total_scores) && !@course.hide_final_grades?
     end
 
   end

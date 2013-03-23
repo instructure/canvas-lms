@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 describe "One Question at a Time Quizzes" do
   it_should_behave_like "quizzes selenium tests"
 
-  def create_oqaat_quiz
+  def create_oqaat_quiz(opts={})
 
     course_with_teacher(:active_all => true)
     student_in_course(:active_all => true)
@@ -12,9 +12,11 @@ describe "One Question at a Time Quizzes" do
     quiz_question("Question 2", "What is the second question?", 2)
     quiz_question("Question 3", "What is the third question?", 3)
     @quiz.title = "OQAAT quiz"
-    @quiz.workflow_state = "available"
     @quiz.one_question_at_a_time = true
-    @quiz.generate_quiz_data
+    if opts[:publish]
+      @quiz.workflow_state = "available"
+      @quiz.generate_quiz_data
+    end
     @quiz.published_at = Time.now
     @quiz.save!
   end
@@ -38,8 +40,8 @@ describe "One Question at a Time Quizzes" do
   end
   
   def preview_the_quiz
-    get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
-    fj("#quiz_options_form a:contains('Preview the Quiz')").click
+    get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+    f("#preview_quiz_button").click
     wait_for_ajaximations
   end
 
@@ -218,7 +220,7 @@ describe "One Question at a Time Quizzes" do
 
   context "as a student" do
     before do
-      create_oqaat_quiz
+      create_oqaat_quiz(:publish => true)
       user_session(@student)
     end
 

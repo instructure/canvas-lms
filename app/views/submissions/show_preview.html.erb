@@ -158,7 +158,7 @@
     <%= t('quiz_submission', 'This submission was a quiz submission.  Redirecting to quiz page.') %>
   </div>
 <% elsif @submission.submission_type == 'media_recording' && @submission.media_comment_id %>
-  <%= t('media_comment_link', "This submission is a media recording. *click here to view*.", :wrapper => '<a href="#" class="play_media_recording_link">\1</a>.') %>
+  <%= t('media_comment_link', "This submission is a media recording. *click here to view.*", :wrapper => '<div><a href="#" class="play_media_recording_link" '+ dataify(@submission, :media_comment_id, :media_comment_type) + '>\1</a></div>') %>
   <div style="width: 400px; margin: 10px auto;" id="media_recording_box">
     <div class="box_content">
     </div>

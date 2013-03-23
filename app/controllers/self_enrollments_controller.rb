@@ -28,8 +28,6 @@ class SelfEnrollmentsController < ApplicationController
       flash[:notice] = t('notices.login_required', "Please log in to join this course.")
       return redirect_to login_url
     end
-
-    js_env :USER => {:MIN_AGE => @course.self_enrollment_min_age || User.self_enrollment_min_age}
   end
 
   def create

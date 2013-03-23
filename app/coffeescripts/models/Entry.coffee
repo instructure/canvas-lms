@@ -102,7 +102,7 @@ define [
     # by the current user
     canModerate: ->
       isAuthorsEntry = @get('user_id') is ENV.DISCUSSION.CURRENT_USER.id
-      isAuthorsEntry or ENV.DISCUSSION.PERMISSIONS.MODERATE
+      isAuthorsEntry and ENV.DISCUSSION.PERMISSIONS.CAN_MANAGE_OWN or ENV.DISCUSSION.PERMISSIONS.MODERATE
 
     ##
     # Only threaded discussions get the ability to reply in an EntryView

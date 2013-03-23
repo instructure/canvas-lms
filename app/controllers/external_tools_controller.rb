@@ -276,7 +276,7 @@ class ExternalToolsController < ApplicationController
           if api_request?
             format.json { render :json => external_tool_json(@tool, @context, @current_user, session) }
           else
-            format.json { render :json => @tool.to_json(:methods => [:readable_state, :custom_fields_string], :include_root => false) }
+            format.json { render :json => @tool.to_json(:methods => [:readable_state, :custom_fields_string, :vendor_help_link], :include_root => false) }
           end
         else
           format.json { render :json => @tool.errors.to_json, :status => :bad_request }
