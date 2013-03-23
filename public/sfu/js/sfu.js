@@ -5,6 +5,18 @@
     $('footer').html('<a href="http://www.sfu.ca/canvas"><img alt="SFU Canvas" src="/sfu/images/sfu-logo.png" width="250" height="38"></a>').show();
 })(jQuery);
 
+// handle no-user case
+(function($) {
+	if ($('#header').hasClass('no-user')) {
+		console.log('no-user');
+		// add in a dummy #menu div
+		$('#header-inner').append('<div id="menu" style="height:41px"></div>');
+		// remove the register link
+		$('#header.no-user a[href="/register"]').parent().remove()
+	}
+})(jQuery);
+
+
 // google analytics
 if (window.location.hostname && 'canvas.sfu.ca' === window.location.hostname) {
     var _gaq = _gaq || [];
