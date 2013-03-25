@@ -35,15 +35,11 @@
         </td>
       </tr>
     <% end %>
-    <tr>
-      <td colspan="2">
-        <div class='button-container'>
-          <button type="submit" class="btn"><%= t('buttons.create_course', %{Create Course}) %></button>
-          <a href="<%= context_url(@context, :context_url) %>" class="btn button-secondary"><%= t '#buttons.cancel', 'Cancel' %></a>
-        </div>
-      </td>
-    </tr>
   </table>
+  <div class='form-actions'>
+    <a href="<%= context_url(@context, :context_url) %>" class="btn button-secondary"><%= t '#buttons.cancel', 'Cancel' %></a>
+    <button type="submit" class="btn btn-primary"><%= t('buttons.create_course', %{Create Course}) %></button>
+  </div>
 <% end %>
 
 <% js_block do %>
