@@ -1,6 +1,4 @@
 # Require any additional compass plugins here.
-require 'bootstrap-sass'
-
 project_type = :rails
 project_path = Rails.root.to_s if defined?(Rails)
 # Set this to the root of your project when deployed:
