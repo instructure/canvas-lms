@@ -218,25 +218,6 @@ describe "users" do
       User.last.initial_enrollment_type.should eql 'student'
     end
 
-    it "should register a student without a join code" do
-      get '/register'
-      f('#signup_student').click
-      wait_for_ajaximations
-      f('.registration-dialog .signup_link').click
-      wait_for_ajaximations
-
-      form = fj('.ui-dialog:visible form')
-      f('#student_higher_ed_name').send_keys('student!')
-      f('#student_higher_ed_email').send_keys('student@example.com')
-      wait_for_ajaximations
-      form.find_element(:css, 'input[name="user[terms_of_use]"]').click
-
-      expect_new_page_load { form.submit }
-      # confirm the user is authenticated into the dashboard
-      f('#identity .logout').should be_present
-      User.last.initial_enrollment_type.should eql 'student'
-    end
-
     it "should register a teacher" do
       get '/register'
       f('#signup_teacher').click
