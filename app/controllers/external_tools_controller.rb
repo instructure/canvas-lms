@@ -159,8 +159,10 @@ class ExternalToolsController < ApplicationController
     else
       # this is coming from a content tag redirect that set @tool
       selection_type = "#{@context.class.base_ar_class.to_s.downcase}_navigation"
-      render_tool(params[:id], selection_type)
-      @active_tab = @tool.asset_string
+
+      find_tool(params[:id], selection_type)
+      @active_tab = @tool.asset_string if @tool
+      render_tool(selection_type)
       add_crumb(@context.name, named_context_url(@context, :context_url))
     end
   end
@@ -177,19 +179,23 @@ class ExternalToolsController < ApplicationController
     @headers       = false
     @self_target   = true
 
-    render_tool(params[:external_tool_id], selection_type)
+    find_tool(params[:external_tool_id], selection_type)
+    render_tool(selection_type)
   end
 
-  def render_tool(id, selection_type)
+  def find_tool(id, selection_type)
     begin
-      @tool = ContextExternalTool.find_for(id, @context, selection_type) 
+      @tool = ContextExternalTool.find_for(id, @context, selection_type)
     rescue ActiveRecord::RecordNotFound; end
     if !@tool
       flash[:error] = t "#application.errors.invalid_external_tool_id", "Couldn't find valid settings for this tool"
       redirect_to named_context_url(@context, :context_url)
-      return
     end
+  end
+  protected :find_tool
 
+  def render_tool(selection_type)
+    return unless @tool
     @resource_title = @tool.label_for(selection_type.to_sym)
     @return_url ||= url_for(@context)
     @launch = @tool.create_launch(@context, @current_user, @return_url, selection_type)
