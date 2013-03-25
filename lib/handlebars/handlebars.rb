@@ -68,7 +68,7 @@ class Handlebars
       if css = get_css(id)
         dependencies << "compiled/util/registerTemplateCss"
         # arguments[1] will be the registerTemplateCss function
-        css_registration = "\narguments[1]('#{id}', #{css.to_json});\n"
+        css_registration = "\narguments[1]('#{id}', #{MultiJson.dump css});\n"
       end
 
       prepared = prepare_i18n(source, id)
@@ -85,7 +85,7 @@ class Handlebars
 
       template = context.call "Handlebars.precompile", prepared[:content]
       <<-JS
-define('#{plugin ? plugin + "/" : ""}jst/#{id}', #{dependencies.to_json}, function (Handlebars) {
+define('#{plugin ? plugin + "/" : ""}jst/#{id}', #{MultiJson.dump dependencies}, function (Handlebars) {
   var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
   templates['#{id}'] = template(#{template});
   #{partial_registration}
