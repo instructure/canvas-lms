@@ -1,0 +1,11 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/files
+<% end %>
+
+<% define_content :subject do %>
+  <%= data.count %> New Files Added to <%= asset.context.name %>
+<% end %>
+
+<p><%= data.count %> new files have been added for the course, <%= asset.context.name %>.</p>
+
+<p><a href="<%= content :link %>">You can view them here</a></p>

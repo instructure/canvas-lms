@@ -1,0 +1,15 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/rubrics/<%= asset.rubric_id %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t :subject, "New Assessment: %{title}, %{context}", :title => asset.title, :context => asset.context.name %>
+<% end %>
+
+<p><%= t :body, "A new assessment has been created for %{context}:", :context => asset.context.name %></p>
+
+<p><strong><%= asset.title %></strong></p>
+<p><%= asset.description %></p>
+
+<p><a href="<%= content :link %>"><%= t :link_message, "Click here to review the assessment and submit your entry" %></a></p>
+

@@ -22,7 +22,10 @@ require [
   'jst/messages/sendForm'
   'compiled/jquery/fixDialogButtons'
   'jqueryui/dialog'
+  'jqueryui/tabs'
 ], (I18n, $, sendForm) ->
+
+  $(".tabs").tabs()
 
   showDialog = (e) ->
     e.preventDefault()

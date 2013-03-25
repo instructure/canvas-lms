@@ -39,4 +39,13 @@ class MessagesController < ApplicationController
     IncomingMessageProcessor.process_single(message, secure_id, message_id)
     render :nothing => true
   end
+
+  def html_message
+    message = @context.messages.find(params[:message_id])
+    if message.html_body.present?
+      render :inline => message.html_body, :layout => false
+    else
+      render :layout => false
+    end
+  end
 end

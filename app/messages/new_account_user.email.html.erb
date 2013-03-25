@@ -1,0 +1,9 @@
+<% define_content :link do %><%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.account) %><% end %>
+<% define_content :subject do %>
+  <%= t :subject, "New Account User" %>
+<% end %>
+<p><%= t :body, "New Account Admin for %{account}", :account => asset.account.name %></p>
+
+<p><%= t :details, "A new admin, %{user}, has been added for the account %{account}", :user => asset.user.name, :account => asset.account.name %></p>
+
+<p><a href="<%= content :link %>"><%= content :link %></a></p>

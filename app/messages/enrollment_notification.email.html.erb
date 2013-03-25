@@ -1,0 +1,47 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.course) %>/<%= asset.course.class.to_s.downcase.pluralize %>/<%= asset.course_id %>
+<% end %>
+<% define_content :subject do %>
+  <%= t :subject, "Course Enrollment" %>
+<% end %>
+<% email = asset.user.email; login = (asset.user.pseudonym.unique_id rescue "none") %>
+<% course = "<a href=\"#{content :link}\">#{asset.course.name}</a>" %>
+<p>
+<%=
+    case asset.type
+    when 'TeacherEnrollment'
+      t :body_teacher, "You've been enrolled in the course, %{course}, as a teacher.", :course => course
+    when 'TaEnrollment'
+      t :body_ta, "You've been enrolled in the course, %{course}, as a TA.", :course => course
+    when 'ObserverEnrollment'
+      t :body_observer, "You've been enrolled in the course, %{course}, as an observer.", :course => course
+    when 'DesignerEnrollment'
+      t :body_designer, "You've been enrolled in the course, %{course}, as a designer.", :course => course
+    else
+      t :body_student, "You've been enrolled in the course, %{course}, as a student.", :course => course
+    end
+%>
+</p>
+
+<table border="0" style="font-size: 14px; color: #444444;
+    font-family: 'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif';
+    border-collapse: collapse;">
+    <tr>
+        <td style="padding-right: 10px;"><%= t(:name, 'Name') %>:</td>
+        <td style="font-weight: bold;"><%= asset.user.name %></td>
+    </tr>
+    <tr>
+        <td style="padding-right: 10px"><%= t(:email, 'Email') %>:</td>
+        <td style="font-weight: bold;"><%= email %></td>
+    </tr>
+    <% if email != login %>
+      <tr>
+          <td style="padding-right: 10px;"><%= t(:username, 'Username') %>:</td>
+          <td style="font-weight: bold;"><%= asset.user.pseudonym.unique_id rescue t(:none, "none") %></td>
+      </tr>
+    <% end %>
+</table>
+
+<% if !asset.user.registered? && asset.user.communication_channel %>
+<p><a href="<%= registration_confirmation_url(asset.user.communication_channel.confirmation_code, :host => HostUrl.context_host(asset.course)) %>"><%= t :complete_registration_link, "Click here to complete registration" %></a></p>
+<% end %>

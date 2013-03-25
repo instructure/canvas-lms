@@ -1,0 +1,11 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/imports/list
+<% end %>
+
+<% define_content :subject do %>
+  <%= t :subject, "Content Import Failed: %{course_name}", :course_name => asset.context.name %>
+<% end %>
+
+<p><%= t :body, "There was a problem importing some content into your course %{destination}.", :destination => asset.context.name %></p>
+
+<p><%= t :notify_admin, "Please notify your system administrator, and point them to your <a href=\"%{link}\">import info page</a>", :link => content(:link) %></p>

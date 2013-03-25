@@ -40,10 +40,37 @@ dd {
   }
 }
 
+.ui-tabs {
+  margin: 15px;
+}
+
 .message-body {
+  border: 0px;
   clear: both;
-  margin: 4px 12px;
   overflow: auto;
+  border: 0px;
+  background-color: white;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.message-html-body {
+  border: 0px;
+  clear: both;
+  overflow: auto;
+  width: 99%;
+  height: 250px;
+}
+
+table.grid tr:first-child td {
+  border-top: none;
+}
+
+.td-label {
+  div {
+    color: #888888;
+    padding-right: 10px;
+    text-align: right;
+  }
 }
 
 /*-- workflow state labels --*/
@@ -82,4 +109,11 @@ dd {
   padding: 4px 12px;
 
   li { display: inline; float: left; margin: 0 16px 0 0; }
+}
+
+a.icon-off {
+  font-size: 11px;
+  &:before {
+    font-size: 11px;
+  }
 }

@@ -1,0 +1,14 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.account) %>/accounts/<%= asset.account_id %>
+<% end %>
+<% define_content :subject do %>
+  <%= t :subject, "Account Admin Notification" %>
+<% end %>
+<p>
+  <%= t('#messages.account_user_registration.email.added_message', "You've been added as an %{role_type} to the account %{account} at %{website}.",
+        :role_type => asset.readable_type,
+        :account => asset.account.name,
+        :website => HostUrl.context_host(asset.account)) %>
+</p>
+
+<p><a href="<%= content :link %>"><%= t(:url_info, "Visit the account page") %></a></p>
