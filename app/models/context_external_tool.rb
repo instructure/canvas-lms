@@ -9,6 +9,7 @@ class ContextExternalTool < ActiveRecord::Base
                   :resource_selection, :editor_button, :homework_submission,
                   :config_type, :config_url, :config_xml, :tool_id
   validates_presence_of :name
+  validates_length_of :name, :maximum => maximum_string_length
   validates_presence_of :consumer_key
   validates_presence_of :shared_secret
   validate :url_or_domain_is_set
