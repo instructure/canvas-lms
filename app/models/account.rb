@@ -136,6 +136,7 @@ class Account < ActiveRecord::Base
   add_setting :error_reporting, :hash => true, :values => [:action, :email, :url, :subject_param, :body_param], :root_only => true
   add_setting :custom_help_links, :root_only => true
   add_setting :prevent_course_renaming_by_teachers, :boolean => true, :root_only => true
+  add_setting :restrict_student_future_view, :boolean => true, :root_only => true, :default => false
   add_setting :teachers_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :students_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :no_enrollments_can_create_courses, :boolean => true, :root_only => true, :default => false

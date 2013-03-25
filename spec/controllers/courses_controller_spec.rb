@@ -288,7 +288,31 @@ describe CoursesController do
       get 'show', :id => @c2.id
       assert_unauthorized
     end
-    
+
+    it "should show unauthorized/authorized to a student for a future course depending on restrict_student_future_view setting" do
+      course_with_student_logged_in(:active_course => 1)
+      a = @course.root_account
+      a.settings[:restrict_student_future_view] = true
+      a.save!
+
+      @course.start_at = Time.now + 2.weeks
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+
+      get 'show', :id => @course.id
+      response.status.should == '401 Unauthorized'
+      assigns[:unauthorized_message].should_not be_nil
+
+      a.settings[:restrict_student_future_view] = false
+      a.save!
+
+      controller.instance_variable_set(:@context_all_permissions, nil)
+
+      get 'show', :id => @course.id
+      response.should be_success
+      assigns[:context].should eql(@course)
+    end
+
     context "show feedback for the current course only on course front page" do
       before(:each) do
         course_with_student_logged_in(:active_all => true)

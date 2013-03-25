@@ -182,7 +182,7 @@ class Enrollment < ActiveRecord::Base
               :conditions => "courses.workflow_state = 'completed' or enrollments.workflow_state = 'rejected' or enrollments.workflow_state = 'completed'"
 
   named_scope :future, lambda { {
-    :joins => :course,
+    :joins => [:course, :root_account],
     :conditions => ["(courses.start_at > ?
                     AND courses.workflow_state = 'available'
                     AND courses.restrict_enrollments_to_course_dates = ?
@@ -559,7 +559,7 @@ class Enrollment < ActiveRecord::Base
     if global_start_at < now
       :completed
     # Allow student view students to use the course before the term starts
-    elsif self.fake_student? || state == :invited
+    elsif self.fake_student? || (state == :invited && !self.root_account.settings[:restrict_student_future_view])
       state
     else
       :inactive

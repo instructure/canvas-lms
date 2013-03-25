@@ -120,6 +120,10 @@ describe "admin settings tab" do
     it "should uncheck 'students can opt-in to receiving scores in email notifications' " do
       check_box_verifier("#account_settings_allow_sending_scores_in_emails", :allow_sending_scores_in_emails, false)
     end
+
+    it "should click on 'restrict students from viewing courses before start date'" do
+      check_box_verifier("#account_settings_restrict_student_future_view", :restrict_student_future_view)
+    end
   end
 
   context "global includes" do
