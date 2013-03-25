@@ -170,11 +170,11 @@
 <% unless (@domain_root_account && @domain_root_account.service_enabled?(:none)) %>
 <a name="registered_web_services"></a>
 <h2><%= t('headers.web_services', "Web Services") %></h2>
-<p><%= t(:web_services, <<-TEXT)
+<p><label><%= t(:web_services, <<-TEXT)
 Canvas can make your life a lot easier by tying itself in with the web tools
 you already use.  Click any of the services in "Other Services" to see what we mean.
 TEXT
-%></p>
+%></label></p>
 <p>
 <input type="checkbox" id="show_user_services" <%= 'checked' if @user.show_user_services %>/> <label for="show_user_services"><%= t('labels.show_user_services', "Let fellow course/group members see which services I've linked to my profile") %></label>
 </p>
