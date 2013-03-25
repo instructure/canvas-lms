@@ -1,8 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
-shared_examples_for "external tools tests" do
-  it_should_behave_like "in-process server selenium tests"
-
   def add_external_tool (*opts)
     name = "external tool"
     key = "1234567"
@@ -204,4 +201,3 @@ shared_examples_for "external tools tests" do
 </cartridge_basiclti_link>
     XML
   end
-end

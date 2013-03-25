@@ -1,9 +1,4 @@
-shared_examples_for "question bank basic tests" do
-  it_should_behave_like "in-process server selenium tests"
-  before (:each) do
-    admin_logged_in
-    get url
-  end
+
 
   def add_question_bank(title = 'bank 1')
     question_bank_title = keep_trying_until do
@@ -23,14 +18,14 @@ shared_examples_for "question bank basic tests" do
     question_bank
   end
 
-  it "should verify question bank is found by navigating to bookmark" do
+  def should_verify_question_bank_is_found_by_navigating_to_bookmark
     question_bank = add_question_bank
     expect_new_page_load { f(".see_bookmarked_banks").click }
     wait_for_ajaximations
     f("#question_bank_#{question_bank.id}").should include_text question_bank.title
   end
 
-  it "should un-bookmark a question bank" do
+  def should_unbookmark_a_question_bank
     question_bank = add_question_bank
     fj(".bookmark_bank_link img:visible").should have_attribute(:alt, "Bookmark")
     fj(".bookmark_bank_link:visible").click
@@ -40,7 +35,7 @@ shared_examples_for "question bank basic tests" do
     question_bank.bookmarked_for?(User.last).should be_false
   end
 
-  it "should edit a question bank" do
+  def should_edit_a_question_bank
     new_title = "bank 2"
     question_bank = add_question_bank
     f("#questions .edit_bank_link").click
@@ -52,7 +47,7 @@ shared_examples_for "question bank basic tests" do
     f("#questions .title").should include_text new_title
   end
 
-  it "should delete a question bank" do
+  def should_delete_a_question_bank
     question_bank = add_question_bank
     f("#questions .delete_bank_link").click
     driver.switch_to.alert.accept
@@ -63,4 +58,3 @@ shared_examples_for "question bank basic tests" do
       f("#questions .title").should be_nil
     end
   end
-end

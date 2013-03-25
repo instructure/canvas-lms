@@ -1,7 +1,8 @@
+require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe "quizzes students" do
-  it_should_behave_like "quizzes selenium tests"
+  it_should_behave_like "in-process server selenium tests"
 
   context "as a teacher " do
 

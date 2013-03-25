@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/external_tools_common')
 
 describe "editing external tools" do
-  it_should_behave_like "external tools tests"
+  it_should_behave_like "in-process server selenium tests"
 
   before (:each) do
     course_with_teacher_logged_in

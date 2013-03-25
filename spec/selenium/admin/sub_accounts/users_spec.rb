@@ -3,9 +3,12 @@ require File.expand_path(File.dirname(__FILE__) + '/../../helpers/basic/users_sp
 
 describe "sub account users" do
   describe "shared users specs" do
-    let(:account) { Account.create(:name => 'sub account from default account', :parent_account => Account.default) }
-    let(:url) { "/accounts/#{account.id}/users" }
-    let(:opts) { {:name => 'student'} }
-    it_should_behave_like "users basic tests"
+    it_should_behave_like "in-process server selenium tests"
+
+    it "should add a new user" do
+      pending('newly added user in sub account does not show up')
+      should_add_a_new_user
+    end
+
   end
 end

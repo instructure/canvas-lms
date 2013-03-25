@@ -1,7 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
-shared_examples_for "quizzes selenium tests" do
-  it_should_behave_like "in-process server selenium tests"
 
   def create_multiple_choice_question
     question = fj(".question_form:visible")
@@ -339,4 +337,3 @@ shared_examples_for "quizzes selenium tests" do
     target = "#group_top_#{group_id} + *"
     js_drag_and_drop source, target
   end
-end

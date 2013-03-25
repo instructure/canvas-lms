@@ -1,9 +1,11 @@
+require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides.rb')
 
 describe "quizzes" do
+  it_should_behave_like "in-process server selenium tests"
   include AssignmentOverridesSeleniumHelper
-  it_should_behave_like "quizzes selenium tests"
+
 
   context "as a teacher" do
     let(:due_at) { Time.zone.now }
@@ -555,20 +557,21 @@ describe "quizzes" do
       wait_for_ajaximations
       select_first_override_section(default_section.name)
       first_due_at_element.clear
-      first_due_at_element.
-          send_keys(default_section_due.strftime('%b %-d, %y'))
+      first_due_at_element.send_keys(default_section_due.strftime('%b %-d, %y'))
 
       add_override
 
       select_last_override_section(other_section.name)
-      last_due_at_element.
-          send_keys(other_section_due.strftime('%b %-d, %y'))
+      last_due_at_element.send_keys(other_section_due.strftime('%b %-d, %y'))
+
       expect_new_page_load do
         click_save_settings_button
-        wait_for_ajax_requests
+        wait_for_ajaximations
       end
+
       overrides = @quiz.reload.assignment_overrides
       overrides.size.should == 2
+
       default_override = overrides.detect { |o| o.set_id == default_section.id }
       default_override.due_at.strftime('%b %-d, %y').
           should == default_section_due.to_date.strftime('%b %-d, %y')

@@ -1,7 +1,8 @@
+require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe "equation editor" do
-  it_should_behave_like "quizzes selenium tests"
+  it_should_behave_like "in-process server selenium tests"
 
   it "should support multiple equation editors on the same page" do
     course_with_teacher_logged_in
@@ -13,6 +14,7 @@ describe "equation editor" do
       submit_form('.question_form')
       wait_for_ajaximations
     end
+
     wait_for_tiny(f("#quiz_description"))
 
     2.times do |time|

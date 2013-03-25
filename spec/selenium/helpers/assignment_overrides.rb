@@ -93,6 +93,5 @@ module AssignmentOverridesSeleniumHelper
     override.due_at_overridden = true
     override.save!
   end
-
 end
 

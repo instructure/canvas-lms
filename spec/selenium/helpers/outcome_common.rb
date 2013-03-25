@@ -1,13 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
-
-
-      #when 'teacher'; course_with_teacher_logged_in
-      #when 'student'; course_with_student_logged_in
-      #when 'admin';   course_with_admin_logged_in
-
-
   def import_account_level_outcomes
     keep_trying_until do
       f(".btn-primary").click
