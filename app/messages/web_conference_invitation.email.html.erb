@@ -1,0 +1,11 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/conferences
+<% end %>
+
+<% define_content :subject do %>
+  <%= t :subject, "Web Conference Invitation: %{name}", :name => asset.context.name %>
+<% end %>
+
+<p><%= t :body, "You've been invited to participate in a web conference, %{title} for %{name}.", :title => asset.title, :name => asset.context.name %></p>
+
+<p><a href="<%= content :link %>"><%= t :details_link, "Click here to see the details", :link => content(:link) %></a></p>

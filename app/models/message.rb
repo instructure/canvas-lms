@@ -305,25 +305,17 @@ class Message < ActiveRecord::Base
   #
   # Returns a template string (or nil).
   def load_html_template(_binding)
-    html_file   = template_filename('email.html')
-    html_path   = Canvas::MessageHelper.find_message_path(html_file)
+    html_file = template_filename('email.html')
+    html_path = Canvas::MessageHelper.find_message_path(html_file)
+    return nil unless File.exist?(html_path)
 
-    if File.exist?(html_path)
-      html_layout do
-        Erubis::Eruby.new(File.read(html_path), :bufvar => '@output_buffer').result(_binding)
-      end
-    end
-  end
+    # Add the attribute 'inner_html' with the value of inner_html into the _binding
+    inner_html = Erubis::Eruby.new(File.read(html_path), :bufvar => '@output_buffer').result(_binding)
+    setter = eval "inner_html = nil; lambda { |v| inner_html = v }", _binding
+    setter.call(inner_html)
 
-  # Public: Return the layout for HTML emails. We need this because
-  # Erubis::Eruby.new.result(binding) doesn't accept a block; by wrapping it
-  # in a method we can pass it a block to handle the <%= yield %> call in the
-  # layout.
-  #
-  # Returns an HTML string.
-  def html_layout
     layout_path = Canvas::MessageHelper.find_message_path('_layout.email.html.erb')
-    Erubis::Eruby.new(File.read(layout_path)).result(binding)
+    Erubis::Eruby.new(File.read(layout_path)).result(_binding)
   end
 
   # Public: Assign the body, subject and url to the message.

@@ -1,0 +1,13 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.submission.assignment.context) %>/<%= asset.submission.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.submission.assignment.context_id %>/assignments/<%= asset.submission.assignment_id %>/submissions/<%= asset.submission.id %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t :subject, "Reminder to Assess: %{rubric}, %{context}", :rubric => asset.rubric_association.title, :context => asset.rubric_association.context.name %>
+<% end %>
+
+<p><%= t :body, "You've been reminded to assess %{rubric}, %{context}:", :rubric => asset.rubric_association.title, :context => asset.rubric_association.context.name %></p>
+
+<p><strong><%= asset.rubric_association.description %></strong></p>
+
+<p><a href="<%= content :link %>"><%= t :link_message, "Click here to review the assessment and submit your entry" %></a></p>

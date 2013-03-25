@@ -544,8 +544,13 @@ ActionController::Routing::Routes.draw do |map|
     user.course_teacher_activity 'teacher_activity/course/:course_id', :controller => 'users', :action => 'teacher_activity'
     user.student_teacher_activity 'teacher_activity/student/:student_id', :controller => 'users', :action => 'teacher_activity'
     user.media_download 'media_download', :controller => 'users', :action => 'media_download'
-    user.resources :messages, :only => [:index, :create]
+    user.resources :messages, :only => [:index, :create] do |message|
+      message.html_message "html_message", :controller => "messages", :action => "html_message", :conditions => {:method => :get}
+    end
   end
+  map.show_message_template 'show_message_template', :controller => 'messages', :action => 'show_message_template'
+  map.message_templates 'message_templates', :controller => 'messages', :action => 'templates'
+
   map.resource :profile, :only => %w(show update),
                :controller => "profile",
                :member => { :update_profile => :put, :communication => :get, :communication_update => :put, :settings => :get } do |profile|

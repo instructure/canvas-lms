@@ -1,0 +1,38 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.account) %>/register/<%= asset.user.communication_channel.confirmation_code %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t :subject, "Canvas Account Admin Invitation" %>
+<% end %>
+<% email = asset.user.email; login = (asset.user.pseudonym.unique_id rescue "none") %>
+
+<p>
+    <%= t(:added_message, "You've been added as an %{role_type} to the account %{account} at %{website}.",
+          :role_type => asset.readable_type,
+          :account => asset.account.name,
+          :website => HostUrl.context_host(asset.account)) %>
+</p>
+
+<table border="0" style="font-size: 14px; color: #444444;
+    font-family: 'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif';
+    border-collapse: collapse;">
+  <tr>
+      <td style="padding-right: 10px;"><%= t(:name, 'Name') %>:</td>
+      <td style="font-weight: bold;"><%=  asset.user.name %></td>
+  </tr>
+  <tr>
+      <td style="padding-right: 10px"><%= t(:email, 'Email') %>:</td>
+      <td style="font-weight: bold;"><%= email %></td>
+  </tr>
+  <% if email != login %>
+    <tr>
+        <td style="padding-right: 10px;"><%= t(:username, 'Username') %>:</td>
+        <td style="font-weight: bold;"><%= login %></td>
+    </tr>
+  <% end %>
+</table>
+
+<p><%= t(:url_info_label, "You'll need to register with Canvas before you can participate as an account admin.") %></p>
+
+<p><a href="<%= content(:link) %>"><%= t(:click_to_finish_registration, "Click here to finish the registration process") %></a></p>

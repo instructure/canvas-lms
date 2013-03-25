@@ -1,0 +1,14 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset_context) || HostUrl.default_host %>/register/<%= asset.confirmation_code %>
+<% end %>
+<% define_content :subject do %>
+  <%= t :subject, "Confirm Email: Canvas" %>
+<% end %>
+<p>
+<%= t :body,
+      "The email address, %{email} is being registered at %{website} for the user, %{user}.",
+      :email => asset.path,
+      :website => HostUrl.context_host(asset_context) || HostUrl.default_host,
+      :user => asset.user.name %>
+</p>
+<p><a href="<%= content :link %>"><%= t :details, "Click here to confirm this registration" %></a></p>

@@ -1,0 +1,28 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t :subject, "Course Import Finished: %{course_name}", :course_name => asset.context.name %>
+<% end %>
+
+<% if asset.warnings.blank? %>
+  <p>
+    <%= t :body_no_warnings, "Importing %{source} into %{destination} has finished. Everything you selected should now be imported into your course.",
+          :source => asset.migration_settings[:course_name],
+          :destination => asset.context.name %>
+  </p>
+<% else %>
+  <p>
+    <%= t :body_with_warnings, "Importing %{source} into %{destination} has finished, but not everything was imported successfully:",
+          :source => asset.migration_settings[:course_name],
+          :destination => asset.context.name %>
+  </p>
+  <ul>
+      <% asset.warnings.each do |warning| %>
+      <li><%= warning %></li>
+      <% end %>
+  </ul>
+<% end %>
+
+<p><a href="<%= content :link %>"><%= t :link, "Click to view the course" %></a></p>

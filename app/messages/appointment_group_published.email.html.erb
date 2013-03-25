@@ -1,0 +1,49 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.contexts.first) %>/appointment_groups/<%= asset.id %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t('subject', 'Appointment "%{appointment_name}" is available for signup (%{course})',
+        :appointment_name => asset.title,
+        :course => asset.contexts_for_user(user).map(&:name).join(", ")) %>
+<% end %>
+
+<p><%= t :message, 'Time slots for "%{appointment_name}" are now available for signup.', :appointment_name => asset.title %></p>
+
+<p><strong><%= t :details, 'Appointment Details' %>:</strong></p>
+<table border="0" style="font-size: 14px; color: #444444;
+    font-family: 'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif';
+    border-collapse: collapse;">
+    <tr>
+        <td style="padding-right: 10px;" valign="top"><%= t :dates, "Date(s)" %>:</td>
+        <td valign="top"><%= date_string(asset.start_at, asset.end_at, :no_words) %></td>
+    </tr>
+    <tr>
+        <td style="padding-right: 10px;" valign="top"><%= t :signup_type, "Signup Type" %>:</td>
+        <td valign="top"><%= asset.participant_type == 'Group' ?
+                t(:group_signup, "Group (%{group_category})", :group_category => asset.sub_contexts.first.name) :
+                t(:individual_signup, "Individual") %></td>
+    </tr>
+    <tr>
+        <td style="padding-right: 10px;" valign="top"><%= t :course, "Course" %>:</td>
+        <td valign="top"><%= asset.participant_type == 'Group' ?
+                asset.contexts.first.name :
+                asset.contexts_for_user(user).map(&:name).join(", ") %></td>
+    </tr>
+    <% if asset.available_slots -%>
+      <tr>
+          <td style="padding-right: 10px;" valign="top"><%= t :slots_remaining, 'Available time slots' %>:</td>
+          <td valign="top"><%= asset.available_slots %></td>
+      </tr>
+    <% end %>
+</table>
+
+<hr style="border: 0;
+    height: 1px;
+    background: #333;
+    background-image: -webkit-linear-gradient(left, #ddd, #aaa, #eee);
+    background-image:    -moz-linear-gradient(left, #ddd, #aaa, #eee);
+    background-image:     -ms-linear-gradient(left, #ddd, #aaa, #eee);
+    background-image:      -o-linear-gradient(left, #ddd, #aaa, #eee);" />
+
+<p><a href="<%= content :link %>"><%= t :link_text, 'Sign up for a time slot' %></a></p>

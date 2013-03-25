@@ -1,0 +1,19 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.assignment.context) %>/<%= asset.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.assignment.context_id %>/assignments/<%= asset.assignment_id %>/submissions/<%= asset.user_id %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t :subject, "Grade Changed: %{assignment}, %{context}", :assignment => asset.assignment.title, :context => asset.assignment.context.name %>
+<% end %>
+
+<p><%= t :body, "The grade on your assignment, %{assignment_title} has been changed.", :assignment_title => asset.assignment.title %></p>
+
+<p><%= t :regraded_date, "re-graded: %{date}", :date => (datetime_string(force_zone(asset.graded_at)) rescue t(:no_date_set, "No Date Set")) %></p>
+
+<% if asset.score && user.try(:send_scores_in_emails?) %>
+  <p><%= t :score, "score:  %{score} out of %{total}", :score => asset.score, :total => (asset.assignment.points_possible || t(:not_applicable, "N/A")) %></p>
+<% end %>
+
+<p><%= t(:score_pending, "score pending review by the teacher") if asset.pending_review? %></p>
+
+<p><a href="<%= content :link %>"><%= t :link_message, "You can review the assignment here" %></a></p>

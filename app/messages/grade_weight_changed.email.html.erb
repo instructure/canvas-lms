@@ -1,0 +1,22 @@
+<% course = asset.is_a?(Course) ? asset : asset.context %>
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset) %>/<%= course.class.to_s.downcase.pluralize %>/<%= course.id %>/assignments
+<% end %>
+<% define_content :subject do %>
+  <%= before_label('subject', 'Grade Weight Changed') %> <%= asset.name %>
+<% end %>
+
+<p><%= t('grade_changed', "The grading policy for the course, %{course_name} has changed.", :course_name => course.name) %></p>
+
+<% if course.group_weighting_scheme == 'percent' %>
+  <p>
+  <%= before_label('grades_based_on_percent', 'Grading is based on the weighted total for each assignment group') %>
+  <% course.assignment_groups.each do |group |%>
+    <br/>- <%= group.name %>: <%= group.group_weight %>%
+  <% end %>
+  </p>
+<% else %>
+  <p><%= t('grading_based_on_points', 'Grading is based on total points for all assignments.') %></p>
+<% end %>
+
+<p><a href="<%= content :link %>"><%= before_label('now_see_here', 'You can see details here') %></a></p>
