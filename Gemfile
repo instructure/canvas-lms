@@ -10,7 +10,7 @@ if CANVAS_RAILS3
   gem 'rails',        '3.0.20'
   gem 'authlogic',    '3.2.0'
 else
-  gem 'rails',        '2.3.17'
+  gem 'rails',        '2.3.18'
   gem 'authlogic',    '2.1.3'
 end
 
