@@ -1,3 +1,5 @@
+@import "environment";
+
 .alert_separator {
   border-top: 1px dotted #aaa;
   width: auto;
@@ -52,4 +54,8 @@
 
 .alert.displaying .editing {
   display: none;
+}
+
+.alert .form-actions {
+  background-color: $warningBackground;
 }
