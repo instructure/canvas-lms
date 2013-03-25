@@ -1,4 +1,5 @@
 require 'i18n/hash_extensions'
+require 'json'
 
 namespace :i18n do
   def infer_scope(filename)
@@ -383,5 +384,47 @@ define(['i18nObj', 'jquery'], function(I18n, $) {
       f.write({import.language => complete_translations}.ya2yaml(:syck_compatible => true))
     }
   end
+
+  def transifex_languages(languages)
+    if languages
+      languages.split(/\s*,\s*/)
+    else
+      %w(ar zh fr ja pt es ru)
+    end
+  end
+
+  def transifex_download(user, password, languages)
+    transifex_url = "http://www.transifex.com/api/2/project/canvas-lms/"
+    translation_url = transifex_url + "resource/canvas-lms/translation"
+    userpass = "#{user}:#{password}"
+    for lang in languages
+      puts "Downloading tmp/#{lang}.yml"
+      json = `curl --user #{userpass} #{translation_url}/#{lang}/`
+      File.open("tmp/#{lang}.yml", "w") do |file|
+        file.write JSON.parse(json)['content']
+      end
+    end
+  end
+
+  desc "Download language files from Transifex"
+  task :transifex, [:user, :password, :languages] do |t, args|
+    languages = transifex_languages(args[:languages])
+    transifex_download(args[:user], args[:password], languages)
+  end
+
+  desc "Download language files from Transifex and import them"
+  task :transifeximport, [:user, :password, :languages, :source_file] do |t, args|
+    languages = transifex_languages(args[:languages])
+    transifex_download(args[:user], args[:password], languages)
+
+    source_file = args[:source_file] || 'config/locales/generated/en.yml'
+    for lang in languages
+      translated_file = "tmp/#{lang}.yml"
+      puts "Importing #{translated_file}"
+      Rake::Task['i18n:import'].reenable
+      Rake::Task['i18n:import'].invoke(source_file, translated_file)
+    end
+  end
+
 end
 

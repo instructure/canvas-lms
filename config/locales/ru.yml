@@ -670,6 +670,7 @@ ru:
     test_ldap_result_canceled: Отменено
     test_ldap_result_failed: Ошибка
     test_ldap_result_ok: ОК
+    test_login: "Проверка входа в систему"
     update_failed_notice: "Ошибка обновления настроек учетной записи"
     user_add_failed_message: "Ошибка добавления пользователя, повторите попытку"
     user_added_message: "%{user} успешно добавлен!"
@@ -840,7 +841,10 @@ ru:
     default_title: "Нет имени - %{course}"
     default_unfiled_title: "Неотвеченные вопросы"
   assignment: 
+    advanced_options_errors: "Для одного или нескольких дополнительных параметров произошла ошибка"
     atom_no_author: "Без автора"
+    buttons: 
+      select_url: Выберите
     comment_from_files: 
       few: "Смотрите приложенные файлы "
       one: "Смотрите приложенный файл"
@@ -849,6 +853,7 @@ ru:
       cannot_save_att: "У вас нет разрешения на изменение заблокированных свойств %{att_name}"
       import: 
         external_tool_url: "Url-адрес для задания внешнего средства \"%{assignment_name}\" недействительный."
+      upload_as_zip: "Загрузите файлы как ZIP-файл"
     feed_entry_title: "Задание: %{assignment}"
     feed_entry_title_with_course: "Задание, %{course}: %{assignment}"
     imported_assignments_group: "Импортированные задания"
@@ -858,6 +863,8 @@ ru:
       assignment_created: "Задание\"%{assignment}\" создано"
     submission_action_take_quiz: "Использовать %{title}"
     submission_action_turn_in_assignment: "Включить в %{title}"
+    titles: 
+      grading_scheme_info: "Просмотр/редактирование схемы оценок"
     warnings: 
       group_assignment: "Задание \"%{assignment}\" было групповым заданием. Вам нужно переустановить настройки группы для этого нового контекста"
       peer_assignment: "Задание \"%{assignment}\" было заданием для рассмотрения коллегами. Вам нужно переустановить настройки рассмотрения коллегами для этого нового контекста"
@@ -938,6 +945,17 @@ ru:
       few: "%{count} задания"
       one: "1 Задание"
       other: "%{count} задания"
+    assignment_group_create_dialog: 
+      assignment_group: 
+        labels: 
+          name: Имя
+      buttons: 
+        add_group: "Добавить группу"
+        cancel: Отменить
+    assignment_group_selector: 
+      assignment_group: "Группа назначений"
+      assignment_group_options: 
+        new_group: "Новая группа"
     assignment_groups_count: 
       few: "%{count} групп"
       one: "1 группа"
@@ -1009,10 +1027,27 @@ ru:
     confirm: 
       delete_assignment: "Вы действительно хотите удалить это задание?"
       delete_group: "Удалить группу?"
+    create_new_crumb: "Создать новый"
     crumbs: 
       new_assignment: "Новое значение"
     drop_highest_scores: "Удалить самые высокие %{number} оценки"
     drop_lowest_scores: "Удалить самые низкие %{number} оценки"
+    due_date_override: 
+      overrides: 
+        due_date: "Дата окончания"
+        for: Для
+      until: До
+    edit: 
+      edit_assignment: "Редактировать назначение"
+      new_quiz: "Новая контрольная работа"
+    edit_view: 
+      assignment_name: "Имя назначения"
+      buttons: 
+        update: "Обновить назначение"
+      description: Описание
+      due_date: "Дата окончания"
+      notify_content_change: "Уведомлять пользователей об изменении этого содержания"
+      points_possible: Баллы
     errors: 
       add_group_failed: "Ошибка добавления группы"
       delete_reminder_failed: "Сбой удаления"
@@ -1043,6 +1078,17 @@ ru:
       titles: 
         submission: Отправки
     graded: "Эта отправка оценена"
+    grading_type_selector: 
+      grading_type_options: 
+        letter_grade: "Буквенная оценка"
+        not_graded: "Нет оценки"
+        pass_fail: Полная/неполная
+        percent: Процент
+        points: Баллы
+      view_grading_levels: "Просмотр уровней оценок"
+    group_category_selector: 
+      group_set: "Набор групп"
+      is_group_assignment: "Это назначение группы"
     group_comment: 
       labels: 
         group_comment: "Отправить комментарий всей группе"
@@ -1129,6 +1175,14 @@ ru:
       titles: 
         automatically_assign_reviews: "Автоматически назначать рассмотрение"
         remind: "Напомнить %{assessor} об проверке знаний, последнее уведомление %{time}"
+    peer_reviews_selector: 
+      labels: 
+        automatically_assign_peer_reviews: "Автоматически назначать экспертные оценки"
+        manually_assign_peer_reviews: "Назначить экспертные оценки вручную"
+        require_peer_reviews: "Требуются экспертные оценки"
+      locked_until: "Назначить оценки"
+      peer_reviews_assign_at_explanation: "Должны быть после даты выполнения. Если пустое, используется дата выполнения."
+      reviews_per_user: "Оценки для пользователя"
     percent_of_final_grade: "%{percent} итоговой оценки"
     redirect_page: 
       redirect_message: |-
@@ -1137,12 +1191,29 @@ ru:
     select_assignment: "[Выберите задание]"
     show: 
       assignment_locked: "Это задание в настоящий момент заблокировано."
+      available_from: "Доступно с"
+      date_time_by: "%{date} по %{time}"
+      defaults: 
+        no_content: "Нет содержимого"
+      due: До
+      due_at: До
       errors: 
         upload_as_zip: "Загрузите файлы как ZIP-файл"
+      for: Для
       links: 
+        add_rubric: "Добавить рубрику"
         assign_rubric: "Назначить рубрику"
         back_to_getting_started: "Вернуться к мастеру по началу работы"
+        edit: Редактировать
+      messages: 
+        locked: "Это назначение в настоящий момент заблокировано."
       new_assignment: "Новое значение"
+      no_due_date: "Нет даты выполнения"
+      no_points: Нет
+      points: Баллы
+      turnitin: Turnitin
+      turnitin_enabled: "Служба Turnitin включена для этого назначения."
+      until: До
     show_locked: 
       labels: 
         assignment: Задание
@@ -1183,6 +1254,18 @@ ru:
     submission_type_icon: 
       tooltips: 
         submitted: Отправлено
+    submission_types_form: 
+      labels: 
+        allow_file_uploads: "Разрешить загрузку файлов"
+        allow_media_recordings: "Разрешить запись мультимедийных данных"
+        allow_text_entry: "Разрешить ввод текста"
+        allow_url: "Разрешить URL-адрес веб-сайта"
+        allowed_extensions: "Разрешенные расширения файлов"
+      submission_type: "Тип отправки"
+      submission_types: 
+        external_tool: "Внешний инструмент"
+        no_submission: "Нет отправки"
+        on_paper: "На бумаге"
     submit_assignment: 
       additional_comments: "Дополнительные комментарии"
       buttons: 
@@ -1253,6 +1336,9 @@ ru:
       add_assignment_group: "Добавить группу заданий"
       assignment_details: "Сведения о задании"
       uploading: "Загрузка отправки"
+    turnitin_settings_dialog: 
+      buttons: 
+        update_settings: "Обновить параметры"
     wizard_box: 
       descriptions: 
         delete_icon: "%{icon}: Удалить задание"
@@ -1626,6 +1712,8 @@ ru:
       edit_appointment_group: "Отредактировать групповую встречу"
       edit_event: "Редактировать событие"
     today: Сегодня
+    undated_events: 
+      undated_events: "Обновленные события"
   calendar_event: 
     errors: 
       duplicate_child_event_contexts: "Продублируйте контекст детского события"
@@ -2755,6 +2843,7 @@ ru:
       add: "Добавить модуль"
       add_item: "Добавить элемент"
       add_module: "Добавить новый модуль"
+      add_module_first: "Добавить новый модуль"
       update: "Обновить модуль"
     confirm: 
       delete: "Действительно хотите удалить этот модуль?"
@@ -2768,6 +2857,7 @@ ru:
       criterion_for_assignment: "Для %{assignment} пользователи должны %{select_criterion}"
       headings: 
         add_prerequisite: "Добавить предварительное условие к %{name}"
+        course_modules: "Модули курса"
         student_progress: "Ход выполнения модуля студентом"
         student_progress_for_module: "Ход выполнения студентом %{module}"
         students_completed: "Студенты, завершившие модуль"
@@ -2841,6 +2931,7 @@ ru:
           remove_prerequisite: "Удалить это предварительное требование"
       module: модуль
       module_details: "Модули показаны в логическом порядке, потому только модули выше %{name} могут быть установлены как предварительные условия."
+      module_name: "Имя модуля"
       must_complete_prerequisites: "Они должны быть выполнены"
       no_preprequisites: "Предварительные условия не определены"
       no_requirements: "Требования не определены"
@@ -2880,6 +2971,9 @@ ru:
         hide_contents: "Скрыть содержимое модуля"
         settings: "Настройки модуля"
         show_contents: "Показать содержание модуля"
+        text: 
+          delete_module: Удалить
+          edit_module: Редактировать
         title: 
           delete_module: "Удалить этот модуль"
           edit_module: "Редактировать настройки модуля"
@@ -2955,6 +3049,13 @@ ru:
       quizzes: "Контрольные работы"
       wiki_pages: Вики-страницы
     points_possible_short: "%{points} pts"
+    prerequisits_footer: 
+      default_module_name: модуль
+      labels: 
+        prerequisites: "Предварительные условия"
+      links: 
+        title: 
+          remove_prerequisite: "Удалить это предварительное требование"
     still_needs_completing: "Требуется завершить"
     titles: 
       add: "Добавить модуль"
@@ -3457,6 +3558,7 @@ ru:
       invitation: 
         designer: "Вы приглашены на участие в этом курсе как *проектировщик* для учетной записи пользователя *%{user}*."
         observer: "Вы приглашены на участие в этом курсе как *наблюдатель* для учетной записи пользователя *%{user}*."
+        one: "Вы приглашены на участие в этом курсе для учетной записи пользователя *%{user}*."
         other: "Вы приглашены на участие в этом курсе для учетной записи пользователя *%{user}*."
         student: "Вы приглашены на участие в этом курсе как *студент* для учетной записи пользователя *%{user}*."
         ta: "Вы приглашены на участие в этом курсе как *ассистент* для учетной записи пользователя *%{user}*."
@@ -3651,6 +3753,7 @@ ru:
         hashtag: "Тег hash"
         hide_distribution_graphs: "Скрыть графики распределения оценок от студентов"
         hide_final_grade: "Скрыть общее число в сводке оценок студентов"
+        hide_final_grades: "Скрыть общее число в сводке оценок студентов"
         indexed: "Включить этот курс в индекс общедоступных курсов"
         is_public: "Сделать этот курс общедоступным"
         language: Язык
@@ -3868,6 +3971,13 @@ ru:
       text_entry: "Текстовая запись"
       unaccepted_students: "Непринятые студенты"
       website_url: "URL-адрес веб-сайта"
+    syllabus: 
+      headers: 
+        date: Дата
+        day: День
+        details: Сведения
+      syllabus: 
+        other_day: Другое
     titles: 
       rss_feed: "Поток %{course}"
     unauthorized: 
@@ -4344,6 +4454,7 @@ ru:
       search_entries_placeholder: "Поиск записей или автора"
       unread: Непрочитанное
     uknown_author: "Неизвестный автор"
+    unknown: Неизвестно
     unknown_author: "Неизвестный автор"
     unread_count_tooltip: 
       one: "1 непрочитанный ответ"
@@ -5485,6 +5596,7 @@ ru:
       faculty_journal: "Журнал преподавателей для %{user}"
       for_course: "Для курса,"
       headers: 
+        details: Сведения
         due: Срок
         grades: "Оценки для %{student}"
         name: Имя
@@ -6311,6 +6423,8 @@ ru:
                     Спасибо,
                     Служба поддержки Canvas
         subject: "Ошибка ответа на сообщение: %{subject}"
+    progress_runner: 
+      error_message: "%{error}: %{ids}"
     send_to_inbox: 
       default_subject: "Нет темы"
     text_helper: 
@@ -7871,6 +7985,7 @@ ru:
       late_grading: "Поздняя оценка"
       membership_update: "Обновление членства"
       migration: Перенос
+      one: Другое
       other: Другое
       registration: Регистрация
       reminder: Напоминание
@@ -8011,6 +8126,7 @@ ru:
       course: "События курса"
       discussions: Обсуждения
       groups: Группы
+      one: Другое
       other: Другое
       parent: "Эл. почта родительского уровня"
       scheduling: Планирование
@@ -8036,6 +8152,9 @@ ru:
           kb: Кбайт
           mb: Мбайт
           tb: ТБ
+  options: 
+    ? "no"
+    : "Новая учетная запись"
   outcome_groups: 
     invalid_file: "Неверный файл группы результатов"
   outcome_groups_api: 
@@ -8197,6 +8316,11 @@ ru:
         average_percent: "Средний процент"
         latest_score: "Последняя оценка"
         outcome: Результат
+  overrides: 
+    everyone: Все
+    everyone_else: "Все остальные"
+    overrides: 
+      everyone: Все
   page_comment: 
     default_user_name: Анонимно
   page_comments: 
@@ -8800,6 +8924,7 @@ ru:
         register_email: "Сообщение электронной почты о регистрации"
         register_sms: "Регистрация SMS"
       carriers: 
+        one: "Другой оператор"
         other: "Другой оператор"
       confirming_contact: Подтверждение...
       contact_types: 
@@ -9148,6 +9273,7 @@ ru:
     choose_option: "[ Выбрать ]"
     confirms: 
       delete_question: "Действительно хотите удалить этот вопрос?"
+      delete_quiz: "Действительно хотите удалить эту контрольную работу?"
       scrap_and_restart: "Удалить эту контрольную работу и начать с начала?"
     current_filter: "Текущий фильтр"
     default_answer_comments: "Ответить при выборе студентом этого ответа"
@@ -9247,6 +9373,7 @@ ru:
     errors: 
       adding_questions_failed: "Ошибка добавления вопросов, повторите попытку"
       creating_group_failed: "Ошибка создания группы, повторите попытку"
+      field_is_required: "Необходимо это поле"
       loading_banks_failed: "Ошибка загрузки банка вопросов, повторите попытку"
       loading_more_questions_failed: "Ошибка загрузки дополнительных вопросов"
       loading_question_failed: "Ошибка загрузки вопросов..."
@@ -9394,6 +9521,8 @@ ru:
         click_to_enter_general_answer_comments: "Щелкните, чтобы ввести общие комментарии"
         click_to_enter_wrong_answer_comments: "Щелкните, чтобы ввести комментарии для неправильного ответа"
       wrong_answer_comments: "Комментарии к неправильному ответу"
+    graded_quiz: "Оцененная контрольная работа"
+    graded_survey: "Оцененный опрос"
     helpers: 
       duration_in_minutes: 
         one: "1 минута"
@@ -9462,6 +9591,8 @@ ru:
     invalid_ip: 
       quiz_protected: "Эта контрольная работа защищена и доступна только в некоторых местоположениях. Используемый компьютер не находится в допустимом местоположении для выполнения этой контрольной работы."
       survey_protected: "Этот опрос защищен и доступен только в некоторых местоположениях. Используемый компьютер не находится в допустимом местоположении для выполнения этого опроса."
+    keep_highest: Высокий
+    keep_latest: Последний
     label: 
       answer: 
         text: "Текст ответа, отформатированный текст"
@@ -9498,6 +9629,19 @@ ru:
       links: 
         download_lockdown: "[Загрузка браузера Respondus LockDown]"
       requires_lockdown: "Для этой контрольной работы требуется браузер Respondus LockDown. Запустите браузер Respondus LockDown для начала выполнения этой контрольной работы или просмотра ее результатов."
+    managed_quiz_data: 
+      anonymous_student: "Студент %{n}"
+      headers: 
+        quiz_unsubmitted_students: "Студенты, не взявшие контрольную работу"
+        submitted_students_quiz: "Студенты, не взявшие контрольную работу"
+        submitted_students_survey: "Студенты, взявшие опрос"
+        survey_unsubmitted_students: "Студенты, не взявшие опрос"
+      quiz_all_students_submitted: "Все студенты взяли контрольную работу"
+      quiz_no_submissions: "Ни один студент еще не взял контрольную работу"
+      survey_all_students_submitted: "Все студенты взяли опрос"
+      survey_no_submissions: "Ни один студент еще не принял опрос"
+      titles: 
+        submission_needs_review: "Требуется проверка этой отправки"
     moderate: 
       add_time: "Добавить время"
       buttons: 
@@ -9561,17 +9705,21 @@ ru:
       muted_quiz_header: "Звук контрольной работы отключен"
     new: 
       allowed_attempts: "Число разрешенных попыток"
+      anonymous_submissions: "Сохранить отправки анонимными"
       buttons: 
         publish_quiz: "Опубликовать контрольную работу"
         republish_quiz: "Повторно опубликовать контрольную работу"
+        save: Сохранить
         save_but_dont_publish: "Сохранить контрольную работу, *но не публиковать*"
         save_settings: "Сохранить настройки"
       cant_go_back: "Блокировать вопросы после ответа на них"
+      code: "Код доступа"
       confirms: 
         delete_quiz: "Действительно хотите удалить эту контрольную работу?"
       default_page_title: "Новая контрольная работа"
       graded_quiz: "Оцененная контрольная работа"
       graded_survey: "Оцененный опрос"
+      group: "Группа назначений"
       headers: 
         create_new_quiz: "Создать новую контрольную работу"
         edit_quiz: "Редактировать контрольную работу"
@@ -9584,6 +9732,8 @@ ru:
       ip_filters: "IP-фильтры Quiz используются для ограничения доступа к упражнениям на компьютерах в указанном диапазоне IP-адресов. Фильтры могут быть списками адресов, разделенными запятыми, или адресом с маской (\"192.168.217.1\", \"192.168.217.1/24\" или \"192.168.217.1/255.255.255.0\")."
       keep_highest: Высокий
       keep_latest: Последний
+      label: 
+        time_limit: "Ограничение времени"
       labels: 
         allow_multiple_attempts: "Разрешить несколько попыток"
         anonymous_submissions: "Сохранить отправки анонимными"
@@ -9613,8 +9763,10 @@ ru:
         this_is_a: Это
         time_limit: "Ограничение времени"
         time_limit_minutes: мин.
+      limited_attempts: "Разрешенные попытки"
       links: 
         add_new_question: "Добавить новый вопрос"
+        cancel: Отменить
         find_questions: "Поиск вопросов"
         link_to_content: "Ссылка на содержание"
         new_question: "Новый вопрос"
@@ -9628,10 +9780,16 @@ ru:
       one_question_at_a_time: "Показывать по одному вопросу за раз"
       points_possible: "%{n} возможных баллов"
       practice_quiz: "Практическая контрольная работа"
+      require_lockdown_browser: "Требуется обозреватель Respondus LockDown"
+      require_lockdown_browser_for_results: "Требуется просмотр результатов контрольной работы"
       retrieving_filters: "Получение фильтров..."
+      score_to_keep: "Оценка контрольной работы для сохранения"
+      show_correct_answers: "Показать правильные ответы"
+      shuffle_answers: "Изменить порядок ответов"
       time_limit: "Сколько минут?"
       titles: 
         click_to_select_filter: "Щелкните, чтобы установить этот фильтр"
+        delete: Удалить
         find_ip_address_filter: "Поиск фильтра IP-адресов"
       ungraded_survey: "Опрос без оценки"
       warnings: 
@@ -9649,6 +9807,7 @@ ru:
         few: "%{count} теста(ов) успешно опубликованы!"
         one: "1 тест успешно опубликован!"
         other: "%{count} теста(ов) успешно опубликованы!"
+    practice_quiz: "Практическая контрольная работа"
     question_group: 
       buttons: 
         update: Обновить
@@ -9690,17 +9849,20 @@ ru:
     quiz_attempts_length_error: "Попытки выполнения контрольной работы ограничены 3 цифрами. Если вы хотите предоставить студентам неограниченное число попыток, не ставьте флажок ''Разрешить несколько попыток'', который находится слева"
     quiz_attempts_nan_error: "Попытки выполнения контрольной работы могут быть выражены только числами"
     quiz_details: 
+      allowed_attempts: "Разрешенные попытки"
       headers: 
         availability: Доступность
         due: "Дата окончания"
         limits: Лимиты
         points: Баллы
         questions: Вопросы
+        time_limit: "Ограничение времени"
       labels: 
         allowed_attempts: "Разрешенные попытки"
       multiple_due_dates: "Несколько дат выполнения"
       no_due_date: "Нет даты выполнения."
       no_time_limit: "Нет лимита времени"
+      none: Нет
       points_possible: "%{points_possible} возможных баллов"
       question_count: 
         one: "1 вопрос"
@@ -9745,6 +9907,20 @@ ru:
       view_previous_attempts: "Просмотреть предыдущие попытки"
       will_keep_highest_score: "Сохранит наивысшую из ваших оценок"
       will_keep_latest_score: "Сохранит самую последнюю из ваших оценок"
+    quiz_show_teacher: 
+      attempts: Попытки
+      available_from: "Доступно с"
+      code: "Код доступа"
+      due: До
+      for: Для
+      group: "Группа назначений"
+      label: 
+        time_limit: "Ограничение времени"
+      no_time_limit: "Нет лимита времени"
+      points: Баллы
+      require_lockdown_browser: "Требуется обозреватель Respondus LockDown"
+      shuffle_answers: "Изменить порядок ответов"
+      until: До
     quiz_submission: 
       attempt_duration: "Эта попытка длилась %{duration}."
       labels: 
@@ -9840,6 +10016,8 @@ ru:
       buttons: 
         lock_quiz: "Заблокировать эту контрольную работу"
         lock_survey: "Заблокировать этот опрос"
+        published: Опубликовано!
+        publishing: Публикация...
         unlock_quiz: "Разрешить студентам начинать эту контрольную работу"
         unlock_survey: "Разрешить студентам начинать этот опрос"
       confirms: 
@@ -9868,6 +10046,7 @@ ru:
       links: 
         delete_this_quiz: "Удалить эту контрольную работу"
         delete_this_survey: "Удалить этот опрос"
+        edit: Редактировать
         edit_assignment_details: "Редактировать сведения о задании"
         edit_this_quiz: "Редактировать эту контрольную работу"
         edit_this_survey: "Редактировать этот опрос"
@@ -9876,6 +10055,7 @@ ru:
         message_students_who: "Отправить сообщения студентам, которые..."
         moderate_this_quiz: "Модерирование этой контрольной работы"
         moderate_this_survey: "Модерирование этого опроса"
+        preview: "Предварительный просмотр"
         quiz_statistics: "Статистика контрольной работы"
         resume_quiz: "Возобновить контрольную работу"
         resume_survey: "Возобновить опрос"
@@ -9911,6 +10091,7 @@ ru:
       survey_no_submissions: "Ни один студент еще не принял опрос"
       survey_not_published: "Этот опрос еще не опубликован. Студенты не могут принимать опрос до его публикации."
       titles: 
+        delete: Удалить
         submission_needs_review: "Требуется проверка этой отправки"
         unlock_for_how_long: "На сколько времени необходимо разблокировать контрольную работу?"
       warnings: 
@@ -10065,6 +10246,7 @@ ru:
     top_level_crumb: "Контрольные работы"
     ? "true"
     : "True"
+    ungraded_survey: "Опрос без оценки"
   re_upload_submissions_form: 
     buttons: 
       upload: "Загрузить файлы"
@@ -10939,6 +11121,7 @@ ru:
       links_title: Заголовок
       links_url: URL-адрес
       manage_settings: "Управление зарегистрированными сервисами"
+      message_title: Сообщение
       name: Имя
       no_links: "%{name} не добавил ссылки"
       nothing_in_common: "У вас нет ничего общего"
@@ -11611,6 +11794,7 @@ ru:
     outcome_artifacts: "Искажения результата"
     review_and_save: "Просмотр и сохранение"
     students: Студенты
+    view_in_separate_window: "Просмотреть в отдельном окне"
   todo_item_view: 
     grading: 
       grade: Оценить
@@ -11838,6 +12022,10 @@ ru:
         few: "%{count} участника"
         one: "1 участник"
         other: "%{count} участников"
+    dashboard_sidebar: 
+      coming_up: Готовится
+      recent_feedback: "Последние отзывы"
+      start_new_course: "Начать новый курс"
     delete: 
       are_you_sure: "Действительно хотите удалить эту учетную запись пользователя?"
       buttons: 
@@ -12264,6 +12452,7 @@ ru:
         more: дополнительно...
         rename_page: "Переименовать эту страницу"
         show_all: "показать все..."
+      title: "Новый заголовок страницы"
       wiki_description_for_course: "Это открытое место для хранения содержания. Его можно использовать для создания описания курса, для предоставления полезных объяснений трудных тем или даже для совместной работы студентов над написанием проектов."
       wiki_description_for_group: "Это открытое место для хранения содержания. Его можно использовать для создания описания группы, для предоставления полезных объяснений трудных тем или даже для совместной работы членов над написанием проектов"
       wiki_description_header: "Для чего предназначена вики?"
