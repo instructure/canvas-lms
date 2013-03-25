@@ -225,10 +225,17 @@ ja:
     default: 
       all_terms: すべての期間
       extra_text: "対象期間: %{term_name}"
+      extra_text_term: "期間: %{term_name};"
       grade: 
         message: "期間 %{term_name} に対する成績のエクスポートが正常に生成されました"
+      message: "%{type} レポートが次の設定で正常に生成されました。アカウント: %{account}; %{options}"
       outcome: 
         message: "%{account_name} に対する受講生 - 課題 - 成果の対応レポートが正常に生成されました"
+    grades: 
+      deleted: "削除されたオブジェクトを含む: true;"
+    sis_exporter: 
+      deleted: "削除されたオブジェクトを含む: true;"
+      reports: "レポート: %{files}"
   account_settings: 
     confirms: 
       delete_announcement: このアナウンスを削除してもよろしいですか?
@@ -370,6 +377,7 @@ ja:
         sis_export: 
           description: 
             text: "このレポートでは、それぞれのカテゴリでの Canvas の準備に関連する必要な情報がすべてエクスポートされます。"
+    retry_login: ログインの再試行
     settings: 
       about_google_docs: |-
           ユーザにとって使い易いよう、Word 文書、PDF 、Excel スプレッドシートやオープン オフィス文書のように(プログラムを自分のコンピュータにインストールすることを要求する上で) 何かしらをダウンロードすることを強いるのではなく、Canvas 内のさまざまなエリアで、文書をインライン プレビューできるようになっています。
@@ -433,6 +441,7 @@ ja:
         default_language: デフォルトの言語
         default_time_zone: "デフォルトのタイム ゾーン"
         default_user_storage_quota: "デフォルトのユーザ ファイル クォータ"
+        edit_institution_email: "ユーザは団体から付与された電子メール アドレスを削除できます"
         enable_alerts: アラート
         enable_eportfolios: eポートフォリオ
         enable_profiles: プロフィールの有効化
@@ -672,10 +681,11 @@ ja:
     test_ldap_result_failed: 失敗しました
     test_ldap_result_ok: OK
     test_login: "テスト ログイン"
+    testing: テストしています...
     update_failed_notice: アカウント設定の更新に失敗しました
     user_add_failed_message: ユーザの追加に失敗しました。もう一度やり直してください
     user_added_message: "%{user} は正常に追加されました!"
-    user_added_message_sent_message: "%{user} は正常に追加されました!追加されたユーザには、間もなく確認の電子メールが送信されます。"
+    user_added_message_sent_message: "%{user} は正常に追加されました! 追加されたユーザには、間もなく確認の電子メールが送信されます。"
     user_deleted_message: "%{username} は正常に削除されました。"
   activerecord: 
     errors: 
@@ -849,6 +859,9 @@ ja:
     default_unfiled_title: 未整理の問題
   assignment: 
     advanced_options_errors: "1 つ以上の詳細オプションにエラーがありました"
+    assignment_group_must_have_group: この課題に対する課題グループを選択してください
+    at_least_one_file_type: "少なくとも 1 つのファイル タイプを指定してください"
+    at_least_one_submission_type: "少なくとも 1 つの提出タイプを選択してください"
     atom_no_author: 作成者なし
     buttons: 
       select_url: 選択
@@ -862,11 +875,16 @@ ja:
       upload_as_zip: "ファイルは .zip 形式でアップロードしてください"
     feed_entry_title: "課題: %{assignment}"
     feed_entry_title_with_course: "課題、%{course}: %{assignment}"
+    group_assignment_must_have_category: "この課題に対するグループ セットを選択してください"
+    hide_advanced_options: 詳細オプションを非表示
     imported_assignments_group: インポートされた課題
     labels: 
       due: 期限
     messages: 
       assignment_created: "課題 \"%{assignment}\" が作成されました"
+    name_is_required: 名前は必須項目です
+    select_external_tool_dialog_title: 外部ツールの設定
+    show_advanced_options: 詳細オプションを表示
     submission_action_take_quiz: "%{title} を受ける"
     submission_action_turn_in_assignment: "%{title} を提出"
     titles: 
@@ -913,8 +931,8 @@ ja:
     add_assignment_form: 
       assignment_name: 課題名
       labels: 
-        due: 期限
-        points: 点数
+        due: "期限:"
+        points: "点数:"
         quiz_points: クイズの点数
         type: タイプ
       links: 
@@ -953,6 +971,7 @@ ja:
           %{count} 個の課題
       other: |-
           1 個の課題
+          
           %{count} 個の課題
     assignment_group_create_dialog: 
       assignment_group: 
@@ -961,6 +980,8 @@ ja:
       buttons: 
         add_group: グループの追加
         cancel: キャンセル
+      links: 
+        add_assignment_group: 課題グループの追加
     assignment_group_selector: 
       assignment_group: 課題グループ
       assignment_group_options: 
@@ -1045,11 +1066,13 @@ ja:
     drop_lowest_scores: "最低スコア %{number} を下げる"
     due_date_override: 
       overrides: 
+        available_from: 次から使用可能
         due_date: 期日
         for: 対象
       until: 次の日時まで
     edit: 
       edit_assignment: 課題の編集
+      new_discussion: 新しいディスカッション
       new_quiz: 新しいクイズ
     edit_view: 
       assignment_name: 課題名
@@ -1060,12 +1083,14 @@ ja:
       freeze_properties: コピーされるときに課題のプロパティをロック
       notify_content_change: この内容が変更になったことをユーザに通知する
       points_possible: 点数
+      show_advanced_options: 詳細オプションを表示
       warnings: 
         assignment_is_frozen: 一部の設定は管理上の理由でロックされています。
     errors: 
       add_group_failed: グループの追加に失敗しました
       delete_reminder_failed: 削除に失敗しました
       deleting_group_failed: 削除に失敗しました
+      google_docs_masquerade_rejected: "Google Docs に匿名ユーザとして接続できません。"
       reminder_failed: 事前通知に失敗しました
     external_grader_sidebar: 
       edit_assignment_settings: 課題設定の編集
@@ -1095,14 +1120,17 @@ ja:
         submission: 提出物
     graded: この課題は既に採点されています
     grading_type_selector: 
+      grading_type: 採点タイプ
       grading_type_options: 
-        letter_grade: "レター グレード"
+        letter_grade: 成績
         not_graded: 未採点
         pass_fail: 完了/未完了
         percent: 割合
         points: 点数
       view_grading_levels: 採点レベルの表示
     group_category_selector: 
+      grade_group_students_individually: それぞれの受講生を個別に採点
+      group_category_options: "新しいグループ カテゴリ"
       group_set: "グループ セット"
       is_group_assignment: これはグループ課題です
     group_comment: 
@@ -1200,8 +1228,8 @@ ja:
         manually_assign_peer_reviews: "ピア レビューの手動割り当て"
         require_peer_reviews: "ピア レビューが必要"
       locked_until: レビューの割り当て
-      peer_reviews_assign_at_explanation: 期限後の到着に限ります。空白の場合は、期日を使用します。
-      reviews_per_user: ユーザあたりのレビュー
+      peer_reviews_assign_at_explanation: 期日以降の日付を指定してください。空白の場合は、期日を使用します。
+      reviews_per_user: ユーザごとのレビュー
     percent_of_final_grade: "最終的な成績の %{percent} "
     redirect_page: 
       redirect_message: |-
@@ -1211,7 +1239,7 @@ ja:
     show: 
       assignment_locked: この課題は現在ロックされています。
       available_from: 次から使用可能
-      date_time_by: "%{date} 終了日 %{time}"
+      date_time_by: "%{date} %{time} まで"
       defaults: 
         no_content: コンテンツなし
       due: 期限
@@ -1228,9 +1256,13 @@ ja:
       new_assignment: 新しい課題
       no_due_date: 期日なし
       no_points: なし
+      no_submission: なし
       points: 点数
+      submission_types: "ファイル タイプ"
+      submitting: 提出しています
       turnitin: Turnitin
-      turnitin_enabled: "この課題には Turnitin が有効になっています。"
+      turnitin_enabled: "この課題では Turnitin が有効になっています。"
+      turnitin_enabled_short: "(Turnitin を有効にしました)"
       until: 次の日時まで
     show_locked: 
       labels: 
@@ -1273,17 +1305,26 @@ ja:
       tooltips: 
         submitted: 提出済み
     submission_types_form: 
+      advanced_turnitin_settings: "Turnitin の詳細設定"
+      descriptions: 
+        allowed_extensions: "受け入れられる拡張子のリストを入力します。例: doc,xls,txt"
+      label: 
+        external_tool_new_tab: このツールを新しいタブに読み込む
+        external_tool_url: "外部ツールの URL"
+        turnitin_enabled: "Turnitin の提出物を有効にする"
       labels: 
         allow_file_uploads: ファイルのアップロードを許可
         allow_media_recordings: メディアに記録されたデータを許可
         allow_text_entry: テキスト入力を許可
         allow_url: "Web サイトの URL を許可"
         allowed_extensions: 許可されるファイル拡張子
+        restrict_file_extensions: "アップロードするファイル タイプを制限"
       submission_type: 提出物のタイプ
       submission_types: 
         external_tool: 外部ツール
         no_submission: 提出なし
         on_paper: 筆記
+        online: オンライン
     submit_assignment: 
       additional_comments: 追加コメント
       buttons: 
@@ -1354,8 +1395,27 @@ ja:
       assignment_details: 課題の詳細
       uploading: 提出物をアップロードしています
     turnitin_settings_dialog: 
+      assignments: 
+        turnitin_settings: 
+          labels: 
+            exclude_small_matches: 少しの一致
       buttons: 
         update_settings: 設定の更新
+      turnitin_settings: 
+        labels: 
+          compare_against: 比較対象
+          do_not_consider: 認めない
+          exclude_biblio: 書誌的資料
+          exclude_quoted: 引用された資料
+          internet_check: "インターネット データベース"
+          journal_check: ジャーナル、定期刊行物、出版物
+          student_paper_check: 他の受講生の論文
+        originality_report_visibility: 受講生が独創性レポートを閲覧できる時期
+        originality_report_visible_after_due_date: 期日後
+        originality_report_visible_after_grading: 課題の採点後
+        originality_report_visible_immediately: 即時
+        settings_exclude_fewer_than_count: "%h{wordsInput} 単語 (語) 未満"
+        settings_exclude_less_than_percent: "その文書の %h{percentInput} パーセント未満"
     wizard_box: 
       descriptions: 
         delete_icon: "%{icon}: この課題の削除"
@@ -1689,6 +1749,8 @@ ja:
       edit_event: イベントの編集
     today: 本日
     undated_events: 
+      loading_undated_events: 日付のないイベントを読み込んでいます...
+      show_undated_events: 日付のないイベントを表示
       undated_events: 日付のないイベント
   calendar_event: 
     errors: 
@@ -1876,7 +1938,9 @@ ja:
     plugins: 
       errors: 
         all_fields_required: すべて必須項目です
+        fields_required: "フィールド \"%{field}\" は必須項目です"
         login_expiration_minimum: "セッションの有効期間は 20 分以上にする必要があります"
+        need_integer: "プレイ リスト キャッシュの整数を入力してください"
   cc: 
     by: "CC 属性"
     by_nc: "CC 属性 非営利"
@@ -1996,6 +2060,8 @@ ja:
     new: 
       pin_to_canvas_network: "Canvas ネットワークに固定"
       saved_successfully: 正常に保存されました
+  collection_view: 
+    no_items: アイテムがありません。
   communication_channel: 
     body: "Canvas 検証コードは %{verification_code} です"
     default_facebook_account: "Facebook アカウント"
@@ -2710,7 +2776,7 @@ ja:
     buttons: 
       add: モジュールの追加
       add_item: アイテムの追加
-      add_module: 新しいモジュールの追加
+      add_module: モジュールの作成
       add_module_first: 新しいモジュールの追加
       update: モジュールの更新
     confirm: 
@@ -2795,6 +2861,7 @@ ja:
         reload_student: 受講生の進捗を再読み込み
         sort_by_name: 名前
         sort_by_progress: 進捗
+        student_progress: 進捗を表示
         title: 
           remove_prerequisite: この前提条件を削除
       module: モジュール
@@ -2822,6 +2889,8 @@ ja:
       titles: 
         student_progression: "モジュールの進捗 (受講生別)"
     context_module: 
+      context_module: 
+        draft: (ドラフト)
       default_module_name: モジュール
       images: 
         alt: 
@@ -2835,8 +2904,9 @@ ja:
       labels: 
         prerequisites: コース受講前提条件
       links: 
-        add_item: モジュールにアイテムを追加
+        add_item: コンテンツの追加
         hide_contents: モジュールのコンテンツの非表示
+        publish: 公開
         settings: モジュール設定
         show_contents: モジュールのコンテンツを表示
         text: 
@@ -2844,17 +2914,21 @@ ja:
           edit_module: 編集
         title: 
           delete_module: このモジュールを削除
-          edit_module: モジュール設定を編集
+          edit_module: 編集
           remove_prerequisite: この前提条件を削除
           student_progress: このモジュールに対する受講生の進捗の確認
+        unpublish: 未公開
       module_will_unlock_at: "は *%{unlock_date}* にロック解除されます"
       progression_complete_count: "*%{count}* 件が完了"
       progression_started_count: "*%{count}* 件が進行中"
       reorder_modules: ドラッグでモジュールを並べ替え
+      unpublish: 未公開
     context_module_right_side: 
       links: 
         student_progress: モジュールに対する受講生の進捗の表示
       loading_progressions: 受講生の進捗を読み込んでいます。
+    context_modules: 
+      publish: 公開
     errors: 
       reorder: 並べ替えに失敗しました。もう一度やり直してください。
     index: 
@@ -2938,6 +3012,15 @@ ja:
         one: "%{list_of_users} が %{current_user} によって会話に追加されました"
         other: "%{list_of_users} が %{current_user} によって会話に追加されました"
     subject: "非公開メッセージ、%{timestamp}"
+  conversation_participant: 
+    batch_update_message: 
+      one: |-
+          1 個の会話が処理されました
+          %{count} 個の会話が処理されました
+      other: |-
+          1 個の会話が処理されました
+          %{count} 個の会話が処理されました
+    not_participating: ユーザはこの会話に参加していません
   conversations: 
     add_attachment: 
       titles: 
@@ -3057,6 +3140,7 @@ ja:
           その他 %{count} 件
       other: |-
           その他 1 件
+          
           その他 %{count} 件
     other_recipients: 
       one: |-
@@ -3064,6 +3148,7 @@ ja:
           およびその他 %{count} 件
       other: |-
           およびその他 1 件
+          
           およびその他 %{count} 件
     people_count: 
       one: |-
@@ -3544,11 +3629,13 @@ ja:
         toggle_navigation_dragging: スペース
       labels: 
         account_id: 学科
+        allow_student_discussion_editing: 受講者がディスカッションへの自分の投稿を編集または削除できるようにする
         allow_student_discussion_topics: "受講生によるディスカッション トピックの作成を許可"
         allow_student_forum_attachments: 受講生がディスカッションにファイルを添付できるようにする
         allow_student_organized_groups: 受講生が独自のグループを組織できるようにする
         conclude_at: 終了日時
         course_code: "コース コード"
+        course_lock_all_announcements: アナウンスへのコメントを無効にする
         course_name: 名前
         course_section_name: 新しいセクションの追加
         course_visibility: 可視性
@@ -3557,7 +3644,7 @@ ja:
         grading_standard_enabled: コースの採点スキームを有効にする
         hide_distribution_graphs: 採点分布グラフを受講生に表示しない
         hide_final_grade: 受講生の成績概要で配点を非表示にする
-        hide_final_grades: 受講生の成績概要で配点を非表示にする
+        hide_final_grades: 受講生の成績概要で合計を非表示にする
         indexed: "このコースを公開コース インデックスに含める"
         is_public: このコースを一般公開する
         language: 言語
@@ -3747,7 +3834,9 @@ ja:
         day: 日
         details: 詳細
       syllabus: 
+        hide_specific_dates: セクション、グループ、個人に関する日付を非表示にする
         other_day: その他
+        show_specific_dates: セクション、グループ、個人に関する日付を表示する
     titles: 
       rss_feed: "%{course} のフィード"
     unauthorized: 
@@ -3856,6 +3945,7 @@ ja:
       medium_month: "%b %Y"
       short: "%b %e"
       short_month: "%b"
+      short_weekday: "%a"
       weekday: "%A"
     month_names: 
       - ~
@@ -4015,6 +4105,13 @@ ja:
       due_date: "期限: %{date}"
       everyone: 他の全員
       for: 対象
+      graded_discussion_and_points: 
+        one: |-
+            これは採点済みのディスカッションです:  *配点 1*
+            これは採点済みのディスカッションです:  *配点 %{count}*
+        other: |-
+            これは採点済みのディスカッションです:  *配点 1*
+            これは採点済みのディスカッションです:  *配点 %{count}*
       points_possible: 
         one: |-
             配点 1
@@ -4045,6 +4142,7 @@ ja:
     deleted_topic_notice: そのトピックは削除されました
     discussion_feed_title: "%{title} ディスカッション フィード"
     discussions_settings_view: 
+      allow_student_discussion_editing: 自分の投稿を編集または削除
       allow_student_topics: "ディスカッション トピックを作成する"
       attach_files: ディスカッションにファイルを添付する
       in_this_course: "このコースでは、受講生は次のことが可能です:"
@@ -4197,6 +4295,7 @@ ja:
       authors_name: 作成者名
       delete: 削除
       edit: 編集
+      edited_comment: "*%{editor.display_name}* が %{edited_at} に編集"
       go_to_parent: 親に移動
       go_to_topic: トピックに移動
       manage_discussion_entry: "ディスカッション エントリの管理"
@@ -4285,6 +4384,7 @@ ja:
     accessibles: 
       background_color: 背景色、押して選択
       forecolor: テキスト色、押して選択
+      record: "この機能はスクリーン リーダーからアクセスできません。"
     titles: 
       font_size: "フォント サイズ、押して選択"
       formatting: 書式設定、押して選択
@@ -4840,6 +4940,7 @@ ja:
         import_zip: "zip ファイルをインポート"
         lock_file: このファイルをロック
         lock_folder: このフォルダをロック
+        manage_collaborations: 共同作業の管理
         new_collaboration: 新しい共同作業
         preview: プレビュー
         rename_file: このファイルの名前を変更
@@ -5288,6 +5389,7 @@ ja:
     crumb: 出欠
     errors: 
       missing_file: アップロードするファイルが見つかりませんでした
+      not_allowed: このコースではスコアをアップロードできません。
       submission_failed: "正常に提出されませんでした: %{error}"
       submission_failed_default: 提出に失敗しました
     grade: 
@@ -5554,6 +5656,7 @@ ja:
         file_attachment: ファイル添付
         media_comment: "メディア コメント"
         speech_recognition: 音声認識
+    speed_grader_disabled: "SpeedGrader は、このコースでは無効になっています"
     student: 
       new_student: 新しい受講生
       student: 受講生
@@ -5930,6 +6033,7 @@ ja:
     datepicker: 
       titles: 
         am_pm: 午前/午後
+    draft: ドラフト
     errors: 
       cannot_view_document_inline: この文書はインライン表示できません。この文書を表示するための権限がないか、または、文書が削除された可能性があります。
       field_is_required: このフィールドは必須項目です
@@ -6129,6 +6233,13 @@ ja:
                     Canvas サポート
         subject: "メッセージの返信に失敗: %{subject}"
     progress_runner: 
+      completed_message: 
+        one: |-
+            1 個のアイテムが処理されました
+            %{count} 個のアイテムが処理されました
+        other: |-
+            1 個のアイテムが処理されました
+            %{count} 個のアイテムが処理されました
       error_message: "%{error}: %{ids}"
     send_to_inbox: 
       default_subject: 件名なし
@@ -6748,6 +6859,7 @@ ja:
             詳細は %{website} をご覧ください
       summary: 
         subject: "成績とコメントがリリースされました:  %{title}, %{course}"
+    assignment_unpublished_module: この課題は未公開モジュールの一部で、まだ使用できません。
     collaboration_invitation: 
       email: 
         body: |-
@@ -6823,6 +6935,7 @@ ja:
     content_locked_at: "このコンテンツは %{at} にロックされました。"
     content_locked_module: "このコンテンツはモジュール *%{module}* の一部で、まだロックが解除されていません。"
     content_locked_until: "%{date} まで、このコンテンツはロックされています。"
+    content_unpublished_module: このコンテンツは未公開モジュールの一部で、まだ使用できません。
     conversation_message: 
       email: 
         attached_files: "添付ファイル:"
@@ -7040,6 +7153,7 @@ ja:
     file_locked_at: "このファイルは %{at} にロックされました。"
     file_locked_module: "このファイルはモジュール *%{module}* の一部で、まだロックが解除されていません。"
     file_locked_until: "%{date} まで、このファイルはロックされています。"
+    file_unpublished_module: このファイルは未公開モジュールの一部で、まだ使用できません。
     forgot_password: 
       email: 
         associated_login: "このアドレスは、ログイン \"%{login_identifier}\" に関連付けられています。"
@@ -7094,12 +7208,7 @@ ja:
         subject: "Canvas アラート - グループ課題の遅延提出: %{group_name}, %{assignment_name}"
     group_membership_accepted: 
       email: 
-        account_group: !binary |
-            xpJBxpJKxpJFxpLigJzGkmfDgoF1JXthY2NvdW50X25hbWV9w4KBduKAmsOJ
-            4oCaw4LigJrCouKAmsOEw4KBQcaST8aS4oC5w4KBW8aSdsOCgXUle2dyb3Vw
-            X25hbWV9w4KBduKAmsOW4oCaw4zFvVHigLDDgeKAlHbigLnDgoHigJrCqsW9
-            w7PigJjDuOKAmsKz4oCaw6rigJrDnOKAmsK14oCawr3DgoFC
-
+        account_group: "ƒAƒJƒEƒ“ƒgÂu%{account_name}Âv‚É‚Â‚¢‚ÄÂAƒOƒ‹Â[ƒvÂu%{group_name}Âv‚Ö‚ÌŽQ‰Á—v‹Â‚ªŽó‘ø‚³‚ê‚Ü‚µ‚½ÂB"
         course_group: "コース「%{course_name}」について、グループ「%{group_name}」への参加要求が受諾されました。"
         group_request_accepted: "グループ要求が受諾されました: %{group_name}"
         labels: 
@@ -7145,6 +7254,10 @@ ja:
     index: 
       titles: 
         messages: "%{name} に対するメッセージ"
+    layout: 
+      email: 
+        html: 
+          click_to_preferences: お知らせ設定を編集するには、ここをクリックしてください
     merge_email_communication_channel: 
       email: 
         body: "アカウントが %{url} に作成されましたが、既に Canvas アカウントをお持ちです。アカウントを1 つにまとめる場合は、次の URL にアクセスしてください:"
@@ -7391,6 +7504,7 @@ ja:
     page_locked_at: "このページは %{at} にロックされました。"
     page_locked_module: "このページはモジュール *%{module}* の一部で、まだロックが解除されていません。"
     page_locked_until: "%{date} まで、このページはロックされています。"
+    page_unpublished_module: このページは未公開モジュールの一部で、まだ使用できません。
     pseudonym_registration: 
       email: 
         body: "%{account} というCanvas アカウントで登録されました!ログインして Canvas を使い始めるには、その前に、設定プロセスを完了する必要があります。"
@@ -7400,6 +7514,7 @@ ja:
     quiz_locked_at: "このクイズは %{at} にロックされました。"
     quiz_locked_module: "このクイズはモジュール *%{module}* の一部で、まだロックが解除されていません。"
     quiz_locked_until: "%{date} まで、このクイズはロックされています。"
+    quiz_unpublished_module: このクイズは未公開モジュールの一部で、まだ使用できません。
     report_generated: 
       email: 
         link_message: "レポートをダウンロードするにはここをクリック:"
@@ -7584,6 +7699,7 @@ ja:
     topic_locked_at: "このトピックは %{at} にロックされました。"
     topic_locked_module: "このトピックはモジュール *%{module}* の一部で、まだロックが解除されていません。"
     topic_locked_until: "%{date} まで、このトピックはロックされています。"
+    topic_unpublished_module: このトピックは未公開モジュールの一部で、まだ使用できません。
     updated_wiki_page: 
       email: 
         body: "%{title} についての Wiki のページが更新されました。受講生活をより便利にしてくれるかもしれません。"
@@ -7968,6 +8084,7 @@ ja:
     everyone_else: 他の全員
     overrides: 
       everyone: 全員
+      everyone_else: 他の全員
   page_comment: 
     default_user_name: 匿名
   page_comments: 
@@ -7982,6 +8099,8 @@ ja:
         time: 時刻
         url: URL
         user_agent: "ユーザ エージェント"
+  paginated_collection: 
+    no_items: アイテムがありません。
   paginated_list: 
     no_results_found: 結果なし
     view_more_link: その他を表示
@@ -8154,6 +8273,7 @@ ja:
       name: Kaltura
     kaltura_settings: 
       account_settings: "これらの値は、\"設定 -> 統合設定\" のKaltura 管理コンソールにあります。"
+      cache_explanation: "空欄は無限キャッシュ、0 はキャッシュしないことを意味します。"
       description: |-
           [Kaltura.com](%{kaltura_url}) でアカウントを持つか、または
           Kaltura インスタンスを自己ホスティングしてアカウントを持つ必要があります。
@@ -8168,6 +8288,7 @@ ja:
           次に "サーバから送信" 列の "エントリの追加" および "エントリの削除" チェックボックスを選択します。
       headers: 
         account_settings: アカウント設定
+        canvas_settings: "Canvas の設定"
         domain_settings: ドメイン設定
         ui_conf_ids: "UI 会議 ID"
       hints: 
@@ -8175,6 +8296,7 @@ ja:
         resource_domain: "ホスティングされるアカウントの場合は、\"cdn.kaltura.com\" を使用します"
         rtmp_domain: "ホスティングされるアカウントの場合は、\"www.kaltura.com\" を使用します"
       labels: 
+        cache_play_list_seconds: "プレイリスト URL をキャッシュする秒数"
         domain: ドメイン
         kcw_ui_conf: "KCW UI 会議 ID"
         partner_id: "パートナー ID"
@@ -8624,6 +8746,7 @@ ja:
       redirect_from_idp: "IdP から LoginResponse を受け取りました"
     default_app_name: サードパーティのアプリケーション
     errors: 
+      blank_password: パスワードが指定されていません
       invalid_credentials: ユーザ名またはパスワード、またはその両方が間違っています
       invalid_otp: 検証コードが無効です。もう一度やり直してください
       login_error: "%{institution} にログインする際に問題が発生しました"
@@ -8877,6 +9000,7 @@ ja:
         access_code: "アクセス コード"
       quiz_restricted: "このクイズはアクセス コードで制限されています。クイズを受けるためには、アクセス コードを打ち込んでくれるよう、またはアクセス コードを教えてくれるよう、講師または試験監督官に依頼する必要があります。"
       survey_restricted: "このサーベイはアクセス コードで制限されています。サーベイを受けるためには、アクセス コードを打ち込んでくれるよう、またはアクセス コードを教えてくれるよう、講師または試験監督官に依頼する必要があります。"
+    after_last_attempt: 前回の試行以降
     alerts: 
       no_valid_combinations: システムは、指定されたパラメータに対して有効な組み合わせを生成できませんでした
       only_n_valid_combinations: 
@@ -8886,6 +9010,7 @@ ja:
         other: |-
             システムは指定されたパラメータに対する有効な組み合わせを 1 個だけ生成できます
             システムは指定されたパラメータに対する有効な組み合わせを %{count} 個だけ生成できます
+    always: 常に
     answer_comments: 解答コメント
     answer_text: 解答テキスト
     buttons: 
@@ -9145,6 +9270,14 @@ ja:
       wrong_answer_comments: 不正解時のコメント
     graded_quiz: 採点済みのクイズ
     graded_survey: 採点済みのサーベイ
+    headers: 
+      unsubmitted_students_count: 
+        one: |-
+            1 人の受講生がサーベイを受けていません
+            %{count} 人の受講生がサーベイを受けていません
+        other: |-
+            1 人の受講生がサーベイを受けていません
+            %{count} 人の受講生がサーベイを受けていません
     helpers: 
       duration_in_minutes: 
         one: "1 分"
@@ -9217,7 +9350,7 @@ ja:
       quiz_protected: このクイズは保護されており、特定の場所でのみ利用できます。現在ご利用のコンピュータが置かれている場所は、このクイズに参加できる正当な場所ではないようです。
       survey_protected: このサーベイは保護されており、特定の場所でのみ利用できます。現在ご利用のコンピュータが置かれている場所は、このサーベイに参加できる正当な場所ではないようです。
     keep_highest: 最高
-    keep_latest: 直近
+    keep_latest: 前回
     label: 
       answer: 
         text: "解答テキスト、リッチ テキスト領域"
@@ -9257,14 +9390,14 @@ ja:
     managed_quiz_data: 
       anonymous_student: "受講生 %{n}"
       headers: 
-        quiz_unsubmitted_students: まだこのクイズを受けていない受講生
-        submitted_students_quiz: すでにこのクイズを受けた受講生
-        submitted_students_survey: すでにこのサーベイを受けた受講生
-        survey_unsubmitted_students: まだこのサーベイを受けていない受講生
-      quiz_all_students_submitted: すべての受講生がクイズを受けました。
-      quiz_no_submissions: "受講生がまだ 1 人もこのクイズを受けていません"
-      survey_all_students_submitted: すべての受講生がサーベイを受けました。
-      survey_no_submissions: "受講生がまだ 1 人もこのサーベイを受けていません"
+        quiz_unsubmitted_students: まだこのクイズに回答していない受講生
+        submitted_students_quiz: すでにこのクイズに回答した受講生
+        submitted_students_survey: すでにこのサーベイに回答した受講生
+        survey_unsubmitted_students: まだこのサーベイに回答していない受講生
+      quiz_all_students_submitted: すべての受講生がクイズに回答しました
+      quiz_no_submissions: "受講生がまだ 1 人もこのクイズに回答していません"
+      survey_all_students_submitted: すべての受講生がサーベイに回答しました
+      survey_no_submissions: "受講生がまだ 1 人もこのサーベイに回答していません"
       titles: 
         submission_needs_review: この提出物はレビューが必要
     moderate: 
@@ -9345,6 +9478,7 @@ ja:
       confirms: 
         delete_quiz: このクイズを削除してもよろしいですか?
       default_page_title: 新しいクイズ
+      filter: "IP フィルタ"
       graded_quiz: 採点済みのクイズ
       graded_survey: 採点済みのサーベイ
       group: 課題グループ
@@ -9401,12 +9535,14 @@ ja:
         preview_quiz: クイズのプレビュー
         quiz_options: クイズのオプション
         return_to_quiz_page: クイズのページに戻る
-        show_assignment_rubric: 課題の注釈の表示
+        show_assignment_rubric: 注釈の表示
         start_over: 最初からやり直し
         switch_views: ビューの切り替え
+      minutes: 分
       one_question_at_a_time: "一度に 1 つの問題を表示する"
       points_possible: "配点 %{n} "
       practice_quiz: 練習クイズ
+      quiz_type: "クイズ タイプ"
       require_lockdown_browser: "Respondus LockDown Browser を要求"
       require_lockdown_browser_for_results: クイズの結果を表示するために必要
       retrieving_filters: フィルタを取得しています...
@@ -9488,6 +9624,7 @@ ja:
       allowed_attempts: 許可されている試行回数
       headers: 
         availability: 入手可能性
+        available: 使用可能
         due: 期日
         limits: 制限
         points: 点数
@@ -9496,13 +9633,13 @@ ja:
       labels: 
         allowed_attempts: 許可されている試行回数
       multiple_due_dates: 複数の期日
-      no_due_date: 期日なし。
+      no_due_date: 期日なし
       no_time_limit: 時間制限なし
       none: なし
       points_possible: "配点 %{points_possible} 点"
       question_count: 
-        one: "1 件の問題"
-        other: "%{count} 件の問題"
+        one: "<span class='value'>%{count}</span> <span class='label'>件の問題</span> "
+        other: "<span class='value'>%{count}</span> <span class='label'>件の問題</span> "
         zero: 問題がありません
       quiz_availabile_through: |-
           %{start_time} ～  
@@ -9518,6 +9655,7 @@ ja:
         other: |-
             1 分
             %{count} 分
+      unlimited: 無制限
       unlimited_attempts: 試行回数の制限なし
     quiz_right_side: 
       attempts_left: 
@@ -9549,19 +9687,36 @@ ja:
       unlimited_attempts: 試行回数の制限なし
       view_previous_attempts: 前の試行を表示
     quiz_show_teacher: 
+      anonymous_submissions: 匿名での提出
       attempts: 試行回数
       available_from: 次から使用可能
+      cant_go_back: 解答の後で問題をロックする
       code: "アクセス コード"
       due: 期限
+      filter: "IP フィルタ"
       for: 対象
       group: 課題グループ
       label: 
         time_limit: 制限時間
+      multiple_attempts: 複数回の試行
       no_time_limit: 時間制限なし
+      one_question_at_a_time: "一度に 1 つの問題"
       points: 点数
+      quiz_type: "クイズ タイプ"
       require_lockdown_browser: "Respondus LockDown Browser を要求"
+      require_lockdown_browser_for_results: クイズの結果を表示するために必要
+      score_to_keep: 保持するスコア
+      show_correct_answers: 正解を表示
       shuffle_answers: 解答のシャッフル
+      time_limit: 
+        one: |-
+            1 分
+            %{count} 分
+        other: |-
+            1 分
+            %{count} 分
       until: 次の日時まで
+      view_responses: 応答を表示
     quiz_submission: 
       attempt_duration: "今回の試行は %{duration} かかりました。"
       labels: 
@@ -9663,8 +9818,10 @@ ja:
       buttons: 
         lock_quiz: 今すぐこのクイズをロックする
         lock_survey: 今すぐこのサーベイをロックする
+        publish: 公開
         published: 公開されました!
         publishing: 公開しています...
+        republish: 再公開
         unlock_quiz: 今すぐ受講生にこのクイズを受けさせる
         unlock_survey: 今すぐ受講生にこのサーベイを受けさせる
       confirms: 
@@ -9711,7 +9868,7 @@ ja:
         preview: プレビュー
         quiz_statistics: クイズの統計情報
         see_full_quiz: クイズ全体の表示
-        show_assignment_rubric: 課題の注釈の表示
+        show_assignment_rubric: 注釈の表示
         show_student_quiz_results: 受講生のクイズの結果を表示
         show_student_survey_results: 受講生のサーベイの結果を表示
         survey_statistics: サーベイの統計情報
@@ -9745,6 +9902,7 @@ ja:
       survey_not_published: このサーベイはまだ公開されていません。受講生は、公開されるまでこのサーベイを受けることはできません。
       titles: 
         delete: 削除
+        related_items: 関連アイテム
         submission_needs_review: この提出物はレビューが必要
         unlock_for_how_long: どのくらいの期間、このクイズをロック解除しますか?
       warnings: 
@@ -9790,6 +9948,7 @@ ja:
             %{count} 件の他の提出物
         other: |-
             1 件の他の提出物
+            
             %{count} 件の他の提出物
     statistics_crumb: 統計
     statistics_filename: "%{title} %{type} レポート"
@@ -9917,6 +10076,9 @@ ja:
     ? "true"
     : "True"
     ungraded_survey: 未採点のサーベイ
+    warnings: 
+      unpublished_changes: "*このクイズに加えた変更内容は未公開です。*これらの変更内容は、クイズを公開または再公開するまで、受講生には表示されません。"
+      unpublished_quiz: "*このクイズは未公開です* 公開されるまでは、このクイズを表示できるのは講師のみです。"
   re_upload_submissions_form: 
     buttons: 
       upload: ファイルのアップロード
@@ -9963,6 +10125,7 @@ ja:
     ok: OK
     parent_dialog: 
       agree_to_terms: "*利用規約* に同意します。"
+      agree_to_terms_and_pp: "*利用規約*と**プライバシー ポリシー**に同意します。"
       buttons: 
         start_participating: 参加の開始
       labels: 
@@ -9972,6 +10135,7 @@ ja:
         username: 子どものユーザ名
     student_dialog: 
       agree_to_terms: "*利用規約* に同意します。"
+      agree_to_terms_and_pp: "*利用規約*と**プライバシー ポリシー**に同意します。"
       buttons: 
         start_learning: 学習を開始
       labels: 
@@ -9984,6 +10148,7 @@ ja:
       sign_up_without_code: コードをお持ちではないですか?
     student_higher_ed_dialog: 
       agree_to_terms: "*利用規約* に同意します。"
+      agree_to_terms_and_pp: "*利用規約*と**プライバシー ポリシー**に同意します。"
       buttons: 
         start_learning: 学習を開始
       labels: 
@@ -9992,6 +10157,7 @@ ja:
         name: "フル ネーム"
     teacher_dialog: 
       agree_to_terms: "*利用規約* に同意します。"
+      agree_to_terms_and_pp: "*利用規約*と**プライバシー ポリシー**に同意します。"
       buttons: 
         start_teaching: 指導を開始
       labels: 
@@ -10048,6 +10214,7 @@ ja:
       read_reports: コースの使用状況レポートの表示
       read_roster: ユーザのリストの表示
       send_messages: "コース メンバーへのメッセージの送信"
+      send_messages_all: クラス全体にメッセージを送信
       view_all_grades: すべての成績の表示
       view_error_reports: "エラー レポートの表示"
       view_group_pages: "すべての受講生グループのグループ ページの表示"
@@ -10756,11 +10923,14 @@ ja:
       links_title: タイトル
       links_url: URL
       manage_settings: 登録済みサービスの管理
+      message_me: "Canvas で自分にメッセージを送信"
       message_title: メッセージ
+      message_user_canvas: "Canvas で %{user} にメッセージを送信"
       name: 名前
       no_links: "%{name} はリンクを追加していません"
       nothing_in_common: 共通のものは何もありません
       save_profile: プロフィールの保存
+      service_contact: "%{service} で %{user} と連絡をとる"
       social_instructions: プロフィールで他のユーザに対して表示する連絡方法を選択してください。
       title: タイトル
       user_has_no_bio: "%{user} は略歴を追加していません"
@@ -11124,6 +11294,8 @@ ja:
     errors: 
       invalid_content_type: "無効なコンテンツ タイプです。UTF-8 である必要があります"
     sis_import_in_process_notice: "SIS インポートは既に処理中です。"
+  site: 
+    view_privacy_policy: "プライバシー ポリシーを表示"
   site_admin: 
     columns: 
       date: 日付
@@ -11301,6 +11473,8 @@ ja:
     help_menu: 
       community_support_description: ピアと交流し、支援を得ます。
       community_support_forums: "コミュニティ サポート フォーラム"
+      contact_support: サポートに問い合わせ
+      contact_support_sub_text: 緊急の問題について問い合わせます。
       curriculum_assessment_errata: カリキュラム/アセスメント正誤表
       curriculum_assessment_errata_description: "既に報告されているアセスメントおよびカリキュラムのエラーを表示します。\"正誤表\" を検索してください。"
       networking_academy_description: "最も一般的な質問に対する Cisco の回答を表示します。"
@@ -11519,6 +11693,7 @@ ja:
           (%{count} 人のユーザが既に存在しました)
       other: |-
           (1 人のユーザが既に存在しました)
+          
           (%{count} 人のユーザが既に存在しました)
     users_to_add: 
       one: |-
@@ -11661,9 +11836,10 @@ ja:
             %{count} 人の参加者
         other: |-
             1 人の参加者
+            
             %{count} 人の参加者
     dashboard_sidebar: 
-      coming_up: 入手予定
+      coming_up: 次の予定
       recent_feedback: 最近のフィードバック
       start_new_course: 新しいコースの開始
     delete: 
