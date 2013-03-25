@@ -155,6 +155,16 @@ describe ApplicationHelper do
         output.should have_tag 'link'
         output.scan(%r{/path/to/(root/|admin/)?css}).should eql [['admin/'], ['root/']]
       end
+
+      it "should not include anything if param is set to 0" do
+        @domain_root_account.settings = @domain_root_account.settings.merge({ :global_includes => true })
+        @domain_root_account.settings = @domain_root_account.settings.merge({ :global_stylesheet => '/path/to/css' })
+        @domain_root_account.save!
+
+        params[:global_includes] = '0'
+        output = include_account_css
+        output.should be_nil
+      end
     end
 
     context "sub-accounts" do

@@ -762,6 +762,7 @@ module ApplicationHelper
   end
 
   def include_account_js
+    return if params[:global_includes] == '0'
     includes = get_global_includes.inject([]) do |js_includes, global_include|
       js_includes << "'#{global_include[:js]}'" if global_include[:js].present?
       js_includes
@@ -788,6 +789,7 @@ module ApplicationHelper
   end
 
   def include_account_css
+    return if params[:global_includes] == '0'
     includes = get_global_includes.inject([]) do |css_includes, global_include|
       css_includes << global_include[:css] if global_include[:css].present?
       css_includes
