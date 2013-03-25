@@ -546,9 +546,9 @@ TEXT
     <%= f.file_field :uploaded_data %>
     <button type="submit" class="btn btn-small"><%= t('buttons.add_picture_file', "Add File") %></button>
   <% end %>
-  <div class="button-container">
-    <button type="button" class="btn select_button"><%= t('buttons.select_image', "Select Image") %></button>
-    <button type="button" class="btn cancel_button btn button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
+  <div class="form-actions">
+    <button type="button" class="btn cancel_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
+    <button type="button" class="btn select_button btn-primary"><%= t('buttons.select_image', "Select Image") %></button>
   </div>
 </div>
 <% else %>
