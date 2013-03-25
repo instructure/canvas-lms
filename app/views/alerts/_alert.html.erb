@@ -33,6 +33,8 @@
     </div>
   </div>
 
-  <button type="submit" class="editing btn submit_button"><%= t('buttons.save_alert', "Save Alert") %></button>
-  <button type="button" class="editing cancel_button btn button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
+  <div class="form-actions">
+    <button class="editing btn cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
+    <button type="submit" class="editing btn btn-primary submit_button"><%= t('buttons.save_alert', "Save Alert") %></button>
+  </div>
 <% end %>
