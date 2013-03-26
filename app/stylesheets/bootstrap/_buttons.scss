@@ -14,6 +14,7 @@
   margin-bottom: 0; // For input.btn
   font-size: $baseFontSize;
   line-height: $baseLineHeight;
+  *line-height: $baseLineHeight;
   text-align: center;
   vertical-align: middle;
   cursor: pointer;
@@ -25,14 +26,15 @@
   @include ie7-restore-left-whitespace(); // Give IE7 some love
   @include box-shadow(inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05));
 
-  // Hover/focus state
-  &:hover,
-  &:focus {
+  // Hover state
+  &:hover {
     color: $grayDark;
     text-decoration: none;
+    background-color: darken($white, 10%);
+    *background-color: darken($white, 15%); /* Buttons in IE7 don't get borders, so darken on hover */
     background-position: 0 -15px;
 
-    // transition is only when going to hover/focus, otherwise the background
+    // transition is only when going to hover, otherwise the background
     // behind the gradient (there for IE<=9 fallback) gets mismatched
     @include transition(background-position .1s linear);
   }
@@ -45,6 +47,8 @@
   // Active state
   &.active,
   &:active {
+    background-color: darken($white, 10%);
+    background-color: darken($white, 15%) \9;
     background-image: none;
     outline: 0;
     @include box-shadow(inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05));
@@ -54,6 +58,7 @@
   &.disabled,
   &[disabled] {
     cursor: default;
+    background-color: darken($white, 10%);
     background-image: none;
     @include opacity(65);
     @include box-shadow(none);
@@ -74,7 +79,7 @@
 }
 .btn-large [class^="icon-"],
 .btn-large [class*=" icon-"] {
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 // Small
@@ -86,10 +91,6 @@
 .btn-small [class^="icon-"],
 .btn-small [class*=" icon-"] {
   margin-top: 0;
-}
-.btn-mini [class^="icon-"],
-.btn-mini [class*=" icon-"] {
-  margin-top: -1px;
 }
 
 // Mini
@@ -142,6 +143,11 @@ input[type="button"] {
 
 // Set the backgrounds
 // -------------------------
+.btn {
+  // reset here as of 2.0.3 due to Recess property order
+  border-color: #c5c5c5;
+  border-color: rgba(0,0,0,.15) rgba(0,0,0,.15) rgba(0,0,0,.25);
+}
 .btn-primary {
   @include buttonBackground($btnPrimaryBackground, $btnPrimaryBackgroundHighlight);
 }
@@ -215,14 +221,12 @@ input[type="submit"].btn {
   color: $linkColor;
   @include border-radius(0);
 }
-.btn-link:hover,
-.btn-link:focus {
+.btn-link:hover {
   color: $linkColorHover;
   text-decoration: underline;
   background-color: transparent;
 }
-.btn-link[disabled]:hover,
-.btn-link[disabled]:focus {
+.btn-link[disabled]:hover {
   color: $grayDark;
   text-decoration: none;
 }
