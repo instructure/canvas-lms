@@ -49,6 +49,14 @@ class PageView < ActiveRecord::Base
     end
   end
 
+  def self.for_request_id(request_id)
+    if PageView.page_view_method == :db
+      find_by_request_id(request_id)
+    else
+      new{ |p| p.request_id = request_id }
+    end
+  end
+
   def ensure_account
     self.account_id ||= (self.context_type == 'Account' ? self.context_id : self.context.account_id) rescue nil
     self.account_id ||= (self.context.is_a?(Account) ? self.context : self.context.account) if self.context
