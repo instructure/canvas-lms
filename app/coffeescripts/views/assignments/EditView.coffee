@@ -153,6 +153,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
 
     handleGradingTypeChange: (gradingType) =>
       @$gradedAssignmentFields.toggleAccessibly gradingType != 'not_graded'
+      @handleSubmissionTypeChange(null)
 
     handleSubmissionTypeChange: (ev) =>
       subVal = @$submissionType.val()
