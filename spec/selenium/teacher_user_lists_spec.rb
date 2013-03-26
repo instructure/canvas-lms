@@ -30,7 +30,7 @@ eolist
       unique_ids = ["user1@example.com", "bob@thesagatfamily.name", "A124123"]
       browser_text = ["user1@example.com\nuser1@example.com\nuser1@example.com", "sagat, bob\nbob sagat\nbob@thesagatfamily.name", "user, login_name\nlogin_name user\nA124123"] if include_short_name
       browser_text = ["user1@example.com\nuser1@example.com", "sagat, bob\nbob@thesagatfamily.name", "user, login_name\nA124123"] unless include_short_name
-      enrollments = Enrollment.all(:conditions => ["(workflow_state = 'invited' OR workflow_state = 'creation_pending') AND type = ? ", enrollment_type])
+      enrollments = Enrollment.where("(workflow_state='invited' OR workflow_state='creation_pending') AND type=?", enrollment_type).all
       (enrollments.count > 2).should be_true
       unique_ids.each do |id|
         enrollment = find_enrollment_by_id(enrollments, id)

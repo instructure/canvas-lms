@@ -138,7 +138,7 @@ describe Group do
       }.each do |join_level, workflow_state|
         group = group_model(:join_level => join_level, :group_category => @communities)
         group.add_user(@user)
-        group.group_memberships.scoped(:conditions => { :workflow_state => workflow_state, :user_id => @user.id }).first.should_not be_nil
+        group.group_memberships.where(:workflow_state => workflow_state, :user_id => @user).first.should_not be_nil
       end
     end
 
@@ -150,7 +150,7 @@ describe Group do
 
       [ 'invited', 'requested', 'accepted' ].each do |workflow_state|
         @group.add_user(@user, workflow_state)
-        @group.group_memberships.scoped(:conditions => { :workflow_state => workflow_state, :user_id => @user.id }).first.should_not be_nil
+        @group.group_memberships.where(:workflow_state => workflow_state, :user_id => @user).first.should_not be_nil
       end
     end
 
@@ -325,7 +325,7 @@ describe Group do
       @group.add_user(@user3, 'invited')
       @group.add_user(@user4, 'requested')
       @group.add_user(@user5, 'rejected')
-      GroupMembership.update_all({:moderator => true}, {:group_id => @group.id, :user_id => @user2.id})
+      GroupMembership.where(:group_id => @group, :user_id => @user2).update_all(:moderator => true)
 
       @group.has_member?(@user1).should be_true
       @group.has_member?(@user2).should be_true
@@ -348,7 +348,7 @@ describe Group do
       @group.add_user(@user3, 'invited')
       @group.add_user(@user4, 'requested')
       @group.add_user(@user5, 'rejected')
-      GroupMembership.update_all({:moderator => true}, {:group_id => @group.id, :user_id => [@user2.id, @user3.id, @user4.id, @user5.id]})
+      GroupMembership.where(:group_id => @group, :user_id => [@user2, @user3, @user4, @user5]).update_all(:moderator => true)
 
       @group.has_moderator?(@user1).should be_false
       @group.has_moderator?(@user2).should be_true

@@ -99,7 +99,7 @@ describe "course rubrics" do
       ff('tr.learning_outcome_criterion td.rating .points').map(&:text).should == @outcome.data[:rubric_criterion][:ratings].map { |c| c[:points].to_s }
       submit_form('#edit_rubric_form')
       wait_for_ajaximations
-      rubric = Rubric.last(:order => :id)
+      rubric = Rubric.order(:id).last
       rubric.data.first[:ratings].map { |r| r[:description] }.should == @outcome.data[:rubric_criterion][:ratings].map { |c| c[:description] }
       rubric.data.first[:ratings].map { |r| r[:points] }.should == @outcome.data[:rubric_criterion][:ratings].map { |c| c[:points] }
     end

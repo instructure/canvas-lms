@@ -603,14 +603,14 @@ describe GroupsController do
       get 'accept_invitation', :group_id => @group.id, :uuid => @membership.uuid
       @group.reload
       @group.has_member?(@user).should be_true
-      @group.group_memberships.scoped(:conditions => {:workflow_state => "invited"}).count.should == 0
+      @group.group_memberships.where(:workflow_state => "invited").count.should == 0
     end
 
     it "should reject an invalid invitation uuid" do
       get 'accept_invitation', :group_id => @group.id, :uuid => @membership.uuid + "x"
       @group.reload
       @group.has_member?(@user).should be_false
-      @group.group_memberships.scoped(:conditions => {:workflow_state => "invited"}).count.should == 1
+      @group.group_memberships.where(:workflow_state => "invited").count.should == 1
     end
   end
 end

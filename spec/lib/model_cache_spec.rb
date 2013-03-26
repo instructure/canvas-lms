@@ -37,8 +37,8 @@ describe ModelCache do
     end
 
     user_with_pseudonym(:name => 'qwerty')
-    @user = TestModelCacheUser.find(:first, :conditions => {:id => @user.id})
-    @pseudonym = TestModelCachePseudonym.find(:first, :conditions => {:id => @pseudonym.id})
+    @user = TestModelCacheUser.where(:id => @user).first
+    @pseudonym = TestModelCachePseudonym.where(:id => @pseudonym).first
   end
 
   after do
@@ -81,7 +81,7 @@ describe ModelCache do
 
     it "should not cache any other lookups" do
       ModelCache.with_cache(:test_model_cache_users => [@user]) do
-        u1 = TestModelCacheUser.find(:first, :conditions => {:id => @user.id})
+        u1 = TestModelCacheUser.where(:id => @user.id).first
         u1.should eql(@user)
         u1.should_not equal(@user)
 

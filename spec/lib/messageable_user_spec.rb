@@ -32,12 +32,13 @@ describe "MessageableUser" do
 
     it "should combine common_course_column and common_role_column in common_courses" do
       course_with_student(:active_all => true)
-      messageable_user = MessageableUser.find(:first,
-        :select => MessageableUser.build_select(
+      messageable_user = MessageableUser.
+        select(MessageableUser.build_select(
           :common_course_column => "'course_column'",
-          :common_role_column => "'role_column'"),
-        :conditions => {:id => @student.id},
-        :group => MessageableUser.connection.group_by(*MessageableUser::COLUMNS))
+          :common_role_column => "'role_column'")).
+        where(:id => @student).
+        group(MessageableUser.connection.group_by(*MessageableUser::COLUMNS)).
+        first
       messageable_user.send(:read_attribute, :common_courses).
         should == "course_column:role_column"
     end
@@ -45,13 +46,14 @@ describe "MessageableUser" do
     it "should combine multiple (course,role) pairs in common_courses" do
       course_with_ta(:active_all => true)
       multiple_student_enrollment(@ta, @course.course_sections.create!)
-      messageable_user = MessageableUser.find(:first,
-        :select => MessageableUser.build_select(
+      messageable_user = MessageableUser.
+        select(MessageableUser.build_select(
           :common_course_column => "'course'",
-          :common_role_column => 'enrollments.type'),
-        :joins => 'INNER JOIN enrollments ON enrollments.user_id=users.id',
-        :conditions => {:id => @ta.id},
-        :group => MessageableUser.connection.group_by(*MessageableUser::COLUMNS))
+          :common_role_column => 'enrollments.type')).
+        joins('INNER JOIN enrollments ON enrollments.user_id=users.id').
+        where(:id => @ta.id).
+        group(MessageableUser.connection.group_by(*MessageableUser::COLUMNS)).
+        first
       messageable_user.send(:read_attribute, :common_courses).split(/,/).sort.
         should == ["course:StudentEnrollment", "course:TaEnrollment"]
     end
@@ -59,11 +61,12 @@ describe "MessageableUser" do
     it "should combine multiple common_group_column values in common_groups" do
       group1 = group_with_user(:active_all => true).group
       group2 = group_with_user(:user => @user, :active_all => true).group
-      messageable_user = MessageableUser.find(:first,
-        :select => MessageableUser.build_select(:common_group_column => "group_memberships.group_id"),
-        :joins => 'INNER JOIN group_memberships ON group_memberships.user_id=users.id',
-        :conditions => {:id => @user.id},
-        :group => MessageableUser.connection.group_by(*MessageableUser::COLUMNS))
+      messageable_user = MessageableUser.
+        select(MessageableUser.build_select(:common_group_column => "group_memberships.group_id")).
+        joins('INNER JOIN group_memberships ON group_memberships.user_id=users.id').
+        where(:id => @user).
+        group(MessageableUser.connection.group_by(*MessageableUser::COLUMNS)).
+        first
       messageable_user.send(:read_attribute, :common_groups).split(/,/).map(&:to_i).sort.
         should == [group1.id, group2.id].sort
     end

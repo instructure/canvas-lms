@@ -183,7 +183,7 @@ describe "account admin question bank" do
     def move_questions_validation(bank_name, questions)
       new_question_bank = AssessmentQuestionBank.find_by_title(bank_name)
       new_question_bank.should be_present
-      new_questions = AssessmentQuestion.all(:conditions => {:assessment_question_bank_id => new_question_bank.id})
+      new_questions = AssessmentQuestion.where(:assessment_question_bank_id => new_question_bank).all
       new_questions.should be_present
       new_questions.should == questions
     end

@@ -890,8 +890,8 @@ describe Conversation do
     source.add_participants(sender, [source_user]) if source_user
     target.add_participants(sender, [target_user]) if target_user
     target_user = source_user || target_user
-    message_count = source.shard.activate { ConversationMessageParticipant.count(:all, :joins => :conversation_message, :conditions => {:user_id => target_user.id, :conversation_messages => {:conversation_id => source.id}}) }
-    message_count += target.shard.activate { ConversationMessageParticipant.count(:all, :joins => :conversation_message, :conditions => {:user_id => target_user.id, :conversation_messages => {:conversation_id => target.id}}) }
+    message_count = source.shard.activate { ConversationMessageParticipant.joins(:conversation_message).where(:user_id => target_user, :conversation_messages => {:conversation_id => source}).count }
+    message_count += target.shard.activate { ConversationMessageParticipant.joins(:conversation_message).where(:user_id => target_user, :conversation_messages => {:conversation_id => target}).count }
 
     source.merge_into(target)
 

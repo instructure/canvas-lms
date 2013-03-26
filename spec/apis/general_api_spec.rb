@@ -66,7 +66,7 @@ describe "API", :type => :integration do
       response.should be_success
       response.header['content-type'].should == 'application/json; charset=utf-8'
 
-      @assignment = @course.assignments.last(:order => :id)
+      @assignment = @course.assignments.order(:id).last
       @assignment.title.should == "test assignment"
       @assignment.points_possible.should == 15
     end
@@ -77,7 +77,7 @@ describe "API", :type => :integration do
       response.should be_success
       response.header['content-type'].should == 'application/json; charset=utf-8'
 
-      @assignment = @course.assignments.last(:order => :id)
+      @assignment = @course.assignments.order(:id).last
       @assignment.title.should == "test assignment"
       @assignment.points_possible.should == 15
     end

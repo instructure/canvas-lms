@@ -129,7 +129,7 @@ describe "Groups API", :type => :integration do
       'is_public'=> false,
       'join_level'=> "parent_context_request",
     })
-    @community2 = Group.last(:order => :id)
+    @community2 = Group.order(:id).last
     @community2.group_category.should be_communities
     json.should == group_json(@community2, @user)
   end
@@ -295,7 +295,7 @@ describe "Groups API", :type => :integration do
         :filter_states => ["invited"]
       })
       json.count.should == 1
-      json.first.should == membership_json(@community.group_memberships.scoped(:conditions => { :workflow_state => 'invited' }).first)
+      json.first.should == membership_json(@community.group_memberships.where(:workflow_state => 'invited').first)
     end
     
     it "should allow someone to request to join a group" do
@@ -305,7 +305,7 @@ describe "Groups API", :type => :integration do
       json = api_call(:post, @memberships_path, @memberships_path_options.merge(:group_id => @community.to_param, :action => "create"), {
         :user_id => @user.id
       })
-      @membership = GroupMembership.scoped(:conditions => { :user_id => @user.id, :group_id => @community.id }).first
+      @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
       @membership.workflow_state.should == "requested"
       json.should == membership_json(@membership)
     end
@@ -317,7 +317,7 @@ describe "Groups API", :type => :integration do
       json = api_call(:post, @memberships_path, @memberships_path_options.merge(:group_id => @community.to_param, :action => "create"), {
         :user_id => @user.id
       })
-      @membership = GroupMembership.scoped(:conditions => { :user_id => @user.id, :group_id => @community.id }).first
+      @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
       @membership.workflow_state.should == "accepted"
       json.should == membership_json(@membership)
     end
@@ -401,16 +401,16 @@ describe "Groups API", :type => :integration do
 
     it "should allow someone to leave a group" do
       @user = @member
-      @gm = @community.group_memberships.scoped(:conditions => { :user_id => @user.id }).first
+      @gm = @community.group_memberships.where(:user_id => @user).first
       api_call(:delete, "#{@memberships_path}/#{@gm.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @gm.to_param, :action => "destroy"))
-      @membership = GroupMembership.scoped(:conditions => { :user_id => @user.id, :group_id => @community.id }).first
+      @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
       @membership.workflow_state.should == "deleted"
     end
 
     it "should allow leaving a group using 'self'" do
       @user = @member
       api_call(:delete, "#{@memberships_path}/self", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => 'self', :action => "destroy"))
-      @membership = GroupMembership.scoped(:conditions => { :user_id => @user.id, :group_id => @community.id }).first
+      @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
       @membership.workflow_state.should == "deleted"
     end
 
@@ -420,7 +420,7 @@ describe "Groups API", :type => :integration do
       expect {
         @json = api_call(:post, "#{@community_path}/invite", @category_path_options.merge(:group_id => @community.to_param, :action => "invite"), invitees)
       }.to change(User, :count).by(2)
-      @memberships = @community.reload.group_memberships.scoped(:conditions => { :workflow_state => "invited" }, :order => :id).all
+      @memberships = @community.reload.group_memberships.where(:workflow_state => "invited").order(:id).all
       @memberships.count.should == 2
       @json.sort{ |a,b| a['id'] <=> b['id'] }.should == @memberships.map{ |gm| membership_json(gm) }
     end
@@ -429,7 +429,7 @@ describe "Groups API", :type => :integration do
       @user = @member
       invitees = { :invitees => ["leonard@example.com", "sheldon@example.com"] }
       api_call(:post, "#{@community_path}/invite", @category_path_options.merge(:group_id => @community.to_param, :action => "invite"), invitees, {}, :expected_status => 401)
-      @memberships = @community.reload.group_memberships.scoped(:conditions => { :workflow_state => "invited" }, :order => :id).count.should == 0
+      @memberships = @community.reload.group_memberships.where(:workflow_state => "invited").order(:id).count.should == 0
     end
 
     it "should find people when inviting to a group in a non-default account" do
@@ -467,7 +467,7 @@ describe "Groups API", :type => :integration do
         @memberships_path_options.merge(:group_id => @group.to_param, :action => "create"),
         { :user_id => @to_add.id })
 
-      @membership = GroupMembership.scoped(:conditions => { :user_id => @to_add.id, :group_id => @group.id }).first
+      @membership = GroupMembership.where(:user_id => @to_add, :group_id => @group).first
       @membership.workflow_state.should == "accepted"
       json.should == membership_json(@membership)
     end

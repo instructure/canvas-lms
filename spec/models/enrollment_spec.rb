@@ -1181,7 +1181,7 @@ describe Enrollment do
     it "should uncache user enrollments when rejected" do
       enable_cache do
         course_with_student(:active_course => 1)
-        User.update_all({:updated_at => 1.year.ago}, :id => @user.id)
+        User.where(:id => @user).update_all(:updated_at => 1.year.ago)
         @user.reload
         @user.cached_current_enrollments.should == [@enrollment]
         @enrollment.reject!
@@ -1493,7 +1493,7 @@ describe Enrollment do
     it "should remove the enrollment from User#cached_current_enrollments" do
       enable_cache do
         course_with_student(:active_all => 1)
-        User.update_all({:updated_at => 1.day.ago}, :id => @user.id)
+        User.where(:id => @user).update_all(:updated_at => 1.day.ago)
         @user.reload
         @user.cached_current_enrollments.should == [ @enrollment ]
         @enrollment.conclude

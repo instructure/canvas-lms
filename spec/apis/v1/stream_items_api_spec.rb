@@ -46,7 +46,7 @@ describe UsersController, :type => :integration do
     @context = @course
     @topic1 = discussion_topic_model
     # introduce a dangling StreamItemInstance
-    StreamItem.delete_all(:id => @user.visible_stream_item_instances.last.stream_item_id)
+    StreamItem.where(:id => @user.visible_stream_item_instances.last.stream_item_id).delete_all
     json = api_call(:get, "/api/v1/users/activity_stream.json",
                     { :controller => "users", :action => "activity_stream", :format => 'json' })
     json.size.should == 1

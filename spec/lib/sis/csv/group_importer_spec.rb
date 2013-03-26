@@ -52,7 +52,7 @@ describe SIS::CSV::GroupImporter do
       "group_id,account_id,name,status",
       "G001,,Group 1,available",
       "G002,A002,Group 2,deleted")
-    groups = Group.all(:order => :id)
+    groups = Group.order(:id).all
     groups.map(&:account_id).should == [@account.id, @sub.id]
     groups.map(&:sis_source_id).should == %w(G001 G002)
     groups.map(&:name).should == ["Group 1", "Group 2"]
@@ -64,7 +64,7 @@ describe SIS::CSV::GroupImporter do
     process_csv_data_cleanly(
       "group_id,name,status",
       "G001,Group 1,available")
-    groups = Group.all(:order => :id)
+    groups = Group.order(:id).all
     groups.map(&:account_id).should == [@account.id]
     groups.map(&:sis_source_id).should == %w(G001)
     groups.map(&:name).should == ["Group 1"]
@@ -85,7 +85,7 @@ describe SIS::CSV::GroupImporter do
       "G001,,Group 1-b,available",
       "G002,A002,Group 2-b,deleted")
     # group 1's name won't change because it was manually changed
-    groups = Group.all(:order => :id)
+    groups = Group.order(:id).all
     groups.map(&:name).should == ["Group 1-1", "Group 2-b"]
     groups.map(&:root_account).should == [@account, @account]
     groups.map(&:workflow_state).should == %w(available deleted)

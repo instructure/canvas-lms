@@ -903,7 +903,7 @@ describe ContentMigration do
 
     it "should add a warning instead of failing when trying to copy an invalid file" do
       att = Attachment.create!(:filename => 'dummy.txt', :uploaded_data => StringIO.new('fakety'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
-      Attachment.update_all({:filename => nil}, {:id => att.id})
+      Attachment.where(:id => att).update_all(:filename => nil)
 
       att.reload
       att.should_not be_valid

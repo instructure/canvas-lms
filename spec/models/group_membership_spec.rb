@@ -42,7 +42,7 @@ describe GroupMembership do
     gm2.reload.should be_deleted
 
     # should work even if we start with bad data (two accepted memberships)
-    GroupMembership.update_all({:workflow_state => "accepted"}, {:id => gm2.id})
+    GroupMembership.where(:id => gm2).update_all(:workflow_state => "accepted")
     gm1.save!
     gm1.reload.should be_accepted
     gm2.reload.should be_deleted
@@ -229,23 +229,23 @@ describe GroupMembership do
 
     it "should auto-follow the group when joining the group" do
       @group.add_user(@user, 'accepted')
-      @user.reload.user_follows.find(:first, :conditions => { :followed_item_id => @group.id, :followed_item_type => 'Group' }).should_not be_nil
+      @user.reload.user_follows.where(:followed_item_id => @group, :followed_item_type => 'Group').first.should_not be_nil
     end
 
     it "should auto-follow the group when a request is accepted" do
       @membership = @group.add_user(@user, 'requested')
-      @user.reload.user_follows.find(:first, :conditions => { :followed_item_id => @group.id, :followed_item_type => 'Group' }).should be_nil
+      @user.reload.user_follows.where(:followed_item_id => @group, :followed_item_type => 'Group').first.should be_nil
       @membership.workflow_state = 'accepted'
       @membership.save!
-      @user.reload.user_follows.find(:first, :conditions => { :followed_item_id => @group.id, :followed_item_type => 'Group' }).should_not be_nil
+      @user.reload.user_follows.where(:followed_item_id => @group, :followed_item_type => 'Group').first.should_not be_nil
     end
 
     it "should auto-follow the group when an invitation is accepted" do
       @membership = @group.add_user(@user, 'invited')
-      @user.reload.user_follows.find(:first, :conditions => { :followed_item_id => @group.id, :followed_item_type => 'Group' }).should be_nil
+      @user.reload.user_follows.where(:followed_item_id => @group, :followed_item_type => 'Group').first.should be_nil
       @membership.workflow_state = 'accepted'
       @membership.save!
-      @user.reload.user_follows.find(:first, :conditions => { :followed_item_id => @group.id, :followed_item_type => 'Group' }).should_not be_nil
+      @user.reload.user_follows.where(:followed_item_id => @group, :followed_item_type => 'Group').first.should_not be_nil
     end
   end
 

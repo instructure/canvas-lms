@@ -77,7 +77,8 @@ describe Notification do
     end
 
     it "should look up all notifications once and cache them thereafter" do
-      Notification.expects(:all).once.returns{ Notification.find(:all) }
+      notifications = Notification.all
+      Notification.expects(:all).once.returns { notifications }
       Notification.by_name("foo").should eql(Notification.find_by_name("foo"))
       Notification.by_name("bar").should eql(Notification.find_by_name("bar"))
     end

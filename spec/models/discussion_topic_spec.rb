@@ -521,7 +521,7 @@ describe DiscussionTopic do
       @entry1 = @topic.discussion_entries.create!(:message => "second message", :user => @user)
       @entry1.created_at = 1.week.ago
       @entry1.save!
-      @submission = @assignment.submissions.scoped(:conditions => {:user_id => @entry1.user_id}).first
+      @submission = @assignment.submissions.where(:user_id => @entry1.user_id).first
     end
 
     it "should not re-flag graded discussion as needs grading if student make another comment" do
@@ -655,7 +655,7 @@ describe DiscussionTopic do
       @student.reload
 
       @assignment.grade_student(@student, :grade => 1)
-      @submission = Submission.find(:first, :conditions => {:user_id => @student.id, :assignment_id => @assignment.id})
+      @submission = Submission.where(:user_id => @student, :assignment_id => @assignment).first
       @submission.workflow_state.should == 'graded'
 
       @topic.ensure_submission(@student)

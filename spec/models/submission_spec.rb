@@ -121,7 +121,7 @@ describe Submission do
       @entry1 = @topic.discussion_entries.create(:message => "first entry", :user => @user)
       @topic.assignment_id = @assignment.id
       @topic.save!
-      @submission = @assignment.submissions.scoped(:conditions => {:user_id => @entry1.user_id}).first
+      @submission = @assignment.submissions.where(:user_id => @entry1.user_id).first
       new_time = Time.now + 30.minutes
       Time.stubs(:now).returns(new_time)
       @entry2 = @topic.discussion_entries.create(:message => "second entry", :user => @user)
@@ -284,8 +284,8 @@ describe Submission do
       }.should change StreamItemInstance, :count
 
       @assignment.unmute!
-      stream_item_ids       = StreamItem.all(:select => :id, :conditions => { :asset_type => 'Submission', :asset_id => @assignment.submissions.map(&:id)})
-      stream_item_instances = StreamItemInstance.all(:conditions => { :stream_item_id => stream_item_ids })
+      stream_item_ids       = StreamItem.where(:asset_type => 'Submission', :asset_id => @assignment.submissions.all).pluck(:id)
+      stream_item_instances = StreamItemInstance.where(:stream_item_id => stream_item_ids)
       stream_item_instances.each { |sii| sii.should_not be_hidden }
     end
 

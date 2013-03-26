@@ -444,7 +444,7 @@ describe "Canvas Cartridge importing" do
     mod3.add_item({ :title => 'Example 1', :type => 'external_url', :url => 'http://a.example.com/' })
     mod3.add_item({ :title => 'Example 2', :type => 'external_url', :url => 'http://b.example.com/' })
     ct = mod3.add_item({ :title => 'Example 3', :type => 'external_url', :url => 'http://b.example.com/with%20space' })
-    ContentTag.update_all({:url => "http://b.example.com/with space"}, "id=#{ct.id}")
+    ContentTag.where(:id => ct).update_all(:url => "http://b.example.com/with space")
     
     # attachments are migrated with just their filename as display_name, 
     # if a content tag has a different title the display_name should not update

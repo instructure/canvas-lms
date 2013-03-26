@@ -452,7 +452,7 @@ describe EnrollmentsApiController, :type => :integration do
 
       it "should list all of a user's enrollments in an account" do
         json = api_call(:get, @user_path, @user_params)
-        enrollments = @student.current_enrollments.scoped(:include => :user, :order => 'users.sortable_name ASC')
+        enrollments = @student.current_enrollments.includes(:user).order("users.sortable_name ASC")
         json.should == enrollments.map { |e|
           {
             'root_account_id' => e.root_account_id,
@@ -599,7 +599,7 @@ describe EnrollmentsApiController, :type => :integration do
         @user = current_user
         json = api_call(:get, @path, @params)
         enrollments = %w{observer student ta teacher}.inject([]) do |res, type|
-          res = res + @course.send("#{type}_enrollments").scoped(:include => :user, :order => 'users.sortable_name ASC')
+          res = res + @course.send("#{type}_enrollments").includes(:user).order("users.sortable_name ASC")
         end
         json.should == enrollments.map { |e|
           h = {
@@ -646,7 +646,7 @@ describe EnrollmentsApiController, :type => :integration do
 
       it "should list its own enrollments" do
         json = api_call(:get, @user_path, @user_params)
-        enrollments = @user.current_enrollments.scoped(:include => :user, :order => 'users.sortable_name ASC')
+        enrollments = @user.current_enrollments.includes(:user).order("users.sortable_name ASC")
         json.should == enrollments.map { |e|
           {
             'root_account_id' => e.root_account_id,
@@ -729,7 +729,7 @@ describe EnrollmentsApiController, :type => :integration do
       it "should include users' sis and login ids" do
         json = api_call(:get, @path, @params)
         enrollments = %w{observer student ta teacher}.inject([]) do |res, type|
-          res = res + @course.send("#{type}_enrollments").scoped(:include => :user)
+          res = res + @course.send("#{type}_enrollments").includes(:user)
         end
         json.should == enrollments.map do |e|
           user_json = {
@@ -788,7 +788,7 @@ describe EnrollmentsApiController, :type => :integration do
       it "should properly paginate" do
         json = api_call(:get, "#{@path}?page=1&per_page=1", @params.merge(:page => 1.to_param, :per_page => 1.to_param))
         enrollments = %w{observer student ta teacher}.inject([]) { |res, type|
-          res = res + @course.send("#{type}_enrollments").scoped(:include => :user)
+          res = res + @course.send("#{type}_enrollments").includes(:user)
         }.map do |e|
           h = {
             'root_account_id' => e.root_account_id,

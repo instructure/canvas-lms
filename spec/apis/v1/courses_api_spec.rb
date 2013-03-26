@@ -1593,7 +1593,7 @@ describe ContentImportsController, :type => :integration do
             { :controller => 'content_imports', :action => 'copy_course_content', :course_id => to_id, :format => 'json' },
     {:source_course => from_id}.merge(options))
 
-    cm = ContentMigration.last(:order => :id)
+    cm = ContentMigration.order(:id).last
     data.should == {
       'id' => cm.id,
       'progress' => nil,

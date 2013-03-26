@@ -31,15 +31,15 @@ describe "BookmarkedCollection::MergeProxy" do
     def self.restrict_scope(scope, pager)
       if bookmark = pager.current_bookmark
         comparison = (pager.include_bookmark ? 'courses.id >= ?' : 'courses.id > ?')
-        scope = scope.scoped(:conditions => [comparison, bookmark])
+        scope = scope.where(comparison, bookmark)
       end
-      scope.scoped(:order => "courses.id ASC")
+      scope.order("courses.id ASC")
     end
   end
 
   describe "#paginate" do
     before :each do
-      @scope = Course.scoped(:order => :id)
+      @scope = Course.order(:id)
       3.times{ @scope.create! }
       @collection = BookmarkedCollection.wrap(MyBookmarker, @scope)
       @proxy = BookmarkedCollection::MergeProxy.new([['label', @collection]])
@@ -85,8 +85,8 @@ describe "BookmarkedCollection::MergeProxy" do
 
     describe "with multiple collections" do
       before :each do
-        @created_scope = Course.scoped(:conditions => {:workflow_state => 'created'})
-        @deleted_scope = Course.scoped(:conditions => {:workflow_state => 'deleted'})
+        @created_scope = Course.where(:workflow_state => 'created')
+        @deleted_scope = Course.where(:workflow_state => 'deleted')
 
         Course.delete_all
         @courses = [
@@ -161,8 +161,8 @@ describe "BookmarkedCollection::MergeProxy" do
       before :each do
         Course.delete_all
         @courses = 6.times.map{ Course.create! }
-        @scope1 = Course.scoped(:select => "id, 1 as scope", :conditions => ['id < ?', @courses[4].id])
-        @scope2 = Course.scoped(:select => "id, 2 as scope", :conditions => ['id > ?', @courses[1].id])
+        @scope1 = Course.select("id, 1 as scope").where("id<?", @courses[4].id)
+        @scope2 = Course.select("id, 2 as scope").where("id>?", @courses[1].id)
 
         @collection1 = BookmarkedCollection.wrap(MyBookmarker, @scope1)
         @collection2 = BookmarkedCollection.wrap(MyBookmarker, @scope2)

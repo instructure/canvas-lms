@@ -147,7 +147,7 @@ shared_examples_for "an object whose dates are overridable" do
 
     it "returns a scope" do
       # can't use "should respond_to", because that delegates to the instantiated Array
-      lambda{ overridable.overrides_visible_to(@teacher).scoped({}) }.should_not raise_exception
+      lambda{ overridable.overrides_visible_to(@teacher).scoped }.should_not raise_exception
     end
   end
 

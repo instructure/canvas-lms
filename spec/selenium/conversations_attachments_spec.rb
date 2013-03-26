@@ -10,7 +10,7 @@ shared_examples_for "conversations attachments selenium tests" do
 
     new_conversation
     submit_message_form(:attachments => [fullpath])
-    @user.all_conversations.scoped(:order => "conversation_id DESC").last.has_attachments.should be_true
+    @user.all_conversations.order("conversation_id DESC").last.has_attachments.should be_true
     @user.conversation_attachments_folder.attachments.count.should == 1
   end
 
@@ -27,7 +27,7 @@ shared_examples_for "conversations attachments selenium tests" do
     ffj(".attachment_list > .attachment:visible").size.should == 1
     ffj(".attachment_list > .attachment:visible .remove_link")[0].click
     submit_message_form
-    @user.all_conversations.scoped(:order => "conversation_id DESC").last.has_attachments.should be_false
+    @user.all_conversations.order("conversation_id DESC").last.has_attachments.should be_false
   end
 
   it "should save just one attachment when sending a bulk private message" do

@@ -737,7 +737,7 @@ describe User do
       set_up_course_with_users
       enrollment = @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
       # we currently force limit_privileges_to_course_section to be false for students; override it in the db
-      Enrollment.update_all({ :limit_privileges_to_course_section => true }, :id => enrollment.id)
+      Enrollment.where(:id => enrollment).update_all(:limit_privileges_to_course_section => true)
       messageable_users = search_messageable_users(@student).map(&:id)
       messageable_users.should include @this_section_user.id
       messageable_users.should_not include @other_section_user.id
@@ -816,7 +816,7 @@ describe User do
       set_up_course_with_users
       enrollment = @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
       # we currently force limit_privileges_to_course_section to be false for students; override it in the db
-      Enrollment.update_all({ :limit_privileges_to_course_section => true }, :id => enrollment.id)
+      Enrollment.where(:id => enrollment).update_all(:limit_privileges_to_course_section => true)
 
       @group.users << @other_section_user
 
@@ -974,7 +974,7 @@ describe User do
         set_up_course_with_users
         enrollment = @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
         # we currently force limit_privileges_to_course_section to be false for students; override it in the db
-        Enrollment.update_all({ :limit_privileges_to_course_section => true }, :id => enrollment.id)
+        Enrollment.where(:id => enrollment).update_all(:limit_privileges_to_course_section => true)
 
         @group.users << @other_section_user
         @this_section_user_enrollment.conclude

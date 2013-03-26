@@ -260,7 +260,7 @@ describe "Users API", :type => :integration do
         users << User.create!(:name => u[0])
         users[i].pseudonyms.create!(:unique_id => u[1], :account => @account) { |p| p.sis_user_id = u[1] }
       end
-      @account.all_users.scoped(:order => :sortable_name).each_with_index do |user, i|
+      @account.all_users.order(:sortable_name).each_with_index do |user, i|
         next unless users.find { |u| u == user }
         json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
                { :controller => 'users', :action => 'index', :account_id => @account.id.to_param, :format => 'json' },

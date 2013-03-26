@@ -401,7 +401,7 @@ answers:
       }.force_encoding('binary').strip
       # now actually insert it into an AR column
       aq = assessment_question_model
-      AssessmentQuestion.update_all({ :question_data => yaml_blob }, { :id => aq.id })
+      AssessmentQuestion.where(:id => aq).update_all(:question_data => yaml_blob)
       text = aq.reload.question_data['answers'][0]['valid_ascii']
       text.should == "text"
       text.encoding.should == Encoding::UTF_8

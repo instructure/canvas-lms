@@ -81,7 +81,7 @@ describe ActiveRecord::Base do
     end
 
     it "should find each enrollment from course join" do
-      e = Course.active.scoped(:joins => :enrollments)
+      e = Course.active.joins(:enrollments)
       all_enrollments = []
       e.useful_find_each(:batch_size => 2) do |e|
         all_enrollments << e.id
@@ -90,7 +90,7 @@ describe ActiveRecord::Base do
     end
 
     it "should find in batches all enrollments from course join" do
-      e = Course.active.scoped(:select => "enrollments.id as eid", :joins => :enrollments)
+      e = Course.active.select("enrollments.id as eid").joins(:enrollments)
       all_enrollments = []
       e.useful_find_in_batches(:batch_size => 2) do |batch|
         batch.each do |e|
@@ -101,8 +101,8 @@ describe ActiveRecord::Base do
     end
 
     it "should find each enrollment from course using temp table" do
-      e = Course.active.scoped(:select => "enrollments.id AS e_id",
-                               :joins => :enrollments, :order => "e_id asc")
+      e = Course.active.select("enrollments.id AS e_id").
+                        joins(:enrollments).order("e_id asc")
       es = []
       e.find_each_with_temp_table(:batch_size => 2) do |record|
         es << record["e_id"]
@@ -113,8 +113,8 @@ describe ActiveRecord::Base do
     end
 
     it "should find all enrollments from course join in batches" do
-      e = Course.active.scoped(:select => "enrollments.id AS e_id",
-                               :joins => :enrollments, :order => "e_id asc")
+      e = Course.active.select("enrollments.id AS e_id").
+                        joins(:enrollments).order("e_id asc")
       batch_size = 2
       es = []
       e.find_in_batches_with_temp_table(:batch_size => batch_size) do |batch|
@@ -480,18 +480,18 @@ describe ActiveRecord::Base do
 
     it "should fail with improper nested hashes" do
       lambda {
-        User.find(:first, :conditions => { :name => { :users => { :id => @user.id }}})
+        User.where(:name => { :users => { :id => @user }}).first
       }.should raise_error(ActiveRecord::StatementInvalid)
     end
 
     it "should fail with dot in nested column name" do
       lambda {
-        User.find(:first, :conditions => { :name => { "users.id" => @user.id }})
+        User.where(:name => { "users.id" => @user }).first
       }.should raise_error(ActiveRecord::StatementInvalid)
     end
 
     it "should not fail with a dot in column name only" do
-      User.find(:first, :conditions => { 'users.id' => @user.id }).should_not be_nil
+      User.where('users.id' => @user).first.should_not be_nil
     end
   end
 
@@ -517,14 +517,14 @@ describe ActiveRecord::Base do
     end
 
     it "should do an update all with a join" do
-      Pseudonym.scoped(:joins => :user).active.update_all({:unique_id => 'pa3'}, {:users => {:name => 'a'}})
+      Pseudonym.joins(:user).active.where(:users => {:name => 'a'}).update_all(:unique_id => 'pa3')
       @p1.reload.unique_id.should == 'pa3'
       @p1_2.reload.unique_id.should == 'pa2'
       @p2.reload.unique_id.should == 'pb'
     end
 
     it "should do a delete all with a join" do
-      Pseudonym.scoped(:joins => :user).active.delete_all({:users => {:name => 'a'}})
+      Pseudonym.joins(:user).active.where(:users => {:name => 'a'}).delete_all
       lambda { @p1.reload }.should raise_error(ActiveRecord::RecordNotFound)
       @u1.reload.should_not be_deleted
       @p1_2.reload.unique_id.should == 'pa2'

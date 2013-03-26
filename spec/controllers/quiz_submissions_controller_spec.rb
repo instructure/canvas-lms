@@ -91,7 +91,7 @@ describe QuizSubmissionsController do
       course_with_student(:active_all => true)
       quiz_model(:course => @course)
       @qs = @quiz.generate_submission(@student, false)
-      QuizSubmission.update_all({ :updated_at => 1.hour.ago }, { :id => @qs.id })
+      QuizSubmission.where(:id => @qs).update_all(:updated_at => 1.hour.ago)
 
       put 'backup', :quiz_id => @quiz.id, :course_id => @course.id, :a => 'test'
       response.status.to_i.should == 401
@@ -103,7 +103,7 @@ describe QuizSubmissionsController do
       course_with_student_logged_in(:active_all => true)
       quiz_model(:course => @course)
       @qs = @quiz.generate_submission(@student, false)
-      QuizSubmission.update_all({ :updated_at => 1.hour.ago }, { :id => @qs.id })
+      QuizSubmission.where(:id => @qs).update_all(:updated_at => 1.hour.ago)
 
       put 'backup', :quiz_id => @quiz.id, :course_id => @course.id, :a => 'test'
       response.should be_success

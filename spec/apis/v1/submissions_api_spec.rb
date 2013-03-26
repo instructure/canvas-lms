@@ -26,14 +26,14 @@ describe 'Submissions API', :type => :integration do
     @submit_homework_time += 1.hour
     sub = assignment.find_or_create_submission(student)
     if sub.versions.size == 1
-      Version.update_all({:created_at => @submit_homework_time}, {:id => sub.versions.first.id})
+      Version.where(:id => sub.versions.first).update_all(:created_at => @submit_homework_time)
     end
     sub.workflow_state = 'submitted'
     yield(sub) if block_given?
     sub.with_versioning(:explicit => true) do
       update_with_protected_attributes!(sub, { :submitted_at => @submit_homework_time, :created_at => @submit_homework_time }.merge(opts))
     end
-    sub.versions(true).each { |v| Version.update_all({ :created_at => v.model.created_at }, { :id => v.id }) }
+    sub.versions(true).each { |v| Version.where(:id => v).update_all(:created_at => v.model.created_at) }
     sub
   end
 
@@ -140,7 +140,7 @@ describe 'Submissions API', :type => :integration do
       }.to change { Delayed::Job.jobs_count(:current) }.by(1)
 
       Submission.count.should == 2
-      @submission = Submission.last(:order => :id)
+      @submission = Submission.order(:id).last
       @submission.grader.should == @teacher
 
       json['score'].should == 7.5
@@ -1213,7 +1213,7 @@ describe 'Submissions API', :type => :integration do
         :course_id => @course.to_param, :assignment_id => assignment.to_param,
         :id => student.to_param },
       { :comment => { :text_comment => 'hidden comment' } })
-    submission.submission_comments.scoped(:order => 'id DESC').first.should be_hidden
+    submission.submission_comments.order("id DESC").first.should be_hidden
   end
 
   it "should not hide student comments on muted assignments" do
@@ -1229,7 +1229,7 @@ describe 'Submissions API', :type => :integration do
         :course_id => @course.to_param, :assignment_id => assignment.to_param,
         :id => student.to_param },
       { :comment => { :text_comment => 'hidden comment' } })
-    submission.submission_comments.scoped(:order => 'id DESC').first.should_not be_hidden
+    submission.submission_comments.order("id DESC").first.should_not be_hidden
   end
 
   it "should allow submitting points" do

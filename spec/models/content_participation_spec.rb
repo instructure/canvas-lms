@@ -54,7 +54,7 @@ describe ContentParticipation do
         })
       }.to change(ContentParticipation, :count).by 0
 
-      cp = ContentParticipation.find(:first, :conditions => { :user_id => @student.id })
+      cp = ContentParticipation.where(:user_id => @student).first
       cp.workflow_state.should == "unread"
     end
   end
@@ -74,7 +74,7 @@ describe ContentParticipation do
         :user => @student,
         :workflow_state => "unread",
       })
-      cpc = ContentParticipationCount.find(:first, :conditions => { :user_id => @student.id })
+      cpc = ContentParticipationCount.where(:user_id => @student).first
       cpc.unread_count.should == 1
     end
 
@@ -92,7 +92,7 @@ describe ContentParticipation do
         :user => @student,
         :workflow_state => "read",
       })
-      cpc = ContentParticipationCount.find(:first, :conditions => { :user_id => @student.id })
+      cpc = ContentParticipationCount.where(:user_id => @student).first
       cpc.unread_count.should == 0
     end
   end

@@ -219,7 +219,7 @@ describe CommunicationChannel do
       HostUrl.stubs(:context_host).with(account).returns('someserver.com')
       HostUrl.stubs(:context_host).with(nil).returns('default')
       @cc.send_confirmation!(account)
-      message = Message.find(:first, :conditions => { :communication_channel_id => @cc.id, :notification_id => notification.id })
+      message = Message.where(:communication_channel_id => @cc, :notification_id => notification).first
       message.should_not be_nil
       message.body.should match /someserver.com/
     end

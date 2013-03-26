@@ -357,7 +357,7 @@ describe SIS::CSV::UserImporter do
     user2.pseudonyms.count.should == 1
     user2.pseudonyms.first.communication_channel_id.should_not be_nil
 
-    Message.find(:first, :conditions => { :communication_channel_id => user2.email_channel.id, :notification_id => notification.id }).should_not be_nil
+    Message.where(:communication_channel_id => user2.email_channel, :notification_id => notification).first.should_not be_nil
   end
 
   it "should not notify about a merge opportunity to an SIS user in the same account" do
@@ -377,7 +377,7 @@ describe SIS::CSV::UserImporter do
     user1.pseudonyms.first.communication_channel_id.should_not be_nil
     user2.pseudonyms.first.communication_channel_id.should_not be_nil
 
-    Message.find(:first, :conditions => { :communication_channel_id => user2.email_channel.id, :notification_id => notification.id }).should be_nil
+    Message.where(:communication_channel_id => user2.email_channel, :notification_id => notification).first.should be_nil
   end
 
   it "should not notify about merge opportunities for users that have no means of logging in" do
@@ -397,7 +397,7 @@ describe SIS::CSV::UserImporter do
     user1.pseudonyms.first.communication_channel_id.should_not be_nil
     user2.pseudonyms.first.communication_channel_id.should_not be_nil
 
-    Message.find(:first, :conditions => { :communication_channel_id => user2.email_channel.id, :notification_id => notification.id }).should be_nil
+    Message.where(:communication_channel_id => user2.email_channel, :notification_id => notification).first.should be_nil
   end
 
   it "should not have problems updating a user to a conflicting email" do
@@ -426,7 +426,7 @@ describe SIS::CSV::UserImporter do
     user2.email_channel.should be_active
     user2.email.should == 'user1@example.com'
 
-    Message.find(:first, :conditions => { :communication_channel_id => user2.email_channel.id, :notification_id => notification.id }).should be_nil
+    Message.where(:communication_channel_id => user2.email_channel, :notification_id => notification).first.should be_nil
   end
 
   it "should not have a problem adding an existing e-mail that differs in case" do
@@ -490,7 +490,7 @@ describe SIS::CSV::UserImporter do
     )
     user2.reload
 
-    Message.find(:first, :conditions => { :communication_channel_id => user2.email_channel.id, :notification_id => notification.id }).should_not be_nil
+    Message.where(:communication_channel_id => user2.email_channel, :notification_id => notification).first.should_not be_nil
   end
 
   it "should not send merge opportunity notifications if the conflicting cc is retired or unconfirmed" do
@@ -508,7 +508,7 @@ describe SIS::CSV::UserImporter do
     user1.communication_channels.length.should == 1
     user1.email.should == 'user1@example.com'
     [cc1, cc2].should_not be_include(user1.email_channel)
-    Message.find(:first, :conditions => { :communication_channel_id => user1.email_channel.id, :notification_id => notification.id }).should be_nil
+    Message.where(:communication_channel_id => user1.email_channel, :notification_id => notification).first.should be_nil
   end
 
   it "should create everything in the deleted state when deleted initially" do

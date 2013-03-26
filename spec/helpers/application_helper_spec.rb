@@ -380,7 +380,7 @@ describe ApplicationHelper do
       # verify it's not overly long
       key1.length.should <= 40
 
-      User.update_all({ :updated_at => 1.hour.ago }, { :id => collection[1].id })
+      User.where(:id => collection[1]).update_all(:updated_at => 1.hour.ago)
       collection[1].reload
       key3 = collection_cache_key(collection)
       key1.should_not == key3

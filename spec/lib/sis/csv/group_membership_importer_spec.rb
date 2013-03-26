@@ -54,7 +54,7 @@ describe SIS::CSV::GroupMembershipImporter do
       "group_id,user_id,status",
       "G001,U001,accepted",
       "G001,U003,deleted")
-    ms = GroupMembership.all(:order => :id)
+    ms = GroupMembership.order(:id).all
     ms.map(&:user_id).should == [@user1.id, @user3.id]
     ms.map(&:group_id).should == [@group.id, @group.id]
     ms.map(&:workflow_state).should == %w(accepted deleted)
@@ -63,7 +63,7 @@ describe SIS::CSV::GroupMembershipImporter do
       "group_id,user_id,status",
       "G001,U001,deleted",
       "G001,U003,deleted")
-    ms = GroupMembership.all(:order => :id)
+    ms = GroupMembership.order(:id).all
     ms.map(&:user_id).should == [@user1.id, @user3.id]
     ms.map(&:group_id).should == [@group.id, @group.id]
     ms.map(&:workflow_state).should == %w(deleted deleted)

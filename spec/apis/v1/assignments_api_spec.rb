@@ -489,7 +489,7 @@ describe AssignmentsApiController, :type => :integration do
           find_or_create_by_notification_id(@notification.id).
           update_attribute(:frequency, 'immediately')
         @assignment = @course.assignments.create!
-        Assignment.update_all({:created_at => Time.zone.now - 1.day}, {:id => @assignment.id})
+        Assignment.where(:id => @assignment).update_all(:created_at => Time.zone.now - 1.day)
         @adhoc_due_at = 5.days.from_now
         @section_due_at = 7.days.from_now
         @params = {

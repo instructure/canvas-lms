@@ -53,8 +53,8 @@ describe "PaginatedCollection" do
       p2.current_page.should == 2
       p2.next_page.should be_nil
       p2.previous_page.should == 1
-      p1.should == User.active.all(:order => :id).map(&:id)[0,2]
-      p2.should == User.active.all(:order => :id).map(&:id)[2,1]
+      p1.should == User.active.order(:id).pluck(:id)[0,2]
+      p2.should == User.active.order(:id).pluck(:id)[2,1]
     end
   end
 end

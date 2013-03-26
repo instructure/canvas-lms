@@ -72,7 +72,7 @@ describe NotificationPolicy do
     @assignment.unpublish!
     @cc = @student.communication_channels.create(:path => "secondary@example.com")
     @cc.confirm!
-    NotificationPolicy.delete_all(:notification_id => @notif.id, :communication_channel_id => @cc.id)
+    NotificationPolicy.where(:notification_id => @notif, :communication_channel_id => @cc).delete_all
     @assignment.previously_published = false
     @assignment.save
     @assignment.publish!
@@ -315,7 +315,7 @@ def policy_setup
   @student = factory_with_protected_attributes(User, :name => "student", :workflow_state => "registered")
   e = @course.enroll_student(@student)
   e.accept!
-  Notification.find(:all).each{|n| n.destroy }
+  Notification.all.each{|n| n.destroy }
   @notif = Notification.create!(:name => "Assignment Graded", :subject => "Test", :category => 'TestNever')
 end
 

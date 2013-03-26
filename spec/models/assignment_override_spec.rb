@@ -129,7 +129,7 @@ describe AssignmentOverride do
     end
 
     def invalid_id_for_model(model)
-      (model.scoped(:select => 'max(id) as id').first.id || 0) + 1
+      (model.maximum(:id) || 0) + 1
     end
 
     it "should reject non-nil set_id with an adhoc set" do

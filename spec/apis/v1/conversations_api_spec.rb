@@ -395,7 +395,7 @@ describe ConversationsController, :type => :integration do
             p.delete("avatar_url")
           }
         }
-        conversation = @me.all_conversations.scoped(:order => "conversation_id DESC").first
+        conversation = @me.all_conversations.order("conversation_id DESC").first
         json.should eql [
           {
             "id" => conversation.conversation_id,
@@ -436,7 +436,7 @@ describe ConversationsController, :type => :integration do
             p.delete("avatar_url")
           }
         }
-        conversation = @me.all_conversations.scoped(:order => "conversation_id DESC").first
+        conversation = @me.all_conversations.order("conversation_id DESC").first
         json.should eql [
           {
             "id" => conversation.conversation_id,
@@ -568,7 +568,7 @@ describe ConversationsController, :type => :integration do
             p.delete("avatar_url")
           }
         }
-        conversation = @me.all_conversations.scoped(:order => "last_message_at DESC, conversation_id DESC").first
+        conversation = @me.all_conversations.order("last_message_at DESC, conversation_id DESC").first
         json.should eql [
           {
             "id" => conversation.conversation_id,
