@@ -138,6 +138,7 @@ input[type="checkbox"] {
   *margin-top: 0; /* IE7 */
   margin-top: 1px \9; /* IE8-9 */
   line-height: normal;
+  cursor: pointer;
 }
 
 // Reset width of input images, buttons, radios, checkboxes
@@ -366,9 +367,9 @@ input[type="checkbox"][readonly] {
 
 // HTML5 invalid states
 // Shares styles with the .control-group.error above
-input:focus:invalid,
-textarea:focus:invalid,
-select:focus:invalid {
+input:focus:required:invalid,
+textarea:focus:required:invalid,
+select:focus:required:invalid {
   color: #b94a48;
   border-color: #ee5f5b;
   &:focus {
@@ -421,9 +422,7 @@ select:focus:invalid {
 // Allow us to put symbols and text within the input field for a cleaner look
 .input-append,
 .input-prepend {
-  display: inline-block;
-  margin-bottom: $baseLineHeight / 2;
-  vertical-align: middle;
+  margin-bottom: 5px;
   font-size: 0; // white space collapse hack
   white-space: nowrap; // Prevent span and input from separating
 
@@ -431,8 +430,7 @@ select:focus:invalid {
   input,
   select,
   .uneditable-input,
-  .dropdown-menu,
-  .popover {
+  .dropdown-menu {
     font-size: $baseFontSize;
   }
 
@@ -464,8 +462,7 @@ select:focus:invalid {
     border: 1px solid #ccc;
   }
   .add-on,
-  .btn,
-  .btn-group > .dropdown-toggle {
+  .btn {
     vertical-align: top;
     @include border-radius(0);
   }
@@ -492,7 +489,7 @@ select:focus:invalid {
   select,
   .uneditable-input {
     @include border-radius($inputBorderRadius 0 0 $inputBorderRadius);
-    + .btn-group .btn:last-child {
+    + .btn-group .btn {
       @include border-radius(0 $inputBorderRadius $inputBorderRadius 0);
     }
   }
@@ -502,8 +499,7 @@ select:focus:invalid {
     margin-left: -1px;
   }
   .add-on:last-child,
-  .btn:last-child,
-  .btn-group:last-child > .dropdown-toggle {
+  .btn:last-child {
     @include border-radius(0 $inputBorderRadius $inputBorderRadius 0);
   }
 }
@@ -674,10 +670,7 @@ legend + .control-group {
   // And apply it only to .help-block instances that follow a form control
   input,
   select,
-  textarea,
-  .uneditable-input,
-  .input-prepend,
-  .input-append {
+  textarea {
     + .help-block {
       margin-top: $baseLineHeight / 2;
     }
