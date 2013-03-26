@@ -51,8 +51,8 @@ require([
           <div id="group_structure_standard_subcontainer">
             <input type="radio" name="category[split_groups]" id="category_split_groups" value="1"/>
             <%= t :group_structure_standard, "*Split students into* %{number_of_groups} *equal groups*",
-              :number_of_groups => '<input type="text" name="category[split_group_count]" id="category_split_group_count" style="width: 25px;"/>'.html_safe,
-              :wrapper => '<label for="category_split_groups">\1</label>' %><br/>
+              :number_of_groups => '<input type="text" name="category[split_group_count]" id="category_split_group_count" style="width: 25px; margin: 0;"/>'.html_safe,
+              :wrapper => '<label for="category_split_groups" style="vertical-align: -4px">\1</label>' %><br/>
             <input type="radio" name="category[split_groups]" id="category_no_groups" value="0" checked="true"/>
             <label for="category_no_groups"><%= t 'labels.manually_create_groups', "I'll create groups manually" %></label>
           </div>
