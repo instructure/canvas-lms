@@ -32,7 +32,7 @@ class ErrorsController < ApplicationController
     if error_search_enabled? && @message.present?
       @reports = @reports.where("message LIKE ?", '%' + @message + '%')
     elsif params[:category].blank?
-      @reports = @reports.where("category<>404")
+      @reports = @reports.where("category<>'404'")
     end
     if params[:category].present?
       @reports = @reports.where(:category => params[:category])
