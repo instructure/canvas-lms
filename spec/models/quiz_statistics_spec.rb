@@ -21,6 +21,12 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe QuizStatistics do
   before { course }
 
+  def csv(opts = {}, quiz = @quiz)
+    attachment = quiz.statistics_csv(opts)
+    attachment.open.read
+  end
+
+
   it 'should calculate mean/stddev as expected with no submissions' do
     q = @course.quizzes.create!
     stats = q.statistics
@@ -86,12 +92,14 @@ describe QuizStatistics do
     stats[:multiple_attempts_exist].should be_false
   end
 
+
   context 'csv' do
     before(:each) do
       student_in_course(:active_all => true)
       @quiz = @course.quizzes.create!
       @quiz.quiz_questions.create!(:question_data => { :name => "test 1" })
       @quiz.generate_quiz_data
+      @quiz.published_at = Time.now
       @quiz.save!
     end
 
@@ -103,7 +111,7 @@ describe QuizStatistics do
       # and one in progress
       @quiz.generate_submission(@student)
 
-      stats = FasterCSV.parse(@quiz.statistics_csv(:include_all_versions => true))
+      stats = FasterCSV.parse(csv(:include_all_versions => true))
       # format for row is row_name, '', data1, data2, ...
       stats.first.length.should == 3
     end
@@ -116,7 +124,7 @@ describe QuizStatistics do
       # and one in progress
       @quiz.generate_submission(@student)
 
-      stats = FasterCSV.parse(@quiz.statistics_csv(:include_all_versions => true, :anonymous => true))
+      stats = FasterCSV.parse(csv(:include_all_versions => true, :anonymous => true))
       # format for row is row_name, '', data1, data2, ...
       stats.first.length.should == 3
       stats[0][0].should == "section"
@@ -138,7 +146,7 @@ describe QuizStatistics do
       qs = @quiz.generate_submission(@student)
       qs.grade_submission
 
-      stats = FasterCSV.parse(@quiz.statistics_csv(:include_all_versions => true))
+      stats = FasterCSV.parse(csv(:include_all_versions => true))
       # format for row is row_name, '', data1, data2, ...
       stats[0].should == ["name", "", "nobody@example.com"]
       stats[1].should == ["id", "", @student.id.to_s]
@@ -161,7 +169,7 @@ describe QuizStatistics do
       qs = @quiz.generate_submission(@student)
       qs.grade_submission
 
-      stats = FasterCSV.parse(@quiz.statistics_csv)
+      stats = FasterCSV.parse(csv)
       # format for row is row_name, '', data1, data2, ...
       stats.first.length.should == 3
     end
@@ -187,7 +195,7 @@ describe QuizStatistics do
           "question_#{@quiz.quiz_questions[2].id}_#{AssessmentQuestion.variable_id('ans1')}" => 'baz'
       }
       qs.grade_submission
-      stats = FasterCSV.parse(@quiz.statistics_csv)
+      stats = FasterCSV.parse(csv)
       stats.size.should == 16 # 3 questions * 2 lines + ten more (name, id, sis_id, section, section_id, section_sis_id, submitted, correct, incorrect, score)
       stats[11].size.should == 3
       stats[11][2].should == ',baz'
@@ -210,14 +218,52 @@ describe QuizStatistics do
       }
       qs.grade_submission
 
-      stats = FasterCSV.parse(@quiz.statistics_csv)
+      stats = FasterCSV.parse(csv)
       stats[9][2].should == '5'
+    end
+
+    context 'generating quiz_statistics' do
+      before { @quiz.update_attribute :published_at, Time.now }
+
+      it 'uses the previously generated quiz_statistics if possible' do
+        qs = @quiz.quiz_statistics.create!
+        a = qs.csv_attachment
+
+        @quiz.statistics_csv.should == a
+      end
+
+      it 'generates a new quiz_statistics if none exist' do
+        QuizStatistics.any_instance.expects(:to_csv).once.returns("")
+        @quiz.statistics_csv
+        @quiz.statistics_csv
+      end
+
+      it 'generates a new quiz_statistics if the quiz changed' do
+        QuizStatistics.any_instance.expects(:to_csv).twice.returns("")
+        @quiz.statistics_csv # once
+        @quiz.one_question_at_a_time = true
+        @quiz.published_at = Time.now
+        @quiz.save!
+        @quiz.statistics_csv # twice
+        @quiz.update_attribute(:one_question_at_a_time, false)
+        @quiz.statistics_csv # unpublished changes don't matter
+      end
+
+      it 'generates a new quiz_statistics if new submissions are in' do
+        QuizStatistics.any_instance.expects(:to_csv).twice.returns("")
+        @quiz.statistics_csv
+        qs = @quiz.quiz_submissions.build
+        qs.save!
+        qs.mark_completed
+        @quiz.statistics_csv
+      end
     end
   end
 
   it 'should strip tags from html multiple-choice/multiple-answers' do
     student_in_course(:active_all => true)
     q = @course.quizzes.create!(:title => "new quiz")
+    q.update_attribute(:published_at, Time.now)
     q.quiz_questions.create!(:question_data => {:name => 'q1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => {'answer_0' => {'answer_text' => '', 'answer_html' => '<em>zero</em>', 'answer_weight' => '100'}, 'answer_1' => {'answer_text' => "", 'answer_html' => "<p>one</p>", 'answer_weight' => '0'}}})
     q.quiz_questions.create!(:question_data => {:name => 'q2', :points_possible => 1, 'question_type' => 'multiple_answers_question', 'answers' => {'answer_0' => {'answer_text' => '', 'answer_html' => "<a href='http://example.com/caturday.gif'>lolcats</a>", 'answer_weight' => '100'}, 'answer_1' => {'answer_text' => 'lolrus', 'answer_weight' => '100'}}})
     q.generate_quiz_data
@@ -249,7 +295,7 @@ describe QuizStatistics do
     stats[:questions][1][1][:answers][1][:text].should == "lolrus"
 
     # csv statistics
-    stats = FasterCSV.parse(q.statistics_csv)
+    stats = FasterCSV.parse(csv({}, q))
     stats[7][2].should == "zero"
     stats[9][2].should == "lolcats,lolrus"
   end

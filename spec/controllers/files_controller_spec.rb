@@ -345,6 +345,15 @@ describe FilesController do
       assigns(:attachment).should == new_file
     end
 
+    it "should work for quiz_statistics" do
+      course_with_teacher_logged_in(:active_all => true)
+      quiz_model
+      file = @quiz.statistics_csv
+      get 'show', :quiz_statistics_id => file.reload.context.id,
+        :file_id => file.id, :download => '1', :verifier => file.uuid
+      response.should be_redirect
+    end
+
     describe "scribd_doc" do
       before do
         course_with_student_logged_in(:active_all => true)

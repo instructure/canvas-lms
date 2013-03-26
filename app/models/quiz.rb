@@ -882,11 +882,25 @@ class Quiz < ActiveRecord::Base
     ).generate
   end
 
+  # returns a statistics csv attachment
   def statistics_csv(options={})
-    quiz_statistics.create!(
+    quiz_stats_opts = {
       :includes_all_versions => options[:include_all_versions],
       :anonymous => options[:anonymous]
-    ).to_csv
+    }
+
+    last_quiz_activity = [
+      published_at || created_at,
+      quiz_submissions.completed.order(:updated_at).pluck(:updated_at).last
+    ].compact.max
+
+    candidate_statistics = quiz_statistics.where(quiz_stats_opts).last
+
+    stats = candidate_statistics.nil? || candidate_statistics.created_at < last_quiz_activity ?
+      quiz_statistics.create!(quiz_stats_opts) :
+      candidate_statistics
+
+    stats.csv_attachment
   end
 
   def unpublished_changes?

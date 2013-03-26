@@ -845,7 +845,7 @@ class Attachment < ActiveRecord::Base
     self.need_notify = true if !@skip_broadcasts &&
         file_state_changed? &&
         file_state == 'available' &&
-        context && context.state == :available &&
+        context.respond_to?(:state) && context.state == :available &&
         folder && folder.visible?
   end
 

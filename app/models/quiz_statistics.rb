@@ -22,6 +22,7 @@ class QuizStatistics < ActiveRecord::Base
   attr_accessible :includes_all_versions, :anonymous
 
   belongs_to :quiz
+  has_one :attachment, :as => 'context', :dependent => :destroy
 
   set_table_name :quiz_statistics
 
@@ -149,7 +150,7 @@ class QuizStatistics < ActiveRecord::Base
     submissions = submissions_for_statistics
     found_question_ids = {}
     quiz_datas = [quiz.quiz_data] + submissions.map(&:quiz_data)
-    quiz_datas.each do |quiz_data|
+    quiz_datas.compact.each do |quiz_data|
       quiz_data.each do |question|
         next if question['entry_type'] == 'quiz_group'
         if !found_question_ids[question[:id]]
@@ -241,6 +242,23 @@ class QuizStatistics < ActiveRecord::Base
         end
         csv << r
       end
+    end
+  end
+
+  def csv_attachment
+    if attachment
+      attachment
+    else
+      display_name = t(:statistics_filename, "%{title} %{type} Report",
+                       :title => quiz.title,
+                       :type => quiz.readable_type) + ".csv"
+      build_attachment(:filename => 'quiz_statistics.csv',
+                       :display_name => display_name,
+                       :uploaded_data => StringIO.new(to_csv)
+                      ).tap { |a|
+        a.content_type = 'text/csv'
+        a.save!
+      }
     end
   end
 

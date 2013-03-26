@@ -871,6 +871,18 @@ describe QuizzesController do
     end
   end
 
+  describe "GET 'statistics.csv'" do
+    it "redirects to the attachment url" do
+      course_with_teacher_logged_in
+      course_quiz
+      get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id,
+        :format => 'csv'
+      @quiz.quiz_statistics.size.should == 1
+      stats = @quiz.quiz_statistics.first
+      response.should redirect_to stats.attachment.cacheable_s3_download_url
+    end
+  end
+
   describe "GET 'read_only'" do
     it "should allow concluded teachers to see a read-only view of a quiz" do
       course_with_teacher_logged_in(:active_all => true)
