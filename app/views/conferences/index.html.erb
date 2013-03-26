@@ -49,7 +49,7 @@
         </td>
       </tr><tr>
         <td class="nobr" style="width: 5px;"><%= f.blabel :duration, :en => "Duration" %></td>
-        <td><%= t :duration_input, "%{text_field} minutes", :text_field => f.text_field(:duration, :style => "width: 25px;", :value => "60") %></td>
+        <td><div class="form-inline"><%= t :duration_input, "%{text_field} minutes", :text_field => f.text_field(:duration, :style => "width: 25px;", :value => "60") %></div></td>
       </tr><tr>
         <td colspan="2">
           <%= f.blabel :description, :en => "Description" %><br/>
@@ -75,13 +75,12 @@
             </ul>
           </div>
         </td>
-      </tr><tr>
-        <td class="button-container" colspan="2">
-          <button type="submit" class="btn"><%= t 'buttons.create', "Create Conference" %></button>
-          <button type="button" class="cancel_button btn button-secondary"><%= t '#buttons.cancel', "Cancel" %></button>
-        </td>
       </tr>
     </table>
+    <div class="form-actions">
+      <button type="button" class="cancel_button btn"><%= t '#buttons.cancel', "Cancel" %></button>
+      <button type="submit" class="btn btn-primary"><%= t 'buttons.create', "Create Conference" %></button>
+    </div>
   </div>
 <% end %>
 

@@ -23,21 +23,21 @@
         <td><%= f.blabel :name, :full_name, :en => "Full Name" %></td>
         <td>
           <%= f.text_field :name %>
-          <div style="font-size: 0.8em; color: #888;"><%= t :full_name_description, 'This name will be used by teachers for grading.' %></div>
+          <div class="hint-text"><%= t :full_name_description, 'This name will be used by teachers for grading.' %></div>
         </td>
       </tr>
       <tr>
         <td><%= f.blabel :short_name, :en => "Display Name" %></td>
         <td>
           <%= f.text_field :short_name %>
-          <div style="font-size: 0.8em; color: #888;"><%= t(:display_name_help, "People will see this name in discussions, messages and comments.") %></div>
+          <div class="hint-text"><%= t(:display_name_help, "People will see this name in discussions, messages and comments.") %></div>
         </td>
       </tr>
       <tr>
         <td><%= f.blabel :sortable_name, :en => "Sortable Name" %></td>
         <td>
           <%= f.text_field :sortable_name %>
-          <div style="font-size: 0.8em; color: #888;"><%= t(:sortable_name_help, "This name appears in sorted lists.") %></div>
+          <div class="hint-text"><%= t(:sortable_name_help, "This name appears in sorted lists.") %></div>
         </td>
       </tr>
       <% if @root_account.login_handle_name_is_customized? || @root_account.delegated_authentication? %>
@@ -58,8 +58,8 @@
       <% end %>
       <tr>
         <td colspan="2">
-          <%= check_box :pseudonym, :send_confirmation, :checked => true %>
-          <%= label :pseudonym, :send_confirmation, :en => "Email the user about this account creation" %>
+          <%= check_box :pseudonym, :send_confirmation, :checked => true %> 
+          &nbsp;<%= label :pseudonym, :send_confirmation, :en => "Email the user about this account creation" %>
         </td>
       </tr>
       <tr>
