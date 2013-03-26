@@ -22,6 +22,7 @@ class SearchController < ApplicationController
   include SearchHelper
   include Api::V1::Conversation
 
+  before_filter :require_user
   before_filter :get_context
 
   def rubrics

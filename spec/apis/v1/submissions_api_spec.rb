@@ -456,7 +456,6 @@ describe 'Submissions API', :type => :integration do
                       :assignment_id => a1.id.to_s, :id => student1.id.to_s },
                     { :include => %w(submission_comments) })
     response.status.should =~ /401/
-    JSON.parse(response.body).should == {"status"=>"unauthorized", "message"=>"You are not authorized to perform that action."}
   end
 
   it "should return grading information for observers" do
@@ -1808,7 +1807,6 @@ describe 'Submissions API', :type => :integration do
       it "should reject uploading files to other students' submissions" do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student2.id}/files",
                         { :controller => "submissions_api", :action => "create_file", :format => "json", :course_id => @course.to_param, :assignment_id => @assignment.to_param, :user_id => @student2.to_param }, {}, {}, { :expected_status => 401 })
-        json["message"].should match(/not authorized/i)
       end
     end
 

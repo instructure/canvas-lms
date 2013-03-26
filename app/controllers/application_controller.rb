@@ -288,7 +288,7 @@ class ApplicationController < ActionController::Base
         render :template => "shared/unauthorized", :layout => "application", :status => :unauthorized
       }
       format.zip { redirect_to(url_for(params)) }
-      format.json { render :json => { 'status' => 'unauthorized', 'message' => 'You are not authorized to perform that action.' }, :status => :unauthorized }
+      format.json { render_json_unauthorized }
     end
     response.headers["Pragma"] = "no-cache"
     response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
@@ -847,7 +847,7 @@ class ApplicationController < ActionController::Base
     when ActiveRecord::RecordNotFound
       data[:message] = 'The specified resource does not exist.'
     when AuthenticationMethods::AccessTokenError
-      response['WWW-Authenticate'] = %{Bearer realm="canvas-lms"}
+      add_www_authenticate_header
       data[:message] = 'Invalid access token.'
     end
 
@@ -1170,11 +1170,12 @@ class ApplicationController < ActionController::Base
 
   def require_site_admin_with_permission(permission)
     unless Account.site_admin.grants_right?(@current_user, permission)
-      flash[:error] = t "#application.errors.permission_denied", "You don't have permission to access that page"
-      store_location
-      opts = {}
-      opts[:canvas_login] = 1 if params[:canvas_login]
-      redirect_to @current_user ? root_url : login_url(opts)
+      if @current_user
+        flash[:error] = t "#application.errors.permission_denied", "You don't have permission to access that page"
+        redirect_to root_url
+      else
+        redirect_to_login
+      end
       return false
     end
   end

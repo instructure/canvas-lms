@@ -29,13 +29,11 @@ describe UsersController, :type => :integration do
   it "should check for auth" do
     get("/api/v1/users/self/activity_stream")
     response.status.should == '401 Unauthorized'
-    JSON.parse(response.body).should == {"message"=>"Invalid access token.", "status"=>"unauthorized"}
 
     @course = factory_with_protected_attributes(Course, course_valid_attributes)
     raw_api_call(:get, "/api/v1/courses/#{@course.id}/activity_stream",
                 :controller => "courses", :action => "activity_stream", :format => "json", :course_id => @course.to_param)
     response.status.should == '401 Unauthorized'
-    JSON.parse(response.body).should == {"message"=>"You are not authorized to perform that action.", "status"=>"unauthorized"}
   end
 
   it "should return the activity stream" do

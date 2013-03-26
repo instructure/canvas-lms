@@ -80,13 +80,11 @@ describe UsersController, :type => :integration do
   it "should check for auth" do
     get("/api/v1/users/self/todo")
     response.status.should == '401 Unauthorized'
-    JSON.parse(response.body).should == {"message"=>"Invalid access token.", "status"=>"unauthorized"}
 
     @course = factory_with_protected_attributes(Course, course_valid_attributes)
     raw_api_call(:get, "/api/v1/courses/#{@course.id}/todo",
                 :controller => "courses", :action => "todo_items", :format => "json", :course_id => @course.to_param)
     response.status.should == '401 Unauthorized'
-    JSON.parse(response.body).should == { 'status' => 'unauthorized', 'message' => 'You are not authorized to perform that action.' }
   end
 
   it "should return a global user todo list" do

@@ -196,7 +196,6 @@ describe "Users API", :type => :integration do
     raw_api_call(:get, "/api/v1/users/#{@admin.id}/avatars",
                  :controller => "profile", :action => "profile_pics", :user_id => @admin.to_param, :format => 'json')
     response.status.should == "401 Unauthorized"
-    JSON.parse(response.body).should == {"status"=>"unauthorized", "message"=>"You are not authorized to perform that action."}
   end
 
   shared_examples_for "page view api" do

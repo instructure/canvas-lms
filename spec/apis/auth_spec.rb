@@ -433,6 +433,7 @@ describe "API Authentication", :type => :integration do
       user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
       course_with_teacher(:user => @user)
       @token = @user.access_tokens.create!
+      @token.full_token.should_not be_nil
     end
 
     def check_used
@@ -466,29 +467,31 @@ describe "API Authentication", :type => :integration do
       Account.default.reload.users.should be_include(u2)
     end
 
-    it "should return a proper www-authenticate header if no access token is given" do
-      get "/api/v1/courses"
-      response.status.to_i.should == 401
-      response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
-    end
-
-    it "should return www-authenticate if the access token is expired or non-existent" do
+    it "should error if the access token is expired or non-existent" do
       get "/api/v1/courses", nil, { 'Authorization' => "Bearer blahblah" }
       response.status.to_i.should == 401
       response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
       @token.update_attribute(:expires_at, 1.hour.ago)
-      get "/api/v1/courses", nil, { 'Authorization' => "Bearer blahblah" }
+      get "/api/v1/courses", nil, { 'Authorization' => "Bearer #{@token.full_token}" }
       response.status.to_i.should == 401
       response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
     end
 
-    it "should require an active pseudonym" do
+    it "should require an active pseudonym for the access token user" do
       @user.pseudonym.destroy
-      get "/api/v1/courses"
+      get "/api/v1/courses", nil, { 'Authorization' => "Bearer #{@token.full_token}" }
       response.status.to_i.should == 401
       response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
       json = JSON.parse(response.body)
       json['message'].should == "Invalid access token."
+    end
+
+    it "should error if no access token is given and authorization is required" do
+      get "/api/v1/courses"
+      response.status.to_i.should == 401
+      response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
+      json = json_parse
+      json["errors"]["message"].should == "user authorization required"
     end
 
     it "should be able to log out" do

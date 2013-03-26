@@ -20,14 +20,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe GroupsController do
 
-  #Delete these examples and add some real ones
-  it "should use GroupsController" do
-    controller.should be_an_instance_of(GroupsController)
-  end
-
   describe "GET context_index" do
     it "should require authorization" do
-      course_with_student
+      course(:active_all => true)
+      user_session(user) # logged in user without course access
       category1 = @course.group_categories.create(:name => "category 1")
       category2 = @course.group_categories.create(:name => "category 2")
       g1 = @course.groups.create(:name => "some group", :group_category => category1)
@@ -54,25 +50,6 @@ describe GroupsController do
   end
 
   describe "GET index" do
-    it "should assign variables" do
-      get 'index'
-      assigns[:groups].should_not be_nil
-    end
-
-    describe 'empty' do
-      it "should assign an empty list for non-json when empty" do
-        get 'index', :format => 'json'
-        response.should be_success
-        assigns[:groups].should == []
-      end
-
-      it "should return an empty list for json when empty" do
-        get 'index', :format => 'json'
-        response.should be_success
-        response.body.should == "[]"
-      end
-    end
-
     describe 'pagination' do
       before do
         course_with_student_logged_in(:active_all => 1)

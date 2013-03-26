@@ -219,7 +219,6 @@ describe "Groups API", :type => :integration do
       'join_level'=> "parent_context_auto_join",
     }
     json = api_call(:put, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "update"), new_attrs, {}, :expected_status => 401)
-    json['message'].should match /not authorized/
   end
 
   it "should allow a moderator to delete a group" do
@@ -231,7 +230,6 @@ describe "Groups API", :type => :integration do
   it "should not allow a member to delete a group" do
     @user = @member
     json = api_call(:delete, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "destroy"), {}, {}, :expected_status => 401)
-    json['message'].should match /not authorized/
   end
 
   describe "following" do

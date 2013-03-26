@@ -58,6 +58,7 @@
 #
 class CollectionsController < ApplicationController
   before_filter :render_backbone_app_if_html_request
+  before_filter :require_user
   before_filter :require_context, :only => [:index, :create]
 
   include Api::V1::Collection

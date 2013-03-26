@@ -90,6 +90,7 @@
 #
 class GroupsController < ApplicationController
   before_filter :get_context
+  before_filter :require_user, :only => %w[index]
 
   include Api::V1::Attachment
   include Api::V1::Group
@@ -147,24 +148,16 @@ class GroupsController < ApplicationController
     return context_index if @context
     respond_to do |format|
       format.html do
-        if @current_user
-          @groups = @current_user.current_groups.
-            with_each_shard{ |scope| scope.includes(:group_category) }
-        else
-          @groups = []
-        end
+        @groups = @current_user.current_groups.
+          with_each_shard{ |scope| scope.includes(:group_category) }
       end
 
       format.json do
-        if @current_user
-          @groups = BookmarkedCollection.with_each_shard(
-            Group::Bookmarker,
-            @current_user.current_groups,
-            :include => :group_category)
-          @groups = Api.paginate(@groups, self, api_v1_current_user_groups_url)
-        else
-          @groups = []
-        end
+        @groups = BookmarkedCollection.with_each_shard(
+          Group::Bookmarker,
+          @current_user.current_groups,
+          :include => :group_category)
+        @groups = Api.paginate(@groups, self, api_v1_current_user_groups_url)
         render :json => @groups.map { |g| group_json(g, @current_user, session) }
       end
     end

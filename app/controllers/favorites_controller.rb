@@ -26,6 +26,7 @@
 #     }
 class FavoritesController < ApplicationController
 
+  before_filter :require_user
   before_filter :check_defaults, :only => [:add_favorite_course, :remove_favorite_course]
   after_filter :touch_user, :only => [:add_favorite_course, :remove_favorite_course, :reset_course_favorites]
 

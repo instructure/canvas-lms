@@ -108,7 +108,6 @@ describe "Collections API", :type => :integration do
 
     it "should not allow getting a private collection" do
       json = api_call(:get, "/api/v1/collections/#{@c1.id}", { :controller => "collections", :collection_id => @c1.to_param, :action => "show", :format => "json" }, {}, {}, :expected_status => 401)
-      json['message'].should match /not authorized/
     end
 
     it "should not allow creating a collection" do

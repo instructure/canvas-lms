@@ -400,14 +400,17 @@ class CoursesController < ApplicationController
   #
   # @returns [User]
   def search_users
-    unless params['search_term']
-      return render \
-              :json => {
-          "status" => "argument_error",
-          "message" => "search_term of 3 or more characters is required" },
-              :status => :bad_request
+    get_context
+    if authorized_action(@context, @current_user, :read_roster)
+      unless params['search_term']
+        return render \
+                :json => {
+            "status" => "argument_error",
+            "message" => "search_term of 3 or more characters is required" },
+                :status => :bad_request
+      end
+      users
     end
-    users
   end
 
   # @API List recently logged in students
