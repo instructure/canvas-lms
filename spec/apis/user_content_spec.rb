@@ -38,6 +38,29 @@ describe UserContent, :type => :integration do
     doc.at_css('img')['src'].should == "http://www.example.com/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
   end
 
+  it "should translate file links to directly-downloadable urls for deleted and replaced files" do
+    course_with_teacher(:active_all => true)
+    attachment_model
+    @attachment.destroy
+    attachment2 = Attachment.create!(:folder => @attachment.folder, :context => @attachment.context, :filename => @attachment.filename, :uploaded_data => StringIO.new("first"))
+    @context.attachments.find(@attachment.id).id.should == attachment2.id
+
+    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
+    <p>
+      Hello, students.<br>
+      This will explain everything: <img src="/courses/#{@course.id}/files/#{@attachment.id}/preview" alt="important">
+    </p>
+    HTML
+
+    json = api_call(:get,
+                    "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+                    { :controller => 'assignments_api', :action => 'show',
+                      :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
+
+    doc = Nokogiri::HTML::DocumentFragment.parse(json['description'])
+    doc.at_css('img')['src'].should == "http://www.example.com/files/#{attachment2.id}/download?verifier=#{attachment2.uuid}"
+  end
+
   it "should translate media comment links to embedded video tags" do
     course_with_teacher(:active_all => true)
     attachment_model
