@@ -419,6 +419,11 @@ class Conversation < ActiveRecord::Base
         User.update_all 'unread_conversations_count = unread_conversations_count + 1',
                         "id IN (SELECT user_id FROM conversation_participants cp WHERE #{cp_conditions})"
       end
+
+      if options[:root_account_ids].present?
+        conversation_participants.update_all(:root_account_ids => options[:root_account_ids])
+      end
+
       conversation_participants.update_all(
         {:last_message_at => message.created_at, :workflow_state => 'unread'},
         ["(last_message_at IS NULL OR subscribed) AND user_id NOT IN (?)", skip_ids]
@@ -434,7 +439,6 @@ class Conversation < ActiveRecord::Base
         maybe_update_timestamp('visible_last_authored_at', message.created_at, ["user_id = ?", message.author_id])
       ]
       updates << "workflow_state = CASE WHEN workflow_state = 'archived' THEN 'read' ELSE workflow_state END" if update_for_skips
-      updates << "root_account_ids='#{options[:root_account_ids]}'" if options[:root_account_ids]
       conversation_participants.update_all(updates.join(", "), ["user_id IN (?)", skip_ids])
 
       if message.has_attachments?
