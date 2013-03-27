@@ -1444,6 +1444,11 @@ describe CalendarEventsApiController, :type => :integration do
       expected_override_date_output = @override.due_at.utc.iso8601.gsub(/[-:]/, '').gsub(/\d\dZ$/, '00Z')
       response.body.match(/DTSTART:\s*#{expected_override_date_output}/).should_not be_nil
     end
+
+    it "should render unauthorized feed for bad code" do
+      get "/feeds/calendars/user_garbage.ics"
+      response.should render_template('shared/unauthorized_feed')
+    end
   end
 
 end

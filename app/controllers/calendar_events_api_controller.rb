@@ -381,7 +381,7 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def public_feed
-    get_feed_context
+    return unless get_feed_context
     @events = []
 
     if @current_user
