@@ -62,7 +62,7 @@ define [
       at: "center bottom+#{CARET_SIZE}"
       collision: 'flipfit flipfit'
 
-  $('body').on 'mouseover', '[data-tooltip]', (event) ->
+  $('body').on 'mouseenter', '[data-tooltip]', (event) ->
     $this = $(this)
     opts = $this.data('tooltip')
 
