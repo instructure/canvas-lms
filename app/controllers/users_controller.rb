@@ -85,7 +85,7 @@ class UsersController < ApplicationController
   include LinkedIn
   include DeliciousDiigo
   include SearchHelper
-  before_filter :require_user, :only => [:grades, :merge, :kaltura_session, :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image, :user_dashboard, :toggle_dashboard, :masquerade, :external_tool]
+  before_filter :require_user, :only => [:grades, :merge, :kaltura_session, :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image, :user_dashboard, :toggle_dashboard, :masquerade, :external_tool, :dashboard_sidebar]
   before_filter :require_registered_user, :only => [:delete_user_service, :create_user_service]
   before_filter :reject_student_view_student, :only => [:delete_user_service, :create_user_service, :merge, :user_dashboard, :masquerade]
   before_filter :require_self_registration, :only => [:new, :create]
