@@ -51,7 +51,6 @@ describe "calendar2" do
     replace_content(title, assignment_title)
     add_date(middle_number) if should_add_date
     submit_form(edit_assignment_form)
-    wait_for_ajax_requests
     keep_trying_until { f('.fc-view-month .fc-event-title').should include_text(assignment_title) }
   end
 
