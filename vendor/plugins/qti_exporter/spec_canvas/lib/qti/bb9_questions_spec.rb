@@ -73,6 +73,7 @@ module BB9Expected
               :matches=>
                   [{:text=>"right 1"},
                    {:text=>"right 2"},
+                   {:text=>"DISTRACTION"},
                    {:text=>"right 4"},
                    {:text=>"right 3"}]}
 end
