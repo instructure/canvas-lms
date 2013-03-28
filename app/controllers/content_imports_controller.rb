@@ -123,7 +123,7 @@ class ContentImportsController < ApplicationController
   def migrate_content_choose
     if authorized_action(@context, @current_user, :manage_content)
       @content_migration = ContentMigration.for_context(@context).find(params[:id]) #)_all_by_context_id_and_context_type(@context.id, @context.class.to_s).last
-      if @content_migration.progress && @content_migration.progress >= 100
+      if @content_migration.workflow_state == "imported"
         flash[:notice] = t 'notices.already_imported', "That extraction has already been imported into the course"
         redirect_to named_context_url(@context, :context_url)
         return

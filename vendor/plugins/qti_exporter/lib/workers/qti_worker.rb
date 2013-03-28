@@ -5,6 +5,9 @@ module Canvas::Migration
       def perform
         cm = ContentMigration.find_by_id migration_id
         begin
+          cm.reset_job_progress
+          cm.job_progress.start
+          cm.update_conversion_progress(1)
           plugin = Canvas::Plugin.find(:qti_converter)
           unless plugin && plugin.settings[:enabled]
             raise "Can't export QTI without the python converter tool installed."
@@ -19,6 +22,7 @@ module Canvas::Migration
           assessments = converter.export
           export_folder_path = assessments[:export_folder_path]
           overview_file_path = assessments[:overview_file_path]
+          cm.update_conversion_progress(50)
 
           if overview_file_path
             file = File.new(overview_file_path)
@@ -28,13 +32,17 @@ module Canvas::Migration
             Canvas::Migration::Worker::upload_exported_data(export_folder_path, cm)
             Canvas::Migration::Worker::clear_exported_data(export_folder_path)
           end
+          cm.update_conversion_progress(100)
 
           cm.migration_settings[:migration_ids_to_import] = {:copy=>{:everything=>true}}.merge(cm.migration_settings[:migration_ids_to_import] || {})
           if path = converter.course[:files_import_root_path]
             cm.migration_settings[:files_import_root_path] = path
           end
           cm.save
-          cm.import_content
+          cm.import_content_without_send_later
+          cm.workflow_state = :imported
+          cm.save
+          cm.update_import_progress(100)
         rescue => e
           report = ErrorReport.log_exception(:content_migration, e)
           if cm

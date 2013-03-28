@@ -25,6 +25,8 @@ describe ContentMigrationsController, :type => :integration do
     @params = { :controller => 'content_migrations', :format => 'json', :course_id => @course.id.to_param}
 
     @migration = @course.content_migrations.create
+    @migration.migration_type = 'common_cartridge_importer'
+    @migration.context = @course
     @migration.user = @user
     @migration.started_at = 1.week.ago
     @migration.finished_at = 1.day.ago
@@ -67,16 +69,28 @@ describe ContentMigrationsController, :type => :integration do
     it "should return migration" do
       @migration.attachment = Attachment.create!(:context => @migration, :filename => "test.txt", :uploaded_data => StringIO.new("test file"))
       @migration.save!
+      progress = Progress.create!(:tag => "content_migration", :context => @migration)
       json = api_call(:get, @migration_url, @params)
 
       json['id'].should == @migration.id
+      json['migration_type'].should == @migration.migration_type
       json['finished_at'].should_not be_nil
       json['started_at'].should_not be_nil
       json['user_id'].should == @user.id
-      json["workflow_state"].should == "created"
+      json["workflow_state"].should == "pre_processing"
       json["migration_issues_url"].should == "http://www.example.com/api/v1/courses/#{@course.id}/content_migrations/#{@migration.id}/migration_issues"
       json["migration_issues_count"].should == 0
-      json["content_archive_download_url"].should == "http://www.example.com/api/v1/courses/#{@course.id}/content_migrations/#{@migration.id}/download_archive"
+      json["attachment"]["url"].should =~ %r{/files/#{@migration.attachment.id}/download}
+      json['progress_url'].should == "http://www.example.com/api/v1/progress/#{progress.id}"
+      json['migration_type_title'].should == 'Common Cartridge Importer'
+    end
+
+    it "should return waiting_for_select when it's supposed to" do
+      @migration.workflow_state = 'exported'
+      @migration.migration_settings[:import_immediately] = false
+      @migration.save!
+      json = api_call(:get, @migration_url, @params)
+      json['workflow_state'].should == 'waiting_for_select'
     end
 
     it "should 404" do
@@ -89,22 +103,138 @@ describe ContentMigrationsController, :type => :integration do
     end
   end
 
-  describe 'download_archive' do
+  describe 'create' do
+
     before do
-      @migration_url = @migration_url + "/#{@migration.id}/download_archive"
-      @params = @params.merge({:action => 'download_archive', :id => @migration.id.to_param})
+      @params = {:controller => 'content_migrations', :format => 'json', :course_id => @course.id.to_param, :action => 'create'}
+      @post_params = {:migration_type => 'common_cartridge_importer', :pre_attachment => {:name => "test.zip"}}
     end
 
-    it "should send file" do
-      @migration.attachment = Attachment.create!(:context => @migration, :filename => "test.txt", :uploaded_data => StringIO.new("test file"))
-      @migration.save!
-      raw_api_call :get, @migration_url, @params
-      response.header['Content-Disposition'].should == 'attachment; filename="test.txt"'
+    it "should error for unknown type" do
+      json = api_call(:post, @migration_url, @params, {:migration_type => 'jerk'}, {}, :expected_status => 400)
+      json.should == {"message"=>"Invalid migration_type"}
     end
 
-    it "should 404" do
-      api_call(:get, @migration_url, @params, {}, {}, :expected_status => 404)
+    it "should queue a migration" do
+      @post_params.delete :pre_attachment
+      p = Canvas::Plugin.new("hi")
+      p.stubs(:settings).returns('worker' => 'CCWorker')
+      Canvas::Plugin.stubs(:find).returns(p)
+      json = api_call(:post, @migration_url, @params, @post_params)
+      json["workflow_state"].should == 'running'
+      migration = ContentMigration.find json['id']
+      migration.workflow_state.should == "exporting"
+      migration.job_progress.workflow_state.should == 'queued'
+    end
+
+    it "should not queue a migration if do_not_run flag is set" do
+      @post_params.delete :pre_attachment
+      Canvas::Plugin.stubs(:find).returns(Canvas::Plugin.new("oi"))
+      json = api_call(:post, @migration_url, @params, @post_params.merge(:do_not_run => true))
+      json["workflow_state"].should == 'pre_processing'
+      migration = ContentMigration.find json['id']
+      migration.workflow_state.should == "created"
+      migration.job_progress.should be_nil
+    end
+
+    context "migration file upload" do
+      it "should set attachment pre-flight data" do
+        json = api_call(:post, @migration_url, @params, @post_params)
+        json['pre_attachment'].should_not be_nil
+        json['pre_attachment']["upload_params"]["key"].end_with?("test.zip").should == true
+      end
+
+      it "should not queue migration with pre_attachent on create" do
+        json = api_call(:post, @migration_url, @params, @post_params)
+        json["workflow_state"].should == 'pre_processing'
+        migration = ContentMigration.find json['id']
+        migration.workflow_state.should == "pre_processing"
+      end
+      
+      it "should error if upload file required but not provided" do
+        @post_params.delete :pre_attachment
+        json = api_call(:post, @migration_url, @params, @post_params, {}, :expected_status => 400)
+        json.should == {"message"=>"File upload is required"}
+      end
+
+      it "should queue the migration when file finishes uploading" do
+        local_storage!
+        @attachment = Attachment.create!(:context => @migration, :filename => "test.zip", :uploaded_data => StringIO.new("test file"))
+        @attachment.file_state = "deleted"
+        @attachment.workflow_state = "unattached"
+        @attachment.save
+        @migration.attachment = @attachment
+        @migration.save!
+        @attachment.workflow_state = nil
+        @content = Tempfile.new(["test", ".zip"])
+        def @content.content_type
+          "application/zip"
+        end
+        @content.write("test file")
+        @content.rewind
+        @attachment.uploaded_data = @content
+        @attachment.save!
+        api_call(:post, "/api/v1/files/#{@attachment.id}/create_success?uuid=#{@attachment.uuid}",
+                        {:controller => "files", :action => "api_create_success", :format => "json", :id => @attachment.to_param, :uuid => @attachment.uuid})
+
+        @migration.reload
+        @migration.attachment.should_not be_nil
+        @migration.workflow_state.should == "exporting"
+        @migration.job_progress.workflow_state.should == 'queued'
+      end
+
+      it "should error if course quota exceeded" do
+        @post_params.merge!(:pre_attachment => {:name => "test.zip", :size => 1.gigabyte})
+        json = api_call(:post, @migration_url, @params, @post_params)
+        json['pre_attachment'].should == {"message"=>"file size exceeds quota", "error" => true}
+        json["workflow_state"].should == 'failed'
+        migration = ContentMigration.find json['id']
+        migration.workflow_state = 'pre_process_error'
+      end
+    end
+
+  end
+
+  describe 'update' do
+    before do
+      @migration_url = "/api/v1/courses/#{@course.id}/content_migrations/#{@migration.id}"
+      @params = {:controller => 'content_migrations', :format => 'json', :course_id => @course.id.to_param, :action => 'update', :id => @migration.id.to_param}
+      @post_params = {}
+    end
+
+    it "should queue a migration" do
+      json = api_call(:put, @migration_url, @params, @post_params)
+      json["workflow_state"].should == 'running'
+      @migration.reload
+      @migration.workflow_state.should == "exporting"
+      @migration.job_progress.workflow_state.should == 'queued'
+    end
+
+    it "should not queue a migration if do_not_run flag is set" do
+      json = api_call(:put, @migration_url, @params, @post_params.merge(:do_not_run => true))
+      json["workflow_state"].should == 'pre_processing'
+      migration = ContentMigration.find json['id']
+      migration.workflow_state.should == "created"
+      migration.job_progress.should be_nil
+    end
+
+    it "should not change migration_type" do
+      json = api_call(:put, @migration_url, @params, @post_params.merge(:migration_type => "oioioi"))
+      json['migration_type'].should == 'common_cartridge_importer'
+    end
+
+    it "should reset progress after queue" do
+      p = @migration.reset_job_progress
+      p.completion = 100
+      p.workflow_state = 'completed'
+      p.save!
+      api_call(:put, @migration_url, @params, @post_params)
+      p.reload
+      p.completion.should == 0
+      p.workflow_state.should == 'queued'
     end
   end
+
+
 
 end

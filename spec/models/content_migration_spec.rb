@@ -1076,12 +1076,10 @@ describe ContentMigration do
       asmnt.save!
       @copy_from.reload
 
-      @cm.migration_settings[:migration_ids_to_import] = {
-              :copy => {
-                      :shift_dates => true,
-                      :day_substitutions => {today.wday.to_s => (today.wday + 1).to_s}
-              }
-      }
+      @cm.copy_options = @cm.copy_options.merge(
+              :shift_dates => true,
+              :day_substitutions => {today.wday.to_s => (today.wday + 1).to_s}
+      )
       @cm.save!
 
       run_course_copy
@@ -1127,9 +1125,7 @@ describe ContentMigration do
       cm.end_at = old_start + 3.days
       cm.save!
 
-      @cm.migration_settings[:migration_ids_to_import] = {
-              :copy => options
-      }
+      @cm.copy_options = options
       @cm.save!
 
       run_course_copy
@@ -1208,18 +1204,16 @@ describe ContentMigration do
           assignment = @copy_from.assignments.create! :title => 'Assignment', :due_at => old_date
           assignment.save!
 
-          migration_settings = {
-            :copy => {
-              :everything => true,
-              :shift_dates => true,
-              :old_start_date => old_start_date,
-              :old_end_date => old_end_date,
-              :new_start_date => new_start_date,
-              :new_end_date => new_end_date
-            }
+          opts = {
+                  :everything => true,
+                  :shift_dates => true,
+                  :old_start_date => old_start_date,
+                  :old_end_date => old_end_date,
+                  :new_start_date => new_start_date,
+                  :new_end_date => new_end_date
           }
-          migration_settings[:copy][:time_zone] = options[:time_zone].name if options.include?(:time_zone)
-          @cm.migration_settings[:migration_ids_to_import] = migration_settings
+          opts[:time_zone] = options[:time_zone].name if options.include?(:time_zone)
+          @cm.copy_options = @cm.copy_options.merge(opts)
           @cm.save!
 
           run_course_copy

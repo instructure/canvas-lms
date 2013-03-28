@@ -93,8 +93,8 @@ module MigratorHelper
   end
 
   def set_progress(progress)
-    if content_migration && content_migration.respond_to?(:fast_update_progress)
-      content_migration.fast_update_progress(progress)
+    if content_migration && content_migration.respond_to?(:update_conversion_progress)
+      content_migration.update_conversion_progress(progress)
     end
   end
   

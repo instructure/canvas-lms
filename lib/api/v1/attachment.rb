@@ -57,48 +57,61 @@ module Api::V1::Attachment
   # render the attachment ajax_upload_params on success, or a relevant
   # error on failure.
   def api_attachment_preflight(context, request, opts = {})
+    params = opts[:params] || request.params
     @attachment = Attachment.new
     @attachment.context = context
-    @attachment.filename = request.params[:name]
+    @attachment.filename = params[:name]
     atts = process_attachment_params(params)
     atts.delete(:display_name)
     @attachment.attributes = atts
     @attachment.submission_attachment = true if opts[:submission_attachment]
     @attachment.file_state = 'deleted'
     @attachment.workflow_state = 'unattached'
-    @attachment.content_type = request.params[:content_type].presence || Attachment.mimetype(@attachment.filename)
+    @attachment.content_type = params[:content_type].presence || Attachment.mimetype(@attachment.filename)
     # Handle deprecated folder path
-    request.params[:parent_folder_path] ||= request.params[:folder]
+    params[:parent_folder_path] ||= params[:folder]
     if opts.key?(:folder)
       @attachment.folder = folder
-    elsif request.params[:parent_folder_path] && request.params[:parent_folder_id]
+    elsif params[:parent_folder_path] && params[:parent_folder_id]
       render :json => {:message => I18n.t('lib.api.attachments.only_one_folder', "Can't set folder path and folder id")}, :status => 400
       return
-    elsif request.params[:parent_folder_id]
-      @attachment.folder = context.folders.find(request.params.delete(:parent_folder_id))
-    elsif context.respond_to?(:folders) && request.params[:parent_folder_path].is_a?(String)
-      @attachment.folder = Folder.assert_path(request.params[:parent_folder_path], context)
+    elsif params[:parent_folder_id]
+      @attachment.folder = context.folders.find(params.delete(:parent_folder_id))
+    elsif context.respond_to?(:folders) && params[:parent_folder_path].is_a?(String)
+      @attachment.folder = Folder.assert_path(params[:parent_folder_path], context)
     end
-    duplicate_handling = check_duplicate_handling_option(request)
+    duplicate_handling = check_duplicate_handling_option(params)
     if opts[:check_quota]
       get_quota
-      if request.params[:size] && @quota < @quota_used + request.params[:size].to_i
-        render(:json => { :message => 'file size exceeds quota' }, :status => :bad_request)
-        return
+      if params[:size] && @quota < @quota_used + params[:size].to_i
+        message = { :message => I18n.t('lib.api.over_quota', 'file size exceeds quota') }
+        if opts[:return_json]
+          message[:error] = true
+          return message
+        else
+          render(:json => message, :status => :bad_request)
+          return
+        end
       end
     end
     @attachment.save!
-    if request.params[:url]
-      @attachment.send_later_enqueue_args(:clone_url, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1, :n_strand => 'file_download' }, request.params[:url], duplicate_handling, opts[:check_quota])
-      render :json => { :id => @attachment.id, :upload_status => 'pending', :status_url => api_v1_file_status_url(@attachment, @attachment.uuid) }
+    if params[:url]
+      @attachment.send_later_enqueue_args(:clone_url, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1, :n_strand => 'file_download' }, params[:url], duplicate_handling, opts[:check_quota])
+      json = { :id => @attachment.id, :upload_status => 'pending', :status_url => api_v1_file_status_url(@attachment, @attachment.uuid) }
     else
       duplicate_handling = nil if duplicate_handling == 'overwrite'
       quota_exemption = opts[:check_quota] ? nil : @attachment.quota_exemption_key
-      render :json => @attachment.ajax_upload_params(@current_pseudonym,
+      json = @attachment.ajax_upload_params(@current_pseudonym,
                                                      api_v1_files_create_url(:on_duplicate => duplicate_handling, :quota_exemption => quota_exemption),
                                                      api_v1_files_create_success_url(@attachment, :uuid => @attachment.uuid, :on_duplicate => duplicate_handling, :quota_exemption => quota_exemption),
                                                      :ssl => request.ssl?, :file_param => opts[:file_param]).
       slice(:upload_url,:upload_params,:file_param,:remote_url)
+    end
+
+    if opts[:return_json]
+      json
+    else
+      render :json => json
     end
   end
   
@@ -111,8 +124,8 @@ module Api::V1::Attachment
     return true
   end
 
-  def check_duplicate_handling_option(request)
-    duplicate_handling = request.params[:on_duplicate].presence || 'overwrite'
+  def check_duplicate_handling_option(params)
+    duplicate_handling = params[:on_duplicate].presence || 'overwrite'
     unless %w(rename overwrite).include?(duplicate_handling)
       render(:json => { :message => 'invalid on_duplicate option' }, :status => :bad_request)
       return nil

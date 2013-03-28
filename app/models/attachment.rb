@@ -668,6 +668,7 @@ class Attachment < ActiveRecord::Base
   def self.get_quota(context)
     quota = 0
     quota_used = 0
+    context = context.quota_context if context.respond_to?(:quota_context) && context.quota_context
     if context
       Shackles.activate(:slave) do
         quota = Setting.get_cached('context_default_quota', 50.megabytes.to_s).to_i

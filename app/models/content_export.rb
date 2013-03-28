@@ -178,6 +178,7 @@ class ContentExport < ActiveRecord::Base
   end
   
   def fast_update_progress(val)
+    content_migration.update_conversion_progress(val) if content_migration
     self.progress = val
     ContentExport.where(:id => self).update_all(:progress=>val)
   end

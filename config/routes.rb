@@ -762,7 +762,8 @@ ActionController::Routing::Routes.draw do |map|
     api.with_options(:controller => :content_migrations) do |cm|
       cm.get 'courses/:course_id/content_migrations/:id', :action => :show, :path_name => 'course_content_migration'
       cm.get 'courses/:course_id/content_migrations', :action => :index, :path_name => 'course_content_migration_list'
-      cm.get 'courses/:course_id/content_migrations/:id/download_archive', :action => 'download_archive', :conditions => {:method => :get}, :path_name => 'course_content_migration_download'
+      cm.post 'courses/:course_id/content_migrations', :action => :create, :path_name => 'course_content_migration_create'
+      cm.put 'courses/:course_id/content_migrations/:id', :action => :update, :path_name => 'course_content_migration_update'
     end
 
     api.with_options(:controller => :migration_issues) do |mi|

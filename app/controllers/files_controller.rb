@@ -564,7 +564,7 @@ class FilesController < ApplicationController
   def api_create_success
     @attachment = Attachment.find_by_id_and_uuid(params[:id], params[:uuid])
     return render(:nothing => true, :status => :bad_request) unless @attachment.try(:file_state) == 'deleted'
-    duplicate_handling = check_duplicate_handling_option(request)
+    duplicate_handling = check_duplicate_handling_option(request.params)
     return unless duplicate_handling
     return unless check_quota_after_attachment(request)
     if Attachment.s3_storage?
@@ -576,6 +576,11 @@ class FilesController < ApplicationController
       @attachment.save!
     end
     @attachment.handle_duplicates(duplicate_handling)
+
+    if @attachment.context.respond_to?(:file_upload_success_callback)
+      @attachment.context.file_upload_success_callback(@attachment)
+    end
+    
     json = attachment_json(@attachment,@current_user)
     # render as_text for IE, otherwise it'll prompt
     # to download the JSON response
