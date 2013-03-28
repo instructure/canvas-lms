@@ -155,7 +155,11 @@ module Instructure #:nodoc:
         @config.fields = []
         @config.allow_comments = true
         args.each { |arg| infer_sanitize_arg(arg) }
-        @config.fields.each { |field| write_inheritable_hash(:fully_sanitize_fields, {field => @config.sanitizer.first} ) }
+        @config.fields.each do |field|
+          class_attribute :fully_sanitize_fields_config
+          fields = (self.fully_sanitize_fields_config ||= {})
+          fields[field] = @config.sanitizer.first
+        end
 
         before_save :fully_sanitize_fields
       end
@@ -191,7 +195,7 @@ module Instructure #:nodoc:
         # configuration set for that specific field or 
         # Sanitize::Config::RESTRICTED as the default. 
         def fully_sanitize_fields
-          fields_hash = self.class.read_inheritable_attribute(:fully_sanitize_fields) || {}
+          fields_hash = self.class.fully_sanitize_fields_config || {}
           fields_hash.each do |field, config|
             config ||= Sanitize::Config::RESTRICTED
             config = Sanitize::Config::RESTRICTED if config.empty?

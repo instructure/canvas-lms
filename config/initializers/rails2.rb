@@ -166,4 +166,10 @@ ActiveRecord::Associations::AssociationCollection.class_eval do
   end
 end
 
+class Class
+  def self.class_attribute(*attrs)
+    class_inheritable_accessor(*attrs)
+  end
+end
+
 end

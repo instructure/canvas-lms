@@ -227,7 +227,7 @@ module Instructure #:nodoc:
     module SingletonMethods
 
       def self.extended(klass)
-        klass.send(:class_inheritable_accessor, :broadcast_policy_list)
+        klass.send(:class_attribute, :broadcast_policy_list)
       end
 
       # This stores the policy for broadcasting changes on a class.  It works like a
