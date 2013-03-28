@@ -84,7 +84,7 @@ class PageView < ActiveRecord::Base
     # remember the page view method selected at the time of creation, so that
     # we use the right method when saving
     @page_view_method = self.class.page_view_method
-    if @page_view_method == :cassandra
+    if cassandra?
       self.shard = Shard.default
     end
   end
@@ -107,11 +107,23 @@ class PageView < ActiveRecord::Base
     self.page_view_method == :cassandra
   end
 
-  def self.cassandra
-    @cassandra ||= Canvas::Cassandra::Database.from_config('page_views')
-  end
-  def cassandra
-    self.class.cassandra
+  EventStream = ::EventStream.new do
+    database_name :page_views
+    table :page_views
+    id_column :request_id
+    record_type PageView
+
+    add_index :user do
+      table :page_views_history_by_context
+      id_column :request_id
+      key_column :context_and_time_bucket
+      scrollback_setting 'page_views_scrollback_limit:users'
+
+      # index by the page view's user, but use the user's global_asset_string
+      # when writing the index
+      entry_proc lambda{ |page_view| page_view.user }
+      key_proc lambda{ |user| user.global_asset_string }
+    end
   end
 
   def self.find_one(id, options)
@@ -122,11 +134,7 @@ class PageView < ActiveRecord::Base
   def self.find_some(ids, options)
     return super unless cassandra?
     raise(NotImplementedError, "options not implemented: #{options.inspect}") if options.present?
-    pvs = []
-    cassandra.execute("SELECT * FROM page_views WHERE request_id IN (?)", ids).fetch do |row|
-      pvs << from_cassandra(row)
-    end
-    pvs
+    PageView::EventStream.fetch(ids)
   end
 
   def self.find_every(options)
@@ -134,9 +142,12 @@ class PageView < ActiveRecord::Base
     raise(NotImplementedError, "find_every not implemented")
   end
 
-  def self.from_cassandra(attrs)
+  def self.from_attributes(attrs)
     @blank_template ||= columns.inject({}) { |h,c| h[c.name] = nil; h }
-    Shard.default.activate { instantiate(@blank_template.merge(attrs)) }.tap { |pv| pv.page_view_method = :cassandra }
+    shard = cassandra? ? Shard.default : Shard.current
+    page_view = shard.activate{ instantiate(@blank_template.merge(attrs)) }
+    page_view.page_view_method = :cassandra if cassandra?
+    page_view
   end
 
   def store
@@ -160,136 +171,52 @@ class PageView < ActiveRecord::Base
   end
 
   def do_update(params = {})
-    updated_at = params['updated_at'] || self.updated_at || Time.now
-    updated_at = Time.parse(updated_at) if updated_at.is_a?(String)
-    self.contributed ||= params['page_view_contributed'] || params['contributed']
-    seconds = self.interaction_seconds || 0
-    if params['interaction_seconds'].to_i > 0
-      seconds += params['interaction_seconds'].to_i
-    else
-      seconds += [5, (Time.now - updated_at)].min
-      seconds = [seconds, Time.now - created_at].min if created_at
+    # nothing currently in the block is shard-sensitive, but to prevent
+    # accidents in the future, we'll add the correct shard activation now
+    shard = cassandra? ? Shard.default : Shard.current
+    shard.activate do
+      updated_at = params['updated_at'] || self.updated_at || Time.now
+      updated_at = Time.parse(updated_at) if updated_at.is_a?(String)
+      self.contributed ||= params['page_view_contributed'] || params['contributed']
+      seconds = self.interaction_seconds || 0
+      if params['interaction_seconds'].to_i > 0
+        seconds += params['interaction_seconds'].to_i
+      else
+        seconds += [5, (Time.now - updated_at)].min
+        seconds = [seconds, Time.now - created_at].min if created_at
+      end
+      self.updated_at = Time.now
+      self.interaction_seconds = seconds
+      self.is_update = true
     end
-    self.updated_at = Time.now
-    self.interaction_seconds = seconds
-    self.is_update = true
   end
 
   def create_without_callbacks
-    if self.page_view_method == :cassandra
-      cassandra.batch do
-        update_cassandra
-      end
-      @new_record = false
-      self.id
-    else
-      super
-    end
+    return super unless cassandra?
+    self.created_at ||= Time.zone.now
+    PageView::EventStream.insert(self)
+    @new_record = false
+    self.id
   end
 
   def update_without_callbacks
-    if self.page_view_method == :cassandra
-      cassandra.batch do
-        update_cassandra
-      end
-      true
-    else
-      super
-    end
-  end
-
-  def update_cassandra
-    self.created_at ||= Time.zone.now
-    cassandra.update_record("page_views", { :request_id => request_id }, self.changes)
-
-    if new_record?
-      if user
-        cassandra.update("INSERT INTO page_views_history_by_context (context_and_time_bucket, ordered_id, request_id) VALUES (?, ?, ?)", "#{user.global_asset_string}/#{PageView.timeline_bucket_for_time(created_at, "User")}", "#{created_at.to_i}/#{request_id[0,8]}", request_id)
-      end
-    end
+    return super unless cassandra?
+    PageView::EventStream.update(self)
+    true
   end
 
   scope :for_context, proc { |ctx| where(:context_type => ctx.class.name, :context_id => ctx) }
   scope :for_users, lambda { |users| where(:user_id => users) }
-
-  module CassandraBookmarker
-    def self.bookmark_for(item)
-      [item['bucket'], item['ordered_id']]
-    end
-
-    def self.validate(bookmark)
-      bookmark.is_a?(Array) &&
-      bookmark.size == 2
-    end
-  end
 
   # returns a collection with very limited functionality
   # basically, it responds to #paginate and returns a
   # WillPaginate::Collection-like object
   def self.for_user(user)
     if cassandra?
-      BookmarkedCollection.build(PageView::CassandraBookmarker) do |pager|
-        page_view_history(user, pager)
-      end
+      PageView::EventStream.for_user(user)
     else
       self.where(:user_id => user).order('created_at desc')
     end
-  end
-
-  def self.page_view_history(context, pager)
-    context_type = context.class.name
-    context_id = context.global_id
-    scrollback_limit = Setting.get('page_views_scrollback_limit:users', 52.weeks.to_s).to_i.ago
-
-    # get the bucket to start at from the bookmark
-    if pager.current_bookmark
-      bucket, ordered_id = pager.current_bookmark
-    else
-      # page 1
-      bucket = PageView.timeline_bucket_for_time(Time.now, context_type)
-      ordered_id = nil
-    end
-
-    # pull results from each bucket until the page is full or we hit the
-    # scrollback_limit
-    until pager.next_bookmark || Time.at(bucket) < scrollback_limit
-      # build up the query based on the context, bucket, and ordered_id. fetch
-      # one extra so we can tell if there are more pages
-      limit = pager.per_page + 1 - pager.size
-      args = []
-      args << "#{context_type.underscore}_#{context_id}/#{bucket}"
-      if ordered_id
-        ordered_id_clause = (pager.include_bookmark ? "AND ordered_id <= ?" : "AND ordered_id < ?")
-        args << ordered_id
-      else
-        ordered_id_clause = nil
-      end
-      qs = "SELECT ordered_id, request_id FROM page_views_history_by_context where context_and_time_bucket = ? #{ordered_id_clause} ORDER BY ordered_id DESC LIMIT #{limit}"
-
-      # execute the query collecting the results. set the bookmark iff there
-      # was a result after the full page
-      PageView.cassandra.execute(qs, *args).fetch do |row|
-        if pager.size == pager.per_page
-          pager.has_more!
-        else
-          pager << row.to_hash.merge('bucket' => bucket)
-        end
-      end
-
-      ordered_id = nil
-      # possible optimization: query page_views_counters_by_context_and_day ,
-      # and use it as a secondary index to skip days where the user didn't
-      # have any page views
-      bucket -= PageView.timeline_bucket_size(context_type)
-    end
-
-    # now that the bookmark's been set, we only need to keep the request
-    # ids per item returned.
-    request_ids = pager.map{ |row| row['request_id'] }
-
-    # before returning, convert those request_ids into actual page views, but
-    # preserve the order
-    pager.replace(PageView.find(request_ids).sort_by { |pv| request_ids.index(pv.request_id) })
   end
 
   def self.cache_queue_name
@@ -340,18 +267,12 @@ class PageView < ActiveRecord::Base
       if attrs['is_update']
         page_view = self.find_some([attrs['request_id']], {}).first
         return unless page_view
-        activate_shard_for_cache_read { page_view.do_update(attrs) }
-        page_view.save
+        page_view.do_update(attrs)
       else
-        create_in_cassandra = self.cassandra?
-        activate_shard_for_cache_read do
-          self.create do |p|
-            p.page_view_method = :cassandra if create_in_cassandra
-            # bypass mass assignment protection
-            p.send(:attributes=, attrs, false)
-          end
-        end
+        page_view = self.from_attributes(attrs)
+        page_view.instance_variable_set(:'@new_record', true)
       end
+      page_view.save
     end
   rescue ActiveRecord::StatementInvalid
   end
@@ -365,27 +286,6 @@ class PageView < ActiveRecord::Base
       end
     end
     alias_method_chain :transaction, :cassandra_check
-
-    def activate_shard_for_cache_read
-      if self.cassandra?
-        Shard.default.activate { yield }
-      else
-        yield
-      end
-    end
-  end
-
-  def self.timeline_bucket_for_time(time, context_type)
-    time.to_i - (time.to_i % timeline_bucket_size(context_type))
-  end
-
-  def self.timeline_bucket_size(context_type)
-    case context_type
-    when "User"
-      1.week.to_i
-    else
-      raise "don't know bucket size for context type: #{context_type}"
-    end
   end
 
   def self.user_count_bucket_for_time(time)
@@ -433,7 +333,7 @@ class PageView < ActiveRecord::Base
       self.migration_data = {}
       account_ids.each do |account_id|
         data = self.migration_data[account_id] = {}
-        data.merge!(PageView.cassandra.execute("SELECT last_created_at FROM page_views_migration_metadata_per_account WHERE shard_id = ? AND account_id = ?", Shard.current.id.to_s, account_id).fetch.try(:to_hash) || {})
+        data.merge!(cassandra.execute("SELECT last_created_at FROM page_views_migration_metadata_per_account WHERE shard_id = ? AND account_id = ?", Shard.current.id.to_s, account_id).fetch.try(:to_hash) || {})
 
         if !(data['last_created_at'])
           data['last_created_at'] = self.start_at
@@ -474,7 +374,7 @@ class PageView < ActiveRecord::Base
           # we may have already inserted this page view
           # use to_i here to avoid sub-second precision problems
           if created_at.to_i == last_created_at.to_i
-            exists = !!PageView.cassandra.select_value("SELECT request_id FROM page_views WHERE request_id = ?", attrs['request_id'])
+            exists = !!cassandra.select_value("SELECT request_id FROM page_views WHERE request_id = ?", attrs['request_id'])
           end
 
           # now instantiate the AR object here, as a brand new record, so
@@ -484,10 +384,10 @@ class PageView < ActiveRecord::Base
           if exists
             false
           else
-            PageView.create! { |pv|
-              pv.page_view_method = :cassandra
-              pv.send(:attributes=, attrs, false)
-            }
+            # assumes PageView.cassandra? is true at this point
+            page_view = PageView.from_attributes(attrs)
+            page_view.instance_variable_set(:'@new_record', true)
+            page_view.save!
             true
           end
         rescue
@@ -500,9 +400,13 @@ class PageView < ActiveRecord::Base
 
       last_created_at = rows.last['created_at']
       last_created_at = Time.zone.parse(last_created_at)
-      PageView.cassandra.execute("UPDATE page_views_migration_metadata_per_account SET last_created_at = ? WHERE shard_id = ? AND account_id = ?", last_created_at, Shard.current.id.to_s, account_id)
+      cassandra.execute("UPDATE page_views_migration_metadata_per_account SET last_created_at = ? WHERE shard_id = ? AND account_id = ?", last_created_at, Shard.current.id.to_s, account_id)
       data['last_created_at'] = last_created_at
       return inserted > 0
+    end
+
+    def cassandra
+      PageView::EventStream.database
     end
 
     def run

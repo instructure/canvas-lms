@@ -148,7 +148,7 @@ describe "Canvas::Redis::Cassandra" do
   describe "execute and update" do
     it_should_behave_like "cassandra page views"
 
-    let(:db) { PageView.cassandra }
+    let(:db) { PageView::EventStream.database }
 
     it "should return the result from execute" do
       db.execute("select count(*) from page_views").fetch['count'].should == 0

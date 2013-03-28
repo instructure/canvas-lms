@@ -42,7 +42,7 @@ describe PageView do
     it "should store and load from cassandra" do
       expect {
         @page_view.save!
-      }.to change { PageView.cassandra.execute("select count(*) from page_views").fetch_row["count"] }.by(1)
+      }.to change { PageView::EventStream.database.execute("select count(*) from page_views").fetch_row["count"] }.by(1)
       PageView.find(@page_view.id).should == @page_view
       expect { PageView.find("junk") }.to raise_error(ActiveRecord::RecordNotFound)
     end
@@ -403,6 +403,74 @@ describe PageView do
         new_pv.should_not be_nil
         new_pv.request_id.should == pv.request_id
         new_pv.url.should_not == pv.url
+      end
+    end
+  end
+
+  describe ".from_attributes" do
+    specs_require_sharding
+
+    before do
+      @attributes = valid_page_view_attributes.stringify_keys
+    end
+
+    it "should return a PageView object" do
+      PageView.from_attributes(@attributes).should be_a(PageView)
+    end
+
+    it "should look like an existing PageView" do
+      PageView.from_attributes(@attributes).should_not be_new_record
+    end
+
+    it "should use the provided attributes" do
+      PageView.from_attributes(@attributes).url.should == @attributes['url']
+    end
+
+    it "should set missing attributes to nil" do
+      PageView.from_attributes(@attributes).user_id.should be_nil
+    end
+
+    context "db-backed" do
+      before do
+        Setting.set('enable_page_views', 'db')
+      end
+
+      it "should interpret ids relative to the current shard" do
+        user_id = 1
+        attributes = @attributes.merge('user_id' => user_id)
+        page_view1 = @shard1.activate{ PageView.from_attributes(attributes) }
+        page_view2 = @shard2.activate{ PageView.from_attributes(attributes) }
+        [@shard1, @shard2].each do |shard|
+          shard.activate do
+            page_view1.user_id.should == @shard1.relative_id_for(user_id)
+            page_view2.user_id.should == @shard2.relative_id_for(user_id)
+          end
+        end
+      end
+
+      it "should not be flagged for cassandra" do
+        PageView.from_attributes(@attributes).should_not be_cassandra
+      end
+    end
+
+    context "cassandra-backed" do
+      it_should_behave_like "cassandra page views"
+
+      it "should interpret ids relative to the default shard" do
+        user_id = 1
+        attributes = @attributes.merge('user_id' => user_id)
+        page_view1 = @shard1.activate{ PageView.from_attributes(attributes) }
+        page_view2 = @shard2.activate{ PageView.from_attributes(attributes) }
+        [@shard1, @shard2].each do |shard|
+          shard.activate do
+            page_view1.user_id.should == Shard.default.relative_id_for(user_id)
+            page_view2.user_id.should == Shard.default.relative_id_for(user_id)
+          end
+        end
+      end
+
+      it "should be flagged for cassandra" do
+        PageView.from_attributes(@attributes).should be_cassandra
       end
     end
   end

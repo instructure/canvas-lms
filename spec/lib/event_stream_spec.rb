@@ -1,0 +1,337 @@
+#
+# Copyright (C) 2013 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+
+describe EventStream do
+  before do
+    @database_name = stub(:to_s => stub('database_name'))
+    @database = stub('database')
+    def @database.batch; yield; end
+    def @database.update_record(*args); end
+    def @database.update(*args); end
+    ::Canvas::Cassandra::Database.stubs(:from_config).with(@database_name.to_s).returns(@database)
+  end
+
+  context "setup block" do
+    before do
+      @table = stub(:to_s => stub('table'))
+    end
+
+    it "should set values as expected" do
+      # can't access spec ivars inside instance_exec
+      database_name = @database_name
+      table = @table
+      id_column = stub(:to_s => stub('id_column'))
+      record_type = stub('record_type')
+
+      stream = EventStream.new do
+        self.database_name database_name
+        self.table table
+        self.id_column id_column
+        self.record_type record_type
+      end
+
+      stream.database_name.should == database_name.to_s
+      stream.database.should == @database
+      stream.table.should == table.to_s
+      stream.id_column.should == id_column.to_s
+      stream.record_type.should == record_type
+    end
+
+    it "should require database_name and table" do
+      # can't access spec ivars inside instance_exec
+      database_name = @database_name
+      table = @table
+
+      lambda{ EventStream.new{ self.database_name database_name } }.should raise_exception ArgumentError
+      lambda{ EventStream.new{ self.table table } }.should raise_exception ArgumentError
+    end
+
+    context "defaults" do
+      before do
+        # can't access spec ivars inside instance_exec
+        database_name = @database_name
+        table = @table
+        @stream = EventStream.new do
+          self.database_name database_name
+          self.table table
+        end
+      end
+
+      it "should default id_column to 'id'" do
+        @stream.id_column.should == 'id'
+      end
+
+      it "should default record_type to EventStream::Record" do
+        @stream.record_type.should == EventStream::Record
+      end
+    end
+  end
+
+  context "usage" do
+    before do
+      @table = stub(:to_s => "expected_table")
+      database_name, table = @database_name, @table
+      @stream = EventStream.new do
+        self.database_name database_name
+        self.table table
+      end
+    end
+
+    describe "on_insert" do
+      before do
+        @record = stub(:id => stub('id'), :attributes => stub('attributes'))
+      end
+
+      it "should register callback for execution during insert" do
+        spy = stub('spy')
+        @stream.on_insert{ spy.trigger }
+        spy.expects(:trigger).once
+        @stream.insert(@record)
+      end
+
+      it "should include the record in the callback invocation" do
+        spy = stub('spy')
+        @stream.on_insert{ |record| spy.trigger(record) }
+        spy.expects(:trigger).once.with(@record)
+        @stream.insert(@record)
+      end
+
+      it "should stack multiple callbacks" do
+        spy = stub('spy')
+        @stream.on_insert{ spy.trigger1 }
+        @stream.on_insert{ spy.trigger2 }
+        spy.expects(:trigger1).once
+        spy.expects(:trigger2).once
+        @stream.insert(@record)
+      end
+    end
+
+    describe "insert" do
+      before do
+        @record = stub(:id => stub('id'), :attributes => stub('attributes'))
+      end
+
+      it "should insert into the configured database" do
+        @database.expects(:update_record).once
+        @stream.insert(@record)
+      end
+
+      it "should insert into the configured table" do
+        @database.expects(:update_record).with(@table.to_s, anything, anything)
+        @stream.insert(@record)
+      end
+
+      it "should insert by the record's id into the configured id column" do
+        id_column = stub(:to_s => stub('id_column'))
+        @stream.id_column id_column
+        @database.expects(:update_record).with(anything, { id_column.to_s => @record.id }, anything)
+        @stream.insert(@record)
+      end
+
+      it "should insert the record's attributes" do
+        @database.expects(:update_record).with(anything, anything, @record.attributes)
+        @stream.insert(@record)
+      end
+
+      it "should execute its commands in a batch" do
+        spy = stub('spy')
+        @stream.on_insert{ spy.trigger }
+        @database.expects(:batch).once
+        @database.expects(:update_record).never
+        spy.expects(:trigger).never
+        @stream.insert(@record)
+      end
+    end
+
+    describe "on_update" do
+      before do
+        @record = stub(:id => stub('id'), :changes => stub('changes'))
+      end
+
+      it "should register callback for execution during update" do
+        spy = stub('spy')
+        @stream.on_update{ spy.trigger }
+        spy.expects(:trigger).once
+        @stream.update(@record)
+      end
+
+      it "should include the record in the callback invocation" do
+        spy = stub('spy')
+        @stream.on_update{ |record| spy.trigger(record) }
+        spy.expects(:trigger).once.with(@record)
+        @stream.update(@record)
+      end
+
+      it "should stack multiple callbacks" do
+        spy = stub('spy')
+        @stream.on_update{ spy.trigger1 }
+        @stream.on_update{ spy.trigger2 }
+        spy.expects(:trigger1).once
+        spy.expects(:trigger2).once
+        @stream.update(@record)
+      end
+    end
+
+    describe "update" do
+      before do
+        @record = stub(:id => stub('id'), :changes => stub('changes'))
+      end
+
+      it "should update in the configured database" do
+        @database.expects(:update_record).once
+        @stream.update(@record)
+      end
+
+      it "should update in the configured table" do
+        @database.expects(:update_record).with(@table.to_s, anything, anything)
+        @stream.update(@record)
+      end
+
+      it "should update by the record's id in the configured id column" do
+        id_column = stub(:to_s => stub('id_column'))
+        @stream.id_column id_column
+        @database.expects(:update_record).with(anything, { id_column.to_s => @record.id }, anything)
+        @stream.update(@record)
+      end
+
+      it "should update the record's changes" do
+        @database.expects(:update_record).with(anything, anything, @record.changes)
+        @stream.update(@record)
+      end
+
+      it "should execute its commands in a batch" do
+        spy = stub('spy')
+        @stream.on_update{ spy.trigger }
+        @database.expects(:batch).once
+        @database.expects(:update_record).never
+        spy.expects(:trigger).never
+        @stream.update(@record)
+      end
+    end
+
+    describe "fetch" do
+      before do
+        @results = stub(:fetch => nil)
+      end
+
+      it "should use the configured database" do
+        @database.expects(:execute).once.returns(@results)
+        @stream.fetch([1])
+      end
+
+      it "should use the configured table" do
+        @database.expects(:execute).once.with(regexp_matches(/ FROM #{@table} /), anything).returns(@results)
+        @stream.fetch([1])
+      end
+
+      it "should use the configured id column" do
+        id_column = stub(:to_s => "expected_id_column")
+        @stream.id_column id_column
+        @database.expects(:execute).once.with(regexp_matches(/ WHERE #{id_column} /), anything).returns(@results)
+        @stream.fetch([1])
+      end
+
+      it "should pass the given ids to the execute" do
+        ids = stub('ids', :empty? => false)
+        @database.expects(:execute).once.with(anything, ids).returns(@results)
+        @stream.fetch(ids)
+      end
+
+      it "should map the returned rows to the configured record type" do
+        record_type = stub('record_type')
+        raw_result = stub('raw_result')
+        typed_result = stub('typed_result')
+        record_type.expects(:from_attributes).with(raw_result).returns(typed_result)
+
+        @stream.record_type record_type
+        @results.expects(:fetch).yields(raw_result)
+        @database.expects(:execute).once.returns(@results)
+        results = @stream.fetch([1])
+        results.should == [typed_result]
+      end
+
+      it "should skip the fetch if no ids were given" do
+        @database.expects(:execute).never
+        @stream.fetch([])
+      end
+    end
+
+    describe "add_index" do
+      before do
+        @table = stub('table')
+        table = @table
+        @index = @stream.add_index :thing do
+          self.table table
+          self.entry_proc lambda{ |record| record.entry }
+        end
+
+        @key = stub('key')
+        @entry = stub('entry', :key => @key)
+      end
+
+      describe "generated on_insert callback" do
+        before do
+          @record = stub(
+            :id => stub('id'),
+            :created_at => stub('created_at', :to_i => 0),
+            :attributes => stub('attributes'),
+            :changes => stub('changes'),
+            :entry => @entry
+          )
+        end
+
+        it "should insert the record with id and created_at" do
+          @index.expects(:insert).once.with(@record.id, anything, @record.created_at)
+          @stream.insert(@record)
+        end
+
+        it "should translate the record through the entry_proc for the key" do
+          @index.expects(:insert).once.with(anything, @entry, anything)
+          @stream.insert(@record)
+        end
+
+        it "should skip insert if entry_proc returns nil" do
+          @index.entry_proc lambda{ |record| nil }
+          @index.expects(:insert).never
+          @stream.insert(@record)
+        end
+
+        it "should translate the result of the entry_proc through the key_proc if present" do
+          @index.key_proc lambda{ |entry| entry.key }
+          @index.expects(:insert).once.with(anything, @key, anything)
+          @stream.insert(@record)
+        end
+      end
+
+      describe "generated for_thing method" do
+        it "should forward argument to index's for_key" do
+          @index.expects(:for_key).once.with(@entry)
+          @stream.for_thing(@entry)
+        end
+
+        it "should translate argument through key_proc if present" do
+          @index.key_proc lambda{ |entry| entry.key }
+          @index.expects(:for_key).once.with(@key)
+          @stream.for_thing(@entry)
+        end
+      end
+    end
+  end
+end
