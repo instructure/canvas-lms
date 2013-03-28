@@ -1426,13 +1426,15 @@ class ApplicationController < ActionController::Base
     data
   end
 
-  filter_parameter_logging *Canvas::LoggingFilter.filtered_parameters
+  unless CANVAS_RAILS3
+    filter_parameter_logging *LoggingFilter.filtered_parameters
+  end
 
   # filter out sensitive parameters in the query string as well when logging
   # the rails "Completed in XXms" line.
   # this is fixed in Rails 3.x
   def complete_request_uri
-    uri = Canvas::LoggingFilter.filter_uri(request.request_uri)
+    uri = LoggingFilter.filter_uri(request.request_uri)
     "#{request.protocol}#{request.host}#{uri}"
   end
 

@@ -20,8 +20,7 @@ class FacebookController < ApplicationController
   protect_from_forgery :only => []
   before_filter :get_facebook_user
   before_filter :require_facebook_user, :only => [:settings, :notification_preferences, :hide_message]
-  filter_parameter_logging :fb_sig_friends
-  
+
   def notification_preferences
     @cc = @user.communication_channels.find_by_path_type('facebook')
     if @cc

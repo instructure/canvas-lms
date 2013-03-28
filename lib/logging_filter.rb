@@ -1,5 +1,5 @@
-module Canvas::LoggingFilter
-  FILTERED_PARAMETERS = [:password, :auth_password, :access_token, :api_key, :client_secret]
+module LoggingFilter
+  FILTERED_PARAMETERS = [:password, :auth_password, :access_token, :api_key, :client_secret, :fb_sig_friends]
   def self.filtered_parameters
     FILTERED_PARAMETERS
   end

@@ -10,6 +10,8 @@ module CanvasRails
     config.autoload_paths += [config.root.join('lib').to_s]
     $LOAD_PATH << config.root.to_s
     config.encoding = 'utf-8'
+    require_dependency 'logging_filter'
+    config.filter_parameters.concat LoggingFilter.filtered_parameters
 
     eval(File.read(File.expand_path("../shared_boot.rb", __FILE__)), binding, "config/shared_boot.rb", 1)
   end

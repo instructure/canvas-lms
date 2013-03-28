@@ -129,7 +129,7 @@ class ErrorReport < ActiveRecord::Base
   end
 
   def url=(val)
-    write_attribute(:url, Canvas::LoggingFilter.filter_uri(val))
+    write_attribute(:url, LoggingFilter.filter_uri(val))
   end
   
   def guess_email
@@ -169,11 +169,11 @@ class ErrorReport < ActiveRecord::Base
   def self.useful_http_env_stuff_from_request(request)
     stuff = request.env.slice(*USEFUL_ENV)
     stuff['REMOTE_ADDR'] = request.remote_ip # ActionController::Request#remote_ip has proxy smarts
-    stuff['QUERY_STRING'] = Canvas::LoggingFilter.filter_query_string("?" + stuff['QUERY_STRING'])
-    stuff['REQUEST_URI'] = Canvas::LoggingFilter.filter_uri(stuff['REQUEST_URI'])
-    stuff['path_parameters'] = Canvas::LoggingFilter.filter_params(request.path_parameters.dup).inspect # params rails picks up from the url
-    stuff['query_parameters'] = Canvas::LoggingFilter.filter_params(request.query_parameters.dup).inspect # params rails picks up from the query string
-    stuff['request_parameters'] = Canvas::LoggingFilter.filter_params(request.request_parameters.dup).inspect # params from forms
+    stuff['QUERY_STRING'] = LoggingFilter.filter_query_string("?" + stuff['QUERY_STRING'])
+    stuff['REQUEST_URI'] = LoggingFilter.filter_uri(stuff['REQUEST_URI'])
+    stuff['path_parameters'] = LoggingFilter.filter_params(request.path_parameters.dup).inspect # params rails picks up from the url
+    stuff['query_parameters'] = LoggingFilter.filter_params(request.query_parameters.dup).inspect # params rails picks up from the query string
+    stuff['request_parameters'] = LoggingFilter.filter_params(request.request_parameters.dup).inspect # params from forms
     stuff
   end
 
