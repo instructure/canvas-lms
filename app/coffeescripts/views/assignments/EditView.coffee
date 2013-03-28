@@ -277,7 +277,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
 
     _validateTitle: (data, errors) =>
       if !data.name or $.trim(data.name.toString()).length == 0
-        errors["'name'"] = [
+        errors["name"] = [
           message: I18n.t 'name_is_required', 'Name is required!'
         ]
       errors
@@ -285,14 +285,14 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
 
     _validateSubmissionTypes: (data, errors) =>
       if data.submission_type == 'online' and data.submission_types.length == 0
-        errors["'online_submission_types[online_text_entry]'"] = [
+        errors["online_submission_types[online_text_entry]"] = [
           message: I18n.t 'at_least_one_submission_type', 'Please choose at least one submission type'
         ]
       errors
 
     _validateAllowedExtensions: (data, errors) =>
       if data.allowed_extensions && data.allowed_extensions.length == 0
-        errors["'allowed_extensions'"] = [
+        errors["allowed_extensions"] = [
           message: I18n.t 'at_least_one_file_type', 'Please specify at least one allowed file type'
         ]
       errors
