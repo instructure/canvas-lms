@@ -44,6 +44,7 @@
     h2 {
       font-size: 18px;
       padding: 0 16px;
+      line-height: 32px;
     }
   }
   .fc-other-month {
@@ -128,6 +129,8 @@
   background-image: url("/images/ajax-loader-black-on-white-static.gif");
   background-position: 50% 50%;
   margin-left: 10px;
+  position: relative;
+  top: 5px;
   &.loading {
     background-image: url("/images/ajax-loader-black-on-white.gif");
   }
@@ -281,6 +284,8 @@
 .whats-new {
   float: right;
   margin-right: 10px;
+  line-height: 32px;
+  font-size: 11px;
 }
 
 .event_button {
