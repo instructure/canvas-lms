@@ -192,7 +192,7 @@ describe "API Authentication", :type => :integration do
       it "should not prepend the csrf protection even if the post has a session" do
         user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
         post "/login", :pseudonym_session => { :unique_id => 'test1@example.com', :password => 'test123' }
-        code = ActiveSupport::SecureRandom.hex(64)
+        code = SecureRandom.hex(64)
         code_data = { 'user' => @user.id, 'client_id' => @client_id }
         Canvas.redis.setex("oauth2:#{code}", 1.day, code_data.to_json)
         post "/login/oauth2/token", :client_id => @client_id, :client_secret => @client_secret, :code => code

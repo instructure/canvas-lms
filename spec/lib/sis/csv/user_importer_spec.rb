@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 def gen_ssha_password(password)
-  salt = ActiveSupport::SecureRandom.random_bytes(10)
+  salt = SecureRandom.random_bytes(10)
   "{SSHA}" + Base64.encode64(Digest::SHA1.digest(password+salt).unpack('H*').first+salt).gsub(/\s/, '')
 end
 

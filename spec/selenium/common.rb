@@ -727,7 +727,7 @@ shared_examples_for "all selenium tests" do
         :user_agent => user_agent)
 
     page_view.summarized = summarized
-    page_view.request_id = ActiveSupport::SecureRandom.hex(10)
+    page_view.request_id = SecureRandom.hex(10)
     page_view.created_at = opts[:created_at] || Time.now
 
     if opts[:participated]
@@ -900,7 +900,7 @@ shared_examples_for "all selenium tests" do
   append_before (:each) do
     driver.manage.timeouts.implicit_wait = 3
     driver.manage.timeouts.script_timeout = 60
-    EncryptedCookieStore.any_instance.stubs(:secret).returns(ActiveSupport::SecureRandom.hex(64))
+    EncryptedCookieStore.any_instance.stubs(:secret).returns(SecureRandom.hex(64))
     enable_forgery_protection
   end
 

@@ -141,7 +141,7 @@ module Canvas::Oauth
 
     describe '.generate_code_for' do
       let(:code) { "brand_new_code" }
-      before { ActiveSupport::SecureRandom.stubs(:hex => code) }
+      before { SecureRandom.stubs(:hex => code) }
 
       it 'returns the new code' do
         Canvas.stubs(:redis => stub(:setex => true))

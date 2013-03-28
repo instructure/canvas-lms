@@ -67,7 +67,7 @@ module Canvas::Oauth
     end
 
     def self.generate_code_for(user_id, client_id, options = {})
-      code = ActiveSupport::SecureRandom.hex(64)
+      code = SecureRandom.hex(64)
       code_data = {
         USER_KEY => user_id,
         CLIENT_KEY => client_id,

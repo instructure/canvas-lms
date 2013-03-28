@@ -7,8 +7,7 @@
 config = {
   :key           => '_normandy_session',
   :session_store => :encrypted_cookie_store,
-  :secret        => (Setting.get_or_set("session_secret_key",
-      ActiveSupport::SecureRandom.hex(64)) rescue ActiveSupport::SecureRandom.hex(64))
+  :secret        => (Setting.get_or_set("session_secret_key", SecureRandom.hex(64)) rescue SecureRandom.hex(64))
 }.merge((Setting.from_config("session_store") || {}).symbolize_keys)
 
 # :expire_after is the "true" option, and :expires is a legacy option, but is applied

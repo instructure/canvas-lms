@@ -113,7 +113,7 @@ describe "shared files tests" do
       it "should allow you to edit html files" do
         current_content = File.read(fixture_file_path("files/html-editing-test.html"))
         4.times do
-          new_content = "<html>#{ActiveSupport::SecureRandom.hex(10)}</html>"
+          new_content = "<html>#{SecureRandom.hex(10)}</html>"
           click_edit_link
           keep_trying_until(120) { driver.execute_script("return $('#edit_content_textarea')[0].value;") == current_content }
           driver.execute_script("$('#edit_content_textarea')[0].value = '#{new_content}';")
