@@ -1,10 +1,10 @@
 require [
-  "i18n!registration_confirmation"
   "jquery"
+  "compiled/registration/registrationErrors"
   "jquery.instructure_forms" #/* getFormData, formErrors */
   'jquery.instructure_misc_plugins' #/* showIf */
   'user_sortable_name'
-], (I18n, $) ->
+], ($, registrationErrors) ->
   $ ->
     $registration_form = $("#registration_confirmation_form")
     $disambiguation_box = $(".disambiguation_box")
@@ -40,13 +40,8 @@ require [
         showPane $where_to_log_in
 
     $registration_form.find(":text:first").focus().select()
-    $registration_form.submit (event) ->
-      data = $registration_form.getFormData()
-      success = true
-      if !data["pseudonym[password]"] || !data["pseudonym[password]"].length
-        $registration_form.formErrors "pseudonym[password]": I18n.t("#pseudonyms.registration_confirmation_form.errors.password_required", "Password required")
-        success = false
-      else if data["pseudonym[password]"].length < 6
-        $registration_form.formErrors "pseudonym[password]": I18n.t("#pseudonyms.registration_confirmation_form.errors.password_too_short", "Password too short")
-        success = false
-      success
+    $registration_form.formSubmit
+      disableWhileLoading: 'spin_on_success'
+      errorFormatter: registrationErrors
+      success: (data) ->
+        location.href = data.url ? '/'

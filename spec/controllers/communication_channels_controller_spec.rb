@@ -109,15 +109,21 @@ describe CommunicationChannelsController do
     end
 
     describe "open registration" do
-      it "should finalize registration for a pre-registered user" do
+      it "should show a pre-registered user the confirmation form" do
         user_with_pseudonym(:password => :autogenerate)
         @user.should be_pre_registered
+
         get 'confirm', :nonce => @cc.confirmation_code
         response.should render_template('confirm')
         assigns[:pseudonym].should == @pseudonym
         assigns[:merge_opportunities].should == []
         @user.reload
         @user.should_not be_registered
+      end
+
+      it "should finalize registration for a pre-registered user" do
+        user_with_pseudonym(:password => :autogenerate)
+        @user.should be_pre_registered
 
         post 'confirm', :nonce => @cc.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
         response.should be_redirect
@@ -133,15 +139,8 @@ describe CommunicationChannelsController do
         # another user claimed the pseudonym
         u2 = user_with_pseudonym(:username => 'asdf@qwerty.com', :active_user => true)
 
-        get 'confirm', :nonce => cc1.confirmation_code
-        response.should render_template('confirm')
-        assigns[:pseudonym].should be_present
-        assigns[:merge_opportunities].should == []
-        u1.reload
-        u1.should_not be_registered
-
         post 'confirm', :nonce => cc1.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
-        response.should render_template('confirm')
+        response.status.should =~ /400 Bad Request/
         u1.reload
         u1.should_not be_registered
       end
@@ -185,6 +184,21 @@ describe CommunicationChannelsController do
         @pseudonym.user.should_not be_registered
       end
 
+      it "should show the confirm form for a creation_pending user" do
+        course(:active_all => 1)
+        user
+        @user.update_attribute(:workflow_state, 'creation_pending')
+        @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
+        @enrollment = @course.enroll_student(@user)
+        @user.should be_creation_pending
+        @enrollment.should be_invited
+
+        get 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid
+        response.should be_success
+        assigns[:pseudonym].should be_new_record
+        assigns[:pseudonym].unique_id.should == 'jt@instructure.com'
+      end
+
       it "should register creation_pending user" do
         course(:active_all => 1)
         user
@@ -193,10 +207,6 @@ describe CommunicationChannelsController do
         @enrollment = @course.enroll_student(@user)
         @user.should be_creation_pending
         @enrollment.should be_invited
-        get 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid
-        response.should be_success
-        assigns[:pseudonym].should be_new_record
-        assigns[:pseudonym].unique_id.should == 'jt@instructure.com'
 
         post 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
         response.should be_redirect
@@ -215,16 +225,25 @@ describe CommunicationChannelsController do
         @pseudonym.communication_channel_id.should == @cc.id
       end
 
+      it "should show the confirm form for a creation_pending user that's logged in (masquerading)" do
+        user
+        @user.update_attribute(:workflow_state, 'creation_pending')
+        @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
+        # not a full user session; just @current_user is set
+        controller.instance_variable_set(:@current_user, @user)
+
+        get 'confirm', :nonce => @cc.confirmation_code
+        response.should be_success
+        assigns[:pseudonym].should be_new_record
+        assigns[:pseudonym].unique_id.should == 'jt@instructure.com'
+      end
+
       it "should register creation_pending user that's logged in (masquerading)" do
         user
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         # not a full user session; just @current_user is set
         controller.instance_variable_set(:@current_user, @user)
-        get 'confirm', :nonce => @cc.confirmation_code
-        response.should be_success
-        assigns[:pseudonym].should be_new_record
-        assigns[:pseudonym].unique_id.should == 'jt@instructure.com'
 
         post 'confirm', :nonce => @cc.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
         response.should be_redirect
@@ -241,6 +260,24 @@ describe CommunicationChannelsController do
         @pseudonym.communication_channel_id.should == @cc.id
       end
 
+      it "should prepare to register a creation_pending user in the correct account" do
+        @account = Account.create!
+        course(:active_all => 1, :account => @account)
+        user
+        @user.update_attribute(:workflow_state, 'creation_pending')
+        @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
+        @enrollment = @course.enroll_student(@user)
+        @user.should be_creation_pending
+        @enrollment.should be_invited
+
+        get 'confirm', :nonce => @cc.confirmation_code
+        response.should be_success
+        assigns[:pseudonym].should be_new_record
+        assigns[:pseudonym].unique_id.should == 'jt@instructure.com'
+        assigns[:pseudonym].account.should == @account
+        assigns[:root_account].should == @account
+      end
+
       it "should register creation_pending user in the correct account" do
         @account = Account.create!
         course(:active_all => 1, :account => @account)
@@ -250,12 +287,6 @@ describe CommunicationChannelsController do
         @enrollment = @course.enroll_student(@user)
         @user.should be_creation_pending
         @enrollment.should be_invited
-        get 'confirm', :nonce => @cc.confirmation_code
-        response.should be_success
-        assigns[:pseudonym].should be_new_record
-        assigns[:pseudonym].unique_id.should == 'jt@instructure.com'
-        assigns[:pseudonym].account.should == @account
-        assigns[:root_account].should == @account
 
         post 'confirm', :nonce => @cc.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
         response.should be_redirect
@@ -274,6 +305,22 @@ describe CommunicationChannelsController do
         @pseudonym.communication_channel_id.should == @cc.id
       end
 
+      it "should prepare to register a creation_pending user in the correct account (admin)" do
+        @account = Account.create!
+        user
+        @user.update_attribute(:workflow_state, 'creation_pending')
+        @account.add_user(@user)
+        @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
+        @user.should be_creation_pending
+
+        get 'confirm', :nonce => @cc.confirmation_code
+        response.should be_success
+        assigns[:pseudonym].should be_new_record
+        assigns[:pseudonym].unique_id.should == 'jt@instructure.com'
+        assigns[:pseudonym].account.should == @account
+        assigns[:root_account].should == @account
+      end
+
       it "should register creation_pending user in the correct account (admin)" do
         @account = Account.create!
         user
@@ -281,12 +328,6 @@ describe CommunicationChannelsController do
         @account.add_user(@user)
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         @user.should be_creation_pending
-        get 'confirm', :nonce => @cc.confirmation_code
-        response.should be_success
-        assigns[:pseudonym].should be_new_record
-        assigns[:pseudonym].unique_id.should == 'jt@instructure.com'
-        assigns[:pseudonym].account.should == @account
-        assigns[:root_account].should == @account
 
         post 'confirm', :nonce => @cc.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
         response.should be_redirect
@@ -303,7 +344,7 @@ describe CommunicationChannelsController do
         @pseudonym.communication_channel_id.should == @cc.id
       end
 
-      it "should work for old creation_pending users that have a pseudonym" do
+      it "should show the confirm form for old creation_pending users that have a pseudonym" do
         course(:active_all => 1)
         user
         @user.update_attribute(:workflow_state, 'creation_pending')
@@ -315,6 +356,17 @@ describe CommunicationChannelsController do
         get 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid
         response.should be_success
         assigns[:pseudonym].should == @pseudonym
+      end
+
+      it "should work for old creation_pending users that have a pseudonym" do
+        course(:active_all => 1)
+        user
+        @user.update_attribute(:workflow_state, 'creation_pending')
+        @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
+        @enrollment = @course.enroll_student(@user)
+        @user.should be_creation_pending
+        @enrollment.should be_invited
+        @pseudonym = @user.pseudonyms.create!(:unique_id => 'jt@instructure.com')
 
         post 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
         response.should be_redirect
@@ -332,6 +384,21 @@ describe CommunicationChannelsController do
         @pseudonym.communication_channel_id.should == @cc.id
       end
 
+      it "should allow the user to pick a new pseudonym if a conflict already exists" do
+        user_with_pseudonym(:active_all => 1, :username => 'jt@instructure.com')
+        course(:active_all => 1)
+        user
+        @user.update_attribute(:workflow_state, 'creation_pending')
+        @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
+        @enrollment = @course.enroll_student(@user)
+        @user.should be_creation_pending
+        @enrollment.should be_invited
+
+        get 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid
+        response.should be_success
+        assigns[:pseudonym].should be_new_record
+        assigns[:pseudonym].unique_id.should be_blank
+      end
 
       it "should force the user to provide a unique_id if a conflict already exists" do
         user_with_pseudonym(:active_all => 1, :username => 'jt@instructure.com')
@@ -342,19 +409,14 @@ describe CommunicationChannelsController do
         @enrollment = @course.enroll_student(@user)
         @user.should be_creation_pending
         @enrollment.should be_invited
-        get 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid
-        response.should be_success
-        assigns[:pseudonym].should be_new_record
-        assigns[:pseudonym].unique_id.should be_blank
 
         post 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
-        response.should be_success
-        assigns[:pseudonym].errors.should_not be_empty
+        response.status.should =~ /400 Bad Request/
       end
     end
 
     describe "merging" do
-      it "should merge with an already-logged-in user" do
+      it "should prepare to merge with an already-logged-in user" do
         user_with_pseudonym(:username => 'jt+1@instructure.com')
         @not_logged_user = @user
         user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1)
@@ -365,6 +427,14 @@ describe CommunicationChannelsController do
         get 'confirm', :nonce => @not_logged_user.email_channel.confirmation_code
         response.should render_template('confirm')
         assigns[:merge_opportunities].should == [[@user, [@pseudonym]]]
+      end
+
+      it "should merge with an already-logged-in user" do
+        user_with_pseudonym(:username => 'jt+1@instructure.com')
+        @not_logged_user = @user
+        user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1)
+        @logged_user = @user
+        user_session(@logged_user, @pseudonym)
 
         get 'confirm', :nonce => @not_logged_user.email_channel.confirmation_code, :confirm => 1
         response.should redirect_to(dashboard_url)
@@ -475,7 +545,7 @@ describe CommunicationChannelsController do
     end
 
     describe "invitations" do
-      it "should accept an invitation when creating a new user" do
+      it "should prepare to accept an invitation when creating a new user" do
         course_with_student(:active_course => 1)
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -485,6 +555,12 @@ describe CommunicationChannelsController do
         assigns[:current_user].should be_nil
         assigns[:pseudonym].should be_new_record
         assigns[:pseudonym].unique_id.should == 'jt@instructure.com'
+      end
+
+      it "should accept an invitation when creating a new user" do
+        course_with_student(:active_course => 1)
+        @user.update_attribute(:workflow_state, 'creation_pending')
+        @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
 
         post 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
         response.should be_redirect
@@ -513,6 +589,16 @@ describe CommunicationChannelsController do
         assigns[:pseudonym].should be_new_record
         assigns[:pseudonym].unique_id.should == 'jt@instructure.com'
         assigns[:merge_opportunities].should == [[@user, [@pseudonym]]]
+      end
+
+      it "should accept an invitation when merging with the current user" do
+        course_with_student(:active_course => 1)
+        @user.update_attribute(:workflow_state, 'creation_pending')
+        @old_cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
+        @old_user = @user
+
+        user_with_pseudonym(:active_all => 1, :username => 'bob@instructure.com')
+        user_session(@user, @pseudonym)
 
         post 'confirm', :nonce => @old_cc.confirmation_code, :enrollment => @enrollment.uuid, :confirm => 1
         response.should redirect_to(course_url(@course))
@@ -527,7 +613,7 @@ describe CommunicationChannelsController do
         @old_cc.user.should == @user
       end
 
-      it "should transfer an enrollment to a different user" do
+      it "should prepare to transfer an enrollment to a different user" do
         course_with_student(:active_user => 1, :active_course => 1)
         @student_cc = @user.communication_channels.create!(:path => 'someone@somewhere.com') { |cc| cc.workflow_state = 'active' }
         user_with_pseudonym(:active_all => 1)
@@ -535,6 +621,13 @@ describe CommunicationChannelsController do
 
         get 'confirm', :nonce => @student_cc.confirmation_code, :enrollment => @enrollment.uuid
         response.should render_template('confirm')
+      end
+
+      it "should transfer an enrollment to a different user" do
+        course_with_student(:active_user => 1, :active_course => 1)
+        @student_cc = @user.communication_channels.create!(:path => 'someone@somewhere.com') { |cc| cc.workflow_state = 'active' }
+        user_with_pseudonym(:active_all => 1)
+        user_session(@user, @pseudonym)
 
         get 'confirm', :nonce => @student_cc.confirmation_code, :enrollment => @enrollment.uuid, :transfer_enrollment => 1
         response.should redirect_to(course_url(@course))

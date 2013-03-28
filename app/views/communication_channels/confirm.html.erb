@@ -104,16 +104,11 @@ Which is you?", :count => @merge_opportunities.length %>
         else
           t 'details.register', "In order to set up your account, we'll need a little more information."
         end %></p>
-      <%= (error_messages_for :object => [@user, @pseudonym], :header_message => nil).gsub("Unique", "Login") %>
       <input type="hidden" name="register" value="1"/>
       <div class="control-group">
         <%= form.blabel :unique_id, :en => "Login", :class => 'control-label' %>
         <div class="controls" style="padding-top: 5px">
-          <% if @pseudonym.unique_id.blank? || @pseudonym.errors && @pseudonym.errors[:unique_id] %>
-            <%= form.text_field :unique_id %>
-          <% else %>
-            <%= @pseudonym.unique_id %>
-          <% end %>
+          <%= form.text_field :unique_id, :disabled => @pseudonym.unique_id.present? %>
         </div>
       </div>
       <div class="control-group">
