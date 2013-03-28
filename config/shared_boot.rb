@@ -15,10 +15,10 @@ if ENV['RUNNING_AS_DAEMON'] == 'true'
   config.log_path = Rails.root+'log/delayed_job.log'
 end
 
-log_config = File.exists?(Rails.root+"config/logging.yml") && YAML.load_file(Rails.root+"config/logging.yml")[RAILS_ENV]
+log_config = File.exists?(Rails.root+"config/logging.yml") && YAML.load_file(Rails.root+"config/logging.yml")[CANVAS_RAILS3 ? Rails.env : RAILS_ENV]
 log_config = { 'logger' => 'rails', 'log_level' => 'debug' }.merge(log_config || {})
 opts = {}
-require 'canvas/logger'
+require 'canvas_logger'
 log_level = ActiveSupport::BufferedLogger.const_get(log_config['log_level'].to_s.upcase)
 opts[:skip_thread_context] = true if log_config['log_context'] == false
 case log_config["logger"]

@@ -8,19 +8,15 @@ class CanvasLogger < ActiveSupport::BufferedLogger
   end
 
   def add(severity, message=nil, progname=nil, &block)
-    return if @level > severity
+    return if level > severity
     message = (message || (block && block.call) || progname).to_s
     # If a newline is necessary then create a new message ending with a newline.
     # Ensures that the original message is not mutated.
-    if @skip_thread_context
-      message = "#{message}\n" unless message[-1] == ?\n
-    else
+    unless @skip_thread_context
       context = Thread.current[:context] || {}
-      message = "[#{context[:session_id] || "-"} #{context[:request_id] || "-"}] #{message}#{"\n" unless message[-1] == ?\n}"
+      message = "[#{context[:session_id] || "-"} #{context[:request_id] || "-"}] #{message}"
     end
-    buffer << message
-    auto_flush
-    message
+    super(severity, message, progname)
   end
 
 end
