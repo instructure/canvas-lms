@@ -47,12 +47,12 @@ class Pseudonym < ActiveRecord::Base
   include StickySisFields
   are_sis_sticky :unique_id
 
+  validates_each :password, {:if => :require_password?}, &Canvas::PasswordPolicy.method("validate")
   acts_as_authentic do |config|
     config.validates_format_of_login_field_options = {:with => /\A\w[\w\.\+\-_@ =]*\z/}
     config.login_field :unique_id
     config.validations_scope = [:account_id, :workflow_state]
     config.perishable_token_valid_for = 30.minutes
-    config.validates_length_of_password_field_options = { :minimum => 6, :if => :require_password? }
     config.validates_length_of_login_field_options = {:within => 1..100}
     config.validates_uniqueness_of_login_field_options = { :case_sensitive => false, :scope => [:account_id, :workflow_state], :if => lambda { |p| p.unique_id_changed? && p.active? } }
   end

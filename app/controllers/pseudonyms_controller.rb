@@ -107,36 +107,40 @@ class PseudonymsController < ApplicationController
     if !@cc || @cc.path_type != 'email'
       flash[:error] = t 'errors.cant_change_password', "Cannot change the password for that login, or login does not exist"
       redirect_to root_url
+    else
+      @password_pseudonyms = @cc.user.pseudonyms.active.select{|p| p.account.password_authentication? }
+      js_env :PASSWORD_POLICY => @domain_root_account.password_policy,
+             :PASSWORD_POLICIES => Hash[@password_pseudonyms.map{ |p| [p.id, p.account.password_policy]}]
     end
   end
 
   def change_password
     @pseudonym = Pseudonym.find(params[:pseudonym][:id] || params[:pseudonym_id])
-    @cc = @pseudonym.user.communication_channels.find_by_confirmation_code(params[:nonce])
-    if @cc
+    if @cc = @pseudonym.user.communication_channels.find_by_confirmation_code(params[:nonce])
+      @pseudonym.require_password = true
       @pseudonym.password = params[:pseudonym][:password]
       @pseudonym.password_confirmation = params[:pseudonym][:password_confirmation]
-    end
-    if @cc && @pseudonym.save
-      # If they changed the password (and we subsequently log them in) then
-      # we're pretty confident this is the right user, and the communication
-      # channel is valid, so register the user and approve the channel.
-      @cc.set_confirmation_code(true)
-      @cc.confirm
-      @cc.save
-      @pseudonym.user.register
+      if @pseudonym.save
+        # If they changed the password (and we subsequently log them in) then
+        # we're pretty confident this is the right user, and the communication
+        # channel is valid, so register the user and approve the channel.
+        @cc.set_confirmation_code(true)
+        @cc.confirm
+        @cc.save
+        @pseudonym.user.register
 
-      # reset the session id cookie to prevent session fixation.
-      reset_session
+        # reset the session id cookie to prevent session fixation.
+        reset_session
 
-      @pseudonym_session = PseudonymSession.new(@pseudonym, true)
-      flash[:notice] = t 'notices.password_changed', "Password changed"
-      redirect_to dashboard_url
-    elsif @cc
-      render :action => "confirm_change_password"
+        @pseudonym_session = PseudonymSession.new(@pseudonym, true)
+        flash[:notice] = t 'notices.password_changed', "Password changed"
+        render :json => @pseudonym, :status => :ok # -> dashboard
+      else
+        render :json => {:pseudonym => @pseudonym.errors.as_json[:errors]}, :status => :bad_request
+      end
     else
-      flash[:notice] = t 'notices.link_invalid', "The link you used appears to no longer be valid.  If you can't login, try clicking \"Don't Know My Password\" and having a new message sent for you."
-      redirect_to login_url
+      flash[:notice] = t 'notices.link_invalid', "The link you used is no longer valid.  If you can't log in, click \"Don't know your password?\" to reset your password."
+      render :json => {:errors => {:nonce => 'expired'}}, :status => :bad_request # -> login url
     end
   end
 

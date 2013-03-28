@@ -19,7 +19,10 @@
   <% end %>
 <% end %>
 
-<% js_env :folder_id => @user.profile_pics_folder.id %>
+<% js_env :folder_id => @user.profile_pics_folder.id,
+          :PASSWORD_POLICY => @domain_root_account.password_policy,
+          :PASSWORD_POLICIES => Hash[@password_pseudonyms.map{ |p| [p.id, p.account.password_policy]}]
+%>
 <% js_bundle :profile %>
 <% jammit_css :profile_edit %>
 

@@ -30,7 +30,7 @@ describe PseudonymsController do
         pword = @pseudonym.crypted_password
         code = @cc.confirmation_code
         post 'change_password', :pseudonym_id => @pseudonym.id, :nonce => @cc.confirmation_code, :pseudonym => {:password => '12341234', :password_confirmation => '12341234'}
-        response.should be_redirect
+        response.should be_success
         assigns[:pseudonym].should eql(@pseudonym)
         @pseudonym.reload
         @pseudonym.crypted_password.should_not eql(pword)
@@ -49,7 +49,7 @@ describe PseudonymsController do
         pword = @pseudonym.crypted_password
         code = @cc.confirmation_code
         post 'change_password', :pseudonym_id => @pseudonym.id, :nonce => @cc.confirmation_code, :pseudonym => {:password => '12341234', :password_confirmation => '12341234'}
-        response.should be_redirect
+        response.should be_success
         assigns[:pseudonym].should eql(@pseudonym)
         @pseudonym.reload
         @pseudonym.crypted_password.should_not eql(pword)
@@ -64,7 +64,7 @@ describe PseudonymsController do
       pword = @pseudonym.crypted_password
       code = @cc.confirmation_code
       post 'change_password', :pseudonym_id => @pseudonym.id, :nonce => @cc.confirmation_code + 'a', :pseudonym => {:password => '12341234', :password_confirmation => '12341234'}
-      response.should be_redirect
+      response.status.should =~ /400 Bad Request/
       assigns[:pseudonym].should eql(@pseudonym)
       assigns[:pseudonym].crypted_password.should eql(pword)
       assigns[:pseudonym].user.should_not be_registered

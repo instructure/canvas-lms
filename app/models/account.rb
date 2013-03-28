@@ -723,7 +723,11 @@ class Account < ActiveRecord::Base
 
   # can be set/overridden by plugin to enforce email pseudonyms
   attr_accessor :email_pseudonyms
-  
+
+  def password_policy
+    Canvas::PasswordPolicy.default_policy.merge(settings[:password_policy] || {})
+  end
+
   def password_authentication?
     !!(!self.account_authorization_config || self.account_authorization_config.password_authentication?)
   end
