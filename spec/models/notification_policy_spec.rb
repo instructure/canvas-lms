@@ -293,7 +293,7 @@ describe NotificationPolicy do
     end
 
     context "across shards" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should find user categories accross shards" do
         @shard1.activate {

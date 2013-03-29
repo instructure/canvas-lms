@@ -503,7 +503,7 @@ describe UsersController do
     end
 
     context 'across shards' do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it 'loads courses from all shards' do
         course_with_teacher_logged_in :active_all => true
@@ -669,7 +669,7 @@ describe UsersController do
 
   describe "GET 'show'" do
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should include enrollments from all shards" do
         course_with_teacher(:active_all => 1)

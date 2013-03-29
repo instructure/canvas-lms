@@ -35,7 +35,7 @@ describe SearchHelper do
     end
 
     describe "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       before do
         @current_user = @shard1.activate{ user(:active_all => true) }

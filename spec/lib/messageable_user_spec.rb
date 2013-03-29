@@ -180,7 +180,7 @@ describe "MessageableUser" do
     end
 
     describe "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should translate keys to the current shard" do
         user = MessageableUser.prepped(:common_course_column => @shard2.relative_id_for(1), :common_role_column => "'StudentEnrollment'").first
@@ -209,7 +209,7 @@ describe "MessageableUser" do
     end
 
     describe "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should translate keys to the current shard" do
         user = MessageableUser.prepped(:common_group_column => @shard2.relative_id_for(1)).first

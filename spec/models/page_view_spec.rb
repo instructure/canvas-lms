@@ -27,7 +27,7 @@ describe PageView do
   end
 
   describe "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should not assign the default shard" do
         PageView.new.shard.should == Shard.default
@@ -55,7 +55,7 @@ describe PageView do
     end
 
     describe "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should always assign the default shard" do
         PageView.new.shard.should == Shard.default

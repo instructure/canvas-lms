@@ -45,7 +45,7 @@ describe Conversation do
     end
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should create the conversation on the appropriate shard" do
         users = []
@@ -138,7 +138,7 @@ describe Conversation do
     end
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should add participants to the proper shards" do
         users = []
@@ -198,7 +198,7 @@ describe Conversation do
     it_should_behave_like "message counts"
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
       it_should_behave_like "message counts"
     end
   end
@@ -284,7 +284,7 @@ describe Conversation do
 
     it_should_behave_like "unread counts"
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
       it_should_behave_like "unread counts"
     end
   end
@@ -482,7 +482,7 @@ describe Conversation do
     end
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should re-use conversations from another shard" do
         u1 = @shard1.activate { user }
@@ -619,7 +619,7 @@ describe Conversation do
       end
 
       context "sharding" do
-        it_should_behave_like "sharding"
+        specs_require_sharding
 
         it "should set all tags on the other shard's participants" do
           course1 = @shard1.activate{ course(:account => Account.create!, :active_all => true) }
@@ -910,7 +910,7 @@ describe Conversation do
     # non-sharding cases are covered by ConversationParticipant#move_to_user specs
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       before do
         @sender = User.create!(:name => 'a')

@@ -1192,7 +1192,7 @@ describe Enrollment do
     end
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       describe "limit_privileges_to_course_section!" do
         it "should use the right shard to find the enrollments" do

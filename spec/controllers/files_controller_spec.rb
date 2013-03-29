@@ -167,7 +167,7 @@ describe FilesController do
     end
 
     describe 'across shards' do
-      it_should_behave_like 'sharding'
+      specs_require_sharding
 
       before do
         @shard2.activate do

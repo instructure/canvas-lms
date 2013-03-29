@@ -451,7 +451,7 @@ describe SearchController, :type => :integration do
     end
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should find top-level groups from any shard" do
         @me.associate_with_shard(@shard1)

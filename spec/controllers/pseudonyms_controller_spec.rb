@@ -327,7 +327,7 @@ describe PseudonymsController do
   end
 
   context "sharding" do
-    it_should_behave_like "sharding"
+    specs_require_sharding
 
     before do
       user_with_pseudonym(:active_all => 1)

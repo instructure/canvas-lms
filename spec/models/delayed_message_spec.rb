@@ -135,7 +135,7 @@ describe DelayedMessage do
   end
 
   context "sharding" do
-    it_should_behave_like "sharding"
+    specs_require_sharding
 
     it "should create messages on the user's shard" do
       Canvas::MessageHelper.create_notification(:name => 'Summaries', :category => 'Summaries')

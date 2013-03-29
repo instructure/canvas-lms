@@ -884,7 +884,7 @@ describe Attachment do
   end
 
   context "sharding" do
-    it_should_behave_like "sharding"
+    specs_require_sharding
 
     it "should infer scribd mime type regardless of shard" do
       scribd_mime_type_model(:extension => 'pdf')

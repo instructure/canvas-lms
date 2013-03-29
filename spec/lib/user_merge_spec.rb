@@ -243,7 +243,7 @@ describe UserMerge do
   end
 
   context "sharding" do
-    it_should_behave_like "sharding"
+    specs_require_sharding
 
     it "should merge a user across shards" do
       user1 = user_with_pseudonym(:username => 'user1@example.com', :active_all => 1)

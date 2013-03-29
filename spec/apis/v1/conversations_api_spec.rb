@@ -166,7 +166,7 @@ describe ConversationsController, :type => :integration do
     end
 
     context "filtering by tags" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       before do
         @conversations = []
@@ -713,7 +713,7 @@ describe ConversationsController, :type => :integration do
     end
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       def check_conversation
         json = api_call(:get, "/api/v1/conversations/#{@conversation.conversation_id}",

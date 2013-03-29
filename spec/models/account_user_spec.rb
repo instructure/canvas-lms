@@ -61,7 +61,7 @@ describe AccountUser do
   end
 
   context "sharding" do
-    it_should_behave_like "sharding"
+    specs_require_sharding
     it_should_behave_like "touching"
 
     before do

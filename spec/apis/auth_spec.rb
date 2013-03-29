@@ -34,7 +34,7 @@ describe "API Authentication", :type => :integration do
   end
 
   context "sharding" do
-    it_should_behave_like "sharding"
+    specs_require_sharding
 
     it "should use developer key + basic auth access on the default shard from a different shard" do
       @shard1.activate do
@@ -319,7 +319,7 @@ describe "API Authentication", :type => :integration do
       end
 
       context "sharding" do
-        it_should_behave_like "sharding"
+        specs_require_sharding
 
         it "should create the access token on the same shard as the user" do
           user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
@@ -506,7 +506,7 @@ describe "API Authentication", :type => :integration do
     end
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should work for an access token from a different shard with the developer key on the default shard" do
         @shard1.activate do

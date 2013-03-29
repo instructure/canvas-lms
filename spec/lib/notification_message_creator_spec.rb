@@ -372,7 +372,7 @@ describe NotificationMessageCreator do
   end
 
   context "sharding" do
-    it_should_behave_like "sharding"
+    specs_require_sharding
 
     it "should create the message on the user's shard" do
       notification_set

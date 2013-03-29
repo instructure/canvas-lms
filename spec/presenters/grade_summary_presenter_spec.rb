@@ -20,7 +20,7 @@ describe GradeSummaryPresenter do
     end
 
     describe 'across shards' do
-      it_should_behave_like 'sharding'
+      specs_require_sharding
 
       it 'can find courses when the user and course are on the same shard' do
         user = course = enrollment = nil

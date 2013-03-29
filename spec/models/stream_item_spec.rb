@@ -55,7 +55,7 @@ describe StreamItem do
   end
 
   context "across shards" do
-    it_should_behave_like "sharding"
+    specs_require_sharding
 
     it "should create stream items on the user's shard" do
       group_with_user

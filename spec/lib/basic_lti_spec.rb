@@ -268,7 +268,7 @@ describe BasicLTI do
   end
 
   context "sharding" do
-    it_should_behave_like "sharding"
+    specs_require_sharding
 
     it "should roundtrip source ids from mixed shards" do
       @shard1.activate do

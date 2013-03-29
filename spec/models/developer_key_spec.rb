@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 describe DeveloperKey do
   describe "default" do
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should always create the default key on the default shard" do
         @shard1.activate do

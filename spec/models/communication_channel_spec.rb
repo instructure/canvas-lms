@@ -271,7 +271,7 @@ describe CommunicationChannel do
     end
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should find a match on another shard" do
         Enrollment.stubs(:cross_shard_invitations?).returns(true)

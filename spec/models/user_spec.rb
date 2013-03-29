@@ -383,7 +383,7 @@ describe User do
     end
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should create associations for a user in multiple shards" do
         user
@@ -490,7 +490,7 @@ describe User do
     end
 
     describe 'with cross sharding' do
-      it_should_behave_like 'sharding'
+      specs_require_sharding
 
       it 'pulls the enrollments that are completed with global ids' do
         alice = bob = bobs_enrollment = alices_enrollment = nil
@@ -1254,7 +1254,7 @@ describe User do
     end
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should include enrollments from all shards" do
         user = User.create!
@@ -1367,7 +1367,7 @@ describe User do
     end
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should find a pseudonym in another shard" do
         @shard1.activate do
@@ -1469,7 +1469,7 @@ describe User do
     end
 
     context "sharding" do
-      it_should_behave_like 'sharding'
+      specs_require_sharding
 
       it "should find a pseudonym on a different shard" do
         @shard1.activate do
@@ -1993,7 +1993,7 @@ describe User do
     end
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       before do
         @shard1.activate do
@@ -2052,7 +2052,7 @@ describe User do
   end
 
   describe "accounts" do
-    it_should_behave_like "sharding"
+    specs_require_sharding
 
     it "should include accounts from multiple shards" do
       user
@@ -2067,7 +2067,7 @@ describe User do
   end
 
   describe "all_pseudonyms" do
-    it_should_behave_like "sharding"
+    specs_require_sharding
 
     it "should include pseudonyms from multiple shards" do
       user_with_pseudonym(:active_all => 1)
@@ -2215,7 +2215,7 @@ describe User do
     end
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       before do
         @shard1_account = @shard1.activate{ Account.create! }

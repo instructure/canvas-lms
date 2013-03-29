@@ -76,7 +76,7 @@ describe GradesPresenter do
     end
 
     context 'across multiple shards' do
-      it_should_behave_like 'sharding'
+      specs_require_sharding
 
       it 'pulls the student enrollment from the same shard as the observer enrollment' do
         course = Course.create!

@@ -738,7 +738,7 @@ describe Account do
   end
 
   context "sharding" do
-    it_should_behave_like "sharding"
+    specs_require_sharding
 
     it "should properly return site admin permissions regardless of active shard" do
       enable_cache do
@@ -914,7 +914,7 @@ describe Account do
 
   describe "account_chain" do
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should find parent accounts when not on the correct shard" do
         @shard1.activate do

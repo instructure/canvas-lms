@@ -361,7 +361,7 @@ describe "MessageableUser::Calculator" do
 
   describe "shard_cached" do
     describe "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should yield once for each of the user's associated shards" do
         @viewing_user.stubs(:associated_shards => [@shard1, @shard2])
@@ -464,7 +464,7 @@ describe "MessageableUser::Calculator" do
   end
 
   describe "sharded and cached summaries" do
-    it_should_behave_like "sharding"
+    specs_require_sharding
 
     before do
       @account1 = @shard1.activate{ Account.create! }
@@ -886,7 +886,7 @@ describe "MessageableUser::Calculator" do
         end
 
         context "sharding" do
-          it_should_behave_like "sharding"
+          specs_require_sharding
 
           it "should work if the conversation's on another shard" do
             @shard1.activate{ conversation(@viewing_user, @bob) }
@@ -1039,7 +1039,7 @@ describe "MessageableUser::Calculator" do
       end
 
       context "sharding" do
-        it_should_behave_like "sharding"
+        specs_require_sharding
 
         it "should work with sections on different shards" do
           Enrollment.limit_privileges_to_course_section!(@course, @viewing_user, true)
@@ -1212,7 +1212,7 @@ describe "MessageableUser::Calculator" do
       end
 
       context "sharding" do
-        it_should_behave_like "sharding"
+        specs_require_sharding
 
         it "should properly interpret and translate exclude_ids" do
           @shard1.activate do

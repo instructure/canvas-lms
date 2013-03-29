@@ -407,7 +407,7 @@ describe ConversationParticipant do
     end
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should be able to move to a user on a different shard" do
         u1 = User.create!
