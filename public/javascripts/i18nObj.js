@@ -103,6 +103,9 @@ I18n.interpolate = function(message, options) {
     needsEscaping = true;
     message = this.applyWrappers(message, options.wrapper);
   }
+  if (options.needsEscaping) {
+    needsEscaping = true;
+  }
 
   matches = message.match(this.PLACEHOLDER) || [];
 

@@ -23,6 +23,9 @@ describe "handlebars" do
         {{/each}}
       </ol>
       <p>{{#t "html"}}lemme instructure you some html: if you type {{input}}, you get {{{input}}}{{/t}}</p>
+      <p>{{#t "reversed"}}in other words you get {{{input}}} when you type {{input}}{{/t}}</p>
+      <p>{{#t "escapage"}}this is {{escaped}}{{/t}}</p>
+      <p>{{#t "unescapage"}}this is {{{unescaped}}}{{/t}}</p>
       {{#t "bye"}}welp, see you l8r! dont forget 2 <a href="{{url}}">like us</a> on facebook lol{{/t}}
     HTML
     compiled = Handlebars.compile_template(template, 'test')
@@ -36,6 +39,8 @@ describe "handlebars" do
         items: ['dont forget to stretch!!!']
         input: '<input>'
         url: 'http://foo.bar'
+        escaped: '<b>escaped</b>'
+        unescaped: '<b>unescaped</b>'
     CS
 
     result.should == <<-RESULT
@@ -47,6 +52,9 @@ describe "handlebars" do
         
       </ol>
       <p>lemme instructure you some html: if you type &lt;input&gt;, you get <input></p>
+      <p>in other words you get <input> when you type &lt;input&gt;</p>
+      <p>this is &lt;b&gt;escaped&lt;/b&gt;</p>
+      <p>this is <b>unescaped</b></p>
       welp, see you l8r! dont forget 2 <a href="http://foo.bar">like us</a> on facebook lol
     RESULT
   end
