@@ -213,7 +213,7 @@ class CourseSection < ActiveRecord::Base
   end
 
   def deletable?
-    self.enrollments.count == 0
+    self.enrollments.not_fake.count == 0
   end
 
   def enroll_user(user, type, state='invited')
