@@ -48,6 +48,7 @@ describe "calendar2" do
     edit_event_dialog.find_element(:css, '.edit_assignment_option').click
     edit_assignment_form = edit_event_dialog.find_element(:id, 'edit_assignment_form')
     title = edit_assignment_form.find_element(:id, 'assignment_title')
+    keep_trying_until { title.displayed? }
     replace_content(title, assignment_title)
     add_date(middle_number) if should_add_date
     submit_form(edit_assignment_form)
@@ -61,6 +62,7 @@ describe "calendar2" do
     edit_event_dialog.should be_displayed
     edit_event_form = edit_event_dialog.find_element(:id, 'edit_calendar_event_form')
     title = edit_event_form.find_element(:id, 'calendar_event_title')
+    keep_trying_until { title.displayed? }
     replace_content(title, event_title)
     add_date(middle_number) if should_add_date
     submit_form(edit_event_form)
@@ -119,10 +121,11 @@ describe "calendar2" do
           event_title = 'new event'
           get "/calendar2"
           wait_for_ajaximations
-
-          fj('ul#context-list > li:nth-child(2) [data-add-event]').click
-          edit_event_dialog = f('#edit_event_tabs')
-          edit_event_dialog.should be_displayed
+          keep_trying_until do
+            fj('ul#context-list > li:nth-child(2) [data-add-event]').click
+            edit_event_dialog = fj('#edit_event_tabs')
+            edit_event_dialog.should be_displayed
+          end
           create_calendar_event(event_title, true)
         end
 
@@ -220,7 +223,6 @@ describe "calendar2" do
 
       it "more options link should go to calendar event edit page" do
         create_middle_day_event
-
         f('.fc-event').click
         fj('.popover-links-holder:visible').should_not be_nil
         driver.execute_script("$('.edit_event_link').hover().click()")
@@ -234,7 +236,9 @@ describe "calendar2" do
         keep_trying_until do
           fj('.fc-event.assignment').click
           wait_for_ajaximations
-          driver.execute_script("$('.view_event_link').hover().click()")
+          if (fj('.view_event_link').displayed?)
+            expect_new_page_load { driver.execute_script("$('.view_event_link').hover().click()") }
+          end
           fj('h2.title').displayed?
         end
 
@@ -489,7 +493,8 @@ describe "calendar2" do
 
 
       it "should change event duration by dragging" do
-        noon = Time.now.at_beginning_of_day + 12.hours
+        noon = Time.now.utc.at_beginning_of_day + 12.hours
+        #expecting time in UTC
         event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 1.hour
         get "/calendar2"
         wait_for_ajaximations

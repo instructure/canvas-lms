@@ -5,7 +5,6 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/submissions_common')
 
 describe "submissions" do
   it_should_behave_like "in-process server selenium tests"
-  it_should_behave_like "submissions selenium tests"
 
   context 'as a student' do
 

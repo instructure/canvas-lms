@@ -1,8 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
-shared_examples_for "manage groups selenium tests" do
-  it_should_behave_like "in-process server selenium tests"
-
   def add_category(course, name, opts={})
     f(".add_category_link").click
     form = f("#add_category_form")
@@ -105,5 +102,3 @@ shared_examples_for "manage groups selenium tests" do
           $('#{to_group}'))
     SCRIPT
   end
-
-end

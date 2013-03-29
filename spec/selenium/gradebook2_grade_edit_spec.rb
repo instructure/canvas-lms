@@ -1,6 +1,25 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 describe "edititing grades" do
-  it_should_behave_like "gradebook2 selenium tests"
+  it_should_behave_like "in-process server selenium tests"
+
+  ASSIGNMENT_1_POINTS = "10"
+  ASSIGNMENT_2_POINTS = "5"
+  ASSIGNMENT_3_POINTS = "50"
+  ATTENDANCE_POINTS = "15"
+
+  STUDENT_NAME_1 = "student 1"
+  STUDENT_NAME_2 = "student 2"
+  STUDENT_NAME_3 = "student 3"
+  STUDENT_SORTABLE_NAME_1 = "1, student"
+  STUDENT_SORTABLE_NAME_2 = "2, student"
+  STUDENT_SORTABLE_NAME_3 = "3, student"
+  STUDENT_1_TOTAL_IGNORING_UNGRADED = "100%"
+  STUDENT_2_TOTAL_IGNORING_UNGRADED = "66.7%"
+  STUDENT_3_TOTAL_IGNORING_UNGRADED = "66.7%"
+  STUDENT_1_TOTAL_TREATING_UNGRADED_AS_ZEROS = "18.8%"
+  STUDENT_2_TOTAL_TREATING_UNGRADED_AS_ZEROS = "12.5%"
+  STUDENT_3_TOTAL_TREATING_UNGRADED_AS_ZEROS = "12.5%"
+  DEFAULT_PASSWORD = "qwerty"
 
   before (:each) do
     data_setup

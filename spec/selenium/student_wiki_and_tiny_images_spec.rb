@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
 
 describe "Wiki pages and Tiny WYSIWYG editor Images" do
-  it_should_behave_like "wiki and tiny selenium tests"
+  it_should_behave_like "in-process server selenium tests"
 
   context "wiki and tiny images as a student" do
 

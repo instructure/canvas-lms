@@ -2,7 +2,10 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/conversations_common
 
 describe "conversations" do
   it_should_behave_like "in-process server selenium tests"
-  it_should_behave_like "conversations selenium tests"
+
+  before (:each) do
+    conversation_setup
+  end
 
   it "should not allow double form submissions" do
     new_message = 'new conversation message'
