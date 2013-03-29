@@ -81,6 +81,7 @@ button.single_item_done_button
 .time-block-list-header, .time-block-list-body-wrapper
   width: 100%
   border-bottom: 1px solid #DDD
+  padding-bottom: 10px
 .time-block-list-body
   width: 100%
 .time-block-list
@@ -92,8 +93,8 @@ button.single_item_done_button
   .time-range-column
     width: 130px
 
-  $date_column_width: 140px
-  $time_column_width: 70px
+  $date_column_width: 200px
+  $time_column_width: 95px
 
   .date-column
     width: $date_column_width
@@ -103,13 +104,15 @@ button.single_item_done_button
   .separator-column
     width: 6px
     text-align: center
+    line-height: 28px
   .end-time-column
     width: $time_column_width
     text-align: center
 
   .date_field
-    width: $date_column_width - 5 - 20
+    width: $date_column_width - 80
   .time_field
+    text-align: right
     width: $time_column_width - 30
 
   .error
@@ -143,6 +146,9 @@ button.single_item_done_button
     list-style-type: none
     margin: 0
     padding: 0
+
+  .right-column-wrapper
+    width: 380px
 
 .ag_contexts_selector
   width: 225px
@@ -179,15 +185,10 @@ button.single_item_done_button
   margin:  5px 5px 0 0
 
 .delete-block-link
-  +hide-text
   display: block
   float: right
-  background: url(/images/jqueryui/icon_sprite.png) 0px -16px no-repeat
-  width: 16px
-  height: 16px
-  margin-top: 4px
-  &:focus, &:hover
-    background-position: -16px -16px
+  color: black
+  line-height: 28px
 
 .left-column-wrapper
   width: 250px
