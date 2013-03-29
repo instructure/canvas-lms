@@ -108,8 +108,8 @@
     </fieldset>
 
     <div>
-      <button type="submit" class="btn submit_button"><%= t 'buttons.import', "Import Course" %></button>
       <a href="<%= context_url(@context, :context_imports_url) %>" class="btn button-secondary"><%= t '#buttons.cancel', "Cancel" %></a>
+      <button type="submit" class="btn btn-primary submit_button"><%= t 'buttons.import', "Import Course" %></button>
     </div>
   </div>
 <% end %>
