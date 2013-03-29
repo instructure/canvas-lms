@@ -4,6 +4,16 @@ body {
   font-size: 13px;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-weight: normal;
+}
+h1, h2 {
+  font-size: 1.8em;
+}
+h3 {
+  font-size: 1.5em;
+}
+
 // make links in .alert be same color as alert text but bold
 .alert a {
   font-weight: bold;
