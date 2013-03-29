@@ -31,6 +31,7 @@
             <input id="course_name"
                    type="text"
                    name="course[name]"
+                   style="z-index:10"
                    value="<%= @query %>"
                    data-behaviors="autocomplete"
                    data-autocomplete-options="<%= { :minLength => 4, :delay => 150, :source => account_courses_path(@account, :format => :json) }.to_json  %>"
