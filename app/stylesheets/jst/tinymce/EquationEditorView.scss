@@ -23,6 +23,13 @@
   // it and the buttonpane
   margin-bottom: -5px;
 }
+
+.mathquill-rendered-math {
+  sup {
+    top: auto;
+  }
+}
+
 //undo the padding added by .ui-dialog
 .mathquill-toolbar {
   margin-top: -.5em !important;
