@@ -46,7 +46,7 @@ describe "scheduler" do
       start_fields = ff('.time-block-list .start_time')
       times = %W(2:00 2:30 3:00 3:30 4:00 4:30 5:00 5:30)
       start_fields.each_with_index do |start_field, i|
-        start_field.attribute(:value).should == times[i] + "PM" unless i == 8
+        start_field.attribute(:value).strip.should == times[i] + "pm" unless i == 8
       end
       f('.ag_contexts_selector').click
       f("#option_course_#{@course.id}").click

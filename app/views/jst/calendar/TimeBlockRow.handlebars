@@ -1,10 +1,8 @@
 <tr {{#if locked}}class="locked"{{/if}}>
-  <td class="date-column">
-    <input name="date" class="date_field" value="{{dateToString start "MMM d, yyyy"}}"{{#if locked}} disabled{{/if}} type="text"/>
-  </td>
-  <td class="start-time-column"><input name="start_time" class="time_field start_time" value="{{dateToString start "h:mmtt"}}"{{#if locked}} disabled{{/if}} type="text"/></td>
+  <td class="date-column"><input name="date" class="date_field" value="{{tDateToString start "medium_with_weekday"}}"{{#if locked}} disabled{{/if}} type="text"/></td>
+  <td class="start-time-column"><input name="start_time" class="time_field start_time" value="{{tTimeToString start "tiny"}}"{{#if locked}} disabled{{/if}} type="text"/></td>
   <td class="separator-column">-</td>
-  <td class="end-time-column"><input name="end_time" class="time_field end_time" value="{{dateToString end "h:mmtt"}}"{{#if locked}} disabled{{/if}} type="text"/></td>
+  <td class="end-time-column"><input name="end_time" class="time_field end_time" value="{{tTimeToString end "tiny"}}"{{#if locked}} disabled{{/if}} type="text"/></td>
   <td class="delete-column">
     {{#unless locked}}
       <a href="#" class="delete-block-link icon-end"></a>

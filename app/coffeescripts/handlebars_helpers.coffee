@@ -68,10 +68,12 @@ define [
 
     # convert a date to a string, using the given i18n format in the date.formats namespace
     tDateToString : (date = '', i18n_format) ->
+      return '' unless date
       I18n.l "date.formats.#{i18n_format}", date
 
     # convert a date to a time string, using the given i18n format in the time.formats namespace
     tTimeToString : (date = '', i18n_format) ->
+      return '' unless date
       I18n.l "time.formats.#{i18n_format}", date
 
     tTimeHours : (date = '') ->

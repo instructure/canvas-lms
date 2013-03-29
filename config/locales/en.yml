@@ -3,6 +3,7 @@ en:
     formats:
       weekday: "%A"
       short_weekday: "%a"
+      medium_with_weekday: "%a %b %-d, %Y"
       medium: "%b %-d, %Y"
       short: "%b %-d"
       short_month: "%b"

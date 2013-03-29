@@ -9,10 +9,10 @@
   {{/if}}
 
   <div class="hide_if_using_sections date_start_end_row">
-    <span><input type="text" name="start_date" class="date_field" value="{{dateToString start_at "MMM d, yyyy"}}" placeholder="{{#t "date"}}Date{{/t}}"/></span>
-    <span><input type="text" name="start_time" class="time_field" {{#unless all_day}} value="{{dateToString start_at "h:mmtt"}}" {{/unless}} placeholder="{{#t "start_time"}}Start Time{{/t}}"/></span>
+    <span><input type="text" name="start_date" class="date_field" value="{{tDateToString start_at "medium"}}" placeholder="{{#t "date"}}Date{{/t}}"/></span>
+    <span><input type="text" name="start_time" class="time_field" {{#unless all_day}} value="{{tTimeToString start_at "tiny"}}" {{/unless}} placeholder="{{#t "start_time"}}Start Time{{/t}}"/></span>
     <span>{{#t "to"}}to{{/t}}</span>
-    <span><input type="text" name="end_time" class="time_field" {{#unless all_day}} value="{{dateToString end_at "h:mmtt"}}" {{/unless}} placeholder="{{#t "end_time"}}End Time{{/t}}"/></span>
+    <span><input type="text" name="end_time" class="time_field" {{#unless all_day}} value="{{tTimeToString end_at "tiny"}}" {{/unless}} placeholder="{{#t "end_time"}}End Time{{/t}}"/></span>
   </div>
 
   {{#if course_sections}}
@@ -23,10 +23,10 @@
           <label for="section_{{id}}_start_date">{{name}}</label>
         </th>
         <td>
-          <span><input type="text" id="section_{{id}}_start_date" name="child_event_data[{{id}}][start_date]" class="date_field" value="{{dateToString event.start_at "MMM d, yyyy"}}" placeholder="{{#t "date"}}Date{{/t}}"/></span>
-          <span><input type="text" name="child_event_data[{{id}}][start_time]" class="time_field" {{#unless all_day}} value="{{dateToString event.start_at "h:mmtt"}}" {{/unless}} placeholder="{{#t "start_time"}}Start Time{{/t}}"/></span>
+          <span><input type="text" id="section_{{id}}_start_date" name="child_event_data[{{id}}][start_date]" class="date_field" value="{{tDateToString event.start_at "medium"}}" placeholder="{{#t "date"}}Date{{/t}}"/></span>
+          <span><input type="text" name="child_event_data[{{id}}][start_time]" class="time_field" {{#unless all_day}} value="{{tTimeToString event.start_at "tiny"}}" {{/unless}} placeholder="{{#t "start_time"}}Start Time{{/t}}"/></span>
           <span>{{#t "to"}}to{{/t}}</span>
-          <span><input type="text" name="child_event_data[{{id}}][end_time]" class="time_field" {{#unless all_day}} value="{{dateToString event.end_at "h:mmtt"}}" {{/unless}} placeholder="{{#t "end_time"}}End Time{{/t}}"/></span>
+          <span><input type="text" name="child_event_data[{{id}}][end_time]" class="time_field" {{#unless all_day}} value="{{tTimeToString event.end_at "tiny"}}" {{/unless}} placeholder="{{#t "end_time"}}End Time{{/t}}"/></span>
           <input type="hidden" name="child_event_data[{{id}}][context_code]" value="course_section_{{id}}">
         </td>
       </tr>
