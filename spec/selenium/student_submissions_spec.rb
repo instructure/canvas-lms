@@ -265,10 +265,18 @@ describe "submissions" do
         f('.toggle_uploaded_files_link').click
 
         # traverse the tree
-        f('#uploaded_files > ul > li.folder > .sign').click
-        wait_for_animations
-        f('#uploaded_files > ul > li.folder .file .name').click
-        wait_for_animations
+        begin
+          f('#uploaded_files > ul > li.folder > .sign').click
+          wait_for_animations
+          f('#uploaded_files > ul > li.folder .file .name').click
+          wait_for_animations
+        rescue => err
+          # prevent the confirm dialog that pops up when you navigate away
+          # from the page from showing.
+          # TODO: actually figure out why the spec intermittently fails.
+          driver.execute_script "window.onbeforeunload = null;"
+          raise err
+        end
 
         expect_new_page_load { f('#submit_file_button').click }
 
