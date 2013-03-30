@@ -1389,7 +1389,15 @@ class ApplicationController < ActionController::Base
   end
 
   def browser_supported?
-    session[:browser_supported] = Browser.supported?(request.user_agent) unless session.key?(:browser_supported)
+    # the user_agent gem likes to (ab)use objects and metaprogramming, so
+    # we just do this check once per session. or maybe more than once, if
+    # you upgrade your browser and it treats session cookie expiration
+    # rules as a suggestion
+    key = request.user_agent.to_s.sum # keep cookie size in check. a legitimate collision here would be 1. extremely unlikely and 2. not a big deal
+    if key != session[:browser_key]
+      session[:browser_key] = key
+      session[:browser_supported] = Browser.supported?(request.user_agent)
+    end
     session[:browser_supported]
   end
 
