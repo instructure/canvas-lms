@@ -170,7 +170,7 @@ class ActiveRecord::Base
     @@cached_contexts[context_key] ||= self.context if self.respond_to?(:context)
     @@cached_contexts[context_key] ||= self.course
     @@cached_permissions ||= {}
-    key = [context_key, (user ? user.id : nil)].join
+    key = [context_key, (user ? user.id : nil)].cache_key
     @@cached_permissions[key] = nil if Rails.env.test?
     @@cached_permissions[key] = nil if session && session[:session_affects_permissions]
     @@cached_permissions[key] ||= @@cached_contexts[context_key].grants_rights?(user, session, nil).keys
