@@ -16,12 +16,5 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'sis/csv/base_importer'
-require 'sis/csv/course_importer'
-require 'sis/csv/account_importer'
-require 'sis/csv/enrollment_importer'
-require 'sis/csv/user_importer'
-require 'sis/csv/term_importer'
-require 'sis/csv/section_importer'
-require 'sis/csv/xlist_importer'
-require 'sis/csv/import'
+module SIS
+end
