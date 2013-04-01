@@ -40,6 +40,7 @@ define [
         success: @enrollSuccess
         error: @enrollError
         formErrors: false
+        disableWhileLoading: 'spin_on_success'
 
     changeType: (e) =>
       @userType = $(e.target).val()
@@ -49,9 +50,6 @@ define [
 
     beforeSubmit: =>
       return false unless @userType
-      unless @promise?
-        @promise = $.Deferred()
-        @$el.disableWhileLoading(@promise)
 
       switch @userType
         when 'new'
@@ -76,14 +74,12 @@ define [
       $.when(deferred).done => @enrollErrorOnce = null
 
     error: (errors) =>
-      @promise.reject()
       # move the "already enrolled" error to the username, since that's visible
       if errors['user[self_enrollment_code]']
         errors['pseudonym[unique_id]'] ?= []
         errors['pseudonym[unique_id]'].push errors['user[self_enrollment_code]'][0]
         delete errors['user[self_enrollment_code]']
       @$el.formErrors errors
-      @promise = null
 
     enrollError: (errors) =>
       @enrollErrorOnce?(errors)
