@@ -958,6 +958,7 @@ define([
     var highestTop = 0;
     var currentTop = $(document).scrollTop();
     var errorDetails = {};
+    $('#aria_alerts').empty();
     $.each(errors, function(name, msg) {
       var $obj = $form.find(":input[name='" + name + "'],:input[name*='[" + name + "]']").filter(":first");
       if(!$obj || $obj.length === 0 || name == "general") {
@@ -1007,6 +1008,12 @@ define([
       }
       var $box = $template.clone(true).attr('id', '').css('zIndex', $obj.zIndex() + 1).appendTo("body");
       $box.find(".error_text").html(message);
+      // it'd be more semantic to make the error_box have a role=alert but that doesn't work everywhere
+      // http://blog.paciellogroup.com/2012/06/html5-accessibility-chops-aria-rolealert-browser-support/
+      // we also have to add aria_alerts to the layout itself, since creating
+      // it dynamically means VoiceOver won't read it
+      $('#aria_alerts').append($('<div/>').html(message));
+
       var offset = $obj.offset();
       var height = $box.outerHeight();
       var objLeftIndent = Math.round($obj.outerWidth() / 5);
