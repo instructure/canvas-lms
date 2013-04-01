@@ -155,6 +155,10 @@ class QuizzesController < ApplicationController
         return unless check_lockdown_browser(:medium, named_context_url(@context, 'context_quiz_url', @quiz.to_param, :viewing => "1"))
       end
 
+      if @quiz.require_lockdown_browser? && refresh_ldb = value_to_boolean(params.delete(:refresh_ldb))
+        return render(:action => "refresh_quiz_after_popup")
+      end
+
       @question_count = @quiz.question_count
       if session[:quiz_id] == @quiz.id && !request.xhr?
         session.delete(:quiz_id)
