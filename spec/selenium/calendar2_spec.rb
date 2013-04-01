@@ -369,14 +369,17 @@ describe "calendar2" do
       end
 
       it "should make an assignment undated if you delete the start date" do
-        pending("failing need to resolve")
         create_middle_day_assignment("undate me")
-        f(".undated-events-link").click
-        f('.fc-event').click
-        driver.execute_script("$('.popover-links-holder .edit_event_link').hover().click()")
+        keep_trying_until do
+          fj('.fc-event-inner').click()
+          driver.execute_script("$('.popover-links-holder .edit_event_link').hover().click()")
+          f('.ui-dialog #assignment_due_at').displayed?
+        end
+
         replace_content(f('.ui-dialog #assignment_due_at'), "")
         submit_form('#edit_assignment_form')
         wait_for_ajax_requests
+        f(".undated-events-link").click
         f('.fc-event').should be_nil
         f('.undated_event_title').text.should == "undate me"
       end
