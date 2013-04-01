@@ -864,20 +864,25 @@ class Course < ActiveRecord::Base
 
   def self.require_assignment_groups(contexts)
     courses = contexts.select{|c| c.is_a?(Course) }
-    hash = {}
-    courses.each{|c| hash[c.id] = {:found => false, :course => c} }
-    groups = AssignmentGroup.select("id, context_id, context_type").where(:context_type => "Course", :context_id => courses)
-    groups.each{|c| hash[c.context_id][:found] = true }
-    hash.select{|id, obj| !obj[:found] }.each{|id, obj| obj[:course].require_assignment_group rescue nil }
+    groups = Shard.partition_by_shard(courses) do |shard_courses|
+      AssignmentGroup.select("id, context_id, context_type").where(:context_type => "Course", :context_id => shard_courses)
+    end.index_by(&:context_id)
+    courses.each do |course|
+      if !groups[course.id]
+        course.require_assignment_group rescue nil
+      end
+    end
   end
 
   def require_assignment_group
-    has_group = Rails.cache.read(['has_assignment_group', self].cache_key)
-    return if has_group && Rails.env.production?
-    if self.assignment_groups.active.empty?
-      self.assignment_groups.create(:name => t('#assignment_group.default_name', "Assignments"))
+    shard.activate do
+      has_group = Rails.cache.read(['has_assignment_group', self].cache_key)
+      return if has_group && Rails.env.production?
+      if self.assignment_groups.active.empty?
+        self.assignment_groups.create(:name => t('#assignment_group.default_name', "Assignments"))
+      end
+      Rails.cache.write(['has_assignment_group', self].cache_key, true)
     end
-    Rails.cache.write(['has_assignment_group', self].cache_key, true)
   end
 
   def self.create_unique(uuid=nil, account_id=nil, root_account_id=nil)

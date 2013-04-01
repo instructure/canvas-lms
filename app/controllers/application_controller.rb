@@ -446,8 +446,8 @@ class ApplicationController < ActionController::Base
       # we already know the user can read these courses and groups, so skip
       # the grants_right? check to avoid querying for the various memberships
       # again.
-      courses = @context.current_enrollments.select { |e| e.state_based_on_date == :active }.map(&:course).uniq
-      groups = include_groups ? @context.current_groups : []
+      courses = @context.current_enrollments.with_each_shard.select { |e| e.state_based_on_date == :active }.map(&:course).uniq
+      groups = include_groups ? @context.current_groups.with_each_shard : []
       if only_contexts.present?
         # find only those courses and groups passed in the only_contexts
         # parameter, but still scoped by user so we know they have rights to
@@ -455,7 +455,7 @@ class ApplicationController < ActionController::Base
         course_ids = only_contexts.select { |c| c.first == "Course" }.map(&:last)
         courses = course_ids.empty? ? [] : courses.select { |c| course_ids.include?(c.id) }
         group_ids = only_contexts.select { |c| c.first == "Group" }.map(&:last)
-        groups = group_ids.empty? ? [] : groups.find_all_by_id(group_ids) if include_groups
+        groups = group_ids.empty? ? [] : groups.select { |g| group_ids.include?(g.id) } if include_groups
       end
       @contexts.concat courses
       @contexts.concat groups
@@ -509,15 +509,23 @@ class ApplicationController < ActionController::Base
       @groups = @courses.first.assignment_groups.active.includes(:active_assignments)
       @assignments = @groups.map(&:active_assignments).flatten
     else
-      @groups = AssignmentGroup.for_context_codes(@context_codes).active
-      @assignments = Assignment.active.for_course(@courses.map(&:id))
+      assignments_and_groups = Shard.partition_by_shard(@courses) do |courses|
+        [[Assignment.active.for_course(courses).all,
+         AssignmentGroup.active.for_course(courses).order(:position).all]]
+      end
+      @assignments = assignments_and_groups.map(&:first).flatten
+      @groups = assignments_and_groups.map(&:last).flatten
     end
     @assignment_groups = @groups
 
     @courses.each { |course| log_course(course) }
 
-    @submissions = @current_user.try(:submissions).to_a
-    @submissions.each{ |s| s.mute if s.muted_assignment? }
+    if @current_user
+      @submissions = @current_user.submissions.with_each_shard
+      @submissions.each{ |s| s.mute if s.muted_assignment? }
+    else
+      @submissions = []
+    end
 
     @assignments.map! {|a| a.overridden_for(@current_user)}
     sorted = SortsAssignments.by_due_date({
