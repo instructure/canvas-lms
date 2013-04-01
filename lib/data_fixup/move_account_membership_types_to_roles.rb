@@ -6,34 +6,36 @@ module DataFixup::MoveAccountMembershipTypesToRoles
 
   Account.where("membership_types IS NOT NULL").select([:id, :membership_types]).
     find_in_batches do |accounts|
-      roles = Role.where(:account_id => accounts).select([:account_id, :name]).all
-      account_users = AccountUser.where(:account_id => accounts).select([:account_id, :membership_type]).uniq.all
+      Account.send(:with_exclusive_scope) do
+        roles = Role.where(:account_id => accounts).select([:account_id, :name]).all
+        account_users = AccountUser.where(:account_id => accounts).select([:account_id, :membership_type]).uniq.all
 
-      accounts.each do |account|
-        names = roles.select{|r| r.account_id == account.id}.collect(&:name) + RoleOverride::KNOWN_ROLE_TYPES
+        accounts.each do |account|
+          names = roles.select{|r| r.account_id == account.id}.collect(&:name) + RoleOverride::KNOWN_ROLE_TYPES
 
-        types_to_add = account.membership_types.split(",").select{|t| !t.empty? && !names.include?(t)}
-        types_to_add.each do |type|
-          role = Role.new
-          role.account_id = account.id
-          role.name = type
-          role.base_role_type = 'AccountMembership'
-          role.workflow_state = 'active'
-          role.save!
-        end
+          types_to_add = account.membership_types.split(",").select{|t| !t.empty? && !names.include?(t)}
+          types_to_add.each do |type|
+            role = Role.new
+            role.account_id = account.id
+            role.name = type
+            role.base_role_type = 'AccountMembership'
+            role.workflow_state = 'active'
+            role.save!
+          end
 
-        # Step 1b. Also find AccountUsers that have a non-existent membership_type
-        # and make an inactive role for them. of course if there isn't one already
+          # Step 1b. Also find AccountUsers that have a non-existent membership_type
+          # and make an inactive role for them. of course if there isn't one already
 
-        names += types_to_add
-        inactive_types_to_add = account_users.select{|au| au.account_id == account.id && !names.include?(au.membership_type)}.collect(&:membership_type)
-        inactive_types_to_add.each do |type|
-          role = Role.new
-          role.account_id = account.id
-          role.name = type
-          role.base_role_type = 'AccountMembership'
-          role.workflow_state = 'inactive'
-          role.save!
+          names += types_to_add
+          inactive_types_to_add = account_users.select{|au| au.account_id == account.id && !names.include?(au.membership_type)}.collect(&:membership_type)
+          inactive_types_to_add.each do |type|
+            role = Role.new
+            role.account_id = account.id
+            role.name = type
+            role.base_role_type = 'AccountMembership'
+            role.workflow_state = 'inactive'
+            role.save!
+          end
         end
       end
     end
