@@ -3,6 +3,10 @@ if RUBY_VERSION < "1.9."
 else
   # ruby 1.9 compatibility fixes
 
+  if ActiveRecord::Base.configurations[RAILS_ENV]['adapter'] == 'mysql'
+    STDERR.puts "NOTE: It's recommended that you change your database adapter to mysql2 for usage with Ruby 1.9"
+  end
+
   # 1.9 has a built-in equivalent to fastercsv
   # make an alias for CSV, which has replaced FasterCSV
   require 'csv'
@@ -58,6 +62,26 @@ else
     raise "These following patches shouldn't be necessary in Rails 3.x"
   end
 
+  require "active_support/core_ext/string/output_safety"
+  class ERB
+    module Util
+      # see https://github.com/rails/rails/issues/7430
+      def html_escape(s)
+        s = s.to_s
+        if s.html_safe?
+          s
+        else
+          s.gsub(/[&"'><]/, HTML_ESCAPE).html_safe
+        end
+      end
+ 
+      alias h html_escape
+ 
+      singleton_class.send(:remove_method, :html_escape)
+      module_function :html_escape, :h
+    end
+  end
+
   # also https://groups.google.com/forum/#!msg/rubyonrails-core/gb5woRkmDlk/iQ2G7jjNWKkJ
   MissingSourceFile::REGEXPS << [/^cannot load such file -- (.+)$/i, 1]
 
@@ -71,6 +95,14 @@ else
   class ActiveRecord::Associations::AssociationProxy
     def respond_to_missing?(meth, incl_priv)
       false
+    end
+
+    # Get rid of the warnings in Rails 2.3 + Ruby 1.9 about unicode
+    # normalization not being supported.
+    module ActiveSupport::Inflector
+      def transliterate(string)
+        I18n.transliterate(string)
+      end
     end
   end
 

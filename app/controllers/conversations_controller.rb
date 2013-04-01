@@ -197,7 +197,7 @@ class ConversationsController < ApplicationController
       render :json => conversations.map{ |c| conversation_json(c, @current_user, session, :include_participant_avatars => false, :include_participant_contexts => false, :visible => visibility_map[c.conversation_id]) }, :status => :created
     else
       @conversation = @current_user.initiate_conversation(@recipients)
-      @conversation.add_message(message, :tags => @tags)
+      @conversation.add_message(message, :tags => @tags, :update_for_sender => false)
       render :json => [conversation_json(@conversation.reload, @current_user, session, :include_indirect_participants => true, :messages => [message])], :status => :created
     end
   end
@@ -523,7 +523,7 @@ class ConversationsController < ApplicationController
     get_conversation(true)
     if params[:body].present?
       message = build_message
-      @conversation.add_message message, :tags => @tags
+      @conversation.add_message message, :tags => @tags, :update_for_sender => false
       render :json => conversation_json(@conversation.reload, @current_user, session, :messages => [message])
     else
       render :json => {}, :status => :bad_request
@@ -683,26 +683,10 @@ class ConversationsController < ApplicationController
         @current_user.conversations.default
     end
 
-    filters = normalize_filters(param_array(:filter))
+    filters = param_array(:filter)
     @conversations_scope = @conversations_scope.for_masquerading_user(@real_current_user) if @real_current_user
     @conversations_scope = @conversations_scope.tagged(*filters) if filters.present?
     @set_visibility = true
-  end
-
-  # tags in the database now use the id relative to the default shard. ids in
-  # the filters are assumed relative to the current shard and need to be cast
-  # to an id relative to the default shard before use in queries.
-  #
-  # NOTE: clients providing values for the filter parameter should ensure that
-  # ids emitted are either global or relative to the current shard. if an id is
-  # emitted as a local id relative to some other shard, this will incorrectly
-  # interpret it as being relative to this shard.
-  def normalize_filters(filters)
-    filters.map do |filter|
-      type, id = ActiveRecord::Base.parse_asset_string(filter)
-      id = Shard.relative_id_for(id, Shard.default)
-      "#{type.underscore}_#{id}"
-    end
   end
 
   def infer_visibility(*conversations)

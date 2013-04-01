@@ -46,7 +46,7 @@ module Delayed
         # outside rails is *not* safe when using mysql for the queue.
         after_destroy :update_strand_on_destroy
         def update_strand_on_destroy
-          if strand.present? && next_in_strand? && self.class.connection.adapter_name == 'MySQL'
+          if strand.present? && next_in_strand? && %w{MySQL Mysql2}.include?(self.class.connection.adapter_name)
             # this funky sub-sub-select is to force mysql to create a temporary
             # table, otherwise it fails complaining that you can't select from
             # the same table you are updating
@@ -250,7 +250,7 @@ module Delayed
               connection.execute(sanitize_sql(["SELECT pg_advisory_xact_lock(half_md5_as_bigint(?))", strand]))
               yield
             end
-          when 'MySQL'
+          when 'MySQL', 'Mysql2'
             self.transaction do
               begin
                 connection.execute("LOCK TABLES #{table_name} WRITE")

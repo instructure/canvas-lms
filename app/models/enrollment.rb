@@ -183,10 +183,12 @@ class Enrollment < ActiveRecord::Base
 
   named_scope :future, lambda { {
     :joins => :course,
-    :conditions => ["courses.start_at > ?
+    :conditions => ["(courses.start_at > ?
                     AND courses.workflow_state = 'available'
                     AND courses.restrict_enrollments_to_course_dates = ?
-                    AND enrollments.workflow_state IN ('invited', 'active', 'completed')", Time.now, true]
+                    AND enrollments.workflow_state IN ('invited', 'active', 'completed'))
+                    OR (courses.workflow_state IN ('created', 'claimed')
+                    AND enrollments.workflow_state IN ('invited', 'active', 'completed', 'creation_pending'))", Time.now, true]
   } }
 
   named_scope :past,
@@ -1037,5 +1039,21 @@ class Enrollment < ActiveRecord::Base
       @sis_user_id = sis_source_id_parts[0]
     end
     @sis_user_id
+  end
+
+  def record_recent_activity_threshold
+    Setting.get_cached('enrollment_last_activity_at_threshold', 10.minutes).to_i
+  end
+
+  def record_recent_activity_worthwhile?(as_of, threshold)
+    last_activity_at.nil? || (as_of - last_activity_at >= threshold)
+  end
+
+  def record_recent_activity(as_of = Time.zone.now,
+                             threshold = record_recent_activity_threshold)
+    if record_recent_activity_worthwhile?(as_of, threshold)
+      self.class.update_all({:last_activity_at => as_of}, {:id => self.id})
+      self.last_activity_at = as_of
+    end
   end
 end

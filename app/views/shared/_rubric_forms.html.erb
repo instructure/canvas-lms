@@ -1,19 +1,19 @@
 <div id="edit_criterion" style="display: none; text-align: center;">
-  <form id="edit_criterion_form">
+  <form id="edit_criterion_form" class="form-inline no-margin-bottom">
     <input type="text" class="criterion_description" style="min-width: 100px; width: 90%;" name="description"/>
     <div class="button-container">
-      <button type="button" class="cancel_button btn btn-mini"><%= t '#buttons.cancel', "Cancel" %></button>
       <button type="submit" class="ok_button btn btn-mini btn-primary"><%= t '#buttons.ok', "OK" %></button>
+      <button type="button" class="cancel_button btn btn-mini"><%= t '#buttons.cancel', "Cancel" %></button>
     </div>
   </form>
 </div>
 <div id="edit_rating" style="display: none; text-align: center;">
-  <form id="edit_rating_form">
+  <form id="edit_rating_form" class="no-margin-bottom">
     <input type="text" class="rating_description" style="min-width: 100px; width: 90%;" name="description"/>
-    <div class='button-container button-container-right-aligned' style="text-align:center;">
-      <%= t :points, "%{points} pts", :points => '<input type="text" size="2" name="points"/>'.html_safe %>
-      <button type="button" class="cancel_button btn btn-mini"><%= t '#buttons.cancel', "Cancel" %></button>
+    <div>
+      <%= t :points, "%{points} pts", :points => '<input type="text" size="2" name="points" class="no-margin-bottom span1" />'.html_safe %>
       <button type="submit" class="ok_button btn btn-mini btn-primary"><%= t '#buttons.ok', "OK" %></button>
+      <button type="button" class="cancel_button btn btn-mini button-secondary"><%= t '#buttons.cancel', "Cancel" %></button>
     </div>
   </form>
 </div>

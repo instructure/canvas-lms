@@ -10,10 +10,11 @@
     </div>
   </div>
 <% else %>
-  <a href="<%= course_path(current_enrollment.course_id) %>">
+  <% show_link = current_enrollment.course.grants_right?(@current_user, session, :read) %>
+  <% if show_link %><a href="<%= course_path(current_enrollment.course_id) %>"><% end %>
     <span class="name ellipsis" title="<%= current_enrollment.long_name %>">
       <%= current_enrollment.long_name %>
-      <% if current_enrollment.course.created? || current_enrollment.course.claimed? %>
+      <% if current_enrollment.admin? && (current_enrollment.course.created? || current_enrollment.course.claimed?) %>
         <%= image_tag "hammer.png", :title => t('course_unpublished', "This course hasn't been published yet"), :alt => "Unpublished", :class => "unpublished_icon" %>
       <% end %>
     </span>
@@ -35,8 +36,8 @@
          message = t('enrolled_as_designer', "Enrolled as a designer")
        end
     %> 
-    <span class="subtitle ellipsis"><%= message %></span> 
-  </a>  
+    <span class="subtitle ellipsis"><%= message %></span>
+  <% if show_link %></a><% end %>
 <% end %>
 <% unless dashboard %>
   </li>

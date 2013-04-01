@@ -112,11 +112,11 @@ module BookmarkedCollection
   # Simplifies the common case of wrapping an ActiveRecord scope in bookmark
   # pagination.
   #
-  # The bookmarker object is as for .build with an additional restrict_to
+  # The bookmarker object is as for .build with an additional restrict_scope
   # method:
   #
-  #  - bookmarker.restrict(scope, pager): should return a new scope based on
-  #    scope and restricted according to pager.current_bookmark and
+  #  - bookmarker.restrict_scope(scope, pager): should return a new scope based
+  #    on scope and restricted according to pager.current_bookmark and
   #    pager.include_bookmark. should typically enforce the scope is ordered by
   #    the bookmark, as well.
   #
@@ -134,7 +134,7 @@ module BookmarkedCollection
   #       bookmark.is_a?(String)
   #     end
   #
-  #     def self.restrict(scope, pager)
+  #     def self.restrict_scope(scope, pager)
   #       if pager.current_bookmark
   #         sortable_name = pager.current_bookmark.to_s
   #         comparison = (pager.include_bookmark ? ">=" : ">")
@@ -174,6 +174,12 @@ module BookmarkedCollection
   # automatically incorporated into the merged collection's bookmark and used
   # to inform the value of include_bookmark when processing the subcollections.
   #
+  # Alternately, if the merge is provided with a block, duplicate elements
+  # across collections will be collapsed down into one element. The block will
+  # be yielded to with the kept element (the first instance seen) and the
+  # duplicate, allowing the caller to copy any necessary information from the
+  # duplicate to the kept element.
+  #
   # NOTE: While a hash interface rather than a list of pairs may seem cleaner,
   # we need to preserve order as well as name association, so it's not
   # feasible.
@@ -187,8 +193,8 @@ module BookmarkedCollection
   #     ['users', users]
   #   )
   #
-  def self.merge(*collections)
-    BookmarkedCollection::MergeProxy.new(collections)
+  def self.merge(*collections, &merge_proc)
+    BookmarkedCollection::MergeProxy.new(collections, &merge_proc)
   end
 
   # Combines multiple named bookmarked collections into a single collection

@@ -92,7 +92,7 @@ describe "edititing grades" do
 
     edit_grade(f('#gradebook_grid [row="0"] .l3'), 'A-')
     wait_for_ajax_requests
-    f('#gradebook_grid [row="0"] .l3').text.should == 'A-'
+    f('#gradebook_grid [row="0"] .l3').should include_text('A-')
     @assignment.reload.submissions.size.should == 1
     sub = @assignment.submissions.first
     sub.grade.should == 'A-'
@@ -122,7 +122,7 @@ describe "edititing grades" do
       first_cell.find_element(:css, '.grade')
     end
     set_value(grade_input, 3)
-    first_cell.send_keys(:tab)
+    grade_input.send_keys(:tab)
     wait_for_ajax_requests
     f('#gradebook_grid [row="0"] .l1').should have_class('editable')
   end
@@ -144,7 +144,7 @@ describe "edititing grades" do
       a2.find_element(:css, '.grade')
     end
     set_value(grade_input, 3)
-    a1.send_keys(:tab)
+    grade_input.send_keys(:tab)
     wait_for_ajaximations
     f(assignment_1_sel)['class'].should_not include 'dropped'
     f(assignment_2_sel)['class'].should include 'dropped'

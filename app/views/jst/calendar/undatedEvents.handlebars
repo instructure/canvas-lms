@@ -1,14 +1,14 @@
 {{#if events}}
-  <b>Undated Events</b>
+  <b>{{#t "undated_events"}}Undated Events{{/t}}</b>
   <ul>
     {{#each events}}
       <li class="undated_event event group_{{contextCode}} {{id}}" data-event-id="{{id}}">
         <i class='icon-{{icon}}' aria-hidden='true'></i>
-        <a href="{{details_url}}" class='undated_event_title'>{{title}}</a>
+        <a href="{{details_url}}" class='undated_event_title'>{{#truncate title 35}}{{/truncate}}</a>
       </li>
     {{/each}}
   </ul>
 {{else}}
   <div class="spin_holder"></div>
-  <a href="#" data-text-while-loading="Loading undated events..." class="undated-events-link">Show undated events</a>
+  <a href="#" data-text-while-loading="{{#t "loading_undated_events"}}Loading undated events...{{/t}}" class="undated-events-link">{{#t "show_undated_events"}}Show undated events{{/t}}</a>
 {{/if}}

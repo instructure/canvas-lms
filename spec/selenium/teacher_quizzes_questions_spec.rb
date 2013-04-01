@@ -183,6 +183,7 @@ describe "quizzes questions" do
       start_quiz_question
       question = fj(".question_form:visible")
       click_option('.question_form:visible .question_type', 'Numerical Answer')
+      wait_for_ajaximations
 
       type_in_tiny '.question:visible textarea.question_content', 'This is a numerical question.'
 
@@ -193,11 +194,20 @@ describe "quizzes questions" do
       JS
       answers[0].find_element(:name, 'answer_error_margin').send_keys('0')
       submit_form(question)
-      wait_for_ajax_requests
+      wait_for_ajaximations
 
-      expect_new_page_load { f('.save_quiz_button').click }
-      expect_new_page_load { f('.publish_quiz_button').click }
-      expect_new_page_load { driver.find_element(:link, 'Take the Quiz').click }
+      expect_new_page_load do
+        f('.save_quiz_button').click
+        wait_for_ajaximations
+      end
+      expect_new_page_load do
+        f('.publish_quiz_button').click
+        wait_for_ajaximations
+      end
+      expect_new_page_load do
+        driver.find_element(:link, 'Take the Quiz').click
+        wait_for_ajaximations
+      end
 
       input = f('input[type=text]')
       input.click

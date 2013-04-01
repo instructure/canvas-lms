@@ -46,7 +46,7 @@ define([
     var $group = $assignment.parents(".assignment_group");
     $form.find('.date_text').show();
     $('.vdd_no_edit').remove();
-    $form.find('img.ui-datepicker-trigger').show();
+    $form.find('.ui-datepicker-trigger').show();
     $form.find('.datetime_suggest').text('');
     $form.find('.datetime_field_enabled').show();
     $form.find("").end()
@@ -134,12 +134,12 @@ define([
     }
     $form.fillFormData(data, { object_name: "assignment" });
     if ( data.multiple_due_dates === "true" && id !== 'assignment_new' ) {
-      var $dateInput = $form.find('.datetime_field_enabled');
+      var $dateInput = $form.find('.input-append');
       $dateInput.before($("<span class=vdd_no_edit>" +
                            I18n.t('multiple_due_dates','Multiple Due Dates')+
                             "</span>"));
       $dateInput.hide();
-      $form.find('img.ui-datepicker-trigger').hide();
+      $form.find('.ui-datepicker-trigger').hide();
       $form.find('.datetime_suggest').text('');
     }
     $form.find(":text:first").focus().select();

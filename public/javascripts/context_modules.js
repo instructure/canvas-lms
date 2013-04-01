@@ -55,6 +55,8 @@ define([
         return indent;
       },
       refreshProgressions: function(show_links) {
+        if (ENV.NO_MODULE_PROGRESSIONS) return;
+
         $("#context_modules .context_module:visible").each(function() {
           var $module = $(this);
           var id = $module.find(".header").getTemplateData({textValues: ['id']});
@@ -81,6 +83,8 @@ define([
         }
       },
       updateProgressions: function(user_id, callback) {
+        if (ENV.NO_MODULE_PROGRESSIONS) return;
+
         var url = $(".progression_list_url").attr('href');
         if(user_id) {
           url = url + "?user_id=" + user_id;

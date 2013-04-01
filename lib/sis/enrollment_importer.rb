@@ -226,9 +226,9 @@ module SIS
             if enrollment.changed?
               @users_to_touch_ids.add(user.id)
               enrollment.sis_batch_id = @batch_id if @batch_id
-              if enrollment.valid?
-                enrollment.save_without_broadcasting
-              else
+              begin
+                enrollment.save_without_broadcasting!
+              rescue ActiveRecord::RecordInvalid
                 msg = "An enrollment did not pass validation "
                 msg += "(" + "course: #{course_id}, section: #{section_id}, "
                 msg += "user: #{user_id}, role: #{role}, error: " + 

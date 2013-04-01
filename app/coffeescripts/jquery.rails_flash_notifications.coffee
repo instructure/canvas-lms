@@ -23,7 +23,7 @@ define [
       <li class="ui-state-#{type}" role="alert">
         <i></i>
         #{content}
-        <a href="#" class="close_link">#{I18n.t("close", "Close")}</a>
+        <a href="#" class="close_link icon-end">#{I18n.t("close", "Close")}</a>
       </li>
     """)
 

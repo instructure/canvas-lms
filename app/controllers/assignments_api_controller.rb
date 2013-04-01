@@ -158,6 +158,9 @@
 #       // (Optional) explanation of lock status
 #       lock_explanation: "This assignment is locked until September 1 at 12:00am",
 #
+#       // (Optional) id of the associated quiz (applies only when submission_types is ["online_quiz"])
+#       quiz_id: 620,
+#
 #       // (Optional) whether anonymous submissions are accepted (applies only to quiz assignments)
 #       anonymous_submissions: false,
 #

@@ -14,11 +14,13 @@ describe "course settings" do
     add_button = f('.add_users_link')
     keep_trying_until { add_button.should be_displayed }
     add_button.click
+    wait_for_ajaximations
+
     click_option('#enrollment_type', type)
     click_option('#course_section_id_holder > #course_section_id', section_name) if section_name
     f('#user_list_boxes .user_list').send_keys(email)
     f('.verify_syntax_button').click
-    wait_for_ajax_requests
+    wait_for_ajaximations
     f('#user_list_parsed').should include_text(email)
     f('.add_users_button').click
     wait_for_ajax_requests
@@ -27,15 +29,14 @@ describe "course settings" do
   describe "course users" do
     def select_from_auto_complete(text, input_id)
       fj(".token_input input:visible").send_keys(text)
-      keep_trying_until do
-        driver.execute_script("return $('##{input_id}').data('token_input').selector.lastSearch") == text
-      end
+      keep_trying_until { driver.execute_script("return $('##{input_id}').data('token_input').selector.lastSearch") == text }
       elements = driver.execute_script("return $('.autocomplete_menu:visible .list').last().find('ul').last().find('li').toArray();").map { |e|
         [e, (e.find_element(:tag_name, :b).text rescue e.text)]
       }
       element = elements.detect { |e| e.last == text } or raise "menu item does not exist"
 
       element.first.click
+      wait_for_ajaximations
     end
 
     def go_to_users_tab
@@ -57,6 +58,7 @@ describe "course settings" do
         f("#user_#{user.id} .admin-links")
       end
       f('button', cog).click
+      wait_for_ajaximations
       cog
     end
 
@@ -128,6 +130,7 @@ describe "course settings" do
       link = driver.find_element(:link, 'User Details')
       href = link['href']
       link.click
+      wait_for_ajaximations
       wait_for_ajax_requests
       # expect
       driver.current_url.should include(href)
@@ -188,7 +191,6 @@ describe "course settings" do
 
     it "should handle deleted observees" do
       custom_observer_role("obob")
-      students = []
       obs = user_model(:name => "The Observer")
       student_in_course(:name => "Student 1", :active_all => true, :role_name => 'custom stu')
       @course.enroll_user(obs, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id, :role_name => 'obob')
@@ -215,7 +217,6 @@ describe "course settings" do
 
     it "should handle deleted observee enrollments" do
       custom_observer_role("obob")
-      students = []
       obs = user_model(:name => "The Observer")
       student_in_course(:name => "Student 1", :active_all => true, :role_name => 'custom stu')
       @course.enroll_user(obs, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id, :role_name => 'obob')

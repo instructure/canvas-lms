@@ -57,7 +57,6 @@ require [
   $container = $ window
   $subentries = $ '#discussion_subentries'
 
-
   scrollToTop = ->
     $container.scrollTo $subentries, offset: -49
 
@@ -96,15 +95,14 @@ require [
 
   ##
   # routes
-  router.route '*catchall', 'catchall', -> router.navigate '', yes
   router.route 'entry-:id', 'id', entriesView.goToEntry
   router.route 'page-:page', 'page', (page) ->
     entriesView.render page
     # TODO: can get a little bouncy when the page isn't as tall as the previous
     scrollToTop()
-  router.route '', 'root', entriesView.render
   initEntries = (initial_entry) ->
     data.fetch success: ->
+      entriesView.render()
       Backbone.history.start
         pushState: yes
         root: ENV.DISCUSSION.APP_URL + '/'

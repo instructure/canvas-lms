@@ -7,13 +7,8 @@ define [
   # when the button is clicked, see _admin_links.scss for markup
   $(document).on 'click', '.al-trigger', (event) ->
     $trigger = $(this)
-    defaults =
-      buttonOpts:
-        icons:
-          primary: null
-          secondary: null
 
     unless $trigger.data('kyleMenu')
       event.preventDefault()
-      opts = $.extend defaults, $trigger.data('kyleMenuOptions')
+      opts = $.extend {noButton: true}, $trigger.data('kyleMenuOptions')
       new KyleMenu($trigger, opts).open()

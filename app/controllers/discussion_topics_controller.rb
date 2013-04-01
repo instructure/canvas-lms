@@ -186,7 +186,6 @@ class DiscussionTopicsController < ApplicationController
              :GROUP_CATEGORIES => categories.
                                   reject { |category| category.student_organized? }.
                                   map { |category| { :id => category.id, :name => category.name } },
-             :IS_LARGE_ROSTER => @context.respond_to?(:large_roster?) && @context.large_roster?,
              :CONTEXT_ID => @context.id
       render :action => "edit"
     end

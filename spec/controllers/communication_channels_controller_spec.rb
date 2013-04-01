@@ -608,4 +608,16 @@ describe CommunicationChannelsController do
       User.record_timestamps = true
     end
   end
+
+  it "should not delete a required institutional channel" do
+    user_with_pseudonym(:active_user => true)
+    user_session(@user, @pseudonym)
+    Account.default.settings[:edit_institution_email] = false
+    Account.default.save!
+    @pseudonym.update_attribute(:sis_communication_channel_id, @pseudonym.communication_channel.id)
+
+    delete 'destroy', :id => @pseudonym.communication_channel.id
+
+    response.code.should == '401'
+  end
 end

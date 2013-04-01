@@ -27,54 +27,49 @@
   <button class="btn btn-primary add_alert_link"><i class="icon-add"></i> <%= t('buttons.add_alert', 'Add Alert') %></button>
 </div>
 
-<% js_block do %>
-  <script type="text/javascript">
-  require([
-    'jquery' /* $ */,
-    'jquery.instructure_forms' /* formSubmit */,
-    'jquery.keycodes' /* keycodes */,
-    'jquery.loadingImg' /* loadingImage */
-  ], function($) {
-
-    window.alert_data = <%= @alerts.to_json.html_safe %>;
-
-    window.possible_alert_recipients_order = [':student', ':teachers'];
-    window.possible_alert_recipients = {
-      ':student': { label: <%= h(t(:the_student, "The Student")).to_json.html_safe %> },
-      ':teachers': { label: <%= h(t(:the_teacher, "The Teacher")).to_json.html_safe %> }
-    };
-    <% @role_types.each do |role| %>
-      possible_alert_recipients_order.push(<%= role[:name].to_json.html_safe %>);
-      possible_alert_recipients[<%= role[:name].to_json.html_safe %>] = { label: <%= role[:label].to_json.html_safe %> };
-    <% end %>
-
-    window.possible_alert_criteria_order = ['Interaction', 'UngradedCount', 'UngradedTimespan'];
-    <% count = "<span class='displaying' /><input type='text' name='alert[criteria][][threshold]' class='editing' size='2' />".html_safe %>
-    window.possible_alert_criteria = {
-      Interaction: {
-        label: <%= t(:description, "A teacher has not interacted with the student for %{count} days", :count => count).to_json.html_safe %>,
-        option: <%= t(:option, "No Teacher Interaction").to_json.html_safe %>,
-        title: <%= t(:title, "Days since a teacher has interacted with the student").to_json.html_safe %>,
-        default_threshold: 7 },
-      UngradedCount: {
-        label: <%= t(:ungraded_count_description, "More than %{count} submissions have not been graded", :count => count).to_json.html_safe %>,
-        option: <%= t(:ungraded_count_option, "Ungraded Submissions (Count)").to_json.html_safe %>,
-        title: <%= t(:ungraded_count_title, "Number of submissions that have not been graded").to_json.html_safe %>,
-        default_threshold: 3 },
-      UngradedTimespan: {
-        label: <%= t(:ungraded_timespan_description, "A submission has been left ungraded for %{count} days", :count => count).to_json.html_safe %>,
-        option: <%= t(:ungraded_timespan_option, "Ungraded Submissions (Time)").to_json.html_safe %>,
-        title: <%= t(:ungraded_timespan_title, "Days that a submission has been left ungraded").to_json.html_safe %>,
-        default_threshold: 7 }
-    };
-    <% if @context.enable_user_notes %>
-      possible_alert_criteria_order.push('UserNote');
-      possible_alert_criteria['UserNote'] = {
-        label: <%= t(:usernote_description, "No faculty journal entry has been added for %{count} days", :count => count).to_json.html_safe %>,
-        option: <%= t(:usernote_option, "No Faculty Journal Entry").to_json.html_safe %>,
-        title: <%= t(:usernote_title, "Days since a faculty journal has been added").to_json.html_safe %>,
-        default_threshold: 7 };
-    <% end %>
-  });
-  </script>
-<% end %>
+<%
+  count = "<span class='displaying' /><input type='text' name='alert[criteria][][threshold]' class='editing' size='2' />".html_safe
+  alert_data = {
+    :DATA => @alerts,
+    :POSSIBLE_RECIPIENTS_ORDER => [':student', ':teachers'],
+    :POSSIBLE_RECIPIENTS => {
+      ':student' => {:label => t(:the_student, "The Student")},
+      ':teachers' => {:label => t(:the_teacher, "The Teacher")}
+    },
+    :POSSIBLE_CRITERIA_ORDER => ['Interaction', 'UngradedCount', 'UngradedTimespan'],
+    :POSSIBLE_CRITERIA => {
+      :Interaction => {
+        :label => t(:description, "A teacher has not interacted with the student for %{count} days", :count => count),
+        :option => t(:option, "No Teacher Interaction"),
+        :title => t(:title, "Days since a teacher has interacted with the student"),
+        :default_threshold => 7
+      },
+      :UngradedCount => {
+        :label => t(:ungraded_count_description, "More than %{count} submissions have not been graded", :count => count),
+        :option => t(:ungraded_count_option, "Ungraded Submissions (Count)"),
+        :title => t(:ungraded_count_title, "Number of submissions that have not been graded"),
+        :default_threshold => 3
+      },
+      :UngradedTimespan => {
+        :label => t(:ungraded_timespan_description, "A submission has been left ungraded for %{count} days", :count => count),
+        :option => t(:ungraded_timespan_option, "Ungraded Submissions (Time)"),
+        :title => t(:ungraded_timespan_title, "Days that a submission has been left ungraded"),
+        :default_threshold => 7
+      }
+    }
+  }
+  @role_types.each do |role|
+    alert_data[:POSSIBLE_RECIPIENTS_ORDER] << role[:name]
+    alert_data[:POSSIBLE_RECIPIENTS][role[:name]] = {:label => role[:label]}
+  end
+  if @context.enable_user_notes
+    alert_data[:POSSIBLE_CRITERIA_ORDER] << 'UserNote'
+    alert_data[:POSSIBLE_CRITERIA]['UserNote'] = {
+      :label => t(:usernote_description, "No faculty journal entry has been added for %{count} days", :count => count),
+      :option => t(:usernote_option, "No Faculty Journal Entry"),
+      :title => t(:usernote_title, "Days since a faculty journal has been added"),
+      :default_threshold => 7
+    }
+  end
+  js_env :ALERTS => alert_data
+%>

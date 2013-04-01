@@ -78,7 +78,7 @@ class MediaObjectsController < ApplicationController
   #
   # @returns Media Object
   def show
-    media_object = MediaObject.active.by_media_id(params[:media_object_id]).first
+    media_object = MediaObject.by_media_id(params[:media_object_id]).first
     unless media_object
       # Unfortunately, we don't have media_object entities created for everything,
       # so we use this opportunity to create the object if it does not exist.

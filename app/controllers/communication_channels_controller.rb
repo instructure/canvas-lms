@@ -345,6 +345,9 @@ class CommunicationChannelsController < ApplicationController
     @cc   = @user.communication_channels.find(params[:id]) if params[:id]
 
     return render_unauthorized_action unless has_api_permissions?
+    if @cc.imported? && !@domain_root_account.edit_institution_email?
+      return render_unauthorized_action
+    end
 
     if @cc.nil? || @cc.destroy
       @user.touch

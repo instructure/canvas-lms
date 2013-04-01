@@ -8,6 +8,10 @@ module Canvas
       PATH_REGEX = %r{.*?/javascripts/(plugins/)?(.*)\.js\z}
       JS_ROOT = "#{Rails.root}/public/javascripts"
 
+      def matcher
+        ENV['JS_SPEC_MATCHER'] || '**/*Spec.js'
+      end
+
       # get all regular canvas (and plugin) bundles
       def app_bundles
         app_bundles = (

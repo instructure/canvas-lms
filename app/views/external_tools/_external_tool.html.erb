@@ -11,7 +11,7 @@
 %>
 
 <div class="external_tool <%= classes.join(" ") %> <%= 'blank' unless tool %>" id="external_tool_<%= tool ? tool.id : 'blank' %>" data-id="<%= tool && tool.id %>" style="<%= hidden unless tool %>" data-workflow_state="<%= tool.try(:workflow_state) %>">
-  <div class="header">
+  <div class="header clearfix">
     <div class="name"><%= tool.try(:name) %></div>
     <div class="links">
       <a href="#" rel="<%= context_url(@context, :context_external_tool_url, tool ? tool.id : "{{ id }}") %>" class="update_tool_url edit_tool_link" title="<%= t :edit_tool, "Edit Tool" %>"><%= image_tag "edit.png" %></a>

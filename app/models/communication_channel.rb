@@ -68,7 +68,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def pseudonym
-    self.user.pseudonyms.find_by_unique_id(self.path)
+    user.pseudonyms.first(:conditions => { :unique_id => path }) if user
   end
 
   set_broadcast_policy do |p|
@@ -141,6 +141,14 @@ class CommunicationChannel < ActiveRecord::Base
     pseudonym.try(:account)
   end
 
+  # Public: Determine if this channel is the product of an SIS import.
+  #
+  # Returns a boolean.
+  def imported?
+    id.present? &&
+      Pseudonym.first(:conditions => { :sis_communication_channel_id => id }).present?
+  end
+
   # Return the 'path' for simple communication channel types like email and sms. For
   # Facebook and Twitter, return the user's configured user_name for the service.
   def path_description
@@ -210,7 +218,7 @@ class CommunicationChannel < ActiveRecord::Base
   }
 
   named_scope :by_path, lambda { |path|
-    if connection_pool.spec.config[:adapter] == 'mysql'
+    if %{mysql mysql2}.include?(connection_pool.spec.config[:adapter])
       { :conditions => {:path => path } }
     else
       { :conditions => ["LOWER(communication_channels.path)=?", path.try(:downcase)]}

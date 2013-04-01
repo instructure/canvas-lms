@@ -10,7 +10,7 @@ describe "course settings" do
 
   it "should show unused tabs to teachers" do
     get "/courses/#{@course.id}/settings"
-    ff("#section-tabs .section.hidden").count.should > 0
+    ff("#section-tabs .section.section-tab-hidden").count.should > 0
   end
 
   describe "course details" do
@@ -164,7 +164,7 @@ describe "course settings" do
       @fake_student = @course.student_view_student
       get "/courses/#{@course.id}/settings"
       f(".student_view_button").click
-      wait_for_dom_ready
+      wait_for_ajaximations
       f("#identity .user_name").should include_text @fake_student.name
     end
 
@@ -173,7 +173,7 @@ describe "course settings" do
       stop_link = f("#masquerade_bar .leave_student_view")
       stop_link.should include_text "Leave Student View"
       stop_link.click
-      wait_for_dom_ready
+      wait_for_ajaximations
       f("#identity .user_name").should include_text @teacher.name
     end
 
@@ -183,7 +183,7 @@ describe "course settings" do
       reset_link = f("#masquerade_bar .reset_test_student")
       reset_link.should include_text "Reset Student"
       reset_link.click
-      wait_for_dom_ready
+      wait_for_ajaximations
       @fake_student_after = @course.student_view_student
       @fake_student_before.id.should_not == @fake_student_after.id
     end

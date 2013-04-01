@@ -1,9 +1,7 @@
 <form id="editCalendarEventFull" class="{{#if use_section_dates}}use_section_dates{{/if}}">
-  <input class="title" name="title" placeholder="{{#t "event_title"}}Event Title{{/t}}" value="{{title}}" maxlength="255"/>
+  <input type="text" class="title input-block-level" name="title" placeholder="{{#t "event_title"}}Event Title{{/t}}" value="{{title}}" maxlength="255"/>
 
-  <a href="#" style="font-size: 0.8em; float: right;" class="switch_event_description_view">{{#t "#links.switch_views"}}Switch Views{{/t}}</a>
-  <div class="clear"></div>
-  <textarea name="description">{{description}}</textarea>
+  <textarea class="input-block-level" name="description" style="width: 100%">{{description}}</textarea>
 
   {{#if course_sections}}
     <label><input type="checkbox" name="use_section_dates" value="1" {{#if use_section_dates}}checked{{/if}}>{{#t "different_date_for_each_section"}}Use a different date for each section{{/t}}</label>
@@ -11,10 +9,10 @@
   {{/if}}
 
   <div class="hide_if_using_sections date_start_end_row">
-    <span><input name="start_date" class="date_field" value="{{dateToString start_at "MMM d, yyyy"}}" placeholder="{{#t "date"}}Date{{/t}}"/></span>
-    <span><input name="start_time" class="time_field" {{#unless all_day}} value="{{dateToString start_at "h:mmtt"}}" {{/unless}} placeholder="{{#t "start_time"}}Start Time{{/t}}"/></span>
+    <span><input type="text" name="start_date" class="date_field" value="{{dateToString start_at "MMM d, yyyy"}}" placeholder="{{#t "date"}}Date{{/t}}"/></span>
+    <span><input type="text" name="start_time" class="time_field" {{#unless all_day}} value="{{dateToString start_at "h:mmtt"}}" {{/unless}} placeholder="{{#t "start_time"}}Start Time{{/t}}"/></span>
     <span>{{#t "to"}}to{{/t}}</span>
-    <span><input name="end_time" class="time_field" {{#unless all_day}} value="{{dateToString end_at "h:mmtt"}}" {{/unless}} placeholder="{{#t "end_time"}}End Time{{/t}}"/></span>
+    <span><input type="text" name="end_time" class="time_field" {{#unless all_day}} value="{{dateToString end_at "h:mmtt"}}" {{/unless}} placeholder="{{#t "end_time"}}End Time{{/t}}"/></span>
   </div>
 
   {{#if course_sections}}
@@ -25,10 +23,10 @@
           <label for="section_{{id}}_start_date">{{name}}</label>
         </th>
         <td>
-          <span><input id="section_{{id}}_start_date" name="child_event_data[{{id}}][start_date]" class="date_field" value="{{dateToString event.start_at "MMM d, yyyy"}}" placeholder="{{#t "date"}}Date{{/t}}"/></span>
-          <span><input name="child_event_data[{{id}}][start_time]" class="time_field" {{#unless all_day}} value="{{dateToString event.start_at "h:mmtt"}}" {{/unless}} placeholder="{{#t "start_time"}}Start Time{{/t}}"/></span>
+          <span><input type="text" id="section_{{id}}_start_date" name="child_event_data[{{id}}][start_date]" class="date_field" value="{{dateToString event.start_at "MMM d, yyyy"}}" placeholder="{{#t "date"}}Date{{/t}}"/></span>
+          <span><input type="text" name="child_event_data[{{id}}][start_time]" class="time_field" {{#unless all_day}} value="{{dateToString event.start_at "h:mmtt"}}" {{/unless}} placeholder="{{#t "start_time"}}Start Time{{/t}}"/></span>
           <span>{{#t "to"}}to{{/t}}</span>
-          <span><input name="child_event_data[{{id}}][end_time]" class="time_field" {{#unless all_day}} value="{{dateToString event.end_at "h:mmtt"}}" {{/unless}} placeholder="{{#t "end_time"}}End Time{{/t}}"/></span>
+          <span><input type="text" name="child_event_data[{{id}}][end_time]" class="time_field" {{#unless all_day}} value="{{dateToString event.end_at "h:mmtt"}}" {{/unless}} placeholder="{{#t "end_time"}}End Time{{/t}}"/></span>
           <input type="hidden" name="child_event_data[{{id}}][context_code]" value="course_section_{{id}}">
         </td>
       </tr>
@@ -48,7 +46,7 @@
       <button type="button" class="btn delete_link">{{#t "delete"}}Delete{{/t}}</button>
     {{/if}}
     {{#if return_to_url}}
-      <a href="{{return_to_url}}" class="button-secondary">{{#t "#buttons.cancel"}}Cancel{{/t}}</button>
+      <a href="{{return_to_url}}" class="btn">{{#t "#buttons.cancel"}}Cancel{{/t}}</a>
     {{/if}}
   </div>
 

@@ -12,6 +12,7 @@ describe "assignment groups" do
     let(:lock_at) { Time.zone.now + 4.days }
 
     before(:each) do
+      make_full_screen
       course_with_teacher_logged_in
     end
 
@@ -74,6 +75,7 @@ describe "assignment groups" do
       visit_assignment_edit_page(assign)
       toggle_advanced_options
 
+      sleep 5
       click_option('.due-date-row:first select', default_section.name)
       first_due_at_element.clear
       first_due_at_element.

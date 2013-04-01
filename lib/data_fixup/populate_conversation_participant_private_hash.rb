@@ -1,6 +1,6 @@
 module DataFixup::PopulateConversationParticipantPrivateHash
   def self.run
-    target = ConversationParticipant.connection.adapter_name == 'MySQL' ? 'conversation_participants.private_hash' : 'private_hash'
+    target = %w{MySQL Mysql2}.include?(ConversationParticipant.connection.adapter_name) ? 'conversation_participants.private_hash' : 'private_hash'
     scope = ConversationParticipant.scoped(:conditions => {:private_hash => nil})
     scope = scope.scoped(:joins => :conversation, :conditions => "conversations.private_hash IS NOT NULL")
     scope.find_ids_in_ranges do |min, max|

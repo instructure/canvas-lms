@@ -1,6 +1,6 @@
 {{#ifAll atLeastOnePageFetched length}}
-  <div class="headerBar">
-    <div class="headerBar-right">
+  <div class="headerBar clearfix">
+    <div class="headerBar-right form-inline">
       {{#if options.atom_feed_url}}
         <a class="btn"
            href="{{options.atom_feed_url}}"
@@ -9,8 +9,8 @@
       {{/if}}
       <span id="actionsForSelectedDiscussions" style="display:none;">
         <input type="checkbox" id="lock" />
-        <label for="lock">{{#t "lock_for_comments"}}Lock for comments{{/t}}</label>
-        <button id="delete">{{#t "delete"}}Delete{{/t}}</button>
+        <label for="lock" data-tooltip>{{#t "lock_for_comments"}}Lock for comments{{/t}}</label>
+        <button id="delete" data-tooltip>{{#t "delete"}}Delete{{/t}}</button>
       </span>
 
       {{#if options.permissions.change_settings}}
@@ -32,7 +32,7 @@
         {{/if}}</a>
       {{/if}}
     </div>
-    <div class="headerBar-left bootstrap-form form-inline index_view_filter_form">
+    <div class="headerBar-left form-inline index_view_filter_form">
       <label class="hidden-inline-text" for="searchTerm">{{#t "search_title_body_or_author"}}Search title, body, or author{{/t}}</label>
       <input id="searchTerm"
              placeholder="{{#t "search_title_body_or_author"}}Search title, body, or author{{/t}}"

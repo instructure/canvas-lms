@@ -26,6 +26,10 @@ describe "conversations context filtering" do
     browse("the course", "Student Groups", "the group") { click "Select All" }
     submit_message_form(:add_recipient => false)
 
+    expect_new_page_load { get "/conversations/sent" }
+    f(".conversations li").click
+    wait_for_ajaximations
+
     audience = fj("#create_message_form ul.conversations .audience")
     audience.text.should include @course1.name
     audience.text.should_not include @course2.name
@@ -38,6 +42,10 @@ describe "conversations context filtering" do
 
     browse("the course") { search("stu") { click "student1" } }
     submit_message_form(:add_recipient => false)
+
+    expect_new_page_load { get "/conversations/sent" }
+    f(".conversations li").click
+    wait_for_ajaximations
 
     audience = fj("#create_message_form ul.conversations .audience")
     audience.text.should include @course1.name
@@ -120,6 +128,10 @@ describe "conversations context filtering" do
     browse("that course", "Everyone") { click "Select All" }
     submit_message_form(:add_recipient => false, :message => "qwerty")
 
+    expect_new_page_load { get "/conversations/sent" }
+    f(".conversations li").click
+    wait_for_ajaximations
+
     get_conversations.size.should == 2
 
     @course1.complete!
@@ -147,6 +159,10 @@ describe "conversations context filtering" do
     browse_menu
     browse("that course", "Everyone") { click "Select All" }
     submit_message_form(:add_recipient => false, :message => "qwerty")
+
+    expect_new_page_load { get "/conversations/sent" }
+    f(".conversations li").click
+    wait_for_ajaximations
 
     @input = fj("#context_tags_filter input:visible")
     search("student2", "#context_tags") { click("student2") }

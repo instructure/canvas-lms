@@ -26,7 +26,7 @@
   </li>
 </ul>
 
-<form class="boostrap-form" id="add_external_feed_form" style="display: none; font-size: 11px">
+<form class="bootstrap-form" id="add_external_feed_form" style="display: none">
   <h2>{{#t "add_a_new_feed"}}Add a New Feed{{/t}}</h2>
 
   <label for="external_feed_url">
@@ -38,10 +38,10 @@
   <input type="text"
          id="external_feed_url"
          name="url"
-         style="width: 98%"
+         class="input-block-level"
          placeholder="Feed URL">
   <div>
-    <select name="verbosity" style="width: 100%">
+    <select name="verbosity" class="input-block-level">
       <option>{{#t "options.content_to_post"}}--Content to post--{{/t}}</option>
       <option value="full">{{#t "options.full_article"}}Full article{{/t}}</option>
       <option value="truncate">{{#t "options.truncated"}}Truncated{{/t}}</option>
@@ -58,12 +58,12 @@
     <input id="external_feed_header_match"
            type="text"
            name="header_match"
-           style="width: 98%"
+           class="input-block-level"
            placeholder="{{#t "phrase_to_look_for"}}Phrase to look for{{/t}}">
   </div>
   <div>
     <button type="submit"
             data-text-while-loading="{{#t "buttons.adding_feed"}}Adding feed...{{/t}}"
-            class="btn btn-small">{{#t "buttons.add_feed"}}Add Feed{{/t}}</button>
+            class="btn">{{#t "buttons.add_feed"}}Add Feed{{/t}}</button>
   </div>
 </form>

@@ -28,7 +28,7 @@ describe "quizzes question creation" do
     question_data[:question_type].should == "multiple_choice_question"
     question_data[:correct_comments].should == "Good job on the question!"
     question_data[:incorrect_comments].should == "You know what they say - study long study wrong."
-    question_data[:neutral_comments].should == "Pass or fail, you're a winner!"
+    question_data[:neutral_comments].should == "Pass or fail you are a winner!"
   end
 
 

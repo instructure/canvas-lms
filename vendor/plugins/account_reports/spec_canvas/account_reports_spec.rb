@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/reports_helper')
+require File.expand_path(File.dirname(__FILE__) + '/report_spec_helper')
 
 describe "Default Account Reports" do
   before(:each) do
@@ -97,7 +97,7 @@ describe "Default Account Reports" do
 
     it "should run the Student Competency report" do
 
-      parsed = ReportsSpecHelper.run_report(@account,'student_assignment_outcome_map_csv',{},1)
+      parsed = ReportSpecHelper.run_report(@account,'student_assignment_outcome_map_csv',{},1)
       parsed.length.should == 2
 
       parsed[0][0].should == @student.sortable_name
@@ -138,7 +138,7 @@ describe "Default Account Reports" do
 
       parameters = {}
       parameters["enrollment_term"] = @term1.id
-      parsed = ReportsSpecHelper.run_report(@account,'student_assignment_outcome_map_csv',parameters)
+      parsed = ReportSpecHelper.run_report(@account,'student_assignment_outcome_map_csv',parameters)
       parsed.length.should == 1
       parsed[0].should == ["No outcomes found"]
 
@@ -148,7 +148,7 @@ describe "Default Account Reports" do
       sub_account = Account.create(:parent_account => @account, :name => 'English')
 
       parameters = {}
-      parsed = ReportsSpecHelper.run_report(sub_account,'student_assignment_outcome_map_csv',parameters)
+      parsed = ReportSpecHelper.run_report(sub_account,'student_assignment_outcome_map_csv',parameters)
       parsed.length.should == 1
       parsed[0].should == ["No outcomes found"]
 
@@ -162,7 +162,7 @@ describe "Default Account Reports" do
       @outcome.save!
 
       param = {}
-      parsed = ReportsSpecHelper.run_report(sub_account,'student_assignment_outcome_map_csv',param,1)
+      parsed = ReportSpecHelper.run_report(sub_account,'student_assignment_outcome_map_csv',param,1)
       parsed.length.should == 2
       parsed[0].should == [@student.sortable_name, @student.id.to_s, "user_sis_id_01", @assignment.title, @assignment.id.to_s,
                            @submission.submitted_at.iso8601, @submission.grade.to_s, @outcome.short_description,
@@ -180,7 +180,7 @@ describe "Default Account Reports" do
 
       param = {}
       param["include_deleted"] = true
-      parsed = ReportsSpecHelper.run_report(@account,'student_assignment_outcome_map_csv',param,1)
+      parsed = ReportSpecHelper.run_report(@account,'student_assignment_outcome_map_csv',param,1)
       parsed.length.should == 2
 
       parsed[0].should == [@student.sortable_name, @student.id.to_s, "user_sis_id_01", @assignment.title, @assignment.id.to_s,
@@ -250,7 +250,7 @@ describe "Default Account Reports" do
 
       parameters = {}
       parameters["enrollment_term"] = @term1.id
-      parsed = ReportsSpecHelper.run_report(@account,'grade_export_csv',parameters,13)
+      parsed = ReportSpecHelper.run_report(@account,'grade_export_csv',parameters,13)
       parsed.length.should == 3
 
       parsed[0].should == ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
@@ -268,7 +268,7 @@ describe "Default Account Reports" do
 
       parameters = {}
       parameters["enrollment_term"] = "sis_term_id:fall12"
-      parsed = ReportsSpecHelper.run_report(@account,'grade_export_csv',parameters,13)
+      parsed = ReportSpecHelper.run_report(@account,'grade_export_csv',parameters,13)
 
       parsed[0].should == ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
@@ -283,7 +283,7 @@ describe "Default Account Reports" do
 
     it "should run grade export with no parameters" do
 
-      parsed = ReportsSpecHelper.run_report(@account,'grade_export_csv',{},13)
+      parsed = ReportSpecHelper.run_report(@account,'grade_export_csv',{},13)
       parsed.length.should == 5
 
       parsed[0].should == ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
@@ -307,7 +307,7 @@ describe "Default Account Reports" do
 
       parameters = {}
       parameters["enrollment_term"] = ""
-      parsed = ReportsSpecHelper.run_report(@account,'grade_export_csv',parameters,13)
+      parsed = ReportSpecHelper.run_report(@account,'grade_export_csv',parameters,13)
       parsed.length.should == 5
 
       parsed[0].should == ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
@@ -334,7 +334,7 @@ describe "Default Account Reports" do
 
       parameters = {}
       parameters["include_deleted"] = true
-      parsed = ReportsSpecHelper.run_report(@account,'grade_export_csv',parameters,13)
+      parsed = ReportSpecHelper.run_report(@account,'grade_export_csv',parameters,13)
       parsed.length.should == 5
 
       parsed[0].should == ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
@@ -360,7 +360,7 @@ describe "Default Account Reports" do
       @course2.save!
 
       parameters = {}
-      parsed = ReportsSpecHelper.run_report(sub_account,'grade_export_csv',parameters,13)
+      parsed = ReportSpecHelper.run_report(sub_account,'grade_export_csv',parameters,13)
       parsed.length.should == 2
 
       parsed[0].should == ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "Math 101", @course2.id.to_s,
@@ -373,6 +373,6 @@ describe "Default Account Reports" do
   end
 
   it "should find the default module and configured reports" do
-    ReportsSpecHelper.find_account_module_and_reports('default')
+    ReportSpecHelper.find_account_module_and_reports('default')
   end
 end

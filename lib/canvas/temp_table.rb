@@ -19,7 +19,7 @@ module Canvas
             when 'PostgreSQL'
               @connection.execute "ALTER TABLE #{@name}
                                    ADD temp_primary_key SERIAL"
-            when 'MySQL'
+            when 'MySQL', 'Mysql2'
               @connection.execute "ALTER TABLE #{@name}
                                    ADD temp_primary_key MEDIUMINT NOT NULL AUTO_INCREMENT"
             else

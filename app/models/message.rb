@@ -161,6 +161,12 @@ class Message < ActiveRecord::Base
     { :conditions => {:user_id => user} }
   }
 
+  # messages that can be moved to the 'cancelled' state. dashboard messages
+  # can be closed by calling 'cancel', but aren't included
+  named_scope :cancellable, { :conditions =>
+    { :workflow_state => ['created', 'staged', 'sending'] }
+  }
+  
   # For finding a very particular message:
   # Message.for(context).by_name(name).directed_to(to).for_user(user), or
   # messages.for(context).by_name(name).directed_to(to).for_user(user)
@@ -609,7 +615,7 @@ class Message < ActiveRecord::Base
       @exception = e
       logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
       cancel if e.message.try(:match, /Bad recipient/)
-    rescue => e
+    rescue StandardError, Timeout::Error => e
       @exception = e
       logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
     end

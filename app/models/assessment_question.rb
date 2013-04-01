@@ -485,6 +485,10 @@ class AssessmentQuestion < ActiveRecord::Base
             bank.migration_id = question[:question_bank_id]
             bank.save!
           end
+          if bank.workflow_state == 'deleted'
+            bank.workflow_state = 'active'
+            bank.save!
+          end
           banks[hash_id] = bank
         end
         
@@ -520,6 +524,10 @@ class AssessmentQuestion < ActiveRecord::Base
         bank ||= context.assessment_question_banks.new
         bank.title = hash[:question_bank_name]
         bank.migration_id = migration_id
+        bank.save!
+      end
+      if bank.workflow_state == 'deleted'
+        bank.workflow_state = 'active'
         bank.save!
       end
     end

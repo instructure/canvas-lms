@@ -24,7 +24,7 @@ class CalendarEvent < ActiveRecord::Base
   attr_accessible :title, :description, :start_at, :end_at, :location_name,
       :location_address, :time_zone_edited, :cancel_reason,
       :participants_per_appointment, :child_event_data,
-      :remove_child_events
+      :remove_child_events, :all_day
   attr_accessor :cancel_reason
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
   copy_authorized_links(:description) { [self.effective_context, nil] }
@@ -179,46 +179,78 @@ class CalendarEvent < ActiveRecord::Base
   def default_values
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}"
     self.title ||= (self.context_type.to_s + " Event") rescue "Event"
+
+    populate_missing_dates
+    populate_all_day_flag
+
+    if parent_event
+      populate_with_parent_event
+    elsif context.is_a?(AppointmentGroup)
+      populate_appointment_group_defaults
+    end
+  end
+  protected :default_values
+
+  def populate_appointment_group_defaults
+    self.effective_context_code = context.appointment_group_contexts.map(&:context_code).join(",")
+    if new_record?
+      AppointmentGroup::EVENT_ATTRIBUTES.each { |attr| send("#{attr}=", attr == :description ? context.description_html : context.send(attr)) }
+      if locked?
+        self.start_at = start_at_was if !new_record? && start_at_changed?
+        self.end_at   = end_at_was   if !new_record? && end_at_changed?
+      end
+    else
+      # we only allow changing the description
+      (AppointmentGroup::EVENT_ATTRIBUTES - [:description]).each { |attr| send("#{attr}=", send("#{attr}_was")) if send("#{attr}_changed?") }
+    end
+  end
+  protected :populate_appointment_group_defaults
+
+  def populate_with_parent_event
+    self.effective_context_code = if appointment_group # appointment participant
+                                    appointment_group.appointment_group_contexts.map(&:context_code).join(',') if appointment_group.participant_type == 'User'
+                                  else # e.g. section-level event
+                                    parent_event.context_code
+                                  end
+    (locked? ? LOCKED_ATTRIBUTES : CASCADED_ATTRIBUTES).each{ |attr| send("#{attr}=", parent_event.send(attr)) }
+  end
+  protected :populate_with_parent_event
+
+  # Populate the start and end dates if they are not set, or if they are invalid
+  def populate_missing_dates
     self.end_at ||= self.start_at
     self.start_at ||= self.end_at
-    if(self.start_at && self.end_at && self.end_at < self.start_at)
+    if self.start_at && self.end_at && self.end_at < self.start_at
       self.end_at = self.start_at
     end
-    zoned_start_at = self.start_at && ActiveSupport::TimeWithZone.new(self.start_at.utc, (ActiveSupport::TimeZone.new(self.time_zone_edited) rescue nil) || Time.zone)
-    if self.start_at_changed?
+  end
+  protected :populate_missing_dates
+
+  def populate_all_day_flag
+    # If the all day flag has been changed to all day, set the times to 00:00
+    if self.all_day_changed? && self.all_day?
+      self.start_at = self.end_at = zoned_start_at.beginning_of_day rescue nil
+
+    elsif self.start_at_changed? || self.end_at_changed?
       if self.start_at && self.start_at == self.end_at && zoned_start_at.strftime("%H:%M") == '00:00'
-        self.all_day = true
-      elsif self.start_at && self.start_at_was && self.start_at == self.end_at && self.all_day && self.start_at.strftime("%H:%M") == self.start_at_was.strftime("%H:%M")
         self.all_day = true
       else
         self.all_day = false
       end
     end
 
-    self.all_day_date = (zoned_start_at.to_date rescue nil) if !self.all_day_date || self.start_at_changed? || self.all_day_date_changed?
-
-    if parent_event
-      self.effective_context_code = if appointment_group # appointment participant
-                                      appointment_group.appointment_group_contexts.map(&:context_code).join(',') if appointment_group.participant_type == 'User' 
-                                    else # e.g. section-level event
-                                      parent_event.context_code
-                                    end
-      (locked? ? LOCKED_ATTRIBUTES : CASCADED_ATTRIBUTES).each{ |attr| send("#{attr}=", parent_event.send(attr)) }
-    elsif context.is_a?(AppointmentGroup)
-      self.effective_context_code = context.appointment_group_contexts.map(&:context_code).join(",")
-      if new_record?
-        AppointmentGroup::EVENT_ATTRIBUTES.each { |attr| send("#{attr}=", attr == :description ? context.description_html : context.send(attr)) }
-        if locked?
-          self.start_at = start_at_was if !new_record? && start_at_changed?
-          self.end_at = end_at_was if !new_record? && end_at_changed?
-        end
-      else
-        # we only allow changing the description
-        (AppointmentGroup::EVENT_ATTRIBUTES - [:description]).each { |attr| send("#{attr}=", send("#{attr}_was")) if send("#{attr}_changed?") }
-      end
+    if self.all_day && (!self.all_day_date || self.start_at_changed? || self.all_day_date_changed?)
+      self.start_at = self.end_at = zoned_start_at.beginning_of_day rescue nil
+      self.all_day_date = (zoned_start_at.to_date rescue nil)
     end
   end
-  protected :default_values
+  protected :populate_all_day_flag
+
+  # Localized start_at
+  def zoned_start_at
+    self.start_at && ActiveSupport::TimeWithZone.new(self.start_at.utc,
+        ((ActiveSupport::TimeZone.new(self.time_zone_edited) rescue nil) || Time.zone))
+  end
 
   CASCADED_ATTRIBUTES = [
     :title,

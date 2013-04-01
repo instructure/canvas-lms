@@ -5,19 +5,19 @@ define [
   'compiled/registration/registrationErrors'
   'jst/registration/teacherDialog'
   'jst/registration/studentDialog'
-  'jst/registration/studentHigherEdDialog'
   'jst/registration/parentDialog'
   'jquery.instructure_forms'
   'jquery.instructure_date_and_time'
-], (_, I18n, preventDefault, registrationErrors, teacherDialog, studentDialog, studentHigherEdDialog, parentDialog) ->
+], (_, I18n, preventDefault, registrationErrors, teacherDialog, studentDialog, parentDialog) ->
 
   $nodes = {}
-  templates = {teacherDialog, studentDialog, studentHigherEdDialog, parentDialog}
+  templates = {teacherDialog, studentDialog, parentDialog}
 
   signupDialog = (id, title) ->
     return unless templates[id]
     $node = $nodes[id] ?= $('<div />')
     $node.html templates[id](
+      hiddenFields: ENV.HIDDEN_FIELDS || []
       terms_url: "http://www.instructure.com/terms-of-use"
       privacy_url: "http://www.instructure.com/privacy-policy"
     )

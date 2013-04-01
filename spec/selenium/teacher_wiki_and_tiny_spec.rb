@@ -80,7 +80,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
         click_option("#wiki_page_editing_roles", permission)
         #form id is set like this because the id iterator is in the form but im not sure how to grab it directly before committed to the DB with the save
         submit_form("#edit_wiki_page_#{p.id + 1}")
-
+        wait_for_ajaximations
         @course.wiki.wiki_pages.last.editing_roles.should == validations[i]
       end
     end

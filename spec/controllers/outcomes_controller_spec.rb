@@ -120,6 +120,17 @@ describe OutcomesController do
 
       assigns[:alignments].any?{ |a| a.id == alignment.id }.should be_true
     end
+
+    it "should not allow access to individual outcomes for large_roster courses" do
+      course
+      course_outcome
+
+      @course.large_roster = true
+      @course.save!
+
+      get 'show', :course_id => @course.id, :id => @outcome.id
+      response.response_code.should == 302 # requests are redirected for large_roster courses
+    end
   end
 
   describe "GET 'detail'" do

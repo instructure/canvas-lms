@@ -24,7 +24,7 @@ define [
   capitalize = (string = '') ->
     string.charAt(0).toUpperCase() + string.substring(1).toLowerCase()
 
-  class @PaginatedCollection extends Backbone.Collection
+  class PaginatedCollection extends Backbone.Collection
 
     # Matches the name of each link: "next," "prev," "first," or "last."
     nameRegex: /rel="([a-z]+)/

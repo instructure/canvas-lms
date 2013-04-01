@@ -29,7 +29,7 @@ describe "quizzes students" do
       f("#question_#{q[:id]}_answer_#{q[:answers][0][:id]}").click
 
       f("#submit_quiz_button").click
-      
+      wait_for_ajaximations
       quiz_sub = @fake_student.reload.submissions.find_by_assignment_id(quiz.assignment.id)
       quiz_sub.should be_present
       quiz_sub.workflow_state.should == "graded"

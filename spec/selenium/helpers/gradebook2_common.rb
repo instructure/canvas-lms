@@ -90,7 +90,7 @@ shared_examples_for "gradebook2 selenium tests" do
     # the dialog fetches the comments async after it displays and then innerHTMLs the whole
     # thing again once it has fetched them from the server, completely replacing it
     wait_for_ajax_requests
-    find_with_jquery '.submission_details_dialog:visible'
+    fj('.submission_details_dialog:visible')
   end
 
   def final_score_for_row(row)

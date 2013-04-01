@@ -292,10 +292,14 @@ describe ConversationsController do
     it "should add a message" do
       course_with_student_logged_in(:active_all => true)
       conversation
+      expected_lma = Time.zone.parse('2012-12-21T12:42:00Z')
+      @conversation.last_message_at = expected_lma
+      @conversation.save!
 
       post 'add_message', :conversation_id => @conversation.conversation_id, :body => "hello world"
       response.should be_success
       @conversation.messages.size.should == 2
+      @conversation.reload.last_message_at.should eql expected_lma
     end
 
     it "should generate a user note when requested" do

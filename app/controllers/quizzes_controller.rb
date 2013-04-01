@@ -22,7 +22,7 @@ class QuizzesController < ApplicationController
   before_filter :require_context
   add_crumb(proc { t(:top_level_crumb, "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
-  before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :filters, :read_only]
+  before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :filters, :read_only, :managed_quiz_data]
 
   # The number of questions that can display "details". After this number, the "Show details" option is disabled
   # and the data is not even loaded.
@@ -98,9 +98,9 @@ class QuizzesController < ApplicationController
   end
 
   def edit
-    @assignment = @quiz.assignment
     if authorized_action(@quiz, @current_user, :update)
       add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
+      @assignment = @quiz.assignment
 
       @quiz.title = params[:title] if params[:title]
       @quiz.due_at = params[:due_at] if params[:due_at]
@@ -117,11 +117,13 @@ class QuizzesController < ApplicationController
       if @has_student_submissions = @quiz.has_student_submissions?
         flash[:notice] = t('notices.has_submissions_already', "Keep in mind, some students have already taken or started taking this quiz")
       end
-      js_env :ASSIGNMENT_OVERRIDES => (assignment_overrides_json(@quiz.overrides_visible_to(@current_user)))
-      js_env :QUIZ => (quiz_json(@quiz,@context,@current_user,session))
-      js_env :SECTION_LIST => @context.course_sections.active.map {|section|
-        {:id => section.id, :name => section.name }
-      }
+
+      sections = @context.course_sections.active
+      js_env :ASSIGNMENT_ID => @assigment.present? ? @assignment.id : nil,
+             :ASSIGNMENT_OVERRIDES => assignment_overrides_json(@quiz.overrides_visible_to(@current_user)),
+             :QUIZ => quiz_json(@quiz, @context, @current_user, session),
+             :SECTION_LIST => sections.map { |section| { :id => section.id, :name => section.name } },
+             :QUIZZES_URL => polymorphic_url([@context, :quizzes])
       render :action => "new"
     end
   end
@@ -174,10 +176,11 @@ class QuizzesController < ApplicationController
         @submission.reload
         @just_graded = true
       end
-      managed_quiz_data if @quiz.grants_right?(@current_user, session, :grade) || @quiz.grants_right?(@current_user, session, :read_statistics)
+      submission_counts if @quiz.grants_right?(@current_user, session, :grade) || @quiz.grants_right?(@current_user, session, :read_statistics)
       @stored_params = (@submission.temporary_data rescue nil) if params[:take] && @submission && (@submission.untaken? || @submission.preview?)
       @stored_params ||= {}
       log_asset_access(@quiz, "quizzes", "quizzes")
+      js_env :QUIZZES_URL => polymorphic_url([@context, :quizzes])
       if params[:take] && can_take_quiz?
         # allow starting the quiz via a GET request, but only when using a lockdown browser
         if request.post? || (@quiz.require_lockdown_browser? && !quiz_submission_active?)
@@ -190,17 +193,19 @@ class QuizzesController < ApplicationController
   end
 
   def managed_quiz_data
-    students = @context.students_visible_to(@current_user).order_by_sortable_name.to_a
-    @submissions = @quiz.quiz_submissions.for_user_ids(students.map(&:id)).scoped(:conditions => "workflow_state<>'settings_only'").all
-    submission_ids = {}
-    @submissions.each{|s| submission_ids[s.user_id] = s.id }
-    @submitted_students = students.select{|stu| submission_ids[stu.id] }
-    if @quiz.survey? && @quiz.anonymous_submissions
-      @submitted_students = @submitted_students.sort_by{|stu| submission_ids[stu.id] }
+    if authorized_action(@quiz, @current_user, [:grade, :read_statistics])
+      students = @context.students_visible_to(@current_user).order_by_sortable_name.to_a.uniq
+      @submissions = @quiz.quiz_submissions.for_user_ids(students.map(&:id)).scoped(:conditions => "workflow_state<>'settings_only'").all
+      submission_ids = {}
+      @submissions.each{|s| submission_ids[s.user_id] = s.id }
+      @submitted_students = students.select{|stu| submission_ids[stu.id] }
+      if @quiz.survey? && @quiz.anonymous_submissions
+        @submitted_students = @submitted_students.sort_by{|stu| submission_ids[stu.id] }
+      end
+      @unsubmitted_students = students.reject{|stu| submission_ids[stu.id] }
+      render :layout => false
     end
-    @unsubmitted_students = students.reject{|stu| submission_ids[stu.id] }
   end
-  protected :managed_quiz_data
 
   def lockdown_browser_required
     plugin = Canvas::LockdownBrowser.plugin
@@ -427,9 +432,6 @@ class QuizzesController < ApplicationController
         @quiz.transaction do
           overrides = delete_override_params
           if params[:activate]
-            # TODO: We need to handle notifications better here. We want to send
-            # notifications if the "notify_of_update" field is passed, but *after*
-            # the assignment overrides have been created.
             @quiz.with_versioning(true) do
               @quiz.generate_quiz_data
               @quiz.workflow_state = 'available'
@@ -437,15 +439,32 @@ class QuizzesController < ApplicationController
               @quiz.save!
             end
           end
-          @quiz.content_being_saved_by(@current_user)
+
+          notify_of_update = value_to_boolean(params[:quiz][:notify_of_update])
+          params[:quiz][:notify_of_update] = false
+
+          old_assignment = nil
+          if @quiz.assignment.present?
+            old_assignment = @quiz.assignment.clone
+            old_assignment.id = @quiz.assignment.id
+          end
+
           @quiz.with_versioning(false) do
             # using attributes= here so we don't need to make an extra
             # database call to get the times right after save!
             @quiz.attributes = params[:quiz]
             @quiz.infer_times
+            @quiz.content_being_saved_by(@current_user)
             @quiz.save!
           end
+
           batch_update_assignment_overrides(@quiz,overrides) unless overrides.nil?
+
+          # quiz.rb restricts all assignment broadcasts if notify_of_update is
+          # false, so we do the same here
+          if @quiz.assignment.present? && notify_of_update
+            @quiz.assignment.do_notifications!(old_assignment, notify_of_update)
+          end
           @quiz.reload
           @quiz.update_quiz_submission_end_at_times if params[:quiz][:time_limit].present?
         end
@@ -595,5 +614,12 @@ class QuizzesController < ApplicationController
 
   def quiz_submission_active?
     @submission && (@submission.untaken? || @submission.preview?) && !@just_graded
+  end
+
+  # counts of submissions queried in #managed_quiz_data
+  def submission_counts
+    submitted_with_submissions = @context.students_visible_to(@current_user).scoped(:joins => :quiz_submissions, :conditions => ["quiz_submissions.quiz_id=? AND quiz_submissions.workflow_state<>'settings_only'", @quiz.id])
+    @submitted_student_count = submitted_with_submissions.count('DISTINCT users.id')
+    @any_submissions_pending_review = submitted_with_submissions.scoped(:conditions => "quiz_submissions.workflow_state = 'pending_review'").count > 0
   end
 end

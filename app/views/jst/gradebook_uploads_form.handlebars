@@ -1,18 +1,9 @@
 <form action="{{action}}" enctype="multipart/form-data" id="upload_modal" method="post" title="{{#t "titles.upload_form"}}Choose a CSV file to upload{{/t}}">
   <input type="hidden" name='authenticity_token' value="{{authenticityToken}}">
   <style>
-    #gradebook-upload-help {
-      display: none;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 10px;
-      margin-bottom: 1.4em;
-      background-color: rgba(0,0,0,0.02);
-    }
     tr.table-callout-notes td div {
       padding: 6px;
       border-radius: 10px;
-      font-weight: bold;
     }
     tr.table-callout-notes-spacer td, tr.table-callout-notes td{
       padding: 0 10px;
@@ -31,11 +22,18 @@
       display: block;
     }
   </style>
-  <p><a class="help" id="gradebook-upload-help-trigger" href="#">{{#t "what_should_csv_look_like"}}What should the CSV file look like?{{/t}}</a></p>
-  <div id="gradebook-upload-help">
+  <p>
+    <a class="icon-question element_toggler"
+       aria-controls="gradebook-upload-help"
+       data-hide-while-target-shown="true"
+       href="#">
+        {{#t "what_should_csv_look_like"}}What should the CSV file look like?{{/t}}
+    </a>
+  </p>
+  <div id="gradebook-upload-help" class="well" style="display:none">
     <h3>{{#t "example_csv_file"}}Example CSV file{{/t}}</h3>
-    <table class="stylized striped bordered">
-      <thead>
+    <table class="table table-striped" >
+      <thead style="background: none">
         <tr class="table-callout-notes">
           <td colspan="4"><div class="ui-state-highlight">{{#t "explanation_of_required_columns"}}You Must have <em>all</em> of these columns, you only <em>need</em> one per row.{{/t}}</div></td>
           <td><div class="ui-state-highlight">{{#t "optional_ignored"}}Optional, ignored.{{/t}}</div></td>

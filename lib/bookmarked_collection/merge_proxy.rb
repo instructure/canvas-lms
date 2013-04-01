@@ -17,11 +17,12 @@
 #
 
 class BookmarkedCollection::MergeProxy < BookmarkedCollection::CompositeProxy
-  def initialize(collections)
+  def initialize(collections, &merge_proc)
     if collections.any?{ |(_,coll)| coll.is_a?(BookmarkedCollection::ConcatProxy) }
       raise ArgumentError, "Cannot include a concatenation in a merge."
     end
-    super
+    super(collections)
+    @merge_proc = merge_proc
   end
 
   # a pair of (1) the leaf bookmark of the next value in collections[index] and
@@ -40,7 +41,7 @@ class BookmarkedCollection::MergeProxy < BookmarkedCollection::CompositeProxy
       subpager = collection.new_pager
       subpager.per_page = pager.per_page
       subpager.current_bookmark = subbookmark
-      subpager.include_bookmark = start_index && index > start_index
+      subpager.include_bookmark = start_index && index > start_index && !@merge_proc
       collections << collection.execute_pager(subpager)
     end
 
@@ -54,15 +55,21 @@ class BookmarkedCollection::MergeProxy < BookmarkedCollection::CompositeProxy
     end
     indexed_bookmarks.sort!
 
-    while pager.size < pager.per_page && indexed_bookmarks.present?
+    last_item, last_leaf_bookmark = nil, nil
+    while indexed_bookmarks.present? && (pager.size < pager.per_page || @merge_proc && indexed_bookmarks.first.first == last_leaf_bookmark)
       # pull the index of the collection with the next lowest bookmark and
       # pull off its first item
-      _, index = indexed_bookmarks.shift
+      leaf_bookmark, index = indexed_bookmarks.shift
       collection = collections[index]
       item, bookmark = collection.shift_with_bookmark
-
-      # add item to pager with bookmark
-      pager.add(item, bookmark, index)
+      if last_leaf_bookmark == leaf_bookmark && @merge_proc
+        # merge this item into the identical item that's already in the pager
+        @merge_proc.call(last_item, item)
+      else
+        # add item to pager with bookmark
+        pager.add(item, bookmark, index)
+        last_item, last_leaf_bookmark = item, leaf_bookmark
+      end
 
       unless collection.empty?
         # collection still has items, put the index back in the list with

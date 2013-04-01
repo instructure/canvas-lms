@@ -1,19 +1,11 @@
 <ul id="context-list">
   {{#each contexts}}
-    <li data-context="{{asset_string}}" class="context_list_context">
-      <span class="checkbox group_{{asset_string}}"></span>
+    <li data-context="{{asset_string}}" class="context_list_context hover-container">
+      <span class="context-list-toggle-box group_{{asset_string}}"></span>
       {{name}}
-      {{#if can_create_stuff}}
-        <button class="settings btn-mini"></button>
-        <ul class="actions ui-menu-small">
-          {{#if can_create_calendar_events}}
-            <li><a href="#" data-action="add_event">Add Event</a></li>
-          {{/if}}
-          {{#if can_create_assignments}}
-            <li><a href="#" data-action="add_assignment">Add Assignment</a></li>
-          {{/if}}
-        </ul>
-      {{/if}}
+      {{#ifAny can_create_calendar_events can_create_assignments}}
+        <a href="#" class="context-list-add hide-till-hover" data-add-event><i class="icon-add standalone-icon"></i></a>
+      {{/ifAny}}
     </li>
   {{/each}}
 </ul>

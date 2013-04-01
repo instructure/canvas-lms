@@ -37,6 +37,9 @@
   <script src="support/sinon/sinon-1.5.2.js"></script>
   <script src="support/sinon/sinon-qunit-1.0.0.js"></script>
   <script>
+    if (location.hash === '#testem') document.write('<script src="/testem.js"></'+'script>')
+  </script>
+  <script>
     var require = {
       urlArgs: "bust=" +  (new Date()).getTime(),
 
@@ -73,9 +76,30 @@
   </script>
   <script src="../../public/javascripts/vendor/require.js"></script>
   <script>
+    // keep JSON.stingify from puking on dom nodes in testem
+    (function() {
+      var old = QUnit.log;
+      var toString = Object.prototype.toString;
+      QUnit.log = function(result) {
+        if (result.actual instanceof HTMLElement) {
+          result.actual = result.actual.toString();
+          result.expected = result.expected.toString();
+        }
+        if (toString.call(result.actual) == '[object Array]') {
+          for (var i = 0; i < result.actual.length; i++) {
+            if (result.actual[i] instanceof HTMLElement) {
+              result.actual[i] = result.actual[i].toString();
+              result.expected[i] = result.expected[i].toString();
+            }
+          }
+        }
+        return old.call(this, result);
+      };
+    })();
+
     // don't run specs until they are all loaded
     stop();
-    require(<%= Dir["spec/javascripts/**/*Spec.js"].map{ |file| file.sub(/\.js$/, '') }.inspect %>, function() {
+    require(<%= Dir["spec/javascripts/#{matcher}"].map{ |file| file.sub(/\.js$/, '') }.inspect %>, function() {
       // run specs once they've all loaded
       start();
     });

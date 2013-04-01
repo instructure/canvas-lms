@@ -308,7 +308,7 @@ class Conversation < ActiveRecord::Base
       messages = ConversationMessage.find_all_by_id(options[:forwarded_message_ids].map(&:to_i))
       conversation_ids = messages.select(&:forwardable?).map(&:conversation_id).uniq
       raise "can only forward one conversation at a time" if conversation_ids.size != 1
-      raise "user doesn't have permission to forward these messages" unless current_user.conversations.find_by_conversation_id(conversation_ids.first)
+      raise "user doesn't have permission to forward these messages" unless current_user.all_conversations.find_by_conversation_id(conversation_ids.first)
       # TODO: optimize me
       message.forwarded_message_ids = messages.map(&:id).join(',')
     end
@@ -409,7 +409,7 @@ class Conversation < ActiveRecord::Base
         self.id,
         skip_ids
       ])
-      if connection.adapter_name =~ /mysql/i
+      if %w{MySQL Mysql2}.include?(connection.adapter_name)
         connection.execute <<-SQL
           UPDATE users, conversation_participants cp
           SET unread_conversations_count = unread_conversations_count + 1
@@ -429,7 +429,7 @@ class Conversation < ActiveRecord::Base
       # column is only viewed by the other participants and doesn't care about
       # what messages the author may have deleted
       updates = [
-        maybe_update_timestamp('last_message_at', message.created_at, update_for_skips ? [] : ["last_message_at IS NOT NULL"]),
+        maybe_update_timestamp('last_message_at', message.created_at, update_for_skips ? [] : ["last_message_at IS NOT NULL AND user_id NOT IN (?)", skip_ids]),
         maybe_update_timestamp('last_authored_at', message.created_at, ["user_id = ?", message.author_id]),
         maybe_update_timestamp('visible_last_authored_at', message.created_at, ["user_id = ?", message.author_id])
       ]
@@ -621,9 +621,9 @@ class Conversation < ActiveRecord::Base
         :select => "#{MessageableUser.build_select}, last_authored_at, conversation_id",
         :joins => :all_conversations,
         :conditions => ["conversation_id IN (?)", conversations.map(&:id)],
-        :order => 'last_authored_at IS NULL, last_authored_at DESC, LOWER(COALESCE(short_name, name))').group_by(&:conversation_id)
+        :order => 'last_authored_at IS NULL, last_authored_at DESC, LOWER(COALESCE(short_name, name))').group_by { |mu| mu.conversation_id.to_i }
       conversations.each do |conversation|
-        participants[conversation.global_id].concat(user_map[conversation.id.to_s] || [])
+        participants[conversation.global_id].concat(user_map[conversation.id] || [])
       end
     end
 

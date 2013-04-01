@@ -31,7 +31,6 @@ module Canvas::Cassandra
         servers = Array(config['servers'])
         raise "No Cassandra servers defined for: #{config_name.inspect}" unless servers.present?
         keyspace = config['keyspace']
-        keyspace = "#{keyspace}#{ENV['TEST_ENV_NUMBER']}" if Rails.env.test?
         raise "No keyspace specified for: #{config_name.inspect}" unless keyspace.present?
         opts = {:keyspace => keyspace, :cql_version => '3.0.0'}
         thrift_opts = {}

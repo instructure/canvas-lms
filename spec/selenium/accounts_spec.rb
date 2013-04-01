@@ -4,7 +4,7 @@ describe "account" do
   it_should_behave_like "in-process server selenium tests"
 
   before (:each) do
-   course_with_admin_logged_in
+    course_with_admin_logged_in
   end
 
   describe "authentication configs" do
@@ -311,9 +311,10 @@ describe "account" do
 
       element = ff('.ui-autocomplete li a').first
       element.text.should == @course_name
-      element.click
-
-      driver.current_url.should include("/courses/#{@course.id}")
+      keep_trying_until do
+        driver.execute_script("$('.ui-autocomplete li a').hover().click()")
+        driver.current_url.should include("/courses/#{@course.id}")
+      end
     end
 
     it "should search for an existing user" do

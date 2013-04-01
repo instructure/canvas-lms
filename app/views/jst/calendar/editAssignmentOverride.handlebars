@@ -1,31 +1,28 @@
 <form action='#' id='edit_assignment_form' style='padding: 5px; width: 400px'>
-  <table class="formtable" style="width: 100%;">
-    <tr>
-      <td>{{#t "due"}}Due:{{/t}}</td>
-      <td>
-        <input class="datetime_field" id="assignment_override_due_at" name="assignment_override[due_at]" size="30" style="width: 150px;" type="text" />
-      </td>
-    </tr>
-    <tr class="context_select">
-      <td>{{#t "calendar"}}Calendar:{{/t}}</td>
-      <td>
-        <select class="context_id">
-          {{#each contexts}}
-            {{#if can_create_assignments}}
-              <option value="{{asset_string}}">{{name}}</option>
-            {{/if}}
-          {{/each}}
-        </select>
-      </td>
-    </tr>
-    <tr>
-      <td></td>
-      <td><a href="#" class="more_options_link">{{#t "links.more_options"}}more options{{/t}}</a></td>
-    </tr>
-    <tr>
-      <td colspan="2" style="text-align: right">
-        <button type="submit" class="btn">{{#t "#buttons.submit"}}Submit{{/t}}</button>
-      </td>
-    </tr>
-  </table>
+  <div class="event-details-content">
+    <table class="formtable" style="width: 100%;">
+      <tr>
+        <td>{{#t "due"}}Due:{{/t}}</td>
+        <td>
+          <input class="datetime_field" id="assignment_override_due_at" name="assignment_override[due_at]" size="30" style="width: 150px;" type="text" />
+        </td>
+      </tr>
+      <tr class="context_select">
+        <td>{{#t "calendar"}}Calendar:{{/t}}</td>
+        <td>
+          <select class="context_id">
+            {{#each contexts}}
+              {{#if can_create_assignments}}
+                <option value="{{asset_string}}">{{name}}</option>
+              {{/if}}
+            {{/each}}
+          </select>
+        </td>
+      </tr>
+    </table>
+    <div class="popover-links-holder event-details-footer">
+      <button type="submit" class="event_button btn btn-primary pull-right">{{#t "#buttons.submit"}}Submit{{/t}}</button>
+      <a href="#" class="event_button btn btn-secondary pull-right more_options_link">{{#t "links.more_options"}}More Options{{/t}}</a>
+    </div>
+  </div>
 </form>

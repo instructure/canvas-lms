@@ -256,7 +256,10 @@ describe "gradebook2" do
     wait_for_ajaximations
 
     #make sure it's on the other student's submission
-    comment = open_comment_dialog(3, 1).find_element(:css, '.comment')
+    comment = keep_trying_until do
+      open_comment_dialog(3, 1)
+      fj(".submission_details_dialog:visible .comment")
+    end
     comment.should include_text(comment_text)
   end
 
@@ -333,7 +336,7 @@ describe "gradebook2" do
         message_form.find_element(:css, '#body').send_keys(message_text)
         submit_form(message_form)
         wait_for_ajax_requests
-      }.to change {ConversationMessage.count(:conversation_id)}.by(1)
+      }.to change { ConversationMessage.count(:conversation_id) }.by(1)
     end
 
     it "should send messages when Scored more than X points" do
@@ -346,7 +349,7 @@ describe "gradebook2" do
       expect {
         message_form = f('#message_assignment_recipients')
         click_option('#message_assignment_recipients .message_types', 'Scored more than')
-        message_form.find_element(:css, '.cutoff_score').send_keys('3')  # both assignments have score of 5
+        message_form.find_element(:css, '.cutoff_score').send_keys('3') # both assignments have score of 5
         message_form.find_element(:css, '#body').send_keys(message_text)
         submit_form(message_form)
         wait_for_ajax_requests

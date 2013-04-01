@@ -22,7 +22,7 @@ require 'spec'
 # require 'spec/autorun'
 require 'spec/rails'
 require 'webrat'
-require 'mocha_standalone'
+require 'mocha/api'
 require File.dirname(__FILE__) + '/mocha_extensions'
 
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
@@ -32,7 +32,7 @@ Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |fil
 # so we remove rspec's definition. This does not prevent 'context' from being
 # used within a 'describe' block.
 module Spec::DSL::Main
-  remove_method :context
+  remove_method :context if respond_to? :context
 end
 
 def truncate_table(model)
@@ -104,14 +104,27 @@ Spec::Matchers.define :encompass do |expected|
   end
 end
 
+module MochaRspecAdapter
+  include Mocha::API
+  def setup_mocks_for_rspec
+    mocha_setup
+  end
+  def verify_mocks_for_rspec
+    mocha_verify
+  end
+  def teardown_mocks_for_rspec
+    mocha_teardown
+  end
+end
+
 Spec::Runner.configure do |config|
   # If you're not using ActiveRecord you should remove these
   # lines, delete config/database.yml and disable :active_record
   # in your config/boot.rb
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures  = false
-  config.fixture_path = RAILS_ROOT + '/spec/fixtures/'
-  config.mock_with :mocha
+  config.fixture_path = Rails.root+'spec/fixtures/'
+  config.mock_with MochaRspecAdapter
 
   config.include Webrat::Matchers, :type => :views
 
@@ -122,6 +135,7 @@ Spec::Runner.configure do |config|
   end
 
   config.before :each do
+    I18n.locale = :en
     Time.zone = 'UTC'
     Account.clear_special_account_cache!
     Account.default.update_attribute(:default_time_zone, 'UTC')
@@ -714,17 +728,14 @@ Spec::Runner.configure do |config|
   end
 
   # enforce forgery protection, so we can verify usage of the authenticity token
-  def enable_forgery_protection(enable = nil)
-    if enable != false
-      ActionController::Base.class_eval { alias_method :_old_protect, :allow_forgery_protection; def allow_forgery_protection; true; end }
-    end
+  def enable_forgery_protection(enable = true)
+    old_value = ActionController::Base.allow_forgery_protection
+    ActionController::Base.stubs(:allow_forgery_protection).including_subclasses.returns(enable)
 
     yield if block_given?
 
   ensure
-    if enable != true
-      ActionController::Base.class_eval { alias_method :allow_forgery_protection, :_old_protect }
-    end
+    ActionController::Base.stubs(:allow_forgery_protection).including_subclasses.returns(old_value) if block_given?
   end
 
   def start_test_http_server(requests=1)

@@ -12,15 +12,15 @@ shared_examples_for "quizzes selenium tests" do
     answers = question.find_elements(:css, ".form_answers > .answer")
     answers.length.should == 4
     replace_content(answers[0].find_element(:css, ".select_answer input"), "Correct Answer")
-    set_feedback_content(answers[0].find_element(:css, ".answer_comments"), "Good job!")
+    set_answer_comment(0, "Good job!")
     replace_content(answers[1].find_element(:css, ".select_answer input"), "Wrong Answer #1")
-    set_feedback_content(answers[1].find_element(:css, ".answer_comments"), "Bad job :(")
+    set_answer_comment(1, "Bad job :(")
     replace_content(answers[2].find_element(:css, ".select_answer input"), "Second Wrong Answer")
     replace_content(answers[3].find_element(:css, ".select_answer input"), "Wrongest Answer")
 
-    set_feedback_content(question.find_element(:css, "div.text .question_correct_comment"), "Good job on the question!")
-    set_feedback_content(question.find_element(:css, "div.text .question_incorrect_comment"), "You know what they say - study long study wrong.")
-    set_feedback_content(question.find_element(:css, "div.text .question_neutral_comment"), "Pass or fail, you're a winner!")
+    set_question_comment(".question_correct_comment", "Good job on the question!")
+    set_question_comment(".question_incorrect_comment", "You know what they say - study long study wrong.")
+    set_question_comment(".question_neutral_comment", "Pass or fail you are a winner!")
 
     submit_form(question)
     wait_for_ajaximations
@@ -37,8 +37,7 @@ shared_examples_for "quizzes selenium tests" do
     answers = question.find_elements(:css, ".form_answers > .answer")
     answers.length.should == 2
     answers[1].find_element(:css, ".select_answer_link").click # false - get it?
-    answers[1].find_element(:css, ".comment_focus").click
-    answers[1].find_element(:css, ".answer_comments textarea").send_keys("Good job!")
+    set_answer_comment(1, "Good job!")
 
     submit_form(question)
     wait_for_ajaximations
@@ -65,10 +64,11 @@ shared_examples_for "quizzes selenium tests" do
     @points_total += points.to_i
     @question_count += 1
     click_new_question_button
+    wait_for_ajaximations
     question = fj('.question_form:visible')
     replace_content(question.find_element(:css, "input[name='question_points']"), points)
     submit_form(question)
-    wait_for_ajax_requests
+    wait_for_ajaximations
     questions = ffj(".question_holder:visible")
     questions.length.should == @question_count
     click_settings_tab
@@ -115,10 +115,9 @@ shared_examples_for "quizzes selenium tests" do
     expect_new_page_load {
       f('.new-quiz-link').click
     }
-
     click_questions_tab
     click_new_question_button
-    wait_for_animations
+    wait_for_ajaximations
     Quiz.last
   end
 
@@ -138,10 +137,16 @@ shared_examples_for "quizzes selenium tests" do
     driver.switch_to.alert.accept
   end
 
-  def set_feedback_content(el, text)
-    el.find_element(:css, ".comment_focus").click
-    el.find_element(:css, "textarea").should be_displayed
-    el.find_element(:css, "textarea").send_keys(text)
+  def set_answer_comment(answer_num, text)
+    driver.execute_script("$('.question_form:visible .form_answers .answer:eq(#{answer_num}) .comment_focus').click()")
+    wait_for_ajaximations
+    driver.execute_script("$('.question_form:visible .form_answers .answer:eq(#{answer_num}) .answer_comment_box').val('#{text}')\;")
+  end
+
+  def set_question_comment(selector, text)
+    driver.execute_script("$('.question_form:visible #{selector} .comment_focus').click()")
+    wait_for_ajaximations
+    driver.execute_script("$('.question_form:visible #{selector} .comments').val('#{text}')\;")
   end
 
   def hover_first_question
@@ -334,6 +339,4 @@ shared_examples_for "quizzes selenium tests" do
     target = "#group_top_#{group_id} + *"
     js_drag_and_drop source, target
   end
-
 end
-

@@ -2,9 +2,10 @@
   <div class='comm-event-option-contents'>
     <div class='event-option-selection'>
       <a href="#" class='change-selection'>
-        <span class="ui-icon {{selected.image}}"></span> <span class='img-text'>{{selected.text}}</span>
+        <i class="{{selected.icon}}"></i> <span class='img-text'>{{selected.text}}</span>
         {{#if touch}}
-        <span class='drop-arrow'>&#x25BC;</span>
+        <i class="{{selected.icon}}"></i>
+        <i class='icon-mini-arrow-down drop-arrow'></i>
         {{/if}}
       </a>
     </div>
@@ -18,7 +19,7 @@
       <div class="btn-group-was event-option-buttons">
         {{#each allButtons}}
         <input type="radio" class="{{code}}-button frequency" id="{{id}}" name="{{coordinate}}" title="{{title}}" data-value='{{code}}' {{#if active}}checked='checked'{{/if}}>
-        <label for="{{id}}" class="{{code}}-label" data-tooltip >{{title}}</label>
+        <label for="{{id}}" class="{{code}}-label" data-tooltip title="{{title}}" ><i class="{{icon}}"></i></label>
         {{/each}}
       </div>
     {{/if}}

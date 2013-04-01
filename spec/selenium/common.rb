@@ -56,6 +56,7 @@ module SeleniumTestsHelperMethods
       options = {}
       if browser == :firefox
         profile = Selenium::WebDriver::Firefox::Profile.new
+        profile.load_no_focus_lib=(true)
         if SELENIUM_CONFIG[:firefox_profile].present?
           profile = Selenium::WebDriver::Firefox::Profile.from_name(SELENIUM_CONFIG[:firefox_profile])
         end
@@ -70,6 +71,7 @@ module SeleniumTestsHelperMethods
       caps = SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox
       if caps == :firefox
         profile = Selenium::WebDriver::Firefox::Profile.new
+        profile.load_no_focus_lib=(true)
         if SELENIUM_CONFIG[:firefox_profile].present?
           profile = Selenium::WebDriver::Firefox::Profile.from_name SELENIUM_CONFIG[:firefox_profile]
         end
@@ -127,6 +129,11 @@ module SeleniumTestsHelperMethods
     driver.manage.timeouts.implicit_wait = 10
     driver
   end
+
+  def set_native_events(setting)
+    driver.instance_variable_get(:@bridge).instance_variable_get(:@capabilities).instance_variable_set(:@native_events, setting)
+  end
+
 
   # f means "find" this is a shortcut to finding elements
   def f(selector, scope = nil)
@@ -434,14 +441,14 @@ shared_examples_for "all selenium tests" do
     course = opts[:course] || @course || course(opts)
     get "/courses/#{@course.id}/settings"
     f(".student_view_button").click
-    wait_for_dom_ready
+    wait_for_ajaximations
   end
 
   def expect_new_page_load
     driver.execute_script("INST.still_on_old_page = true;")
     yield
     keep_trying_until { driver.execute_script("return INST.still_on_old_page;") == nil }
-    wait_for_dom_ready
+    wait_for_ajaximations
   end
 
   def check_domready
@@ -781,15 +788,14 @@ shared_examples_for "all selenium tests" do
 
   # you can pass an array to use the rails polymorphic_path helper, example:
   # get [@course, @announcement] => "http://10.0.101.75:65137/courses/1/announcements/1"
-  def get(link, wait_for_dom = true)
+  def get(link, waitforajaximations = true)
     link = polymorphic_path(link) if link.is_a? Array
     driver.get(app_host + link)
-    wait_for_dom_ready if wait_for_dom
+    wait_for_ajaximations if waitforajaximations
   end
 
   def refresh_page
-    driver.navigate.refresh
-    wait_for_dom_ready
+    expect_new_page_load { driver.navigate.refresh }
   end
 
   def make_full_screen
@@ -865,24 +871,21 @@ shared_examples_for "all selenium tests" do
 
   def assert_flash_notice_message(okay_message_regex)
     keep_trying_until do
-      text = f("#flash_message_holder .ui-state-success").text rescue ''
-      raise "server error" if text =~ /The last request didn't work out/
+      text = ff("#flash_message_holder .ui-state-success").map(&:text).join("\n") rescue ''
       text =~ okay_message_regex
     end
   end
 
-  def assert_flash_warning_message(okay_message_regex)
+  def assert_flash_warning_message(warn_message_regex)
     keep_trying_until do
-      text = f("#flash_message_holder .ui-state-warning").text rescue ''
-      raise "server error" if text =~ /The last request didn't work out/
-      text =~ okay_message_regex
+      text = ff("#flash_message_holder .ui-state-warning").map(&:text).join("\n") rescue ''
+      text =~ warn_message_regex
     end
   end
 
   def assert_flash_error_message(fail_message_regex)
     keep_trying_until do
-      text = f("#flash_message_holder .ui-state-error").text rescue ''
-      raise "server error" if text =~ /The last request didn't work out/
+      text = ff("#flash_message_holder .ui-state-error").map(&:text).join("\n") rescue ''
       text =~ fail_message_regex
     end
   end
@@ -944,16 +947,12 @@ shared_examples_for "all selenium tests" do
     driver.manage.timeouts.implicit_wait = 3
     driver.manage.timeouts.script_timeout = 60
     EncryptedCookieStore.any_instance.stubs(:secret).returns(ActiveSupport::SecureRandom.hex(64))
+    enable_forgery_protection
   end
 
   append_before (:all) do
     $selenium_driver ||= setup_selenium
     default_url_options[:host] = $app_host_and_port
-    enable_forgery_protection(true)
-  end
-
-  append_after(:all) do
-    enable_forgery_protection(false)
   end
 
   append_before (:all) do
@@ -1069,9 +1068,25 @@ shared_examples_for "in-process server selenium tests" do
     HostUrl.stubs(:default_host).returns($app_host_and_port)
     HostUrl.stubs(:file_host).returns($app_host_and_port)
   end
+
+  # tricksy tricksy. grab the current connection, and then always return the same one
+  # (even if on a different thread - i.e. the server's thread), so that it will be in
+  # the same transaction and see the same data
   before do
-    conn = ActiveRecord::Base.connection
-    ActiveRecord::ConnectionAdapters::ConnectionPool.any_instance.stubs(:connection).returns(conn)
+    @db_connection = ActiveRecord::Base.connection
+
+    # synchronize the execute method since for a modicum of thread safety
+    if !@db_connection.respond_to?(:execute_without_synchronization)
+      @db_connection.class.class_eval do
+        def execute_with_synchronization(*args)
+          @mutex ||= Mutex.new
+          @mutex.synchronize { execute_without_synchronization(*args) }
+        end
+        alias_method_chain :execute, :synchronization
+      end
+    end
+
+    ActiveRecord::ConnectionAdapters::ConnectionPool.any_instance.stubs(:connection).returns(@db_connection)
   end
 end
 

@@ -889,6 +889,7 @@ describe CoursesController, :type => :integration do
       @section1 = @course1.default_section
       @section2 = @course1.course_sections.create!(:name => 'Section B')
       @ta = user(:name => 'TAPerson')
+      @ta.communication_channels.create!(:path => 'ta@ta.com') { |cc| cc.workflow_state = 'confirmed' }
       @ta_enroll1 = @course1.enroll_user(@ta, 'TaEnrollment', :section => @section1)
       @ta_enroll2 = @course1.enroll_user(@ta, 'TaEnrollment', :section => @section2, :allow_multiple_enrollments => true)
 
@@ -949,6 +950,29 @@ describe CoursesController, :type => :integration do
             :only => USER_API_FIELDS)
 
         sorted_users.should == expected_users.sort_by{ |x| x["id"] }
+      end
+
+      it "respects limit option (as pagination)" do
+        json = api_call(:get, api_url, api_route, :search_term => "SSS", :limit => 1)
+        json.length.should == 1
+        link_header = response.headers['Link'].split(',')
+        link_header[0].should match /page=2&per_page=1/ # next page
+        link_header[1].should match /page=1&per_page=1/ # first page
+      end
+
+      it "should respect includes" do
+        @user = @course1.teachers.first
+        json = api_call(:get, api_url, api_route, :search_term => "TAPerson", :include => ['email'])
+
+        json.should == [
+          {
+            'id' => @ta.id,
+            'name' => 'TAPerson',
+            'sortable_name' => 'TAPerson',
+            'short_name' => 'TAPerson',
+            'email' => 'ta@ta.com'
+          }
+        ]
       end
     end
 

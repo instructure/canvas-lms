@@ -5,6 +5,7 @@ require [
   'jqueryui/tabs'
   'jqueryui/button'
   'jqueryui/tooltip'
+  'jquery.instructure_date_and_time'
 ], ($, preventDefault) ->
 
 
@@ -55,24 +56,12 @@ require [
   # Combinations
   $("#tabs2").tabs()
   $("#accordion2").accordion header: "h4"
-  $("#buttonInModal").button icons:
-    primary: "ui-icon-wrench"
 
-
-  # Nested button tests
-  $("#nestedButtonTest_1, #nestedButtonTest_2, #buttonInModal").button().click false
 
   #Toolbar
   $("#play, #shuffle").button()
   $("#repeat").buttonset()
 
-  #Popover - Should be refactored to be more general purpose and reusable like tooltip.coffee. Do that when next needed.
-  $('.show-popover').tooltip(
-    position:
-      my: "left center"
-      at: "right+10 center"
-      collision: 'none none'
-    ,
-    tooltipClass: 'popover left middle horizontal'
-  )
+  $(".styleguide-datetime_field-example").datetime_field()
+
 

@@ -256,7 +256,7 @@ describe ContentMigration do
       new_att.grants_right?(student, :download).should be_false
     end
 
-    it "should tranlsate links to module items in html content" do
+    it "should translate links to module items in html content" do
       mod1 = @copy_from.context_modules.create!(:name => "some module")
       asmnt1 = @copy_from.assignments.create!(:title => "some assignment")
       tag = mod1.add_item({:id => asmnt1.id, :type => 'assignment', :indent => 1})
@@ -1614,6 +1614,18 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       end
     end
 
+  end
+
+  context "#prepare_data" do
+    it "should strip invalid utf8" do
+      pending("Ruby 1.9 only") if RUBY_VERSION < "1.9"
+      data = {
+        'assessment_questions' => [{
+          'question_name' => "hai\xfbabcd"
+        }]
+      }
+      ContentMigration.new.prepare_data(data)[:assessment_questions][0][:question_name].should == "haiabcd"
+    end
   end
 
   context "import_object?" do

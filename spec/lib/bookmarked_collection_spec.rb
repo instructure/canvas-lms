@@ -151,6 +151,27 @@ describe "BookmarkedCollection" do
       @collection.paginate(:page => page.next_page, :per_page => 2).should == [@deleted_course1, @created_course2]
     end
 
+    context "with a merge proc" do
+      before :each do
+        # the name bookmarker will generate the same bookmark for both of the
+        # courses.
+        Course.delete_all
+        @created_course = @created_scope.create!(:name => "Same Name")
+        @deleted_course = @deleted_scope.create!(:name => "Same Name")
+
+        @created_collection = BookmarkedCollection.wrap(NameBookmarker, @created_scope)
+        @deleted_collection = BookmarkedCollection.wrap(NameBookmarker, @deleted_scope)
+        @collection = BookmarkedCollection.merge(
+          ['created', @created_collection],
+          ['deleted', @deleted_collection]
+        ) do; end
+      end
+
+      it "should collapse duplicates" do
+        @collection.paginate(:per_page => 2).should == [@created_course]
+      end
+    end
+
     context "with ties across collections" do
       before :each do
         # the name bookmarker will generate the same bookmark for both of the

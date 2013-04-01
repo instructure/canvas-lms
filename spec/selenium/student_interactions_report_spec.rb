@@ -34,30 +34,37 @@ describe "student interactions report" do
     ths = ff(".report th")
     trs = ff(".report tbody tr")
     ths[0].click
+    wait_for_ajaximations
     ths[0].should have_class("headerSortDown")
     ff(".report tbody tr").should == [trs[0], trs[1]]
 
     ths[0].click
+    wait_for_ajaximations
     ths[0].should have_class("headerSortUp")
     ff(".report tbody tr").should == [trs[1], trs[0]]
 
     ths[2].click
+    wait_for_ajaximations
     ths[2].should have_class("headerSortDown")
     ff(".report tbody tr").should == [trs[0], trs[1]]
 
     ths[2].click
+    wait_for_ajaximations
     ths[2].should have_class("headerSortUp")
     ff(".report tbody tr").should == [trs[1], trs[0]]
 
     ths[3].click
+    wait_for_ajaximations
     ths[3].should have_class("headerSortDown")
     ff(".report tbody tr").should == [trs[0], trs[1]]
 
     ths[3].click
+    wait_for_ajaximations
     ths[3].should have_class("headerSortUp")
     ff(".report tbody tr").should == [trs[1], trs[0]]
 
     ths[5].click
+    wait_for_ajaximations
     ths[5].should_not have_class("header")
   end
 end

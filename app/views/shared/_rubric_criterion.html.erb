@@ -1,9 +1,9 @@
 <% criterion = rubric_criterion || nil; assessing ||= false; rubric ||= nil; rubric_association ||= nil; edit_view ||= false; assessment_rating ||= nil %>
 <tr id="criterion_<%= criterion ? criterion.id : "blank" %>" class="criterion <%= "blank" unless criterion %> <%= 'ignore_criterion_for_scoring' if criterion && criterion.ignore_for_scoring %> <%= 'learning_outcome_criterion' if criterion && criterion.learning_outcome_id %>" style="<%= hidden unless criterion %>">
-  <td class="criterion_description">
+  <td class="criterion_description hover-container">
     <div class="container">
       <div class="links editing">
-        <a href="#" class="edit_criterion_link no-hover"><i class="icon-edit standalone-icon"></i></a>
+        <a href="#" class="edit_criterion_link hide-till-hover"><i class="icon-edit standalone-icon"></i></a>
       </div>
       <%= image_tag "flagged_question.png", :class => "learning_outcome_flag", :title => t('titles.linked_to_learning_outcome', "This criterion is linked to a Learning Outcome") %>
       <span class="description criterion_description_value"><%= criterion.description rescue t('defaults.description', "Description of criterion") %></span>
@@ -72,13 +72,13 @@
   </td>
   <td class="nobr points_form">
     <div class="editing" style="white-space: normal">
-      <span style="white-space: nowrap;">
-        <% rating_points = %{<input type="text" style="width: 30px;" value="#{ assessing ? (assessment_rating.points rescue "") : (criterion.points rescue 5) }" class="criterion_points"/>}.html_safe %>
-        <% if assessing && criterion && criterion.points %>
-            <%= t :points_out_of, "%{points} / %{total} pts", :points => rating_points, :total => criterion.points %>
-        <% else %>
-            <%= t :points, "%{points} pts", :points => rating_points %>
-        <% end %>
+      <span style="white-space: nowrap; font-size: 0.8em">
+        <% rating_points = %{<input type="text" value="#{ assessing ? (assessment_rating.points rescue "") : (criterion.points rescue 5) }" class="criterion_points span1 no-margin-bottom" />}.html_safe %>
+          <% if assessing && criterion && criterion.points %>
+              <%= t :points_out_of, "%{points} / %{total} pts", :points => rating_points, :total => criterion.points %>
+          <% else %>
+              <%= t :points, "%{points} pts", :points => rating_points %>
+          <% end %>
       </span><br />
     </div>
     <div class="displaying">
@@ -100,7 +100,7 @@
     </div>
   </td>
   <td class="editing">
-    <a href="#" class="delete_criterion_link no-hover"><i class="icon-trash standalone-link"></i></a>
+    <a href="#" class="delete_criterion_link"><i class="icon-end"></i></a>
   </td>
 </tr>
 

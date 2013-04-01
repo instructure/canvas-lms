@@ -6,8 +6,8 @@
 #submit_assignment
   .submission_comment_textarea
     width: 300px
-    height: 14px
-    padding: 3px
+    height: 20px
+    padding: 4px 6px
     &.focus_or_content
       width: 100%
       height: 72px
@@ -19,13 +19,10 @@
     padding-top: 18px
   .advanced-togglable-false
     margin-top: 18px
-  label.inline
-    display: inline-block
+
   #group_category_selector,
   #assignment_peer_reviews_fields
     margin-bottom: 0
-  #assignment_group_category_id
-    margin-left: 10px
 
   .frozen-description
     padding: 15px
@@ -34,8 +31,18 @@
     border: 1px solid #AAA
     resize: vertical
 
-  p.help-block
-    margin-top: 3px
+  .explanation
+    font-size: 0.8em
+    color: #888
+
+#assignment_turnitin_settings
+  min-width: 400px
+  label
+    width: 100%
+  .js-exclude-small-matches-options
+    margin-left: 21px
+    input[type="radio"]
+      margin-top: 13px
 
 #assignment_show
   .assignment-title
@@ -59,7 +66,6 @@
     margin-right: -1em
     margin-bottom: -1em
 
-
   .student-assignment-overview
     list-style: none
     width: 100%
@@ -67,18 +73,17 @@
     border-bottom: 1px solid #BBB
     font-size: 1.1em
     padding: 0.5em 0.25em
-    margin-bottom: 0 0 1em 0
+    margin: 0 0 1em 0
 
     li
-      float: left
+      display: inline-block
 
-    .label
+    .title
       font-weight: bold
       padding-right: 0.5em
 
     .value
       padding-right: 2.5em
-
 
   .form-horizontal.display-only .control-group
     margin-bottom: 0
@@ -107,7 +112,6 @@
     height: 200px
     border: 1px solid #AAA
     resize: vertical
-
 
   .control-group
     .control-label

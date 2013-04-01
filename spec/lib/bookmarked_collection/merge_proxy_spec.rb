@@ -156,5 +156,51 @@ describe "BookmarkedCollection::MergeProxy" do
         end
       end
     end
+
+    describe "with a merge proc" do
+      before :each do
+        Course.delete_all
+        @courses = 6.times.map{ Course.create! }
+        @scope1 = Course.scoped(:select => "id, 1 as scope", :conditions => ['id < ?', @courses[4].id])
+        @scope2 = Course.scoped(:select => "id, 2 as scope", :conditions => ['id > ?', @courses[1].id])
+
+        @collection1 = BookmarkedCollection.wrap(MyBookmarker, @scope1)
+        @collection2 = BookmarkedCollection.wrap(MyBookmarker, @scope2)
+        collections = [['1', @collection1], ['2', @collection2]]
+
+        @yield = stub(:tally => nil)
+        @proxy = BookmarkedCollection::MergeProxy.new(collections) do |c1, c2|
+          @yield.tally(c1, c2)
+        end
+      end
+
+      it "should yield each pair of duplicates" do
+        @yield.expects(:tally).once.with(@scope1.all[2], @scope2.all[0])
+        @yield.expects(:tally).once.with(@scope1.all[3], @scope2.all[1])
+        @proxy.paginate(:per_page => 6)
+      end
+
+      it "should yield duplicates of the last element" do
+        @yield.expects(:tally).once.with(@scope1.all[2], @scope2.first)
+        @proxy.paginate(:per_page => 3)
+      end
+
+      it "should keep the first of each pair of duplicates" do
+        results = @proxy.paginate(:per_page => 6)
+        results.should == @courses
+        results.map(&:scope).should == ['1', '1', '1', '1', '2', '2']
+      end
+
+      it "should indicate the first collection to provide the last value in the bookmark" do
+        results = @proxy.paginate(:per_page => 3)
+        results.next_bookmark.should == ['1', @courses[2].id]
+      end
+
+      it "should not repeat elements from prior pages regardless of duplicates" do
+        @next_page = @proxy.paginate(:per_page => 3).next_page
+        results = @proxy.paginate(:page => @next_page, :per_page => 3)
+        results.first.should == @courses[3]
+      end
+    end
   end
 end

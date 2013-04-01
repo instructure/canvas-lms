@@ -460,6 +460,54 @@ describe ContextExternalTool do
     end
   end
 
+  describe "change_domain" do
+    let(:prod_base_url) {'http://www.example.com'}
+    let(:new_host) {'test.example.com'}
+
+    let(:tool) do
+      tool = @root_account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "www.example.com", :url => prod_base_url)
+      tool.settings = {:url => prod_base_url, :icon_url => "#{prod_base_url}/icon.ico"}
+      tool.account_navigation = {:url => "#{prod_base_url}/launch?my_var=1"}
+      tool.editor_button = {:url => "#{prod_base_url}/resource_selection", :icon_url => "#{prod_base_url}/resource_selection.ico"}
+      tool
+    end
+
+    it "should update the domain" do
+      tool.change_domain! new_host
+      tool.domain.should == new_host
+      URI.parse(tool.url).host.should == new_host
+      URI.parse(tool.settings[:url]).host.should == new_host
+      URI.parse(tool.settings[:icon_url]).host.should == new_host
+      URI.parse(tool.account_navigation[:url]).host.should == new_host
+      URI.parse(tool.editor_button[:url]).host.should == new_host
+      URI.parse(tool.editor_button[:icon_url]).host.should == new_host
+    end
+
+    it "should ignore domain if it is nil" do
+      tool.domain = nil
+      tool.change_domain! new_host
+      tool.domain.should be_nil
+    end
+
+    it "should ignore launch url if it is nil" do
+      tool.url = nil
+      tool.change_domain! new_host
+      tool.url.should be_nil
+    end
+
+    it "should ignore custom fields" do
+      tool.custom_fields = {:url => 'http://www.google.com/'}
+      tool.change_domain! new_host
+      tool.custom_fields[:url].should == 'http://www.google.com/'
+    end
+
+    it "should ignore environments fields" do
+      tool.settings["environments"] = {:launch_url => 'http://www.google.com/'}
+      tool.change_domain! new_host
+      tool.settings["environments"].should == {:launch_url => 'http://www.google.com/'}
+    end
+  end
+
   describe "standardize_url" do
     it "should standardize urls" do
       url = ContextExternalTool.standardize_url("http://www.google.com?a=1&b=2")

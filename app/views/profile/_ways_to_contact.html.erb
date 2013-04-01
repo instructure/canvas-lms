@@ -55,7 +55,9 @@
         <% if c.state == :unconfirmed && (@user.grants_right?(@current_user, nil, :manage_user_details) || (@real_current_user && @user.grants_right?(@real_current_user, nil, :manage_user_details))) %>
             <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="confirm_channel_link no-hover"><i class="icon-check standalone-icon" title="<%= t('titles.confirm_email_address', "Confirm Email Address") %>"></i></a>
         <% end %>
-        <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover"><i class="icon-trash standalone-icon" title="<%= t('titles.remove_email_address', "Remove email address") %>"></i></a>
+        <% unless !@domain_root_account.edit_institution_email? && c.imported? %>
+          <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover"><i class="icon-trash standalone-icon" title="<%= t('titles.remove_email_address', "Remove email address") %>"></i></a>
+        <% end %>
         <% if c.active? && c.merge_candidates.length != 0 %>
           <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="merge_users_link no-hover"><i class="icon-group-new standalone-icon" title="<%= t('titles.merge_users', "Another user has the same email address.  Click here to combine user accounts.") %>"></i></a>
         <% end %>

@@ -891,7 +891,7 @@ class User < ActiveRecord::Base
   end
 
   def courses_with_grades
-    self.available_courses.select{|c| c.grants_right?(self, nil, :participate_as_student)}
+    self.available_courses.with_each_shard.select{|c| c.grants_right?(self, nil, :participate_as_student)}
   end
   memoize :courses_with_grades
 
@@ -944,6 +944,14 @@ class User < ActiveRecord::Base
       )
     end
     can :create_user_notes and can :read_user_notes and can :delete_user_notes
+
+    given do |user|
+      user && (
+      Account.site_admin.grants_right?(user, :view_statistics) ||
+          self.associated_accounts.any?{|a| a.grants_right?(user, nil, :view_statistics)  }
+      )
+    end
+    can :view_statistics
 
     given do |user|
       user && (

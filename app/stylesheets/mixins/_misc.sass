@@ -1,25 +1,3 @@
-
-// Provides cross-browser CSS opacity. Takes a number between 0 and 1 as the argument, e.g. 0.5 for 50% opacity.
-//
-//     @param $opacity
-//         A number between 0 and 1, where 0 is transparent and 1 is opaque.
-
-=opacity($opacity)
-  // XXX consider only using the official property. I think -moz, -webkit, and -o support it.
-  opacity: $opacity
-  @if $experimental-support-for-microsoft
-    $value: unquote("alpha(Opacity=#{round($opacity * 100)})")
-    +experimental(filter, $value, not -moz, not -webkit, not -o, -ms, not -khtml, official)
-
-// Make an element completely transparent.
-=transparent
-  +opacity(0)
-
-// Make an element completely opaque.
-=opaque
-  +opacity(1)
-  
-
 // use on a UL or a OL to reset
 =reset-list
   margin: 0

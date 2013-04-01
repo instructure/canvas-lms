@@ -224,11 +224,13 @@ en:
   account_reports: 
     default: 
       all_terms: "All Terms"
-      extra_text: "For Term: %{term_name}"
-      grade: 
-        message: "Grade export successfully generated for term %{term_name}"
-      outcome: 
-        message: "Student-assignment-outcome mapping report successfully generated for %{account_name}"
+      extra_text_term: "Term: %{term_name};"
+      message: "%{type} report successfully generated with the following settings. Account: %{account}; %{options}"
+    grades: 
+      deleted: "Include Deleted Objects: true;"
+    sis_exporter: 
+      deleted: "Include Deleted Objects: true;"
+      reports: "Reports: %{files}"
   account_settings: 
     confirms: 
       delete_announcement: "Are you sure you want to delete this announcement?"
@@ -362,6 +364,7 @@ en:
         sis_export: 
           description: 
             text: "This report will export all the needed information that relates to provisioning Canvas in its respective categories."
+    retry_login: "Retry Login"
     settings: 
       about_google_docs: |-
           In order to make it easier for users, rather than forcing them to download things like Word docs, PDFs, Excel spreadsheets, and open office documents (In addition to requiring that those programs be installed on their on their computer), in many areas throughout Canvas, it will allow you an inline preview of the document.
@@ -425,6 +428,7 @@ en:
         default_language: "Default Language"
         default_time_zone: "Default Time Zone"
         default_user_storage_quota: "Default User File Quota"
+        edit_institution_email: "Users can delete their institution-assigned email address"
         enable_alerts: "Alerts (beta)"
         enable_eportfolios: ePortfolios
         enable_profiles: "Enable Profiles"
@@ -651,10 +655,12 @@ en:
     test_ldap_result_canceled: Canceled
     test_ldap_result_failed: Failed
     test_ldap_result_ok: OK
+    test_login: "Test Login"
+    testing: Testing...
     update_failed_notice: "Account settings update failed"
     user_add_failed_message: "Adding User Failed, please try again"
-    user_added_message: "%{user} successfully added!"
-    user_added_message_sent_message: "%{user} successfully added! They should receive an email confirmation shortly."
+    user_added_message: "*%{user}* successfully added!"
+    user_added_message_sent_message: "*%{user}* successfully added! They should receive an email confirmation shortly."
     user_deleted_message: "%{username} successfully deleted"
   activerecord: 
     errors: 
@@ -820,6 +826,7 @@ en:
     default_unfiled_title: "Unfiled Questions"
   assignment: 
     advanced_options_errors: "There were errors on one or more advanced options"
+    assignment_group_must_have_group: "Please select an assignment group for this assignment"
     at_least_one_file_type: "Please specify at least one allowed file type"
     at_least_one_submission_type: "Please choose at least one submission type"
     atom_no_author: "No Author"
@@ -891,13 +898,13 @@ en:
     add_assignment_form: 
       assignment_name: "Assignment Name"
       labels: 
-        due: due
-        points: points
+        due: "due:"
+        points: "points:"
         quiz_points: "quiz pts."
         type: type
       links: 
         full_edit: "Full Edit"
-        more_options: "more options"
+        more_options: "More options"
       options: 
         assignment: Assignment
         attendance: Attendance
@@ -913,7 +920,7 @@ en:
         assignments: Assignments
         group_name: "Group Name"
       links: 
-        add_grading_rule: "add grading rule"
+        add_grading_rule: "Add grading rule"
         delete_assignment: Delete
       options: 
         drop_highest: "Drop the Highest"
@@ -922,7 +929,7 @@ en:
         never_drop: "Never Drop"
         no_assignments: "[No Assignments]"
         weighted_by_points: "Weighted By Points"
-      percent_of_total_grade: "%{percent} % of total grade"
+      percent_of_total_grade: "% of total grade"
     assignment_count: 
       one: "1 Assignment"
       other: "%{count} Assignments"
@@ -1176,7 +1183,6 @@ en:
         no_content: "No Content"
       due: Due
       due_at: Due
-      everyone: "Everyone else"
       for: For
       links: 
         add_rubric: "Add Rubric"
@@ -1237,6 +1243,8 @@ en:
         submitted: Submitted
     submission_types_form: 
       advanced_turnitin_settings: "Advanced Turnitin Settings"
+      descriptions: 
+        allowed_extensions: "Enter a list of accepted extensions, for example: doc,xls,txt"
       label: 
         external_tool_new_tab: "Load This Tool In A New Tab"
         external_tool_url: "External Tool URL"
@@ -1289,7 +1297,6 @@ en:
       no_files: "No Files"
       titles: 
         media_recordings_disabled: "Media recordings are not enabled for this Canvas site"
-        view_in_separate_window: "View in Separate Window"
       upload_or_choose_file: "Upload a file, or choose a file you've already uploaded."
     syllabus: 
       page_title: "Syllabus for %{course}"
@@ -1670,6 +1677,10 @@ en:
       edit_appointment_group: "Edit Appointment Group"
       edit_event: "Edit Event"
     today: Today
+    undated_events: 
+      loading_undated_events: "Loading undated events..."
+      show_undated_events: "Show undated events"
+      undated_events: "Undated Events"
   calendar_event: 
     errors: 
       duplicate_child_event_contexts: "Duplicate child event contexts"
@@ -2686,7 +2697,6 @@ en:
       add_item: "Add Item"
       add_module: "Create a Module"
       add_module_first: "Add a New Module"
-      add_module_right_side: "Add a New Module"
       update: "Update Module"
     confirm: 
       delete: "Are you sure you want to delete this module?"
@@ -2700,6 +2710,7 @@ en:
       criterion_for_assignment: "For %{assignment} users must %{select_criterion}"
       headings: 
         add_prerequisite: "Add Prerequisite to %{name}"
+        course_modules: "Course Modules"
         student_progress: "Module Progress by Student"
         student_progress_for_module: "Student Progress for %{module}"
         students_completed: "Students who have Completed the Module"
@@ -2749,12 +2760,8 @@ en:
         outdent: o
         previous: k
       labels: 
-        assignment_picker: For
-        assignment_requirement_picker: "users must"
         indent: Indent
         module_complete_when: "This module is complete when"
-        module_list: "They must complete"
-        module_name: Name
         modules: 
           before_students_view: "Before students can view this module"
         new_tab: "Load this tool in a new tab"
@@ -2769,10 +2776,12 @@ en:
         reload_student: "Reload Student's Progress"
         sort_by_name: Name
         sort_by_progress: Progress
+        student_progress: "View Progress"
         title: 
           remove_prerequisite: "Remove this prerequisite"
       module: module
       module_details: "Modules are shown in sequential order, so only modules that are above %{name} can be set as prerequisites."
+      module_name: "Module Name"
       must_complete_prerequisites: "They must complete"
       no_preprequisites: "No prerequisites defined"
       no_requirements: "No requirements defined"
@@ -2825,19 +2834,11 @@ en:
       progression_started_count: "*%{count}* In Progress"
       reorder_modules: "Drag to reorder modules"
       unpublish: Unpublish
-    context_module_right_side: 
-      links: 
-        student_progress: "View Student Progress for Modules"
-      loading_progressions: "Loading Student Progress..."
     context_modules: 
       publish: Publish
     errors: 
       reorder: "Reorder failed, please try again."
     index: 
-      headings: 
-        course_modules: "Course Modules"
-      links: 
-        student_progress: "View Progress"
       titles: 
         course_modules: "Course Modules"
     module_empty: "There are no items in the module \"%{module}\""
@@ -3914,14 +3915,12 @@ en:
       available_from: "Available from"
       due: Due
       due_date: "due %{date}"
-      everyone: "Everyone else"
       for: For
-      points_possible: 
-        one: "1 point possible"
-        other: "%{count} points possible"
+      graded_discussion_and_points: 
+        one: "This is a graded discussion: *1 point possible*"
+        other: "This is graded discussion: *%{count} points possible*"
       separated_conversation_notice: "Since this is a group assignment, each group has its own conversation for this topic. Here are the ones you have access to:"
       show_due_dates: "Show Due Dates"
-      topic_for_assignment: "This is a graded discussion"
       until: Until
     confirm_delete_announcement: 
       one: "Are you sure you want to delete this announcement?"
@@ -3943,13 +3942,10 @@ en:
     edit_crumb: Edit
     edit_view: 
       allow_threaded_replies: "Allow threaded replies"
-      assignment_group: "Assignment Group"
       attachment: Attachment
       delay_posting: "Delay posting"
-      due: Due
       enable_podcast_feed: "Enable podcast feed"
       include_replies_in_podcast_feed: "Include Replies in podcast feed"
-      loading: Loading...
       options: Options
       points_possible: "Points possible"
       post_at: "Post At"
@@ -4164,6 +4160,7 @@ en:
     accessibles: 
       background_color: "Background Color, press down to select"
       forecolor: "Text Color, press down to select"
+      record: "This feature is inaccessible for screen readers."
     titles: 
       font_size: "Font Size, press down to select"
       formatting: "Formatting, press down to select"
@@ -5704,8 +5701,6 @@ en:
       error_reported: "Thanks for your help!  We'll get right on this"
     styleguide: 
       create_collection: "Create a collection"
-      find_people: "Find people on Canvas"
-      new_course: "Add a new course"
       start_a_group: "Start a group"
   instructions: 
     authorize_google_docs: "Before you can collaborate on documents, you need to authorize Canvas to access your Google Docs account:"
@@ -5835,11 +5830,9 @@ en:
     groups: Groups
     learning_modules: "Learning Modules"
     lock_module_until: "lock module until a given date"
-    module_name_label: "Module Name"
     quizzes: Quizzes
     rubrics: Rubrics
     tasks: Tasks
-    unlock_module_at_label: "Unlock module at"
     web_links: "Web Links"
     wikis: Wikis
   layouts: 
@@ -6908,6 +6901,10 @@ en:
     index: 
       titles: 
         messages: "Messages for %{name}"
+    layout: 
+      email: 
+        html: 
+          click_to_preferences: "click here to edit your notification preferences"
     merge_email_communication_channel: 
       email: 
         body: "An account has been created for you at %{url}, but you already have a Canvas account.  If you would like to merge them together, please visit the following url:"
@@ -7599,6 +7596,11 @@ en:
     precision: 
       format: 
         delimiter: ""
+  options: 
+    ? "no"
+    : "No"
+    ? "yes"
+    : "Yes"
   outcome_groups: 
     invalid_file: "Invalid outcome group file"
   outcome_groups_api: 
@@ -7727,6 +7729,8 @@ en:
         latest_score: "Latest Score"
         outcome: Outcome
   overrides: 
+    everyone: Everyone
+    everyone_else: "Everyone else"
     overrides: 
       everyone: Everyone
       everyone_else: "Everyone Else"
@@ -7744,6 +7748,8 @@ en:
         time: Time
         url: URL
         user_agent: "User Agent"
+  paginated_collection: 
+    no_items: "No items."
   paginated_list: 
     no_results_found: "No Results"
     view_more_link: "View More"
@@ -8216,7 +8222,6 @@ en:
         short_name: "People will see this name in discussions, messages and comments."
         sortable_name: "This name appears in sorted lists."
       labels: 
-        birthdate: "Birth Date"
         change_password: "Change Password"
         confirm_password: "Confirm Password"
         default_email: "Default Email"
@@ -8390,6 +8395,7 @@ en:
       redirect_from_idp: "Recieved LoginResponse from IdP"
     default_app_name: "Third-Party Application"
     errors: 
+      blank_password: "No password was given"
       invalid_credentials: "Incorrect username and/or password"
       invalid_otp: "Invalid verification code, please try again"
       login_error: "There was a problem logging in at %{institution}"
@@ -8644,11 +8650,13 @@ en:
         access_code: "Access Code"
       quiz_restricted: "This quiz is restricted by an access code. You'll need to ask your teacher or proctor to type in or tell you the access code in order to take the quiz."
       survey_restricted: "This survey is restricted by an access code. You'll need to ask your teacher or proctor to type in or tell you the access code in order to take the survey."
+    after_last_attempt: "After Last Attempt"
     alerts: 
       no_valid_combinations: "The system could not generate any valid combinations for the parameters given"
       only_n_valid_combinations: 
         one: "The system could only generate 1 valid combination for the parameters given"
         other: "The system could only generate %{count} valid combinations for the parameters given"
+    always: Always
     answer_comments: "Answer comments"
     answer_text: "Answer text"
     buttons: 
@@ -8659,9 +8667,6 @@ en:
       creating_group: "Creating Group..."
       generating: Generating...
       generating_combinations_progress: "Generating... (%{done}/%{total})"
-      published: Published!
-      publishing: Publishing...
-      save_settings: "Save Settings"
       saved: Saved!
       saving: Saving...
       update_group: "Update Group"
@@ -8669,6 +8674,7 @@ en:
     choose_option: "[ Choose ]"
     confirms: 
       delete_question: "Are you sure you want to delete this question?"
+      delete_quiz: "Are you sure you want to delete this quiz?"
       scrap_and_restart: "Scrap this quiz and start from scratch?"
     current_filter: "Current Filter"
     default_answer_comments: "Response if the student chooses this answer"
@@ -8730,6 +8736,7 @@ en:
     errors: 
       adding_questions_failed: "Adding Questions Failed, please try again"
       creating_group_failed: "Create Group Failed, Please Try Again"
+      field_is_required: "This field is required"
       loading_banks_failed: "Question Banks failed to load, please try again"
       loading_more_questions_failed: "loading more questions failed"
       loading_question_failed: "Loading Question Failed..."
@@ -8755,8 +8762,6 @@ en:
       group_points: "%{points} per question"
       headers: 
         bank_name: "Bank Name"
-        find_questions_to_add: "Find Quiz Questions to Add"
-        link_to_question_bank: "Link to Question Bank"
       hints: 
         group_pick_count: "%{pick_count} selected so far"
       labels: 
@@ -8872,6 +8877,12 @@ en:
         click_to_enter_general_answer_comments: "Click to enter general comments"
         click_to_enter_wrong_answer_comments: "Click to enter comments for a wrong answer"
       wrong_answer_comments: "Wrong answer comments"
+    graded_quiz: "Graded Quiz"
+    graded_survey: "Graded Survey"
+    headers: 
+      unsubmitted_students_count: 
+        one: "1 student hasn't taken the survey"
+        other: "%{count} students haven't taken the survey"
     helpers: 
       duration_in_minutes: 
         one: "1 minute"
@@ -8939,6 +8950,8 @@ en:
     invalid_ip: 
       quiz_protected: "This quiz is protected and is only available from certain locations. The computer you are currently using does not appear to be at a valid location for taking this quiz."
       survey_protected: "This survey is protected and is only available from certain locations. The computer you are currently using does not appear to be at a valid location for taking this survey."
+    keep_highest: Highest
+    keep_latest: Latest
     label: 
       answer: 
         text: "Answer text, rich text area"
@@ -8975,6 +8988,19 @@ en:
       links: 
         download_lockdown: "[Download Respondus LockDown Browser]"
       requires_lockdown: "This quiz requires Respondus LockDown Browser. Please launch Respondus LockDown Browser to take this quiz or view your quiz results."
+    managed_quiz_data: 
+      anonymous_student: "Student %{n}"
+      headers: 
+        quiz_unsubmitted_students: "Students who haven't taken the quiz"
+        submitted_students_quiz: "Students who have taken the quiz"
+        submitted_students_survey: "Students who have taken the survey"
+        survey_unsubmitted_students: "Students who haven't taken the survey"
+      quiz_all_students_submitted: "All Students have taken the quiz"
+      quiz_no_submissions: "No Students have taken the quiz yet"
+      survey_all_students_submitted: "All Students have taken the survey"
+      survey_no_submissions: "No Students have taken the survey yet"
+      titles: 
+        submission_needs_review: "This submission needs review"
     moderate: 
       add_time: "Add Time"
       buttons: 
@@ -9037,92 +9063,69 @@ en:
       muted_quiz_header: "Your quiz has been muted"
     new: 
       allowed_attempts: "Number of allowed attempts"
+      anonymous_submissions: "Keep Submissions Anonymous"
       buttons: 
-        publish_quiz: "Publish Quiz"
-        republish_quiz: "Re-Publish Quiz"
-        save_but_dont_publish: "Save Quiz *but don't Publish*"
-        save_settings: "Save Settings"
+        save: Save
       cant_go_back: "Lock questions after answering"
-      confirms: 
-        delete_quiz: "Are you sure you want to delete this quiz?"
+      code: "Access Code"
       default_page_title: "New Quiz"
-      graded_quiz: "Graded Quiz"
-      graded_survey: "Graded Survey"
+      filter: "IP Filter"
+      group: "Assignment Group"
       headers: 
-        create_new_quiz: "Create a New Quiz"
-        edit_quiz: "Edit Quiz"
         ip_filters: "What are Quiz IP Filters?"
-        link_to_content: "Link to Content"
-        quiz_options: "Quiz Options"
       hints: 
         question_detail_disabled: "NOTE: Question details not available when more than %{question_count}."
         quiz_score: "students will automatically receive full credit once they take the survey"
       ip_filters: "Quiz IP filters are a way to limit access to quizzes to computers in a specified IP range. Filters can be a comma-separated list of addresses, or an address followed by a mask (\"192.168.217.1\", \"192.168.217.1/24\" or \"192.168.217.1/255.255.255.0\")."
-      keep_highest: Highest
-      keep_latest: Latest
+      label: 
+        time_limit: "Time Limit"
       labels: 
         allow_multiple_attempts: "Allow Multiple Attempts"
-        anonymous_submissions: "Keep Submissions Anonymous"
-        code: "Access Code"
-        due_date: "Due Date"
-        filter: "IP Filter"
-        group: Group
-        hide_results_only_after_last: "Only After their Last Attempt"
+        hide_results_only_after_last: "Only After Their Last Attempt"
         ip_filter: "Filter IP Addresses"
-        limited_attempts: "Allowed Attempts"
-        locked_after: "Locked After"
-        locked_until: "Locked Until"
-        never_hide_results: "Let Students See their Quiz Responses"
+        never_hide_results: "Let Students See Their Quiz Responses"
         quiz_instructions: "Quiz Instructions"
-        quiz_name: Name
         quiz_notify: "Notify users this quiz has changed"
         quiz_score: Score
-        quiz_type: Type
         require_access_code: "Require an access code"
-        require_lockdown_browser: "Require Respondus LockDown Browser"
-        require_lockdown_browser_for_results: "Required to view quiz results"
         restrict_quiz: "Restrict this Quiz"
-        score_to_keep: "Quiz Score to Keep"
-        show_correct_answers: "Show Which Answers Were Correct"
         show_question_details: "Show Question Details"
-        shuffle_answers: "Shuffle Answers"
-        time_limit: "Time Limit"
-        time_limit_minutes: minutes
+      limited_attempts: "Allowed Attempts"
       links: 
-        add_new_question: "Add a New Question"
+        cancel: Cancel
         find_questions: "Find Questions"
-        link_to_content: "Link to Content"
         new_question: "New Question"
         new_question_group: "New Question Group"
-        preview_quiz: "Preview the Quiz"
-        quiz_options: "Quiz Options"
-        return_to_quiz_page: "Return to Quiz Page"
-        show_assignment_rubric: "Show Assignment Rubric"
-        start_over: "Start Over"
+        show_assignment_rubric: "Show Rubric"
         switch_views: "Switch Views"
+      minutes: Minutes
       one_question_at_a_time: "Show one question at a time"
-      points_possible: "%{n} Points Possible"
-      practice_quiz: "Practice Quiz"
+      points_possible: "Points %{n}"
+      quiz_type: "Quiz Type"
+      require_lockdown_browser: "Require Respondus LockDown Browser"
+      require_lockdown_browser_for_results: "Required to view quiz results"
       retrieving_filters: "Retrieving Filters..."
+      score_to_keep: "Quiz Score to Keep"
+      show_correct_answers: "Show Which Answers Were Correct"
+      shuffle_answers: "Shuffle Answers"
       time_limit: "How many minutes?"
       titles: 
         click_to_select_filter: "Click to select this filter"
+        delete: Delete
         find_ip_address_filter: "Find IP Address Filter"
-      ungraded_survey: "Ungraded Survey"
       warnings: 
         has_student_submissions: "Students have either already taken or started taking this quiz, so be careful about editing it. If you change any quiz questions in a significant way, you may want to consider re-grading students who took the old version of the quiz."
-        unpublished_changes: "You have made unpublished changes to this quiz. These changes will not appear for students until you publish or re-publish the quiz."
     no_filters_found: "No filters found"
     notices: 
       cant_view_submission_while_muted: "You cannot view the quiz history while the quiz is muted."
       has_submissions_already: "Keep in mind, some students have already taken or started taking this quiz"
       less_than_allotted_time: "You started this quiz near when it was due, so you won't have the full amount of time to take the quiz."
       no_submission_for_user: "There is no submission available for that user"
-      quiz_data_saved: "Quiz data saved"
       quiz_updated: "Quiz successfully updated"
       quizzes_published: 
         one: "1 quiz successfully published!"
         other: "%{count} quizzes successfully published!"
+    practice_quiz: "Practice Quiz"
     question_group: 
       buttons: 
         update: Update
@@ -9162,33 +9165,27 @@ en:
     quiz_attempts_length_error: "Quiz attempts are limited to 3 digits, if you would like to give your students unlimited attempts, do not check Allow Multiple Attempts box to the left"
     quiz_attempts_nan_error: "Quiz attempts can only be specified in numbers"
     quiz_details: 
+      allowed_attempts: "Allowed Attempts"
       headers: 
-        availability: Availability
-        due: "Due Date"
-        limits: Limits
+        available: Available
+        due: Due
         points: Points
-        questions: Questions
-      labels: 
-        allowed_attempts: "Allowed Attempts"
+        time_limit: "Time Limit"
       multiple_due_dates: "Multiple Due Dates"
-      no_due_date: "No due date."
-      no_time_limit: "No Time Limit"
-      points_possible: "%{points_possible} pts possible"
+      no_due_date: "No due date"
+      none: None
       question_count: 
-        one: "1 Question"
-        other: "%{count} Questions"
+        one: "<span class='label'>Questions</span> <span class='value'>%{count}</span>"
+        other: "<span class='label'>Questions</span> <span class='value'>%{count}</span>"
         zero: "No Questions"
-      quiz_availabile_through: |-
-          %{start_time} through  
-          %{end_time}
+      quiz_availabile_through: "%{start_time} - %{end_time}"
       quiz_available_after: "after %{start_time}"
-      quiz_available_always: "Always available"
       quiz_available_until: "until %{end_time}"
       requires_lockdown: "Requires Respondus LockDown Browser"
       time_limit: 
         one: "1 Minute"
         other: "%{count} Minutes"
-      unlimited_attempts: "Unlimited Attempts"
+      unlimited: Unlimited
     quiz_right_side: 
       attempts_left: 
         one: "1 More Attempt available"
@@ -9210,6 +9207,33 @@ en:
       score_set_manually: "This score was set by the teacher"
       unlimited_attempts: "Unlimited Attempts"
       view_previous_attempts: "View Previous Attempts"
+    quiz_show_teacher: 
+      anonymous_submissions: "Anonymous Submissions"
+      attempts: Attempts
+      available_from: "Available from"
+      cant_go_back: "Lock Questions After Answering"
+      code: "Access Code"
+      due: Due
+      filter: "IP Filter"
+      for: For
+      group: "Assignment Group"
+      label: 
+        time_limit: "Time Limit"
+      multiple_attempts: "Multiple Attempts"
+      no_time_limit: "No Time Limit"
+      one_question_at_a_time: "One Question at a Time"
+      points: Points
+      quiz_type: "Quiz Type"
+      require_lockdown_browser: "Require Respondus LockDown Browser"
+      require_lockdown_browser_for_results: "Required to View Quiz Results"
+      score_to_keep: "Score to Keep"
+      show_correct_answers: "Show Correct Answers"
+      shuffle_answers: "Shuffle Answers"
+      time_limit: 
+        one: "1 Minute"
+        other: "%{count} Minutes"
+      until: Until
+      view_responses: "View Responses"
     quiz_submission: 
       attempt_duration: "This attempt took %{duration}."
       labels: 
@@ -9287,7 +9311,6 @@ en:
       titles: 
         details: "Assignment Rubric Details"
     show: 
-      anonymous_student: "Student %{n}"
       answers: 
         correct: Correct!
         correct_answers: "Correct Answers"
@@ -9299,6 +9322,10 @@ en:
       buttons: 
         lock_quiz: "Lock this Quiz Now"
         lock_survey: "Lock this Survey Now"
+        publish: Publish
+        published: Published!
+        publishing: Publishing...
+        republish: Re-Publish
         unlock_quiz: "Let Students Take this Quiz Now"
         unlock_survey: "Let Students Take this Survey Now"
       confirms: 
@@ -9308,59 +9335,33 @@ en:
           other: "Warning: %{count} students have already taken this quiz. If you delete it, any completed submissions will be deleted and no longer appear in the gradebook."
       have_not_taken_the_quiz: "Have NOT taken the quiz"
       have_taken_the_quiz: "Have taken the quiz"
-      headers: 
-        quiz_unsubmitted_students: "Students who haven't taken the quiz"
-        submitted_students_quiz: "Students who have taken the quiz"
-        submitted_students_survey: "Students who have taken the survey"
-        survey_unsubmitted_students: "Students who haven't taken the survey"
-        unsubmitted_students_count: 
-          one: "1 student hasn't taken the survey"
-          other: "%{count} students haven't taken the survey"
       labels: 
-        access_code: "Access Code"
         available_until: Until
-        instructions: Instructions
         no_time_limit: "No time limit"
-        quiz_due: due
       links: 
-        delete_this_quiz: "Delete This Quiz"
-        delete_this_survey: "Delete This Survey"
-        edit_assignment_details: "Edit Assignment Details"
-        edit_this_quiz: "Edit This Quiz"
-        edit_this_survey: "Edit This Survey"
+        edit: Edit
         keep_editing_this_quiz: "Keep Editing This Quiz"
         keep_editing_this_survey: "Keep Editing This Survey"
         message_students_who: "Message Students Who..."
         moderate_this_quiz: "Moderate This Quiz"
         moderate_this_survey: "Moderate This Survey"
+        preview: Preview
         quiz_statistics: "Quiz Statistics"
         see_full_quiz: "See Full Quiz"
-        show_assignment_rubric: "Show Assignment Rubric"
+        show_assignment_rubric: "Show Rubric"
         show_student_quiz_results: "Show Student Quiz Results"
         show_student_survey_results: "Show Student Survey Results"
         survey_statistics: "Survey Statistics"
       only_registered_users: "Only registered, enrolled users can take graded quizzes"
-      points_possible: 
-        one: "1 pt"
-        other: "%{count} pts"
-      publish_quiz_instructions: "To publish the quiz, click \"Edit This Quiz\" to the right and then click the \"Publish\" button."
-      publish_survey_instructions: "To publish the survey, click \"Edit This Survey\" to the right and then click the \"Publish\" button."
-      quiz_all_students_submitted: "All Students have taken the quiz"
-      quiz_for_assignment: "This quiz is for the assignment **%{assignment}**"
       quiz_in_progress: "You're in the middle of taking this quiz."
-      quiz_no_submissions: "No Students have taken the quiz yet"
-      quiz_not_published: "This quiz hasn't been published yet. Students can't take the quiz until it's published."
       speed_grader: SpeedGrader™
       students_submitted_so_far: 
         one: "1 student submitted so far"
         other: "%{count} students submitted so far"
-      survey_all_students_submitted: "All Students have taken the survey"
-      survey_for_assignment: "This survey is for the assignment **%{assignment}**"
       survey_in_progress: "You're in the middle of taking this survey."
-      survey_no_submissions: "No Students have taken the survey yet"
-      survey_not_published: "This survey hasn't been published yet. Students can't take the survey until it's published."
       titles: 
-        submission_needs_review: "This submission needs review"
+        delete: Delete
+        related_items: "Related Items"
         unlock_for_how_long: "How long would you like to unlock the quiz for?"
       warnings: 
         draft_version: "This is a preview of the draft version of the quiz"
@@ -9491,6 +9492,10 @@ en:
     top_level_crumb: Quizzes
     ? "true"
     : "True"
+    ungraded_survey: "Ungraded Survey"
+    warnings: 
+      unpublished_changes: "*You have made unpublished changes to this quiz.* These changes will not appear for students until you publish or republish the quiz."
+      unpublished_quiz: "*This quiz is unpublished* Only teachers can see the quiz until it is published."
   re_upload_submissions_form: 
     buttons: 
       upload: "Upload Files"
@@ -9520,9 +9525,8 @@ en:
       password: Password
       remember_me: "Remember Me"
       sign_in: "Sign In"
-    ok: OK
     parent_dialog: 
-      agree_to_terms: "You agree to the *terms of use*."
+      agree_to_terms_and_pp: "You agree to the *terms of use* and the **privacy policy**."
       buttons: 
         start_participating: "Start Participating"
       labels: 
@@ -9531,11 +9535,10 @@ en:
         password: "Child's Password"
         username: "Child's Username"
     student_dialog: 
-      agree_to_terms: "You agree to the *terms of use*."
+      agree_to_terms_and_pp: "You agree to the *terms of use* and the **privacy policy**."
       buttons: 
         start_learning: "Start Learning"
       labels: 
-        birthdate: "Birth Date"
         join_code: "Join Code"
         name: "Full Name"
         password: Password
@@ -9543,22 +9546,19 @@ en:
         username: Username
       sign_up_without_code: "don't have a code?"
     student_higher_ed_dialog: 
-      agree_to_terms: "You agree to the *terms of use*."
+      agree_to_terms_and_pp: "You agree to the *terms of use* and the **privacy policy**."
       buttons: 
         start_learning: "Start Learning"
       labels: 
-        birthdate: "Birth Date"
         email: Email
         name: "Full Name"
     teacher_dialog: 
-      agree_to_terms: "You agree to the *terms of use*."
+      agree_to_terms_and_pp: "You agree to the *terms of use* and the **privacy policy**."
       buttons: 
         start_teaching: "Start Teaching"
       labels: 
         email: Email
         name: Name
-    too_young_error: "You must be at least %{min_years} years of age to enroll in this course."
-    too_young_error_join_code: "You must be at least %{min_years} years of age to use Canvas without a course join code."
     welcome_to_canvas: "Welcome to Canvas!"
   retrieve_timeout: "could not retrieve configuration, the server response timed out"
   role: 
@@ -9850,7 +9850,6 @@ en:
       existing_user: "I already have a %{institution_name} login"
       getting_started: "You are enrolling in **%{course}**."
       labels: 
-        birthdate: "Birth Date"
         email: Email
         name: "Full Name"
         password: Password
@@ -9946,8 +9945,8 @@ en:
       group_weight: "*%{percent}% of total grade"
       links: 
         add_an_assignment: "Add an Assignment"
-        edit_group_details: "Edit Group Details"
-        hide_info: "hide info"
+        edit_group_details: "Edit group details"
+        hide_info: "Hide info"
         more_info: "more info..."
         reorder_groups: "Reorder Groups"
       no_assignments: "No assignments yet"
@@ -10536,6 +10535,8 @@ en:
     errors: 
       invalid_content_type: "Invalid content type, UTF-8 required"
     sis_import_in_process_notice: "An SIS import is already in process."
+  site: 
+    view_privacy_policy: "View Privacy Policy"
   site_admin: 
     columns: 
       date: Date
@@ -10818,6 +10819,7 @@ en:
     learning_outcomes: "Learning Outcomes"
     messages: Messages
     outcome_artifacts: "Outcome Artifacts"
+    view_in_separate_window: "View in Separate Window"
   turnitin: 
     error_1007: "The uploaded file is too big."
     error_1009: "Invalid file type. (Valid file types are MS Word, Acrobat PDF, Postscript, Text, HTML, WordPerfect (WPD) and Rich Text Format.)"
@@ -10846,7 +10848,6 @@ en:
       required: Required
       terms: "You must agree to the terms"
       too_long: "Can't exceed %{max} characters"
-      too_young: "Too young"
     registration: 
       agree_to_terms: "You agree to the *terms of use*."
   user_follow: 
@@ -11414,8 +11415,6 @@ en:
         common_pages: "Common Pages"
         page_tools: "Page Tools"
         recent_changes: "Recent Changes"
-      labels: 
-        title: "New page title"
       links: 
         create_page: "Create a New Page"
         delete_page: "Delete this Page"
@@ -11423,6 +11422,7 @@ en:
         more: more...
         rename_page: "Rename this page"
         show_all: "show all..."
+      title: "New page title"
       wiki_description_for_course: "Think of it as an open-ended place to hold content. You could use it to describe your course, to provide helpful explanations of difficult topics, or even to let students work together on writing projects."
       wiki_description_for_group: "Think of it as an open-ended place to hold content. You could use it to describe your group, to provide helpful explanations of difficult topics, or even to let members work together on writing projects."
       wiki_description_header: "What's a wiki for?"

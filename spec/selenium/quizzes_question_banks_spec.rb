@@ -12,8 +12,7 @@ describe "quizzes question banks" do
     get "/courses/#{@course.id}/question_banks/#{bank.id}"
 
     f('.add_question_link').click
-    wait_for_animations
-
+    wait_for_ajaximations
     expect { create_multiple_choice_question }.to change(AssessmentQuestion, :count).by(1)
   end
 
@@ -29,6 +28,7 @@ describe "quizzes question banks" do
     click_questions_tab
     keep_trying_until {
       find_questions_link.click
+      wait_for_ajaximations
       f(".select_all_link")
     }.click
     submit_dialog("div#find_question_dialog", '.submit_button')
@@ -47,13 +47,14 @@ describe "quizzes question banks" do
     get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
     click_questions_tab
 
-    keep_trying_until {
+    keep_trying_until do
       f('.find_question_link').click
-      f('#find_question_dialog').should be_displayed
       wait_for_ajaximations
+      f('#find_question_dialog').should be_displayed
       f(".select_all_link").should be_displayed
-    }
+    end
     f(".select_all_link").click
+    wait_for_ajaximations
     submit_dialog("div#find_question_dialog", '.submit_button')
     wait_for_ajaximations
     click_settings_tab
@@ -61,6 +62,7 @@ describe "quizzes question banks" do
 
     click_questions_tab
     f(".add_question_group_link").click
+    wait_for_ajaximations
     f('.find_bank_link').click
     keep_trying_until {
       fj("#find_bank_dialog .bank:visible")
@@ -83,13 +85,15 @@ describe "quizzes question banks" do
     get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
     click_questions_tab
 
-    keep_trying_until {
+    keep_trying_until do
       f('.find_question_link').click
+      wait_for_ajaximations
       f('#find_question_dialog').should be_displayed
       wait_for_ajaximations
       f(".select_all_link").should be_displayed
-    }
+    end
     f(".select_all_link").click
+    wait_for_ajaximations
     submit_dialog("#find_question_dialog", '.submit_button')
     wait_for_ajaximations
     click_settings_tab
@@ -97,7 +101,9 @@ describe "quizzes question banks" do
 
     click_questions_tab
     f(".add_question_group_link").click
+    wait_for_ajaximations
     f(".find_bank_link").click
+    wait_for_ajaximations
     keep_trying_until {
       fj("#find_bank_dialog .bank:visible")
     }.click
@@ -123,19 +129,20 @@ describe "quizzes question banks" do
     get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
     click_questions_tab
 
-    keep_trying_until {
+    keep_trying_until do
       f('.find_question_link').click
-      f('#find_question_dialog').should be_displayed
       wait_for_ajaximations
+      f('#find_question_dialog').should be_displayed
       f(".select_all_link").should be_displayed
-    }
+    end
     ffj("#find_question_dialog .bank:visible").size.should == 1
 
     close_visible_dialog
-    keep_trying_until {
+    keep_trying_until do
       f('.add_question_group_link').click
+      wait_for_ajaximations
       f('.find_bank_link').should be_displayed
-    }
+    end
     f(".find_bank_link").click
     wait_for_ajaximations
     ffj("#find_bank_dialog .bank:visible").size.should == 1
@@ -146,6 +153,7 @@ describe "quizzes question banks" do
     click_questions_tab
 
     f('.add_question_group_link').click
+    wait_for_ajaximations
     group_form = f('#group_top_new .quiz_group_form')
     group_form.find_element(:name, 'quiz_group[name]').send_keys('new group')
     replace_content(group_form.find_element(:name, 'quiz_group[question_points]'), '2')

@@ -31,7 +31,6 @@ class ContextModule < ActiveRecord::Base
   before_save :infer_position
   before_save :validate_prerequisites
   before_save :confirm_valid_requirements
-  after_save :check_students
   after_save :touch_context
 
   def self.module_positions(context)
@@ -109,19 +108,13 @@ class ContextModule < ActiveRecord::Base
   named_scope :active, :conditions => ['context_modules.workflow_state = ?', 'active']
   named_scope :unpublished, :conditions => ['context_modules.workflow_state = ?', 'unpublished']
   named_scope :not_deleted, :conditions => ['context_modules.workflow_state != ?', 'deleted']
-  named_scope :include_tags_and_progressions, :include => [:content_tags, :context_module_progressions]
 
-  def check_students
-    return if @dont_check_students || self.deleted?
-    send_later_if_production :update_student_progressions
-    true
-  end
-  
   def update_student_progressions(user=nil)
     # modules are ordered by position, so running through them in order will
     # automatically handle issues with dependencies loading in the correct
     # order
-    modules = ContextModule.find(:all, :conditions => {:context_type => self.context_type, :context_id => self.context_id}, :order => :position)
+    modules = ContextModule.find(:all, :order => :position, :conditions => {
+        :context_type => self.context_type, :context_id => self.context_id, :workflow_state => 'active'})
     students = user ? [user] : self.context.students
     modules.each do |mod|
       mod.re_evaluate_for(students, true)
@@ -399,14 +392,13 @@ class ContextModule < ActiveRecord::Base
   end
 
   def active_prerequisites
-    return [] unless self.prerequisites
+    return [] unless self.prerequisites.any?
     prereq_ids = self.prerequisites.select{|pre|pre[:type] == 'context_module'}.map{|pre| pre[:id] }
     active_ids = self.context.context_modules.active.scoped(:select => :id, :conditions => {:id => prereq_ids}).map(&:id)
     self.prerequisites.select{|pre| pre[:type] == 'context_module' && active_ids.member?(pre[:id])}
   end
   
   def clear_cached_lookups
-    @cached_progressions = nil
     @cached_tags = nil
   end
   
@@ -445,7 +437,6 @@ class ContextModule < ActiveRecord::Base
       changed = true if !added
     end
     self.completion_requirements = new_reqs
-    @dont_check_students = true
     self.save if do_save && changed
     new_reqs
   end
@@ -454,8 +445,7 @@ class ContextModule < ActiveRecord::Base
     users = Array(users)
     users_hash = {}
     users.each{|u| users_hash[u.id] = u }
-    @cached_progressions ||= self.context_module_progressions
-    progressions = @cached_progressions.select{|p| users_hash[p.user_id] } #self.context_module_progressions.find_all_by_user_id(users.map(&:id))
+    progressions = self.context_module_progressions.find_all_by_user_id(users.map(&:id))
     progressions_hash = {}
     progressions.each{|p| progressions_hash[p.user_id] = p }
     newbies = users.select{|u| !progressions_hash[u.id] }

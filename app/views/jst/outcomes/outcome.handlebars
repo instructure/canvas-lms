@@ -1,6 +1,10 @@
 <h3 class="title">
   <i class="icon-note-light"></i>
-  <a href='outcomes/{{id}}'>{{title}}</a>
+  {{#unless isLargeRoster}}
+    <a href='outcomes/{{id}}'>{{title}}</a>
+  {{else}}
+    {{title}}
+  {{/unless}}
 </h3>
 <div class="description">
   {{{description}}}

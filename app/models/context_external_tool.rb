@@ -245,7 +245,7 @@ class ContextExternalTool < ActiveRecord::Base
   def shared_secret=(val)
     write_attribute(:shared_secret, val) unless val.blank?
   end
-  
+
   def infer_defaults
     self.url = nil if url.blank?
     self.domain = nil if domain.blank?
@@ -275,7 +275,33 @@ class ContextExternalTool < ActiveRecord::Base
     self.has_editor_button = !!settings[:editor_button]
     true
   end
-  
+
+  #This aggressively updates the domain on all URLs in this tool
+  def change_domain!(new_domain)
+    replace_host = lambda do |url, host|
+      uri = URI.parse(url)
+      uri.host = host
+      uri.to_s
+    end
+
+    self.domain = new_domain if self.domain
+
+    self.url = replace_host.call(self.url, new_domain) if self.url
+
+    settings.keys.each do |setting|
+      next if [:custom_fields, :environments].include? setting.to_sym
+      if settings[setting].is_a?(Hash)
+        settings[setting].keys.each do |property|
+          if settings[setting][property] =~ URI::regexp
+            settings[setting][property] = replace_host.call(settings[setting][property], new_domain)
+          end
+        end
+      elsif settings[setting] =~ URI::regexp
+        settings[setting] = replace_host.call(settings[setting], new_domain)
+      end
+    end
+  end
+
   def self.standardize_url(url)
     return "" if url.empty?
     url = "http://" + url unless url.match(/:\/\//)
@@ -549,5 +575,4 @@ class ContextExternalTool < ActiveRecord::Base
 
     settings[setting]
   end
-  
 end

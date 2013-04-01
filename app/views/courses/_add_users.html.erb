@@ -10,17 +10,17 @@
   <% end %>
 <% end %>
 
-<% form_tag course_enroll_users_url(@context), {:id => "enroll_users_form", :style => "display: none;"} do  %>
+<% form_tag course_enroll_users_url(@context), {:id => "enroll_users_form", :class => "form-inline", :style => "display: none;"} do  %>
   <h2><%= t('headings.add_users', %{Add Course Users}) %></h2>
 
   <div class="add-course-users">
     <div class="header">
-      <div class="id-holder">
+      <div class="id-holder form-inline">
         <%= render :partial => 'enrollment_type_select' %>
       </div>
       <div class="id-holder" style="<%= hidden unless has_multiple_sections %>" id="course_section_id_holder">
         <%= label_tag :course_section_id, :en => 'For the section' %>
-        <select title="<%= t('titles.course_section', 'Course Section') %>" name="course_section_id" id="course_section_id">
+        <select title="<%= t('titles.course_section', 'Course Section') %>" name="course_section_id" id="course_section_id" class="span2">
           <% @context.course_sections.active.each do |section| %>
             <option value="<%= section.id %>" class="option_for_section_<%= section.id %>"><%= section.display_name %></option>
           <% end %>

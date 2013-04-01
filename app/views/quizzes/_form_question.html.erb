@@ -9,8 +9,8 @@
 <form id="question_form_template" class="question_form" style="display: none;">
 <div class="question">
   <div class="header" style="background-color: transparent;">
-    <input type="text" style="width: 150px;" name="question_name" aria-label="<%= t "label.question.name", "Question name" %>"/>
-    <select class="question_type" name="question_type" aria-label="<%= t "label.question.type", "Question type" %>">
+    <input type="text" style="width: 120px;" name="question_name" aria-label="<%= t "label.question.name", "Question name" %>"/>
+    <select class="question_type" name="question_type" style="width: 150px;" aria-label="<%= t "label.question.type", "Question type" %>">
       <option value="multiple_choice_question" style="padding: 2px;"><%= t('question_type.multiple_choice', "Multiple Choice") %></option>
       <option value="true_false_question" style="padding: 2px;"><%= t('question_type.true_false', "True/False") %></option>
       <option value="short_answer_question" style="padding: 2px;"><%= t('question_type.short_answer', "Fill In the Blank") %></option>
@@ -26,7 +26,7 @@
     </select>
     <span class="question_points_holder">
       <span style="padding-left: 20px;"><%= before_label :points, 'pts' %></span>
-      <input class="float_value" type="text" style="width: 25px;" name="question_points" aria-label="<%= t "label.question.points", "Question point value" %>"/>
+      <input class="float_value" type="text" style="width: 25px; min-width: 0;" name="question_points" aria-label="<%= t "label.question.points", "Question point value" %>"/>
     </span>
   </div>
   <div class="links">

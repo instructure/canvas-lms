@@ -14,7 +14,7 @@ describe "conversations" do
     expect {
       f('#create_message_form .conversation_body').send_keys(new_message)
       5.times { submit_form('#create_message_form form') rescue nil }
-      keep_trying_until { get_conversations.size == 1 }
+      assert_message_status("sent", new_message[0, 10])
     }.to change(ConversationMessage, :count).by(1)
   end
 
@@ -29,9 +29,10 @@ describe "conversations" do
       @me = @user
       5.times { conversation(@me, user, :workflow_state => 'unread') }
       get "/conversations/unread"
-      c = get_conversations.first
-      c.click
-      c.should have_class('unread') # not marked immediately
+      ce = get_conversations.first
+      ce.should have_class('unread') # not marked immediately
+      ce.click
+      wait_for_ajaximations
       @me.conversations.unread.size.should == 5
       keep_trying_until do
         get_conversations.first.should_not have_class('unread')
@@ -134,11 +135,10 @@ describe "conversations" do
       wait_for_ajaximations
       f('.selectable').click
       f('#forward_body').send_keys(forward_body_text)
-      f('.btn-primary').click
+      f('.ui-dialog-buttonset > .btn-primary').click
       wait_for_ajaximations
-      keep_trying_until {
-        f('.messages .message').should include_text(forward_body_text)
-      }
+      expect_new_page_load { get '/conversations/sent' }
+      f('.conversations li.read').should include_text(forward_body_text)
     end
 
     it "should delete a message" do
@@ -194,8 +194,11 @@ describe "conversations" do
         new_conversation(:message => media_comment_type)
 
         message = submit_message_form(:media_comment => [mo.media_id, mo.media_type])
-        message = "#message_#{message.id}"
 
+        expect_new_page_load { get '/conversations/sent' }
+        f('.conversations li').click
+        wait_for_ajaximations
+        message = "#message_#{message.id}"
         ff("#{message} .message_attachments li").size.should == 1
         f("#{message} .message_attachments li a .title").text.should == mo.title
       end
@@ -256,7 +259,7 @@ describe "conversations" do
       new_conversation
       add_recipient("student1")
 
-      submit_message_form(:message => "ohai", :add_recipient => false).should_not be_nil
+      submit_message_form(:message => "ohai", :add_recipient => false, :existing_conversation => true).should_not be_nil
     end
   end
 
@@ -306,6 +309,7 @@ describe "conversations" do
       submit_form('#create_message_form')
       wait_for_ajaximations
       run_jobs
+      expect_new_page_load { get "/conversations/sent" }
       wait_for_ajaximations
       f('.others').click
       f('#others_popup').should be_displayed

@@ -87,7 +87,13 @@ class Pool
     say "Started job master", :info
     $0 = "delayed_jobs_pool"
     read_config(options[:config_file])
-    unlock_orphaned_jobs
+
+    # fork to handle unlocking (to prevent polluting the parent with worker objects)
+    unlock_pid = fork do
+      unlock_orphaned_jobs
+    end
+    Process.wait unlock_pid
+
     spawn_periodic_auditor
     spawn_all_workers
     say "Workers spawned"

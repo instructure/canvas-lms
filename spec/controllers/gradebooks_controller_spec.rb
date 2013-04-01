@@ -48,7 +48,7 @@ describe GradebooksController do
       course_with_student_logged_in(:active_all => true)
       get 'grade_summary', :course_id => @course.id, :id => @user.id
       response.should render_template('grade_summary')
-      assigns[:courses_with_grades].should_not be_nil
+      assigns[:presenter].courses_with_grades.should_not be_nil
     end
 
     it "should not allow access for wrong user" do
@@ -136,8 +136,8 @@ describe GradebooksController do
       user_session(student)
       get 'grade_summary', :course_id => @course.id, :id => student.id
       response.should be_success
-      assigns[:courses_with_grades].should_not be_nil
-      assigns[:courses_with_grades].length.should == 2
+      assigns[:presenter].courses_with_grades.should_not be_nil
+      assigns[:presenter].courses_with_grades.length.should == 2
     end
     
     it "should not give a teacher the option to switch between courses when viewing a student's grades" do
@@ -187,7 +187,7 @@ describe GradebooksController do
       submission2 = assignment2.submit_homework(@student)
 
       get 'grade_summary', :course_id => @course.id, :id => @student.id
-      assigns[:submissions_by_assignment].values.map(&:count).should == [1,1]
+      assigns[:presenter].submissions_by_assignment.values.map(&:count).should == [1,1]
     end
 
     it "should assign an empty submissions_by_assignment for MOOCs" do
@@ -200,7 +200,7 @@ describe GradebooksController do
       submission2 = assignment2.submit_homework(@student)
 
       get 'grade_summary', :course_id => @course.id, :id => @student.id
-      assigns[:submissions_by_assignment].should == {}
+      assigns[:presenter].submissions_by_assignment.should == {}
     end
     
     it "should assign values for grade calculator to ENV" do
@@ -230,7 +230,7 @@ describe GradebooksController do
       assignment3 = @course.assignments.create(:title => "Assignment 3", :due_at => 2.days.from_now)
 
       get 'grade_summary', :course_id => @course.id, :id => @student.id
-      assigns[:assignments].select{|a| a.class == Assignment}.map(&:id).should == [assignment3, assignment2, assignment1].map(&:id)
+      assigns[:presenter].assignments.select{|a| a.class == Assignment}.map(&:id).should == [assignment3, assignment2, assignment1].map(&:id)
     end
 
     context "with assignment due date overrides" do
@@ -253,7 +253,7 @@ describe GradebooksController do
           controller.js_env.clear
           user_session(u)
           get 'grade_summary', :course_id => @course.id, :id => @student.id
-          assigns[:assignments].find{|a| a.class == Assignment}.due_at.should == due_at
+          assigns[:presenter].assignments.find{|a| a.class == Assignment}.due_at.should == due_at
         end
       end
 
@@ -284,7 +284,7 @@ describe GradebooksController do
         session[:become_user_id] = @fake_student.id
 
         get 'grade_summary', :course_id => @course.id, :id => @fake_student.id
-        assigns[:assignments].find{|a| a.class == Assignment}.due_at.should == @due_at
+        assigns[:presenter].assignments.find{|a| a.class == Assignment}.due_at.should == @due_at
       end
 
       it "should reflect group overrides when student is a member" do

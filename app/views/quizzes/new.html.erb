@@ -9,34 +9,9 @@
   <%= render :partial => "shared/wiki_sidebar" %>
 <% end %>
 
-
-<% js_block do %>
-<script>
-require([
-  'i18nObj' /* I18n.t */,
-  'jquery' /* $ */,
-  'jquery.instructure_date_and_time' /* time_field, datetime_field */,
-  'jquery.instructure_misc_plugins' /* confirmDelete */
-], function(I18n, $) {
-
-window.quizAssignmentId = "<%= @assignment ? @assignment.id : "" %>";
-$(document).ready(function() {
-  $(".delete_quiz_link").click(function(event) {
-    event.preventDefault();
-    $(this).parents(".quiz").confirmDelete({
-      message: <%= jt('confirms.delete_quiz', "Are you sure you want to delete this quiz?") %>,
-      url: $(this).attr('href'),
-      success: function() { window.location.replace("<%= context_url(@context, :context_quizzes_url) %>"); }
-    });
-  });
-});
-});
-</script>
-<% end %>
-
 <div id="quiz_edit_wrapper">
   <% if @has_student_submissions %>
-    <div class="content-callout border" id="student_submissions_warning">
+    <div class="alert alert-info" id="student_submissions_warning">
       <i class="icon-warning"></i> <%= t('warnings.has_student_submissions', <<-TEXT)
       Students have either already taken or started taking this quiz, so be careful
       about editing it.  If you change any quiz questions in a significant way, you
@@ -48,12 +23,16 @@ $(document).ready(function() {
 
   <div class="row-fluid">
     <div class="span6">
-    <%= text_field :quiz, :title, :style => "font-size:1.8em;font-family:inherit;", :placeholder => "Quiz Title" %>
+    <%= text_field :quiz, :title, :placeholder => "Quiz Title" %>
     </div>
     <div class="span6">
       <div class="admin-link-hover-area">
         <div class="admin-links">
-          <button class="al-trigger ui-button"><span class="al-trigger-inner">Manage</span></button>
+          <a class="al-trigger btn">
+            <span class="screenreader-only">Manage</span>
+            <i class="icon-settings"></i>
+            <i class="icon-mini-arrow-down"></i>
+          </a>
           <ul class="al-options">
 
             <% if @assignment %>
@@ -304,28 +283,28 @@ $(document).ready(function() {
       <%= render :partial => "quizzes/question_group", :object => nil %>
       <%= render :partial => "quizzes/find_question_from_bank" %>
       <div style="text-align: center; margin: -1px 1px 1px" class="add_question question_editing">
+        <a href="#" class="add_question_link btn">
+          <i class="icon-add"></i>
+          <%= t('links.new_question', "New Question") %>
+        </a>
+        <a href="#" class="add_question_group_link btn" style="margin-left: 20px; margin-right: 20px;">
+          <i class="icon-add"></i>
+          <%= t('links.new_question_group', "New Question Group") %>
+        </a>
         <% if feature_enabled?(:question_banks) %>
           <a href="#" class="find_question_link btn">
             <i class="icon-search"></i>
             <%= t('links.find_questions', "Find Questions") %>
           </a>
         <% end %>
-        <a href="#" class="add_question_group_link btn" style="margin-left: 20px; margin-right: 20px;">
-          <i class="icon-add"></i>
-          <%= t('links.new_question_group', "New Question Group") %>
-        </a>
-        <a href="#" class="add_question_link btn">
-          <i class="icon-add"></i>
-          <%= t('links.new_question', "New Question") %>
-        </a>
       </div>
     </div>
   </div>
 
   <div class="form-actions">
     <div class="row-fluid">
-      <div class="span6" style="text-align:left;">
-        <label for="quiz_notify_of_update" style="line-height:28px;">
+      <div class="span6" style="text-align:left; line-height:28px;">
+        <label for="quiz_notify_of_update" class="checkbox">
           <input type="checkbox" name="quiz[notify_of_update]" id="quiz_notify_of_update" value="1" />
           <%= t('labels.quiz_notify', 'Notify users this quiz has changed') %>
         </label>
@@ -366,3 +345,4 @@ $(document).ready(function() {
     </tbody>
   </table>
 </div>
+

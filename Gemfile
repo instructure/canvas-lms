@@ -18,7 +18,7 @@ gem 'encrypted_cookie_store-instructure', '1.0.2', :require => 'encrypted_cookie
 gem 'erubis',         '2.7.0'
 gem 'ffi',            '1.1.5'
 gem 'hairtrigger',    '0.1.14'
-gem 'sass',           '3.2.1'
+gem 'sass',           '3.2.3'
 if !ONE_NINE
   gem 'fastercsv', '1.5.3'
 end
@@ -64,6 +64,7 @@ gem 'rubyzip',        '0.9.5',  :require => 'zip/zip'
 gem 'safe_yaml-instructure', '0.8.0',  :require => false
 gem 'sanitize',       '2.0.3'
 gem 'tzinfo',         '0.3.35'
+gem 'useragent',      '0.4.16'
 gem 'uuid',           '2.3.2'
 gem 'will_paginate',  '2.3.15'
 gem 'xml-simple',     '1.0.12', :require => 'xmlsimple'
@@ -73,12 +74,12 @@ gem 'foreigner',      '0.9.2'
 gem 'crocodoc-ruby',  '0.0.1', :require => 'crocodoc'
 
 group :assets do
-  gem 'compass-rails', '1.0.2'
-  gem 'bootstrap-sass', '2.0.3.1'
+  gem 'compass-rails', '1.0.3'
 end
 
 group :mysql do
   gem 'mysql',        '2.8.1'
+  gem 'mysql2',       '0.2.18'
 end
 
 group :postgres do
@@ -92,7 +93,7 @@ end
 group :test do
   gem 'bluecloth',    '2.0.10' # for generating api docs
   gem 'parallelized_specs', '0.4.16'
-  gem 'mocha',        '0.12.3', :require => 'mocha_standalone'
+  gem 'mocha',        :git => 'git://github.com/ccutrer/mocha.git', :require => false
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.2'
   gem 'rspec-rails',  '1.3.4'

@@ -15,10 +15,10 @@
 <% end %>
 <style>
 </style>
-<% unless @student_enrollments.empty? %>
+<% unless @presenter.student_enrollments.empty? %>
 <h2><%= t('titles.current_student_courses', "Courses I'm Taking") %></h2>
 <table class="course_details student_grades">
-<% @student_enrollments.each do |course, enrollment| %>
+<% @presenter.student_enrollments.each do |course, enrollment| %>
   <tr>
     <td class="course"><a href="<%= course_student_grades_path(course.id, enrollment.user_id) %>"><%= course.name %></a></td>
     <td class="percent">
@@ -35,10 +35,10 @@
 <% end %>
 </table>
 <% end %>
-<% unless @observed_enrollments.empty? %>
+<% unless @presenter.observed_enrollments.empty? %>
 <h2 style="margin-top: 20px;"><%= t('linked_student_accounts', 'Linked Student Accounts') %></h2>
 <table class="course_details observer_grades">
-<% @observed_enrollments.each do |enrollment| %>
+<% @presenter.observed_enrollments.each do |enrollment| %>
   <tr>
     <td class="course"><a href="<%= course_student_grades_path(enrollment.course_id, enrollment.user_id) %>"><%= context_user_name(nil, enrollment.user_id) %>, <%= enrollment.course.name %></a></td>
     <td class="percent">
@@ -55,29 +55,29 @@
 <% end %>
 </table>
 <% end %>
-<% unless @teacher_enrollments.empty? %>
+<% unless @presenter.teacher_enrollments.empty? %>
 <h2 style="margin-top: 20px;"><%= t('current_teacher_courses', "Courses I'm Teaching") %></h2>
 <table class="course_details teacher_grades">
-<% @teacher_enrollments.each do |enrollment| %>
+<% @presenter.teacher_enrollments.each do |enrollment| %>
   <tr>
     <td class="course" style="vertical-align: middle;"><a href="<%= course_grades_path(enrollment.course_id) %>"><%= enrollment.course.name %></a></td>
     <td class="percent">
-      <% if @course_grade_summaries[enrollment.course_id] && @course_grade_summaries[enrollment.course_id][:score] %>
-        <%= number_to_percentage(@course_grade_summaries[enrollment.course_id][:score], :precision => 2) %>
-        <div style="font-size: 0.6em; font-weight: normal;"><%= t('average_grades', {:one => "average for 1 student", :other => "average for %{count} students"}, :count => @course_grade_summaries[enrollment.course_id][:students]) %></div>
+      <% if @presenter.course_grade_summaries[enrollment.course_id][:score] %>
+        <%= number_to_percentage(@presenter.course_grade_summaries[enrollment.course_id][:score], :precision => 2) %>
+        <div style="font-size: 0.6em; font-weight: normal;"><%= t('average_grades', {:one => "average for 1 student", :other => "average for %{count} students"}, :count => @presenter.course_grade_summaries[enrollment.course_id][:students]) %></div>
       <% else %>
         <span style="font-weight: normal; font-size: 0.9em;"><%= t('no_grades', 'no grades') %></span>
       <% end %>
     </td>
     <td style="display: none;"><a href="#" title="<%= t('send_teacher_message', 'Send a Message to the Teacher') %>" class="no-hover"><%= image_tag "email.png" %></a></td>
     <td class="report">
-      <%= link_to(t('links.teacher_activity', 'Student Interactions Report'), user_course_teacher_activity_url(@current_user, enrollment.course_id)) unless @course_grade_summaries[enrollment.course_id][:students].try(:zero?) %>
+      <%= link_to(t('links.teacher_activity', 'Student Interactions Report'), user_course_teacher_activity_url(@current_user, enrollment.course_id)) unless @presenter.course_grade_summaries[enrollment.course_id][:students].try(:zero?) %>
     </td>
   </tr>
 <% end %>
 </table>
 <% end %>
-<% unless @prior_enrollments.empty? %>
+<% unless @presenter.prior_enrollments.empty? %>
 <div style="margin-top: 20px; display: none;" id="previous_courses">
 <h2><%= t('titles.previous_courses', 'Previous Courses') %></h2>
 <table class="summary" style="margin-left: 20px; min-width: 350px;">
@@ -85,7 +85,7 @@
     <th><%= t('course', 'Course') %></th>
     <th><%= t('percent', 'Percent') %></th>
   </tr></thead>
-  <% @prior_enrollments.each do |enrollment| %>
+  <% @presenter.prior_enrollments.each do |enrollment| %>
     <tr>
       <td><%= enrollment.course.name %></td>
       <td>

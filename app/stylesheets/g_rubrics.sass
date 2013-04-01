@@ -6,6 +6,12 @@
   .ignoring
     :display $igno
 
+// unfortunately, we used the same class name as bootstrap's .container, need to reset it's effects
+@mixin revert_bootstrap_container
+  margin-left: 0
+  margin-right: 0
+  width: auto
+
 table.rubric
   :margin-top 20px
   :border-collapse collapse
@@ -23,6 +29,7 @@ table.rubric
     // :max-width 150px
 
     .container
+      +revert_bootstrap_container
       :position relative
       :font-size 0.9em
 
@@ -82,9 +89,8 @@ table.rubric
       :padding 2px 8px
 
       .container
+        +revert_bootstrap_container
         :padding 5px 0
-
-      .container
         :position relative
 
       .links

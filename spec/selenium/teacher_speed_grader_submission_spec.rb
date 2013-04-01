@@ -188,7 +188,7 @@ describe "speed grader submissions" do
     f('#rubric_full .save_rubric_button').click
     wait_for_ajaximations
     f('.toggle_full_rubric').click
-    wait_for_animations
+    wait_for_ajaximations
 
     f("#criterion_#{@rubric.criteria[0][:id]} input.criterion_points").should have_attribute("value", "3")
     f("#criterion_#{@rubric.criteria[1][:id]} input.criterion_points").should have_attribute("value", "5")

@@ -1287,26 +1287,30 @@ describe Enrollment do
       end
     end
 
-    describe "future" do
-      it "should include future enrollments" do
+    describe "future scope" do
+      it "should include enrollments for future and unpublished courses" do
         user
         future_course  = Course.create!(:name => 'future course', :start_at => Time.now + 2.weeks,
                                         :restrict_enrollments_to_course_dates => true)
         current_course = Course.create!(:name => 'current course', :start_at => Time.now - 2.weeks)
 
+        current_unpublished_course  = Course.create!(:name => 'future course 2', :start_at => Time.now - 2.weeks)
         future_unpublished_course  = Course.create!(:name => 'future course 2', :start_at => Time.now + 2.weeks)
         future_unrestricted_course = Course.create!(:name => 'future course 3', :start_at => Time.now + 2.weeks)
 
         current_enrollment = StudentEnrollment.create!(:course => current_course, :user => @user)
         future_enrollment  = StudentEnrollment.create!(:course => future_course, :user => @user)
+        current_unpublished_enrollment = StudentEnrollment.create!(:course => current_unpublished_course, :user => @user)
         future_unpublished_enrollment = StudentEnrollment.create!(:course => future_unpublished_course, :user => @user)
         future_unrestricted_enrollment = StudentEnrollment.create!(:course => future_unrestricted_course, :user => @user)
 
         [future_course, current_course, future_unrestricted_course].each { |course| course.offer }
-        [current_enrollment, future_enrollment, future_unpublished_enrollment, future_unrestricted_enrollment].each { |e| e.accept }
+        [current_enrollment, future_enrollment, current_unpublished_enrollment, future_unpublished_enrollment, future_unrestricted_enrollment].each { |e| e.accept }
 
-        @user.enrollments.future.length.should == 1
+        @user.enrollments.future.length.should == 3
         @user.enrollments.future.should include(future_enrollment)
+        @user.enrollments.future.should include(current_unpublished_enrollment)
+        @user.enrollments.future.should include(future_unpublished_enrollment)
       end
     end
   end
@@ -1609,6 +1613,33 @@ describe Enrollment do
       course_with_student(:active_all => 1)
       @enrollment.sis_source_id.should be_nil
       @enrollment.sis_user_id.should be_nil
+    end
+  end
+
+  describe "record_recent_activity" do
+    it "should record on the first call (last_activity_at is nil)" do
+      course_with_student(:active_all => 1)
+      @enrollment.last_activity_at.should be_nil
+      @enrollment.record_recent_activity
+      @enrollment.last_activity_at.should_not be_nil
+    end
+
+    it "should not record anything within the time threshold" do
+      course_with_student(:active_all => 1)
+      @enrollment.last_activity_at.should be_nil
+      now = Time.zone.now
+      @enrollment.record_recent_activity(now)
+      @enrollment.record_recent_activity(now + 5.minutes)
+      @enrollment.last_activity_at.to_s.should == now.to_s
+    end
+
+    it "should record again after the threshold is done" do
+      course_with_student(:active_all => 1)
+      @enrollment.last_activity_at.should be_nil
+      now = Time.zone.now
+      @enrollment.record_recent_activity(now)
+      @enrollment.record_recent_activity(now + 11.minutes)
+      @enrollment.last_activity_at.should.to_s == (now + 11.minutes).to_s
     end
   end
 end

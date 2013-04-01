@@ -75,12 +75,13 @@
   <a href="<%= context_url(@context, :context_wiki_page_url, @page) %>" class="wiki_page_url" style="display: none;">&nbsp;</a>
   <% if can_do(@context, @current_user, :manage_wiki) || can_do(@wiki, @current_user, :create_page) %>
     <div id="wiki_page_new">
-      <a class="new button button-sidebar-wide" href="#"><i class="icon-add"></i> <%= t 'links.create_page', 'Create a New Page' %></a>
-      <% form_for(:wiki_page, :url => context_url(@context, :context_wiki_pages_url), :html => {:method => :post, :style => "margin-left: 20px; display: none", :id => 'add_wiki_page_form'}) do |f| -%>
-        <%= f.blabel :title, :en => "New page title" %><br />
-        <%= f.text_field :title, :style => "width: 150px;" %>
+      <a class="new btn button-sidebar-wide element_toggler" aria-controls="add_wiki_page_form" href="#"><i class="icon-add"></i> <%= t 'links.create_page', 'Create a New Page' %></a>
+      <% form_for(:wiki_page, :url => context_url(@context, :context_wiki_pages_url), :html => {:method => :post, :style => "display: none", :id => 'add_wiki_page_form'}) do |f| -%>
+        <div class="input-append">
+          <%= f.text_field :title, :style => "width: 182px;", :placeholder => t(:title, "New page title") %>
+          <button class="btn" type="submit"><%= t 'buttons.create', 'Create' %></button>
+        </div>
         <input type="hidden" name="url_prefix" value="" id="url_prefix" />
-        <button class="btn btn-small" type="submit"><%= t 'buttons.create', 'Create' %></button>
       <% end %>
     </div>
   <% end %>
@@ -94,12 +95,13 @@
     <ul class="item_list">
       <% unless @page.url == "front-page" || @page.new_record? %>
         <li>
-          <a id="wiki_page_rename_link" class="icon-note-dark" href="#"><%= t 'links.rename_page', 'Rename this page' %></a>
-          <div id="wiki_page_rename_section" style="display:none; margin-left: 15px;">
+          <a id="wiki_page_rename_link" class="icon-note-dark element_toggler" aria-controls="wiki_page_rename_section" href="#"><%= t 'links.rename_page', 'Rename this page' %></a>
+          <div id="wiki_page_rename_section" style="display:none;">
             <% form_for(@page, :url => context_url(@context, :context_wiki_page_url, @page), :html => {:id => 'rename_wiki_page_form'}) do |f| -%>
-              <%= f.blabel :title, :en => "New page title" %><br />
-              <%= f.text_field :title, :style => "width: 200px;" %>
-              <button class="btn btn-primary btn-small" type="submit"><%= t 'buttons.rename', 'Rename' %></button>
+              <div class="input-append">
+                <%= f.text_field :title, :style => "width: 157px;", :placeholder => t(:title, "New page title") %>
+                <button class="btn" type="submit"><%= t 'buttons.rename', 'Rename' %></button>
+              </div>
             <% end -%>
           </div>
         </li>

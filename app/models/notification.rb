@@ -141,128 +141,202 @@ class Notification < ActiveRecord::Base
     end
   end
 
-  def create_message(asset, *tos)
-    current_locale = I18n.locale
+  def users_from_to_list(to_list)
+    to_list = [to_list] unless to_list.is_a? Enumerable
 
-    tos = tos.flatten.compact.uniq
-    if tos.last.is_a? Hash
-      options = tos.delete_at(tos.length - 1)
-      data = options.delete(:data)
+    to_user_ids = []
+    to_user_ids += to_list.select{ |to| to.is_a? Numeric }
+    to_user_ids += to_list.select{ |to| to.is_a? User }.collect{ |user| user.id }
+    to_user_ids.uniq!
+    
+    User.find(:all, :conditions => {:id =>to_user_ids}, :include => { :communication_channels => :notification_policies})
+  end
+  
+  def communication_channels_from_to_list(to_list)
+    to_list = [to_list] unless to_list.is_a? Enumerable
+    
+    to_list.select{ |to| to.is_a? CommunicationChannel }.uniq
+  end
+
+  def asset_filtered_by_user(asset, user)
+    if asset.respond_to?(:filter_asset_by_recipient)
+      asset.filter_asset_by_recipient(self, user)
+    else
+      asset
     end
+  end
+  
+  def message_options_for(asset, user)
+    user_asset = asset_filtered_by_user(asset, user)
+ 
+    asset_context = user_asset.context(user) rescue user_asset
+   
+    message_options = {
+      :subject => subject,
+      :notification => self,
+      :notification_name => name,
+      :user => user,
+      :context => user_asset,
+      :asset_context => asset_context,
+    }
+    message_options[:delay_for] = delay_for if delay_for
+    message_options
+  end
+
+  def increment_user_counts(user_id, count)
+    @user_counts[user_id] ||= 0
+    @user_counts[user_id] += count
+    @user_counts["#{user_id}_#{self.category_spaceless}"] ||= 0
+    @user_counts["#{user_id}_#{self.category_spaceless}"] += count
+  end
+  
+  def user_asset_context(user_asset)
+    if user_asset.is_a?(Context)
+      user_asset
+    elsif user_asset.respond_to?(:context)
+      user_asset.context
+    end
+  end
+
+  # creates and saves a delayed message for each given communication channel 
+  def create_delayed_message(asset, to_channels, data=nil, options={})
     @delayed_messages_to_save = []
-    recipient_ids = []
-    recipients = []
-    tos.each do |to|
-      if to.is_a?(CommunicationChannel)
-        recipients << to
-      else
-        user = nil
-        case to
-        when User
-          user = to
-        when Numeric
-          user = User.find(to)
-        when CommunicationChannel
-          user = to.user
-        end
-        recipient_ids << user.id if user
-      end
-    end
-    
-    recipients += User.find(:all, :conditions => {:id => recipient_ids}, :include => { :communication_channels => :notification_policies})
-    
-    messages = []
-    @user_counts = {}
-    recipients.uniq.each do |recipient|
-      cc = nil
-      user = nil
-      if recipient.is_a?(CommunicationChannel)
-        cc = recipient
-        user = cc.user
-      elsif recipient.is_a?(User)
-        user = recipient
-        cc = user.email_channel
-      end
-
-      user_asset = asset.respond_to?(:filter_asset_by_recipient) ?
-          asset.filter_asset_by_recipient(self, user) : asset
-      next unless user_asset
-
+    to_channels.each do |to_channel|
+      user = to_channel.user
+      
       I18n.locale = infer_locale(:user => user,
-        :context => user_asset.is_a?(Context) ? user_asset : user_asset.try_rescue(:context))
+                                 :context => user_asset_context(asset_filtered_by_user(asset, user)))
 
+      
       # For non-essential messages, check if too many have gone out, and if so
       # send this message as a daily summary message instead of immediate.
-      should_summarize = user && self.summarizable? && too_many_messages?(user)
-      channels = CommunicationChannel.find_all_for(user, self, cc)
-      fallback_channel = channels.sort_by{|c| c.path_type }.first
-      delayed_options = (options || {}).merge(:user => user, :communication_channel => cc, :asset => user_asset, :fallback_channel => should_summarize ? channels.first : nil)
+      fallback_channel = if should_throttle_for?(user)
+                           CommunicationChannel.find_all_for(user, self, to_channel).sort_by(&:path_type).first
+                         end
+
+      delayed_options = options.merge(:user => user,
+                                      :communication_channel => to_channel,
+                                      :asset => asset_filtered_by_user(asset, user),
+                                      :fallback_channel => fallback_channel)
       delayed_options[:data] = data if data
+      
       record_delayed_messages(delayed_options)
-      if should_summarize
-        channels = channels.select{|cc| cc.path_type != 'email' && cc.path_type != 'sms' }
-      end
-      channels << "dashboard" if self.dashboard? && self.show_in_feed?
-      channels.clear if !user || (user.pre_registered? && !self.registration?)
-      channels.each do |c|
-        to_path = c
-        to_path = c.path if c.respond_to?("path")
-
-        message = (user || cc || self).messages.build(
-          :subject => self.subject, 
-          :to => to_path,
-          :notification => self
-        )
-
-        message.notification_name = self.name
-        message.communication_channel = c if c.is_a?(CommunicationChannel)
-        message.dispatch_at = nil
-        message.user = user
-        message.context = user_asset
-        message.asset_context = options[:asset_context] || user_asset.context(user) rescue user_asset
-        message.notification_category = self.category
-        message.delay_for = self.delay_for if self.delay_for
-        message.data = data if data
-        message.parse!
-        # keep track of new messages added for caching so we don't
-        # have to re-look it up
-        @user_counts[user.id] ||= 0
-        @user_counts[user.id] += 1 if c.respond_to?(:path_type) && ['email', 'sms'].include?(c.path_type)
-        @user_counts["#{user.id}_#{self.category_spaceless}"] ||= 0
-        @user_counts["#{user.id}_#{self.category_spaceless}"] += 1 if c.respond_to?(:path_type) && ['email', 'sms'].include?(c.path_type)
-        messages << message
-      end
     end
-    @delayed_messages_to_save.each{|m| m.save! }
+    @delayed_messages_to_save.each{ |message| message.save! }
+  end
 
-    dashboard_messages, dispatch_messages = messages.partition { |m| m.to == 'dashboard' }
+  # builds a message for each applicable communication channel (plus one for the dashboard) on each user
+  def build_immediate_messages(asset, to_users, data=nil, asset_context=nil)
+    messages = []
+    to_users.each do |user|
+      I18n.locale = infer_locale(:user => user,
+                                 :context => user_asset_context(asset_filtered_by_user(asset, user)))
 
-    dashboard_messages.each do |m|
-      if Notification.types_to_show_in_feed.include?(self.name)
-        m.set_asset_context_code
-        m.infer_defaults
-        m.create_stream_items
+      message_options = message_options_for(asset, user)
+
+      # can't just merge these because nil values need to be overwritten
+      message_options[:data] = data if data
+      message_options[:asset_context] = asset_context if asset_context
+
+      channels = CommunicationChannel.find_all_for(user, self, user.email_channel)
+      channels.reject!{ |channel| ['email', 'sms'].include?(channel.path_type) } if should_throttle_for?(user)
+
+      messages += channels.map do |channel|
+        user.messages.build(message_options.merge(:communication_channel => channel,
+                                                  :to => channel.path))
+      end
+
+      messages << user.messages.build(message_options.merge(:to => 'dashboard')) if dashboard? && show_in_feed?
+
+      increment_user_counts(user.id, channels.count{ |channel| ['email', 'sms'].include?(channel.path_type) })
+    end
+    messages.each{ |message| message.parse! }
+  end
+  
+  def create_immediate_message(asset, to_users, data=nil, options={})
+    messages = build_immediate_messages(asset, to_users, data, options[:asset_context])
+    dashboard_messages, dispatch_messages = messages.partition { |message| message.to == 'dashboard' }
+
+    dashboard_messages.each do |message|
+      if Notification.types_to_show_in_feed.include?(name)
+        message.set_asset_context_code
+        message.infer_defaults
+        message.create_stream_items
       end
     end
 
     Message.transaction do
       # Cancel any that haven't been sent out for the same purpose
-      all_matching_messages = self.messages.for(asset).by_name(name).for_user(recipients).in_state([:created,:staged,:sending,:dashboard])
-      all_matching_messages.update_all(:workflow_state => 'cancelled')
-      dispatch_messages.each { |m| m.stage_without_dispatch!; m.save! }
+      cancel_messages_for(asset, to_users)
+      dispatch_messages.each do |message|
+        message.stage_without_dispatch!
+        message.save!
+      end
     end
     MessageDispatcher.batch_dispatch(dispatch_messages)
 
+    messages
+  end
+  
+  # Public: create (and dispatch, and queue delayed) a message
+  #  for this notication, associated with the given asset, sent to the given recipients
+  #
+  # asset - what the message applies to. An assignment, a discussion, etc.
+  # to_list - a list of who to send the message to. the list can contain Users, User ids, or communication channels
+  # options - a hash of extra options to merge with the options used to build the Message
+  #
+  # Returns a list of the messages dispatched immediately
+  def create_message(asset, to_list, options={})
+    # to_list can include Users, User IDs, CommunicationChannels, or nils.
+    # to_list can contain duplicates
+    # to_list might just be one thing rather than a list
+    current_locale = I18n.locale
+
+    @user_counts = {}
+    data = options.delete(:data)
+    
+    users_to_immediately_send_message_to = users_from_to_list(to_list)
+    
+    channels_to_send_delayed_message_to = communication_channels_from_to_list(to_list)
+
+    # The original behavior of this method had the potential to duplicate messages if a user and
+    # their communication channel were both in the to_list. This may not be correct behavior, but
+    # it was kept this way to maintain bug-parity during a refactor.
+    users_to_immediately_send_message_to += channels_to_send_delayed_message_to.collect(&:user)
+    channels_to_send_delayed_message_to += users_to_immediately_send_message_to.collect(&:email_channel).compact
+
+    channels_to_send_delayed_message_to.uniq!
+    channels_to_send_delayed_message_to.reject!{ |channel| !asset_filtered_by_user(asset, channel.user) }
+    create_delayed_message(asset, channels_to_send_delayed_message_to, data, options)
+    
+    # This must come after delayed messages because @user_counts affects too_many_messages? and pre_registered users still get delayed messages 
+    users_to_immediately_send_message_to.reject!{ |user| !asset_filtered_by_user(asset, user) || (user.pre_registered? && !registration?) }
+    messages = create_immediate_message(asset, users_to_immediately_send_message_to, data, options)
+    
     # re-set cached values
-    @user_counts.each{|user_id, cnt| recent_messages_for_user(user_id, cnt) }
+    @user_counts.each{|user_id, count| recent_messages_for_user(user_id, count) }
 
     messages
   ensure
     I18n.locale = current_locale
   end
   
+  def cancel_messages_for(asset, recipients)
+    # doesn't include dashboard messages. should it?
+    messages.
+      for(asset).
+      by_name(name).
+      for_user(recipients).
+      cancellable.
+      update_all(:workflow_state => 'cancelled')
+  end
+  
   def category_spaceless
     (self.category || "None").gsub(/\s/, "_")
+  end
+
+  def should_throttle_for?(user)
+    summarizable? && too_many_messages?(user)
   end
   
   def too_many_messages?(user)

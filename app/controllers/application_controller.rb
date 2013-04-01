@@ -48,6 +48,7 @@ class ApplicationController < ActionController::Base
   before_filter :fix_xhr_requests
   before_filter :init_body_classes
   after_filter :set_response_headers
+  after_filter :update_enrollment_last_activity_at
 
   add_crumb(proc { %Q{<i title="#{I18n.t('links.dashboard', "My Dashboard")}" class="icon-home standalone-icon"></i>}.html_safe }, :root_path, :class => "home")
 
@@ -76,14 +77,17 @@ class ApplicationController < ActionController::Base
   #
   def js_env(hash = {})
     # set some defaults
-    @js_env ||= {
-      :current_user_id => @current_user.try(:id),
-      :current_user => user_display_json(@current_user, :profile),
-      :current_user_roles => @current_user.try(:roles),
-      :context_asset_string => @context.try(:asset_string),
-      :AUTHENTICITY_TOKEN => form_authenticity_token,
-      :files_domain => HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
-    }
+    unless @js_env
+      @js_env = {
+        :current_user_id => @current_user.try(:id),
+        :current_user => user_display_json(@current_user, :profile),
+        :current_user_roles => @current_user.try(:roles),
+        :context_asset_string => @context.try(:asset_string),
+        :AUTHENTICITY_TOKEN => form_authenticity_token,
+        :files_domain => HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
+      }
+      @js_env[:IS_LARGE_ROSTER] = true if @context.respond_to?(:large_roster?) && @context.large_roster?
+    end
 
     hash.each do |k,v|
       if @js_env[k]
@@ -710,6 +714,12 @@ class ApplicationController < ActionController::Base
     true
   end
 
+  def update_enrollment_last_activity_at
+    if @context.is_a?(Course) && @context_enrollment
+      @context_enrollment.record_recent_activity
+    end
+  end
+
   # Asset accesses are used for generating usage statistics.  This is how
   # we say, "the user just downloaded this file" or "the user just
   # viewed this wiki page".  We can then after-the-fact build statistics
@@ -764,12 +774,12 @@ class ApplicationController < ActionController::Base
         @page_view_update = true
       end
       if @page_view && !request.xhr? && request.get? && (response.content_type || "").match(/html/)
-        @page_view.context ||= @context rescue nil
-        @page_view.account_id = @domain_root_account.id
         @page_view.render_time ||= (Time.now.utc - @page_before_render) rescue nil
         @page_view_update = true
       end
       if @page_view && @page_view_update
+        @page_view.context = @context if !@page_view.context_id
+        @page_view.account_id = @domain_root_account.id
         @page_view.store
       end
     else
@@ -1364,6 +1374,7 @@ class ApplicationController < ActionController::Base
   def flash_notices
     @notices ||= begin
       notices = []
+      notices << {:type => 'warning', :content => unsupported_browser, :classes => 'no_close'} if !browser_supported?
       if error = flash.delete(:error)
         notices << {:type => 'error', :content => error}
       end
@@ -1377,6 +1388,15 @@ class ApplicationController < ActionController::Base
     end
   end
   helper_method :flash_notices
+
+  def unsupported_browser
+    t("#application.warnings.unsupported_browser", "Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Guides* for a complete list of supported browsers.", :wrapper => @template.link_to('\1', 'http://guides.instructure.com/s/2204/m/4214/l/41056-which-browsers-does-canvas-support'))
+  end
+
+  def browser_supported?
+    session[:browser_supported] = Browser.supported?(request.user_agent) unless session.key?(:browser_supported)
+    session[:browser_supported]
+  end
 
   def profile_data(profile, viewer, session, includes)
     extend Api::V1::UserProfile

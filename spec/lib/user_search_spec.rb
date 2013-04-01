@@ -5,7 +5,7 @@ describe UserSearch do
   describe '.for_user_in_course' do
     let(:search_names) { ['Rose Tyler', 'Martha Jones', 'Rosemary Giver', 'Martha Stewart', 'Tyler Pickett', 'Jon Stewart', 'Stewart Little'] }
     let(:course) { Course.create! }
-    let(:users) { UserSearch.for_user_in_course('Stewart', course, user) }
+    let(:users) { UserSearch.for_user_in_course('Stewart', course, user).to_a }
     let(:names) { users.map(&:name) }
     let(:user) { User.last }
     let(:student) { User.find_by_name(search_names.last) }
@@ -42,11 +42,6 @@ describe UserSearch do
           search_results.should == []
         end
 
-        it 'can be limited with an extra parameter' do
-          users = UserSearch.for_user_in_course('Stewart', course, user, :limit => 2)
-          users.size.should == 2
-        end
-
         it 'will not pickup students outside the course' do
           out_of_course_student = User.create!(:name => 'Stewart Stewart')
           # names is evaluated lazily from the 'let' block so ^ user is still being
@@ -62,7 +57,7 @@ describe UserSearch do
         describe 'filtering by role' do
           subject { names }
           describe 'to a single role' do
-            let(:users) { UserSearch.for_user_in_course('Tyler', course, user, :enrollment_type => 'student' ) }
+            let(:users) { UserSearch.for_user_in_course('Tyler', course, user, :enrollment_type => 'student' ).to_a }
 
             it { should include('Rose Tyler') }
             it { should include('Tyler Pickett') }
@@ -70,7 +65,7 @@ describe UserSearch do
           end
 
           describe 'to multiple roles' do
-            let(:users) { UserSearch.for_user_in_course('Tyler', course, student, :enrollment_type => ['ta', 'teacher'] ) }
+            let(:users) { UserSearch.for_user_in_course('Tyler', course, student, :enrollment_type => ['ta', 'teacher'] ).to_a }
             before do
               ta = User.create!(:name => 'Tyler TA')
               TaEnrollment.create!(:user => ta, :course => course, :workflow_state => 'active')
@@ -82,7 +77,7 @@ describe UserSearch do
           end
 
           describe 'with the broader role parameter' do
-            let(:users) { UserSearch.for_user_in_course('Tyler', course, student, :enrollment_role => 'ObserverEnrollment' ) }
+            let(:users) { UserSearch.for_user_in_course('Tyler', course, student, :enrollment_role => 'ObserverEnrollment' ).to_a }
 
             before do
               ta = User.create!(:name => 'Tyler Observer')

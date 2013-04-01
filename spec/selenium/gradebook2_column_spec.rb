@@ -54,16 +54,156 @@ describe "assignment column headers" do
     open_gradebook_settings(arrange_settings.first.find_element(:xpath, '..'))
     first_row_cells = find_slick_cells(0, f('#gradebook_grid'))
     validate_cell_text(first_row_cells[0], expected_text)
-    open_gradebook_settings(arrange_settings.last.find_element(:xpath, '..'))
+    open_gradebook_settings()
+    arrange_settings.first.find_element(:xpath, '..').should_not be_displayed
+    arrange_settings.last.find_element(:xpath, '..').should be_displayed
+
+    # Setting should stick after reload
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    first_row_cells = find_slick_cells(0, f('#gradebook_grid'))
+    validate_cell_text(first_row_cells[0], expected_text)
+
+    first_row_cells = find_slick_cells(0, f('#gradebook_grid'))
+    validate_cell_text(first_row_cells[0], expected_text)
+    validate_cell_text(first_row_cells[1], ASSIGNMENT_1_POINTS)
+    validate_cell_text(first_row_cells[2], ASSIGNMENT_2_POINTS)
+
+    arrange_settings = ff('input[name="arrange-columns-by"]')
+    open_gradebook_settings()
+    arrange_settings.first.find_element(:xpath, '..').should_not be_displayed
+    arrange_settings.last.find_element(:xpath, '..').should be_displayed
+  end
+
+  it "should default to arrange columns by assignment group" do
+    first_row_cells = find_slick_cells(0, f('#gradebook_grid'))
+    validate_cell_text(first_row_cells[0], ASSIGNMENT_1_POINTS)
+    validate_cell_text(first_row_cells[1], ASSIGNMENT_2_POINTS)
+    validate_cell_text(first_row_cells[2], "-")
+
+    arrange_settings = ff('input[name="arrange-columns-by"]')
+    open_gradebook_settings()
+    arrange_settings.first.find_element(:xpath, '..').should be_displayed
+    arrange_settings.last.find_element(:xpath, '..').should_not be_displayed
   end
 
   it "should validate arrange columns by assignment group option" do
-    # due date, then assignment group
+    # since assignment group is the default, sort by due date, then assignment group again
     arrange_settings = ff('input[name="arrange-columns-by"]')
     open_gradebook_settings(arrange_settings.first.find_element(:xpath, '..'))
     open_gradebook_settings(arrange_settings.last.find_element(:xpath, '..'))
     first_row_cells = find_slick_cells(0, f('#gradebook_grid'))
     validate_cell_text(first_row_cells[0], ASSIGNMENT_1_POINTS)
+    validate_cell_text(first_row_cells[1], ASSIGNMENT_2_POINTS)
+    validate_cell_text(first_row_cells[2], "-")
+
+    arrange_settings = ff('input[name="arrange-columns-by"]')
+    open_gradebook_settings()
+    arrange_settings.first.find_element(:xpath, '..').should be_displayed
+    arrange_settings.last.find_element(:xpath, '..').should_not be_displayed
+
+    # Setting should stick (not be messed up) after reload
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+
+    first_row_cells = find_slick_cells(0, f('#gradebook_grid'))
+    validate_cell_text(first_row_cells[0], ASSIGNMENT_1_POINTS)
+    validate_cell_text(first_row_cells[1], ASSIGNMENT_2_POINTS)
+    validate_cell_text(first_row_cells[2], "-")
+
+    arrange_settings = ff('input[name="arrange-columns-by"]')
+    open_gradebook_settings()
+    arrange_settings.first.find_element(:xpath, '..').should be_displayed
+    arrange_settings.last.find_element(:xpath, '..').should_not be_displayed
+  end
+
+  it "should allow custom column ordering" do
+    pending("drag and drop doesn't seem to work")
+    columns = ff('.assignment-points-possible')
+    columns.should_not be_empty
+    driver.action.drag_and_drop_by(columns[1], -300, 0).perform
+
+    first_row_cells = find_slick_cells(0, f('#gradebook_grid'))
+    validate_cell_text(first_row_cells[0], ASSIGNMENT_2_POINTS)
+    validate_cell_text(first_row_cells[1], ASSIGNMENT_1_POINTS)
+    validate_cell_text(first_row_cells[2], "-")
+
+    # with a custom order, both sort options should be displayed
+    arrange_settings = ff('input[name="arrange-columns-by"]')
+    open_gradebook_settings()
+    arrange_settings.first.find_element(:xpath, '..').should be_displayed
+    arrange_settings.last.find_element(:xpath, '..').should be_displayed
+  end
+
+  it "should load custom column ordering" do
+    # since drag and drop doesn't work, we'll just have to store a fake configuration and make sure it gets loaded.
+
+    script = <<-JS
+      sortOrder = {
+        sortType: 'custom',
+        customOrder: [#{@third_assignment.id}, #{@second_assignment.id}, #{@first_assignment.id}] };
+      localStorage.setItem('_#{@user.id}_course_#{@course.id}_sort_grade_columns_by', JSON.stringify(sortOrder));
+    JS
+    driver.execute_script(script)
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+
+    first_row_cells = find_slick_cells(0, f('#gradebook_grid'))
+    validate_cell_text(first_row_cells[0], '-')
+    validate_cell_text(first_row_cells[1], ASSIGNMENT_2_POINTS)
+    validate_cell_text(first_row_cells[2], ASSIGNMENT_1_POINTS)
+
+    # both predefined short orders should be displayed since neither one is selected.
+    arrange_settings = ff('input[name="arrange-columns-by"]')
+    open_gradebook_settings()
+    arrange_settings.first.find_element(:xpath, '..').should be_displayed
+    arrange_settings.last.find_element(:xpath, '..').should be_displayed
+  end
+
+  it "should put new assignments at the end when columns have custom order" do
+    script = <<-JS
+      sortOrder = {
+        sortType: 'custom',
+        customOrder: [#{@third_assignment.id}, #{@second_assignment.id}, #{@first_assignment.id}] };
+      localStorage.setItem('_#{@user.id}_course_#{@course.id}_sort_grade_columns_by', JSON.stringify(sortOrder));
+    JS
+    driver.execute_script(script)
+
+    @fourth_assignment = assignment_model({
+      :course => @course,
+      :name => "new assignment",
+      :due_at => nil,
+      :points_possible => 150,
+      :assignment_group => nil,
+      })
+    @fourth_assignment.grade_student(@student_1, :grade => 150)
+
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+
+    first_row_cells = find_slick_cells(0, f('#gradebook_grid'))
+    validate_cell_text(first_row_cells[0], '-')
+    validate_cell_text(first_row_cells[1], ASSIGNMENT_2_POINTS)
+    validate_cell_text(first_row_cells[2], ASSIGNMENT_1_POINTS)
+    validate_cell_text(first_row_cells[3], '150')
+  end
+
+  it "should maintain order of remaining assignments if an assignment is destroyed" do
+    script = <<-JS
+      sortOrder = {
+        sortType: 'custom',
+        customOrder: [#{@third_assignment.id}, #{@second_assignment.id}, #{@first_assignment.id}] };
+      localStorage.setItem('_#{@user.id}_course_#{@course.id}_sort_grade_columns_by', JSON.stringify(sortOrder));
+    JS
+    driver.execute_script(script)
+    @first_assignment.destroy
+
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+
+    first_row_cells = find_slick_cells(0, f('#gradebook_grid'))
+    validate_cell_text(first_row_cells[0], '-')
+    validate_cell_text(first_row_cells[1], ASSIGNMENT_2_POINTS)
   end
 
   it "should validate show attendance columns option" do

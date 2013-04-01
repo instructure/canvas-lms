@@ -167,6 +167,7 @@ class Account < ActiveRecord::Base
   add_setting :allow_invitation_previews, :boolean => true, :root_only => true, :default => false
   add_setting :self_registration, :boolean => true, :root_only => true, :default => false
   add_setting :large_course_rosters, :boolean => true, :root_only => true, :default => false
+  add_setting :edit_institution_email, :boolean => true, :root_only => true, :default => true
 
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -800,6 +801,9 @@ class Account < ActiveRecord::Base
   # an opportunity for plugins to load some other stuff up before caching the account
   def precache
   end
+
+  # for plugins
+  def tracking_fields(params={}); []; end
 
   def self.find_cached(id)
     account = Rails.cache.fetch(account_lookup_cache_key(id), :expires_in => 1.hour) do

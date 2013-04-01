@@ -84,6 +84,17 @@ class ConversationParticipant < ActiveRecord::Base
     sanitize_sql conditions
   end
 
+  tagged_scope_handler(/\A(course|group|section)_(\d+)\z/) do |tags, options|
+    tags.map do |tag|
+      # tags in the database use the id relative to the default shard. ids in
+      # the filters are assumed relative to the current shard and need to be
+      # cast to an id relative to the default shard before use in queries.
+      type, id = ActiveRecord::Base.parse_asset_string(tag)
+      id = Shard.relative_id_for(id, Shard.default)
+      wildcard('conversation_participants.tags', "#{type.underscore}_#{id}", :delimiter => ',')
+    end
+  end
+
   cacheable_method :user
   cacheable_method :conversation
 
@@ -104,14 +115,14 @@ class ConversationParticipant < ActiveRecord::Base
       :id => conversation_id,
       :workflow_state => workflow_state,
       :last_message => latest ? truncate_text(latest.body, :max_length => 100) : nil,
-      :last_message_at => latest ? latest.created_at : last_message_at,
+      :last_message_at => last_message_at,
       :last_authored_message => latest_authored ? truncate_text(latest_authored.body, :max_length => 100) : nil,
       :last_authored_message_at => latest_authored ? latest_authored.created_at : visible_last_authored_at,
       :message_count => message_count,
       :subscribed => subscribed?,
       :private => private?,
       :starred => starred,
-      :properties => properties(latest)
+      :properties => properties(latest || latest_authored)
     }.with_indifferent_access
   end
 
