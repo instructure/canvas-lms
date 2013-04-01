@@ -31,15 +31,13 @@ define [
     promise = null
     $form.formSubmit
       disableWhileLoading: 'spin_on_success'
+      errorFormatter: registrationErrors
       success: (data) =>
         # they should now be authenticated (either registered or pre_registered)
         if data.course
           window.location = "/courses/#{data.course.course.id}?registration_success=1"
         else
           window.location = "/?registration_success=1"
-      formErrors: false
-      error: (errors) ->
-        $form.formErrors registrationErrors(errors)
 
     $node.dialog
       resizable: false

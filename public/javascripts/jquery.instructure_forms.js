@@ -169,6 +169,8 @@ define([
           needValidForm = false;
         }
         if ($formObj.parents("html").get(0) == $("html").get(0) && options.formErrors !== false) {
+          if ($.isFunction(options.errorFormatter))
+            data = options.errorFormatter(data.errors || data);
           $formObj.formErrors(data, options);
         } else if (needValidForm) {
           $.ajaxJSON.unhandledXHRs.push(request);
