@@ -107,6 +107,12 @@ define([
       if (options.disableWhileLoading) {
         var oldOnSubmit = onSubmit;
         onSubmit = function(loadingPromise) {
+          if (options.disableWhileLoading === 'spin_on_success') {
+            // turn it into a false promise, i.e. never resolve
+            var origPromise = loadingPromise;
+            loadingPromise = $.Deferred();
+            origPromise.fail(function(){ loadingPromise.reject(); });
+          }
           $form.disableWhileLoading(loadingPromise);
           if (oldOnSubmit) oldOnSubmit.apply(this, arguments);
         }

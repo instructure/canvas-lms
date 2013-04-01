@@ -30,9 +30,7 @@ define [
     $form = $node.find('form')
     promise = null
     $form.formSubmit
-      beforeSubmit: ->
-        promise = $.Deferred()
-        $form.disableWhileLoading(promise)
+      disableWhileLoading: 'spin_on_success'
       success: (data) =>
         # they should now be authenticated (either registered or pre_registered)
         if data.course
@@ -41,7 +39,6 @@ define [
           window.location = "/?registration_success=1"
       formErrors: false
       error: (errors) ->
-        promise.reject()
         $form.formErrors registrationErrors(errors)
 
     $node.dialog
