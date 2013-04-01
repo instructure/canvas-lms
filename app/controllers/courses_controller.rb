@@ -136,7 +136,7 @@ class CoursesController < ApplicationController
       format.html {
         @current_enrollments = @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]).sort_by{|e| [e.active? ? 1 : 0, e.long_name] }
         @past_enrollments    = @current_user.enrollments.with_each_shard{|scope| scope.past }
-        @future_enrollments  = @current_user.enrollments.with_each_shard{|scope| scope.future}.reject{|e| e.root_account.settings[:restrict_student_future_view]}
+        @future_enrollments  = @current_user.enrollments.with_each_shard{|scope| scope.future.includes(:root_account)}.reject{|e| e.root_account.settings[:restrict_student_future_view]}
 
         @past_enrollments.concat(@current_enrollments.select { |e| e.state_based_on_date == :completed })
         @current_enrollments.reject! do |e|

@@ -182,7 +182,7 @@ class Enrollment < ActiveRecord::Base
               :conditions => "courses.workflow_state = 'completed' or enrollments.workflow_state = 'rejected' or enrollments.workflow_state = 'completed'"
 
   named_scope :future, lambda { {
-    :joins => [:course, :root_account],
+    :joins => :course,
     :conditions => ["(courses.start_at > ?
                     AND courses.workflow_state = 'available'
                     AND courses.restrict_enrollments_to_course_dates = ?
