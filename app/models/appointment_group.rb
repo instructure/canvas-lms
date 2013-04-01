@@ -333,15 +333,19 @@ class AppointmentGroup < ActiveRecord::Base
   end
 
   def participant_for(user)
-    participant = if participant_type == 'User'
-      user
-    else
-      # can't have more than one group_category
-      raise "inconsistent appointment group" if sub_contexts.size > 1
-      sub_context_id = sub_contexts.first.id
-      user.groups.detect{ |g| g.group_category_id == sub_context_id }
+    @participant_for ||= {}
+    return @participant_for[user.id] if @participant_for.has_key?(user.id)
+    @participant_for[user.id] = begin
+      participant = if participant_type == 'User'
+          user
+        else
+          # can't have more than one group_category
+          raise "inconsistent appointment group" if sub_contexts.size > 1
+          sub_context_id = sub_contexts.first.id
+          user.groups.detect{ |g| g.group_category_id == sub_context_id }
+        end
+      participant if participant && eligible_participant?(participant)
     end
-    participant if participant && eligible_participant?(participant)
   end
 
   def reservations_for(participant)
@@ -440,16 +444,24 @@ class AppointmentGroup < ActiveRecord::Base
   end
 
   def contexts_for_user(user)
-    context_codes = context_codes_for_user(user)
-    course_ids = appointment_group_contexts.where(:context_code => context_codes).pluck(:context_id)
+    @contexts_for_user ||= {}
+    return @contexts_for_user[user.id] if @contexts_for_user.has_key?(user.id)
+    @contexts_for_user[user.id] = begin
+      context_codes = context_codes_for_user(user)
+      course_ids = appointment_group_contexts.select{|agc| context_codes.include? agc.context_code }.map(&:context_id)
     Course.where(:id => course_ids).all
+    end
   end
 
   def context_codes_for_user(user)
-    manageable_codes = user.manageable_appointment_context_codes
-    user_codes = user.appointment_context_codes[:primary] |
-                   manageable_codes[:full] | manageable_codes[:limited]
-    context_codes & user_codes
+    @context_codes_for_user ||= {}
+    @context_codes_for_user[user.id] if @context_codes_for_user.has_key?(user.id)
+    @context_codes_for_user[user.id] = begin
+      manageable_codes = user.manageable_appointment_context_codes
+      user_codes = user.appointment_context_codes[:primary] |
+        manageable_codes[:full] | manageable_codes[:limited]
+      context_codes & user_codes
+    end
   end
 
   def context_codes

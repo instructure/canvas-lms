@@ -98,7 +98,7 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def hidden?
-    !appointment_group && child_events.size > 0
+    !appointment_group? && child_events.size > 0
   end
 
   def effective_context
@@ -404,6 +404,10 @@ class CalendarEvent < ActiveRecord::Base
     read_attribute(:user) || (context_type == 'User' ? context : nil)
   end
 
+  def appointment_group?
+    context_type == 'AppointmentGroup' || parent_event.try(:context_type) == 'AppointmentGroup'
+  end
+
   def appointment_group
     if parent_event.try(:context).is_a?(AppointmentGroup)
       parent_event.context
@@ -593,17 +597,17 @@ class CalendarEvent < ActiveRecord::Base
     given { |user, session| self.cached_context_grants_right?(user, session, :read) }#students.include?(user) }
     can :read
 
-    given { |user, session| !appointment_group ^ cached_context_grants_right?(user, session, :read_appointment_participants) }
+    given { |user, session| !appointment_group? ^ cached_context_grants_right?(user, session, :read_appointment_participants) }
     can :read_child_events
 
-    given { |user, session| parent_event && appointment_group && parent_event.grants_right?(user, session, :manage) }
+    given { |user, session| parent_event && appointment_group? && parent_event.grants_right?(user, session, :manage) }
     can :read and can :delete
 
-    given { |user, session| appointment_group && cached_context_grants_right?(user, session, :manage) }
+    given { |user, session| appointment_group? && cached_context_grants_right?(user, session, :manage) }
     can :manage
 
     given { |user, session|
-      appointment_group && (
+      appointment_group? && (
         grants_right?(user, session, :manage) ||
         cached_context_grants_right?(user, nil, :reserve) && context.participant_for(user).present?
       )
