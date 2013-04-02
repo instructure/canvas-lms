@@ -60,20 +60,20 @@ define [
       isArchived   = $conversation.hasClass('archived')
 
       # set action visibility based on current state
-      $list.find('.action_mark_as_read').parent().hide() if isRead
-      $list.find('.action_mark_as_unread').parent().hide() unless isRead
-      $list.find('.action_star').parent().hide() if isStarred
-      $list.find('.action_unstar').parent().hide() unless isStarred
-      $list.find('.action_archive').parent().hide() if isArchived
-      $list.find('.action_unarchive').parent().hide() unless isArchived
+      $list.find('.action_mark_as_read').parent().remove() if isRead
+      $list.find('.action_mark_as_unread').parent().remove() unless isRead
+      $list.find('.action_star').parent().remove() if isStarred
+      $list.find('.action_unstar').parent().remove() unless isStarred
+      $list.find('.action_archive').parent().remove() if isArchived
+      $list.find('.action_unarchive').parent().remove() unless isArchived
       if isArchived
-        $list.find('.action_mark_as_read').parent().hide()
-        $list.find('.action_mark_as_unread').parent().hide()
+        $list.find('.action_mark_as_read').parent().remove()
+        $list.find('.action_mark_as_unread').parent().remove()
       if isPrivate
-        $list.find('.action_subscribe, .action_unsubscribe').parent().hide()
+        $list.find('.action_subscribe, .action_unsubscribe').parent().remove()
       else
-        $list.find('.action_subscribe').parent().hide() if isSubscribed
-        $list.find('.action_unsubscribe').parent().hide() unless isSubscribed
+        $list.find('.action_subscribe').parent().remove() if isSubscribed
+        $list.find('.action_unsubscribe').parent().remove() unless isSubscribed
 
     resize: (newHeight) ->
       @list.$scroller.height(newHeight - $('#actions').outerHeight(true))
