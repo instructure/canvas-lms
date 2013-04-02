@@ -234,10 +234,12 @@ div#content
 #questions.assessing,#questions.assessment_results
   .question_holder
     .question
+      margin: 0.7em 30px 30px 30px
       &.related
         :border-width 2px
       .move
         :display none
+
 
 #questions.assessing
   background: $backgroundColor
@@ -369,6 +371,11 @@ div#content
       :display none
     .answer_comment,.question_comment_text
       white-space: pre-wrap
+
+#questions.assessment_results .question_holder .question
+  margin: 0.7em auto 30px auto
+  min-width: 415px
+  width: 80%
 
 .question
   :border 1px solid $borderColor
