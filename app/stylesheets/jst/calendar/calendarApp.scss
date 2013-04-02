@@ -123,17 +123,25 @@
 
 #refresh_calendar_link {
   @include hide_text;
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   float: right;
   background-image: url("/images/ajax-loader-black-on-white-static.gif");
   background-position: 50% 50%;
-  margin-left: 10px;
+  margin-left: 3px;
   position: relative;
-  top: 5px;
+  top: 7px;
   &.loading {
     background-image: url("/images/ajax-loader-black-on-white.gif");
   }
+}
+
+#create_new_event_link {
+  float: right;
+  position: relative;
+  top: 3px;
+  color: #444444;
+  margin-left: 5px;
 }
 
 .event-details {

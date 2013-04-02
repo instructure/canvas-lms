@@ -1,5 +1,7 @@
 <div id="calendar-header" {{#if showScheduler}}class="with-scheduler"{{/if}}>
-  <a href="#" id="refresh_calendar_link">{{#t "refresh"}}Refresh{{/t}}</a>
+  <a href="#" id="refresh_calendar_link" title="{{#t "refresh"}}Refresh{{/t}}" data-tooltip>{{#t "refresh"}}Refresh{{/t}}</a>
+  <a href="#" id="create_new_event_link" class="icon-add" title="{{#t "create_event"}}Create New Event{{/t}}" data-tooltip></a>
+
   {{#unless calendar2Only}}
   <a id="change-calendar-version" href="/switch_calendar/1" data-method="post" rel="nofollow" class="btn">{{#t "use_old_calendar"}}Old Calendar{{/t}}</a>
   {{/unless}}

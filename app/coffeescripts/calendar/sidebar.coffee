@@ -67,16 +67,6 @@ define [
     visibleContexts = new VisibleContextManager(contexts, selectedContexts, $holder)
 
     $holder.delegate '.context_list_context', 'click', (event) ->
-      # dont toggle if thy were clicking the .settings button
-      unless $(event.target).closest('[data-add-event]').length
-        visibleContexts.toggle $(this).data('context')
-        userSettings.set('checked_calendar_codes',
-          map($(this).parent().children('.checked'), (c) -> $(c).data('context')))
-
-    $holder.delegate '[data-add-event]', 'click', ->
-      context = $(this).parents('li[data-context]').data('context')
-      event = commonEventFactory(null, contexts)
-      new EditEventDetailsDialog(event).show()
-      # TODO, codesmell: we should get rid of this next line and let EditEventDetailsDialog
-      # take care of that behaviour
-      $('select[class="context_id"]').val(context).triggerHandler('change')
+      visibleContexts.toggle $(this).data('context')
+      userSettings.set('checked_calendar_codes',
+        map($(this).parent().children('.checked'), (c) -> $(c).data('context')))
