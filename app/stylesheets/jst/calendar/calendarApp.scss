@@ -164,6 +164,9 @@
   .delete_event_link {
     float: right !important;
   }
+  .event-details-content {
+    overflow: auto;
+  }
 }
 
 .event-details-timestring {
@@ -215,7 +218,6 @@
 
 .event-detail-overflow {
   min-height: 30px;
-  max-height: 160px;
   max-width: 395px;
   margin-bottom: 6px;
   overflow: auto;
