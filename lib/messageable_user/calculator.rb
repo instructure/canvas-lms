@@ -658,14 +658,16 @@ class MessageableUser
     # in the account (user and account from user_account_associations in the
     # outer query). used to fake a common "course" context with that enrollment
     # type in users found via the account roster.
+    #
+    # NOTE: the conditions on user_account_associations needs to be a where
+    # condition vs. an inner join on condition to make mysql happy.
     HIGHEST_ENROLLMENT_SQL = <<-SQL
       (SELECT enrollments.type
       FROM enrollments
       INNER JOIN courses ON courses.id=enrollments.course_id
-      INNER JOIN course_account_associations ON
-        course_account_associations.course_id=courses.id AND
-        course_account_associations.account_id=user_account_associations.account_id
+      INNER JOIN course_account_associations ON course_account_associations.course_id=courses.id
       WHERE enrollments.user_id=user_account_associations.user_id
+        AND course_account_associations.account_id=user_account_associations.account_id
         AND #{enrollment_conditions(:include_concluded => false)}
       ORDER BY #{Enrollment.type_rank_sql}
       LIMIT 1)
