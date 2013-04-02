@@ -44,16 +44,18 @@ $questionHeaderBackground: #F5F5F5
   #quiz_details
     // display: none so jquery ui toggles correctly
     display: none
-    margin: 0 auto 10px 0
+    margin: 0 auto 10px auto
+    max-height: 500px
     overflow: auto
-    max-height: 400px
-    tr
-      th
-        font-weight: bold
-        text-transform: capitalize
-      td
-        border-top: 1px solid #bbb
-        border-bottom: 1px solid #bbb
+
+    .submitted_list
+      float: left
+      width: 50%
+
+    .name
+      display: block
+      padding: 4px 12px
+      border-top: 1px solid white
 
   .control-group
     margin-bottom: 0px
@@ -232,10 +234,12 @@ div#content
 #questions.assessing,#questions.assessment_results
   .question_holder
     .question
+      margin: 0.7em 30px 30px 30px
       &.related
         :border-width 2px
       .move
         :display none
+
 
 #questions.assessing
   background: $backgroundColor
@@ -367,6 +371,11 @@ div#content
       :display none
     .answer_comment,.question_comment_text
       white-space: pre-wrap
+
+#questions.assessment_results .question_holder .question
+  margin: 0.7em auto 30px auto
+  min-width: 415px
+  width: 80%
 
 .question
   :border 1px solid $borderColor
