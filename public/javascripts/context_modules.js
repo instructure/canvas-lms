@@ -56,6 +56,49 @@ define([
         }
         return indent;
       },
+
+      updateModulePositions: function() {
+        var ids = []
+        $("#context_modules .context_module").each(function() {
+          ids.push($(this).attr('id').substring('context_module_'.length));
+        });
+        var url = $(".reorder_modules_url").attr('href');
+        $("#context_modules").loadingImage();
+        $.ajaxJSON(url, 'POST', {order: ids.join(",")}, function(data) {
+          $("#context_modules").loadingImage('remove');
+          for(var idx in data) {
+            var module = data[idx];
+            $("#context_module_" + module.context_module.id).triggerHandler('update', module);
+          }
+        }, function(data) {
+          $("#context_modules").loadingImage('remove');
+        });
+      },
+
+      updateModuleItemPositions: function(event, ui) {
+        var $module = ui.item.parents(".context_module");
+        var url = $module.find(".reorder_items_url").attr('href');
+        $module.find(".content").loadingImage();
+        var items = [];
+        $module.find(".context_module_items .context_module_item").each(function() {
+          items.push($(this).getTemplateData({textValues: ['id']}).id);
+        });
+        $.ajaxJSON(url, 'POST', {order: items.join(",")}, function(data) {
+          $module.find(".content").loadingImage('remove');
+          if(data && data.context_module && data.context_module.content_tags) {
+            for(var idx in data.context_module.content_tags) {
+              var tag = data.context_module.content_tags[idx].content_tag;
+              $module.find("#context_module_item_" + tag.id).fillTemplateData({
+                data: {position: tag.position}
+              });
+            }
+          }
+        }, function(data) {
+          $module.find(".content").loadingImage('remove');
+          $module.find(".content").errorBox(I18n.t('errors.reorder', 'Reorder failed, please try again.'));
+        });
+      },
+
       refreshProgressions: function(show_links) {
         if (ENV.NO_MODULE_PROGRESSIONS) return;
 
@@ -285,6 +328,7 @@ define([
         }
         $item.addClass(data.type + "_" + data.id);
         $item.addClass(data.type);
+        $item.attr('aria-label', data.title);
         $item.fillTemplateData({
           data: data,
           id: 'context_module_item_' + data.id,
@@ -411,30 +455,7 @@ define([
         placeholder: 'context_module_placeholder',
         forcePlaceholderSize: true,
         axis: 'y',
-        containment: "#context_modules",
-        update: function(event, ui) {
-          var $module = ui.item.parents(".context_module");
-          var url = $module.find(".reorder_items_url").attr('href');
-          $module.find(".content").loadingImage();
-          var items = [];
-          $module.find(".context_module_items .context_module_item").each(function() {
-            items.push($(this).getTemplateData({textValues: ['id']}).id);
-          });
-          $.ajaxJSON(url, 'POST', {order: items.join(",")}, function(data) {
-            $module.find(".content").loadingImage('remove');
-            if(data && data.context_module && data.context_module.content_tags) {
-              for(var idx in data.context_module.content_tags) {
-                var tag = data.context_module.content_tags[idx].content_tag;
-                $module.find("#context_module_item_" + tag.id).fillTemplateData({
-                  data: {position: tag.position}
-                });
-              }
-            }
-          }, function(data) {
-            $module.find(".content").loadingImage('remove');
-            $module.find(".content").errorBox(I18n.t('errors.reorder', 'Reorder failed, please try again.'));
-          });
-        }
+        containment: "#context_modules"
       }
     };
   })();
@@ -443,7 +464,8 @@ define([
   modules.initModuleManagement = function() {
     // Create the context modules backbone view to manage the publish button. 
     var context_modules_view = new ContextModulesView({
-      el: $("#content")
+      el: $("#content"),
+      modules: modules
     });
 
     $("#unlock_module_at").change(function() {
@@ -460,6 +482,7 @@ define([
     $(".context_module").bind('update', function(event, data) {
       data.context_module.unlock_at = $.parseFromISO(data.context_module.unlock_at).datetime_formatted;
       var $module = $("#context_module_" + data.context_module.id);
+      $module.attr('aria-label', data.context_module.name);
       $module.find(".header").fillTemplateData({
         data: data.context_module,
         hrefValues: ['id']
@@ -750,7 +773,9 @@ define([
       event.preventDefault();
       var $module = $("#context_module_blank").clone(true).attr('id', 'context_module_new');
       $("#context_modules").append($module);
-        $module.find(".context_module_items").sortable(modules.sortable_module_options);
+        var opts = modules.sortable_module_options;
+        opts['update'] = modules.updateModuleItemPositions;
+        $module.find(".context_module_items").sortable(opts);
         $("#context_modules.ui-sortable").sortable('refresh');
         $("#context_modules .context_module .context_module_items.ui-sortable").each(function() {
           $(this).sortable('refresh');
@@ -873,7 +898,9 @@ define([
       var next = function() {
         if($items.length > 0) {
           var $item = $items.shift();
-          $item.sortable(modules.sortable_module_options);
+          var opts = modules.sortable_module_options;
+          opts['update'] = modules.updateModuleItemPositions;
+          $item.sortable(opts);
           setTimeout(next, 10);
         }
       };
@@ -883,23 +910,7 @@ define([
         helper: 'clone',
         containment: '#context_modules_sortable_container',
         axis: 'y',
-        update: function(event, ui) {
-          var ids = []
-          $("#context_modules .context_module").each(function() {
-            ids.push($(this).attr('id').substring('context_module_'.length));
-          });
-          var url = $(".reorder_modules_url").attr('href');
-          $("#context_modules").loadingImage();
-          $.ajaxJSON(url, 'POST', {order: ids.join(",")}, function(data) {
-            $("#context_modules").loadingImage('remove');
-            for(var idx in data) {
-              var module = data[idx];
-              $("#context_module_" + module.context_module.id).triggerHandler('update', module);
-            }
-          }, function(data) {
-            $("#context_modules").loadingImage('remove');
-          });
-        }
+        update: modules.updateModulePositions
       });
       modules.refreshModuleList();
       modules.refreshed = true;
