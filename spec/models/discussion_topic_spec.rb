@@ -801,6 +801,18 @@ describe DiscussionTopic do
     end
   end
 
+  context "restore" do
+    it "should restore the assignment and associated child topics" do
+      group_discussion_assignment
+      @topic.destroy
+
+      @topic.reload.assignment.expects(:restore).with(:discussion_topic).once
+      @topic.restore
+      @topic.reload.should be_active
+      @topic.child_topics.each { |ct| ct.reload.should be_active }
+    end
+  end
+
   describe "reply_from" do
     it "should ignore responses in deleted account" do
       account = Account.create!

@@ -444,8 +444,13 @@ class DiscussionTopic < ActiveRecord::Base
   def restore
     self.workflow_state = 'active'
     self.save
-    if self.for_assignment?
+
+    if self.for_assignment? && self.root_topic_id.blank?
       self.assignment.restore(:discussion_topic)
+    end
+
+    self.child_topics.each do |child|
+      child.restore
     end
   end
 
