@@ -341,7 +341,7 @@ class ConversationsController < ApplicationController
 
     @conversation.update_attribute(:workflow_state, "read") if @conversation.unread? && auto_mark_as_read?
     messages = submissions = nil
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+    Shackles.activate(:slave) do
       messages = @conversation.messages
       ConversationMessage.send(:preload_associations, messages, :asset)
       submissions = messages.map(&:submission).compact
@@ -614,7 +614,7 @@ class ConversationsController < ApplicationController
       f.updated = Time.now
       f.id = conversations_url
     end
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+    Shackles.activate(:slave) do
       @entries = []
       @conversation_contexts = {}
       @current_user.conversations.each do |conversation|

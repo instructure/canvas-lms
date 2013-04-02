@@ -410,7 +410,7 @@ class CalendarEventsApiController < ApplicationController
 
       get_options(nil)
 
-      ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+      Shackles.activate(:slave) do
         @events.concat assignment_scope.all
         @events = apply_assignment_overrides(@events)
         @events.concat calendar_event_scope.events_without_child_events.all
@@ -427,7 +427,7 @@ class CalendarEventsApiController < ApplicationController
       # if the feed url doesn't give us the requesting user,
       # we have to just display the generic course feed
       get_all_pertinent_contexts
-      ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+      Shackles.activate(:slave) do
         @contexts.each do |context|
           @assignments = context.assignments.active.all if context.respond_to?("assignments")
           # no overrides to apply without a current user

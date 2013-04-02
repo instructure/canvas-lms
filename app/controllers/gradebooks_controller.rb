@@ -45,7 +45,7 @@ class GradebooksController < ApplicationController
         if @presenter.student
           add_crumb(@presenter.student_name, named_context_url(@context, :context_student_grades_url, @presenter.student_id))
 
-          ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+          Shackles.activate(:slave) do
             #run these queries on the slave database for speed
             @presenter.assignments
             @presenter.groups_assignments = groups_as_assignments(@presenter.groups, :out_of_final => true, :exclude_total => @context.hide_final_grades?)
@@ -83,7 +83,7 @@ class GradebooksController < ApplicationController
   end
 
   def submissions_json
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+    Shackles.activate(:slave) do
       updated = Time.parse(params[:updated]) rescue nil
       updated ||= Time.parse("Jan 1 2000")
       @submissions = @context.submissions.includes(:quiz_submission, :submission_comments, :attachments).
@@ -148,7 +148,7 @@ class GradebooksController < ApplicationController
             return
           end
 
-          ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+          Shackles.activate(:slave) do
             @groups = @context.assignment_groups.active
             @groups_order = {}
             @groups.each_with_index{|group, idx| @groups_order[group.id] = idx }
@@ -182,7 +182,7 @@ class GradebooksController < ApplicationController
         }
         format.csv {
           cancel_cache_buster
-          ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+          Shackles.activate(:slave) do
             send_data(
               @context.gradebook_to_csv(:include_sis_id => @context.grants_rights?(@current_user, session, :read_sis, :manage_sis).values.any?, :user => @current_user),
               :type => "text/csv",
@@ -192,7 +192,7 @@ class GradebooksController < ApplicationController
           end
         }
         format.json  {
-          ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+          Shackles.activate(:slave) do
             @submissions = @context.submissions
             @new_submissions = @submissions
             render :json => @new_submissions.to_json(:include => [:quiz_submission, :submission_comments, :attachments])
@@ -203,7 +203,7 @@ class GradebooksController < ApplicationController
   end
 
   def gradebook_init_json
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+    Shackles.activate(:slave) do
       if params[:assignments]
         # you need to specify specifically which assignment fields you want returned to the gradebook via json here
         # that makes it so we do a lot less querying to the db, which means less active record instantiation,

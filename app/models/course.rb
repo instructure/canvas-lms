@@ -2685,7 +2685,7 @@ class Course < ActiveRecord::Base
     default_tabs = Course.default_tabs
     opts.reverse_merge!(:include_external => true)
 
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+    Shackles.activate(:slave) do
       # We will by default show everything in default_tabs, unless the teacher has configured otherwise.
       tabs = self.tab_configuration.compact
       settings_tab = default_tabs[-1]

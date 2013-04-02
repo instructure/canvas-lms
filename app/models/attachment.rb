@@ -612,7 +612,7 @@ class Attachment < ActiveRecord::Base
     quota = 0
     quota_used = 0
     if context
-      ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+      Shackles.activate(:slave) do
         quota = Setting.get_cached('context_default_quota', 50.megabytes.to_s).to_i
         quota = context.quota if (context.respond_to?("quota") && context.quota)
         min = self.minimum_size_for_quota

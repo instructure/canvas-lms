@@ -247,7 +247,7 @@ class QuizStatistics < ActiveRecord::Base
   private
 
   def submissions_for_statistics
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+    Shackles.activate(:slave) do
       for_users = quiz.context.student_ids
       scope = quiz.quiz_submissions.where(:user_id => for_users)
       scope = scope.includes(:versions) if includes_all_versions?

@@ -1305,7 +1305,7 @@ class User < ActiveRecord::Base
   end
 
   def assignments_needing_submitting(opts={})
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+    Shackles.activate(:slave) do
       course_ids = if opts[:contexts]
         (Array(opts[:contexts]).map(&:id) &
          current_student_enrollment_course_ids)
@@ -1339,7 +1339,7 @@ class User < ActiveRecord::Base
   end
 
   def assignments_needing_grading(opts={})
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+    Shackles.activate(:slave) do
       course_ids = if opts[:contexts]
         (Array(opts[:contexts]).map(&:id) &
         current_admin_enrollment_course_ids)
@@ -1640,7 +1640,7 @@ class User < ActiveRecord::Base
     opts[:start_at] ||= 2.weeks.ago
     opts[:limit] ||= 20
 
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+    Shackles.activate(:slave) do
       submissions = []
       submissions += self.submissions.after(opts[:start_at]).for_context_codes(context_codes).find(
         :all,
@@ -1735,7 +1735,7 @@ class User < ActiveRecord::Base
   # NOTE: excludes submission stream items
   def recent_stream_items(opts={})
     self.shard.activate do
-      ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+      Shackles.activate(:slave) do
         visible_instances = visible_stream_item_instances(opts).
             includes(:stream_item).
             limit(Setting.get('recent_stream_item_limit', 100))

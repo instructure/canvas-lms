@@ -70,7 +70,7 @@ class ErrorReport < ActiveRecord::Base
     end
 
     def create_error_report(opts)
-      ActiveRecord::Base::ConnectionSpecification.with_environment(nil) do
+      Shackles.activate(:master) do
         report = ErrorReport.new
         report.assign_data(opts)
         begin

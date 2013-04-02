@@ -47,7 +47,7 @@ class SummaryMessageConsolidator
   end
 
   def delayed_message_batch_ids
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+    Shackles.activate(:slave) do
       DelayedMessage.connection.select_all(
         DelayedMessage.scoped.select('communication_channel_id').select('root_account_id').uniq.
           where("workflow_state = ? AND send_at <= ?", 'pending', Time.now.to_s(:db)).
