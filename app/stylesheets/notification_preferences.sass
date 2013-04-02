@@ -8,6 +8,13 @@ $stripeColor: #f3f4f8
   th:nth-child(2n)
     background: none repeat scroll 0 0 $stripeColor
 
+.notification-table-wrapper
+  +transition(margin 0.3s ease)
+
+@media screen and (max-width: 1300px)
+  .notification-table-wrapper
+    margin-right: 40px
+
 .notification-prefs-table
 
   .ui-button
