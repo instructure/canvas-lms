@@ -20,7 +20,7 @@ require_dependency 'sis/common'
 
 module SIS
   module CSV
-    class BaseImporter
+    class CSVBaseImporter
       PARSE_ARGS = {:headers => :first_row,
                   :skip_blanks => true,
                   :header_converters => :downcase,

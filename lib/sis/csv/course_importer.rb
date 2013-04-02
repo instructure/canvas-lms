@@ -18,7 +18,7 @@
 
 module SIS
   module CSV
-    class CourseImporter < BaseImporter
+    class CourseImporter < CSVBaseImporter
 
       def self.is_course_csv?(row)
         row.include?('course_id') && row.include?('short_name')

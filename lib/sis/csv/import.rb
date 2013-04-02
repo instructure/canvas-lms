@@ -108,7 +108,7 @@ module SIS
           @csvs[importer].reject! do |csv|
             begin
               rows = 0
-              FasterCSV.open(csv[:fullpath], "rb", BaseImporter::PARSE_ARGS) do |faster_csv|
+              FasterCSV.open(csv[:fullpath], "rb", CSVBaseImporter::PARSE_ARGS) do |faster_csv|
                 rows += 1 while faster_csv.shift
               end
               @rows[importer] += rows
@@ -336,7 +336,7 @@ module SIS
           Attachment.skip_3rd_party_submits
           @csvs[importer].each do |csv|
             remaining_in_batch = 0
-            FasterCSV.foreach(csv[:fullpath], BaseImporter::PARSE_ARGS) do |row|
+            FasterCSV.foreach(csv[:fullpath], CSVBaseImporter::PARSE_ARGS) do |row|
               if remaining_in_batch == 0
                 temp_file += 1
                 if out_csv
@@ -399,7 +399,7 @@ module SIS
             return
           end
           begin
-            FasterCSV.foreach(csv[:fullpath], BaseImporter::PARSE_ARGS.merge(:headers => false)) do |row|
+            FasterCSV.foreach(csv[:fullpath], CSVBaseImporter::PARSE_ARGS.merge(:headers => false)) do |row|
               row.each(&:downcase!)
               importer = IMPORTERS.index do |importer|
                 if SIS::CSV.const_get(importer.to_s.camelcase + 'Importer').send('is_' + importer.to_s + '_csv?', row)

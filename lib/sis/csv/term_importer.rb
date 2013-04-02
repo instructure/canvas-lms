@@ -18,7 +18,7 @@
 
 module SIS
   module CSV
-    class TermImporter < BaseImporter
+    class TermImporter < CSVBaseImporter
     
       def self.is_term_csv?(row)
         #This matcher works because a course has long_name/short_name

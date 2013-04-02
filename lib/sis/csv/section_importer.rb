@@ -18,7 +18,7 @@
 
 module SIS
   module CSV
-    class SectionImporter < BaseImporter
+    class SectionImporter < CSVBaseImporter
 
       def self.is_section_csv?(row)
         #This matcher works because an enrollment doesn't have name

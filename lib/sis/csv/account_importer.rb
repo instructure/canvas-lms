@@ -18,7 +18,7 @@
 
 module SIS
   module CSV
-    class AccountImporter < BaseImporter
+    class AccountImporter < CSVBaseImporter
 
       def self.is_account_csv?(row)
         row.include?('account_id') && row.include?('parent_account_id')
