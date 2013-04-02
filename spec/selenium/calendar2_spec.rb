@@ -117,18 +117,6 @@ describe "calendar2" do
       end
 
       describe "contexts list" do
-        it "should create an event by hitting the '+' on the context list on the sidebar" do
-          event_title = 'new event'
-          get "/calendar2"
-          wait_for_ajaximations
-          keep_trying_until do
-            fj('ul#context-list > li:nth-child(2) [data-add-event]').click
-            edit_event_dialog = fj('#edit_event_tabs')
-            edit_event_dialog.should be_displayed
-          end
-          create_calendar_event(event_title, true)
-        end
-
         it "should toggle event display when context is clicked" do
           make_event :context => @course, :start => Time.now
           get "/calendar2"
@@ -444,6 +432,18 @@ describe "calendar2" do
         details.should_not be_nil
         details.text.should include(@course.default_section.name)
         details.find_element(:css, '.view_event_link')[:href].should include "/calendar_events/#{e1.id}" # links to parent event
+      end
+
+      context "event creation" do
+        it "should create an event by hitting the '+' in the top bar" do
+          event_title = 'new event'
+          get "/calendar2"
+          wait_for_ajaximations
+
+          fj('#create_new_event_link').click
+          edit_event_dialog = f('#edit_event_tabs')
+          edit_event_dialog.should be_displayed
+        end
       end
 
       context "event editing" do

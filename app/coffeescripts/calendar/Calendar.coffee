@@ -82,6 +82,7 @@ define [
         eventResize: @eventResize
         eventResizeStart: @eventResizeStart
         dayClick: @dayClick
+        addEventClick: @addEventClick
         titleFormat:
           week: "MMM d[ yyyy]{ '&ndash;'[ MMM] d, yyyy}"
         viewDisplay: @viewDisplay
@@ -121,6 +122,7 @@ define [
         @loadView $(event.target).attr('id')
 
       @$refresh_calendar_link = @el.find('#refresh_calendar_link').click @reloadClick
+      @$create_new_event_link = @el.find('#create_new_event_link').click @addEventClick
       @colorizeContexts()
 
       @scheduler = new Scheduler(".scheduler-wrapper", this)
@@ -289,6 +291,17 @@ define [
       # if short events are being resized, assume the user knows what they're doing
       event.saveDates null, revertFunc
 
+    addEventClick: (event, jsEvent, view) =>
+      if @displayAppointmentEvents
+        # Don't allow new event creation while in scheduler mode
+        return
+
+      # create a new dummy event
+      allowedContexts = userSettings.get('checked_calendar_codes') or _.pluck(@contexts, 'asset_string')
+      activeContexts  = _.filter @contexts, (c) -> _.contains(allowedContexts, c.asset_string)
+      event = commonEventFactory(null, activeContexts)
+
+      new EditEventDetailsDialog(event).show()
 
     eventClick: (event, jsEvent, view) =>
       $event = $(jsEvent.currentTarget)
@@ -449,12 +462,14 @@ define [
         @calendar.removeClass('scheduler-mode')
         @displayAppointmentEvents = null
         @scheduler.hide()
+        @$create_new_event_link.show()
         @calendar.show()
         @calendar.fullCalendar('refetchEvents')
         @calendar.fullCalendar('changeView', if view == 'week' then 'agendaWeek' else 'month')
       else
         @currentView = 'scheduler'
         @calendar.addClass('scheduler-mode')
+        @$create_new_event_link.hide()
         @calendar.hide()
         @scheduler.show()
 
