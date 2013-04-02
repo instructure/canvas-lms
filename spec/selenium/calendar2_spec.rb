@@ -231,9 +231,12 @@ describe "calendar2" do
       it "should go to assignment page when clicking assignment title" do
         name = 'special assignment'
         create_middle_day_assignment(name)
-        f('.fc-event.assignment').click
-        wait_for_ajaximations
-        driver.execute_script("$('.view_event_link').hover().click()")
+        keep_trying_until do
+          fj('.fc-event.assignment').click
+          wait_for_ajaximations
+          driver.execute_script("$('.view_event_link').hover().click()")
+          fj('h2.title').displayed?
+        end
 
         f('h2.title').text.should include(name)
       end
@@ -264,16 +267,19 @@ describe "calendar2" do
 
       it "should delete an assignment" do
         create_middle_day_assignment
-        fj('.fc-event').click
-        driver.execute_script("$('.delete_event_link').hover().click()")
+        keep_trying_until do
+          fj('.fc-event-inner').click()
+          driver.execute_script("$('.delete_event_link').hover().click()")
+          fj('.ui-dialog .ui-dialog-buttonset').displayed?
+        end
         wait_for_ajaximations
         driver.execute_script("$('.ui-dialog:visible .btn-primary').hover().click()")
         wait_for_ajaximations
-        fj('.fc-event').should be_nil
+        fj('.fc-event-inner').should be_nil
         # make sure it was actually deleted and not just removed from the interface
         get("/calendar2")
         wait_for_ajax_requests
-        fj('.fc-event').should be_nil
+        fj('.fc-event-inner').should be_nil
       end
 
       it "should let me message students who have signed up for an appointment" do
