@@ -455,7 +455,7 @@ class DiscussionTopicsController < ApplicationController
         end
 
         # handle creating/deleting assignment
-        if params[:assignment]
+        if params[:assignment] && !@topic.root_topic_id?
           if params[:assignment].has_key?(:set_assignment) && !value_to_boolean(params[:assignment][:set_assignment])
             if @topic.assignment && @topic.assignment.grants_right?(@current_user, session, :update)
               assignment = @topic.assignment
