@@ -156,8 +156,23 @@ class AppointmentGroupsController < ApplicationController
       self,
       api_v1_appointment_groups_url(:scope => params[:scope])
     )
-    AppointmentGroup.send(:preload_associations, groups, :appointments) if params[:include]
-    render :json => groups.map{ |group| appointment_group_json(group, @current_user, session, :include => params[:include]) }
+    if params[:include]
+      AppointmentGroup.send(:preload_associations, groups,
+                            [{:appointments =>
+                               [:parent_event,
+                                {:context =>
+                                  [{:appointment_group_contexts => :context},
+                                   :appointment_group_sub_contexts]},
+                                {:child_events =>
+                                  [:parent_event,
+                                   :context,
+                                   {:child_events =>
+                                     [:parent_event,
+                                      :context]}]}]},
+                             {:appointment_group_contexts => :context},
+                             :appointment_group_sub_contexts])
+    end
+    render :json => groups.map{ |group| appointment_group_json(group, @current_user, session, :include => params[:include]) } 
   end
 
   # @API Create an appointment group
