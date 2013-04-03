@@ -372,6 +372,7 @@ class WikiPage < ActiveRecord::Base
       }), context)
     end
     return if hash[:type] && ['folder', 'FOLDER_TYPE'].member?(hash[:type]) && hash[:linked_resource_id]
+    hash[:missing_links] = {}
     allow_save = true
     if hash[:type] == 'linked_resource' || hash[:type] == "URL_TYPE"
       allow_save = false
@@ -379,9 +380,11 @@ class WikiPage < ActiveRecord::Base
       item.title = hash[:title] unless hash[:root_folder]
       description = ""
       if hash[:header]
-        description += hash[:header][:is_html] ? ImportedHtmlConverter.convert(hash[:header][:body] || "", context) : ImportedHtmlConverter.convert_text(hash[:header][:body] || [""], context)
+        hash[:missing_links][:field] = []
+        description += hash[:header][:is_html] ? ImportedHtmlConverter.convert(hash[:header][:body] || "", context, {:missing_links => hash[:missing_links][:header]}) : ImportedHtmlConverter.convert_text(hash[:header][:body] || [""], context)
       end
-      description += ImportedHtmlConverter.convert(hash[:description], context) if hash[:description]
+      hash[:missing_links][:description] = []
+      description += ImportedHtmlConverter.convert(hash[:description], context, {:missing_links => hash[:missing_links][:description]}) if hash[:description]
       contents = ""
       allow_save = false if hash[:migration_id] && hash[:outline_folders_to_import] && !hash[:outline_folders_to_import][hash[:migration_id]]
       hash[:contents].each do |sub_item|
@@ -395,7 +398,8 @@ class WikiPage < ActiveRecord::Base
             contents = ""
           end
           description += "\n<h2>#{sub_item[:title]}</h2>\n" if sub_item[:title]
-          description += ImportedHtmlConverter.convert(sub_item[:description], context) if sub_item[:description]
+          hash[:missing_links][:sub_item] = []
+          description += ImportedHtmlConverter.convert(sub_item[:description], context, {:missing_links => hash[:missing_links][:sub_item]}) if sub_item[:description]
         elsif sub_item[:type] == 'linked_resource'
           case sub_item[:linked_resource_type]
           when 'TOC_TYPE'
@@ -427,7 +431,8 @@ class WikiPage < ActiveRecord::Base
       end
       description += "<ul>\n#{contents}\n</ul>" if contents && contents.length > 0
       if hash[:footer]
-        description += hash[:footer][:is_html] ? ImportedHtmlConverter.convert(hash[:footer][:body] || "", context) : ImportedHtmlConverter.convert_text(hash[:footer][:body] || [""], context)
+        hash[:missing_links][:footer] = []
+        description += hash[:footer][:is_html] ? ImportedHtmlConverter.convert(hash[:footer][:body] || "", context, {:missing_links => hash[:missing_links][:footer]}) : ImportedHtmlConverter.convert_text(hash[:footer][:body] || [""], context)
       end
       item.body = description
       allow_save = false if !description || description.empty?
@@ -454,10 +459,13 @@ class WikiPage < ActiveRecord::Base
       #it's an actual wiki page
       item.title = hash[:title].presence || item.url.presence || "unnamed page"
       if item.title.length > TITLE_LENGTH
-        migration.add_warning(t('warnings.truncated_wiki_title', "The title of the following wiki page was truncated: %{title}", :title => item.title))
+        if context.respond_to?(:content_migration) && context.content_migration
+          context.content_migration.add_warning(t('warnings.truncated_wiki_title', "The title of the following wiki page was truncated: %{title}", :title => item.title))
+        end
         item.title.splice!(0...TITLE_LENGTH) # truncate too-long titles
       end
-      item.body = ImportedHtmlConverter.convert(hash[:text] || "", context)
+      hash[:missing_links][:body] = []
+      item.body = ImportedHtmlConverter.convert(hash[:text] || "", context, {:missing_links => hash[:missing_links][:body]})
       item.editing_roles = hash[:editing_roles] if hash[:editing_roles].present?
       item.hide_from_students = hash[:hide_from_students] if !hash[:hide_from_students].nil?
       item.notify_of_update = hash[:notify_of_update] if !hash[:notify_of_update].nil?
@@ -467,6 +475,13 @@ class WikiPage < ActiveRecord::Base
     if allow_save && hash[:migration_id]
       item.save_without_broadcasting!
       context.imported_migration_items << item if context.imported_migration_items
+      if context.respond_to?(:content_migration) && context.content_migration
+        hash[:missing_links].each do |field, missing_links|
+          context.content_migration.add_missing_content_links(:class => item.class.to_s,
+            :id => item.id, :field => field, :missing_links => missing_links,
+            :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/wiki/#{item.url}")
+        end
+      end
       return item
     end
   end

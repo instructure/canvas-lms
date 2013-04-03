@@ -961,7 +961,8 @@ class Quiz < ActiveRecord::Base
     item.unlock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:unlock_at]) if hash[:unlock_at]
     item.due_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:due_at]) if hash[:due_at]
     item.scoring_policy = hash[:which_attempt_to_keep] if hash[:which_attempt_to_keep]
-    item.description = ImportedHtmlConverter.convert(hash[:description], context)
+    hash[:missing_links] = []
+    item.description = ImportedHtmlConverter.convert(hash[:description], context, {:missing_links => hash[:missing_links]})
     [:migration_id, :title, :allowed_attempts, :time_limit,
      :shuffle_answers, :show_correct_answers, :points_possible, :hide_results,
      :access_code, :ip_filter, :scoring_policy, :require_lockdown_browser,
@@ -972,6 +973,13 @@ class Quiz < ActiveRecord::Base
     end
     
     item.save!
+
+    if context.respond_to?(:content_migration) && context.content_migration
+      context.content_migration.add_missing_content_links(:class => item.class.to_s,
+        :id => item.id, :missing_links => hash[:missing_links],
+        :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/#{item.class.to_s.underscore.pluralize}/#{item.id}")
+    end
+
     if question_data
       hash[:questions] ||= []
 

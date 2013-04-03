@@ -1917,6 +1917,8 @@ class Course < ActiveRecord::Base
       import_syllabus_from_migration(syllabus_body) if syllabus_body
     end
 
+    migration.add_warnings_for_missing_content_links
+
     begin
       #Adjust dates
       if bool_res(params[:copy][:shift_dates])
@@ -1968,7 +1970,11 @@ class Course < ActiveRecord::Base
   attr_accessor :folder_name_lookups, :attachment_path_id_lookup, :attachment_path_id_lookup_lower, :assignment_group_no_drop_assignments
 
   def import_syllabus_from_migration(syllabus_body)
-    self.syllabus_body = ImportedHtmlConverter.convert(syllabus_body, self)
+    missing_links = []
+    self.syllabus_body = ImportedHtmlConverter.convert(syllabus_body, self, {:missing_links => missing_links})
+    self.content_migration.add_missing_content_links(:class => self.class.to_s,
+      :id => self.id, :field => "syllabus", :missing_links => missing_links,
+      :url => "/#{self.class.to_s.underscore.pluralize}/#{self.id}/assignments/syllabus")
   end
 
   def import_settings_from_migration(data, migration)

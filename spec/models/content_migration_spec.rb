@@ -1613,7 +1613,6 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
         tool.user_navigation.should == @tool_from.user_navigation
       end
     end
-
   end
 
   context "#prepare_data" do

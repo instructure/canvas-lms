@@ -548,7 +548,8 @@ class CalendarEvent < ActiveRecord::Base
     item.migration_id = hash[:migration_id]
     item.workflow_state = 'active' if item.deleted?
     item.title = hash[:title] || hash[:name]
-    description = ImportedHtmlConverter.convert(hash[:description] || "", context)
+    hash[:missing_links] = []
+    description = ImportedHtmlConverter.convert(hash[:description] || "", context, {:missing_links => hash[:missing_links]})
     if hash[:attachment_type] == 'external_url'
       url = hash[:attachment_value]
       description += "<p><a href='#{url}'>" + ERB::Util.h(t(:see_related_link, "See Related Link")) + "</a></p>" if url
@@ -581,6 +582,11 @@ class CalendarEvent < ActiveRecord::Base
     item.end_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:end_at]) unless hash[:end_at].nil?
 
     item.save_without_broadcasting!
+    if context.respond_to?(:content_migration) && context.content_migration
+      context.content_migration.add_missing_content_links(:class => item.class.to_s,
+        :id => item.id, :missing_links => hash[:missing_links],
+        :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/#{item.class.to_s.underscore.pluralize}/#{item.id}")
+    end
     context.imported_migration_items << item if context.imported_migration_items
     if hash[:all_day]
       item.all_day = hash[:all_day]

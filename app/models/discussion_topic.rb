@@ -748,7 +748,8 @@ class DiscussionTopic < ActiveRecord::Base
     end
     item.migration_id = hash[:migration_id]
     item.title = hash[:title]
-    item.message = ImportedHtmlConverter.convert(hash[:description] || hash[:text], context)
+    hash[:missing_links] = []
+    item.message = ImportedHtmlConverter.convert(hash[:description] || hash[:text], context, {:missing_links => (hash[:missing_links])})
     item.message = t('#discussion_topic.empty_message', "No message") if item.message.blank?
     item.posted_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:posted_at]) if hash[:posted_at]
     item.delayed_post_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:delayed_post_at]) if hash[:delayed_post_at]
@@ -783,6 +784,13 @@ class DiscussionTopic < ActiveRecord::Base
     context.migration_results << "" if hash[:peer_rating_type] && hash[:peer_rating_types] != "none" if context.respond_to?(:migration_results)
     hash[:messages] ||= hash[:posts]
     context.imported_migration_items << item if context.respond_to?(:imported_migration_items) && context.imported_migration_items
+
+    if context.respond_to?(:content_migration) && context.content_migration
+      context.content_migration.add_missing_content_links(:class => item.class.to_s,
+        :id => item.id, :missing_links => hash[:missing_links],
+        :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/#{item.class.to_s.underscore.pluralize}/#{item.id}")
+    end
+
     item
   end
 

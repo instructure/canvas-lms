@@ -21,7 +21,7 @@ class ImportedHtmlConverter
 
   CONTAINER_TYPES = ['div', 'p', 'body']
 
-  def self.convert(html, context, remove_outer_nodes_if_one_child = false)
+  def self.convert(html, context, opts={})
     doc = Nokogiri::HTML(html || "")
     attrs = ['rel', 'href', 'src', 'data', 'value']
     course_path = "/#{context.class.to_s.underscore.pluralize}/#{context.id}"
@@ -35,6 +35,9 @@ class ImportedHtmlConverter
           if attr == 'value'
             next unless node['name'] && node['name'] == 'src'
           end
+
+          new_url = nil
+          missing_relative_url = nil
           val = URI.unescape(node[attr])
           if val =~ /wiki_page_migration_id=(.*)/
             # This would be from a BB9 migration. 
@@ -42,18 +45,18 @@ class ImportedHtmlConverter
             #todo: FLAG UNFOUND REFERENCES TO re-attempt in second loop?
             if wiki_migration_id = $1
               if linked_wiki = context.wiki.wiki_pages.find_by_migration_id(wiki_migration_id)
-                node[attr] = URI::escape("#{course_path}/wiki/#{linked_wiki.url}")
+                new_url = URI::escape("#{course_path}/wiki/#{linked_wiki.url}")
               end
             end
           elsif val =~ /discussion_topic_migration_id=(.*)/
             if topic_migration_id = $1
               if linked_topic = context.discussion_topics.find_by_migration_id(topic_migration_id)
-                node[attr] = URI::escape("#{course_path}/discussion_topics/#{linked_topic.id}")
+                new_url = URI::escape("#{course_path}/discussion_topics/#{linked_topic.id}")
               end
             end
           elsif val =~ %r{\$CANVAS_COURSE_REFERENCE\$/modules/items/(.*)}
             if tag = context.context_module_tags.find_by_migration_id($1, :select => 'id')
-              node[attr] = URI::escape "#{course_path}/modules/items/#{tag.id}"
+              new_url = URI::escape "#{course_path}/modules/items/#{tag.id}"
             end
           elsif val =~ %r{(?:\$CANVAS_OBJECT_REFERENCE\$|\$WIKI_REFERENCE\$)/([^/]*)/(.*)}
             type = $1
@@ -62,59 +65,84 @@ class ImportedHtmlConverter
             type = 'context_modules' if type == 'modules'
             if type == 'wiki'
               if page = context.wiki.wiki_pages.find_by_url(migration_id)
-                node[attr] = URI::escape("#{course_path}/wiki/#{page.url}")
+                new_url = URI::escape("#{course_path}/wiki/#{page.url}")
               end
             elsif type == 'attachments'
               if att = context.attachments.find_by_migration_id(migration_id)
-                node[attr] = URI::escape("#{course_path}/files/#{att.id}/preview")
+                new_url = URI::escape("#{course_path}/files/#{att.id}/preview")
               end
             elsif context.respond_to?(type) && context.send(type).respond_to?(:find_by_migration_id)
               if object = context.send(type).find_by_migration_id(migration_id)
-                node[attr] = URI::escape("#{course_path}/#{type_for_url}/#{object.id}")
+                new_url = URI::escape("#{course_path}/#{type_for_url}/#{object.id}")
               end
             end
           elsif val =~ %r{\$CANVAS_COURSE_REFERENCE\$/(.*)}
             section = $1
-            node[attr] = URI::escape("#{course_path}/#{section}")
+            new_url = URI::escape("#{course_path}/#{section}")
           elsif val =~ %r{\$IMS_CC_FILEBASE\$/(.*)}
             rel_path = $1
             if attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/
-              replace_media_comment_data(node, rel_path, context, course_path)
+              unless new_url = replace_media_comment_data(node, rel_path, context)
+                unless new_url = replace_relative_file_url(rel_path, context)
+                  missing_relative_url = rel_path
+                end
+              end
             else
-              node[attr] = replace_relative_file_url(rel_path, context, course_path)
+              unless new_url = replace_relative_file_url(rel_path, context)
+                missing_relative_url = rel_path
+              end
             end
           elsif attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/
             # Course copy media reference, leave it alone
+            new_url = node[attr]
           elsif attr == 'src' && node['class'] && node['class'] =~ /equation_image/
             # Equation image, leave it alone
+            new_url = node[attr]
           elsif val =~ %r{\A/assessment_questions/\d+/files/\d+}
             # The file is in the context of an AQ, leave the link alone
+            new_url = node[attr]
           elsif val =~ %r{\A/courses/\d+/files/\d+}
             # This points to a specific file already, leave it alone
+            new_url = node[attr]
           elsif for_course_copy
             # For course copies don't try to fix relative urls. Any url we can
             # correctly alter was changed during the 'export' step
+            new_url = node[attr]
           else
             begin
               if relative_url?(node[attr])
-                node[attr] = replace_relative_file_url(val, context, course_path)
+                unless new_url = replace_relative_file_url(val, context)
+                  missing_relative_url = val
+                end
+              else
+                new_url = node[attr]
               end
             rescue URI::InvalidURIError
               Rails.logger.warn "attempting to translate invalid url: #{node[attr]}"
               # leave the url as it was
             end
           end
+
+          if missing_relative_url
+            node[attr] = replace_missing_relative_url(missing_relative_url, context, course_path)
+          end
+          if new_url
+            node[attr] = new_url
+          elsif opts[:missing_links]
+            opts[:missing_links] << node[attr]
+          end
         end
       end
     end
 
     node = doc.at_css('body')
-    if remove_outer_nodes_if_one_child
+    if opts[:remove_outer_nodes_if_one_child]
       while node.children.size == 1 && node.child.child
         break unless CONTAINER_TYPES.member? node.child.name
         node = node.child
       end
     end
+
     node.inner_html
   rescue
     ""
@@ -137,7 +165,7 @@ class ImportedHtmlConverter
     mig_id && context.attachments.find_by_migration_id(mig_id)
   end
 
-  def self.replace_relative_file_url(rel_path, context, course_path)
+  def self.replace_relative_file_url(rel_path, context)
     new_url = nil
     rel_path, qs = rel_path.split('?', 2)
     if file = find_file_in_context(rel_path, context)
@@ -160,32 +188,32 @@ class ImportedHtmlConverter
         new_url += "/preview"
       end
     end
-    unless new_url
-      # the rel_path should already be escaped
-      new_url = File.join(URI::escape("#{course_path}/file_contents/#{Folder.root_folders(context).first.name}"), rel_path)
-    end
     new_url
   end
 
-  def self.replace_media_comment_data(node, rel_path, context, course_path)
+  def self.replace_missing_relative_url(rel_path, context, course_path)
+    # the rel_path should already be escaped
+    File.join(URI::escape("#{course_path}/file_contents/#{Folder.root_folders(context).first.name}"), rel_path)
+  end
+
+  def self.replace_media_comment_data(node, rel_path, context)
     if context.respond_to?(:attachment_path_id_lookup) &&
       context.attachment_path_id_lookup &&
         context.attachment_path_id_lookup[rel_path]
       file = context.attachments.find_by_migration_id(context.attachment_path_id_lookup[rel_path])
       if file && file.media_object
         media_id = file.media_object.media_id
-        node['href'] = "/media_objects/#{media_id}"
         node['id'] = "media_comment_#{media_id}"
-        return
+        return "/media_objects/#{media_id}"
       end
     end
     if node['id'] && node['id'] =~ /\Amedia_comment_(.+)\z/
-      node['href'] = "/media_objects/#{$1}"
+      return "/media_objects/#{$1}"
     else
-      node['href'] = replace_relative_file_url(rel_path, context, course_path)
       node.delete('class')
       node.delete('id')
       node.delete('style')
+      return nil
     end
   end
   

@@ -548,16 +548,27 @@ class AssessmentQuestion < ActiveRecord::Base
       id = AssessmentQuestion.connection.insert(query)
       hash['assessment_question_id'] = id
     end
+    if context.respond_to?(:content_migration) && context.content_migration
+      hash[:missing_links].each do |field, missing_links|
+        context.content_migration.add_missing_content_links(:class => self.to_s,
+         :id => hash['assessment_question_id'], :field => field, :missing_links => missing_links,
+         :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/question_banks/#{bank.id}#question_#{hash['assessment_question_id']}_question_text")
+      end
+    end
+    hash.delete(:missing_links)
     hash
   end
   
   def self.prep_for_import(hash, context)
+    hash[:missing_links] = {}
     [:question_text, :correct_comments_html, :incorrect_comments_html, :neutral_comments_html, :more_comments_html].each do |field|
-      hash[field] = ImportedHtmlConverter.convert(hash[field], context, true) if hash[field].present?
+      hash[:missing_links][field] = []
+      hash[field] = ImportedHtmlConverter.convert(hash[field], context, {:missing_links => hash[:missing_links][field], :remove_outer_nodes_if_one_child => true}) if hash[field].present?
     end
-    hash[:answers].each do |answer|
+    hash[:answers].each_with_index do |answer, i|
       [:html, :comments_html, :left_html].each do |field|
-        answer[field] = ImportedHtmlConverter.convert(answer[field], context, true) if answer[field].present?
+        hash[:missing_links]["answer #{i} #{field}"] = []
+        answer[field] = ImportedHtmlConverter.convert(answer[field], context, {:missing_links => hash[:missing_links]["answer #{i} #{field}"], :remove_outer_nodes_if_one_child => true}) if answer[field].present?
       end
     end if hash[:answers]
     hash[:prepped_for_import] = true

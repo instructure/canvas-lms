@@ -1586,9 +1586,10 @@ class Assignment < ActiveRecord::Base
     if hash[:instructions_in_html] == false
       self.extend TextHelper
     end
+    hash[:missing_links] = {:description => [], :instructions => [], }
     description = ""
-    description += hash[:instructions_in_html] == false ? ImportedHtmlConverter.convert_text(hash[:description] || "", context) : ImportedHtmlConverter.convert(hash[:description] || "", context)
-    description += hash[:instructions_in_html] == false ? ImportedHtmlConverter.convert_text(hash[:instructions] || "", context) : ImportedHtmlConverter.convert(hash[:instructions] || "", context)
+    description += hash[:instructions_in_html] == false ? ImportedHtmlConverter.convert_text(hash[:description] || "", context) : ImportedHtmlConverter.convert(hash[:description] || "", context, {:missing_links => hash[:missing_links][:description]})
+    description += hash[:instructions_in_html] == false ? ImportedHtmlConverter.convert_text(hash[:instructions] || "", context) : ImportedHtmlConverter.convert(hash[:instructions] || "", context, {:missing_links => hash[:missing_links][:instructions]})
     description += Attachment.attachment_list_from_migration(context, hash[:attachment_ids])
     item.description = description
 
@@ -1691,6 +1692,14 @@ class Assignment < ActiveRecord::Base
 
     context.imported_migration_items << item if context.imported_migration_items && new_record
     item.save_without_broadcasting!
+
+    if context.respond_to?(:content_migration) && context.content_migration
+      hash[:missing_links].each do |field, missing_links|
+        context.content_migration.add_missing_content_links(:class => item.class.to_s,
+          :id => item.id, :field => field, :missing_links => missing_links,
+          :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/#{item.class.to_s.underscore.pluralize}/#{item.id}")
+      end
+    end
 
     if item.submission_types == 'external_tool'
       tag = item.create_external_tool_tag(:url => hash[:external_tool_url], :new_tab => hash[:external_tool_new_tab])

@@ -18,6 +18,7 @@
 
 class ContentMigration < ActiveRecord::Base
   include Workflow
+  include TextHelper
   belongs_to :context, :polymorphic => true
   belongs_to :user
   belongs_to :attachment
@@ -203,8 +204,9 @@ class ContentMigration < ActiveRecord::Base
       er = ErrorReport.log_exception(:content_migration, opts[:exception])
       mi.error_report_id = er.id
     end
-    mi.error_message = opts[:error_message]
+    mi.error_message = truncate_text(opts[:error_message], :max_length => 200)
     mi.fix_issue_html_url = opts[:fix_issue_html_url]
+
     mi.save!
     
     mi
@@ -479,5 +481,28 @@ class ContentMigration < ActiveRecord::Base
   def fast_update_progress(val)
     self.progress = val
     ContentMigration.where(:id => self).update_all(:progress=>val)
+  end
+
+  def add_missing_content_links(item)
+    @missing_content_links ||= {}
+    item[:field] ||= :text
+    key = "#{item[:class]}_#{item[:id]}_#{item[:field]}"
+    if item[:missing_links].present?
+      @missing_content_links[key] = item
+    else
+      @missing_content_links.delete(key)
+    end
+  end
+
+  def add_warnings_for_missing_content_links
+    return unless @missing_content_links
+    @missing_content_links.each_value do |item|
+      if item[:missing_links].any?
+        add_warning(t(:missing_content_links_title, "Missing links found in imported content") + " - #{item[:class]} #{item[:field]}",
+          {:error_message => "#{item[:class]} #{item[:field]} - " + t(:missing_content_links_message,
+            "The following references could not be resolved: ") + " " + item[:missing_links].join(', '),
+            :fix_issue_html_url => item[:url]})
+      end
+    end
   end
 end
