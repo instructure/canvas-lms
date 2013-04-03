@@ -85,8 +85,6 @@ define([
         }
       },
       updateProgressions: function(user_id, callback) {
-        if (ENV.NO_MODULE_PROGRESSIONS) return;
-
         var url = $(".progression_list_url").attr('href');
         if(user_id) {
           url = url + "?user_id=" + user_id;
