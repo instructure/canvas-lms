@@ -982,7 +982,7 @@ def get_file(filename, data = nil)
   [filename, fullpath, data, @file]
 end
 
-def validate_link(link_element, breadcrumb_text)
+def validate_breadcrumb_link(link_element, breadcrumb_text)
   expect_new_page_load { link_element.click }
   if breadcrumb_text != nil
     breadcrumb = f('#breadcrumbs')
