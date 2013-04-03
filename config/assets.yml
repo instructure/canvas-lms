@@ -155,4 +155,6 @@ stylesheets:
     - public/stylesheets/compiled/content_imports.css
   user_notes:
     - public/stylesheets/compiled/user_notes.css
+  imports:
+    - public/stylesheets/compiled/imports.css
   <%= plugin_assets.anchors_yml %>
