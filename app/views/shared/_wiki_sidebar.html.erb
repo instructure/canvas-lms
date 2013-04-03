@@ -48,11 +48,13 @@
               <% end %>
             </ul>
             <%= link_to t('links.new_page', "Link to a New Page"), context_url(@context, :new_context_wiki_page_url), :id => 'new_page_link', :class => "add" %>
-            <form id="new_page_drop_down" style="display:none; margin-left: 15px; margin-top: 5px;">
-              <label for="new_page_name"><%= t('new_page_name', %{What would you like to call the new page?}) %></label><br />
-              <input type="text" name="new_page_name" id="new_page_name">
-              <input type="hidden" name="new_page_url_prefix" value="<%= context_url(@context, :context_wiki_pages_url) %>" id="new_page_url_prefix" />
-              <button id="new_page_submit" class="btn btn-small" type="submit"><%= t('buttons.insert_link', %{Insert Link}) %></button>
+            <form id="new_page_drop_down" style="display:none; margin: 5px;">
+              <div class="row-fluid">
+                <label for="new_page_name"><%= t('new_page_name', %{What would you like to call the new page?}) %></label><br />
+                <input type="text" name="new_page_name" id="new_page_name" class="span12">
+                <input type="hidden" name="new_page_url_prefix" value="<%= context_url(@context, :context_wiki_pages_url) %>" id="new_page_url_prefix" />
+                <button id="new_page_submit" class="btn btn-small" type="submit"><%= t('buttons.insert_link', %{Insert Link}) %></button>
+              </div>
             </form>
         </div>
       </div>
