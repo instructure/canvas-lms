@@ -518,7 +518,14 @@ define [
     # conjunction with a click listener on <body />. When we 'blur' the grid
     # by clicking outside of it, save the current field.
     onGridBlur: (e) =>
-      return if e.target.className.match(/cell|slick/) or !@gradeGrid.getActiveCell?
+      if e.target.className.match(/cell|slick/) or !@gradeGrid.getActiveCell
+        return
+
+      if e.target.className is 'grade' and @gradeGrid.getCellEditor() instanceof SubmissionCell.out_of 
+        # We can assume that a user clicked the up or down arrows on the
+        # number input, we want to allow them to keep doing that.
+        return
+      
       @gradeGrid.getEditorLock().commitCurrentEdit()
 
     onGridInit: () ->
