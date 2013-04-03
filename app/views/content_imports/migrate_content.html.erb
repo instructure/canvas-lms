@@ -1,5 +1,7 @@
 <% add_crumb "Migrate From Another System", context_url(@context, :context_import_migrate_url) %>
 <% content_for :page_title do %><%= t :page_title, "Migrate from Another System" %><% end %>
+<% jammit_css :imports %>
+<% js_bundle :content_migration %>
 
 <h2><%= t :page_title, "Migrate from Another System" %></h2>
 <p>
@@ -24,13 +26,13 @@
     <%= options_for_select @select_options %>
   </select>
 
-  <div id="config_options" style="display:none;">
+  <div id="config_options" class="hide">
     <div id="migration_config"></div>
 
-    <fieldset id="file_upload" style="display:none;">
+    <fieldset id="file_upload" class="hide">
       <legend><%= t :choose_file, "Choose a %{file_extension} file to import", :file_extension => '<span id="upload_extension">.zip</span>'.html_safe %></legend>
       <input type="file" id="export_file_input" name="export_file" class="export_file_input"/>
-      <br/><span class="error zip_error ui-state-error" style="display:none; font-size: 16px"><%= t 'errors.choos_file', "You must choose a .zip file to upload" %></span>
+      <span class="error zip_error ui-state-error ui-corner-all hide"><%= t 'errors.choos_file', "You must choose a .zip file to upload" %></span>
     </fieldset>
 
     <fieldset class="qti_settings">
@@ -42,7 +44,7 @@
       <legend><%= t :selective_import, "Selective import" %></legend>
       <input type="checkbox" id="import_subset"/>
       <label for="import_subset"><%= t 'instructions.selective_import', "Choose which parts of the course to migrate" %></label>
-      <ul id="import_subset_options" class="unstyled_list" style="margin: 10px 20px; font-size: 0.9em; display: none;">
+      <ul id="import_subset_options" class="unstyled_list hide">
         <li>
           <%= t 'details.selective_import', "We'll only extract the areas you select below. Not all courses will have all these features.
           After we've finished extracting, you can decide exactly
@@ -107,18 +109,18 @@
       </ul>
     </fieldset>
 
-    <div>
+    <div class="action-buttons">
       <a href="<%= context_url(@context, :context_imports_url) %>" class="btn button-secondary"><%= t '#buttons.cancel', "Cancel" %></a>
       <button type="submit" class="btn btn-primary submit_button"><%= t 'buttons.import', "Import Course" %></button>
     </div>
   </div>
 <% end %>
 
-<div id="file_uploaded" style="display: none;">
+<div id="file_uploaded" class="hide">
   <p><%= mt 'messages.import_started', "**Thank you!** We'll start importing your course, you'll get an email when it's done and you'll be able to select the sections you'd like to import." %></p>
 </div>
 
-<div id="migration_configs" style="display:none;">
+<div id="migration_configs" class="hide">
   <% @plugins.each do |plugin| %>
     <div id="plugin_<%= plugin.id %>">
       <%= render :partial => plugin.settings[:migration_partial] %>
@@ -127,5 +129,3 @@
 </div>
 
 <div id="migration_alt_div"></div>
-
-<% js_bundle :content_migration %>
