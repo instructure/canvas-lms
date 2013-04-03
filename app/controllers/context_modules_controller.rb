@@ -354,8 +354,12 @@ class ContextModulesController < ApplicationController
         if params[:user_id] && @user = @context.students.find(params[:user_id])
           @progressions = @context.context_modules.active.map{|m| m.evaluate_for(@user, true, true) }
         else
-          context_module_ids = @context.context_modules.active.pluck(:id)
-          @progressions = ContextModuleProgression.where(:context_module_id => context_module_ids)
+          if  @context.large_roster
+            @progressions = []
+          else
+            context_module_ids = @context.context_modules.active.pluck(:id)
+            @progressions = ContextModuleProgression.where(:context_module_id => context_module_ids)
+          end
         end
         render :json => @progressions.to_json
       else
