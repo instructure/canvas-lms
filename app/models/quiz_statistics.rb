@@ -23,6 +23,7 @@ class QuizStatistics < ActiveRecord::Base
 
   belongs_to :quiz
   has_one :attachment, :as => 'context', :dependent => :destroy
+  has_one :progress, :as => 'context', :dependent => :destroy
 
   set_table_name :quiz_statistics
 
@@ -137,6 +138,9 @@ class QuizStatistics < ActiveRecord::Base
   end
 
   def to_csv
+    build_progress(:tag => 'quiz_statistics_csv', :completion => 0)
+    progress.start
+
     columns = []
     columns << t('statistics.csv_columns.name', 'name') unless anonymous?
     columns << t('statistics.csv_columns.id', 'id') unless anonymous?
@@ -165,7 +169,9 @@ class QuizStatistics < ActiveRecord::Base
     columns << t('statistics.csv_columns.n_incorrect', 'n incorrect')
     columns << t('statistics.csv_columns.score', 'score')
     rows = []
-    submissions.each do |submission|
+    submissions.each_with_index do |submission, i|
+      update_progress(i, submissions.size)
+
       row = []
       row << submission.user.name unless anonymous?
       row << submission.user_id unless anonymous?
@@ -232,7 +238,8 @@ class QuizStatistics < ActiveRecord::Base
       row << submission.score
       rows << row
     end
-    FasterCSV.generate do |csv|
+
+    csv = FasterCSV.generate do |csv|
       columns.each_with_index do |val, idx|
         r = []
         r << val
@@ -243,6 +250,11 @@ class QuizStatistics < ActiveRecord::Base
         csv << r
       end
     end
+
+    progress.complete
+    progress.save!
+
+    csv
   end
 
   def csv_attachment
@@ -340,5 +352,16 @@ class QuizStatistics < ActiveRecord::Base
     } rescue nil
     question[:answers] << none if none && none[:responses] > 0
     question
+  end
+
+  def update_progress(i, n)
+    # TODO: smarter updates?  maybe 10 updates isn't enough for quizzes with
+    # hundreds of submissions
+    increment = 10
+    percent = (i.to_f / n * 100).round
+
+    if (percent / increment) > (progress.completion / increment)
+      progress.update_completion! percent
+    end
   end
 end

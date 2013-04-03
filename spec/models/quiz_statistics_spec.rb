@@ -257,6 +257,13 @@ describe QuizStatistics do
         qs.mark_completed
         @quiz.statistics_csv
       end
+
+      it 'provides progress updates' do
+        @quiz.statistics_csv
+        progress = @quiz.quiz_statistics.first.progress
+        progress.completion.should == 100
+        progress.should be_completed
+      end
     end
   end
 
