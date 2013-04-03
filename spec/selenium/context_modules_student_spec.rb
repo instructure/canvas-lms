@@ -102,6 +102,14 @@ describe "context_modules" do
       validate_context_module_status_text(1, @completed_text)
       validate_context_module_status_text(2, @completed_text)
     end
+    
+    it "should show progression in large_roster courses" do
+      @course.large_roster = true
+      @course.save!
+      go_to_modules
+      navigate_to_module_item(0, @assignment_1.title)
+      validate_context_module_status_text(0, @completed_text)
+    end
 
     it "should validate that a student can't get to a locked context module" do
       go_to_modules
