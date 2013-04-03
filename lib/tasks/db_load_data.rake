@@ -1,4 +1,5 @@
 Dir.glob("#{File.dirname(__FILE__)}/../../spec/factories/*.rb").each { |file| require file }
+require 'securerandom'
 
 def ping
   STDOUT.sync = true
