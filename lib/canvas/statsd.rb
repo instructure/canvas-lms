@@ -29,7 +29,7 @@
 # At least a host needs to be defined for the environment, all other config is optional
 #
 # If a namespace is defined in statsd.yml, it'll be prepended to the stat name.
-# The hostname of the server will be appended to the stat name.
+# The hostname of the server will be appended to the stat name, unless `append_hostname: false` is specified in the config.
 # So if the namespace is "canvas" and the hostname is "app01", the final stat name of "my_stat" would be "stats.canvas.my_stat.app01"
 # (assuming the default statsd/graphite configuration)
 #
@@ -43,7 +43,12 @@ module Canvas::Statsd
     class_eval <<-RUBY, __FILE__, __LINE__+1
     def self.#{method}(stat, *args)
       if self.instance
-        self.instance.#{method}("\#{stat}.\#{hostname}", *args)
+        if self.append_hostname?
+          stat_name = "\#{stat}.\#{hostname}"
+        else
+          stat_name = stat.to_s
+        end
+        self.instance.#{method}(stat_name, *args)
       else
         nil
       end
@@ -55,6 +60,7 @@ module Canvas::Statsd
     start = Time.now
     result = yield
     self.timing(stat, ((Time.now - start) * 1000).round, sample_rate)
+    result
   end
 
   def self.instance
@@ -65,11 +71,16 @@ module Canvas::Statsd
         @statsd = ::Statsd.new(statsd_settings[:host])
         @statsd.port = statsd_settings[:port] if statsd_settings[:port]
         @statsd.namespace = statsd_settings[:namespace] if statsd_settings[:namespace]
+        @append_hostname = !statsd_settings.key?(:append_hostname) || !!statsd_settings[:append_hostname]
       else
         @statsd = nil
       end
     end
     @statsd
+  end
+
+  def self.append_hostname?
+    @append_hostname
   end
 
   def self.reset_instance
