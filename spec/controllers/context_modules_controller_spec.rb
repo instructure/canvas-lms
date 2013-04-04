@@ -398,4 +398,52 @@ describe ContextModulesController do
     end
 
   end
+  
+  describe "GET progressions" do
+    before do
+      course_with_student(:active_all => true)
+      @module = @course.context_modules.create!(:name => "first module")
+      @module.publish
+      @wiki = @course.wiki.wiki_pages.create!(:title => "wiki", :body => 'hi')
+      
+      @tag = @module.add_item(:id => @wiki.id, :type => 'wiki_page')
+      @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
+      @progression = @module.update_for(@student, :read, @tag)
+    end
+    
+    it "should return all student progressions to teacher" do
+      course_with_teacher_logged_in(:course => @course, :active_all => true)
+      get 'progressions', :course_id => @course.id
+      json = JSON.parse response.body.gsub("while(1);",'')
+      json.length.should == 1
+    end
+    
+    it "should return a single student progression" do
+      user_session(@student)
+      get 'progressions', :course_id => @course.id
+      json = JSON.parse response.body.gsub("while(1);",'')
+      json.length.should == 1
+    end
+    
+    context "with large_roster" do
+      before do
+        @course.large_roster = true
+        @course.save!
+      end
+      
+      it "should return a single student progression" do
+        user_session(@student)
+        get 'progressions', :course_id => @course.id
+        json = JSON.parse response.body.gsub("while(1);",'')
+        json.length.should == 1
+      end
+      
+      it "should not return any student progressions to teacher" do
+        course_with_teacher_logged_in(:course => @course, :active_all => true)
+        get 'progressions', :course_id => @course.id
+        json = JSON.parse response.body.gsub("while(1);",'')
+        json.length.should == 0
+      end
+    end
+  end
 end
