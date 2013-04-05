@@ -8,7 +8,7 @@
   <div style="margin-top: -5px; margin-bottom: 10px;"><a href="#" class="jump_to_today_link"><%= t 'links.jump_to_today', "Jump to Today" %></a></div>
 <% end %>
 <div id="course_syllabus" style="margin-bottom: 10px;" class="user_content">
-  <%= user_content(@context.syllabus_body) %>
+  <%= user_content(@syllabus_body) %>
 </div>
 <div id="course_syllabus_details" style="<%= hidden unless can_do(@context, @current_user, :manage_content) && (!@context.syllabus_body || @context.syllabus_body.strip.empty?) %>">
   <%= mt 'instructions.syllabus', <<-DOC

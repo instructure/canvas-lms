@@ -60,7 +60,8 @@ class Course < ActiveRecord::Base
                   :locale,
                   :hide_final_grades,
                   :hide_distribution_graphs,
-                  :lock_all_announcements
+                  :lock_all_announcements,
+                  :public_syllabus
 
   serialize :tab_configuration
   serialize :settings, Hash
@@ -940,7 +941,10 @@ class Course < ActiveRecord::Base
 
   set_policy do
     given { |user| self.available? && self.is_public }
-    can :read and can :read_outcomes
+    can :read and can :read_outcomes and can :read_syllabus
+
+    given { |user| self.available? && self.public_syllabus }
+    can :read_syllabus
 
     RoleOverride.permissions.each do |permission, details|
       given {|user, session| (self.enrollment_allows(user, session, permission) || self.account_membership_allows(user, session, permission)) && (!details[:if] || send(details[:if])) }
@@ -2737,8 +2741,10 @@ class Course < ActiveRecord::Base
         end
         unless self.grants_rights?(user, opts[:session], :read, :manage_content, :manage_assignments).values.any?
           tabs.delete_if { |t| t[:id] == TAB_ASSIGNMENTS }
-          tabs.delete_if { |t| t[:id] == TAB_SYLLABUS }
           tabs.delete_if { |t| t[:id] == TAB_QUIZZES }
+        end
+        unless self.grants_rights?(user, opts[:session], :read, :read_syllabus, :manage_content, :manage_assignments).values.any?
+          tabs.delete_if { |t| t[:id] == TAB_SYLLABUS }
         end
         tabs.delete_if{ |t| t[:visibility] == 'admins' } unless self.grants_right?(user, opts[:session], :manage_content)
         if self.grants_rights?(user, opts[:session], :manage_content, :manage_assignments).values.any?
@@ -2869,6 +2875,7 @@ class Course < ActiveRecord::Base
   add_setting :allow_student_discussion_editing, :boolean => true, :default => true
   add_setting :lock_all_announcements, :boolean => true, :default => false
   add_setting :large_roster, :boolean => true, :default => lambda { |c| c.root_account.large_course_rosters? }
+  add_setting :public_syllabus, :boolean => true, :default => false
 
   def user_can_manage_own_discussion_posts?(user)
     return true if allow_student_discussion_editing?
