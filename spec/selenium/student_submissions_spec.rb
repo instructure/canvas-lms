@@ -266,9 +266,9 @@ describe "submissions" do
         # traverse the tree
         begin
           f('#uploaded_files > ul > li.folder > .sign').click
-          wait_for_animations
+          wait_for_ajaximations
           f('#uploaded_files > ul > li.folder .file .name').click
-          wait_for_animations
+          wait_for_ajaximations
         rescue => err
           # prevent the confirm dialog that pops up when you navigate away
           # from the page from showing.
