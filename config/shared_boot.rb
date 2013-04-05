@@ -77,17 +77,18 @@ if Rails.version < "3.0"
           # Override to support custom postgresql connection parameters
           def self.postgresql_connection(config) # :nodoc:
             config = config.symbolize_keys
-            config[:user] = config.delete(:username)
+            config[:user] ||= config.delete(:username) if config.key?(:username)
 
             if config.has_key?(:database)
               config[:dbname] = config.delete(:database)
             else
               raise ArgumentError, "No database specified. Missing argument: database."
             end
+            conn_params = config.slice(:host, :port, :dbname, :user, :password, :connect_timeout)
 
             # The postgres drivers don't allow the creation of an unconnected PGconn object,
             # so just pass a nil connection object for the time being.
-            ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.new(nil, logger, [config], config)
+            ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.new(nil, logger, [conn_params], config)
           end
         end
 

@@ -98,7 +98,7 @@ group :mysql do
 end
 
 group :postgres do
-  gem 'pg',           '0.10.1'
+  gem 'pg',           '0.15.0'
 end
 
 group :sqlite do
