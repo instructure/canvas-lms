@@ -217,10 +217,16 @@ TEXT
         <th scope="row"><label><%= before_label('course_visibility', %{Visibility}) %></label></th>
         <td colspan="3">
           <span class="course_form">
-            <%= f.check_box :is_public, :class => "is_public_checkbox" %>
-            <%= f.label :is_public, :en => "Make this course publicly visible" %>
-            <span class="aside checklabelfix"><%= t('help.public_course', %{(student data will remain private)}) %></span>
+            <%= f.check_box :public_syllabus %>
+            <%= f.label :public_syllabus, :en => "Make the syllabus for this course publicly visible" %>
           </span>
+          <div>
+            <span class="course_form">
+              <%= f.check_box :is_public, :class => "is_public_checkbox" %>
+              <%= f.label :is_public, :en => "Make this course publicly visible" %>
+              <span class="aside checklabelfix"><%= t('help.public_course', %{(student data will remain private)}) %></span>
+            </span>
+          </div>
           <span class="course_info is_public"><%= @context.is_public ? t('public_course', 'Public') : t('private_course', 'Private') %></span>
           <div class="public_options">
             <span class="course_form">

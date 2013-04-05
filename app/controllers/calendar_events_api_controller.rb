@@ -188,7 +188,7 @@
 class CalendarEventsApiController < ApplicationController
   include Api::V1::CalendarEvent
 
-  before_filter :require_user, :except => %w(public_feed)
+  before_filter :require_user, :except => %w(public_feed index)
   before_filter :get_calendar_context, :only => :create
 
   # @API List calendar events
@@ -214,6 +214,23 @@ class CalendarEventsApiController < ApplicationController
   def index
     codes = (params[:context_codes] || [@current_user.asset_string])[0, 10]
     get_options(codes)
+
+    # if specific context codes were requested, ensure the user can access them
+    if codes && codes.length > 0
+      selected_context_codes = Set.new(@context_codes)
+      codes.each do |c|
+        unless selected_context_codes.include?(c)
+          render_unauthorized_action
+          return
+        end
+      end
+    else
+      # otherwise, ensure there is a user provided
+      unless @current_user
+        redirect_to_login
+        return
+      end
+    end
 
     scope  = @type == :assignment ? assignment_scope : calendar_event_scope
     events = Api.paginate(scope, self, api_v1_calendar_events_url)
@@ -496,20 +513,38 @@ class CalendarEventsApiController < ApplicationController
     # a function parameter
     params[:include_contexts] = codes.join(",") if codes
 
-    get_all_pertinent_contexts(true)
+    # only get pertinent contexts if there is a user
+    if @current_user
+      get_all_pertinent_contexts(true)
+    end
 
     if codes
+      # add publicly accessible courses to the selected contexts
+      @contexts ||= []
+      pertinent_context_codes = Set.new @contexts.map { |c| c.asset_string }
+
+      codes.each do |c|
+        unless pertinent_context_codes.include?(c)
+          context = Context.find_by_asset_string(c)
+          @contexts.push context if context && (context.is_public || context.public_syllabus)
+        end
+      end
+
+      # filter the contexts to only the requested contexts
       selected_contexts = @contexts.select{ |c| codes.include?(c.asset_string) }
     else
       selected_contexts = @contexts
     end
     @context_codes = selected_contexts.map(&:asset_string)
-    @section_codes = selected_contexts.inject([]){ |ary, context|
-      next ary unless context.is_a?(Course)
-      ary + context.sections_visible_to(@current_user).map(&:asset_string)
-    }
+    @section_codes = []
+    if @current_user
+      @section_codes = selected_contexts.inject([]){ |ary, context|
+        next ary unless context.is_a?(Course)
+        ary + context.sections_visible_to(@current_user).map(&:asset_string)
+      }
+    end
 
-    if @type == :event && @start_date
+    if @type == :event && @start_date && @current_user
       # pull in reservable appointment group events, if requested
       group_codes = codes.grep(/\Aappointment_group_(\d+)\z/).map{ |m| m.sub(/.*_/, '').to_i }
       if group_codes.present?
@@ -537,8 +572,12 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def calendar_event_scope
-    scope = CalendarEvent.active.order_by_start_at.
-      for_user_and_context_codes(@current_user, @context_codes, @section_codes)
+    scope = CalendarEvent.active.order_by_start_at
+    if @current_user
+      scope = scope.for_user_and_context_codes(@current_user, @context_codes, @section_codes)
+    else
+      scope = scope.for_context_codes(@context_codes)
+    end
 
     scope = scope.send(*date_scope_and_args) unless @all_events
     scope
@@ -581,10 +620,14 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def manageable_appointment_group_codes
+    return [] unless @current_user
+
     AppointmentGroup.
       manageable_by(@current_user, @context_codes).
       intersecting(@start_date, @end_date).
       map(&:asset_string)
   end
 
+  def select_public_codes(codes)
+  end
 end

@@ -176,6 +176,7 @@ class CoursesController < ApplicationController
   # @argument course[end_at] [Datetime] [optional] Course end date in ISO8601 format. e.g. 2011-01-01T01:00Z
   # @argument course[license] [String] [optional] The name of the licensing. Should be one of the following abbreviations (a descriptive name is included in parenthesis for reference): 'private' (Private Copyrighted); 'cc_by_nc_nd' (CC Attribution Non-Commercial No Derivatives); 'cc_by_nc_sa' (CC Attribution Non-Commercial Share Alike); 'cc_by_nc' (CC Attribution Non-Commercial); 'cc_by_nd' (CC Attribution No Derivatives); 'cc_by_sa' (CC Attribution Share Alike); 'cc_by' (CC Attribution); 'public_domain' (Public Domain).
   # @argument course[is_public] [Boolean] [optional] Set to true if course if public.
+  # @argument course[public_syllabus] [Boolean] [optional] Set to true to make the course syllabus public.
   # @argument course[public_description] [String] [optional] A publicly visible description of the course.
   # @argument course[allow_student_wiki_edits] [Boolean] [optional] If true, students will be able to modify the course wiki.
   # @argument course[allow_wiki_comments] [Boolean] [optional] If true, course members will be able to comment on wiki pages.
@@ -231,7 +232,7 @@ class CoursesController < ApplicationController
             @current_user,
             session,
             [:start_at, course_end, :license, :publish_grades_immediately,
-             :is_public, :allow_student_assignment_edits, :allow_wiki_comments,
+             :is_public, :public_syllabus, :allow_student_assignment_edits, :allow_wiki_comments,
              :allow_student_forum_attachments, :open_enrollment, :self_enrollment,
              :root_account_id, :account_id, :public_description,
              :restrict_enrollments_to_course_dates, :workflow_state, :hide_final_grades], nil)

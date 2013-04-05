@@ -159,17 +159,18 @@ describe CalendarEventsApiController, :type => :integration do
       json.size.should eql 9 # first context has no events
     end
 
-    it 'should ignore contexts the user cannot access' do
+    it 'should fail with unauthorized if provided a context the user cannot access' do
       contexts = [@course.asset_string]
-      contexts.concat 5.times.map { |i|
-        course()
-        @course.calendar_events.create(:title => "#{i}", :start_at => '2012-01-08 12:00:00')
-        @course.asset_string
-      }
+
+      # second context the user cannot access
+      course()
+      @course.calendar_events.create(:title => "unauthorized_course", :start_at => '2012-01-08 12:00:00')
+      contexts.push(@course.asset_string)
+
       json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-07&per_page=25&context_codes[]=" + contexts.join("&context_codes[]="), {
                         :controller => 'calendar_events_api', :action => 'index', :format => 'json',
-                        :context_codes => contexts, :start_date => '2012-01-08', :end_date => '2012-01-07', :per_page => '25'})
-      json.size.should eql 0 # first context has no events
+                        :context_codes => contexts, :start_date => '2012-01-08', :end_date => '2012-01-07', :per_page => '25'},
+                        {}, {}, {:expected_status => 401})
     end
 
     it "should allow specifying an unenrolled but accessible context" do
@@ -182,6 +183,35 @@ describe CalendarEventsApiController, :type => :integration do
                         { :start_date => 2.days.ago.strftime("%Y-%m-%d"), :end_date => 2.days.from_now.strftime("%Y-%m-%d"), :context_codes => ["course_#{unrelated_course.id}"] })
       json.size.should == 1
       json.first['title'].should == "from unrelated one"
+    end
+
+    def public_course_query(options = {})
+      yield @course if block_given?
+      @course.save!
+
+      api_call(:get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-31&context_codes[]=course_#{@course.id}", {
+                :controller => 'calendar_events_api', :action => 'index', :format => 'json',
+                :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-01', :end_date => '2012-01-31'},
+                options[:body_params] || {}, options[:headers] || {}, options[:opts] || {})
+    end
+
+    it "should not allow anonymous users to access a non-public context" do
+      course(:active_all => true)
+      public_course_query(:opts => {:expected_status => 401})
+    end
+
+    it "should allow anonymous users to access public context" do
+      course(:active_all => true)
+      public_course_query() do |c|
+        c.is_public = true
+      end
+    end
+
+    it "should allow anonymous users to access a public syllabus" do
+      course(:active_all => true)
+      public_course_query() do |c|
+        c.public_syllabus = true
+      end
     end
 
     it 'should return undated events' do

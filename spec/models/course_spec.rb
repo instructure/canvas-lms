@@ -3038,7 +3038,7 @@ describe Course do
     end
 
     it 'can be read by a nil user if public and available' do
-      @course.check_policy(nil).should == [:read, :read_outcomes]
+      @course.check_policy(nil).should == [:read, :read_outcomes, :read_syllabus]
     end
 
     it 'cannot be read by a nil user if public but not available' do
