@@ -91,7 +91,7 @@ class QuizzesController < ApplicationController
           redirect_to @quiz.statistics_csv(
             :include_all_versions => params[:all_versions] == '1',
             :anonymous => @quiz.anonymous_submissions
-          ).cacheable_s3_download_url
+          ).csv_attachment.cacheable_s3_download_url
         }
       end
     end

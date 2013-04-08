@@ -22,8 +22,9 @@ describe QuizStatistics do
   before { course }
 
   def csv(opts = {}, quiz = @quiz)
-    attachment = quiz.statistics_csv(opts)
-    attachment.open.read
+    stats = quiz.statistics_csv(opts)
+    run_jobs
+    stats.csv_attachment(true).open.read
   end
 
 
@@ -226,40 +227,49 @@ describe QuizStatistics do
       before { @quiz.update_attribute :published_at, Time.now }
 
       it 'uses the previously generated quiz_statistics if possible' do
-        qs = @quiz.quiz_statistics.create!
-        a = qs.csv_attachment
-
-        @quiz.statistics_csv.should == a
+        QuizStatistics.any_instance.expects(:to_csv).once.returns("")
+        @quiz.statistics_csv
+        run_jobs
+        @quiz.statistics_csv
+        run_jobs
       end
 
       it 'generates a new quiz_statistics if none exist' do
         QuizStatistics.any_instance.expects(:to_csv).once.returns("")
         @quiz.statistics_csv
+        run_jobs
         @quiz.statistics_csv
+        run_jobs
       end
 
       it 'generates a new quiz_statistics if the quiz changed' do
         QuizStatistics.any_instance.expects(:to_csv).twice.returns("")
         @quiz.statistics_csv # once
+        run_jobs
         @quiz.one_question_at_a_time = true
         @quiz.published_at = Time.now
         @quiz.save!
         @quiz.statistics_csv # twice
+        run_jobs
         @quiz.update_attribute(:one_question_at_a_time, false)
         @quiz.statistics_csv # unpublished changes don't matter
+        run_jobs
       end
 
       it 'generates a new quiz_statistics if new submissions are in' do
         QuizStatistics.any_instance.expects(:to_csv).twice.returns("")
         @quiz.statistics_csv
+        run_jobs
         qs = @quiz.quiz_submissions.build
         qs.save!
         qs.mark_completed
         @quiz.statistics_csv
+        run_jobs
       end
 
       it 'provides progress updates' do
         @quiz.statistics_csv
+        run_jobs
         progress = @quiz.quiz_statistics.first.progress
         progress.completion.should == 100
         progress.should be_completed

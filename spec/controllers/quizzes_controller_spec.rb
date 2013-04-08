@@ -879,7 +879,7 @@ describe QuizzesController do
         :format => 'csv'
       @quiz.quiz_statistics.size.should == 1
       stats = @quiz.quiz_statistics.first
-      response.should redirect_to stats.attachment.cacheable_s3_download_url
+      response.should redirect_to stats.csv_attachment.cacheable_s3_download_url
     end
   end
 
