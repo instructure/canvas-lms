@@ -1,9 +1,9 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe "Wiki pages and Tiny WYSIWYG editor Images" do
   it_should_behave_like "in-process server selenium tests"
+  it_should_behave_like "quizzes selenium tests"
 
   context "wiki and tiny images as a teacher" do
 
@@ -52,7 +52,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
         images = ffj('#editor_tabs_4 .image_list .img')
         images.length.should == 2
         images.each { |i| i.should have_attribute('complete', 'true') } # - commented out because it is breaking with
-                                                                        #webdriver 2.22 and firefox 12
+                                                                     #webdriver 2.22 and firefox 12
       end
     end
 

@@ -1,3 +1,12 @@
+shared_examples_for "settings basic tests" do
+  it_should_behave_like "in-process server selenium tests"
+
+  before (:each) do
+    course_with_admin_logged_in
+  end
+
+  context "admins tab" do
+
     def add_account_admin
       address = "student1@example.com"
       f(".add_users_link").click
@@ -16,24 +25,36 @@
       admin.id
     end
 
-    def click_submit
-      submit_form("#account_settings")
-      wait_for_ajax_requests
+    before (:each) do
+      get "/accounts/#{account.id}/settings"
+      f("#tab-users-link").click
     end
 
-    def should_add_an_account_admin
+    it "should add an account admin" do
       add_account_admin
     end
 
-    def should_delete_an_account_admin
+    it "should delete an account admin" do
       admin_id = add_account_admin
       f("#enrollment_#{admin_id} .remove_account_user_link").click
       driver.switch_to.alert.accept
       wait_for_ajax_requests
       AccountUser.find_by_id(admin_id).should be_nil
     end
+  end
 
-    def should_change_the_account_name
+  context "account settings" do
+
+    def click_submit
+      submit_form("#account_settings")
+      wait_for_ajax_requests
+    end
+
+    before (:each) do
+      get account_settings_url
+    end
+
+    it "should change the account name " do
       new_account_name = 'new default account name'
       replace_content(f("#account_name"), new_account_name)
       click_submit
@@ -42,7 +63,7 @@
       f("#account_name").should have_value(new_account_name)
     end
 
-    def should_change_the_default_file_quota
+    it "should change the default file quota" do
       mb = 300
       quota_input = f("#account_default_course_storage_quota")
       quota_input.should have_value("500")
@@ -54,10 +75,12 @@
       fj("#account_default_course_storage_quota").should have_value("300") # fj to avoid selenium caching
     end
 
-    def should_change_the_default_language_to_spanish
+    it "should change the default language to spanish" do
       f("#account_default_locale option[value='es']").click
       click_submit
       account.reload
       account.default_locale.should == "es"
       f("label[for='account_name']").text.should include_text("Nombre de Cuenta")
     end
+  end
+end
