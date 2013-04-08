@@ -183,7 +183,11 @@ div#content
   clear: both
   .question
     .header
+      :padding 8px 20px 12px 
       :background-color $questionHeaderBackground
+      .name
+        :display inline-block
+        :padding-top 5px
     .answers
       .answer
         clear: both
@@ -1293,8 +1297,6 @@ ul#quiz_versions
       margin: 0
     .question_input
       width: 30px
-      &:focus
-        +transform(scale(1.3))
 
   .short_answer_question
     .answers
