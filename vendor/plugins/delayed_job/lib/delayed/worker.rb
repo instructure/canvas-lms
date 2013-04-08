@@ -187,9 +187,10 @@ class Worker
   def configure_for_job(job)
     previous_tmpdir = ENV['TMPDIR'] if @make_tmpdir
     Thread.current[:context] = {
-      # these keys aren't terribly well named for this, since they were intended for http requests
+      # these 2 keys aren't terribly well named for this, since they were intended for http requests
       :request_id => job.id,
       :session_id => self.name,
+      :job        => job,
     }
 
     if @make_tmpdir
@@ -213,6 +214,10 @@ class Worker
       # if this fails again, it'll raise the error up
       ActiveRecord::Base.connection.execute("select 1")
     end
+  end
+
+  def self.current_job
+    Thread.current[:context].try(:[], :job)
   end
 
 end
