@@ -837,7 +837,79 @@ describe CoursesController, :type => :integration do
     end
   end
 
-  describe "students" do
+  describe "course state" do
+    before do
+      @course3 = course
+      @course3.enroll_user(@me, 'TeacherEnrollment', { :role_name => 'SuperTeacher', :active_all => true })
+      @course4 = course
+      @course4.enroll_user(@me, 'TaEnrollment')
+      @course4.workflow_state = 'created'
+      @course4.save
+    end
+    
+    it "should return only courses with state available on ?state[]=available" do
+      json = api_call(:get, "/api/v1/courses.json",
+                      { :controller => 'courses', :action => 'index', :format => 'json' },
+                      { :state => ['available'] })
+      json.collect{ |c| c['id'].to_i }.sort.should == [@course1.id, @course2.id].sort
+      json.collect{ |c| c['workflow_state']}.each do |s|
+        %w{available}.should include(s)
+      end
+    end
+
+    it "should return only courses with state unpublished on ?state[]=unpublished" do
+      json = api_call(:get, "/api/v1/courses.json",
+                      { :controller => 'courses', :action => 'index', :format => 'json' },
+                      { :state => ['unpublished'] })
+      json.collect{ |c| c['id'].to_i }.sort.should == [@course3.id,@course4.id].sort
+      json.collect{ |c| c['workflow_state']}.each do |s|
+        %w{unpublished}.should include(s)
+      end
+    end
+
+    it "should return only courses with state unpublished and available on ?state[]=unpublished, available" do
+      json = api_call(:get, "/api/v1/courses.json",
+                      { :controller => 'courses', :action => 'index', :format => 'json' },
+                      { :state => ['unpublished','available'] })
+      json.collect{ |c| c['id'].to_i }.sort.should == [@course1.id, @course2.id, @course3.id, @course4.id].sort
+      json.collect{ |c| c['workflow_state']}.each do |s|
+        %w{available unpublished}.should include(s)
+      end
+    end
+
+    it "should return courses by custom role and state unpublished" do
+      json = api_call(:get, "/api/v1/courses.json?enrollment_role=SuperTeacher",
+                      { :controller => 'courses', :action => 'index', :format => 'json', :enrollment_role => 'SuperTeacher' },
+                      { :state => ['unpublished'] })
+      json.collect{ |c| c['id'].to_i }.should == [@course3.id]
+      json[0]['enrollments'].should == [{ 'type' => 'teacher', 'role' => 'SuperTeacher' }]
+      json.collect{ |c| c['workflow_state']}.each do |s|
+        %w{unpublished}.should include(s)
+      end
+    end
+
+    it "should not return courses with StudentEnrollment or ObserverEnrollment when state[] param" do
+      @course4.enrollments.each do |e|
+        e.type = 'StudentEnrollment'
+        e.save
+      end
+      json = api_call(:get, "/api/v1/courses.json",
+                      { :controller => 'courses', :action => 'index', :format => 'json' },
+                      { :state => ['unpublished'] })
+      json.collect{ |c| c['id'].to_i }.sort.should ==[@course3.id]
+
+      @course3.enrollments.each do |e|
+        e.type = 'ObserverEnrollment'
+        e.save
+      end
+      json = api_call(:get, "/api/v1/courses.json",
+                      { :controller => 'courses', :action => 'index', :format => 'json' },
+                      { :state => ['unpublished'] })
+      json.collect{ |c| c['id'].to_i }.should ==[]
+    end
+  end
+
+  describe "/students" do
     it "should return the list of students for the course" do
       first_user = @user
       new_user = User.create!(:name => 'Zombo')

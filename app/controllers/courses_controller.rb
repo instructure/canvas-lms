@@ -143,6 +143,11 @@ class CoursesController < ApplicationController
   #   When term is given, the information for the enrollment term for each course
   #   is returned.
   #
+  # @argument state[] [optional] If set, only return courses that are in the given state(s).
+  #   Valid states are "unpublished", "available", "completed", and "deleted".
+  #   By default, "available" is returned for students and observers, and
+  #   anything except "deleted", for all other enrollment types
+  #
   # @returns [Course]
   def index
     respond_to do |format|
@@ -159,7 +164,14 @@ class CoursesController < ApplicationController
       }
 
       format.json {
-        enrollments = @current_user.cached_current_enrollments
+        if params[:state]
+          params[:state] += %w(created claimed) if params[:state].include? 'unpublished'
+          enrollments = @current_user.enrollments
+          enrollments = enrollments.reject { |e| !params[:state].include?(e.course.workflow_state) || (%w(StudentEnrollment ObserverEnrollment).include?(e.type) && %w(created claimed).include?(e.course.workflow_state))}
+        else
+          enrollments = @current_user.cached_current_enrollments
+        end
+
         if params[:enrollment_role]
           enrollments = enrollments.reject { |e| (e.role_name || e.class.name) != params[:enrollment_role] }
         elsif params[:enrollment_type]
