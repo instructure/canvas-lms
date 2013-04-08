@@ -1652,6 +1652,22 @@ describe User do
         @quiz.lock_at = nil
         @quiz.due_at = 2.days.from_now
       end
+
+      it "includes assignments with no due date but have overrides that are due" do
+        @quiz.due_at = nil
+        @quiz.save!
+        section = @course.course_sections.create! :name => "Test"
+        @student = student_in_section section
+        override = @quiz.assignment.assignment_overrides.build
+        override.title = "Shows up in todos"
+        override.set_type = 'CourseSection'
+        override.set = section
+        override.due_at = 1.weeks.from_now - 1.day
+        override.due_at_overridden = true
+        override.save!
+        @student.assignments_needing_submitting(:contexts => [@course]).
+          should include @quiz.assignment
+      end
       it "should include assignments with no locks" do
         @quiz.save!
         list = @student.assignments_needing_submitting(:contexts => [@course])

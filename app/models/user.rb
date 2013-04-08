@@ -1316,13 +1316,14 @@ class User < ActiveRecord::Base
       # allow explicitly passing a nil limit
       limit = opts[:limit]
       limit = 15 unless opts.key?(:limit)
+      due_after = opts[:due_after] || 4.weeks.ago
 
       result = Shard.partition_by_shard(course_ids) do |shard_course_ids|
         Assignment.for_course(shard_course_ids).
           active.
-          due_before(1.week.from_now).
+          due_between_with_overrides(due_after,1.week.from_now).
           not_ignored_by(self, 'submitting').
-          expecting_submission.due_after(opts[:due_after] || 4.weeks.ago).
+          expecting_submission.
           need_submitting_info(id, limit).
           not_locked
       end
