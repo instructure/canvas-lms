@@ -1399,25 +1399,31 @@ class Assignment < ActiveRecord::Base
           user, purpose)
   }
 
+  # the map on the API_NEEDED_FIELDS here is because PostgreSQL will see the
+  # query as ambigious for the "due_at" field if combined with another table
+  # (e.g. assignment overrides) with similar fields (like id,lock_at,etc),
+  # throwing an error.
+  scope :api_needed_fields, select(API_NEEDED_FIELDS.map{ |f| "assignments." + f.to_s})
+
   # This should only be used in the course drop down to show assignments needing a submission
   scope :need_submitting_info, lambda { |user_id, limit|
-    select(API_NEEDED_FIELDS).
-        select("(SELECT name FROM courses WHERE id = assignments.context_id) AS context_name").
-        where("(SELECT COUNT(id) FROM submissions
-              WHERE assignment_id = assignments.id
-              AND submission_type IS NOT NULL
-              AND user_id = ?) = 0", user_id).
-        limit(limit).
-        order(:due_at)
+    api_needed_fields.
+      select("(SELECT name FROM courses WHERE courses.id = assignments.context_id) AS context_name").
+      where("(SELECT COUNT(id) FROM submissions
+            WHERE assignment_id = assignments.id
+            AND submission_type IS NOT NULL
+            AND user_id = ?) = 0", user_id).
+      limit(limit).
+      order("assignments.due_at")
   }
 
   # This should only be used in the course drop down to show assignments not yet graded.
   scope :need_grading_info, lambda { |limit|
-    select(API_NEEDED_FIELDS).
+    api_needed_fields.
         select("(SELECT name FROM courses WHERE id = assignments.context_id) AS context_name, needs_grading_count").
-        where("needs_grading_count>0").
+        where("assignments.needs_grading_count>0").
         limit(limit).
-        order(:due_at)
+        order("assignments.due_at")
   }
 
   scope :expecting_submission, where("submission_types NOT IN ('', 'none', 'not_graded', 'on_paper') AND submission_types IS NOT NULL")
