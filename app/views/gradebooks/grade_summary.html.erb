@@ -186,19 +186,19 @@
       <td class="possible points_possible" <%= "colspan='2'" if assignment.special_class %>><%= assignment.points_possible %></td>
       <% if !assignment.special_class %>
       <td style="padding-left: 10px; white-space: nowrap;">
-        <a href="#" class="toggle_comments_link tooltip" aria-role="button" aria-controls="grade_info_<%= assignment.id %>" title="<%= t(:view_comments, "View comments and scoring details") %>" style="<%= 'visibility: hidden;' unless assignment_presenter.has_comments? %>">
+        <a href="#" class="toggle_comments_link tooltip" <% if assignment_presenter.has_comments? %>aria-role="button" aria-controls="grade_info_<%= assignment.id %>"<% else %>aria-hidden='true' role='presentation' tabindex='-1'<% end %> title="<%= t(:view_comments, "View comments and scoring details") %>" style="<%= 'visibility: hidden;' unless assignment_presenter.has_comments? %>">
           <span class="tooltip_wrap right">
             <span class="tooltip_text"><%= t(:comment_count, "comment", :count => (submission.visible_submission_comments.size rescue 0)) %></span>
           </span>
           <i class="icon-discussion standalone-icon"></i>
         </a>
-        <a href="#" class="toggle_comments_link tooltip" aria-role="button" aria-controls="grade_info_<%= assignment.id %>" title="<%= t 'titles.view_scoring_details', 'View Scoring Details' %>" style="<%= 'visibility: hidden;' unless (assignment_presenter.has_scoring_details? && can_view_distribution) %>">
+        <a href="#" class="toggle_comments_link tooltip" <% if assignment_presenter.has_scoring_details? && can_view_distribution %>aria-role="button" aria-controls="grade_info_<%= assignment.id %>"<% else %>aria-hidden='true' role='presentation' tabindex='-1'<% end %> title="<%= t 'titles.view_scoring_details', 'View Scoring Details' %>" style="<%= 'visibility: hidden;' unless (assignment_presenter.has_scoring_details? && can_view_distribution) %>">
           <span class="tooltip_wrap right">
             <span class="tooltip_text"><%= t(:see_scoring_details, "See scoring details") %></span>
           </span>
           <i class="icon-check-plus standalone-icon"></i>
         </a>
-        <a href="#" class="toggle_rubric_assessments_link tooltip" title="<%= t 'titles.view_rubric_evaluation', 'View Rubric Evaluation' %>" style="<%= 'visibility: hidden;' if !assignment_presenter.has_rubric_assessments? %>">
+        <a href="#" class="toggle_rubric_assessments_link tooltip" <% if !assignment_presenter.has_rubric_assessments? %>aria-hidden='true' role='presentation' tabindex='-1'<% end %> title="<%= t 'titles.view_rubric_evaluation', 'View Rubric Evaluation' %>" style="<%= 'visibility: hidden;' if !assignment_presenter.has_rubric_assessments? %>">
           <span class="tooltip_wrap right">
             <span class="tooltip_text"><%= t(:see_rubric_results, "See rubric results") %></span>
           </span>
