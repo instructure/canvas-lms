@@ -11,6 +11,6 @@ define ['jquery', 'jquery.google-analytics'], ($) ->
   #   >click here</a>
   $('body').on 'click', '[data-track-category]', (event) ->
     {trackCategory, trackLabel, trackAction, trackValue} = $(this).data()
-    $.trackEvent trackCategory, trackLabel, trackAction, trackValue
+    $.trackEvent(trackCategory, trackAction, trackLabel, trackValue)
     null
 

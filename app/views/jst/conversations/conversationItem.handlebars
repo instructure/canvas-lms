@@ -1,9 +1,29 @@
 <li data-id="{{id}}" class="{{classes}} admin-link-hover-area">
   {{#if avatar_url}}<img src="{{avatar_url}}" class="avatar" />{{/if}}
-  <a href="/conversations/{{id}}?conversation[workflow_state]=unread" class="action_mark_as_unread standard_action" title="{{#t "inbox_actions.mark_as_unread"}}Mark as Unread{{/t}}">{{#t "inbox_actions.mark_as_unread"}}Mark as Unread{{/t}}</a>
-  <a href="/conversations/{{id}}?conversation[workflow_state]=read" class="action_mark_as_read standard_action" title="{{#t "inbox_actions.mark_as_read"}}Mark as Read{{/t}}">{{#t "inbox_actions.mark_as_read"}}Mark as Read{{/t}}</a>
-  <a href="/conversations/{{id}}?conversation[starred]=true" class="action_star standard_action" title="{{#t "inbox_actions.action_star"}}Star{{/t}}">{{#t "inbox_actions.action_star"}}Star{{/t}}</a>
-  <a href="/conversations/{{id}}?conversation[starred]=false" class="action_unstar standard_action" title="{{#t "inbox_actions.action_unstar"}}Unstar{{/t}}">{{#t "inbox_actions.action_unstar"}}Unstar{{/t}}</a>
+  <a href="/conversations/{{id}}?conversation[workflow_state]=unread"
+     class="action_mark_as_unread standard_action"
+     data-track-category="Thread Actions"
+     data-track-action="Individual Left Side"
+     data-track-category="Mark as Unread"
+     title="{{#t "inbox_actions.mark_as_unread"}}Mark as Unread{{/t}}">{{#t "inbox_actions.mark_as_unread"}}Mark as Unread{{/t}}</a>
+  <a href="/conversations/{{id}}?conversation[workflow_state]=read"
+     class="action_mark_as_read standard_action"
+     data-track-category="Thread Actions"
+     data-track-action="Individual Left Side"
+     data-track-category="Mark as Read"
+     title="{{#t "inbox_actions.mark_as_read"}}Mark as Read{{/t}}">{{#t "inbox_actions.mark_as_read"}}Mark as Read{{/t}}</a>
+  <a href="/conversations/{{id}}?conversation[starred]=true"
+     class="action_star standard_action"
+     data-track-category="Thread Actions"
+     data-track-action="Individual Left Side"
+     data-track-category="Star"
+     title="{{#t "inbox_actions.action_star"}}Star{{/t}}">{{#t "inbox_actions.action_star"}}Star{{/t}}</a>
+  <a href="/conversations/{{id}}?conversation[starred]=false"
+     class="action_unstar standard_action"
+     data-track-category="Thread Actions"
+     data-track-action="Individual Left Side"
+     data-track-category="Unstar"
+     title="{{#t "inbox_actions.action_unstar"}}Unstar{{/t}}">{{#t "inbox_actions.action_unstar"}}Unstar{{/t}}</a>
   <span class="date">{{lastMessageAt}}</span>
   <div class="conversation-summary">
     <img class="attachments" src="/images/messages/attach-gray.png" title="{{#t "has_attachments"}}This conversation has one or more attachments{{/t}}">
@@ -19,35 +39,59 @@
     </button>
     <ul class="al-options" data-id="{{id}}">
       <li><a href="/conversations/{{id}}?conversation[workflow_state]=unread"
-             class="action_mark_as_unread standard_action">
+             class="action_mark_as_unread standard_action"
+             data-track-category="Thread Actions"
+             data-track-action="Individual Gear"
+             data-track-label="Mark as Unread">
         {{#t "inbox_actions.mark_as_unread"}}Mark as Unread{{/t}}
       </a></li>
       <li><a href="/conversations/{{id}}?conversation[workflow_state]=read"
-             class="action_mark_as_read standard_action">
+             class="action_mark_as_read standard_action"
+             data-track-category="Thread Actions"
+             data-track-action="Individual Gear"
+             data-track-label="Mark as Read">
         {{#t "inbox_actions.mark_as_read"}}Mark as Read{{/t}}
       </a></li>
       <li><a href="/conversations/{{id}}?conversation[starred]=false"
-             class="action_unstar standard_action">
+             class="action_unstar standard_action"
+             data-track-category="Thread Actions"
+             data-track-action="Individual Gear"
+             data-track-label="Unstar">
         {{#t "inbox_actions.action_unstar"}}Unstar{{/t}}
       </a></li>
       <li><a href="/conversations/{{id}}?conversation[starred]=true"
-             class="action_star standard_action">
+             class="action_star standard_action"
+             data-track-category="Thread Actions"
+             data-track-action="Individual Gear"
+             data-track-label="Star">
         {{#t "inbox_actions.unstar"}}Star{{/t}}
       </a></li>
       <li><a href="/conversations/{{id}}?conversation[subscribed]=0"
-             class="action_unsubscribe standard_action">
+             class="action_unsubscribe standard_action"
+             data-track-category="Thread Actions"
+             data-track-action="Individual Gear"
+             data-track-label="Unsubscribe">
         {{#t "inbox_actions.unsubscribe"}}Unsubscribe{{/t}}
       </a></li>
       <li><a href="/conversations/{{id}}?conversation[subscribed]=1"
-             class="action_subscribe standard_action">
+             class="action_subscribe standard_action"
+             data-track-category="Thread Actions"
+             data-track-action="Individual Gear"
+             data-track-label="Subscribe">
         {{#t "inbox_actions.subscribe"}}Subscribe{{/t}}
       </a></li>
       <li><a href="/conversations/{{id}}?conversation[workflow_state]=archived"
-             class="action_archive standard_action">
+             class="action_archive standard_action"
+             data-track-category="Thread Actions"
+             data-track-action="Individual Gear"
+             data-track-label="Archive">
         {{#t "inbox_actions.archive"}}Archive{{/t}}
       </a></li>
       <li><a href="/conversations/{{id}}?conversation[workflow_state]=read"
-             class="action_unarchive standard_action">
+             class="action_unarchive standard_action"
+             data-track-category="Thread Actions"
+             data-track-action="Individual Gear"
+             data-track-label="Unarchive">
         {{#t "inbox_actions.unarchive"}}Unarchive{{/t}}
       </a></li>
       <li><a href="/conversations/{{id}}"
