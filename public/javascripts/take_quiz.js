@@ -276,6 +276,23 @@ define([
 
         quizSubmission.toggleActiveButtonState("#submit_quiz_button", active);
       },
+
+      updateQuestionIndicators: function(answer, questionId){
+        var listSelector = "#list_" + questionId;
+        var questionSelector = "#" + questionId;
+        var combinedId = listSelector + ", " + questionSelector;
+        var $questionIcon = $(listSelector + "> i.placeholder");
+        if(answer) {
+          $(combinedId).addClass('answered');
+          $questionIcon.addClass('icon-check').removeClass('icon-question');
+          $questionIcon.siblings('div.icon-text').text(I18n.t('question_answered',"Answered"))
+        } else {
+          $(combinedId).removeClass('answered');
+          $questionIcon.addClass('icon-question').removeClass('icon-check');
+          $questionIcon.siblings('div.icon-text').text(I18n.t('question_unanswered', "Haven't Answered Yet"))
+        }
+      },
+
       updateNextButtonState: function(id) {
         var $question = $("#" + id);
         quizSubmission.toggleActiveButtonState('button.next-question', $question.hasClass('answered'));
@@ -439,8 +456,8 @@ define([
             }
           });
         }
-        $("#list_" + id + ", #" + id)[val ? 'addClass' : 'removeClass']('answered');
 
+        quizSubmission.updateQuestionIndicators(val, id);
         quizSubmission.updateFinalSubmitButtonState();
         quizSubmission.updateNextButtonState(id);
       })

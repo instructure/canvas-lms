@@ -37,7 +37,7 @@ describe TakeQuizPresenter do
   before do
     submission.stubs(:questions_as_object).returns all_questions
   end
-  
+
   describe "current_questions" do
     context "when the question ID is set" do
       it "queries the submission for that question and returns it in an array" do
@@ -171,4 +171,20 @@ describe TakeQuizPresenter do
       presenter.question_seen?(question2).should be_true
     end
   end
+
+  describe "question_answered?" do
+    before do
+      submission.stubs(:question_answered?).with(question1[:id]).returns(true)
+      submission.stubs(:question_answered?).with(question2[:id]).returns(false)
+    end
+
+    it 'returns true for answered questions' do
+      presenter.question_answered?(question1).should be_true
+    end
+
+    it 'returns false for unanswered questions' do
+      presenter.question_answered?(question2).should be_false
+    end
+  end
+
 end
