@@ -285,7 +285,7 @@ describe ExternalToolsController do
       response.should_not be_success
       assigns[:tool].should be_new_record
       json = json_parse(response.body)
-      json['errors']['base'][0]['message'].should == I18n.t(:invalid_xml_syntax, 'Invalid xml syntax')
+      json['errors']['config_xml'][0]['message'].should == I18n.t(:invalid_xml_syntax, 'Invalid xml syntax')
 
       course_with_teacher_logged_in(:active_all => true)
       xml = "<a><b>c</b></a>"
@@ -293,7 +293,7 @@ describe ExternalToolsController do
       response.should_not be_success
       assigns[:tool].should be_new_record
       json = json_parse(response.body)
-      json['errors']['base'][0]['message'].should == I18n.t(:invalid_xml_syntax, 'Invalid xml syntax')
+      json['errors']['config_xml'][0]['message'].should == I18n.t(:invalid_xml_syntax, 'Invalid xml syntax')
     end
     
     it "should handle advanced xml configurations by URL retrieval" do
@@ -348,7 +348,7 @@ describe ExternalToolsController do
       response.should_not be_success
       assigns[:tool].should be_new_record
       json = json_parse(response.body)
-      json['errors']['base'][0]['message'].should == I18n.t(:retrieve_timeout, 'could not retrieve configuration, the server response timed out')
+      json['errors']['config_url'][0]['message'].should == I18n.t(:retrieve_timeout, 'could not retrieve configuration, the server response timed out')
     end
     
   end

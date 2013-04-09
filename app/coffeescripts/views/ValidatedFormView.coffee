@@ -4,10 +4,11 @@ define [
   'jquery'
   'underscore'
   'compiled/fn/preventDefault'
+  'i18n!errors'
   'jquery.toJSON'
   'jquery.disableWhileLoading'
   'jquery.instructure_forms'
-], (Backbone, ValidatedMixin, $, _) ->
+], (Backbone, ValidatedMixin, $, _, preventDefault, I18n) ->
 
   ##
   # Sets model data from a form, saves it, and displays errors returned in a
@@ -121,3 +122,33 @@ define [
           $.parseJSON(response.responseText).errors
         catch error
           {}
+
+    translations:
+      required: I18n.t "required", "Required"
+      blank: I18n.t "blank", "Required"
+
+    ##
+    # Errors are displayed relative to the field to which they belong. If
+    # the key of the error in the response doesn't match the name attribute
+    # of the form input element, configure a selector here.
+    #
+    # For example, given a form field like this:
+    #
+    #   <input name="user[first_name]">
+    #
+    # and an error response like this:
+    #
+    #   {errors: { first_name: {...} }}
+    #
+    # you would do this:
+    #
+    #   fieldSelectors:
+    #     first_name: '[name=user[first_name]]'
+    fieldSelectors: null
+
+    findField: (field) ->
+      selector = @fieldSelectors?[field] or "[name='#{field}']"
+      $el = @$(selector)
+      if $el.data('rich_text')
+        $el = $el.next('.mceEditor').find(".mceIframeContainer")
+      $el

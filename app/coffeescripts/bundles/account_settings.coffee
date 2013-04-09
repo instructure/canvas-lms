@@ -1,1 +1,1 @@
-require ['account_settings', 'external_tools']
+require ['account_settings']

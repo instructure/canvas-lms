@@ -1,0 +1,116 @@
+<fieldset>
+  <div class="control-group">
+    <label class="control-label" for="external_tool_name">Name</label>
+    <div class="controls">
+      <input type="text" id="external_tool_name" value="{{name}}" name="name">
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="external_tool_consumer_key">Consumer Key</label>
+    <div class="controls">
+      <input type="text" id="external_tool_consumer_key" value="{{consumer_key}}" name="consumer_key">
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="external_tool_shared_secret">Shared Secret</label>
+    <div class="controls">
+      <input type="text" id="external_tool_shared_secret" value="{{shared_secret}}" name="shared_secret">
+      {{#if id}}
+        <p class="help-block">{{#t "shared_secret_note"}}Enter a new value
+        to change{{/t}}</p>
+      {{/if}}
+    </div>
+  </div>
+  <div class="control-group {{#if id}}hide{{/if}}">
+    <label class="control-label" for="external_tool_config_type">Configuration Type</label>
+    <div class="controls">
+      <select id="external_tool_config_type" name="config_type">
+        <option value="manual">{{#t "manual"}}Manual Entry{{/t}}</option>
+        <option value="by_url">{{#t "by_url"}}By URL{{/t}}</option>
+        <option value="by_xml">{{#t "by_xml"}}Paste XML{{/t}}</option>
+      </select>
+    </div>
+  </div>
+  <div class="control-group config_type by_url">
+    <label class="control-label" for="external_tool_config_url">
+      {{#t "config_url"}}Configuration URL{{/t}}
+    </label>
+    <div class="controls">
+      <input type="text" id="external_tool_config_url" value="{{config_url}}" name="config_url">
+    </div>
+  </div>
+  <div class="control-group config_type by_xml">
+    <label class="control-label" for="external_tool_config_xml">
+      {{#t "paste_xml"}}Paste XML Here{{/t}}
+    </label>
+    <div class="controls">
+      <textarea id="external_tool_config_xml" name="config_xml"
+      ></textarea>
+    </div>
+  </div>
+  <div class="control-group config_type manual">
+    <label class="control-label" for="external_tool_url">
+      {{#t "tool_url"}}URL{{/t}}
+    </label>
+    <div class="controls">
+      <input type="text" id="external_tool_url" value="{{url}}" name="url">
+    </div>
+  </div>
+  <div class="control-group config_type manual">
+    <label class="control-label" for="external_tool_domain">
+      {{#t "tool_domain"}}Domain{{/t}}
+    </label>
+    <div class="controls">
+      <input type="text" id="external_tool_domain" value="{{domain}}" name="domain">
+    </div>
+  </div>
+  <div class="control-group config_type manual">
+    <label class="control-label" for="external_tool_privacy_level">
+      {{#t "privacy"}}Privacy{{/t}}
+    </label>
+    <div class="controls">
+      <select id="external_tool_privacy_level" name="privacy_level">
+        <option
+          value="anonymous"
+          {{#ifEqual privacy_level "anonymous"}}selected{{/ifEqual}}
+        >{{#t "anonymous"}}Anonymous{{/t}}</option>
+        <option
+          value="email_only"
+          {{#ifEqual privacy_level "email_only"}}selected{{/ifEqual}}
+        >{{#t "email_only"}}E-Mail Only{{/t}}</option>
+        <option 
+          value="name_only"
+          {{#ifEqual privacy_level "name_only"}}selected{{/ifEqual}}
+        >{{#t "name_only"}}Name Only{{/t}}</option>
+        <option
+          value="public"
+          {{#ifEqual privacy_level "public"}}selected{{/ifEqual}}
+        >{{#t "public"}}Public{{/t}}</option>
+      </select>
+    </div>
+  </div>
+  <div class="control-group config_type manual">
+    <label class="control-label" for="external_tool_custom_fields_string">
+      {{#t "custom_fields"}}Custom Fields{{/t}}
+    </label>
+    <div class="controls">
+      <textarea
+        id="external_tool_custom_fields_string"
+        name="custom_fields_string"
+      >{{custom_fields_string}}</textarea>
+      <div class="help-block"> {{#t "custom_feilds_explanation"}}One per
+      line.  Format: name=value{{/t}}</div>
+    </div>
+  </div>
+  <div class="control-group config_type manual">
+    <label class="control-label" for="external_tool_description">
+      {{#t "description"}}Description{{/t}}
+    </label>
+    <div class="controls">
+      <textarea
+        id="external_tool_description"
+        name="description"
+      >{{description}}</textarea>
+    </div>
+  </div>
+</fieldset>

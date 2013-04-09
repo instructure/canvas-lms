@@ -16,7 +16,7 @@ describe "editing external tools" do
     f('#external_tool_consumer_key').send_keys('fdjaklfjdaklfdjaslfjajfkljsalkjflas')
     f('#external_tool_shared_secret').send_keys('r08132ufio1jfj1iofj3j1kf3ljl1')
     f('#external_tool_domain').send_keys('instructure.com')
-    submit_form('#external_tool_form')
+    fj('.ui-dialog:visible .btn-primary').click()
     wait_for_ajaximations
     f("#external_tool_#{ContextExternalTool.find_by_name(tool_name).id} .edit_tool_link").click
     f('#external_tool_name').should have_attribute(:value, tool_name)
@@ -27,7 +27,6 @@ describe "editing external tools" do
     get "/courses/#{@course.id}/settings"
     f("#tab-tools-link").click
     add_external_tool
-    f("#external_tools_dialog").should_not be_displayed
     tool = ContextExternalTool.last
     tool_elem = f("#external_tool_#{tool.id}")
     tool_elem.should be_displayed
@@ -44,18 +43,15 @@ describe "editing external tools" do
     get "/courses/#{@course.id}/settings"
     keep_trying_until { f("#tab-tools-link").should be_displayed }
     f("#tab-tools-link").click
-    tool_elem = f("#external_tool_#{tool.id}")
-    tool_elem.find_element(:css, ".edit_tool_link").click
-    f("#external_tools_dialog").should be_displayed
+    f("#external_tool_#{tool.id} .edit_tool_link").click
     replace_content(f("#external_tool_name"), "new tool (updated)")
     replace_content(f("#external_tool_consumer_key"), "key (updated)")
     replace_content(f("#external_tool_shared_secret"), "secret (updated)")
     replace_content(f("#external_tool_domain"), "example2.com")
     replace_content(f("#external_tool_custom_fields_string"), "a=9\nb=8")
-    f("#external_tools_dialog .save_button").click
+    fj('.ui-dialog:visible .btn-primary').click()
     wait_for_ajax_requests
-    f("#external_tools_dialog").should_not be_displayed
-    tool_elem = fj("#external_tools .external_tool:visible").should be_displayed
+    tool_elem = fj("#external_tools .external_tool").should be_displayed
     tool_elem.should_not be_nil
     tool.reload
     tool.name.should == "new tool (updated)"

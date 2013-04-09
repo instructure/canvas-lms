@@ -12,6 +12,9 @@ class ContextExternalTool < ActiveRecord::Base
   validates_length_of :name, :maximum => maximum_string_length
   validates_presence_of :consumer_key
   validates_presence_of :shared_secret
+  validates_presence_of :config_url, :if => lambda { |t| t.config_type == "by_url" }
+  validates_presence_of :config_xml, :if => lambda { |t| t.config_type == "by_xml" }
+  validates_length_of :domain, :maximum => 253, :allow_blank => true
   validate :url_or_domain_is_set
   serialize :settings
   attr_accessor :config_type, :config_url, :config_xml
@@ -76,15 +79,10 @@ class ContextExternalTool < ActiveRecord::Base
       settings[:text] || name || "External Tool"
   end
   
-  def xml_error(error)
-    @xml_error = error
-  end
-  
   def check_for_xml_error
-    if @xml_error
-      errors.add_to_base(@xml_error)
-      false
-    end
+    (@config_errors || []).each { |attr,msg|
+      errors.add attr, msg
+    }
   end
   protected :check_for_xml_error
   
@@ -154,18 +152,37 @@ class ContextExternalTool < ActiveRecord::Base
     rescue CC::Importer::BLTIConverter::CCImportError => e
       tool_hash = {:error => e.message}
     end
+
+    @config_errors = []
+    error_field = config_type == 'by_xml' ? 'config_xml' : 'config_url'
+
+    converter = CC::Importer::BLTIConverter.new
+    tool_hash = if config_type == 'by_url'
+                  uri = URI.parse(config_url)
+                  raise URI::InvalidURIError unless uri.host && uri.port
+                  converter.retrieve_and_convert_blti_url(config_url)
+                else
+                  converter.convert_blti_xml(config_xml)
+                end
+
     real_name = self.name
     if tool_hash[:error]
-      xml_error(tool_hash[:error])
+      @config_errors << [error_field, tool_hash[:error]]
     else
-      ContextExternalTool.import_from_migration(tool_hash, self.context, self)
+      ContextExternalTool.import_from_migration(tool_hash, context, self)
     end
     self.name = real_name unless real_name.blank?
+  rescue CC::Importer::BLTIConverter::CCImportError => e
+    @config_errors << [error_field, e.message]
+  rescue URI::InvalidURIError
+    @config_errors << [:config_url, "Invalid URL"]
+  rescue ActiveRecord::RecordInvalid => e
+    @config_errors += Array(e.record.errors)
   end
   
   def custom_fields_string=(str)
     hash = {}
-    str.split(/\n/).each do |line|
+    str.split(/[\r\n]+/).each do |line|
       key, val = line.split(/=/)
       hash[key] = val if key.present? && val.present?
     end

@@ -55,7 +55,7 @@ describe "admin settings tabs" do
     it "should delete an external tool" do
       add_external_tool
       hover_and_click(".delete_tool_link:visible")
-      driver.switch_to.alert.accept
+      fj('.ui-dialog button:contains(Delete):visible').click
       wait_for_ajax_requests
       tool = ContextExternalTool.last
       tool.workflow_state.should == "deleted"
@@ -67,7 +67,7 @@ describe "admin settings tabs" do
       new_description = "a different description"
       hover_and_click(".edit_tool_link:visible")
       replace_content(f("#external_tool_description"), new_description)
-      fj(".save_button:visible").click
+      fj('.ui-dialog button:contains(Submit):visible').click
       wait_for_ajax_requests
       tool = ContextExternalTool.last
       tool.description.should == new_description

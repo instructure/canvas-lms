@@ -301,7 +301,11 @@ define [
     truncate: ( string, max ) ->
       return textHelper.truncateText( string, { max: max } )
 
-
     enrollmentName: enrollmentName
+
+    titleize: (str) ->
+      words = str.split(/[ _]+/)
+      titleizedWords = _(words).map (w) -> w[0].toUpperCase() + w.slice(1)
+      titleizedWords.join(' ')
   }
   return Handlebars

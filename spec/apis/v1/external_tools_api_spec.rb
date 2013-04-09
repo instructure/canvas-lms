@@ -111,7 +111,7 @@ describe ExternalToolsController, :type => :integration do
                     {:controller => 'external_tools', :action => 'show', :format => 'json',
                      :"#{type}_id" => context.id.to_s, :external_tool_id => et.id.to_s})
 
-    json.should == example_json(et)
+    json.diff(example_json(et)).should == {}
   end
 
   def not_found_call(context, type="course")
@@ -128,7 +128,8 @@ describe ExternalToolsController, :type => :integration do
                     {:controller => 'external_tools', :action => 'index', :format => 'json',
                      :"#{type}_id" => context.id.to_s})
 
-    json.should == [example_json(et)]
+    json.size.should == 1
+    json.first.diff(example_json(et)).should == {}
   end
 
   def create_call(context, type="course")
@@ -138,7 +139,7 @@ describe ExternalToolsController, :type => :integration do
     context.context_external_tools.count.should == 1
 
     et = context.context_external_tools.last
-    json.should == example_json(et)
+    json.diff(example_json(et)).should == {}
   end
 
   def update_call(context, type="course")
@@ -148,7 +149,7 @@ describe ExternalToolsController, :type => :integration do
                     {:controller => 'external_tools', :action => 'update', :format => 'json',
                      :"#{type}_id" => context.id.to_s, :external_tool_id => et.id.to_s}, post_hash)
     et.reload
-    json.should == example_json(et)
+    json.diff(example_json(et)).should == {}
   end
   
   def destroy_call(context, type="course")
@@ -251,6 +252,7 @@ describe ExternalToolsController, :type => :integration do
      "domain"=>nil,
      "url"=>"http://www.example.com/ims/lti",
      "id"=>et ? et.id : nil,
+     "workflow_state"=>"public",
      "resource_selection"=>
              {"text"=>"",
               "url"=>"http://www.example.com/ims/lti/resource",

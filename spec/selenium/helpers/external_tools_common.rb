@@ -9,7 +9,6 @@ shared_examples_for "external tools tests" do
     secret = "secret"
 
     f("#tab-tools .add_tool_link").click
-    f("#external_tools_dialog").should be_displayed
 
     f("#external_tool_name").send_keys(name)
     f("#external_tool_consumer_key").send_keys(key)
@@ -21,7 +20,7 @@ shared_examples_for "external tools tests" do
     else
       add_manual opts
     end
-    submit_form("#external_tools_dialog")
+    fj('.ui-dialog:visible .btn-primary').click()
     wait_for_ajax_requests
    # ContextExternalTool.count.should != 0
     tool = ContextExternalTool.last
@@ -38,24 +37,16 @@ shared_examples_for "external tools tests" do
       tool.url.should == url
       tool.workflow_state.should == "public"
       tool.description.should == "Description"
-      tool.has_editor_button.should be_true
-      tool.has_resource_selection.should be_true
-      tool.has_course_navigation.should be_true
-      tool.has_account_navigation.should be_true
-      tool.has_user_navigation.should be_true
       f("#external_tool_#{tool.id} .url").text.should == url
-      f("#external_tool_#{tool.id} .editor_button").should be_displayed
-      f("#external_tool_#{tool.id} .resource_selection").should be_displayed
-      f("#external_tool_#{tool.id} .course_navigation").should be_displayed
-      f("#external_tool_#{tool.id} .user_navigation").should be_displayed
-      f("#external_tool_#{tool.id} .account_navigation").should be_displayed
       f("#external_tool_#{tool.id} .readable_state").text.should == "Public"
       f("#external_tool_#{tool.id} .description").text.should == "Description"
       f("#external_tool_#{tool.id} .vendor_help_link").should be_displayed
       f("#external_tool_#{tool.id} .vendor_help_link").text.should == tool.vendor_help_link
       ContextExternalTool::EXTENSION_TYPES.each do |type|
+        tool.extension_setting(type).should_not be_empty
         f("#external_tool_#{tool.id} .#{type}").should be_displayed
       end
+      f("#external_tool_#{tool.id} .url").text.should eql url
     elsif opts.include? :url
       url = "https://lti-examples.heroku.com/tool_redirect"
       kitten_text = "pictures of kittens to your site"
@@ -100,7 +91,7 @@ shared_examples_for "external tools tests" do
 
   def add_manual (opts)
     f("#external_tool_config_type option[value='manual']").click
-    f("#external_tool_form .config_type.manual").should be_displayed
+    f(".config_type.manual").should be_displayed
     f("#external_tool_config_url").should_not be_displayed
     f("#external_tool_config_xml").should_not be_displayed
     @custom_key = "value"
@@ -111,10 +102,8 @@ shared_examples_for "external tools tests" do
     f("#external_tool_description").send_keys(@description)
     if opts.include? :manual_url
       @manual_url = @domain+":80"
-      f("#external_tool_match_by option[value='url']").click
       f("#external_tool_url").send_keys(@manual_url)
     else
-      f("#external_tool_match_by option[value='domain']").click
       f("#external_tool_domain").send_keys(@domain)
     end
 
@@ -139,7 +128,7 @@ shared_examples_for "external tools tests" do
 
   def add_xml
     f("#external_tool_config_type option[value='by_xml']").click
-    f("#external_tool_form .config_type.manual").should_not be_displayed
+    f(".config_type.manual").should_not be_displayed
     f("#external_tool_config_url").should_not be_displayed
     f("#external_tool_config_xml").should be_displayed
 
