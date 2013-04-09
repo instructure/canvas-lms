@@ -28,7 +28,7 @@ def new_valid_tool(course)
                                            :consumer_key => "bob",
                                            :shared_secret => "bob")
   tool.url = "http://www.example.com/basic_lti"
-  tool.settings[:resource_selection] = {
+  tool.resource_selection = {
   :url => "http://#{HostUrl.default_host}/selection_test",
   :selection_width => 400,
   :selection_height => 400 }

@@ -9,7 +9,7 @@ describe "external tool buttons" do
 
   def load_selection_test_tool(element)
     tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
-    tool.settings[:editor_button] = {
+    tool.editor_button = {
         :url => "http://#{HostUrl.default_host}/selection_test",
         :icon_url => "/images/add.png",
         :text => "Selection Test"
@@ -77,7 +77,7 @@ describe "external tool buttons" do
     tools = []
     4.times do |i|
       tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
-      tool.settings[:editor_button] = {
+      tool.editor_button = {
           :url => "http://#{HostUrl.default_host}/selection_test",
           :icon_url => "/images/add.png",
           :text => "Selection Test #{i}"
@@ -104,7 +104,7 @@ describe "external tool buttons" do
     tools = []
     4.times do |i|
       tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
-      tool.settings[:editor_button] = {
+      tool.editor_button = {
           :url => "http://#{HostUrl.default_host}/selection_test",
           :icon_url => "/images/add.png",
           :text => "Selection Test #{i}"

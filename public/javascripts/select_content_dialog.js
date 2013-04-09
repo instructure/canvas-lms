@@ -197,8 +197,8 @@ $(document).ready(function() {
     if($tool.hasClass('resource_selection')) {
       var tool = $tool.data('tool');
       var frameHeight = Math.max(Math.min($(window).height() - 100, 550), 100);
-      var width = tool.resource_selection_settings.selection_width;
-      var height = tool.resource_selection_settings.selection_height;
+      var width = tool.resource_selection.selection_width || tool.selection_width;
+      var height = tool.resource_selection.selection_height || tool.selection_height;
       var $dialog = $("#resource_selection_dialog");
       if($dialog.length == 0) {
         $dialog = $("<div/>", {id: 'resource_selection_dialog', style: 'padding: 0; overflow-y: hidden;'});
@@ -274,9 +274,9 @@ $(document).ready(function() {
           $select.find(".tools").empty();
           for(var idx in data) {
             var tool = data[idx];
-            if(tool.url || tool.domain || tool.resource_selection_settings) {
+            if(tool.url || tool.domain || tool.resource_selection) {
               var $tool = $tool_template.clone(true);
-              $tool.toggleClass('resource_selection', !!tool.resource_selection_settings);
+              $tool.toggleClass('resource_selection', !!tool.resource_selection);
               $tool.fillTemplateData({
                 data: tool,
                 dataValues: ['id', 'url', 'domain', 'name']

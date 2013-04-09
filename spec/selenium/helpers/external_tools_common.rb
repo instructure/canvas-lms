@@ -64,7 +64,7 @@ shared_examples_for "external tools tests" do
       tool.description.should include_text kitten_text
       tool.has_editor_button.should be_true
       tool.settings.should be_present
-      tool.settings[:editor_button].should be_present
+      tool.editor_button.should be_present
       f("#external_tool_#{tool.id} .url").text.should == url
       f("#external_tool_#{tool.id} .description").text.should include_text kitten_text
       f("#external_tool_#{tool.id} .editor_button").should be_displayed
@@ -72,9 +72,9 @@ shared_examples_for "external tools tests" do
     else
       tool.description.should == @description
       tool.settings.count > 0
-      tool.settings[:custom_fields].keys.count >0
+      tool.custom_fields.keys.count >0
       custom_hash = {@custom_key => @custom_value}
-      tool.settings[:custom_fields].should == custom_hash
+      tool.custom_fields.should == custom_hash
       f("#external_tool_#{tool.id} .description").text.should == @description
 
       if (opts.include? :manual_url)

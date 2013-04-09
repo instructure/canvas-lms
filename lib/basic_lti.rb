@@ -178,8 +178,8 @@ module BasicLTI
       hash['context_label'] = context.course_code if context.respond_to?(:course_code)
       hash['launch_presentation_locale'] = I18n.locale || I18n.default_locale.to_s
       hash['launch_presentation_document_target'] = 'iframe'
-      hash['launch_presentation_width'] = 600
-      hash['launch_presentation_height'] = 400
+      hash['launch_presentation_width'] = tool.extension_setting(resource_type, :selection_width) if resource_type
+      hash['launch_presentation_height'] = tool.extension_setting(resource_type, :selection_height) if resource_type
       hash['launch_presentation_return_url'] = return_url
       hash['tool_consumer_instance_guid'] = root_account.lti_guid
       hash['tool_consumer_instance_name'] = root_account.name

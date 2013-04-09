@@ -27,13 +27,13 @@ describe "conversations group" do
     level = 1
 
     @input.send_keys(name)
-    wait_for_ajaximations(150)
+    wait_for_ajaximations(250)
     loop do
       keep_trying_until { ffj('.autocomplete_menu:visible .list').size == level }
       driver.execute_script("return $('.autocomplete_menu:visible .list').last().find('ul').last().find('li').toArray();").detect { |e|
         (e.find_element(:tag_name, :b).text rescue e.text) == name
       }.click
-      wait_for_ajaximations
+      wait_for_ajaximations(250)
 
       break if names.empty?
 

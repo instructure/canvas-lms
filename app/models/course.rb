@@ -2682,9 +2682,9 @@ class Course < ActiveRecord::Base
         :label => tool.label_for(:course_navigation, opts[:language]),
         :css_class => tool.asset_string,
         :href => :course_external_tool_path,
-        :visibility => tool.settings[:course_navigation][:visibility],
+        :visibility => tool.course_navigation(:visibility),
         :external => true,
-        :hidden => tool.settings[:course_navigation][:default] == 'disabled',
+        :hidden => tool.course_navigation(:default) == 'disabled',
         :args => [self.id, tool.id]
      }
     end

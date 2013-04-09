@@ -132,8 +132,6 @@ describe BasicLTI do
       hash['lis_person_sourcedid'].should == 'testfun'
       hash['launch_presentation_locale'].should == I18n.default_locale.to_s
       hash['launch_presentation_document_target'].should == 'iframe'
-      hash['launch_presentation_width'].should == '600'
-      hash['launch_presentation_height'].should == '400'
       hash['launch_presentation_return_url'].should == 'http://www.google.com'
       hash['tool_consumer_instance_guid'].should == @course.root_account.lti_guid
       hash['tool_consumer_instance_name'].should == @course.root_account.name
@@ -265,6 +263,20 @@ describe BasicLTI do
     hash['ext_outcome_data_values_accepted'].should == 'url,text'
     hash['custom_canvas_assignment_title'].should == @assignment.title
     hash['custom_canvas_assignment_points_possible'].should == @assignment.points_possible.to_s
+  end
+
+  it "gets the correct width and height based on resource type" do
+    @user = user_with_managed_pseudonym(:sis_user_id => 'testfun', :name => "A Name")
+    course_with_teacher_logged_in(:active_all => true, :user => @user, :account => @account)
+    @course.sis_source_id = 'coursesis'
+    @course.save!
+    @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool', :privacy_level => 'public')
+    @tool.editor_button = { :selection_width => 1000, :selection_height => 300, :icon_url => 'www.example.com/icon', :url => 'www.example.com' }
+    @tool.save!
+    hash = BasicLTI.generate(:url => 'http://www.yahoo.com', :tool => @tool, :user => @user, :context => @course,
+                             :link_code => '123456', :return_url => 'http://www.google.com', :resource_type => 'editor_button')
+    hash['launch_presentation_width'].should == '1000'
+    hash['launch_presentation_height'].should == '300'
   end
 
   context "sharding" do

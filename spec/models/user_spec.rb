@@ -1028,7 +1028,7 @@ describe User do
   context "tabs_available" do
     it "should not include unconfigured external tools" do
       tool = Account.default.context_external_tools.new(:consumer_key => 'bob', :shared_secret => 'bob', :name => 'bob', :domain => "example.com")
-      tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+      tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
       tool.has_user_navigation.should == false
       user_model
@@ -1038,7 +1038,7 @@ describe User do
 
     it "should include configured external tools" do
       tool = Account.default.context_external_tools.new(:consumer_key => 'bob', :shared_secret => 'bob', :name => 'bob', :domain => "example.com")
-      tool.settings[:user_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+      tool.user_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
       tool.has_user_navigation.should == true
       user_model

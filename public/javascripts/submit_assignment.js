@@ -278,11 +278,7 @@ define([
           $tools.find("ul.tools").empty();
           for(var idx = 0; idx < data.length; idx++) {
             var tool = data[idx];
-            var text = tool.homework_submission.locales && tool.homework_submission.locales[I18n.locale];
-            text = text || tool.homework_submission.locales && tool.homework_submission.locales[I18n.defaultLocale];
-            text = text || tool.homework_submission.text;
-            text = text || tool.name;
-            tool.display_text = text;
+            tool.display_text = tool.homework_submission.label;
             var html = homework_submission_tool(tool);
             var $li = $(html).data('tool', tool);
             $tools.find("ul.tools").append($li);
@@ -331,8 +327,8 @@ define([
     event.preventDefault();
     var tool = $(this).data('tool');
     var url = "/courses/" + $("#identity .course_id").text() + "/external_tools/" + tool.id + "/resource_selection?homework=1&assignment_id=" + ENV.SUBMIT_ASSIGNMENT.ID;
-    var width = tool.homework_submission.selection_width;
-    var height = tool.homework_submission.selection_height;
+    var width = tool.homework_submission.selection_width || tool.selection_width;
+    var height = tool.homework_submission.selection_height || tool.selection_height;
     var title = tool.display_text;
     var $div = $("<div/>", {id: "homework_selection_dialog"}).appendTo($("body"));
     function invalidToolReturn(message) {

@@ -54,12 +54,8 @@ class ContextExternalTool < ActiveRecord::Base
   EXTENSION_TYPES = [:user_navigation, :course_navigation, :account_navigation, :resource_selection, :editor_button, :homework_submission]
   def url_or_domain_is_set
     setting_types = EXTENSION_TYPES
-    # both url and domain should not be set
-    if url.present? && domain.present?
-      errors.add(:url, t('url_or_domain_not_both', "Either the url or domain should be set, not both."))
-      errors.add(:domain, t('url_or_domain_not_both', "Either the url or domain should be set, not both."))
     # url or domain (or url on canvas lti extension) is required
-    elsif url.blank? && domain.blank? && setting_types.all?{|k| !settings[k] || settings[k]['url'].blank? }
+    if url.blank? && domain.blank? && setting_types.all?{|k| !settings[k] || settings[k]['url'].blank? }
       errors.add(:url, t('url_or_domain_required', "Either the url or domain should be set."))
       errors.add(:domain, t('url_or_domain_required', "Either the url or domain should be set."))
     end
@@ -192,48 +188,48 @@ class ContextExternalTool < ActiveRecord::Base
     }
   end
 
-  def course_navigation
-    settings[:course_navigation]
+  def course_navigation(setting = nil)
+    extension_setting(:course_navigation, setting)
   end
 
   def account_navigation=(hash)
     tool_setting(:account_navigation, hash)
   end
 
-  def account_navigation
-    settings[:account_navigation]
+  def account_navigation(setting = nil)
+    extension_setting(:account_navigation, setting)
   end
 
   def user_navigation=(hash)
     tool_setting(:user_navigation, hash)
   end
 
-  def user_navigation
-    settings[:user_navigation]
+  def user_navigation(setting = nil)
+    extension_setting(:user_navigation, setting)
   end
 
   def resource_selection=(hash)
     tool_setting(:resource_selection, hash, :selection_width, :selection_height, :icon_url)
   end
 
-  def resource_selection
-    settings[:resource_selection]
+  def resource_selection(setting = nil)
+    extension_setting(:resource_selection, setting)
   end
 
   def editor_button=(hash)
     tool_setting(:editor_button, hash, :selection_width, :selection_height, :icon_url)
   end
 
-  def editor_button
-    settings[:editor_button]
+  def editor_button(setting = nil)
+    extension_setting(:editor_button, setting)
   end
   
   def homework_submission=(hash)
     tool_setting(:homework_submission, hash, :selection_width, :selection_height, :icon_url)
   end
   
-  def homework_submission
-    settings[:homework_submission]
+  def homework_submission(setting = nil)
+    extension_setting(:homework_submission, setting)
   end
 
   def icon_url=(i_url)
@@ -256,27 +252,47 @@ class ContextExternalTool < ActiveRecord::Base
     write_attribute(:shared_secret, val) unless val.blank?
   end
 
+  def extension_setting(type, property = nil)
+    type = type.to_sym
+    return settings[type] unless property && settings[type]
+    settings[type][property] || settings[property] || extension_default_value(property)
+  end
+
+  def extension_default_value(property)
+    case property
+      when :url
+        url
+      when :selection_width
+        800
+      when :selection_height
+        400
+      else
+        nil
+    end
+  end
+  
   def infer_defaults
     self.url = nil if url.blank?
     self.domain = nil if domain.blank?
 
+    settings[:selection_width] = settings[:selection_width].to_i if settings[:selection_width]
+    settings[:selection_height] = settings[:selection_height].to_i if settings[:selection_height]
+
     [:resource_selection, :editor_button, :homework_submission].each do |type|
       if settings[type]
-        settings[:icon_url] ||= settings[type][:icon_url] if settings[type][:icon_url]
         settings[type][:selection_width] = settings[type][:selection_width].to_i if settings[type][:selection_width]
         settings[type][:selection_height] = settings[type][:selection_height].to_i if settings[type][:selection_height]
       end
     end
     EXTENSION_TYPES.each do |type|
       if settings[type]
-        if !(settings[type][:url] || self.url) || (settings[type].has_key?(:enabled) && !settings[type][:enabled])
+        if !(extension_setting(type, :url)) || (settings[type].has_key?(:enabled) && !settings[type][:enabled])
           settings.delete(type)
         end
       end
     end
 
-    settings.delete(:resource_selection) if settings[:resource_selection] && (!settings[:resource_selection][:selection_width] || !settings[:resource_selection][:selection_height])
-    settings.delete(:editor_button) if settings[:editor_button] && !settings[:icon_url]
+    settings.delete(:editor_button) if !editor_button(:icon_url)
 
     EXTENSION_TYPES.each do |type|
       message = "has_#{type}="
@@ -428,7 +444,7 @@ class ContextExternalTool < ActiveRecord::Base
     # and there's no reason to assume a different URL was intended. With a resource_selection 
     # insertion, there's a stronger chance that a different URL was intended.
     preferred_tool = ContextExternalTool.active.find_by_id(preferred_tool_id)
-    return preferred_tool if preferred_tool && preferred_tool.settings[:resource_selection]
+    return preferred_tool if preferred_tool && preferred_tool.resource_selection
 
     sorted_external_tools = contexts.collect{|context| context.context_external_tools.active.sort_by{|t| [t.precedence, t.id == preferred_tool_id ? 0 : 1] }}.flatten(1)
 

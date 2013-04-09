@@ -19,19 +19,32 @@
 module Api::V1::ExternalTools
   include Api::V1::Json
 
-  def external_tools_json(tools, context, user, session)
+  def external_tools_json(tools, context, user, session, extension_types = ContextExternalTool::EXTENSION_TYPES)
     tools.map do |topic|
-      external_tool_json(topic, context, user, session)
+      external_tool_json(topic, context, user, session, extension_types)
     end
   end
 
-  def external_tool_json(tool, context, user, session)
+  def external_tool_json(tool, context, user, session, extension_types = ContextExternalTool::EXTENSION_TYPES)
     methods = %w[privacy_level custom_fields]
-    methods += ContextExternalTool::EXTENSION_TYPES
-    api_json(tool, user, session,
+    methods += extension_types
+    json = api_json(tool, user, session,
                   :only => %w(id name description url domain consumer_key created_at updated_at),
                   :methods => methods
     )
+
+    json['selection_width'] = tool.settings[:selection_width] if tool.settings.key? :selection_width
+    json['selection_height'] = tool.settings[:selection_height] if tool.settings.key? :selection_height
+    json['icon_url'] = tool.settings[:icon_url] if tool.settings.key? :icon_url
+    extension_types.each do |type|
+      if json[type]
+        json[type]['label'] = tool.label_for(type, user.locale)
+        json[type].delete 'labels'
+        json.delete 'labels'
+      end
+    end
+
+    json
   end
 
   def tool_pagination_url

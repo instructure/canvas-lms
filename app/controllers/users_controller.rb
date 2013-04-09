@@ -612,7 +612,7 @@ class UsersController < ApplicationController
   def external_tool
     @tool = ContextExternalTool.find_for(params[:id], @domain_root_account, :user_navigation)
     @resource_title = @tool.label_for(:user_navigation)
-    @resource_url = @tool.settings[:user_navigation][:url]
+    @resource_url = @tool.user_navigation(:url)
     @opaque_id = @current_user.opaque_identifier(:asset_string)
     @resource_type = 'user_navigation'
     @return_url = user_profile_url(@current_user, :include_host => true)

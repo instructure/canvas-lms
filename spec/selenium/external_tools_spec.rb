@@ -62,7 +62,7 @@ describe "editing external tools" do
     tool.consumer_key.should == "key (updated)"
     tool.shared_secret.should == "secret (updated)"
     tool.domain.should == "example2.com"
-    tool.settings[:custom_fields].should == {'a' => '9', 'b' => '8'}
+    tool.custom_fields.should == {'a' => '9', 'b' => '8'}
   end
 
   it "should allow adding an external tool to a course module" do
@@ -169,7 +169,7 @@ describe "editing external tools" do
   it "should allow adding an external tool with resource selection enabled to a course module" do
     @module = @course.context_modules.create!(:name => "module")
     tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
-    tool.settings[:resource_selection] = {
+    tool.resource_selection = {
         :url => "http://#{HostUrl.default_host}/selection_test",
         :selection_width => 400,
         :selection_height => 400
@@ -212,7 +212,7 @@ describe "editing external tools" do
   it "should alert when invalid url data is returned by a resource selection dialog" do
     @module = @course.context_modules.create!(:name => "module")
     tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
-    tool.settings[:resource_selection] = {
+    tool.resource_selection = {
         :url => "http://#{HostUrl.default_host}/selection_test",
         :selection_width => 400,
         :selection_height => 400
@@ -273,7 +273,7 @@ describe "editing external tools" do
   it "should use the tool name if no link text is returned" do
     @module = @course.context_modules.create!(:name => "module")
     tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
-    tool.settings[:resource_selection] = {
+    tool.resource_selection = {
         :url => "http://#{HostUrl.default_host}/selection_test",
         :selection_width => 400,
         :selection_height => 400
@@ -390,7 +390,7 @@ describe "editing external tools" do
 
     def homework_submission_tool
       @tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
-      @tool.settings[:homework_submission] = {
+      @tool.homework_submission = {
           :url => "http://#{HostUrl.default_host}/selection_test",
           :selection_width => 400,
           :selection_height => 400

@@ -90,7 +90,7 @@ describe "External Tools" do
     
     it "should render user navigation tools with a full return url" do
       tool = @course.root_account.context_external_tools.build(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'my grade passback test tool', :domain => 'example.com', :privacy_level => 'public')
-      tool.settings[:user_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+      tool.user_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
       
       student_in_course(:active_all => true)
@@ -108,7 +108,7 @@ describe "External Tools" do
     course_with_teacher_logged_in(:active_all => true)
 
     @tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'my grade passback test tool', :domain => 'example.com')
-    @tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+    @tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
     @tool.save!
 
     get "/courses/#{@course.id}/external_tools/#{@tool.id}"

@@ -68,12 +68,8 @@ class ExternalToolsController < ApplicationController
         @tools = @context.context_external_tools.active
       end
       respond_to do |format|
-        if api_request?
           @tools = Api.paginate(@tools, self, tool_pagination_url)
           format.json {render :json => external_tools_json(@tools, @context, @current_user, session)}
-        else
-          format.json { render :json => @tools.to_json(:include_root => false, :methods => [:resource_selection_settings, :custom_fields_string]) }
-        end
       end
     end
   end
@@ -82,7 +78,7 @@ class ExternalToolsController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       @tools = ContextExternalTool.all_tools_for(@context, :user => @current_user).select(&:has_homework_submission)
       respond_to do |format|
-        format.json { render :json => @tools.to_json(:include_root => false, :methods => [:homework_submission, :icon_url]) }
+        format.json {render :json => external_tools_json(@tools, @context, @current_user, session)}
       end
     end
   end
@@ -316,10 +312,10 @@ class ExternalToolsController < ApplicationController
   # @example_request
   #
   #   This would update the specified keys on this external tool
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/external_tools/<external_tool_id>' \ 
+  #   curl -X PUT 'http://<canvas>/api/v1/courses/<course_id>/external_tools/<external_tool_id>' \ 
   #        -H "Authorization: Bearer <token>" \ 
   #        -F 'name=Public Example' \ 
-  #        -F 'privacy_level=public' 
+  #        -F 'privacy_level=public'
   def update
     @tool = @context.context_external_tools.active.find(params[:id] || params[:external_tool_id])
     if authorized_action(@tool, @current_user, :update)
@@ -338,8 +334,14 @@ class ExternalToolsController < ApplicationController
     end
   end
 
-  # API
+  # @API Delete an external tool
   # Remove the specified external tool
+  #
+  # @example_request
+  #
+  #   This would delete the specified external tool
+  #   curl -X DELETE 'http://<canvas>/api/v1/courses/<course_id>/external_tools/<external_tool_id>' \ 
+  #        -H "Authorization: Bearer <token>"
   def destroy
     @tool = @context.context_external_tools.active.find(params[:id] || params[:external_tool_id])
     if authorized_action(@tool, @current_user, :delete)
