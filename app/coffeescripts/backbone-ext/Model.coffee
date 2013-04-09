@@ -1,21 +1,29 @@
 define [
+  'compiled/util/mixin'
   'underscore'
   'use!vendor/backbone'
   'compiled/backbone-ext/Model/computedAttributes'
   'compiled/backbone-ext/Model/dateAttributes'
   'compiled/backbone-ext/Model/errors'
-], (_, Backbone) ->
+], (mixin, _, Backbone) ->
 
   class Backbone.Model extends Backbone.Model
 
     ##
-    # Define default options, options passed in to the constructor will
-    # overwrite these
-    defaults: {}
+    # Mixes in objects to a model's definition, being mindful of certain
+    # properties (like defaults) that need to be merged also.
+    #
+    # @param {Object} mixins...
+    # @api public
+
+    @mixin: (mixins...) ->
+      mixin this, mixins...
 
     initialize: (attributes, options) ->
       super
       @options = _.extend {}, @defaults, options
+      fn.call this for fn in @__initialize__ if @__initialize__
+      this
 
     # Method Summary
     #   Trigger an event indicating an item has started to save. This 
