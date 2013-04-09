@@ -32,7 +32,8 @@ describe CalendarEventsApiController, :type => :integration do
       'title', 'updated_at', 'url', 'workflow_state'
     ]
     expected_slot_fields = (expected_fields + ['appointment_group_id', 'appointment_group_url', 'available_slots', 'participants_per_appointment', 'reserve_url', 'effective_context_code']).sort
-    expected_reservation_fields = (expected_fields + ['appointment_group_id', 'appointment_group_url', 'effective_context_code'] - ['child_events']).sort
+    expected_reservation_event_fields = (expected_fields + ['appointment_group_id', 'appointment_group_url', 'effective_context_code']).sort
+    expected_reservation_fields = expected_reservation_event_fields - ['child_events']
 
     it 'should return events within the given date range' do
       e1 = @course.calendar_events.create(:title => '1', :start_at => '2012-01-07 12:00:00')
@@ -300,7 +301,8 @@ describe CalendarEventsApiController, :type => :integration do
         json.sort! {|e1, e2| e1['id'] <=> e2['id']}
 
         ejson = json.first
-        ejson.keys.sort.should eql((expected_slot_fields + ['reserved'] - ['child_events']).sort) # not reserved, so no child events can be seen
+        ejson.keys.sort.should eql((expected_slot_fields + ['reserved']).sort)
+        ejson['child_events'].should == [] # not reserved, so no child events can be seen
         ejson['reserve_url'].should match %r{calendar_events/#{event1.id}/reservations/#{@me.id}}
         ejson['reserved'].should be_false
         ejson['available_slots'].should eql 1
@@ -398,14 +400,14 @@ describe CalendarEventsApiController, :type => :integration do
                           :context_codes => [@course.asset_string], :start_date => '2012-01-01', :end_date => '2012-01-31'})
         # the group appointment won't show on the course calendar
         json.size.should eql 1
-        json.first.keys.sort.should eql(expected_reservation_fields)
+        json.first.keys.sort.should eql(expected_reservation_event_fields)
         json.first['id'].should eql my_personal_appointment.id
 
         json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-31&context_codes[]=#{mygroup.asset_string}", {
                           :controller => 'calendar_events_api', :action => 'index', :format => 'json',
                           :context_codes => [mygroup.asset_string], :start_date => '2012-01-01', :end_date => '2012-01-31'})
         json.size.should eql 1
-        json.first.keys.sort.should eql(expected_reservation_fields - ['effective_context_code'])
+        json.first.keys.sort.should eql(expected_reservation_event_fields - ['effective_context_code'])
         json.first['id'].should eql my_group_appointment.id
 
         # if we go look at those appointment slots, they now show as reserved
@@ -463,12 +465,12 @@ describe CalendarEventsApiController, :type => :integration do
           prepare(true)
           json = api_call(:post, "/api/v1/calendar_events/#{@event1.id}/reservations", {
                             :controller => 'calendar_events_api', :action => 'reserve', :format => 'json', :id => @event1.id.to_s})
-          json.keys.sort.should eql(expected_reservation_fields)
+          json.keys.sort.should eql(expected_reservation_event_fields)
           json['appointment_group_id'].should eql(@ag1.id)
 
           json = api_call(:post, "/api/v1/calendar_events/#{@event3.id}/reservations", {
                             :controller => 'calendar_events_api', :action => 'reserve', :format => 'json', :id => @event3.id.to_s})
-          json.keys.sort.should eql(expected_reservation_fields - ['effective_context_code']) # group one is on the group, no effective context
+          json.keys.sort.should eql(expected_reservation_event_fields - ['effective_context_code']) # group one is on the group, no effective context
           json['appointment_group_id'].should eql(@ag2.id)
         end
 
@@ -498,13 +500,13 @@ describe CalendarEventsApiController, :type => :integration do
           prepare(true)
           json = api_call(:post, "/api/v1/calendar_events/#{@event1.id}/reservations", {
                             :controller => 'calendar_events_api', :action => 'reserve', :format => 'json', :id => @event1.id.to_s})
-          json.keys.sort.should eql(expected_reservation_fields)
+          json.keys.sort.should eql(expected_reservation_event_fields)
           json['appointment_group_id'].should eql(@ag1.id)
           @ag1.reservations_for(@me).map(&:parent_calendar_event_id).should eql [@event1.id]
 
           json = api_call(:post, "/api/v1/calendar_events/#{@event2.id}/reservations?cancel_existing=1", {
                             :controller => 'calendar_events_api', :action => 'reserve', :format => 'json', :id => @event2.id.to_s, :cancel_existing => '1'})
-          json.keys.sort.should eql(expected_reservation_fields)
+          json.keys.sort.should eql(expected_reservation_event_fields)
           json['appointment_group_id'].should eql(@ag1.id)
           @ag1.reservations_for(@me).map(&:parent_calendar_event_id).should eql [@event2.id]
         end
@@ -524,12 +526,12 @@ describe CalendarEventsApiController, :type => :integration do
           prepare
           json = api_call(:post, "/api/v1/calendar_events/#{@event1.id}/reservations/#{@other_guy.id}", {
                             :controller => 'calendar_events_api', :action => 'reserve', :format => 'json', :id => @event1.id.to_s, :participant_id => @other_guy.id.to_s})
-          json.keys.sort.should eql(expected_reservation_fields)
+          json.keys.sort.should eql(expected_reservation_event_fields)
           json['appointment_group_id'].should eql(@ag1.id)
 
           json = api_call(:post, "/api/v1/calendar_events/#{@event3.id}/reservations/#{@group.id}", {
                             :controller => 'calendar_events_api', :action => 'reserve', :format => 'json', :id => @event3.id.to_s, :participant_id => @group.id.to_s})
-          json.keys.sort.should eql(expected_reservation_fields - ['effective_context_code'])
+          json.keys.sort.should eql(expected_reservation_event_fields - ['effective_context_code'])
           json['appointment_group_id'].should eql(@ag2.id)
         end
 
