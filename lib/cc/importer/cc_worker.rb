@@ -18,6 +18,7 @@
 class Canvas::Migration::Worker::CCWorker < Struct.new(:migration_id)
   def perform
     cm = ContentMigration.find_by_id migration_id
+    cm.job_progress.start
     begin
       cm.update_conversion_progress(1)
       settings = cm.migration_settings.clone
@@ -41,7 +42,6 @@ class Canvas::Migration::Worker::CCWorker < Struct.new(:migration_id)
       if export_folder_path
         Canvas::Migration::Worker::upload_exported_data(export_folder_path, cm)
         Canvas::Migration::Worker::clear_exported_data(export_folder_path)
-        cm.update_conversion_progress(100)
       end
 
       cm.migration_settings[:worker_class] = converter_class.name
@@ -50,6 +50,7 @@ class Canvas::Migration::Worker::CCWorker < Struct.new(:migration_id)
       end
       cm.workflow_state = :exported
       saved = cm.save
+      cm.update_conversion_progress(100)
 
       if cm.import_immediately?
         cm.import_content_without_send_later
@@ -61,13 +62,13 @@ class Canvas::Migration::Worker::CCWorker < Struct.new(:migration_id)
       end
 
       saved
+    rescue Canvas::Migration::Error
+      cm.add_error($!.message, :exception => $!)
+      cm.workflow_state = :failed
+      cm.job_progress.fail
+      cm.save
     rescue => e
-      report = ErrorReport.log_exception(:content_migration, e)
-      if cm
-        cm.workflow_state = :failed
-        cm.migration_settings[:last_error] = "ErrorReport:#{report.id}"
-        cm.save
-      end
+      cm.fail_with_error!(e) if cm
     end
   end
 

@@ -108,7 +108,7 @@ class ContentMigrationsController < ApplicationController
   #
   # You can use the {api:ProgressController#show Progress API} to track the
   # progress of the migration. The migration's progress is linked to with the
-  # _progress_url_ value
+  # _progress_url_ value.
   #
   # The two general workflows are:
   #
@@ -124,11 +124,15 @@ class ContentMigrationsController < ApplicationController
   # 3. {api:ContentMigrationsController#show GET} the ContentMigration
   # 4. Use the {api:ProgressController#show Progress} specified in _progress_url_ to monitor progress
   #
-  # @argument migration_type [string] The type of the migration. Allowed values: canvas_cartridge_importer, common_cartridge_importer, qti_converter, moodle_converter
+  # @argument migration_type [string] The type of the migration. Allowed values: canvas_cartridge_importer, common_cartridge_importer, course_copy_importer, zip_file_importer, qti_converter, moodle_converter
   #
   # @argument pre_attachment[name] [string] Required if uploading a file. This is the first step in uploading a file to the content migration. See the {file:file_uploads.html File Upload Documentation} for details on the file upload workflow.
   #
   # @argument pre_attachment[*] (optional) Other file upload properties, See {file:file_uploads.html File Upload Documentation}
+  #
+  # @argument settings[source_course_id] [string] (optional) The course to copy from for a course copy migration. (required if doing course copy)
+  #
+  # @argument settings[folder_id] [string] (optional) The folder to unzip the .zip file into for a zip_file_import. (required if doing .zip file upload)
   #
   # @argument settings[overwrite_quizzes] [boolean] (optional) Whether to overwrite quizzes with the same identifiers between content packages
   #
@@ -160,13 +164,19 @@ class ContentMigrationsController < ApplicationController
   # 
   # @returns ContentMigration
   def create
-    plugin = Canvas::Plugin.find(params[:migration_type])
-    if !plugin
+    @plugin = Canvas::Plugin.find(params[:migration_type])
+    if !@plugin
       return render(:json => { :message => t('bad_migration_type', "Invalid migration_type") }, :status => :bad_request)
     end
-    if plugin.settings && plugin.settings[:requires_file_upload]
+    settings = @plugin.settings || {}
+    if settings[:requires_file_upload]
       if !params[:pre_attachment] || params[:pre_attachment][:name].blank?
         return render(:json => { :message => t('must_upload_file', "File upload is required") }, :status => :bad_request)
+      end
+    end
+    if validator = settings[:required_options_validator]
+      if res = validator.has_error(params[:settings], @current_user, @context)
+        return render(:json => { :message => res.respond_to?(:call) ? res.call : res }, :status => :bad_request)
       end
     end
 
@@ -186,6 +196,7 @@ class ContentMigrationsController < ApplicationController
   # @returns ContentMigration
   def update
     @content_migration = @context.content_migrations.find(params[:id])
+    @plugin = Canvas::Plugin.find(@content_migration.migration_type)
 
     update_migration
   end
@@ -200,6 +211,8 @@ class ContentMigrationsController < ApplicationController
   def update_migration
     @content_migration.update_migration_settings(params[:settings]) if params[:settings]
     @content_migration.set_date_shift_options(params[:date_shift_options])
+
+    params[:selective_import] = false if @plugin.settings && @plugin.settings[:no_selective_import]
     if Canvas::Plugin.value_to_boolean(params[:selective_import])
       #todo selective import options
     else

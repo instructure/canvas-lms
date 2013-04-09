@@ -1753,4 +1753,29 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
     ContentMigration.migration_plugins(true).include?(ab).should be_false
   end
 
+  context "zip file import" do
+    it "should import" do
+      course_with_teacher
+      zip_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/file.zip")
+      cm = ContentMigration.new(:context => @course, :user => @user,)
+      cm.migration_type = 'zip_file_importer'
+      cm.migration_settings[:folder_id] = Folder.root_folders(@course).first.id
+      cm.save!
+
+      attachment = Attachment.new
+      attachment.context = cm
+      attachment.uploaded_data = File.open(zip_path, 'rb')
+      attachment.filename = 'file.zip'
+      attachment.save!
+
+      cm.attachment = attachment
+      cm.save!
+
+      cm.queue_migration
+      run_jobs
+      @course.reload
+      @course.attachments.count.should == 1
+    end
+  end
+
 end

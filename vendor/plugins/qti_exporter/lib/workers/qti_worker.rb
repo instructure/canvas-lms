@@ -44,12 +44,7 @@ module Canvas::Migration
           cm.save
           cm.update_import_progress(100)
         rescue => e
-          report = ErrorReport.log_exception(:content_migration, e)
-          if cm
-            cm.workflow_state = :failed
-            cm.migration_settings[:last_error] = "ErrorReport:#{report.id}"
-            cm.save
-          end
+          cm.fail_with_error!(e) if cm
         end
       end
 

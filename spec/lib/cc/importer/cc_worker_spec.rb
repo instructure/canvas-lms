@@ -21,6 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 describe Canvas::Migration::Worker::CCWorker do
   it "should set the worker_class on the migration" do
     cm = ContentMigration.create!(:migration_settings => { :no_archive_file => true })
+    cm.reset_job_progress
     Canvas::Migration::Worker.expects(:get_converter).with(anything).returns(CC::Importer::Canvas::Converter)
     CC::Importer::Canvas::Converter.any_instance.expects(:export).returns({})
     worker = Canvas::Migration::Worker::CCWorker.new(cm.id)

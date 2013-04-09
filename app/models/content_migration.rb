@@ -267,6 +267,19 @@ class ContentMigration < ActiveRecord::Base
     add_warning(t('errors.import_error', "Import Error: ") + "#{item_type} - \"#{item_name}\"", warning)
   end
 
+  def fail_with_error!(exception_or_info)
+    opts={}
+    if exception_or_info.is_a?(Exception)
+      opts[:exception] = exception_or_info
+    else
+      opts[:error_message] = exception_or_info
+    end
+    add_error(t(:unexpected_error, "There was an unexpected error, please contact support."), opts)
+    self.workflow_state = :failed
+    job_progress.fail
+    save
+  end
+
   # deprecated warning format
   def old_warnings_format
     self.migration_issues.map do |mi|
@@ -425,7 +438,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def for_course_copy?
-    !!self.source_course
+    !!self.source_course || (self.migration_type && self.migration_type == 'course_copy_importer')
   end
 
   def set_date_shift_options(opts)
@@ -439,63 +452,8 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def copy_course
-    self.workflow_state = :pre_processing
-    reset_job_progress
-    self.migration_settings[:skip_import_notification] = true
-    self.save
-
-    begin
-      ce = ContentExport.new
-      ce.content_migration = self
-      ce.selected_content = copy_options
-      ce.course = self.source_course
-      ce.export_type = ContentExport::COURSE_COPY
-      ce.user = self.user
-      ce.save!
-      self.content_export = ce
-
-      ce.export_course_without_send_later
-
-      if ce.workflow_state == 'exported_for_course_copy'
-        # use the exported attachment as the import archive
-        self.attachment = ce.attachment
-        migration_settings[:migration_ids_to_import] ||= {:copy=>{}}
-        migration_settings[:migration_ids_to_import][:copy][:everything] = true
-        # set any attachments referenced in html to be copied
-        ce.selected_content['attachments'] ||= {}
-        ce.referenced_files.values.each do |att_mig_id|
-          ce.selected_content['attachments'][att_mig_id] = true
-        end
-        ce.save
-
-        self.save
-        worker = Canvas::Migration::Worker::CCWorker.new
-        worker.migration_id = self.id
-        worker.perform
-        self.reload
-        if self.workflow_state == 'exported'
-          self.workflow_state = :pre_processed
-          self.update_import_progress(10)
-
-          self.context.copy_attachments_from_course(self.source_course, :content_export => ce, :content_migration => self)
-          self.update_import_progress(20)
-
-          self.import_content_without_send_later
-        end
-      else
-        self.workflow_state = :failed
-        migration_settings[:last_error] = "ContentExport failed to export course."
-        self.save
-      end
-    rescue => e
-      self.workflow_state = :failed
-      er = ErrorReport.log_exception(:content_migration, e)
-      migration_settings[:last_error] = "ErrorReport:#{er.id}"
-      logger.error e
-      self.save
-      raise e
-    ensure
-    end
+    worker = Canvas::Migration::Worker::CourseCopyWorker.new
+    worker.perform(self)
   end
   handle_asynchronously :copy_course, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
   
@@ -570,7 +528,13 @@ class ContentMigration < ActiveRecord::Base
 
   def fast_update_progress(val)
     reset_job_progress unless job_progress
-    job_progress.update_completion!(val)
+    if val == 100
+      job_progress.completion = 100
+      job_progress.workflow_state = 'completed'
+      job_progress.save
+    else
+      job_progress.update_completion!(val)
+    end
     # Until this progress is phased out
     self.progress = val
     ContentMigration.where(:id => self).update_all(:progress=>val)

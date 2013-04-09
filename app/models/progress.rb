@@ -29,6 +29,7 @@ class Progress < ActiveRecord::Base
   workflow do
     state :queued do
       event :start, :transitions_to => :running
+      event :fail, :transitions_to => :failed
     end
     state :running do
       event(:complete, :transitions_to => :completed) { update_completion! 100 }

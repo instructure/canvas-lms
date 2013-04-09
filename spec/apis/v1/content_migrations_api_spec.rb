@@ -136,6 +136,16 @@ describe ContentMigrationsController, :type => :integration do
       migration.workflow_state.should == "created"
       migration.job_progress.should be_nil
     end
+    
+    it "should error if expected setting isn't set" do
+      json = api_call(:post, @migration_url, @params, {:migration_type => 'course_copy_importer'}, {}, :expected_status => 400)
+      json.should == {"message"=>'A course copy requires a source course.'}
+    end
+    
+    it "should queue if correct settings set" do
+      # implicitly tests that the response was a 200
+      api_call(:post, @migration_url, @params, {:migration_type => 'course_copy_importer', :settings => {:source_course_id => @course.id.to_param}})
+    end
 
     context "migration file upload" do
       it "should set attachment pre-flight data" do

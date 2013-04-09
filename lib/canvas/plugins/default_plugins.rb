@@ -138,6 +138,39 @@ Canvas::Plugin.register 'canvas_cartridge_importer', :export_system, {
     :provides =>{:canvas_cartridge => CC::Importer::Canvas::Converter}
   },
 }
+require_dependency 'canvas/migration/worker/course_copy_worker'
+Canvas::Plugin.register 'course_copy_importer', :export_system, {
+        :name => lambda { I18n.t :course_copy_name, 'Copy Canvas Course' },
+        :author => 'Instructure',
+        :author_website => 'http://www.instructure.com',
+        :description => lambda { I18n.t :course_copy_description, 'Migration plugin for copying canvas courses' },
+        :version => '1.0.0',
+        :select_text => lambda { I18n.t :course_copy_file_description, "Copy a Canvas Course" },
+        :hide_from_users => true, # until new UI is done
+        :settings => {
+                :worker => 'CourseCopyWorker',
+                :migration_partial => '',
+                :requires_file_upload => false,
+                :required_options_validator => Canvas::Migration::Validators::CourseCopyValidator
+        },
+}
+require_dependency 'canvas/migration/worker/zip_file_worker'
+Canvas::Plugin.register 'zip_file_importer', :export_system, {
+        :name => lambda { I18n.t :zip_file_name, 'Copy Canvas Course' },
+        :author => 'Instructure',
+        :author_website => 'http://www.instructure.com',
+        :description => lambda { I18n.t :zip_file_description, 'Migration plugin for unpacking plain .zip files into a course' },
+        :version => '1.0.0',
+        :select_text => lambda { I18n.t :zip_file_file_description, "Import plain files from a .zip" },
+        :hide_from_users => true, # until new UI is done
+        :settings => {
+                :worker => 'ZipFileWorker',
+                :migration_partial => '',
+                :requires_file_upload => true,
+                :no_selective_import => true,
+                :required_options_validator => Canvas::Migration::Validators::ZipImporterValidator
+        },
+}
 Canvas::Plugin.register 'common_cartridge_importer', :export_system, {
   :name => lambda{ I18n.t :common_cartridge_name, 'Common Cartridge Importer' },
   :author => 'Instructure',
