@@ -13,6 +13,7 @@
 <div class="calendar_event <%= 'assignment' if is_assignment %> <%= "group_#{event.try_rescue(:context_type).try_rescue(:downcase)}_#{event.try_rescue(:context_id)}" %> <%= "draggable" if can_do(event, @current_user, :update) %>" id="<%= full_id %>" style="<%= event ? '' : 'display: none;' %>" title="<%= title_text %>">
   <div>&nbsp;</div>
   <div class="calendar_event_text">
+    <span class="screenreader-only calendar-name-text"></span>
     <span class="due_text">
       <%= t :due, "due" %>
     </span>
