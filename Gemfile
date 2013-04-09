@@ -50,7 +50,6 @@ if ONE_NINE
 else
   gem 'mail', '2.4.4'
 end
-gem 'mailman',        '0.5.3'
 # using this forked gem until https://github.com/37signals/marginalia/pull/15 is in the source gem
 gem 'instructure-marginalia',     '1.1.3',    :require => false
 gem 'mime-types',     '1.17.2',   :require => 'mime/types'

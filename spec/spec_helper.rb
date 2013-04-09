@@ -28,6 +28,7 @@ else
 end
 require 'webrat'
 require 'mocha/api'
+require File.expand_path(File.dirname(__FILE__) + '/mocha_rspec_adapter')
 require File.expand_path(File.dirname(__FILE__) + '/mocha_extensions')
 
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
@@ -121,19 +122,6 @@ Spec::Matchers.define :match_ignoring_whitespace do |expected|
   end
 end
 
-module MochaRspecAdapter
-  include Mocha::API
-  def setup_mocks_for_rspec
-    mocha_setup
-  end
-  def verify_mocks_for_rspec
-    mocha_verify
-  end
-  def teardown_mocks_for_rspec
-    mocha_teardown
-  end
-end
-
 Spec::Runner.configure do |config|
   # If you're not using ActiveRecord you should remove these
   # lines, delete config/database.yml and disable :active_record
@@ -141,7 +129,6 @@ Spec::Runner.configure do |config|
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures  = false
   config.fixture_path = Rails.root+'spec/fixtures/'
-  config.mock_with MochaRspecAdapter
 
   config.include Webrat::Matchers, :type => :views
 

@@ -16,9 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
-describe IncomingMessageProcessor do
+describe IncomingMail::IncomingMessageProcessor do
+
+  # Import this one constant
+  IncomingMessageProcessor = IncomingMail::IncomingMessageProcessor
+
   def setup_test_outgoing_mail
     @original_delivery_method = ActionMailer::Base.delivery_method
     @original_perform_deliveries = ActionMailer::Base.perform_deliveries
@@ -88,7 +92,38 @@ describe IncomingMessageProcessor do
     DiscussionTopic.class_eval { alias_method :reply_from, :old_reply_from }
   end
 
-  describe "IncomingMessageProcessor.process_single" do
+  describe ".configure" do
+    it "should raise on invalid configuration settings" do
+      expect { IncomingMessageProcessor.configure('bogus_setting' => 42) }.to raise_error(StandardError)
+    end
+
+    it "should accept legacy mailman configurations" do
+      IncomingMessageProcessor.configure('poll_interval' => 42, 'ignore_stdin' => true)
+    end
+  end
+
+  describe ".run_periodically?" do
+    it "should consult .poll_interval and .ignore_stdin for backwards compatibility" do
+      IncomingMessageProcessor.configure('poll_interval' => 0, 'ignore_stdin' => true)
+      IncomingMessageProcessor.run_periodically?.should be_true
+
+      IncomingMessageProcessor.configure('poll_interval' => 0, 'ignore_stdin' => false)
+      IncomingMessageProcessor.run_periodically?.should be_false
+
+      IncomingMessageProcessor.configure('poll_interval' => 42, 'ignore_stdin' => true)
+      IncomingMessageProcessor.run_periodically?.should be_false
+    end
+
+    it "should use 'run_periodically' configuration setting" do
+      IncomingMessageProcessor.configure({})
+      IncomingMessageProcessor.run_periodically?.should be_false
+
+      IncomingMessageProcessor.configure('run_periodically' => true)
+      IncomingMessageProcessor.run_periodically?.should be_true
+    end
+  end
+
+  describe ".process_single" do
     before(:each) do
       IncomingMessageProcessor.configure({})
 
@@ -213,45 +248,12 @@ describe IncomingMessageProcessor do
       check_new_message(:locked)
     end
 
-    it "should process emails from mailman" do
-      Dir.mktmpdir do |tmpdir|
-        newdir = tmpdir + "/new"
-        Dir.mkdir(newdir)
-        
-        addr, domain = HostUrl.outgoing_email_address.split(/@/)
-        to_address = "#{addr}+#{ReplyToAddress.new(@message).secure_id}-#{@message.id}@#{domain}"
-        mail = Mail.new do
-          from 'test@example.com'
-          to to_address
-          subject 'subject of test message'
-          body 'body of test message'
-        end
-        
-        Mailman.config.maildir = nil
-        Mailman.config.ignore_stdin = false
-        Mailman.config.poll_interval = 0
-        Mailman.config.pop3 = nil
-        
-        # If we try to use maildir with mailman, it will just poll the maildir forever.
-        # Using stdin is the safest, but we have to do this little dance for it to work.
-        read, write = IO.pipe
-        saved_stdin = STDIN.dup
-        write.puts mail.to_s
-        write.close
-        STDIN.reopen(read)
-        IncomingMessageProcessor.process
-        STDIN.reopen(saved_stdin)
-        
-        DiscussionTopic.incoming_replies.length.should == 1
-        DiscussionTopic.incoming_replies[0][:text].should == 'body of test message'
-      end
-    end
   end
 
-  describe "IncomingMessageProcessor.process" do
+  describe ".process" do
     before(:each) do
-      @configured = OpenObject.new
-      Mailman.stubs(:config).returns(@configured)
+      @mock_mailbox = mock
+      IncomingMessageProcessor.stubs(:create_mailbox => @mock_mailbox)
     end
 
     it "should support original incoming_mail configuration format for a single inbox" do
@@ -268,15 +270,16 @@ describe IncomingMessageProcessor do
         }
       }
 
-      Mailman::Application.expects(:run).once
+      IncomingMessageProcessor.expects(:create_mailbox).returns(@mock_mailbox).with do |account|
+        account.protocol == :imap &&
+        account.config == config['imap'].symbolize_keys
+      end
       IncomingMessageProcessor.configure(config)
-      @configured.poll_interval.should eql 42
-      @configured.ignore_stdin.should be_true
-      @configured.rails_root.should eql 'nil'
-      @configured.logger.should eql Rails.logger
-      @configured.imap.should be_nil
+
+      @mock_mailbox.expects(:connect)
+      @mock_mailbox.expects(:each_message)
+      @mock_mailbox.expects(:disconnect)
       IncomingMessageProcessor.process
-      @configured.imap.should eql config['imap'].symbolize_keys
     end
 
     it "should process incoming_mail configuration with multiple accounts" do
@@ -294,63 +297,154 @@ describe IncomingMessageProcessor do
         },
       }
 
-      Mailman::Application.expects(:run).times(3)
-      @configured.expects(:imap=).with({:server => 'fake', :username => 'user1@fake.fake', :password => 'pass1'})
-      @configured.expects(:imap=).with({:server => 'fake', :username => 'user2@fake.fake', :password => 'pass2'})
-      @configured.expects(:imap=).with({:server => 'fake', :username => 'user3@fake.fake', :password => 'pass3'})
+      seq = sequence('create_mailbox')
+      imp = IncomingMessageProcessor
+      imp.expects(:create_mailbox).in_sequence(seq).returns(@mock_mailbox).with do |account| 
+        account.protocol == :imap &&
+        account.config == { :server => 'fake', :username => 'user1@fake.fake', :password => 'pass1'}
+      end
+      imp.expects(:create_mailbox).in_sequence(seq).returns(@mock_mailbox).with do |account|
+        account.protocol == :imap &&
+        account.config == { :server => 'fake', :username => 'user2@fake.fake', :password => 'pass2'}
+      end
+      imp.expects(:create_mailbox).in_sequence(seq).returns(@mock_mailbox).with do |account|
+        account.protocol == :imap &&
+        account.config == { :server => 'fake', :username => 'user3@fake.fake', :password => 'pass3'}
+      end
+
+      @mock_mailbox.expects(:connect).times(3)
+      @mock_mailbox.expects(:each_message).times(3)
+      @mock_mailbox.expects(:disconnect).times(3)
 
       IncomingMessageProcessor.configure(config)
       IncomingMessageProcessor.process
     end
 
-    it "should raise if both imap and pop3 are specified" do
+    it "should extract special values from account settings" do
       config = {
-        'poll_interval' => 0,
-        'ignore_stdin' => true,
         'imap' => {
           'server' => 'fake',
-        },
-        'pop3' => {
-          'server' => 'fake',
+          'username' => 'user@fake.fake',
+          'password' => 'fake',
+          'error_folder' => 'broken',
         },
       }
-      lambda { IncomingMessageProcessor.configure(config) }.should raise_error
+
+      IncomingMail::MailboxAccount.expects(:new).with({
+        :protocol => :imap,
+        :address => 'user@fake.fake',
+        :error_folder => 'broken',
+        :config => config['imap'].except('error_folder').symbolize_keys,
+      })
+      IncomingMessageProcessor.configure(config)
     end
 
-    it "should raise if multiple accounts are specified and poll_interval is not 0" do
+    describe "message processing" do
+      before do
+        IncomingMessageProcessor.configure({
+          'imap' => {
+            'username' => 'me@fake.fake',
+            'error_folder' => 'errors_go_here',
+          }
+        })
+      end
+
+      it "should perform normal message processing of messages retrieved from mailbox" do
+        foo = "To: me+123-1@fake.fake\r\n\r\nfoo body"
+        bar = "To: me+456-2@fake.fake\r\n\r\nbar body"
+        baz = "To: me+abc-3@fake.fake\r\n\r\nbaz body"
+
+        @mock_mailbox.expects(:connect)
+        @mock_mailbox.expects(:move_message).never
+        @mock_mailbox.expects(:delete_message).with(:foo)
+        @mock_mailbox.expects(:delete_message).with(:bar)
+        @mock_mailbox.expects(:delete_message).with(:baz)
+        @mock_mailbox.expects(:each_message).multiple_yields([:foo, foo], [:bar, bar], [:baz, baz])
+        @mock_mailbox.expects(:disconnect)
+        imp = IncomingMessageProcessor
+        imp.expects(:process_single).with(kind_of(Mail::Message), "123", 1, anything)
+        imp.expects(:process_single).with(kind_of(Mail::Message), "456", 2, anything)
+        imp.expects(:process_single).with(kind_of(Mail::Message), "abc", 3, anything)
+
+        IncomingMessageProcessor.process
+      end
+
+      it "should move aside messages that have parsing errors" do
+        foo = "To: me+123-1@fake.f\n ake\r\n\r\nfoo body" # illegal folding of "to" header
+
+        @mock_mailbox.expects(:connect)
+        @mock_mailbox.expects(:delete_message).never
+        @mock_mailbox.expects(:move_message).with(:foo, 'errors_go_here')
+        @mock_mailbox.expects(:each_message).yields(:foo, foo)
+        @mock_mailbox.expects(:disconnect)
+        ErrorReport.expects(:log_error).
+          with(IncomingMessageProcessor.error_report_category, kind_of(Hash))
+
+        IncomingMessageProcessor.process
+      end
+
+      it "should move aside messages that raise errors" do
+        foo = "To: me+123-1@fake.fake\r\n\r\nfoo body"
+
+        Mail.stubs(:new).raises(StandardError)
+
+        @mock_mailbox.expects(:connect)
+        @mock_mailbox.expects(:delete_message).never
+        @mock_mailbox.expects(:move_message).with(:foo, 'errors_go_here')
+        @mock_mailbox.expects(:each_message).yields(:foo, foo)
+        @mock_mailbox.expects(:disconnect)
+        ErrorReport.expects(:log_exception).
+          with(IncomingMessageProcessor.error_report_category, kind_of(StandardError), anything)
+
+        IncomingMessageProcessor.process
+      end
+
+      it "should abort account processing on exception, but continue processing other accounts" do
+        IncomingMessageProcessor.configure({
+          'imap' => {
+            'error_folder' => 'errors_go_here',
+            'accounts' => [
+              {'username' => 'first'},
+              {'username' => 'second'},
+            ]
+          }
+        })
+
+        seq = sequence('connect')
+        @mock_mailbox.expects(:connect).in_sequence(seq).raises(StandardError)
+        @mock_mailbox.expects(:connect).in_sequence(seq)
+        @mock_mailbox.expects(:disconnect).in_sequence(seq)
+        @mock_mailbox.expects(:each_message).once
+        ErrorReport.expects(:log_exception).
+          with(IncomingMessageProcessor.error_report_category, kind_of(StandardError), anything)
+
+        IncomingMessageProcessor.process
+      end
+    end
+
+    it "should accept multiple account types with overrides" do
       config = {
-        'poll_interval' => 42,
-        'ignore_stdin' => true,
         'imap' => {
-          'server' => 'fake',
+          'server' => 'fake', 
           'accounts' => [
-            { 'username' => 'user1@fake.fake', 'password' => 'pass1' },
-            { 'username' => 'user2@fake.fake', 'password' => 'pass2' },
-          ],
+            {'username' => 'foo'},
+            {'username' => 'bar'},
+          ]
         },
-      }
-      lambda { IncomingMessageProcessor.configure(config) }.should raise_error
-    end
 
-    it "should succeed if poll_interval is non-0 and only one account is specified" do
-      config = {
-        'poll_interval' => 42,
-        'ignore_stdin' => true,
-        'imap' => {
-          'server' => 'fake',
-          'username' => 'user',
-          'password' => 'pass',
-        },
+        'directory' => {'folder' => '/tmp/mail'},
       }
-      lambda { IncomingMessageProcessor.configure(config) }.should_not raise_error
-    end
-
-    it "should succeed if poll_interval is non-0 and imap and pop3 are not specified" do
-      config = {
-        'poll_interval' => 42,
-        'ignore_stdin' => false,
-      }
-      lambda { IncomingMessageProcessor.configure(config) }.should_not raise_error
+      IncomingMessageProcessor.configure(config)
+      accounts = IncomingMessageProcessor.mailbox_accounts
+      accounts.size.should eql 3
+      protocols = accounts.map(&:protocol)
+      protocols.count.should eql 3
+      protocols.count(:imap).should eql 2
+      protocols.count(:directory).should eql 1
+      usernames = accounts.map(&:config).map{ |c| c[:username] }
+      usernames.count('foo').should eql 1
+      usernames.count('bar').should eql 1
+      usernames.count(nil).should eql 1
     end
 
   end

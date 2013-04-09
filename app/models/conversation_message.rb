@@ -227,7 +227,7 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def reply_from(opts)
-    raise IncomingMessageProcessor::UnknownAddressError if self.context.try(:root_account).try(:deleted?)
+    raise IncomingMail::IncomingMessageProcessor::UnknownAddressError if self.context.try(:root_account).try(:deleted?)
     conversation.reply_from(opts.merge(:root_account_id => self.root_account_id))
   end
 

@@ -390,7 +390,7 @@ describe DiscussionEntry do
       root = @topic.reply_from(:user => @teacher, :text => "root entry")
       Account.default.destroy
       root.reload
-      lambda { root.reply_from(:user => @teacher, :text => "sub entry") }.should raise_error(IncomingMessageProcessor::UnknownAddressError)
+      lambda { root.reply_from(:user => @teacher, :text => "sub entry") }.should raise_error(IncomingMail::IncomingMessageProcessor::UnknownAddressError)
     end
 
     it "should prefer html to text" do
@@ -407,7 +407,7 @@ describe DiscussionEntry do
       discussion_topic_model
       @entry = @topic.reply_from(:user => @teacher, :text => "topic")
       @topic.lock!
-      lambda { @entry.reply_from(:user => @teacher, :text => "reply") }.should raise_error(IncomingMessageProcessor::ReplyToLockedTopicError)
+      lambda { @entry.reply_from(:user => @teacher, :text => "reply") }.should raise_error(IncomingMail::IncomingMessageProcessor::ReplyToLockedTopicError)
     end
   end
 end

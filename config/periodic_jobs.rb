@@ -64,9 +64,9 @@ Delayed::Periodic.cron 'StreamItem.destroy_stream_items', '45 11 * * *' do
   end
 end
 
-if Mailman.config.poll_interval == 0 && Mailman.config.ignore_stdin == true
+if IncomingMail::IncomingMessageProcessor.run_periodically?
   Delayed::Periodic.cron 'IncomingMessageProcessor.process', '*/1 * * * *' do
-    IncomingMessageProcessor.process
+    IncomingMail::IncomingMessageProcessor.process
   end
 end
 
