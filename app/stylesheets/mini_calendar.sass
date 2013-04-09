@@ -48,17 +48,20 @@ $kyle-blue: #0081e3
     line-height: 35px
   .fc-day-content
     display: none
-  .event .fc-day-content
-    display: block
-    position: absolute
-    bottom: -1px
-    right: -1px
-    border-color: transparent $kyle-blue $kyle-blue transparent
-    border-style: solid
-    border-width: 5px
-    width: 0
-    height: 0
-    padding: 0
+  .event
+    &> div
+      position: relative
+    .fc-day-content
+      display: block
+      position: absolute
+      bottom: -1px
+      right: -1px
+      border-color: transparent $kyle-blue $kyle-blue transparent
+      border-style: solid
+      border-width: 5px
+      width: 0
+      height: 0
+      padding: 0
   .fc-widget-content
     +vertical-gradient(#f0f0f0, #dcdddf)
     position: relative
