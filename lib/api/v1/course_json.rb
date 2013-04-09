@@ -75,6 +75,7 @@ module Api::V1
             h.merge!(
               :computed_current_score => e.computed_current_score,
               :computed_final_score => e.computed_final_score,
+              :computed_current_grade => e.computed_current_grade,
               :computed_final_grade => e.computed_final_grade)
           end
           h

@@ -141,7 +141,7 @@ module Api::V1::User
         }
 
         if has_grade_permissions?(user, enrollment)
-          %w{current_score final_score}.each do |method|
+          %w{current_score final_score current_grade final_grade}.each do |method|
             json[:grades][method.to_sym] = enrollment.send("computed_#{method}")
           end
         end

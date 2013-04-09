@@ -40,6 +40,8 @@ describe Api::V1::Course do
       @user.pseudonym.update_attribute(:sis_user_id, 'user1')
     end
 
+    let(:teacher_enrollment) { @course1.teacher_enrollments.first }
+
     it 'should support optionally providing the url' do
       @test_api.course_json(@course1, @me, {}, ['html_url'], []).should encompass({
         "html_url" => "course_url(Course.find(#{@course1.id}), :host => #{HostUrl.context_host(@course1)})"
@@ -48,19 +50,38 @@ describe Api::V1::Course do
     end
 
     it 'should only include needs_grading_count if requested' do
-      @teacher_enrollment = @course1.teacher_enrollments.first
-      @test_api.course_json(@course1, @me, {}, [], [@teacher_enrollment]).has_key?("needs_grading_count").should be_false
+      @test_api.course_json(@course1, @me, {}, [], [teacher_enrollment]).has_key?("needs_grading_count").should be_false
     end
 
     it 'should honor needs_grading_count for teachers' do
-      @teacher_enrollment = @course1.teacher_enrollments.first
-      @test_api.course_json(@course1, @me, {}, ['needs_grading_count'], [@teacher_enrollment]).has_key?("needs_grading_count").should be_true
+      @test_api.course_json(@course1, @me, {}, ['needs_grading_count'], [teacher_enrollment]).has_key?("needs_grading_count").should be_true
     end
 
     it 'should not honor needs_grading_count for designers' do
       @designer_enrollment = @course1.enroll_designer(@me)
       @designer_enrollment.accept!
       @test_api.course_json(@course1, @me, {}, ['needs_grading_count'], [@designer_enrollment]).has_key?("needs_grading_count").should be_false
+    end
+
+    context "total_scores" do
+      before do
+        @enrollment.computed_current_score = 95.0;
+        @enrollment.computed_final_score = 85.0;
+        def @course.grading_standard_enabled?; true; end
+      end
+
+      let(:json) { @test_api.course_json(@course1, @me, {}, ['total_scores'], [@enrollment]) }
+
+      it "should include computed scores" do
+        json['enrollments'].should == [{
+          "type" => "student",
+          "role" => "StudentEnrollment",
+          "computed_current_score" => 95,
+          "computed_final_score" => 85,
+          "computed_current_grade" => "A",
+          "computed_final_grade" => "B"
+        }]
+      end
     end
   end
 

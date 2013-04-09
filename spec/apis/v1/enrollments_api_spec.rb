@@ -58,7 +58,9 @@ describe EnrollmentsApiController, :type => :integration do
           'grades'                             => {
             'html_url' => course_student_grades_url(@course, @unenrolled_user),
             'final_score' => nil,
-            'current_score' => nil
+            'current_score' => nil,
+            'final_grade' => nil,
+            'current_grade' => nil,
           },
           'associated_user_id'                 => nil,
           'updated_at'                         => new_enrollment.updated_at.xmlschema
@@ -383,7 +385,9 @@ describe EnrollmentsApiController, :type => :integration do
           'grades'                             => {
             'html_url' => course_student_grades_url(@course, @unenrolled_user),
             'final_score' => nil,
-            'current_score' => nil
+            'current_score' => nil,
+            'final_grade' => nil,
+            'current_grade' => nil,
           },
           'associated_user_id'                 => nil,
           'updated_at'                         => new_enrollment.updated_at.xmlschema
@@ -475,7 +479,9 @@ describe EnrollmentsApiController, :type => :integration do
             'grades' => {
               'html_url' => course_student_grades_url(e.course_id, e.user_id),
               'final_score' => nil,
-              'current_score' => nil
+              'current_score' => nil,
+              'final_grade' => nil,
+              'current_grade' => nil,
             },
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema
@@ -626,7 +632,9 @@ describe EnrollmentsApiController, :type => :integration do
           h['grades'] = {
             'html_url' => course_student_grades_url(@course, e.user),
             'final_score' => nil,
-            'current_score' => nil
+            'current_score' => nil,
+            'final_grade' => nil,
+            'current_grade' => nil,
           } if e.student? && e.user_id == @user.id
           # should not display grades for other users.
           h['grades'] = {
@@ -668,7 +676,9 @@ describe EnrollmentsApiController, :type => :integration do
             'grades' => {
               'html_url' => course_student_grades_url(e.course_id, e.user_id),
               'final_score' => nil,
-              'current_score' => nil
+              'current_score' => nil,
+              'final_grade' => nil,
+              'current_grade' => nil,
             },
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema
@@ -761,7 +771,9 @@ describe EnrollmentsApiController, :type => :integration do
           h['grades'] = {
             'html_url' => course_student_grades_url(@course, e.user),
             'final_score' => nil,
-            'current_score' => nil
+            'current_score' => nil,
+            'final_grade' => nil,
+            'current_grade' => nil,
           } if e.student?
           h
         end
@@ -813,7 +825,9 @@ describe EnrollmentsApiController, :type => :integration do
           h['grades'] = {
             'html_url' => course_student_grades_url(@course, e.user),
             'final_score' => nil,
-            'current_score' => nil
+            'current_score' => nil,
+            'final_grade' => nil,
+            'current_grade' => nil,
           } if e.student?
           h
         end
@@ -868,7 +882,9 @@ describe EnrollmentsApiController, :type => :integration do
             'grades'                             => {
               'html_url' => course_student_grades_url(@course, @student),
               'final_score' => nil,
-              'current_score' => nil
+              'current_score' => nil,
+              'final_grade' => nil,
+              'current_grade' => nil,
             },
             'associated_user_id'                 => @enrollment.associated_user_id,
             'updated_at'                         => @enrollment.updated_at.xmlschema
@@ -892,7 +908,9 @@ describe EnrollmentsApiController, :type => :integration do
             'grades'                             => {
               'html_url' => course_student_grades_url(@course, @student),
               'final_score' => nil,
-              'current_score' => nil
+              'current_score' => nil,
+              'final_grade' => nil,
+              'current_grade' => nil,
             },
             'associated_user_id'                 => @enrollment.associated_user_id,
             'updated_at'                         => @enrollment.updated_at.xmlschema
@@ -945,7 +963,9 @@ describe EnrollmentsApiController, :type => :integration do
             'grades' => {
               'html_url' => course_student_grades_url(@course, e.user),
               'final_score' => nil,
-              'current_score' => nil
+              'current_score' => nil,
+              'final_grade' => nil,
+              'current_grade' => nil,
             },
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
@@ -991,7 +1011,9 @@ describe EnrollmentsApiController, :type => :integration do
           h['grades'] = {
             'html_url' => course_student_grades_url(@course, e.user),
             'final_score' => nil,
-            'current_score' => nil
+            'current_score' => nil,
+            'final_grade' => nil,
+            'current_grade' => nil,
           } if e.student?
           h
         }

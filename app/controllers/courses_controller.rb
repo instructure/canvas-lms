@@ -56,7 +56,8 @@ require 'set'
 #           role: StudentEnrollment,
 #           computed_final_score: 41.5,
 #           computed_current_score: 90,
-#           computed_final_grade: 'A-'
+#           computed_final_grade: 'F'
+#           computed_current_grade: 'A-',
 #         }
 #       ],
 #
@@ -119,12 +120,14 @@ class CoursesController < ApplicationController
   # @argument include[] ["total_scores"] Optional information to include with each Course.
   #   When total_scores is given, any enrollments with type 'student' will also
   #   include the fields 'calculated_current_score', 'calculated_final_score',
-  #   and 'calculated_final_grade'. calculated_current_score is the student's
-  #   score in the course, ignoring ungraded assignments. calculated_final_score
-  #   is the student's score in the course including ungraded assignments with
-  #   a score of 0. calculated_final_grade is the letter grade equivalent of
-  #   calculated_final_score (if available). This argument is ignored if the
-  #   course is configured to hide final grades.
+  #   'calculated_current_grade', and 'calculated_final_grade'.
+  #   calculated_current_score is the student's score in the course, ignoring
+  #   ungraded assignments. calculated_final_score is the student's score in
+  #   the course including ungraded assignments with a score of 0.
+  #   calculated_current_grade is the letter grade equivalent of
+  #   calculated_current_score (if available). calculated_final_grade is the
+  #   letter grade equivalent of calculated_final_score (if available). This
+  #   argument is ignored if the course is configured to hide final grades.
   #
   # @argument include[] ["term"] Optional information to include with each Course.
   #   When term is given, the information for the enrollment term for each course
@@ -331,14 +334,19 @@ class CoursesController < ApplicationController
   #   'ObserverEnrollment', or 'DesignerEnrollment'.
   #
   # @argument include[] ["email"] Optional user email.
-  # @argument include[] ["enrollments"] Optionally include with each Course the
-  #   user's current and invited enrollments.
+  # @argument include[] ["enrollments"]
+  #   Optionally include with each Course the user's current and invited
+  #   enrollments. If the user is enrolled as a student, and the account has
+  #   permission to manage or view all grades, each enrollment will include a
+  #   'grades' key with 'current_score', 'final_score', 'current_grade' and
+  #   'final_grade' values.
   # @argument include[] ["locked"] Optionally include whether an enrollment is locked.
   # @argument include[] ["avatar_url"] Optionally include avatar_url.
   #
-  # @argument user_id [optional] If included, the user will be queried and if
-  #   the user is part of the users set, the page parameter will be modified so
-  #   that the page containing user_id will be returned.
+  # @argument user_id [optional]
+  #   If included, the user will be queried and if the user is part of the
+  #   users set, the page parameter will be modified so that the page
+  #   containing user_id will be returned.
   #
   # @returns [User]
   def users
