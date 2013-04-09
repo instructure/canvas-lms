@@ -87,6 +87,7 @@ module Api::V1::CalendarEvent
       end
     end
 
+    hash["child_events"] = [] if include.include?('child_events') || hash['reserved']
     if event.child_events.any?
       can_read_child_events = include.include?('child_events') && event.grants_right?(user, session, :read_child_events)
       if can_read_child_events || hash['reserved']
@@ -102,9 +103,8 @@ module Api::V1::CalendarEvent
           )
         }
       end
-    elsif include.include?('child_events') || hash['reserved']
-      hash["child_events"] = []
     end
+
     can_read = event.grants_right?(user, session, :read)
     hash['url'] = api_v1_calendar_event_url(event) if options.has_key?(:url_override) ? options[:url_override] || hash['own_reservation'] : can_read
     hash['html_url'] = calendar_url_for(event.effective_context, :event => event) if can_read
