@@ -435,12 +435,7 @@ class ConversationsController < ApplicationController
   def delete_for_all
     return unless authorized_action(Account.site_admin, @current_user, :become_user)
 
-    conversation = Conversation.find(params[:id])
-    conversation.stream_item.stream_item_instances.destroy_all
-    conversation.conversation_participants.each do |cp|
-      cp.messages.clear
-      cp.destroy
-    end
+    Conversation.find(params[:id]).delete_for_all
 
     render :json => {}
   end

@@ -1430,6 +1430,41 @@ describe ConversationsController, :type => :integration do
       Conversation.count.should eql 1
       ConversationMessage.count.should eql 1 
     end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "should delete the conversation for users on multiple shards" do
+        users = [@me]
+        users << @shard1.activate { User.create! }
+
+        cp = conversation(*users)
+        conv = cp.conversation
+        users.each do |user|
+          user.all_conversations.size.should eql 1
+          user.stream_item_instances.size.should eql 1 unless user.id == @me.id
+        end
+
+        user_session(site_admin_user)
+        @shard2.activate do
+          json = api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
+                          {:controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => conv.id.to_s},
+                          {})
+
+          json.should eql({})
+        end
+
+        users.each do |user|
+          user.reload.all_conversations.size.should eql 0
+          user.stream_item_instances.size.should eql 0
+        end
+        ConversationParticipant.count.should eql 0
+        ConversationMessageParticipant.count.should eql 0
+        # should leave the conversation and its message in the database
+        Conversation.count.should eql 1
+        ConversationMessage.count.should eql 1
+      end
+    end
   end
 
 end

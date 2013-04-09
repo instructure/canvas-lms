@@ -23,6 +23,7 @@ class Conversation < ActiveRecord::Base
 
   has_many :conversation_participants, :dependent => :destroy
   has_many :conversation_messages, :order => "created_at DESC, id DESC", :dependent => :delete_all
+  has_many :conversation_message_participants, :through => :conversation_messages
   has_one :stream_item, :as => :asset
 
   # see also MessageableUser
@@ -668,6 +669,13 @@ class Conversation < ActiveRecord::Base
 
   def associated_shards
     [Shard.default]
+  end
+
+  def delete_for_all
+    stream_item.destroy_stream_item_instances
+    # bare scoped call avoid Rails 2 HasManyAssociation loading all objects
+    shard.activate { conversation_message_participants.scoped.delete_all }
+    conversation_participants.with_each_shard { |scope| scope.scoped.delete_all; nil }
   end
 
   protected
