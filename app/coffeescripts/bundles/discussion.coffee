@@ -15,9 +15,8 @@ require [
   'compiled/jquery/sticky'
 ], (EntryView, DiscussionFilterState, DiscussionToolbarView, DiscussionFilterResultsView, MarkAsReadWatcher, $, Backbone, Entry, MaterializedDiscussionTopic, SideCommentDiscussionTopic, EntryCollection, TopicView, EntriesView) ->
 
-  perPage     = 10
-  descendants = 3
-  children    = 3
+  descendants = 5
+  children    = 10
 
   ##
   # create the objects ...
@@ -28,7 +27,7 @@ require [
                   else
                     new SideCommentDiscussionTopic root_url: ENV.DISCUSSION.ROOT_URL
 
-  entries       = new EntryCollection null, {perPage}
+  entries       = new EntryCollection null
 
   filterModel   = new DiscussionFilterState
 
@@ -63,7 +62,9 @@ require [
   ##
   # connect them ...
   data.on 'change', ->
-    entries.reset data.get 'entries'
+    entryData = data.get 'entries'
+    entries.options.per_page = entryData.length
+    entries.reset entryData
 
   entriesView.on 'scrollAwayFromEntry', ->
     # prevent scroll to top for non-pushstate browsers when hash changes

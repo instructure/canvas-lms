@@ -193,7 +193,7 @@ describe "discussions" do
         @topic = @course.discussion_topics.create!(:title => 'test', :message => 'attachment test', :user => @user)
         @entry = @topic.discussion_entries.create!(:user => @user, :message => 'blah')
         @replies = []
-        5.times do
+        11.times do
           attachment = @course.attachments.create!(:context => @course, :filename => "text.txt", :user => @user, :uploaded_data => StringIO.new("testing"))
           reply = @entry.discussion_subentries.create!(
               :user => @user, :message => 'i haz attachments', :discussion_topic => @topic, :attachment => attachment)
@@ -201,7 +201,7 @@ describe "discussions" do
         end
         @topic.create_materialized_view
         go_to_topic
-        ffj('.comment_attachments').count.should == 3
+        ffj('.comment_attachments').count.should == 10
         fj('.showMore').click
         wait_for_ajaximations
         ffj('.comment_attachments').count.should == @replies.count
@@ -793,14 +793,14 @@ describe "discussions" do
         end
       end
 
-      it "should create multiple side comments but only show 3 and expand the rest" do
-        side_comment_number = 10
+      it "should create multiple side comments but only show 10 and expand the rest" do
+        side_comment_number = 11
         side_comment_number.times { |i| @topic.discussion_entries.create!(:user => @student, :message => "new side comment #{i} from student", :parent_entry => @entry) }
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
         wait_for_ajaximations
         DiscussionEntry.last.depth.should == 2
         keep_trying_until do
-          ff('.discussion-entries .entry').count.should == 4 # +1 because of the initial entry
+          ff('.discussion-entries .entry').count.should == 11 # +1 because of the initial entry
         end
         f('.showMore').click
         ff('.discussion-entries .entry').count.should == (side_comment_number + 1) # +1 because of the initial entry
