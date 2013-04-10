@@ -24,6 +24,7 @@ es:
     manually_created_courses: "Cursos Creados Manualmente"
     root_account_cant_have_sis_id: "IDs del SIS no pueden establecerse en supercuentas"
     sis_id_in_use: "SIS ID \"%{sis_id}\" ya está en uso"
+    tab_admin_tools: "Herramientas de administración"
     tab_authentication: Autentificación
     tab_courses: Cursos
     tab_developer_keys: "Claves del elaborador"
@@ -283,6 +284,35 @@ es:
     add_user_dialog_title: "Agregar un Usuario Nuevo"
     adding_course_message: "Agregando Curso..."
     adding_user_message: "Agregando Usuario..."
+    admin_tools: 
+      admin_tools: 
+        tab_labels: 
+          restore_course: "Restaurar cursos"
+      admin_tools_cumb: "Herramientas de administración"
+      course_search_form: 
+        labels: 
+          find_deleted_course: "Buscar un curso eliminado"
+      course_search_results: 
+        error_message: "No se ha encontrado ningún curso eliminado con esa ID para esta cuenta."
+        info_text: "Las matrículas de este curso se deben restaurar manualmente."
+        labels: 
+          account_id: "ID de la cuenta:"
+          account_id2: "ID de la cuenta:"
+          coures_id1: "ID del curso:"
+          coures_id2: "ID del curso:"
+          course_code1: "Código del curso:"
+          course_code2: "Código del curso:"
+          restore_btn: Restaurar
+        notdeleted_restore: 
+          add_enrollments: "Agregar inscripciones"
+          header_subtext: "(No eliminado)"
+          view_course: "Ver curso"
+        successful_restore: 
+          view_course: "Ver curso"
+        successfull_restore: 
+          add_enrollments: "Agregar inscripciones"
+          subtext: "¿Qué desea hacer a continuación?"
+      page_title: "Herramientas administrativas para %{account}"
     avatars: 
       all_link: 
         one: "Todo %{count}"
@@ -322,7 +352,7 @@ es:
       course_unpublished_tooltip: "Sin publicar"
       homepage_link: "Página de Inicio"
       more_count: 
-        one: más
+        one: "1 más"
         other: "%{count} más"
       none: ninguno
       settings_link: Configuraciones
@@ -465,6 +495,7 @@ es:
         outgoing_email_default_name_option_custom: "Nombre \"Desde\" personalizado"
         outgoing_email_default_name_option_default: "Configuración predeterminada de Canvas"
         prevent_course_renaming_by_teachers: "No permita que los profesores vuelvan a nombrar sus cursos"
+        restrict_student_future_view: "Restringir que los alumnos vean los cursos antes de la fecha de inicio"
         self_enrollment: "Permitir la Auto-Inscripción"
         show_scheduler: "Habilitar Scheduler"
         sis_source_id: "Identificación de SIS"
@@ -814,6 +845,7 @@ es:
       page_disabled_for_group: "Esa página ha sido inhabilitada para este grupo"
     warnings: 
       please_log_in: "Por seguridad, introduzca su contraseña para continuar"
+      unsupported_browser: "Su explorador no cumple los requisitos mínimos para poder utilizar Canvas. Visite las *Guías de Canvas* para ver la lista completa de exploradores compatibles."
     wiki_front_page_default_content_course: "¡Bienvenido a nuestro nuevo wiki para el curso!"
     wiki_front_page_default_content_group: "¡Bienvenido a nuestro nuevo wiki para el grupo!"
   appointment_group: 
@@ -856,6 +888,7 @@ es:
     feed_entry_title: "Tarea: %{assignment}"
     feed_entry_title_with_course: "Tarea, %{course}: %{assignment}"
     group_assignment_must_have_category: "Seleccione un grupo para esta tarea"
+    group_assignment_must_have_group_set: "Seleccione un grupo para esta tarea"
     hide_advanced_options: "Ocultar opciones  avanzadas"
     imported_assignments_group: "Tareas Importadas"
     labels: 
@@ -1066,6 +1099,8 @@ es:
     external_grader_sidebar: 
       edit_assignment_settings: "Editar Configuraciones de la Tarea"
       speed_grader: "Calificador Rápido"
+    file_retrieval_error: "Ha fallado la recuperación del archivo"
+    getting_file: "Recuperando archivo..."
     grade_assignment: 
       buttons: 
         upload_files: "Cargar archivos"
@@ -1084,6 +1119,7 @@ es:
           
           *Asegúrese de no cambiar los nombres de los archivos de envío para que podamos reconocerlos.*
       titles: 
+        related_items: "Elementos relacionados"
         submission: Envíos
     graded: "Esta tarea ha sido calificada"
     grading_type_selector: 
@@ -1132,6 +1168,9 @@ es:
       links: 
         wizard: "¿Como hago...?"
       page_title: Tareas
+    invalid_file_retrieval: "Se ha producido un problema al intentar recuperar el archivo enviado desde esta herramienta."
+    invalid_tool_return: "La herramienta que se ha ejecutado ha dado como resultado un recurso no válido para esta tarea"
+    loading_tools_failed: "Ha fallado la carga de herramientas"
     messages: 
       adding_group: "Añadiendo grupo..."
       agree_to_pledge: "Debe acceder al compromiso de envío antes de poder enviar esta tarea."
@@ -1145,6 +1184,7 @@ es:
     needs_grading_count: "%{needs_grading_count} envíos para esta tarea todavía necesitan ser calificados"
     never_drop_scores: "Nunca Eliminar %{assignment_name}"
     no_assignments: "[Sin Tareas]"
+    no_tools_found: "No se han encontrado herramientas"
     notices: 
       assignment_delete: "Esta tarea ha sido borrada."
       created: "Esta tarea se creó con éxito."
@@ -1297,6 +1337,7 @@ es:
       errors: 
         unacceptable_file_type: "Este tipo de archive no está. Los archivos aceptados son: %{allowed_extensions_list}"
       instructions: 
+        from_external_tool: "Elija una herramienta de la lista que aparece a continuación para cargar y enviar un recurso facilitado por dicha herramienta."
         google_docs: "Seleccione el archive de la lista siguiente."
         media_recording: "Use el enlace siguiente para registrar su envio. Haga click en “Guardar” cuando haya terminado y esté listo para enviar."
         online_text_entry: "Copie y pegue o escriba su envío aquí."
@@ -1309,11 +1350,13 @@ es:
         authorize_google_docs: "Autorize Acceso a Google Docs"
         find_file: "Haga click aqui para encontrar un archivo que ya ha cargado"
         submit: 
+          external_tool: Más
           file_upload: "Carga de Archivo"
           google_doc: "Google Doc"
           media: "Contenido Audiovisual"
           text_entry: "Entrada de Texto"
           website: "URL de Pagína Website URL"
+      loading_tools: "Cargando herramientas..."
       messages: 
         google_docs_auth_required: |-
             Antes de enviar tareas directamente desde Google Docs necesita
@@ -1323,6 +1366,8 @@ es:
         submitting: Enviando...
         uploading: "Recuperando una copia de su Google Doc para enviar para esta tarea. Esto puede llevar un tiempo, dependiendo en el tamaño del archivo…"
       no_files: "No hay archivos"
+      no_submission: "No se ha seleccionado el envío"
+      submission_url: "Envío:"
       titles: 
         media_recordings_disabled: "Grabación de Contenido Audiovisual no está activado para este sitio de Canvas"
         view_in_separate_window: "Ver en una Ventana Separada"
@@ -1377,8 +1422,8 @@ es:
         originality_report_visible_after_due_date: "Después de la fecha de vencimiento"
         originality_report_visible_after_grading: "Después de que la tarea se califique"
         originality_report_visible_immediately: Inmediatamente
-        settings_exclude_fewer_than_count: "menos de %h{wordsInput} palabras"
-        settings_exclude_less_than_percent: "menos del %h{percentInput} del documento"
+        settings_exclude_fewer_than_count: "Menos de %h{wordsInput} palabras"
+        settings_exclude_less_than_percent: "Menos del %h{percentInput} del documento"
     wizard_box: 
       descriptions: 
         delete_icon: "%{icon}: Borrar esta tarea"
@@ -1580,7 +1625,7 @@ es:
         calendar_scheduler: Programador
         calendar_week: Semana
       refresh: Actualizar
-      use_old_calendar: "Volver al calendario antiguo"
+      use_old_calendar: "Calendario anterior"
     cancel_appointment: "¿Está seguro de que quiere cancelar su cita con %{name}?"
     confirm_appointment_group_deletion: "¿Está seguro de que quiere borrar este grupo de citas?"
     confirm_deletion: "Confirmar el borrado"
@@ -1605,9 +1650,13 @@ es:
       appt_group_options_help1: "Algunas reservas existentes sobrepasan el límite que ha agregado. Estas no serán afectadas, este cambio solo previene que se hagan nuevas reservas."
       appt_group_options_help2: "No obstante, puede eliminar manualmente cualquier reserva existente"
       calendar: Calendario
+      date: Fecha
+      details: "Detalles:"
       group_category: "Categoría de grupo"
+      group_signup: "Alumnos que se han registrado en grupo."
       location: Ubicación
       name: Nombre
+      time_range: "Intervalo de tiempo"
     edit_appt_calendar_event: 
       description: "Descripción:"
       slot_limit: "Limitar este espacio a"
@@ -1617,19 +1666,19 @@ es:
       due: "Vence:"
       group: "Grupo:"
       links: 
-        more_options: "más opciones"
+        more_options: "Más opciones"
       title: "Título:"
     edit_assignment_override: 
       calendar: "Calendario:"
       due: "Vence:"
       links: 
-        more_options: "más opciones"
+        more_options: "Más opciones"
     edit_calendar_event: 
       calendar: "Calendario:"
       date: "Fecha:"
       from: "Remitente:"
       links: 
-        more_options: "más opciones"
+        more_options: "Más opciones"
       timespan_separator: "* para *"
       title: "Título:"
     edit_calendar_event_full: 
@@ -1794,7 +1843,7 @@ es:
         full_details: "Detalles Completos"
         how_do_i: "¿Cómo hago...?"
         jump_to_calendar: "Saltar al Calendario"
-        more_options: "más opciones"
+        more_options: "Más opciones"
         show_undated_events: "mostrar %{count} eventos sin fechas"
       messages: 
         max_visible: "Puede visualizar hasta %{count} calendarios a la vez"
@@ -2502,6 +2551,8 @@ es:
       content_is_locked: "El Contenido está Bloqueado"
   content_migration: 
     unknown: Desconocido
+  content_migrations: 
+    no_archive: "No existe un archivo para la migración de este contenido"
   content_tag: 
     no_title: "Sin título"
   content_tags: 
@@ -3244,6 +3295,10 @@ es:
     wrapper: 
       close_course_menu_title: cerrar
       reset_course_menu: Restablecer
+  course_restore: 
+    restore_error: "Se ha producido un error al intentar restaurar el curso. No se ha podido restaurar el curso."
+  course_search: 
+    cant_be_blank: "No se puede dejar en blanco"
   course_section: 
     sis_id_taken: "ID SIS \"%{sis_id}\" ya está en uso"
   course_settings: 
@@ -3302,6 +3357,9 @@ es:
     updating: Actualizando...
   course_statistics: 
     unknown: desconocido
+  course_users: 
+    greater_than_three: "Introduzca un término de busqueda que contenga tres o más caracteres"
+    unknown_error: "Se ha producido un error en su búsqueda. Inténtelo de nuevo."
   courses: 
     add_users: 
       buttons: 
@@ -3517,6 +3575,17 @@ es:
       submission_points: 
         with_score: "Calificación: %{score} *de %{points_possible}*"
         without_score: "de %{points_possible}"
+    roster: 
+      index: 
+        all_roles: "Todas las funciones"
+        role_to_search: "Limitar la búsqueda a la función"
+        search: Buscar
+        search_people: "Buscar personas"
+      roster_users: 
+        name: Nombre
+        no_people_found: "No se han econtrado personas"
+        sis_id: "ID de SIS"
+        you_can_search_by: "Puede buscar por:"
     roster_user: 
       course_profile: "Perfil del curso"
       profile: Profile
@@ -3843,6 +3912,7 @@ es:
     eportfolio_welcome: "Bienvenido a Su ePortafolio"
     error_reports: "Reportes de Errores"
     files: Archivos
+    grades: Calificaciones
     grading_schemes: "Esquemas de Calificación"
     groups: Grupos
     jobs: Trabajos
@@ -4282,6 +4352,7 @@ es:
     button: 
       insert_equation: "Introducir ecuación"
     cancel: Cancelar
+    cannot_render_equation: "Esta ecuación no se puede representar en vista básica."
     click_to_embed: "Hacer clic para incorporar la imagen"
     done: 
       title: "Haga clic para terminar de editar el área de texto con formato"
@@ -4289,7 +4360,7 @@ es:
     embed_external: "Incorporar imagen externa"
     embed_from_external_tool: "\"Incorporar contenido de herramienta externa\""
     embed_image: "Incorporar imagen"
-    equation_editor_title: "Utilice las barras de herramientas o escriba/pegue en formato LaTeX para añadir una ecuación"
+    equation_editor_title: "Utilice las barras de herramientas que aparecen aquí o cambie la vista a Avanzada para escribir/pegar en formato LaTeX"
     image_not_found: "Imagen no encontrada. Inténtelo con una nueva URL"
     instructions: "Pegar o escribir la URL de la imagen que desea incorporar"
     loading: Cargando...
@@ -4300,7 +4371,17 @@ es:
     save_failed: "No se pudo guardar. Inténtelo más tarde"
     saving: Guardando...
     search_flickr: "Buscar en flickr creative commons"
+    switch_to_mathjax: "Cambiar la vista a básica"
+    switch_to_mathquill: "Cambiar la vista a avanzada"
     switch_views: "Cambiar Vistas"
+    tabs: 
+      arrows: Flechas
+      basic: Básico
+      delimiters: Delimitadores
+      greek: Griego
+      misc: Varios
+      operators: Operadores
+      relationships: Relaciones
     url: "URL:"
   editor_accessibility: 
     accessibles: 
@@ -4338,6 +4419,12 @@ es:
       invited: Invitado
       pending: Pendiente
       rejected: Rechazado
+  enrollmentNames: 
+    course_designer: "Diseñador del curso"
+    observer: Observador
+    student: Alumno
+    teacher: Profesor
+    teacher_assistant: AP
   enrollment_term: 
     errors: 
       not_unique: "ID SIS \"%{sis_source_id}\" ya está en uso"
@@ -4653,6 +4740,7 @@ es:
       delete_tool: "Borrar la Herramienta"
       edit_tool: "Editar la Herramienta"
       editor_button_configured: "Botón de Editor configurado"
+      homework_submission_configured: "Envío de deberes configurado"
       labels: 
         consumer_key: "Código de Consumidor"
         description: Descripción
@@ -5928,7 +6016,8 @@ es:
       view_in_new_window: "Ver en una ventana nueva"
     tooltips: 
       enter_search_terms: "ingresar los términos de búsqueda"
-  invalid_xml_syntax: "sintaxis xml inválida"
+  invalid_url_in_xml: "URL no válida en xml. Se debe evitar el símbolo &."
+  invalid_xml_syntax: "Sintaxis xml inválida"
   jobs: 
     columns: 
       attempt: intento
@@ -6056,6 +6145,9 @@ es:
         not_authenticated: "Debe estar conectado para tener acceso a esta página"
         student_not_found: "No se encontró ningún estudiante"
         teacher_not_found: "No se encontró ningún profesor"
+      not_authorized: "usuario no autorizado para realizar esta acción"
+      status_unauthenticated: "no autenticado"
+      status_unauthorized: "no autorizado"
     basic_lti: 
       bad_score: "La calificación no es entre 0 y 1"
       no_points_comment: |-
@@ -7543,6 +7635,9 @@ es:
         subject: "Invitación a Conferencia en Línea: %{name}"
       twitter: 
         tweet: "Alerta de Canvas - Invitar: asistir %{title}, %{name}"
+  migration_issues: 
+    errors: 
+      valid_workflow_state: "Debe enviar un estado de flujo de trabajo válido"
   mute_dialog: 
     curving_assignments: "Aplicando Curvas a tareas"
     grade_change_notifications: "Notificaciones de Cambios de Calificaciones"
@@ -7887,9 +7982,12 @@ es:
   overrides: 
     everyone: Todos
     everyone_else: "Todos los demás"
+    lock_date_before_due_date: "La fecha de bloqueo no puede ser anterior a la fecha de vencimiento"
     overrides: 
       everyone: Todos
       everyone_else: "Todos los demás"
+    unlock_date_after_due_date: "La fecha de desbloqueo no puede ser posterior a la fecha de vencimiento"
+    unlock_date_after_lock_date: "La fecha de desbloqueo no puede ser posterior a la fecha de bloqueo"
   page_comment: 
     default_user_name: Anónimo
   page_comments: 
@@ -8581,6 +8679,8 @@ es:
         allow_application: "%{app_name} está solicitando acceso a su cuenta."
         email: "Su correo electrónico es %{email}."
         login_name: "Está iniciando sesión en esta aplicación como %{user_name}."
+      labels: 
+        remember_access: "Recordar mi autorización para este servicio"
       log_in: "Iniciar sesión"
       page_title: "Inicio de sesión en la aplicación"
     otp_login: 
@@ -8773,6 +8873,10 @@ es:
   quiz_question: 
     defaults: 
       question_name: Pregunta
+  quiz_question/numerical_question: 
+    statistics: 
+      exact_answer: "%{exact_value} +/- %{margin}"
+      inexact_answer: "%{lower_bound} a %{upper_bound}"
   quiz_submissions: 
     errors: 
       late_quiz: "Envió esta evaluación tarde, y sus preguntas pueden no haber sido grabadas."
@@ -9576,6 +9680,8 @@ es:
         edit_assignment_details: "Editar los Detalles de la Tarea"
         edit_this_quiz: "Editar esta Evaluación"
         edit_this_survey: "Editar esta Encuesta"
+        hide_student_quiz_results: "Ocultar los resultados de las evaluaciones de los alumnos"
+        hide_student_survey_results: "Ocultar los resultados de la encuesta de los alumnos"
         keep_editing_this_quiz: "Seguir Editando esta Evaluación"
         keep_editing_this_survey: "Seguir Editando esta Encuesta"
         message_students_who: "Enviar Mensajes a Estudiantes que..."
@@ -9848,14 +9954,16 @@ es:
       manage_files: "Manejar (agregar / editar / borrar) archivos del curso"
       manage_frozen_assignment: "Gestionar (editar/borrar) tareas congeladas"
       manage_global_outcomes: "Gestionar resultados de aprendizaje globales"
-      manage_grades: "Editar las calificaciones (incluye rúbricas de evaluación)"
+      manage_grades: "Editar las calificaciones"
       manage_groups: "Maneje (crear / editar / borrar) grupos"
       manage_interaction_alerts: "Manejar alertas"
       manage_outcomes: "Manejar los resultados de aprendizaje"
       manage_role_overrides: "Manejar los permisos"
+      manage_rubrics: "Crear y editar rúbricas de evaluación"
       manage_sections: "Gestionar (crear/editar/borrar) secciones del curso"
       manage_sis: "Importe y maneje información SIS"
       manage_site_settings: "Manejar las configuraciones de todo el sitio y complementos"
+      manage_storage_quotas: "Gestionar cuotas de almacenamiento"
       manage_students: "Agregar/remover estudiantes para el curso"
       manage_user_logins: "Modificar los detalles de ingreso para los usuarios"
       manage_user_notes: "Manejar las entradas a la revista de los profesores"
@@ -9872,6 +9980,7 @@ es:
       read_roster: "Ver la lista de usuarios"
       send_messages: "Envíe mensajes a miembros del curso individualmente"
       send_messages_all: "Enviar mensajes a toda la clase"
+      undelete_courses: "Recuperar cursos"
       view_all_grades: "Ver todas las calificaciones"
       view_error_reports: "Ver los reportes de errores"
       view_group_pages: "Ver las páginas de grupos de todos los grupos de estudiantes"
@@ -9894,6 +10003,7 @@ es:
       toogle: "Haga click para cambiar este permiso de Encendido a Apagado"
   role_overrides: 
     account_permissions: "Permisos para la cuenta"
+    admin_tools_permissions: "Herramientas de administración"
     course_permissions: "Permisos para el curso y la cuenta"
     course_role_deactivate: "Se está utilizando esta función y no se puede eliminar.  Se ha desactivado para evitar que se asigne a otros usuarios."
     index: 
@@ -9939,6 +10049,9 @@ es:
         enable: Habilitar
         enable_and_lock: "Habilitar y bloquear"
         use_default: "Usar predeterminado"
+  roster: 
+    greater_than_three: "Introduzca un término de busqueda que contenga tres o más caracteres"
+    unknown_error: "Se ha producido un error en su búsqueda. Inténtelo de nuevo."
   rubric: 
     context_name_rubric: "Rúbrica de %{course_name}"
     errors: 
@@ -11351,6 +11464,7 @@ es:
       messages: 
         no_entries: "No hay contribuciones a la revista para este estudiante."
       page_title: "Revista de Profesores"
+      title: Título
       titles: 
         journal_for: "Revista de Profesores para %{user}"
     messages: 
@@ -11369,6 +11483,7 @@ es:
       links: 
         delete: "Borrar esta contribución"
       no_title: "Sin Título"
+      subheader: "%{creator} en %{created_at}"
     user_notes: 
       crumbs: 
         faculty_journal: "Revista de Profesores"
@@ -11802,7 +11917,7 @@ es:
         page_deleted: "Esta página ha sido borrada."
         page_does_not_exist: "Esta página aún no existe."
         page_edited_while_viewing: "Esta página ha sido actualizada por alguien más desde que comenzó a verla. [Haga click aquí para recargar la página.](%{link})"
-        page_edited_while_viewing_detailed: " Alguien ha editado esta página desde que se cargó, y si hace un envío ahora, sobrescribirá los cambios. Puede volver a cargar la página y volver a ingresar sus cambios para asegurarse de no perder el trabajo de otro. "
+        page_edited_while_viewing_detailed: "Alguien ha editado esta página desde que la cargó por primera vez. Si hace un envío ahora, sobrescribirá los cambios. Puede volver a cargar la página e introducir de nuevo sus cambios para asegurarse de que no se pierde el trabajo de otro. "
       welcome_message: "Bienvenido al Wiki de este Curso"
     delete_comment_confirmation: "¿Seguro que quiere borrar este comentario?"
     errors: 

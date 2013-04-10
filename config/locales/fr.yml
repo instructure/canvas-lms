@@ -27,6 +27,7 @@ fr:
     manually_created_courses: "Cours créés manuellement"
     root_account_cant_have_sis_id: "Les ID SIS ne peuvent pas être définis sur les comptes racines."
     sis_id_in_use: "L’ID SIS \"%{sis_id}\" est déjà utilisé."
+    tab_admin_tools: "Outils d’administration"
     tab_authentication: Authentification
     tab_courses: Cours
     tab_developer_keys: "Clés de développeur"
@@ -289,6 +290,35 @@ fr:
     add_user_dialog_title: "Ajouter un nouvel utilisateur"
     adding_course_message: "Ajout d’un cours..."
     adding_user_message: "Ajout d’un utilisateur..."
+    admin_tools: 
+      admin_tools: 
+        tab_labels: 
+          restore_course: "Restaurer les cours"
+      admin_tools_cumb: "Outils d’administration"
+      course_search_form: 
+        labels: 
+          find_deleted_course: "Trouver un cours supprimé"
+      course_search_results: 
+        error_message: "Impossible de trouver un cours supprimé avec cet identifiant pour ce compte."
+        info_text: "Les inscriptions à ce cours doivent être restaurées manuellement."
+        labels: 
+          account_id: "ID de compte :"
+          account_id2: "ID de compte :"
+          coures_id1: "ID de cours :"
+          coures_id2: "ID de cours :"
+          course_code1: "Code de cours :"
+          course_code2: "Code de cours :"
+          restore_btn: Restaurer
+        notdeleted_restore: 
+          add_enrollments: "Ajouter des inscriptions"
+          header_subtext: "(Non supprimés)"
+          view_course: "Afficher le cours"
+        successful_restore: 
+          view_course: "Afficher le cours"
+        successfull_restore: 
+          add_enrollments: "Ajouter des inscriptions"
+          subtext: "Que souhaitez-vous faire ensuite ?"
+      page_title: "Outils d’administration pour %{account}"
     avatars: 
       all_link: 
         one: "Tous les %{count}"
@@ -474,6 +504,7 @@ fr:
         outgoing_email_default_name_option_custom: "« Expéditeur » personnalisé"
         outgoing_email_default_name_option_default: "Paramètre Canvas par défaut"
         prevent_course_renaming_by_teachers: "Ne laissez pas les enseignants renommer leurs cours"
+        restrict_student_future_view: "Empêcher les étudiants de voir les cours avant la date de début"
         self_enrollment: "Autoriser l’auto-inscription"
         show_scheduler: "Activer l’outil de planification"
         sis_source_id: "ID SIS"
@@ -821,6 +852,7 @@ fr:
       page_disabled_for_group: "Cette page a été désactivée pour ce groupe"
     warnings: 
       please_log_in: "Pour des raisons de sécurité, veuillez saisir votre mot de passe pour continuer."
+      unsupported_browser: "Votre navigateur ne répond pas aux conditions requises pour Canvas. Veuillez consulter les *Guides Canvas* pour avoir la liste complète des navigateurs pris en charge."
     wiki_front_page_default_content_course: "Bienvenue dans votre nouveau cours Wiki !"
     wiki_front_page_default_content_group: "Bienvenue dans votre nouveau groupe Wiki !"
   appointment_group: 
@@ -846,7 +878,7 @@ fr:
     default_unfiled_title: "Questions non classées"
   assignment: 
     advanced_options_errors: "Des erreurs se sont produites sur une ou plusieurs options avancées"
-    assignment_group_must_have_group: "Sélectionnez un groupe pour ce devoir."
+    assignment_group_must_have_group: "Sélectionnez un groupe pour cette tâche."
     at_least_one_file_type: "Spécifiez au moins un type de fichier autorisé"
     at_least_one_submission_type: "Choisissez au moins un type d’envoi"
     atom_no_author: "Aucun auteur"
@@ -858,17 +890,18 @@ fr:
     errors: 
       cannot_save_att: "Vous n'est pas autorisé à modifier l'attribut verrouillé %{att_name}"
       import: 
-        external_tool_url: "L’URL pour le devoir de l’outil externe \"%{assignment_name}\" n’est pas valide."
+        external_tool_url: "L’URL pour la tâche de l’outil externe \"%{assignment_name}\" n’est pas valide."
       upload_as_zip: "Veuillez envoyer les fichiers sous forme de fichier zip."
-    feed_entry_title: "Devoir : %{assignment}"
-    feed_entry_title_with_course: "Devoir, %{course} : %{assignment}"
+    feed_entry_title: "Tâcher : %{assignment}"
+    feed_entry_title_with_course: "Tâche, %{course} : %{assignment}"
     group_assignment_must_have_category: "Sélectionnez un ensemble de groupes pour ce devoir"
+    group_assignment_must_have_group_set: "Sélectionnez un ensemble de groupes pour cette tâche"
     hide_advanced_options: "Masquer les options avancées"
-    imported_assignments_group: "Devoirs importés"
+    imported_assignments_group: "Tâches importées"
     labels: 
       due: Échéance
     messages: 
-      assignment_created: "Devoir \"%{assignment}\" créé"
+      assignment_created: "Tâche \"%{assignment}\" créée"
     name_is_required: "Le nom doit être spécifié."
     select_external_tool_dialog_title: "Configurer un outil externe"
     show_advanced_options: "Afficher les options avancées"
@@ -877,8 +910,8 @@ fr:
     titles: 
       grading_scheme_info: "Afficher/Modifier le système de notation"
     warnings: 
-      group_assignment: "Le devoir \"%{assignment}\" est un devoir de groupe et vous devrez reconfigurer les paramètres de groupe pour ce nouveau contexte."
-      peer_assignment: "Le devoir \"%{assignment}\" est un devoir révisé par des pairs, et vous devrez reconfigurer les paramètres de révision par des pairs pour ce nouveau contexte."
+      group_assignment: "\"%{assignment}\" est un travail de groupe et vous devrez reconfigurer les paramètres de groupe pour ce nouveau contexte."
+      peer_assignment: "\"%{assignment}\" est un travail vérifié par les autres étudiants et vous devrez reconfigurer les paramètres de révision par des pairs pour ce nouveau contexte."
   assignment_details_dialog: 
     average_score: "Note moyenne :"
     count_of_submissions: "%{cnt} envois"
@@ -891,32 +924,32 @@ fr:
     scores_lower_than_the_average: "Notes inférieures à la moyenne de %{average}"
     total_submitted: "Total envoyé :"
   assignment_group: 
-    default_name: Devoirs
-    default_title: Devoirs
+    default_name: Tâches
+    default_title: Tâches
   assignment_group_weights_dialog: 
     buttons: 
       save: Enregistrer
     titles: 
-      assignment_group_weights: "Gérer les coefficients de groupes de devoirs"
+      assignment_group_weights: "Gérer les coefficients des groupes de tâches"
       total: Total
     weight_final: "Pondérer la note finale en fonction des groupes"
   assignment_groups: 
     errors: 
-      cannot_delete_group: "Vous ne pouvez pas supprimer un groupe ayant un devoir verrouillé."
+      cannot_delete_group: "Vous ne pouvez pas supprimer un groupe comportant une tâche verrouillée."
     notices: 
-      created: "Le groupe de devoirs a été créé."
+      created: "Le groupe de tâches a été créé."
       deleted: "Ce groupe a été supprimé"
-      updated: "Le groupe de devoirs a été mis à jour."
+      updated: "Le groupe de tâches a été mis à jour."
   assignment_muter: 
-    mute_assignment: "Devoir silencieux"
-    muting_assignment: "Devoir en mode silencieux..."
-    unmute_assignment: "Annuler un devoir silencieux"
-    unmute_button: "Annuler un devoir silencieux"
-    unmute_dialog: "Ce devoir est actuellement silencieux. Cela signifie que les étudiants ne peuvent pas voir leurs notes et leurs corrections. Voulez-vous annuler le devoir silencieux maintenant ?"
-    unmuting_assignment: "Réactiver le son pour le devoir..."
+    mute_assignment: "Tâche silencieuse"
+    muting_assignment: "Tâche en mode silencieux..."
+    unmute_assignment: "Annuler une tâche silencieuse"
+    unmute_button: "Annuler une tâche silencieuse"
+    unmute_dialog: "Cette tâche est actuellement en mode silencieux. Cela signifie que les étudiants ne peuvent pas voir leurs notes ni leurs corrections. Voulez-vous annuler la tâche silencieuse maintenant ?"
+    unmuting_assignment: "Réactiver le son pour la tâche..."
   assignments: 
     add_assignment_form: 
-      assignment_name: "Nom du devoir"
+      assignment_name: "Nom de la tâche"
       labels: 
         due: "Échéance :"
         points: "points :"
@@ -926,18 +959,18 @@ fr:
         full_edit: "Modification complète"
         more_options: "Plus d’options"
       options: 
-        assignment: Devoir
+        assignment: Tâche
         attendance: Participation
         discussion: Discussion
         external_tool: "Outil externe"
         not_graded: "Non noté"
         quiz: Questionnaire
       tooltips: 
-        assignment_is_quiz: "Ce devoir est un questionnaire, par conséquent les points proviennent des questions et ne peuvent pas être attribués manuellement."
+        assignment_is_quiz: "Cette tâche est un questionnaire, aussi les points proviennent des questions et ne peuvent pas être attribués manuellement."
     add_assignment_group_form: 
       drop_x_scores_for_each_student: "%{scores} notes pour chaque étudiant"
       labels: 
-        assignments: Devoirs
+        assignments: Tâches
         group_name: "Nom de groupe"
       links: 
         add_grading_rule: "Ajouter une règle de notation"
@@ -947,14 +980,14 @@ fr:
         drop_lowest: "Ôter la plus basse"
         equally_weighted: Équipondéré
         never_drop: "Ne jamais ôter"
-        no_assignments: "[Pas de devoirs]"
+        no_assignments: "[Pas de tâches]"
         weighted_by_points: "Pondération par points"
       percent_of_total_grade: "% de la note totale"
     assignment: 
       default_content: "Pas de contenu"
     assignment_count: 
       one: 1 devoir
-      other: "%{count} devoirs"
+      other: "%{count} tâches"
     assignment_group_create_dialog: 
       assignment_group: 
         labels: 
@@ -963,27 +996,27 @@ fr:
         add_group: "Ajouter un groupe"
         cancel: Annuler
       links: 
-        add_assignment_group: "Ajouter un groupe de devoirs"
+        add_assignment_group: "Ajouter un groupe de tâches"
     assignment_group_selector: 
-      assignment_group: "Groupe de devoirs"
+      assignment_group: "Groupe de tâches"
       assignment_group_options: 
         new_group: "Nouveau groupe"
     assignment_groups_count: 
       one: 1 groupe
       other: "%{count} groupes"
     assignment_locked: 
-      assignment_locked: "Ce devoir est verrouillé à partir du *%{lock_at}*"
-      assignment_unlocked_from: "Ce devoir est verrouillé jusqu’au *%{unlock_at}*"
-      assignment_unlocked_from_to: "Ce devoir est déverrouillé seulement du *%{unlock_at}* au *%{lock_at}*"
+      assignment_locked: "Cette tâche est verrouillée à partir du *%{lock_at}*"
+      assignment_unlocked_from: "Cette tâche est verrouillée jusqu’au *%{unlock_at}*"
+      assignment_unlocked_from_to: "Cette tâche est déverrouillée seulement du *%{unlock_at}* au *%{lock_at}*"
     assignment_sidebar: 
       allowed_file_types: "Les types de chargements de fichiers autorisés sont : %{extensions_list}."
       buttons: 
-        publish: "Publier ce devoir"
+        publish: "Publier cette tâche"
       links: 
         add_rubric: "Ajouter un barème"
         align_outcomes: "Aligner les résultats"
         edit_assignment: "Modifier le devoir"
-        submit: "Envoyer un devoir"
+        submit: "Envoyer une tâche"
         view_assignment: "Afficher un devoir"
       submission_types_for_graders: "Les étudiants peuvent soumettre ce devoir comme *%{submission_types}*"
       submission_types_for_student: "Ce devoir peut être soumis comme *%{submission_types}*"
@@ -991,52 +1024,52 @@ fr:
         unpublished: "Non publié"
       turnitin_enabled: "Turnitin a été activé pour ce devoir."
       warnings: 
-        unpublished: "Vous devez publier les devoirs dont vous avez terminé la notation afin que les étudiants puissent considérer leurs notes comme étant \"officielles\"."
+        unpublished: "Vous devez publier les tâches dont vous avez terminé la notation afin que les étudiants puissent considérer leurs notes comme étant \"officielles\"."
     assignments_content: 
       buttons: 
         delete_group: "Supprimer le groupe"
       labels: 
-        class_weighting_policy: "Pondérer la note finale en fonction des groupes de devoirs"
-        delete_assignments_in_group: "Supprimer les devoirs de ce groupe"
-        move_assignments_to: "Déplacer les devoirs de ce groupe vers"
+        class_weighting_policy: "Pondérer la note finale en fonction des groupes de tâches"
+        delete_assignments_in_group: "Supprimer les tâches de ce groupe"
+        move_assignments_to: "Déplacer les tâches de ce groupe vers"
       options: 
         select_group: "[ Sélectionner un groupe ]"
       titles: 
-        delete_assignment_group: "Supprimer le groupe de devoirs ?"
+        delete_assignment_group: "Supprimer le groupe de tâches?"
       tooltips: 
-        target_group: "Sélectionner un groupe vers lequel déplacer ce devoir"
+        target_group: "Sélectionner un groupe vers lequel déplacer cette tâche"
       warnings: 
-        delete_assignment_group: "Le groupe de devoirs %{group} contient %{assignment_count}. Vous pouvez soit supprimer ces devoirs soit les déplacer vers un autre groupe de devoirs."
+        delete_assignment_group: "Le groupe de tâches %{group} contient %{assignment_count}. Vous pouvez soit supprimer ces tâches, soit les déplacer vers un autre groupe."
     assignments_list_content: 
-      no_assignments: "Aucun devoir créé pour ce cours."
+      no_assignments: "Aucune tâche créée pour ce cours."
       titles: 
-        assignments: Devoirs
-        course_assignments: "Devoirs de cours"
-        overdue_assignments: "Devoirs en retard"
-        past_assignments: "Devoirs antérieurs"
-        undated_assignments: "Devoirs non datés"
-        ungraded_assignments: "Devoirs non notés"
-        upcoming_assignments: "Prochains devoirs"
+        assignments: Tâches
+        course_assignments: "Tâches du cours"
+        overdue_assignments: "Tâches en retard"
+        past_assignments: "Tâches antérieures"
+        undated_assignments: "Tâches non datées"
+        ungraded_assignments: "Tâches non notées"
+        upcoming_assignments: "Prochaines tâches"
     assignments_list_right_side: 
       links: 
-        group_assignments_by_type: "Grouper les devoirs par type"
-        just_show_assignment_list: "Afficher seulement la liste des devoirs"
-        manage_assignments: "Gérer les devoirs"
+        group_assignments_by_type: "Grouper les tâches par type"
+        just_show_assignment_list: "Afficher seulement la liste des tâches"
+        manage_assignments: "Gérer les tâches"
         see_current_grades: "Afficher mes notes jusqu’à présent"
       titles: 
-        show_only_assignments_from: "Afficher uniquement les devoirs pour"
-        upcoming_assignments: "Prochains devoirs"
+        show_only_assignments_from: "Afficher uniquement les tâches pour"
+        upcoming_assignments: "Prochaines tâches"
     assignments_right_side: 
-      add_assignment_to_group: "*Ajouter le devoir* à %{group}"
+      add_assignment_to_group: "*Ajouter la tâche à %{group}"
       assignment_groups_wrapper: "( dans %{number_of_groups})"
       links: 
-        add_assignment_group: "Ajouter un groupe de devoirs"
+        add_assignment_group: "Ajouter un groupe de tâches"
     buttons: 
       add_group: "Ajouter un groupe"
       delete_group: "Supprimer le groupe"
-      submit_assignment: "Envoyer un devoir"
+      submit_assignment: "Envoyer une tâche"
     confirm: 
-      delete_assignment: "Voulez-vous vraiment supprimer ce devoir ?"
+      delete_assignment: "Voulez-vous vraiment supprimer cette tâche?"
       delete_group: "Voulez-vous vraiment supprimer ce groupe ?"
     create_new_crumb: "Créer nouveau"
     crumbs: 
@@ -1050,16 +1083,16 @@ fr:
         for: Pour
       until: Jusqu’au
     edit: 
-      edit_assignment: "Modifier le devoir"
+      edit_assignment: "Modifier la tâche"
       new_discussion: "Nouvelle discussion"
       new_quiz: "Nouveau questionnaire"
     edit_view: 
-      assignment_name: "Nom du devoir"
+      assignment_name: "Nom de la tâche"
       buttons: 
-        update: "Mettre à jour un devoir"
+        update: "Mettre à jour une tâche"
       description: Description
       due_date: "Date d’échéance"
-      freeze_properties: "Verrouiller les propriétés du devoir lors de la copie"
+      freeze_properties: "Verrouiller les propriétés de la tâche lors de la copie"
       notify_content_change: "Informer les utilisateurs que ce contenu a changé"
       points_possible: Points
       show_advanced_options: "Afficher les options avancées"
@@ -1072,8 +1105,10 @@ fr:
       google_docs_masquerade_rejected: "Impossible de se connecter à Google Docs sous une autre identité."
       reminder_failed: "Échec du rappel"
     external_grader_sidebar: 
-      edit_assignment_settings: "Modifier les paramètres des devoirs"
+      edit_assignment_settings: "Modifier les paramètres des tâches"
       speed_grader: SpeedGrader
+    file_retrieval_error: "Échec de récupération du fichier"
+    getting_file: "Récupération du fichier..."
     grade_assignment: 
       buttons: 
         upload_files: "Télécharger des fichiers"
@@ -1092,8 +1127,9 @@ fr:
           
           *Assurez-vous de ne pas modifier les noms des fichiers d’envoi afin que nous puissions les reconnaître.*
       titles: 
+        related_items: "Éléments apparentés"
         submission: Devoirs
-    graded: "Ce devoir a été noté"
+    graded: "Cette tâche a été notée"
     grading_type_selector: 
       grading_type: "Type de notation"
       grading_type_options: 
@@ -1107,7 +1143,7 @@ fr:
       grade_group_students_individually: "Attribuer les notes individuellement à chaque étudiant"
       group_category_options: "Nouvelle catégorie de groupe"
       group_set: "Ensemble de groupes"
-      is_group_assignment: "Ceci est un devoir de groupe"
+      is_group_assignment: "Ceci est une tâche pour un groupe"
     group_comment: 
       labels: 
         group_comment: "Envoyer un commentaire au groupe complet"
@@ -1117,19 +1153,19 @@ fr:
         group_submission: "Notez que ce devoir comptera pour chacune des personnes dans votre groupe %{group_type}."
     group_weights: 
       headers: 
-        assignment_group: "Groupe de devoirs"
+        assignment_group: "Groupe de tâches"
         group_weight: Pondération
         total: Total
     index: 
-      assignment_locked: "Ce devoir est actuellement verrouillé. Pour plus d’informations, consultez la page d’informations du devoir."
+      assignment_locked: "Cette tâche est actuellement verrouillée. Pour plus d’informations, consultez sa page d’informations."
       assignment_locked_tooltip: verrouillé
       keycode_descriptions: 
-        add_assignment_or_group: "Ajouter un devoir au groupe actuel"
-        delete_assignment_or_group: "Supprimer le devoir/groupe actuel"
-        edit_assignment_or_group: "Modifier le devoir/groupe actuel"
-        full_preview: "Aperçu complet/Modifier le devoir"
-        next_assignment_or_group: "Devoir/groupe suivant"
-        previous_assignment_or_group: "Devoir/groupe précédent"
+        add_assignment_or_group: "Ajouter une tâche au groupe actuel"
+        delete_assignment_or_group: "Supprimer la tâche et/ou le groupe actuel"
+        edit_assignment_or_group: "Modifier la tâche et/ou le groupe actuel"
+        full_preview: "Aperçu complet/Modifier la tâche"
+        next_assignment_or_group: "Tâche/groupe suivant"
+        previous_assignment_or_group: "Tâche/groupe précédent"
       keycodes: 
         add_assignment_or_group: a
         delete_assignment_or_group: d
@@ -1139,29 +1175,33 @@ fr:
         previous_assignment_or_group: k
       links: 
         wizard: "Comment faire pour... ?"
-      page_title: Devoirs
+      page_title: Tâches
+    invalid_file_retrieval: "Un problème s’est produit pendant la récupération du fichier envoyé depuis cet outil."
+    invalid_tool_return: "L'outil utilisé a renvoyé une ressource non valide pour cette tâche."
+    loading_tools_failed: "Échec du chargement des outils"
     messages: 
       adding_group: "Ajout d’un groupe..."
-      agree_to_pledge: "Vous devez accepter cet engagement avant d’envoyer un devoir."
-      not_submitted_yet: "Vous n’avez pas terminé d’envoyer votre devoir. Vous devez encore cliquer sur \"Envoyer\" pour terminer l’envoi. Voulez-vous quitter cette page ?"
-      now_overdue: "Ce devoir est à présent en retard. Tout nouvel envoi sera signalé comme devoir en retard. Voulez-vous continuer ?"
-      overdue: "Ce devoir est en retard. Voulez-vous toujours l’envoyer ?"
+      agree_to_pledge: "Vous devez accepter cet engagement avant d’envoyer une tâche."
+      not_submitted_yet: "Vous n’avez pas terminé d’envoyer votre tâche. Vous devez encore cliquer sur \"Envoyer\" pour terminer l’envoi. Voulez-vous quitter cette page ?"
+      now_overdue: "Cette tâche est à présent en retard. Tout nouvel envoi sera signalé comme tâche en retard. Voulez-vous continuer ?"
+      overdue: "Cette tâche est en retard. Voulez-vous toujours l’envoyer ?"
       record_before_submitting: "Enregistrer avant l’envoi"
       submit_failed: "Échec de l’envoi, veuillez réessayer"
       submitting: "Envoi en cours…"
     multiple_due_dates: "Plusieurs dates d’échéance"
-    needs_grading_count: "%{needs_grading_count} envois pour ce devoir restent à noter"
+    needs_grading_count: "%{needs_grading_count} envois pour cette tâche restent à noter"
     never_drop_scores: "Ne jamais ôter %{assignment_name}"
-    no_assignments: "[Pas de devoirs]"
+    no_assignments: "[Pas de tâches]"
+    no_tools_found: "Aucun outil trouvé"
     notices: 
-      assignment_delete: "Ce devoir a été supprimé"
-      created: "Le devoir a été créé."
-      updated: "Le devoir a été mis à jour."
+      assignment_delete: "Cette tâche a été supprimée"
+      created: "La tâche a été créée."
+      updated: "La tâche a été mise à jour."
     number_of_assignments: 
       one: 1 devoir
-      other: "%{count} devoirs"
-    other_assignments: "Autres devoirs"
-    overdue: "Ce devoir est en retard."
+      other: "%{count} tâches"
+    other_assignments: "Autres tâches"
+    overdue: "Cette tâche est en retard."
     peer_review_assignment: 
       titles: 
         remind_reviewer: "Rappeler à %{user} les évaluations"
@@ -1173,10 +1213,10 @@ fr:
         assign_peer_reviews: "Attribuer des révisions aux pairs"
       descriptions: 
         automatically_assign_reviews: "Vous pouvez attribuer des devoirs à réviser aux utilisateurs pairs qui en ont déjà envoyés à réviser mais n’ont pas encore reçu de révisions, en cliquant sur le bouton ci-dessous."
-      details: "À gauche, vous pouvez apercevoir la liste des étudiants pour ce devoir, mais également les envois d’étudiants qu’ils ont reçus à réviser."
+      details: "À gauche, vous pouvez apercevoir la liste des étudiants pour cette tâche, mais également les envois d’étudiants qu’ils ont reçus à réviser."
       links: 
         assign_peer_review: "Donner à %{student} un autre envoi à évaluer"
-        back_to_assignment: "Revenir au devoir"
+        back_to_assignment: "Revenir à la tâche"
       messages: 
         cancel_peer_review: "Annuler cette révision par un pair ?"
         no_students_found: "Aucun étudiant trouvé"
@@ -1185,7 +1225,7 @@ fr:
       options: 
         select_student: "[ Sélectionner un étudiant ]"
       overview: "Les révisions des étudiants pairs seront considérées comme terminées lorsque les étudiants auront commenté la page au moins une fois."
-      overview_with_rubric: "Les révisions des étudiants pairs seront considérées comme terminées lorsque les étudiants auront commenté la page au moins une fois, et complété le formulaire de barème pour le devoir."
+      overview_with_rubric: "Les révisions des autres étudiants seront considérées comme terminées lorsque les étudiants auront commenté la page au moins une fois, et complété le formulaire de barème pour la tâche."
       page_title: "Révisions par les pairs"
       reviews_per_user: "%{count} révisions par utilisateur"
       submitted: envoyé
@@ -1206,9 +1246,9 @@ fr:
       redirect_message: |-
           Cet envoi était une URL ; nous vous dirigeons maintenant vers le lien de l’URL.  
           [Cliquez ici pour accéder à l’envoi](%{url})
-    select_assignment: "[Sélectionner un devoir]"
+    select_assignment: "[Sélectionner une tâche]"
     show: 
-      assignment_locked: "Ce devoir est actuellement verrouillé."
+      assignment_locked: "Cette tâche est actuellement verrouillée."
       available_from: "Disponible depuis"
       date_time_by: "%{date} à %{time}"
       defaults: 
@@ -1223,8 +1263,8 @@ fr:
         assign_rubric: "Attribuer un barème"
         edit: Modifier
       messages: 
-        locked: "Ce devoir est actuellement verrouillé."
-      new_assignment: "Nouveau devoir"
+        locked: "Cette tâche est actuellement verrouillée."
+      new_assignment: "Nouvelle tâche"
       no_due_date: "Pas de date d’échéance"
       no_points: Aucun
       no_submission: Aucune
@@ -1232,25 +1272,25 @@ fr:
       submission_types: "Types de fichiers"
       submitting: "Envoi en cours"
       turnitin: Turnitin
-      turnitin_enabled: "Turnitin a été activé pour ce devoir."
+      turnitin_enabled: "Turnitin a été activé pour cette tâche."
       turnitin_enabled_short: "(Turnitin activé)"
       until: Jusqu’au
     show_locked: 
       labels: 
-        assignment: Devoir
+        assignment: Tâche
       locked: Verrouillé
     status: 
       deleting_group: "Suppression du groupe..."
     student_index: 
       labels: 
-        assignments: Devoirs
+        assignments: Tâches
     submission_sidebar: 
       comment_signature: "%{author}, %{created_at}"
       labels: 
         grade: "Note : %{grade} *(%{points_possible} points possibles)*"
         none_assigned: "Aucune attribuée"
       links: 
-        resubmit: "Renvoyer le devoir"
+        resubmit: "Renvoyer la tâche"
         submission: 
           details: "Informations de l’envoi"
           download_attachment: "Télécharger %{attachment_display_name}"
@@ -1258,7 +1298,7 @@ fr:
           view_original_page: "Afficher la page d’origine"
           view_quiz: "Afficher l’envoi du questionnaire"
           view_survey: "Afficher l’envoi de l’enquête"
-        submit: "Envoyer un devoir"
+        submit: "Envoyer une tâche"
         view_rubric_evaluation: "Afficher l’évaluation par barème"
       messages: 
         no_comments: "Aucun commentaire"
@@ -1300,15 +1340,16 @@ fr:
       additional_comments: "Autres commentaires"
       buttons: 
         record_media: "Enregistrer/Télécharger un multimédia"
-        submit_assignment: "Envoyer un devoir"
+        submit_assignment: "Envoyer une tâche"
       comments_placeholder: Commentaires...
       errors: 
         unacceptable_file_type: "Ce type de fichier n’est pas autorisé. Les types de fichiers acceptés sont : %{allowed_extensions_list}"
       instructions: 
+        from_external_tool: "Sélectionnez un outil dans la liste ci-dessous pour le charger et envoyer une ressource qu’il fournit."
         google_docs: "Sélectionnez le fichier dans la liste ci-dessous."
         media_recording: "Utilisez le lien ci-dessous pour enregistrer votre envoi. Cliquez sur \"Enregistrer\" lorsque vous avez terminé et que vous êtes prêt à envoyer votre devoir."
         online_text_entry: "Copiez et collez ou saisissez votre envoi ici."
-        online_url: "Copiez et collez le lien vers le site Web que vous souhaitez envoyer pour ce devoir."
+        online_url: "Copiez et collez le lien vers le site Web que vous souhaitez envoyer pour cette tâche."
       labels: 
         uploaded_data: Fichier
         url: "URL du site Web"
@@ -1317,18 +1358,22 @@ fr:
         authorize_google_docs: "Autoriser l’accès à Google Docs"
         find_file: "Cliquez ici pour chercher un fichier déjà téléchargé"
         submit: 
+          external_tool: Autres
           file_upload: "Téléchargement de fichiers"
           google_doc: "Google Docs"
           media: Multimédia
           text_entry: "Saisie de texte"
           website: "URL du site Web"
+      loading_tools: "Chargement des outils..."
       messages: 
-        google_docs_auth_required: "Avant d’envoyer les devoirs directement à partir de Google Docs, vous devez autoriser Canvas à accéder à votre compte Google Docs."
-        media_recording_ready: "L’envoi est prêt. Cliquez sur « Envoyer un devoir » pour terminer."
-        media_recordings_disabled: "Les enregistrements multimédias ne sont pas acceptés par le site Canvas et vous ne pourrez pas envoyer ce type de devoirs. Contactez votre formateur afin qu’il change les paramètres pour ce devoir, ou votre administrateur système afin qu’il autorise les enregistrements multimédias."
+        google_docs_auth_required: "Avant d’envoyer les tâches directement à partir de Google Docs, vous devez autoriser Canvas à accéder à votre compte Google Docs."
+        media_recording_ready: "L’envoi est prêt. Cliquez sur « Envoyer une tâche » pour terminer."
+        media_recordings_disabled: "Les enregistrements multimédias ne sont pas acceptés par le site Canvas et vous ne pourrez pas envoyer ce type de travail. Contactez votre instructeur afin qu’il change les paramètres pour cette tâche, ou votre administrateur système afin qu’il autorise les enregistrements multimédias."
         submitting: "Envoi en cours…"
-        uploading: "Récupération d’une copie de votre Google Docs à envoyer pour ce devoir. Cette opération peut durer quelques instants en fonction de la taille du fichier..."
+        uploading: "Récupération d’une copie de votre Google Docs à envoyer pour cette tâche. Cette opération peut durer quelques instants en fonction de la taille du fichier..."
       no_files: "Aucun fichier"
+      no_submission: "Aucun envoi sélectionné"
+      submission_url: "Envoi :"
       titles: 
         media_recordings_disabled: "Les enregistrements multimédias ne sont pas autorisés sur le site Canvas"
         view_in_separate_window: "Afficher dans une fenêtre séparée"
@@ -1361,7 +1406,7 @@ fr:
       syllabus: 
         other_day: Autres
     titles: 
-      add_assignment_group: "Ajouter un groupe de devoirs"
+      add_assignment_group: "Ajouter un groupe de tâches"
       assignment_details: "Informations du devoir"
       uploading: "Envoi en cours"
     turnitin_settings_dialog: 
@@ -1382,33 +1427,33 @@ fr:
           student_paper_check: "Autres copies d’étudiants"
         originality_report_visibility: "Les étudiants peuvent voir le rapport d’origine"
         originality_report_visible_after_due_date: "Après la date d’échéance"
-        originality_report_visible_after_grading: "Une fois le devoir noté"
+        originality_report_visible_after_grading: "Une fois la tâche notée"
         originality_report_visible_immediately: Immédiatement
-        settings_exclude_fewer_than_count: "moins de %h{wordsInput} mots"
-        settings_exclude_less_than_percent: "moins de %h{percentInput} du document"
+        settings_exclude_fewer_than_count: "Moins de %h{wordsInput} mots"
+        settings_exclude_less_than_percent: "Moins de %h{percentInput} du document"
     wizard_box: 
       descriptions: 
-        delete_icon: "%{icon}: Supprimer le devoir"
+        delete_icon: "%{icon}: Supprimer la tâche"
         edit_icon: "%{icon}: Modifier de nouveau les options de base"
-        move_icon: "%{icon}: Déplacer le devoir vers un autre groupe"
-        preview_icon: "%{icon}: Afficher le devoir et le modifier complètement"
+        move_icon: "%{icon}: Déplacer la tâche vers un autre groupe"
+        preview_icon: "%{icon}: Afficher la tâche et la modifier complètement"
       errors: 
-        no_assignment_group: "Erreur. Vous devez d’abord ajouter un groupe de devoirs. Cliquez sur \"Créer un groupe de devoirs\" pour découvrir comment."
+        no_assignment_group: "Erreur. Vous devez d’abord ajouter un groupe de tâches. Cliquez sur \"Créer un groupe de tâches\" pour découvrir comment."
       instructions: 
         wizard: 
-          details: "Un devoir se compose de bien d’autres choses que des dates d’échéance et des points. Si vous souhaitez saisir une description du devoir, autoriser le téléchargement de fichiers, modifier le type de notation ou d’autres actions, cliquez sur le nom du devoir ou sur l’icône %{edit_icon} puis sur \"autres options\"."
+          details: "Une tâche se compose de bien d’autres choses que des dates d’échéance et des points. Si vous souhaitez saisir une description, autoriser le téléchargement de fichiers, modifier le type de notation ou d’autres actions, cliquez sur le nom de la tâche ou sur l’icône %{edit_icon} puis sur \"autres options\"."
           group: 
-            step1: "Les groupes de devoirs permettent d’organiser les devoirs. Vous devez fournir un nom pour chaque groupe. Si vous choisissez de pondérer la note finale en fonction des groupes (*où ?*), vous pouvez également définir une note en pourcentage pour chaque groupe. Cliquez sur \"Créer un nouveau groupe\" pour créer un nouveau groupe."
-          overview: "Cette page permet de paramétrer votre cours à un niveau plus avancé. Vous pouvez ajouter des devoirs, les grouper puis pondérer ces groupes. L’idée étant de commencer par vous organiser puis d’entrer ensuite dans les détails. Mais pour commencer, vous pouvez déjà réaliser beaucoup."
-          quizzes: "Les questionnaires sont des types particuliers de devoirs. Vous pouvez créer ou importer des questionnaires en cliquant sur le lien \"Questionnaires\" dans la barre latérale à gauche."
-          step1: "Les devoirs sont toujours organisés en groupes, par conséquent, pour ajouter un devoir vous devez commencer par connaître le groupe auquel vous souhaitez l’ajouter. Sélectionnez le groupe puis cliquez sur \"Ajouter le devoir à\" ou cliquez sur l’icône %{add_icon} pour commencer un nouveau devoir de groupe."
-          step2: "Très bien ! À présent, complétez vos informations. Vous pouvez entrer un titre pour votre devoir, une date d’échéance et le nombre de points possibles. Si vous souhaitez ajouter d’autre choses, vous le pourrez uniquement après la création du devoir."
-          step3: "Terminé. Le devoir a été ajouté au groupe. Si vous déplacez votre souris sur le devoir, vous verrez apparaître un groupe d’options. Voici leur signification :"
+            step1: "Les groupes de tâches permettent d’organiser les tâches. Vous devez fournir un nom pour chaque groupe. Si vous choisissez de pondérer la note finale en fonction des groupes (*où ?*), vous pouvez également définir une note en pourcentage pour chaque groupe. Cliquez sur \"Créer un nouveau groupe\" pour créer un nouveau groupe."
+          overview: "Cette page permet de paramétrer votre cours à un niveau plus avancé. Vous pouvez ajouter des tâches, les grouper puis pondérer ces groupes. L’idée étant de commencer par vous organiser puis d’entrer ensuite dans les détails. Mais pour commencer, vous pouvez déjà réaliser beaucoup."
+          quizzes: "Les questionnaires sont des types particuliers de tâches. Vous pouvez créer ou importer des questionnaires en cliquant sur le lien \"Questionnaires\" dans la barre latérale à gauche."
+          step1: "Les tâches sont toujours organisées en groupes. Par conséquent, pour ajouter une tâche, vous devez commencer par connaître le groupe auquel vous souhaitez l’ajouter. Sélectionnez le groupe puis cliquez sur \"Ajouter la tâche à\" ou cliquez sur l’icône %{add_icon} pour commencer un nouveau travail de groupe."
+          step2: "Très bien ! À présent, complétez vos informations. Vous pouvez entrer un titre pour votre travail, une date d’échéance et le nombre de points possibles. Si vous souhaitez ajouter d’autre choses, vous le pourrez uniquement après la création de la tâche."
+          step3: "Terminé. La tâche a été ajoutée au groupe. Si vous amenez la souris sur la tâche, vous verrez apparaître un groupe d’options. Voici leur signification :"
       links: 
-        create_assignment: "Créer un nouveau devoir"
-        create_assignment_group: "Créer un groupe de devoirs"
+        create_assignment: "Créer une nouvelle tâche"
+        create_assignment_group: "Créer un groupe de tâches"
         create_or_import_quiz: "Créer/Importer un questionnaire"
-        edit_assignment_in_detail: "Modifier les devoirs en détail"
+        edit_assignment_in_detail: "Modifier les tâches en détail"
         show_me_where: "Me montrer où"
       subtitles: 
         edit_assignment_in_detail: "(autoriser les téléchargements, modifier la description, etc.)"
@@ -1435,22 +1480,22 @@ fr:
   attendance: 
     default_attendance_title: "Participation le %{date}"
     errors: 
-      could_not_add_assignment: "L’ajout du devoir a échoué"
+      could_not_add_assignment: "L’ajout de la tâche a échoué"
     options: 
       clear_attendance_marks: "Effacer les marques de participation"
-      edit_assignment: "Modifier le devoir"
+      edit_assignment: "Modifier la tâche"
       mark_all_as_absent: "Marquer tout le mode absent"
       mark_all_as_present: "Marquer tout le monde présent"
     status: 
-      added_assignment: "Devoir ajouté"
-      adding_assignment: "Ajout d’un devoir"
+      added_assignment: "Tâche ajoutée"
+      adding_assignment: "Ajout d’une tâche"
     titles: 
       attendance_help: "Aide sur la participation"
       new_attendance_column: "Colonne Nouvelle participation"
   bookmark_service: 
     default_title: "Sans titre"
   button: 
-    submit_assignment: "Envoyer un devoir"
+    submit_assignment: "Envoyer une tâche"
   buttons: 
     add: Ajouter
     add_external_tool: "Ajouter un outil externe"
@@ -1581,7 +1626,7 @@ fr:
       scheduler_explanation_student_paragraph_2: "Aucun de vos enseignants n’a créé de rendez-vous auxquels vous pouvez vous inscrire. Si quelqu’un crée un événement, vous en serez informé et vous pourrez vous y inscrire."
       scheduler_explanation_teacher_header: "Vous n’avez créé aucun groupe de rendez-vous ; vous ne pouvez vous inscrire à aucun groupe."
       scheduler_explanation_teacher_paragraph_1: "Voici l’outil de planification. Vous pouvez l’utiliser pour créer des groupes de rendez-vous auxquels vos étudiants peuvent s’inscrire."
-      scheduler_explanation_teacher_paragraph_2: "Par exemple, supposons que vous souhaitiez revoir le devoir écrit de mi-trimestre avec chaque étudiant du cours. Vous créez un nouveau groupe de rendez-vous, vous indiquez les dates et heures auxquelles vous êtes disponibles, vous demandez à l’outil de répartir ce temps en tranches horaires de 15 minutes et vous n’autorisez qu’un seul étudiant par tranche horaire."
+      scheduler_explanation_teacher_paragraph_2: "Par exemple, supposons que vous souhaitiez revoir le travail sur table de la mi-trimestre avec chaque étudiant du cours. Vous créez un nouveau groupe de rendez-vous, vous indiquez les dates et heures auxquelles vous êtes disponibles, vous demandez à l’outil de répartir ce temps en tranches horaires de 15 minutes et vous n’autorisez qu’un seul étudiant par tranche horaire."
       scheduler_explanation_teacher_paragraph_3: "Les étudiants seront avisés et verront qu’ils doivent s’inscrire à l’une des tranches horaires indiquées. Un calendrier avec les tranches horaires disponibles s’affichera au-dessus de toutes les activités de leurs autres calendriers pour qu’ils choisissent un horaire qui leur convient."
       scheduler_explanation_teacher_paragraph_4: "* Commencez en cliquant sur le bouton « Créer un groupe de rendez-vous  » sur la droite.*"
       x_groups_have_signed_up: "%{signed_up} groupes se sont inscrits."
@@ -1596,7 +1641,7 @@ fr:
         calendar_scheduler: Planificateur
         calendar_week: Semaine
       refresh: Actualiser
-      use_old_calendar: "Revenir à l’ancien calendrier"
+      use_old_calendar: "Ancien calendrier"
     cancel_appointment: "Voulez-vous vraiment annuler votre rendez-vous avec %{name} ?"
     confirm_appointment_group_deletion: "Voulez-vous vraiment supprimer ce groupe de rendez-vous ?"
     confirm_deletion: "Confirmer la suppression"
@@ -1621,9 +1666,13 @@ fr:
       appt_group_options_help1: "Certaines réservations existantes dépassent la limite que vous avez ajoutée. Celles-ci ne seront pas affectées. Cette modification empêche seulement de créer de nouvelles réservations."
       appt_group_options_help2: "Cependant, vous pouvez retirer manuellement des réservations existantes."
       calendar: Calendrier
+      date: Date
+      details: "Détails :"
       group_category: "Catégorie de groupe"
+      group_signup: "Demandez aux étudiants de s’inscrire dans des groupes."
       location: Lieu
       name: Nom
+      time_range: "Intervalle de temps"
     edit_appt_calendar_event: 
       description: "Description :"
       slot_limit: "Limiter ce créneau à"
@@ -1633,19 +1682,19 @@ fr:
       due: "Échéance :"
       group: "Groupe :"
       links: 
-        more_options: "autres options"
+        more_options: "Plus d’options"
       title: "Titre :"
     edit_assignment_override: 
       calendar: "Calendrier :"
       due: "Échéance :"
       links: 
-        more_options: "autres options"
+        more_options: "Plus d’options"
     edit_calendar_event: 
       calendar: "Calendrier :"
       date: "Date :"
       from: "Du :"
       links: 
-        more_options: "autres options"
+        more_options: "Plus d’options"
       timespan_separator: "* au *"
       title: "Titre :"
     edit_calendar_event_full: 
@@ -1661,7 +1710,7 @@ fr:
       to: à
     edit_event: 
       tabs: 
-        assignment: Devoir
+        assignment: Tâche
         event: Événement
     end_before_start_error: "L’heure de début doit être antérieure à l’heure de fin."
     ends_in_past_error: "Impossible de créer un créneau de rendez-vous qui se termine dans le passé"
@@ -1705,9 +1754,9 @@ fr:
     ok: OK
     open_appointment_on_this_day: "Il y a un rendez-vous disponible à cette date."
     prompts: 
-      delete_assignment: "Voulez-vous vraiment supprimer ce devoir ?"
+      delete_assignment: "Voulez-vous vraiment supprimer cette tâche ?"
       delete_event: "Voulez-vous vraiment supprimer cet événement ?"
-      delete_override: "Voulez-vous vraiment supprimer le changement apporté pour ce devoir ?"
+      delete_override: "Voulez-vous vraiment supprimer le changement apporté pour cette tâche ?"
       unreserve_event: "Voulez-vous vraiment supprimer votre réservation relative à cet événement ?"
     reschedule: Reprogrammer
     reservation_over_limit_dialog: 
@@ -1782,7 +1831,7 @@ fr:
     ics_description_user: "Événements de calendrier pour l’utilisateur %{user_name}"
     ics_title: "Calendrier de %{course_or_group_name} (Canvas)"
   calendars: 
-    assignment_details: "Informations du devoir"
+    assignment_details: "Informations sur la tâche"
     calendar: 
       alts: 
         next: Suivant
@@ -1810,14 +1859,14 @@ fr:
         full_details: "Informations complètes"
         how_do_i: "Comment faire pour...?"
         jump_to_calendar: "Atteindre le calendrier"
-        more_options: "autres options"
+        more_options: "Plus d’options"
         show_undated_events: "afficher %{count} événements non datés"
       messages: 
         max_visible: "Vous pouvez afficher jusqu’à %{count} calendriers en même temps"
       options: 
         new_group: "[ Nouveau groupe ]"
       tabs: 
-        assignment: Devoir
+        assignment: Tâche
         event: Événement
       timespan: "%{start_time} *à* %{end_time}"
     default_title: événement
@@ -1841,7 +1890,7 @@ fr:
     notices: 
       event_moved: "%{event} a été déplacé vers %{day}"
     prompts: 
-      delete_assignment: "Voulez-vous vraiment supprimer ce devoir ?"
+      delete_assignment: "Voulez-vous vraiment supprimer cette tâche ?"
       delete_event: "Voulez-vous vraiment supprimer cet événement ?"
     show: 
       crumbs: 
@@ -1880,30 +1929,30 @@ fr:
       links: 
         feed: "cliquez ici pour afficher le flux"
     titles: 
-      add_new_assignment: "Ajouter un nouveau devoir"
+      add_new_assignment: "Ajouter une nouvelle tâche"
       add_new_event: "Ajouter un nouvel événement"
-      edit_assignment: "Modifier le devoir"
+      edit_assignment: "Modifier la tâche"
       edit_event: "Modifier l’événement"
     use_new_calendar: "Essayer le nouveau calendrier"
     wizard_box: 
       descriptions: 
-        assignment: "Bien. Maintenant, cliquez sur l’onglet \"Devoir\" pour créer un devoir au lieu d’un événement calendaire."
-        assignment_done: "Vous avez terminé ! Le devoir a été créé. Vous pouvez cliquer dessus pour afficher les informations, modifier et supprimer l’événement, ou le faire glisser vers un autre jour pour modifier sa date."
+        assignment: "Bien. Maintenant, cliquez sur l’onglet Tâche pour créer une tâche au lieu d’un événement calendaire."
+        assignment_done: "Vous avez terminé ! La tâche a été créée. Vous pouvez cliquer dessus pour afficher ses informations, modifier et supprimer l’événement, ou la faire glisser vers un autre jour pour modifier sa date."
         change_date: "Cette opération est simple. Faites simplement glisser l’événement vers une autre date puis relâchez pour le déposer. Ou, cliquez sur l’événement puis sur \"Modifier\" pour apporter des changements plus spécifiques."
         create: "Pour créer un événement dans le calendrier, commencez par cliquer sur le jour du calendrier où vous souhaitez le situer."
-        create_assignment: "Comme avec un événement de calendrier, cliquez sur la date où vous souhaitez ajouter le devoir. Ou, vous pouvez créer un devoir sans date d’échéance en cliquant sur la zone \"Événements non datés\" (*où ?*)."
-        delete: "Cliquez sur l’événement ou le devoir à supprimer dans le calendrier."
+        create_assignment: "Comme avec un événement de calendrier, cliquez sur la date à laquelle vous souhaitez ajouter la tâche. Vous pouvez aussi créer une tâche sans date d’échéance en cliquant sur la zone \"Événements non datés\" (*où ?*)."
+        delete: "Cliquez sur l’événement ou la tâche à supprimer dans le calendrier."
         delete2: "Puis, cliquez sur \"Supprimer\" (*où ?*) et l’événement sera supprimé."
         delete_done: "C’est terminé. Vous êtes un vrai pro de la suppression !"
         done: "Vous avez terminé ! L’événement a été créé. Vous pouvez cliquer dessus pour afficher les informations, modifier et supprimer l’événement, ou le faire glisser vers un autre jour pour modifier sa date."
         edit: "Très bien ! À présent, entrez un nom pour l’événement (*où ?*). Vous pouvez, si vous le souhaitez, spécifier une heure de début et de fin pour l’événement. Ou juste une heure de début. Ou vous ne spécifiez aucune heure. Pour terminer, cliquez sur \"Envoyer\"."
-        edit_assignment: "À présent, entrez un nom pour le devoir (*où ?*) et le groupe de devoirs auquel il appartient. Vous pouvez également spécifier une date d’échéance si vous le souhaitez. Pour terminer, cliquez sur \"Envoyer\"."
+        edit_assignment: "À présent, entrez un nom pour la tâche (*où ?*) et le groupe de tâches auquel il appartient. Vous pouvez également spécifier une date d’échéance si vous le souhaitez. Pour terminer, cliquez sur \"Envoyer\"."
       labels: 
         i_would_like_to: "Je souhaite"
       links: 
-        change_date: "Modifier la date d’un événement/devoir"
-        create_assignment: "Créer un nouveau devoir"
-        delete: "Supprimer un événement/devoir"
+        change_date: "Modifier la date d’un événement/tâche"
+        create_assignment: "Créer une nouvelle tâche"
+        delete: "Supprimer un événement/une tâche"
         new: "Créer un événement"
   canvas: 
     migration: 
@@ -1928,7 +1977,7 @@ fr:
     public_domain: "Domaine public"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
-      update_assignment_points: "Ce devoir dispose de %{assignmentPoints} points possibles. Voulez-vous remplacer ce nombre par %{rubricPoints} points possibles pour vous aligner sur ce barème ?"
+      update_assignment_points: "Ce travail a %{assignmentPoints} points possibles. Voulez-vous remplacer ce nombre par %{rubricPoints} points possibles pour vous aligner sur ce barème ?"
     titles: 
       update_assignment_points: "Voulez-vous modifier le nombre de points possibles pour vous aligner sur le barème ?"
   chat: 
@@ -2205,13 +2254,13 @@ fr:
   content_imports: 
     assignment: 
       links: 
-        delete_assignment: "Supprimer le devoir"
-        edit_assignment: "Modifier le devoir"
+        delete_assignment: "Supprimer la tâche"
+        edit_assignment: "Modifier la tâche"
     assignment_form: 
       buttons: 
-        save_assignment: "Enregistrer le devoir"
+        save_assignment: "Enregistrer la tâche"
       options: 
-        assignment: Devoir
+        assignment: Tâche
         discussion: Discussion
         file_upload: "Téléchargement de fichier"
         new_group: "[ Nouveau groupe ]"
@@ -2222,11 +2271,11 @@ fr:
         total: Total
         weight_groups: "Pondérer la note finale par groupes"
       links: 
-        add_group: "Ajouter un groupe de devoirs"
+        add_group: "Ajouter un groupe de tâches"
         delete_group: "Supprimer le groupe"
         edit_group: "Modifier le nom du groupe"
       titles: 
-        assignment_groups: "Groupes de devoirs"
+        assignment_groups: "Groupes de tâches"
     buttons: 
       import: "Importer un cours"
     choose_content: 
@@ -2264,9 +2313,9 @@ fr:
       crumbs: 
         copy_from_course: "Copie à partir de %{course}"
       descriptions: 
-        copy_succeeded: "Le contenu du cours a bien été importé ! Vous pouvez consulter les résultats de l’importation ci-dessous.⏎ ⏎ Si vous n’êtes pas satisfait de la date d’un devoir ou d’un événement, vous pouvez facilement⏎ [la modifier par glisser-déplacer sur le calendrier de cours](%{url})."
+        copy_succeeded: "Le contenu du cours a bien été importé ! Vous pouvez consulter les résultats de l’importation ci-dessous.⏎ ⏎ Si vous n’êtes pas satisfait de la date d’une tâche ou d’un événement, vous pouvez facilement⏎ [la modifier par glisser-déplacer sur le calendrier de cours](%{url})."
       labels: 
-        assignment: "Devoirs pour %{course}"
+        assignment: "Tâches pour %{course}"
         discussions: "Discussions pour %{course}"
         events: "Événements pour %{course}"
         external_tools: "Outils externes pour %{course}"
@@ -2282,7 +2331,7 @@ fr:
         what_it_looks_like_now: "Contenu actuel de %{course}"
     copy_course_item_selection: 
       labels: 
-        assignment: "Devoirs pour %{course}"
+        assignment: "Tâches pour %{course}"
         copy: "comprend des entrées de l’ancien cours"
         copy_settings: "Paramètres de %{course}"
         copy_syllabus: "Description du syllabus de %{course}"
@@ -2346,7 +2395,7 @@ fr:
         migrations_needing_action: "Migrations nécessitant une intervention"
         successful_migrations: "Migrations terminées"
     intro: 
-      description: "Si vous passez d’un autre système de gestion de cours à Canvas, il y a de fortes chances que vous souhaitiez déplacer des fichiers, des questionnaires ou des devoirs de ce système vers Canvas. Cet assistant vous simplifiera la tâche."
+      description: "Si vous passez d’un autre système de gestion de cours à Canvas, il y a de fortes chances que vous souhaitiez déplacer des fichiers, des questionnaires ou des tâches de ce système vers Canvas. Cet assistant vous simplifiera la tâche."
       if_any: "(si besoin)"
       links: 
         copy_course: "Copier le contenu depuis **un autre cours Canvas**"
@@ -2396,7 +2445,7 @@ fr:
       from_to: "*de* %{start_date} **à** %{end_date}"
       instructions: "Sélectionnez le contenu à copier dans ce cours. En bas, vous pouvez également choisir d’adapter toutes les dates des éléments de migration si vous êtes passé à un nouveau semestre."
       labels: 
-        assignment_groups: "Groupes de devoirs"
+        assignment_groups: "Groupes de tâches"
         content_folders: "Dossiers de contenu"
         copy_all_question_banks: "Copier toutes les banques de questions"
         copy_everything: "Tout copier"
@@ -2495,10 +2544,10 @@ fr:
     buttons: 
       ok_thanks: "D’accord, merci"
     messages: 
-      assignment_locked_at: "Ce devoir a été verrouillé le %{at}"
-      assignment_locked_module: "Ce devoir fait partie du module *%{module}* et n’a pas encore été déverrouillé."
-      assignment_locked_no_reason: "Ce devoir est verrouillé. Aucune autre raison n’a été fournie."
-      assignment_locked_until: "Ce devoir est verrouillé jusqu’au %{date}."
+      assignment_locked_at: "Cette tâche a été verrouillée le %{at}"
+      assignment_locked_module: "Cette tâche fait partie du module *%{module}* et n’a pas encore été déverrouillée."
+      assignment_locked_no_reason: "Cette tâche est verrouillée. Aucune autre raison n’a été fournie."
+      assignment_locked_until: "Cette tâche est verrouillée jusqu’au %{date}."
       content_locked_at: "Ce contenu a été verrouillé le %{at}"
       content_locked_module: "Ce contenu fait partie du module *%{module}* et n’a pas encore été déverrouillé."
       content_locked_no_reason: "Ce contenu est verrouillé. Aucune autre raison n’a été fournie."
@@ -2524,6 +2573,8 @@ fr:
       content_is_locked: "Contenu verrouillé"
   content_migration: 
     unknown: Inconnu
+  content_migrations: 
+    no_archive: "Aucune archive pour la migration de ce contenu"
   content_tag: 
     no_title: "Sans titre"
   content_tags: 
@@ -2847,7 +2898,7 @@ fr:
       max_score: "ne doit pas avoir une note supérieure à %{score}"
       min_score: "ne doit pas avoir une note inférieure à %{score}"
       must_contribute: "doit contribuer à la page"
-      must_submit: "doit envoyer le devoir"
+      must_submit: "doit envoyer la tâche"
       must_view: "doit afficher la page"
   context_modules: 
     buttons: 
@@ -2877,7 +2928,7 @@ fr:
         students_unlocked: "Étudiants qui ont déverrouillé (mais pas commencé) le module"
       help: 
         create: |-
-            Les modules de cours permettent d’organiser les devoirs, les pages, les fichiers, etc. en sections ou unités plus petites. Les modules peuvent être centrés autour d’un thème, ciblés en fonction d’un sujet spécifique ou simplement groupés chronologiquement.
+            Les modules de cours permettent d’organiser les tâches, les pages, les fichiers, etc. en sections ou unités plus petites. Les modules peuvent être centrés autour d’un thème, ciblés en fonction d’un sujet spécifique ou simplement groupés chronologiquement.
             
             Vous pouvez aussi ranger les modules en définissant des critères ou des conditions préalables pour chacun d’entre eux. Les étudiants ne pourront pas accéder aux modules avant d’avoir déverrouillé toutes les conditions requises. Cette mesure permet de les empêcher d’accéder à certains contenus ou fichiers avant d’avoir, par exemple, obtenu 75 % à un questionnaire de révision.
             
@@ -2892,7 +2943,7 @@ fr:
         title: 
           min_score: "Les étudiants doivent obtenir au moins %{min_score} à cet élément avant que le module ne soit considéré comme terminé."
           must_contribute: "Les étudiants doivent participer à cet élément avant que le module ne soit considéré comme terminé."
-          must_submit: "Les étudiants doivent envoyer ce devoir avant que le module ne soit considéré comme terminé."
+          must_submit: "Les étudiants doivent envoyer cette tâche avant que le module ne soit considéré comme terminé."
           must_view: "Les étudiants doivent consulter cet élément avant que le module ne soit considéré comme terminé."
       indent: 
         ? "n"
@@ -2953,7 +3004,7 @@ fr:
       requirements: 
         must_contribute: "contribuer à la page"
         must_score_at_least: "obtenir au moins"
-        must_submit: "envoyer le devoir"
+        must_submit: "envoyer la tâche"
         must_view: "afficher l’élément"
       select_module: 
         instructions: "Sélectionnez le module"
@@ -3035,7 +3086,7 @@ fr:
           max_score: "Les étudiants ne doivent pas dépasser la note maximum à cet élément avant de pouvoir considérer ce module comme terminé."
           min_score: "Les étudiants doivent obtenir la note minimum à cet élément avant de pouvoir considérer ce module comme terminé."
           must_contribute: "Les étudiants doivent participer à cet élément avant de pouvoir considérer ce module comme terminé."
-          must_submit: "Les étudiants doivent envoyer ce devoir avant de pouvoir considérer ce module comme terminé."
+          must_submit: "Les étudiants doivent envoyer cette tâche avant de pouvoir considérer ce module comme terminé."
           must_view: "Les étudiants doivent consulter cet élément avant de pouvoir considérer ce module comme terminé."
       links: 
         edit_item: "Modifier les informations de l’élément"
@@ -3056,15 +3107,15 @@ fr:
         fulfilled: "a participé au contenu de la page"
         unfulfilled: "doit participer au contenu de la page"
       must_submit: 
-        fulfilled: "a envoyé le devoir"
-        unfulfilled: "doit envoyer le devoir"
+        fulfilled: "a envoyé la tâche"
+        unfulfilled: "doit envoyer la tâche"
       must_view: 
         fulfilled: "a consulté la page"
         unfulfilled: "doit consulter la page"
     multiple_due_dates: "Plusieurs dates d’échéance"
     none_in_progress: "aucun en cours..."
     optgroup: 
-      assignments: Devoirs
+      assignments: Tâches
       discussion_topics: Discussions
       external_tools: "Outils externes"
       external_urls: "URL externes"
@@ -3330,10 +3381,10 @@ fr:
       teachers_students: "Enseignants et étudiants"
   course_exports: 
     errors: 
-      assignment: "L’exportation du devoir \"%{title}\" a échoué"
-      assignment_groups: "Échec de l’exportation des groupes de devoirs"
-      assignment_is_locked: "Impossible de copier le devoir « %{title} », car il est verrouillé."
-      assignments: "Échec de l’exportation de certains devoirs"
+      assignment: "L’exportation de la tâche \"%{title}\" a échoué"
+      assignment_groups: "Échec de l’exportation des groupes de tâches"
+      assignment_is_locked: "Impossible de copier la tâche « %{title} », car elle est verrouillée."
+      assignments: "Échec de l’exportation de certaines tâches"
       canvas_meta: "Échec de l’exportation des métadonnées spécifiques à Canvas"
       course_export: "Erreur lors de l’exécution de l’exportation du cours."
       course_settings: "Échec de l’exportation des paramètres du cours"
@@ -3363,7 +3414,7 @@ fr:
       wiki_pages: "Échec de l’exportation de pages Wiki"
     errors_list_message: "Erreurs d’exportation pour l’exportation %{export_id} :"
     unknown_titles: 
-      assignment: "Devoir inconnu"
+      assignment: "Tâche inconnue"
       file: "Fichier inconnu"
       topic: "Sujet inconnu"
       wiki_page: "Page Wiki inconnue"
@@ -3371,6 +3422,10 @@ fr:
     wrapper: 
       close_course_menu_title: fermer
       reset_course_menu: Réinitialiser
+  course_restore: 
+    restore_error: "Une erreur s’est produite lors de la restauration du cours. Celui-ci n’a pas été restauré."
+  course_search: 
+    cant_be_blank: "Ne doit pas être vide"
   course_section: 
     sis_id_taken: "L’ID SIS \"%{sis_id}\" est déjà utilisé."
   course_settings: 
@@ -3429,6 +3484,9 @@ fr:
     updating: "Mise à jour en cours..."
   course_statistics: 
     unknown: inconnu
+  course_users: 
+    greater_than_three: "Indiquez un élément à rechercher comprenant au moins trois caractères."
+    unknown_error: "Erreur lors de votre recherche. Veuillez réessayer."
   courses: 
     add_users: 
       buttons: 
@@ -3458,7 +3516,7 @@ fr:
       links: 
         show_more: "%{count} autres..."
         title: 
-          ignore: "Ignorer ce devoir"
+          ignore: "Ignorer cette tâche"
       need_grading_count: 
         one: "1 doit être noté"
         other: "%{count} doivent être notés"
@@ -3498,9 +3556,9 @@ fr:
       buttons: 
         publish: "Publier le cours"
       details: 
-        assignments: "Ajoutez vos devoirs. Vous pouvez simplement ajouter une longue liste de cours, ou les diviser en groupes, voire même spécifier des pondérations pour chaque groupe de devoirs."
+        assignments: "Ajoutez vos tâches. Vous pouvez simplement ajouter une longue liste de cours, ou les diviser en groupes, voire même spécifier des pondérations pour chaque groupe de tâches."
         available: "À présent que votre cours est paramétré et disponible, vous n’aurez probablement plus besoin de cette liste de vérification. Toutefois, nous la conserverons au cas où vous auriez envie d’essayer quelque chose de nouveau, ou souhaiteriez un peu d’aide pour apporter des modifications au contenu de votre cours."
-        calendar: "Voici l’occasion rêvée de découvrir le calendrier, et d’ajouter des événements sans devoirs au cours. Pas d’inquiétude, nous allons vous aider dans cette démarche."
+        calendar: "Voici l’occasion rêvée de découvrir le calendrier, et d’ajouter des événements sans tâches au cours. Pas d’inquiétude, nous allons vous aider dans cette démarche."
         claimed: 
           not_saved: |-
               Bien, votre cours est prêt... Oui, mais ensuite ? Eh bien, avant de le publier, vous pouvez avoir envie de vérifier que vous avez placé l’essentiel. Vérifiez les éléments de la liste située à gauche pour vous assurer que votre cours est prêt à être utilisé.
@@ -3531,11 +3589,11 @@ fr:
               La publication enverra automatiquement des e-mail d’invitation à tous les utilisateurs du cours afin qu’ils puissent s’inscrire et commencer à participer.
           not_registered: "Ce cours est déclaré et prêt, mais vous devez terminer le processus d’enregistrement avant de le publier. Vous devez avoir reçu un e-mail de Canvas contenant un lien pour terminer le processus. Pensez à vérifier votre boîte de courrier indésirable."
         students: "Vous en aurez besoin. Pourquoi donner des cours si personne ne vous écoute ?"
-        tas: "Pour vous aider dans votre tâche, vous pouvez attribuer des aides-enseignants (AE) au cours. Les aides-enseignants peuvent noter les envois des étudiants, jouer le rôle de modérateur dans les discussions et même mettre à jour les dates d’échéance et les informations des devoirs pour vous."
+        tas: "Pour vous aider dans votre tâche, vous pouvez attribuer des aides-enseignants (AE) au cours. Les aides-enseignants peuvent noter les envois des étudiants, jouer le rôle de modérateur dans les discussions et même mettre à jour les dates d’échéance et les informations des tâches pour vous."
       headings: 
         next_steps: "Étapes suivantes"
       links: 
-        assignments: "Ajouter des devoirs pour le cours"
+        assignments: "Ajouter des tâches pour le cours"
         calendar: "Ajouter des événements de calendrier pour le cours"
         files: "Ajouter des fichiers de cours"
         home: "Choisir une page d’accueil de cours"
@@ -3651,6 +3709,17 @@ fr:
       submission_points: 
         with_score: "Note : %{score} *sur %{points_possible}*"
         without_score: "sur %{points_possible}"
+    roster: 
+      index: 
+        all_roles: "Tous les rôles"
+        role_to_search: "Limiter la recherche au rôle"
+        search: Rechercher
+        search_people: "Rechercher des personnes"
+      roster_users: 
+        name: Nom
+        no_people_found: "Recherche infructueuse"
+        sis_id: "ID SIS"
+        you_can_search_by: "Vous pouvez rechercher sur les critères suivants :"
     roster_user: 
       course_profile: "Profil du cours"
       profile: Profil
@@ -3802,7 +3871,7 @@ fr:
         edit_navigation: "Modifier la barre de navigation des cours"
         enrollment_type: "Type d’inscription"
       transifex_message: "Rejoindre la [Canvas Translation Community](%{transifex_url})"
-      turnitin: "ces commentaires seront affichés à l’attention des étudiants lors de l’envoi d’un devoir validé par Turnitin."
+      turnitin: "ces commentaires seront affichés à l’attention des étudiants lors de l’envoi d’une tâche validée par Turnitin."
       unaccepted_invitations: "%{count} invitations n’ont pas encore été acceptées. Vous pouvez cliquer sur le nom d’un utilisateur pour lui renvoyer l’invitation."
       user_view: 
         links: 
@@ -3822,7 +3891,7 @@ fr:
       headings: 
         current_users: "Utilisateurs actuels"
       help: 
-        reset_course_content: "La réinitialisation du contenu du cours aura pour effet la suppression définitive de tous les devoirs, discussions, quizz, modules, barèmes, pages, fichiers, résultats d’apprentissage, banques de questions, collaborations, conférences ou tout autre contenu associé. Cette action est irréversible et les données ne *pourront pas* être récupérées. Voulez-vous vraiment continuer ?"
+        reset_course_content: "La réinitialisation du contenu du cours aura pour effet la suppression définitive de l’ensemble des tâches, discussions, quizz, modules, barèmes, pages, fichiers, résultats d’apprentissage, banques de questions, collaborations, conférences ou tout autre contenu associé. Cette action est irréversible et les données ne *pourront pas* être récupérées. Voulez-vous vraiment continuer ?"
       labels: 
         designers: Concepteurs
         observers: Observateurs
@@ -3844,17 +3913,17 @@ fr:
       buttons: 
         update_layout: "Mettre à jour la présentation"
       details: 
-        assignments: "Cette fenêtre contient la **liste des devoirs** pour ce cours, avec en tête les devoirs les plus récents et à venir."
+        assignments: "Cette fenêtre contient la **liste des tâches** pour ce cours, avec en tête les tâches les plus récentes et à venir."
         communication_stream: "Le **flux de communication** permet aux participants d’afficher les conversations, notifications et interactions les plus récentes. Il ressemble fortement à la page du tableau de bord qui s’affiche lorsque l’utilisateur se connecte pour la première fois, mais contient uniquement le contenu de ce cours spécifique."
         confirm_unenroll: "Voulez-vous vraiment vous désinscrire de ce cours ? Vous ne pourrez plus afficher la liste des cours ou communiquer directement avec les enseignants, et vous ne pourrez plus afficher les événements du cours dans le flux ou sous forme de notifications."
         custom_page: "Vous pouvez **créer votre propre page d’accueil de cours** et inclure les liens, images ou éléments multimédias de votre choix."
         joining_a_course: "Lorsque vous rejoignez un cours, vous pouvez le voir s’afficher dans votre liste de cours. Vous pourrez ainsi participer à des portions notées du cours et communiquer directement avec les enseignants et d’autres étudiants. Vous verrez également les conversations et les événements du cours s’afficher dans votre flux et sous forme de notifications."
         modules: |-
-            Vous pouvez organiser votre cours en **modules ou sections**, où chaque section contient par exemple un ensemble de fichiers, devoirs ou pages associés. Si vous le souhaitez, vous pouvez également ordonner des modules en définissant des critères et des conditions préalables à remplir avant que chaque module ne soit déverrouillé.
+            Vous pouvez organiser votre cours en **modules ou sections**, où chaque section contient par exemple un ensemble de fichiers, tâches ou pages associés. Si vous le souhaitez, vous pouvez également ordonner des modules en définissant des critères et des conditions préalables à remplir avant que chaque module ne soit déverrouillé.
             
             Cette présentation est probablement la mieux adaptée aux cours qui ne sont pas basés sur un agenda spécifique de type trimestriel ou semestriel.
         recent_activity_dashboard: "Le **tableau des dernières activités** permet aux participants de voir les dernières conversations, annonces, discussions et interactions relatives à ce cours. Ce tableau ressemble à celui que les utilisateurs voient la première fois qu’ils se connectent, mais il ne montre que ce qui concerne ce cours."
-        syllabus: "La **fenêtre du programme** permet d’écrire une description des attentes pour le cours, ou de le présenter accompagné de liens, d’images, etc., et d’afficher également un calendrier de tous les devoirs et événements du cours."
+        syllabus: "La **fenêtre du programme** permet d’écrire une description des attentes pour le cours, ou de le présenter accompagné de liens, d’images, etc., et d’afficher également un calendrier de toutes les tâches et événements du cours."
       dropping_course: "Abandon du cours..."
       empty_body: "Pas de contenu"
       headings: 
@@ -3877,12 +3946,12 @@ fr:
         new_announcement: "Nouvelle annonce"
         restore_role: "Rétablir le rôle et les autorisations"
       options: 
-        assignments: "la liste des devoirs"
+        assignments: "la liste des tâches"
         communication_stream: "le flux de communication"
         custom_page: "une page conçue par moi-même"
         modules: "les modules/sections du cours"
         recent_activity_dashboard: "le tableau des dernières activités"
-        syllabus: "les devoirs avec le programme"
+        syllabus: "les tâches avec le programme"
       period_name: "les deux dernières semaines"
       re_sending: "Renvoi en cours..."
       send_done: "Terminé. Le message peut prendre quelques minutes à arriver."
@@ -3899,15 +3968,15 @@ fr:
         total: Total
         weight: Pondération
       labels: 
-        assignments_weighting: "Les devoirs sont pondérés par groupe"
+        assignments_weighting: "Les tâches sont pondérées par groupe"
       no_groups: "Aucune configuration de groupes"
-      not_weighted: "Les devoirs du cours ne sont pas pondérés."
+      not_weighted: "Les tâches du cours ne sont pas pondérées."
     statistics: 
       active_students: "Étudiants actifs"
       all_rubrics: "Tous les barèmes"
       any: Tous
-      assignment_groups: "Groupes de devoirs"
-      assignments: Devoirs
+      assignment_groups: "Groupes de tâches"
+      assignments: Tâches
       course_rubrics: "Barèmes du cours"
       discussion_posts: "Billets de discussions"
       discussion_topic: "Sujet de discussion"
@@ -3917,7 +3986,7 @@ fr:
         other: "%{count} fichiers"
       file_upload: "Téléchargement de fichiers"
       headings: 
-        assignments: "Rapport d’utilisation des devoirs"
+        assignments: "Rapport d’utilisation des tâches"
         files: "Stockage de fichier"
         stats: "Statistiques pour %{course}"
         students: "Utilisateurs connectés récemment"
@@ -3929,7 +3998,7 @@ fr:
       new: Nouveau
       new_discussion_entries: "Entrées d’une nouvelle discussion"
       new_discussions: "Nouvelles discussions"
-      num_assignments: "# Devoirs"
+      num_assignments: "# tâches"
       num_submissions: "# Envois"
       page_title: "Statistiques du cours"
       quiz: Questionnaire
@@ -3938,7 +4007,7 @@ fr:
       quizzes: Questionnaires
       submission_type: "Type d’envoi"
       tabs: 
-        assignments: Devoirs
+        assignments: Tâches
         files: "Stockage de fichier"
         students: Étudiants
         totals: Totaux
@@ -3969,7 +4038,7 @@ fr:
   crumbs: 
     access_report: "Accéder au rapport"
     announcements: Annonces
-    assignments: Devoirs
+    assignments: Tâches
     calendar_events: "Événements de calendrier"
     chat: Discussion
     conferences: Conférences
@@ -3980,6 +4049,7 @@ fr:
     eportfolio_welcome: "Bienvenue dans votre portefeuille électronique"
     error_reports: "Rapports d’erreur"
     files: Fichiers
+    grades: Notes
     grading_schemes: "Systèmes de notation"
     groups: Groupes
     jobs: Tâches
@@ -4256,7 +4326,7 @@ fr:
     index: 
       course_discussions_atom_feed_title: "Flux Atom des discussions du cours"
     index_view: 
-      assignments: Devoirs
+      assignments: Tâches
       delete: Supprimer
       edit_settings: "Modifier les paramètres des discussions"
       loading: "Chargement en cours..."
@@ -4273,7 +4343,7 @@ fr:
       there_are_no_discussion_topics_to_show: "Aucun sujet de discussion à afficher"
       try_different_more_general_or_fewer_keywords: "Essayez avec des mots-clés différents, plus généraux ou moins nombreux."
       try_disabling_the_unread_filters: "Essayez de désactiver le filtre « Non lu(s) »."
-      try_disabling_the_unread_or_assignments_filters: "Essayez de désactiver les filtres « Non lu(s) » ou « Devoirs »."
+      try_disabling_the_unread_or_assignments_filters: "Essayez de désactiver les filtres « Non lu(s) » ou « Tâches »."
       unread: "Non lus"
       your_search_did_not_match_any_announcements: "Votre recherche ne correspond à aucune annonce."
       your_search_did_not_match_any_discussion_topics: "Votre recherche ne correspond à aucun sujet de discussion."
@@ -4445,6 +4515,7 @@ fr:
     button: 
       insert_equation: "Insérer une équation"
     cancel: Annuler
+    cannot_render_equation: "Cette équation ne peut pas être affichée en mode simple."
     click_to_embed: "Cliquez pour incorporer l’image"
     done: 
       title: "Cliquez pour finir de modifier la zone de texte enrichi."
@@ -4452,7 +4523,7 @@ fr:
     embed_external: "Incorporer une image externe"
     embed_from_external_tool: "« Incorporer le contenu depuis l’outil externe »"
     embed_image: "Incorporer l’image"
-    equation_editor_title: "Utilisez les barres d’outils ou tapez/collez le contenu au format LaTeX pour ajouter une équation."
+    equation_editor_title: "Utilisez les barres d’outils ou passez en mode d’affichage avancé pour taper/coller le contenu au format LaTeX."
     image_not_found: "Image introuvable. Essayez avec une autre URL."
     instructions: "Collez ou saisissez l’URL de l’image à incorporer :"
     loading: Chargement...
@@ -4463,7 +4534,17 @@ fr:
     save_failed: "Échec de l’enregistrement. Veuillez réessayer ultérieurement."
     saving: Enregistrement...
     search_flickr: "Chercher des contenus Creative Commons flickr"
+    switch_to_mathjax: "Passer en mode d’affichage simple"
+    switch_to_mathquill: "Passer en mode d’affichage avancé"
     switch_views: "Basculer les fenêtres"
+    tabs: 
+      arrows: Flèches
+      basic: Simple
+      delimiters: Délimiteurs
+      greek: Grec
+      misc: Divers
+      operators: Opérateurs
+      relationships: Relations
     url: "URL :"
   editor_accessibility: 
     accessibles: 
@@ -4501,6 +4582,12 @@ fr:
       invited: Invité
       pending: "En attente"
       rejected: Rejeté
+  enrollmentNames: 
+    course_designer: "Concepteur de cours"
+    observer: Observateur
+    student: Étudiant
+    teacher: Enseignant
+    teacher_assistant: AE
   enrollment_term: 
     errors: 
       not_unique: "L’ID SIS \"%{sis_source_id}\" est déjà utilisé."
@@ -4511,7 +4598,7 @@ fr:
     confirm_delete_message: "Voulez-vous vraiment supprimer ce message ?"
     confirm_delete_page: "Supprimer cette page et tout son contenu ?"
     confirm_delete_section: "Supprimer cette section et toutes ses pages ?"
-    default_description: "Envoi de mon devoir %{assignment} pour %{course}."
+    default_description: "Envoi de mon travail %{assignment} pour %{course}."
     eportfolio_settings: "Paramètres du portefeuille électronique"
     errors: 
       compiling: "Erreur lors de la compilation du portefeuille électronique Veuillez réessayer dans quelques instants."
@@ -4596,7 +4683,7 @@ fr:
         submission: "Envoi d’étudiant pour %{assignment}, créé le %{created_date}"
       links: 
         download_attachment: "Cliquez ici pour télécharger *%{attachment}*"
-        submission_url: "Afficher l’URL envoyée pour ce devoir"
+        submission_url: "Afficher l’URL envoyée pour cette tâche"
       not_rendered: "Impossible de trouver l’envoi qui se trouvait à cet endroit, ou le type d’envoi n’est pas pris en charge pour l’exportation."
       rich_text: 
         default_content: "Aucune information n’a été entrée."
@@ -4643,7 +4730,7 @@ fr:
       labels: 
         add_comment: "Ajouter un commentaire"
         allow_comments: "Autoriser les commentaires sur cette page"
-        choose_submission: "Sélectionnez l’envoi d’un devoir à incorporer dans cette page"
+        choose_submission: "Sélectionnez l’envoi d’une tâche à incorporer dans cette page"
         eportfolio_name: "Nom du portefeuille électronique"
         file_select: "Sélectionnez un fichier à inclure dans cette page"
         file_upload: "Ou téléchargez un fichier"
@@ -4771,7 +4858,7 @@ fr:
         url: url
         user: utilisateur
       message_contains: "Le message contient"
-    no_attached_file: "Vous devez joindre au moins un fichier à ce devoir."
+    no_attached_file: "Vous devez joindre au moins un fichier à cette tâche."
     registration_incomplete: "Vous devez confirmer votre adresse e-mail pour pouvoir consulter cette page."
     sis_id_in_use: "L’ID SIS \"%{sis_id}\" est déjà utilisé."
   external_content: 
@@ -4818,6 +4905,7 @@ fr:
       delete_tool: "Supprimer l’outil"
       edit_tool: "Modifier l’outil"
       editor_button_configured: "Touche de l’éditeur configurée"
+      homework_submission_configured: "L’envoi du travail à la maison est maintenant configuré."
       labels: 
         consumer_key: "Code client"
         description: Description
@@ -4835,7 +4923,7 @@ fr:
       custom_fields_explanation: "(un par ligne, format : nom=valeur)"
       domain: Domaine
       email_only: "E-mail uniquement"
-      external_tools_note: "Les outils externes (LTI) permettent d’ajouter facilement de nouvelles fonctionnalités à Canvas.⏎ Ces outils peuvent être ajoutés à des cours individuels ou à tous les cours d’un compte.⏎ Une fois qu’ils sont configurés, vous pouvez créer un lien via les modules des cours et créer des devoirs pour⏎ les outils d’évaluation.⏎ ⏎ Cliquez [ici](%{lti_index_url}) pour voir quelques outils LTI tout à fait compatibles avec Canvas. Vous pouvez également consulter les rubriques de la communauté Canvas à propos des outils LTI [ici](%{lti_examples_url})."
+      external_tools_note: "Les outils externes (LTI) permettent d’ajouter facilement de nouvelles fonctionnalités à Canvas.⏎ Ces outils peuvent être ajoutés à des cours individuels ou à tous les cours d’un compte.⏎ Une fois qu’ils sont configurés, vous pouvez créer un lien via les modules des cours et créer des tâches pour⏎ les outils d’évaluation.⏎ ⏎ Cliquez [ici](%{lti_index_url}) pour voir quelques outils LTI tout à fait compatibles avec Canvas. Vous pouvez également consulter les rubriques de la communauté Canvas à propos des outils LTI [ici](%{lti_examples_url})."
       labels: 
         config_type: "Type de configuration"
         config_url: "URL de configuration"
@@ -4884,11 +4972,11 @@ fr:
       learn_more: "Pour en savoir plus, voir instructure.com."
       more_information: "Pour plus d’informations, voir %{domain_list}."
       no_messages_notice: "Alors que le cours évolue, vous verrez les notifications s’afficher ici pour vous informer de ce qui se passe dans votre compte Canvas."
-      notification_about: "L’application Canvas Facebook vous offre un accès plus aisé aux interactions qui ont lieu dans vos cours. Vous pouvez la paramétrer de sorte qu’elle vous envoie des notifications lorsque des devoirs sont notés, des dates d’échéance modifiées, etc. Vos données privées resteront confidentielles dans Canvas."
+      notification_about: "L’application Canvas Facebook vous offre un accès plus aisé aux interactions qui ont lieu dans vos cours. Vous pouvez la paramétrer de sorte qu’elle vous envoie des notifications lorsque des tâches sont notées, des dates d’échéance modifiées, etc. Vos données privées resteront confidentielles dans Canvas."
       notification_settings: "Paramètres de notification"
       notifications_notice: "Ci-dessous, vous trouverez une liste de vos dernières notifications Canvas. Si vous ajoutez cette application dans vos signets, vous pourrez voir le nombre de nouvelles notifications Canvas depuis votre page d’accueil Facebook."
       welcome: "Bienvenue de retour parmi nous %{name} !"
-      welcome_message: "Bienvenue dans une nouvelle génération de logiciels de formation en ligne, offerte par Instructure. Notre rôle est de vous aider à utiliser simplement le Web pour améliorer la formation. Notre interface est simple, épurée et ouverte, et nous travaillons avec les outils que vous et vos étudiants utilisez déjà -- comme Facebook par exemple -- pour offrir une expérience d’apprentissage ouverte et collaborative. Nous avons tout intégré dans un progiciel puissant et ouvert qui offre davantage qu’un suivi des devoirs. Il encourage les interactions et favorise l’apprentissage."
+      welcome_message: "Bienvenue dans une nouvelle génération de logiciels de formation en ligne, offerte par Instructure. Notre rôle est de vous aider à utiliser simplement le Web pour améliorer la formation. Notre interface est simple, épurée et ouverte, et nous travaillons avec les outils que vous et vos étudiants utilisez déjà -- comme Facebook par exemple -- pour offrir une expérience d’apprentissage ouverte et collaborative. Nous avons tout intégré dans un progiciel puissant et ouvert qui offre davantage qu’un suivi du travail personnel. Il encourage les interactions et favorise l’apprentissage."
       welcome_title: "Bienvenue dans Instructure Canvas."
     index_disabled: 
       disabled_notice: "Ce site Canvas n’est pas configuré pour communiquer avec Facebook."
@@ -5167,7 +5255,7 @@ fr:
       students_updated: 
         one: "1 étudiant mis à jour"
         other: "%{count} étudiants mis à jour"
-    assignment_details: "Informations du devoir"
+    assignment_details: "Informations sur la tâche"
     buttons: 
       change_section: "Modifier la section"
       saving_settings: "Enregistrement des paramètres..."
@@ -5202,8 +5290,8 @@ fr:
     hide_all_things: "Tout masquer %{things}"
     hide_column: "Masquer une colonne"
     hide_student_name: "Masquer les noms des étudiants"
-    ignore_ungraded: "Ignorer les devoirs non notés"
-    include_ungraded: "Inclure les devoirs non notés"
+    ignore_ungraded: "Ignorer les tâches non notées"
+    include_ungraded: "Inclure les tâches non notées"
     labels: 
       details: Informations
     links: 
@@ -5215,7 +5303,7 @@ fr:
       view_submission: "Afficher l’envoi"
     loud_late: "EN RETARD"
     message_students_who: "Envoyer un message aux étudiants qui..."
-    mute_assignment: "Devoir silencieux"
+    mute_assignment: "Tâche silencieuse"
     new_assessment: "[Nouvelle évaluation]"
     no_submission_time: "aucune heure d’envoi"
     nth_student: "Étudiant %{n}"
@@ -5241,11 +5329,11 @@ fr:
       scored_less_than: "Note inférieure à"
       scored_more_than: "Note supérieure à"
     submission_information: "Informations de l’envoi"
-    teacher_muted_title: "Le devoir est silencieux"
+    teacher_muted_title: "La tâche est silencieuse"
     titles: 
-      assignment_groups: "Groupes de devoirs"
+      assignment_groups: "Groupes de tâches"
       click_to_record: "Cliquez sur le micro pour enregistrer vos commentaires"
-      dropped_assignment_no_total: "Ce devoir ne sera pas pris en compte dans le calcul du total"
+      dropped_assignment_no_total: "Cette tâche ne sera pas prise en compte dans le calcul du total"
       hypothetical_score: "Ceci est une note hypothétique"
       loading: "Chargement en cours..."
       turnitin_score: "Note de similitude Turnitin -- informations complémentaires"
@@ -5260,8 +5348,8 @@ fr:
         error: "Cote de similitude de Turnitin - Voir le détail des erreurs d’envoi"
         pending: "Cote de similitude de Turnitin - Envoi en attente"
         score: "Cote de similitude de Turnitin - Voir le rapport détaillé"
-    unmute_assignment: "Annuler un devoir silencieux"
-    unmute_button: "Annuler un devoir silencieux"
+    unmute_assignment: "Annuler une tâche silencieuse"
+    unmute_button: "Annuler une tâche silencieuse"
     upload_scores: "Télécharger les notes (de %{format})"
     view_grading_history: "Afficher l’historique de notation"
   gradebook2: 
@@ -5271,21 +5359,21 @@ fr:
         one: "1 note d’étudiant mise à jour"
         other: "%{count} notes d’étudiant mises à jour"
     all_sections: "Toutes les sections"
-    assignment_muted: "Devoir silencieux"
+    assignment_muted: "Tâche silencieuse"
     column_header: 
-      assignment_options: "Options du devoir"
+      assignment_options: "Options de la tâche"
       points_out_of: "Sur %{assignment.points_possible}"
-      this_assignment_is_muted: "Ce devoir est silencieux"
-      zero_point_assignment: "Les devoirs de ce groupe ne peuvent pas avoir de points et ils ne peuvent pas être inclus dans le calcul de la note."
+      this_assignment_is_muted: "Cette tâche est silencieuse"
+      zero_point_assignment: "Les tâches de ce groupe ne peuvent pas avoir de points et elles ne peuvent pas être incluses dans le calcul de la note."
     concluded_course_error_message: "Ce cours est clos, aussi seules les inscriptions closes sont disponibles."
     dropped_for_grading: "Abandonné pour des raisons de notation"
     error: 
-      update: "Une erreur s’est produite pendant la mise à jour de ce devoir. Veuillez réactualiser la page et recommencer."
+      update: "Une erreur s’est produite pendant la mise à jour de cette tâche. Veuillez réactualiser la page et recommencer."
     errors: 
       none_to_update: "Aucune mise à jour nécessaire"
       upload_as_zip: "Veuillez télécharger les fichiers sous forme de fichier zip."
     gradebook_header_menu: 
-      assignment_details: "Informations du devoir"
+      assignment_details: "Informations sur la tâche"
       curve_grades: "Courbe des notes"
       download_submissions: "Télécharger les envois"
       message_students_who: "Envoyer un message aux étudiants qui..."
@@ -5296,7 +5384,7 @@ fr:
     invalid_assignment_groups_warning: 
       one: "Le résultat n’inclut pas %{groups} parce qu’il n’a                   pas de points possibles"
       other: "Le résultat n’inclut pas %{groups} parce qu’ils n’ont                    pas de points possibles"
-    no_assignments_have_points_warning: "Impossible de calculer le résultat jusqu’à ce qu’un devoir ait des points possibles"
+    no_assignments_have_points_warning: "Impossible de calculer le résultat jusqu’à ce qu’une tâche ait des points possibles"
     percent_of_grade: "%{percentage} de la note"
     points_out_of: "sur %{points_possible}"
     resubmitted: "Renvoyé depuis la dernière note"
@@ -5307,7 +5395,7 @@ fr:
       choose_a_section_to_show: "Choisir une section à afficher"
     show: 
       arrange_columns_by_due_date: "Placer les colonnes par date d’échéance"
-      arrange_columns_by_group: "Placer les colonnes par groupe de devoirs"
+      arrange_columns_by_group: "Placer les colonnes par groupe de tâches"
       download_scores: "Télécharger les notes (.csv)"
       filter_by_student: "Filtrer par nom d’étudiant ou ID secondaire"
       go_back_to_the_old_gradebook: "Revenir à l’ancien relevé de notes"
@@ -5355,16 +5443,16 @@ fr:
         one: "1 envoi a été mis à jour."
         other: "%{count} envois ont été mis à jour."
     show: 
-      assignment_answer: "Ce devoir est"
+      assignment_answer: "Cette tâche est"
       assignment_example: "Questionnaire sur les indices boursiers"
-      assignment_question: "Devoir en question"
+      assignment_question: "Tâche en question"
       buttons: 
         continue: "Continuer %{icon}"
         save_changes: "Enregistrer les modifications"
       choose_option: "-- Choisir --"
       headers: 
         import_error: "Les données téléchargées comportent des erreurs :"
-        missing_assignment: "Vous avez téléchargé des devoirs qui ne semblaient pas apparaître dans votre relevé de notes auparavant. Veuillez m’indiquer s’il s’agit d’un nouveau devoir ou d’un devoir existant."
+        missing_assignment: "Vous avez téléchargé des tâches qui ne semblaient pas apparaître dans votre relevé de notes auparavant. Veuillez m’indiquer s’il s’agit d’une nouvelle tâche ou d’une tâche existante."
         missing_student: "Vous avez téléchargé des lignes pour les étudiants suivants ; impossible de savoir de quels étudiants de votre classe il s’agit. Veuillez m’indiquer de quels étudiants il s’agit."
         no_changes: "Aucun changement n’a été détecté dans le relevé de notes que vous avez téléchargé."
       ignore_assignment_option: "Ceci est un faux, l’ignorer"
@@ -5373,9 +5461,9 @@ fr:
         points_possible: "Points possibles"
       links: 
         back: "Revenir au relevé de notes"
-      new_assignment_option: "Un nouveau devoir"
+      new_assignment_option: "Une nouvelle tâche"
       notices: 
-        unchanged: "Remarque : vous avez téléchargé des devoirs pour lesquels aucune modification de note n’a été détectée. Ceux-ci ont été masqués."
+        unchanged: "Remarque : vous avez téléchargé des tâches pour lesquelles aucune modification de note n’a été détectée. Celles-ci ont été masquées."
       page_title: "Relevé de notes"
       student_answer: "Cette personne est vraiment"
       student_example: Quelqu’un
@@ -5386,14 +5474,14 @@ fr:
     buttons: 
       upload_data: "Télécharger les données"
     example_csv_file: "Fichier CSV d’exemple"
-    existing_assignment_example: "Devoir existant (581)"
+    existing_assignment_example: "Tâche existante (581)"
     explanation_of_required_columns: "Vous avez besoin de *toutes* ces colonnes, vous avez *besoin* d’une seule par ligne."
     instructions: 
       csv_download_and_upload: "Si vous ne savez pas, vous pouvez toujours *télécharger un fichier CSV*, modifier les notes souhaitées et retélécharger le même fichier."
     labels: 
       upload: "Choisissez un fichier CSV à télécharger :"
-    leaving_id_will_match_better_can_add_new_assignment: "Laisser l’ID intact (la partie \"(581)\" dans ce cas) aidera à mieux combiner. Vous pouvez aussi ajouter de nouveaux devoirs créés à la volée."
-    new_assignment_example: "Nouveau devoir"
+    leaving_id_will_match_better_can_add_new_assignment: "Laisser l’ID intact (la partie \"(581)\" dans ce cas) aidera à mieux combiner. Vous pouvez aussi ajouter de nouvelles tâches créées à la volée."
+    new_assignment_example: "Nouvelle tâche"
     optional_ignored: "Optionnel, ignoré."
     titles: 
       upload_form: "Choisissez un fichier CSV à télécharger"
@@ -5401,22 +5489,22 @@ fr:
   gradebooks: 
     assignment: 
       gradebook: 
-        unmute_assignment: "Annuler un devoir silencieux"
+        unmute_assignment: "Annuler une tâche silencieuse"
       out_of_points_possible: "*sur* %{points_possible}"
       points_possible_of_grade: "%{points_possible} *de la note*"
-      teacher_muted_title: "Devoir silencieux"
-      unmute_dialog: "Ce devoir est actuellement silencieux. Cela signifie que les étudiants ne peuvent pas voir leurs notes et leurs corrections. Voulez-vous annuler le devoir silencieux maintenant ?"
-      zero_point_assignment: "Les devoirs de ce groupe n’ont pas de points possibles et ne peuvent pas être inclus dans le calcul de la note"
+      teacher_muted_title: "Tâche silencieuse"
+      unmute_dialog: "Cette tâche est actuellement silencieuse. Cela signifie que les étudiants ne peuvent pas voir leurs notes et leurs corrections. Voulez-vous annuler la tâche silencieuse maintenant ?"
+      zero_point_assignment: "Les tâches de ce groupe n’ont pas de points possibles et ne peuvent pas être incluses dans le calcul de la note"
     assignments: 
       options: Options
       refresh_grades: "Actualiser les notes"
       titles: 
         refresh_scores: "Actualiser les notes"
     attendance: 
-      attendance_info: "Aucun devoir de participation n’a été créé."
+      attendance_info: "Aucune tâche de participation n’a été créée."
       buttons: 
-        add_assignment: "Ajouter un devoir"
-      edit_attendance_info: "Pour modifier les informations pour un devoir de participation, cliquez sur l’icône de liste déroulante en dessous du nom du devoir, puis cliquez sur \"Modifier le devoir\"."
+        add_assignment: "Ajouter une tâche"
+      edit_attendance_info: "Pour modifier les informations d’une tâche de participation, cliquez sur l’icône de liste déroulante sous le nom de la tâche, puis cliquez sur \"Modifier la tâche\"."
       headers: 
         attendance: Participation
         edit_attendance: "Modifier les informations de participation"
@@ -5431,7 +5519,7 @@ fr:
         title: Titre
       links: 
         add_column: "Ajouter une colonne"
-      mark_attendance_info: "La vue de participation affiche un tableau avec les étudiants énumérés dans la colonne de gauche et les devoirs dans la ligne du haut. Pour indiquer qu’un étudiant est présent ou absent, cliquez sur la case correspondante jusqu’à obtenir la marque souhaitée (%{present_icon} pour présent, %{absent_icon} pour absent). Vous pouvez aussi utiliser la liste déroulante pour chaque devoir afin d’indiquer la présence ou l’absence de tous."
+      mark_attendance_info: "La vue de participation affiche un tableau avec les étudiants énumérés dans la colonne de gauche et les tâches dans la ligne du haut. Pour indiquer qu’un étudiant est présent ou absent, cliquez sur la case correspondante jusqu’à obtenir la marque souhaitée (%{present_icon} pour présent, %{absent_icon} pour absent). Vous pouvez aussi utiliser la liste déroulante pour chaque tâche afin d’indiquer la présence ou l’absence de tous."
       new_group: "Nouveau groupe"
       page_title: Participation
       points_abbrev: points
@@ -5473,7 +5561,7 @@ fr:
         low_score: Faible
         mean: Moyenne
         mean_score: Moyenne
-        only_graded: "Calcul basé uniquement sur les devoirs notés"
+        only_graded: "Calcul basé uniquement sur les tâches notées"
         total: Total
         your_score: "Votre note"
       links: 
@@ -5503,7 +5591,7 @@ fr:
       buttons: 
         by_due_date: "Par échéance"
         by_email: "Par e-mail/ID"
-        by_group: "Par groupe de devoirs"
+        by_group: "Par groupe de tâches"
         by_name: "Par nom d’étudiant"
         by_section: "Par nom de section"
         by_total_asc: "Par total (dans l’ordre croissant)"
@@ -5514,7 +5602,7 @@ fr:
         set_grade: "Définir une note"
         update: "Mettre à jour"
         upload: "Télécharger des fichiers"
-      curve_average: "Entrez une note moyenne pour la courbe *du devoir*. Le graphique affiche sa meilleure proposition de normalisation des notes en fonction des notes actuelles des étudiants."
+      curve_average: "Entrez une note moyenne pour la courbe *de la tâche*. Le graphique affiche sa meilleure proposition de normalisation des notes en fonction des notes actuelles des étudiants."
       default_grades: "Donner à tous les étudiants actuellement visibles la même note pour %{class} en entrant et en envoyant une valeur de note ci-dessous :"
       download: "Télécharger %{attachment}"
       grade_statistics: "Statistiques des notes pour %{assignment}"
@@ -5536,12 +5624,12 @@ fr:
         sort_rows: "Trier les lignes du relevé de notes"
         total_submitted: "Total envoyé"
       links: 
-        add_assignments: "Ajouter des devoirs au cours"
+        add_assignments: "Ajouter des tâches au cours"
         add_students: "Ajouter des étudiants au cours"
         attach_file: "Joindre un fichier"
-        manage: "Gérer les groupes de devoirs"
+        manage: "Gérer les groupes de tâches"
       loading_submission: "Chargement des informations d’envoi..."
-      no_assignments: "Encore aucun devoir créé pour ce cours."
+      no_assignments: "Encore aucune tâche créée pour ce cours."
       no_comments: "Aucun commentaire"
       no_students: "Aucun étudiant inscrit à ce cours."
       out_of_points_possible: "*sur* %{points_possible}"
@@ -5594,10 +5682,10 @@ fr:
     invalid_assignment_groups_warning: 
       one: "Le résultat n’inclut pas %{groups} parce qu’il n’a pas de points possibles"
       other: "Le résultat n’inclut pas %{groups} parce qu’ils n’ont pas de points possibles"
-    no_assignments_have_points_warning: "Impossible de calculer le résultat jusqu’à ce qu’un devoir ait des points possibles"
+    no_assignments_have_points_warning: "Impossible de calculer le résultat jusqu’à ce qu’une tâche ait des points possibles"
     notices: 
       unauthorized: "Vous n’êtes pas autorisé à afficher la participation pour ce cours"
-      updated: "L’envoi du devoir a été mis à jour."
+      updated: "L’envoi du travail a été mis à jour."
       uploaded: 
         one: "Fichiers et commentaires créés pour un envoi d’utilisateur"
         other: "Fichiers et commentaires créés pour %{count} envois d’utilisateur"
@@ -5607,9 +5695,9 @@ fr:
       keycode_descriptions: 
         edit_cell: "Modifier la cellule"
         more_information: "Informations complémentaires sur la cellule actuelle"
-        next_assignment: "Devoir suivant"
+        next_assignment: "Tâche suivante"
         next_student: "Étudiant suivant"
-        previous_assignment: "Devoir précédent"
+        previous_assignment: "Tâche précédente"
         previous_student: "Étudiant précédent"
         refresh_gradebook: "Actualiser le relevé de notes"
       keycodes: 
@@ -5632,15 +5720,15 @@ fr:
         submit_comment: "Envoyer un commentaire"
       due_at: "échéance le %{datetime}"
       gradebook: 
-        mute_assignment: "Devoir silencieux"
-        unmute_assignment: "Annuler un devoir silencieux"
+        mute_assignment: "Tâche silencieuse"
+        unmute_assignment: "Annuler une tâche silencieuse"
       headers: 
-        anonymous_submission: "Les réponses de cet étudiant sont masquées du fait que ce devoir est anonyme."
+        anonymous_submission: "Les réponses de cet étudiant sont masquées du fait que cette tâche est anonyme."
         assessment: Évaluation
         discussion: Discussion
         grading: Notation
-        no_submission: "Cet étudiant n’a pas d’envoi pour ce devoir"
-        submission: "Cet étudiant a envoyé le devoir."
+        no_submission: "Cet étudiant n’a pas d’envoi pour cette tâche"
+        submission: "Cet étudiant a envoyé la tâche."
       keycode_descriptions: 
         change_grade: "Modifier la note"
         leave_comment: "Laisser un commentaire"
@@ -5685,7 +5773,7 @@ fr:
       sort_by: 
         status: "par statut d’envoi (nécessite une notation, non envoyé, etc.)"
         student_name: "par nom d’étudiant (ordre alphabétique)"
-        submitted_at: "la date d’envoi du devoir"
+        submitted_at: "la date d’envoi du travail"
       student_index_of_total: "étudiant %{index} de %{total_students}"
       submitted_files: "Fichiers envoyés : (cliquez pour télécharger)"
       titles: 
@@ -5704,14 +5792,14 @@ fr:
       student: Étudiant
     student_attendance: 
       headers: 
-        assignment: Devoir
+        assignment: Tâche
         mark: Marquer
         no_attendance: Participation
         student_attendance: "Participation de %{user}"
       links: 
         grades: "Notes de %{user}"
         message_user: "Envoyer un message à %{user}"
-      no_attendance_assignments: "Aucun devoir de participation n’a été créé."
+      no_attendance_assignments: "Aucune tâche de participation n’a été créée."
       page_title: "Participation de %{user}"
       titles: 
         absent: "Marquer comme Absent, cliquez pour plus d’informations"
@@ -5724,7 +5812,7 @@ fr:
       comments_made: 
         one: "1 commentaire ajouté"
         other: "%{count} commentaires ajoutés"
-      done: "Terminé. Nous avons pris les fichiers que vous avez téléchargés et nous les avons joints avec un bref commentaire à chaque page d’envoi d’utilisateur pour ce devoir. Les étudiants recevront une notification pour les informer qu’un nouveau commentaire a été ajouté."
+      done: "Terminé. Nous avons pris les fichiers que vous avez téléchargés et nous les avons joints avec un bref commentaire à chaque page d’envoi d’utilisateur pour cette tâche. Les étudiants recevront une notification pour les informer qu’un nouveau commentaire a été ajouté."
       failures: "Certains fichiers n’ont pas pu être traités. Ils n’ont été ajoutés à aucune page d’envoi. Vous pouvez voir la liste à gauche."
       files_ignored: 
         one: "1 fichier ignoré"
@@ -5734,7 +5822,7 @@ fr:
       headers: 
         attached_files: "Les fichiers ont été joints aux envois d’utilisateurs suivants"
       links: 
-        back_to_assignment: "Revenir à la page de devoir"
+        back_to_assignment: "Revenir à la page de la tâche"
         back_to_gradebook: "Revenir au relevé de notes"
       no_comments_added: "Aucun commentaire ajouté"
       renamed_file: "renommé d’après %{filename}"
@@ -5852,7 +5940,7 @@ fr:
         one: 1 étudiant
         other: "%{count} étudiants"
       warnings: 
-        studend_groups: "Ces groupes sont organisés automatiquement par étudiants. Contrairement aux autres types de groupes, les étudiants peuvent appartenir à plusieurs de ces groupes à la fois, par conséquent ils ne constituent pas la meilleure solution pour les devoirs notés."
+        studend_groups: "Ces groupes sont organisés automatiquement par étudiants. Contrairement aux autres types de groupes, les étudiants peuvent appartenir à plusieurs de ces groupes à la fois, par conséquent ils ne constituent pas la meilleure solution pour les tâches notées."
     confirm: 
       assign_students: "Tous les étudiants non attribués seront distribués de manière aléatoire et aussi égale que possible dans les groupes d’étudiants existants."
       delete_group: "Voulez-vous vraiment supprimer ce groupe ?"
@@ -5877,7 +5965,7 @@ fr:
         invite_only: "Adhésion sur invitation uniquement"
         open_to_course_members: "Adhésion libre pour les membres du cours"
       page_title: "Groupes de cours"
-      student_group_warning: "Si votre enseignant vous a proposé de rejoindre des groupes associés à un devoir, l’adhésion aux groupes doit se faire différemment. Les groupes que vous organisez vous-même ne peuvent pas être utilisés pour la notation. Vous pouvez quand même former vos propres groupes, mais vous ne pourrez pas remettre une copie électronique de vos devoirs à moins que votre enseignant ne crée les groupes pour vous."
+      student_group_warning: "Si votre enseignant vous a proposé de rejoindre des groupes associés à une tâche, l’adhésion aux groupes doit se faire différemment. Les groupes que vous organisez vous-même ne peuvent pas être utilisés pour la notation. Vous pouvez quand même former vos propres groupes, mais vous ne pourrez pas remettre une copie électronique de vos tâches à moins que votre enseignant ne crée les groupes pour vous."
     context_manage_groups: 
       account_group_explanation: "Les groupes d’étudiants créés au niveau du compte représentent un bon moyen de créer des groupes sans être lié à un cours donné. Chaque groupe d’étudiants reçoit son calendrier, son tableau de discussion et ses outils de collaboration afin de s’organiser et de travailler ensemble plus efficacement."
       actions: 
@@ -5887,7 +5975,7 @@ fr:
       course_group_explanation: "Les groupes d’étudiants sont très utiles pour organiser les étudiants autour d’activités telles que des projets ou des essais de groupe. Chaque groupe d’étudiants reçoit son calendrier, son tableau de discussion et ses outils de collaboration afin de s’organiser et de travailler ensemble plus efficacement."
       drag_and_drop_instructions: "Cliquez et faites glisser les étudiants dans un autre groupe."
       get_started_info: "Pour commencer, cliquez sur le lien \"Créer un ensemble de groupes\" à droite."
-      group_assignment_instructions: "Vous pouvez attribuer des étudiants aléatoirement dans des groupes de taille spécifique, ou créer et organiser des groupes manuellement. Une fois que vos groupes sont créés, vous pouvez définir les devoirs comme des devoirs \"d’envoi groupé\", ce qui signifie que chaque groupe fera un envoi pour tous les utilisateurs du groupe."
+      group_assignment_instructions: "Vous pouvez attribuer des étudiants aléatoirement dans des groupes de taille spécifique, ou créer et organiser des groupes manuellement. Une fois que vos groupes sont créés, vous pouvez définir les tâches comme des tâches \"d’envoi groupé\", ce qui signifie que chaque groupe fera un envoi pour tous les utilisateurs du groupe."
       group_pages: "Pages de groupe"
       headings: 
         account_groups: "Groupes d’étudiants au niveau compte"
@@ -6009,7 +6097,7 @@ fr:
     dashboard_helper: 
       activity_category_title_with_contexts: "%{x_new_in_category} dans %{contexts_list}"
       announcement_details: "Détails de l’annonce"
-      assignment_details: "Informations du devoir"
+      assignment_details: "Informations sur la tâche"
       conversation_details: "Détails de la conversation "
       discussion_details: "Détails de la discussion"
       x_course: 
@@ -6024,7 +6112,7 @@ fr:
         other: "%{count} annonces"
       x_new_in_assignments: 
         one: "1 notification de devoir"
-        other: "%{count} notifications de devoir"
+        other: "%{count} notifications de tâche"
       x_new_in_conversations: 
         one: "1 message de conversation"
         other: "%{count} messages de conversation"
@@ -6102,7 +6190,8 @@ fr:
       view_in_new_window: "Afficher dans une nouvelle fenêtre"
     tooltips: 
       enter_search_terms: "entrer les termes de la recherche"
-  invalid_xml_syntax: "syntaxe xml incorrecte"
+  invalid_url_in_xml: "URL non valide dans le XML. Les signes & doivent être précédés d’un  caractère d’échappement."
+  invalid_xml_syntax: "Syntaxe XMLl incorrecte"
   jobs: 
     columns: 
       attempt: tentative
@@ -6175,7 +6264,7 @@ fr:
       choose_a_collection: "Choisir une collection"
   labels: 
     announcements: Annonces
-    assignments: Devoirs
+    assignments: Tâches
     calendar_events: "Événements de calendrier"
     discussions: Discussions
     external_tools: "Outils externes"
@@ -6202,7 +6291,7 @@ fr:
         home: Accueil
         skip_to_content: "Passer au contenu"
       menu: 
-        assignments: Devoirs
+        assignments: Tâches
         assignments_needing_grading: "Doivent être notés"
         assignments_needing_submitting: Remettre
         assignments_recently_graded: "Notés récemment"
@@ -6263,10 +6352,13 @@ fr:
         not_authenticated: "Vous devez vous connecter pour accéder à cette page"
         student_not_found: "Aucun étudiant trouvé"
         teacher_not_found: "Aucun enseignant trouvé"
+      not_authorized: "utilisateur non autorisé à effectuer cette action"
+      status_unauthenticated: "non authentifié"
+      status_unauthorized: "non autorisé"
     basic_lti: 
       bad_score: "Le résultat n’est pas compris entre 0 et 1."
-      no_points_comment: "Un outil externe a tenté de donner à ce devoir la note %{grade}, mais l’opération a échoué car il n’est pas possible d’attribuer des points à ce devoir."
-      no_points_possible: "Pas de points possibles pour ce devoir."
+      no_points_comment: "Un outil externe a tenté de donner à cette tâche la note %{grade}, mais l’opération a échoué car il n’est pas possible d’attribuer des points à ce travail."
+      no_points_possible: "Pas de points possibles pour cette tâche."
       no_score: "Aucun résultat donné"
     cc: 
       standard: 
@@ -6458,7 +6550,7 @@ fr:
           other: "Aucune interaction étudiant/enseignant depuis au moins %{count} jours "
         ungraded_count_description: 
           one: "Un ou plusieurs devoirs n’ont pas été notés"
-          other: "Au moins %{count} devoirs n’ont pas été notés"
+          other: "Au moins %{count} tâches n’ont pas été notées"
         ungraded_timespan_description: 
           one: "Un ou plusieurs envois n’ont pas été notés depuis un ou plusieurs jours"
           other: "Un ou plusieurs envois n’ont pas été notés depuis au moins %{count} jours"
@@ -6482,7 +6574,7 @@ fr:
         subject: "Alerte : %{user_name}"
         ungraded_count_description: 
           one: "Un ou plusieurs devoirs n’ont pas été notés"
-          other: "Au moins %{count} devoirs n’ont pas été notés"
+          other: "Au moins %{count} tâches n’ont pas été notées"
         ungraded_timespan_description: 
           one: "Un ou plusieurs envois n’ont pas été notés depuis un ou plusieurs jours"
           other: "Un ou plusieurs envois n’ont pas été notés depuis au moins %{count} jours"
@@ -6707,44 +6799,44 @@ fr:
     assignment_changed: 
       email: 
         body: |-
-            Le devoir « %{title} » pour %{course} a été modifié. 
+            La tâche « %{title} » pour %{course} a été modifiée. 
             
-            Cliquez ici pour afficher ce devoir : 
+            Cliquez ici pour afficher cette tâche : 
             %{url}
-        subject: "Le devoir a changé : %{title}, %{course}"
+        subject: "La tâche a changé : %{title}, %{course}"
       facebook: 
-        body: "Le devoir %{title_link} pour %{course} a été modifié."
+        body: "La tâche %{title_link} pour %{course} a été modifiée."
       sms: 
         body: |-
             %{title}, %{course} a changé.
             
             Informations complémentaires sur %{website}
       summary: 
-        subject: "Le devoir a changé : %{title}, %{course}"
+        subject: "La tâche a changé : %{title}, %{course}"
       twitter: 
         assignment_change: "Alerte Canvas - Modification : %{assignment_name}, %{course_name}"
     assignment_created: 
       email: 
-        assignment_created: "Devoir créé - %{assignment_name}, %{course_name}"
+        assignment_created: "Tâche créée - %{assignment_name}, %{course_name}"
         due_at: "échéance : %{assignment_due_date_time}"
         labels: 
-          click_to_see_assignment: "Cliquez ici pour afficher le devoir"
+          click_to_see_assignment: "Cliquez ici pour afficher la tâche"
         multiple_due_dates: "échéance : plusieurs dates d’échéance"
-        new_assignment: "Un nouveau devoir a été créé pour votre cours %{course_name}"
+        new_assignment: "Une nouvelle tâche a été créée pour votre cours %{course_name}"
         no_due_date: "échéance : Pas d’échéance"
       facebook: 
         due_at: "échéance : %{assignment_due_date_time}"
         multiple_due_dates: "échéance : plusieurs dates d’échéance"
-        new_assignment: "Un nouveau devoir a été créé pour %{course_name}"
+        new_assignment: "Une nouvelle tâche a été créée pour %{course_name}"
         no_due_date: "échéance : Pas d’échéance"
       sms: 
         due_at: "échéance : %{assignment_due_date_time}"
         more_info: "Informations complémentaires sur %{course_name}"
         multiple_due_dates: "échéance : plusieurs dates d’échéance"
-        new_assignment: "Nouveau devoir pour %{course_name}"
+        new_assignment: "Nouvelle tâche pour %{course_name}"
         no_due_date: "échéance : Pas d’échéance"
       summary: 
-        assignment_created: "Devoir créé - %{assignment_name}, %{course_name}"
+        assignment_created: "Tâche créée - %{assignment_name}, %{course_name}"
         due_at: "échéance : %{assignment_due_date_time}"
         multiple_due_dates: "échéance : plusieurs dates d’échéance"
         no_due_date: "échéance : Pas d’échéance"
@@ -6755,20 +6847,20 @@ fr:
         no_due_date: "échéance : Pas d’échéance"
     assignment_due_date_changed: 
       email: 
-        assignment_due_date_changed: "Changement d’échéance pour le devoir : %{assignment_name}, %{course_name}"
-        assignment_due_date_changed_sentence: "La date d’échéance du devoir %{assignment_name} pour le cours %{course_name} est à présent le :"
+        assignment_due_date_changed: "Changement d’échéance pour la tâche : %{assignment_name}, %{course_name}"
+        assignment_due_date_changed_sentence: "La date d’échéance de la tâche %{assignment_name} pour le cours %{course_name} est à présent le :"
         labels: 
-          click_to_see_assignment: "Cliquez ici pour afficher le devoir."
+          click_to_see_assignment: "Cliquez ici pour afficher la tâche."
         no_due_date: "Pas d’échéance"
       facebook: 
-        assignment_due_date_changed_sentence: "La date d’échéance du devoir *%{assignment_name}* pour le cours %{course_name} est à présent le :"
+        assignment_due_date_changed_sentence: "La date d’échéance de la tâche *%{assignment_name}* pour le cours %{course_name} est à présent le :"
         no_due_date: "Pas d’échéance"
       sms: 
         assignment_due_date_changed: "%{assignment_name}, %{course_name}, est à présent prévu pour le :"
         more_info_at_url: "Informations complémentaires sur %{web_address}"
         no_due_date: "Pas d’échéance"
       summary: 
-        assignment_due_date_changed: "Changement d’échéance pour le devoir : %{assignment_name}, %{course_name}"
+        assignment_due_date_changed: "Changement d’échéance pour la tâche : %{assignment_name}, %{course_name}"
         due_at: "échéance : %{assignment_due_date_time}"
         no_due_date: "échéance : Pas d’échéance"
       twitter: 
@@ -6777,20 +6869,20 @@ fr:
         no_due_date: "échéance : Pas d’échéance"
     assignment_due_date_override_changed: 
       email: 
-        assignment_due_date_changed: "Changement d’échéance pour le devoir : %{assignment_name}, %{course_name} (%{override})"
-        assignment_due_date_changed_sentence: "La date d’échéance du devoir %{assignment_name} pour le cours %{course_name} (%{override}) est à présent le :"
+        assignment_due_date_changed: "Changement d’échéance pour la tâche : %{assignment_name}, %{course_name} (%{override})"
+        assignment_due_date_changed_sentence: "La date d’échéance de la tâche %{assignment_name} pour le cours %{course_name} (%{override}) est à présent le :"
         labels: 
-          click_to_see_assignment: "Cliquez ici pour afficher le devoir."
+          click_to_see_assignment: "Cliquez ici pour afficher la tâche."
         no_due_date: "Pas d’échéance"
       facebook: 
-        assignment_due_date_changed_sentence: "La date d’échéance du devoir *%{assignment_name}* pour le cours %{course_name} (%{override}) est à présent le :"
+        assignment_due_date_changed_sentence: "La date d’échéance de la tâche *%{assignment_name}* pour le cours %{course_name} (%{override}) est à présent le :"
         no_due_date: "Pas d’échéance"
       sms: 
         assignment_due_date_changed: "%{assignment_name}, %{course_name} (%{override}), est à présent prévu pour le :"
         more_info_at_url: "Informations complémentaires sur %{web_address}"
         no_due_date: "Pas d’échéance"
       summary: 
-        assignment_due_date_changed: "Changement d’échéance pour le devoir : %{assignment_name}, %{course_name} (%{override})"
+        assignment_due_date_changed: "Changement d’échéance pour la tâche : %{assignment_name}, %{course_name} (%{override})"
         due_at: "échéance : %{assignment_due_date_time}"
         no_due_date: "échéance : Pas d’échéance"
       twitter: 
@@ -6815,18 +6907,18 @@ fr:
         assignment_is_due: "Alerte Canvas - Rappel : %{assignment_name}, %{course_name} est prévu pour le %{due_date}"
     assignment_graded: 
       email: 
-        assignment_graded: "Devoir noté : %{assignment_name}, %{course_name}"
+        assignment_graded: "Tâche notée : %{assignment_name}, %{course_name}"
         labels: 
           view_here: "Vous pouvez le consulter ici"
-        the_assignment_is_graded: "Le devoir %{assignment_name} a été noté."
+        the_assignment_is_graded: "La tâche %{assignment_name} a été notée."
       facebook: 
-        the_assignment_is_graded: "Le devoir %{assignment_name} a été noté."
+        the_assignment_is_graded: "La tâche %{assignment_name} a été notée."
       sms: 
         assignment_is_graded: "%{assignment_name}, %{course_name} a été noté."
         more_info_at: "Informations complémentaires sur %{web_address}"
       summary: 
-        assignment_graded: "Devoir noté : %{assignment_name}, %{course_name}"
-        the_assignment_is_graded: "Le devoir %{assignment_name} a été noté."
+        assignment_graded: "Tâche notée : %{assignment_name}, %{course_name}"
+        the_assignment_is_graded: "La tâche %{assignment_name} a été notée."
       twitter: 
         assignment_graded: "Alerte Canvas - Noté : %{assignment_name}, %{course_name}"
     assignment_grading_reminder: 
@@ -6845,10 +6937,10 @@ fr:
         ungraded_assignment: "Devoir non noté : %{assignment_name}, %{course_name}"
       twitter: 
         not_graded: "Alerte Canvas - Rappel : noter %{assignment_name}, %{course_name}, pour le %{due_date}"
-    assignment_locked: "Ce devoir est actuellement verrouillé."
-    assignment_locked_at: "Ce devoir a été verrouillé le %{at}."
-    assignment_locked_module: "Ce devoir fait partie du module *%{module}* et n’a pas encore été déverrouillé."
-    assignment_locked_until: "Ce devoir est verrouillé jusqu’au %{date}."
+    assignment_locked: "Cette tâche est actuellement verrouillée."
+    assignment_locked_at: "Cette tâche a été verrouillée le %{at}."
+    assignment_locked_module: "Cette tâche fait partie du module *%{module}* et n’a pas encore été déverrouillée."
+    assignment_locked_until: "Cette tâche est verrouillée jusqu’au %{date}."
     assignment_publishing_reminder: 
       email: 
         labels: 
@@ -6870,13 +6962,13 @@ fr:
         labels: 
           view_submission: "Vous pouvez afficher l’envoi ici"
         user_resubmitted: "Renvoi : %{user_name}, %{assignment_name}"
-        user_resubmitted_sentence: "%{user_name} vient de remettre un renvoi pour le devoir %{assignment_name} du cours %{course_name}"
+        user_resubmitted_sentence: "%{user_name} vient de remettre un renvoi pour la tâche %{assignment_name} du cours %{course_name}"
       facebook: 
         click_to_view: "Cliquez ici pour afficher l’envoi."
-        user_resubmitted: "**%{user_name}** vient de remettre un renvoi pour le devoir **%{assignment_name}** du cours %{course_name}"
+        user_resubmitted: "**%{user_name}** vient de remettre un renvoi pour la tâche **%{assignment_name}** du cours %{course_name}"
       sms: 
         more_info_at: "Informations complémentaires sur %{web_address}"
-        user_resubmitted: "%{user_name} vient de remettre (à nouveau) son devoir %{assignment_name}"
+        user_resubmitted: "%{user_name} vient de remettre (à nouveau) son travail %{assignment_name}"
       summary: 
         turned_in_at: "remis : %{submission_date}"
         user_resubmitted: "Renvoi : %{user_name}, %{assignment_name}"
@@ -6887,13 +6979,13 @@ fr:
         labels: 
           view_submission: "Vous pouvez afficher l’envoi ici"
         user_submitted: "Envoi : %{user_name}, %{assignment_name}"
-        user_submitted_sentence: "%{user_name} vient de remettre un envoi pour le devoir %{assignment_name} du cours %{course_name}"
+        user_submitted_sentence: "%{user_name} vient de remettre un envoi pour la tâche %{assignment_name} du cours %{course_name}"
       facebook: 
         click_to_view: "Cliquez ici pour afficher l’envoi."
-        user_submitted: "**%{user_name}** vient de remettre un renvoi pour le devoir **%{assignment_name}** du cours %{course_name}"
+        user_submitted: "**%{user_name}** vient de remettre un renvoi pour la tâche **%{assignment_name}** du cours %{course_name}"
       sms: 
         more_info_at: "Informations complémentaires sur %{web_address}"
-        user_submitted: "%{user_name} vient de remettre son devoir %{assignment_name}"
+        user_submitted: "%{user_name} vient de remettre son travail %{assignment_name}"
       summary: 
         turned_in_at: "remis : %{submission_date}"
         user_submitted: "Envoi : %{user_name}, %{assignment_name}"
@@ -6903,17 +6995,17 @@ fr:
       email: 
         labels: 
           view_submission: "Vous pouvez afficher l’envoi ici"
-        user_resubmitted_sentence: "%{user_name} vient de remettre un envoi en retard pour le devoir %{assignment_name} du cours %{course_name}"
-        user_submitted: "Devoir en retard : %{user_name}, %{assignment_name}"
+        user_resubmitted_sentence: "%{user_name} vient de remettre un envoi en retard pour la tâche %{assignment_name} du cours %{course_name}"
+        user_submitted: "Travail en retard : %{user_name}, %{assignment_name}"
       facebook: 
         click_to_view: "Cliquez ici pour afficher l’envoi."
-        user_resubmitted_sentence: "**%{user_name}** vient de remettre un envoi en retard pour le devoir **%{assignment_name}** du cours %{course_name}"
+        user_resubmitted_sentence: "**%{user_name}** vient de remettre un envoi en retard pour la tâche **%{assignment_name}** du cours %{course_name}"
       sms: 
         more_info_at: "Informations complémentaires sur %{web_address}"
-        user_submitted: "%{user_name} vient de remettre (en retard) son devoir %{assignment_name}"
+        user_submitted: "%{user_name} vient de remettre (en retard) son travail %{assignment_name}"
       summary: 
         turned_in_at: "remis : %{submission_date}"
-        user_submitted: "Devoir en retard : %{user_name}, %{assignment_name}"
+        user_submitted: "Travail en retard : %{user_name}, %{assignment_name}"
       twitter: 
         user_submitted: "Alerte Canvas - Envoi en retard : %{user_name}, %{assignment_name}"
     assignment_unmuted: 
@@ -6923,7 +7015,7 @@ fr:
             
             Vous pouvez les consulter ici :
             %{url}
-        subject: "Devoir silencieux annulé : %{title}, %{course}"
+        subject: "Tâche silencieuse annulée : %{title}, %{course}"
       sms: 
         body: |-
             Votre formateur a publié des notes et des commentaires pour %{title}, %{course}.
@@ -6931,7 +7023,7 @@ fr:
             Informations complémentaires sur %{website}
       summary: 
         subject: "Notes et commentaires publiés pour : %{title}, %{course}"
-    assignment_unpublished_module: "Ce devoir fait partie d’un module non publié et n’est pas encore disponible."
+    assignment_unpublished_module: "Cette tâche fait partie d’un module non publié et n’est pas encore disponible."
     collaboration_invitation: 
       email: 
         body: |-
@@ -7241,24 +7333,24 @@ fr:
     grade_weight_changed: 
       email: 
         grade_changed: "Les règles de notation pour le cours %{course_name} ont changé."
-        grading_based_on_points: "La notation est basée sur le total des points de tous les devoirs."
+        grading_based_on_points: "La notation est basée sur le total des points de toutes les tâches."
         labels: 
-          grades_based_on_percent: "La notation est basée sur le total pondéré pour chaque groupe de devoirs"
+          grades_based_on_percent: "La notation est basée sur le total pondéré pour chaque groupe de tâches"
           now_see_here: "Vous pouvez consulter les informations ici"
           subject: "Coefficient modifié"
       facebook: 
-        grading_based_on_points: "La notation est basée sur le total des points de tous les devoirs."
+        grading_based_on_points: "La notation est basée sur le total des points de toutes les tâches."
         grading_policy_changed: "Les règles de notation pour **[%{course_name}](%{course_url})** ont changé."
         labels: 
-          grades_based_on_percent: "La notation est basée sur le total pondéré pour chaque groupe de devoirs."
+          grades_based_on_percent: "La notation est basée sur le total pondéré pour chaque groupe de tâches."
       sms: 
         grade_changed: "Les règles de notation pour le cours %{course_name} ont changé."
         more_info_at: "Informations complémentaires sur %{course_url}"
       summary: 
         grade_changed: "Les règles de notation pour le cours %{course_name} ont changé."
-        grading_based_on_points: "La notation est basée sur le total des points de tous les devoirs."
+        grading_based_on_points: "La notation est basée sur le total des points de toutes les tâches."
         labels: 
-          grades_based_on_percent: "La notation est basée sur le total pondéré pour chaque groupe de devoirs."
+          grades_based_on_percent: "La notation est basée sur le total pondéré pour chaque groupe de tâches."
           subject: "Coefficient modifié"
       twitter: 
         grade_changed: "Alerte Canvas - Modification des règles de notation : %{course_name}"
@@ -7267,15 +7359,15 @@ fr:
         body: "Le groupe %{group_name} vient de remettre un envoi en retard pour %{assignment_name} du cours %{course_name}."
         labels: 
           view_submission_here: "Vous pouvez afficher l’envoi ici"
-        subject: "Devoir en retard : %{group_name}, %{assignment_name}"
+        subject: "Travail en retard : %{group_name}, %{assignment_name}"
       facebook: 
         body: "Le groupe %{group_name} vient de remettre un envoi en retard pour **[%{assignment_name}](%{assignment_url})** du cours %{course_name}."
       sms: 
         more_info: "Informations complémentaires sur %{web_address}"
-        subject: "%{group_name} vient de remettre (en retard) son devoir %{assignment_name}"
+        subject: "%{group_name} vient de remettre (en retard) son travail %{assignment_name}"
       summary: 
         body: "Le groupe %{group_name} a remis un envoi en retard pour %{assignment_name} du cours %{course_name}."
-        subject: "Devoir en retard : %{group_name}, %{assignment_name}"
+        subject: "Travail en retard : %{group_name}, %{assignment_name}"
       twitter: 
         subject: "Alerte Canvas - Envoi groupé en retard : %{group_name}, %{assignment_name}"
     group_membership_accepted: 
@@ -7683,8 +7775,8 @@ fr:
         tweet: "Alerte Canvas - Commentaire : %{author} pour %{assignment}, %{user}, %{context}."
     submission_grade_changed: 
       email: 
-        body: "La note de votre devoir %{assignment_title} a été modifiée."
-        link_message: "Vous pouvez consulter le devoir ici :"
+        body: "La note de votre travail %{assignment_title} a été modifiée."
+        link_message: "Vous pouvez consulter la tâche ici :"
         no_date_set: "Aucune date définie"
         not_applicable: NA
         regraded_date: "renoté le : %{date}"
@@ -7692,7 +7784,7 @@ fr:
         score_pending: "révision en attente de la note par l’enseignant"
         subject: "Note modifiée : %{assignment}, %{context}"
       facebook: 
-        body: "La note de votre devoir *%{title}* a été modifiée."
+        body: "La note de votre travail *%{title}* a été modifiée."
         no_date_set: "Aucune date définie"
         not_applicable: NA
         regraded_date: "renoté : %{date}"
@@ -7721,16 +7813,16 @@ fr:
         tweet: "Alerte Canvas - Modification de note : %{date}"
     submission_graded: 
       email: 
-        body: "Votre devoir %{assignment} a été noté."
+        body: "Votre travail %{assignment} a été noté."
         graded_date: "noté le : %{date}"
-        link_message: "Vous pouvez consulter le devoir ici :"
+        link_message: "Vous pouvez consulter la tâche ici :"
         no_date_set: "Aucune date définie"
         not_applicable: NA
         score: "note : %{score} sur %{total}"
         score_pending_review: "révision en attente de la note par l’enseignant"
-        subject: "Devoir noté : %{assignment}, %{context}"
+        subject: "Tâche notée : %{assignment}, %{context}"
       facebook: 
-        body: "Votre devoir *%{title}* a été noté."
+        body: "Votre travail *%{title}* a été noté."
         graded_date: "noté le : %{date}"
         no_date_set: "Aucune date définie"
         not_applicable: NA
@@ -7750,7 +7842,7 @@ fr:
         not_applicable: NA
         score: "note : %{score} sur %{total}"
         score_pending_review: "révision en attente de la note par l’enseignant"
-        subject: "Devoir noté : %{assignment}, %{context}"
+        subject: "Tâche notée : %{assignment}, %{context}"
       twitter: 
         no_date_set: "Aucune date définie"
         not_applicable: NA
@@ -7804,23 +7896,26 @@ fr:
         subject: "Invitation à la conférence Web : %{name}"
       twitter: 
         tweet: "Alerte Canvas - Invitation : participer à %{title}, %{name}"
+  migration_issues: 
+    errors: 
+      valid_workflow_state: "Un état de workflow valide doit être envoyé."
   mute_dialog: 
-    curving_assignments: "Courbe des devoirs"
+    curving_assignments: "Courbe des tâches"
     grade_change_notifications: "Notifications de changement de notes"
-    how_to_unmute: "Après avoir mis ce devoir en mode silencieux, vous pouvez recommencer à envoyer des notifications en cliquant sur le lien \"Annuler un devoir silencieux\"."
-    mute_assignment: "Devoir silencieux"
+    how_to_unmute: "Après avoir mis cette tâche en mode silencieux, vous pouvez recommencer à envoyer des notifications en cliquant sur le lien \"Annuler une tâche silencieuse\"."
+    mute_assignment: "Tâche silencieuse"
     score_change_notifications: "Notifications de changement de notes"
-    see_grade: "Leur note pour le devoir"
-    students_will_see: "Les étudiants pourront voir que ce devoir est en mode silencieux."
+    see_grade: "Leur note pour la tâche"
+    students_will_see: "Les étudiants pourront voir que cette tâche est en mode silencieux."
     submission_comments: "Commentaires sur l’envoi"
-    sure_you_want_to_mute: "Voulez-vous vraiment mettre ce devoir en mode silencieux ? Tant que ce devoir est en mode silencieux, les étudiants ne reçoivent pas de nouvelles notifications ni ne peuvent afficher :"
+    sure_you_want_to_mute: "Voulez-vous vraiment mettre cette tâche en mode silencieux ? Tant qu’elle sera en mode silencieux, les étudiants ne reçoivent pas de nouvelles notifications ni ne peuvent afficher :"
   not_applicable: NA
   notification: 
     added_to_conversation_description: "Pour les conversations auxquelles vous êtes ajouté"
     added_to_conversation_display: "Ajouté à la conversation"
     alert_description: "Pour les notifications d’alerte"
     alert_display: Alerte
-    all_submissions_description: "Pour tous les envois de devoirs dans les cours que vous enseignez"
+    all_submissions_description: "Pour tous les envois de tâches dans les cours que vous enseignez"
     all_submissions_display: "Tous les envois"
     announcement_description: "Pour les nouvelles annonces"
     announcement_display: Annonce
@@ -7858,7 +7953,7 @@ fr:
       submission_comment: "Commentaire sur l’envoi"
     conversation_message_description: "Pour les nouveaux messages de conversation"
     conversation_message_display: "Message de conversation"
-    course_content_description: "Pour les modifications apportées aux pages du cours"
+    course_content_description: "Pour les modifications apportées aux pages et aux tâches du cours"
     course_content_display: "Contenu du cours"
     discussion_description: "Pour les nouveaux sujets"
     discussion_display: Discussion
@@ -7875,7 +7970,7 @@ fr:
     grading_policies_display: "Règles de notation"
     invitation_description: "Pour les nouvelles invitations"
     invitation_display: Invitation
-    late_grading_description: "Pour les devoirs remis en retard"
+    late_grading_description: "Pour les tâches remises en retard"
     late_grading_display: "Notation en retard"
     membership_update_description: "Pour les notifications de changement d’adhésion"
     membership_update_display: "Mise à jour de l’adhésion"
@@ -7893,17 +7988,17 @@ fr:
       appointment_group_updated: "Groupe de rendez-vous mis à jour"
       appointment_reserved_by_user: "Rendez-vous réservé par l’utilisateur"
       appointment_reserved_for_user: "Rendez-vous réservé pour l’utilisateur"
-      assignment_changed: "Le devoir a changé"
-      assignment_created: "Le devoir a été créé"
-      assignment_due_date_changed: "La date d’échéance du devoir a changé"
+      assignment_changed: "La tâche a changé"
+      assignment_created: "La tâche a été créée"
+      assignment_due_date_changed: "La date d’échéance de la tâche a changé"
       assignment_due_date_override_changed: "Le changement de la date d’échéance a été modifié"
       assignment_due_date_reminder: "Rappel de l’échéance du devoir"
-      assignment_graded: "Le devoir a été noté"
+      assignment_graded: "La tâche a été notée"
       assignment_grading_reminder: "Rappel de notation du devoir"
       assignment_publishing_reminder: "Rappel de publication du devoir"
-      assignment_resubmitted: "Le devoir a été renvoyé"
-      assignment_submitted: "Le devoir a été envoyé"
-      assignment_submitted_late: "Le devoir a été envoyé en retard"
+      assignment_resubmitted: "La tâche a été renvoyée"
+      assignment_submitted: "La tâche a été envoyée"
+      assignment_submitted_late: "La tâche a été envoyé en retard"
       collaboration_invitation: "Invitation de collaboration"
       confirm_email_communication_channel: "Confirmer le canal de communication par e-mail"
       confirm_registration: "Confirmer l’inscription"
@@ -7918,7 +8013,7 @@ fr:
       event_date_changed: "Changement de date de l’événement"
       forgot_password: "Mot de passe oublié"
       grade_weight_changed: "Coefficient de note modifié"
-      group_assignment_submitted_late: "Devoir de groupe envoyé en retard"
+      group_assignment_submitted_late: "Travail de groupe envoyé en retard"
       group_membership_accepted: "Adhésion au groupe acceptée"
       group_membership_rejected: "Adhésion au groupe rejetée"
       merge_email_communication_channel: "Fusionner le canal de communication par e-mail"
@@ -7959,7 +8054,7 @@ fr:
     reminder_display: Rappel
     student_appointment_description: "Pour les inscriptions des étudiants aux rendez-vous et les annulations"
     student_appointment_display: "Inscriptions des étudiants aux rendez-vous"
-    submission_comment_description: "Pour les commentaires sur les envois de devoirs"
+    submission_comment_description: "Pour les commentaires sur les envois de tâches"
     submission_comment_display: "Commentaire sur l’envoi"
     submission_new_as_read: "Marquer les nouveaux commentaires d’envoi comme étant lus."
   notification_preferences: 
@@ -8085,7 +8180,7 @@ fr:
       instructions: 
         main: 
           manage: 
-            description: "*Les résultats sont créés ici pour suivre la progression des élèves dans un cours. Pour commencer, regardez la barre de menus en haut. Cliquez sur le bouton Nouveau pour créer un nouveau résultat, ou sur le bouton Nouveau groupe pour créer un nouveau groupe où classer vos résultats. Le bouton Chercher vous permet d’utiliser les résultats qui ont été créés par votre région ou votre institution. Lorsque vous créez et utilisez les résultats, vous pouvez utiliser le volet sur la gauche pour les parcourir. Vous pouvez les faire glisser et les déposer à différents niveaux pour créer une arborescence.* *Mieux encore : Canvas vous permet d’ajouter des résultats dans vos barèmes et ainsi d’évaluer la progression lorsque vous notez les devoirs. Une fois que vous avez défini les résultats, cliquez sur Gérer les barèmes pour commencer à utiliser vos résultats pour vos notations.*"
+            description: "*Les résultats sont créés ici pour suivre la progression des élèves dans un cours. Pour commencer, regardez la barre de menus en haut. Cliquez sur le bouton Nouveau pour créer un nouveau résultat, ou sur le bouton Nouveau groupe pour créer un nouveau groupe où classer vos résultats. Le bouton Chercher vous permet d’utiliser les résultats qui ont été créés par votre région ou votre institution. Lorsque vous créez et utilisez les résultats, vous pouvez utiliser le volet sur la gauche pour les parcourir. Vous pouvez les faire glisser et les déposer à différents niveaux pour créer une arborescence.* *Mieux encore : Canvas vous permet d’ajouter des résultats dans vos barèmes et ainsi d’évaluer la progression lorsque vous notez les tâches. Une fois que vous avez défini les résultats, cliquez sur Gérer les barèmes pour commencer à utiliser vos résultats pour vos notations.*"
             title: "Définition des résultats"
     mastery_error: "Doit être supérieur ou égal à 0"
     missing_outcome: "Impossible de trouver ce résultat d’apprentissage"
@@ -8118,7 +8213,7 @@ fr:
       add_rating: "Ajouter une note"
       criterion: "Notes du critère"
       criterion_definition: "Définir un critère d’utilisation dans les barèmes"
-      criterion_dialog: "Les résultats de l’apprentissage peuvent être ajoutés aux barèmes des devoirs afin d’évaluer aisément la maîtrise des résultats basée sur des devoirs spécifiques. Lorsque vous définissez un résultat d’apprentissage, vous devez également spécifier un critère à utiliser lors de la création des barèmes de devoirs. Définissez autant de colonnes de barème que nécessaires, puis spécifiez un niveau qui permettra de définir la maîtrise de ce résultat."
+      criterion_dialog: "Les résultats de l’apprentissage peuvent être ajoutés aux barèmes des tâches afin d’évaluer aisément la maîtrise des résultats basée sur des tâches spécifiques. Lorsque vous définissez un résultat d’apprentissage, vous devez également spécifier un critère à utiliser lors de la création des barèmes des tâches. Définissez autant de colonnes de barème que nécessaires, puis spécifiez un niveau qui permettra de définir la maîtrise de ce résultat."
       criterion_info_link: "Cliquez pour en savoir plus sur les notations des critères"
       description: "Décrire ce résultat"
       labels: 
@@ -8183,9 +8278,12 @@ fr:
   overrides: 
     everyone: Tous
     everyone_else: "Tous les autres"
+    lock_date_before_due_date: "La date de verrouillage ne peut pas être antérieure à la date d’échéance."
     overrides: 
       everyone: Tous
       everyone_else: "Tous les autres"
+    unlock_date_after_due_date: "La date de déverrouillage ne peut pas être postérieure à la date d’échéance."
+    unlock_date_after_lock_date: "La date de déverrouillage ne peut pas être postérieure à la date de verrouillage."
   page_comment: 
     default_user_name: Anonyme
   page_comments: 
@@ -8228,13 +8326,13 @@ fr:
       description: "Sélectionner des rapports de compte"
       name: "Rapports de compte"
     assignment_freezer: 
-      description: "Bloquer les propriétés du devoir lors de la copie"
-      name: "Outil de blocage des propriétés des devoirs"
+      description: "Bloquer les propriétés de la tâche lors de la copie"
+      name: "Outil de blocage des propriétés des tâches"
     assignment_freezer_settings: 
       description: |-
           Ce plug-in permet aux administrateurs d’activer une propriété qui empêche
-          de modifier les propriétés configurées lorsque le devoir est copié dans un autre cours.
-      no_copying_frozen: "N’autorise pas la copie des devoirs gelés."
+          de modifier les propriétés configurées lorsque la tâche est copiée dans un autre cours.
+      no_copying_frozen: "N’autorise pas la copie des tâches gelées."
     big_blue_button: 
       description: "Assistance pour les conférences Web BigBlueButton"
       name: BigBlueButton
@@ -8649,7 +8747,7 @@ fr:
           de votre part. Ces jetons sont normalement créé automatiquement pour
           les applications selon les besoins, mais si [vous développez un projet
           nouveau ou limité](%{documentation_url}) vous pouvez simplement générer le jeton à partir d’ici.
-      google_docs_description: "Une fois que vous nous avez autorisés à voir vos documents Google Docs, vous pourrez envoyer vos devoirs directement à partir de Google Docs et créer et partager vos documents avec d’autres membres de votre classe."
+      google_docs_description: "Une fois que vous nous avez autorisés à voir vos documents Google Docs, vous pourrez envoyer vos tâches directement à partir de Google Docs et créer et partager vos documents avec d’autres membres de votre classe."
       headers: 
         application_abbrev: Appl.
         dates: Dates
@@ -8897,6 +8995,8 @@ fr:
         allow_application: "%{app_name} demande à accéder à votre compte."
         email: "Votre adresse e-mail est %{email}."
         login_name: "Vous vous connectez à cette application en tant que %{user_name}."
+      labels: 
+        remember_access: "Mémoriser mon autorisation pour ce service"
       log_in: Connexion
       page_title: "Connexion à l’application"
     otp_login: 
@@ -9093,6 +9193,10 @@ fr:
   quiz_question: 
     defaults: 
       question_name: Question
+  quiz_question/numerical_question: 
+    statistics: 
+      exact_answer: "%{exact_value} +/- %{margin}"
+      inexact_answer: "%{lower_bound} jusqu’à %{upper_bound}"
   quiz_submissions: 
     errors: 
       late_quiz: "Vous avez envoyé ce questionnaire en retard, par conséquent vos réponses n’ont peut-être pas été enregistrées."
@@ -9425,7 +9529,7 @@ fr:
         delete_quiz: "Voulez-vous vraiment supprimer ce questionnaire ?"
       default_title: "Questionnaire sans titre"
       headers: 
-        assignment_quizzes: "Questionnaires de devoir"
+        assignment_quizzes: "Questionnaires sur les tâches"
         course_quizzes: "Questionnaires de cours"
         practice_quizzes: "Questionnaires d’entraînement"
         publish_multiple_quizzes: "Publier plusieurs questionnaires"
@@ -9572,7 +9676,7 @@ fr:
       filter: "Filtre IP"
       graded_quiz: "Questionnaire noté"
       graded_survey: "Enquête notée"
-      group: "Groupe de devoirs"
+      group: "Groupe de tâches"
       headers: 
         create_new_quiz: "Créer un nouveau questionnaire"
         edit_quiz: "Modifier le questionnaire"
@@ -9717,8 +9821,8 @@ fr:
       none: Aucun
       points_possible: "%{points_possible} points possibles"
       question_count: 
-        one: "<span class='label'>Questions</span> <span class='value'>%{count}</span>"
-        other: "<span class='label'>Questions</span> <span class='value'>%{count}</span>"
+        one: "<span class='title'>Questions</span> <span class='value'>%{count}</span>"
+        other: "<span class='title'>Questions</span> <span class='value'>%{count}</span>"
         zero: "Aucune question"
       quiz_availabile_through: |-
           %{start_time} à  
@@ -9766,7 +9870,7 @@ fr:
       due: Échéance
       filter: "Filtre IP"
       for: Pour
-      group: "Groupe de devoirs"
+      group: "Groupe de tâches"
       label: 
         time_limit: "Limite de durée"
       multiple_attempts: "Plusieurs tentatives"
@@ -9862,7 +9966,7 @@ fr:
     rubric: 
       loading: Chargement...
       titles: 
-        details: "Informations du barème du devoir"
+        details: "Informations du barème des tâches"
     show: 
       anonymous_student: "Étudiant %{n}"
       answers: 
@@ -9910,6 +10014,8 @@ fr:
         edit_assignment_details: "Modifier les informations du devoir"
         edit_this_quiz: "Modifier ce questionnaire"
         edit_this_survey: "Modifier cette enquête"
+        hide_student_quiz_results: "Masquer les résultats du questionnaire pour l’étudiant"
+        hide_student_survey_results: "Masquer les résultats de l’enquête pour l’étudiant"
         keep_editing_this_quiz: "Continuer de modifier ce questionnaire"
         keep_editing_this_survey: "Continuer de modifier cette enquête"
         message_students_who: "Envoyer un message aux étudiants qui..."
@@ -10187,22 +10293,24 @@ fr:
       manage_account_settings: "Gérer les paramètres du compte"
       manage_admin_users: "Ajouter/supprimer d’autres enseignants, des concepteurs de cours ou des aides-enseignants pour ce cours"
       manage_alerts: "Gérer les alertes générales"
-      manage_assignments: "Gérer (ajouter/modifier/supprimer) les devoirs et les questionnaires"
+      manage_assignments: "Gérer (ajouter/modifier/supprimer) les tâches et les questionnaires"
       manage_calendar: "Ajouter, modifier et supprimer des événements dans le calendrier du cours"
       manage_content: "Gérer tous les autres contenus du cours"
       manage_courses: "Gérer (ajouter/modifier/supprimer) des cours"
       manage_developer_keys: "Gérer les clés de développeur"
       manage_files: "Gérer (ajouter/modifier/supprimer) des fichiers de cours"
-      manage_frozen_assignment: "Gérer (modifier/supprimer) les devoirs bloqués"
+      manage_frozen_assignment: "Gérer (modifier/supprimer) les tâches bloquées"
       manage_global_outcomes: "Gérer les résultats globaux"
-      manage_grades: "Modifier des notes (comprend les barèmes d’évaluation)"
+      manage_grades: "Modifier des notes"
       manage_groups: "Gérer (créer/modifier/supprimer) des groupes"
       manage_interaction_alerts: "Gérer les alertes"
       manage_outcomes: "Gérer les résultats d’apprentissage"
       manage_role_overrides: "Gérer les autorisations"
+      manage_rubrics: "Créer et modifier des barèmes d’évaluation"
       manage_sections: "Gérer (créer/modifier/supprimer) des sections de cours"
       manage_sis: "Importer et gérer des données SIS"
       manage_site_settings: "Gérer les paramètres de site et de logiciel d’extension"
+      manage_storage_quotas: "Gérer les quotas de stockage"
       manage_students: "Ajouter/supprimer des étudiants pour le cours"
       manage_user_logins: "Modifier les informations de connexion des utilisateurs"
       manage_user_notes: "Gérer les entrées du journal des enseignants"
@@ -10219,6 +10327,7 @@ fr:
       read_roster: "Voir la liste des utilisateurs"
       send_messages: "Envoyer des messages aux participants du cours"
       send_messages_all: "Envoyer des messages à toute la classe"
+      undelete_courses: "Annuler la suppression des cours"
       view_all_grades: "Afficher toutes les notes"
       view_error_reports: "Afficher les rapports d’erreur"
       view_group_pages: "Afficher les pages de groupe de tous les groupes d’étudiants"
@@ -10241,6 +10350,7 @@ fr:
       toogle: "Cliquez pour activer ou désactiver l’autorisation"
   role_overrides: 
     account_permissions: "Autorisations du compte"
+    admin_tools_permissions: "Outils d’administration"
     course_permissions: "Autorisations du compte et du cours"
     course_role_deactivate: "Ce rôle est actuellement utilisé et il ne peut pas être supprimé. Il a été désactivé pour empêcher qu’il soit attribué à de nouveaux utilisateurs."
     index: 
@@ -10286,6 +10396,9 @@ fr:
         enable: Activer
         enable_and_lock: "Activer et verrouiller"
         use_default: "Utiliser les valeurs par défaut"
+  roster: 
+    greater_than_three: "Indiquez un élément à rechercher comprenant au moins trois caractères"
+    unknown_error: "Erreur lors de votre recherche. Veuillez réessayer."
   rubric: 
     context_name_rubric: "Barème de %{course_name}"
     errors: 
@@ -10354,7 +10467,7 @@ fr:
       titles: 
         edit_rubric: "Modifier un barème"
     titles: 
-      assignment_rubric_details: "Informations du barème de devoir"
+      assignment_rubric_details: "Informations du barème des tâches"
     user_index: 
       buttons: 
         add_rubric: "Ajouter un barème"
@@ -10541,16 +10654,16 @@ fr:
         find_user: "Chercher un utilisateur"
     add_assignment: 
       buttons: 
-        add_assignment: "Ajouter un devoir"
+        add_assignment: "Ajouter une tâche"
       labels: 
         assignment_group_id: Groupe
         due_at: Échéance
         points_possible: Points
         title: Nom
       options: 
-        assignments: Devoirs
+        assignments: Tâches
       titles: 
-        add_assignment: "Ajouter un devoir"
+        add_assignment: "Ajouter une tâche"
     add_assignment_group: 
       buttons: 
         add_group: "Ajouter un groupe"
@@ -10598,24 +10711,24 @@ fr:
       submitted_and_graded_count: "%{submitted_count} envoyés, %{graded_count} notés"
       submitted_count: "%{submitted_count} envoyés"
       tiles: 
-        sort_or_move: "Trier les devoirs ou passer à un autre groupe"
+        sort_or_move: "Trier les tâches ou passer à un autre groupe"
     assignment_group: 
       alts: 
-        add_assignment: "Ajouter un devoir"
-        delete_assignment_group: "Supprimer un groupe de devoirs"
+        add_assignment: "Ajouter une tâche"
+        delete_assignment_group: "Supprimer un groupe de tâches"
         edit_group_details: Modifier
         move: Déplacer
       defaults: 
-        group_name: "Devoirs de cours"
+        group_name: "Travail sur le cours"
       group_weight: "*%{percent}% de la note totale"
       links: 
-        add_an_assignment: "Ajouter un devoir"
+        add_an_assignment: "Ajouter une tâche"
         add_assignment: "Ajouter un devoir"
         edit_group_details: "Modifier les détails du groupe"
         hide_info: "Masquer les informations"
         more_info: "informations complémentaires..."
         reorder_groups: "Classer les groupes"
-      no_assignments: "Pas de devoirs pour l’instant"
+      no_assignments: "Pas de tâches pour l’instant"
       titles: 
         delete_assignment_group: "Supprimer un groupe de devoirs"
         percent_of_final_grade: "Pourcentage de la note finale"
@@ -10909,21 +11022,20 @@ fr:
       out_of_points: "sur %{points_possible}"
     mute_dialog: 
       gradebook: 
-        mute_assignment: "Devoir silencieux"
+        mute_assignment: "Tâche silencieuse"
       mute_dialog: |-
-          Voulez-vous vraiment mettre ce devoir en mode silencieux ? Tant que ce devoir
-          est en mode silencieux, les étudiants ne reçoivent pas de nouvelles notifications
+          Voulez-vous vraiment mettre cette tâche en mode silencieux ? Tant qu’elle sera en mode silencieux, les étudiants ne reçoivent pas de nouvelles notifications
           ni ne peuvent afficher :
           
           *  les notifications de changement de notes (lettres) ;
           *  les commentaires relatifs à l’envoi ;
-          *  les courbes des devoirs ;
+          *  les courbes des tâches ;
           *  les notifications de changement de notes (nombres).
           
-          Les étudiants pourront voir que ce devoir est en mode silencieux.
+          Les étudiants pourront voir que cette tâche est en mode silencieux.
           
-          Après avoir mis ce devoir en mode silencieux, vous pouvez recommencer à envoyer
-          des notifications en cliquant sur le lien « Annuler un devoir silencieux ».
+          Après avoir mis cette tâche en mode silencieux, vous pouvez recommencer à envoyer
+          des notifications en cliquant sur le lien « Annuler une tâche silencieuse ».
     new_course_form: 
       cancel: Annuler
       course_cose_explanation: "Ceci sera affiché dans des emplacements réduits."
@@ -11010,7 +11122,7 @@ fr:
         ratings: Notes
       labels: 
         custom_rating: "J’écrirai des commentaires libres pendant l’évaluation des étudiants"
-        grading_rubric: "Utiliser ce barème pour la notation des devoirs"
+        grading_rubric: "Utiliser ce barème pour la notation des tâches"
         title: Titre
         total_points: "Total de points"
         totallying_rubric: "Masquer le total des notes dans les résultats de l’évaluation"
@@ -11093,8 +11205,8 @@ fr:
     select_content_dialog: 
       add_to_module: "Ajouter %{item} au *module*"
       assignment_alt: Devoir
-      assignment_item: Devoir
-      assignment_notice: "Sélectionnez le devoir que vous souhaitez associer à ce *module*, ou ajoutez un devoir en sélectionnant \"Nouveau devoir\"."
+      assignment_item: Tâche
+      assignment_notice: "Sélectionnez la tâche que vous souhaitez associer à ce *module*, ou ajoutez une tâche en sélectionnant \"Nouvelle tâche\"."
       content_page_item: "Page de contenu"
       discussion_item: Discussion
       domain_match_notice: "pour utiliser cet outil, le domaine doit correspondre à %{domain}"
@@ -11111,7 +11223,7 @@ fr:
         other: "*Retrait %{count} niveaux*"
         zero: "*Pas de retrait*"
       labels: 
-        assignment_name: "Nom du devoir"
+        assignment_name: "Nom de la tâche"
         file: Fichier
         folder: Dossier
         header: En-tête
@@ -11122,14 +11234,14 @@ fr:
         topic_name: "Nom du sujet"
         url: URL
       loading: Chargement...
-      new_assignment_option: "[ Nouveau devoir ]"
+      new_assignment_option: "[ Nouvelle tâche]"
       new_file_option: "[ Nouveau fichier ]"
       new_page_option: "[ Nouvelle page ]"
       new_quiz_option: "[ Nouveau questionnaire ]"
       new_tab: "Télécharger cet outil dans un nouvel onglet"
       new_topic_option: "[ Nouveau sujet ]"
       options: 
-        assignments: Devoirs
+        assignments: Tâches
       quiz_alt: Questionnaire
       quiz_item: Questionnaire
       quiz_notice: "Sélectionnez le questionnaire que vous souhaitez associer à ce *module*, ou ajoutez un nouveau questionnaire en sélectionnant \"Nouveau questionnaire\"."
@@ -11146,7 +11258,7 @@ fr:
       next: Suivant
       previous: Précédent
     submission_comment: 
-      assignment: Devoir
+      assignment: Tâche
       grading_alt: notation
       submission_comment: "Commentaire sur l’envoi"
     turnitin_settings: 
@@ -11237,8 +11349,8 @@ fr:
       insert: 
         announcements: "Cliquez pour insérer un lien dans l’annonce"
         announcements_page: "Cliquez pour insérer un lien dans la page d’annonces"
-        assignments: "Cliquez pour insérer un lien dans le devoir"
-        assignments_page: "Cliquez pour insérer un lien dans la page des devoirs"
+        assignments: "Cliquez pour insérer un lien dans la tâche"
+        assignments_page: "Cliquez pour insérer un lien dans la page des tâches"
         collaborations_page: "Cliquez pour insérer un lien dans la page des collaborations"
         discussions: "Cliquez pour insérer un lien dans ce sujet"
         discussions_page: "Cliquez pour insérer un lien dans la page des discussions"
@@ -11256,8 +11368,8 @@ fr:
       links: 
         announcements: "Liste des annonces"
         announcements_page: "Liste des annonces"
-        assignments: "Liste des devoirs"
-        assignments_page: "Liste des devoirs"
+        assignments: "Liste des tâches"
+        assignments_page: "Liste des tâches"
         collaborations_page: Collaborations
         discussions: "Index des discussions"
         discussions_page: "Index des discussions"
@@ -11275,7 +11387,7 @@ fr:
         wiki_pages_index: "Page d’accueil de Wiki"
       links_to: 
         announcements: Annonces
-        assignments: Devoirs
+        assignments: Tâches
         discussions: Discussions
         modules: Modules
         nav: 
@@ -11420,17 +11532,17 @@ fr:
     this_was_submitted_multiple_times_choose_a_submission_to_view: "Il y a eu plusieurs envois, veuillez choisir l’envoi à afficher :"
     view_rubric_assessment_in_the_speedgrader: "Afficher l’évaluation par barème dans SpeedGrader"
   submissions: 
-    assignment_submit_success: "Le devoir a été envoyé."
-    assignment_submitted: "Devoir envoyé."
+    assignment_submit_success: "La tâche a été envoyée."
+    assignment_submitted: "Tâche envoyée."
     click_to_download: "Cliquez ici pour télécharger %{size_of_file}."
     creating_zip: "Création d’un fichier zip..."
-    download_submissions: "Télécharger les envois de devoirs"
+    download_submissions: "Télécharger les envois de tâches"
     errors: 
-      assignment_submit_fail: "Impossible d’envoyer le devoir"
-      can_not_submit_locked_assignment: "L’envoi d’un devoir est impossible lorsqu’il est verrouillé"
+      assignment_submit_fail: "Impossible d’envoyer la tâche"
+      can_not_submit_locked_assignment: "L’envoi d’une tâche est impossible lorsqu’elle est verrouillée"
       invalid_file_type: "Type de fichier non valide"
       media_file_attached: "Pas d’enregistrement de support dans l’envoi."
-      no_attached_file: "Vous devez joindre au moins un fichier à ce devoir."
+      no_attached_file: "Vous devez joindre au moins un fichier à cette tâche."
       no_report: "Impossible de trouver un rapport pour cet élément d’envoi"
       student_not_enrolled: "L’utilisateur spécifié n’est pas un étudiant appartenant à ce cours"
       student_not_enrolled_id: "L’utilisateur spécifié (%{id}) n’est pas un étudiant appartenant à ce cours"
@@ -11445,18 +11557,18 @@ fr:
         save: Enregistrer
         save_comment: "Enregistrer un commentaire"
       crumbs: 
-        assignments: Devoirs
+        assignments: Tâches
       labels: 
         add_a_comment: "Ajouter un commentaire"
         grade: Note
         show_assessment_by: "Afficher l’évaluation par"
       late_submission: "(en retard)"
       links: 
-        resubmit: "Renvoyer le devoir"
-        submit: "Envoyer un devoir"
+        resubmit: "Renvoyer la tâche"
+        submit: "Envoyer une tâche"
       media_comment: "Commentaire multimédia"
       media_comment_link: "Ceci est un commentaire multimédia, *cliquez ici pour l’afficher*"
-      only_see_your_own_comments_muted: "Il se peut que les commentaires ne soient pas visibles immédiatement, car le devoir est en cours de notation."
+      only_see_your_own_comments_muted: "Il se peut que les commentaires ne soient pas visibles immédiatement, car la tâche est en cours de notation."
       only_see_your_own_comments_peer: "En tant qu’étudiant évaluant d’autres étudiants, vous verrez uniquement vos propres commentaires."
       options: 
         new_assessment: "[Nouvelle évaluation]"
@@ -11473,12 +11585,12 @@ fr:
       submitted_at: "envoyé %{submit_date}"
       teachers_notified_of_comments: "Les enseignants et les expéditeurs de l’envoi seront informés de tous les commentaires"
     show_preview: 
-      discussion_submission_description: "Les envois pour ce devoir sont publiés dans la discussion du devoir. Ci-dessous se trouvent les billets de la discussion pour %{user}, mais vous pouvez aussi *afficher la discussion complète*."
+      discussion_submission_description: "Les envois pour cette tâche sont publiés dans la discussion la concernant. Ci-dessous se trouvent les billets de la discussion pour %{user}, mais vous pouvez aussi *afficher la discussion complète*."
       entry_no_image: "Gardez à l’esprit que cette page peut avoir été modifiée depuis l’envoi d’origine."
       entry_with_image: "Nous avons inclus une image représentant la page au moment de l’envoi. Vous pouvez également cliquer pour afficher l’envoi d’origine."
       external_url_submission: "Cet envoi correspond à une URL vers une page externe."
       file_uploads_for_user: "Téléchargements de fichiers pour **%{user}**"
-      group_discussion_submission_description: "Les envois relatifs à ce devoir sont publiés dans la discussion du groupe associé à ce devoir. Vous voyez ci-dessous les contributions destinées à  %{user}, mais vous pouvez aussi *afficher la discussion complète du groupe*."
+      group_discussion_submission_description: "Les envois relatifs à cette tâche sont publiés dans la discussion du groupe associé à cette tâche. Vous voyez ci-dessous les contributions destinées à  %{user}, mais vous pouvez aussi *afficher la discussion complète du groupe*."
       media_comment_link: "Cet envoi est un enregistrement multimédia. *cliquez ici pour afficher*."
       no_files: "Aucun fichier n’a été téléchargé pour cet envoi"
       no_preview_available: "Aucun aperçu disponible"
@@ -11520,7 +11632,7 @@ fr:
     type: Type
   tabs: 
     announcements: Annonces
-    assignments: Devoirs
+    assignments: Tâches
     chat: Discussion
     collaborations: Collaborations
     conferences: Conférences
@@ -11753,6 +11865,7 @@ fr:
       messages: 
         no_entries: "Il n’y a pas d’entrée dans le journal pour cet étudiant."
       page_title: "Journal des enseignants"
+      title: Titre
       titles: 
         journal_for: "Journal des enseignants pour %{user}"
     messages: 
@@ -11771,6 +11884,7 @@ fr:
       links: 
         delete: "Supprimer l’entrée"
       no_title: "Sans titre"
+      subheader: "%{creator} le %{created_at}"
     user_notes: 
       crumbs: 
         faculty_journal: "Journal des enseignants"
@@ -12082,7 +12196,7 @@ fr:
         last_journal_entry: "Dernière entrée dans le journal des enseignants"
         student_name: Étudiant
         teacher_activity: "Rapport d’activité de l’enseignant %{teacher}"
-        ungraded: "Devoirs non notés"
+        ungraded: "Tâches non notées"
       last_time: 
         one: "Il y a 1 jour"
         other: "Il y a %{count} jours"
@@ -12215,8 +12329,8 @@ fr:
         anyone: Tous
         only_teachers: "Uniquement les enseignants"
         teachers_and_students: "Enseignant et étudiants"
-      course_home_wiki_page_description: "Vous pouvez utiliser cette page pour organiser ou présenter votre cours comme bon vous semble. Vous pouvez aisément créer des liens vers des devoirs, des fichiers, etc. à l’aide de la section \"Outils de mise en page\" qui s’affichera à droite lorsque vous commencerez vos modifications."
-      course_wiki_page_description: "Vous pouvez utiliser ce Wiki pour créer des pages supplémentaires ou des descriptions des documents de votre cours. Vous pouvez aisément créer des liens vers des pages Wiki à partir de devoirs, ou vers d’autres documents et fichiers de cours depuis n’importe quelle page Wiki. C’est l’endroit idéal pour expliquer des concepts difficiles, participer à des projets de groupe, ou créer presque n’importe quel type de page nécessaire à votre cours."
+      course_home_wiki_page_description: "Vous pouvez utiliser cette page pour organiser ou présenter votre cours comme bon vous semble. Vous pouvez aisément créer des liens vers des tâches, des fichiers, etc. à l’aide de la section \"Outils de mise en page\" qui s’affichera à droite lorsque vous commencerez vos modifications."
+      course_wiki_page_description: "Vous pouvez utiliser ce Wiki pour créer des pages supplémentaires ou des descriptions des documents de votre cours. Vous pouvez aisément créer des liens vers des pages Wiki à partir de tâches, ou vers d’autres documents et fichiers de cours depuis n’importe quelle page Wiki. C’est l’endroit idéal pour expliquer des concepts difficiles, participer à des projets de groupe, ou créer presque n’importe quel type de page nécessaire à votre cours."
       default_wiki_page_description: "Cette page est la page Wiki par défaut, et les étudiants la verront lorsqu’ils cliqueront sur l’onglet \"Pages\" de ce cours."
       default_wiki_page_is_course_home_page_warning: "Pour l’instant, elle est également définie comme page par défaut, par conséquent les          visiteurs de votre cours verront cette page en premier. Vous pouvez modifier cela dans [la page d’accueil du cours](%{link})."
       editing_content: "Modification du contenu."
@@ -12237,7 +12351,7 @@ fr:
         page_deleted: "Cette page a été supprimée."
         page_does_not_exist: "Cette page n’existe pas."
         page_edited_while_viewing: "Cette page a été mise à jour par une autre personne depuis que vous l’avez affichée. [Cliquez ici pour télécharger de nouveau la page.](%{link})"
-        page_edited_while_viewing_detailed: "Une autre personne a modifié cette page depuis que vous l’avez téléchargée ; si vous l’envoyez maintenant, ses modifications seront supprimées. Afin d’y remédier, vous pouvez retélécharger la page et entrer de nouveau vos modifications afin d’être sûr de ne pas effacer le travail d’une autre personne."
+        page_edited_while_viewing_detailed: "Une tierce personne a modifié cette page depuis que vous l’avez téléchargée ; si vous l’envoyez maintenant, les modifications seront perdues. Pour éviter cela, vous pouvez charger à nouveau la page et répéter vos modifications afin d’être sûr de ne pas effacer le travail de quelqu’un d’autre."
       welcome_message: "Bienvenue dans le Wiki du cours"
     delete_comment_confirmation: "Voulez-vous vraiment supprimer ce commentaire ?"
     errors: 
