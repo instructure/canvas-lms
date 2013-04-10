@@ -78,6 +78,12 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
       Rake::Task["spec"].execute
     end
 
+    desc "Run non-selenium files in a single thread"
+    Spec::Rake::SpecTask.new(:single) do |t|
+      require File.expand_path(File.dirname(__FILE__) + '/parallel_exclude')
+      t.spec_files = ParallelExclude::AVAILABLE_FILES
+    end
+
     desc "Run all specs in spec directory with RCov (excluding plugin specs)"
     Spec::Rake::SpecTask.new(:rcov) do |t|
       t.spec_opts = ['--options', "\"#{Rails.root}/spec/spec.opts\""]
