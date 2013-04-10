@@ -90,7 +90,7 @@ gem 'crocodoc-ruby',  '0.0.1', :require => 'crocodoc'
 
 group :assets do
   gem 'compass-rails', '1.0.3'
-  gem 'dress_code', '1.0.1'
+  gem 'dress_code', '1.0.2'
 end
 
 group :mysql do
