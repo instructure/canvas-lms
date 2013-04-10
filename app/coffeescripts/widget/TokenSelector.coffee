@@ -260,7 +260,7 @@ define [
             $parentNode.removeClass('on')
           @updateSelectAll($parentNode, offset)
 
-    select: ($node, preserveMode = false) ->
+    select: ($node, preserveMode = false) =>
       return if $node?[0] is @selection?[0]
       @selection?.removeClass('active')
       @selection = if $node?.length

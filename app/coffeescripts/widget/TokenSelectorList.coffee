@@ -25,30 +25,30 @@ define [
     tagName: 'div'
     className: 'list'
 
-    paginationLoaderTemplate: ->
-      """
-      <div class='pagination-loader' style='height: 60px'>&nbsp;</div>
-      """
-
+    paginationLoaderTemplate: -> """
+      <div class="pagination-loader" style="height: 60px;">&nbsp;</div>
+    """
     initialize: (options) ->
-      super
-
       @selector = @options.selector
       @parent = @options.parent
       @ancestors = @options.ancestors
       @query = @options.query
 
-      @$heading = $('<ul class="heading" />').appendTo(@$el)
-      @$body = $('<ul />').appendTo(@$el)
+      @$heading                  = $('<ul />', class: 'heading').appendTo(@$el)
+      @paginationScrollContainer = $('<ul />')
+      @$body                     = @paginationScrollContainer.appendTo(@$el)
+
       @$el.find('ul')
-        .mousemove(@selector.mouseMove)
-        .mousedown(@selector.mouseDown)
-        .click(@selector.click)
+        .on('mousemove', @selector.mouseMove)
+        .on('mousedown', @selector.mouseDown)
+        .on('click', @selector.click)
 
       @collection.on 'beforeFetch', @showPaginationLoader, this
       @collection.on 'fetch', @render
+      super
 
     render: =>
+      activeIndex = @paginationScrollContainer.children('.active').index()
       @clear()
       @$selectAll = null
 
@@ -71,6 +71,7 @@ define [
       @collection.each @addOne
       @$body.find('li.toggleable').addClass('on') if @selectAllActive() or @parent?.hasClass?('on')
       @$el.toggleClass('with-toggles', @selector.options.showToggles and @$body.find('li.toggleable').length > 0)
+      @selector.select($(@paginationScrollContainer.children()[activeIndex]))
 
       if @collection.fetchingPage or @collection.fetchingNextPage
         @showPaginationLoader()
@@ -167,6 +168,7 @@ define [
       @$heading.empty()
 
     showPaginationLoader: =>
+      return if @paginationScrollContainer.children().length > 0
       rv = super
       @$paginationLoader.disableWhileLoading(@collection.deferred)
       rv
