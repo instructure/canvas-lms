@@ -1,13 +1,9 @@
 $LOAD_PATH << File.dirname(__FILE__)
+
 guard 'coffeescript', :input => 'app/coffeescripts',  :output => 'public/javascripts/compiled'
 guard 'coffeescript', :input => 'spec/coffeescripts', :output => 'spec/javascripts'
 guard 'jst',          :input => 'app/views/jst',      :output => 'public/javascripts/jst'
-guard :shell do
-  watch('app/stylesheets/.*') do
-    puts '--> creating styleguide'
-    `dress_code config/styleguide.yml`
-  end
-end
+guard :styleguide
 
 Dir[File.join(File.dirname(__FILE__),'vendor/plugins/*/Guardfile')].each do |g|
   eval(File.read(g))

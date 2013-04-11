@@ -129,7 +129,6 @@ end
 
 group :development do
   gem 'guard', '1.6.0'
-  gem 'guard-shell'
   gem 'rb-inotify', '~>0.9.0', :require => false
   gem 'rb-fsevent', :require => false
   gem 'rb-fchange', :require => false
