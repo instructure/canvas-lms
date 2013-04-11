@@ -271,7 +271,7 @@ class ApplicationController < ActionController::Base
       @headers = !!@current_user if @headers != false
       @files_domain = @account_domain && @account_domain.host_type == 'files'
       format.html {
-        store_location if request.get?
+        store_location
         return if !@current_user && initiate_delegated_login(request.host_with_port)
         if @context.is_a?(Course) && @context_enrollment
           start_date = @context_enrollment.enrollment_dates.map(&:first).compact.min if @context_enrollment.state_based_on_date == :inactive
@@ -319,18 +319,7 @@ class ApplicationController < ActionController::Base
     return @context != nil
   end
 
-  def clean_return_to(url)
-    return nil if url.blank?
-    uri = URI.parse(url)
-    return nil unless uri.path[0] == ?/
-    return "#{request.protocol}#{request.host_with_port}#{uri.path}#{uri.query && "?#{uri.query}"}#{uri.fragment && "##{uri.fragment}"}"
-  end
   helper_method :clean_return_to
-
-  def return_to(url, fallback)
-    url = clean_return_to(url) || clean_return_to(fallback)
-    redirect_to url
-  end
 
   MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS = 3
 

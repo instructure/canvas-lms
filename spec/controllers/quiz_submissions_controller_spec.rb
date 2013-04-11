@@ -111,4 +111,33 @@ describe QuizSubmissionsController do
       @qs.reload.submission_data[:a].should == 'test'
     end
   end
+
+  describe "POST 'record_answer'" do
+    before do
+      quiz_with_submission(!:complete_quiz)
+      @quiz.update_attribute(:one_question_at_a_time, true)
+    end
+
+    it "should require authentication" do
+      post 'record_answer', :quiz_id => @quiz.id, :course_id => @course.id, :id => @qsub.id, :a => 'test'
+      response.status.to_i.should == 401
+
+      @qsub.reload.submission_data[:a].should be_nil
+    end
+
+    it "should record the user's submission" do
+      user_session(@student)
+
+      post 'record_answer', :quiz_id => @quiz.id, :course_id => @course.id, :id => @qsub.id, :a => 'test'
+      response.status.to_i.should == 401
+
+      @qsub.reload.submission_data[:a].should be_nil
+    end
+
+    it "should redirect back to quiz after login if unauthorized" do
+      post 'record_answer', :quiz_id => @quiz.id, :course_id => @course.id, :id => @qsub.id, :a => 'test'
+      assert_unauthorized
+      session[:return_to].should_not be_nil
+    end
+  end
 end

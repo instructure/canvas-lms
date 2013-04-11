@@ -178,9 +178,22 @@ module AuthenticationMethods
   end
   protected :require_user
 
+  def clean_return_to(url)
+    return nil if url.blank?
+    uri = URI.parse(url)
+    return nil unless uri.path[0] == ?/
+    return "#{request.protocol}#{request.host_with_port}#{uri.path}#{uri.query && "?#{uri.query}"}#{uri.fragment && "##{uri.fragment}"}"
+  end
+
+  def return_to(url, fallback)
+    url = clean_return_to(url) || clean_return_to(fallback)
+    redirect_to url
+  end
+
   def store_location(uri=nil, overwrite=true)
     if overwrite || !session[:return_to]
-      session[:return_to] = uri || request.request_uri
+      uri ||= request.get? ? request.request_uri : request.referrer
+      session[:return_to] = clean_return_to(uri)
     end
   end
   protected :store_location
