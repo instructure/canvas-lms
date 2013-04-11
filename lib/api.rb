@@ -275,7 +275,17 @@ module Api
         end
       end
       next unless obj && rewriter.user_can_view_content?(obj)
-      file_download_url(obj.id, :verifier => obj.uuid, :download => '1', :host => host, :protocol => protocol)
+
+      if ["Course", "Group", "Account", "User"].include?(obj.context_type)
+        if match.rest.start_with?("/preview")
+          url = self.send("#{obj.context_type.downcase}_file_preview_url", obj.context_id, obj.id, :verifier => obj.uuid, :host => host, :protocol => protocol)
+        else
+          url = self.send("#{obj.context_type.downcase}_file_download_url", obj.context_id, obj.id, :verifier => obj.uuid, :download => '1', :host => host, :protocol => protocol)
+        end
+      else
+        url = file_download_url(obj.id, :verifier => obj.uuid, :download => '1', :host => host, :protocol => protocol)
+      end
+      url
     end
     html = rewriter.translate_content(html)
 

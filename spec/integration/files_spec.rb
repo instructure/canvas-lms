@@ -146,6 +146,50 @@ describe FilesController do
     # ensure that the user wasn't logged in by the normal means
     controller.instance_variable_get(:@current_user).should be_nil
   end
+  
+  it "should be able to use verifier in course context" do
+    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+    a1 = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @course)
+    HostUrl.stubs(:file_host_with_shard).returns(['files-test.host', Shard.default])
+    get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download?verifier=#{a1.uuid}"
+    response.should be_redirect
+
+    uri = URI.parse response['Location']
+    qs = Rack::Utils.parse_nested_query(uri.query)
+    uri.host.should == 'files-test.host'
+    uri.path.should == "/courses/#{@course.id}/files/#{a1.id}/course%20files/test%20my%20file%3F%20hai!%26.png"
+    qs['verifier'].should == a1.uuid
+    location = response['Location']
+    reset!
+
+    get location
+    response.should be_success
+    response.content_type.should == 'image/png'
+    # ensure that the user wasn't logged in by the normal means
+    controller.instance_variable_get(:@current_user).should be_nil
+  end
+
+  it "should be able to directly download in course context preview links with verifier" do
+    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+    a1 = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @course)
+    HostUrl.stubs(:file_host_with_shard).returns(['files-test.host', Shard.default])
+    get "http://test.host/courses/#{@course.id}/files/#{a1.id}/preview?verifier=#{a1.uuid}"
+    response.should be_redirect
+
+    uri = URI.parse response['Location']
+    qs = Rack::Utils.parse_nested_query(uri.query)
+    uri.host.should == 'files-test.host'
+    uri.path.should == "/courses/#{@course.id}/files/#{a1.id}/course%20files/test%20my%20file%3F%20hai!%26.png"
+    qs['verifier'].should == a1.uuid
+    location = response['Location']
+    reset!
+
+    get location
+    response.should be_success
+    response.content_type.should == 'image/png'
+    # ensure that the user wasn't logged in by the normal means
+    controller.instance_variable_get(:@current_user).should be_nil
+  end
 
   it "should update module progressions for html safefiles iframe" do
     HostUrl.stubs(:file_host_with_shard).returns(['files-test.host', Shard.default])
