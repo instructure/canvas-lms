@@ -49,13 +49,7 @@ class LearningOutcomeResult < ActiveRecord::Base
       nil
     end
   end
-  
-  def changes_worth_versioning?
-    !(self.changes.keys - [
-      "updated_at",
-    ]).empty?
-  end
-  
+
   def save_to_version(attempt)
     current_version = self.versions.current.try(:model)
     if current_version.try(:attempt) && attempt < current_version.attempt

@@ -16,6 +16,17 @@ module SoftwareHeretics
           super( "Keys: #{keys.join( "," )} are not known by SimplyVersioned" )
         end
       end
+
+      DEFAULTS = {
+        :keep => nil,
+        :automatic => true,
+        :exclude => [],
+        :explicit => false,
+        # callbacks
+        :when => nil,
+        :on_create => nil,
+        :on_update => nil
+      }
       
       module ClassMethods
         
@@ -24,11 +35,22 @@ module SoftwareHeretics
         # the +versions+ association.
         #
         # Options:
-        # +limit+ - specifies the number of old versions to keep (default = nil, never delete old versions)
+        # +keep+ - specifies the number of old versions to keep (default = nil, never delete old versions)
         # +automatic+ - controls whether versions are created automatically (default = true, save versions)
         # +exclude+ - specify columns that will not be saved (default = [], save all columns)
-        # +explicit+ - INSTRUCTURE: explicit versioning keeps the last version up to date, but doesn't
-        #              automatically create new versions (default = false)
+        #
+        # Additional INSTRUCTURE options:
+        # +explicit+ - explicit versioning keeps the last version up to date,
+        #              but doesn't automatically create new versions (default = false)
+        # +when+ - callback to indicate whether an instance needs a version
+        #          saved or not. if present, the model is passed to the
+        #          callback which should return true or false, true indicating
+        #          a version should be saved. if absent, versions are saved if
+        #          any attribute other than updated_at is changed.
+        # +on_create+ - callback to allow additional changes to a new version
+        #               that's about to be saved.
+        # +on_update+ - callback to allow additional changes to an updated (see
+        #               +explicit+ parameter) version that's about to be saved.
         #
         # To save the record without creating a version either set +versioning_enabled+ to false
         # on the model before calling save or, alternatively, use +without_versioning+ and save
@@ -36,15 +58,11 @@ module SoftwareHeretics
         #
         
         def simply_versioned( options = {} )
-          bad_keys = options.keys - [:keep,:automatic,:exclude,:explicit]
+          bad_keys = options.keys - SimplyVersioned::DEFAULTS.keys
           raise SimplyVersioned::BadOptions.new( bad_keys ) unless bad_keys.empty?
           
-          options.reverse_merge!( {
-            :keep => nil,
-            :automatic => true,
-            :exclude => [],
-            :explicit => false
-          })
+          options.reverse_merge!(DEFAULTS)
+          options[:exclude] = Array( options[ :exclude ] ).map( &:to_s )
           
           has_many :versions, :order => 'number DESC', :as => :versionable, :dependent => :destroy, :extend => VersionsProxyMethods
           # INSTRUCTURE: Added to allow quick access to the most recent version
@@ -53,17 +71,8 @@ module SoftwareHeretics
           before_save :check_if_changes_are_worth_versioning
           after_save :simply_versioned_create_version
           
-          cattr_accessor :simply_versioned_keep_limit
-          self.simply_versioned_keep_limit = options[:keep]
-          
-          cattr_accessor :simply_versioned_save_by_default
-          self.simply_versioned_save_by_default = options[:automatic]
-          
-          cattr_accessor :simply_versioned_excluded_columns
-          self.simply_versioned_excluded_columns = Array( options[ :exclude ] ).map( &:to_s )
-
-          cattr_accessor :simply_versioned_explicitly_versioned
-          self.simply_versioned_explicitly_versioned = options[:explicit]
+          cattr_accessor :simply_versioned_options
+          self.simply_versioned_options = options
           
           class_eval do
             def versioning_enabled=( enabled )
@@ -73,7 +82,7 @@ module SoftwareHeretics
             def versioning_enabled?
               enabled = self.instance_variable_get( :@simply_versioned_enabled )
               if enabled.nil?
-                enabled = self.instance_variable_set( :@simply_versioned_enabled, self.simply_versioned_save_by_default )
+                enabled = self.instance_variable_set( :@simply_versioned_enabled, self.simply_versioned_options[:automatic] )
               end
               enabled
             end
@@ -170,8 +179,9 @@ module SoftwareHeretics
         # on the before_create to see if the changes are worth
         # creating a new version for
         def check_if_changes_are_worth_versioning
-          @changes_are_worth_versioning = !self.respond_to?(:changes_worth_versioning?) || self.changes_worth_versioning?
-          @changes_are_worth_versioning = false if self.changes.keys == ["updated_at"]
+          @changes_are_worth_versioning = simply_versioned_options[:when] ?
+            simply_versioned_options[:when].call(self) :
+            (self.changes.keys - ["updated_at"]).present?
           true
         end
         
@@ -180,12 +190,17 @@ module SoftwareHeretics
             # INSTRUCTURE
             if @versioning_explicitly_enabled || @changes_are_worth_versioning
               @changes_are_worth_versioning = nil
-              if simply_versioned_explicitly_versioned && !@simply_versioned_explicit_enabled && versioned?
+              if simply_versioned_options[:explicit] && !@simply_versioned_explicit_enabled && versioned?
                 version = self.versions.current
-                version.yaml = self.attributes.except( *simply_versioned_excluded_columns ).to_yaml
+                version.yaml = self.attributes.except( *simply_versioned_options[:exclude] ).to_yaml
+                simply_versioned_options[:on_update].try(:call, self, version)
                 version.save
-              elsif self.versions.create( :yaml => self.attributes.except( *simply_versioned_excluded_columns ).to_yaml )
-                self.versions.clean_old_versions( simply_versioned_keep_limit.to_i ) if simply_versioned_keep_limit
+              else
+                version = self.versions.create( :yaml => self.attributes.except( *simply_versioned_options[:exclude] ).to_yaml )
+                if version
+                  simply_versioned_options[:on_create].try(:call, self, version)
+                  self.versions.clean_old_versions( simply_versioned_options[:keep].to_i ) if simply_versioned_options[:keep]
+                end
               end
             end
           end

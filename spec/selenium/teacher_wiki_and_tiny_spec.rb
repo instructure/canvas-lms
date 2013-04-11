@@ -99,7 +99,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       keep_trying_until { f("#page_history").should be_displayed }
       f('#page_history').click
 
-      ff('a[title]').length.should == 3
+      ff('a[title]').length.should == 2
     end
 
 
@@ -167,7 +167,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       f('.history').click
       wait_for_ajax_requests
 
-      ff('a[title]').length.should == 3
+      ff('a[title]').length.should == 2
     end
   end
 end
