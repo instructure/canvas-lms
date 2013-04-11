@@ -26,7 +26,8 @@ def attachment_model(opts={})
 end
   
 def valid_attachment_attributes(opts={})
-  @context ||= opts[:context] || Course.first || course_model(:reusable => true)
+  @context = opts[:context] || @context
+  @context ||= Course.first || course_model(:reusable => true)
   @folder = Folder.root_folders(@context).find{|f| f.name == 'unfiled'} || Folder.root_folders(@context).first || folder_model
   @attributes_res = {
     :context => @context,
