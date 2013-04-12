@@ -2,6 +2,28 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'db/migrate/20130405213030_fix_broken_file_links_in_assignments.rb'
 
 describe 'DataFixup::FixBrokenFileLinksInAssignments' do
+  
+  it "should find assignments without verifiers" do
+    assignment_model
+    @assignment.description = '<a id="l16" href="/files/1/download">oi</a>'
+    @assignment.save!
+    DataFixup::FixBrokenFileLinksInAssignments.broken_assignment_scope.count.should == 1
+  end
+  
+  it "should find assignments with verifiers" do
+    assignment_model
+    @assignment.description = '<a id="l16" href="/files/1/download?verifier=hahaha">oi</a>'
+    @assignment.save!
+    DataFixup::FixBrokenFileLinksInAssignments.broken_assignment_scope.count.should == 1
+  end
+  
+  it "should not find assignments with only normal links" do
+    assignment_model
+    @assignment.description = '<a id="l16" href="/courses/1/files/1/download?wrap=1>oi</a>'
+    @assignment.save!
+    DataFixup::FixBrokenFileLinksInAssignments.broken_assignment_scope.count.should == 0
+  end
+  
   it "should fix links in assignment descriptions that point to deleted files with a verifier param" do
     course1 = course
     att1 = attachment_model(:context => course1)
