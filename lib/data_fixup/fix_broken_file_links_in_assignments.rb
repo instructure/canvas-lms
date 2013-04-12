@@ -60,7 +60,7 @@ module DataFixup::FixBrokenFileLinksInAssignments
 
     if changed
       assignment.description = doc.at_css('body').inner_html
-      assignment.save!
+      assignment.save_without_broadcasting!
     end
   end
 end
