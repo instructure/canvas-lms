@@ -35,7 +35,7 @@ class AssessmentQuestion < ActiveRecord::Base
                         "multiple_choice_question", "numerical_question", 
                         "text_only_question", "short_answer_question", 
                         "multiple_dropdowns_question", "calculated_question", 
-                        "essay_question", "true_false_question"]
+                        "essay_question", "true_false_question", "file_upload_question"]
 
   serialize :question_data
 
@@ -392,15 +392,6 @@ class AssessmentQuestion < ActiveRecord::Base
     end
     question[:assessment_question_id] = assessment_question.id rescue nil
     return question
-  end
-  
-  def self.update_question(assessment_question, qdata)
-    question = parse_question(qdata, assessment_question)
-    assessment_question.question_data = question
-    assessment_question.name = question[:question_name]
-    assessment_question.save
-    question[:assessment_question_id] = assessment_question.id
-    question
   end
   
   def self.variable_id(variable)

@@ -105,17 +105,38 @@
               <td>
                 <div class="essay_answers">
                   <% question[:essay_responses].reverse.each do |response| %>
-                        <div class="essay_answer" style="padding-bottom: 5px;">
-                          <div class="user_content">
-                            <%= user_content(response[:text]) %>
-                          </div>
-                          <% if @quiz.graded? && !@quiz.anonymous_submissions? %>
-                            <div class="user_name" style="text-align: right; font-style: italic;">
-                              <%= @users[response[:user_id]].short_name %>
-                            </div>
-                          <% end %>
+                    <div class="essay_answer" style="padding-bottom: 5px;">
+                      <div class="user_content">
+                        <%= user_content(response[:text]) %>
+                      </div>
+                      <% if @quiz.graded? && !@quiz.anonymous_submissions? %>
+                        <div class="user_name" style="text-align: right; font-style: italic;">
+                          <%= @users[response[:user_id]].short_name %>
                         </div>
-                        
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+          </table>
+        <% elsif question[:file_upload_responses] %>
+          <table class="results">
+            <tr>
+              <td>
+                <div class="file_upload_answers">
+                  <% question[:file_upload_responses].reverse.each do |response| %>
+                    <div class="file_upload_answer" style="padding-bottom: 5px;">
+                      <div>
+                        <%# TODO: what should be displayed for file upload quiz stats? %>
+                        <%= response[:filename] %>
+                      </div>
+                      <% if @quiz.graded? && !@quiz.anonymous_submissions? %>
+                        <div class="user_name" style="text-align: right; font-style: italic;">
+                          <%= @users[response[:user_id]].short_name %>
+                        </div>
+                      <% end %>
+                    </div>
                   <% end %>
                 </div>
               </td>

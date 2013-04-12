@@ -10,19 +10,20 @@
 <div class="question">
   <div class="header" style="background-color: transparent;">
     <input type="text" style="width: 120px;" name="question_name" aria-label="<%= t "label.question.name", "Question name" %>"/>
-    <select class="question_type" name="question_type" style="width: 150px;" aria-label="<%= t "label.question.type", "Question type" %>">
-      <option value="multiple_choice_question" style="padding: 2px;"><%= t('question_type.multiple_choice', "Multiple Choice") %></option>
-      <option value="true_false_question" style="padding: 2px;"><%= t('question_type.true_false', "True/False") %></option>
-      <option value="short_answer_question" style="padding: 2px;"><%= t('question_type.short_answer', "Fill In the Blank") %></option>
-      <option value="fill_in_multiple_blanks_question" style="padding: 2px;"><%= t('question_type.fill_in_multiple_blanks', "Fill In Multiple Blanks") %></option>
-      <option value="multiple_answers_question" style="padding: 2px;"><%= t('question_type.multiple_answers', "Multiple Answers") %></option>
-      <option value="multiple_dropdowns_question" style="padding: 2px;"><%= t('question_type.multiple_dropdowns', "Multiple Dropdowns") %></option>
-      <option value="matching_question" style="padding: 2px;"><%= t('question_type.matching', "Matching") %></option>
-      <option value="numerical_question" style="padding: 2px;"><%= t('question_type.numerical', "Numerical Answer") %></option>
-      <option value="calculated_question" style="padding: 2px;"><%= t('question_type.calculated', "Formula Question") %></option>
-      <option value="missing_word_question" style="padding: 2px;" class="missing_word"><%= t('question_type.missing_word', "Missing Word") %></option>
-      <option value="essay_question" style="padding: 2px;"><%= t('question_type.essay', "Essay Question") %></option>
-      <option value="text_only_question" style="padding: 2px;"><%= t('question_type.text_only', "Text (no question)") %></option>
+    <select class="question_type" name="question_type" aria-label="<%= t "label.question.type", "Question type" %>">
+      <option value="multiple_choice_question"><%= t('question_type.multiple_choice', "Multiple Choice") %></option>
+      <option value="true_false_question"><%= t('question_type.true_false', "True/False") %></option>
+      <option value="short_answer_question"><%= t('question_type.short_answer', "Fill In the Blank") %></option>
+      <option value="fill_in_multiple_blanks_question"><%= t('question_type.fill_in_multiple_blanks', "Fill In Multiple Blanks") %></option>
+      <option value="multiple_answers_question"><%= t('question_type.multiple_answers', "Multiple Answers") %></option>
+      <option value="multiple_dropdowns_question"><%= t('question_type.multiple_dropdowns', "Multiple Dropdowns") %></option>
+      <option value="matching_question"><%= t('question_type.matching', "Matching") %></option>
+      <option value="numerical_question"><%= t('question_type.numerical', "Numerical Answer") %></option>
+      <option value="calculated_question"><%= t('question_type.calculated', "Formula Question") %></option>
+      <option value="missing_word_question" class="missing_word"><%= t('question_type.missing_word', "Missing Word") %></option>
+      <option value="essay_question"><%= t('question_type.essay', "Essay Question") %></option>
+      <%# TODO: add file upload option here %>
+      <option value="text_only_question"><%= t('question_type.text_only', "Text (no question)") %></option>
     </select>
     <span class="question_points_holder">
       <span style="padding-left: 20px;"><%= before_label :points, 'pts' %></span>
@@ -65,6 +66,9 @@
     </div>
     <div tabindex="0" class="essay_question_explanation explanation subheader">
       <%= t('explanations.essay', "Students will be given a text field to compose their answer.") %>
+    </div>
+    <div tabindex="0" class="file_upload_question_explanation explanation subheader">
+      <%= t('explanations.file_upload', "Students will be able to upload a file for their answer.") %>
     </div>
     <div tabindex="0" class="text_only_question_explanation explanation subheader">
       <%= t('explanations.text_only', 'This "question" will not be scored, but can be useful for introducing a set of related questions.') %>

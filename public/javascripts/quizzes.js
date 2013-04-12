@@ -128,7 +128,7 @@ define([
 
     // Determines whether or not to show the "show question details" link.
     checkShowDetails: function() {
-      var hasQuestions = this.$questions.find('div.display_question:not(.essay_question, .text_only_question)').length;
+      var hasQuestions = this.$questions.find('div.display_question:not(.essay_question, .file_upload_question, .text_only_question)').length;
       this.$showDetailsWrap[hasQuestions ? 'show' : 'hide'](200);
     },
 
@@ -211,7 +211,7 @@ define([
 
       $answer.find(".comment_focus").attr('title', I18n.t('titles.click_to_enter_comments_on_answer', 'Click to enter comments for the student if they choose this answer'));
 
-      if (question_type == "essay_question") {
+      if (question_type == "essay_question" || question_type == "file_upload_question") {
         templateData.comments_header = I18n.beforeLabel('comments_on_question', "Comments for this question");
       } else if (question_type == "matching_question") {
         templateData.answer_match_left_html = answer.answer_match_left_html;
@@ -310,6 +310,10 @@ define([
         answer_type = "comment";
         question_type = "essay_question";
         n_correct = "none";
+      } else if (qt == 'file_upload_question') {
+        answer_type = "comment";
+        question_type = "file_upload_question";
+        n_correct = "none";
       } else if (qt == 'matching_question') {
         answer_type = "matching_answer";
         question_type = "matching_question";
@@ -347,6 +351,8 @@ define([
       } else if (question_type == 'short_answer_question') {
         result = "any_answer";
       } else if (question_type == 'essay_question') {
+        result = "none";
+      } else if (question_type == 'file_upload_question') {
         result = "none";
       } else if (question_type == 'matching_question') {
         result = "matching";
@@ -643,7 +649,7 @@ define([
       } else if (question_type == 'short_answer_question') {
         $formQuestion.removeClass('selectable');
         result.answer_type = "short_answer";
-      } else if (question_type == 'essay_question') {
+      } else if (question_type == 'essay_question' || question_type == 'file_upload_question') {
         $formQuestion.find(".answer").remove();
         $formQuestion.removeClass('selectable');
         $formQuestion.find(".answers_header").hide().end()
@@ -1530,7 +1536,7 @@ define([
           $form.find(".form_answers").append($answer);
         });
       }
-      if ($question.hasClass('essay_question')) {
+      if ($question.hasClass('essay_question') || $question.hasClass('file_upload')) {
         $formQuestion.find(".comments_header").text(I18n.beforeLabel('comments_on_question', "Comments for this question"));
       }
       $question.hide().after($form);
@@ -2026,6 +2032,12 @@ define([
         }];
         answer_type = "comment";
         question_type = "essay_question";
+      } else if ($question.hasClass('file_upload_question')) {
+        var answers = [{
+          comments: I18n.t('default_response_to_file_upload', "Response to show student after they submit an answer")
+        }];
+        answer_type = "comment";
+        question_type = "file_upload_question";
       } else if ($question.hasClass('matching_question')) {
         var answers = [{
           comments: I18n.t('default_comments_on_wrong_match', "Response if the user misses this match")
@@ -2117,7 +2129,7 @@ define([
           error_text = I18n.t('errors.no_possible_solution', "Please generate at least one possible solution");
         }
       } else if ($answers.length === 0 || $answers.filter(".correct_answer").length === 0) {
-        if ($answers.length === 0 && questionData.question_type != "essay_question" && questionData.question_type != "text_only_question") {
+        if ($answers.length === 0 && !_.contains(["essay_question", "file_upload_question", "text_only_question"], questionData.question_type)) {
           error_text = I18n.t('errors.no_answer', "Please add at least one answer");
         } else if ($answers.filter(".correct_answer").length === 0 && (questionData.question_type == "multiple_choice_question" || questionData.question_type == "true_false_question" || questionData.question_tyep == "missing_word_question")) {
           error_text = I18n.t('errors.no_correct_answer', "Please choose a correct answer");

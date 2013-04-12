@@ -184,6 +184,14 @@ module QuizzesHelper
         false,
         false
       ),
+      "file_upload_question" => QuestionType.new(
+        "file_upload_question",
+        "file",
+        "single",
+        "file_answer",
+        false,
+        false
+      ),
       "matching_question" => QuestionType.new(
         "matching_question",
         "matching",
