@@ -457,6 +457,7 @@ class DiscussionTopicsApiController < ApplicationController
   end
 
   def build_entry(association)
+    params[:message] = process_incoming_html_content(params[:message])
     @topic.save! if @topic.new_record?
     association.build(:message => params[:message], :user => @current_user, :discussion_topic => @topic)
   end

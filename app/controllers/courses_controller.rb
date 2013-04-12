@@ -197,6 +197,11 @@ class CoursesController < ApplicationController
     @account = params[:account_id] ? Account.find(params[:account_id]) : @domain_root_account.manually_created_courses_account
     if authorized_action(@account, @current_user, [:manage_courses, :create_courses])
       params[:course] ||= {}
+
+      if params[:course].has_key?(:syllabus_body)
+        params[:course][:syllabus_body] = process_incoming_html_content(params[:course][:syllabus_body])
+      end
+
       if (sub_account_id = params[:course].delete(:account_id)) && sub_account_id.to_i != @account.id
         @sub_account = @account.find_child(sub_account_id) || raise(ActiveRecord::RecordNotFound)
       end
@@ -1305,6 +1310,9 @@ class CoursesController < ApplicationController
     @course = api_find(Course, params[:id])
     if authorized_action(@course, @current_user, :update)
       params[:course] ||= {}
+      if params[:course].has_key?(:syllabus_body)
+        params[:course][:syllabus_body] = process_incoming_html_content(params[:course][:syllabus_body])
+      end
       root_account_id = params[:course].delete :root_account_id
       if root_account_id && Account.site_admin.grants_right?(@current_user, session, :manage_courses)
         @course.root_account = Account.root_accounts.find(root_account_id)

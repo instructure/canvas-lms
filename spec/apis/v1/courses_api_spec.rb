@@ -239,6 +239,17 @@ describe CoursesController, :type => :integration do
         json.should eql course_response
       end
 
+      it 'should process html content in syllabus_body on create' do
+        should_process_incoming_user_content(@course) do |content|
+          json = api_call(:post, @resource_path,
+            @resource_params,
+            { :account_id => @account.id, :offer => true, :course => { :name => 'Test Course', :syllabus_body => content } }
+          )
+          new_course = Course.find(json['id'])
+          new_course.syllabus_body
+        end
+      end
+
       it "should offer a course if passed the 'offer' parameter" do
         json = api_call(:post, @resource_path,
           @resource_params,
@@ -417,6 +428,15 @@ describe CoursesController, :type => :integration do
         json['start_at'].should eql @new_values['course']['start_at']
         json['end_at'].should eql @new_values['course']['end_at']
         json['default_view'].should eql @new_values['course']['default_view']
+      end
+
+      it 'should process html content in syllabus_body on update' do
+        should_process_incoming_user_content(@course) do |content|
+          json = api_call(:put, @path, @params, {'course' => {'syllabus_body' => content}})
+
+          @course.reload
+          @course.syllabus_body
+        end
       end
 
       it "should not be able to update the storage quota (bytes)" do

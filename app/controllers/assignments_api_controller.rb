@@ -424,6 +424,7 @@ class AssignmentsApiController < ApplicationController
   end
 
   def save_and_render_response
+    @assignment.content_being_saved_by(@current_user)
     if update_api_assignment(@assignment, params[:assignment])
       render :json => assignment_json(@assignment, @current_user, session).to_json, :status => 201
     else

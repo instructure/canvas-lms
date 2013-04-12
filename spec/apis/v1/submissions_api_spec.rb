@@ -1766,6 +1766,14 @@ describe 'Submissions API', :type => :integration do
         json['body'].should == @submission.body
       end
 
+      it "should process html content in body" do
+        @assignment.update_attributes(:submission_types => 'online_text_entry')
+        should_process_incoming_user_content(@course) do |content|
+          do_submit(:submission_type => 'online_text_entry', :body => content)
+          @submission.body
+        end
+      end
+
       it "should create a file upload submission" do
         @assignment.update_attributes(:submission_types => 'online_upload')
         a1 = attachment_model(:context => @user)

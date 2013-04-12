@@ -277,6 +277,10 @@ module Api::V1::Assignment
 
     # TODO: allow rubric creation
 
+    if update_params.has_key?("description")
+      update_params["description"] = process_incoming_html_content(update_params["description"])
+    end
+
     assignment.updating_user = @current_user
     assignment.attributes = update_params
     assignment.infer_times

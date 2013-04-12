@@ -226,6 +226,18 @@ describe AssignmentsApiController, :type => :integration do
       Assignment.last.turnitin_enabled.should be_false
     end
 
+    it "should process html content in description on create" do
+      course_with_teacher(:active_all => true)
+
+      should_process_incoming_user_content(@course) do |content|
+        api_create_assignment_in_course(@course, { 'description' => content })
+
+        a = Assignment.last
+        a.reload
+        a.description
+      end
+    end
+
     it "allows creating an assignment with overrides via the API" do
       course_with_teacher(:active_all => true)
       student_in_course(:course => @course, :active_enrollment => true)
@@ -431,6 +443,20 @@ describe AssignmentsApiController, :type => :integration do
       it "updates the grading standard" do
         @assignment.grading_standard_id.should == @new_grading_standard.id
         @json['grading_standard_id'].should == @new_grading_standard.id
+      end
+    end
+
+    it "should process html content in description on update" do
+      course_with_teacher(:active_all => true)
+      @assignment = @course.assignments.create!
+
+      should_process_incoming_user_content(@course) do |content|
+        api_update_assignment_call(@course, @assignment, {
+            'description' => content
+        })
+
+        @assignment.reload
+        @assignment.description
       end
     end
 
