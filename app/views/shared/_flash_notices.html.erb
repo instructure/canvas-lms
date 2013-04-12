@@ -1,11 +1,12 @@
-<% notices = flash_notices() %>
-<div id="flash_message_buffer" style="height:<%= notices.size * 30 %>px;"></div>
+<% notices = flash_notices()
+# static messages (i.e. ones that are present on page load) need to push
+# the content down, since they don't auto-dismiss themselves. but they
+# also need to be fixed so they remain visible when you scroll down so we
+# put a copy of them in this hidden (but layout-ed) buffer
+%>
+<ul id="flash_message_buffer" aria-hidden="true">
+  <%= render :partial => "shared/flash_notice", :collection => notices %>
+</ul>
 <ul id="flash_message_holder" aria-live="polite" role="alert">
-  <% notices.each do |notice| %>
-    <li class="static_message ui-state-<%= notice[:type] || 'warning' %> <%= notice[:size] %> <%= notice[:classes] %>">
-      <i></i>
-      <%= notice[:content] %>
-      <a href='#' class='icon-end close_link'><%= t "close", "Close" %></a>
-    </li>
-  <% end %>
+  <%= render :partial => "shared/flash_notice", :collection => notices %>
 </ul>

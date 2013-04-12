@@ -27,12 +27,17 @@
   left: 0
   width: 100%
 
+#flash_message_buffer // contains copies of all static messages so that we reserve enough height in the ui
+  visibility: hidden
+
 #flash_message_holder
+  height: 0
+
+#flash_message_holder, #flash_message_buffer
   top: 0
   list-style: none
   margin: 0
   padding: 0
-  height: 0
   li, .ui-effects-wrapper
     margin: 0 auto !important
   li

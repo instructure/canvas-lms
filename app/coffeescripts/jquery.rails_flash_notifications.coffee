@@ -13,10 +13,8 @@ define [
     $this = $(this)
     return if $this.hasClass('no_close')
     $this.stop(true, true).remove()
-    if $this.hasClass('static_message')
-      $buffer.height _.reduce($holder.find('.static_message'),
-        (s, n) -> s + $(n).outerHeight()
-      , 0)
+    if (bufferIndex = $this.data('buffer-index'))?
+      $buffer.find("[data-buffer-index=#{bufferIndex}]").remove()
 
   flashBox = (type, content, timeout, cssOptions = {}) ->
     $node = $("""

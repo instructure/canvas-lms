@@ -1,0 +1,5 @@
+<li class="static_message ui-state-<%= flash_notice[:type] || 'warning' %> <%= flash_notice[:size] %> <%= flash_notice[:classes] %>" data-buffer-index="<%= flash_notice_counter %>">
+  <i></i>
+  <%= flash_notice[:content] %>
+  <a href='#' class='icon-end close_link'><%= t "close", "Close" %></a>
+</li>
