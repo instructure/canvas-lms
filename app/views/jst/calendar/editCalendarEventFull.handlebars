@@ -4,50 +4,63 @@
   <textarea class="input-block-level" name="description" style="width: 100%">{{description}}</textarea>
 
   {{#if course_sections}}
-    <label><input type="checkbox" name="use_section_dates" value="1" {{#if use_section_dates}}checked{{/if}}>{{#t "different_date_for_each_section"}}Use a different date for each section{{/t}}</label>
+    <label class="label_with_checkbox">
+      <input type="checkbox" name="use_section_dates" value="1" {{#if use_section_dates}}checked{{/if}}>{{#t "different_date_for_each_section"}}Use a different date for each section{{/t}}
+    </label>
     <input type="hidden" name="remove_child_events" value="{{#unless use_section_dates}}1{{/unless}}" />
   {{/if}}
 
   <div class="hide_if_using_sections date_start_end_row">
-    <span><input type="text" name="start_date" class="date_field" value="{{tDateToString start_at "medium"}}" placeholder="{{#t "date"}}Date{{/t}}"/></span>
-    <span><input type="text" name="start_time" class="time_field" {{#unless all_day}} value="{{tTimeToString start_at "tiny"}}" {{/unless}} placeholder="{{#t "start_time"}}Start Time{{/t}}"/></span>
-    <span>{{#t "to"}}to{{/t}}</span>
-    <span><input type="text" name="end_time" class="time_field" {{#unless all_day}} value="{{tTimeToString end_at "tiny"}}" {{/unless}} placeholder="{{#t "end_time"}}End Time{{/t}}"/></span>
+    <table>
+      <tbody>
+        <tr>
+          <td><input type="text" name="start_date" class="date_field" value="{{tDateToString start_at "medium"}}" placeholder="{{#t "date"}}Date{{/t}}"/></td>
+          <td><input type="text" name="start_time" class="time_field" {{#unless all_day}} value="{{tTimeToString start_at "tiny"}}" {{/unless}} placeholder="{{#t "start_time"}}Start Time{{/t}}"/></td>
+          <td><span class="time_separator">-</span></td>
+          <td><input type="text" name="end_time" class="time_field" {{#unless all_day}} value="{{tTimeToString end_at "tiny"}}" {{/unless}} placeholder="{{#t "end_time"}}End Time{{/t}}"/></td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
   {{#if course_sections}}
     <table class="formtable show_if_using_sections">
       {{#each course_sections}}
       <tr class="date_start_end_row">
-        <th>
-          <label for="section_{{id}}_start_date">{{name}}</label>
-        </th>
-        <td>
-          <span><input type="text" id="section_{{id}}_start_date" name="child_event_data[{{id}}][start_date]" class="date_field" value="{{tDateToString event.start_at "medium"}}" placeholder="{{#t "date"}}Date{{/t}}"/></span>
-          <span><input type="text" name="child_event_data[{{id}}][start_time]" class="time_field" {{#unless all_day}} value="{{tTimeToString event.start_at "tiny"}}" {{/unless}} placeholder="{{#t "start_time"}}Start Time{{/t}}"/></span>
-          <span>{{#t "to"}}to{{/t}}</span>
-          <span><input type="text" name="child_event_data[{{id}}][end_time]" class="time_field" {{#unless all_day}} value="{{tTimeToString event.end_at "tiny"}}" {{/unless}} placeholder="{{#t "end_time"}}End Time{{/t}}"/></span>
-          <input type="hidden" name="child_event_data[{{id}}][context_code]" value="course_section_{{id}}">
-        </td>
+        <td colspan="4"><label class="row_header" for="section_{{id}}_start_date">{{name}}</label></td>
+      </tr>
+      <tr class="date_start_end_row">
+        <td><input type="text" id="section_{{id}}_start_date" name="child_event_data[{{id}}][start_date]" 
+                   class="date_field" value="{{tDateToString event.start_at "medium"}}" 
+                   placeholder="{{#t "date"}}Date{{/t}}"/></td>
+
+        <td><input type="text" name="child_event_data[{{id}}][start_time]" class="time_field" {{#unless all_day}} 
+                   value="{{tTimeToString event.start_at "tiny"}}" {{/unless}} placeholder="{{#t "start_time"}}Start Time{{/t}}"/></td>
+
+        <td><span class="time_separator">-</span></td>
+
+        <td><input type="text" name="child_event_data[{{id}}][end_time]" class="time_field" {{#unless all_day}} 
+                   value="{{tTimeToString event.end_at "tiny"}}" {{/unless}} placeholder="{{#t "end_time"}}End Time{{/t}}"/>
+            <input type="hidden" name="child_event_data[{{id}}][context_code]" value="course_section_{{id}}"></td>
       </tr>
       {{/each}}
     </table>
   {{/if}}
 
-  <div class="button-container">
-    <button type="submit" class="btn {{#if url}} btn-primary {{/if}}">
-      {{#if newRecord}}
-        {{#t "buttons.create"}}Create Event{{/t}}
-      {{else}}
-        {{#t "buttons.update"}}Update Event{{/t}}
-      {{/if}}
-    </button>
+  <div class="form-actions">
     {{#if url}}
       <button type="button" class="btn delete_link">{{#t "delete"}}Delete{{/t}}</button>
     {{/if}}
     {{#if return_to_url}}
       <a href="{{return_to_url}}" class="btn">{{#t "#buttons.cancel"}}Cancel{{/t}}</a>
     {{/if}}
+    <button type="submit" class="btn btn-primary">
+      {{#if newRecord}}
+        {{#t "buttons.create"}}Create Event{{/t}}
+      {{else}}
+        {{#t "buttons.update"}}Update Event{{/t}}
+      {{/if}}
+    </button>
   </div>
 
 </form>
