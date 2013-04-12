@@ -32,6 +32,14 @@ describe Pseudonym do
     @pseudonym.save!
   end
 
+  it "should allow apostrophes in usernames" do
+    pseudonym = Pseudonym.new(:unique_id => "o'brien@example.com",
+                              :password => 'password',
+                              :password_confirmation => 'password')
+    pseudonym.user_id = 1
+    pseudonym.should be_valid
+  end
+
   it "should validate the presence of user and account ids" do
     u = User.create!
     p = Pseudonym.new(:unique_id => 'cody@instructure.com')
