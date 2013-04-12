@@ -92,5 +92,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
   def open_edit_dialog
     driver.action.move_to(f('.appointment-group-item')).perform
     click_al_option('.edit_link')
+    wait_for_ajaximations
   end
 

@@ -134,6 +134,11 @@ module Api::V1::CalendarEvent
     include = options[:include] || []
     hash = api_json(group, user, session, :only => %w{id created_at description end_at location_address location_name max_appointments_per_participant min_appointments_per_participant participants_per_appointment start_at title updated_at workflow_state participant_visibility}, :methods => :sub_context_codes)
 
+    hash['participant_count'] = group.appointments_participants.count if include.include?('participant_count')
+    hash['reserved_times'] = group.reservations_for(user).map{|event| {
+        :id => event.id,
+        :start_at => event.start_at,
+        :end_at => event.end_at}} if include.include?('reserved_times')
     hash['context_codes'] = group.context_codes_for_user(user)
     hash['requiring_action'] = group.requiring_action?(user)
     if group.new_appointments.present?
