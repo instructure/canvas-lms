@@ -415,6 +415,10 @@ class DiscussionTopicsController < ApplicationController
         @topic.workflow_state = 'active' if @topic.post_delayed? && !@topic.delayed_post_at
       end
 
+      if discussion_topic_hash.has_key?(:message)
+        discussion_topic_hash[:message] = process_incoming_html_content(discussion_topic_hash[:message])
+      end
+
       #handle locking/unlocking
       if params.has_key? :locked
         if value_to_boolean(params[:locked])

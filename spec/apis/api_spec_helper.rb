@@ -149,3 +149,11 @@ def should_translate_user_content(course)
   doc.css('a').last['data-api-endpoint'].should match(%r{http://www.example.com/api/v1/courses/#{course.id}/pages/awesome-page})
   doc.css('a').last['data-api-returntype'].should == 'Page'
 end
+
+def should_process_incoming_user_content(context)
+  attachment_model(:context => context)
+  incoming_content = "<p>content blahblahblah <a href=\"/files/#{@attachment.id}/download?a=1&amp;verifier=2&amp;b=3\">haha</a></p>"
+
+  saved_content = yield incoming_content
+  saved_content.should == "<p>content blahblahblah <a href=\"/#{context.class.to_s.underscore.pluralize}/#{context.id}/files/#{@attachment.id}/download?a=1&amp;b=3\">haha</a></p>"
+end

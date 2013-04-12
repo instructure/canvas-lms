@@ -354,6 +354,41 @@ module Api
     return doc.to_s
   end
 
+  # This removes the verifier parameters that are added to attachment links by api_user_content
+  # and adds context (e.g. /courses/:id/) if it is missing
+  def process_incoming_html_content(html)
+    return html unless html.present? &&
+      (html.include?("verifier=") || html.include?("'/files") || html.include?("\"/files"))
+
+    attrs = ['href', 'src']
+    link_regex = %r{/files/(\d+)/(?:download|preview)}
+    verifier_regex = %r{(\?)verifier=[^&]*&?|&verifier=[^&]*}
+
+    context_types = ["Course", "Group", "Account", "User"]
+
+    doc = Nokogiri::HTML(html)
+    doc.search("*").each do |node|
+      attrs.each do |attr|
+        if link = node[attr]
+          if link =~ link_regex
+            if link.start_with?('/files')
+              att_id = $1
+              if (att = Attachment.find_by_id(att_id)) && context_types.include?(att.context_type)
+                link = "/#{att.context_type.underscore.pluralize}/#{att.context_id}" + link
+              end
+            end
+            if link.include?('verifier=')
+              link.gsub!(verifier_regex, '\1')
+            end
+            node[attr] = link
+          end
+        end
+      end
+    end
+
+    return doc.at_css('body').inner_html
+  end
+
   def value_to_boolean(value)
     Canvas::Plugin.value_to_boolean(value)
   end
