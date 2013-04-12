@@ -308,6 +308,47 @@ describe AppointmentGroupsController, :type => :integration do
     ag.reload.should be_deleted
   end
 
+  it 'should include participant count, if requested' do
+    ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00",
+                                                                                "#{Time.now.year + 1}-01-01 13:00:00"],
+                                                                               ["#{Time.now.year + 1}-01-01 13:00:00",
+                                                                                "#{Time.now.year + 1}-01-01 14:00:00"]], :contexts => [@course])
+    student_in_course(:course => @course, :active_all => true)
+    ag.appointments.first.reserve_for @student, @me
+    student_in_course(:course => @course, :active_all => true)
+    ag.appointments.last.reserve_for @student, @me
+
+    @user = @me
+
+    json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&include[]=participant_count", {
+                      :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable', :include => ['participant_count']})
+    json.size.should eql 1
+    json.first.keys.sort.should eql((expected_fields + ['participant_count']).sort)
+    json.first['participant_count'].should eql(2)
+  end
+
+  it "should include the user's reserved times, if requested" do
+    year = Time.now.year + 1
+    appointment_times = [["#{year}-01-01T12:00:00Z", "#{year}-01-01T13:00:00Z"],
+                         ["#{year}-01-01T13:00:00Z", "#{year}-01-01T14:00:00Z"]]
+    ag = AppointmentGroup.create!(:title => "something", :new_appointments => appointment_times, :contexts => [@course])
+    ag.publish!
+    student_in_course(:course => @course, :active_all => true)
+    child_events = []
+    ag.appointments.each {|appt| child_events << appt.reserve_for(@student, @me)}
+
+    @user = @student
+
+    json = api_call(:get, "/api/v1/appointment_groups?include[]=reserved_times", {
+                      :controller => 'appointment_groups', :action => 'index', :format => 'json', :include => ['reserved_times']})
+    json.size.should eql 1
+    json.first.keys.sort.should eql((expected_fields + ['reserved_times']).sort)
+    json.first['reserved_times'].length.should eql(child_events.length)
+    child_events.each do |event|
+      json.first['reserved_times'].should include({"id" => event.id, "start_at" => event.start_at.iso8601, "end_at" => event.end_at.iso8601})
+    end
+  end
+  
   types = {
     'users' => proc {
       @ag = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]], :contexts => [@course])

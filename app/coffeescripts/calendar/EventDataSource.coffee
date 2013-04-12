@@ -9,7 +9,7 @@ define [
     constructor: (contexts) ->
       @contexts = contexts
       @clearCache()
-      @inFlightRequest = false
+      @inFlightRequest = {}
       @pendingRequests = []
 
       # The cache will store all the events we've fetched so far, and looks like this:
@@ -120,12 +120,12 @@ define [
 
       events
 
-    processNextRequest: () =>
-      request = @pendingRequests.shift()
-      if request
-        method = request[0]
-        args = request[1]
-        method args...
+    processNextRequest: (inFlightCheckKey='default') =>
+      for id, [method, args, key] of @pendingRequests
+        if key == inFlightCheckKey
+          @pendingRequests.splice(id, 1)
+          method args...
+          return
 
     getEventsFromCache: (start, end, contexts) =>
       events = []
@@ -137,13 +137,13 @@ define [
       (group for id, group of @cache.appointmentGroups)
 
     getAppointmentGroups: (fetchManageable, cb) =>
-      if @inFlightRequest
-        @pendingRequests.push([@getAppointmentGroups, arguments])
+      if @inFlightRequest['appointmentGroups']
+        @pendingRequests.push([@getAppointmentGroups, arguments, 'appointmentGroups'])
         return
 
       if @cache.fetchedAppointmentGroups && @cache.fetchedAppointmentGroups.manageable == fetchManageable
         cb @getAppointmentGroupsFromCache()
-        @processNextRequest()
+        @processNextRequest('appointmentGroups')
         return
 
       @cache.fetchedAppointmentGroups = { manageable: fetchManageable }
@@ -160,15 +160,19 @@ define [
 
       doneCB = () => cb @getAppointmentGroupsFromCache()
 
-      fetchJobs = [[ '/api/v1/appointment_groups', { include: [ 'appointments', 'child_events' ] } ]]
+      fetchJobs = [[ '/api/v1/appointment_groups', { include: [ 'reserved_times', 'participant_count' ] } ]]
 
       if fetchManageable
-        fetchJobs.push [ '/api/v1/appointment_groups', { scope: 'manageable', include: [ 'appointments', 'child_events' ], include_past_appointments: true } ]
+        fetchJobs.push [ '/api/v1/appointment_groups', { scope: 'manageable', include: [ 'reserved_times', 'participant_count' ], include_past_appointments: true } ]
 
-      @startFetch fetchJobs, dataCB, doneCB
+      @startFetch fetchJobs, dataCB, doneCB, 'appointmentGroups'
 
     processAppointmentData: (group) =>
       id = group.id
+      if @cache.appointmentGroups[id]?.is_manageable
+        group.is_manageable = true
+      else
+        group.is_scheduleable = true
       @cache.appointmentGroups[id] = group
 
       if group.appointments
@@ -188,25 +192,25 @@ define [
                   event.childEvents.push childEvent
 
     getEventsForAppointmentGroup: (group, cb) =>
-      if @inFlightRequest
-        @pendingRequests.push([@getEventsForAppointmentGroup, arguments])
+      if @inFlightRequest['default']
+        @pendingRequests.push([@getEventsForAppointmentGroup, arguments, 'default'])
         return
 
-      # appointment group events are cached on the appointment group itself
-      if group.appointmentEvents
-        cb group.appointmentEvents
+      cachedEvents = @cache.appointmentGroups[group.id]?.appointmentEvents
+      if cachedEvents
+        cb cachedEvents
         @processNextRequest()
         return
 
       dataCB = (data) =>
         @processAppointmentData data if data
 
-      params = { include: [ 'appointments', 'child_events' ]}
-      @startFetch [[ group.url, params ]], dataCB, (() => cb group.appointmentEvents)
+      params = { include: [ 'reserved_times', 'participant_count', 'appointments', 'child_events' ]}
+      @startFetch [[ group.url, params ]], dataCB, (() => cb @cache.appointmentGroups[group.id].appointmentEvents)
 
     getEvents: (start, end, contexts, cb) =>
-      if @inFlightRequest
-        @pendingRequests.push([@getEvents, arguments])
+      if @inFlightRequest['default']
+        @pendingRequests.push([@getEvents, arguments, 'default'])
         return
 
       paramsForDatedEvents = (start, end, contexts) =>
@@ -265,8 +269,8 @@ define [
       ], dataCB, doneCB
 
     getParticipants: (appointmentGroup, registrationStatus, cb) =>
-      if @inFlightRequest
-        @pendingRequests.push([@getParticipants, arguments])
+      if @inFlightRequest['default']
+        @pendingRequests.push([@getParticipants, arguments, 'default'])
         return
 
       key = "#{appointmentGroup.id}_#{registrationStatus}"
@@ -293,10 +297,10 @@ define [
     # situations where you need to do paginated fetches of data from N different endpoints
     # a little simpler. dataCB(data, url, params) is called on every request with the data,
     # and completionCB is called when all fetches have completed.
-    startFetch: (urlAndParamsArray, dataCB, doneCB) =>
+    startFetch: (urlAndParamsArray, dataCB, doneCB, inFlightCheckKey='default') =>
       numCompleted = 0
 
-      @inFlightRequest = true
+      @inFlightRequest[inFlightCheckKey] = true
 
       wrapperCB = (data, isDone, url, params) =>
         dataCB(data, url, params)
@@ -305,8 +309,8 @@ define [
           numCompleted += 1
           if numCompleted >= urlAndParamsArray.length
             doneCB()
-            @inFlightRequest = false
-            @processNextRequest()
+            @inFlightRequest[inFlightCheckKey] = false
+            @processNextRequest(inFlightCheckKey)
 
       for urlAndParams in urlAndParamsArray
         do (urlAndParams) =>
