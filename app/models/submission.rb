@@ -140,8 +140,13 @@ class Submission < ActiveRecord::Base
 
   has_a_broadcast_policy
 
-  simply_versioned :explicit => true, :when => lambda{ |model|
-    model.turnitin_data_changed? || (model.changes.keys - [
+  simply_versioned :explicit => true,
+    :when => lambda{ |model| model.new_version_needed? },
+    :on_create => lambda{ |model,version| SubmissionVersion.index_version(version) },
+    :on_update => lambda{ |model,version| SubmissionVersion.reindex_version(version) }
+
+  def new_version_needed?
+    turnitin_data_changed? || (changes.keys - [
       "updated_at",
       "processed",
       "process_attempts",
@@ -150,7 +155,7 @@ class Submission < ActiveRecord::Base
       "published_score",
       "published_grade"
     ]).present?
-  }
+  end
 
   set_policy do
     given {|user| user && user.id == self.user_id }

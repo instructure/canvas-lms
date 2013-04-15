@@ -87,6 +87,31 @@ describe Submission do
     }.should_not change(@submission.versions, :count)
   end
 
+  describe "version indexing" do
+    it "should create a SubmissionVersion when a new submission is created" do
+      lambda {
+        submission_spec_model
+      }.should change(SubmissionVersion, :count)
+    end
+
+    it "should create a SubmissionVersion when a new version is saved" do
+      submission_spec_model
+      lambda {
+        @submission.with_versioning(:explicit => true) { @submission.save }
+      }.should change(SubmissionVersion, :count)
+    end
+
+    it "should update a SubmissionVersion when an existing version is updated" do
+      submission_spec_model
+      version = SubmissionVersion.where(:version_id => @submission.versions.current).first
+      @submission.user = new_user = user_model
+      lambda {
+        @submission.with_versioning{ @submission.save }
+      }.should_not change(SubmissionVersion, :count)
+      version.reload.user_id.should == new_user.id
+    end
+  end
+
   it "should not return duplicate conversation groups" do
     assignment_model
     @assignment.workflow_state = 'published'
