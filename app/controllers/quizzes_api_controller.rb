@@ -29,6 +29,11 @@
 #       // the HTTP/HTTPS URL to the quiz
 #       html_url: "http://canvas.example.edu/courses/1/quizzes/2",
 #
+#       // a url suitable for loading the quiz in a mobile webview.  it will
+#       // persiste the headless session and, for quizzes in public courses, will
+#       // force the user to login
+#       mobile_url: "http://canvas.example.edu/courses/1/quizzes/2?persist_healdess=1&force_user=1",
+#
 #       // the description of the quiz
 #       description: "This is a quiz on Act 3 of Hamlet",
 #

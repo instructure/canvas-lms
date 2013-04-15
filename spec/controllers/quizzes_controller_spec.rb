@@ -59,7 +59,7 @@ describe QuizzesController do
 
     it "should retrieve quizzes" do
       course_with_teacher_logged_in(:active_all => true)
-      course_quiz(:active => true)
+      course_quiz(!!:active)
 
       get 'index', :course_id => @course.id
       assigns[:quizzes].should_not be_nil
@@ -165,6 +165,31 @@ describe QuizzesController do
       get 'show', :course_id => @course.id, :id => @quiz.id
       assigns[:submitted_student_count].should == 1
       assigns[:any_submissions_pending_review].should == false
+    end
+
+    it "should allow forcing authentication on public quiz pages" do
+      course_with_student :active_all => 1
+      @course.update_attribute :is_public, true
+      course_quiz !!:active
+      get 'show', :course_id => @course.id, :id => @quiz.id, :force_user => 1
+      response.should be_redirect
+      response.location.should match /login/
+    end
+
+    it "should set session[headless_quiz] if persist_headless param is sent" do
+      course_with_student_logged_in :active_all => 1
+      course_quiz !!:active
+      get 'show', :course_id => @course.id, :id => @quiz.id, :persist_headless => 1
+      controller.session[:headless_quiz].should be_true
+      assigns[:headers].should be_false
+    end
+
+    it "should not render headers if session[:headless_quiz] is set" do
+      course_with_student_logged_in :active_all => 1
+      course_quiz !!:active
+      controller.session[:headless_quiz] = true
+      get 'show', :course_id => @course.id, :id => @quiz.id
+      assigns[:headers].should be_false
     end
   end
 

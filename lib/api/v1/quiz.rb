@@ -73,7 +73,8 @@ module Api::V1::Quiz
 
   def quiz_json(quiz, context, user, session)
     api_json(quiz, user, session, API_ALLOWED_QUIZ_OUTPUT_FIELDS).merge(
-      :html_url => polymorphic_url([context, quiz])
+      :html_url => polymorphic_url([context, quiz]),
+      :mobile_url => polymorphic_url([context, quiz], :persist_headless => 1, :force_user => 1)
     )
   end
 

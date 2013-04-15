@@ -54,6 +54,10 @@ describe QuizzesApiController, :type => :integration do
       it "includes html_url" do
         @json['html_url'].should == polymorphic_url([@course, @quiz])
       end
+
+      it "includes mobile_url" do
+        @json['mobile_url'].should == polymorphic_url([@course, @quiz], :persist_headless => 1, :force_user => 1)
+      end
     end
 
     context "non-existent quiz" do

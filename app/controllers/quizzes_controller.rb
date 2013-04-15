@@ -22,7 +22,7 @@ class QuizzesController < ApplicationController
   before_filter :require_context
   add_crumb(proc { t('#crumbs.quizzes', "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
-  before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :filters, :read_only, :managed_quiz_data, :handle_logout]
+  before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :filters, :read_only, :managed_quiz_data]
 
   # The number of questions that can display "details". After this number, the "Show details" option is disabled
   # and the data is not even loaded.
@@ -143,10 +143,13 @@ class QuizzesController < ApplicationController
       return
     end
     if authorized_action(@quiz, @current_user, :read)
+      # optionally force auth even for public courses
+      return if value_to_boolean(params[:force_user]) && !force_user
+
       @quiz = @quiz.overridden_for(@current_user)
       add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
 
-      @headers = !params[:headless]
+      setup_headless
 
       if @quiz.require_lockdown_browser? && @quiz.require_lockdown_browser_for_results? && params[:viewing]
         return unless check_lockdown_browser(:medium, named_context_url(@context, 'context_quiz_url', @quiz.to_param, :viewing => "1"))
@@ -534,9 +537,18 @@ class QuizzesController < ApplicationController
     end
   end
 
-  def handle_logout
-    session[:return_to] = polymorphic_path([@context, @quiz])
-    redirect_to login_path
+  def force_user
+    if !@current_user
+      session[:return_to] = polymorphic_path([@context, @quiz])
+      redirect_to login_path
+    end
+    return @current_user.present?
+  end
+
+  def setup_headless
+    # persist headless state through take button and next/prev questions
+    session[:headless_quiz] = true if value_to_boolean(params[:persist_headless])
+    @headers = !params[:headless] && !session[:headless_quiz]
   end
 
   protected
