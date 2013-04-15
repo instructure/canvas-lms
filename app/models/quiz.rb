@@ -1127,7 +1127,9 @@ class Quiz < ActiveRecord::Base
   end
 
   def access_code_key_for_user(user)
-    "quiz_#{id}_#{user.id}_entered_access_code"
+    # user might be nil (practice quiz in public course) and isn't really
+    # necessary for this key anyway, but maintain backwards compat
+    "quiz_#{id}_#{user.try(:id)}_entered_access_code"
   end
 
   def group_category_id

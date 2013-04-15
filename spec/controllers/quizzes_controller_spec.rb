@@ -425,12 +425,21 @@ describe QuizzesController do
       response.should render_template('invalid_ip')
     end
 
-    it" should let the user take the quiz if the ip_filter matches" do
+    it "should let the user take the quiz if the ip_filter matches" do
       course_with_student_logged_in(:active_all => true)
       course_quiz(true)
       @quiz.ip_filter = '123.123.123.123'
       @quiz.save!
       request.env['REMOTE_ADDR'] = '123.123.123.123'
+      post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
+    end
+
+    it "should work without a user for non-graded quizzes in public courses" do
+      course_with_student :active_all => true
+      @course.update_attribute :is_public, true
+      course_quiz :active
+      @quiz.update_attribute :quiz_type, 'practice_quiz'
       post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
       response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
     end
