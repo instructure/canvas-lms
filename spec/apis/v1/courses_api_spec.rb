@@ -1380,6 +1380,22 @@ describe CoursesController, :type => :integration do
       }
     end
 
+    it "should map 'created' to 'unpublished'" do
+      @course1.workflow_state = 'created'
+      @course1.save!
+      json = api_call(:get, "/api/v1/courses/#{@course1.id}.json",
+              { :controller => 'courses', :action => 'show', :id => @course1.to_param, :format => 'json' })
+      json['workflow_state'].should == 'unpublished'
+    end
+
+    it "should map 'claimed' to 'unpublished'" do
+      @course1.workflow_state = 'claimed'
+      @course1.save!
+      json = api_call(:get, "/api/v1/courses/#{@course1.id}.json",
+              { :controller => 'courses', :action => 'show', :id => @course1.to_param, :format => 'json' })
+      json['workflow_state'].should == 'unpublished'
+    end
+
     it "should allow sis id in hex packed format" do
       sis_id = 'This.Sis/Id\\Has Nasty?Chars'
       # sis_id.unpack('H*').first

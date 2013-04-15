@@ -35,8 +35,9 @@ require 'set'
 #       // the course code
 #       course_code: "INSTCON12",
 #
-#       // the current status
-#       workflow_state: "available"
+#       // the current state of the course
+#       // one of "unpublished", "available", "completed", or "deleted"
+#       workflow_state: "available",
 #
 #       // the account associated with the course
 #       account_id: 81259,
@@ -243,7 +244,7 @@ class CoursesController < ApplicationController
              :is_public, :public_syllabus, :allow_student_assignment_edits, :allow_wiki_comments,
              :allow_student_forum_attachments, :open_enrollment, :self_enrollment,
              :root_account_id, :account_id, :public_description,
-             :restrict_enrollments_to_course_dates, :workflow_state, :hide_final_grades], nil)
+             :restrict_enrollments_to_course_dates, :hide_final_grades], nil)
           }
         else
           flash[:error] = t('errors.create_failed', "Course creation failed")
