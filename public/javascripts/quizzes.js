@@ -2339,7 +2339,6 @@ define([
         var $group = $form.parents(".group_top");
         var group = data.quiz_group;
         $form.loadingImage('remove');
-        var $group = $form.parents(".group_top");
         $group.removeClass('editing');
         $group.fillTemplateData({
           data: group,
@@ -2357,6 +2356,7 @@ define([
           $group.next(".assessment_question_bank").fillTemplateData({data: bank, hrefValues: ['bank_id', 'context_type_string', 'context_id']})
             .find(".bank_name").hide().filter(".bank_name_link").show();
         }
+        $group.find(".find_bank_link").hide();
         $group.fillFormData(data, {object_name: 'quiz_group'});
         var $bottom = $group.next();
         while($bottom.length > 0 && !$bottom.hasClass('group_bottom')) {
