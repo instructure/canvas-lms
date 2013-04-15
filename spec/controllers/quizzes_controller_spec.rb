@@ -826,7 +826,7 @@ describe QuizzesController do
         @student.messages.detect{|m| m.notification_id == @notification.id}.should_not be_nil
       end
 
-      it "should not send due date changed if notify_of_update is not set" do
+      it "should send due date changed if notify_of_update is not set" do
         course_due_date = 2.days.from_now
         section_due_date = 3.days.from_now
         post 'update', :course_id => @course.id,
@@ -841,7 +841,7 @@ describe QuizzesController do
             }]
           }
 
-        @student.messages.detect{|m| m.notification_id == @notification.id}.should be_nil
+        @student.messages.detect{ |m| m.notification_id == @notification.id }.should_not be_nil
       end
     end
   end
