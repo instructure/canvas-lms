@@ -150,6 +150,7 @@ class Account < ActiveRecord::Base
   add_setting :users_can_edit_name, :boolean => true, :root_only => true
   add_setting :open_registration, :boolean => true, :root_only => true
   add_setting :enable_scheduler, :boolean => true, :root_only => true, :default => false
+  add_setting :enable_draft, :boolean => true, :root_only => true, :default => false
   add_setting :calendar2_only, :boolean => true, :root_only => true, :default => false
   add_setting :show_scheduler, :boolean => true, :root_only => true, :default => false
   add_setting :enable_profiles, :boolean => true, :root_only => true, :default => false
