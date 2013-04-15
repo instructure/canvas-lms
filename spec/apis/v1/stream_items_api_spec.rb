@@ -334,7 +334,8 @@ describe UsersController, :type => :integration do
         'hide_final_grades' => false,
         'html_url' => course_url(@course, :host => HostUrl.context_host(@course)),
         'default_view' => 'feed',
-        'workflow_state' => 'available'
+        'workflow_state' => 'available',
+        'public_syllabus' => false,
       },
 
       'user' => {
@@ -423,7 +424,8 @@ describe UsersController, :type => :integration do
         'hide_final_grades' => false,
         'html_url' => course_url(@course, :host => HostUrl.context_host(@course)),
         'default_view' => 'feed',
-        'workflow_state' => 'available'
+        'workflow_state' => 'available',
+        'public_syllabus' => false,
       },
 
       'user' => {
