@@ -4,6 +4,7 @@ define [
   'underscore'
   'compiled/fn/preventDefault'
   'jqueryui/effects/drop'
+  'vendor/jquery.cookie'
 ], (I18n, _, preventDefault) ->
 
   $buffer = $("#flash_message_buffer")
@@ -12,6 +13,7 @@ define [
   $holder.on 'click', 'li', ->
     $this = $(this)
     return if $this.hasClass('no_close')
+    $.cookie('unsupported_browser_dismissed', '1') if $this.hasClass('unsupported_browser')
     $this.stop(true, true).remove()
     if (bufferIndex = $this.data('buffer-index'))?
       $buffer.find("[data-buffer-index=#{bufferIndex}]").remove()

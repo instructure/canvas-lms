@@ -1369,7 +1369,9 @@ class ApplicationController < ActionController::Base
   def flash_notices
     @notices ||= begin
       notices = []
-      notices << {:type => 'warning', :content => unsupported_browser, :classes => 'no_close'} if !browser_supported? && !@embedded_view
+      if !browser_supported? && !@embedded_view && !cookies['unsupported_browser_dismissed']
+        notices << {:type => 'warning', :content => unsupported_browser, :classes => 'unsupported_browser'} 
+      end
       if error = flash.delete(:error)
         notices << {:type => 'error', :content => error}
       end
