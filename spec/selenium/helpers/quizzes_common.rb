@@ -59,6 +59,18 @@ shared_examples_for "quizzes selenium tests" do
     wait_for_ajaximations
   end
 
+  def create_file_upload_question
+    question = fj(".question_form:visible")
+    click_option('.question_form:visible .question_type', 'File Upload Question')
+
+    replace_content(question.find_element(:css, "input[name='question_points']"), '4')
+
+    type_in_tiny '.question_form:visible textarea.question_content', 'This is a file upload question.'
+
+    submit_form(question)
+    wait_for_ajaximations
+  end
+
   def add_quiz_question(points)
     click_questions_tab
     @points_total += points.to_i
