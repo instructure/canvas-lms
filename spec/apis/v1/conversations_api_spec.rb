@@ -607,7 +607,8 @@ describe ConversationsController, :type => :integration do
                                              'locked_for_user' => false,
                                              'hidden_for_user' => false,
                                              'created_at' => attachment.created_at.as_json,
-                                             'updated_at' => attachment.updated_at.as_json, }]
+                                             'updated_at' => attachment.updated_at.as_json, 
+                                             'thumbnail_url' => attachment.thumbnail_url }]
                   }
                 ]
               }
@@ -692,6 +693,7 @@ describe ConversationsController, :type => :integration do
                 'hidden_for_user' => false,
                 'created_at' => attachment.created_at.as_json,
                 'updated_at' => attachment.updated_at.as_json,
+                'thumbnail_url' => attachment.thumbnail_url
               }
             ]
           },

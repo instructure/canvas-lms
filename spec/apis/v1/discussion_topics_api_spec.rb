@@ -201,6 +201,7 @@ describe DiscussionTopicsController, :type => :integration do
                                    'hidden_for_user' => false,
                                    'created_at' => @attachment.created_at.as_json,
                                    'updated_at' => @attachment.updated_at.as_json,
+                                   'thumbnail_url' => @attachment.thumbnail_url,
                   }],
                   "topic_children"=>[@sub.id],
                   "discussion_type" => 'side_comment',
@@ -464,6 +465,7 @@ describe DiscussionTopicsController, :type => :integration do
                 'hidden_for_user' => false,
                 'created_at' => attachment.created_at.as_json,
                 'updated_at' => attachment.updated_at.as_json,
+                'thumbnail_url' => attachment.thumbnail_url,
               }],
       "posted_at"=>gtopic.posted_at.as_json,
       "root_topic_id"=>nil,
@@ -1326,6 +1328,7 @@ describe DiscussionTopicsController, :type => :integration do
         'hidden_for_user' => false,
         'created_at' => @attachment.created_at.as_json,
         'updated_at' => @attachment.updated_at.as_json,
+        'thumbnail_url' => @attachment.thumbnail_url,
       }
 
       v0 = json['view'][0]

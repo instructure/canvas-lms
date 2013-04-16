@@ -35,6 +35,7 @@ shared_examples_for "file uploads api" do
       'hidden_for_user' => false,
       'created_at' => attachment.created_at.as_json,
       'updated_at' => attachment.updated_at.as_json,
+      'thumbnail_url' => attachment.thumbnail_url
     }
   end
 
@@ -81,6 +82,7 @@ shared_examples_for "file uploads api" do
       'hidden_for_user' => false,
       'created_at' => attachment.created_at.as_json,
       'updated_at' => attachment.updated_at.as_json,
+      'thumbnail_url' => attachment.thumbnail_url
     }
 
     attachment.file_state.should == 'available'

@@ -34,7 +34,8 @@
 #       "hidden':false,
 #       "lock_at':null,
 #       "locked_for_user":false,
-#       "hidden_for_user":false
+#       "hidden_for_user":false,
+#       "thumbnail_url":null
 #     }
 class FilesController < ApplicationController
   before_filter :require_user, :only => :create_pending
