@@ -82,6 +82,13 @@ describe "Canvas::Redis::Cassandra" do
     end
   end
 
+  describe "#build_where_conditions" do
+    it "should build a where clause given a hash" do
+      db.build_where_conditions(name: "test1").should == ["name = ?", ["test1"]]
+      db.build_where_conditions(state: "ut", name: "test1").should == ["name = ? AND state = ?", ["test1", "ut"]]
+    end
+  end
+
   describe "#update_record" do
     it "should do nothing if there are no updates or deletes" do
       db.expects(:execute).never

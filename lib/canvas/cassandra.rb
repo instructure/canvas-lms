@@ -157,13 +157,22 @@ module Canvas::Cassandra
       @db.keyspaces.find { |k| k.name == @db.keyspace }
     end
 
+    # returns a CQL snippet and list of arguments given a hash of conditions
+    # e.g.
+    # build_where_conditions(name: "foo", state: "ut")
+    # => ["name = ? AND state = ?", ["foo", "ut"]]
+    def build_where_conditions(conditions)
+      where_args = []
+      where_clause = conditions.sort_by { |k,v| k.to_s }.map { |k,v| where_args << v; "#{k} = ?" }.join(" AND ")
+      return where_clause, where_args
+    end
+
     protected
 
     def do_update_record(table_name, primary_key_attrs, changes)
-      where_args = []
       primary_key_attrs = primary_key_attrs.with_indifferent_access
       changes = changes.with_indifferent_access
-      where_clause = primary_key_attrs.sort_by { |k,v| k.to_s }.map { |k,v| where_args << v; "#{k} = ?" }.join(" AND ")
+      where_clause, where_args = build_where_conditions(primary_key_attrs)
 
       primary_key_attrs.each do |key,value|
         if changes[key].is_a?(Array) && !changes[key].first.nil?
