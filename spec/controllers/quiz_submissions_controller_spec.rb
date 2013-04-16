@@ -43,7 +43,7 @@ describe QuizSubmissionsController do
       @quiz.save!
       @submission = @quiz.find_or_create_submission(@student)
       @submission.grade_submission
-      post 'create', :course_id => @quiz.context_id, :quiz_id => @quiz.id, :question_123 => 'hi'
+      post 'create', :course_id => @quiz.context_id, :quiz_id => @quiz.id, :question_123 => 'hi', :validation_token => @submission.validation_token
       response.should be_redirect
     end
 
@@ -54,8 +54,18 @@ describe QuizSubmissionsController do
       @quiz.save!
       access_code_key = @quiz.access_code_key_for_user(@student)
       session[access_code_key] = true
-      post 'create', :course_id => @quiz.context_id, :quiz_id => @quiz.id, :question_123 => 'hi'
+      @submission = @quiz.find_or_create_submission(@student)
+      post 'create', :course_id => @quiz.context_id, :quiz_id => @quiz.id, :question_123 => 'hi', :validation_token => @submission.validation_token
       session.has_key?(access_code_key).should == false
+    end
+
+    it "should reject a submission when the validation token does not match" do
+      student_in_course(:active_all => true)
+      user_session(@student)
+      @submission = @quiz.find_or_create_submission(@student)
+      post 'create', :course_id => @quiz.context_id, :quiz_id => @quiz.id, :question_123 => 'hi', :validation_token => "xxx"
+      response.should be_redirect
+      flash[:error].should_not be_blank
     end
   end
   
@@ -93,7 +103,7 @@ describe QuizSubmissionsController do
       @qs = @quiz.generate_submission(@student, false)
       QuizSubmission.where(:id => @qs).update_all(:updated_at => 1.hour.ago)
 
-      put 'backup', :quiz_id => @quiz.id, :course_id => @course.id, :a => 'test'
+      put 'backup', :quiz_id => @quiz.id, :course_id => @course.id, :a => 'test', :validation_token => @qs.validation_token
       response.status.to_i.should == 401
 
       @qs.reload.submission_data[:a].should be_nil
@@ -105,7 +115,7 @@ describe QuizSubmissionsController do
       @qs = @quiz.generate_submission(@student, false)
       QuizSubmission.where(:id => @qs).update_all(:updated_at => 1.hour.ago)
 
-      put 'backup', :quiz_id => @quiz.id, :course_id => @course.id, :a => 'test'
+      put 'backup', :quiz_id => @quiz.id, :course_id => @course.id, :a => 'test', :validation_token => @qs.validation_token
       response.should be_success
 
       @qs.reload.submission_data[:a].should == 'test'

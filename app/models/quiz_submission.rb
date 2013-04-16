@@ -28,6 +28,7 @@ class QuizSubmission < ActiveRecord::Base
   before_save :update_kept_score
   before_save :sanitize_responses
   before_save :update_assignment_submission
+  before_create :assign_validation_token
 
   # update the QuizSubmission's Submission to 'graded' when the QuizSubmission is marked as 'complete.' this
   # ensures that quiz submissions with essay questions don't show as graded in the SpeedGrader until the instructor
@@ -632,4 +633,12 @@ class QuizSubmission < ActiveRecord::Base
   }
   scope :for_user_ids, lambda { |user_ids| where(:user_id => user_ids) }
   scope :completed, where(:workflow_state => %w(complete pending_review))
+
+  def assign_validation_token
+    self.validation_token = SecureRandom.hex(32)
+  end
+
+  def valid_token?(token)
+    self.validation_token.blank? || self.validation_token == token
+  end
 end

@@ -24,6 +24,9 @@
 
 <div id="questions" class="assessing">
   <input type="hidden" name="attempt" value="<%= @submission.attempt %>"/>
+  <% if @submission.validation_token.present? %>
+    <input type="hidden" name="validation_token" value="<%= @submission.validation_token %>"/>
+  <% end %>
   <% if @submission.preview? %>
     <input type="hidden" name="preview" value="1"/>
   <% end %>
