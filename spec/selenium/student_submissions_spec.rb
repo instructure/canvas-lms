@@ -265,8 +265,11 @@ describe "submissions" do
 
         # traverse the tree
         begin
-          f('#uploaded_files > ul > li.folder > .sign').click
-          wait_for_ajaximations
+          keep_trying_until do
+            f('#uploaded_files > ul > li.folder > .sign').click
+            wait_for_ajaximations
+            f('#uploaded_files > ul > li.folder .file .name').should be_displayed
+          end
           f('#uploaded_files > ul > li.folder .file .name').click
           wait_for_ajaximations
         rescue => err
