@@ -38,7 +38,7 @@
             $('.checkbox-workflow').on('change', function() {
                 var filter = [];
                 $('.checkbox-workflow:checked').each(function() {
-                    filter.push(this.value);
+                    filter.push('^' + this.value);
                 });
                 courseTable.fnFilter(filter.join('|'), 3, true);
             });
