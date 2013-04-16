@@ -88,6 +88,11 @@ class ContentMigration < ActiveRecord::Base
       record.changed_state(:failed) && !record.migration_settings[:skip_import_notification]
     }
   end
+  
+  def self.migration_plugins(exclude_hidden=false)
+    plugins = Canvas::Plugin.all_for_tag(:export_system)
+    exclude_hidden ? plugins.select{|p|!p.meta[:hide_from_users]} : plugins
+  end
 
   # the stream item context is decided by calling asset.context(user), i guess
   # to differentiate from the normal asset.context() call that may not give us

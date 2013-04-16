@@ -93,7 +93,7 @@ class ContentImportsController < ApplicationController
           render :json => @migration.errors, :status => :bad_request
         end
       else
-        @plugins = Canvas::Plugin.all_for_tag(:export_system)
+        @plugins = ContentMigration.migration_plugins(true)
         @select_options = @plugins.map{|p|[p.metadata(:select_text), p.id]}
         @pending_migrations = ContentMigration.find_all_by_context_id(@context.id).any?
         render

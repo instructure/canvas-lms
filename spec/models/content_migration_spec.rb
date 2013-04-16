@@ -1672,5 +1672,10 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
     end
 
   end
+  
+  it "should exclude user-hidden migration plugins" do
+    ab = Canvas::Plugin.find(:academic_benchmark_importer)
+    ContentMigration.migration_plugins(true).include?(ab).should be_false
+  end
 
 end
