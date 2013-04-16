@@ -84,7 +84,7 @@ define [
 
     onSaveFail: (xhr) =>
       errors = {}
-      errors = @parseErrorResponse xhr.responseText
+      errors = @parseErrorResponse xhr
       @showErrors errors
       @trigger 'fail', errors, arguments...
 
@@ -113,4 +113,10 @@ define [
     #     ]
     #   }
     parseErrorResponse: (response) ->
-      $.parseJSON(response).errors
+      if response.status is 422
+        {authenticity_token: "invalid"}
+      else
+        try
+          $.parseJSON(response.responseText).errors
+        catch error
+          {}
