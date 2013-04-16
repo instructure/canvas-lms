@@ -4,7 +4,7 @@ body
   background-image: url("/images/blue/bg.jpg")
   min-width: $min_main_width
 
-  &.no-headers
+  &.no-headers, &.embedded
     #header, #topbar, #left-side, #breadcrumbs
       display: none !important
     #footer
@@ -27,6 +27,16 @@ body
       min-height: 0
     #content
       padding: 1em
+    h2
+      @include ui-widget-header-bg-and-text
+      font-size: 14px
+      font-weight: bold
+      margin: -0.95em -0.95em 1em
+      padding: 0.4em 1em
+      line-height: 20px
+    &.no-headers
+      h2
+        display: none
     .embedded-footer
       position: absolute
       bottom: 0

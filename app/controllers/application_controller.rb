@@ -1275,7 +1275,7 @@ class ApplicationController < ActionController::Base
 
   def set_layout_options
     @embedded_view = params[:embedded]
-    @headers = false if params[:no_headers] || @embedded_view
+    @headers = false if params[:no_headers]
     (@body_classes ||= []) << 'embedded' if @embedded_view
   end
 
@@ -1369,7 +1369,7 @@ class ApplicationController < ActionController::Base
   def flash_notices
     @notices ||= begin
       notices = []
-      notices << {:type => 'warning', :content => unsupported_browser, :classes => 'no_close'} if !browser_supported?
+      notices << {:type => 'warning', :content => unsupported_browser, :classes => 'no_close'} if !browser_supported? && !@embedded_view
       if error = flash.delete(:error)
         notices << {:type => 'error', :content => error}
       end

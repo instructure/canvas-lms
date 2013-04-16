@@ -12,9 +12,7 @@
 %>
 
 <div id="modal-box">
-  <% if !@embedded_view %>
-    <h2><%= t :course_enrollment, "Course Enrollment" %></h2>
-  <% end %>
+  <h2><%= t('titles.course_enrollment', 'Enroll in %{course}', :course => @course.name) %></h2>
   <% if !@course.self_enrollment? %>
     <%= render :partial => 'enrollment_closed' %>
   <% elsif @current_user && @course.user_is_student?(@current_user, :include_future => true) %>
