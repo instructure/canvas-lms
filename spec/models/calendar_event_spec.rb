@@ -202,10 +202,10 @@ describe CalendarEvent do
       </p>
       HTML
         ev = @event.to_ics(false)
-        ev.description.should == "This assignment is due December 16th. Please do the reading.
+        ev.description.should match_ignoring_whitespace("This assignment is due December 16th. Please do the reading.
  
 
-[link!](www.example.com)"
+[link!](www.example.com)")
         ev.x_alt_desc.should == @event.description
       end
 

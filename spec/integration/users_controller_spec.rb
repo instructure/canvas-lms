@@ -36,13 +36,13 @@ describe UsersController do
 
     it "should count conversations as interaction" do
       get user_student_teacher_activity_url(@teacher, @e1.user)
-      Nokogiri::HTML(response.body).at_css('table.report tr:first td:nth(2)').text.should match(/never/)
+      Nokogiri::HTML(response.body).at_css('table.report tbody tr:first td:nth(2)').text.should match(/never/)
 
       @conversation = Conversation.initiate([@e1.user, @teacher], false)
       @conversation.add_message(@teacher, "hello")
 
       get user_student_teacher_activity_url(@teacher, @e1.user)
-      Nokogiri::HTML(response.body).at_css('table.report tr:first td:nth(2)').text.should match(/less than 1 day/)
+      Nokogiri::HTML(response.body).at_css('table.report tbody tr:first td:nth(2)').text.should match(/less than 1 day/)
     end
 
     it "should only include students the teacher can view" do

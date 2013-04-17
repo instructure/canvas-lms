@@ -153,7 +153,7 @@ describe ImportedHtmlConverter do
 </object>
       HTML
 
-      ImportedHtmlConverter.convert(test_string, @course).should == <<-HTML.strip
+      ImportedHtmlConverter.convert(test_string, @course).should match_ignoring_whitespace(<<-HTML.strip)
 <object>
 <param name="controls" value="CONSOLE">
 <param name="controller" value="true">

@@ -111,6 +111,16 @@ Spec::Matchers.define :encompass do |expected|
   end
 end
 
+Spec::Matchers.define :match_ignoring_whitespace do |expected|
+  def whitespaceless(str)
+    str.gsub(/\s+/, '')
+  end
+
+  match do |actual|
+    whitespaceless(actual) == whitespaceless(expected)
+  end
+end
+
 module MochaRspecAdapter
   include Mocha::API
   def setup_mocks_for_rspec

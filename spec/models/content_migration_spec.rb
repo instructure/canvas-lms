@@ -1260,7 +1260,7 @@ describe ContentMigration do
       bank.assessment_questions.count.should == 1
       aq = bank.assessment_questions.first
 
-      aq.question_data['question_text'].should == @question.question_data['question_text']
+      aq.question_data['question_text'].should match_ignoring_whitespace(@question.question_data['question_text'])
     end
 
     it "should correctly copy quiz question html file references" do
@@ -1304,8 +1304,8 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
       q_to = @copy_to.quizzes.first
       qq_to = q_to.quiz_questions.first
-      qq_to.question_data[:question_text].should == qtext % [@copy_to.id, att_2.id, @copy_to.id, "files/#{att2_2.id}/preview", @copy_to.id, "files/#{att4_2.id}/preview"]
-      qq_to.question_data[:answers][0][:html].should == %{File ref:<img src="/courses/#{@copy_to.id}/files/#{att3_2.id}/download">}
+      qq_to.question_data[:question_text].should match_ignoring_whitespace(qtext % [@copy_to.id, att_2.id, @copy_to.id, "files/#{att2_2.id}/preview", @copy_to.id, "files/#{att4_2.id}/preview"])
+      qq_to.question_data[:answers][0][:html].should match_ignoring_whitespace(%{File ref:<img src="/courses/#{@copy_to.id}/files/#{att3_2.id}/download">})
     end
 
     it "should copy all html fields in assessment questions" do
