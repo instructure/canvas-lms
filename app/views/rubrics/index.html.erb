@@ -72,7 +72,16 @@ require([
 });
 </script>
 <% end %>
-<h2><%= @context.class.to_s %> <%= t('titles.rubrics', 'Rubrics') %></h2>
+<h2>
+  <% case @context.class.to_s %>
+    <% when 'Course' %>
+      <%= t 'course_rubrics', "Course Rubrics" %>
+    <% when 'User' %>
+      <%= t 'user_rubrics', "User Rubrics" %>
+    <% when 'Account' %>
+      <%= t 'account_rubrics', "Account Rubrics" %>
+  <% end %>
+</h2>
 <a href="<%= context_url(@context, :context_rubrics_url) %>" id="add_rubric_url" style="display: none;">&nbsp;</a>
 <div id="rubrics" class="raw_listing">
   <ul>

@@ -53,7 +53,9 @@
   </div>
 <% end %>
 
-<a class="btn btn-small print-grades" href="javascript:window.print()"><i class="icon-printer"></i> Print grades</a>
+<a class="btn btn-small print-grades icon-printer" href="javascript:window.print()">
+  <%= t :print_grades, "Print grades" %>
+</a>
 <h2>
 <% ot('headers.grades', "Grades For %{student}", :student => capture { %>
  <% unless @presenter.multiple_observed_students?  %>

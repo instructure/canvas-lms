@@ -13,13 +13,24 @@
     <input type="hidden" name="quiz_group[assessment_question_bank_id]" class="bank_id"/>
     <span class="group_display name" style="font-weight: bold; padding-right: 20px;"><%= hash_get(group, :name, t(:default_group_name, "Group")) %></span>
     <input name="quiz_group[name]" type="text" value="Group Name" class="group_edit" value="<%= hash_get(group, :name, t(:default_group_name, "Group")) %>"/>
-    Pick 
-    <span class="group_display pick_count"><%= hash_get(group, :pick_count, 1) %></span>
-    <input name="quiz_group[pick_count]" type="text" style="width: 20px;" class="group_edit" value="<%= hash_get(group, :pick_count, 1) %>"/> 
-    questions, 
-    <span class="group_display question_points"><%= hash_get(group, :question_points, 1) %></span>
-    <input name="quiz_group[question_points]" type="text" style="width: 20px;" class="group_edit" value="<%= hash_get(group, :question_points, 1) %>"/> 
-    pts per question
+    <span class="group_display">
+      <%= t(:show_questions_and_points, "Pick *%{num_questions}* questions, #%{num_points}# pts per question",
+            :num_questions => hash_get(group, :pick_count, 1),
+            :num_points => hash_get(group, :question_points, 1),
+            :wrapper => { 
+              '*' => '<span class="pick_count">\1</span>', 
+              '#' => '<span class="question_points">\1</span>'
+            }) %>
+    </span>
+    <span class="group_edit">
+      <%= t(:edit_questions_and_points, "Pick *%{num_questions}* questions, #%{num_points}# pts per question",
+            :num_questions => hash_get(group, :pick_count, 1),
+            :num_points => hash_get(group, :question_points, 1),
+            :wrapper => { 
+              '*' => '<input name="quiz_group[pick_count]" type="text" style="width: 20px;" value="\1"/>',
+              '#' => '<input name="quiz_group[question_points]" type="text" style="width: 20px;" value="\1"/>'
+            }) %>
+    </span>
     <% if !group %>
       <div class="group_edit">
         <a href="#" class="icon-search find_bank_link"><%= t('links.link_to_a_question_bank', "Link to a Question Bank") %></a>
