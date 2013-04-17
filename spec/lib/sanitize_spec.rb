@@ -86,6 +86,12 @@ describe Sanitize do
     res = Sanitize.clean(str, Instructure::SanitizeField::SANITIZE)
     res.should == str
   end
+  
+  it "should allow font tags with valid attributes" do
+    str = %{<font face="Comic Sans MS" color="blue" size="3" bacon="yes">hello</font>}
+    res = Sanitize.clean(str, Instructure::SanitizeField::SANITIZE)
+    res.should == %{<font face="Comic Sans MS" color="blue" size="3">hello</font>}
+  end
 
   Dir.glob(Rails.root.join('spec', 'fixtures', 'xss', '*.xss')) do |filename|
     name = File.split(filename).last
