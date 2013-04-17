@@ -50,6 +50,10 @@ class QuizzesController < ApplicationController
     end
   end
 
+  def attachment_hash(attachment)
+    {:id => attachment.id, :display_name => attachment.display_name}
+  end
+
   def new
     if authorized_action(@context.quizzes.new, @current_user, :create)
       @assignment = nil
@@ -149,6 +153,17 @@ class QuizzesController < ApplicationController
     end
   end
 
+  def setup_attachments
+    if @submission
+      @attachments = Hash[@submission.attachments.map do |attachment|
+          [attachment.id,attachment]
+      end
+      ]
+    else
+      @attachments = {}
+    end
+  end
+
   def show
     if @quiz.deleted?
       flash[:error] = t('errors.quiz_deleted', "That quiz has been deleted")
@@ -196,6 +211,11 @@ class QuizzesController < ApplicationController
         @submission.reload
         @just_graded = true
       end
+      if @submission
+        upload_url = api_v1_quiz_submission_create_file_path(:course_id => @context.id, :quiz_id => @quiz.id)
+        js_env :UPLOAD_URL => upload_url
+      end
+      setup_attachments
       submission_counts if @quiz.grants_right?(@current_user, session, :grade) || @quiz.grants_right?(@current_user, session, :read_statistics)
       @stored_params = (@submission.temporary_data rescue nil) if params[:take] && @submission && (@submission.untaken? || @submission.preview?)
       @stored_params ||= {}
@@ -203,7 +223,8 @@ class QuizzesController < ApplicationController
       js_env :QUIZZES_URL => polymorphic_url([@context, :quizzes]),
              :IS_SURVEY => @quiz.survey?,
              :QUIZ => quiz_json(@quiz,@context,@current_user,session),
-             :LOCKDOWN_BROWSER => @quiz.require_lockdown_browser?
+             :LOCKDOWN_BROWSER => @quiz.require_lockdown_browser?,
+             :ATTACHMENTS => Hash[@attachments.map { |_,a| [a.id,attachment_hash(a)]}]
       if params[:take] && can_take_quiz?
         # allow starting the quiz via a GET request, but only when using a lockdown browser
         if request.post? || (@quiz.require_lockdown_browser? && !quiz_submission_active?)
@@ -341,6 +362,7 @@ class QuizzesController < ApplicationController
         @submission.grade_submission(:finished_at => @submission.end_at)
         @submission.reload
       end
+      setup_attachments
       if @quiz.deleted?
         flash[:error] = t('errors.quiz_deleted', "That quiz has been deleted")
         redirect_to named_context_url(@context, :context_quizzes_url)

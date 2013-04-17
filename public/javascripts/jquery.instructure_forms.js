@@ -268,14 +268,7 @@ define([
     return this;
   };
 
-  var assert_option = function(data, arg) {
-    if(!data[arg]) {
-      throw arg + " option is required";
-    }
-  };
-
   $.ajaxJSONPreparedFiles = function(options) {
-    assert_option(options, 'context_code');
     var list = [];
     var $this = this;
     var pre_list = options.files || options.file_elements || [];
@@ -312,7 +305,7 @@ define([
           }, function(data) {
             $(file).attr('name', old_name);
             (options.upload_error || options.error).call($this, data);
-          }, {onlyGivenParameters: data.remote_url});
+          }, {onlyGivenParameters: data.remote_url });
         } else {
           (options.upload_error || options.error).call($this, data);
         }
@@ -327,6 +320,8 @@ define([
       var item = list.shift();
       if(item) {
         uploadFile.call($this, $.extend({
+          'name': item.name,
+          'on_duplicate': 'rename',
           'attachment[folder_id]': options.folder_id,
           'attachment[intent]': options.intent,
           'attachment[asset_string]': options.asset_string,

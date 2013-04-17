@@ -1076,7 +1076,7 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :quiz_submissions_api) do |quiz_submissions|
-      quiz_submissions.post 'courses/:course_id/quizzes/:quiz_id/quiz_submissions/self/files', :action => :create_file
+      quiz_submissions.post 'courses/:course_id/quizzes/:quiz_id/quiz_submissions/self/files', :action => :create_file, :path_name => 'quiz_submission_create_file'
     end
 
     api.with_options(:controller => :outcome_groups_api) do |outcome_groups|

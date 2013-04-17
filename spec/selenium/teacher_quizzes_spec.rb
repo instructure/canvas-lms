@@ -444,6 +444,80 @@ describe "quizzes" do
       confirm_dialog.accept
     end
 
+    def upload_attachment_answer
+      fj('input[type=file]').send_keys @fullpath
+      wait_for_ajaximations
+      keep_trying_until do
+        fj('.file-uploaded').text
+        fj('.list_question, .answered').text
+      end
+      fj('.upload-label').click
+      wait_for_ajaximations
+    end
+
+    def file_upload_submission_data
+      @quiz.reload.quiz_submissions.first.
+        submission_data["question_#{@question.id}".to_sym]
+    end
+
+    def file_upload_attachment
+      @quiz.reload.quiz_submissions.first.attachments.first
+    end
+
+
+    it "works with file upload questions" do
+      @context = @course
+      bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
+      q = quiz_model
+      a = AssessmentQuestion.create!
+      b = AssessmentQuestion.create!
+      bank.assessment_questions << a
+      bank.assessment_questions << b
+      answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
+      @question = q.quiz_questions.create!(:question_data => {
+          :name => "first question",
+          'question_type' => 'file_upload_question',
+          'question_text' => 'file upload question maaaan',
+          'answers' => answers,
+          :points_possible => 1
+      }, :assessment_question => a)
+      q.generate_quiz_data
+      q.save!
+      filename,@fullpath,data = get_file "testfile1.txt"
+      get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
+      expect_new_page_load do
+        driver.find_element(:link_text, 'Take the Quiz').click
+      end
+      wait_for_animations
+      # so we can .send_keys to the input, can't if it's invisible to
+      # the browser
+      driver.execute_script "$('.file-upload').removeClass('hidden')"
+      upload_attachment_answer
+      file_upload_submission_data.should == [ file_upload_attachment.id.to_s ]
+      # delete the attachment id
+      fj('.delete-attachment').click
+      keep_trying_until do
+        fj('.answered').should == nil
+      end
+      keep_trying_until do
+        fj('.upload-label').click
+        wait_for_ajaximations
+        file_upload_submission_data.should == [""]
+      end
+      upload_attachment_answer
+      expect_new_page_load do
+        driver.get driver.current_url
+        driver.switch_to.alert.accept
+      end
+      wait_for_animations
+      attachment = file_upload_attachment
+      fj('.file-upload-box').text.should include attachment.display_name
+      f('#submit_quiz_button').click
+      keep_trying_until do
+        fj('.selected_answer').text.should include attachment.display_name
+      end
+    end
+
     it "should notify a student of extra time given by a moderator" do
       @context = @course
       bank = @course.assessment_question_banks.create!(:title => 'Test Bank')

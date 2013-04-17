@@ -16,12 +16,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 define([
+  'compiled/views/quizzes/FileUploadQuestionView',
   'i18n!quizzes.take_quiz',
   'jquery' /* $ */,
   'quiz_timing',
   'compiled/behaviors/autoBlurActiveInput',
   'underscore',
   'jquery.ajaxJSON' /* ajaxJSON */,
+  'jquery.toJSON',
   'jquery.instructure_date_and_time' /* friendlyDatetime, friendlyDate */,
   'jquery.instructure_forms' /* getFormData, errorBox */,
   'jqueryui/dialog',
@@ -31,7 +33,7 @@ define([
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'compiled/behaviors/quiz_selectmenu'
-], function(I18n, $, timing, autoBlurActiveInput, _) {
+], function(FileUploadQuestionView,I18n, $, timing, autoBlurActiveInput, _) {
 
   var lastAnswerSelected = null;
   var lastSuccessfulSubmissionData = null;
@@ -444,7 +446,7 @@ define([
 
         if (tagName == "TEXTAREA") {
           val = $this.editorBox('get_code');
-        } else if ($this.attr('type') == "text") {
+        } else if ($this.attr('type') == "text" || $this.attr('type') == 'hidden') {
           val = $this.val();
         } else if (tagName == "SELECT") {
           var $selects = $this.parents(".question").find("select.question_input");
@@ -580,5 +582,16 @@ define([
     // now that JS has been initialized, enable the next and previous buttons
     $submit_buttons.removeAttr('disabled');
   });
+
+  $('.file-upload-question-holder').each(function(i,el) {
+    var $el = $(el);
+    var val = parseInt($el.find('input.attachment-id').val(),10);
+    if (val && val !==  0){
+      $el.find('.file-upload-box').addClass('file-upload-box-with-file');
+    }
+    var model = ENV.ATTACHMENTS[val] || {};
+    new FileUploadQuestionView({el: el,model: model}).render();
+  });
+
 });
 

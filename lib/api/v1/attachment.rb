@@ -97,7 +97,7 @@ module Api::V1::Attachment
       render :json => @attachment.ajax_upload_params(@current_pseudonym,
                                                      api_v1_files_create_url(:on_duplicate => duplicate_handling, :quota_exemption => quota_exemption),
                                                      api_v1_files_create_success_url(@attachment, :uuid => @attachment.uuid, :on_duplicate => duplicate_handling, :quota_exemption => quota_exemption),
-                                                     :ssl => request.ssl?).slice(:upload_url, :upload_params)
+                                                     :ssl => request.ssl?).slice(:upload_url,:upload_params,:file_param,:remote_url)
     end
   end
   

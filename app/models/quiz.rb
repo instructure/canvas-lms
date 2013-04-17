@@ -1151,4 +1151,5 @@ class Quiz < ActiveRecord::Base
   def anonymous_survey?
     survey? && anonymous_submissions
   end
+
 end

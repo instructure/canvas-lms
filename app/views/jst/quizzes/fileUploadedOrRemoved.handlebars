@@ -1,0 +1,18 @@
+{{#if fileUploaded}}
+
+  <div class="file-status file-uploaded">
+    <em>
+    {{#t "quizzes.file_successfully_uploaded"}}
+      Your file has been successfully uploaded.
+      {{/t}}
+    </em>
+  </div>
+{{else}}
+  <div class="file-status file-removed">
+    <em>
+      {{#t "quizzes.files_removed"}}
+        {{display_name}} has been removed.
+      {{/t}}
+    </em>
+  </div>
+{{/if}}

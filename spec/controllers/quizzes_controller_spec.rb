@@ -191,6 +191,27 @@ describe QuizzesController do
       get 'show', :course_id => @course.id, :id => @quiz.id
       assigns[:headers].should be_false
     end
+
+    it "assigns js_env for attachments if submission is present" do
+      require 'action_controller'
+      require 'action_controller/test_process.rb'
+      course_with_student_logged_in :active_all => true
+      course_quiz !!:active
+      submission = @quiz.generate_submission @user
+      io = ActionController::TestUploadedFile.new(
+        File.expand_path(File.dirname(__FILE__) +
+                         '/../fixtures/scribd_docs/doc.doc'),
+                         'application/msword', true)
+      submission.attachments.create! :filename => "attachment.png",
+        :display_name => "attachment.png", :user => @user,
+        :uploaded_data => io
+      get 'show', :course_id => @course.id, :id => @quiz.id
+      attachment = submission.attachments.first
+      assigns[:js_env][:ATTACHMENTS].should == {
+        attachment.id => {:id => attachment.id,
+                          :display_name => attachment.display_name }
+      }
+    end
   end
 
   describe "GET 'managed_quiz_data'" do
@@ -206,7 +227,6 @@ describe QuizzesController do
       course_quiz
       @sub1 = @quiz.generate_submission(@user1)
       @sub2 = @quiz.generate_submission(@user2)
-
       user_session @teacher
       get 'managed_quiz_data', :course_id => @course.id, :quiz_id => @quiz.id
       assigns[:submissions][@sub1.user_id].should == @sub1
