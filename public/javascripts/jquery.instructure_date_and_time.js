@@ -460,6 +460,9 @@ define([
           .text(text);
 
       }).triggerHandler('change');
+      // TEMPORARY FIX: Hide from aria screenreader until the jQuery UI datepicker is updated for accessibility.
+      $field.next().attr('aria-hidden', 'true');
+      $field.next().attr('tabindex', '-1');
     });
     return this;
   };
