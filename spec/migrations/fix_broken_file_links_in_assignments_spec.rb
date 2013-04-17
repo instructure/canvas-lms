@@ -101,4 +101,22 @@ describe 'DataFixup::FixBrokenFileLinksInAssignments' do
     att2_2 = course2.attachments.find_by_cloned_item_id(att1.cloned_item_id) if att1.cloned_item_id
     att2_2.should == att2
   end
+
+  it "shouldn't break a discussion assignment" do
+    course1 = course
+    att1 = attachment_model(:context => course1)
+    assignment_model(:context => course1, :submission_types => "discussion_topic", :description => "<a id=\"l3\" href=\"/files/#{att1.id}/download?verifier=hurpdurpdurp\">no context, verifier</a>")
+    topic = @assignment.discussion_topic
+
+    topic.reload
+    topic.assignment.should_not be_nil
+
+    FixBrokenFileLinksInAssignments.up
+
+    @assignment.reload
+    @assignment.description.should == "<a id=\"l3\" href=\"/courses/#{course1.id}/files/#{att1.id}/download?wrap=1\">no context, verifier</a>"
+
+    topic.reload
+    topic.assignment.should_not be_nil
+  end
 end
