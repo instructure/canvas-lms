@@ -118,13 +118,24 @@ end
 
 def data_setup
   course_with_teacher_logged_in
+  assignment_setup
+end
+
+def data_setup_as_observer
+  course_with_observer_logged_in
+  @course.observers=[@observer]
+  assignment_setup
+  @all_students.each {|s| s.observers=[@observer]}
+end
+
+def assignment_setup
+  course_with_teacher_logged_in
   @course.grading_standard_enabled = true
   @course.save!
   @course.reload
 
   #add first student
   @student_1 = User.create!(:name => STUDENT_NAME_1)
-
   @student_1.register!
   @student_1.pseudonyms.create!(:unique_id => "nobody1@example.com", :password => DEFAULT_PASSWORD, :password_confirmation => DEFAULT_PASSWORD)
 
