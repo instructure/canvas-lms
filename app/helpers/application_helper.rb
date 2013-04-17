@@ -343,6 +343,10 @@ module ApplicationHelper
     attr_accessor :cached_translation_blocks
   end
 
+  def include_js_translations?
+    !!(params[:include_js_translations] || use_optimized_js?)
+  end
+
   # See `js_base_url`
   def use_optimized_js?
     if ENV['USE_OPTIMIZED_JS'] == 'true'
