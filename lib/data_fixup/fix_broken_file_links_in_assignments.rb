@@ -1,16 +1,20 @@
 module DataFixup::FixBrokenFileLinksInAssignments
-  
+
   def self.broken_assignment_scope
+    # This date is the date that g/16823 was deployed to beta and production
     Assignment.where(["context_type = ? AND updated_at > ? AND
       (description LIKE ? OR description LIKE ? OR description LIKE ?)",
       "Course", "2013-03-08", "%verifier%", "%'/files/%", "%\"/files/%"])
   end
-  
+
   def self.run
     broken_assignment_scope.find_in_batches do |assignments|
-      # This date is the date that g/16823 was deployed to beta and production
-      assignments.each do |assignment|
-        check_and_fix_assignment_description(assignment)
+      # When the topic is saved it can't find the assignment because the
+      # find_in_batches scope is still in effect, make it have an exclusive scope
+      Assignment.send(:with_exclusive_scope) do
+        assignments.each do |assignment|
+          check_and_fix_assignment_description(assignment)
+        end
       end
     end
   end
@@ -67,12 +71,9 @@ module DataFixup::FixBrokenFileLinksInAssignments
     end
 
     if changed
-      assignment.description = doc.at_css('body').inner_html
-      if !assignment.save_without_broadcasting
-        Rails.logger.error "FixBrokenFileLinksInAssignments couldn't fix #{assignment.id}"
-      end
+      Assignment.where(:id => assignment).update_all(:description => doc.at_css('body').inner_html)
     end
-  rescue 
+  rescue
     Rails.logger.error "FixBrokenFileLinksInAssignments couldn't fix #{assignment.id}"
   end
 end
