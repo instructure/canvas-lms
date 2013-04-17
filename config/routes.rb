@@ -747,6 +747,7 @@ ActionController::Routing::Routes.draw do |map|
 
     api.with_options(:controller => :gradebook_history_api) do |gradebook_history|
       gradebook_history.get "courses/:course_id/gradebook_history/days", :action => :days, :path_name => 'gradebook_history'
+      gradebook_history.get "courses/:course_id/gradebook_history/feed", :action => :feed, :path_name => 'gradebook_history_feed'
       gradebook_history.get "courses/:course_id/gradebook_history/:date", :action =>:day_details, :path_name => 'gradebook_history_for_day'
       gradebook_history.get "courses/:course_id/gradebook_history/:date/graders/:grader_id/assignments/:assignment_id/submissions", :action => :submissions, :path_name => 'gradebook_history_submissions'
     end

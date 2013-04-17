@@ -20,6 +20,7 @@ class SubmissionVersion < ActiveRecord::Base
   attr_accessible :context_id, :context_type, :user_id, :assignment_id, :version_id
 
   belongs_to :context, :polymorphic => true
+  belongs_to :version
 
   class << self
     def index_version(version)
