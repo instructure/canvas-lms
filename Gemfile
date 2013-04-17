@@ -31,7 +31,7 @@ if !CANVAS_RAILS3
   gem 'fake_arel',      '1.0.0'
 end
 gem 'ffi',            '1.1.5'
-gem 'hairtrigger',    '0.1.14'
+gem 'hairtrigger',    '0.2.3'
 gem 'sass',           '3.2.3'
 if !ONE_NINE
   gem 'fastercsv', '1.5.3'
@@ -155,8 +155,8 @@ group :development, :test do
 end
 
 group :i18n_tools do
-  gem 'ruby_parser', '2.0.6'
-  gem 'sexp_processor', '3.0.5'
+  gem 'ruby_parser', '3.1.3'
+  gem 'sexp_processor', '4.2.1'
   gem 'ya2yaml', '0.30'
 end
 

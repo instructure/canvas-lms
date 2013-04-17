@@ -24,17 +24,16 @@ module I18nExtraction
 
       call_scope = @scope
       if receiver && receiver.last == :Plugin && method == :register &&
-          exp.first && exp.first.sexp_type == :arglist &&
-          exp.first[1] && [:lit, :str].include?(exp.first[1].sexp_type)
-        call_scope = "plugins.#{exp.first[1].last}."
+          exp.first && [:lit, :str].include?(exp.first.sexp_type)
+        call_scope = "plugins.#{exp.first.last}."
       end
 
       # ignore things like mt's t call
       unless ALL_CALLS.include?(@current_defn)
         if TRANSLATE_CALLS.include?(method)
-          process_translate_call(receiver, method, exp.shift)
+          process_translate_call(receiver, method, exp)
         elsif LABEL_CALLS.include?(method)
-          process_label_call(receiver, method, exp.shift)
+          process_label_call(receiver, method, exp)
         end
       end
 
@@ -54,7 +53,6 @@ module I18nExtraction
 
     def process_translate_call(receiver, method, args)
       line = args.line
-      args.shift
       unless args.size >= 2
         if method == :before_label
           process args.shift until args.empty?
@@ -118,7 +116,6 @@ module I18nExtraction
     #  label_tag :foo, :en => "Foo"
     #  label_tag :foo, :foo_key, :en => "Foo"
     def process_label_call(receiver, method, args)
-      args.shift
       args.shift unless receiver || method.to_s == 'label_tag' # remove object_name arg
 
       inferred = false
@@ -199,8 +196,8 @@ module I18nExtraction
         exp.last
       elsif exp.sexp_type == :lit && options.delete(:allow_symbols)
         exp.last
-      elsif exp.sexp_type == :call && exp[2] == :+ && exp.last && exp.last.sexp_type == :arglist && exp.last.size == 2 && exp.last.last.sexp_type == :str
-        process_possible_string_concat(exp[1]) + exp.last.last.last
+      elsif exp.sexp_type == :call && exp[2] == :+ && exp.size == 4 && exp[3].sexp_type == :str
+        process_possible_string_concat(exp[1]) + exp[3].last
       else
         raise options[:top_level_error] ? options[:top_level_error].call(exp) : "unsupported string concatenation/interpolation #{exp.inspect} on line #{exp.line}"
       end
