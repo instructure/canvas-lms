@@ -46,12 +46,10 @@ describe Handlebars do
     end
 
     it "should fix up the scope" do
-      Handlebars.prepare_i18n('{{#t "foo"}}hello{{/t}}', '_test')[:content].
-        should eql('{{{t "foo" "hello" scope="test"}}}')
-      Handlebars.prepare_i18n('{{#t "foo"}}hello{{/t}}', 'test/test')[:content].
-        should eql('{{{t "foo" "hello" scope="test.test"}}}')
-      Handlebars.prepare_i18n('{{#t "foo"}}hello{{/t}}', 'test/_this_is_a_test')[:content].
-        should eql('{{{t "foo" "hello" scope="test.this_is_a_test"}}}')
+      Handlebars.scopify('_test').should == "test"
+      Handlebars.scopify('test/test').should == "test.test"
+      Handlebars.scopify('test/_this_is-a_test').should == "test.this_is_a_test"
+      Handlebars.scopify('test/_andThisIsATest').should == "test.and_this_is_a_test"
     end
 
   end
