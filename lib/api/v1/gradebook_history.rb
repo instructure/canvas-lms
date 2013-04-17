@@ -23,35 +23,64 @@ module Api::V1
         each { |grader| compress(grader, :assignments) }
     end
 
+    def version_json(course, version, opts={})
+      json = version.model.attributes.symbolize_keys
+      submission = opts[:submission] || version.versionable
+      assignment = opts[:assignment] || submission.assignment
+      student = opts[:student] || submission.user
+      current_grader = submission.grader || default_grader
+      grader = (json[:grader_id] && json[:grader_id] > 0 && user_cache[json[:grader_id]]) || default_grader
+
+      json = json.merge(
+        :grader => grader.name,
+        :safe_grader_id => grader.id,
+        :assignment_name => assignment.title,
+        :student_user_id => student.id,
+        :student_name => student.name,
+        :course_id => course.id,
+        :submission_id => submission.id,
+        :current_grade => submission.grade,
+        :current_graded_at => submission.graded_at,
+        :current_grader => current_grader.name
+      )
+      json[:graded_on] = json[:graded_at].in_time_zone.to_date if json[:graded_at]
+      json
+    end
+
+    def versions_json(course, versions, opts={})
+      # preload for efficiency
+      unless opts[:submission]
+        ::Version.send(:preload_associations, versions, :versionable)
+        submissions = versions.map(&:versionable)
+        ::Submission.send(:preload_associations, submissions, :assignment) unless opts[:assignment]
+        ::Submission.send(:preload_associations, submissions, :user) unless opts[:student]
+        ::Submission.send(:preload_associations, submissions, :grader)
+      end
+
+      versions.map do |version|
+        submission = opts[:submission] || version.versionable
+        assignment = opts[:assignment] || submission.assignment
+        student = opts[:student] || submission.user
+        version_json(course, version, :submission => submission, :assignment => assignment, :student => student)
+      end
+    end
+
     def submissions_for(course, api_context, date, grader_id, assignment_id)
       assignment = ::Assignment.find(assignment_id)
       options = {:date => date, :assignment_id => assignment_id, :grader_id => grader_id}
-      submissions_array = submissions_set(course, api_context, options)
+      submissions = submissions_set(course, api_context, options)
 
-      versions_hash = submissions_array.inject({}) do |memo, sub|
-        memo[sub.id] = sub.versions.map do |version|
-          hash = version.model.attributes.symbolize_keys
-          if hash[:grader_id] && hash[:grader_id] > 0
-            hash[:grader] = user_cache[hash[:grader_id]].name
-            hash[:safe_grader_id] = hash[:grader_id]
-          else
-            hash[:grader] = default_grader.name
-            hash[:safe_grader_id] = 0
-          end
-          hash[:assignment_name] = assignment.title
-          hash[:student_user_id] = hash[:user_id]
-          hash[:student_name] = user_cache[hash[:user_id]].name
-          hash[:course_id] = course.id
-          hash[:submission_id] = sub.id
-          hash[:graded_on] = hash[:graded_at].in_time_zone.to_date if hash[:graded_at]
-          hash[:current_grade] = sub.grade
-          hash[:current_graded_at] = sub.graded_at
-          hash[:current_grader] = sub.grader.try(:name) || default_grader.name
-          hash
-        end
-        memo
-      end
+      # load all versions for the given submissions and back-populate their
+      # versionable associations
+      submission_index = submissions.index_by(&:id)
+      versions = Version.where(:versionable_type => 'Submission', :versionable_id => submissions).order('number DESC')
+      versions.each{ |version| version.versionable = submission_index[version.versionable_id] }
 
+      # convert them all to json and then group by submission
+      versions = versions_json(course, versions, :assignment => assignment)
+      versions_hash = versions.group_by{ |version| version[:submission_id] }
+
+      # populate previous_* and new_* keys and convert hash to array of objects
       versions_hash.inject([]) do |memo, (submission_id, versions)|
         prior = {}
         filtered_versions = versions.sort{|a,b| a[:updated_at] <=> b[:updated_at] }.each_with_object([]) do |version, new_array|

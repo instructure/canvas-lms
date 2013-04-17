@@ -186,6 +186,7 @@
 
 class GradebookHistoryApiController < ApplicationController
   before_filter :require_context
+  before_filter :require_manage_grades
 
   include Api::V1::GradebookHistory
 
@@ -197,10 +198,8 @@ class GradebookHistoryApiController < ApplicationController
   #
   # @returns [Day]
   def days
-    if authorized_action(@context, @current_user, :manage_grades)
-      days_hash = days_json(@context, api_context(api_v1_gradebook_history_url(@context)))
-      render :json => days_hash.to_json
-    end
+    days_hash = days_json(@context, api_context(api_v1_gradebook_history_url(@context)))
+    render :json => days_hash.to_json
   end
 
   # @API Details for a given date in gradebook history for this course
@@ -216,12 +215,10 @@ class GradebookHistoryApiController < ApplicationController
   #
   # @returns [Grader]
   def day_details
-    if authorized_action(@context, @current_user, :manage_grades)
-      date = Date.strptime(params[:date], '%Y-%m-%d').in_time_zone
-      path = api_v1_gradebook_history_for_day_url(@context, params[:date])
-      day_hash = json_for_date(date, @context, api_context(path))
-      render :json => day_hash.to_json
-    end
+    date = Date.strptime(params[:date], '%Y-%m-%d').in_time_zone
+    path = api_v1_gradebook_history_for_day_url(@context, params[:date])
+    day_hash = json_for_date(date, @context, api_context(path))
+    render :json => day_hash.to_json
   end
 
   # @API Lists submissions
@@ -241,15 +238,63 @@ class GradebookHistoryApiController < ApplicationController
   #
   # @returns [SubmissionHistory]
   def submissions
-    if authorized_action(@context, @current_user, :manage_grades)
-      date = Date.strptime(params[:date], '%Y-%m-%d').in_time_zone
-      path = api_v1_gradebook_history_submissions_url(@context, params[:date], params[:grader_id], params[:assignment_id])
-      submissions_hash = submissions_for(@context, api_context(path), date, params[:grader_id], params[:assignment_id])
-      render :json => submissions_hash.to_json
-    end
+    date = Date.strptime(params[:date], '%Y-%m-%d').in_time_zone
+    path = api_v1_gradebook_history_submissions_url(@context, params[:date], params[:grader_id], params[:assignment_id])
+    submissions_hash = submissions_for(@context, api_context(path), date, params[:grader_id], params[:assignment_id])
+    render :json => submissions_hash.to_json
+  end
+
+  # @API List uncollated submission versions
+  #
+  # Gives a paginated, uncollated list of submission versions for all matching
+  # submissions in the context. This SubmissionVersion objects will not include
+  # the +new_grade+ or +previous_grade+ keys, only the +grade+; same for
+  # +graded_at+ and +grader+.
+  #
+  # @argument course_id [Integer]
+  #   The id of the contextual course for this API call
+  #
+  # @argument assignment_id [Integer, Optional]
+  #   The ID of the assignment for which you want to see submissions. If
+  #   absent, versions of submissions from any assignment in the course are
+  #   included.
+  #
+  # @argument user_id [Integer, Optional]
+  #   The ID of the user for which you want to see submissions. If absent,
+  #   versions of submissions from any user in the course are included.
+  #
+  # @argument ascending [Boolean, Optional]
+  #   Returns submission versions in ascending date order (oldest first). If
+  #   absent, returns submission versions in descending date order (newest
+  #   first).
+  #
+  # @returns [SubmissionVersion]
+  def feed
+    student = api_find(User, params[:user_id]) if params[:user_id]
+    assignment = Assignment.find(params[:assignment_id]) if params[:assignment_id]
+
+    # construct scope of interesting submission versions using index table
+    indexed_versions = SubmissionVersion.
+      where(:context_type => 'Course', :context_id => @context).
+      order(params[:ascending] ? :version_id : 'version_id DESC')
+    indexed_versions = indexed_versions.where(:assignment_id => assignment) if assignment
+    indexed_versions = indexed_versions.where(:user_id => student) if student
+
+    # paginate the indexed scope and then convert to actual Version records
+    path = api_v1_gradebook_history_feed_url(@context, params)
+    indexed_versions = Api.paginate(indexed_versions, self, path)
+    SubmissionVersion.send(:preload_associations, indexed_versions, :version)
+    versions = indexed_versions.map(&:version)
+
+    # render them
+    render :json => versions_json(@context, versions, :assignment => assignment, :student => student)
   end
 
   private
+  def require_manage_grades
+    authorized_action(@context, @current_user, :manage_grades)
+  end
+
   def api_context(path)
     Api::V1::ApiContext.new(self, path, @current_user, session, params.slice(:page))
   end
