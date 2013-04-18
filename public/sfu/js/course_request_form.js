@@ -216,15 +216,15 @@
     }
 
     function sandbox_course(sfu_id) {
-        var title = "Sandbox - " + sfu_id;
-        var sis_id = "sandbox-" + sfu_id + "-1";
+        var title = "Sandbox - " + sfu_id + " - " + today();
+        var sis_id = "sandbox-" + sfu_id + "-" + today();
         $.ajax({
             url: "/sfu/api/course/" + sis_id,
             dataType: 'json',
             success: function(data) {
                 if (!data.id) {
                     $("#course_list").append("<div id='sandbox'><h4>Other</h4></div>");
-                    var checkbox_html = '<label class="checkbox"><input type="checkbox" name="selected_course_sandbox" id="selected_course_sandbox" value="sandbox">'+ title +'</label>';
+                    var checkbox_html = '<label class="checkbox"><input type="checkbox" name="selected_course_sandbox_'+ today() +'" id="selected_course_sandbox_'+ today() +'" value="'+ sis_id +'">'+ title +'</label>';
                     $("#sandbox").append(checkbox_html);
                 }
             },
@@ -239,6 +239,12 @@
             $("#username").val(value);
         }
         return value;
+    }
+
+    function today() {
+        var now = new Date();
+        var dateString = (now.getMonth()+1.).toString() + now.getDate().toString() + (now.getYear()-100).toString() + (now.getTime()).toString().substr(10);
+        return dateString;
     }
 
 })(jQuery);
