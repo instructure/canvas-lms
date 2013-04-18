@@ -81,6 +81,14 @@ describe CoursesController do
     end
   end
 
+  describe "GET 'statistics'" do
+    it 'does not break using new student_ids method from course' do
+      course_with_teacher_logged_in(:active_all => true)
+      get 'statistics', :format => 'json', :course_id => @course.id
+      response.should be_success
+    end
+  end
+
   describe "GET 'settings'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -577,7 +585,7 @@ describe CoursesController do
     end
   end
 
-  describe "POST 'unenroll'" do
+  describe "POST 'unenroll_user'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
       post 'unenroll_user', :course_id => @course.id, :id => @enrollment.id
@@ -686,7 +694,6 @@ describe CoursesController do
       @course.observers.map{|s| s.name}.should be_include("Sam")
       @course.observers.map{|s| s.name}.should be_include("Fred")
     end
-    
   end
   
   describe "PUT 'update'" do
@@ -744,11 +751,9 @@ describe CoursesController do
       put 'update', :id => @course.id, :course => { :lock_all_announcements => 0 }
       assigns[:course].lock_all_announcements.should be_false
     end
-
-
   end
 
-  describe "POST unconclude" do
+  describe "POST 'unconclude'" do
     it "should unconclude the course" do
       course_with_teacher_logged_in(:active_all => true)
       delete 'destroy', :id => @course.id, :event => 'conclude'
@@ -997,13 +1002,6 @@ describe CoursesController do
     end
   end
 
-  describe 'GET statistics' do
-    it 'does not break using new student_ids method from course' do
-      course_with_teacher_logged_in(:active_all => true)
-      get 'statistics', :format => 'json', :course_id => @course.id
-      response.status.to_i.should == 200
-    end
-  end
   
   describe "quotas" do
     context "with :manage_storage_quotas" do
