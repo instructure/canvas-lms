@@ -347,6 +347,8 @@ class CoursesController < ApplicationController
   #   'final_grade' values.
   # @argument include[] ["locked"] Optionally include whether an enrollment is locked.
   # @argument include[] ["avatar_url"] Optionally include avatar_url.
+  # @argument include[] ["test_student"] Optionally include the course's Test Student,
+  #   if present. Default is to not include Test Student.
   #
   # @argument user_id [optional]
   #   If included, the user will be queried and if the user is part of the
@@ -388,6 +390,11 @@ class CoursesController < ApplicationController
       users = Api.paginate(users, self, api_v1_course_users_url)
       includes = Array(params[:include])
       user_json_preloads(users, includes.include?('email'))
+      if not includes.include?('test_student')
+        users.reject! do |u|
+          u.preferences[:fake_student]
+        end
+      end
       if includes.include?('enrollments')
         # not_ended_enrollments for enrollment_json
         # enrollments course for has_grade_permissions?

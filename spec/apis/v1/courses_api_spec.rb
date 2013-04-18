@@ -837,7 +837,7 @@ describe CoursesController, :type => :integration do
     end
   end
 
-  describe "/students" do
+  describe "students" do
     it "should return the list of students for the course" do
       first_user = @user
       new_user = User.create!(:name => 'Zombo')
@@ -1038,26 +1038,36 @@ describe CoursesController, :type => :integration do
 
     describe "/users" do
       it "returns a list of users" do
-        # when
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                         { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' })
-        # expect
         json.sort_by{|x| x["id"]}.should == api_json_response(@course1.users.uniq,
                                                               :only => USER_API_FIELDS).sort_by{|x| x["id"]}
       end
 
+      it "excludes the test student by default" do
+        test_student = @course1.student_view_student
+        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+                        { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' })
+        json.map{ |s| s["name"] }.should_not contain("Test Student")
+      end
+
+      it "includes the test student if told to do so" do
+        test_student = @course1.student_view_student
+        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+                        { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json'},
+                          :include => ['test_student'] )
+        json.map{ |s| s["name"] }.should contain("Test Student")
+      end
+
       it "returns a list of users with emails" do
         @user = @course1.teachers.first
-        # when
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                         { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
                         :include => ['email'])
-        # expect
         json.each { |u| u.keys.should include('email') }
       end
 
       it "returns a list of users and enrollments with enrollments option" do
-        # when
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                         { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
                         :include => ['enrollments'])
@@ -1075,23 +1085,18 @@ describe CoursesController, :type => :integration do
       end
 
       it "doesn't return enrollments from another course" do
-        # given
         other_enroll = @course2.enroll_user(@student1, 'StudentEnrollment')
-        # when
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                         { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
                         :include => ['enrollments'])
-        # expect
         enroll_ids = json.find { |x| x['id'] == @student1.id }['enrollments'].map { |e| e['id'] }.sort
         enroll_ids.should == [@student1_enroll.id]
       end
 
       it "optionally filters users by enrollment_type" do
-        # when
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                         { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
                         :enrollment_type => 'student')
-        # expect
         json.map {|x| x["id"]}.sort.should == api_json_response([@student1, @student2],
                                                                 :only => USER_API_FIELDS).map {|x| x["id"]}.sort
       end
@@ -1473,7 +1478,6 @@ describe CoursesController, :type => :integration do
       end
 
     end
-
   end
 
 
@@ -1548,7 +1552,6 @@ describe CoursesController, :type => :integration do
       @course.allow_student_forum_attachments.should == true
       @course.allow_student_discussion_editing.should == false
     end
-
   end
 
   describe "/recent_students" do
@@ -1576,7 +1579,6 @@ describe CoursesController, :type => :integration do
       json.map{ |el| el['id'] }.should == [@student2.id, @student3.id, @student1.id]
     end
   end
-
 end
 
 def each_copy_option
