@@ -363,7 +363,7 @@ class AssignmentsController < ApplicationController
           @assignment.reload
           flash[:notice] = t 'notices.updated', "Assignment was successfully updated."
           format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment) }
-          format.json { render :json => @assignment.to_json(:permissions => {:user => @current_user, :session => session}, :methods => [:readable_submission_types], :include => [:quiz, :discussion_topic]), :status => :ok }
+          format.json { render :json => @assignment.to_json(:permissions => {:user => @current_user, :session => session}, :include => [:quiz, :discussion_topic]), :status => :ok }
         else
           format.html { render :action => "edit" }
           format.json { render :json => @assignment.errors.to_json, :status => :bad_request }
