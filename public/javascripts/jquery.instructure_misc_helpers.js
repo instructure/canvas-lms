@@ -24,7 +24,7 @@ define([
   'str/htmlEscape',
   'compiled/str/TextHelper',
   'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_forms' /* formSuggestion */,
+  'jquery.instructure_forms',
   'jqueryui/dialog',
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
 ], function(INST, I18n, $, _, htmlEscape, TextHelper) {
@@ -286,13 +286,12 @@ define([
       $dialog = $("<div id='instructure_image_search'/>")
                   .append("<form id='image_search_form' class='form-inline' style='margin-bottom: 5px;'>" +
                             "<img src='/images/flickr_creative_commons_small_icon.png'/>&nbsp;&nbsp;" + 
-                            "<input type='text' class='query' style='width: 250px;' title='" +
+                            "<input type='text' class='query' style='width: 250px;' placeholder='" +
                             htmlEscape(I18n.t('tooltips.enter_search_terms', "enter search terms")) + "'/>" + 
                             "<button class='btn' type='submit'>" +
                             htmlEscape(I18n.t('buttons.search', "Search")) + "</button></form>")
                   .append("<div class='results' style='max-height: 240px; overflow: auto;'/>");
 
-      $dialog.find("form .query").formSuggestion();
       $dialog.find("form").submit(function(event) {
         event.preventDefault();
         event.stopPropagation();

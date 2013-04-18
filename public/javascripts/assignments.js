@@ -25,7 +25,7 @@ define([
   'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* parseFromISO, dateString, datepicker, time_field, datetime_field, /\$\.datetime/ */,
-  'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formSuggestion */,
+  'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData */,
   'jqueryui/dialog',
   'compiled/jquery/fixDialogButtons',
   'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
@@ -833,7 +833,6 @@ define([
         $("#add_assignment_form input[name='assignment[due_date]']").focus().select();
       }
     });
-    $("#add_assignment_form :input").formSuggestion();
     $("#add_assignment_form").formSubmit({
       object_name: 'assignment',
       required: ['title'],

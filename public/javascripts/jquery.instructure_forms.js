@@ -681,9 +681,7 @@ define([
           inputType = $input.attr('type');
       if ((inputType == "radio" || inputType == 'checkbox') && !$input.attr('checked')) return;
       var val = $input.val();
-      if ($input.hasClass('suggestion_title') && $input.attr('title') == val) {
-        val = "";
-      } else if ($input.hasClass('datetime_field_enabled')) {
+      if ($input.hasClass('datetime_field_enabled')) {
         var suggestText = $input.parent().children(".datetime_suggest").text();
         if (suggestText) val = suggestText;
       }
@@ -1100,57 +1098,5 @@ define([
     }
     return this;
   };
-
-  // Shows a gray-colored text suggestion for the form object when it is
-  // blank, i.e. a date field would show DD-MM-YYYY until the user clicks on it.
-  // I may phase this out or rewrite it, I'm undecided.  It's not
-  // being used very much yet.
-  $.fn.formSuggestion = function() {
-    return this.each(function() {
-      var $this = $(this);
-      $this.focus(function(event) {
-        var $this = $(this),
-            title = $this.attr('title');
-        $this.addClass('suggestionFocus');
-        if(!title || title === "") { return; }
-        if($this.val() == title) {
-          $this.select();
-        }
-        $this.removeClass("form_text_hint");
-      }).blur(function(event) {
-        var $this = $(this),
-            title = $this.attr('title');
-        $this.removeClass('suggestionFocus');
-        if(!title || title === "") { return; }
-        if($this.val() === "") {
-          $this.val(title);
-        }
-        if($this.val() == title) {
-          $this.addClass("form_text_hint");
-        }
-      })
-      // Workaround a strage bug where the input would be selected then immediately unselected
-      // every other time you clicked on the input with its defaultValue being shown
-      .mouseup(false)
-      .change(function(event) {
-        var $this = $(this),
-            title;
-        if ( !$this.hasClass('suggestionFocus') && ( title = $(this).attr('title') ) ) {
-          $this.removeClass('suggestionFocus');
-          if ($this.val() === "") {
-            $this.val(title);
-          }
-          $this.toggleClass("form_text_hint", $this.val() == title);
-        }
-      }).addClass('suggestion_title');
-
-      var title = $this.attr('title'),
-          val   = $this.val();
-      if ( title && ( val === "" || val == title) ) {
-        $this.addClass("form_text_hint").val(title);
-      }
-    });
-  };
-  $.fn.formSuggestion.suggestions = [];
 
 });
