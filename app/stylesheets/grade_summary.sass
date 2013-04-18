@@ -16,7 +16,8 @@
       text-decoration: none !important
       color: black
 
-#grades_summary th
+#grades_summary thead th
+  border-top: none
   font-size: 1.0em
   padding: 4px 5px 2px
   font-weight: bold
@@ -34,7 +35,7 @@
 
 #grades_summary tr
   
-  td
+  > *
     padding: 5px
     text-align: left
     border-top: 2px solid black
@@ -62,7 +63,7 @@
     margin-top: 0
     margin-bottom: 20px
 
-#grades_summary tr.editable:hover td
+#grades_summary tr.editable:hover > *
   background-color: #cdf
 
 #grades_summary tr.editable.student_assignment.dropped:hover td.points_possible
@@ -93,10 +94,10 @@
   text-align: center
   white-space: nowrap
 
-#grades_summary td.assignment_score:hover .grade
+#grades_summary tr > .assignment_score:hover .grade
   font-weight: bold
 
-#grades_summary td.assignment_score .grade.changed
+#grades_summary tr > .assignment_score .grade.changed
   color: #800
   font-weight: bold
 
@@ -104,8 +105,9 @@
   text-align: right
   padding-right: 15px
 
-#grades_summary td.title
+#grades_summary th.title
   font-size: 1.1em
+  font-weight: normal
   padding-left: 20px
   
   @media print
@@ -113,7 +115,7 @@
     font-size: 1.0em
     font-weight: normal
 
-#grades_summary td.title .context
+#grades_summary th.title .context
   visibility: hidden
   font-size: 0.8em
   color: #999
@@ -125,7 +127,7 @@
     margin: 5px 0
     padding: 0
 
-#grades_summary td.title .context.context_hover
+#grades_summary th.title .context.context_hover
   visibility: visible
 
 #grades_summary td.due
@@ -135,7 +137,7 @@
   @media print
     font-size: 1em
 
-#grades_summary tr.assignment_graded td
+#grades_summary tr.assignment_graded > *
   background-color: #eee
   
   @media print
@@ -144,7 +146,7 @@
     &.title
       font-weight: bold
 
-#grades_summary tr.final_grade td
+#grades_summary tr.final_grade > *
   background-color: #666
   color: #eee
   font-size: 1.5em
@@ -156,8 +158,8 @@
     border-top: 2px solid black
     font-size: 1.2em
 
-#grades_summary tr.group_total 
-  td
+#grades_summary tr.group_total
+  td, th[scope=row]
     background-color: #ccc
     border-top-width: 0
     font-weight: bold

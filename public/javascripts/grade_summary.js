@@ -211,9 +211,9 @@ define([
     });
     $("#grades_summary:not(.editable) .assignment_score").css('cursor', 'default');
     $("#grades_summary tr").hover(function() {
-      $(this).find("td.title .context").addClass('context_hover');
+      $(this).find("th.title .context").addClass('context_hover');
     }, function() {
-      $(this).find("td.title .context").removeClass('context_hover');
+      $(this).find("th.title .context").removeClass('context_hover');
     });
     $(".show_guess_grades_link").click(function(event) {
       $("#grades_summary .student_entered_score").each(function() {
