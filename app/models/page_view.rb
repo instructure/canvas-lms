@@ -85,7 +85,7 @@ class PageView < ActiveRecord::Base
     # we use the right method when saving
     @page_view_method = self.class.page_view_method
     if cassandra?
-      self.shard = Shard.default
+      self.shard = Shard.birth
     end
   end
 
@@ -144,7 +144,7 @@ class PageView < ActiveRecord::Base
 
   def self.from_attributes(attrs, new_record=false)
     @blank_template ||= columns.inject({}) { |h,c| h[c.name] = nil; h }
-    shard = cassandra? ? Shard.default : Shard.current
+    shard = cassandra? ? Shard.birth : Shard.current
     page_view = shard.activate do
       if new_record
         new{ |pv| pv.send(:attributes=, attrs, false) }

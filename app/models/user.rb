@@ -1894,7 +1894,7 @@ class User < ActiveRecord::Base
   # Returns an array of context code strings.
   def conversation_context_codes(include_concluded_codes = true)
     Rails.cache.fetch([self, include_concluded_codes, 'conversation_context_codes4'].cache_key, :expires_in => 1.day) do
-      Shard.default.activate do
+      Shard.birth.activate do
         associations = %w{courses concluded_courses current_groups}
         associations.slice!(1) unless include_concluded_codes
 

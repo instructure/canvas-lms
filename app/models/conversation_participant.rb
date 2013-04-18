@@ -52,7 +52,7 @@ class ConversationParticipant < ActiveRecord::Base
     #
     # we're also counting on conversations being in the join
 
-    own_root_account_ids = Shard.default.activate do
+    own_root_account_ids = Shard.birth.activate do
       user.associated_root_accounts.select{ |a| a.grants_right?(user, :become_user) }.map(&:id)
     end
     id_string = "[" + own_root_account_ids.sort.join("][") + "]"
@@ -160,7 +160,7 @@ class ConversationParticipant < ActiveRecord::Base
       # the filters are assumed relative to the current shard and need to be
       # cast to an id relative to the default shard before use in queries.
       type, id = ActiveRecord::Base.parse_asset_string(tag)
-      id = Shard.relative_id_for(id, Shard.default)
+      id = Shard.relative_id_for(id, Shard.birth)
       wildcard('conversation_participants.tags', "#{type.underscore}_#{id}", :delimiter => ',')
     end
   end

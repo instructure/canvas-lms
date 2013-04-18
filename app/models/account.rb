@@ -392,7 +392,7 @@ class Account < ActiveRecord::Base
   end
 
   def file_namespace
-    Shard.default.activate { "account_#{self.root_account.id}" }
+    Shard.birth.activate { "account_#{self.root_account.id}" }
   end
   
   def self.account_lookup_cache_key(id)
@@ -813,7 +813,7 @@ class Account < ActiveRecord::Base
   end
 
   def self.get_special_account(special_account_type, default_account_name)
-    Shard.default.activate do
+    Shard.birth.activate do
       @special_account_ids ||= {}
       @special_accounts ||= {}
 

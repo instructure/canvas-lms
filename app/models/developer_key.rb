@@ -50,7 +50,7 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def self.get_special_key(default_key_name)
-    Shard.default.activate do
+    Shard.birth.activate do
       @special_keys ||= {}
 
       if Rails.env.test?

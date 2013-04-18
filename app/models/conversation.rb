@@ -47,7 +47,7 @@ class Conversation < ActiveRecord::Base
 
   def self.private_hash_for(users_or_user_ids)
     if (users_or_user_ids.first.is_a?(User))
-      user_ids = Shard.default.activate { users_or_user_ids.map(&:id) }
+      user_ids = Shard.birth.activate { users_or_user_ids.map(&:id) }
     else
       user_ids = users_or_user_ids
     end
@@ -273,7 +273,7 @@ class Conversation < ActiveRecord::Base
       new_tags = options[:tags] ? options[:tags] & current_context_strings(1) : []
       new_tags = current_context_strings if new_tags.blank? && tags.empty? # i.e. we're creating the first message and there are no tags yet
       self.tags |= new_tags if new_tags.present?
-      Shard.default.activate do
+      Shard.birth.activate do
         self.root_account_ids |= [message.root_account_id] if message.root_account_id
       end
       options[:root_account_ids] = read_attribute(:root_account_ids) if self.root_account_ids_changed?
@@ -496,7 +496,7 @@ class Conversation < ActiveRecord::Base
   def regenerate_private_hash!(user_ids = nil)
     return unless private?
     self.private_hash = Conversation.private_hash_for(user_ids ||
-      Shard.default.activate { self.conversation_participants.map(&:user_id) } )
+      Shard.birth.activate { self.conversation_participants.map(&:user_id) } )
     return unless private_hash_changed?
     existing = self.shard.activate do
       ConversationParticipant.find_by_private_hash(private_hash).try(:conversation)

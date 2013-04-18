@@ -1,7 +1,7 @@
 namespace :db do
   desc "migrate the page views in the database to cassandra"
   task :migrate_pageviews_to_cassandra, [:shard_id] => :environment do |t,args|
-    shard = Shard.default
+    shard = Shard.birth
     if args[:shard_id]
       shard = Shard.find(args[:shard_id])
     end
