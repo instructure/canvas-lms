@@ -53,7 +53,7 @@ class CourseFormController < ApplicationController
 
         else
           logger.info "[SFU Course Form] Creating sandbox for #{teacher_username}"
-          sandbox = sandbox_info(teacher_username, account_id, teacher_sis_user_id, teacher2_sis_user_id)
+          sandbox = sandbox_info(teacher_username, teacher_sis_user_id, teacher2_sis_user_id)
 
           course_array.push sandbox["csv"]
           enrollment_array.push sandbox["enrollment_csv_1"]
@@ -160,7 +160,8 @@ class CourseFormController < ApplicationController
     course
   end
 
-  def sandbox_info(username, account_id, teacher1, teacher2 = nil)
+  def sandbox_info(username, teacher1, teacher2 = nil)
+    account_id = Account.find_by_name('Sandbox for Instructors').id
     datestamp = "1"
     sandbox = {}
     sandbox["course_id"] = "sandbox-#{username}-#{datestamp}"
