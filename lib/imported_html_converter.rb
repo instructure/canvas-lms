@@ -175,18 +175,21 @@ class ImportedHtmlConverter
       # CCHelper::file_query_string
       params = Rack::Utils.parse_nested_query(qs.presence || "")
       qs = []
+      new_action = ""
       params.each do |k,v|
         case k
         when /canvas_qs_(.*)/
           qs << "#{Rack::Utils.escape($1)}=#{Rack::Utils.escape(v)}"
         when /canvas_(.*)/
-          new_url += "/#{$1}"
+          new_action += "/#{$1}"
         end
       end
-      new_url += "?#{qs.join("&")}" if qs.present?
-      if params.blank?
+      if new_action.present?
+        new_url += new_action
+      else
         new_url += "/preview"
       end
+      new_url += "?#{qs.join("&")}" if qs.present?
     end
     new_url
   end

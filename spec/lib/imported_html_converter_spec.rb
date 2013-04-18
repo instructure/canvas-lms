@@ -103,7 +103,21 @@ describe ImportedHtmlConverter do
       test_string = %{<img src="subfolder/WithCapital/TEST.png" alt="nope" />}
       ImportedHtmlConverter.convert(test_string, @course).should == %{<img src="#{@path}files/#{att.id}/preview" alt="nope">}
     end
-  
+
+    it "should find an attachment with query params" do
+      att = make_test_att()
+      @course.attachment_path_id_lookup = {"test.png" => att.migration_id}
+
+      test_string = %{<img src="%24IMS_CC_FILEBASE%24/test.png?canvas_customaction=1&canvas_qs_customparam=1" alt="nope" />}
+      ImportedHtmlConverter.convert(test_string, @course).should == %{<img src="#{@path}files/#{att.id}/customaction?customparam=1" alt="nope">}
+
+      test_string = %{<img src="%24IMS_CC_FILEBASE%24/test.png?canvas_qs_customparam2=3" alt="nope" />}
+      ImportedHtmlConverter.convert(test_string, @course).should == %{<img src="#{@path}files/#{att.id}/preview?customparam2=3" alt="nope">}
+
+      test_string = %{<img src="%24IMS_CC_FILEBASE%24/test.png?notarelevantparam" alt="nope" />}
+      ImportedHtmlConverter.convert(test_string, @course).should == %{<img src="#{@path}files/#{att.id}/preview" alt="nope">}
+    end
+
     it "should convert course section urls" do
       test_string = %{<a href="%24CANVAS_COURSE_REFERENCE%24/discussion_topics">discussions</a>}
       ImportedHtmlConverter.convert(test_string, @course).should == %{<a href="#{@path}discussion_topics">discussions</a>}
