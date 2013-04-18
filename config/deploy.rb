@@ -12,7 +12,7 @@ set :deploy_via,    :remote_cache
 set :deploy_to,     "/var/rails/canvas"
 set :use_sudo,      false
 set :deploy_env,    "production"
-set :bundle_dir,    "/opt/ruby-enterprise-1.8.7-2012.02/lib/ruby/gems/1.8"
+set :bundle_dir,    "/mnt/data/gems"
 set :bundle_without, []
 set :stats_server,	"stats.tier2.sfu.ca"
 default_run_options[:pty] = true
