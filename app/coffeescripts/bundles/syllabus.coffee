@@ -67,6 +67,8 @@ require [
   view = new SyllabusView
     el: '#syllabusContainer'
     collection: acollection
+    can_read: ENV.CAN_READ
+    is_valid_user: if ENV.current_user_id then true else false
 
   # When all of the fetches have completed, render the view and bind behaviors
   $.when.apply(this, deferreds).then ->
