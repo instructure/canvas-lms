@@ -63,16 +63,29 @@ body.with-right-side.with-left-side {
   float: right;
 }
 
-.reply-textarea {
-  width: 100%;
-}
-
 .discussion-section {
   padding: 4px 10px 3px 10px;
   position: relative;
   a {
     color: #396eb2;
   }
+}
+
+.reply-textarea {
+  border-radius: 5px 5px 0 0;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  min-height: 155px;
+  width: 100%;
+
+  @media screen and (min-width: 1100px) {
+    min-height: 129px
+  }
+}
+
+.toggle-wrapper {
+  margin-bottom: 11px;
+  text-align: right;
 }
 
 .due_date_wrapper {

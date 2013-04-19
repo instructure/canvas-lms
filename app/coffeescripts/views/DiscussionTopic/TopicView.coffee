@@ -24,11 +24,13 @@ define [
       'click .add_root_reply': 'addRootReply'
       'click .discussion_locked_toggler': 'toggleLocked'
       'click .toggle_due_dates': 'toggleDueDates'
+      'click .rte_switch_views_link': 'toggleEditorMode'
 
     els:
       '.add_root_reply': '$addRootReply'
       '#discussion_topic': '$topic'
       '.due_date_wrapper': '$dueDates'
+      '.reply-textarea:first': '$textarea'
 
     initialize: ->
       @model.set 'id', ENV.DISCUSSION.TOPIC.ID
@@ -67,6 +69,11 @@ define [
         I18n.t('show_due_dates', 'Show Due Dates')
       else
         I18n.t('hide_due_dates', 'Hide Due Dates')
+
+    toggleEditorMode: (event) ->
+      event.preventDefault()
+      event.stopPropagation()
+      @$textarea.editorBox('toggle')
 
     ##
     # Adds a root level reply to the main topic
