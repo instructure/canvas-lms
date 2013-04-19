@@ -104,7 +104,7 @@ module I18nExtraction
             raise "interpolation value not provided for #{match[0].to_sym.inspect} (#{sub_key.inspect}) on line #{line}"
           end
         end
-        add_translation sub_key, str, (:remove_whitespace if @in_html_view && ![:mt, :jt].include?(method))
+        add_translation sub_key, str, line, (:remove_whitespace if @in_html_view && ![:mt, :jt].include?(method))
       end
     end
 
@@ -147,7 +147,7 @@ module I18nExtraction
         if default
           key = process_translation_key(receiver, key_arg, 'labels.', inferred)
           raise "english default for a blabel call ends in a colon on line #{key_arg.line}" if method == :blabel && default.strip =~ /:\z/
-          add_translation key, default, :remove_whitespace
+          add_translation key, default, key_arg.line, :remove_whitespace
         elsif key_arg.sexp_type == :str && key_arg.last.to_s =~ /[^a-z_\.]/
           raise "unlocalized label call on line #{key_arg.line}: #{key_arg.inspect}"
         else
