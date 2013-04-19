@@ -1,5 +1,5 @@
 class AddManageRubricsPermission < ActiveRecord::Migration
-  tag :predeploy
+  tag :postdeploy
 
   def self.up
     DataFixup::CopyRoleOverrides.send_later_if_production_enqueue_args(:run,
