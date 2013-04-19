@@ -33,12 +33,24 @@ describe Message do
 
   describe '#populate body' do
     it 'should save an html body if a template exists' do
-      Message.any_instance.expects(:load_html_template).returns('template')
+      Message.any_instance.expects(:apply_html_template).returns('template')
       user         = user(:active_all => true)
       account_user = AccountUser.create!(:account => account_model, :user => user)
       message      = generate_message(:account_user_notification, :email, account_user)
 
       message.html_body.should == 'template'
+    end
+
+    it 'should sanitize html' do
+      Message.any_instance.expects(:load_html_template).returns <<-ZOMGXSS
+        <b>Your content</b>: <%= "<script>alert('haha')</script>" %>
+      ZOMGXSS
+      user         = user(:active_all => true)
+      account_user = AccountUser.create!(:account => account_model, :user => user)
+      message      = generate_message(:account_user_notification, :email, account_user)
+
+      message.html_body.should_not include "<script>"
+      message.html_body.should include "<b>Your content</b>: &lt;script&gt;alert(&#39;haha&#39;)&lt;/script&gt;"
     end
   end
 
