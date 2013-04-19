@@ -22,9 +22,9 @@
 <%=
     case asset.group.context_type
     when 'Account'
-      t :html_details_account, "You can see which groups you're a part of for this account by <a href=\"%{link}\">clicking here</a>", :link => content(:link)
+      t :html_details_account2, "You can see which groups you're a part of for this account by *clicking here*", :wrapper => "<a href=\"#{content(:link)}\">\\1</a>"
     else
-      t :html_details_course, "You can see which groups you're a part of for this course by <a href=\"%{link}\">clicking here</a>", :link => content(:link)
+      t :html_details_course2, "You can see which groups you're a part of for this course by *clicking here*", :wrapper => "<a href=\"#{content(:link)}\">\\1</a>"
     end
 %>
 </p>

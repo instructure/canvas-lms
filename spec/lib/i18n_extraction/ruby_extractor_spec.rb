@@ -190,4 +190,15 @@ describe I18nExtraction::RubyExtractor do
       extract("mt 'foo', \"\\n Foo \\t foo!\\n\"").should == {'foo' => "Foo \t foo!"}
     end
   end
+
+  context "sanitization" do
+    it "should reject stuff that looks sufficiently html-y" do
+      lambda{ extract "t 'dude', 'this is <em>important</em>'" }.should raise_error /html tags on line 1/
+    end
+
+    it "should generally be ok with angle brackets" do
+      extract("t 'obvious', 'TIL 1 < 2'").should == {'obvious' => 'TIL 1 < 2'}
+      extract("t 'email', 'please enter an email, e.g. Joe User <joe@example.com>'").should == {'email' => 'please enter an email, e.g. Joe User <joe@example.com>'}
+    end
+  end
 end

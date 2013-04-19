@@ -8,4 +8,4 @@
 
 <p><%= t :body, "Your content is ready to be imported into your course." %></p>
 
-<p><%= t :link_message, "Click <a href=\"%{link}\">this link</a> to choose which items of your content to import", :link => content(:link) %></p>
+<p><%= t :link_message2, "Click *this link* to choose which items of your content to import", :wrapper => "<a href=\"#{content(:link)}\">\\1</a>" %></p>

@@ -8,4 +8,4 @@
 
 <p><%= t :body, "There was a problem importing some content into your course %{destination}.", :destination => asset.context.name %></p>
 
-<p><%= t :notify_admin, "Please notify your system administrator, and point them to your <a href=\"%{link}\">import info page</a>", :link => content(:link) %></p>
+<p><%= t :notify_admin2, "Please notify your system administrator, and point them to your *import info page*", :wrapper => "<a href=\"#{content(:link)}\">\\1</a>" %></p>
