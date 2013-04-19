@@ -114,3 +114,6 @@ iframe#tool_content {
 // fixes bug in Cal1 where not-allowed cursor appears over checkboxes set to readonly
 .calendar_links input[readonly] { cursor: auto; }
 
+blockquote p {
+  font-size: inherit;
+}
