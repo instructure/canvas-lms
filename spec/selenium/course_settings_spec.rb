@@ -66,8 +66,11 @@ describe "course settings" do
       a.save!
       get "/courses/#{@course.id}/settings"
       f('.edit_course_link').click
+      wait_for_ajaximations
       f('.course_form_more_options_link').click
+      wait_for_ajaximations
       f('#course_self_enrollment').click
+      wait_for_ajaximations
       submit_form('#course_form')
       wait_for_ajaximations
 
