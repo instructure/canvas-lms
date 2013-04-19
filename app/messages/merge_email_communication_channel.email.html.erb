@@ -7,4 +7,4 @@
 <% end %>
 <% url = (HostUrl.context_host((asset.pseudonym || asset.user.pseudonym).account) rescue nil) || HostUrl.default_host %>
 <p><%= t :account_created, "An account has been created for you at %{url}, but you already have a Canvas account.", :url => url %></p>
-<p><%= t :merge, "If you would like to merge them together, <a href=\"%{link}\">click here</a>", :link => content(:link) %></p>
+<p><%= t :merge2, "If you would like to merge them together, *click here*", :wrapper => "<a href=\"#{content(:link)}\">\\1</a>" %></p>
