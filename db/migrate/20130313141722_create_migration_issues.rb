@@ -14,7 +14,7 @@ class CreateMigrationIssues < ActiveRecord::Migration
 
       t.timestamps
     end
-    add_index :migration_issues, :content_migration_id, :concurrently => true
+    add_index :migration_issues, :content_migration_id
   end
 
   def self.down
