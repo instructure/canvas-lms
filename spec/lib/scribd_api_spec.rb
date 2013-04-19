@@ -52,7 +52,6 @@ describe ScribdAPI do
   end
   
   it "should be able to upload a file" do
-    pending("mocha class method bug") if RUBY_VERSION < "1.9"
     Scribd::Document.expects(:upload).returns('dispatched')
     ScribdAPI.upload('filename.txt', 'txt')
   end

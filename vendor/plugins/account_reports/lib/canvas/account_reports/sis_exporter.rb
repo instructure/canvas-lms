@@ -64,7 +64,7 @@ module Canvas::AccountReports
     end
 
     def users
-      list_csv = FasterCSV.generate do |csv|
+      list_csv = CSV.generate do |csv|
         if @sis_format
           headers = ['user_id','login_id','password','first_name','last_name','email','status']
         else
@@ -104,7 +104,7 @@ module Canvas::AccountReports
     end
 
     def accounts
-      list_csv = FasterCSV.generate do |csv|
+      list_csv = CSV.generate do |csv|
         if @sis_format
           headers = ['account_id','parent_account_id', 'name','status']
         else
@@ -147,7 +147,7 @@ module Canvas::AccountReports
     end
 
     def terms
-      list_csv = FasterCSV.generate do |csv|
+      list_csv = CSV.generate do |csv|
         headers = ['term_id','name','status', 'start_date', 'end_date']
         headers.unshift 'canvas_term_id' unless @sis_format
         csv << headers
@@ -178,7 +178,7 @@ module Canvas::AccountReports
     end
 
     def courses
-      list_csv = FasterCSV.generate do |csv|
+      list_csv = CSV.generate do |csv|
         if @sis_format
           headers = ['course_id','short_name', 'long_name','account_id','term_id','status',
                      'start_date', 'end_date']
@@ -238,7 +238,7 @@ module Canvas::AccountReports
     end
 
     def sections
-      list_csv = FasterCSV.generate do |csv|
+      list_csv = CSV.generate do |csv|
         if @sis_format
           headers = ['section_id','course_id','name','status','start_date','end_date']
         else
@@ -311,7 +311,7 @@ module Canvas::AccountReports
     end
 
     def enrollments
-      list_csv = FasterCSV.generate do |csv|
+      list_csv = CSV.generate do |csv|
         if @sis_format
           headers = ['course_id', 'user_id', 'role', 'section_id', 'status', 'associated_user_id']
         else
@@ -386,7 +386,7 @@ module Canvas::AccountReports
     end
 
     def groups
-      list_csv = FasterCSV.generate do |csv|
+      list_csv = CSV.generate do |csv|
         if @sis_format
           headers = ['group_id', 'account_id', 'name', 'status']
         else
@@ -428,7 +428,7 @@ module Canvas::AccountReports
     end
 
     def group_membership
-      list_csv = FasterCSV.generate do |csv|
+      list_csv = CSV.generate do |csv|
         if @sis_format
           headers = ['group_id', 'user_id', 'status']
         else
@@ -474,7 +474,7 @@ module Canvas::AccountReports
     end
 
     def xlist
-      list_csv = FasterCSV.generate do |csv|
+      list_csv = CSV.generate do |csv|
         if @sis_format
           headers = ['xlist_course_id', 'section_id', 'status']
         else

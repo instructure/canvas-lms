@@ -969,9 +969,7 @@ Spec::Runner.configure do |config|
     # now extract the headers
     post_headers = post_lines[1..post_lines.index("")]
     expected_post_headers = expected_post_lines[1..expected_post_lines.index("")]
-    if RUBY_VERSION >= "1.9."
-      expected_post_headers << "User-Agent: Ruby"
-    end
+    expected_post_headers << "User-Agent: Ruby"
     post_headers.sort.should == expected_post_headers.sort
 
     # now check payload

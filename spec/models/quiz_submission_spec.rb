@@ -1423,8 +1423,6 @@ describe QuizSubmission do
 
     context "when loading UTF-8 data" do
       it "should strip bad chars" do
-        pending("1.9 only") if RUBY_VERSION < "1.9"
-        
         vs = submission.versions
 
         # inject bad byte into yaml

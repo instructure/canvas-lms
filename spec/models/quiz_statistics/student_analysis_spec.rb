@@ -80,7 +80,7 @@ describe QuizStatistics::StudentAnalysis do
       # and one in progress
       @quiz.generate_submission(@student)
 
-      stats = FasterCSV.parse(csv(:include_all_versions => true, :anonymous => true))
+      stats = CSV.parse(csv(:include_all_versions => true, :anonymous => true))
       # format for row is row_name, '', data1, data2, ...
       stats.first.length.should == 3
       stats[0][0].should == "section"
@@ -102,7 +102,7 @@ describe QuizStatistics::StudentAnalysis do
       qs = @quiz.generate_submission(@student)
       qs.grade_submission
 
-      stats = FasterCSV.parse(csv(:include_all_versions => true))
+      stats = CSV.parse(csv(:include_all_versions => true))
       # format for row is row_name, '', data1, data2, ...
       stats[0].should == ["name", "", "nobody@example.com"]
       stats[1].should == ["id", "", @student.id.to_s]
@@ -139,7 +139,7 @@ describe QuizStatistics::StudentAnalysis do
           "question_#{@quiz.quiz_questions[2].id}_#{AssessmentQuestion.variable_id('ans1')}" => 'baz'
       }
       qs.grade_submission
-      stats = FasterCSV.parse(csv)
+      stats = CSV.parse(csv)
       stats.size.should == 16 # 3 questions * 2 lines + ten more (name, id, sis_id, section, section_id, section_sis_id, submitted, correct, incorrect, score)
       stats[11].size.should == 3
       stats[11][2].should == ',baz'
@@ -162,7 +162,7 @@ describe QuizStatistics::StudentAnalysis do
       }
       qs.grade_submission
 
-      stats = FasterCSV.parse(csv)
+      stats = CSV.parse(csv)
       stats[9][2].should == '5'
     end
 
@@ -203,7 +203,7 @@ describe QuizStatistics::StudentAnalysis do
     stats[:questions][1][1][:answers][1][:text].should == "lolrus"
 
     # csv statistics
-    stats = FasterCSV.parse(csv({}, q))
+    stats = CSV.parse(csv({}, q))
     stats[7][2].should == "zero"
     stats[9][2].should == "lolcats,lolrus"
   end

@@ -6,7 +6,7 @@ class QuizStatistics::ItemAnalysis < QuizStatistics::Report
 
   def to_csv
     @csv ||=
-      FasterCSV.generate do |csv|
+      CSV.generate do |csv|
         start_progress
         stats = QuizStatistics::ItemAnalysis::Summary.new(quiz)
         headers = [

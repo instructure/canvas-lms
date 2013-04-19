@@ -189,30 +189,14 @@ describe TextHelper do
     it "should split on multi-byte character boundaries" do
       str = "This\ntext\nhere\n获\nis\nutf-8"
       
-      # In ruby 1.8, unicode characters are counted as multiple characters when calculating length.  
-      # In ruby 1.9, a unicode character is still 1 character.  It seems to me the proper path here
-      # is to allow the counting to take it's course, as the real GOAL of this test is not to 
-      # split mid-unicode-character since that was possible in 1.8.
-
-      if RUBY_VERSION >= '1.9'
-        th.truncate_text(str, :max_length => 9).should ==  "This\nt..."
-        th.truncate_text(str, :max_length => 18).should == "This\ntext\nhere\n..."
-        th.truncate_text(str, :max_length => 19).should == "This\ntext\nhere\n获..."
-        th.truncate_text(str, :max_length => 20).should == "This\ntext\nhere\n获\n..."
-        th.truncate_text(str, :max_length => 21).should == "This\ntext\nhere\n获\ni..."
-        th.truncate_text(str, :max_length => 22).should == "This\ntext\nhere\n获\nis..."
-        th.truncate_text(str, :max_length => 23).should == "This\ntext\nhere\n获\nis\n..."
-        th.truncate_text(str, :max_length => 80).should == str
-      else
-        th.truncate_text(str, :max_length => 9).should ==  "This\nt..."
-        th.truncate_text(str, :max_length => 18).should == "This\ntext\nhere\n..."
-        th.truncate_text(str, :max_length => 19).should == "This\ntext\nhere\n..."
-        th.truncate_text(str, :max_length => 20).should == "This\ntext\nhere\n..."
-        th.truncate_text(str, :max_length => 21).should == "This\ntext\nhere\n获..."
-        th.truncate_text(str, :max_length => 22).should == "This\ntext\nhere\n获\n..."
-        th.truncate_text(str, :max_length => 23).should == "This\ntext\nhere\n获\ni..."
-        th.truncate_text(str, :max_length => 80).should == str
-      end
+      th.truncate_text(str, :max_length => 9).should ==  "This\nt..."
+      th.truncate_text(str, :max_length => 18).should == "This\ntext\nhere\n..."
+      th.truncate_text(str, :max_length => 19).should == "This\ntext\nhere\n获..."
+      th.truncate_text(str, :max_length => 20).should == "This\ntext\nhere\n获\n..."
+      th.truncate_text(str, :max_length => 21).should == "This\ntext\nhere\n获\ni..."
+      th.truncate_text(str, :max_length => 22).should == "This\ntext\nhere\n获\nis..."
+      th.truncate_text(str, :max_length => 23).should == "This\ntext\nhere\n获\nis\n..."
+      th.truncate_text(str, :max_length => 80).should == str
     end
 
     it "should split on words if specified" do
@@ -349,16 +333,12 @@ Ad dolore andouille meatball irure, ham hock tail exercitation minim ribeye sint
     }
   
     test_strings.each do |input, output|
-      input = input.dup.force_encoding("UTF-8") if RUBY_VERSION >= '1.9'
+      input = input.dup.force_encoding("UTF-8")
       TextHelper.strip_invalid_utf8(input).should == output
     end
   end
 
   describe "YAML invalid UTF8 stripping" do
-    before do
-      pending("ruby 1.9 only") if RUBY_VERSION < "1.9"
-    end
-
     it "should recursively strip out invalid utf-8" do
       data = YAML.load(%{
 ---

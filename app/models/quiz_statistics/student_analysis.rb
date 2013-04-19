@@ -212,7 +212,7 @@ class QuizStatistics::StudentAnalysis < QuizStatistics::Report
       rows << row
     end
 
-    csv = FasterCSV.generate do |csv|
+    csv = CSV.generate do |csv|
       columns.each_with_index do |val, idx|
         r = []
         r << val

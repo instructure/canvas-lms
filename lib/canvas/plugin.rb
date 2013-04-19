@@ -83,14 +83,8 @@ module Canvas
       t_if_proc(settings[name])
     end
 
-    if RUBY_VERSION > "1.9."
     def t_if_proc(attribute)
       attribute.is_a?(Proc) ? instance_exec(&attribute) : attribute
-    end
-    else
-    def t_if_proc(attribute)
-      attribute.is_a?(Proc) ? instance_eval(&attribute) : attribute
-    end
     end
 
     def validator

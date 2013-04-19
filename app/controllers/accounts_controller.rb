@@ -378,7 +378,7 @@ class AccountsController < ApplicationController
       respond_to do |format|
         format.json { render :json => @items.to_json }
         format.csv { 
-          res = FasterCSV.generate do |csv|
+          res = CSV.generate do |csv|
             csv << ['Timestamp', 'Value']
             @items.each do |item|
               csv << [item[0]/1000, item[1]]

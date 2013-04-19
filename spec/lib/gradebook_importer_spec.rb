@@ -96,7 +96,7 @@ describe GradebookImporter do
       student_in_course(:user => @user)
       @u5 = @user
 
-      uploaded_csv = FasterCSV.generate do |csv|
+      uploaded_csv = CSV.generate do |csv|
         csv << ["Student", "ID", "SIS User ID", "SIS Login ID", "Section", "Assignment 1"]
         csv << ["    Points Possible", "", "","", ""]
         csv << [@u1.name , "", "", "", "", 99]
@@ -147,7 +147,7 @@ describe GradebookImporter do
       student_in_course(:user => @user)
       @u1 = @user
 
-      uploaded_csv = FasterCSV.generate do |csv|
+      uploaded_csv = CSV.generate do |csv|
         csv << ["Student", "ID", "SIS User ID", "SIS Login ID", "Section", "Assignment 1"]
         csv << ["    Points Possible", "", "","", ""]
         csv << ["" , "", "0123456", "", "", 99]

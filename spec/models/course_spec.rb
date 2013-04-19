@@ -648,7 +648,7 @@ describe Course, "gradebook_to_csv" do
     
     csv = @course.gradebook_to_csv
     csv.should_not be_nil
-    rows = FasterCSV.parse(csv)
+    rows = CSV.parse(csv)
     rows.length.should equal(3)
     rows[0][-1].should == "Final Score"
     rows[1][-1].should == "(read only)"
@@ -686,7 +686,7 @@ describe Course, "gradebook_to_csv" do
 
     csv = @course.gradebook_to_csv
     csv.should_not be_nil
-    rows = FasterCSV.parse(csv)
+    rows = CSV.parse(csv)
     rows.length.should equal(3)
     assignments = []
     rows[0].each do |column|
@@ -710,7 +710,7 @@ describe Course, "gradebook_to_csv" do
     
     csv = @course.gradebook_to_csv
     csv.should_not be_nil
-    rows = FasterCSV.parse(csv)
+    rows = CSV.parse(csv)
     rows.length.should equal(3)
     rows[0][-1].should == "Final Grade"
     rows[1][-1].should == "(read only)"
@@ -744,7 +744,7 @@ describe Course, "gradebook_to_csv" do
 
     csv = @course.gradebook_to_csv(:include_sis_id => true)
     csv.should_not be_nil
-    rows = FasterCSV.parse(csv)
+    rows = CSV.parse(csv)
     rows.length.should == 5
     rows[0][1].should == 'ID'
     rows[0][2].should == 'SIS User ID'
@@ -776,7 +776,7 @@ describe Course, "gradebook_to_csv" do
     StudentEnrollment.create!(:user => @user1, :course => @course, :course_section => @s2)
     @course.reload
     csv = @course.gradebook_to_csv(:include_sis_id => true)
-    rows = FasterCSV.parse(csv)
+    rows = CSV.parse(csv)
     rows.length.should == 4
   end
 
@@ -803,7 +803,7 @@ describe Course, "gradebook_to_csv" do
 
       csv = @course.gradebook_to_csv(:include_sis_id => true)
       csv.should_not be_nil
-      rows = FasterCSV.parse(csv)
+      rows = CSV.parse(csv)
       rows.length.should == 6
       rows[0][1].should == 'ID'
       rows[0][2].should == 'SIS User ID'
@@ -838,7 +838,7 @@ describe Course, "gradebook_to_csv" do
 
     csv = @course.gradebook_to_csv(:user => @teacher)
     csv.should_not be_nil
-    rows = FasterCSV.parse(csv)
+    rows = CSV.parse(csv)
     # two header rows, and one student row
     rows.length.should == 3
     rows[2][1].should == @user2.id.to_s

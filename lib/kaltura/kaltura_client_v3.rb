@@ -236,7 +236,7 @@ module Kaltura
       data = {}
       data[:result] = result
       url = result.css('logFileUrl')[0].content
-      csv = FasterCSV.parse(Canvas::HTTP.get(url).body)
+      csv = CSV.parse(Canvas::HTTP.get(url).body)
       data[:entries] = []
       csv.each do |row|
         data[:entries] << {
@@ -269,7 +269,7 @@ module Kaltura
         url = file[:url]
         rows << [filename, description, file[:tags] || "", url, file[:media_type] || "video", '', '', '' ,'' ,'' ,'' ,file[:id] || ''] if file[:url]
       end
-      res = FasterCSV.generate do |csv|
+      res = CSV.generate do |csv|
         rows.each do |row|
           csv << row
         end

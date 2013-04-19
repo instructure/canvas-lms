@@ -107,7 +107,7 @@ class MediaObject < ActiveRecord::Base
   end
 
   def self.migration_csv(media_objects)
-    FasterCSV.generate do |csv|
+    CSV.generate do |csv|
       media_objects.each do |mo|
         mo.retrieve_details unless mo.data[:download_url]
         if mo.data[:download_url]

@@ -54,7 +54,7 @@ describe QuizStatistics do
     # and one in progress
     @quiz.generate_submission(@student)
 
-    stats = FasterCSV.parse(csv(:include_all_versions => true))
+    stats = CSV.parse(csv(:include_all_versions => true))
     # format for row is row_name, '', data1, data2, ...
     stats.first.length.should == 3
   end
@@ -66,7 +66,7 @@ describe QuizStatistics do
     qs = @quiz.generate_submission(@student)
     qs.grade_submission
 
-    stats = FasterCSV.parse(csv)
+    stats = CSV.parse(csv)
     # format for row is row_name, '', data1, data2, ...
     stats.first.length.should == 3
   end

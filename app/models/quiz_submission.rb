@@ -495,7 +495,7 @@ class QuizSubmission < ActiveRecord::Base
   # simply_versioned for making this possible!
   def update_submission_version(version, attrs)
     version_data = YAML::load(version.yaml)
-    TextHelper.recursively_strip_invalid_utf8!(version_data, true) if RUBY_VERSION >= '1.9'
+    TextHelper.recursively_strip_invalid_utf8!(version_data, true)
     version_data["submission_data"] = self.submission_data if attrs.include?(:submission_data)
     version_data["temporary_user_code"] = "was #{version_data['score']} until #{Time.now.to_s}"
     version_data["score"] = self.score if attrs.include?(:score)

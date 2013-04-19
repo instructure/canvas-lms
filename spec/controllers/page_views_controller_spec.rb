@@ -57,7 +57,7 @@ describe PageViewsController do
       pv3 = page_view(@user, '/somewhere/in/app/2', :created_at => 3.days.ago)  # 3rd day
       get 'index', :user_id => @user.id, :format => 'csv'
       response.should be_success
-      dates = FasterCSV.parse(response.body, :headers => true).map { |row| row['created_at'] }
+      dates = CSV.parse(response.body, :headers => true).map { |row| row['created_at'] }
       dates.should == [pv1, pv2, pv3].map(&:created_at).map(&:to_s)
     end
   end

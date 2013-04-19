@@ -1351,7 +1351,7 @@ class Course < ActiveRecord::Base
 
   def generate_grade_publishing_csv_output(enrollments, publishing_user, publishing_pseudonym)
     enrollment_ids = []
-    res = FasterCSV.generate do |csv|
+    res = CSV.generate do |csv|
       row = ["publisher_id", "publisher_sis_id", "course_id", "course_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrollment_id", "enrollment_status", "score"]
       row << "grade" if self.grading_standard_enabled?
       csv << row
@@ -1410,7 +1410,7 @@ class Course < ActiveRecord::Base
     t 'csv.final_score', 'Final Score'
     t 'csv.final_grade', 'Final Grade'
     t 'csv.points_possible', 'Points Possible'
-    res = FasterCSV.generate do |csv|
+    res = CSV.generate do |csv|
       #First row
       row = ["Student", "ID"]
       row.concat(["SIS User ID", "SIS Login ID"]) if options[:include_sis_id]

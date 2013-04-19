@@ -154,7 +154,7 @@ describe IncomingMail::IncomingMessageProcessor do
         }, ReplyToAddress.new(@message).secure_id, @message.id)
       DiscussionTopic.incoming_replies.length.should == 1
       comparison_string = "\xe3\x82\xa1"
-      comparison_string.force_encoding("UTF-8") if RUBY_VERSION >= '1.9'
+      comparison_string.force_encoding("UTF-8")
       DiscussionTopic.incoming_replies[0][:text].should == comparison_string
       DiscussionTopic.incoming_replies[0][:html].should == comparison_string
     end

@@ -355,7 +355,7 @@ class ContentMigration < ActiveRecord::Base
 
   def prepare_data(data)
     data = data.with_indifferent_access if data.is_a? Hash
-    TextHelper.recursively_strip_invalid_utf8!(data, true) if RUBY_VERSION >= "1.9"
+    TextHelper.recursively_strip_invalid_utf8!(data, true)
     data['all_files_export'] ||= {}
     data
   end

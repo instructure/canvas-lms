@@ -205,7 +205,7 @@ describe Qti::Converter do
          "weight"=>0,
          "id"=>9001}],
       "question_text"=>
-       "This is the question text.<br>\nThese are some symbol font characters: <span style=\"font-size: 12pt;\">&part;&hearts;&exist;&Delta;&fnof;</span>"},
+       "This is the question text.<br>\nThese are some symbol font characters: <span style=\"font-size: 12pt;\">∂♥∃Δƒ</span>"},
      {"position"=>2,
       "correct_comments"=>"correct answer feedback",
       "question_type"=>"true_false_question",
@@ -377,10 +377,6 @@ describe Qti::Converter do
         {"match_id"=>5875, "text"=>"Distractor 1"},
         {"match_id"=>2330, "text"=>"Distractor 2"}],
       "question_text"=>"This is the question text."}]
-if RUBY_VERSION >= '1.9'
-  # handle new nokogiri behavior of NOT turning these utf-8 chars into html entities
-  RESPONDUS_QUESTIONS[0]["question_text"] = "This is the question text.<br>\nThese are some symbol font characters: <span style=\"font-size: 12pt;\">∂♥∃Δƒ</span>"
-end
 end
 
 end
