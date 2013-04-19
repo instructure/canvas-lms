@@ -160,11 +160,12 @@ class CourseFormController < ApplicationController
     course
   end
 
-  def sandbox_info(course, username, teacher1, teacher2 = nil)
+  def sandbox_info(course_line, username, teacher1, teacher2 = nil)
     account_sis_id = "sfu:::sandbox:::instructors"
+    course_arr = course_line.split("-")
     sandbox = {}
-    sandbox["course_id"] = course
-    sandbox["short_long_name"] = "Sandbox - #{username}"
+    sandbox["course_id"] = course_line
+    sandbox["short_long_name"] = "Sandbox - #{username} - #{course_arr.last}"
     sandbox["default_section_id"] = ""
 
     sandbox["csv"] = "\"#{sandbox["course_id"]}\",\"#{sandbox["short_long_name"]}\",\"#{sandbox["short_long_name"]}\",\"#{account_sis_id}\",\"\",\"active\""
