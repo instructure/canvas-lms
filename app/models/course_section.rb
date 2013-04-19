@@ -89,7 +89,7 @@ class CourseSection < ActiveRecord::Base
     given {|user, session| self.cached_context_grants_right?(user, session, :manage_calendar) }
     can :manage_calendar
 
-    given {|user, session| self.enrollments.find_by_user_id(user.id) && self.cached_context_grants_right?(user, session, :read_roster) }
+    given {|user, session| user && self.enrollments.find_by_user_id(user.id) && self.cached_context_grants_right?(user, session, :read_roster) }
     can :read
 
     given {|user, session| self.cached_context_grants_right?(user, session, :read_as_admin) }

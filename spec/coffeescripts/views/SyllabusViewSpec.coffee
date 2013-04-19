@@ -126,11 +126,6 @@ define [
         el: '#syllabusContainer'
         collection: acollection
 
-      @view.render()
-
-      SyllabusBehaviors.bindToMiniCalendar()
-      SyllabusBehaviors.bindToSyllabus()
-
     teardown: ->
       @syllabusContainer.remove()
       @miniMonth.remove()
@@ -139,49 +134,93 @@ define [
       @getUserOffset.restore()
       @server.restore()
 
-  test 'render', ->
-    expect 15
+    render: ->
+      @view.render()
 
-    # rendering
-    syllabus = $('#syllabus')
-    ok syllabus.length, 'syllabus - syllabus added to the dom'
-    ok syllabus.is(':visible'), 'syllabus - syllabus visible'
+      SyllabusBehaviors.bindToMiniCalendar()
+      SyllabusBehaviors.bindToSyllabus()
 
-    dates = $('tr.date', syllabus)
-    equal dates.length, 6, 'dates - dates coalesce'
+    renderAssertions: ->
+      expect 15
 
-    assignments = $('tr.syllabus_assignment', dates)
-    equal assignments.length, 10, 'events - all assignments rendered'
-    equal $('td.name a', assignments).length, 10, 'events - link rendered for each assignment'
+      # rendering
+      syllabus = $('#syllabus')
+      ok syllabus.length, 'syllabus - syllabus added to the dom'
+      ok syllabus.is(':visible'), 'syllabus - syllabus visible'
 
-    events = $('tr.syllabus_event', dates)
-    equal events.length, 6, 'events - all events rendered'
-    equal $('td.name a', events).length, 6, 'events - link rendered for each event'
+      dates = $('tr.date', syllabus)
+      equal dates.length, 6, 'dates - dates coalesce'
 
-    # mini calendar dates - has event
-    expected = $('#mini_day_2012_01_01, #mini_day_2012_01_11, #mini_day_2012_01_23, #mini_day_2012_01_30, #mini_day_2012_01_31')
-    actual = $('.mini_calendar_day.has_event')
-    equal expected.length, 5, 'mini calendar - expected dates with events found'
-    deepEqual actual.toArray(), expected.toArray(), 'mini calendar - dates with events highlighted'
+      assignments = $('tr.syllabus_assignment', dates)
+      equal assignments.length, 10, 'events - all assignments rendered'
+      if @view.can_read
+        equal $('td.name a', assignments).length, 10, 'events - link rendered for each assignment'
+      else
+        equal $('td.name a', assignments).length, 0, 'events - link not rendered for each assignment'
 
-    # today
-    expected = $('#mini_day_2012_01_23')
-    actual = $('.mini_calendar_day.related')
-    equal expected.length, 1, 'today - today found'
-    deepEqual actual.toArray(), expected.toArray(), 'today - today highlighted'
+      events = $('tr.syllabus_event', dates)
+      equal events.length, 6, 'events - all events rendered'
+      if @view.can_read && @view.is_valid_user
+        equal $('td.name a', events).length, 6, 'events - link rendered for each event'
+      else
+        equal $('td.name a', events).length, 0, 'events - link not rendered for each event'
 
-    expected = $('.events_2012_01_23')
-    actual = $('tr.date.related')
-    equal expected.length, 1, 'today - today\'s events found'
-    deepEqual actual.toArray(), expected.toArray(), 'today - today\'s events highlighted'
+      # mini calendar dates - has event
+      expected = $('#mini_day_2012_01_01, #mini_day_2012_01_11, #mini_day_2012_01_23, #mini_day_2012_01_30, #mini_day_2012_01_31')
+      actual = $('.mini_calendar_day.has_event')
+      equal expected.length, 5, 'mini calendar - expected dates with events found'
+      deepEqual actual.toArray(), expected.toArray(), 'mini calendar - dates with events highlighted'
 
-    expected = $('.events_2012_01_01, .events_2012_01_11')
-    actual = $('tr.date.date_passed')
-    equal expected.length, 2, 'passed events - passed events found'
-    deepEqual actual.toArray(), expected.toArray(), 'passed events - events before today marked as passed'
+      # today
+      expected = $('#mini_day_2012_01_23')
+      actual = $('.mini_calendar_day.related')
+      equal expected.length, 1, 'today - today found'
+      deepEqual actual.toArray(), expected.toArray(), 'today - today highlighted'
+
+      expected = $('.events_2012_01_23')
+      actual = $('tr.date.related')
+      equal expected.length, 1, 'today - today\'s events found'
+      deepEqual actual.toArray(), expected.toArray(), 'today - today\'s events highlighted'
+
+      expected = $('.events_2012_01_01, .events_2012_01_11')
+      actual = $('tr.date.date_passed')
+      equal expected.length, 2, 'passed events - passed events found'
+      deepEqual actual.toArray(), expected.toArray(), 'passed events - events before today marked as passed'
+
+  test 'render (user public course)', ->
+    @view.can_read = true # public course -- can read
+    @view.is_valid_user = true # user - enrolled (can read)
+
+    @render()
+    @renderAssertions()
+
+  test 'render (anonymous public course)', ->
+    @view.can_read = true # public course -- can read
+    @view.is_valid_user = false # anonymous
+    
+    @render()
+    @renderAssertions()
+
+  test 'render (user public syllabus)', ->
+    @view.can_read = false # public syllabus -- cannot read
+    @view.is_valid_user = true # user - non-enrolled (cannot read)
+    
+    @render()
+    @renderAssertions()
+
+  test 'render (anonymous public syllabus)', ->
+    @view.can_read = false # public syllabus -- cannot read
+    @view.is_valid_user = false # anonymous
+    
+    @render()
+    @renderAssertions()
 
   test 'syllabus interaction', ->
     expect 14
+
+    @view.is_public_course = true
+    @view.can_participate = true
+    @render()
 
     # dated hover
     event = $('.events_2012_01_11')
@@ -245,6 +284,10 @@ define [
   test 'hide/show special events', ->
     expect 20
 
+    @view.is_public_course = true
+    @view.can_participate = true
+    @render()
+
     # hide/show special
     day = $('#mini_day_2012_01_31')
     equal day.length, 1, 'render - expected day found'
@@ -296,6 +339,10 @@ define [
 
   test 'mini calendar', ->
     expect 27
+
+    @view.is_public_course = true
+    @view.can_participate = true
+    @render()
 
     # hover non-event date
     nonEventMiniDay = $('#mini_day_2012_01_17')
