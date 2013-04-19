@@ -30,6 +30,8 @@ class QuizSubmission < ActiveRecord::Base
   before_save :update_assignment_submission
   before_create :assign_validation_token
 
+  has_many :attachments, :as => :context, :dependent => :destroy
+
   # update the QuizSubmission's Submission to 'graded' when the QuizSubmission is marked as 'complete.' this
   # ensures that quiz submissions with essay questions don't show as graded in the SpeedGrader until the instructor
   # has graded the essays.

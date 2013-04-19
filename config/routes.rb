@@ -1075,6 +1075,10 @@ ActionController::Routing::Routes.draw do |map|
       quizzes.put "courses/:course_id/quizzes/:id", :action => :update, :path_name => 'course_quiz_update'
     end
 
+    api.with_options(:controller => :quiz_submissions_api) do |quiz_submissions|
+      quiz_submissions.post 'courses/:course_id/quizzes/:quiz_id/quiz_submissions/self/files', :action => :create_file
+    end
+
     api.with_options(:controller => :outcome_groups_api) do |outcome_groups|
       def og_routes(route_object, context)
         prefix = (context == "global" ? context : "#{context}s/:#{context}_id")
