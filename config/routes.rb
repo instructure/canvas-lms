@@ -1045,11 +1045,17 @@ ActionController::Routing::Routes.draw do |map|
       favorites.delete "users/self/favorites/courses", :action => :reset_course_favorites
     end
 
-    api.with_options(:controller => :wiki_pages) do |wiki_pages|
-      wiki_pages.get "courses/:course_id/pages", :action => :api_index, :path_name => 'course_wiki_pages'
-      wiki_pages.get "groups/:group_id/pages", :action => :api_index, :path_name => 'group_wiki_pages'
-      wiki_pages.get "courses/:course_id/pages/:url", :action => :api_show, :path_name => 'course_wiki_page'
-      wiki_pages.get "groups/:group_id/pages/:url", :action => :api_show, :path_name => 'group_wiki_page'
+    api.with_options(:controller => :wiki_pages_api) do |wiki_pages|
+      wiki_pages.get "courses/:course_id/pages", :action => :index, :path_name => 'course_wiki_pages'
+      wiki_pages.get "groups/:group_id/pages", :action => :index, :path_name => 'group_wiki_pages'
+      wiki_pages.get "courses/:course_id/pages/:url", :action => :show, :path_name => 'course_wiki_page'
+      wiki_pages.get "groups/:group_id/pages/:url", :action => :show, :path_name => 'group_wiki_page'
+      wiki_pages.post "courses/:course_id/pages", :action => :create
+      wiki_pages.post "groups/:group_id/pages", :action => :create
+      wiki_pages.put "courses/:course_id/pages/:url", :action => :update
+      wiki_pages.put "groups/:group_id/pages/:url", :action => :update
+      wiki_pages.delete "courses/:course_id/pages/:url", :action => :destroy
+      wiki_pages.delete "groups/:group_id/pages/:url", :action => :destroy
     end
 
     api.with_options(:controller => :context_modules_api) do |context_modules|

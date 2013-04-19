@@ -20,15 +20,18 @@ module Api::V1::WikiPage
   include Api::V1::Json
   include Api::V1::User
 
-  WIKI_PAGE_JSON_ATTRS = %w(url title created_at updated_at hide_from_students)
+  WIKI_PAGE_JSON_ATTRS = %w(url title created_at updated_at hide_from_students editing_roles)
 
-  def wiki_page_json(wiki_page, current_user, session)
+  def wiki_page_json(wiki_page, current_user, session, include_body = true)
     hash = api_json(wiki_page, current_user, session, :only => WIKI_PAGE_JSON_ATTRS)
-    hash['body'] = api_user_content(wiki_page.body)
+    hash['editing_roles'] ||= 'teachers'
+    hash['body'] = api_user_content(wiki_page.body) if include_body
+    hash['last_edited_by'] = user_display_json(wiki_page.user, wiki_page.context) if wiki_page.user
+    hash['published'] = wiki_page.active?
     hash
   end
 
   def wiki_pages_json(wiki_pages, current_user, session)
-    wiki_pages.map { |page| api_json(page, current_user, session, :only => WIKI_PAGE_JSON_ATTRS) }
+    wiki_pages.map { |page| wiki_page_json(page, current_user, session, false) }
   end
 end

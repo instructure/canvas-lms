@@ -60,6 +60,10 @@ class WikiPage < ActiveRecord::Base
     end
   end
 
+  def self.title_order_by_clause
+    best_unicode_collation_key('wiki_pages.title')
+  end  
+  
   def ensure_unique_url
     url_attribute = self.class.url_attribute
     base_url = self.send(url_attribute)
@@ -142,7 +146,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   def notify_of_update=(val)
-    @wiki_page_changed = (val == '1' || val == true)
+    @wiki_page_changed = Canvas::Plugin.value_to_boolean(val)
   end
 
   def notify_of_update
@@ -494,5 +498,15 @@ class WikiPage < ActiveRecord::Base
 
   def self.comments_enabled?
     !Rails.env.production?
+  end
+
+  def increment_view_count(user, context = nil)
+    unless self.new_record?
+      self.with_versioning(false) do |p|
+        context ||= p.context
+        p.connection.execute("UPDATE wiki_pages SET view_count=COALESCE(view_count, 0) + 1 WHERE id=#{p.id}")
+        p.context_module_action(user, context, :read)
+      end
+    end
   end
 end

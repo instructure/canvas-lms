@@ -218,7 +218,7 @@ describe UserContent, :type => :integration do
     @wiki_page.workflow_state = 'active'
     @wiki_page.save!
     api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}",
-               { :controller => 'wiki_pages', :action => 'api_show',
+               { :controller => 'wiki_pages_api', :action => 'show',
                  :format => 'json', :course_id => @course.id.to_s, :url => @wiki_page.url })
   end
 
@@ -244,7 +244,7 @@ describe UserContent, :type => :integration do
         @wiki_page.save!
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}",
-                        { :controller => 'wiki_pages', :action => 'api_show',
+                        { :controller => 'wiki_pages_api', :action => 'show',
                           :format => 'json', :course_id => @course.id.to_s, :url => @wiki_page.url })
         doc = Nokogiri::HTML::DocumentFragment.parse(json['body'])
         doc.css('a').collect { |att| att['data-api-endpoint'] }.should == [
@@ -281,7 +281,7 @@ describe UserContent, :type => :integration do
         @wiki_page.save!
 
         json = api_call(:get, "/api/v1/groups/#{@group.id}/pages/#{@wiki_page.url}",
-                        { :controller => 'wiki_pages', :action => 'api_show',
+                        { :controller => 'wiki_pages_api', :action => 'show',
                           :format => 'json', :group_id => @group.id.to_s, :url => @wiki_page.url })
         doc = Nokogiri::HTML::DocumentFragment.parse(json['body'])
         doc.css('a').collect { |att| att['data-api-endpoint'] }.should == [
