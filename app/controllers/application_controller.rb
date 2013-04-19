@@ -775,13 +775,13 @@ class ApplicationController < ActionController::Base
   def rescue_action_in_public(exception)
     response_code = response_code_for_rescue(exception)
     begin
-      @status_code = interpret_status(response_code)
-      @status = @status_code
-      @status = 'AUT' if exception.is_a?(ActionController::InvalidAuthenticityToken)
+      status_code = interpret_status(response_code)
+      status = status_code
+      status = 'AUT' if exception.is_a?(ActionController::InvalidAuthenticityToken)
       type = 'default'
-      type = '404' if @status == '404 Not Found'
+      type = '404' if status == '404 Not Found'
 
-      @error = ErrorReport.log_exception(type, exception, {
+      error = ErrorReport.log_exception(type, exception, {
         :url => request.url,
         :user => @current_user,
         :user_agent => request.headers['User-Agent'],
@@ -792,22 +792,41 @@ class ApplicationController < ActionController::Base
       }.merge(ErrorReport.useful_http_env_stuff_from_request(request)))
 
       if api_request?
-        rescue_action_in_api(exception, @error)
+        rescue_action_in_api(exception, error)
       else
-        @headers = nil
-        session[:last_error_id] = @error.id rescue nil
-        if request.xhr? || request.format == :text
-          render :json => {:errors => {:base => "Unexpected error, ID: #{@error.id rescue "unknown"}"}, :status => @status}, :status => @status_code
-        else
-          @status = '500' unless File.exists?(File.join('app', 'views', 'shared', 'errors', "#{@status.to_s[0,3]}_message.html.erb"))
-          render :template => "shared/errors/#{@status.to_s[0, 3]}_message.html.erb", 
-            :layout => 'application', :status => @status, :locals => {:error => @error, :exception => exception, :status => @status}
-        end
+        render_rescue_action(exception, error, status, status_code)
       end
     rescue => e
       # error generating the error page? failsafe.
       render_optional_error_file response_code_for_rescue(exception)
       ErrorReport.log_exception(:default, e)
+    end
+  end
+
+  def render_rescue_action(exception, error, status, status_code)
+    clear_crumbs
+    @headers = nil
+    session[:last_error_id] = error.id rescue nil
+    if request.xhr? || request.format == :text
+      render :status => status_code, :json => {
+        :errors => {
+          :base => "Unexpected error, ID: #{error.id rescue "unknown"}"
+        },
+        :status => status
+      }
+    else
+      erbfile = "#{status.to_s[0,3]}_message.html.erb"
+      erbpath = File.join('app', 'views', 'shared', 'errors', erbfile)
+      erbfile = "500_message.html.erb" unless File.exists?(erbpath)
+      @status_code = status_code
+      render :template => "shared/errors/#{erbfile}", 
+        :layout => 'application',
+        :status => status,
+        :locals => {
+          :error => error,
+          :exception => exception,
+          :status => status
+        }
     end
   end
 
