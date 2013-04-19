@@ -181,6 +181,13 @@ class Message < ActiveRecord::Base
   end
   alias_method_chain :polymorphic_url, :context_host
 
+  # the hostname for user-specific links (e.g. setting notification prefs).
+  # may be different from the asset/context host
+  def primary_host
+    primary_context = user.pseudonym.try(:account)
+    primary_context ||= context.respond_to?(:context) ? context.context : context
+    HostUrl.context_host primary_context
+  end
 
   # Internal: Store any transmission errors in the database to help with later
   # debugging.
@@ -344,7 +351,7 @@ class Message < ActiveRecord::Base
     # Append a footer to the body if the path type is email
     if path_type == 'email'
       raw_footer_message = File.read(Canvas::MessageHelper.find_message_path('_email_footer.email.erb'))
-      footer_message = Erubis::Eruby.new(raw_footer_message, :bufvar => "@output_buffer").result(b) rescue nil
+      footer_message = Erubis::Eruby.new(raw_footer_message, :bufvar => "@output_buffer").result(_binding)
       if footer_message.present?
         self.body = <<-END.strip_heredoc
           #{self.body}
