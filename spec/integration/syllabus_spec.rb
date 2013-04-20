@@ -39,4 +39,18 @@ describe "syllabus" do
   it "should allow access to a public syllabus" do
     anonymous_syllabus_access_allowed :public_syllabus
   end
+
+  it "should display syllabus description on syllabus course home pages" do
+    course_with_teacher_logged_in(:active_all => true)
+    syllabus_body = "test syllabus body"
+    @course.syllabus_body = syllabus_body
+    @course.default_view = "syllabus"
+    @course.save!
+
+    get "/courses/#{@course.id}"
+
+    response.should be_success
+    page = Nokogiri::HTML(response.body)
+    page.at_css('#course_syllabus').text.should include(syllabus_body)
+  end
 end
