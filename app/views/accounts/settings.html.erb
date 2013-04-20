@@ -4,6 +4,13 @@
   js_bundle :account_settings
   jammit_css :account_settings, :reports, :tinymce
   content_for :page_title, t(:page_title, "Account Settings")
+  if can_do(@context, @current_user, :manage_storage_quotas)
+    js_env :ACCOUNT => {
+      'id' => @context.id,
+      'default_storage_quota_mb' => @context.default_storage_quota_mb,
+      'default_user_storage_quota_mb' => @context.default_user_storage_quota_mb,
+    }
+  end
 %>
 
 <% content_for :right_side do %>
@@ -27,6 +34,11 @@
   <ul>
     <% if can_do(@context, @current_user, :manage_account_settings) %>
     <li><a href="#tab-settings" id="tab-settings-link"><%= t(:tab_settings, "Settings") %></a></li>
+    <% end %>
+    <% if can_do(@context, @current_user, :manage_storage_quotas) %>
+    <li><a href="#tab-quotas" id="tab-quotas-link"><%= t(:tab_quotas, "Quotas") %></a></li>
+    <% end %>
+    <% if can_do(@context, @current_user, :manage_account_settings) %>
     <li><a href="#tab-notifications" id="tab-notifications-link"><%= t(:tab_notifications, "Notifications") %></a></li>
     <% end %>
     <li><a href="#tab-users" id="tab-users-link"><%= t(:tab_admins, "Admins") %></a></li>
@@ -45,7 +57,7 @@
   </ul>
   <% if can_do(@context, @current_user, :manage_account_settings) %>
     <div id="tab-settings">
-      <% form_for :account, :url => account_url(@account), :html => {:method => :put, :id => "account_settings"} do |f| %>
+      <% form_for :account, :url => account_url(@account), :html => {:method => :put, :id => "account_settings", :class => 'account_settings'} do |f| %>
         <fieldset id="account_settings" class="">
           <legend><%= t(:account_settings_title, "Account Settings") %></legend>
           <table class="formtable">
@@ -65,25 +77,6 @@
                     <% end %>
                   </span>
                 </td>
-              </tr>
-            <% end %>
-            <% has_manage_quotas = can_do(@context, @current_user, :manage_storage_quotas) %>
-            <tr>
-              <td>
-                <%= f.blabel :default_course_storage_quota, :en => "Default Course File Quota" %>
-              </td>
-              <td><%= t(:megabytes_field, "%{text_field} megabytes", :text_field => (has_manage_quotas ?
-                      f.text_field(:default_storage_quota_mb, :id => 'account_default_course_storage_quota', :style => "width: 50px;", :title => t(:megabytes_tooltip, "megabytes")) :
-                      @account.default_storage_quota_mb.to_s)) %></td>
-            </tr>
-            <% if @account.root_account? && !@account.site_admin? %>
-              <tr>
-                <td>
-                  <%= f.blabel :default_user_storage_quota, :en => "Default User File Quota" %>
-                </td>
-                <td><%= t(:megabytes_field, "%{text_field} megabytes", :text_field => (has_manage_quotas ?
-                        f.text_field(:default_user_storage_quota_mb, :id => 'account_default_user_storage_quota', :style => "width: 50px;", :title => t(:megabytes_tooltip, "megabytes")) :
-                        @account.default_user_storage_quota_mb.to_s)) %></td>
               </tr>
             <% end %>
             <% if available_locales.size > 1 %>
@@ -479,6 +472,10 @@ TEXT
         </div>
       <% end %>
     </div>
+  <% end %>
+
+  <% if can_do(@context, @current_user, :manage_storage_quotas) %>
+    <div id="tab-quotas"></div>
   <% end %>
 
   <% if can_do(@context, @current_user, :manage_account_settings) %>

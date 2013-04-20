@@ -48,17 +48,16 @@ define [
     # @returns jqXHR
     submit: (event) ->
       event?.preventDefault()
-      @$el.hideErrors()
+      @hideErrors()
 
       data = @getFormData()
       errors = @validateBeforeSave data, {}
 
       if _.keys(errors).length == 0
         disablingDfd = new $.Deferred()
-        saveDfd = @model
-          .save(data, @saveOpts)
-          .then(@onSaveSuccess, @onSaveFail)
-          .fail -> disablingDfd.reject()
+        saveDfd = @saveFormData(data)
+        saveDfd.then(@onSaveSuccess, @onSaveFail)
+        saveDfd.fail -> disablingDfd.reject()
 
         unless @dontRenableAfterSaveSuccess
           saveDfd.done -> disablingDfd.resolve()
@@ -77,16 +76,61 @@ define [
       @$el.toJSON()
 
     ##
-    # Override this to perform pre-save validations.  Return errors that can
-    # show with the showErrors format below
-    validateBeforeSave: -> {}
+    # Saves data from the form using the model.
+    # Override to provide customized saving behavior.
+    saveFormData: (data=null) ->
+      model = @model
+      data ||= @getFormData()
+      saveOpts = @saveOpts
+      model.save(data, saveOpts)
+
+    ##
+    # Performs validation on the form, using the validateFormData method, and
+    # shows the errors using showErrors.
+    #
+    # Override validateFormData or showErrors to change their respective behaviors.
+    #
+    # @api public
+    # @returns true if there were no validation errors, otherwise false
+    validate: (opts={}) ->
+      opts ||= {}
+      data = opts['data'] || @getFormData()
+      errors = @validateFormData data, {}
+
+      @hideErrors()
+      @showErrors(errors)
+      errors.length == 0
+
+    ##
+    # Validates provided form data, returning any errors found.
+    # Override to provide customized validation behavior.
+    #
+    # @returns errors (see parseErrorResponse for the errors format)
+    validateFormData: (data) ->
+      {}
+
+    ##
+    # Validates provided form data just before saving, returning any errors
+    # found. By default it delegates to @validateFormData to perform validation,
+    # but allows for alternative save-oriented validation to be performed.
+    # Override to provide customized pre-save validation behavior.
+    #
+    # @returns errors (see parseErrorResponse for the errors format)
+    validateBeforeSave: (data) ->
+      @validateFormData(data)
+
+    ##
+    # Hides all errors previously shown in the UI.
+    # Override to match the way showErrors displays the errors.
+    hideErrors: ->
+      @$el.hideErrors()
 
     onSaveSuccess: =>
       @trigger 'success', arguments...
 
     onSaveFail: (xhr) =>
-      errors = {}
       errors = @parseErrorResponse xhr
+      errors ||= {}
       @showErrors errors
       @trigger 'fail', errors, arguments...
 

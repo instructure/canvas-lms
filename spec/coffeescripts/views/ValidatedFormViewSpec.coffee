@@ -127,3 +127,66 @@ define [
       equal @form.$(':disabled').length, 3
     @form.submit()
 
+  test 'submit delegates to saveFormData', 1, ->
+    sinon.spy(@form, 'saveFormData')
+
+    @form.submit()
+    ok @form.saveFormData.called, 'saveFormData called'
+
+  test 'submit calls validateBeforeSave', 1, ->
+    sinon.spy(@form, 'validateBeforeSave')
+
+    @form.submit()
+    ok @form.validateBeforeSave.called, 'validateBeforeSave called'
+
+  test 'submit always calls hideErrors', 1, ->
+    sinon.spy(@form, 'hideErrors')
+
+    @form.submit()
+    ok @form.hideErrors.called, 'hideErrors called'
+
+  test 'validateBeforeSave delegates to validateFormData, by default', 1, ->
+    sinon.spy(@form, 'validateFormData')
+
+    @form.validateBeforeSave({})
+    ok @form.validateFormData.called, 'validateFormData called'
+
+  test 'validate delegates to validateFormData', 1, ->
+    sinon.spy(@form, 'validateFormData')
+
+    @form.validate()
+    ok @form.validateFormData.called, 'validateFormData called'
+
+  test 'validate always calls hideErrors', 2, ->
+    sinon.stub(@form, 'validateFormData')
+    sinon.spy(@form, 'hideErrors')
+
+    @form.validateFormData.returns({})
+    @form.validate()
+    ok @form.hideErrors.called, 'hideErrors called with no errors'
+
+    @form.hideErrors.reset()
+    @form.validateFormData.returns
+      errors: [
+        type: 'required'
+        message: 'REQUIRED!'
+      ]
+    @form.validate()
+    ok @form.hideErrors.called, 'hideErrors called with errors'
+
+  test 'validate always calls showErrors', 2, ->
+    sinon.stub(@form, 'validateFormData')
+    sinon.spy(@form, 'showErrors')
+
+    @form.validateFormData.returns({})
+    @form.validate()
+    ok @form.showErrors.called, 'showErrors called with no errors'
+
+    @form.showErrors.reset()
+    @form.validateFormData.returns
+      errors: [
+        type: 'required'
+        message: 'REQUIRED!'
+      ]
+    @form.validate()
+    ok @form.showErrors.called, 'showErrors called with errors'
