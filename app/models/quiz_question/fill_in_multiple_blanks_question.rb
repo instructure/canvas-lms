@@ -110,13 +110,13 @@ class QuizQuestion::FillInMultipleBlanksQuestion < QuizQuestion::Base
           end
           if !found
             if answer_md5
-              answer = {
+              match = {
                 :id => answer_md5,
                 :responses => 1,
                 :user_ids => [response[:user_id]],
                 :text => response["answer_for_#{answer[:blank_id]}".to_sym]
               }
-              answer[:answer_matches] << answer
+              answer[:answer_matches] << match
             end
           end
         end
