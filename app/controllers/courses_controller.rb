@@ -1033,6 +1033,7 @@ class CoursesController < ApplicationController
         @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).select([:context_module_id, :collapsed]).select{|p| p.collapsed? }.map(&:context_module_id)
       when 'syllabus'
         add_crumb(t('#crumbs.syllabus', "Syllabus"))
+        @syllabus_body = api_user_content(@context.syllabus_body, @context)
         @groups = @context.assignment_groups.active.order(:position, :name).all
         @events = @context.calendar_events.active.to_a
         @events.concat @context.assignments.active.to_a
