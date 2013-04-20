@@ -99,6 +99,7 @@ class GradeSummaryPresenter
 
   def submissions
     @submissions ||= @context.submissions.
+      except(:includes).
       includes(:submission_comments, :rubric_assessments, :assignment).
       find_all_by_user_id(student)
   end
@@ -110,6 +111,7 @@ class GradeSummaryPresenter
         # assignment in order to calculate grade distributions
         @context.submissions.
           select([:assignment_id, :score, :grade, :quiz_submission_id]).
+          except(:includes).
           group_by(&:assignment_id)
       else
         {}
