@@ -35,6 +35,9 @@ class GradebooksController < ApplicationController
       return redirect_to_appropriate_gradebook_version
     end
 
+    flash[:warning] = "The grades page is temporarily disabled"
+    return redirect_to(course_url(@context))
+
     if !@presenter.student || !@presenter.student_enrollment
       return authorized_action(nil, @current_user, :permission_fail)
     end
