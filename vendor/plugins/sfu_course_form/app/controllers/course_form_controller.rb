@@ -5,6 +5,7 @@ class CourseFormController < ApplicationController
   def new
     @user = User.find(@current_user.id)
     @sfuid = @user.pseudonym.unique_id
+    @sfuid.slice! "@sfu.ca"
     @course_list = Array.new
     @terms = Account.find_by_name('Simon Fraser University').enrollment_terms.delete_if {|t| t.name == 'Default Term'}
     if SFU::User.student_only? @sfuid
