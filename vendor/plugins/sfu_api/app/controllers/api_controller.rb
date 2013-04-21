@@ -1,5 +1,3 @@
-#require "rest_client"
-#require "json"
 require Pathname(File.dirname(__FILE__)) + "../model/sfu/course"
 
 class ApiController < ApplicationController
@@ -16,7 +14,7 @@ class ApiController < ApplicationController
     end
 
     respond_to do |format|
-      format.json { render :text => course_hash.to_json }
+      format.json { render :json => course_hash }
     end
   end
 
@@ -24,6 +22,9 @@ class ApiController < ApplicationController
     account_id = Account.find_by_name('Simon Fraser University').id
     sfu_id = params[:sfu_id]
     pseudonym = Pseudonym.where(:unique_id => sfu_id, :account_id => account_id).all
+    if pseudonym.empty?
+      raise(ActiveRecord::RecordNotFound)
+    end
     user_hash = {}
     unless pseudonym.empty?
       user = User.find pseudonym.first.user_id
@@ -32,14 +33,18 @@ class ApiController < ApplicationController
         user_hash["name"] = user.name
         user_hash["uuid"] = user.uuid
       elsif params[:property].eql? "uuid"
-        user_hash = user.uuid
+        user_hash["uuid"] = user.uuid
       elsif params[:property].eql? "terms"
         user_hash = teaching_terms_for sfu_id
       end
     end
 
+    if params[:property] != "terms"
+      return unless authorized_action(user, @current_user, :read)
+    end
+
     respond_to do |format|
-      format.json { render :text => user_hash.to_json }
+      format.json { render :json => user_hash }
     end
   end
 
@@ -91,12 +96,15 @@ class ApiController < ApplicationController
     end
 
     respond_to do |format|
-      format.json { render :text => course_array.to_json }
+      format.json { render :json => course_array }
     end
   end
 
   def course_info(sis_id, property = nil)
-    course = Course.where(:sis_source_id => sis_id).all
+    course = Course.where(:sis_source_id => sis_id.downcase).all
+    if course.empty?
+      raise(ActiveRecord::RecordNotFound)
+    end
     course_hash = {}
     if course.length == 1
       if property.nil?
@@ -142,5 +150,10 @@ class ApiController < ApplicationController
       end
     end
     sections[0..-3]
+  end
+
+  # orverride ApplicationController::api_request? to force canvas to treat all calls to /sfu/api/* as an API call
+  def api_request?
+    return true
   end
 end
