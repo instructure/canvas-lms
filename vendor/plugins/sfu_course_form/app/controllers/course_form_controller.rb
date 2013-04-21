@@ -15,7 +15,7 @@ class CourseFormController < ApplicationController
 
   def create
     selected_courses = []
-    account_id = account_id "Simon Fraser University"
+    account_id = Account.find_by_name("Simon Fraser University").id
     teacher_username = params[:username]
     teacher2_username = params[:enroll_me]
     teacher_sis_user_id = sis_user_id(teacher_username, account_id)
@@ -160,26 +160,18 @@ class CourseFormController < ApplicationController
     course
   end
 
-  def sandbox_info(course, username, teacher1, teacher2 = nil)
-    account_id = account_id "Sandbox for Instructors"
+  def sandbox_info(course_line, username, teacher1, teacher2 = nil)
+    account_sis_id = "sfu:::sandbox:::instructors"
+    course_arr = course_line.split("-")
     sandbox = {}
-    sandbox["course_id"] = course
-    sandbox["short_long_name"] = "Sandbox - #{username}"
+    sandbox["course_id"] = course_line
+    sandbox["short_long_name"] = "Sandbox - #{username} - #{course_arr.last}"
     sandbox["default_section_id"] = ""
 
-    sandbox["csv"] = "\"#{sandbox["course_id"]}\",\"#{sandbox["short_long_name"]}\",\"#{sandbox["short_long_name"]}\",\"#{account_id}\",\"\",\"active\""
+    sandbox["csv"] = "\"#{sandbox["course_id"]}\",\"#{sandbox["short_long_name"]}\",\"#{sandbox["short_long_name"]}\",\"#{account_sis_id}\",\"\",\"active\""
     sandbox["enrollment_csv_1"] = "\"#{sandbox["course_id"]}\",\"#{teacher1}\",\"teacher\",\"#{sandbox["default_section_id"]}\",\"active\""
     sandbox["enrollment_csv_1"] = "\"#{sandbox["course_id"]}\",\"#{teacher2}\",\"teacher\",\"#{sandbox["default_section_id"]}\",\"active\"" unless teacher2.nil?
     sandbox
-  end
-
-  def account_id(name)
-    account = Account.find_by_name(name)
-    unless account.nil?
-      account.id
-    else
-      ""
-    end
   end
 
   def sis_user_id(username, account_id)
