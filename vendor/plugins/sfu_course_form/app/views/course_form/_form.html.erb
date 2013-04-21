@@ -1,3 +1,7 @@
+<%
+  js_bundle :course_request_form, :plugin => :sfu_course_form
+%>
+
 <h1>Start a New Course</h1>
   <% form_tag({:controller => "course_form" ,:action => "create"}, :class => "bootstrap-form form-horizontal") do -%>
   <div class="control-group">
@@ -39,7 +43,3 @@
     <%= submit_tag "Create Courses", :id => "create_course_btn" ,:class=> "btn btn-primary", :disabled => true %>
   </div>
 <% end %>
-
-<%= javascript_include_tag "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" %>
-<%= javascript_include_tag "/javascripts/vendor/spin.min.js" %>
-<%= javascript_include_tag "/sfu/js/course_request_form.js" %>
