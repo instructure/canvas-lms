@@ -40,8 +40,7 @@
 
             $(document).ready(function () {
                 $("#create_course_btn").click(function() {
-                    $("#create_course_btn").toggleClass("btn btn-success");
-                    $("#create_course_btn").attr("value","Submitting...");
+                    $("#create_course_btn").toggleClass("btn-primary btn-success").attr("value","Submitting...");
                     $("#button-container").spin(spinnerOpts);
                 });
 
