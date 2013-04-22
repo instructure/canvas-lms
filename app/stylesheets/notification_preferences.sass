@@ -2,6 +2,53 @@
 
 $stripeColor: #f3f4f8
 
+/* normal table style overrides (make 6 tables look like one) */
+thead th
+  background: #fff
+
+.table-bordered
+  border-bottom: none
+  border-radius: 0
+  margin-bottom: 0
+
+  thead
+    tr:first-child th:first-child
+      border-top-left-radius: 0 !important
+    tr:first-child th:last-child
+      border-top-right-radius: 0 !important
+
+  tbody
+    tr:last-child th
+      border-bottom-left-radius: 0 !important
+    tr:last-child td:last-child
+      border-bottom-right-radius: 0 !important
+
+.table-bordered:first-of-type
+  border-radius: 4px 4px 0 0
+  thead
+    tr:first-child th:first-child
+      border-top-left-radius: 4px !important
+    tr:first-child th:last-child
+      border-top-right-radius: 4px !important
+  .channel-name, .channel-addr
+    text-indent: 0
+
+.table-bordered:last-of-type
+  border-bottom: 1px solid #ddd
+  border-radius: 0 0 4px 4px
+
+  tbody
+    tr:last-child th
+      border-bottom-left-radius: 4px !important
+    tr:last-child td:last-child
+      border-bottom-right-radius: 4px !important
+
+.comm-channel
+  min-width: 125px
+
+.channel-name, .channel-addr
+  text-indent: -9999px
+
 /* Column striping */
 .table-columns-striped tr
   td:nth-child(2n),

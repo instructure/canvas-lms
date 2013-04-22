@@ -1,37 +1,58 @@
-<table class="notification-prefs-table table table-columns-striped table-bordered" cellspacing="0">
-  <caption class="ui-helper-hidden-accessible">{{#t "captions.notification_preferences"}}List of notification events and your settings for frequency and delivery method.{{/t}}</caption>
-  <tbody>
-    {{#each eventGroups}}
-    <!-- New group -->
-    <tr class='grouping'>
-      <td><h3 class='group-name'>{{ name }}</h3></td>
-      {{#each ../channels}}
-      <th class="comm-channel">
-        <div class='channel-name'>{{ name }}</div>
-        <div class='channel-addr'>{{ address }}</div>
-      </th>
-      {{/each}}
-    </tr>
+{{#each eventGroups}}
+  <table cellspacing="0"
+         class="notification-prefs-table table
+                table-columns-striped table-bordered">
+    <caption class="screenreader-only">
+      {{#t "captions.notification_preferences"}}
+        {{name}} notification events and settings
+      {{/t}}
+    </caption>
+
+    <thead>
+      <tr class="grouping">
+        <th scope="col"><h3 class="group-name">{{name}}</h3></th>
+        {{#each ../channels}}
+          <th class="comm-channel" scope="col">
+            <div class="channel-name">{{name}}</div>
+            <div class="channel-addr">{{address}}</div>
+          </th>
+        {{/each}}
+      </tr>
+    </thead>
+
+    <tbody>
       {{#each items}}
-    <tr>
-      <th class='comm-event'>
-        <div class='row-title-cell'>
-          <span class='category-name show-popover' title="<div class='arrow'></div><div class='popover-title'>{{ title }}</div><div class='popover-content'><p>{{description}}</p></div>">
-            {{title}}
-          </span>
-          {{#if checkName }}
-          <div class="user-preference">
-            <label class="checkbox" for="{{ checkID }}">
-              <input type="checkbox" id="{{ checkID }}" class='user-pref-check' name="{{ checkName }}" {{# if checkedState }}checked{{/if}} />
-              {{ checkLabel }}
-            </label>
-          </div>
-          {{/if}}
-        </div>
-      </th>
-      {{{ policyCells }}}
-    </tr>
+        <tr>
+          <th class="comm-event" scope="row">
+            <div class="row-title-cell">
+              <span class="category-name show-popover"
+                    title="<div class='arrow'></div>
+                           <div class='popover-title'>{{title}}</div>
+                           <div class='popover-content'>
+                             <p>{{description}}</p>
+                           </div>">
+                {{title}}
+              </span>
+
+              {{#if checkName}}
+                <div class="user-preference">
+                  <label class="checkbox" for="{{checkID}}">
+                    <input type="checkbox"
+                           id="{{checkID}}"
+                           class="user-pref-check"
+                           name="{{checkName}}"
+                           {{#if checkedState}}checked="checked"{{/if}} />
+                    {{checkLabel}}
+                  </label>
+                </div>
+              {{/if}}
+            </div>
+          </th>
+
+          {{{policyCells}}}
+
+        </tr>
       {{/each}}
-    {{/each}}
-  </tbody>
-</table>
+    </tbody>
+  </table>
+{{/each}}
