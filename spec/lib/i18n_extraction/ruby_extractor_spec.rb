@@ -156,6 +156,10 @@ describe I18nExtraction::RubyExtractor do
       extract("t '#foo', 'Foo'", 'asdf.', false).should == {'foo' => "Foo"}
     end
 
+    it "should not auto-scope keys with I18n as the receiver" do
+      extract("I18n.t 'foo', 'Foo'", 'asdf.', false).should == {'foo' => 'Foo'}
+    end
+
     it "should auto-scope plugin registration" do
       extract("Canvas::Plugin.register('dim_dim', :web_conferencing, {:name => lambda{ t :name, \"DimDim\" }})", '', false).should ==
         {'plugins' => {'dim_dim' => {'name' => "DimDim"}}}

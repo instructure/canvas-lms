@@ -162,12 +162,13 @@ module I18nExtraction
         raise "invalid translation key #{exp.inspect} on line #{exp.line}"
       end
       key = exp.pop.to_s
-      if key =~ /\A#/
+      if key =~ /\A#/ || receiver && receiver.last == :I18n
         key.sub!(/\A#/, '')
       else
-        raise "ambiguous translation key #{key.inspect} on line #{exp.line}" if @scope.empty? && receiver.nil?
+        raise "ambiguous translation key #{key.inspect} on line #{exp.line}" if @scope.empty?
         key = @scope + relative_scope + key
       end
+      key
     end
 
     def process_default_translation(exp, key)
