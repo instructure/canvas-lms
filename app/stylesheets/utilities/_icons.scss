@@ -98,7 +98,7 @@ a[class*=icon-], a[class^=icon-] {
 }
 
 // change vertical alignment of icons used with common typographic elements to line them up better
-h1, h2, h3, h4, p {
+h1, h2, h3, h4, .h1, .h2, .h3, .h4, p {
 
   i[class*=icon-]:before, i[class^=icon-]:before {
     vertical-align: baseline;

@@ -43,7 +43,7 @@ a {
   background: #fff;
   height: 122px;
   padding-top: 12px;
-  h1 {
+  h1, .h1 {
     padding: 50px 0 0 0px;
     a {
       display: block;
@@ -86,7 +86,7 @@ a {
   height: 90px;
   background: transparent url(/images/registration/signup_bg.png) 0 0 no-repeat;
   position: relative;
-  h2 {
+  h2, .h2 {
     text-indent: -9999em;
     margin: 0;
     height: 30px;
