@@ -22,7 +22,7 @@
                 bInfo: true,
                 bAutoWidth: false,
                 aoColumnDefs: [
-                    { bVisible: false, aTargets: [0] }
+                    { bVisible: false, aTargets: [cols.id, cols.sis_source_id] },
                 ],
                 aaSorting: [[cols.workflow_state, 'asc'], [cols.name, 'asc']],
                 oLanguage: {
