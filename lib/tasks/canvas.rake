@@ -158,6 +158,18 @@ namespace :db do
     end
   end
 
+   desc "execute migration_lint script."
+   task :migration_lint do
+     output = `script/migration_lint`
+     exit_status = $?.exitstatus
+     puts output
+     if exit_status != 0
+       raise "migration_lint test failed"
+     else
+       puts "migration_lint test succeeded"
+     end
+   end
+
   namespace :migrate do
     desc "Run all pending predeploy migrations"
     task :predeploy => [:environment, :load_config] do
