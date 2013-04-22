@@ -2,6 +2,13 @@
 (function() {
     define(['jquery', 'sfu_stats/vendor/jquery.dataTables'], function() {
         return function() {
+            var cols = {
+                id: 0,
+                sis_source_id: 1,
+                name: 2,
+                course_code: 3,
+                workflow_state: 4
+            };
             var tableOptions = {
                 sAjaxSource: '/sfu/stats/courses/current.json',
                 fnServerData: function(sSource, aoData, fnCallback) {
@@ -15,9 +22,16 @@
                 bInfo: true,
                 bAutoWidth: false,
                 aoColumnDefs: [
-                    { bVisible: false, aTargets: [0] }
+                    { bVisible: false, aTargets: [cols.id, cols.sis_source_id] },
+                    {
+                        mData: function(data) { return { id: data[cols.id], name: data[cols.name] }; },
+                        mRender: function(data) {
+                            return '<a href="/courses/' + data.id + '">' + data.name + '</a>';
+                        },
+                        aTargets: [cols.name]
+                    }
                 ],
-                aaSorting: [[3, 'asc'], [1, 'asc']],
+                aaSorting: [[cols.workflow_state, 'asc'], [cols.name, 'asc']],
                 oLanguage: {
                     sInfo: "Showing _TOTAL_ courses",
                     sInfoFiltered: "(filtered from _MAX_ courses)",
@@ -40,7 +54,7 @@
                 $('.checkbox-workflow:checked').each(function() {
                     filter.push('^' + this.value);
                 });
-                courseTable.fnFilter(filter.join('|'), 3, true);
+                courseTable.fnFilter(filter.join('|'), cols.workflow_state, true);
             });
 
             $('.checkbox-credit-only, .checkbox-exclude-webct').on('change', function() {
@@ -48,7 +62,7 @@
                 var checked = el.is(':checked');
                 var data = el.data();
                 var filter = checked ? data.filter_checked : (data.filter_unchecked || '');
-                courseTable.fnFilter(filter, data.col, data.regex);
+                courseTable.fnFilter(filter, cols[data.col], data.regex);
             });
 
             $('#course_filter_search input').on('keyup', function() {
@@ -59,7 +73,6 @@
                 var url = '/sfu/stats/courses/' + $(this).val() + '.json';
                 courseTable.fnReloadAjax(url);
             });
-
 
             $('#course_filters input[type=checkbox]').trigger('change')
         };

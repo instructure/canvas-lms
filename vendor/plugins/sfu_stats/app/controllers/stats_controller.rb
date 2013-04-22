@@ -20,6 +20,7 @@ class StatsController < ApplicationController
         aaData = courses_for_term(params[:term_id], "id, sis_source_id, name, course_code, workflow_state")
         aaData.map! do |course|
           [
+            course.id,
             course.sis_source_id,
             course.name,
             course.course_code,
