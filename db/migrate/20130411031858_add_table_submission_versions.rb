@@ -9,18 +9,18 @@ class AddTableSubmissionVersions < ActiveRecord::Migration
       t.integer  "user_id", :limit => 8
       t.integer  "assignment_id", :limit => 8
     end
-    case connection.adapter_name
+
+    columns = case connection.adapter_name
     when 'PostgreSQL'
-      connection.execute(
-        "CREATE INDEX index_submission_versions " +
-        "ON submission_versions (context_id, version_id, user_id, assignment_id) " +
-        "WHERE context_type = 'Course'")
+      [:context_id, :version_id, :user_id, :assignment_id]
     else
-      add_index :submission_versions,
-        [:context_id, :context_type, :version_id, :user_id, :assignment_id],
-        :name => 'index_submission_versions',
-        :unique => true
+      [:context_id, :context_type, :version_id, :user_id, :assignment_id]
     end
+
+    add_index :submission_versions, columns,
+      :name => 'index_submission_versions',
+      :conditions => { :context_type => 'Course' },
+      :unique => true
   end
 
   def self.down
