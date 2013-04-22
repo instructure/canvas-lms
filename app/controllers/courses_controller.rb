@@ -67,6 +67,15 @@ require 'set'
 #         ics: "https:\/\/canvas.instructure.com\/feeds\/calendars\/course_abcdef.ics"
 #       }
 #
+#       // the type of page that users will see when they first visit the course
+#       // - 'feed': Recent Activity Dashboard
+#       // - 'wiki': Wiki Front Page
+#       // - 'modules': Course Modules/Sections Page
+#       // - 'assignments': Course Assignments List
+#       // - 'syllabus': Course Syllabus Page
+#       // other types may be added in the future
+#       default_view: 'feed'
+#
 #       // optional: user-generated HTML for the course syllabus
 #       syllabus_body: "<p>syllabus html goes here<\/p>",
 #
