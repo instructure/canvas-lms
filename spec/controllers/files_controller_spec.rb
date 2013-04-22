@@ -348,7 +348,7 @@ describe FilesController do
     it "should work for quiz_statistics" do
       course_with_teacher_logged_in(:active_all => true)
       quiz_model
-      file = @quiz.statistics_csv.csv_attachment
+      file = @quiz.statistics_csv('student_analysis').csv_attachment
       get 'show', :quiz_statistics_id => file.reload.context.id,
         :file_id => file.id, :download => '1', :verifier => file.uuid
       response.should be_redirect

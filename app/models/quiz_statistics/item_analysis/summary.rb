@@ -6,6 +6,7 @@ class QuizStatistics::ItemAnalysis::Summary
 
   def initialize(quiz, options = {})
     @quiz = quiz
+    @items = {}
     @attempts = quiz.quiz_submissions.map { |qs| qs.submitted_versions.first }
     @options = options
     @options[:buckets] ||= [
@@ -27,7 +28,6 @@ class QuizStatistics::ItemAnalysis::Summary
   end
 
   def add_response(question, answer, respondent_id)
-    @items ||= {}
     @items[question] ||= QuizStatistics::ItemAnalysis::Item.from(self, question) or return
     @items[question].add_response(answer, respondent_id)
   end

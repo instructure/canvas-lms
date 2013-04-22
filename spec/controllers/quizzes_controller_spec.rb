@@ -917,6 +917,30 @@ describe QuizzesController do
     end
   end
 
+  describe "POST statistics.json" do
+    it "should return a progress_url" do
+      course_with_teacher_logged_in
+      course_quiz
+      post 'statistics', :format => 'json',
+        :course_id => @course.id, :quiz_id => @quiz.id
+      response.should be_success
+      progress = @quiz.quiz_statistics.last.progress
+      response.body.should include("\"progress_url\":\"http://test.host/api/v1/progress/#{progress.id}\"")
+    end
+  end
+
+  describe "POST item_analysis_report.json" do
+    it "should return a progress_url" do
+      course_with_teacher_logged_in
+      course_quiz
+      post 'item_analysis_report', :format => 'json',
+        :course_id => @course.id, :quiz_id => @quiz.id
+      response.should be_success
+      progress = @quiz.quiz_statistics.last.progress
+      response.body.should include("\"progress_url\":\"http://test.host/api/v1/progress/#{progress.id}\"")
+    end
+  end
+
   describe "GET 'read_only'" do
     it "should allow concluded teachers to see a read-only view of a quiz" do
       course_with_teacher_logged_in(:active_all => true)

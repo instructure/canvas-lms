@@ -41,7 +41,6 @@ class Quiz < ActiveRecord::Base
   has_many :quiz_submissions, :dependent => :destroy
   has_many :quiz_groups, :dependent => :destroy, :order => 'position'
   has_many :quiz_statistics, :class_name => 'QuizStatistics', :order => 'created_at'
-  has_many :csv_attachments, :class_name => 'Attachment', :as => :context, :dependent => :destroy
   belongs_to :context, :polymorphic => true
   belongs_to :assignment
   belongs_to :cloned_item
@@ -879,14 +878,16 @@ class Quiz < ActiveRecord::Base
 
   def statistics(include_all_versions = true)
     quiz_statistics.build(
+      :report_type => 'student_analysis',
       :includes_all_versions => include_all_versions
-    ).generate
+    ).report.generate
   end
 
   # returns the QuizStatistics object that will ultimately contain the csv
   # (it may be generating in the background)
-  def statistics_csv(options={})
+  def statistics_csv(report_type, options={})
     quiz_stats_opts = {
+      :report_type => report_type,
       :includes_all_versions => options[:include_all_versions],
       :anonymous => options[:anonymous]
     }
@@ -896,11 +897,11 @@ class Quiz < ActiveRecord::Base
       quiz_submissions.completed.order(:updated_at).pluck(:updated_at).last
     ].compact.max
 
-    candidate_stats = quiz_statistics.where(quiz_stats_opts).last
+    candidate_stats = quiz_statistics.report_type(report_type).where(quiz_stats_opts).last
 
     if candidate_stats.nil? || candidate_stats.created_at < last_quiz_activity
       stats = quiz_statistics.create!(quiz_stats_opts)
-      stats.generate_csv
+      options[:async] ? stats.generate_csv_in_background : stats.generate_csv
       stats
     else
       candidate_stats

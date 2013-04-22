@@ -22,7 +22,7 @@ class QuizzesController < ApplicationController
   before_filter :require_context
   add_crumb(proc { t('#crumbs.quizzes', "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
-  before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :filters, :read_only, :managed_quiz_data]
+  before_filter :get_quiz, :only => [:statistics, :item_analysis_report, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :filters, :read_only, :managed_quiz_data]
 
   # The number of questions that can display "details". After this number, the "Show details" option is disabled
   # and the data is not even loaded.
@@ -68,6 +68,7 @@ class QuizzesController < ApplicationController
     end
   end
 
+  # student_analysis report
   def statistics
     if authorized_action(@quiz, @current_user, :read_statistics)
       if @context.large_roster?
@@ -88,10 +89,22 @@ class QuizzesController < ApplicationController
           ]
         }
         format.csv {
-          redirect_to @quiz.statistics_csv(
-            :include_all_versions => params[:all_versions] == '1',
-            :anonymous => @quiz.anonymous_submissions
-          ).csv_attachment.cacheable_s3_download_url
+          redirect_to quiz_stats('student_analysis').csv_attachment.cacheable_s3_download_url
+        }
+        format.json {
+          stats = quiz_stats('student_analysis', :async => true)
+          render :json => {:progress_url => api_v1_progress_url(stats.progress)}
+        }
+      end
+    end
+  end
+
+  def item_analysis_report
+    if authorized_action(@quiz, @current_user, :read_statistics)
+      respond_to do |format|
+        format.json {
+          stats = quiz_stats('item_analysis', :async => true)
+          render :json => {:progress_url => api_v1_progress_url(stats.progress)}
         }
       end
     end
@@ -663,4 +676,12 @@ class QuizzesController < ApplicationController
     @submitted_student_count = submitted_with_submissions.count(:id, :distinct => true)
     @any_submissions_pending_review = submitted_with_submissions.where("quiz_submissions.workflow_state = 'pending_review'").count > 0
   end
+
+  def quiz_stats(report_type, opts = {})
+    @quiz.statistics_csv(report_type, {
+      :include_all_versions => params[:all_versions] == '1',
+      :anonymous => @quiz.anonymous_submissions
+    }.merge(opts))
+  end
+
 end

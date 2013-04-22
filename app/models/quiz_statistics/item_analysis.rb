@@ -1,25 +1,13 @@
-class QuizStatistics::ItemAnalysis
-
-  def initialize(quiz)
-    @quiz = quiz
-  end
-
-  attr_reader :quiz
-
-  def save!
-    quiz.csv_attachments.create!(
-      :uploaded_data => StringIO.new(csv),
-      :filename => filename
-    )
-  end
+class QuizStatistics::ItemAnalysis < QuizStatistics::Report
 
   def filename
     "quiz-item-analysis-#{Time.now.to_i}.csv"
   end
 
-  def csv
+  def to_csv
     @csv ||=
       FasterCSV.generate do |csv|
+        start_progress
         stats = QuizStatistics::ItemAnalysis::Summary.new(quiz)
         headers = [
           I18n.t('csv.question.id',                  'Question Id'),
@@ -42,12 +30,13 @@ class QuizStatistics::ItemAnalysis
           I18n.t('csv.alpha',                        'Alpha'),
           I18n.t('csv.point.biserial',               'Point Biserial of Correct')
         ]
-        point_biserial_max_count = stats.map {|item| item.point_biserials.size }.max
+        point_biserial_max_count = stats.map {|item| item.point_biserials.size }.max || 0
         (point_biserial_max_count - 1).times do |i|
           headers << I18n.t("csv.point.distractor", 'Point Biserial of Distractor %{num}', :num => i + 2)
         end
         csv << headers
-        stats.each do |item|
+        stats.each_with_index do |item, i|
+          update_progress(i, stats.size)
           row = [
             item.question[:id],
             item.question_text,
@@ -73,6 +62,7 @@ class QuizStatistics::ItemAnalysis
           end
           csv << row
         end
+        complete_progress
       end
   end
 
