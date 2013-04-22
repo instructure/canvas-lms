@@ -208,9 +208,9 @@ class User < ActiveRecord::Base
   scope :has_current_student_enrollments, where("EXISTS (SELECT * FROM enrollments JOIN courses ON courses.id=enrollments.course_id AND courses.workflow_state='available' WHERE enrollments.user_id=users.id AND enrollments.workflow_state IN ('active','invited') AND enrollments.type='StudentEnrollment')")
 
   def self.order_by_sortable_name(options = {})
-    clause = sortable_name_order_by_clause
-    clause << " DESC" if options[:direction] == :descending
-    scope = self.order(clause)
+    order_clause = clause = sortable_name_order_by_clause
+    order_clause = "#{clause} DESC" if options[:direction] == :descending
+    scope = self.order(order_clause)
     if (scope.scope(:find, :select))
       scope = scope.select(clause)
     end
