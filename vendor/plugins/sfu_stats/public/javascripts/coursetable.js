@@ -23,6 +23,13 @@
                 bAutoWidth: false,
                 aoColumnDefs: [
                     { bVisible: false, aTargets: [cols.id, cols.sis_source_id] },
+                    {
+                        mData: function(data) { return { id: data[cols.id], name: data[cols.name] }; },
+                        mRender: function(data) {
+                            return '<a href="/courses/' + data.id + '">' + data.name + '</a>';
+                        },
+                        aTargets: [cols.name]
+                    }
                 ],
                 aaSorting: [[cols.workflow_state, 'asc'], [cols.name, 'asc']],
                 oLanguage: {
@@ -66,7 +73,6 @@
                 var url = '/sfu/stats/courses/' + $(this).val() + '.json';
                 courseTable.fnReloadAjax(url);
             });
-
 
             $('#course_filters input[type=checkbox]').trigger('change')
         };
