@@ -30,6 +30,7 @@ describe 'appointment_deleted_for_user.twitter' do
                                        :cancel_reason => "just because"})
 
     @message.body.should include('some title')
+    @message.main_link.should be_present
   end
 
   it "should render for groups" do
@@ -46,5 +47,6 @@ describe 'appointment_deleted_for_user.twitter' do
                                        :cancel_reason => "just because"})
 
     @message.body.should include('some title')
+    @message.main_link.should be_present
   end
 end

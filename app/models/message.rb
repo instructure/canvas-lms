@@ -639,6 +639,8 @@ class Message < ActiveRecord::Base
 
   # Internal: Deliver the message through Twitter.
   #
+  # The template should define the content for :link and not place into the body of the template itself
+  #
   # Returns nothing.
   def deliver_via_twitter
     TwitterMessenger.new(self).deliver

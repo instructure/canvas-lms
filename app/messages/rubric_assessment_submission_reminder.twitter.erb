@@ -1,4 +1,4 @@
-<% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.rubric_association.context) %>/<%= asset.rubric_association.context.class.to_s.downcase.pluralize %>/<%= asset.rubric_association.context_id %>/rubrics/<%= asset.rubric_association.rubric_id %>
-<% end %>
+<% define_content :link do -%>
+<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.rubric_association.context) %>/<%= asset.rubric_association.context.class.to_s.downcase.pluralize %>/<%= asset.rubric_association.context_id %>/rubrics/<%= asset.rubric_association.rubric_id %>
+<% end -%>
 <%= t :tweet, "Canvas Alert - Reminder: assess %{rubric}, %{context}", :rubric => asset.rubric_association.title, :context => asset.rubric_association.context.name %>

@@ -3,7 +3,7 @@
 <% end %>
 
 <% define_content :subject do %>
-  New File Added: <%= asset.title %>, <%= asset.context.name %>
+  <%= t('subject', 'New File Added: %{title}, %{name}', :title => asset.title, :name => asset.context.name) %>
 <% end %>
 
 <%= asset.title %>
