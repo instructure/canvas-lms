@@ -49,6 +49,14 @@ class PageView < ActiveRecord::Base
     end
   end
 
+  def self.for_request_id(request_id)
+    if PageView.page_view_method == :db
+      find_by_request_id(request_id)
+    else
+      new{ |p| p.request_id = request_id }
+    end
+  end
+
   def ensure_account
     self.account_id ||= (self.context_type == 'Account' ? self.context_id : self.context.account_id) rescue nil
     self.account_id ||= (self.context.is_a?(Account) ? self.context : self.context.account) if self.context
@@ -201,10 +209,8 @@ class PageView < ActiveRecord::Base
     end
   end
 
-  named_scope :for_context, proc { |ctx| { :conditions => { :context_type => ctx.class.name, :context_id => ctx.id } } }
-  named_scope :for_users, lambda{ |users|
-    { :conditions => {:user_id => users} }
-  }
+  scope :for_context, proc { |ctx| where(:context_type => ctx.class.name, :context_id => ctx) }
+  scope :for_users, lambda { |users| where(:user_id => users) }
 
   module CassandraBookmarker
     def self.bookmark_for(item)
@@ -226,7 +232,7 @@ class PageView < ActiveRecord::Base
         page_view_history(user, pager)
       end
     else
-      self.scoped(:conditions => { :user_id => user.id }, :order => 'created_at desc')
+      self.where(:user_id => user).order('created_at desc')
     end
   end
 
@@ -337,8 +343,14 @@ class PageView < ActiveRecord::Base
         activate_shard_for_cache_read { page_view.do_update(attrs) }
         page_view.save
       else
-        # bypass mass assignment protection
-        activate_shard_for_cache_read { self.create { |p| p.send(:attributes=, attrs, false) } }
+        create_in_cassandra = self.cassandra?
+        activate_shard_for_cache_read do
+          self.create do |p|
+            p.page_view_method = :cassandra if create_in_cassandra
+            # bypass mass assignment protection
+            p.send(:attributes=, attrs, false)
+          end
+        end
       end
     end
   rescue ActiveRecord::StatementInvalid
@@ -409,9 +421,9 @@ class PageView < ActiveRecord::Base
       self.logger = Rails.logger
 
       if skip_deleted_accounts
-        account_ids = Set.new(Account.root_accounts.all(:select => :id, :conditions => { :workflow_state => 'active' }).map(&:id))
+        account_ids = Set.new(Account.root_accounts.active.pluck(:id))
       else
-        account_ids = Set.new(Account.root_accounts.all(:select => :id).map(&:id))
+        account_ids = Set.new(Account.root_accounts.pluck(:id))
       end
 
       load_migration_data(account_ids)
@@ -447,9 +459,8 @@ class PageView < ActiveRecord::Base
 
       # this could run into problems if one account gets more than
       # batch_size page views created in the second on this boundary
-      finder_sql = PageView.scoped(:conditions => ["account_id = ? AND created_at >= ?", account_id, last_created_at],
-                                   :order => "created_at asc",
-                                   :limit => batch_size).construct_finder_sql({})
+      finder_sql = PageView.where("account_id = ? AND created_at >= ?", account_id, last_created_at).
+          order("created_at asc").limit(batch_size).to_sql
 
       # query just the raw attributes, don't instantiate AR objects
       rows = PageView.connection.execute(finder_sql).to_a

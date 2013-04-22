@@ -6,8 +6,8 @@ describe "quizzes" do
   it_should_behave_like "quizzes selenium tests"
 
   context "as a teacher" do
-    let(:due_at) { Time.zone.now + 3.days }
-    let(:unlock_at) { Time.zone.now + 2.days }
+    let(:due_at) { Time.zone.now }
+    let(:unlock_at) { Time.zone.now - 2.days }
     let(:lock_at) { Time.zone.now + 4.days }
 
     def create_quiz_with_default_due_dates
@@ -26,6 +26,21 @@ describe "quizzes" do
       @course.update_attributes(:name => 'teacher course')
       @course.save!
       @course.reload
+    end
+
+    it "should show a summary of due dates if there are multiple" do
+      create_quiz_with_default_due_dates
+      get "/courses/#{@course.id}/quizzes"
+      f('.quiz_list .description').should_not include_text "Multiple Dates"
+      add_due_date_override(@quiz)
+
+      get "/courses/#{@course.id}/quizzes"
+      f('.quiz_list .description').should include_text "Multiple Dates"
+      driver.mouse.move_to f('.quiz_list .description a')
+      wait_for_animations
+      tooltip = fj('.vdd_tooltip_content:visible')
+      tooltip.should include_text 'New Section'
+      tooltip.should include_text 'Everyone else'
     end
 
     it "should allow a teacher to create a quiz from the quizzes tab directly" do
@@ -573,7 +588,6 @@ describe "quizzes" do
       other_section_due = Time.zone.now + 2.days
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
       wait_for_ajaximations
-      due_at = Time.zone.now + 1.days
       select_first_override_section(default_section.name)
       first_due_at_element.clear
       first_due_at_element.
@@ -589,7 +603,7 @@ describe "quizzes" do
         wait_for_ajax_requests
       end
       overrides = @quiz.reload.assignment_overrides
-      overrides.count.should == 2
+      overrides.size.should == 2
       default_override = overrides.detect { |o| o.set_id == default_section.id }
       default_override.due_at.strftime('%b %-d, %y').
           should == default_section_due.to_date.strftime('%b %-d, %y')

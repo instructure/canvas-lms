@@ -51,7 +51,7 @@ module LuckySneaks
       # on a large selection, you will get much better results writing your own version with
       # using pagination.
       def initialize_urls
-        find(:all, :conditions => {self.url_attribute => nil}).each do |instance|
+        where(self.url_attribute => nil).each do |instance|
           instance.send :ensure_unique_url
           instance.save
         end
@@ -72,7 +72,7 @@ module LuckySneaks
         conditions.first << " and #{self.class.scope_for_url} = ?"
         conditions << send(self.class.scope_for_url)
       end
-      url_owners = self.class.find(:all, :conditions => conditions)
+      url_owners = self.class.where(conditions).all
       if url_owners.size > 0
         n = 1
         while url_owners.detect{|u| u.send(url_attribute) == "#{base_url}-#{n}"}

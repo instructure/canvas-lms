@@ -167,7 +167,7 @@ class QuizQuestion < ActiveRecord::Base
   end
 
   def self.batch_migrate_file_links(ids)
-    questions = QuizQuestion.find(:all, :include => [:quiz, :assessment_question], :conditions => ['id in (?)', ids])
+    questions = QuizQuestion.includes(:quiz, :assessment_question).where(:id => ids)
     questions.each do |question|
       if question.migrate_file_links
         question.save

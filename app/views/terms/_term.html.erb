@@ -14,18 +14,23 @@
       <%= term && t(:user_count, "User", :count => term.users_count) %>
     </div>
     <% form_for (term || EnrollmentTerm.new), :url => (term ? context_url(@context, :context_term_url, term.id) : context_url(@context, :context_terms_url)), :html => {:class => "enrollment_term_form", :method => (term ? :put : :post)} do |f| %>
-      <div class="edit_term">
-        <%= f.label :name, :en => 'Term Name:' %>
-        <%= f.text_field :name %>
-      </div>
+        <div class="control-group edit_term">
+          <label class="control-label" for="enrollment_term_name"><%= t :name, 'Term Name:' %></label>
+          <div class="controls">
+            <%= f.text_field :name, :class => "input-xlarge" %>
+          </div>
+        </div>
       <% if term && can_do(@root_account, @current_user, :manage_sis) %>
-        <div class="edit_term" style="font-size: 0.8em;">
-          <%= before_label :sis_id, "SIS ID" %> <%= f.text_field :sis_source_id %>
+        <div class="control-group edit_term">
+          <label class="control-label" for="enrollment_term_sis_source_id"><%= t :sis_source_id, 'SIS ID:' %></label>
+          <div class="controls">
+            <%= f.text_field :sis_source_id, :class => "input-xlarge" %>
+          </div>
         </div>
       <% end %>
-      <div class="edit_term" style="margin-top: 10px;">
-        <button class="btn submit_button" type="submit"><%= term ? t('buttons.update', "Update Term") : t('buttons.add', "Add Term") %></button>
-        <button class="btn btn button-secondary cancel_button" type="button"><%= t '#buttons.cancel', "Cancel" %></button>
+      <div class="edit_term edit_term_buttons">
+        <button class="btn button-secondary cancel_button" type="button"><%= t '#buttons.cancel', "Cancel" %></button>
+        <button class="btn btn-primary submit_button" type="submit"><%= term ? t('buttons.update', "Update Term") : t('buttons.add', "Add Term") %></button>
       </div>
     <% end %>
   </td>

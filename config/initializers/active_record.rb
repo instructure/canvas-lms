@@ -1,15 +1,20 @@
 class ActiveRecord::Base
+  # XXX: Rails3 There are lots of issues with these patches in Rails3 still
+
   extend ActiveSupport::Memoizable # used for a lot of the reporting queries
 
-  class ProtectedAttributeAssigned < Exception; end
-  def log_protected_attribute_removal_with_raise(*attributes)
-    if Canvas.protected_attribute_error == :raise
-      raise ProtectedAttributeAssigned, "Can't mass-assign these protected attributes for class #{self.class.name}: #{attributes.join(', ')}"
-    else
-      log_protected_attribute_removal_without_raise(*attributes)
+  if Rails.version < "3.0"
+    # this functionality is built into rails 3
+    class ProtectedAttributeAssigned < Exception; end
+    def log_protected_attribute_removal_with_raise(*attributes)
+      if Canvas.protected_attribute_error == :raise
+        raise ProtectedAttributeAssigned, "Can't mass-assign these protected attributes for class #{self.class.name}: #{attributes.join(', ')}"
+      else
+        log_protected_attribute_removal_without_raise(*attributes)
+      end
     end
+    alias_method_chain :log_protected_attribute_removal, :raise
   end
-  alias_method_chain :log_protected_attribute_removal, :raise
 
   def feed_code
     id = self.uuid rescue self.id
@@ -35,8 +40,8 @@ class ActiveRecord::Base
 
   def self.models_from_files
     @from_files ||= Dir[
-      "#{RAILS_ROOT}/app/models/*",
-      "#{RAILS_ROOT}/vendor/plugins/*/app/models/*"
+      "#{Rails.root}/app/models/*",
+      "#{Rails.root}/vendor/plugins/*/app/models/*"
     ].collect { |file|
       model = File.basename(file, ".*").camelize.constantize
       next unless model < ActiveRecord::Base
@@ -158,15 +163,15 @@ class ActiveRecord::Base
   end
 
   def cached_context_grants_right?(user, session, *permissions)
-    @@cached_contexts = nil if ENV['RAILS_ENV'] == "test"
+    @@cached_contexts = nil if Rails.env.test?
     @@cached_contexts ||= {}
     context_key = "#{self.context_type}_#{self.context_id}" if self.respond_to?(:context_type)
     context_key ||= "Course_#{self.course_id}"
     @@cached_contexts[context_key] ||= self.context if self.respond_to?(:context)
     @@cached_contexts[context_key] ||= self.course
     @@cached_permissions ||= {}
-    key = [context_key, (user ? user.id : nil)].join
-    @@cached_permissions[key] = nil if ENV['RAILS_ENV'] == "test"
+    key = [context_key, (user ? user.id : nil)].cache_key
+    @@cached_permissions[key] = nil if Rails.env.test?
     @@cached_permissions[key] = nil if session && session[:session_affects_permissions]
     @@cached_permissions[key] ||= @@cached_contexts[context_key].grants_rights?(user, session, nil).keys
     (@@cached_permissions[key] & Array(permissions).flatten).any?
@@ -329,7 +334,7 @@ class ActiveRecord::Base
   end
 
   def self.best_unicode_collation_key(col)
-    if ActiveRecord::Base.configurations[RAILS_ENV]['adapter'] == 'postgresql'
+    if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
       # For PostgreSQL, we can't trust a simple LOWER(column), with any collation, since
       # Postgres just defers to the C library which is different for each platform. The best
       # choice is the collkey function from pg_collkey which uses ICU to get a full unicode sort.
@@ -448,7 +453,7 @@ class ActiveRecord::Base
     column = column.to_s
     options = {:include_nil => false}.merge(options)
 
-    result = if ActiveRecord::Base.configurations[RAILS_ENV]['adapter'] == 'postgresql'
+    result = if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
       sql = ''
       sql << "SELECT NULL AS #{column} WHERE EXISTS(SELECT * FROM #{table_name} WHERE #{column} IS NULL) UNION ALL (" if options[:include_nil]
       sql << <<-SQL
@@ -468,31 +473,6 @@ class ActiveRecord::Base
       find(:all, :select => "DISTINCT #{column}", :conditions => conditions, :order => column)
     end
     result.map(&column.to_sym)
-  end
-
-  named_scope :order, lambda { |order_by|
-    {:order => order_by}
-  }
-
-  named_scope :where, lambda { |conditions|
-    {:conditions => conditions}
-  }
-
-  # convenience method to add a (computed) field to :select/:order(/:group) all
-  # at once
-  def self.add_sort_key!(options, qualified_field)
-    unqualified_field = qualified_field.sub(/\s+(ASC|DESC)\s*$/, '')
-    direction = $1 == 'DESC' ? 'DESC' : 'ASC'
-    sort_clause = "#{unqualified_field} #{direction}, #{quoted_table_name}.id #{direction}"
-    options[:select] ||= "#{quoted_table_name}.*"
-    options[:select] << ", #{unqualified_field}"
-    if options[:order]
-      options[:order] << ", #{sort_clause}"
-    else
-      options[:order] = sort_clause
-    end
-    options[:group] << ", #{unqualified_field}" if options[:group]
-    options
   end
 
   def self.generate_temp_table(options = {})
@@ -528,39 +508,6 @@ class ActiveRecord::Base
     useful_find_in_batches(options) do |batch|
       batch.each { |row| yield row }
     end
-  end
-
-  # provides a way to override :order and :select in an association, while
-  # still just getting a scope (rather than doing an immediate find). primarily
-  # useful if you intend to paginate or otherwise use the scope multiple times.
-  # note that uber_scope still needs to be the last one in the chain
-  module UberScope
-    def find(*args)
-      super args.first, add_uber_options!(args.last.is_a?(::Hash) ? args.last : {})
-    end
-
-    def paginate(*args)
-      add_uber_options!(args.last)
-      super
-    end
-
-    def add_uber_options!(options)
-      options[:select] ||= uber_option(options, :select) || "#{proxy_scope.quoted_table_name}.*"
-      options[:order] ||= uber_option(options, :order)
-      options
-    end
-
-    def uber_option(options, key)
-      if @proxy_options && @proxy_options[key]
-        @proxy_options[key]
-      elsif (scope = scope(:find)) && scope[key]
-        scope[key]
-      end
-    end
-  end
-
-  def self.uber_scope(options)
-    scoped options.merge(:extend => UberScope)
   end
 
   # set up class-specific getters/setters for a polymorphic association, e.g.
@@ -960,14 +907,7 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
       execute "CREATE #{index_type} INDEX #{concurrently}#{quote_column_name(index_name)} ON #{quote_table_name(table_name)} (#{quoted_column_names})#{conditions}"
     end
   end
-end
 
-ActiveRecord::NamedScope::Scope.class_eval do
-  # returns a new scope, with just the order replaced
-  # does *not* support extended scopes
-  def reorder(new_order)
-    self.class.new(proxy_scope, proxy_options.merge(:order => new_order))
-  end
 end
 
 class ActiveRecord::Serialization::Serializer

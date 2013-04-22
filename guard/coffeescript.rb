@@ -73,7 +73,7 @@ module Guard
           if Canvas::CoffeeScript.coffee_script_binary_is_available?
             Parallel.each(directories.map, :in_threads => Parallel.processor_count) do |(directory, scripts)|
               FileUtils.mkdir_p(File.expand_path(directory)) if !File.directory?(directory) && !options[:noop]
-              system('coffee', '-c', '-o', directory, *scripts)
+              system('coffee', '-m', '-c', '-o', directory, *scripts)
               if $?.exitstatus != 0
                 Formatter.error("Unable to compile coffeescripts in #{directory}")
               else

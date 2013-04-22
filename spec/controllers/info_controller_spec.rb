@@ -29,6 +29,31 @@ describe InfoController do
       assert_recorded_error
     end
 
+    it "should not choke on non-integer ids" do
+      post 'record_error', :error => {:id => 'garbage'}
+      assert_recorded_error
+      ErrorReport.last.message.should_not == "Error Report Creation failed"
+    end
+
+    it "should not return nil.id if report creation failed" do
+      ErrorReport.expects(:find_by_id).once.raises("failed!")
+      post 'record_error', :format => 'json', :error => {:id => 1}
+      JSON.parse(response.body).should == { 'logged' => true, 'id' => nil }
+    end
+
+    it "should not record the user as nil.id if report creation failed" do
+      ErrorReport.expects(:find_by_id).once.raises("failed!")
+      post 'record_error', :error => {:id => 1}
+      ErrorReport.last.user_id.should be_nil
+    end
+
+    it "should record the user if report creation failed" do
+      user = User.create!
+      user_session(user)
+      ErrorReport.expects(:find_by_id).once.raises("failed!")
+      post 'record_error', :error => {:id => 1}
+      ErrorReport.last.user_id.should == user.id
+    end
   end
 
   def assert_recorded_error(msg = "Thanks for your help!  We'll get right on this")

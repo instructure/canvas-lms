@@ -229,6 +229,7 @@ describe ExternalToolsController, :type => :integration do
     et.account_navigation = {:url=>"http://www.example.com/ims/lti/account", :text=>"Account nav", :custom_fields=>{"key"=>"value"}}
     et.user_navigation = {:url=>"http://www.example.com/ims/lti/user", :text=>"User nav"}
     et.editor_button = {:url=>"http://www.example.com/ims/lti/editor", :icon_url=>"/images/delete.png", :selection_width=>50, :selection_height=>50, :text=>"editor button"}
+    et.homework_submission = {:url=>"http://www.example.com/ims/lti/editor", :selection_width=>50, :selection_height=>50, :text=>"homework submission"}
     et.resource_selection = {:url=>"http://www.example.com/ims/lti/resource", :text => "", :selection_width=>50, :selection_height=>50}
     et.save!
     et
@@ -268,6 +269,11 @@ describe ExternalToolsController, :type => :integration do
      "editor_button"=>
              {"icon_url"=>"/images/delete.png",
               "text"=>"editor button",
+              "url"=>"http://www.example.com/ims/lti/editor",
+              "selection_height"=>50,
+              "selection_width"=>50},
+     "homework_submission"=>
+             {"text"=>"homework submission",
               "url"=>"http://www.example.com/ims/lti/editor",
               "selection_height"=>50,
               "selection_width"=>50},

@@ -2,11 +2,9 @@
   tool ||= external_tool 
   classes = []
   if tool
-    classes << "has_editor_button" if tool.try(:has_editor_button)
-    classes << "has_resource_selection" if tool.try(:has_resource_selection)
-    classes << "has_course_navigation" if tool.try(:has_course_navigation)
-    classes << "has_account_navigation" if tool.try(:has_account_navigation)
-    classes << "has_user_navigation" if tool.try(:has_user_navigation)
+    ContextExternalTool::EXTENSION_TYPES.each do |type|
+      classes << "has_#{type}" if tool.try("has_#{type}")
+    end
   end
 %>
 
@@ -55,6 +53,7 @@
           <div class="course_navigation"><%= t :course_navigation_configured, "Course navigation configured" %></div>
           <div class="user_navigation"><%= t :user_navigation_configured, "User navigation configured" %></div>
           <div class="account_navigation"><%= t :account_navigation_configured, "Account navigation configured" %></div>
+          <div class="homework_submission"><%= t :homework_submission_configured, "Homework submission configured" %></div>
         </td>
       </tr>
     </table>

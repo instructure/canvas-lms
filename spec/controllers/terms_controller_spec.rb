@@ -19,22 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe TermsController do
-  before(:all) do
-    EnrollmentTerm.class_eval do
-      alias_method :old_touch_all_courses, :touch_all_courses
-      def touch_all_courses
-        $touch_all_courses_count ||= 0
-        $touch_all_courses_count = $touch_all_courses_count + 1
-      end
-    end
-  end
-
-  after(:all) do
-    EnrollmentTerm.class_eval do
-      alias_method :touch_all_courses, :old_touch_all_courses
-    end
-  end
-
   it "should only touch courses once when setting overrides" do
     a = Account.default
     u = user(:active_all => true)
@@ -42,6 +26,7 @@ describe TermsController do
     user_session(@user)
 
     term = a.default_enrollment_term
+    term.any_instantiation.expects(:touch_all_courses).once
 
     put 'update', :account_id => a.id, :id => term.id, :enrollment_term => {:start_at => 1.day.ago, :end_at => 1.day.from_now,
         :overrides => {
@@ -49,8 +34,6 @@ describe TermsController do
           :teacher_enrollment => { :start_at => 1.day.ago, :end_at => 1.day.from_now},
           :ta_enrollment => { :start_at => 1.day.ago, :end_at => 1.day.from_now},
       }}
-
-    $touch_all_courses_count.should == 1
   end
 
 end

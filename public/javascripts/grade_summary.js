@@ -239,8 +239,13 @@ define([
       var $parent = $(this).parents(".comment_media"),
           comment_id = $parent.getTemplateData({textValues: ['media_comment_id']}).media_comment_id;
       if(comment_id) {
+        var mediaType = 'any';
+        if ($(this).hasClass('video_comment'))
+          mediaType = 'video';
+        else if ($(this).hasClass('audio_comment'))
+          mediaType = 'audio';
         $parent.children(":not(.media_comment_content)").remove();
-        $parent.find(".media_comment_content").mediaComment('show_inline', comment_id, 'any');
+        $parent.find(".media_comment_content").mediaComment('show_inline', comment_id, mediaType);
       }
     });
     $("#only_consider_graded_assignments").change(function() {

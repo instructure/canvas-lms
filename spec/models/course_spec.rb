@@ -589,8 +589,8 @@ describe Course, "enroll" do
   it "should scope correctly when including teachers from course" do
     account = @course.account
     @course.enroll_student(@user)
-    scope = account.associated_courses.active.scoped(:select=>"id, name", :joins=>:teachers, :include=>:teachers, :conditions => "enrollments.workflow_state = 'active'")
-    sql = scope.construct_finder_sql({})
+    scope = account.associated_courses.active.select([:id, :name]).joins(:teachers).includes(:teachers).where(:enrollments => { :workflow_state => 'active' })
+    sql = scope.to_sql
     sql.should match(/enrollments.type = 'TeacherEnrollment'/)
   end
 end
@@ -2587,7 +2587,7 @@ describe Course, "inherited_assessment_question_banks" do
     bank = @course.assessment_question_banks.create
 
     banks = @course.inherited_assessment_question_banks(true)
-    banks.scoped(:order => :id).should eql [root_bank, account_bank, bank]
+    banks.order(:id).should eql [root_bank, account_bank, bank]
     banks.find_by_id(bank.id).should eql bank
     banks.find_by_id(account_bank.id).should eql account_bank
     banks.find_by_id(root_bank.id).should eql root_bank
@@ -2618,7 +2618,7 @@ describe Course, "section_visibility" do
 
   it "should return a scope from sections_visible_to" do
     # can't use "should respond_to", because that delegates to the instantiated Array
-    lambda{ @course.sections_visible_to(@teacher).scoped({}) }.should_not raise_exception
+    lambda{ @course.sections_visible_to(@teacher).scoped }.should_not raise_exception
   end
 
   context "full" do
@@ -2977,7 +2977,7 @@ describe Course do
 
     it "should generate a code on demand for existing self enrollment courses" do
       c1 = course()
-      Course.update_all({:self_enrollment => true}, {:id => @course.id})
+      Course.where(:id => @course).update_all(:self_enrollment => true)
       c1.reload
       c1.read_attribute(:self_enrollment_code).should be_nil
       c1.self_enrollment_code.should_not be_nil
@@ -3026,7 +3026,7 @@ describe Course do
 
     it "should return a scope" do
       # can't use "should respond_to", because that delegates to the instantiated Array
-      lambda{ @course.groups_visible_to(@user).scoped({}) }.should_not raise_exception
+      lambda{ @course.groups_visible_to(@user).scoped }.should_not raise_exception
     end
   end
 
@@ -3038,7 +3038,7 @@ describe Course do
     end
 
     it 'can be read by a nil user if public and available' do
-      @course.check_policy(nil).should == [:read, :read_outcomes]
+      @course.check_policy(nil).should == [:read, :read_outcomes, :read_syllabus]
     end
 
     it 'cannot be read by a nil user if public but not available' do
@@ -3091,7 +3091,7 @@ describe Course do
   end
 
   context "sharding" do
-    it_should_behave_like "sharding"
+    specs_require_sharding
 
     it "should properly return site admin permissions from another shard" do
       enable_cache do
@@ -3164,7 +3164,7 @@ describe Course do
         end
 
         it "should play nice with other scopes" do
-          Course.with_enrollments.scoped(:conditions => {:name => 'A'}).should == [@course1a]
+          Course.with_enrollments.where(:name => 'A').should == [@course1a]
         end
 
         it "should be disjoint with #without_enrollments" do
@@ -3178,7 +3178,7 @@ describe Course do
         end
 
         it "should play nice with other scopes" do
-          Course.without_enrollments.scoped(:conditions => {:name => 'A'}).should == [@course2a]
+          Course.without_enrollments.where(:name => 'A').should == [@course2a]
         end
       end
     end
@@ -3205,7 +3205,7 @@ describe Course do
         end
 
         it "should play nice with other scopes" do
-          Course.completed.scoped(:conditions => {:conclude_at => nil}).should == [@c4]
+          Course.completed.where(:conclude_at => nil).should == [@c4]
         end
 
         it "should be disjoint with #not_completed" do
@@ -3219,7 +3219,7 @@ describe Course do
         end
 
         it "should play nice with other scopes" do
-          Course.not_completed.scoped(:conditions => {:conclude_at => nil}).should == [@c1]
+          Course.not_completed.where(:conclude_at => nil).should == [@c1]
         end
       end
     end
@@ -3426,4 +3426,32 @@ describe Course do
       @course.short_name_slug.should == @course.short_name
     end
   end
+
+  describe "re_send_invitations!" do
+    it "should send invitations" do
+      course(:active_all => true)
+      user1 = user_with_pseudonym(:active_all => true)
+      user2 = user_with_pseudonym(:active_all => true)
+      @course.enroll_student(user1)
+      @course.enroll_student(user2).accept!
+
+      dm_count = DelayedMessage.count
+      DelayedMessage.where(:communication_channel_id => user1.communication_channels.first).count.should == 0
+      Notification.create!(:name => 'Enrollment Invitation')
+      @course.re_send_invitations!
+
+      DelayedMessage.count.should == dm_count + 1
+      DelayedMessage.where(:communication_channel_id => user1.communication_channels.first).count.should == 1
+    end
+  end
+
+  it "creates a scope the returns deleted courses" do 
+    @course1 = Course.create!
+    @course1.workflow_state = 'deleted'
+    @course1.save!
+    @course2 = Course.create!
+
+    Course.deleted.count.should == 1
+  end
+
 end

@@ -31,7 +31,7 @@ module Api::V1
     describe '#days_json' do
       let!(:course) { ::Course.create! }
 
-      before(:all) do
+      before do
         students = (1..3).inject([]) do |memo, idx|
           student = ::User.create!
           course.enroll_student(student)
@@ -47,8 +47,6 @@ module Api::V1
         submit(@assignment2, students[0], yesterday, @grader2)
         @days = GradebookHistoryHarness.new.days_json(course, api_context)
       end
-
-      after(:all) { truncate_all_tables }
 
       it 'has a top level key for each day represented' do
         dates = @days.map{|d| d[:date] }
@@ -82,7 +80,7 @@ module Api::V1
     end
 
     describe '#json_for_date' do
-      before(:all) do
+      before do
         course = ::Course.create!
         student1 = ::User.create!
         course.enroll_student(student1)
@@ -95,8 +93,6 @@ module Api::V1
         submit(@assignment, student2, now, @grader2)
         @day_hash = GradebookHistoryHarness.new.json_for_date(now, course, api_context)
       end
-
-      after(:all) { truncate_all_tables }
 
       it 'returns a grader hash for that day' do
         @day_hash.map{|g| g[:id] }.sort.should == [@grader1.id, @grader2.id].sort

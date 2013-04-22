@@ -1,7 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
-shared_examples_for "discussions selenium tests" do
-  it_should_behave_like "in-process server selenium tests"
 
   def go_to_topic
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
@@ -98,4 +96,3 @@ shared_examples_for "discussions selenium tests" do
     fj(menu_item_selector).click
     topic
   end
-end

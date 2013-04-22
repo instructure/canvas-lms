@@ -21,6 +21,7 @@ define([
   'i18n!assignments',
   'jquery' /* $ */,
   'str/htmlEscape',
+  'compiled/util/vddTooltip',
   'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* parseFromISO, dateString, datepicker, time_field, datetime_field, /\$\.datetime/ */,
@@ -37,7 +38,7 @@ define([
   'jqueryui/datepicker' /* /\.datepicker/ */,
   'jqueryui/droppable' /* /\.droppable/ */,
   'jqueryui/sortable' /* /\.sortable/ */
-], function(INST, I18n, $, htmlEscape) {
+], function(INST, I18n, $, htmlEscape, vddTooltip) {
 
   var defaultShowDateOptions = false;
   function hideAssignmentForm() {
@@ -1033,4 +1034,5 @@ define([
       $newAssignment.find(":tabbable:first").focus();
     }
   }
+  vddTooltip();
 });

@@ -97,7 +97,7 @@ describe "assignments" do
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-      ffj('.formtable input[name="submission[group_comment]"]').size.should == 3
+      ffj('.formtable input[name="submission[group_comment]"]').size.should == 4
     end
 
     it "should not show assignments in an unpublished course" do
@@ -221,8 +221,8 @@ describe "assignments" do
       end
 
       it "should validate file upload restrictions" do
-        filename_txt, fullpath_txt, data_txt = get_file("testfile4.txt")
-        filename_zip, fullpath_zip, data_zip = get_file("testfile5.zip")
+        filename_txt, fullpath_txt, data_txt, tempfile_txt = get_file("testfile4.txt")
+        filename_zip, fullpath_zip, data_zip, tempfile_zip = get_file("testfile5.zip")
         @fourth_assignment.update_attributes(:submission_types => 'online_upload', :allowed_extensions => '.txt')
         get "/courses/#{@course.id}/assignments/#{@fourth_assignment.id}"
         f('.submit_assignment_link').click

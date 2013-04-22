@@ -52,8 +52,8 @@ class CollectionItem < ActiveRecord::Base
     state :deleted
   end
 
-  named_scope :active, { :conditions => { :workflow_state => 'active' } }
-  named_scope :newest_first, { :order => "id desc" }
+  scope :active, where(:workflow_state => 'active')
+  scope :newest_first, order("id DESC")
 
   def discussion_topic
     DiscussionTopic.find_by_context_type_and_context_id(self.class.name, self.id) ||
@@ -86,7 +86,7 @@ class CollectionItem < ActiveRecord::Base
 
     if increment != 0
       data.shard.activate do
-        data.class.update_all(['post_count = post_count + ?', increment], :id => data.id)
+        data.class.where(:id => data).update_all(['post_count = post_count + ?', increment])
       end
     end
   end

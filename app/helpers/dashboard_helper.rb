@@ -72,6 +72,7 @@ module DashboardHelper
     end
 
     contexts.map do |name, url|
+      url = nil if category == 'Conversation'
       url.present? ? "<a href=\"#{url}\">#{h(name)}</a>" : h(name)
     end.to_sentence.html_safe
   end

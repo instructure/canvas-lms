@@ -44,9 +44,7 @@ class SubmissionComment < ActiveRecord::Base
 
   serialize :cached_attachments
 
-  named_scope :for_assignment_id, lambda { |assignment_id|
-    { :conditions => ['submissions.assignment_id = ?', assignment_id], :joins => :submission }
-  }
+  scope :for_assignment_id, lambda { |assignment_id| where(:submissions => { :assignment_id => assignment_id }).joins(:submission) }
 
   def delete_other_comments_in_this_group
     return if !self.group_comment_id || @skip_destroy_callbacks
@@ -183,8 +181,8 @@ class SubmissionComment < ActiveRecord::Base
 
   def update_submission
     return nil if hidden?
-    comments_count = SubmissionComment.count(:conditions => { :submission_id => submission_id, :hidden => false })
-    Submission.update_all({ :submission_comments_count => comments_count }, { :id => submission_id }) rescue nil
+    comments_count = SubmissionComment.where(:submission_id => submission_id, :hidden => false).count
+    Submission.where(:id => submission_id).update_all(:submission_comments_count => comments_count) rescue nil
   end
 
   def formatted_body(truncate=nil)
@@ -219,14 +217,10 @@ class SubmissionComment < ActiveRecord::Base
     self.ar_to_json(options, &block)
   end
 
-  named_scope :visible, :conditions => { :hidden => false }
+  scope :visible, where(:hidden => false)
 
-  named_scope :after, lambda{|date|
-    {:conditions => ['submission_comments.created_at > ?', date] }
-  }
-  named_scope :for_context, lambda{|context|
-    {:conditions => ['submission_comments.context_id = ? AND submission_comments.context_type = ?', context.id, context.class.to_s] }
-  }
+  scope :after, lambda { |date| where("submission_comments.created_at>?", date) }
+  scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }
 
   def update_participation
     # id_changed? because new_record? is false in after_save callbacks

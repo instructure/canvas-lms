@@ -34,13 +34,11 @@ class ConversationMessage < ActiveRecord::Base
 
   after_create :generate_user_note!
 
-  named_scope :human, :conditions => "NOT generated"
-  named_scope :with_attachments, :conditions => "attachment_ids <> '' OR has_attachments" # TODO: simplify post-migration
-  named_scope :with_media_comments, :conditions => "media_comment_id IS NOT NULL OR has_media_objects" # TODO: simplify post-migration
-  named_scope :by_user, lambda { |user_or_id|
-    user_or_id = user_or_id.id if user_or_id.is_a?(User)
-    {:conditions => {:author_id => user_or_id}}
-  }
+  scope :human, where("NOT generated")
+  scope :with_attachments, where("attachment_ids<>'' OR has_attachments") # TODO: simplify post-migration
+  scope :with_media_comments, where("media_comment_id IS NOT NULL OR has_media_objects") # TODO: simplify post-migration
+  scope :by_user, lambda { |user_or_id| where(:author_id => user_or_id) }
+
   def self.preload_latest(conversation_participants, author=nil)
     return unless conversation_participants.present?
 

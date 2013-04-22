@@ -21,3 +21,4 @@ define [
   test "#AssignmentOverride.defaultDueDate class method returns an AssignmentOverride that represents the default due date", ->
     override = AssignmentOverride.defaultDueDate()
     strictEqual override.representsDefaultDueDate(), true
+

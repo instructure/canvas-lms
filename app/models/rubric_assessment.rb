@@ -132,7 +132,7 @@ class RubricAssessment < ActiveRecord::Base
   
   def update_artifact
     if self.artifact_type == 'Submission' && self.artifact
-      Submission.update_all({:has_rubric_assessment => true}, {:id => self.artifact.id})
+      Submission.where(:id => self.artifact).update_all(:has_rubric_assessment => true)
       if self.rubric_association && self.rubric_association.use_for_grading && self.artifact.score != self.score
         if self.rubric_association.association.grants_right?(self.assessor, nil, :grade)
           # TODO: this should go through assignment.grade_student to 
@@ -161,15 +161,13 @@ class RubricAssessment < ActiveRecord::Base
     given {|user, session| 
       self.rubric_association && 
       self.rubric_association.grants_rights?(user, session, :manage)[:manage] &&
-      (self.rubric_association.association.context.grants_right?(self.assessor, nil, :manage_grades) rescue false)
+      (self.rubric_association.association.context.grants_right?(self.assessor, nil, :manage_rubrics) rescue false)
     }
     can :update
   end
   
-  named_scope :of_type, lambda {|type|
-    {:conditions => ['rubric_assessments.assessment_type = ?', type.to_s]}
-  }
-  
+  scope :of_type, lambda { |type| where(:assessment_type => type.to_s) }
+
   def methods_for_serialization(*methods)
     @serialization_methods = methods
   end

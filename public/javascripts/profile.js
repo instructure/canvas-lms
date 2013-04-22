@@ -20,6 +20,7 @@ define([
   'i18n!profile',
   'jquery' /* $ */,
   'compiled/util/BackoffPoller',
+  'compiled/models/Pseudonym',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* parseFromISO, time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, formErrors, errorBox */,
@@ -30,7 +31,7 @@ define([
   'jquery.templateData' /* fillTemplateData */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'compiled/jquery.rails_flash_notifications'
-], function(INST, I18n, $, BackoffPoller) {
+], function(INST, I18n, $, BackoffPoller, Pseudonym) {
 
   var $edit_settings_link = $(".edit_settings_link");
 
@@ -96,27 +97,13 @@ define([
   $update_profile_form
     .attr('method', 'PUT')
     .formSubmit({
+      formErrors: false,
       required: ($update_profile_form.find('#user_name').length ? ['name'] : []),
       object_name: 'user',
       property_validations: {
         '=default_email_id': function(val, data) {
           if($("#default_email_id").length && (!val || val == "new")) {
             return I18n.t('please_select_an_option', "Please select an option");
-          }
-        },
-        'birthdate(1i)': function(val, data) {
-          if (!val && (data['birthdate(2i)'] || data['birthdate(3i)'])) {
-            return I18n.t('please_select_a_year', "Please select a year");
-          }
-        },
-        'birthdate(2i)': function(val, data) {
-          if (!val && (data['birthdate(1i)'] || data['birthdate(3i)'])) {
-            return I18n.t('please_select_a_month', "Please select a month");
-          }
-        },
-        'birthdate(3i)': function(val, data) {
-          if (!val && (data['birthdate(1i)'] || data['birthdate(2i)'])) {
-            return I18n.t('please_select_a_day', "Please select a day");
           }
         }
       },
@@ -130,7 +117,6 @@ define([
           full_name: user.name,
           sortable_name: user.sortable_name,
           time_zone: user.time_zone,
-          birthdate: (user.birthdate ? $.parseFromISO(user.birthdate).date_formatted : '-'),
           locale: $("#user_locale option[value='" + user.locale + "']").text()
         };
         if (templateData.locale != $update_profile_form.find('.locale').text()) {
@@ -148,8 +134,12 @@ define([
           data: templateData
         }).find(".cancel_button").click();
       },
-      error: function(data) {
-        $update_profile_form.loadingImage('remove').formErrors(data.errors || data);
+      error: function(errors) {
+        if (errors.password) {
+          var pseudonymId = $(this).find("#profile_pseudonym_id").val();
+          errors = Pseudonym.prototype.normalizeErrors(errors, ENV.PASSWORD_POLICIES[pseudonymId] || ENV.PASSWORD_POLICY);
+        }
+        $update_profile_form.loadingImage('remove').formErrors(errors);
         $edit_settings_link.click();
       }
     })

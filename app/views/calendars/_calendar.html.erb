@@ -81,7 +81,7 @@
       <% if context.respond_to?("assignments") %>
         <a href="<%= context_url(context, :context_assignments_url) %>" class="<%= context.class.to_s.downcase %>_<%= context.id %>_add_assignment_url">&nbsp;</a>
         <a href="<%= context_url(context, :context_assignment_url, "{{ id }}") %>" class="<%= context.class.to_s.downcase %>_<%= context.id %>_assignment_url">&nbsp;</a>
-        <%= select :assignment, :assignment_group_id, (context.assignment_groups.active.scoped(:select => "id, name").map {|g| [g.name, g.id]} << [t('options.new_group', "[ New Group ]"), "new"]), {}, {:class => "assignment_group_id #{context.try_rescue(:weight_assignment_groups) ? 'weight' : ''}", :id => "#{ context.class.to_s.downcase }_#{ context.id }_assignment_groups"} %>
+        <%= select :assignment, :assignment_group_id, (context.assignment_groups.active.select("id, name").map {|g| [g.name, g.id]} << [t('options.new_group', "[ New Group ]"), "new"]), {}, {:class => "assignment_group_id #{context.try_rescue(:weight_assignment_groups) ? 'weight' : ''}", :id => "#{ context.class.to_s.downcase }_#{ context.id }_assignment_groups"} %>
         <a href="<%= context_url(context, :context_assignment_groups_url) %>" class="<%= context.class.to_s.downcase %>_<%= context.id %>_add_assignment_group_url">&nbsp;</a>
       <% end %>
     <% end %>

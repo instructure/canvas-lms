@@ -214,6 +214,8 @@ describe ConversationsController do
   
         @new_user2 = User.create
         @course.enroll_student(@new_user2).accept!
+
+        @account_id = @course.account_id
       end
 
       ["1", "true", "yes", "on"].each do |truish|
@@ -231,6 +233,32 @@ describe ConversationsController do
           response.should be_success
     
           Conversation.count.should eql(@old_count + 2)
+        end
+      end
+
+      it "should set the root account id to the participants for group conversations" do
+        post 'create', :recipients => [@new_user1.id.to_s, @new_user2.id.to_s], :body => "yo", :group_conversation => "true"
+        response.should be_success
+
+        json = json_parse(response.body)
+        json.each do |conv|
+          conversation = Conversation.find(conv['id'])
+          conversation.conversation_participants.each do |cp|
+            cp.root_account_ids.should == @account_id.to_s
+          end
+        end
+      end
+
+      it "should set the root account id to the participants for bulk private messages" do
+        post 'create', :recipients => [@new_user1.id.to_s, @new_user2.id.to_s], :body => "yo", :mode => "sync"
+        response.should be_success
+
+        json = json_parse(response.body)
+        json.each do |conv|
+          conversation = Conversation.find(conv['id'])
+          conversation.conversation_participants.each do |cp|
+            cp.root_account_ids.should == @account_id.to_s
+          end
         end
       end
     end

@@ -1,8 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/context_modules_common')
 
 describe "context_modules" do
-  it_should_behave_like "context module tests"
-
+  it_should_behave_like "in-process server selenium tests"
   context "as a teacher" do
 
     before (:each) do
@@ -228,7 +227,7 @@ describe "context_modules" do
       modules[1].save!
 
       #updates new_student module state by completing @assignment
-      modules[0].update_for(new_student2, :read, @tag_1)
+      modules[0].update_for(new_student, :read, @tag_1)
 
       get "/courses/#{@course.id}/modules"
 
@@ -646,11 +645,15 @@ describe "context_modules" do
 
       add_module 'Test module'
       f('.admin-links .al-trigger').click
+      wait_for_ajaximations
       f('.add_module_item_link').click
-      select_module_item('#add_module_item_select', 'External Tool')
-      find_with_jquery('.add_item_button:visible').click
-      ff('.alert.alert-error').length.should == 1
-      find_with_jquery('.alert.alert-error:visible').text.should == "An external tool can't be saved without a URL."
+      wait_for_ajaximations
+      keep_trying_until do
+        select_module_item('#add_module_item_select', 'External Tool')
+        fj('.add_item_button:visible').click
+        ff('.alert.alert-error').length.should == 1
+      end
+      fj('.alert.alert-error:visible').text.should == "An external tool can't be saved without a URL."
     end
 
     it "should hide module contents" do
@@ -900,6 +903,32 @@ describe "context_modules" do
       module_item.attribute('class').split.should include 'must_contribute_requirement'
       f('.criterion', module_item).attribute('class').split.should include 'defined'
       driver.execute_script("return $('#context_module_item_#{tag.id} .criterion_type').text()").should == "must_contribute"
+    end
+
+    it "should show a vdd tooltip summary for assignments with multiple due dates" do
+      selector = "table.Assignment_#{@assignment2.id} .due_date_display"
+      get "/courses/#{@course.id}/modules"
+      add_existing_module_item('#assignments_select', 'Assignment', @assignment2.title)
+      wait_for_ajaximations
+      f(selector).should_not include_text "Multiple Due Dates"
+
+      # add a second due date
+      new_section = @course.course_sections.create!(:name => 'New Section')
+      override = @assignment2.assignment_overrides.build
+      override.set = new_section
+      override.due_at = Time.zone.now + 1.day
+      override.due_at_overridden = true
+      override.save!
+
+      get "/courses/#{@course.id}/modules"
+      wait_for_ajaximations
+      f(selector).should include_text "Multiple Due Dates"
+      driver.mouse.move_to f("#{selector} a")
+      wait_for_animations
+
+      tooltip = fj('.vdd_tooltip_content:visible')
+      tooltip.should include_text 'New Section'
+      tooltip.should include_text 'Everyone else'
     end
   end
 

@@ -298,7 +298,7 @@ describe Quiz do
 
     qq1 = q.quiz_questions.create!(:question_data => { :name => "test 1" }, :quiz_group => g)
     # make sure we handle sorting with nil positions
-    QuizQuestion.update_all({:position => nil}, {:id => qq1.id})
+    QuizQuestion.where(:id => qq1).update_all(:position => nil)
 
     q.quiz_questions.create!(:question_data => { :name => "test 2" }, :quiz_group => g)
     q.quiz_questions.create!(:question_data => { :name => "test 3" })
@@ -604,7 +604,7 @@ describe Quiz do
       qs = q.generate_submission(@student)
 
       stats = q.statistics(false)
-      stats[:submission_count].should == 1
+      stats[:multiple_attempts_exist].should be_false
     end
 
     context 'csv' do

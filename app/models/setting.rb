@@ -69,7 +69,7 @@ class Setting < ActiveRecord::Base
   end
 
   def self.set_config(config_name, value)
-    raise "config settings can only be set via config file" unless RAILS_ENV == 'test'
+    raise "config settings can only be set via config file" unless Rails.env.test?
     @@cache[config_key(config_name)] = value
   end
 

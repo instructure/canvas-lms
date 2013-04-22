@@ -206,7 +206,7 @@ describe "assignments" do
 
         get "/courses/#{@course.id}/assignments"
         group = @course.assignment_groups.first
-        AssignmentGroup.update_all({:updated_at => 1.hour.ago}, {:id => group.id})
+        AssignmentGroup.where(:id => group).update_all(:updated_at => 1.hour.ago)
         first_stamp = group.reload.updated_at.to_i
         f('.add_assignment_link').click
         wait_for_ajaximations
@@ -388,7 +388,7 @@ describe "assignments" do
 
         get "/courses/#{@course.id}/assignments"
         group = @course.assignment_groups.first
-        AssignmentGroup.update_all({:updated_at => 1.hour.ago}, {:id => group.id})
+        AssignmentGroup.where(:id => group).update_all(:updated_at => 1.hour.ago)
         first_stamp = group.reload.updated_at.to_i
         f('.add_assignment_link').click
         wait_for_ajaximations

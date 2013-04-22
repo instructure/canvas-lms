@@ -7,7 +7,7 @@ define [
   module 'PaginatedCollection',
     setup: ->
       @server = sinon.fakeServer.create()
-      @collection = new PaginatedCollection null
+      @collection = new PaginatedCollection null,
         params:
           multi: ['foos', 'bars']
           single: 1

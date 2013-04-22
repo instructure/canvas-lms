@@ -1,0 +1,23 @@
+<div class="form-inline">
+  <input
+    type="text"
+    name="search_term"
+    data-view="inputFilter"
+    placeholder='{{#t "search_people"}}Search people{{/t}}'
+    aria-label='{{#t "search"}}Search{{/t}}'
+  >
+
+  <select
+    name="enrollment_role"
+    data-view="roleSelect"
+    aria-label='{{#t "role_to_search"}}Limit search to role{{/t}}'
+  >
+    <option value="">{{#t "all_roles"}}All Roles{{/t}}</option>
+    {{#each roles}}
+    <option value="{{name}}">{{plural_label}}</option>
+    {{/each}}
+  </select>
+</div>
+
+<div data-view="users" class="v-gutter"></div>
+

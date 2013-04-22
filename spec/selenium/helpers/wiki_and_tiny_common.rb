@@ -95,13 +95,25 @@ shared_examples_for "wiki and tiny selenium tests" do
   end
 
   def add_flickr_image(el)
+    require 'open-uri'
+
     el.find_element(:css, '.mce_instructure_embed').click
     f('.flickr_search_link').click
     f('#image_search_form > input').send_keys('angel')
     submit_form('#image_search_form')
     wait_for_ajax_requests
     keep_trying_until { f('.image_link').should be_displayed }
-    f('.image_link').click
+    # sometimes flickr has broken images; choose the first one that works
+    image = ff('.image_link').detect do |image|
+      begin
+        temp_file = open(image.attribute('src'))
+        temp_file.size > 0
+      rescue
+        next
+      end
+    end
+    raise "Couldn't find an image on flickr!" unless image
+    image.click
   end
 
   def add_image_to_rce

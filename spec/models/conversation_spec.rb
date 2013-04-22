@@ -45,7 +45,7 @@ describe Conversation do
     end
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should create the conversation on the appropriate shard" do
         users = []
@@ -138,7 +138,7 @@ describe Conversation do
     end
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should add participants to the proper shards" do
         users = []
@@ -198,7 +198,7 @@ describe Conversation do
     it_should_behave_like "message counts"
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
       it_should_behave_like "message counts"
     end
   end
@@ -284,7 +284,7 @@ describe Conversation do
 
     it_should_behave_like "unread counts"
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
       it_should_behave_like "unread counts"
     end
   end
@@ -482,7 +482,7 @@ describe Conversation do
     end
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should re-use conversations from another shard" do
         u1 = @shard1.activate { user }
@@ -616,6 +616,23 @@ describe Conversation do
         u1.conversations.first.tags.should eql [@course1.asset_string]
         u2.conversations.first.tags.should eql [@course1.asset_string] # just the one, since it was explicit
         u3.conversations.first.tags.should eql [@course2.asset_string] # not in course1, so fall back to common ones (i.e. course2)
+      end
+
+      context "sharding" do
+        specs_require_sharding
+
+        it "should set all tags on the other shard's participants" do
+          course1 = @shard1.activate{ course(:account => Account.create!, :active_all => true) }
+          course2 = @shard2.activate{ course(:account => Account.create!, :active_all => true) }
+          user1 = student_in_course(:course => course1, :active_all => true).user
+          user2 = student_in_course(:course => course2, :active_all => true).user
+          student_in_course(:course => course2, :user => user1, :active_all => true)
+          student_in_course(:course => course1, :user => user2, :active_all => true)
+          conversation = Conversation.initiate([user1, user2], false)
+          conversation.add_message(user1, 'test')
+          user1.conversations.first.tags.sort.should eql [course1.asset_string, course2.asset_string].sort
+          user2.conversations.first.tags.sort.should eql [course1.asset_string, course2.asset_string].sort
+        end
       end
     end
 
@@ -873,8 +890,8 @@ describe Conversation do
     source.add_participants(sender, [source_user]) if source_user
     target.add_participants(sender, [target_user]) if target_user
     target_user = source_user || target_user
-    message_count = source.shard.activate { ConversationMessageParticipant.count(:all, :joins => :conversation_message, :conditions => {:user_id => target_user.id, :conversation_messages => {:conversation_id => source.id}}) }
-    message_count += target.shard.activate { ConversationMessageParticipant.count(:all, :joins => :conversation_message, :conditions => {:user_id => target_user.id, :conversation_messages => {:conversation_id => target.id}}) }
+    message_count = source.shard.activate { ConversationMessageParticipant.joins(:conversation_message).where(:user_id => target_user, :conversation_messages => {:conversation_id => source}).count }
+    message_count += target.shard.activate { ConversationMessageParticipant.joins(:conversation_message).where(:user_id => target_user, :conversation_messages => {:conversation_id => target}).count }
 
     source.merge_into(target)
 
@@ -893,7 +910,7 @@ describe Conversation do
     # non-sharding cases are covered by ConversationParticipant#move_to_user specs
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       before do
         @sender = User.create!(:name => 'a')

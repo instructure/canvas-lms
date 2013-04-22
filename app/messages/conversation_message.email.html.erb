@@ -1,0 +1,47 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/conversations/<%= asset.conversation_id %>
+<% end %>
+<% define_content :user_name do %>
+  <%= asset.author.short_name_with_shared_contexts(user) rescue t(:unknown_user, "Unknown User") %>
+<% end %>
+<% define_content :subject do %>
+  <%= t :subject, "%{user_name} just sent you a message in Canvas.", :user_name => content(:user_name) %>
+<% end %>
+<p><%= t :body, "%{user_name} just sent you a message in Canvas:", :user_name => content(:user_name) %></p>
+
+<hr style="border: 0;
+    height: 1px;
+    background: #333;
+    background-image: -webkit-linear-gradient(left, #ddd, #aaa, #eee);
+    background-image:    -moz-linear-gradient(left, #ddd, #aaa, #eee);
+    background-image:     -ms-linear-gradient(left, #ddd, #aaa, #eee);
+    background-image:      -o-linear-gradient(left, #ddd, #aaa, #eee);" />
+
+<p><%= asset.body.gsub(/\n/,'</p><p>') %></p>
+
+<hr style="border: 0;
+    height: 1px;
+    background: #333;
+    background-image: -webkit-linear-gradient(left, #ddd, #aaa, #eee);
+    background-image:    -moz-linear-gradient(left, #ddd, #aaa, #eee);
+    background-image:     -ms-linear-gradient(left, #ddd, #aaa, #eee);
+    background-image:      -o-linear-gradient(left, #ddd, #aaa, #eee);" />
+
+<% if asset.has_media_objects? %>
+<p><%= t :audio_comment, "This message includes media comments. To listen or reply, click the link below:" %></p>
+<% else %>
+<p><%= t :reply_message, "To reply to this message, click the link below:" %></p>
+<% end %>
+
+<p><a href="<%= content :link %>"><%= content :link %></a></p>
+
+<% unless asset.attachments.empty? %>
+<div style="margin-top: 20px; padding: 10px; border: 1px solid #f1f1f1; background-color: #f3f3f3;">
+  <p style="margin: 0px;"><%= t :attached_files, "Attached Files:" %></p>
+  <ul style="padding-left: 20px;">
+    <% asset.attachments.each do |attachment| %>
+    <li><%= attachment.display_name %> - <%= attachment.readable_size %> <a href="<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/files/<%= attachment.id %>/download?verifier=<%= attachment.uuid %>">[<%= t :download, "download" %>] %></a></li>
+    <% end %>
+  </ul>
+</div>
+<% end %>

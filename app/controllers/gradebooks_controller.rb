@@ -86,7 +86,8 @@ class GradebooksController < ApplicationController
     ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
       updated = Time.parse(params[:updated]) rescue nil
       updated ||= Time.parse("Jan 1 2000")
-      @submissions = @context.submissions.find(:all, :include => [:quiz_submission, :submission_comments, :attachments], :conditions => ['submissions.updated_at > ?', updated]).to_a
+      @submissions = @context.submissions.includes(:quiz_submission, :submission_comments, :attachments).
+          where('submissions.updated_at > ?', updated).all
       @new_submissions = @submissions
 
       respond_to do |format|
@@ -151,7 +152,7 @@ class GradebooksController < ApplicationController
             @groups = @context.assignment_groups.active
             @groups_order = {}
             @groups.each_with_index{|group, idx| @groups_order[group.id] = idx }
-            @just_assignments = @context.assignments.active.gradeable.find(:all, :order => 'due_at, title').select{|a| @groups_order[a.assignment_group_id] }
+            @just_assignments = @context.assignments.active.gradeable.order(:due_at, :title).select{|a| @groups_order[a.assignment_group_id] }
             newest = Time.parse("Jan 1 2010")
             @just_assignments = @just_assignments.sort_by{|a| [a.due_at || newest, @groups_order[a.assignment_group_id] || 0, a.position || 0] }
             @assignments = @just_assignments.dup + groups_as_assignments(@groups)
@@ -208,14 +209,14 @@ class GradebooksController < ApplicationController
         # that makes it so we do a lot less querying to the db, which means less active record instantiation,
         # which means less AR -> JSON serialization overhead which means less data transfer over the wire and faster request.
         # (in this case, the worst part was the assignment 'description' which could be a massive wikipage)
-        render :json => @context.assignments.active.gradeable.scoped(
-          :select => ["id", "title", "due_at", "unlock_at", "lock_at",
+        render :json => @context.assignments.active.gradeable.select(
+                     ["id", "title", "due_at", "unlock_at", "lock_at",
                       "points_possible", "min_score", "max_score",
                       "mastery_score", "grading_type", "submission_types",
                       "assignment_group_id", "grading_scheme_id",
                       "grading_standard_id", "grade_group_students_individually",
                       "(select name from group_categories where
-                         id=assignments.group_category_id) AS group_category"].join(", ")) + groups_as_assignments
+                         id=assignments.group_category_id) AS group_category"]) + groups_as_assignments
       elsif params[:students]
         # you need to specify specifically which student fields you want returned to the gradebook via json here
         render :json => @context.students_visible_to(@current_user).order_by_sortable_name.to_json(:only => ["id", "name", "sortable_name", "short_name"])
@@ -223,17 +224,9 @@ class GradebooksController < ApplicationController
         params[:user_ids] ||= params[:user_id]
         user_ids = params[:user_ids].split(",").map(&:to_i) if params[:user_ids]
         assignment_ids = params[:assignment_ids].split(",").map(&:to_i) if params[:assignment_ids]
-        # you need to specify specifically which submission fields you want returned to the gradebook here
-        scope_options = {
-          :select => ["assignment_id", "attachment_id", "grade", "grade_matches_current_submission", "group_id", "has_rubric_assessment", "id", "score", "submission_comments_count", "submission_type", "submitted_at", "url", "user_id"].join(" ,")
-        }
-        if user_ids && assignment_ids
-          @submissions = @context.submissions.scoped(scope_options).find(:all, :conditions => {:user_id => user_ids, :assignment_id => assignment_ids})
-        elsif user_ids
-          @submissions = @context.submissions.scoped(scope_options).find(:all, :conditions => {:user_id => user_ids})
-        else
-          @submissions = @context.submissions.scoped(scope_options)
-        end
+        @submissions = @context.submissions
+        @submissions = @submissions.where(:user_id => user_ids) if user_ids
+        @submissions = @submissions.where(:assignment_id => assignment_ids) if assignment_ids
         render :json => @submissions.to_json(:include => [:attachments, :quiz_submission, :submission_comments])
       end
     end

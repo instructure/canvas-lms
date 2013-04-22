@@ -26,11 +26,11 @@ describe QuizSubmission do
   end
 
   it "should copy the quiz's points_possible whenever it's saved" do
-    Quiz.update_all("points_possible = 1.1", "id = #{@quiz.id}")
+    Quiz.where(:id => @quiz).update_all(:points_possible => 1.1)
     q = @quiz.quiz_submissions.create!
     q.reload.quiz_points_possible.should eql 1.1
 
-    Quiz.update_all("points_possible = 1.9", "id = #{@quiz.id}")
+    Quiz.where(:id => @quiz).update_all(:points_possible => 1.9)
     q.reload.quiz_points_possible.should eql 1.1
 
     q.save!
@@ -1423,6 +1423,8 @@ describe QuizSubmission do
 
     context "when loading UTF-8 data" do
       it "should strip bad chars" do
+        pending("1.9 only") if RUBY_VERSION < "1.9"
+        
         vs = submission.versions
 
         # inject bad byte into yaml

@@ -12,9 +12,7 @@ class AccessToken < ActiveRecord::Base
   # on the scope defined in the auth process (scope has not
   # yet been implemented)
 
-  named_scope :active, lambda {
-    { :conditions => ['expires_at IS NULL OR expires_at > ?', Time.zone.now] }
-  }
+  scope :active, lambda { where("expires_at IS NULL OR expires_at>?", Time.zone.now) }
 
   TOKEN_SIZE = 64
   OAUTH2_SCOPE_NAMESPACE = '/auth/'
@@ -23,7 +21,7 @@ class AccessToken < ActiveRecord::Base
   before_create :generate_token
 
   def self.authenticate(token_string)
-    token = self.first(:conditions => ["crypted_token = ?", hashed_token(token_string)])
+    token = self.where(:crypted_token => hashed_token(token_string)).first
     token = nil unless token.try(:usable?)
     token
   end

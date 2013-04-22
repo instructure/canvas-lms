@@ -218,6 +218,8 @@ h1, h2, h3, h4, p {
 .icon-unmuted:before { content: "\e052" }
 .icon-plus:before { content: "\e078" }
 .icon-zipped:before { content: "\e089" }
+.icon-publish:before { content: "\e090" }
+.icon-draft:before { content: "\e091" }
 
 // deprecated in favor of .screenreader-only, which is meant to be usable anywhere
 span.screen-reader-text {

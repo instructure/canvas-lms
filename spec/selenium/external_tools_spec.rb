@@ -381,4 +381,159 @@ describe "editing external tools" do
     f("#tool_form").should be_displayed
     ff("#tool_form .load_tab").length.should == 1
   end
+
+  context "homework submission from an LTI tool" do
+    before(:each) do
+      course_with_student_logged_in
+      @assignment = @course.assignments.create!(:title => "test assignment", :submission_types => "online_upload,online_url")
+    end
+
+    def homework_submission_tool
+      @tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
+      @tool.settings[:homework_submission] = {
+          :url => "http://#{HostUrl.default_host}/selection_test",
+          :selection_width => 400,
+          :selection_height => 400
+      }
+      @tool.save!
+    end
+
+    def pick_submission_tool(iframe_link_selector)
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      wait_for_dom_ready
+      f(".submit_assignment_link").click
+      wait_for_ajax_requests
+      f(".submit_from_external_tool_option").should be_displayed
+      f(".submit_from_external_tool_option").click
+      ff("#submit_from_external_tool_form .tools .tool").length.should > 0
+      f("#external_tool_url").attribute('value').should == ""
+      select_submission_content(iframe_link_selector)
+    end
+
+    def select_submission_content(iframe_link_selector)
+      f("#submit_from_external_tool_form .tools .tool").click
+      keep_trying_until { f("#homework_selection_dialog").displayed? }
+
+      in_frame('homework_selection_iframe') do
+        keep_trying_until { ff(iframe_link_selector).length > 0 }
+        f(iframe_link_selector).click
+      end
+      keep_trying_until { f("#homework_selection_dialog") == nil }
+    end
+
+    def assert_invalid_selection_message(msg=nil)
+      msg ||= /returned an invalid/
+      keep_trying_until{ ff("#flash_message_holder li").length > 0 }
+      message = f("#flash_message_holder li")
+      message.should_not be_nil
+      message.text.should match(msg)
+      ff("#submit_assignment .cancel_button").select(&:displayed?).first.click
+    end
+
+    it "should not load if no tools are configured" do
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      wait_for_dom_ready
+      f(".submit_assignment_link").click
+      wait_for_ajax_requests
+      f(".submit_from_external_tool_option").should_not be_displayed
+      ff("#submit_assignment .cancel_button").select(&:displayed?).first.click
+    end
+
+    it "should load a list of tools in the 'more' tab if configured and applicable" do
+      homework_submission_tool
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      wait_for_dom_ready
+      f(".submit_assignment_link").click
+      wait_for_ajax_requests
+      f(".submit_from_external_tool_option").should be_displayed
+      ff("#submit_assignment .cancel_button").select(&:displayed?).first.click
+      # TODO: make sure the 'submit' button isn't enabled yed
+    end
+
+    it "should allow submission for a tool that returns a file URL for a file assignment" do
+      homework_submission_tool
+      pick_submission_tool('#file_link')
+
+      f("#external_tool_url").attribute('value').should match(/delete\.png/)
+      f("#external_tool_filename").attribute('value').should eql('delete.png')
+      f("#external_tool_submission_type").attribute('value').should eql('online_url_to_file')
+      f("#submit_from_external_tool_form .btn-primary").click
+      wait_for_ajax_requests
+      Delayed::Job.last.invoke_job
+      a = Attachment.last
+      keep_trying_until { puts a.file_state; a.file_state == 'available' }
+      keep_trying_until { !f("#submit_assignment").displayed? }
+      submission = @assignment.find_or_create_submission(@user)
+      submission.submission_type.should == 'online_upload'
+      submission.submitted_at.should_not be_nil
+    end
+
+    it "should allow submission for a tool that returns a URL for a URL assignment" do
+      homework_submission_tool
+      pick_submission_tool('#full_url_link')
+
+      f("#external_tool_url").attribute('value').should match(/delete\.png/)
+      f("#external_tool_submission_type").attribute('value').should eql('online_url')
+      f("#submit_from_external_tool_form .btn-primary").click
+      keep_trying_until { !f("#submit_assignment").displayed? }
+      submission = @assignment.find_or_create_submission(@user)
+      submission.submission_type.should == 'online_url'
+      submission.submitted_at.should_not be_nil
+    end
+
+    it "should fail if the tool tries to return any other type" do
+      homework_submission_tool
+      pick_submission_tool('#basic_lti_link')
+
+      assert_invalid_selection_message
+    end
+
+    it "should fail if the tool returns a file type that isn't valid for the file assignment" do
+      @assignment.update_attributes(:allowed_extensions => 'pdf,doc')
+      @assignment.reload.allowed_extensions.should == ['pdf', 'doc']
+      homework_submission_tool
+      pick_submission_tool('#file_link')
+      f('#submit_from_external_tool_form .bad_ext_msg').should be_displayed
+      f('#submit_from_external_tool_form .btn-primary').should have_attribute('disabled', 'true')
+      ff("#submit_assignment .cancel_button").select(&:displayed?).first.click
+    end
+
+    it "should allow submission for a valid type after an invalid submission" do
+      @assignment.update_attributes(:allowed_extensions => 'pdf,doc')
+      @assignment.reload.allowed_extensions.should == ['pdf', 'doc']
+      homework_submission_tool
+      pick_submission_tool('#file_link')
+      select_submission_content('#full_url_link')
+      f('#submit_from_external_tool_form .bad_ext_msg').should_not be_displayed
+      f('#submit_from_external_tool_form .btn-primary').attribute('disabled').should be_nil
+      ff("#submit_assignment .cancel_button").select(&:displayed?).first.click
+    end
+
+    it "should fail if the tool returns a file URL for a non-file assignment" do
+      @assignment.update_attributes(:submission_types => 'online_url')
+      homework_submission_tool
+      pick_submission_tool('#file_link')
+      assert_invalid_selection_message
+    end
+
+    it "should fail if the tool returns a URL for a non-URL assignment" do
+      @assignment.update_attributes(:submission_types => 'online_upload')
+      homework_submission_tool
+      pick_submission_tool('#full_url_link')
+      assert_invalid_selection_message
+    end
+
+    it "should fail to submit if the tool returns an invalid file URL" do
+      homework_submission_tool
+      pick_submission_tool('#bad_file_link')
+
+      f("#external_tool_submission_type").attribute('value').should eql('online_url_to_file')
+      f('#submit_from_external_tool_form .btn-primary').click
+      wait_for_ajax_requests
+      Delayed::Job.last.invoke_job
+      a = Attachment.last
+
+      assert_invalid_selection_message(/problem retrieving/)
+    end
+  end
 end

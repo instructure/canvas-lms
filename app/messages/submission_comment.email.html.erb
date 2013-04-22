@@ -1,0 +1,14 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.submission.assignment.context) %>/<%= asset.submission.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.submission.assignment.context_id %>/assignments/<%= asset.submission.assignment_id %>/submissions/<%= asset.submission.user_id %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t :subject, "Submission Comment: %{user}, %{assignment}, %{context}", :user => asset.submission.user.short_name, :assignment => asset.submission.assignment.title, :context => asset.submission.assignment.context.name %>
+<% end %>
+
+<p><%= t :body, "%{author} just made a new comment on the submission for %{user} for %{assignment}",
+         :author => (asset.author_name || t(:someone, "Someone")),
+         :user => asset.submission.user.short_name,
+         :assignment => asset.submission.assignment.title %></p>
+
+<p><a href="<%= content :link %>"><%= t :link_message, "Click here to review the submission details" %></a></p>

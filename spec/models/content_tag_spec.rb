@@ -207,7 +207,7 @@ describe ContentTag do
     @tag.reload
 
     yesterday = 1.day.ago
-    ContextModule.update_all({:updated_at => yesterday}, {:id => @module.id})
+    ContextModule.where(:id => @module).update_all(:updated_at => yesterday)
 
     @tag.skip_touch = true
     @tag.save

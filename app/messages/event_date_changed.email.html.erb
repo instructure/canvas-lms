@@ -1,0 +1,22 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context_type.underscore.pluralize %>/<%= asset.context_id %>/calendar_events/<%= asset.id %>
+<% end %>
+<% define_content :subject do %>
+  <%= t('subject', 'Event Date Changed: %{event_title}, %{course_name}', :event_title => asset.title, :course_name => asset.context.name) %>
+<% end %>
+
+<p>
+<%= t('email_body', "The event, %{event_title}, for the course, %{course_name}, has changed times. It's now:", :event_title => asset.title, :course_name => asset.context.name) %>
+</p>
+
+<p><em style="color: #00ae00;">
+<% if !asset.start_at && !asset.end_at %>
+  <%= t('no_time_set', 'No Time Set') %>
+<% elsif (asset.start_at == asset.end_at || !asset.end_at) %>
+  <%= datetime_string(force_zone(asset.start_at)) %>
+<% else %>
+  <%= t('from_to_time', 'from %{start_date_time} to %{end_date_time}', :start_date_time => datetime_string(force_zone(asset.start_at)), :end_date_time => datetime_string(force_zone(asset.end_at))) %>
+<% end %>
+</em></p>
+
+<p><a href="<%= content :link %>"><%= t 'see_details', 'You can see details here' %></a></p>

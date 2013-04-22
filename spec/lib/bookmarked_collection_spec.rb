@@ -32,9 +32,9 @@ describe "BookmarkedCollection" do
     def self.restrict_scope(scope, pager)
       if bookmark = pager.current_bookmark
         comparison = (pager.include_bookmark ? 'id >= ?' : 'id > ?')
-        scope = scope.scoped(:conditions => [comparison, bookmark])
+        scope = scope.where(comparison, bookmark)
       end
-      scope.scoped(:order => "id ASC")
+      scope.order("id ASC")
     end
   end
 
@@ -50,9 +50,9 @@ describe "BookmarkedCollection" do
     def self.restrict_scope(scope, pager)
       if bookmark = pager.current_bookmark
         comparison = (pager.include_bookmark ? 'name >= ?' : 'name > ?')
-        scope = scope.scoped(:conditions => [comparison, bookmark])
+        scope = scope.where(comparison, bookmark)
       end
-      scope.scoped(:order => "name ASC")
+      scope.order("name ASC")
     end
   end
 
@@ -80,28 +80,20 @@ describe "BookmarkedCollection" do
     end
 
     it "should use the bookmarker's bookmark applicator to restrict by bookmark" do
-      bookmark = @scope.scoped(:order => 'courses.id').first.id
-      bookmarked_scope = @scope.scoped(:order => 'courses.id', :conditions => ['courses.id > ?', bookmark])
+      bookmark = @scope.order("courses.id").first.id
+      bookmarked_scope = @scope.order("courses.id").where("courses.id>?", bookmark)
       IDBookmarker.stubs(:restrict_scope).returns(bookmarked_scope)
 
       collection = BookmarkedCollection.wrap(IDBookmarker, @scope)
       collection.paginate(:per_page => 1).should == [bookmarked_scope.first]
     end
 
-    it "should apply any options given to the scope" do
-      course = @scope.scoped(:order => 'courses.id').last
-      course.update_attributes(:name => 'Matching Name')
-
-      collection = BookmarkedCollection.wrap(IDBookmarker, @scope, :conditions => {:name => course.name})
-      collection.paginate(:per_page => 1).should == [course]
-    end
-
     it "should apply any restriction block given to the scope" do
-      course = @scope.scoped(:order => 'courses.id').last
+      course = @scope.order("courses.id").last
       course.update_attributes(:name => 'Matching Name')
 
       collection = BookmarkedCollection.wrap(IDBookmarker, @scope) do |scope|
-        scope.scoped(:conditions => {:name => course.name})
+        scope.where(:name => course.name)
       end
 
       collection.paginate(:per_page => 1).should == [course]
@@ -110,8 +102,8 @@ describe "BookmarkedCollection" do
 
   describe ".merge" do
     before :each do
-      @created_scope = Course.scoped(:conditions => {:workflow_state => 'created'})
-      @deleted_scope = Course.scoped(:conditions => {:workflow_state => 'deleted'})
+      @created_scope = Course.where(:workflow_state => 'created')
+      @deleted_scope = Course.where(:workflow_state => 'deleted')
 
       Course.delete_all
       @created_course1 = @created_scope.create!
@@ -206,8 +198,8 @@ describe "BookmarkedCollection" do
 
   describe ".concat" do
     before :each do
-      @created_scope = Course.scoped(:conditions => {:workflow_state => 'created'})
-      @deleted_scope = Course.scoped(:conditions => {:workflow_state => 'deleted'})
+      @created_scope = Course.where(:workflow_state => 'created')
+      @deleted_scope = Course.where(:workflow_state => 'deleted')
 
       Course.delete_all
       @created_course1 = @created_scope.create!
@@ -263,8 +255,8 @@ describe "BookmarkedCollection" do
   describe "nested compositions" do
     before :each do
       @user_scope = User
-      @created_scope = Course.scoped(:conditions => {:workflow_state => 'created'})
-      @deleted_scope = Course.scoped(:conditions => {:workflow_state => 'deleted'})
+      @created_scope = Course.where(:workflow_state => 'created')
+      @deleted_scope = Course.where(:workflow_state => 'deleted')
 
       # user's names are so it sorts Created X < Creighton < Deanne < Deleted
       # X when using NameBookmarks

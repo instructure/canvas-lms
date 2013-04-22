@@ -1,7 +1,7 @@
 module Api::V1
   class CourseJson
 
-    BASE_ATTRIBUTES = %w(id name course_code account_id start_at default_view)
+    BASE_ATTRIBUTES = %w(id name course_code account_id start_at default_view workflow_state)
     
     INCLUDE_CHECKERS = { :grading => 'needs_grading_count', :syllabus => 'syllabus_body', 
                          :url => 'html_url', :description => 'public_description' }
@@ -28,6 +28,7 @@ module Api::V1
     
     def methods_to_send
       methods = ['end_at']
+      methods << 'public_syllabus'
       methods << 'hide_final_grades' if @includes.include?(:hide_final_grades)
       methods
     end

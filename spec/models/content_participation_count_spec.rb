@@ -56,7 +56,7 @@ describe ContentParticipationCount do
     it "should not save if not changed" do
       time = Time.now.utc - 1.day
       cpc = ContentParticipationCount.create_or_update(:context => @course, :user => @student, :content_type => "Submission")
-      ContentParticipationCount.update_all({:updated_at => time}, {:id => cpc.id})
+      ContentParticipationCount.where(:id => cpc).update_all(:updated_at => time)
       ContentParticipationCount.create_or_update(:context => @course, :user => @student, :content_type => "Submission")
       cpc.reload.updated_at.to_i.should == time.to_i
     end
@@ -106,7 +106,7 @@ describe ContentParticipationCount do
         cpc = ContentParticipationCount.create_or_update(:context => @course, :user => @teacher, :content_type => type)
         cpc.expects(:refresh_unread_count).never
         cpc.unread_count.should == 0
-        ContentParticipationCount.update_all({:updated_at => Time.now.utc - 1.day}, {:id => cpc.id})
+        ContentParticipationCount.where(:id => cpc).update_all(:updated_at => Time.now.utc - 1.day)
         cpc.reload
         cpc.expects(:refresh_unread_count)
         cpc.unread_count.should == 0

@@ -2,9 +2,10 @@ define [
   'underscore'
   'i18n!editor'
   'jquery'
+  'Backbone'
   'compiled/fn/preventDefault'
   'tinymce.editor_box'
-], (_, I18n, $, preventDefault) ->
+], (_, I18n, $, Backbone, preventDefault) ->
 
   ##
   # Toggles an element between a rich text editor and itself

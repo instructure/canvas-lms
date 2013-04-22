@@ -51,14 +51,12 @@ class ExternalFeed < ActiveRecord::Base
     write_attribute(:header_match, str.to_s.strip.presence)
   end
   
-  named_scope :to_be_polled, lambda {
-    { :conditions => ['external_feeds.consecutive_failures < ? and external_feeds.refresh_at < ?', 5, Time.now ], :order => :refresh_at }
+  scope :to_be_polled, lambda {
+    where("external_feeds.consecutive_failures<5 AND external_feeds.refresh_at<?", Time.now.utc).order(:refresh_at)
   }
   
-  named_scope :for, lambda {|obj|
-    { :conditions => ['external_feeds.feed_purpose = ?', obj] }
-  }
-  
+  scope :for, lambda { |obj| where(:feed_purpose => obj) }
+
   def add_rss_entries(rss)
     items = rss.items.map{|item| add_entry(item, rss, :rss) }.compact
     self.context.add_aggregate_entries(items, self) if self.context && self.context.respond_to?(:add_aggregate_entries)

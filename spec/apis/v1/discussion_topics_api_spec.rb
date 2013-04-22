@@ -104,7 +104,7 @@ describe DiscussionTopicsController, :type => :integration do
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
                { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
                { :title => "test title", :message => "test <b>message</b>" })
-      @topic = @course.discussion_topics.last(:order => :id)
+      @topic = @course.discussion_topics.order(:id).last
       @topic.title.should == "test title"
       @topic.message.should == "test <b>message</b>"
       @topic.threaded?.should be_false
@@ -118,7 +118,7 @@ describe DiscussionTopicsController, :type => :integration do
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
                { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
                { :title => "test title", :message => "test <b>message</b>", :is_announcement => true })
-      @topic = @course.announcements.last(:order => :id)
+      @topic = @course.announcements.order(:id).last
       @topic.title.should == "test title"
       @topic.message.should == "test <b>message</b>"
     end
@@ -128,7 +128,7 @@ describe DiscussionTopicsController, :type => :integration do
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
                { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
                { :title => "test title", :message => "test <b>message</b>", :discussion_type => "threaded", :delayed_post_at => post_at.as_json, :podcast_has_student_posts => '1', :require_initial_post => '1' })
-      @topic = @course.discussion_topics.last(:order => :id)
+      @topic = @course.discussion_topics.order(:id).last
       @topic.title.should == "test title"
       @topic.message.should == "test <b>message</b>"
       @topic.threaded?.should == true
@@ -144,7 +144,7 @@ describe DiscussionTopicsController, :type => :integration do
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
                { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
                { :title => "test title", :message => "test <b>message</b>", :assignment => { :points_possible => 15, :grading_type => "percent", :due_at => due_date.as_json, :name => "override!" } })
-      @topic = @course.discussion_topics.last(:order => :id)
+      @topic = @course.discussion_topics.order(:id).last
       @topic.title.should == "test title"
       @topic.assignment.should be_present
       @topic.assignment.points_possible.should == 15
@@ -158,7 +158,7 @@ describe DiscussionTopicsController, :type => :integration do
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
                { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
                { :title => "test title", :message => "test <b>message</b>", :assignment => { :set_assignment => 'false' } })
-      @topic = @course.discussion_topics.last(:order => :id)
+      @topic = @course.discussion_topics.order(:id).last
       @topic.title.should == "test title"
       @topic.assignment.should be_nil
     end
@@ -1231,7 +1231,7 @@ describe DiscussionTopicsController, :type => :integration do
                  { :controller => "discussion_topics_api", :action => "add_reply", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @sub2.id.to_s },
                  { :message => "ohai" })
         json['parent_id'].should == @sub2.id
-        @sub4 = DiscussionEntry.last(:order => :id)
+        @sub4 = DiscussionEntry.order(:id).last
         @sub4.id.should == json['id']
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies",
@@ -1507,7 +1507,7 @@ describe DiscussionTopicsController, :type => :integration do
     end
 
     it "should mark entries as read on a collection item" do
-      Collection.update_all({ :visibility => 'public' }, { :id => @collection.id })
+      Collection.where(:id => @collection).update_all(:visibility => 'public')
       @collection.reload
       topic = @item.discussion_topic
       topic.save!

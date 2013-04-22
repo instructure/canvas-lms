@@ -1,7 +1,7 @@
 require 'test/unit'
 
 begin
-  require File.dirname(__FILE__) + '/../../../config/environment'
+  require File.expand_path(File.dirname(__FILE__) + '/../../../config/environment')
 rescue LoadError
   require 'rubygems'
   gem 'activerecord'

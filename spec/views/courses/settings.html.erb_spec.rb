@@ -99,4 +99,32 @@ describe "courses/settings.html.erb" do
 
   end
 
+  describe "quota box" do
+    context "as account admin" do
+      before do
+        admin = account_admin_user
+        view_context(@course, admin)
+        assigns[:current_user] = admin
+      end
+  
+      it "should show quota input box" do
+        render
+        response.should have_tag "input#course_storage_quota_mb"
+      end
+    end
+  
+    context "as teacher" do
+      before do
+        view_context(@course, @teacher)
+        assigns[:current_user] = @teacher
+        @user = @teacher
+      end
+  
+      it "should not show quota input box" do
+        render
+        response.should_not have_tag "input#course_storage_quota_mb"
+      end
+    end
+  end
+    
 end

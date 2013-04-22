@@ -91,17 +91,6 @@ describe "account admin question bank" do
     add_multiple_choice_question
   end
 
-  it "should delete a multiple choice question" do
-    hover_and_click("#question_#{@question.id} .delete_question_link")
-    driver.switch_to.alert.accept
-    wait_for_ajaximations
-    @question.reload
-    keep_trying_until do
-      @question.workflow_state.should == "deleted"
-      fj("#questions .question_name").should be_nil
-    end
-  end
-
   it "should edit a multiple choice question" do
     new_name = "question 2"
     new_question_text = "what is the answer to #{new_name}?"
@@ -162,6 +151,17 @@ describe "account admin question bank" do
     keep_trying_until { @question_bank.workflow_state.should == "deleted" }
   end
 
+  it "should delete a multiple choice question" do
+    hover_and_click("#question_#{@question.id} .delete_question_link")
+    driver.switch_to.alert.accept
+    wait_for_ajaximations
+    @question.reload
+    keep_trying_until do
+      @question.workflow_state.should == "deleted"
+      fj("#questions .question_name").should be_nil
+    end
+  end
+
   context "moving multiple questions" do
     def add_questions_and_move(question_count = 1)
       question_number = question_count + 1
@@ -183,7 +183,7 @@ describe "account admin question bank" do
     def move_questions_validation(bank_name, questions)
       new_question_bank = AssessmentQuestionBank.find_by_title(bank_name)
       new_question_bank.should be_present
-      new_questions = AssessmentQuestion.all(:conditions => {:assessment_question_bank_id => new_question_bank.id})
+      new_questions = AssessmentQuestion.where(:assessment_question_bank_id => new_question_bank).all
       new_questions.should be_present
       new_questions.should == questions
     end

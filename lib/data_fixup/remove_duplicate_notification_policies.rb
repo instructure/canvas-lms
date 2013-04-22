@@ -10,9 +10,9 @@ module DataFixup::RemoveDuplicateNotificationPolicies
           HAVING count(*) > 1 LIMIT 50000")
       break if ccs.empty?
       ccs.each do |cc_id|
-        scope = NotificationPolicy.scoped(:conditions => { :communication_channel_id => cc_id, :notification_id => nil, :frequency => 'daily' })
-        keeper = scope.first(:select => "id")
-        scope.delete_all(["id<>?", keeper.id]) if keeper
+        scope = NotificationPolicy.where(:communication_channel_id => cc_id, :notification_id => nil, :frequency => 'daily')
+        keeper = scope.limit(1).pluck(:id).first
+        scope.where("id<>?", keeper).delete_all if keeper
       end
     end
   end

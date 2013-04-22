@@ -59,8 +59,7 @@ module Api
     unless columns.empty?
       find_params = sis_make_params_for_sis_mapping_and_columns(columns, sis_mapping, root_account)
       return result if find_params == :not_found
-      find_params[:select] = :id
-      result.concat collection.all(find_params).map(&:id)
+      result.concat collection.scoped(find_params).pluck(:id)
       result.uniq!
     end
     result
@@ -268,7 +267,13 @@ module Api
 
     rewriter = UserContent::HtmlRewriter.new(context, user)
     rewriter.set_handler('files') do |match|
-      obj = match.obj_id && match.obj_class.find_by_id(match.obj_id)
+      if match.obj_id
+        if match.obj_class == Attachment && context && !context.is_a?(User)
+          obj = context.attachments.find(match.obj_id) rescue nil
+        else
+          obj = match.obj_class.find_by_id(match.obj_id)
+        end
+      end
       next unless obj && rewriter.user_can_view_content?(obj)
       file_download_url(obj.id, :verifier => obj.uuid, :download => '1', :host => host, :protocol => protocol)
     end

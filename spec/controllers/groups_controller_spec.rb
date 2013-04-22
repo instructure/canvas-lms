@@ -20,14 +20,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe GroupsController do
 
-  #Delete these examples and add some real ones
-  it "should use GroupsController" do
-    controller.should be_an_instance_of(GroupsController)
-  end
-
   describe "GET context_index" do
     it "should require authorization" do
-      course_with_student
+      course(:active_all => true)
+      user_session(user) # logged in user without course access
       category1 = @course.group_categories.create(:name => "category 1")
       category2 = @course.group_categories.create(:name => "category 2")
       g1 = @course.groups.create(:name => "some group", :group_category => category1)
@@ -54,25 +50,6 @@ describe GroupsController do
   end
 
   describe "GET index" do
-    it "should assign variables" do
-      get 'index'
-      assigns[:groups].should_not be_nil
-    end
-
-    describe 'empty' do
-      it "should assign an empty list for non-json when empty" do
-        get 'index', :format => 'json'
-        response.should be_success
-        assigns[:groups].should == []
-      end
-
-      it "should return an empty list for json when empty" do
-        get 'index', :format => 'json'
-        response.should be_success
-        response.body.should == "[]"
-      end
-    end
-
     describe 'pagination' do
       before do
         course_with_student_logged_in(:active_all => 1)
@@ -266,6 +243,36 @@ describe GroupsController do
       post 'create', :course_id => @course.id, :group => {:name => "some group", :group_category_id => 11235}
       response.should_not be_success
     end
+    
+    describe "quota" do
+      before do
+        course :active_all => true
+        Setting.set('group_default_quota', 11.megabytes)
+      end
+      
+      context "teacher" do
+        before do
+          course_with_teacher_logged_in :course => @course, :active_all => true
+        end
+        
+        it "should ignore the storage_quota_mb parameter" do
+          post 'create', :course_id => @course.id, :group => {:name => "a group", :storage_quota_mb => 22}
+          assigns[:group].storage_quota_mb.should == 11
+        end
+      end
+      
+      context "account admin" do
+        before do
+          account_admin_user
+          user_session(@admin)
+        end
+        
+        it "should set the storage_quota_mb parameter" do
+          post 'create', :course_id => @course.id, :group => {:name => "a group", :storage_quota_mb => 22}
+          assigns[:group].storage_quota_mb.should == 22
+        end
+      end
+    end
   end
 
   describe "PUT update" do
@@ -302,8 +309,44 @@ describe GroupsController do
       put 'update', :course_id => @course.id, :id => @group.id, :group => {:group_category_id => 11235}
       response.should_not be_success
     end
+    
+    describe "quota" do
+      before do
+        course :active_all => true
+        @group = @course.groups.build(:name => "teh gruop")
+        @group.storage_quota_mb = 11
+        @group.save!
+      end
+      
+      context "teacher" do
+        before do
+          course_with_teacher_logged_in :course => @course, :active_all => true
+        end
+        
+        it "should ignore the quota parameter" do
+          put 'update', :course_id => @course.id, :id => @group.id, :group => {:name => 'the group', :storage_quota_mb => 22}
+          @group.reload
+          @group.name.should == 'the group'
+          @group.storage_quota_mb.should == 11
+        end
+      end
+      
+      context "account admin" do
+        before do
+          account_admin_user
+          user_session(@admin)
+        end
+        
+        it "should update group quota" do
+          put 'update', :course_id => @course.id, :id => @group.id, :group => {:name => 'the group', :storage_quota_mb => 22}
+          @group.reload
+          @group.name.should == 'the group'
+          @group.storage_quota_mb.should == 22
+        end
+      end
+    end
   end
-
+  
   describe "DELETE destroy" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -603,14 +646,14 @@ describe GroupsController do
       get 'accept_invitation', :group_id => @group.id, :uuid => @membership.uuid
       @group.reload
       @group.has_member?(@user).should be_true
-      @group.group_memberships.scoped(:conditions => {:workflow_state => "invited"}).count.should == 0
+      @group.group_memberships.where(:workflow_state => "invited").count.should == 0
     end
 
     it "should reject an invalid invitation uuid" do
       get 'accept_invitation', :group_id => @group.id, :uuid => @membership.uuid + "x"
       @group.reload
       @group.has_member?(@user).should be_false
-      @group.group_memberships.scoped(:conditions => {:workflow_state => "invited"}).count.should == 1
+      @group.group_memberships.where(:workflow_state => "invited").count.should == 1
     end
   end
 end

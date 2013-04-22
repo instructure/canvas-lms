@@ -84,7 +84,7 @@ class ApplicationController < ActionController::Base
         :current_user_roles => @current_user.try(:roles),
         :context_asset_string => @context.try(:asset_string),
         :AUTHENTICITY_TOKEN => form_authenticity_token,
-        :files_domain => HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
+        :files_domain => HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port)
       }
       @js_env[:IS_LARGE_ROSTER] = true if @context.respond_to?(:large_roster?) && @context.large_roster?
     end
@@ -288,7 +288,7 @@ class ApplicationController < ActionController::Base
         render :template => "shared/unauthorized", :layout => "application", :status => :unauthorized
       }
       format.zip { redirect_to(url_for(params)) }
-      format.json { render :json => { 'status' => 'unauthorized', 'message' => 'You are not authorized to perform that action.' }, :status => :unauthorized }
+      format.json { render_json_unauthorized }
     end
     response.headers["Pragma"] = "no-cache"
     response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
@@ -479,9 +479,8 @@ class ApplicationController < ActionController::Base
   def badge_counts_for(context, user, enrollment=nil)
     badge_counts = {}
     ['Submission'].each do |type|
-      participation_count = context.content_participation_counts.find(:first, {
-        :conditions => { :user_id => user.id, :content_type => type },
-      })
+      participation_count = context.content_participation_counts.
+          where(:user_id => user.id, :content_type => type).first
       participation_count ||= ContentParticipationCount.create_or_update({
         :context => context,
         :user => user,
@@ -502,7 +501,7 @@ class ApplicationController < ActionController::Base
     @context = @courses.first
 
     if @just_viewing_one_course
-      @groups = @courses.first.assignment_groups.active.scoped(:include => :active_assignments)
+      @groups = @courses.first.assignment_groups.active.includes(:active_assignments)
       @assignments = @groups.map(&:active_assignments).flatten
     else
       @groups = AssignmentGroup.for_context_codes(@context_codes).active
@@ -740,18 +739,10 @@ class ApplicationController < ActionController::Base
     return true if !page_views_enabled?
 
     if @current_user && @log_page_views != false
-      if @page_view && @page_view.generated_by_hand
-      elsif request.xhr? && params[:page_view_id]
-        if PageView.page_view_method != :db
-          @page_view = PageView.new { |p| p.request_id = params[:page_view_id] }
-        else
-          @page_view = PageView.find_by_request_id(params[:page_view_id])
-          if @page_view
-            response.headers["X-Canvas-Page-View-Id"] = @page_view.id.to_s
-          end
-        end
-
+      if request.xhr? && params[:page_view_id] && !(@page_view && @page_view.generated_by_hand)
+        @page_view = PageView.for_request_id(params[:page_view_id])
         if @page_view
+          response.headers["X-Canvas-Page-View-Id"] = @page_view.id.to_s if @page_view.id
           @page_view.do_update(params.slice(:interaction_seconds, :page_view_contributed))
           @page_view_update = true
         end
@@ -831,7 +822,11 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
+  if Rails.version < "3.0"
+    rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
+  else
+    ActionDispatch::ShowExceptions.rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
+  end
 
   def rescue_action_in_api(exception, error_report)
     status_code = response_code_for_rescue(exception) || 500
@@ -852,7 +847,7 @@ class ApplicationController < ActionController::Base
     when ActiveRecord::RecordNotFound
       data[:message] = 'The specified resource does not exist.'
     when AuthenticationMethods::AccessTokenError
-      response['WWW-Authenticate'] = %{Bearer realm="canvas-lms"}
+      add_www_authenticate_header
       data[:message] = 'Invalid access token.'
     end
 
@@ -900,9 +895,8 @@ class ApplicationController < ActionController::Base
     params[request_forgery_protection_token] = token if token
 
     if    protect_against_forgery? &&
-          request.method != :get &&
-          !api_request? &&
-          verifiable_request_format?
+          !request.get? &&
+          !api_request?
       if session[:_csrf_token].nil? && session.empty? && !request.xhr? && !api_request?
         # the session should have the token stored by now, but doesn't? sounds
         # like the user doesn't have cookies enabled.
@@ -1176,11 +1170,12 @@ class ApplicationController < ActionController::Base
 
   def require_site_admin_with_permission(permission)
     unless Account.site_admin.grants_right?(@current_user, permission)
-      flash[:error] = t "#application.errors.permission_denied", "You don't have permission to access that page"
-      store_location
-      opts = {}
-      opts[:canvas_login] = 1 if params[:canvas_login]
-      redirect_to @current_user ? root_url : login_url(opts)
+      if @current_user
+        flash[:error] = t "#application.errors.permission_denied", "You don't have permission to access that page"
+        redirect_to root_url
+      else
+        redirect_to_login
+      end
       return false
     end
   end
@@ -1374,7 +1369,9 @@ class ApplicationController < ActionController::Base
   def flash_notices
     @notices ||= begin
       notices = []
-      notices << {:type => 'warning', :content => unsupported_browser, :classes => 'no_close'} if !browser_supported?
+      if !browser_supported? && !cookies['unsupported_browser_dismissed']
+        notices << {:type => 'warning', :content => unsupported_browser, :classes => 'unsupported_browser'} 
+      end
       if error = flash.delete(:error)
         notices << {:type => 'error', :content => error}
       end
@@ -1439,13 +1436,15 @@ class ApplicationController < ActionController::Base
     data
   end
 
-  filter_parameter_logging *Canvas::LoggingFilter.filtered_parameters
+  unless CANVAS_RAILS3
+    filter_parameter_logging *LoggingFilter.filtered_parameters
+  end
 
   # filter out sensitive parameters in the query string as well when logging
   # the rails "Completed in XXms" line.
   # this is fixed in Rails 3.x
   def complete_request_uri
-    uri = Canvas::LoggingFilter.filter_uri(request.request_uri)
+    uri = LoggingFilter.filter_uri(request.request_uri)
     "#{request.protocol}#{request.host}#{uri}"
   end
 

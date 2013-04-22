@@ -1,0 +1,33 @@
+<% define_content :link do %>
+  <%= polymorphic_url asset_context.course %>
+<% end %>
+<% define_content :subject do %>
+  <%= t('subject', 'Alert: %{user_name}', :user_name => asset_context.user.name) %>
+<% end %>
+
+<p>
+<%=
+    if asset_context.user_id == user.id
+      t('body_student', {:one => "An alert has been triggered for you because the following condition has been met:", :other => "An alert has been triggered for you because the following conditions have been met:"}, :count => asset.criteria.length)
+    else
+      t('body', {:one => "An alert has been triggered for %{student} because the following condition has been met:", :other => "An alert has been triggered for %{student} because the following conditions have been met:"}, :count => asset.criteria.length, :student => asset_context.user.name)
+    end
+%>
+</p>
+
+<% asset.criteria.each do |criterion| %>
+  <p><em style="color: #ff0000;"><%=
+      case criterion.criterion_type
+        when 'Interaction'
+          t('interaction_description', 'No student/teacher interaction for %{count} days', :count => criterion.threshold)
+        when 'UngradedCount'
+          t('ungraded_count_description', '%{count} or more submissions have not been graded', :count => criterion.threshold)
+        when 'UngradedTimespan'
+          t('ungraded_timespan_description', 'A submission has been left ungraded for %{count} days', :count => criterion.threshold)
+        when 'UserNote'
+          t('usernote_description', 'No faculty journal entries for %{count} days', :count => criterion.threshold)
+      end
+  %></em></p>
+<% end %>
+
+<p><a href="<%= content :link %>"><%= t('view_here', 'You can view it here') %></a></p>

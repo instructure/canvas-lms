@@ -26,7 +26,7 @@ class GradeCalculator
       @course = course :
       @course = Course.find(course)
     @course_id = @course.id
-    @groups = @course.assignment_groups.active.scoped(:include => :assignments)
+    @groups = @course.assignment_groups.active.includes(:assignments)
     @assignments = @groups.map(&:assignments).flatten.select { |a|
       a.graded? && a.active?
     }
@@ -57,12 +57,12 @@ class GradeCalculator
   def save_scores
     raise "Can't save scores when ignore_muted is false" unless @ignore_muted
 
-    Course.update_all({:updated_at => Time.now.utc}, {:id => @course.id})
+    Course.where(:id => @course).update_all(:updated_at => Time.now.utc)
     if !@current_updates.empty? || !@final_updates.empty?
       query = "updated_at=#{Enrollment.sanitize(Time.now.utc)}"
       query += ", computed_current_score=CASE #{@current_updates.join(" ")} ELSE computed_current_score END" unless @current_updates.empty?
       query += ", computed_final_score=CASE #{@final_updates.join(" ")} ELSE computed_final_score END" unless @final_updates.empty?
-      Enrollment.update_all(query, {:user_id => @user_ids, :course_id => @course.id})
+      Enrollment.where(:user_id => @user_ids, :course_id => @course).update_all(query)
     end
   end
 

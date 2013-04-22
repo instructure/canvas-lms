@@ -582,7 +582,7 @@ define([
 
     //some html_templates aren't very pretty/useful, so we override them.
     var html_template_overrides = {
-      binomial: '<span style="font-size: 0.5em"><span class="paren" style="font-size: 2.087912087912088em; ">(</span><span class="array"><span><var>n</var></span><span><var>m</var></span></span><span class="paren" style="font-size: 2.087912087912088em; ">)</span></span>',
+      binomial: '<span style="font-size: 0.48em"><span class="paren" style="font-size: 2.087912087912088em; ">(</span><span class="array"><span><var>n</var></span><span><var>m</var></span></span><span class="paren" style="font-size: 2.087912087912088em; ">)</span></span>',
       frac: '<span style="font-size: 0.55em; vertical-align: middle" class="fraction"><span class="numerator"><var>n</var></span><span class="denominator"><var>m</var></span><span style="width:0"></span></span>',
       sqrt: '<span class="block"><span class="sqrt-prefix">&radic;</span><span class="sqrt-stem">&nbsp;</span></span>',
       nthroot: '<span style="font-size: 0.7em"><sup class="nthroot"><var>n</var></sup><span class="block"><span class="sqrt-prefix">&radic;</span><span class="sqrt-stem">&nbsp;</span></span></span>',
@@ -607,16 +607,15 @@ define([
       });
       panes.push('<div class="mathquill-tab-pane" id="' + tab.name + '_tab"><ul>' + buttons.join('') + '</ul></div>');
     });
-    root.toolbar = $('<div class="mathquill-toolbar"><ul class="mathquill-tab-bar">' + tabs.join('') + '</ul><div class="mathquill-toolbar-panes">' + panes.join('') + '</div></div>').prependTo(jQ);
-
-    jQ.find('.mathquill-tab-bar li a').mouseenter(function() {
-      jQ.find('.mathquill-tab-bar li').removeClass('mathquill-tab-selected');
-      jQ.find('.mathquill-tab-pane').removeClass('mathquill-tab-pane-selected');
+    root.toolbar = $('#mathquill-view .mathquill-toolbar').html('<ul class="mathquill-tab-bar">' + tabs.join('') + '</ul><div class="mathquill-toolbar-panes">' + panes.join('') + '</div>');
+    $('#mathquill-view .mathquill-tab-bar li a').click(function() {
+      $('#mathquill-view .mathquill-tab-bar li').removeClass('mathquill-tab-selected');
+      $('#mathquill-view .mathquill-tab-pane').removeClass('mathquill-tab-pane-selected');
       $(this).parent().addClass('mathquill-tab-selected');
       $(this.href.replace(/.*#/, '#')).addClass('mathquill-tab-pane-selected');
     });
-    jQ.find('.mathquill-tab-bar li:first-child a').mouseenter();
-    jQ.find('a.mathquill-rendered-math').mousedown(function(e) {
+    $('#mathquill-view .mathquill-tab-bar li:first-child a').click();
+    $('#mathquill-view a.mathquill-rendered-math').mousedown(function(e) {
       e.stopPropagation();
     }).click(function(){
       root.cursor.writeLatex(this.title, true);

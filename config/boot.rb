@@ -1,6 +1,16 @@
 # Don't change this file!
 # Configure your app in config/environment.rb and config/environments/*.rb
 
+require File.expand_path("../canvas_rails3", __FILE__)
+
+if CANVAS_RAILS3
+  require 'rubygems'
+
+  # Set up gems listed in the Gemfile.
+  ENV['BUNDLE_GEMFILE'] ||= File.expand_path('../../Gemfile', __FILE__)
+  require 'bundler/setup' if File.exists?(ENV['BUNDLE_GEMFILE'])
+else
+
 RAILS_ROOT = "#{File.dirname(__FILE__)}/.." unless defined?(RAILS_ROOT)
 $LOAD_PATH.unshift RAILS_ROOT.dup
 
@@ -120,3 +130,4 @@ end
 
 # All that for this:
 Rails.boot!
+end

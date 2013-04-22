@@ -31,9 +31,7 @@ describe Enrollment do
 
   it "should have an interesting state machine" do
     enrollment_model
-    list = {}
-    list.stubs(:find_all_by_context_id_and_context_type).returns([])
-    @user.stubs(:dashboard_messages).returns(list)
+    @user.stubs(:dashboard_messages).returns(Message.where("?", false))
     @enrollment.state.should eql(:invited)
     @enrollment.accept
     @enrollment.state.should eql(:active)
@@ -48,13 +46,6 @@ describe Enrollment do
     enrollment_model
     @enrollment.accept
     @enrollment.state.should eql(:active)
-  end
-
-  it "should find students" do
-    @student_list = mock('student list')
-    @student_list.stubs(:map).returns(['student list'])
-    Enrollment.expects(:find).returns(@student_list)
-    Enrollment.students.should eql(['student list'])
   end
 
   it "should be pending if it is invited or creation_pending" do
@@ -1181,7 +1172,7 @@ describe Enrollment do
     it "should uncache user enrollments when rejected" do
       enable_cache do
         course_with_student(:active_course => 1)
-        User.update_all({:updated_at => 1.year.ago}, :id => @user.id)
+        User.where(:id => @user).update_all(:updated_at => 1.year.ago)
         @user.reload
         @user.cached_current_enrollments.should == [@enrollment]
         @enrollment.reject!
@@ -1192,7 +1183,7 @@ describe Enrollment do
     end
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       describe "limit_privileges_to_course_section!" do
         it "should use the right shard to find the enrollments" do
@@ -1493,7 +1484,7 @@ describe Enrollment do
     it "should remove the enrollment from User#cached_current_enrollments" do
       enable_cache do
         course_with_student(:active_all => 1)
-        User.update_all({:updated_at => 1.day.ago}, :id => @user.id)
+        User.where(:id => @user).update_all(:updated_at => 1.day.ago)
         @user.reload
         @user.cached_current_enrollments.should == [ @enrollment ]
         @enrollment.conclude

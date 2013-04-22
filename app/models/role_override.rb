@@ -301,7 +301,7 @@ class RoleOverride < ActiveRecord::Base
         ]
       },
       :manage_grades => {
-        :label => lambda { t('permissions.manage_grades', "Edit grades (includes assessing rubrics)") },
+        :label => lambda { t('permissions.manage_grades', "Edit grades") },
         :available_to => [
           'TaEnrollment',
           'TeacherEnrollment',
@@ -313,6 +313,22 @@ class RoleOverride < ActiveRecord::Base
           'TeacherEnrollment',
           'AccountAdmin'
         ]
+      },
+      :manage_rubrics => {
+          :label => lambda { t('permissions.manage_rubrics', "Create and edit assessing rubrics") },
+          :available_to => [
+              'TaEnrollment',
+              'DesignerEnrollment',
+              'TeacherEnrollment',
+              'AccountAdmin',
+              'AccountMembership'
+          ],
+          :true_for => [
+              'DesignerEnrollment',
+              'TaEnrollment',
+              'TeacherEnrollment',
+              'AccountAdmin'
+          ]
       },
       :comment_on_others_submissions => {
         :label => lambda { t('permissions.comment_on_others_submissions', "View all students' submissions and make comments on them") },
@@ -459,6 +475,16 @@ class RoleOverride < ActiveRecord::Base
           'AccountAdmin'
         ]
       },
+      :undelete_courses => {
+        :label => lambda { t('permissions.undelete_courses', "Undelete courses") },
+        :admin_tool => true,
+        :account_only => true, 
+        :available_to => [
+          'AccountAdmin',
+          'AccountMembership'
+        ], 
+        :true_for => [ 'AccountAdmin' ]
+      },
       :read_question_banks => {
         :label => lambda { t('permissions.read_question_banks', "View and link to question banks") },
         :available_to => [
@@ -589,6 +615,12 @@ class RoleOverride < ActiveRecord::Base
         :account_only => true,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership)
+      },
+      :manage_storage_quotas => {
+          :label => lambda { t('permissions.manage_storage_quotas', "Manage storage quotas") },
+          :account_only => true,
+          :true_for => %w(AccountAdmin),
+          :available_to => %w(AccountAdmin AccountMembership)
       },
       :manage_user_notes => {
         :label => lambda { t('permissions.manage_user_notes', "Manage faculty journal entries") },
@@ -783,7 +815,7 @@ class RoleOverride < ActiveRecord::Base
         account_ids = role_context.account_chain_ids
         case_string = ""
         account_ids.each_with_index{|account_id, idx| case_string += " WHEN context_id='#{account_id}' THEN #{idx} " }
-        overrides = RoleOverride.find(:all, :conditions => {:context_id => account_ids, :enrollment_type => generated_permission[:enrollment_type].to_s}, :order => "CASE #{case_string} ELSE 9999 END DESC")
+        overrides = RoleOverride.where(:context_id => account_ids, :enrollment_type => generated_permission[:enrollment_type].to_s).order("CASE #{case_string} ELSE 9999 END DESC")
         overrides.group_by(&:permission).freeze
       end
     end

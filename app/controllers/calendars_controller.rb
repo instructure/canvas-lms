@@ -92,14 +92,14 @@ class CalendarsController < ApplicationController
         :appointment_group_url => context.respond_to?("appointment_groups") ? api_v1_appointment_groups_url(:id => '{{ id }}') : '',
         :can_create_calendar_events => context.respond_to?("calendar_events") && context.calendar_events.new.grants_right?(@current_user, session, :create),
         :can_create_assignments => context.respond_to?("assignments") && context.assignments.new.grants_right?(@current_user, session, :create),
-        :assignment_groups => context.respond_to?("assignments") ? context.assignment_groups.active.scoped(:select => "id, name").map {|g| { :id => g.id, :name => g.name } } : [],
+        :assignment_groups => context.respond_to?("assignments") ? context.assignment_groups.active.select([:id, :name]).map {|g| { :id => g.id, :name => g.name } } : [],
         :can_create_appointment_groups => can_create_ags
       }
       if context.respond_to?("course_sections")
-        info[:course_sections] = context.course_sections.active.scoped(:select => "id, name").map {|cs| { :id => cs.id, :asset_string => cs.asset_string, :name => cs.name } }
+        info[:course_sections] = context.course_sections.active.select([:id, :name]).map {|cs| { :id => cs.id, :asset_string => cs.asset_string, :name => cs.name } }
       end
       if info[:can_create_appointment_groups] && context.respond_to?("group_categories")
-        info[:group_categories] = context.group_categories.active.scoped(:select => "id, name").map {|gc| { :id => gc.id, :asset_string => gc.asset_string, :name => gc.name } }
+        info[:group_categories] = context.group_categories.active.select([:id, :name]).map {|gc| { :id => gc.id, :asset_string => gc.asset_string, :name => gc.name } }
       end
       info
     end

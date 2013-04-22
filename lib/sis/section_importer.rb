@@ -28,7 +28,7 @@ module SIS
         end
       end
       Course.update_account_associations(importer.course_ids_to_update_associations.to_a) unless importer.course_ids_to_update_associations.empty?
-      CourseSection.update_all({:sis_batch_id => @batch_id}, {:id => importer.sections_to_update_sis_batch_ids}) if @batch_id && !importer.sections_to_update_sis_batch_ids.empty?
+      CourseSection.where(:id => importer.sections_to_update_sis_batch_ids).update_all(:sis_batch_id => @batch_id) if @batch_id && !importer.sections_to_update_sis_batch_ids.empty?
       @logger.debug("Sections took #{Time.now - start} seconds")
       return importer.success_count
     end

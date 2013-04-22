@@ -29,13 +29,11 @@ describe UsersController, :type => :integration do
   it "should check for auth" do
     get("/api/v1/users/self/activity_stream")
     response.status.should == '401 Unauthorized'
-    JSON.parse(response.body).should == {"message"=>"Invalid access token.", "status"=>"unauthorized"}
 
     @course = factory_with_protected_attributes(Course, course_valid_attributes)
     raw_api_call(:get, "/api/v1/courses/#{@course.id}/activity_stream",
                 :controller => "courses", :action => "activity_stream", :format => "json", :course_id => @course.to_param)
     response.status.should == '401 Unauthorized'
-    JSON.parse(response.body).should == {"message"=>"You are not authorized to perform that action.", "status"=>"unauthorized"}
   end
 
   it "should return the activity stream" do
@@ -46,7 +44,7 @@ describe UsersController, :type => :integration do
     @context = @course
     @topic1 = discussion_topic_model
     # introduce a dangling StreamItemInstance
-    StreamItem.delete_all(:id => @user.visible_stream_item_instances.last.stream_item_id)
+    StreamItem.where(:id => @user.visible_stream_item_instances.last.stream_item_id).delete_all
     json = api_call(:get, "/api/v1/users/activity_stream.json",
                     { :controller => "users", :action => "activity_stream", :format => 'json' })
     json.size.should == 1
@@ -335,7 +333,8 @@ describe UsersController, :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course.uuid}.ics" },
         'hide_final_grades' => false,
         'html_url' => course_url(@course, :host => HostUrl.context_host(@course)),
-        'default_view' => 'feed'
+        'default_view' => 'feed',
+        'workflow_state' => 'available'
       },
 
       'user' => {
@@ -423,7 +422,8 @@ describe UsersController, :type => :integration do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course.uuid}.ics" },
         'hide_final_grades' => false,
         'html_url' => course_url(@course, :host => HostUrl.context_host(@course)),
-        'default_view' => 'feed'
+        'default_view' => 'feed',
+        'workflow_state' => 'available'
       },
 
       'user' => {

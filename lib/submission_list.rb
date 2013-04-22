@@ -364,7 +364,7 @@ class SubmissionList
     # A complete list of all graders that have graded submissions for this
     # course as User models 
     def graders
-      @graders ||= User.find(:all, :conditions => ['id IN (?)', all_grader_ids])
+      @graders ||= User.where(:id => all_grader_ids).all
     end
     
     # A hash of graders by their ids, for easy lookup in full_hash_list
@@ -383,7 +383,7 @@ class SubmissionList
     # A complete list of all students that have submissions for this course
     # as User models 
     def students
-      @students ||= User.find(:all, :conditions => ['id IN (?)', all_student_ids])
+      @students ||= User.where(:id => all_student_ids).all
     end
     
     # A hash of students by their ids, for easy lookup in full_hash_list
@@ -401,7 +401,7 @@ class SubmissionList
     
     # A complete list of assignments that have submissions for this course
     def assignments
-      @assignments ||= Assignment.find(:all, :conditions => ['id IN (?)', all_assignment_ids])
+      @assignments ||= Assignment.where(:id => all_assignment_ids).all
     end
     
     # A hash of assignments by their ids, for easy lookup in full_hash_list

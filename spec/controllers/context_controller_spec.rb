@@ -58,7 +58,7 @@ describe ContextController do
     end
 
     describe 'across shards' do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it 'allows merged users from other shards to be referenced' do
         user1 = user_model

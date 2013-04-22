@@ -89,6 +89,7 @@ describe "Canvas Cartridge importing" do
     tool1.settings[:account_navigation] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :extra => 'extra'}
     tool1.settings[:resource_selection] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :selection_width => 100, :selection_height => 50, :extra => 'extra'}
     tool1.settings[:editor_button] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :selection_width => 100, :selection_height => 50, :icon_url => "http://www.example.com", :extra => 'extra'}
+    tool1.settings[:homework_submission] = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :selection_width => 100, :selection_height => 50, :extra => 'extra'}
     tool1.settings[:icon_url] = "http://www.example.com/favicon.ico"
     tool1.save!
     tool2 = @copy_from.context_external_tools.new
@@ -145,7 +146,7 @@ describe "Canvas Cartridge importing" do
         t1.settings[type].keys.map(&:to_s).sort.should == ['labels', 'text', 'url']
       end
     end
-    [:resource_selection, :editor_button].each do |type|
+    [:resource_selection, :editor_button, :homework_submission].each do |type|
       t1.settings[type][:url].should == "http://www.example.com"
       t1.settings[type][:text].should == "hello"
       t1.settings[type][:labels][:en].should == 'hello'
@@ -177,6 +178,7 @@ describe "Canvas Cartridge importing" do
     t2.settings[:account_navigation].should be_nil
     t2.settings[:resource_selection].should be_nil
     t2.settings[:editor_button].should be_nil
+    t2.settings[:homework_submission].should be_nil
     t2.settings.keys.map(&:to_s).sort.should == ['custom_fields', 'vendor_extensions']
     t2.settings[:vendor_extensions].should == [{'platform'=>"my.lms.com", 'custom_fields'=>{"key"=>"value"}}]
     t2.settings[:vendor_extensions][0][:platform].should == 'my.lms.com'
@@ -442,7 +444,7 @@ describe "Canvas Cartridge importing" do
     mod3.add_item({ :title => 'Example 1', :type => 'external_url', :url => 'http://a.example.com/' })
     mod3.add_item({ :title => 'Example 2', :type => 'external_url', :url => 'http://b.example.com/' })
     ct = mod3.add_item({ :title => 'Example 3', :type => 'external_url', :url => 'http://b.example.com/with%20space' })
-    ContentTag.update_all({:url => "http://b.example.com/with space"}, "id=#{ct.id}")
+    ContentTag.where(:id => ct).update_all(:url => "http://b.example.com/with space")
     
     # attachments are migrated with just their filename as display_name, 
     # if a content tag has a different title the display_name should not update
@@ -503,7 +505,7 @@ describe "Canvas Cartridge importing" do
     mod3_2.content_tags.length.should == 2
     mod3_2.content_tags[0].url.should == "http://a.example.com/"
     mod3_2.content_tags[1].url.should == "http://b.example.com/"
-    @migration.migration_settings[:warnings].first.first.should == %{Couldn't import the module item "Example 3" in the module "url module"}
+    @migration.old_warnings_format.first.first.should == %{Couldn't import the module item "Example 3" in the module "url module"}
     
     mod4_2 = @copy_to.context_modules.find_by_migration_id(CC::CCHelper.create_key(mod4))
     mod4_2.content_tags.first.title.should == att_tag.title

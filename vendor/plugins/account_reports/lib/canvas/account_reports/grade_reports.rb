@@ -58,9 +58,8 @@ module Canvas::AccountReports
       # in order to exclude the pesky :user that is included by default in
       # the Account#pseudonyms association, and one after the .active, to
       # actually perform the query.
-      students = root_account.pseudonyms.
-        scoped(:include => { :exclude => :user }).scoped(
-        :select => %{
+      students = root_account.pseudonyms.except(:includes).
+        select(%{
           pseudonyms.id,
           u.sortable_name        AS "student name",
           pseudonyms.user_id     AS "student id",
@@ -77,8 +76,8 @@ module Canvas::AccountReports
           c.id                   AS "course id",
           c.sis_source_id        AS "course sis id",
           lo.context_id          AS "outcome context id",
-          lo.context_type        AS "outcome context type"},
-        :joins => Pseudonym.send(:sanitize_sql, ["
+          lo.context_type        AS "outcome context type"}).
+        joins(Pseudonym.send(:sanitize_sql, ["
           INNER JOIN users u ON pseudonyms.user_id = u.id
           INNER JOIN (
             SELECT user_id, course_id
@@ -102,16 +101,14 @@ module Canvas::AccountReports
           LEFT JOIN learning_outcome_results r ON (r.user_id=pseudonyms.user_id
                                                    AND r.content_tag_id = ct.id)
           LEFT JOIN submissions sub ON sub.assignment_id = a.id
-            AND sub.user_id = pseudonyms.user_id", parameters]),
-        :conditions => "
+            AND sub.user_id = pseudonyms.user_id", parameters])).
+        where("
           ct.tag_type = 'learning_outcome'
-          AND ct.workflow_state != 'deleted'"
+          AND ct.workflow_state <> 'deleted'"
       )
 
       unless @include_deleted
-        students = students.scoped(
-          :conditions => "pseudonyms.workflow_state != 'deleted'
-                          AND c.workflow_state = 'available'")
+        students = students.where("pseudonyms.workflow_state<>'deleted' AND c.workflow_state='available'")
       end
 
       students = add_course_sub_account_scope(students, 'c')
@@ -168,27 +165,26 @@ module Canvas::AccountReports
     # - student final score
 
     def grade_export()
-      students = root_account.pseudonyms.scoped(
-        :include => { :exclude => :user }).scoped(
-        :select => "pseudonyms.id, u.name AS user_name, e.user_id, e.course_id,
-                    pseudonyms.sis_user_id, c.name AS course_name,
-                    c.sis_source_id AS course_sis_id, s.name AS section_name,
-                    e.course_section_id, s.sis_source_id AS section_sis_id,
-                    t.name AS term_name, t.id AS term_id,
-                    t.sis_source_id AS term_sis_id, e.computed_current_score,
-                    e.computed_final_score",
-        :order => 't.id, c.id, e.id',
-        :joins => "INNER JOIN users u ON pseudonyms.user_id = u.id
-                   INNER JOIN enrollments e ON pseudonyms.user_id = e.user_id
-                     AND e.type = 'StudentEnrollment'
-                   INNER JOIN courses c ON c.id = e.course_id
-                   INNER JOIN enrollment_terms t ON c.enrollment_term_id = t.id
-                   INNER JOIN course_sections s ON e.course_section_id = s.id")
+      students = root_account.pseudonyms.except(:includes).
+        select("pseudonyms.id, u.name AS user_name, e.user_id, e.course_id,
+                pseudonyms.sis_user_id, c.name AS course_name,
+                c.sis_source_id AS course_sis_id, s.name AS section_name,
+                e.course_section_id, s.sis_source_id AS section_sis_id,
+                t.name AS term_name, t.id AS term_id,
+                t.sis_source_id AS term_sis_id, e.computed_current_score,
+                e.computed_final_score").
+        order("t.id, c.id, e.id").
+        joins("INNER JOIN users u ON pseudonyms.user_id = u.id
+               INNER JOIN enrollments e ON pseudonyms.user_id = e.user_id
+                 AND e.type = 'StudentEnrollment'
+               INNER JOIN courses c ON c.id = e.course_id
+               INNER JOIN enrollment_terms t ON c.enrollment_term_id = t.id
+               INNER JOIN course_sections s ON e.course_section_id = s.id")
 
       unless @include_deleted
-        students = students.scoped(
-          :conditions => "pseudonyms.workflow_state != 'deleted'
-                          AND c.workflow_state = 'available'
+        students = students.where(
+                         "pseudonyms.workflow_state<>'deleted'
+                          AND c.workflow_state='available'
                           AND e.workflow_state IN ('active', 'completed')")
       end
 

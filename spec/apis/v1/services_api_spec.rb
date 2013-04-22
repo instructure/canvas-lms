@@ -33,7 +33,6 @@ describe "Services API", :type => :integration do
   it "should check for auth" do
     get("/api/v1/services/kaltura")
     response.status.should == '401 Unauthorized'
-    JSON.parse(response.body).should == { 'status' => 'unauthorized', 'message' => 'Invalid access token.' }
   end
   
   it "should return the config information for kaltura" do

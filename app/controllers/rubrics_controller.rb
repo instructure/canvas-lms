@@ -61,7 +61,7 @@ class RubricsController < ApplicationController
     params[:rubric_association].delete(:invitations)
     @association_object = RubricAssociation.get_association_object(params[:rubric_association])
     params[:rubric][:user] = @current_user if params[:rubric]
-    if (!@association_object || authorized_action(@association_object, @current_user, :read)) && authorized_action(@context, @current_user, :manage_grades)
+    if (!@association_object || authorized_action(@association_object, @current_user, :read)) && authorized_action(@context, @current_user, :manage_rubrics)
       @association = @context.rubric_associations.find_by_id(params[:rubric_association_id]) if params[:rubric_association_id].present?
       @association_object ||= @association.association if @association
       params[:rubric_association][:association] = @association_object

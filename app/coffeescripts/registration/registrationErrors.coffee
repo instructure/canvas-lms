@@ -5,9 +5,9 @@ define [
 ], (User, Pseudonym, flatten) ->
 
   # normalize errors we get from POST /user (user creation API)
-  registrationErrors = (errors) ->
+  registrationErrors = (errors, passwordPolicy = ENV.PASSWORD_POLICY) ->
     flatten
       user: User::normalizeErrors(errors.user)
-      pseudonym: Pseudonym::normalizeErrors(errors.pseudonym)
-      observee: Pseudonym::normalizeErrors(errors.observee)
+      pseudonym: Pseudonym::normalizeErrors(errors.pseudonym, passwordPolicy)
+      observee: Pseudonym::normalizeErrors(errors.observee, passwordPolicy)
     , arrays: false

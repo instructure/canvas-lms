@@ -1,8 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
-shared_examples_for "context module tests" do
-  it_should_behave_like "in-process server selenium tests"
-
   def io
     require 'action_controller'
     require 'action_controller/test_process.rb'
@@ -72,7 +69,9 @@ shared_examples_for "context module tests" do
   def add_new_external_item(module_name, url_text, page_name_text)
     add_module(module_name + 'Module')
     f('.admin-links .al-trigger').click
+    wait_for_ajaximations
     f('.add_module_item_link').click
+    wait_for_ajaximations
     select_module_item('#add_module_item_select', module_name)
     wait_for_ajaximations
     url_input = fj('input[name="url"]:visible')
@@ -100,4 +99,3 @@ shared_examples_for "context module tests" do
     submit_form(edit_form)
     wait_for_ajaximations
   end
-end

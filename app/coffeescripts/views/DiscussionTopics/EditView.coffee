@@ -156,6 +156,7 @@ htmlEscape, DiscussionTopic, Assignment, $, preventDefault, MissingDateDialog) -
       data.lock_at = defaultDate?.get('lock_at') or null
       data.unlock_at = defaultDate?.get('unlock_at') or null
       data.due_at = defaultDate?.get('due_at') or null
+      data.assignment_overrides = @dueDateOverrideView.getOverrides()
 
       assignment = @model.get('assignment')
       assignment or= new Assignment
@@ -197,6 +198,16 @@ htmlEscape, DiscussionTopic, Assignment, $, preventDefault, MissingDateDialog) -
           errors = @assignmentGroupSelector.validateBeforeSave(data, errors)
         unless ENV?.IS_LARGE_ROSTER
           errors = @groupCategorySelector.validateBeforeSave(data, errors)
+        data2 =
+          assignment_overrides: @dueDateOverrideView.getAllDates(data.assignment.toJSON())
+        errors = @dueDateOverrideView.validateBeforeSave(data2,errors)
       else
         @model.set 'assignment', {set_assignment: false}
       errors
+
+    showErrors: (errors) ->
+      # override view handles displaying override errors, remove them
+      # before calling super
+      # see getFormValues in DueDateView.coffee
+      delete errors.assignmentOverrides
+      super(errors)

@@ -109,7 +109,7 @@ describe "collaborations" do
           end
 
           f('.collaboration .title').text.should == new_title
-          Collaboration.last(:order => 'id DESC').title.should == new_title
+          Collaboration.order("id DESC").last.title.should == new_title
         end
 
         it 'should be delete-able' do
@@ -126,7 +126,7 @@ describe "collaborations" do
           wait_for_ajaximations
 
           f('#no_collaborations_message').should be_displayed
-          Collaboration.last(:order => 'id DESC').should be_deleted
+          Collaboration.order("id DESC").last.should be_deleted
         end
 
         it 'should not display the new collaboration form if other collaborations exist' do

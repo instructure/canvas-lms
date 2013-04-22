@@ -30,10 +30,6 @@ define [
 
     els: '.discussion-entries': 'list'
 
-    initialize: ->
-      super
-      @attach()
-
     attach: ->
       @collection.on 'reset', @addAll
       @collection.on 'add', @add

@@ -1,8 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
-shared_examples_for "scheduler selenium tests" do
-  it_should_behave_like "in-process server selenium tests"
-
   def fill_out_appointment_group_form(new_appointment_text, opts = {})
     f('.create_link').click
     edit_form = f('#edit_appointment_form')
@@ -95,6 +92,6 @@ shared_examples_for "scheduler selenium tests" do
   def open_edit_dialog
     driver.action.move_to(f('.appointment-group-item')).perform
     click_al_option('.edit_link')
+    wait_for_ajaximations
   end
-end
 

@@ -56,7 +56,7 @@ module SendToStream
       stream_recipients = Array(self.instance_eval(&block)) if block
       generate_stream_items(stream_recipients) if stream_recipients
     rescue => e
-      if ENV['RAILS_ENV'] == 'production'
+      if Rails.env.production?
         ErrorReport.log_exception(:default, e, {
           :message => "SendToStream failure",
         })

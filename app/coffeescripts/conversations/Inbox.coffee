@@ -546,34 +546,15 @@ define [
         canToggle: (data) ->
           data.type is 'user' or data.permissions?.send_messages_all
         selector:
-          limiter: (options) =>
-            if options.level > 0 then -1 else 5
           showToggles: true
-          preparer: (postData, data, parent) =>
-            context = postData.context
-            if not postData.search and context and data.length > 1
-              parentData = parent.data('user_data')
-              if context.match(/^(course|section)_\d+$/)
-                # i.e. we are listing synthetic contexts under a course or section
-                data.unshift
-                  id: "#{context}_all"
-                  name: everyoneText
-                  user_count: parentData.user_count
-                  type: 'context'
-                  avatar_url: parentData.avatar_url
-                  permissions: parentData.permissions
-                  selectAll: parentData.permissions.send_messages_all
-              else if context.match(/^((course|section)_\d+_.*|group_\d+)$/) and not context.match(/^course_\d+_(groups|sections)$/) and parentData.permissions.send_messages_all
-                # i.e. we are listing all users in a group or synthetic context
-                data.unshift
-                  id: context
-                  name: selectAllText
-                  user_count: parentData.user_count
-                  type: 'context'
-                  avatar_url: parentData.avatar_url
-                  permissions: parentData.permissions
-                  selectAll: true
-                  noExpand: true # just a magic select-all checkbox, you can't drill into it
+          includeEveryoneOption: (postData, parent) =>
+            # i.e. we are listing synthetic contexts under a course or section
+            if postData.context?.match(/^(course|section)_\d+$/)
+              everyoneText
+          includeSelectAllOption: (postData, parent) =>
+            # i.e. we are listing all users in a group or synthetic context
+            if postData.context?.match(/^((course|section)_\d+_.*|group_\d+)$/) and not postData.context?.match(/^(course|section)_\d+$/) and not postData.context?.match(/^course_\d+_(groups|sections)$/) and parent.data('user_data').permissions.send_messages_all
+              selectAllText
           baseData:
             permissions: ["send_messages_all"]
 
@@ -587,29 +568,14 @@ define [
           $token.prevAll().remove() # only one token at a time
         tokenWrapBuffer: 80
         selector:
-          limiter: (options) =>
-            if options.level > 0 then -1 else 5
-          preparer: (postData, data, parent) =>
-            context = postData.context
-            if not postData.search and context and data.length > 0 and context.match(/^(course|group)_\d+$/)
-              if data.length > 1 and context.match(/^course_/)
-                data.unshift
-                  id: "#{context}_all"
-                  name: everyoneText
-                  user_count: parent.data('user_data').user_count
-                  type: 'context'
-                  avatar_url: parent.data('user_data').avatar_url
-              filterText = if context.match(/^course/)
-                I18n.t('filter_by_course', 'Filter by this course')
-              else
-                I18n.t('filter_by_group', 'Filter by this group')
-              data.unshift
-                id: context
-                name: parent.data('text')
-                type: 'context'
-                avatar_url: parent.data('user_data').avatar_url
-                subText: filterText
-                noExpand: true
+          includeEveryoneOption: (postData, parent) =>
+            if postData.context?.match(/^course_\d+$/)
+              everyoneText
+          includeFilterOption: (postData) =>
+            if postData.context?.match(/^course_\d+$/)
+              I18n.t('filter_by_course', 'Filter by this course')
+            else if postData.context?.match(/^group_\d+$/)
+              I18n.t('filter_by_group', 'Filter by this group')
           baseData:
             synthetic_contexts: 1
             types: ['course', 'user', 'group']

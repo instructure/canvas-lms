@@ -17,11 +17,10 @@
 #
 
 require 'action_controller'
-require 'action_controller/test_process.rb'
+# XXX: Rails3 doesn't have ActionController::TestUploadedFile, time to fix this
+require 'action_controller/test_process.rb' if Rails.version < "3.0"
 
-module Canvas::Migration
-module Worker
-  
+module Canvas::Migration::Worker
   def self.get_converter(settings)
     Canvas::Migration::PackageIdentifier.new(settings).get_converter
   end
@@ -83,5 +82,4 @@ module Worker
       Rails.logger.warn "Couldn't clear export data for content_migration #{content_migration.id}"
     end
   end
-end
 end

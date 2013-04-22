@@ -17,13 +17,18 @@
 #
 
 ENV["RAILS_ENV"] = 'test'
-require File.dirname(__FILE__) + "/../config/environment" unless defined?(RAILS_ROOT)
-require 'spec'
-# require 'spec/autorun'
-require 'spec/rails'
+
+require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
+if CANVAS_RAILS3
+  require 'rspec/rails'
+else
+  require 'spec'
+  # require 'spec/autorun'
+  require 'spec/rails'
+end
 require 'webrat'
 require 'mocha/api'
-require File.dirname(__FILE__) + '/mocha_extensions'
+require File.expand_path(File.dirname(__FILE__) + '/mocha_extensions')
 
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
 
@@ -31,8 +36,10 @@ Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |fil
 # globally on every object. :context is already heavily used in our application,
 # so we remove rspec's definition. This does not prevent 'context' from being
 # used within a 'describe' block.
-module Spec::DSL::Main
-  remove_method :context if respond_to? :context
+if defined?(Spec::DSL::Main)
+  module Spec::DSL::Main
+    remove_method :context if respond_to? :context
+  end
 end
 
 def truncate_table(model)
@@ -795,18 +802,87 @@ Spec::Runner.configure do |config|
     JSON.parse(json_string.sub(%r{^while\(1\);}, ''))
   end
 
-  def s3_storage!
+  # inspired by http://blog.jayfields.com/2007/08/ruby-calling-methods-of-specific.html
+  module AttachmentStorageSwitcher
+    BACKENDS = %w{FileSystem S3}.map { |backend| Technoweenie::AttachmentFu::Backends.const_get(:"#{backend}Backend") }.freeze
+
+    class As #:nodoc:
+      private *instance_methods.select { |m| m !~ /(^__|^\W|^binding$)/ }
+
+      def initialize(subject, ancestor)
+        @subject = subject
+        @ancestor = ancestor
+      end
+
+      def method_missing(sym, *args, &blk)
+        @ancestor.instance_method(sym).bind(@subject).call(*args,&blk)
+      end
+    end
+
+    def self.included(base)
+      base.cattr_accessor :current_backend
+      base.current_backend = (base.ancestors & BACKENDS).first
+
+      # make sure we have all the backends
+      BACKENDS.each do |backend|
+        base.send(:include, backend) unless base.ancestors.include?(backend)
+      end
+      # remove the duplicate callbacks added by multiple backends
+      base.before_update.uniq!
+
+      BACKENDS.map(&:instance_methods).flatten.uniq.each do |method|
+        # overridden by Attachment anyway; don't re-overwrite it
+        next if Attachment.instance_method(method).owner == Attachment
+        if method.to_s[-1..-1] == '='
+          base.class_eval <<-CODE
+          def #{method}(arg)
+            self.as(self.class.current_backend).#{method} arg
+          end
+          CODE
+        else
+          base.class_eval <<-CODE
+          def #{method}(*args, &block)
+            self.as(self.class.current_backend).#{method}(*args, &block)
+          end
+          CODE
+        end
+      end
+    end
+
+    def as(ancestor)
+      @__as ||= {}
+      unless r = @__as[ancestor]
+        r = (@__as[ancestor] = As.new(self, ancestor))
+      end
+      r
+    end
+  end
+
+  def s3_storage!(opts = {:stubs => true})
+    Attachment.send(:include, AttachmentStorageSwitcher) unless Attachment.ancestors.include?(AttachmentStorageSwitcher)
+    Attachment.stubs(:current_backend).returns(Technoweenie::AttachmentFu::Backends::S3Backend)
+
     Attachment.stubs(:s3_storage?).returns(true)
     Attachment.stubs(:local_storage?).returns(false)
-    conn = mock('AWS::S3::Connection')
-    AWS::S3::Base.stubs(:connection).returns(conn)
-    conn.stubs(:access_key_id).returns('stub_id')
-    conn.stubs(:secret_access_key).returns('stub_key')
+    if opts[:stubs]
+      conn = mock('AWS::S3::Client')
+      AWS::S3::S3Object.any_instance.stubs(:client).returns(conn)
+      AWS::Core::Configuration.any_instance.stubs(:access_key_id).returns('stub_id')
+      AWS::Core::Configuration.any_instance.stubs(:secret_access_key).returns('stub_key')
+      AWS::S3::Bucket.any_instance.stubs(:name).returns('no-bucket')
+    else
+      if Attachment.s3_config.blank? || Attachment.s3_config[:access_key_id] == 'access_key'
+        pending "Please put valid S3 credentials in config/amazon_s3.yml"
+      end
+    end
     Attachment.s3_storage?.should eql(true)
     Attachment.local_storage?.should eql(false)
   end
 
   def local_storage!
+    Attachment.send(:include, AttachmentStorageSwitcher) unless Attachment.ancestors.include?(AttachmentStorageSwitcher)
+    Attachment.stubs(:current_backend).returns(Technoweenie::AttachmentFu::Backends::FileSystemBackend)
+
     Attachment.stubs(:s3_storage?).returns(false)
     Attachment.stubs(:local_storage?).returns(true)
     Attachment.local_storage?.should eql(true)
@@ -826,19 +902,6 @@ Spec::Runner.configure do |config|
       Delayed::MAX_PRIORITY)
       run_job(job)
     end
-  end
-
-  def enable_jobs
-    job_thread = Thread.new do
-      Thread.current[:done] = false
-      while !Thread.current[:done]
-        run_jobs
-        sleep 1
-      end
-    end
-    yield
-    job_thread[:done] = true
-    job_thread.join
   end
 
   def track_jobs
@@ -941,6 +1004,29 @@ Spec::Runner.configure do |config|
     def content_type
       self['content-type']
     end
+  end
+
+  def intify_timestamps(object)
+    case object
+    when Time
+      object.to_i
+    when Hash
+      object.inject({}) { |memo, (k, v)| memo[intify_timestamps(k)] = intify_timestamps(v); memo }
+    when Array
+      object.map { |v| intify_timestamps(v) }
+    else
+      object
+    end
+  end
+
+  def web_conference_plugin_mock(id, settings)
+    mock = mock("WebConferencePlugin")
+    mock.stubs(:id).returns(id)
+    mock.stubs(:settings).returns(settings)
+    mock.stubs(:valid_settings?).returns(true)
+    mock.stubs(:enabled?).returns(true)
+    mock.stubs(:base).returns(nil)
+    mock
   end
 end
 

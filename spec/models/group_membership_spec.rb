@@ -21,11 +21,31 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe GroupMembership do
   
   it "should ensure a mutually exclusive relationship" do
-    group_model
+    category = Account.default.group_categories.create!(:name => "blah")
+    group1 = category.groups.create!(:context => Account.default)
+    group2 = category.groups.create!(:context => Account.default)
     user_model
-    @gm = group_membership_model(:save => false)
-    @gm.expects(:ensure_mutually_exclusive_membership)
-    @gm.save!
+
+    # start with one active membership
+    gm1 = group1.group_memberships.create!(:user => @user, :workflow_state => "accepted")
+    gm1.reload.should be_accepted
+
+    # adding another should mark the first as deleted
+    gm2 = group2.group_memberships.create!(:user => @user, :workflow_state => "accepted")
+    gm2.reload.should be_accepted
+    gm1.reload.should be_deleted
+
+    # restoring the first should mark the second as deleted
+    gm1.workflow_state = "accepted"
+    gm1.save!
+    gm1.reload.should be_accepted
+    gm2.reload.should be_deleted
+
+    # should work even if we start with bad data (two accepted memberships)
+    GroupMembership.where(:id => gm2).update_all(:workflow_state => "accepted")
+    gm1.save!
+    gm1.reload.should be_accepted
+    gm2.reload.should be_deleted
   end
 
   context "section homogeneity" do
@@ -209,23 +229,23 @@ describe GroupMembership do
 
     it "should auto-follow the group when joining the group" do
       @group.add_user(@user, 'accepted')
-      @user.reload.user_follows.find(:first, :conditions => { :followed_item_id => @group.id, :followed_item_type => 'Group' }).should_not be_nil
+      @user.reload.user_follows.where(:followed_item_id => @group, :followed_item_type => 'Group').first.should_not be_nil
     end
 
     it "should auto-follow the group when a request is accepted" do
       @membership = @group.add_user(@user, 'requested')
-      @user.reload.user_follows.find(:first, :conditions => { :followed_item_id => @group.id, :followed_item_type => 'Group' }).should be_nil
+      @user.reload.user_follows.where(:followed_item_id => @group, :followed_item_type => 'Group').first.should be_nil
       @membership.workflow_state = 'accepted'
       @membership.save!
-      @user.reload.user_follows.find(:first, :conditions => { :followed_item_id => @group.id, :followed_item_type => 'Group' }).should_not be_nil
+      @user.reload.user_follows.where(:followed_item_id => @group, :followed_item_type => 'Group').first.should_not be_nil
     end
 
     it "should auto-follow the group when an invitation is accepted" do
       @membership = @group.add_user(@user, 'invited')
-      @user.reload.user_follows.find(:first, :conditions => { :followed_item_id => @group.id, :followed_item_type => 'Group' }).should be_nil
+      @user.reload.user_follows.where(:followed_item_id => @group, :followed_item_type => 'Group').first.should be_nil
       @membership.workflow_state = 'accepted'
       @membership.save!
-      @user.reload.user_follows.find(:first, :conditions => { :followed_item_id => @group.id, :followed_item_type => 'Group' }).should_not be_nil
+      @user.reload.user_follows.where(:followed_item_id => @group, :followed_item_type => 'Group').first.should_not be_nil
     end
   end
 

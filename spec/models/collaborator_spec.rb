@@ -19,11 +19,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Collaborator do
-  before(:all) do
-    @notification = Notification.create!(:name => 'Collaboration Invitation')
-  end
-
-  before(:each) do
+  before do
+    @notification       = Notification.create!(:name => 'Collaboration Invitation')
     @author             = user_with_pseudonym(:active_all => true)
     @collaboration      = Collaboration.new(:title => 'Test collaboration')
     @collaboration.type = 'EtherpadCollaboration'

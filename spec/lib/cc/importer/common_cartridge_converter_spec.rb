@@ -11,6 +11,11 @@ describe "Standard Common Cartridge importing" do
     @course_data = @converter.course.with_indifferent_access
     @course_data['all_files_export'] ||= {}
     @course_data['all_files_export']['file_path'] = @course_data['all_files_zip']
+
+    @course = course
+    @migration = ContentMigration.create(:context => @course)
+    @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
+    @course.import_from_migration(@course_data, nil, @migration)
   end
   
   after(:all) do
@@ -18,13 +23,7 @@ describe "Standard Common Cartridge importing" do
     if File.exists?(@export_folder)
       FileUtils::rm_rf(@export_folder)
     end
-  end
-
-  before(:each) do
-    @course = course
-    @migration = ContentMigration.create(:context => @course)
-    @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
-    @course.import_from_migration(@course_data, nil, @migration)
+    truncate_all_tables
   end
 
   it "should import webcontent" do
@@ -237,7 +236,7 @@ describe "Standard Common Cartridge importing" do
   end
 
   context "selective import" do
-    before(:each) do
+    it "should selectively import files" do
       @course = course
       @migration = ContentMigration.create(:context => @course)
       @migration.migration_settings[:migration_ids_to_import] = {
@@ -271,9 +270,7 @@ describe "Standard Common Cartridge importing" do
                         "all_assignment_groups" => "0"}}.with_indifferent_access
 
       @course.import_from_migration(@course_data, nil, @migration)
-    end
 
-    it "should selectively import files" do
       @course.attachments.count.should == 5
       @course.context_external_tools.count.should == 1
       @course.context_external_tools.first.migration_id.should == "I_00011_R"
@@ -282,6 +279,17 @@ describe "Standard Common Cartridge importing" do
       @course.wiki.wiki_pages.count.should == 0
       @course.discussion_topics.count.should == 1
       @course.discussion_topics.first.migration_id.should == 'I_00006_R'
+    end
+
+    it "should not import all attachments if :files does not exist" do
+      @course = course
+      @migration = ContentMigration.create(:context => @course)
+      @migration.migration_settings[:migration_ids_to_import] = {
+          :copy => {"everything" => "0"}}.with_indifferent_access
+
+      @course.import_from_migration(@course_data, nil, @migration)
+
+      @course.attachments.count.should == 0
     end
   end
 

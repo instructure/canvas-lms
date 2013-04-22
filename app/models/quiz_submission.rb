@@ -104,13 +104,10 @@ class QuizSubmission < ActiveRecord::Base
     return questions, [] if bank_ids.empty?
 
     # equivalent to AssessmentQuestionBank#learning_outcome_alignments, but for multiple banks at once
-    return questions, ContentTag.learning_outcome_alignments.active.scoped(
-      :conditions => {
-        :content_type => 'AssessmentQuestionBank',
-        :content_id => bank_ids
-      },
-      :include => [:learning_outcome, :context]
-    ).all
+    return questions, ContentTag.learning_outcome_alignments.active.where(
+          :content_type => 'AssessmentQuestionBank',
+          :content_id => bank_ids).
+        includes(:learning_outcome, :context).all
   end
 
   def track_outcomes(attempt)
@@ -438,7 +435,11 @@ class QuizSubmission < ActiveRecord::Base
   end
 
   def latest_submitted_version
-    self.submitted_versions.last
+    if completed?
+      self
+    else
+      submitted_versions.last
+    end
   end
   
   def attempts_left
@@ -447,7 +448,7 @@ class QuizSubmission < ActiveRecord::Base
   end
   
   def mark_completed
-    QuizSubmission.update_all({ :workflow_state => 'complete' }, { :id => self.id })
+    QuizSubmission.where(:id => self).update_all(:workflow_state => 'complete')
   end
   
   def grade_submission(opts={})
@@ -625,15 +626,9 @@ class QuizSubmission < ActiveRecord::Base
     return result
   end
 
-  named_scope :before, lambda{|date|
-    {:conditions => ['quiz_submissions.created_at < ?', date]}
+  scope :before, lambda { |date| where("quiz_submissions.created_at<?", date) }
+  scope :updated_after, lambda { |date|
+    date ? where("quiz_submissions.updated_at>?", date) : scoped
   }
-  named_scope :updated_after, lambda{|date|
-    if date
-      {:conditions => ['quiz_submissions.updated_at > ?', date]}
-    end
-  }
-  named_scope :for_user_ids, lambda{|user_ids|
-    {:conditions => {:user_id => user_ids} }
-  }
+  scope :for_user_ids, lambda { |user_ids| where(:user_id => user_ids) }
 end

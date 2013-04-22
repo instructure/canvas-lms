@@ -46,56 +46,45 @@ class Submission < ActiveRecord::Base
   include CustomValidations
   validates_as_url :url
 
-  named_scope :with_comments, :include => [:submission_comments ]
-  named_scope :after, lambda{|date|
-    {:conditions => ['submissions.created_at > ?', date] }
-  }
-  named_scope :before, lambda{|date|
-    {:conditions => ['submissions.created_at < ?', date]}
-  }
-  named_scope :submitted_before, lambda{|date|
-    {:conditions => ['submitted_at < ?', date] }
-  }
-  named_scope :submitted_after, lambda{|date|
-    {:conditions => ['submitted_at > ?', date] }
-  }
+  scope :with_comments, includes(:submission_comments)
+  scope :after, lambda { |date| where("submissions.created_at>?", date) }
+  scope :before, lambda { |date| where("submissions.created_at<?", date) }
+  scope :submitted_before, lambda { |date| where("submitted_at<?", date) }
+  scope :submitted_after, lambda { |date| where("submitted_at>?", date) }
 
-  named_scope :for_context_codes, lambda { |context_codes|
-    { :conditions => {:context_code => context_codes} }
-  }
+  scope :for_context_codes, lambda { |context_codes| where(:context_code => context_codes) }
 
   # This should only be used in the course drop down to show assignments recently graded.
-  named_scope :recently_graded_assignments, lambda{|user_id, date, limit|
-    {
-            :select => 'assignments.id, assignments.title, assignments.points_possible, assignments.due_at,
-                        submissions.grade, submissions.score, submissions.graded_at, assignments.grading_type,
-                        assignments.context_id, assignments.context_type, courses.name AS context_name',
-            :joins => 'JOIN assignments ON assignments.id = submissions.assignment_id
-                       JOIN courses ON courses.id = assignments.context_id',
-            :conditions => ["graded_at > ? AND user_id = ? AND muted = ?", date.to_s(:db), user_id, false],
-            :order => 'graded_at DESC',
-            :limit => limit
-            }
+  scope :recently_graded_assignments, lambda { |user_id, date, limit|
+    select("assignments.id, assignments.title, assignments.points_possible, assignments.due_at,
+            submissions.grade, submissions.score, submissions.graded_at, assignments.grading_type,
+            assignments.context_id, assignments.context_type, courses.name AS context_name").
+    joins("JOIN assignments ON assignments.id=submissions.assignment_id
+           JOIN courses ON courses.id=assignments.context_id").
+    where("graded_at>? AND user_id=? AND muted=?", date, user_id, false).
+    order("graded_at DESC").
+    limit(limit)
   }
 
-  named_scope :needs_grading, :conditions => <<-SQL
-    submissions.submission_type IS NOT NULL 
-    AND (submissions.workflow_state = 'pending_review'
-      OR (submissions.workflow_state = 'submitted' 
-        AND (submissions.score IS NULL OR NOT submissions.grade_matches_current_submission)
-      )
-    )
-  SQL
-
-  named_scope :for_course, lambda{ |course|
-    { :conditions => ["submissions.assignment_id IN (SELECT assignments.id FROM assignments WHERE assignments.context_id = ? AND assignments.context_type = 'Course')", course.id] }
+  scope :for_course, lambda { |course|
+    where("submissions.assignment_id IN (SELECT assignments.id FROM assignments WHERE assignments.context_id = ? AND assignments.context_type = 'Course')", course)
   }
 
   def self.needs_grading_conditions(prefix = nil)
-    conditions = needs_grading.proxy_options[:conditions].gsub(/\s+/, ' ')
+    conditions = <<-SQL
+      submissions.submission_type IS NOT NULL 
+      AND (submissions.workflow_state = 'pending_review'
+        OR (submissions.workflow_state = 'submitted' 
+          AND (submissions.score IS NULL OR NOT submissions.grade_matches_current_submission)
+        )
+      )
+    SQL
+    conditions.gsub!(/\s+/, ' ')
     conditions.gsub!("submissions.", prefix + ".") if prefix
     conditions
   end
+
+  scope :needs_grading, where(needs_grading_conditions)
 
 
   sanitize_field :body, Instructure::SanitizeField::SANITIZE
@@ -729,49 +718,22 @@ class Submission < ActiveRecord::Base
     state :graded
   end
 
-  named_scope :graded, lambda {
-    {:conditions => ['submissions.grade IS NOT NULL']}
-  }
+  scope :graded, where("submissions.grade IS NOT NULL")
 
-  named_scope :ungraded, lambda {
-    {:conditions => ['submissions.grade IS NULL'], :include => :assignment}
-  }
+  scope :ungraded, where(:grade => nil).includes(:assignment)
 
-  named_scope :in_workflow_state, lambda { |provided_state|
-    { :conditions => { :workflow_state => provided_state } }
-  }
+  scope :in_workflow_state, lambda { |provided_state| where(:workflow_state => provided_state) }
 
-  named_scope :having_submission, :conditions => 'submissions.submission_type IS NOT NULL'
+  scope :having_submission, where("submissions.submission_type IS NOT NULL")
 
-  named_scope :include_user, lambda {
-    {:include => [:user] }
-  }
+  scope :include_user, includes(:user)
 
-  named_scope :include_teacher, lambda{
-    {:include => {:assignment => :teacher_enrollment} }
-  }
-  named_scope :include_assessment_requests, lambda {
-    {:include => [:assessment_requests, :assigned_assessments] }
-  }
-  named_scope :include_versions, lambda{
-    {:include => [:versions] }
-  }
-  named_scope :include_submission_comments, lambda{
-    {:include => [:submission_comments] }
-  }
-  named_scope :speed_grader_includes, lambda{
-    {:include => [:versions, :submission_comments, :attachments, :rubric_assessment]}
-  }
-  named_scope :for, lambda {|context|
-    {:include => :assignment, :conditions => ['assignments.context_id = ? AND assignments.context_type = ?', context.id, context.class.to_s]}
-  }
-  named_scope :for_user, lambda {|user|
-    user_id = user.is_a?(User) ? user.id : user
-    {:conditions => ['submissions.user_id IN (?)', Array(user_id)]}
-  }
-  named_scope :needing_screenshot, lambda {
-    {:conditions => ['submissions.submission_type = ? AND submissions.attachment_id IS NULL AND submissions.process_attempts < 3', 'online_url'], :order => :updated_at}
-  }
+  scope :include_assessment_requests, includes(:assessment_requests, :assigned_assessments)
+  scope :include_versions, includes(:versions)
+  scope :include_submission_comments, includes(:submission_comments)
+  scope :speed_grader_includes, includes(:versions, :submission_comments, :attachments, :rubric_assessment)
+  scope :for_user, lambda { |user| where(:user_id => user) }
+  scope :needing_screenshot, where("submissions.submission_type='online_url' AND submissions.attachment_id IS NULL AND submissions.process_attempts<3").order(:updated_at)
 
   def needs_regrading?
     graded? && !grade_matches_current_submission?
@@ -823,12 +785,12 @@ class Submission < ActiveRecord::Base
     nil
   end
 
-  named_scope :for, lambda { |obj|
+  scope :for, lambda { |obj|
     case obj
     when User
-      {:conditions => ['user_id = ?', obj]}
+      where(:user_id => obj)
     else
-      {}
+      scoped
     end
   }
 
@@ -867,7 +829,7 @@ class Submission < ActiveRecord::Base
   end
 
   def conversation_message_data
-    latest = visible_submission_comments.scoped(:conditions => ["author_id IN (?)", possible_participants_ids]).last or return
+    latest = visible_submission_comments.where(:author_id => possible_participants_ids).last or return
     {
       :created_at => latest.created_at,
       :author => latest.author,
@@ -1197,7 +1159,7 @@ class Submission < ActiveRecord::Base
     return state if state.present?
     return "read" if (assignment.deleted? || assignment.muted? || !self.user_id)
     return "unread" if (self.grade || self.score)
-    return "unread" if self.submission_comments.scoped(:conditions => ["author_id <> ?", user_id]).first.present?
+    return "unread" if self.submission_comments.where("author_id<>?", user_id).exists?
     return "read"
   end
 

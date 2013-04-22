@@ -1,4 +1,9 @@
-define ['Backbone', 'jst/searchView'], (Backbone, template) ->
+define [
+  'jquery'
+  'Backbone'
+  'jst/searchView'
+  'compiled/views/SearchMixin'
+], ($, Backbone, template, SearchMixin) ->
 
   ##
   # Base class for search/filter views. Simply wires up an
@@ -7,23 +12,25 @@ define ['Backbone', 'jst/searchView'], (Backbone, template) ->
 
   class SearchView extends Backbone.View
 
+    @mixin SearchMixin
+
+    ##
+    # An InputFilterView
+
     @child 'inputFilterView', '.inputFilterView'
+
+    ##
+    # A CollectionView (and its sub-classes that don't break the
+    # substitution rule like PaginatedCollectionView)
 
     @child 'collectionView', '.collectionView'
 
+    ##
+    # You probably don't want this template, but need the elements
+    # found therein.
+
     template: template
 
-    initialize: (options) ->
-      super
-      @collection = @collectionView.collection
-      @attach()
-
-    attach: ->
-      @inputFilterView.on 'input', @fetchResults
-      @inputFilterView.on 'enter', @fetchResults
-
-    fetchResults: (query) =>
-      @lastRequest?.abort()
-      @collection.setParam 'search_term', query
-      @lastRequest = @collection.fetch()
+    toJSON: ->
+      collection: @collection
 

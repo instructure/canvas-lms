@@ -48,7 +48,7 @@ describe 'DataFixup::RemoveExtraneousConversationTags' do
       # fake up the bad data
       @conversation.update_attribute :tags, [@course1.asset_string, @course2.asset_string]
       @cp1.update_attribute :tags, [@course1.asset_string, @course2.asset_string]
-      cmp1 = @cp1.conversation_message_participants.find(:first, :conditions => ["conversation_message_id = ?", @message.id])
+      cmp1 = @cp1.conversation_message_participants.where(:conversation_message_id => @message).first
       cmp1.update_attribute :tags, [@course2.asset_string]
 
       DataFixup::RemoveExtraneousConversationTags.fix_private_conversation!(@conversation)
@@ -61,7 +61,7 @@ describe 'DataFixup::RemoveExtraneousConversationTags' do
     it "should fix invalid participant tags even if the conversation's tags are correct" do
       # fake up the bad data
       @cp1.update_attribute :tags, [@course1.asset_string, @course2.asset_string]
-      cmp1 = @cp1.conversation_message_participants.find(:first, :conditions => ["conversation_message_id = ?", @message.id])
+      cmp1 = @cp1.conversation_message_participants.where(:conversation_message_id => @message).first
       cmp1.update_attribute :tags, [@course2.asset_string]
 
       DataFixup::RemoveExtraneousConversationTags.fix_private_conversation!(@conversation)

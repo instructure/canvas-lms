@@ -93,7 +93,7 @@ describe ConversationBatch do
     end
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should reuse existing private conversations" do
         @shard1.activate { @user4 = user }

@@ -512,11 +512,13 @@ describe "gradebook2" do
 
       # make sure it appears in each submission dialog
       icons.each do |icon|
-        cell = icon.find_element(:xpath, '..')
-        driver.action.move_to(cell).perform
-        cell.find_element(:css, "a").click
-        wait_for_ajaximations
-        fj('.turnitin_similarity_score:visible').should be_present
+        keep_trying_until do
+          cell = icon.find_element(:xpath, '..')
+          driver.action.move_to(cell).perform
+          cell.find_element(:css, "a").click
+          wait_for_ajaximations
+          fj('.turnitin_similarity_score:visible').should be_present
+        end
         fj('.ui-icon-closethick:visible').click
       end
     end

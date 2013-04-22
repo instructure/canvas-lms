@@ -78,32 +78,30 @@ module Canvas::AccountReports::ReportHelper
 
   def add_term_scope(scope,table = 'courses')
     if term
-      scope.scoped(:conditions => ["#{table}.enrollment_term_id=?", term.id])
+      scope.where(table => { :enrollment_term_id => term })
     else
       scope
     end
   end
 
   def add_course_sub_account_scope(scope,table = 'courses')
-    if account.id != root_account.id
-      scope.scoped(:conditions => ["EXISTS (SELECT course_id
-                                            FROM course_account_associations caa
-                                            WHERE caa.account_id = ?
-                                            AND caa.course_id=#{table}.id
-                                            AND caa.course_section_id IS NULL
-                                            )", account.id])
+    if account != root_account
+      scope.where("EXISTS (SELECT course_id
+                           FROM course_account_associations caa
+                           WHERE caa.account_id = ?
+                           AND caa.course_id=#{table}.id
+                           AND caa.course_section_id IS NULL)", account)
     else
       scope
     end
   end
 
   def add_user_sub_account_scope(scope,table = 'users')
-    if account.id != root_account.id
-      scope.scoped(:conditions => ["EXISTS (SELECT user_id
-                                            FROM user_account_associations uaa
-                                            WHERE uaa.account_id = ?
-                                            AND uaa.user_id=#{table}.id
-                                            )", account.id])
+    if account != root_account
+      scope.where("EXISTS (SELECT user_id
+                           FROM user_account_associations uaa
+                           WHERE uaa.account_id = ?
+                           AND uaa.user_id=#{table}.id)", account)
     else
       scope
     end
@@ -124,7 +122,9 @@ module Canvas::AccountReports::ReportHelper
 
   def send_report(file = nil, account_report = @account_report)
     type = Canvas::AccountReports.for_account(account)[account_report.report_type][:title]
-    options = account_report.parameters["extra_text"]
+    if account_report.has_parameter? "extra_text"
+      options = account_report.parameters["extra_text"]
+    end
     Canvas::AccountReports.message_recipient(
       account_report,
       I18n.t(

@@ -3,9 +3,6 @@
     <li data-context="{{asset_string}}" class="context_list_context hover-container">
       <span class="context-list-toggle-box group_{{asset_string}}"></span>
       {{name}}
-      {{#ifAny can_create_calendar_events can_create_assignments}}
-        <a href="#" class="context-list-add hide-till-hover" data-add-event><i class="icon-add standalone-icon"></i></a>
-      {{/ifAny}}
     </li>
   {{/each}}
 </ul>

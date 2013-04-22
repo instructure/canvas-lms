@@ -753,7 +753,7 @@ describe ContextModule do
       @old_assignment = @course.assignments.create!(:title => "my assignment")
       @old_tag = @old_module.add_item({:type => 'assignment', :id => @old_assignment.id})
       ct = @old_module.add_item({ :title => 'Broken url example', :type => 'external_url', :url => 'http://example.com/with%20space' })
-      ContentTag.update_all({:url => "http://example.com/with space"}, "id=#{ct.id}")
+      ContentTag.where(:id => ct).update_all(:url => "http://example.com/with space")
       @old_module.reload
       @old_module.content_tags.length.should eql(2)
       course_model

@@ -70,13 +70,13 @@ class DelayedNotification < ActiveRecord::Base
     lookups.each do |klass, ids|
       includes = []
       includes = [:user] if klass == CommunicationChannel
-      res += klass.find(:all, :conditions => {:id => ids}, :include => includes) rescue []
+      res += klass.where(:id => ids).includes(includes).all rescue []
     end
     res.uniq
   end
   memoize :to_list
   
-  named_scope :to_be_processed, lambda {|limit|
-    {:conditions => ['delayed_notifications.workflow_state = ?', 'to_be_processed'], :limit => limit, :order => 'delayed_notifications.created_at'}
+  scope :to_be_processed, lambda { |limit|
+    where(:workflow_state => 'to_be_processed').limit(limit).order("delayed_notifications.created_at")
   }
 end

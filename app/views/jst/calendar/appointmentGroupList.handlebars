@@ -26,10 +26,10 @@
             </div>
           </div>
         {{else}}
-          {{#if signed_up_times}}
+          {{#if reserved_times}}
             <div class="alert alert-success">
               <div>You're signed up for</div>
-              {{#each signed_up_times}}
+              {{#each reserved_times}}
                 <div><strong><a href="#" class="show_event_link" data-event-id="{{id}}">{{{formatted_time}}}</a></strong></div>
               {{/each}}
             </div>
@@ -53,11 +53,11 @@
           <div class="ag-x-of-x-signed-up">
             {{#ifEqual participant_type "Group"}}
               {{#t "x_groups_have_signed_up"}}
-                {{signed_up}} groups have signed up
+                {{participant_count}} groups have signed up
               {{/t}}
             {{else}}
               {{#t "x_people_have_signed_up"}}
-                {{signed_up}} people have signed up
+                {{participant_count}} people have signed up
               {{/t}}
             {{/ifEqual}}
             {{#unless published}}(unpublished){{/unless}}

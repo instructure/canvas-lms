@@ -33,8 +33,8 @@ class Assignment < ActiveRecord::Base
     :peer_review_count, :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
     :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
     :notify_of_update, :time_zone_edited, :turnitin_enabled, :turnitin_settings,
-    :set_custom_field_values, :context, :position, :allowed_extensions,
-    :external_tool_tag_attributes, :freeze_on_copy, :assignment_group_id
+    :context, :position, :allowed_extensions, :external_tool_tag_attributes,
+    :freeze_on_copy, :assignment_group_id
     
   attr_accessor :original_id, :updating_user, :copying
 
@@ -124,8 +124,6 @@ class Assignment < ActiveRecord::Base
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
   copy_authorized_links( :description) { [self.context, nil] }
 
-  has_custom_fields :scopes => %w(root_account)
-
   def root_account
     context && context.root_account
   end
@@ -182,7 +180,7 @@ class Assignment < ActiveRecord::Base
       # needs to be .each(&:destroy) instead of .update_all(:workflow_state =>
       # 'deleted') so that the override gets versioned properly
       active_assignment_overrides.
-        scoped(:conditions => {:set_type => 'Group'}).
+        where(:set_type => 'Group').
         each { |o|
           o.dont_touch_assignment = true
           o.destroy
@@ -210,7 +208,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def touch_assignment_group
-    AssignmentGroup.update_all({:updated_at => Time.now.utc}, {:id => self.assignment_group_id}) if self.assignment_group_id
+    AssignmentGroup.where(:id => self.assignment_group_id).update_all(:updated_at => Time.now.utc) if self.assignment_group_id
     true
   end
 
@@ -332,7 +330,7 @@ class Assignment < ActiveRecord::Base
 
   def clear_unannounced_grading_changes_if_just_unpublished
     if @workflow_state_was == 'published' && self.available?
-      Submission.update_all({:changed_since_publish => false}, {:assignment_id => self.id})
+      Submission.where(:assignment_id => self).update_all(:changed_since_publish => false)
     end
     true
   end
@@ -418,17 +416,11 @@ class Assignment < ActiveRecord::Base
 
   def context_module_tag_info(user)
     tag_info = {:points_possible => self.points_possible}
-
     if self.multiple_due_dates_apply_to?(user)
-      as_student, as_instructor = self.due_dates_for(user)
-      tag_info[:due_dates] = as_instructor.map{|hash| {
-          :title => hash[:title],
-          :due_date => (hash[:due_at].utc.iso8601 rescue nil)}
-      }
+      tag_info[:vdd_tooltip] = OverrideTooltipPresenter.new(self, user).as_json
     else
       tag_info[:due_date] = self.overridden_for(user).due_at.utc.iso8601 rescue nil
     end
-
     tag_info
   end
 
@@ -849,10 +841,6 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def self.search(query)
-    find(:all, :conditions => wildcard('title', 'description', query))
-  end
-
   def grade_distribution(submissions = nil)
     submissions ||= self.submissions
     tally = 0
@@ -897,7 +885,7 @@ class Assignment < ActiveRecord::Base
     end
 
     changed_since_publish = !!self.available?
-    Submission.update_all({:score => score, :grade => grade, :published_score => score, :published_grade => grade, :changed_since_publish => changed_since_publish, :workflow_state => 'graded', :graded_at => Time.now.utc}, {:id => submissions_to_save.map(&:id)} ) unless submissions_to_save.empty?
+    Submission.where(:id => submissions_to_save).update_all(:score => score, :grade => grade, :published_score => score, :published_grade => grade, :changed_since_publish => changed_since_publish, :workflow_state => 'graded', :graded_at => Time.now.utc) unless submissions_to_save.empty?
 
     self.context.recompute_student_scores
     student_ids = context.student_ids
@@ -930,7 +918,11 @@ class Assignment < ActiveRecord::Base
     students = [student]
     if self.has_group_category?
       group = self.group_category.group_for(student)
-      students = (group.users & self.context.students) if group
+      if group
+        students = group.users.joins("INNER JOIN enrollments ON enrollments.user_id=users.id").
+          where(:enrollments => { :course_id => self.context}).
+          where(Course.reflections[:student_enrollments].options[:conditions]).all
+      end
     end
     [group, students]
   end
@@ -1077,7 +1069,7 @@ class Assignment < ActiveRecord::Base
       opts.delete(k) unless [:body, :url, :attachments, :submission_type, :comment, :media_comment_id, :media_comment_type, :group_comment].include?(k.to_sym)
     }
     raise "Student Required" unless original_student
-    raise "User must be enrolled in the course as a student to submit homework" unless context.student_enrollments.find(:first, :conditions => { :user_id => original_student.id })
+    raise "User must be enrolled in the course as a student to submit homework" unless context.student_enrollments.except(:includes).where(:user_id => original_student).exists?
     comment = opts.delete(:comment)
     group_comment = opts.delete(:group_comment)
     group, students = group_students(original_student)
@@ -1179,7 +1171,7 @@ class Assignment < ActiveRecord::Base
     res[:context][:enrollments] = context.enrollments_visible_to(user).
       map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
     res[:context][:quiz] = self.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
-    res[:submissions] = submissions.scoped(:conditions => {:user_id => visible_students.map(&:id)}).map{|s|
+    res[:submissions] = submissions.where(:user_id => visible_students).map{|s|
       json = s.as_json(:include_root => false,
         :include => {
           :submission_comments => {
@@ -1353,124 +1345,104 @@ class Assignment < ActiveRecord::Base
     0.5
   end
 
-  named_scope :include_submitted_count, lambda {
-    {:select => "assignments.*, (SELECT COUNT(*) FROM submissions
-      WHERE assignments.id = submissions.assignment_id
-      AND submissions.submission_type IS NOT NULL) AS submitted_count"
-    }
+  scope :include_submitted_count, select(
+    "assignments.*, (SELECT COUNT(*) FROM submissions
+    WHERE assignments.id = submissions.assignment_id
+    AND submissions.submission_type IS NOT NULL) AS submitted_count")
+
+  scope :include_graded_count, select(
+    "assignments.*, (SELECT COUNT(*) FROM submissions
+    WHERE assignments.id = submissions.assignment_id
+    AND submissions.grade IS NOT NULL) AS graded_count")
+
+  scope :include_quiz_and_topic, includes(:quiz, :discussion_topic)
+
+  scope :no_graded_quizzes_or_topics, where("submission_types NOT IN ('online_quiz', 'discussion_topic')")
+
+  scope :with_submissions, includes(:submissions)
+
+  scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
+  scope :for_course, lambda { |course_id| where(:context_type => 'Course', :context_id => course_id) }
+
+  scope :due_before, lambda { |date| where("assignments.due_at<?", date) }
+
+  scope :due_after, lambda { |date| where("assignments.due_at>?", date) }
+  scope :undated, where(:due_at => nil)
+
+  scope :only_graded, where("submission_types<>'not_graded'")
+
+  scope :with_just_calendar_attributes, lambda {
+    select(((Assignment.column_names & CalendarEvent.column_names) + ['due_at', 'assignment_group_id', 'could_be_locked', 'unlock_at', 'lock_at', 'submission_types', '(freeze_on_copy AND copied) AS frozen'] - ['cloned_item_id', 'migration_id']).join(", "))
   }
 
-  named_scope :include_graded_count, lambda {
-    {:select => "assignments.*, (SELECT COUNT(*) FROM submissions
-      WHERE assignments.id = submissions.assignment_id
-      AND submissions.grade IS NOT NULL) AS graded_count"
-    }
-  }
-
-  named_scope :include_quiz_and_topic, lambda {
-    {:include => [:quiz, :discussion_topic] }
-  }
-
-  named_scope :no_graded_quizzes_or_topics, :conditions=>"submission_types NOT IN ('online_quiz', 'discussion_topic')"
-
-  named_scope :with_submissions, lambda {
-    {:include => :submissions }
-  }
-
-  named_scope :for_context_codes, lambda {|codes|
-    {:conditions => ['assignments.context_code IN (?)', codes] }
-  }
-  named_scope :for_course, lambda { |course_id|
-    {:conditions => {:context_type => 'Course', :context_id => course_id}}
-  }
-
-  named_scope :due_before, lambda{|date|
-    {:conditions => ['assignments.due_at < ?', date] }
-  }
-
-  named_scope :due_after, lambda{|date|
-    {:conditions => ['assignments.due_at > ?', date] }
-  }
-  named_scope :undated, :conditions => {:due_at => nil}
-
-  named_scope :only_graded, :conditions => "submission_types != 'not_graded'"
-
-  named_scope :with_just_calendar_attributes, lambda {
-    { :select => ((Assignment.column_names & CalendarEvent.column_names) + ['due_at', 'assignment_group_id', 'could_be_locked', 'unlock_at', 'lock_at', 'submission_types', '(freeze_on_copy AND copied) AS frozen'] - ['cloned_item_id', 'migration_id']).join(", ") }
-  }
-
-  named_scope :due_between, lambda { |start, ending|
-    { :conditions => { :due_at => (start)..(ending) } }
-  }
+  scope :due_between, lambda { |start, ending| where(:due_at => start..ending) }
 
   # Return all assignments and their active overrides where either the
   # assignment or one of its overrides is due between start and ending.
-  named_scope :due_between_with_overrides, lambda { |start, ending|
-    { :include => :assignment_overrides,
-      :conditions => ['assignments.due_at BETWEEN ? AND ?
-                      OR assignment_overrides.due_at_overridden = TRUE AND
-                      assignment_overrides.due_at BETWEEN ? AND ?', start, ending, start, ending]}
+  scope :due_between_with_overrides, lambda { |start, ending|
+    includes(:assignment_overrides).
+        where('assignments.due_at BETWEEN ? AND ?
+              OR assignment_overrides.due_at_overridden AND
+              assignment_overrides.due_at BETWEEN ? AND ?', start, ending, start, ending)
   }
 
-  named_scope :updated_after, lambda { |*args|
+  scope :updated_after, lambda { |*args|
     if args.first
-      { :conditions => [ "assignments.updated_at IS NULL OR assignments.updated_at > ?", args.first ] }
+      where("assignments.updated_at IS NULL OR assignments.updated_at>?", args.first)
+    else
+      scoped
     end
   }
 
-  named_scope :not_ignored_by, lambda { |user, purpose|
-    {:conditions =>
-         ["NOT EXISTS (SELECT * FROM ignores WHERE asset_type='Assignment' AND asset_id=assignments.id AND user_id=? AND purpose=?)",
-          user.id, purpose]}
+  scope :not_ignored_by, lambda { |user, purpose|
+    where("NOT EXISTS (SELECT * FROM ignores WHERE asset_type='Assignment' AND asset_id=assignments.id AND user_id=? AND purpose=?)",
+          user, purpose)
   }
 
+  # the map on the API_NEEDED_FIELDS here is because PostgreSQL will see the
+  # query as ambigious for the "due_at" field if combined with another table
+  # (e.g. assignment overrides) with similar fields (like id,lock_at,etc),
+  # throwing an error.
+  scope :api_needed_fields, select(API_NEEDED_FIELDS.map{ |f| "assignments." + f.to_s})
+
   # This should only be used in the course drop down to show assignments needing a submission
-  named_scope :need_submitting_info, lambda{|user_id, limit|
-    ignored_ids ||= []
-          {:select => API_NEEDED_FIELDS.join( ',' ) +
-          ',(SELECT name FROM courses WHERE id = assignments.context_id) AS context_name',
-          :conditions =>["(SELECT COUNT(id) FROM submissions
-              WHERE assignment_id = assignments.id
-              AND submission_type IS NOT NULL
-              AND user_id = ?) = 0", user_id],
-          :limit => limit,
-          :order => 'due_at ASC'
-    }
+  scope :need_submitting_info, lambda { |user_id, limit|
+    api_needed_fields.
+      select("(SELECT name FROM courses WHERE courses.id = assignments.context_id) AS context_name").
+      where("(SELECT COUNT(id) FROM submissions
+            WHERE assignment_id = assignments.id
+            AND submission_type IS NOT NULL
+            AND user_id = ?) = 0", user_id).
+      limit(limit).
+      order("assignments.due_at")
   }
 
   # This should only be used in the course drop down to show assignments not yet graded.
-  named_scope :need_grading_info, lambda{|limit|
-    ignore_ids ||= []
-    {
-      :select => API_NEEDED_FIELDS.join(',') +
-                 ',(SELECT name FROM courses WHERE id = assignments.context_id) AS context_name, needs_grading_count',
-      :conditions => "needs_grading_count > 0",
-      :limit => limit,
-      :order=>'due_at ASC'
-    }
+  scope :need_grading_info, lambda { |limit|
+    api_needed_fields.
+        select("(SELECT name FROM courses WHERE id = assignments.context_id) AS context_name, needs_grading_count").
+        where("assignments.needs_grading_count>0").
+        limit(limit).
+        order("assignments.due_at")
   }
 
-  named_scope :expecting_submission, :conditions=>"submission_types NOT IN ('', 'none', 'not_graded', 'on_paper') AND submission_types IS NOT NULL"
+  scope :expecting_submission, where("submission_types NOT IN ('', 'none', 'not_graded', 'on_paper') AND submission_types IS NOT NULL")
 
-  named_scope :gradeable, lambda {
-    {:conditions => ['assignments.submission_types != ?', 'not_graded'] }
+  scope :gradeable, where("assignments.submission_types<>'not_graded'")
+
+  scope :need_publishing, lambda {
+    where("assignments.due_at<? AND assignments.workflow_state='available'", 1.week.ago)
   }
 
-  named_scope :need_publishing, lambda {
-    {:conditions => ['assignments.due_at < ? AND assignments.workflow_state = ?', 1.week.ago, 'available'] }
+  scope :active, where("assignments.workflow_state<>'deleted'")
+  scope :before, lambda { |date| where("assignments.created_at<?", date) }
+
+  scope :not_locked, lambda {
+    where("(assignments.unlock_at IS NULL OR assignments.unlock_at<:now) AND (assignments.lock_at IS NULL OR assignments.lock_at>:now)",
+      :now => Time.zone.now)
   }
 
-  named_scope :active, :conditions => ['assignments.workflow_state != ?', 'deleted']
-  named_scope :before, lambda{|date|
-    {:conditions => ['assignments.created_at < ?', date]}
-  }
-
-  named_scope :not_locked, lambda {
-    {:conditions => ['(assignments.unlock_at IS NULL OR assignments.unlock_at < :now) AND (assignments.lock_at IS NULL OR assignments.lock_at > :now)',
-                     {:now => Time.zone.now}]}
-  }
-
-  named_scope :order_by_base_due_at, :order => 'assignments.due_at ASC'
+  scope :order_by_base_due_at, order("assignments.due_at")
 
   def needs_publishing?
     self.due_at && self.due_at < 1.week.ago && self.available?
@@ -1879,9 +1851,8 @@ class Assignment < ActiveRecord::Base
           when :full
             self.needs_grading_count
           when :sections
-            self.submissions.count('DISTINCT submissions.id',
-              :joins => "INNER JOIN enrollments e ON e.user_id = submissions.user_id",
-              :conditions => [<<-SQL, self.id, self.context.id, vis.map {|v| v[:course_section_id]}])
+            self.submissions.joins("INNER JOIN enrollments e ON e.user_id = submissions.user_id").
+                where(<<-SQL, self, self.context, vis.map {|v| v[:course_section_id]}).count(:id, :distinct => true)
               submissions.assignment_id = ?
                 AND e.course_id = ?
                 AND e.course_section_id in (?)

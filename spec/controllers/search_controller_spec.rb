@@ -22,10 +22,10 @@ describe SearchController do
       response.body.should include(other.name)
     end
 
-    it "should not sort by rank if a search term is not used" do
+    it "should sort alphabetically" do
       course_with_student_logged_in(:active_all => true)
-      @user.update_attribute(:name, 'billy')
-      other = User.create(:name => 'bob')
+      @user.update_attribute(:name, 'bob')
+      other = User.create(:name => 'billy')
       @course.enroll_student(other).tap{ |e| e.workflow_state = 'active'; e.save! }
 
       group = @course.groups.create(:name => 'group')
@@ -35,21 +35,6 @@ describe SearchController do
       response.should be_success
       response.body.should include('billy')
       response.body.should_not include('bob')
-    end
-
-    it "should sort by rank if a search term is used" do
-      course_with_student_logged_in(:active_all => true)
-      @user.update_attribute(:name, 'billy')
-      other = User.create(:name => 'bob')
-      @course.enroll_student(other).tap{ |e| e.workflow_state = 'active'; e.save! }
-
-      group = @course.groups.create(:name => 'group')
-      group.users << other
-
-      get 'recipients', :search => 'b', :per_page => '1', :type => 'user'
-      response.should be_success
-      response.body.should include('bob')
-      response.body.should_not include('billy')
     end
 
     it "should optionally show users who haven't finished registration" do

@@ -249,7 +249,7 @@ describe Pseudonym do
     end
 
     it "should offer the user sms if there is one" do
-      communication_channel_model(:path_type => 'sms', :user_id => @user.id)
+      communication_channel_model(:path_type => 'sms')
       @user.communication_channels << @cc
       @user.save!
       @user.sms.should eql(@cc.path)
@@ -257,7 +257,7 @@ describe Pseudonym do
     end
 
     it "should be able to change the user sms" do
-      communication_channel_model(:path_type => 'sms', :user_id => @user.id, :path => 'admin@example.com')
+      communication_channel_model(:path_type => 'sms', :path => 'admin@example.com')
       @pseudonym.sms = @cc
       @pseudonym.sms.should eql('admin@example.com')
       @pseudonym.user.sms.should eql('admin@example.com')

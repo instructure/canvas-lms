@@ -107,6 +107,45 @@ describe ExternalToolsController do
       get 'resource_selection', :course_id => @course.id, :external_tool_id => tool.id
       response.should be_success
       assigns[:tool].should == tool
+      assigns[:tool_settings]['custom_canvas_enrollment_state'].should == 'active'
+    end
+
+    it "should be accessible even after course is soft-concluded" do
+      course_with_student_logged_in(:active_all => true)
+      @course.conclude_at = 1.day.ago
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+
+      tool = new_valid_tool(@course)
+      get 'resource_selection', :course_id => @course.id, :external_tool_id => tool.id
+      response.should be_success
+      assigns[:tool].should == tool
+      assigns[:tool_settings]['custom_canvas_enrollment_state'].should == 'inactive'
+    end
+
+    it "should be accessible even after course is hard-concluded" do
+      course_with_student_logged_in(:active_all => true)
+      @course.complete
+
+      tool = new_valid_tool(@course)
+      get 'resource_selection', :course_id => @course.id, :external_tool_id => tool.id
+      response.should be_success
+      assigns[:tool].should == tool
+      assigns[:tool_settings]['custom_canvas_enrollment_state'].should == 'inactive'
+    end
+
+    it "should be accessible even after enrollment is concluded and include a parameter indicating inactive state" do
+      course_with_student_logged_in(:active_all => true)
+      e = @student.enrollments.first
+      e.conclude
+      e.reload
+      e.workflow_state.should == 'completed'
+
+      tool = new_valid_tool(@course)
+      get 'resource_selection', :course_id => @course.id, :external_tool_id => tool.id
+      response.should be_success
+      assigns[:tool].should == tool
+      assigns[:tool_settings]['custom_canvas_enrollment_state'].should == 'inactive'
     end
   end
   
@@ -246,7 +285,7 @@ describe ExternalToolsController do
       response.should_not be_success
       assigns[:tool].should be_new_record
       json = json_parse(response.body)
-      json['errors']['base'][0]['message'].should == I18n.t(:invalid_xml_syntax, 'invalid xml syntax')
+      json['errors']['base'][0]['message'].should == I18n.t(:invalid_xml_syntax, 'Invalid xml syntax')
 
       course_with_teacher_logged_in(:active_all => true)
       xml = "<a><b>c</b></a>"
@@ -254,7 +293,7 @@ describe ExternalToolsController do
       response.should_not be_success
       assigns[:tool].should be_new_record
       json = json_parse(response.body)
-      json['errors']['base'][0]['message'].should == I18n.t(:invalid_xml_syntax, 'invalid xml syntax')
+      json['errors']['base'][0]['message'].should == I18n.t(:invalid_xml_syntax, 'Invalid xml syntax')
     end
     
     it "should handle advanced xml configurations by URL retrieval" do

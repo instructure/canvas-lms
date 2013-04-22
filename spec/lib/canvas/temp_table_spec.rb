@@ -31,9 +31,9 @@ describe "Canvas::TempTable" do
     @e4 = c2.enroll_student(u1, :enrollment_state => 'active')
     @e5 = c2.enroll_student(u2, :enrollment_state => 'active')
     @e6 = c2.enroll_student(u3, :enrollment_state => 'active')
-    @scope = Course.active.scoped(:select => "enrollments.id AS e_id",
-                                  :joins => :enrollments, :order => "e_id asc")
-    @sql = @scope.construct_finder_sql({})
+    @scope = Course.active.select("enrollments.id AS e_id").
+                           joins(:enrollments).order("e_id asc")
+    @sql = @scope.to_sql
   end
 
   it "should not create a temp table before executing" do

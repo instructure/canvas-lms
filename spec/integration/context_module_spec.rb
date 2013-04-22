@@ -29,7 +29,7 @@ describe ContextModule do
       course_with_teacher_logged_in(:active_all => true)
       context_module = @course.context_modules.create!
       content_tag = context_module.add_item :type => 'context_module_sub_header', :title => "My Sub Header Title"
-      ContextModule.update_all({ :updated_at => 1.hour.ago }, { :id => context_module.id })
+      ContextModule.where(:id => context_module).update_all(:updated_at => 1.hour.ago)
       get "/courses/#{@course.id}/modules"
       response.body.should match(/My Sub Header Title/)
 

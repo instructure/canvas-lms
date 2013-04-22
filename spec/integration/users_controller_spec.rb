@@ -123,16 +123,6 @@ describe UsersController do
       response.body.should match /Olds, JT.*St\. Clair, John/m
     end
 
-    it "should not show student view student in a course context" do
-      course_with_teacher_logged_in(:active_all => true)
-      @fake_student = @course.student_view_student
-
-      get course_users_url @course.id
-      body = Nokogiri::HTML(response.body)
-      body.css("#user_#{@fake_student.id}").should be_empty
-      body.at_css('.student_roster').text.should_not match(/Test Student/)
-    end
-
     it "should not show any student view students at the account level" do
       course_with_teacher(:active_all => true)
       @fake_student = @course.student_view_student

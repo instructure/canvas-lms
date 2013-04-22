@@ -145,11 +145,6 @@ describe AssignmentsApiController, :type => :integration do
       @group_category = @course.group_categories.create!
       @course.any_instantiation.expects(:turnitin_enabled?).
         at_least_once.returns true
-      # make sure we can assign a custom field during creation
-      CustomField.create!(:name => 'test_custom',
-                          :field_type => 'boolean',
-                          :default_value => false,
-                          :target_type => 'assignments')
       @json = api_create_assignment_in_course(@course,
             { 'name' => 'some assignment',
               'position' => '1',
@@ -174,11 +169,6 @@ describe AssignmentsApiController, :type => :integration do
               'group_category_id' => @group_category.id,
               'turnitin_enabled' => true,
               'grading_type' => 'points',
-              'set_custom_field_values' => {
-                'test_custom' => {
-                  'value' => '1'
-                }
-              },
               'muted' => 'true'
             }
        )
@@ -221,8 +211,6 @@ describe AssignmentsApiController, :type => :integration do
       @json['needs_grading_count'].should == 0
 
       Assignment.count.should == 1
-      a = Assignment.first
-      a.get_custom_field_value('test_custom').true?.should == true
     end
 
     it "does not allow modifying turnitin_enabled when not enabled on the context" do
@@ -331,7 +319,7 @@ describe AssignmentsApiController, :type => :integration do
 
   describe "PUT /courses/:course_id/assignments/:id (#update)" do
     context "without overrides or frozen attributes" do
-      before(:all) do
+      before do
         course_with_teacher(:active_all => true)
         @start_group = @course.assignment_groups.create!({:name => "start group"})
         @group = @course.assignment_groups.create!({:name => "new group"})
@@ -351,20 +339,10 @@ describe AssignmentsApiController, :type => :integration do
 
         @new_grading_standard = grading_standard_for(@course)
 
-        # make sure we can assign a custom field during update
-        CustomField.create!(:name => 'test_custom',
-                            :field_type => 'boolean',
-                            :default_value => false,
-                            :target_type => 'assignments')
         @json = api_update_assignment_call(@course,@assignment,{
           'name' => 'some assignment',
           'points_possible' => '12',
           'assignment_group_id' => @group.id,
-          'set_custom_field_values' => {
-            'test_custom' => {
-              'value' => '1'
-            }
-          },
           'peer_reviews' => false,
           'grading_standard_id' => @new_grading_standard.id,
           'group_category_id' => nil,
@@ -375,10 +353,6 @@ describe AssignmentsApiController, :type => :integration do
           'muted' => true
         })
         @assignment.reload
-      end
-
-      after(:all) do
-        truncate_all_tables
       end
 
       it "returns, but does not update, the assignment's id" do
@@ -432,7 +406,7 @@ describe AssignmentsApiController, :type => :integration do
 
       it "updates the assignment's due_at" do
         # fancy midnight
-        @json['due_at'].should == "2011-01-01T23:59:59-07:00"
+        @json['due_at'].should == "2011-01-01T23:59:59Z"
       end
 
       it "updates the assignment's submission types" do
@@ -454,10 +428,6 @@ describe AssignmentsApiController, :type => :integration do
         @json.has_key?( 'peer_reviews_assign_at' ).should == false
       end
 
-      it "updates custom fields" do
-        @assignment.get_custom_field_value('test_custom').true?.should == true
-      end
-
       it "updates the grading standard" do
         @assignment.grading_standard_id.should == @new_grading_standard.id
         @json['grading_standard_id'].should == @new_grading_standard.id
@@ -465,7 +435,7 @@ describe AssignmentsApiController, :type => :integration do
     end
 
     context "when updating assignment overrides on the assignment" do
-      before :all do
+      before do
         course_with_teacher(:active_all => true)
         student_in_course(:course => @course, :active_enrollment => true)
         @assignment = @course.assignments.create!
@@ -487,10 +457,6 @@ describe AssignmentsApiController, :type => :integration do
           }
         })
         @assignment.reload
-      end
-
-      after(:all) do
-        truncate_all_tables
       end
 
       it "updates any ADHOC overrides" do
@@ -523,7 +489,7 @@ describe AssignmentsApiController, :type => :integration do
           find_or_create_by_notification_id(@notification.id).
           update_attribute(:frequency, 'immediately')
         @assignment = @course.assignments.create!
-        Assignment.update_all({:created_at => Time.zone.now - 1.day}, {:id => @assignment.id})
+        Assignment.where(:id => @assignment).update_all(:created_at => Time.zone.now - 1.day)
         @adhoc_due_at = 5.days.from_now
         @section_due_at = 7.days.from_now
         @params = {
@@ -717,7 +683,7 @@ describe AssignmentsApiController, :type => :integration do
 
     describe 'with a normal assignment' do
 
-      before :all do
+      before do
         course_with_student(:active_all => true)
         @assignment = @course.assignments.create!(
           :title => "Locked Assignment",
@@ -727,10 +693,6 @@ describe AssignmentsApiController, :type => :integration do
           {:asset_string => '', :unlock_at => 1.hour.from_now }
         ).at_least_once
         @json = api_get_assignment_in_course(@assignment,@course)
-      end
-
-      after(:all) do
-        truncate_all_tables
       end
 
       it "does not return the assignment's description if locked for user" do

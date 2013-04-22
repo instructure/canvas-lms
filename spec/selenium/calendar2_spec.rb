@@ -1,7 +1,16 @@
+require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/calendar2_common')
 
 describe "calendar2" do
-  it_should_behave_like "calendar2 selenium tests"
+  it_should_behave_like "in-process server selenium tests"
+
+  before (:each) do
+    Account.default.tap do |a|
+      a.settings[:enable_scheduler] = true
+      a.settings[:show_scheduler] = true
+      a.save!
+    end
+  end
 
   def make_event(params = {})
     opts = {
@@ -42,7 +51,6 @@ describe "calendar2" do
     replace_content(title, assignment_title)
     add_date(middle_number) if should_add_date
     submit_form(edit_assignment_form)
-    wait_for_ajax_requests
     keep_trying_until { f('.fc-view-month .fc-event-title').should include_text(assignment_title) }
   end
 
@@ -107,17 +115,6 @@ describe "calendar2" do
       end
 
       describe "contexts list" do
-        it "should create an event by hitting the '+' on the context list on the sidebar" do
-          event_title = 'new event'
-          get "/calendar2"
-          wait_for_ajaximations
-
-          fj('ul#context-list > li:nth-child(2) [data-add-event]').click
-          edit_event_dialog = f('#edit_event_tabs')
-          edit_event_dialog.should be_displayed
-          create_calendar_event(event_title, true)
-        end
-
         it "should toggle event display when context is clicked" do
           make_event :context => @course, :start => Time.now
           get "/calendar2"
@@ -362,12 +359,16 @@ describe "calendar2" do
 
       it "should make an assignment undated if you delete the start date" do
         create_middle_day_assignment("undate me")
-        f(".undated-events-link").click
-        f('.fc-event').click
-        driver.execute_script("$('.popover-links-holder .edit_event_link').hover().click()")
+        keep_trying_until do
+          fj('.fc-event-inner').click()
+          driver.execute_script("$('.popover-links-holder .edit_event_link').hover().click()")
+          f('.ui-dialog #assignment_due_at').displayed?
+        end
+
         replace_content(f('.ui-dialog #assignment_due_at'), "")
         submit_form('#edit_assignment_form')
         wait_for_ajax_requests
+        f(".undated-events-link").click
         f('.fc-event').should be_nil
         f('.undated_event_title').text.should == "undate me"
       end
@@ -422,6 +423,18 @@ describe "calendar2" do
         details.should_not be_nil
         details.text.should include(@course.default_section.name)
         details.find_element(:css, '.view_event_link')[:href].should include "/calendar_events/#{e1.id}" # links to parent event
+      end
+
+      context "event creation" do
+        it "should create an event by hitting the '+' in the top bar" do
+          event_title = 'new event'
+          get "/calendar2"
+          wait_for_ajaximations
+
+          fj('#create_new_event_link').click
+          edit_event_dialog = f('#edit_event_tabs')
+          edit_event_dialog.should be_displayed
+        end
       end
 
       context "event editing" do
@@ -635,7 +648,7 @@ describe "calendar2" do
         # click the event in the calendar
         fj('.fc-event').click
         fj("#popover-0").should be_displayed
-        expect_new_page_load  { driver.execute_script("$('.view_event_link').hover().click()") }
+        expect_new_page_load { driver.execute_script("$('.view_event_link').hover().click()") }
 
         page_title = f('.title')
         page_title.should be_displayed

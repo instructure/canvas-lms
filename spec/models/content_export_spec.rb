@@ -105,7 +105,7 @@ describe ContentExport do
     end
 
     it "should send notifications immediately" do
-      communication_channel_model(:user_id => @user).confirm!
+      communication_channel_model.confirm!
 
       ['created', 'exporting', 'exported_for_course_copy', 'deleted'].each do |workflow|
         @ce.workflow_state = workflow 

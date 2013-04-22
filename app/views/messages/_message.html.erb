@@ -1,35 +1,71 @@
 <li class="message list-view border border-trbl"
-  data-message-id="<%= message.id %>"
-  data-secure-id="<%= ReplyToAddress.new(message).secure_id %>">
-  <header>
-    <span class="h6"><%= message.subject %></span>
+    data-message-id="<%= message.id %>"
+    data-secure-id="<%= ReplyToAddress.new(message).secure_id %>">
+    <header>
+        <span class="h6"><%= message.subject %></span>
 
     <span class="label label-<%= message.workflow_state %>">
       <%= message.workflow_state.capitalize %>
     </span>
-  </header>
+    </header>
 
-  <dl class="message-meta-data">
-    <dt><%= t('titles.to', 'To') %></dt>
-    <dd class="message-to"><%= message.to %></dd>
-
-    <dt><%= t('titles.from_name', 'From Name') %></dt>
-    <dd class="message-from"><%= message.from_name %></dd>
-
-    <dt><%= t('titles.reply_to', 'Reply to') %></dt>
-    <dd>
-      <span class="message-reply"><%= ReplyToAddress.new(message).address %></span>
-      (<a class="reply-button" href="#" role="button"><%= t('actions.reply', 'Reply') %></a>)
-    </dd>
-
-    <dt><%= t('titles.created_at', 'Created at') %></dt>
-    <dd class="message-created-at"><%= message.created_at %></dd>
-
-    <dt><%= t('titles.sent_at', 'Sent at') %></dt>
-    <dd class="message-sent-at"><%= message.sent_at %></dd>
-  </dl>
-
-  <pre class="message-body well">
-    <%= message.body %>
-  </pre>
+    <div class="tabs">
+        <ul>
+            <li><a href="#meta-data-<%= message.id %>"><%= t('meta_data', 'Meta Data') %></a></li>
+            <li><a href="#tabs-plain-<%= message.id %>"><%= t('plain_text', 'Plain Text') %></a></li>
+            <li><a href="#tabs-plain-html-<%= message.id %>">HTML</a></li>
+        </ul>
+        <div id="meta-data-<%= message.id %>">
+            <table class="table table-condensed grid">
+                <tbody>
+                <tr>
+                    <td class="td-label"><div><%= t('titles.subject', 'Subject') %></div></td>
+                    <td><%= message.subject %></td>
+                </tr>
+                <tr>
+                    <td class="td-label"><div><%= t('titles.to', 'To') %></div></td>
+                    <td><%= message.to %></td>
+                </tr>
+                <tr>
+                    <td class="td-label"><div><%= t('titles.from_name', 'From Name') %></div></td>
+                    <td><%= message.from_name %></td>
+                </tr>
+                <tr>
+                    <td class="td-label"><div><%= t('titles.reply_to', 'Reply to') %></div></td>
+                    <td><span class="message-reply"><%= ReplyToAddress.new(message).address %></span>
+                        (<a class="reply-button" href="#" role="button"><%= t('actions.reply', 'Reply') %></a>)</td>
+                </tr>
+                <tr>
+                    <td class="td-label"><div><%= t('titles.created_at', 'Created at') %></div></td>
+                    <td><%= message.created_at %></td>
+                </tr>
+                <tr>
+                    <td class="td-label"><div><%= t('titles.sent_at', 'Sent at') %></div></td>
+                    <td><%= message.sent_at %></td>
+                </tr>
+                <tr>
+                    <td class="td-label"><div><%= t('titles.delay_for', 'Delay for') %></div></td>
+                    <td><%= message.delay_for %></td>
+                </tr>
+                <tr>
+                    <td class="td-label"><div><%= t('titles.path_type', 'Path type') %></div></td>
+                    <td><%= message.path_type %></td>
+                </tr>
+                <tr>
+                    <td class="td-label"><div><%= t('titles.notification_name', 'Notification Name') %></div></td>
+                    <td><%= message.notification_name %></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="tabs-plain-<%= message.id %>">
+            <pre class="message-body"><%= message.body %></pre>
+        </div>
+        <div id="tabs-plain-html-<%= message.id %>">
+            <iframe class="message-html-body" src="<%= user_message_html_message_path(message.user, message) %>"></iframe>
+            <% if message.html_body.present? %>
+              <%= link_to "Open in new window", user_message_html_message_path(message.user, message), :target => "_blank", :class => "icon-off small" %>
+            <% end %>
+        </div>
+    </div>
 </li>

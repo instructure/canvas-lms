@@ -54,6 +54,7 @@ module Kaltura
       return nil unless res && res['partner_id'] && res['subpartner_id']
 
       # default settings
+      res = res.dup
       res['max_file_size_bytes'] = 500.megabytes unless res['max_file_size_bytes'].to_i > 0
 
       res

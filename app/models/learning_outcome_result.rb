@@ -79,37 +79,26 @@ class LearningOutcomeResult < ActiveRecord::Base
     end
   end
   
-  named_scope :for_context_codes, lambda{|codes| 
+  scope :for_context_codes, lambda { |codes|
     if codes == 'all'
-      {}
+      scoped
     else
-      {:conditions => {:context_code => Array(codes)} }
+      where(:context_code => codes)
     end
   }
-  named_scope :for_user, lambda{|user|
-    {:conditions => {:user_id => user.id} }
-  }
-  named_scope :custom_ordering, lambda{|param|
+  scope :for_user, lambda { |user| where(:user_id => user) }
+  scope :custom_ordering, lambda { |param|
     orders = {
       'recent' => "assessed_at DESC",
       'highest' => "score DESC",
       'oldest' => "score ASC",
       'default' => "assessed_at DESC"
     }
-    order = orders[param] || orders['default']
-    {:order => order }
+    order_clause = orders[param] || orders['default']
+    order(order_clause)
   }
-  named_scope :for_outcome_ids, lambda{|ids|
-    {:conditions => {:learning_outcome_id => ids} }
-  }
-  named_scope :for_association, lambda{|association|
-    {:conditions => {:association_type => association.class.to_s, :association_id => association.id} }
-  }
-  named_scope :for_associated_asset, lambda{|associated_asset|
-    {:conditions => {:associated_asset_type => associated_asset.class.to_s, :associated_asset_id => associated_asset.id} }
-  }
-  named_scope :for_user, lambda{|user|
-    user_id = user.is_a?(User) ? user.id : user
-    {:conditions => {:user_id => user_id} }
-  }
+  scope :for_outcome_ids, lambda { |ids| where(:learning_outcome_id => ids) }
+  scope :for_association, lambda { |association| where(:association_type => association.class.to_s, :association_id => association.id) }
+  scope :for_associated_asset, lambda { |associated_asset| where(:associated_asset_type => associated_asset.class.to_s, :associated_asset_id => associated_asset.id) }
+  scope :for_user, lambda { |user| where(:user_id => user) }
 end

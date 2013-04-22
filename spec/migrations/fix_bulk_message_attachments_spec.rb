@@ -29,7 +29,7 @@ describe 'DataFixup::FixBulkMessageAttachments' do
       ConversationBatch.generate(root_message, 20.times.map{ user }, :sync)
 
       # ensure they aren't linked to the attachment
-      AttachmentAssociation.delete_all(["context_id <> ?", root_message.id])
+      AttachmentAssociation.where("context_id<>?", root_message).delete_all
 
       DataFixup::FixBulkMessageAttachments.run
 

@@ -231,7 +231,7 @@ describe DiscussionEntry do
     @subtopic.root_topic = @topic
     @subtopic.save!
 
-    DiscussionTopic.update_all({ :updated_at => 1.hour.ago }, { :id => [@topic.id, @subtopic.id] })
+    DiscussionTopic.where(:id => [@topic, @subtopic]).update_all(:updated_at => 1.hour.ago)
     @topic_updated_at = @topic.reload.updated_at
     @subtopic_updated_at = @subtopic.reload.updated_at
 

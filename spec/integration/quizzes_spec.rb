@@ -27,7 +27,7 @@ describe QuizzesController do
         get "courses/#{@course.id}/quizzes"
 
         doc = Nokogiri::HTML(response.body)
-        doc.css("div.description").text.include?("Due: Multiple Dates").should be_true
+        doc.css("div.description").text.include?("Multiple Dates").should be_true
       end
 
       it "should not indicate multiple due dates if the dates are the same" do

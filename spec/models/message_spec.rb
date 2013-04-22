@@ -26,30 +26,12 @@ describe Message do
       HostUrl.stubs(:protocol).returns("https")
       au = AccountUser.create(:account => account_model)
       msg = generate_message(:account_user_notification, :email, au)
-      file_path = File.expand_path(File.join(RAILS_ROOT, 'app', 'messages', 'alert.email.erb'))
-      template = msg.get_template(file_path)
-      template.should match(%r{Account Admin Notification})
+      template = msg.get_template('alert.email.erb')
+      template.should match(%r{An alert has been triggered})
     end
   end
 
   describe '#populate body' do
-    it 'should generate a body' do
-      HostUrl.stubs(:protocol).returns('https')
-      user = user(:active_all => true)
-      au   = AccountUser.create(:account => account_model, :user => user)
-      msg  = generate_message(:account_user_notification, :email, au)
-      msg.populate_body('this is a test', 'email', msg.send(:binding))
-      msg.body.should eql('this is a test')
-    end
-
-    it 'should not save an html body by default' do
-      user         = user(:active_all => true)
-      account_user = AccountUser.create!(:account => account_model, :user => user)
-      message      = generate_message(:account_user_notification, :email, account_user)
-
-      message.html_body.should be_nil
-    end
-
     it 'should save an html body if a template exists' do
       Message.any_instance.expects(:load_html_template).returns('template')
       user         = user(:active_all => true)
@@ -66,6 +48,7 @@ describe Message do
       @au = AccountUser.create(:account => account_model)
       msg = generate_message(:account_user_notification, :email, @au)
       msg.body.should include('Account Admin')
+      msg.html_body.should include('Account Admin')
     end
   end
 

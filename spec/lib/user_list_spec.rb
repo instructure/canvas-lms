@@ -474,7 +474,7 @@ describe UserList do
   end
 
   context "sharding" do
-    it_should_behave_like "sharding"
+    specs_require_sharding
 
     it "should find a user from a trusted account in a different shard" do
       @shard1.activate do

@@ -6,9 +6,9 @@ class FixEnrollmentRootAccountId < ActiveRecord::Migration
     when 'MySQL', 'Mysql2'
       execute "UPDATE enrollments e, courses c SET e.root_account_id = c.root_account_id WHERE e.course_id = c.id AND e.root_account_id != c.root_account_id"
     else
-      courses = Course.all.each do |c|
-        bad_enrollments = c.enrollments.select { |e| e.root_account_id != c.root_account_id }.map(&:id)
-        Enrollment.update_all({:root_account_id => c.root_account_id}, :id => bad_enrollments)
+      Course.find_each do |c|
+        bad_enrollments = c.enrollments.where("enrollments.root_account_id<>courses.root_account_id").pluck(:id)
+        Enrollment.where(:id => bad_enrollments).update_all(:root_account_id => c.root_account_id)
       end
     end
   end

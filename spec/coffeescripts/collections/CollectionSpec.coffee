@@ -10,6 +10,8 @@ define [
         multi: ['foos', 'bars']
         single: 1
 
+    @optionProperty 'foo'
+
     url: '/fake'
 
     model: Backbone.Model.extend()
@@ -30,6 +32,10 @@ define [
     collection2 = new TestCollection null, foo: 'baz'
     equal collection2.options.foo, 'baz',
       'overrides default options with instance options'
+
+  test 'optionProperty', ->
+    collection = new TestCollection foo: 'bar'
+    equal collection.foo, 'bar'
 
   test 'sends @params in request', ->
     collection = new TestCollection()
@@ -56,4 +62,32 @@ define [
 
     equal collection.url(), '/api/v1/courses/1/discussion_topics',
       'used conventional URL with specific contextAssetString'
+
+  test 'triggers setParam event', ->
+    collection = new Backbone.Collection
+    spy = sinon.spy()
+    collection.on 'setParam', spy
+    collection.setParam 'foo', 'bar'
+    ok spy.calledOnce, 'event triggered'
+    equal spy.args[0][0], 'foo'
+    equal spy.args[0][1], 'bar'
+
+  test 'setParams', ->
+    collection = new Backbone.Collection
+    ok !collection.options.params, 'no params'
+    collection.setParams
+      foo: 'bar'
+      baz: 'qux'
+    deepEqual collection.options.params, foo: 'bar', baz: 'qux'
+
+  test 'triggers setParams event', ->
+    collection = new Backbone.Collection
+    spy = sinon.spy()
+    collection.on 'setParams', spy
+    params =
+      foo: 'bar'
+      baz: 'qux'
+    collection.setParams params
+    ok spy.calledOnce, 'event triggered'
+    equal spy.args[0][0], params
 

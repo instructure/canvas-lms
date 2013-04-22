@@ -1,18 +1,11 @@
 <html>
-<body style="background-color: #EAEAEA; background-image: url(<%= "#{HostUrl.protocol}://#{HostUrl.context_host(asset_context)}" %>/images/noisy-gray.jpg);">
+<body style="background-color: #EAEAEA;">
 
 <center>
   <table cellpadding="8" cellspacing="0" style="margin: 0; padding: 0; width:528px;" border="0">
     <tr>
       <td valign="top">
         <table cellpadding="0" cellspacing="0" align="center" border="0" style="background-color: #ffffff; border-left: 1px #D2D2D2 solid; border-right: 1px #D2D2D2 solid; border-top: 1px #D2D2D2 solid;">
-          <tr>
-            <td align="left" style="font-size: 0px;" height="1">
-              <div style="padding: 15px;">
-                <img src="<%= "#{HostUrl.protocol}://#{HostUrl.context_host(asset_context)}" %>/images/canvas-email.png" style="height: 40px;" height="40">
-              </div>
-            </td>
-          </tr>
           <tr>
             <td>
               <table cellpadding="0" cellspacing="0" style="border-bottom: 1px #D2D2D2 solid;" border="0" align="center">
@@ -23,7 +16,7 @@
                   <td width="36"></td>
                   <td width="454" style="font-size: 14px; color: #444444; font-family: 'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif'; border-collapse: collapse;" align="left" valign="top">
 
-                    <%= yield %>
+                    <%= inner_html %>
 
                   </td>
                   <td width="36"></td>
@@ -43,8 +36,8 @@
             <td style="padding: 0; border-collapse: collapse;">
               <table cellpadding="0" cellspacing="0" align="center" border="0">
                 <tr style="font-size: 11px; color: #a8b9c6; font-family: 'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif';" valign="top">
-                  <td width="400" align="left"><a href="<%= "#{HostUrl.protocol}://#{HostUrl.context_host(asset_context)}/profile/communication" %>" style="color: #555555;">
-                      <%= t 'click_to_preferences', "click here to edit your notification preferences" %></a></td>
+                  <td width="400" align="left"><a href="<%= "#{HostUrl.protocol}://#{HostUrl.default_host}/profile/communication" %>" style="color: #555555;">
+                    <%= t 'click_to_preferences', "Click here to edit your notification preferences" %></a></td>
                   <td width="128" align="right">&#169; <%= Time.now.year %> Instructure</td>
                 </tr>
               </table>

@@ -54,4 +54,20 @@ describe "/gradebooks/grade_summary" do
     response.should_not be_nil
     response.body.should_not match(/Click any score/)
   end
+  
+  it "should know the types of media comments" do
+    stub_kaltura
+    course_with_teacher
+    student_in_course
+    view_context
+    a = @course.assignments.create!(:title => 'some assignment', :submission_types => ['online_text_entry'])
+    sub = a.submit_homework @student, :submission_type => "online_text_entry", :body => "o hai"
+    sub.add_comment :author => @teacher, :media_comment_id => '0_abcdefgh', :media_comment_type => 'audio'
+    sub.add_comment :author => @teacher, :media_comment_id => '0_ijklmnop', :media_comment_type => 'video'
+    assigns[:presenter] = GradeSummaryPresenter.new(@course, @teacher, @student.id)
+    render "gradebooks/grade_summary"
+    doc = Nokogiri::HTML::DocumentFragment.parse response.body
+    doc.at_css('.audio_comment ~ span.media_comment_id').text.should eql '0_abcdefgh'
+    doc.at_css('.video_comment ~ span.media_comment_id').text.should eql '0_ijklmnop'
+  end
 end

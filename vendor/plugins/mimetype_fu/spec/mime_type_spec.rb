@@ -1,5 +1,5 @@
-require File.dirname(__FILE__) + '/spec_helper'
-require File.dirname(__FILE__) + '/../lib/mimetype_fu'
+require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../lib/mimetype_fu')
 
 describe 'A file with a know extension' do
   

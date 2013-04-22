@@ -108,7 +108,7 @@ module Workflow
   
   module WorkflowClassMethods
     def self.extended(klass)
-      klass.send(:class_inheritable_accessor, :workflow_spec)
+      klass.send(:class_attribute, :workflow_spec)
     end
  
     def workflow(&specification)

@@ -286,6 +286,96 @@ describe AccountsController do
       @account.enable_profiles?.should be_true
       @account.admins_can_change_passwords?.should be_true
     end
+    
+    describe "quotas" do
+      before do
+        @account = Account.create!
+        user
+        user_session(@user)
+        @account.default_storage_quota_mb = 123
+        @account.default_user_storage_quota_mb = 45
+        @account.storage_quota = 555.megabytes
+        @account.save!
+      end
+      
+      context "with :manage_storage_quotas" do
+        before do
+          custom_account_role 'quota-setter', :account => @account
+          @account.role_overrides.create! :permission => 'manage_account_settings', :enabled => true,
+                                          :enrollment_type => 'quota-setter'
+          @account.role_overrides.create! :permission => 'manage_storage_quotas', :enabled => true,
+                                          :enrollment_type => 'quota-setter'
+          @account.add_user @user, 'quota-setter'
+        end
+        
+        it "should allow setting default quota (mb)" do
+          post 'update', :id => @account.id, :account => {
+              :default_storage_quota_mb => 999,
+              :default_user_storage_quota_mb => 99
+          }
+          @account.reload
+          @account.default_storage_quota_mb.should == 999
+          @account.default_user_storage_quota_mb.should == 99
+        end
+        
+        it "should allow setting default quota (bytes)" do
+          post 'update', :id => @account.id, :account => {
+              :default_storage_quota => 101.megabytes,
+          }
+          @account.reload
+          @account.default_storage_quota.should == 101.megabytes
+        end
+        
+        it "should allow setting storage quota" do
+          post 'update', :id => @account.id, :account => {
+            :storage_quota => 777.megabytes
+          }
+          @account.reload
+          @account.storage_quota.should == 777.megabytes
+        end
+      end
+      
+      context "without :manage_storage_quotas" do
+        before do
+          custom_account_role 'quota-loser', :account => @account
+          @account.role_overrides.create! :permission => 'manage_account_settings', :enabled => true,
+                                          :enrollment_type => 'quota-loser'
+          @account.add_user @user, 'quota-loser'
+        end
+        
+        it "should disallow setting default quota (mb)" do
+          post 'update', :id => @account.id, :account => {
+              :default_storage_quota => 999,
+              :default_user_storage_quota_mb => 99,
+              :default_time_zone => 'Alaska'
+          }
+          @account.reload
+          @account.default_storage_quota_mb.should == 123
+          @account.default_user_storage_quota_mb.should == 45
+          @account.default_time_zone.should == 'Alaska'
+        end
+
+        it "should disallow setting default quota (bytes)" do
+          post 'update', :id => @account.id, :account => {
+              :default_storage_quota => 101.megabytes,
+              :default_time_zone => 'Alaska'
+          }
+          @account.reload
+          @account.default_storage_quota.should == 123.megabytes
+          @account.default_time_zone.should == 'Alaska'
+        end
+
+        it "should disallow setting storage quota" do
+          post 'update', :id => @account.id, :account => {
+              :storage_quota => 777.megabytes,
+              :default_time_zone => 'Alaska'
+          }
+          @account.reload
+          @account.storage_quota.should == 555.megabytes
+          @account.default_time_zone.should == 'Alaska'
+        end
+      end
+    end
   end
 
 end

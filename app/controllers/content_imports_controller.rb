@@ -113,7 +113,7 @@ class ContentImportsController < ApplicationController
 
   def migrate_content_s3_success
     load_migration_and_attachment do
-      if Attachment.s3_storage? && details = AWS::S3::S3Object.about(@attachment.full_filename, @attachment.bucket_name) rescue nil
+      if Attachment.s3_storage? && details = @attachment.s3object.head rescue nil
         @attachment.process_s3_details!(details)
         @migration.export_content
       end

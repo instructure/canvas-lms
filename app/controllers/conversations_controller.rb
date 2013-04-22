@@ -190,7 +190,7 @@ class ConversationsController < ApplicationController
       end
 
       # reload and preload stuff
-      conversations = ConversationParticipant.find(:all, :conditions => {:id => batch.conversations.map(&:id)}, :include => [:conversation], :order => "visible_last_authored_at DESC, last_message_at DESC, id DESC")
+      conversations = ConversationParticipant.where(:id => batch.conversations).includes(:conversation).order("visible_last_authored_at DESC, last_message_at DESC, id DESC")
       Conversation.preload_participants(conversations.map(&:conversation))
       ConversationParticipant.preload_latest_messages(conversations, @current_user)
       visibility_map = infer_visibility(*conversations) 
@@ -425,6 +425,24 @@ class ConversationsController < ApplicationController
   def destroy
     @conversation.remove_messages(:all)
     render :json => conversation_json(@conversation, @current_user, session, :visible => false)
+  end
+
+  # internal api
+  # @example_request
+  #     curl https://<canvas>/api/v1/conversations/:id/delete_for_all \ 
+  #       -X DELETE \ 
+  #       -H 'Authorization: Bearer <token>'
+  def delete_for_all
+    return unless authorized_action(Account.site_admin, @current_user, :become_user)
+
+    conversation = Conversation.find(params[:id])
+    conversation.stream_item.stream_item_instances.destroy_all
+    conversation.conversation_participants.each do |cp|
+      cp.messages.clear
+      cp.destroy
+    end
+
+    render :json => {}
   end
 
   # @API Add recipients
@@ -692,10 +710,7 @@ class ConversationsController < ApplicationController
   def infer_visibility(*conversations)
     result = Hash.new(false)
     visible_conversations = @current_user.shard.activate do
-        @conversations_scope.find(:all,
-          :select => "conversation_id",
-          :conditions => {:conversation_id => conversations.map(&:conversation_id)}
-        )
+        @conversations_scope.select(:conversation_id).where(:conversation_id => conversations.map(&:conversation_id)).all
       end
     visible_conversations.each { |c| result[c.conversation_id] = true }
     if conversations.size == 1
@@ -728,7 +743,7 @@ class ConversationsController < ApplicationController
 
   def get_conversation(allow_deleted = false)
     scope = @current_user.all_conversations
-    scope = scope.scoped(:conditions => "message_count > 0") unless allow_deleted
+    scope = scope.where('message_count>0') unless allow_deleted
     @conversation = scope.find_by_conversation_id(params[:id] || params[:conversation_id] || 0)
     raise ActiveRecord::RecordNotFound unless @conversation
   end

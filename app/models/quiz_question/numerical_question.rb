@@ -50,4 +50,18 @@ class QuizQuestion::NumericalQuestion < QuizQuestion::Base
 
     !!match
   end
+
+  def stats(responses)
+    super
+
+    @question_data[:answers].each do |answer|
+      if answer[:numerical_answer_type] == 'exact_answer'
+        answer[:text] = I18n.t('statistics.exact_answer', "%{exact_value} +/- %{margin}", :exact_value => answer[:exact], :margin => answer[:margin])
+      else
+        answer[:text] = I18n.t('statistics.inexact_answer', "%{lower_bound} to %{upper_bound}", :lower_bound => answer[:start], :upper_bound => answer[:end])
+      end
+    end
+
+    @question_data
+  end
 end

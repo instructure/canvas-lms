@@ -27,7 +27,7 @@ describe PageView do
   end
 
   describe "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should not assign the default shard" do
         PageView.new.shard.should == Shard.default
@@ -55,7 +55,7 @@ describe PageView do
     end
 
     describe "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should always assign the default shard" do
         PageView.new.shard.should == Shard.default
@@ -89,6 +89,32 @@ describe PageView do
         expect { PageView.find(pv.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
       end
 
+      it "should respect the per-shard setting" do
+        pending("needs redis") unless Canvas.redis_enabled?
+
+        begin
+          Shard.default.settings[:page_view_method] = :db
+          Shard.default.save!
+
+          @shard1.activate do
+            course_model
+            pv = page_view_model
+            pv.user = @user
+            pv.context = @course
+            pv.store
+
+            PageView.process_cache_queue
+            pv = PageView.find(pv.request_id)
+            pv.should be_present
+            pv.user.should == @user
+            pv.context.should == @course
+          end
+        ensure
+          Shard.default.settings.delete(:page_view_method)
+          Shard.default.save!
+        end
+      end
+
       it "should handle default shard ids through redis" do
         pending("needs redis") unless Canvas.redis_enabled?
 
@@ -105,7 +131,7 @@ describe PageView do
           pv.request_id
         end
 
-        pv = PageView.find(id)
+        pv = @shard1.activate { PageView.find(id) }
         pv.user.should == @pv_user
         pv.context.should == @course
 
@@ -351,5 +377,33 @@ describe PageView do
     its(:created_at) { should_not be_nil }
     its(:updated_at) { should_not be_nil }
     its(:http_method) { should == 'get' }
+  end
+
+  describe ".for_request_id" do
+    context "db-backed" do
+      before do
+        Setting.set('enable_page_views', 'db')
+      end
+
+      it "should return use existing page view if any" do
+        pv = page_view_model
+        PageView.for_request_id(pv.request_id).should == pv
+      end
+
+      it "should return nothing with unknown request id" do
+        PageView.for_request_id('unknown').should be_nil
+      end
+    end
+
+    context "cassandra-backed" do
+      it_should_behave_like "cassandra page views"
+      it "should generate a new page view with that request_id" do
+        pv = page_view_model
+        new_pv = PageView.for_request_id(pv.request_id)
+        new_pv.should_not be_nil
+        new_pv.request_id.should == pv.request_id
+        new_pv.url.should_not == pv.url
+      end
+    end
   end
 end

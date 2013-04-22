@@ -27,7 +27,7 @@ SQL
           # duplicate!
           # we have no way of knowing which one (or both) has stream item instances,
           # so just let the first one win
-          StreamItem.delete_all(:id => si['id'])
+          StreamItem.where(:id => si['id']).delete_all
         end
       end
     end
@@ -45,7 +45,7 @@ SQL
         context_type, context_id = ActiveRecord::Base.parse_asset_string(sii['context_code'])
         updates[:context_type] = context_type
         updates[:context_id] = context_id
-        StreamItemInstance.update_all(updates, :id => sii['id'])
+        StreamItemInstance.where(:id => sii['id']).update_all(updates)
       end
     end
   end

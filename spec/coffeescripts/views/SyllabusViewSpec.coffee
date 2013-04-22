@@ -46,7 +46,7 @@ define [
       links = "<#{request.url}>; rel=\"first\""
       links += ",<#{request.url}>; rel=\"next\"" if more
 
-      request.respond 200
+      request.respond 200,
         'Content-Type': 'application/json'
         'Link': links
         JSON.stringify response
@@ -61,7 +61,7 @@ define [
       links = "<#{request.url}>; rel=\"first\""
       links += ",<#{request.url}>; rel=\"next\"" if more
 
-      request.respond 200
+      request.respond 200,
         'Content-Type': 'application/json'
         'Link': links
         JSON.stringify response

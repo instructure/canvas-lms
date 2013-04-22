@@ -1,7 +1,7 @@
 if RUBY_VERSION >= "1.9."
   module Mail
     class Ruby19
-      raise 'mail gem version has changed from 2.5.3: check these patches against the new mail gem' if Mail::VERSION.version != '2.5.3'
+      raise 'mail gem version has changed from 2.5.3: check these patches against the new mail gem' if Mail::VERSION.version > '2.5.3'
 
       # Updating the fix_encoding function to match the pick_encoding function from the gem's master branch:
       # This will fix encoding issues we've run into with ks_c_5601-1987 and gb2312

@@ -111,10 +111,6 @@ module AuthenticationMethods
       @current_user = nil
     end
 
-    if api_request? && !@current_user
-      raise AccessTokenError
-    end
-
     if @current_user && %w(become_user_id me become_teacher become_student).any? { |k| params.key?(k) }
       request_become_user = nil
       if params[:become_user_id]
@@ -210,8 +206,29 @@ module AuthenticationMethods
         opts[:canvas_login] = 1 if params[:canvas_login]
         redirect_to login_url(opts) # should this have :no_auto => 'true' ?
       }
-      format.json { render :json => {:errors => {:message => I18n.t('lib.auth.authentication_required', "user authorization required")}}.to_json, :status => :unauthorized}
+      format.json { render_json_unauthorized }
     end
+  end
+
+  def render_json_unauthorized
+    add_www_authenticate_header if api_request? && !@current_user
+    if @current_user
+      render :json => {
+               :status => I18n.t('lib.auth.status_unauthorized', 'unauthorized'),
+               :errors => { :message => I18n.t('lib.auth.not_authorized', "user not authorized to perform that action") }
+             },
+             :status => :unauthorized
+    else
+      render :json => {
+               :status => I18n.t('lib.auth.status_unauthenticated', 'unauthenticated'),
+               :errors => { :message => I18n.t('lib.auth.authentication_required', "user authorization required") }
+             },
+             :status => :unauthorized
+    end
+  end
+
+  def add_www_authenticate_header
+    response['WWW-Authenticate'] = %{Bearer realm="canvas-lms"}
   end
 
   # Reset the session, and copy the specified keys over to the new session.

@@ -1,0 +1,13 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/accounts/<%= asset.account_id %>/files/<%= asset.attachment_id %>/download
+<% end %>
+  
+<% define_content :subject do %>
+  <%= t :subject, "Report Generated" %>
+<% end %>
+
+<p><strong><%= t :subject, "Report Generated" %></strong></p>
+
+<p><%= asset.message %></p>
+
+<p><a href="<%= content :link %>"><%= t :link_message, "Click here to download the report" %></a></p>

@@ -26,8 +26,8 @@
 <div id="account_settings_tabs" style="display:none;" class="ui-tabs-minimal">
   <ul>
     <% if can_do(@context, @current_user, :manage_account_settings) %>
-    <li><a href="#tab-settings"><%= t(:tab_settings, "Settings") %></a></li>
-    <li><a href="#tab-notifications"><%= t(:tab_notifications, "Notifications") %></a></li>
+    <li><a href="#tab-settings" id="tab-settings-link"><%= t(:tab_settings, "Settings") %></a></li>
+    <li><a href="#tab-notifications" id="tab-notifications-link"><%= t(:tab_notifications, "Notifications") %></a></li>
     <% end %>
     <li><a href="#tab-users" id="tab-users-link"><%= t(:tab_admins, "Admins") %></a></li>
     <% if @account.root_account? %>
@@ -67,19 +67,24 @@
                 </td>
               </tr>
             <% end %>
+            <% has_manage_quotas = can_do(@context, @current_user, :manage_storage_quotas) %>
             <tr>
               <td>
                 <%= f.blabel :default_course_storage_quota, :en => "Default Course File Quota" %>
               </td>
-              <td><%= t(:megabytes_field, "%{text_field} megabytes", :text_field => f.text_field(:default_storage_quota_mb, :id => 'account_default_course_storage_quota', :style => "width: 50px;", :title => t(:megabytes_tooltip, "megabytes"))) %></td>
+              <td><%= t(:megabytes_field, "%{text_field} megabytes", :text_field => (has_manage_quotas ?
+                      f.text_field(:default_storage_quota_mb, :id => 'account_default_course_storage_quota', :style => "width: 50px;", :title => t(:megabytes_tooltip, "megabytes")) :
+                      @account.default_storage_quota_mb.to_s)) %></td>
             </tr>
             <% if @account.root_account? && !@account.site_admin? %>
-            <tr>
-              <td>
-                <%= f.blabel :default_user_storage_quota, :en => "Default User File Quota" %>
-              </td>
-              <td><%= t(:megabytes_field, "%{text_field} megabytes", :text_field => f.text_field(:default_user_storage_quota_mb, :id => 'account_default_user_storage_quota', :style => "width: 50px;", :title => t(:megabytes_tooltip, "megabytes"))) %></td>
-            </tr>
+              <tr>
+                <td>
+                  <%= f.blabel :default_user_storage_quota, :en => "Default User File Quota" %>
+                </td>
+                <td><%= t(:megabytes_field, "%{text_field} megabytes", :text_field => (has_manage_quotas ?
+                        f.text_field(:default_user_storage_quota_mb, :id => 'account_default_user_storage_quota', :style => "width: 50px;", :title => t(:megabytes_tooltip, "megabytes")) :
+                        @account.default_user_storage_quota_mb.to_s)) %></td>
+              </tr>
             <% end %>
             <% if available_locales.size > 1 %>
             <tr>
@@ -133,6 +138,11 @@ TEXT
                   <tr>
                     <td colspan="2"><%= settings.check_box :allow_sending_scores_in_emails, :checked => @account.settings[:allow_sending_scores_in_emails] != false %>
                     <%= settings.label :allow_sending_scores_in_emails, :en => "Students can opt-in to receiving scores in email notifications" %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="2"><%= settings.check_box :restrict_student_future_view, :checked => @account.settings[:restrict_student_future_view] %>
+                      <%= settings.label :restrict_student_future_view, :en => "Restrict students from viewing courses before start date" %>
                     </td>
                   </tr>
                 <% end %>
@@ -312,6 +322,7 @@ TEXT
                 <% ((@account.settings[:custom_help_links] || []) << {}).each_with_index do |help_link, i| %>
                   <div class="custom_help_link <%= raw ' blank" style="display: none;' if help_link.empty? %>">
                     <a href="#" class="delete" title="<%= t(:delete, "delete") %>">&nbsp;</a>
+                    <input type="hidden" name="account[custom_help_links][<%= i %>][state]" value="<%= help_link[:state] || 'active' %>" id="custom_help_links_<%= i %>_state" class="custom_help_link_state"/>
                     <table class="formtable">
                       <tr>
                         <td><label for="custom_help_links_<%= i %>_text"><%= before_label :help_link_text, "Text to display for link" %></label></td>

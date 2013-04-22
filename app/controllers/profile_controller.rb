@@ -209,7 +209,10 @@ class ProfileController < ApplicationController
         if params[:pseudonym]
           change_password = params[:pseudonym].delete :change_password
           old_password = params[:pseudonym].delete :old_password
-          pseudonym_to_update = @user.pseudonyms.find(params[:pseudonym][:password_id]) if params[:pseudonym][:password_id] && change_password
+          if params[:pseudonym][:password_id] && change_password
+            pseudonym_to_update = @user.pseudonyms.find(params[:pseudonym][:password_id])
+            pseudonym_to_update.require_password = true if pseudonym_to_update
+          end
           if change_password == '1' && pseudonym_to_update && !pseudonym_to_update.valid_arbitrary_credentials?(old_password)
             error_msg = t('errors.invalid_old_passowrd', "Invalid old password for the login %{pseudonym}", :pseudonym => pseudonym_to_update.unique_id)
             pseudonymed = true
@@ -271,8 +274,8 @@ class ProfileController < ApplicationController
         visible, invisible = params[:user_services].partition { |service,bool|
           value_to_boolean(bool)
         }
-        @user.user_services.update_all("visible = TRUE", :service => visible.map(&:first))
-        @user.user_services.update_all("visible = FALSE", :service => invisible.map(&:first))
+        @user.user_services.where(:service => visible.map(&:first)).update_all(:visible => true)
+        @user.user_services.where(:service => invisible.map(&:first)).update_all(:visible => false)
       end
 
       respond_to do |format|

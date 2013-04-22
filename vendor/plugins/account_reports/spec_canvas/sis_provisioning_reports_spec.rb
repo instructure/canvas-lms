@@ -193,7 +193,7 @@ describe "Default Account Reports" do
     @enrollment9 = @section1.enroll_user(@user4,'TeacherEnrollment','active')
     @enrollment10 = @course1.enroll_user(@user6,'TeacherEnrollment',
                                          :enrollment_state => :completed)
-    @enrollment11 = @course2.enroll_user(@user5,'DesignerEnrollment',
+    @enrollment11 = @course2.enroll_user(@user4,'DesignerEnrollment',
                                          :role_name => 'Pixel Engineer',
                                          :enrollment_state => :active)
   end
@@ -644,7 +644,7 @@ describe "Default Account Reports" do
         parsed[5].should == ["SIS_COURSE_ID_2","user_sis_id_03","student",nil,"active",nil]
         parsed[6].should == ["SIS_COURSE_ID_1","user_sis_id_04","teacher",
                              "english_section_1","active",nil]
-        parsed[7].should == ["SIS_COURSE_ID_2","user_sis_id_05","Pixel Engineer",nil,"active",nil]
+        parsed[7].should == ["SIS_COURSE_ID_2","user_sis_id_04","Pixel Engineer",nil,"active",nil]
       end
 
       it "should run sis report for a term" do
@@ -658,7 +658,7 @@ describe "Default Account Reports" do
                              nil,"active","user_sis_id_03"]
         parsed[1].should == ["SIS_COURSE_ID_3","user_sis_id_02","student",nil,"active",nil]
         parsed[2].should == ["SIS_COURSE_ID_2","user_sis_id_03","student",nil,"active",nil]
-        parsed[3].should == ["SIS_COURSE_ID_2","user_sis_id_05","Pixel Engineer",nil,"active",nil]
+        parsed[3].should == ["SIS_COURSE_ID_2","user_sis_id_04","Pixel Engineer",nil,"active",nil]
       end
 
       it "should run the provisioning report with deleted enrollments" do
@@ -688,11 +688,11 @@ describe "Default Account Reports" do
                              "english_section_1","active",nil,nil]
         parsed[8].should == [@course1.id.to_s ,"SIS_COURSE_ID_1",@user4.id.to_s,"user_sis_id_04",
                              "teacher",@enrollment6.course_section_id.to_s,nil,"deleted",nil,nil]
-        parsed[9].should == [@course4.id.to_s ,nil,@user5.id.to_s,"user_sis_id_05","teacher",
-                             @enrollment8.course_section_id.to_s,nil,"active",nil,nil]
-        parsed[10].should == [@course2.id.to_s ,"SIS_COURSE_ID_2",@user5.id.to_s,"user_sis_id_05",
+        parsed[9].should == [@course2.id.to_s ,"SIS_COURSE_ID_2",@user4.id.to_s,"user_sis_id_04",
                               "Pixel Engineer",@enrollment11.course_section_id.to_s,
                               nil,"active",nil,nil]
+        parsed[10].should == [@course4.id.to_s ,nil,@user5.id.to_s,"user_sis_id_05","teacher",
+                             @enrollment8.course_section_id.to_s,nil,"active",nil,nil]
       end
 
       it "should run the provisioning report on a term and sub account with deleted enrollments" do

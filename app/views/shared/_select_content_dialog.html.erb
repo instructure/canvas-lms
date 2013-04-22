@@ -120,7 +120,7 @@
         <select class="module_item_select" multiple>
           <%# cache on the context.wiki instead of just the context because even though it will require a db query, we will get a much better cache hit rate %>
           <% cache([@context.wiki, 'active_wiki_pages']) do  %>
-            <% @context.wiki.wiki_pages.active.scoped({:select => "id, title"}).each do |page| %>
+            <% @context.wiki.wiki_pages.active.select([:id, :title]).each do |page| %>
               <% if page && !page.new_record? %>
                 <option value="<%= page.id %>"><%= page.title %></option>
               <% end %>
@@ -144,7 +144,7 @@
         </div>
         <div style="margin-top: 5px;">
         <select class="module_item_select" multiple>
-          <% @context.folders.active.scoped({:limit => 200}).sort_by{|f| f.full_name}.each do |folder| %>
+          <% @context.folders.active.limit(200).sort_by{|f| f.full_name}.each do |folder| %>
             <optgroup label="<%= folder.full_name %>">
               <% 
               attachments = if @context.grants_right?(@current_user, session, :manage_files)
@@ -191,7 +191,7 @@
         </div>
         <div style="margin-top: 5px;">
         <select class="module_item_select" multiple>
-          <% @context.quizzes.active.scoped({:limit => 400}).each do |quiz| %>
+          <% @context.quizzes.active.limit(400).each do |quiz| %>
             <option value="<%= quiz.id %>"><%= quiz.title %></option>
           <% end %>
           <option value="new"><%= t :new_quiz_option, "[ New Quiz ]" %></option>
@@ -233,7 +233,7 @@
         <select class="module_item_select" multiple>
           <% @context.assignment_groups.active.include_active_assignments.each do |group| %>
             <optgroup label="<%= group.name %>">
-            <% group.active_assignments.no_graded_quizzes_or_topics.scoped({:limit => 200}).each do |assignment| %>
+            <% group.active_assignments.no_graded_quizzes_or_topics.limit(200).each do |assignment| %>
               <option value="<%= assignment.id %>"><%= assignment.title %></option>
             <% end %>
             </optgroup>

@@ -6,11 +6,12 @@ Technoweenie::AttachmentFu::InstanceMethods.module_eval do
     begin
       tmp = self.create_temp_file
       res = self.create_or_update_thumbnail(tmp, target_size.to_s, actual_size)
-    rescue AWS::S3::NoSuchKey => e
+    rescue AWS::S3::Errors::NoSuchKey => e
       logger.warn("error when trying to make thumbnail for attachment_id: #{self.id} (the image probably doesn't exist on s3) error details: #{e.inspect}")
+    ensure
+      tmp.unlink if tmp
     end
     
-    FileUtils.rm_rf(Dir.glob(File.join(RAILS_ROOT, 'tmp', 'attachment_fu', '*')))
     res
   end
 end

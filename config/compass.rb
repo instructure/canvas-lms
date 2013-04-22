@@ -1,6 +1,6 @@
 # Require any additional compass plugins here.
 project_type = :rails
-project_path = RAILS_ROOT if defined?(RAILS_ROOT)
+project_path = Rails.root.to_s if defined?(Rails)
 # Set this to the root of your project when deployed:
 http_path = "/"
 css_dir = "public/stylesheets/compiled"

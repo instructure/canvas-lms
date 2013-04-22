@@ -2,10 +2,9 @@ module DataFixup::PopulateConversationMessageProperties
 
   def self.run
     ConversationMessage.where("forwarded_message_ids IS NULL").find_ids_in_batches do |ids|
-      ConversationMessage.update_all [
+      ConversationMessage.where(:id => ids).update_all(
         "has_attachments = (attachment_ids IS NOT NULL AND attachment_ids <> ''), " +
-        "has_media_objects = (media_comment_id IS NOT NULL)"
-      ], :id => ids
+        "has_media_objects = (media_comment_id IS NOT NULL)")
     end
 
     # infer_defaults will set has_attachments/has_media_objects

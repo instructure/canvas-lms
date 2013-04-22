@@ -239,8 +239,9 @@ ActionController::Routing::Routes.draw do |map|
     course.resources :assignment_groups, :collection => {:reorder => :post} do |group|
       group.reorder_assignments 'reorder', :controller => 'assignment_groups', :action => 'reorder_assignments'
     end
-    course.resources :external_tools, :collection => {:retrieve => :get} do |tools|
+    course.resources :external_tools, :collection => {:retrieve => :get, :homework_submissions => :get} do |tools|
       tools.resource_selection 'resource_selection', :controller => 'external_tools', :action => 'resource_selection'
+      tools.homework_submission 'homework_submission', :controller => 'external_tools', :action => 'homework_submission'
       tools.finished 'finished', :controller => 'external_tools', :action => 'finished'
     end
     course.resources :submissions
@@ -424,6 +425,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :accounts, :member => { :statistics => :get } do |account|
     account.settings 'settings', :controller => 'accounts', :action => 'settings'
+    account.admin_tools 'admin_tools', :controller => 'accounts', :action => 'admin_tools'
     account.add_account_user 'account_users', :controller => 'accounts', :action => 'add_account_user', :conditions => {:method => :post}
     account.remove_account_user 'account_users/:id', :controller => 'accounts', :action => 'remove_account_user', :conditions => {:method => :delete}
 
@@ -542,8 +544,13 @@ ActionController::Routing::Routes.draw do |map|
     user.course_teacher_activity 'teacher_activity/course/:course_id', :controller => 'users', :action => 'teacher_activity'
     user.student_teacher_activity 'teacher_activity/student/:student_id', :controller => 'users', :action => 'teacher_activity'
     user.media_download 'media_download', :controller => 'users', :action => 'media_download'
-    user.resources :messages, :only => [:index, :create]
+    user.resources :messages, :only => [:index, :create] do |message|
+      message.html_message "html_message", :controller => "messages", :action => "html_message", :conditions => {:method => :get}
+    end
   end
+  map.show_message_template 'show_message_template', :controller => 'messages', :action => 'show_message_template'
+  map.message_templates 'message_templates', :controller => 'messages', :action => 'templates'
+
   map.resource :profile, :only => %w(show update),
                :controller => "profile",
                :member => { :update_profile => :put, :communication => :get, :communication_update => :put, :settings => :get } do |profile|
@@ -748,6 +755,19 @@ ActionController::Routing::Routes.draw do |map|
       topics.get 'groups/:group_id/discussion_topics', :action => :index, :path_name => 'group_discussion_topics'
     end
 
+    api.with_options(:controller => :content_migrations) do |cm|
+      cm.get 'courses/:course_id/content_migrations/:id', :action => :show, :path_name => 'course_content_migration'
+      cm.get 'courses/:course_id/content_migrations', :action => :index, :path_name => 'course_content_migration_list'
+      cm.get 'courses/:course_id/content_migrations/:id/download_archive', :action => 'download_archive', :conditions => {:method => :get}, :path_name => 'course_content_migration_download'
+    end
+
+    api.with_options(:controller => :migration_issues) do |mi|
+      mi.get 'courses/:course_id/content_migrations/:content_migration_id/migration_issues/:id', :action => :show, :path_name => 'course_content_migration_migration_issue'
+      mi.get 'courses/:course_id/content_migrations/:content_migration_id/migration_issues', :action => :index, :path_name => 'course_content_migration_migration_issue_list'
+      mi.post 'courses/:course_id/content_migrations/:content_migration_id/migration_issues', :action => :create, :path_name => 'course_content_migration_migration_issue_create'
+      mi.put 'courses/:course_id/content_migrations/:content_migration_id/migration_issues/:id', :action => :update, :path_name => 'course_content_migration_migration_issue_update'
+    end
+
     api.with_options(:controller => :discussion_topics_api) do |topics|
       def topic_routes(topics, context)
         topics.get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id", :action => :show, :path_name => "#{context}_discussion_topic"
@@ -845,6 +865,7 @@ ActionController::Routing::Routes.draw do |map|
       accounts.put 'accounts/:id', :action => :update
       accounts.get 'accounts/:account_id/courses', :action => :courses_api, :path_name => 'account_courses'
       accounts.get 'accounts/:account_id/sub_accounts', :action => :sub_accounts, :path_name => 'sub_accounts'
+      accounts.get 'accounts/:account_id/courses/:id', :controller => :courses, :action => :show, :path_name => 'account_course_show'
     end
 
     api.with_options(:controller => :role_overrides) do |roles|
@@ -902,6 +923,7 @@ ActionController::Routing::Routes.draw do |map|
       conversations.post 'conversations/:id/add_recipients', :action => :add_recipients
       conversations.post 'conversations/:id/remove_messages', :action => :remove_messages
       conversations.put 'conversations', :action => :batch_update
+      conversations.delete 'conversations/:id/delete_for_all', :action => :delete_for_all
     end
 
     api.with_options(:controller => :communication_channels) do |channels|

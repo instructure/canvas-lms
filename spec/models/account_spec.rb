@@ -138,6 +138,7 @@ describe Account do
       it "should list associated courses" do
         @account.fast_all_courses.map(&:sis_source_id).sort.should == [
           "C001", "C005", "C006", "C007", "C008", "C009",
+          
           "C001S", "C005S", "C006S", "C007S", "C008S", "C009S", ].sort
       end
 
@@ -737,7 +738,7 @@ describe Account do
   end
 
   context "sharding" do
-    it_should_behave_like "sharding"
+    specs_require_sharding
 
     it "should properly return site admin permissions regardless of active shard" do
       enable_cache do
@@ -913,7 +914,7 @@ describe Account do
 
   describe "account_chain" do
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should find parent accounts when not on the correct shard" do
         @shard1.activate do
@@ -924,6 +925,32 @@ describe Account do
 
         @account3.account_chain.should == [@account3, @account2, @account1]
       end
+    end
+  end
+
+  describe "#can_see_admin_tools_tab?" do 
+    it "returns false if no user is present" do 
+      account = Account.create!
+      account.can_see_admin_tools_tab?(nil).should be_false
+    end
+
+    it "returns false if you are a site admin" do
+      admin = account_admin_user(:account => Account.site_admin)
+      Account.site_admin.can_see_admin_tools_tab?(admin).should be_false
+    end
+
+    it "doesn't have permission, it returns false" do 
+      account = Account.create!
+      account.stubs(:grants_right?).returns(false)
+      account_admin_user(:account => account)
+      account.can_see_admin_tools_tab?(@admin).should be_false
+    end
+
+    it "does have permission, it returns true" do 
+      account = Account.create!
+      account.stubs(:grants_right?).returns(true)
+      account_admin_user(:account => account)
+      account.can_see_admin_tools_tab?(@admin).should be_true
     end
   end
 end

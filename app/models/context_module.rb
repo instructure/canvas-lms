@@ -76,7 +76,7 @@ class ContextModule < ActiveRecord::Base
   def destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now
-    ContentTag.update_all({:workflow_state => 'deleted', :updated_at => Time.now.utc}, {:context_module_id => self.id})
+    ContentTag.where(:context_module_id => self).update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
     self.send_later_if_production(:update_downstreams, self.position)
     save!
     true
@@ -105,16 +105,16 @@ class ContextModule < ActiveRecord::Base
     state :deleted
   end
   
-  named_scope :active, :conditions => ['context_modules.workflow_state = ?', 'active']
-  named_scope :unpublished, :conditions => ['context_modules.workflow_state = ?', 'unpublished']
-  named_scope :not_deleted, :conditions => ['context_modules.workflow_state != ?', 'deleted']
+  scope :active, where(:workflow_state => 'active')
+  scope :unpublished, where(:workflow_state => 'unpublished')
+  scope :not_deleted, where("context_modules.workflow_state<>'deleted'")
 
   def update_student_progressions(user=nil)
     # modules are ordered by position, so running through them in order will
     # automatically handle issues with dependencies loading in the correct
     # order
-    modules = ContextModule.find(:all, :order => :position, :conditions => {
-        :context_type => self.context_type, :context_id => self.context_id, :workflow_state => 'active'})
+    modules = ContextModule.order(:position).where(
+        :context_type => self.context_type, :context_id => self.context_id, :workflow_state => 'active')
     students = user ? [user] : self.context.students
     modules.each do |mod|
       mod.re_evaluate_for(students, true)
@@ -394,7 +394,7 @@ class ContextModule < ActiveRecord::Base
   def active_prerequisites
     return [] unless self.prerequisites.any?
     prereq_ids = self.prerequisites.select{|pre|pre[:type] == 'context_module'}.map{|pre| pre[:id] }
-    active_ids = self.context.context_modules.active.scoped(:select => :id, :conditions => {:id => prereq_ids}).map(&:id)
+    active_ids = self.context.context_modules.active.where(:id => prereq_ids).pluck(:id)
     self.prerequisites.select{|pre| pre[:type] == 'context_module' && active_ids.member?(pre[:id])}
   end
   
@@ -506,7 +506,7 @@ class ContextModule < ActiveRecord::Base
     end
     @cached_tags ||= self.content_tags.active
     tags = @cached_tags
-    if recursive_check || progression.new_record? || progression.updated_at < self.updated_at || ENV['RAILS_ENV'] == 'test' || User.module_progression_jobs_queued?(user.id)
+    if recursive_check || progression.new_record? || progression.updated_at < self.updated_at || Rails.env.test? || User.module_progression_jobs_queued?(user.id)
       if self.completion_requirements.blank? && active_prerequisites.empty?
         progression.workflow_state = 'completed'
         progression.save

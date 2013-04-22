@@ -2,6 +2,7 @@
 @import "utilities/context_search";
 
 body {
+  min-width: 960px;
   overflow: hidden;
   &.too_small {
     overflow: auto;
@@ -831,6 +832,9 @@ ul.messages, ul.messages.private, ul.messages.private li:hover {
     > li {
       padding: 0 0 5px 0;
       border: 0;
+    }
+    input[type=file] {
+      height: auto;
     }
   }
   .media_comment {

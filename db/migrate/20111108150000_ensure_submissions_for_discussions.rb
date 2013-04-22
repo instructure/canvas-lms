@@ -87,8 +87,8 @@ class EnsureSubmissionsForDiscussions < ActiveRecord::Migration
     end
 
     # touch all the courses and users
-    Course.update_all({:updated_at => Time.now.utc}, :id => touched_course_ids.to_a) unless touched_course_ids.empty?
-    User.update_all({:updated_at => Time.now.utc}, :id => touched_user_ids.to_a) unless touched_user_ids.empty?
+    Course.where(:id => touched_course_ids.to_a).update_all(:updated_at => Time.now.utc) unless touched_course_ids.empty?
+    User.where(:id => touched_user_ids.to_a).update_all(:updated_at => Time.now.utc) unless touched_user_ids.empty?
   end
 
   def self.down
