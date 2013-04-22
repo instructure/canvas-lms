@@ -1,8 +1,8 @@
-<% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.group.context) %>/<%= asset.group.context.class.to_s.downcase.pluralize %>/<%= asset.group.context_id %>/groups
-<% end %>
-<% if asset.group.context.class.to_s == 'Account' %>
+<% define_content :link do -%>
+<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.group.context) %>/<%= asset.group.context.class.to_s.downcase.pluralize %>/<%= asset.group.context_id %>/groups
+<% end -%>
+<% if asset.group.context.class.to_s == 'Account' -%>
 <%= t('account_group', "Canvas Alert - Group Membership Rejected: %{group_name} for the account %{account_name}.", :group_name => asset.group.name, :account_name => asset.group.context.name) %>
-<% elsif asset.group.context.class.to_s == 'Course' %>
+<% elsif asset.group.context.class.to_s == 'Course' -%>
 <%= t('course_group', "Canvas Alert - Group Membership Rejected: %{group_name} for the course %{course_name}.", :group_name => asset.group.name, :course_name => asset.group.context.name) %>
-<% end %>
+<% end -%>

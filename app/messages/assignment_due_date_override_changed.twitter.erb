@@ -1,9 +1,14 @@
-<% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.assignment.context) %>/<%= asset.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.assignment.context_id %>/assignments/<%= asset.assignment.id %>
-<% end %>
-<%= t('assignment_change', 'Canvas Alert - Date Change: %{assignment_name}, %{course_name} (%{override})', :assignment_name => asset.assignment.title, :course_name => asset.assignment.context.name, :override => asset.title) %>
-<% if asset.due_at %>
+<% define_content :link do -%>
+<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.assignment.context) %>/<%= asset.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.assignment.context_id %>/assignments/<%= asset.assignment.id %>
+<% end -%>
+<%= t('assignment_change', 'Canvas Alert - Date Change: %{assignment_name}, %{course_name} (%{override})', 
+        :assignment_name => asset.assignment.title, 
+        :course_name => asset.assignment.context.name, 
+        :override => asset.title) %>
+
+<% if asset.due_at -%>
   <%= t('due_at', 'due: %{assignment_due_date_time}', :assignment_due_date_time => datetime_string(force_zone(asset.due_at))) %>
-<% else %>
+<% else -%>
   <%= t('no_due_date', 'due: No Due Date') %>
-<% end %>
+<% end -%>
+

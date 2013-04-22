@@ -1,3 +1,7 @@
-<%= data.count %> new files added for <%= asset.context.name %>
-
-More info at <%= HostUrl.context_host(asset.context) %>
+<% define_content :link do -%>
+<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/files
+<% end -%>
+<%= t('body', '%{count} new files added for %{name}.', 
+        :count => data.count,
+        :name => asset.context.name) %>
+<% t('link', 'More info at %{link}', :link => content(:link))

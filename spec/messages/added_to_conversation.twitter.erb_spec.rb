@@ -29,5 +29,7 @@ describe 'added_to_conversation.twitter' do
     conversation.add_message("some message")
     event = conversation.add_participants([student3])
     generate_message(:added_to_conversation, :twitter, event)
+    @message.main_link.should be_present
+    @message.body.should be_present
   end
 end

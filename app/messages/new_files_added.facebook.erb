@@ -1,7 +1,8 @@
 <% define_content :link do %>
   <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/files
 <% end %>
+<p><%= t('body', '%{count} new files have been added for the course, %{name}:', 
+        :count => data.count,
+        :name => asset.context.name) %></p>
 
-<%= data.count %> new files have been added for the course, <%= asset.context.name %>.
-
-<b><a href="<%= content :link %>">View files</a></b>
+<p><a href="<%= content :link %>"><%= t 'link', 'You can view them here' %></a></p>
