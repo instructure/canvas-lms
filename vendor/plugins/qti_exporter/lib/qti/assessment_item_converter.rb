@@ -4,7 +4,7 @@ class AssessmentItemConverter
   DEFAULT_CORRECT_WEIGHT = 100
   DEFAULT_INCORRECT_WEIGHT = 0
   DEFAULT_POINTS_POSSIBLE = 1
-  UNSUPPORTED_TYPES = ['File Upload', 'Hot Spot', 'Quiz Bowl', 'WCT_JumbledSentence', 'file_upload_question']
+  UNSUPPORTED_TYPES = ['File Upload', 'Hot Spot', 'Quiz Bowl', 'WCT_JumbledSentence']
   WEBCT_REL_REGEX = "/webct/RelativeResourceManager/Template/"
 
   attr_reader :base_dir, :identifier, :href, :interaction_type, :title, :question
@@ -90,8 +90,10 @@ class AssessmentItemConverter
       if @migration_type and UNSUPPORTED_TYPES.member?(@migration_type)
         @question[:question_type] = @migration_type
         @question[:unsupported] = true
-      elsif !%w(text_only_question).include?(@migration_type)
+      elsif !%w(text_only_question file_upload_question).include?(@migration_type)
         self.parse_question_data
+      else
+        @question[:question_type] ||= @migration_type
       end
     rescue => e
       message = "There was an error exporting an assessment question"

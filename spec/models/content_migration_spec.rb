@@ -1384,6 +1384,39 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       aq.question_data[:answers][1][:left_html].should == data2[:answers][1][:left_html]
     end
 
+    it "should copy file_upload_questions" do
+      pending unless Qti.qti_enabled?
+      bank = @copy_from.assessment_question_banks.create!(:title => 'Test Bank')
+      data = {:question_type => "file_upload_question",
+              :points_possible => 10,
+              :question_text => "<strong>html for fun</strong>"
+              }.with_indifferent_access
+      bank.assessment_questions.create!(:question_data => data)
+
+      q = @copy_from.quizzes.create!(:title => "survey pub", :quiz_type => "survey")
+      q.quiz_questions.create!(:question_data => data)
+      q.generate_quiz_data
+      q.published_at = Time.now
+      q.workflow_state = 'available'
+      q.save!
+
+      run_course_copy
+
+      @copy_to.assessment_questions.count.should == 2
+      @copy_to.assessment_questions.each do |aq|
+        aq.question_data['question_type'].should == data[:question_type]
+        aq.question_data['question_text'].should == data[:question_text]
+      end
+
+      @copy_to.quizzes.count.should == 1
+      quiz = @copy_to.quizzes.first
+      quiz.quiz_questions.count.should == 1
+
+      qq = quiz.quiz_questions.first
+      qq.question_data['question_type'].should == data[:question_type]
+      qq.question_data['question_text'].should == data[:question_text]
+    end
+
     it "should import calendar events" do
       body_with_link = "<p>Watup? <strong>eh?</strong><a href=\"/courses/%s/assignments\">Assignments</a></p>"
       cal = @copy_from.calendar_events.new
