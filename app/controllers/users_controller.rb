@@ -273,7 +273,39 @@ class UsersController < ApplicationController
     @stream_items = @current_user.try(:cached_recent_stream_items) || []
   end
 
+  def cached_upcoming_events(user)
+    Rails.cache.fetch(['cached_user_upcoming_events', user].cache_key,
+      :expires_in => 3.minutes) do
+      user.upcoming_events :contexts => ([user] + user.cached_contexts)
+    end
+  end
+
+  def cached_submissions(user, upcoming_events)
+    Rails.cache.fetch(['cached_user_submissions', user].cache_key,
+      :expires_in => 3.minutes) do
+      assignments = upcoming_events.select{ |e| e.is_a?(Assignment) }
+      Shard.partition_by_shard(assignments) do |shard_assignments|
+        Submission.
+          select([:id, :assignment_id, :score, :workflow_state]).
+          where(:assignment_id => shard_assignments, :user_id => user)
+      end
+    end
+  end
+
+  def prepare_current_user_dashboard_items
+    if @current_user
+      @upcoming_events =
+        cached_upcoming_events(@current_user)
+      @current_user_submissions =
+        cached_submissions(@current_user, @upcoming_events)
+    else
+      @upcoming_events = []
+    end
+  end
+
   def dashboard_sidebar
+    prepare_current_user_dashboard_items
+
     if @show_recent_feedback = (@current_user.student_enrollments.active.size > 0)
       @recent_feedback = (@current_user && @current_user.recent_feedback) || []
     end
@@ -453,9 +485,7 @@ class UsersController < ApplicationController
   #     }
   #   ]
   def todo_items
-    unless @current_user
-      return render_unauthorized_action
-    end
+    return render_unauthorized_action unless @current_user
 
     grading = @current_user.assignments_needing_grading().map { |a| todo_item_json(a, @current_user, session, 'grading') }
     submitting = @current_user.assignments_needing_submitting().map { |a| todo_item_json(a, @current_user, session, 'submitting') }
@@ -464,38 +494,83 @@ class UsersController < ApplicationController
 
   include Api::V1::Assignment
   include Api::V1::CalendarEvent
-  # Returns the user's upcoming events
+
+  # @API List upcoming assignments, calendar events
+  # Returns the current user's upcoming events, i.e. the same things shown
+  # in the dashboard 'Coming Up' sidebar.
   #
-  #   [{"type": "Assignment|CalendarEvent", "title": "Some Title", start_at: "2012-06-11T00:00:00-06:00"}]
-  def coming_up_items
-    unless @current_user
-      return render_unauthorized_action
+  # @example_response
+  #   [
+  #     {
+  #       "id"=>597,
+  #       "title"=>"Upcoming Course Event",
+  #       "description"=>"Attendance is correlated with passing!",
+  #       "start_at"=>"2013-04-27T14:33:14Z",
+  #       "end_at"=>"2013-04-27T14:33:14Z",
+  #       "location_name"=>"Red brick house",
+  #       "location_address"=>"110 Top of the Hill Dr.",
+  #       "all_day"=>false,
+  #       "all_day_date"=>nil,
+  #       "created_at"=>"2013-04-26T14:33:14Z",
+  #       "updated_at"=>"2013-04-26T14:33:14Z",
+  #       "workflow_state"=>"active",
+  #       "context_code"=>"course_12938",
+  #       "child_events_count"=>0,
+  #       "child_events"=>[],
+  #       "parent_event_id"=>nil,
+  #       "hidden"=>false,
+  #       "url"=>"http://www.example.com/api/v1/calendar_events/597",
+  #       "html_url"=>"http://www.example.com/calendar?event_id=597&include_contexts=course_12938"
+  #     },
+  #     {
+  #       "id"=>"assignment_9729",
+  #       "title"=>"Upcoming Assignment",
+  #       "description"=>nil,
+  #       "start_at"=>"2013-04-28T14:47:32Z",
+  #       "end_at"=>"2013-04-28T14:47:32Z",
+  #       "all_day"=>false,
+  #       "all_day_date"=>"2013-04-28",
+  #       "created_at"=>"2013-04-26T14:47:32Z",
+  #       "updated_at"=>"2013-04-26T14:47:32Z",
+  #       "workflow_state"=>"published",
+  #       "context_code"=>"course_12942",
+  #       "assignment"=>{
+  #         "id"=>9729,
+  #         "name"=>"Upcoming Assignment",
+  #         "description"=>nil,
+  #         "points_possible"=>10,
+  #         "due_at"=>"2013-04-28T14:47:32Z",
+  #         "assignment_group_id"=>2439,
+  #         "automatic_peer_reviews"=>false,
+  #         "grade_group_students_individually"=>nil,
+  #         "grading_standard_id"=>nil,
+  #         "grading_type"=>"points",
+  #         "group_category_id"=>nil,
+  #         "lock_at"=>nil,
+  #         "peer_reviews"=>false,
+  #         "position"=>1,
+  #         "unlock_at"=>nil,
+  #         "course_id"=>12942,
+  #         "submission_types"=>["none"],
+  #         "muted"=>false,
+  #         "needs_grading_count"=>0,
+  #         "html_url"=>"http://www.example.com/courses/12942/assignments/9729"
+  #       },
+  #       "url"=>"http://www.example.com/api/v1/calendar_events/assignment_9729",
+  #       "html_url"=>"http://www.example.com/courses/12942/assignments/9729"
+  #     }
+  #   ]
+  def upcoming_events
+    return render_unauthorized_action unless @current_user
+
+    prepare_current_user_dashboard_items
+
+    events = @upcoming_events.map do |e|
+      event_json(e, @current_user, session)
     end
 
-    def api_event(event)
-      url =  event.is_a?(CalendarEvent) ? api_v1_calendar_event_url(event) : course_assignment_url(event.context_id, event)
-      {
-        :title => event.title,
-        :start_at => event.start_at,
-        :type => event.class.name,
-        :html_url => url
-      }
-    end
-    render :json => @current_user.upcoming_events.map { |e| api_event(e) }
+    render :json => events
   end
-
-  def recent_feedback
-    unless @current_user
-      return render_unauthorized_action
-    end
-
-    def api_feedback(feedback)
-
-    end
-
-    render :json => @current_user.recent_feedback
-  end
-
 
   def ignore_item
     unless %w[grading submitting].include?(params[:purpose])
