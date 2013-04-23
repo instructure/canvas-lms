@@ -123,7 +123,7 @@ class QuizzesApiController < ApplicationController
   #
   # @returns Quiz
   def show
-    if authorized_action(@quiz, @current_user, :read) && tab_enabled?(@context.class::TAB_QUIZZES)
+    if authorized_action(@quiz, @current_user, :read)
       render :json => quiz_json(@quiz, @context, @current_user, session)
     end
   end
@@ -215,7 +215,7 @@ class QuizzesApiController < ApplicationController
   #
   # @returns Quiz
   def create
-    if authorized_action(@context.quizzes.new, @current_user, :create) && tab_enabled?(@context.class::TAB_QUIZZES)
+    if authorized_action(@context.quizzes.new, @current_user, :create)
       @quiz = @context.quizzes.build
       update_api_quiz(@quiz, params[:quiz])
       unless @quiz.new_record?
@@ -239,7 +239,7 @@ class QuizzesApiController < ApplicationController
   #
   # @returns Quiz
   def update
-    if authorized_action(@quiz, @current_user, :update) && tab_enabled?(@context.class::TAB_QUIZZES)
+    if authorized_action(@quiz, @current_user, :update)
       update_api_quiz(@quiz, params[:quiz])
       unless @quiz.changed?
         render :json => quiz_json(@quiz, @context, @current_user, session)

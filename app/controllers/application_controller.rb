@@ -201,20 +201,39 @@ class ApplicationController < ActionController::Base
   end
 
   def tab_enabled?(id)
-    if @context && @context.respond_to?(:tabs_available) && !@context.tabs_available(@current_user, :session => session, :include_hidden_unused => true, :root_account => @domain_root_account).any?{|t| t[:id] == id }
-      if @context.is_a?(Account)
-        flash[:notice] = t "#application.notices.page_disabled_for_account", "That page has been disabled for this account"
-      elsif @context.is_a?(Course)
-        flash[:notice] = t "#application.notices.page_disabled_for_course", "That page has been disabled for this course"
-      elsif @context.is_a?(Group)
-        flash[:notice] = t "#application.notices.page_disabled_for_group", "That page has been disabled for this group"
-      else
-        flash[:notice] = t "#application.notices.page_disabled", "That page has been disabled"
-      end
-      redirect_to named_context_url(@context, :context_url)
-      return false
+    return true unless @context && @context.respond_to?(:tabs_available)
+    tabs = @context.tabs_available(@current_user,
+                                   :session => session,
+                                   :include_hidden_unused => true,
+                                   :root_account => @domain_root_account)
+    valid = tabs.any?{|t| t[:id] == id }
+    render_tab_disabled unless valid
+    return valid
+  end
+
+  def render_tab_disabled
+    msg = tab_disabled_message(@context)
+    respond_to do |format|
+      format.html {
+        flash[:notice] = msg
+        redirect_to named_context_url(@context, :context_url)
+      }
+      format.json {
+        render :json => { :message => msg }, :status => :not_found
+      }
     end
-    true
+  end
+
+  def tab_disabled_message(context)
+    if context.is_a?(Account)
+      t "#application.notices.page_disabled_for_account", "That page has been disabled for this account"
+    elsif context.is_a?(Course)
+      t "#application.notices.page_disabled_for_course", "That page has been disabled for this course"
+    elsif context.is_a?(Group)
+      t "#application.notices.page_disabled_for_group", "That page has been disabled for this group"
+    else
+      t "#application.notices.page_disabled", "That page has been disabled"
+    end
   end
 
   def require_password_session
