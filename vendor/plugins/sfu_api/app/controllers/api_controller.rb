@@ -156,13 +156,13 @@ class ApiController < ApplicationController
 
   def mysfu_enrollments_for (user)
     output = {
-      "enrolledCourse" => [],
-      "teachingCourse" => []
+      "enrolled" => [],
+      "teaching" => []
     }
     enrollment_type_map = {
-      "StudentEnrollment" => "enrolledCourse",
-      "TeacherEnrollment" => "teachingCourse",
-      "TaEnrollment"      => "teachingCourse"
+      "StudentEnrollment" => "enrolled",
+      "TeacherEnrollment" => "teaching",
+      "TaEnrollment"      => "teaching"
     }
     enrollments = user.enrollments.with_each_shard { |scope| scope.scoped(:conditions => "enrollments.workflow_state<>'deleted' AND courses.workflow_state<>'deleted'", :include => [{:course => { :enrollment_term => :enrollment_dates_overrides }}, :associated_user, :course_section]) }
     enrollments.sort_by! {|e| e.course.enrollment_term_id }
