@@ -36,6 +36,8 @@ class ApiController < ApplicationController
         user_hash["uuid"] = user.uuid
       elsif params[:property].eql? "terms"
         user_hash = teaching_terms_for sfu_id
+      elsif params[:property].eql? "mysfu"
+        user_hash = mysfu_enrollments_for user
       end
     end
 
@@ -150,6 +152,38 @@ class ApiController < ApplicationController
       end
     end
     sections[0..-3]
+  end
+
+  def mysfu_enrollments_for (user)
+    output = {
+      "enrolledCourse" => [],
+      "teachingCourse" => []
+    }
+    enrollment_type_map = {
+      "StudentEnrollment" => "enrolledCourse",
+      "TeacherEnrollment" => "teachingCourse",
+      "TaEnrollment"      => "teachingCourse"
+    }
+    enrollments = user.enrollments.with_each_shard { |scope| scope.scoped(:conditions => "enrollments.workflow_state<>'deleted' AND courses.workflow_state<>'deleted'", :include => [{:course => { :enrollment_term => :enrollment_dates_overrides }}, :associated_user, :course_section]) }
+    enrollments.sort_by! {|e| e.course.enrollment_term_id }
+    enrollments.each do |e|
+      sis_source_id = e.course.sis_source_id
+      course_id = e.course.id
+      term = e.enrollment_term.sis_source_id
+      enrollment_type = e.type
+      unless term.nil? || sis_source_id.nil?
+        if enrollment_type_map.has_key? enrollment_type
+          enrollment_type = enrollment_type_map[enrollment_type]
+          course = {
+            "term" => term,
+            "course_sis_source_id" => sis_source_id,
+            "course_id" => course_id
+          }
+          output[enrollment_type].push course
+        end
+      end
+    end
+    output
   end
 
   # orverride ApplicationController::api_request? to force canvas to treat all calls to /sfu/api/* as an API call
