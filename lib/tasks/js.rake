@@ -46,7 +46,13 @@ namespace :js do
     end
   end
 
-  desc "generates compiled coffeescript and handlebars templates"
+  desc "generates plugin extension modules"
+  task :generate_extensions do
+    require 'canvas/require_js/plugin_extension'
+    Canvas::RequireJs::PluginExtension.generate_all
+  end
+
+  desc "generates compiled coffeescript, handlebars templates and plugin extensions"
   task :generate do
     require 'config/initializers/plugin_symlinks'
     require 'fileutils'
@@ -63,6 +69,12 @@ namespace :js do
     FileUtils.rm_rf(paths_to_remove)
 
     threads = []
+    threads << Thread.new do
+      puts "--> Generating plugin extensions"
+      extensions_time = Benchmark.realtime { Rake::Task['js:generate_extensions'].invoke }
+      puts "--> Generating plugin extensions finished in #{extensions_time}"
+    end
+
     threads << Thread.new do
       puts "--> Pre-compiling handlebars templates"
       handlebars_time = Benchmark.realtime { Rake::Task['jst:compile'].invoke }

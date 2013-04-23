@@ -56,7 +56,7 @@ module Canvas
           :jqueryui => 'vendor/jqueryui',
           :use => 'vendor/use',
           :uploadify => '../flash/uploadify/jquery.uploadify-3.1.min'
-        }.update(plugin_paths).to_json.gsub(/([,{])/, "\\1\n    ")
+        }.update(plugin_paths).update(Canvas::RequireJs::PluginExtension.paths).to_json.gsub(/([,{])/, "\\1\n    ")
       end
   
       def plugin_paths
