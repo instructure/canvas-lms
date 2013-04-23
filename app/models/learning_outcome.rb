@@ -220,7 +220,7 @@ class LearningOutcome < ActiveRecord::Base
           LearningOutcome.import_from_migration(outcome, migration)
         end
       rescue
-        migration.add_warning("Couldn't import learning outcome \"#{outcome[:title]}\"", $!)
+        migration.add_import_warning(t('#migration.learning_outcome_type', "Learning Outcome"), outcome[:title], $!)
       end
     end
   end

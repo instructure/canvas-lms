@@ -203,7 +203,7 @@ class ExternalFeed < ActiveRecord::Base
         begin
           import_from_migration(tool, migration.context)
         rescue
-          migration.add_warning("Couldn't import external feed \"#{tool[:title]}\"", $!)
+          migration.add_import_warning(t('#migration.external_feed_type', "External Feed"), tool[:title], $!)
         end
       end
     end

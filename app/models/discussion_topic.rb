@@ -713,7 +713,7 @@ class DiscussionTopic < ActiveRecord::Base
         begin
           import_from_migration(event, migration.context)
         rescue
-          migration.add_warning("Couldn't import the announcement \"#{event[:title]}\"", $!)
+          migration.add_import_warning(t('#migration.announcement_type', "Announcement"), event[:title], $!)
         end
       end
     end
@@ -728,7 +728,7 @@ class DiscussionTopic < ActiveRecord::Base
             begin
               import_from_migration(topic.merge({:topic_entries_to_import => topic_entries_to_import}), context)
             rescue
-              migration.add_warning("Couldn't import the topic \"#{topic[:title]}\"", $!)
+              migration.add_import_warning(t('#migration.discussion_topic_type', "Discussion Topic"), topic[:title], $!)
             end
           end
         end

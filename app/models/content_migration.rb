@@ -209,7 +209,7 @@ class ContentMigration < ActiveRecord::Base
       er = ErrorReport.log_exception(:content_migration, opts[:exception])
       mi.error_report_id = er.id
     end
-    mi.error_message = truncate_text(opts[:error_message], :max_length => 200)
+    mi.error_message = opts[:error_message]
     mi.fix_issue_html_url = opts[:fix_issue_html_url]
 
     mi.save!
@@ -237,6 +237,11 @@ class ContentMigration < ActiveRecord::Base
       end
     end
     add_issue(user_message, :warning, opts)
+  end
+
+  def add_import_warning(item_type, item_name, warning)
+    item_name = truncate_text(item_name || "", :max_length => 150)
+    add_warning(t('errors.import_error', "Import Error: ") + "#{item_type} - \"#{item_name}\"", warning)
   end
 
   # deprecated warning format
