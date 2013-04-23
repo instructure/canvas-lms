@@ -334,5 +334,61 @@ describe EventStream do
         end
       end
     end
+
+    describe "failure" do
+      before do
+        @database = stub('database')
+        @stream.stubs(:database).returns(@database)
+        @record = stub(
+          :id => 'id',
+          :attributes => {'attribute' => 'attribute_value'},
+          :changes => {'changed_attribute' => 'changed_value'})
+        @exception = Exception.new
+      end
+
+      shared_examples_for "recording failures" do
+        it "should record failed inserts" do
+          EventStream::Failure.expects(:log!).once.with(:insert, @stream, @record, @exception)
+          @stream.insert(@record)
+        end
+
+        it "should record failed updates" do
+          EventStream::Failure.expects(:log!).once.with(:update, @stream, @record, @exception)
+          @stream.update(@record)
+        end
+      end
+
+      context "failing database" do
+        before do
+          @database.stubs(:batch).raises(@exception)
+        end
+
+        it_should_behave_like "recording failures"
+      end
+
+      context "failing callbacks" do
+        before do
+          @database.stubs(:batch).yields
+          @database.stubs(:insert_record)
+          @database.stubs(:update_record)
+
+          exception = @exception
+          @stream.on_insert{ raise exception }
+          @stream.on_update{ raise exception }
+        end
+
+        it "should not insert a record when insert callback fails" do
+          @database.expects(:execute).never
+          @stream.insert(@record)
+        end
+
+        it "should not update a record when update callback fails" do
+          @database.expects(:execute).never
+          @stream.update(@record)
+        end
+
+        it_should_behave_like "recording failures"
+      end
+    end
   end
 end
