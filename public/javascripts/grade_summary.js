@@ -22,13 +22,14 @@ define([
   'jquery' /* $ */,
   'underscore',
   'compiled/grade_calculator',
+  'compiled/util/round',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_forms' /* getFormData */,
   'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar */,
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'media_comments' /* mediaComment, mediaCommentThumbnail */
-], function(INST, I18n, $, _, GradeCalculator) {
+], function(INST, I18n, $, _, GradeCalculator, round) {
 
   function updateStudentGrades() {
     var ignoreUngradedSubmissions = $("#only_consider_graded_assignments").attr('checked');
@@ -56,7 +57,7 @@ define([
         grade = Math.round((score / possible) * 1000) / 10;
       }
       return grade;
-    }
+    };
 
     for (var i = 0; i < calculatedGrades.group_sums.length; i++) {
       var groupSum = calculatedGrades.group_sums[i];
@@ -65,12 +66,19 @@ define([
       $groupRow.find('.grade').text(
         calculateGrade(groupGradeInfo.score, groupGradeInfo.possible)
       );
+      $groupRow.find('.score_teaser').text(
+        round(groupGradeInfo.score, 2) + ' / ' + round(groupGradeInfo.possible, 2)
+      );
     }
 
     var finalScore = calculatedGrades[currentOrFinal].score;
     var finalPossible = calculatedGrades[currentOrFinal].possible;
     var finalGrade = calculateGrade(finalScore, finalPossible);
-    $(".student_assignment.final_grade .grade").text(finalGrade);
+    var $finalGradeRow = $(".student_assignment.final_grade");
+    $finalGradeRow.find(".grade").text(finalGrade);
+    $finalGradeRow.find(".score_teaser").text(
+      round(finalScore, 2) + ' / ' + round(finalPossible, 2)
+    );
 
     if(window.grading_scheme) {
       $(".final_letter_grade .grade").text(GradeCalculator.letter_grade(grading_scheme, finalGrade));
