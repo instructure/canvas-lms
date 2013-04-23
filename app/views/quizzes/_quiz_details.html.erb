@@ -18,12 +18,8 @@
   </li>
 
   <li>
-    <%= t(:question_count2,
-          { :zero => "No Questions",
-            :one => "*Questions* **%{count}**",
-            :other => "*Questions* **%{count}**" },
-          :wrapper => { '*' => "<span class='title'>\\1</span>", '**' => "<span class='value'>\\1</span>" },
-          :count => @question_count) %>
+    <span class="title"><%= t('headers.questions', "Questions") %></span>
+    <span class="value"><%= @question_count || 0 %></span>
   </li>
 
   <% if @quiz.lock_at || @quiz.unlock_at %>
