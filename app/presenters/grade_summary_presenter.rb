@@ -106,7 +106,7 @@ class GradeSummaryPresenter
 
   def submissions_by_assignment
     @submissions_by_assignment ||=
-      if @context.allows_gradebook_uploads?
+      if allow_loading_all_submissions?
         # Yes, fetch *all* submissions for this course; otherwise the view will end up doing a query for each
         # assignment in order to calculate grade distributions
         @context.submissions.
@@ -169,4 +169,10 @@ class GradeSummaryPresenter
     assignments.concat(value)
   end
 
+  protected
+
+  def allow_loading_all_submissions?
+    threshold = Setting.get('grade_distributions_submission_count_threshold', '0').to_i
+    @context.allows_gradebook_uploads? && (threshold == 0 || @context.submissions.count < threshold)
+  end
 end
