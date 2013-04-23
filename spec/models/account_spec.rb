@@ -490,6 +490,15 @@ describe Account do
     end
   end
 
+  it "should allow no_enrollments_can_create_courses correctly" do
+    a = Account.default
+    a.settings = { :no_enrollments_can_create_courses => true }
+    a.save!
+
+    user
+    a.grants_right?(@user, :create_courses).should be_true
+  end
+
   it "should correctly return sub-accounts as options" do
     a = Account.default
     sub = Account.create!(:name => 'sub', :parent_account => a)

@@ -669,7 +669,7 @@ class Account < ActiveRecord::Base
         result ||= root_account.students_can_create_courses? &&
             scope.where(:type => ['StudentEnrollment', 'ObserverEnrollment']).exists?
         result ||= root_account.no_enrollments_can_create_courses? &&
-            scope.exists?
+            !scope.exists?
       end
 
       result
