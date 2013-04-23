@@ -1557,7 +1557,7 @@ class Assignment < ActiveRecord::Base
         begin
           import_from_migration(assign, migration.context)
         rescue
-          migration.add_warning("Couldn't import the assignment \"#{assign[:title]}\"", $!)
+          migration.add_import_warning(t('#migration.assignment_type', "Assignment"), assign[:title], $!)
         end
       end
     end

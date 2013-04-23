@@ -343,7 +343,7 @@ class WikiPage < ActiveRecord::Base
       begin
         import_from_migration(wiki, migration.context) if wiki
       rescue
-        migration.add_warning("Couldn't import the wiki page \"#{wiki[:title]}\"", $!)
+        migration.add_import_warning(t('#migration.wiki_page_type', "Wiki Page"), wiki[:title], $!)
       end
     end
   end

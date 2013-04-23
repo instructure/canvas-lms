@@ -199,7 +199,7 @@ class Attachment < ActiveRecord::Base
         begin
           import_from_migration(att, migration.context)
         rescue
-          migration.add_warning("Couldn't import file \"#{att[:display_name] || att[:path_name]}\"", $!)
+          migration.add_import_warning(t('#migration.file_type', "File"), (att[:display_name] || att[:path_name]), $!)
         end
       end
     end

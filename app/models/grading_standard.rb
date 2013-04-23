@@ -211,7 +211,7 @@ class GradingStandard < ActiveRecord::Base
         begin
           import_from_migration(standard, migration.context)
         rescue
-          migration.add_warning("Couldn't import grading standard \"#{standard[:title]}\"", $!)
+          migration.add_import_warning(t('#migration.grading_standard_type', "Grading Standard"), standard[:title], $!)
         end
       end
     end

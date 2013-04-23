@@ -497,7 +497,7 @@ class AssessmentQuestion < ActiveRecord::Base
           
           question_data[:aq_data][question['migration_id']] = question
         rescue
-          migration.add_warning("Couldn't import quiz question \"#{question[:question_name]}\"", $!)
+          migration.add_import_warning(t('#migration.quiz_question_type', "Quiz Question"), question[:question_name], $!)
         end
       end
     end

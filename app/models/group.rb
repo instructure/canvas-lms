@@ -467,7 +467,7 @@ class Group < ActiveRecord::Base
         begin
           import_from_migration(group, migration.context)
         rescue
-          migration.add_warning("Couldn't import group \"#{group[:title]}\"", $!)
+          migration.add_import_warning(t('#migration.group_type', "Group"), group[:title], $!)
         end
       end
     end

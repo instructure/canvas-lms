@@ -952,7 +952,7 @@ class Quiz < ActiveRecord::Base
           assessment[:migration] = migration
           Quiz.import_from_migration(assessment, migration.context, question_data, nil, allow_update)
         rescue
-          migration.add_warning(t('warnings.import_from_migration_failed', "Couldn't import the quiz \"%{quiz_title}\"", :quiz_title => assessment[:title]), $!)
+          migration.add_import_warning(t('#migration.quiz_type', "Quiz"), assessment[:title], $!)
         end
       end
     end

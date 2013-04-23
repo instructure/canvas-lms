@@ -533,7 +533,7 @@ class CalendarEvent < ActiveRecord::Base
         begin
           import_from_migration(event, migration.context)
         rescue
-          migration.add_warning("Couldn't import the event \"#{event[:title]}\"", $!)
+          migration.add_import_warning(t('#migration.calendar_event_type', "Calendar Event"), event[:title], $!)
         end
       end
     end
