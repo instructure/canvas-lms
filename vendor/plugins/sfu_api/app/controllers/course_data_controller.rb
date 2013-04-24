@@ -2,7 +2,7 @@ class CourseDataController < ApplicationController
   before_filter :require_user
 
   def base_dir
-    "/mnt/courseData"
+    "/usr/local/canvas/course-data"
   end
 
   def sep
