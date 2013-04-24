@@ -625,14 +625,14 @@ class UsersController < ApplicationController
 
   def new
     return redirect_to(root_url) if @current_user
-    js_env :HIDDEN_FIELDS => @domain_root_account.tracking_fields(params),
-           :USER => {:LOGIN_HANDLE_NAME => @domain_root_account.login_handle_name},
+    js_env :ACCOUNT => account_json(@domain_root_account, nil, session, ['registration_settings']),
            :PASSWORD_POLICY => @domain_root_account.password_policy
     render :layout => 'bare'
   end
 
   include Api::V1::User
   include Api::V1::Avatar
+  include Api::V1::Account
 
   # @API Create a user
   # Create and return a new user and pseudonym for an account.

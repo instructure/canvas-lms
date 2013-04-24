@@ -6,6 +6,7 @@ define [
   'jst/registration/teacherDialog'
   'jst/registration/studentDialog'
   'jst/registration/parentDialog'
+  'compiled/jquery/validate'
   'jquery.instructure_forms'
   'jquery.instructure_date_and_time'
 ], (_, I18n, preventDefault, registrationErrors, teacherDialog, studentDialog, parentDialog) ->
@@ -17,7 +18,7 @@ define [
     return unless templates[id]
     $node = $nodes[id] ?= $('<div />')
     $node.html templates[id](
-      hiddenFields: ENV.HIDDEN_FIELDS || []
+      account: ENV.ACCOUNT.registration_settings
       terms_url: "http://www.instructure.com/terms-of-use"
       privacy_url: "http://www.instructure.com/privacy-policy"
     )
@@ -28,8 +29,8 @@ define [
       signupDialog($(this).data('template'), $(this).prop('title'))
 
     $form = $node.find('form')
-    promise = null
     $form.formSubmit
+      required: (el.name for el in $form.find(':input[name]').not('[type=hidden]'))
       disableWhileLoading: 'spin_on_success'
       errorFormatter: registrationErrors
       success: (data) =>
@@ -48,3 +49,6 @@ define [
         $(this).find(':input').eq(0).focus()
       close: -> $('.error_box').filter(':visible').remove()
     $node.fixDialogButtons()
+
+  signupDialog.templates = templates
+  signupDialog

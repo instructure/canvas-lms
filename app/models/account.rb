@@ -802,9 +802,6 @@ class Account < ActiveRecord::Base
   def precache
   end
 
-  # for plugins
-  def tracking_fields(params={}); []; end
-
   def self.find_cached(id)
     account = Rails.cache.fetch(account_lookup_cache_key(id), :expires_in => 1.hour) do
       account = Account.find_by_id(id)

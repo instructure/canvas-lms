@@ -25,7 +25,7 @@ define [
     if $loginForm
       $loginForm.toggle()
     else
-      $loginForm = $(loginForm(login_handle_name: ENV.USER.LOGIN_HANDLE_NAME))
+      $loginForm = $(loginForm(login_handle_name: ENV.ACCOUNT.registration_settings.login_handle_name))
       $loginForm.appendTo($(this).closest('.registration-content'))
     if $loginForm.is(':visible')
       $loginForm.find('input:visible').eq(0).focus()
