@@ -1376,8 +1376,12 @@ class Course < ActiveRecord::Base
   end
 
   def gradebook_to_csv(options = {})
+    # user: used for name in csv output
+    # course_section: used for display_name in csv output
+    # user > pseudonyms: used for sis_user_id/unique_id if options[:include_sis_id]
+    # user > pseudonyms > account: used in find_pseudonym_for_account > works_for_account
     includes = [:user, :course_section]
-    includes = {:user => :pseudonyms, :course_section => []} if options[:include_sis_id]
+    includes = {:user => {:pseudonyms => :account}, :course_section => []} if options[:include_sis_id]
     scope = options[:user] ? self.enrollments_visible_to(options[:user]) : self.student_enrollments
     student_enrollments = scope.includes(includes).order_by_sortable_name # remove duplicate enrollments for students enrolled in multiple sections
     student_enrollments = student_enrollments.all.uniq_by(&:user_id)
