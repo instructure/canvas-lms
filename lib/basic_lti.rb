@@ -61,7 +61,7 @@ module BasicLTI
       data['enrollment_state'] = memberships.any?{|membership| membership.state_based_on_date == :active} ? 'active' : 'inactive'
     end
     if context.respond_to?(:account_chain) && !context.account_chain_ids.empty?
-      memberships += user.account_users.find_all_by_membership_type_and_account_id('AccountAdmin', context.account_chain_ids).uniq
+      memberships += user.account_users.find_all_by_account_id(context.account_chain_ids).uniq
     end
     data['role_types'] = memberships.map{|membership|
       case membership
