@@ -11,7 +11,7 @@ define [
     $dummy.find('video.instructure_inline_media_comment,audio.instructure_inline_media_comment').replaceWith ->
       $node = $("<a id='media_comment_#{$(this).data('media_comment_id')}'
             data-media_comment_type='#{$(this).data('media_comment_type')}'
-            class='instructure_inline_media_comment' />")
+            class='instructure_inline_media_comment #{this.nodeName.toLowerCase()}_comment' />")
       $node.html $(this).html()
       $node
 
