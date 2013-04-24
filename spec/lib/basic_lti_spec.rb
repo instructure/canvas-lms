@@ -325,6 +325,18 @@ describe BasicLTI do
       BasicLTI.user_lti_data(ta, @course)['role_types'].should == ['urn:lti:role:ims/lis/TeachingAssistant']
     end
 
+    it "should return admin for custom admin" do
+      account = Account.default
+      role_name = 'psuedo_admin'
+      role = account.roles.build(:name => role_name)
+      role.base_role_type = AccountUser::BASE_ROLE_NAME.to_s
+      role.workflow_state = 'active'
+      role.save!
+      admin = user_model
+      account.add_user(admin,role_name)
+      BasicLTI.user_lti_data(admin, account)['role_types'].should == ['urn:lti:instrole:ims/lis/Administrator']
+    end
+
     it "should return multiple role types if applicable" do
       course_model
       @course.offer
