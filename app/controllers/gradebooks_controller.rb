@@ -411,7 +411,7 @@ class GradebooksController < ApplicationController
     groups << OpenObject.build('assignment',
         :id => 'final-grade',
         :title => t('titles.total', 'Total'),
-        :points_possible => (options[:out_of_final] ? '-' : percentage[100]),
+        :points_possible => (options[:out_of_final] ? '' : percentage[100]),
         :hard_coded => true,
         :special_class => 'final_grade',
         :asset_string => "final_grade_column") unless options[:exclude_total]
