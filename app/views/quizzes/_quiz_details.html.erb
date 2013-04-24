@@ -18,11 +18,10 @@
   </li>
 
   <li>
-    <%= t(:question_count2,
+    <%= raw t(:question_count,
           { :zero => "No Questions",
-            :one => "*Questions* **%{count}**",
-            :other => "*Questions* **%{count}**" },
-          :wrapper => { '*' => "<span class='title'>\\1</span>", '**' => "<span class='value'>\\1</span>" },
+            :one => "<span class='title'>Questions</span> <span class='value'>%{count}</span>",
+            :other => "<span class='title'>Questions</span> <span class='value'>%{count}</span>" },
           :count => @question_count) %>
   </li>
 

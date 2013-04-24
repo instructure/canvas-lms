@@ -8,8 +8,7 @@ module I18nExtraction
       super()
     end
 
-    def add_translation(full_key, default, line, remove_whitespace = false)
-      raise "html tags on line #{line} (hint: use a wrapper or markdown)" if default =~ /<[a-z][a-z0-9]*[> \/]/i
+    def add_translation(full_key, default, remove_whitespace = false)
       default = default.gsub(/\s+/, ' ') if remove_whitespace
       default = default.strip unless full_key =~ /separator/
       @total += 1
