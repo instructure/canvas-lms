@@ -141,7 +141,7 @@ group :development do
   # Set this option in your dev environment to disable.
   unless ENV['DISABLE_RUBY_DEBUGGING']
     if ONE_NINE
-      gem 'debugger',     '1.1.3'
+      gem 'debugger',     '1.5.0'
     else
       gem 'ruby-debug',   '0.10.4'
     end
