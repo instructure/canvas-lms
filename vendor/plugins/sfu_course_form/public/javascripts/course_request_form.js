@@ -219,14 +219,18 @@
                 $.ajax({
                     url: "/sfu/api/course/" + sis_id,
                     dataType: 'json',
-                    success: function(data) {
-                        if (!data.id) {
+                    success: function() { /* Nothing todo since */  },
+                    error: function() {
+                        var statusCode = xhr.status;
+                        if (statusCode === 404) {
+                            // 404 indicates course with the sis_id doesn't exists
                             $("#course_list").append("<div id='sandbox'><h4>Other</h4></div>");
                             var checkbox_html = '<label class="checkbox"><input type="checkbox" name="selected_course_sandbox_'+ today() +'" id="selected_course_sandbox_'+ today() +'" value="'+ sis_id +'">'+ title +'</label>';
                             $("#sandbox").append(checkbox_html);
+                        } else {
+                            $("#course_list").html("<h5>An unknown error occurred</h5>");
                         }
-                    },
-                    error: function() {  /* TODO: do something useful here */ }
+                    }
                 });
             }
 
