@@ -188,6 +188,14 @@
 #       // plugin is available for your account.
 #       frozen_attributes: [ "title" ],
 #
+#       // (Optional) If 'submission' is included in the 'include' parameter,
+#       // includes a Submission object that represents the current user's
+#       // (user who is requesting information from the api) current submission
+#       // for the assignment. See the Submissions API for an example
+#       // response. If the user does not have a submission, this key
+#       // will be absent.
+#       submission: { ... },
+#
 #       // (Optional) If true, the rubric is directly tied to grading the assignment.
 #       // Otherwise, it is only advisory. Included if there is an associated rubric.
 #       use_rubric_for_grading: true,
@@ -245,12 +253,14 @@
 #
 class AssignmentsApiController < ApplicationController
   before_filter :require_context
-
   include Api::V1::Assignment
+  include Api::V1::Submission
   include Api::V1::AssignmentOverride
 
   # @API List assignments
   # Returns the list of assignments for the current context.
+  # @argument include[] ["submission"] Associations to include with the
+  # assignment.
   # @returns [Assignment]
   def index
     if authorized_action(@context, @current_user, :read)
@@ -258,8 +268,22 @@ class AssignmentsApiController < ApplicationController
           includes(:assignment_group, :rubric_association, :rubric).
           reorder("assignment_groups.position, assignments.position")
 
-      hashes = @assignments.map { |assignment|
-        assignment_json(assignment, @current_user, session) }
+      if Array(params[:include]).include?('submission')
+        submissions = Hash[
+          @context.submissions.where(:assignment_id => @assignments).
+                                    except(:includes).
+                                    for_user(@current_user).
+                                    map do |s|
+                                      [s.assignment_id,s]
+                                    end
+        ]
+      else
+        submissions = {}
+      end
+      hashes = @assignments.map do |assignment|
+        submission = submissions[assignment.id]
+        assignment_json(assignment, @current_user, session,true,submission)
+      end
 
       render :json => hashes.to_json
     end
@@ -268,13 +292,19 @@ class AssignmentsApiController < ApplicationController
   # @API Get a single assignment
   # Returns the assignment with the given id.
   # @returns Assignment
+  # @argument include[] ["submission"] Associations to include with the
+  # assignment.
   def show
     if authorized_action(@context, @current_user, :read)
       @assignment = @context.active_assignments.find(params[:id],
           :include => [:assignment_group, :rubric_association, :rubric])
-
+      if Array(params[:include]).include?('submission')
+        submission = @assignment.submissions.for_user(@current_user).first
+      else
+         submission =  nil
+      end
       @assignment.context_module_action(@current_user, :read) unless @assignment.locked_for?(@current_user, :check_policies => true)
-      render :json => assignment_json(@assignment, @current_user, session)
+      render :json => assignment_json(@assignment, @current_user, session,true,submission)
     end
   end
 
