@@ -410,9 +410,6 @@ class ApplicationController < ActionController::Base
         @context = @current_user
         @context_membership = @context
       end
-      if @context.try_rescue(:only_wiki_is_public) && params[:controller].match(/wiki/) && !@current_user && (!@context.is_a?(Course) || session[:enrollment_uuid_course_id] != @context.id)
-        @show_left_side = false
-      end
       if @context.is_a?(Account) && !@context.root_account?
         account_chain = @context.account_chain.to_a.select {|a| a.grants_right?(@current_user, session, :read) }
         account_chain.slice!(0) # the first element is the current context
@@ -965,6 +962,13 @@ class ApplicationController < ActionController::Base
       :title => page_name.titleize,
       :url => page_name.to_url
     )
+    if @page.new_record?
+      if @domain_root_account.enable_draft?
+        @page.workflow_state = 'unpublished'
+      else
+        @page.workflow_state = 'active'
+      end
+    end
     if page_name == "front-page" && @page.new_record?
       @page.body = t "#application.wiki_front_page_default_content_course", "Welcome to your new course wiki!" if @context.is_a?(Course)
       @page.body = t "#application.wiki_front_page_default_content_group", "Welcome to your new group wiki!" if @context.is_a?(Group)

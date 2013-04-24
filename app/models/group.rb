@@ -319,7 +319,9 @@ class Group < ActiveRecord::Base
     can :read_roster and
     can :send_messages and
     can :send_messages_all and
-    can :follow
+    can :follow and
+    can :view_unpublished_items and
+    can :view_hidden_items
 
     # if I am a member of this group and I can moderate_forum in the group's context
     # (makes it so group members cant edit each other's discussion entries)
@@ -355,7 +357,9 @@ class Group < ActiveRecord::Base
     can :post_to_forum and
     can :read and
     can :read_roster and
-    can :update
+    can :update and
+    can :view_unpublished_items and
+    can :view_hidden_items
 
     given { |user, session| self.context && self.context.grants_right?(user, session, :view_group_pages) }
     can :read and can :read_roster

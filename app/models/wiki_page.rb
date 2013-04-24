@@ -120,6 +120,7 @@ class WikiPage < ActiveRecord::Base
 
   workflow do
     state :active
+    state :unpublished
     state :post_delayed do
       event :delayed_post, :transitions_to => :active
     end
@@ -209,7 +210,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   def can_read_page?(user)
-    !hide_from_students || (context.respond_to?(:admins) && context.admins.include?(user))
+    (!hide_from_students && self.active?) || (context.respond_to?(:admins) && context.admins.include?(user))
   end
 
   def editing_role?(user)
@@ -362,6 +363,11 @@ class WikiPage < ActiveRecord::Base
         # If there is no id there isn't a front page yet
         item = front_page
       end
+    end
+    if hash[:workflow_state] == 'active'
+      item.workflow_state = 'active'
+    else
+      item.workflow_state = 'unpublished'
     end
     context.imported_migration_items << item if context.imported_migration_items && item.new_record?
     item.migration_id = hash[:migration_id]

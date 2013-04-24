@@ -95,6 +95,25 @@ describe WikiPage do
     p1.url.should eql('asdf-2')
   end
 
+  context "unpublished" do
+    before do
+      teacher_in_course(:active_all => true)
+      @page = @course.wiki.wiki_pages.create(:title => "some page")
+      @page.workflow_state = :unpublished
+      @page.save!
+    end
+
+    it "should not allow students to read" do
+      student_in_course(:course => @course, :active_all => true)
+      @page.can_read_page?(@student).should == false
+    end
+
+    it "should allow teachers to read" do
+      @page.can_read_page?(@teacher).should == true
+    end
+  end
+
+
   context "clone_for" do
     it "should clone for another context" do
       course_with_teacher(:active_all => true)

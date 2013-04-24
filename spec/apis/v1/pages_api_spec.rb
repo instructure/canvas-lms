@@ -41,15 +41,15 @@ describe "Pages API", :type => :integration do
     end
 
     it "should paginate" do
-      11.times { |i| @wiki.wiki_pages.create!(:title => "New Page #{i}") }
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/pages",
-                      :controller=>"wiki_pages", :action=>"api_index", :format=>"json", :course_id=>"#{@course.id}")
-      json.size.should == 10
+      2.times { |i| @wiki.wiki_pages.create!(:title => "New Page #{i}") }
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?per_page=2",
+                      :controller=>"wiki_pages", :action=>"api_index", :format=>"json", :course_id=>"#{@course.id}", :per_page=>"2")
+      json.size.should == 2
       urls = json.collect{ |page| page['url'] }
       
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?page=2",
-                      :controller=>"wiki_pages", :action=>"api_index", :format=>"json", :course_id=>"#{@course.id}", :page => "2")
-      json.size.should == 3
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?page=2&per_page=2",
+                      :controller=>"wiki_pages", :action=>"api_index", :format=>"json", :course_id=>"#{@course.id}", :page => "2", :per_page=>"2")
+      json.size.should == 2
       urls += json.collect{ |page| page['url'] }
       
       urls.should == @wiki.wiki_pages.sort_by(&:id).collect(&:url)
@@ -79,8 +79,27 @@ describe "Pages API", :type => :integration do
                { :controller=>"wiki_pages", :action=>"api_show", :format=>"json", :course_id=>"#{@course.id}", :url=>'nonexistent' },
                {}, {}, { :expected_status => 404 })
     end
+
+    context "unpublished pages" do
+      before do
+        @unpublished_page = @wiki.wiki_pages.create(:title => "Draft Page", :body => "Don't text and drive.")
+        @unpublished_page.workflow_state = :unpublished
+        @unpublished_page.save!
+      end
+
+      it "should be in index" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/pages",
+                      :controller=>"wiki_pages", :action=>"api_index", :format=>"json", :course_id=>"#{@course.id}")
+        json.select{|w|w[:title] == @unpublished_page.title}.should_not be_nil
+      end
+      it "should show" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@unpublished_page.url}",
+                      :controller=>"wiki_pages", :action=>"api_show", :format=>"json", :course_id=>"#{@course.id}", :url=>@unpublished_page.url)
+        json['title'].should == @unpublished_page.title
+      end
+    end
   end
-  
+
   context "as a student" do
     before :each do
       course_with_student(:course => @course, :active_all => true)
@@ -91,7 +110,7 @@ describe "Pages API", :type => :integration do
                       :controller=>"wiki_pages", :action=>"api_index", :format=>"json", :course_id=>"#{@course.id}")
       json.should == [{"hide_from_students" => false, "url" => @front_page.url, "created_at" => @front_page.created_at.as_json, "updated_at" => @front_page.updated_at.as_json, "title" => @front_page.title}]
     end
-    
+
     it "should paginate, excluding hidden" do
       11.times { |i| @wiki.wiki_pages.create!(:title => "New Page #{i}") }
       json = api_call(:get, "/api/v1/courses/#{@course.id}/pages",
@@ -112,7 +131,7 @@ describe "Pages API", :type => :integration do
                {:controller=>"wiki_pages", :action=>"api_show", :format=>"json", :course_id=>"#{@course.id}", :url=>@hidden_page.url},
                {}, {}, { :expected_status => 401 })      
     end
-    
+
     it "should refuse to list pages in an unpublished course" do
       @course.workflow_state = 'created'
       @course.save!
@@ -169,6 +188,34 @@ describe "Pages API", :type => :integration do
       api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@front_page.url}",
                {:controller=>"wiki_pages", :action=>"api_show", :format=>"json", :course_id=>"#{@course.id}", :url=>@front_page.url})
       mod.evaluate_for(@user).workflow_state.should == "completed"     
+    end
+
+    context "unpublished pages" do
+      before do
+        @unpublished_page = @wiki.wiki_pages.create(:title => "Draft Page", :body => "Don't text and drive.")
+        @unpublished_page.workflow_state = :unpublished
+        @unpublished_page.save!
+      end
+
+      it "should not be in index" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/pages",
+                        :controller => "wiki_pages", :action => "api_index", :format => "json", :course_id => "#{@course.id}")
+        json.select { |w| w[:title] == @unpublished_page.title }.should == []
+      end
+
+      it "should not show" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@unpublished_page.url}",
+                        {:controller => "wiki_pages", :action => "api_show", :format => "json", :course_id => "#{@course.id}", :url => @unpublished_page.url},
+                        {}, {}, {:expected_status => 401})
+      end
+
+      it "should not show unpublished on public courses" do
+        @course.is_public = true
+        @course.save!
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@unpublished_page.url}",
+                        {:controller => "wiki_pages", :action => "api_show", :format => "json", :course_id => "#{@course.id}", :url => @unpublished_page.url},
+                        {}, {}, {:expected_status => 401})
+      end
     end
   end
   

@@ -58,7 +58,7 @@ class WikiPagesController < ApplicationController
       redirect_to named_context_url(@context, :context_wiki_page_url, 'front-page')
       return
     end
-    if @context.try_rescue(:wiki_is_public) || is_authorized_action?(@page, @current_user, :read)
+    if is_authorized_action?(@page, @current_user, :read)
       add_crumb(@page.title)
       update_view_count(@page)
       respond_to do |format|
@@ -85,11 +85,17 @@ class WikiPagesController < ApplicationController
   #
   # @returns [Page]
   def api_index
-    if authorized_action(@context.wiki.wiki_pages.new, @current_user, :read)
+    if authorized_action(@context.wiki, @current_user, :read)
       pages_route = polymorphic_url([:api_v1, @context, :wiki_pages])
-      scope = @context.wiki.wiki_pages.active.order_by_id
-      view_hidden = is_authorized_action?(@context.wiki.wiki_pages.new(:hide_from_students => true), @current_user, :read)
-      scope = scope.visible_to_students unless view_hidden
+      scope = @context.wiki.wiki_pages.order_by_id
+      if @context.grants_right?(@current_user, session, :view_unpublished_items)
+        scope = scope.not_deleted
+      else
+        scope = scope.active
+      end
+      if !@context.grants_right?(@current_user, session, :view_hidden_items)
+        scope = scope.visible_to_students
+      end
       wiki_pages = Api.paginate(scope, self, pages_route)
       render :json => wiki_pages_json(wiki_pages, @current_user, session)
     end
@@ -109,8 +115,8 @@ class WikiPagesController < ApplicationController
   def api_show
     # not using get_wiki_page since this API is read-only for now
     @wiki = @context.wiki
-    @page = @wiki.wiki_pages.active.find_by_url!(params[:url])
-    if @context.try_rescue(:wiki_is_public) || authorized_action(@page, @current_user, :read)
+    @page = @wiki.wiki_pages.not_deleted.find_by_url!(params[:url])
+    if authorized_action(@page, @current_user, :read)
       update_view_count(@page)
       render :json => wiki_page_json(@page, @current_user, session)
     end
@@ -121,7 +127,11 @@ class WikiPagesController < ApplicationController
       unless @page.grants_right?(@current_user, session, :update)
         params[:wiki_page] = {:body => params[:wiki_page][:body], :title => params[:wiki_page][:title]}
       end
-      @page.workflow_state = 'active' if @page.deleted?
+      if @page.deleted? && @domain_root_account.enable_draft?
+        @page.workflow_state = 'unpublished'
+      elsif @page.deleted?
+        @page.workflow_state = 'active'
+      end
       if @page.update_attributes(params[:wiki_page].merge(:user_id => @current_user.id))
         log_asset_access(@page, "wiki", @wiki, 'participate')
         generate_new_page_view

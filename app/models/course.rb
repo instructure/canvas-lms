@@ -974,7 +974,7 @@ class Course < ActiveRecord::Base
 
     # Active admins (Teacher/TA/Designer)
     given { |user, session| (self.available? || self.created? || self.claimed?) && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_admin? } && (!session || !session["role_course_#{self.id}"]) }
-    can :read_as_admin and can :read and can :manage and can :update and can :use_student_view and can :read_outcomes
+    can :read_as_admin and can :read and can :manage and can :update and can :use_student_view and can :read_outcomes and can :view_hidden_items and can :view_unpublished_items
 
     # Teachers and Designers can delete/reset, but not TAs
     given { |user, session| !self.deleted? && !self.sis_source_id && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_content_admin? } && (!session || !session["role_course_#{self.id}"]) }
@@ -1045,7 +1045,7 @@ class Course < ActiveRecord::Base
     can :read_as_admin
 
     given { |user, session| self.account_membership_allows(user, session, :manage_courses) }
-    can :read_as_admin and can :manage and can :update and can :delete and can :use_student_view and can :reset_content
+    can :read_as_admin and can :manage and can :update and can :delete and can :use_student_view and can :reset_content and can :view_hidden_items and can :view_unpublished_items
 
     given { |user, session| self.account_membership_allows(user, session, :read_course_content) }
     can :read and can :read_outcomes
@@ -2617,10 +2617,6 @@ class Course < ActiveRecord::Base
 
   def unpublished?
     self.created? || self.claimed?
-  end
-
-  def only_wiki_is_public
-    self.respond_to?(:wiki_is_public) && self.wiki_is_public && !self.is_public
   end
 
   def tab_configuration

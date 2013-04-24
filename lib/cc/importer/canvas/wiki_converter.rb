@@ -40,6 +40,7 @@ module CC::Importer::Canvas
       wiki[:editing_roles] = meta['editing_roles']
       wiki[:hide_from_students] = meta['hide_from_students'] == 'true'
       wiki[:notify_of_update] = meta['notify_of_update'] == 'true'
+      wiki[:workflow_state] = meta['workflow_state']
       wiki[:text] = body
       wiki[:url_name] = wiki_name
       wiki
