@@ -1,5 +1,3 @@
-#require "rest_client"
-#require "json"
 require Pathname(File.dirname(__FILE__)) + "../model/sfu/course"
 
 class ApiController < ApplicationController
@@ -16,7 +14,7 @@ class ApiController < ApplicationController
     end
 
     respond_to do |format|
-      format.json { render :text => course_hash.to_json }
+      format.json { render :json => course_hash }
     end
   end
 
@@ -24,6 +22,9 @@ class ApiController < ApplicationController
     account_id = Account.find_by_name('Simon Fraser University').id
     sfu_id = params[:sfu_id]
     pseudonym = Pseudonym.where(:unique_id => sfu_id, :account_id => account_id).all
+    if pseudonym.empty?
+      raise(ActiveRecord::RecordNotFound)
+    end
     user_hash = {}
     unless pseudonym.empty?
       user = User.find pseudonym.first.user_id
@@ -32,14 +33,20 @@ class ApiController < ApplicationController
         user_hash["name"] = user.name
         user_hash["uuid"] = user.uuid
       elsif params[:property].eql? "uuid"
-        user_hash = user.uuid
+        user_hash["uuid"] = user.uuid
       elsif params[:property].eql? "terms"
         user_hash = teaching_terms_for sfu_id
+      elsif params[:property].eql? "mysfu"
+        user_hash = mysfu_enrollments_for user
       end
     end
 
+    if params[:property] != "terms"
+      return unless authorized_action(user, @current_user, :read)
+    end
+
     respond_to do |format|
-      format.json { render :text => user_hash.to_json }
+      format.json { render :json => user_hash }
     end
   end
 
@@ -91,12 +98,15 @@ class ApiController < ApplicationController
     end
 
     respond_to do |format|
-      format.json { render :text => course_array.to_json }
+      format.json { render :json => course_array }
     end
   end
 
   def course_info(sis_id, property = nil)
-    course = Course.where(:sis_source_id => sis_id).all
+    course = Course.where(:sis_source_id => sis_id.downcase).all
+    if course.empty?
+      raise(ActiveRecord::RecordNotFound)
+    end
     course_hash = {}
     if course.length == 1
       if property.nil?
@@ -142,5 +152,44 @@ class ApiController < ApplicationController
       end
     end
     sections[0..-3]
+  end
+
+  def mysfu_enrollments_for (user)
+    output = {
+      "enrolled" => [],
+      "teaching" => []
+    }
+    enrollment_type_map = {
+      "StudentEnrollment" => "enrolled",
+      "TeacherEnrollment" => "teaching",
+      "TaEnrollment"      => "teaching"
+    }
+    enrollments = user.enrollments.with_each_shard { |scope| scope.scoped(:conditions => "enrollments.workflow_state<>'deleted' AND courses.workflow_state<>'deleted'", :include => [{:course => { :enrollment_term => :enrollment_dates_overrides }}, :associated_user, :course_section]) }
+    enrollments.sort_by! {|e| e.course.enrollment_term_id }
+    enrollments.each do |e|
+      sis_source_id = e.course.sis_source_id
+      course_id = e.course.id
+      term = e.enrollment_term.sis_source_id
+      enrollment_type = e.type
+      status = e.course.workflow_state
+      unless term.nil? || sis_source_id.nil?
+        if enrollment_type_map.has_key? enrollment_type
+          enrollment_type = enrollment_type_map[enrollment_type]
+          course = {
+            "term" => term,
+            "course_sis_source_id" => sis_source_id,
+            "course_id" => course_id,
+            "status" => status
+          }
+          output[enrollment_type].push course
+        end
+      end
+    end
+    output
+  end
+
+  # orverride ApplicationController::api_request? to force canvas to treat all calls to /sfu/api/* as an API call
+  def api_request?
+    return true
   end
 end

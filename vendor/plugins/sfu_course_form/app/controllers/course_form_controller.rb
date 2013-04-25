@@ -5,6 +5,7 @@ class CourseFormController < ApplicationController
   def new
     @user = User.find(@current_user.id)
     @sfuid = @user.pseudonym.unique_id
+    @sfuid.slice! "@sfu.ca"
     @course_list = Array.new
     @terms = Account.find_by_name('Simon Fraser University').enrollment_terms.delete_if {|t| t.name == 'Default Term'}
     if SFU::User.student_only? @sfuid
@@ -15,7 +16,7 @@ class CourseFormController < ApplicationController
 
   def create
     selected_courses = []
-    account_id = Account.find_by_name('Simon Fraser University').id
+    account_id = Account.find_by_name("Simon Fraser University").id
     teacher_username = params[:username]
     teacher2_username = params[:enroll_me]
     teacher_sis_user_id = sis_user_id(teacher_username, account_id)
@@ -35,7 +36,7 @@ class CourseFormController < ApplicationController
     unless cross_list
 
       selected_courses.compact.uniq.each do |course|
-        unless course == "sandbox"
+        unless course.starts_with? "sandbox"
           logger.info "[SFU Course Form] Creating single course container : #{course}"
           course_info = course_info(course, account_id, teacher_sis_user_id, teacher2_sis_user_id)
 
@@ -53,7 +54,7 @@ class CourseFormController < ApplicationController
 
         else
           logger.info "[SFU Course Form] Creating sandbox for #{teacher_username}"
-          sandbox = sandbox_info(teacher_username, account_id, teacher_sis_user_id, teacher2_sis_user_id)
+          sandbox = sandbox_info(course, teacher_username, teacher_sis_user_id, teacher2_sis_user_id)
 
           course_array.push sandbox["csv"]
           enrollment_array.push sandbox["enrollment_csv_1"]
@@ -160,14 +161,15 @@ class CourseFormController < ApplicationController
     course
   end
 
-  def sandbox_info(username, account_id, teacher1, teacher2 = nil)
-    datestamp = "1"
+  def sandbox_info(course_line, username, teacher1, teacher2 = nil)
+    account_sis_id = "sfu:::sandbox:::instructors"
+    course_arr = course_line.split("-")
     sandbox = {}
-    sandbox["course_id"] = "sandbox-#{username}-#{datestamp}"
-    sandbox["short_long_name"] = "Sandbox - #{username}"
+    sandbox["course_id"] = course_line
+    sandbox["short_long_name"] = "Sandbox - #{username} - #{course_arr.last}"
     sandbox["default_section_id"] = ""
 
-    sandbox["csv"] = "\"#{sandbox["course_id"]}\",\"#{sandbox["short_long_name"]}\",\"#{sandbox["short_long_name"]}\",\"#{account_id}\",\"\",\"active\""
+    sandbox["csv"] = "\"#{sandbox["course_id"]}\",\"#{sandbox["short_long_name"]}\",\"#{sandbox["short_long_name"]}\",\"#{account_sis_id}\",\"\",\"active\""
     sandbox["enrollment_csv_1"] = "\"#{sandbox["course_id"]}\",\"#{teacher1}\",\"teacher\",\"#{sandbox["default_section_id"]}\",\"active\""
     sandbox["enrollment_csv_1"] = "\"#{sandbox["course_id"]}\",\"#{teacher2}\",\"teacher\",\"#{sandbox["default_section_id"]}\",\"active\"" unless teacher2.nil?
     sandbox
