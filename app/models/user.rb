@@ -2417,4 +2417,12 @@ class User < ActiveRecord::Base
   def prefers_gradebook2?
     preferences[:use_gradebook2] != false
   end
+
+  def stamp_logout_time!
+    if Rails.version < '3.0'
+      User.update_all({ :last_logged_out => Time.zone.now }, :id => self)
+    else
+      User.where(:id => self).update_all(:last_logged_out => Time.zone.now)
+    end
+  end
 end

@@ -84,9 +84,19 @@ module AuthenticationMethods
     if !@current_pseudonym
       if @policy_pseudonym_id
         @current_pseudonym = Pseudonym.find_by_id(@policy_pseudonym_id)
-      else
-        @pseudonym_session = PseudonymSession.find
-        @current_pseudonym = @pseudonym_session && @pseudonym_session.record
+      elsif @pseudonym_session = PseudonymSession.find
+        @current_pseudonym = @pseudonym_session.record
+
+        # if the session was created before the last time the user explicitly
+        # logged out (of any session for any of their pseudonyms), invalidate
+        # this session
+        if (invalid_before = @current_pseudonym.user.last_logged_out) &&
+          (session_refreshed_at = request.env['encrypted_cookie_store.session_refreshed_at']) &&
+          session_refreshed_at < invalid_before
+
+          destroy_session
+          @current_pseudonym = nil
+        end
       end
       if params[:login_success] == '1' && !@current_pseudonym
         # they just logged in successfully, but we can't find the pseudonym now?

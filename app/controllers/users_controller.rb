@@ -847,19 +847,6 @@ class UsersController < ApplicationController
     end
   end
 
-  def registered
-    @pseudonym_session.destroy if @pseudonym_session
-    @pseudonym = Pseudonym.find_by_id(flash[:pseudonym_id]) if flash[:pseudonym_id].present?
-    if flash[:user_id] && (@user = User.find(flash[:user_id]))
-      @email_address = @pseudonym && @pseudonym.communication_channel && @pseudonym.communication_channel.path
-      @email_address ||= @user.email
-      @pseudonym ||= @user.pseudonym
-      @cc = @pseudonym.communication_channel || @user.communication_channel
-    else
-      redirect_to root_url
-    end
-  end
-
   # @API Edit a user
   # Modify an existing user. To modify a user's login, see the documentation for logins.
   #
@@ -1096,8 +1083,7 @@ class UsersController < ApplicationController
     if authorized_action(@user, @current_user, [:manage, :manage_logins])
       @user.destroy(@user.grants_right?(@current_user, session, :manage_logins))
       if @user == @current_user
-        @pseudonym_session.destroy rescue true
-        reset_session
+        logout_current_user
       end
 
       respond_to do |format|

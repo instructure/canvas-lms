@@ -2269,4 +2269,25 @@ describe User do
       end
     end
   end
+
+  describe "#stamp_logout_time!" do
+    before do
+      user_model
+    end
+
+    it "should update last_logged_out" do
+      now = Time.zone.now
+      Timecop.freeze(now) { @user.stamp_logout_time! }
+      @user.reload.last_logged_out.to_i.should == now.to_i
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "should update regardless of current shard" do
+        @shard1.activate{ @user.stamp_logout_time! }
+        @user.reload.last_logged_out.should_not be_nil
+      end
+    end
+  end
 end

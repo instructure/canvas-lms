@@ -1312,6 +1312,16 @@ class ApplicationController < ActionController::Base
     super
   end
 
+  def destroy_session
+    @pseudonym_session.destroy rescue true
+    reset_session
+  end
+
+  def logout_current_user
+    @current_user.try(:stamp_logout_time!)
+    destroy_session
+  end
+
   def set_layout_options
     @embedded_view = params[:embedded]
     @headers = false if params[:no_headers]
