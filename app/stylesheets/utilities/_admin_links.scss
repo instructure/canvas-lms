@@ -1,27 +1,44 @@
 
 /*
-@styleguide Admin Links (Cogs)
+@styleguide Cogs (Admin Links)
+
+Cogs, *AKA admin links*, are generally floated to the right, make sure it's the right-most item in your UI. There are different cogs for the toolbar and content:
+<ul>
+<li>toolbar cogs are buttons with the cog and arrow inside</li>
+<li>content cogs are just the cog icon with the arrow and are generally used in the content areas, list items oir anything else that is NOT in a toolbar</li>
+</ul>
+**adding `class="admin-links"` to the container will float cog to the right**
+
+### Toolbar Cog (button + cog)
 
 ```html
-<a class="al-trigger btn">
-  <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-  <span class="screenreader-only">Discussion Settings</span>
-</a>
-<ul class="al-options">
-  <li><a href="#">Delete</a></li>
-  <li><a href="#">Save</a></li>
-</ul>
+<div>
+  <a class="al-trigger btn">
+    <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+    <span class="screenreader-only">Settings</span>
+  </a>
+  <ul class="al-options">
+    <li><a href="#" class="icon-edit">Edit</a></li>
+    <li><a href="#" class="icon-trash">Delete</a></li>
+    <li><a href="#" class="icon-lock">Lock</a></li>
+  </ul>
+</div>
 ```
 
-### Notes
+### Content cog
 
-Generally used in a toolbar. Make sure its the right-most item in
-your UI. The `admin-links` behavior will make it work.
-
-**TODO:**
-
-- Make a new icon that has both the cog and the arrow
-- Rename this because "admin links" is too specific
+```html
+<div>
+  <a class="al-trigger">
+    <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+  </a>
+  <ul class="al-options">
+    <li><a href="#" class="icon-plus">Add</a></li>
+    <li><a href="#" class="icon-edit" title="Edit">Edit</a></li>
+    <li><a href="#" class="icon-trash" title="Delete this module">Delete</a></li>
+  </ul>
+</div>
+```
 
 */
 

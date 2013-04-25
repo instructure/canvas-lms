@@ -2,6 +2,29 @@
 // Accordion
 // --------------------------------------------------
 
+/*
+@styleguide Accordion
+
+We use the jQuery UI accordion instead of Bootstraps', however, instead of using the class `ui-accordion` just use `accordion`
+
+```html
+<div class="accordion">
+  <h3><a href="#">Section 1</a></h3>
+  <div>
+    <p>Photo booth aesthetic skateboard, vice ethnic 3 wolf moon street art plaid umami marfa. Carles blue bottle occupy, polaroid ethical four loko farm-to-table freegan ennui truffaut. Fanny pack terry richardson locavore, cred salvia Austin selfies quinoa dreamcatcher.</p>
+  </div>
+  <h3><a href="#">Section 2</a></h3>
+  <div>
+    <p>Pour-over carles quinoa, butcher mustache synth umami whatever ugh messenger bag retro occupy disrupt 90's vegan. Semiotics godard retro squid gluten-free intelligentsia. Mumblecore wes anderson kale chips, irony mcsweeney's terry richardson viral wayfarers.</p>
+  </div>
+  <h3><a href="#">Section 3</a></h3>
+  <div> 
+    <p>Irony brunch high life mixtape pitchfork narwhal. Meggings keffiyeh direct trade biodiesel, typewriter pinterest twee narwhal tattooed tonx. Gluten-free odd future 90's, fashion axe pinterest fixie locavore put a bird on it you probably haven't heard of them ethical.</p>
+  </div>
+</div>
+```
+
+*/
 
 // Parent container
 .accordion {
