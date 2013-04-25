@@ -631,6 +631,20 @@ class DiscussionTopic < ActiveRecord::Base
     self.user ? self.user.name : nil
   end
 
+  def visible_for?(user=nil, opts={})
+    return true if user == self.user
+    if unlock_at = locked_for?(user, opts).try_rescue(:[], :unlock_at)
+      unlock_at < Time.now
+    else
+      true
+    end
+  end
+
+  # Public: Determine if the discussion topic is locked for a specific user. The topic is locked when the 
+  #         delayed_post_at is in the future or the group assignment is locked. This does not determine
+  #         the visibility of the topic to the user, only that they are unable to reply.
+  #
+  # Returns: boolean
   def locked_for?(user=nil, opts={})
     return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do

@@ -136,7 +136,6 @@ class DiscussionTopicsController < ApplicationController
                    @context.active_discussion_topics.only_discussion_topics)
           scope = scope.by_position
           @topics = Api.paginate(scope, self, topic_pagination_url(:only_announcements => params[:only_announcements]))
-          @topics.reject! { |a| a.locked_for?(@current_user, :check_policies => true) }
           @topics.each { |t| t.current_user = @current_user }
           if api_request?
             render :json => discussion_topics_api_json(@topics, @context, @current_user, session)
@@ -208,12 +207,11 @@ class DiscussionTopicsController < ApplicationController
       redirect_to named_context_url(@context, :context_discussion_topics_url)
       return
     end
+
     if authorized_action(@topic, @current_user, :read)
       @headers = !params[:headless]
-      @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
-      unless @locked
-        @topic.change_read_state('read', @current_user)
-      end
+      @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true) || @topic.locked?
+      @topic.change_read_state('read', @current_user)
       if @topic.for_group_assignment?
         @groups = @topic.assignment.group_category.groups.active.select{ |g| g.grants_right?(@current_user, session, :read) }
         topics = @topic.child_topics.to_a
@@ -243,10 +241,10 @@ class DiscussionTopicsController < ApplicationController
                 :ID => @topic.id,
               },
               :PERMISSIONS => {
-                :CAN_REPLY => !(@topic.for_group_assignment? || @topic.locked?),
-                :CAN_ATTACH => @topic.grants_right?(@current_user, session, :attach),
-                :CAN_MANAGE_OWN => @context.user_can_manage_own_discussion_posts?(@current_user),
-                :MODERATE => @context.grants_right?(@current_user, session, :moderate_forum)
+                :CAN_REPLY      => @locked ? false : !(@topic.for_group_assignment? || @topic.locked?),     # Can reply
+                :CAN_ATTACH     => @locked ? false : @topic.grants_right?(@current_user, session, :attach), # Can attach files on replies
+                :CAN_MANAGE_OWN => @context.user_can_manage_own_discussion_posts?(@current_user),           # Can moderate their own topics
+                :MODERATE       => @context.grants_right?(@current_user, session, :moderate_forum)          # Can moderate any topic
               },
               :ROOT_URL => named_context_url(@context, :api_v1_context_discussion_topic_view_url, @topic),
               :ENTRY_ROOT_URL => named_context_url(@context, :api_v1_context_discussion_topic_entry_list_url, @topic),
@@ -419,14 +417,14 @@ class DiscussionTopicsController < ApplicationController
         discussion_topic_hash[:message] = process_incoming_html_content(discussion_topic_hash[:message])
       end
 
-      #handle locking/unlocking
-      if params.has_key? :locked
-        if value_to_boolean(params[:locked])
-          @topic.lock
-        else
-          @topic.unlock
-        end
-      end
+       #handle locking/unlocking
+       if (params.has_key?(:locked) && !params[:locked].is_a?(Hash))
+         if value_to_boolean(params[:locked])
+           @topic.lock
+         else
+           @topic.unlock
+         end
+       end
 
       if @topic.update_attributes(discussion_topic_hash)
         log_asset_access(@topic, 'topics', 'topics', 'participate')

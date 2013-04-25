@@ -780,10 +780,11 @@ class Assignment < ActiveRecord::Base
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       assignment_for_user = self.overridden_for(user)
-      if (assignment_for_user.unlock_at && assignment_for_user.unlock_at > Time.now)
-        locked = {:asset_string => self.asset_string, :unlock_at => assignment_for_user.unlock_at}
-      elsif (assignment_for_user.lock_at && assignment_for_user.lock_at <= Time.now)
-        locked = {:asset_string => self.asset_string, :lock_at => assignment_for_user.lock_at}
+      if ((assignment_for_user.unlock_at && assignment_for_user.unlock_at > Time.now) ||
+          (assignment_for_user.lock_at && assignment_for_user.lock_at <= Time.now))
+        locked = { :asset_string => self.asset_string, 
+                   :unlock_at    => assignment_for_user.unlock_at,
+                   :lock_at      => assignment_for_user.lock_at }
       elsif self.could_be_locked && item = locked_by_module_item?(user, opts[:deep_check_if_needed])
         locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
       end

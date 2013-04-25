@@ -22,6 +22,7 @@ describe StreamItemsHelper do
   before do
     Notification.create!(:name => "Assignment Created", :category => "TestImmediately")
     course_with_teacher(:active_all => true)
+    course_with_student(:active_all => true, :course => @course)
     @other_user = user()
     @another_user = user()
 
@@ -59,6 +60,21 @@ describe StreamItemsHelper do
         presenter.context.should_not be_nil
         presenter.summary.should_not be_nil
       end
+    end
+
+    it "should skip items that are not visible to the current user" do
+      # this discussion topic will not be shown since it is a graded discussion with a
+      # future unlock at date
+      @group_assignment_discussion = group_assignment_discussion({ :course => @course })
+      @group_assignment_discussion.update_attribute(:user_id, @teacher.id)
+      assignment = @group_assignment_discussion.assignment
+      assignment.update_attributes({
+        :due_at => 30.days.from_now,
+        :lock_at => 30.days.from_now,
+        :unlock_at => 20.days.from_now
+      })
+      @student.recent_stream_items.should_not include @group_assignment_discussion
+      @teacher.recent_stream_items.should_not include @group_assignment_discussion
     end
   end
 

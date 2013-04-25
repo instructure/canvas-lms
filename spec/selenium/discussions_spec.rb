@@ -246,6 +246,7 @@ describe "discussions" do
           type_in_tiny('textarea[name=message]', 'file attachement discussion')
           expect_new_page_load { submit_form('.form-actions') }
           wait_for_ajaximations
+
           f('.zip').should include_text(filename)
         end
 

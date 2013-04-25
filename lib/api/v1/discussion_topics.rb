@@ -22,6 +22,9 @@ module Api::V1::DiscussionTopics
   include Api::V1::Attachment
 
   def discussion_topics_api_json(topics, context, user, session)
+    # remove the topics which are not visible for the current user from the returned list of topics
+    topics.reject! { |t| !t.visible_for?(user, :check_policies => true) }
+
     topics.map do |topic|
       discussion_topic_api_json(topic, context, user, session)
     end
@@ -53,7 +56,7 @@ module Api::V1::DiscussionTopics
                   :unread_count => topic.unread_count(user),
                   :topic_children => children,
                   :attachments => attachments,
-                  :locked => topic.locked?,
+                  :locked => (topic.locked_for?(user) || topic.locked?),
                   :author => user_display_json(topic.user, topic.context),
                   :html_url => context.is_a?(CollectionItem) ? nil :
                           named_context_url(context,

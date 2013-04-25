@@ -102,6 +102,51 @@ describe DiscussionTopic do
     (@entry.check_policy(@student) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply'].sort
   end
 
+  describe "visiblity" do
+    before(:each) do
+      course_with_teacher(:active_all => 1)
+      student_in_course(:active_all => 1)
+      @topic = @course.discussion_topics.create!(:user => @teacher)
+    end
+
+    it "should be visible to students when topic is not locked" do
+      @topic.visible_for?(@student).should be_true
+    end
+
+    it "should not be visible to students when topic delayed_post_at is in the future" do
+      @topic.delayed_post_at = 5.days.from_now
+      @topic.save!
+      @topic.visible_for?(@student).should be_false
+    end
+
+    it "should be visible to students when topic delayed_post_at is in the past" do
+      @topic.delayed_post_at = 5.days.ago
+      @topic.save!
+      @topic.visible_for?(@student).should be_true
+    end
+
+    it "should be visible to students when topic delayed_post_at is nil" do
+      @topic.delayed_post_at = nil
+      @topic.save!
+      @topic.visible_for?(@student).should be_true
+    end
+
+    it "should not be visible when no delayed_post but assignment unlock date in future" do
+      @topic.delayed_post_at = nil
+      group_category = @course.group_categories.create(:name => "category")
+      @topic.assignment = @course.assignments.build(:submission_types => 'discussion_topic', 
+        :title => @topic.title, 
+        :group_category => group_category,
+        :unlock_at => 10.days.from_now,
+        :lock_at => 30.days.from_now)
+      @topic.assignment.infer_times
+      @topic.assignment.saved_by = :discussion_topic
+      @topic.save
+      
+      @topic.visible_for?(@student).should be_false
+    end
+  end
+
   describe "allow_student_discussion_topics setting" do
 
     before(:each) do
