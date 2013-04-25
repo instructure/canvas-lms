@@ -26,7 +26,9 @@ define [
     searchFlickr: (event) ->
       event?.preventDefault()
       return unless query = @$('.flickrSearchTerm').val()
-      flickrUrl = 'https://secure.flickr.com/services/rest/?method=flickr.photos.search&format=json' +
+
+      flickrUrl = "#{@flickrUrl}/#{query}" if @flickrUrl
+      flickrUrl ||= 'https://secure.flickr.com/services/rest/?method=flickr.photos.search&format=json' +
                   '&api_key=734839aadcaa224c4e043eaf74391e50&sort=relevance&license=1,2,3,4,5,6' +
                   "&text=#{query}&per_page=150&jsoncallback=?"
       @request?.abort()
