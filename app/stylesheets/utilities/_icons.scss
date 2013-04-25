@@ -247,6 +247,8 @@ i[class*=icon-], i[class^=icon-], a[class*=icon-], a[class^=icon-] {
     font-family: 'canvasregular';
     display: inline-block;
     vertical-align: middle;
+    position: relative;
+    top: -1px;
     text-rendering: optimizeLegibility;
 
     // the specific reason for this being in the :before and not part of the <i> was to get
