@@ -171,13 +171,15 @@ class ApiController < ApplicationController
       course_id = e.course.id
       term = e.enrollment_term.sis_source_id
       enrollment_type = e.type
+      status = e.course.workflow_state
       unless term.nil? || sis_source_id.nil?
         if enrollment_type_map.has_key? enrollment_type
           enrollment_type = enrollment_type_map[enrollment_type]
           course = {
             "term" => term,
             "course_sis_source_id" => sis_source_id,
-            "course_id" => course_id
+            "course_id" => course_id,
+            "status" => status
           }
           output[enrollment_type].push course
         end
