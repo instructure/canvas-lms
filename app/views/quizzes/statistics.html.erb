@@ -169,7 +169,6 @@ tr.question td .number_answer.correct_answer {
         <% if @statistics[:multiple_attempts_exist] %>
           <a href="<%= context_url(@context, :context_quiz_statistics_url, @quiz.id) %>" class="btn button-sidebar-wide"><%= t('links.count_only_latest_attempts', "Count Only Each Latest Attempt") %></a>
         <% end %>
-        <a href="<%= context_url(@context, :context_quiz_formatted_statistics_url, @quiz.id, :all_versions => '1', :format => :csv) %>" class="btn button-sidebar-wide"><i class="icon-ms-excel"></i> <%= t('links.download_csv', "Download csv") %></a>
       </div>
     <% else %>
       <% if @statistics[:multiple_attempts_exist] %>
@@ -181,9 +180,9 @@ tr.question td .number_answer.correct_answer {
         <% if @statistics[:multiple_attempts_exist] %>
           <a href="<%= context_url(@context, :context_quiz_statistics_url, @quiz.id, :all_versions => '1') %>" class="btn button-sidebar-wide"><%= mt('links.count_all_attempts', "Count **All** Attempts") %></a>
         <% end %>
-        <a href="<%= context_url(@context, :context_quiz_formatted_statistics_url, @quiz.id, :format => :csv) %>" class="btn button-sidebar-wide"><i class="icon-ms-excel"></i> <%= t('links.download_csv', "Download csv") %></a>
       </div>
     <% end %>
+    <div class="quiz-reports"></div>
   </div>
 <% end %>
 <h2><%= @quiz.survey? ? t('headers.survey_statistics', "Survey Statistics") : t('headers.quiz_statistics', "Quiz Statistics") %></h2> 

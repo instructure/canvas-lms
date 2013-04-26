@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -28,7 +28,7 @@ class QuizStatistics < ActiveRecord::Base
 
   scope :report_type, lambda { |type| where(:report_type => type) }
 
-  REPORTS = %w[item_analysis student_analysis].freeze
+  REPORTS = %w[student_analysis item_analysis].freeze
 
   validates_inclusion_of :report_type, :in => REPORTS
 
@@ -54,6 +54,7 @@ class QuizStatistics < ActiveRecord::Base
     ).tap { |a|
       a.content_type = 'text/csv'
       a.save!
+      complete_progress
     }
   end
 
@@ -92,10 +93,15 @@ class QuizStatistics < ActiveRecord::Base
     end
   end
 
+  set_policy do
+    given { |user, session| quiz.grants_right?(user, session, :read_statistics) }
+    can :read
+  end
+
   class QuizStatistics::Report
     extend Forwardable
 
-    def_delegators :quiz_statistics, :quiz, :includes_all_versions?, :anonymous?, :start_progress, :update_progress, :complete_progress
+    def_delegators :quiz_statistics, :quiz, :includes_all_versions?, :anonymous?, :start_progress, :update_progress
 
     attr_reader :quiz_statistics
 

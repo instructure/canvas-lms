@@ -18,11 +18,12 @@
 
 class QuizzesController < ApplicationController
   include Api::V1::Quiz
+  include Api::V1::QuizStatistics
   include Api::V1::AssignmentOverride
   before_filter :require_context
   add_crumb(proc { t('#crumbs.quizzes', "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
-  before_filter :get_quiz, :only => [:statistics, :item_analysis_report, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :filters, :read_only, :managed_quiz_data]
+  before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :filters, :read_only, :managed_quiz_data]
 
   # The number of questions that can display "details". After this number, the "Show details" option is disabled
   # and the data is not even loaded.
@@ -80,35 +81,26 @@ class QuizzesController < ApplicationController
         redirect_to named_context_url(@context, :context_quiz_url, @quiz)
         return
       end
-      
+
       respond_to do |format|
         format.html {
+          all_versions = params[:all_versions] == '1'
           add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
           add_crumb(t(:statistics_crumb, "Statistics"), named_context_url(@context, :context_quiz_statistics_url, @quiz))
-          @statistics = @quiz.statistics(params[:all_versions] == '1')
+          @statistics = @quiz.statistics(all_versions)
           user_ids = @statistics[:submission_user_ids]
           @submitted_users = User.where(:id => user_ids.to_a).order_by_sortable_name
           @users = Hash[
             @submitted_users.map { |u| [u.id, u] }
           ]
-        }
-        format.csv {
-          redirect_to quiz_stats('student_analysis').csv_attachment.cacheable_s3_download_url
-        }
-        format.json {
-          stats = quiz_stats('student_analysis', :async => true)
-          render :json => {:progress_url => api_v1_progress_url(stats.progress)}
-        }
-      end
-    end
-  end
-
-  def item_analysis_report
-    if authorized_action(@quiz, @current_user, :read_statistics)
-      respond_to do |format|
-        format.json {
-          stats = quiz_stats('item_analysis', :async => true)
-          render :json => {:progress_url => api_v1_progress_url(stats.progress)}
+          js_env :quiz_reports => QuizStatistics::REPORTS.map { |report_type|
+            report = @quiz.current_statistics_for(report_type, :includes_all_versions => all_versions)
+            json = quiz_statistics_json(report, @current_user, session, :include => ['file'])
+            json[:course_id] = @context.id
+            json[:report_name] = report.readable_type
+            json[:progress] = progress_json(report.progress, @current_user, session) if report.progress
+            json
+          }
         }
       end
     end
@@ -698,13 +690,6 @@ class QuizzesController < ApplicationController
         where("quiz_submissions.quiz_id=? AND quiz_submissions.workflow_state<>'settings_only'", @quiz)
     @submitted_student_count = submitted_with_submissions.count(:id, :distinct => true)
     @any_submissions_pending_review = submitted_with_submissions.where("quiz_submissions.workflow_state = 'pending_review'").count > 0
-  end
-
-  def quiz_stats(report_type, opts = {})
-    @quiz.statistics_csv(report_type, {
-      :include_all_versions => params[:all_versions] == '1',
-      :anonymous => @quiz.anonymous_submissions
-    }.merge(opts))
   end
 
 end

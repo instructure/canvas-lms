@@ -904,10 +904,6 @@ describe QuizzesController do
     it "should allow concluded teachers to see a quiz's statistics" do
       course_with_teacher_logged_in(:active_all => true)
       course_quiz
-      get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
-      response.should be_success
-      response.should render_template('statistics')
-
       @enrollment.conclude
       get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
       response.should be_success
@@ -922,42 +918,6 @@ describe QuizzesController do
       get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
       flash[:notice].should == "That page has been disabled for this course"
       response.should redirect_to course_quiz_url(@course.id, @quiz.id)
-    end
-  end
-
-  describe "GET 'statistics.csv'" do
-    it "redirects to the attachment url" do
-      course_with_teacher_logged_in
-      course_quiz
-      get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id,
-        :format => 'csv'
-      @quiz.quiz_statistics.size.should == 1
-      stats = @quiz.quiz_statistics.first
-      response.should redirect_to stats.csv_attachment.cacheable_s3_download_url
-    end
-  end
-
-  describe "POST statistics.json" do
-    it "should return a progress_url" do
-      course_with_teacher_logged_in
-      course_quiz
-      post 'statistics', :format => 'json',
-        :course_id => @course.id, :quiz_id => @quiz.id
-      response.should be_success
-      progress = @quiz.quiz_statistics.last.progress
-      response.body.should include("\"progress_url\":\"http://test.host/api/v1/progress/#{progress.id}\"")
-    end
-  end
-
-  describe "POST item_analysis_report.json" do
-    it "should return a progress_url" do
-      course_with_teacher_logged_in
-      course_quiz
-      post 'item_analysis_report', :format => 'json',
-        :course_id => @course.id, :quiz_id => @quiz.id
-      response.should be_success
-      progress = @quiz.quiz_statistics.last.progress
-      response.body.should include("\"progress_url\":\"http://test.host/api/v1/progress/#{progress.id}\"")
     end
   end
 

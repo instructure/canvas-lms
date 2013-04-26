@@ -73,6 +73,7 @@ describe QuizStatistics::StudentAnalysis do
     end
 
     it 'should not include user data for anonymous surveys' do
+      @quiz.update_attribute :anonymous_submissions, true
       # one complete submission
       qs = @quiz.generate_submission(@student)
       qs.grade_submission
@@ -80,7 +81,7 @@ describe QuizStatistics::StudentAnalysis do
       # and one in progress
       @quiz.generate_submission(@student)
 
-      stats = CSV.parse(csv(:include_all_versions => true, :anonymous => true))
+      stats = CSV.parse(csv(:include_all_versions => true))
       # format for row is row_name, '', data1, data2, ...
       stats.first.length.should == 3
       stats[0][0].should == "section"

@@ -7,6 +7,13 @@ describe QuizStatistics::ItemAnalysis::Summary do
     QuizStatistics::ItemAnalysis::Summary.new(@quiz)
   }
 
+  describe "#add_response" do
+    it "should not add unsupported response types" do
+      summary.add_response({:question_type => "foo", :answers => []}, 0, 0)
+      summary.size.should == 3
+    end
+  end
+
   describe "#each" do
     it "should yield each item" do
       count = 0

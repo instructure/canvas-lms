@@ -4,6 +4,8 @@ class QuizStatistics::ItemAnalysis < QuizStatistics::Report
     "quiz-item-analysis-#{Time.now.to_i}.csv"
   end
 
+  MIN_STATS_FOR_ALPHA = 15
+
   def to_csv
     @csv ||=
       CSV.generate do |csv|
@@ -55,14 +57,13 @@ class QuizStatistics::ItemAnalysis < QuizStatistics::Report
             item.variance,
             item.standard_deviation,
             item.difficulty_index,
-            stats.alpha
+            stats.size > MIN_STATS_FOR_ALPHA ? stats.alpha : "N/A"
           ]
           point_biserial_max_count.times do |i|
             row << item.point_biserials[i]
           end
           csv << row
         end
-        complete_progress
       end
   end
 

@@ -114,7 +114,7 @@ class QuizStatistics::ItemAnalysis::Item
     @point_biserials ||= {}
     @point_biserials[answer] ||= begin
       mean, mean_other = mean_score_split(answer)
-      if mean
+      if mean && mean_other
         ratio = ratio_for(answer)
         sd = @summary.standard_deviation(all_respondents)
         (mean - mean_other) / sd * Math.sqrt(ratio * (1 - ratio))

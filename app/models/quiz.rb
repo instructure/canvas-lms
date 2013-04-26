@@ -883,13 +883,17 @@ class Quiz < ActiveRecord::Base
     ).report.generate
   end
 
-  # returns the QuizStatistics object that will ultimately contain the csv
-  # (it may be generating in the background)
-  def statistics_csv(report_type, options={})
+  # finds or initializes a QuizStatistics for the given report_type and
+  # options
+  def current_statistics_for(report_type, options = {})
+    # item analysis always takes the first attempt (not necessarily the
+    # most recent), thus we say it always cares about all versions
+    options[:includes_all_versions] = true if report_type == 'item_analysis'
+
     quiz_stats_opts = {
       :report_type => report_type,
-      :includes_all_versions => options[:include_all_versions],
-      :anonymous => options[:anonymous]
+      :includes_all_versions => options[:includes_all_versions],
+      :anonymous => anonymous_submissions?
     }
 
     last_quiz_activity = [
@@ -900,12 +904,20 @@ class Quiz < ActiveRecord::Base
     candidate_stats = quiz_statistics.report_type(report_type).where(quiz_stats_opts).last
 
     if candidate_stats.nil? || candidate_stats.created_at < last_quiz_activity
-      stats = quiz_statistics.create!(quiz_stats_opts)
-      options[:async] ? stats.generate_csv_in_background : stats.generate_csv
-      stats
+      quiz_statistics.build(quiz_stats_opts)
     else
       candidate_stats
     end
+  end
+
+  # returns the QuizStatistics object that will ultimately contain the csv
+  # (it may be generating in the background)
+  def statistics_csv(report_type, options = {})
+    stats = current_statistics_for(report_type, options)
+    return stats unless stats.new_record?
+    stats.save!
+    options[:async] ? stats.generate_csv_in_background : stats.generate_csv
+    stats
   end
 
   def unpublished_changes?

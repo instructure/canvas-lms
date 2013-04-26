@@ -244,8 +244,6 @@ class QuizStatistics::StudentAnalysis < QuizStatistics::Report
       end
     end
 
-    complete_progress
-
     csv
   end
 

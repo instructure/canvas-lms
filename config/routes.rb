@@ -257,8 +257,6 @@ ActionController::Routing::Routes.draw do |map|
       quiz.reorder "reorder", :controller => "quizzes", :action => "reorder"
       quiz.history "history", :controller => "quizzes", :action => "history"
       quiz.statistics "statistics", :controller => 'quizzes', :action => 'statistics'
-      quiz.formatted_statistics "statistics.:format", :controller => 'quizzes', :action => 'statistics'
-      quiz.item_analysis_report "item_analysis_report", :controller => 'quizzes', :action => 'item_analysis_report'
       quiz.read_only "read_only", :controller => 'quizzes', :action => 'read_only'
       quiz.filters 'filters', :controller => 'quizzes', :action => 'filters'
       quiz.resources :quiz_submissions, :as => "submissions", :collection => {:backup => :put}, :member => {:record_answer => :post} do |submission|
@@ -1072,6 +1070,11 @@ ActionController::Routing::Routes.draw do |map|
       quizzes.post "courses/:course_id/quizzes", :action => :create, :path_name => 'course_quiz_create'
       quizzes.get "courses/:course_id/quizzes/:id", :action => :show, :path_name => 'course_quiz'
       quizzes.put "courses/:course_id/quizzes/:id", :action => :update, :path_name => 'course_quiz_update'
+    end
+
+    api.with_options(:controller => :quiz_reports) do |statistics|
+      statistics.post "courses/:course_id/quizzes/:quiz_id/reports", :action => :create, :path_name => 'course_quiz_reports_create'
+      statistics.get "courses/:course_id/quizzes/:quiz_id/reports/:id", :action => :show, :path_name => 'course_quiz_report'
     end
 
     api.with_options(:controller => :quiz_submissions_api) do |quiz_submissions|
