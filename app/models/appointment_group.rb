@@ -167,8 +167,7 @@ class AppointmentGroup < ActiveRecord::Base
 
     codes = user.appointment_context_codes.dup
     if restrict_to_codes
-      codes[:full] &= restrict_to_codes
-      codes[:limited] &= restrict_to_codes
+      codes[:primary] &= restrict_to_codes
     end
     uniq.
         joins("JOIN appointment_group_contexts agc " \

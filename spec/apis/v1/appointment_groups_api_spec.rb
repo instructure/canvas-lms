@@ -58,6 +58,19 @@ describe AppointmentGroupsController, :type => :integration do
     json.size.should eql 1
   end
 
+  it "should restrict manageable appointment groups by context_codes" do
+    ag1 = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :contexts => [@course1])
+    ag2 = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :contexts => [@course2])
+
+    json = api_call(:get, "/api/v1/appointment_groups?scope=manageable", {
+        :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable'})
+    json.size.should eql 2
+
+    json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&context_codes[]=course_#{@course2.id}", {
+        :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable', :context_codes => ["course_#{@course2.id}"]})
+    json.size.should eql 1
+  end
+
   it 'should return reservable appointment groups' do
     ag1 = AppointmentGroup.create!(:title => "can't reserve", :contexts => [@course])
     ag1.publish!
@@ -110,6 +123,24 @@ describe AppointmentGroupsController, :type => :integration do
       json.size.should eql 1
       json.first['id'].should eql ag9.id
     end
+  end
+
+  it "should restrict reservable appointment groups by context_codes" do
+    student_in_course :course => course(:active_all => true), :user => @me, :active_all => true
+    ag1 = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :contexts => [@course])
+    ag1.publish!
+
+    student_in_course :course => course(:active_all => true), :user => @me, :active_all => true
+    ag2 = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :contexts => [@course])
+    ag2.publish!
+
+    json = api_call(:get, "/api/v1/appointment_groups?scope=reservable", {
+        :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'reservable'})
+    json.size.should eql 2
+
+    json = api_call(:get, "/api/v1/appointment_groups?scope=reservable&context_codes[]=course_#{@course.id}", {
+        :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'reservable', :context_codes => ["course_#{@course.id}"]})
+    json.size.should eql 1
   end
 
   it "should return past reservable appointment groups, if requested" do
