@@ -15,8 +15,9 @@ class CourseDataController < ApplicationController
 
   def search
     data_arr = []
+    queries = []
     term = params[:term]
-    queries = params[:query].to_s.downcase.split
+    queries = params[:query].to_s.downcase.split unless params[:query].nil?
     file_name = "#{base_dir}/#{term}/all.lst"
     if File.exists? file_name
       File.open(file_name).each_line do |line|
