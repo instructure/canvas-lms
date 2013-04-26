@@ -3,7 +3,15 @@
     {{#if warning}}
       {{warning}}
     {{else}}
-      {{score}} / {{possible}}
+      {{#unless showPointsNotPercent}}
+        {{score}} / {{possible}}
+      {{else}}
+        {{#if possible}}
+          {{percentage}}%
+        {{else}}
+          -
+        {{/if}}
+      {{/unless}}
     {{/if}}
   </div>
   <span class="percentage">
@@ -11,10 +19,14 @@
       <i class="icon-warning final-warning"></i>
     {{/if}}
 
-    {{#if possible}}
-      {{percentage}}%
+    {{#if showPointsNotPercent}}
+      {{score}}
     {{else}}
-      -
+      {{#if possible}}
+        {{percentage}}%
+      {{else}}
+        -
+      {{/if}}
     {{/if}}
   </span>
    {{#if letterGrade}}
