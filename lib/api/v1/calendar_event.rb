@@ -57,7 +57,9 @@ module Api::V1::CalendarEvent
 
     hash["child_events_count"] = event.child_events.size
     hash['parent_event_id'] = event.parent_calendar_event_id
-    hash['hidden'] = event.hidden?
+    # events are hidden when section-specific events override them
+    # but if nobody is logged in, no sections apply, so show the base event
+    hash['hidden'] = user ? event.hidden? : false
 
     if include.include?('participants')
       if event.context_type == 'User'
