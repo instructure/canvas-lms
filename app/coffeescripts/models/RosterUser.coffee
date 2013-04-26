@@ -2,6 +2,9 @@ define ['compiled/models/User'], (User) ->
 
   class RosterUser extends User
 
+    defaults:
+      avatar_url: '/images/messages/avatar-50.png'
+
     computedAttributes: [
       'sections'
       {name: 'html_url', deps: ['enrollments']}
