@@ -605,7 +605,7 @@ define [
       @userFilterRemovedRows = []
 
       if term != ''
-        propertiesToMatch = ['name', 'login_id', 'short_name', 'sortable_name']
+        propertiesToMatch = ['name', 'login_id', 'short_name', 'sortable_name', 'sis_user_id']
         index = @multiGrid.data.length
         while index--
           student = @multiGrid.data[index]
