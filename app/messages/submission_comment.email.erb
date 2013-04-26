@@ -8,5 +8,20 @@
 
 <%= t :body, "%{author} just made a new comment on the submission for %{user} for %{assignment}", :author => (asset.author_name || t(:someone, "Someone")), :user => asset.submission.user.short_name, :assignment => asset.submission.assignment.title %>
 
+<%= asset.comment %>
+
+<% if asset.media_comment? %>
+<%= t "#messages.conversation_message.email.audio_comment", "This message includes media comments. To listen or reply, click the link below:" %>
+<% else %>
 <%= t :link_message, "You can review the submission details here:" %>
+<% end %>
+
 <%= content :link %>
+
+<% unless asset.attachments.empty? %>
+<%= t "#messages.conversation_message.email.attached_files", "Attached Files:" %>
+<% asset.attachments.each do |attachment| %>
+<%= attachment.display_name %> - <%= attachment.readable_size %> 
+<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/files/<%= attachment.id %>/download
+<% end %>
+<% end %>
