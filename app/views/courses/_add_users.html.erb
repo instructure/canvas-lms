@@ -28,8 +28,10 @@
       </div>
       <div style="clear:both">
           <span id="limit_privileges_to_course_section_holder" style="padding-left: 10px; white-space: nowrap;">
-            <input type="checkbox" id="limit_privileges_to_course_section" name="limit_privileges_to_course_section" value="1"/>
-            <%= label_tag :limit_privileges_to_course_section, :en => 'these admins can only grade students in their section' %>
+            <label for="limit_privileges_to_course_section" class="checkbox">
+              <input type="checkbox" id="limit_privileges_to_course_section" name="limit_privileges_to_course_section" value="1"/>
+              <%= t(:limit_privileges_to_course_section, 'these admins can only grade students in their section') %>
+            </label>
           </span>
       </div>
       <div class="teacherless_invite_message" style="<%= hidden unless @context.teacherless? %> font-size: 0.8em;">
