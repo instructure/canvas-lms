@@ -51,7 +51,7 @@ module Guard
     def run_on_change(paths)
       Parallel.each(paths, :in_threads => Parallel.processor_count) do |path|
         begin
-          puts "Compiling: #{path}"
+          UI.info "Compiling: #{path}"
           Handlebars.compile_file path, 'app/views/jst', @options[:output]
         rescue Exception => e
           ::Guard::Notifier.notify(e.to_s, :title => path.sub('app/views/jst/', ''), :image => :failed)
@@ -64,9 +64,10 @@ module Guard
     # @raise [:task_has_failed] when stop has failed
     #
     def run_all
-      UI.info "pre-compiling all handlebars templates in #{@options[:input]} to #{@options[:output]}"
+      UI.info "Compiling all handlebars templates in #{@options[:input]} to #{@options[:output]}"
       FileUtils.rm_r @options[:output] if File.exists?(@options[:output])
       Handlebars.compile @options[:input], @options[:output]
+      UI.info "Successfully compiled all handlebars templates in #{@options[:input]}"
     end
 
 
@@ -76,11 +77,11 @@ module Guard
     # @raise [:task_has_failed] when run_on_change has failed
     #
     def run_on_deletion(paths)
-      raise "doesnt work "
-      # paths.each do |file|
-      #   javascript = file.gsub(/(js\.coffee|coffee)$/, 'js')
-      #   File.remove(javascript) if File.exists?(javascript)
-      # end
+      paths.each do |file|
+        javascript = file.sub(%r{\A#{Regexp.escape(@options[:input])}/(.*?)\.handlebars}, "#{@options[:output]}/\\1.js")
+        UI.info "Removing: #{javascript}"
+        File.remove(javascript) if File.exists?(javascript)
+      end
     end
 
   end
