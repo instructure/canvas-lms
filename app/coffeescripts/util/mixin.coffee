@@ -10,8 +10,9 @@ define ['underscore'], ({extend}) ->
       for key, prop of mixin
         # don't blow away old events, merge them
         if key in ['events', 'defaults', 'els']
-          target[key] ?= {}
-          extend target[key], prop
+          # don't extend parent embedded objects, copy them
+          parentClassKey = target.constructor?.prototype[key]
+          target[key] = extend({}, parentClassKey, target[key], prop)
         # crazy magic multiple inheritence
         else if key in ['attach', 'afterRender', 'initialize']
           (target["__#{key}__"] ||= []).push prop
