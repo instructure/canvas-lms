@@ -1999,56 +1999,60 @@ class User < ActiveRecord::Base
     Conversation.initiate(users, private).conversation_participants.find_by_user_id(self)
   end
 
+  def messageable_user_calculator
+    @messageable_user_calculator ||= MessageableUser::Calculator.new(self)
+  end
+
   def load_messageable_user(user, options={})
-    MessageableUser::Calculator.load_messageable_user(self, user, options)
+    messageable_user_calculator.load_messageable_user(user, options)
   end
 
   def load_messageable_users(users, options={})
-    MessageableUser::Calculator.load_messageable_users(self, users, options)
+    messageable_user_calculator.load_messageable_users(users, options)
   end
 
   def messageable_users_in_context(asset_string)
-    MessageableUser::Calculator.messageable_users_in_context(self, asset_string)
+    messageable_user_calculator.messageable_users_in_context(asset_string)
   end
 
   def count_messageable_users_in_context(asset_string)
-    MessageableUser::Calculator.count_messageable_users_in_context(self, asset_string)
+    messageable_user_calculator.count_messageable_users_in_context(asset_string)
   end
 
   def messageable_users_in_course(course_or_id)
-    MessageableUser::Calculator.messageable_users_in_course(self, course_or_id)
+    messageable_user_calculator.messageable_users_in_course(course_or_id)
   end
 
   def count_messageable_users_in_course(course_or_id)
-    MessageableUser::Calculator.count_messageable_users_in_course(self, course_or_id)
+    messageable_user_calculator.count_messageable_users_in_course(course_or_id)
   end
 
   def messageable_users_in_section(section_or_id)
-    MessageableUser::Calculator.messageable_users_in_section(self, section_or_id)
+    messageable_user_calculator.messageable_users_in_section(section_or_id)
   end
 
   def count_messageable_users_in_section(section_or_id)
-    MessageableUser::Calculator.count_messageable_users_in_section(self, section_or_id)
+    messageable_user_calculator.count_messageable_users_in_section(section_or_id)
   end
 
   def messageable_users_in_group(group_or_id)
-    MessageableUser::Calculator.messageable_users_in_group(self, group_or_id)
+    messageable_user_calculator.messageable_users_in_group(group_or_id)
   end
 
   def count_messageable_users_in_group(group_or_id)
-    MessageableUser::Calculator.count_messageable_users_in_group(self, group_or_id)
+    messageable_user_calculator.count_messageable_users_in_group(group_or_id)
   end
 
   def search_messageable_users(options={})
-    MessageableUser::Calculator.search_messageable_users(self, options)
+    messageable_user_calculator.search_messageable_users(options)
   end
 
   def messageable_sections
-    MessageableUser::Calculator.messageable_sections(self)
+    messageable_user_calculator.messageable_sections
   end
 
   def messageable_groups
-    MessageableUser::Calculator.messageable_groups(self)
+    messageable_user_calculator.messageable_groups
   end
 
   def short_name_with_shared_contexts(user)
