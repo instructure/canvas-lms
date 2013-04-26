@@ -261,7 +261,9 @@ describe "submissions" do
                                                  :submission_types => "online_upload")
         get "/courses/#{@course.id}/assignments/#{assignment.id}"
         f('.submit_assignment_link').click
+        wait_for_ajaximations
         f('.toggle_uploaded_files_link').click
+        wait_for_ajaximations
 
         # traverse the tree
         begin
