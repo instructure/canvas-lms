@@ -79,9 +79,9 @@ class ApiController < ApplicationController
 
         if course_hash["section"].end_with? "00"
           if params[:term].nil?
-            course_hash["sectionTutorials"] = section_tutorials_for(course_code, course_hash["peopleSoftCode"], course_hash["section"])
+            course_hash["sectionTutorials"] = SFU::Course.section_tutorials(course_code, course_hash["peopleSoftCode"], course_hash["section"])
           else
-            course_hash["sectionTutorials"] = section_tutorials_for(course_code, params[:term], course_hash["section"])
+            course_hash["sectionTutorials"] = SFU::Course.section_tutorials(course_code, params[:term], course_hash["section"])
           end
         end
 
@@ -125,7 +125,7 @@ class ApiController < ApplicationController
     if course.length == 1
       return true
     end
-    false
+      false
   end
 
   def teaching_terms_for(sfu_id)
@@ -135,23 +135,6 @@ class ApiController < ApplicationController
       term_array.push term
     end
     term_array
-  end
-
-  def section_tutorials_for(course_code, term_code, section_code)
-    details = SFU::Course.info course_code, term_code
-    main_section = section_code[0..2].downcase
-    sections = ""
-
-    unless details == "[]"
-      details.each do |info|
-        code = info["course"]["name"] + info["course"]["number"]
-        section = info["course"]["section"].downcase
-        if code.downcase == course_code.downcase && section.start_with?(main_section) && section.downcase != section_code.downcase
-          sections += info["course"]["section"] + ", "
-        end
-      end
-    end
-    sections[0..-3]
   end
 
   def mysfu_enrollments_for (user)
