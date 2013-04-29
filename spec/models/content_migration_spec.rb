@@ -794,6 +794,18 @@ describe ContentMigration do
       bank2.assessment_questions.size.should == 2
     end
 
+    it "should copy discussion topic attributes" do
+      topic = @copy_from.discussion_topics.create!(:title => "topic", :message => "<p>bloop</p>", :discussion_type => "threaded")
+
+      run_course_copy
+
+      @copy_to.discussion_topics.count.should == 1
+      new_topic = @copy_to.discussion_topics.first
+
+      attrs = ["title", "message", "discussion_type", "type"]
+      topic.attributes.slice(*attrs).should == new_topic.attributes.slice(*attrs)
+    end
+
     it "should copy a discussion topic when assignment is selected" do
       topic = @copy_from.discussion_topics.build(:title => "topic")
       assignment = @copy_from.assignments.build(:submission_types => 'discussion_topic', :title => topic.title)
