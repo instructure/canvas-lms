@@ -41,8 +41,8 @@ module CC::Importer::Canvas
           crit[:id] = get_node_val(c_node, 'criterion_id')
           crit[:description] = get_node_val(c_node, 'description')
           crit[:long_description] = get_val_if_child(c_node, 'long_description')
-          crit[:points] = get_int_val(c_node, 'points')
-          crit[:mastery_points] = get_int_val(c_node, 'mastery_points')
+          crit[:points] = get_float_val(c_node, 'points')
+          crit[:mastery_points] = get_float_val(c_node, 'mastery_points')
           crit[:learning_outcome_migration_id] = get_node_val(c_node, 'learning_outcome_identifierref')
           crit[:title] = get_node_val(c_node, 'description')
           crit[:ratings] = []
@@ -51,7 +51,7 @@ module CC::Importer::Canvas
             rating[:description] = get_node_val(rat_node, 'description')
             rating[:id] = get_node_val(rat_node, 'id')
             rating[:criterion_id] = get_node_val(rat_node, 'criterion_id')
-            rating[:points] = get_int_val(rat_node, 'points')
+            rating[:points] = get_float_val(rat_node, 'points')
             crit[:ratings] << rating
           end
           
