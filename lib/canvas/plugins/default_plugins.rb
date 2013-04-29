@@ -233,3 +233,14 @@ Canvas::Plugin.register('account_reports', nil, {
   :settings => nil,
   :validator => 'AccountReportsValidator'
 })
+Canvas::Plugin.register('app_center', nil, {
+    :name => lambda{ t :name, 'App Center' },
+    :description => lambda{ t :description, 'App Center for tracking/installing external tools in Canvas' },
+    :settings_partial => 'plugins/app_center_settings',
+    :settings => {
+        :base_url => 'https://www.edu-apps.org',
+        :token => nil,
+        :apps_endpoint => '/api/v1/apps'
+    },
+    :validator => 'AppCenterValidator'
+})

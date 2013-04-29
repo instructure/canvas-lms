@@ -1121,6 +1121,11 @@ ActionController::Routing::Routes.draw do |map|
     api.with_options(:controller => :progress) do |progress|
       progress.get "progress/:id", :action => :show, :path_name => "progress"
     end
+
+    api.with_options(:controller => :app_center) do |app_center|
+      app_center.get 'accounts/:account_id/app_center/apps', :action => :index, :path_name => 'account_app_center_apps'
+      app_center.get 'courses/:course_id/app_center/apps', :action => :index, :path_name => 'course_app_center_apps'
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented
@@ -1150,11 +1155,6 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :files do |file|
     file.download 'download', :controller => 'files', :action => 'show', :download => '1'
-  end
-
-  map.resources :apps, :only => [:index, :show] do |app|
-    app.comments 'comments', :controller => 'apps', :action => 'comments', :conditions => {:method => :get}
-    app.post_comment 'comments', :controller => 'apps', :action => 'comment', :conditions => {:method => :post}
   end
 
   map.resources :developer_keys, :only => [:index]
