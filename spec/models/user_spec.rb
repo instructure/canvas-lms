@@ -2219,6 +2219,12 @@ describe User do
       @user.conversation_context_codes.should include(@course.asset_string)
     end
 
+    it "should optionally not include concluded courses" do
+      course_with_student(:user => @user, :active_all => true)
+      @enrollment.update_attribute(:workflow_state, 'completed')
+      @user.conversation_context_codes(false).should_not include(@course.asset_string)
+    end
+
     it "should include groups" do
       group_with_user(:user => @user, :active_all => true)
       @user.conversation_context_codes.should include(@group.asset_string)
@@ -2241,6 +2247,12 @@ describe User do
         @enrollment.workflow_state = 'completed'
         @enrollment.save!
         @user.conversation_context_codes.should include(@course.asset_string)
+      end
+
+      it "should optionally not include concluded courses on other shards" do
+        course_with_student(:account => @shard1_account, :user => @user, :active_all => true)
+        @enrollment.update_attribute(:workflow_state, 'completed')
+        @user.conversation_context_codes(false).should_not include(@course.asset_string)
       end
 
       it "should include groups on other shards" do
