@@ -1,7 +1,8 @@
 module Api::V1
   module GradebookHistory
     include Api
-    include Assignment
+    include Api::V1::Assignment
+    include Api::V1::Submission
 
     def days_json(course, api_context)
       day_hash = Hash.new{|hash, date| hash[date] = {:graders => {}} }
@@ -23,31 +24,27 @@ module Api::V1
         each { |grader| compress(grader, :assignments) }
     end
 
-    def version_json(course, version, opts={})
-      json = version.model.attributes.symbolize_keys
+    def version_json(course, version, api_context, opts={})
       submission = opts[:submission] || version.versionable
       assignment = opts[:assignment] || submission.assignment
       student = opts[:student] || submission.user
       current_grader = submission.grader || default_grader
+
+      json = submission_attempt_json(version.model, assignment, api_context.user, api_context.session, nil, course).with_indifferent_access
       grader = (json[:grader_id] && json[:grader_id] > 0 && user_cache[json[:grader_id]]) || default_grader
 
       json = json.merge(
         :grader => grader.name,
-        :safe_grader_id => grader.id,
         :assignment_name => assignment.title,
-        :student_user_id => student.id,
-        :student_name => student.name,
-        :course_id => course.id,
-        :submission_id => submission.id,
+        :user_name => student.name,
         :current_grade => submission.grade,
         :current_graded_at => submission.graded_at,
         :current_grader => current_grader.name
       )
-      json[:graded_on] = json[:graded_at].in_time_zone.to_date if json[:graded_at]
       json
     end
 
-    def versions_json(course, versions, opts={})
+    def versions_json(course, versions, api_context, opts={})
       # preload for efficiency
       unless opts[:submission]
         ::Version.send(:preload_associations, versions, :versionable)
@@ -61,7 +58,7 @@ module Api::V1
         submission = opts[:submission] || version.versionable
         assignment = opts[:assignment] || submission.assignment
         student = opts[:student] || submission.user
-        version_json(course, version, :submission => submission, :assignment => assignment, :student => student)
+        version_json(course, version, api_context, :submission => submission, :assignment => assignment, :student => student)
       end
     end
 
@@ -77,8 +74,8 @@ module Api::V1
       versions.each{ |version| version.versionable = submission_index[version.versionable_id] }
 
       # convert them all to json and then group by submission
-      versions = versions_json(course, versions, :assignment => assignment)
-      versions_hash = versions.group_by{ |version| version[:submission_id] }
+      versions = versions_json(course, versions, api_context, :assignment => assignment)
+      versions_hash = versions.group_by{ |version| version[:id] }
 
       # populate previous_* and new_* keys and convert hash to array of objects
       versions_hash.inject([]) do |memo, (submission_id, versions)|
@@ -93,7 +90,7 @@ module Api::V1
                 PREVIOUS_VERSION_ATTRS.each { |attr| version["previous_#{attr}".to_sym] = prior[attr] }
               end
               NEW_ATTRS.each { |attr| version["new_#{attr}".to_sym] = version[attr] }
-              new_array << version.slice(*VALID_KEYS)
+              new_array << version
             end
           end
           prior.merge!(version.slice(:grade, :score, :graded_at, :grader, :submission_id))
@@ -143,18 +140,6 @@ module Api::V1
     NEW_ATTRS = [:grade, :graded_at, :grader, :score]
 
     DEFAULT_GRADER = Struct.new(:name, :id)
-
-    VALID_KEYS = [
-        :assignment_id, :assignment_name, :attachment_id, :attachment_ids,
-        :body, :course_id, :created_at, :current_grade, :current_graded_at,
-        :current_grader, :grade_matches_current_submission, :graded_at,
-        :graded_on, :grader, :grader_id, :group_id, :id, :new_grade,
-        :new_graded_at, :new_grader, :previous_grade, :previous_graded_at,
-        :previous_grader, :process_attempts, :processed, :published_grade,
-        :published_score, :safe_grader_id, :score, :student_entered_score,
-        :student_user_id, :submission_id, :student_name, :submission_type,
-        :updated_at, :url, :user_id, :workflow_state
-    ].freeze
 
     def default_grader
       @default_grader ||= DEFAULT_GRADER.new(I18n.t('gradebooks.history.graded_on_submission', 'Graded on submission'), 0)

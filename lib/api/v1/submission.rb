@@ -76,7 +76,7 @@ module Api::V1::Submission
     hash
   end
 
-  SUBMISSION_JSON_FIELDS = %w(id user_id url score grade attempt submission_type submitted_at body assignment_id grade_matches_current_submission grader_id workflow_state late).freeze
+  SUBMISSION_JSON_FIELDS = %w(id user_id url score grade attempt submission_type submitted_at body assignment_id graded_at grade_matches_current_submission grader_id workflow_state late).freeze
   SUBMISSION_OTHER_FIELDS = %w(attachments discussion_entries)
 
   def submission_attempt_json(attempt, assignment, user, session, version_idx = nil, context = nil)

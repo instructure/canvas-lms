@@ -65,6 +65,7 @@ describe 'Submissions API', :type => :integration do
       "score"=>nil,
       "workflow_state"=>nil,
       "late"=>nil,
+      "graded_at"=>nil,
     }
   end
 
@@ -401,7 +402,7 @@ describe 'Submissions API', :type => :integration do
     a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
     sub1 = submit_homework(a1, student1)
     media_object(:media_id => "3232", :media_type => "audio")
-    a1.grade_student(student1, {:grade => '90%', :comment => "Well here's the thing...", :media_comment_id => "3232", :media_comment_type => "audio", :grader => @teacher})
+    sub1 = a1.grade_student(student1, {:grade => '90%', :comment => "Well here's the thing...", :media_comment_id => "3232", :media_comment_type => "audio", :grader => @teacher}).first
     comment = sub1.submission_comments.first
 
     @user = student1
@@ -416,6 +417,7 @@ describe 'Submissions API', :type => :integration do
         "id"=>sub1.id,
         "grade"=>"A-",
         "grader_id"=>@teacher.id,
+        "graded_at"=>sub1.graded_at.as_json,
         "body"=>"test!",
         "assignment_id" => a1.id,
         "submitted_at"=>"1970-01-01T01:00:00Z",
@@ -576,6 +578,7 @@ describe 'Submissions API', :type => :integration do
       [{"id"=>sub1.id,
         "grade"=>"A-",
         "grader_id"=>@teacher.id,
+        "graded_at"=>sub1.graded_at.as_json,
         "body"=>"test!",
         "assignment_id" => a1.id,
         "submitted_at"=>"1970-01-01T03:00:00Z",
@@ -603,6 +606,7 @@ describe 'Submissions API', :type => :integration do
          [{"id"=>sub1.id,
            "grade"=>nil,
            "grader_id"=>nil,
+           "graded_at"=>nil,
            "body"=>"test!",
            "assignment_id" => a1.id,
            "submitted_at"=>"1970-01-01T01:00:00Z",
@@ -618,6 +622,7 @@ describe 'Submissions API', :type => :integration do
           {"id"=>sub1.id,
            "grade"=>nil,
            "grader_id"=>nil,
+           "graded_at"=>nil,
            "assignment_id" => a1.id,
            "media_comment" =>
             { "media_type"=>"video",
@@ -639,6 +644,7 @@ describe 'Submissions API', :type => :integration do
           {"id"=>sub1.id,
            "grade"=>"A-",
            "grader_id"=>@teacher.id,
+           "graded_at"=>sub1.graded_at.as_json,
            "assignment_id" => a1.id,
            "media_comment" =>
             { "media_type"=>"video",
@@ -708,6 +714,7 @@ describe 'Submissions API', :type => :integration do
        {"id"=>sub2.id,
         "grade"=>"F",
         "grader_id"=>@teacher.id,
+        "graded_at"=>sub2.graded_at.as_json,
         "assignment_id" => a1.id,
         "body"=>nil,
         "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?preview=1",
@@ -717,6 +724,7 @@ describe 'Submissions API', :type => :integration do
          [{"id"=>sub2.id,
            "grade"=>"F",
            "grader_id"=>@teacher.id,
+           "graded_at"=>sub2.graded_at.as_json,
            "assignment_id" => a1.id,
            "body"=>nil,
            "submitted_at"=>"1970-01-01T04:00:00Z",
