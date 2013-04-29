@@ -1059,10 +1059,19 @@ ActionController::Routing::Routes.draw do |map|
     api.with_options(:controller => :context_modules_api) do |context_modules|
       context_modules.get "courses/:course_id/modules", :action => :index, :path_name => 'course_context_modules'
       context_modules.get "courses/:course_id/modules/:id", :action => :show, :path_name => 'course_context_module'
-      context_modules.get "courses/:course_id/modules/:module_id/items", :action => :list_module_items, :path_name => 'course_context_module_items'
-      context_modules.get "courses/:course_id/modules/:module_id/items/:id", :action => :show_module_item, :path_name => 'course_context_module_item'
-      context_modules.get "courses/:course_id/module_item_redirect/:id", :action => :module_item_redirect, :path_name => 'course_context_module_item_redirect'
       context_modules.put "courses/:course_id/modules", :action => :batch_update
+      context_modules.post "courses/:course_id/modules", :action => :create, :path_name => 'course_context_module_create'
+      context_modules.put "courses/:course_id/modules/:id", :action => :update, :path_name => 'course_context_module_update'
+      context_modules.delete "courses/:course_id/modules/:id", :action => :destroy
+    end
+
+    api.with_options(:controller => :context_module_items_api) do |context_module_items|
+      context_module_items.get "courses/:course_id/modules/:module_id/items", :action => :index, :path_name => 'course_context_module_items'
+      context_module_items.get "courses/:course_id/modules/:module_id/items/:id", :action => :show, :path_name => 'course_context_module_item'
+      context_module_items.get "courses/:course_id/module_item_redirect/:id", :action => :redirect, :path_name => 'course_context_module_item_redirect'
+      context_module_items.post "courses/:course_id/modules/:module_id/items", :action => :create, :path_name => 'course_context_module_items_create'
+      context_module_items.put "courses/:course_id/modules/:module_id/items/:id", :action => :update, :path_name => 'course_context_module_item_update'
+      context_module_items.delete "courses/:course_id/modules/:module_id/items/:id", :action => :destroy
     end
 
     api.with_options(:controller => :quizzes_api) do |quizzes|
