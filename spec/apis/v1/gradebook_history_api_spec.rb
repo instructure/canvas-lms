@@ -159,7 +159,7 @@ describe GradebookHistoryApiController, :type => :integration do
         :course_id => @course.id.to_s
       }).first
 
-      json.keys.sort.should == %w(
+      expected_keys = %w(
         assignment_id assignment_name attachment_id attachment_ids attempt body
         cached_due_date cached_tardy_status changed_since_publish context_code
         course_id created_at current_grade current_graded_at current_grader
@@ -169,8 +169,9 @@ describe GradebookHistoryApiController, :type => :integration do
         processed published_grade published_score quiz_submission_id
         safe_grader_id score student_entered_score student_name student_user_id
         submission_comments_count submission_id submission_type submitted_at
-        turnitin_data updated_at url user_id workflow_state
-      )
+        turnitin_data updated_at url user_id workflow_state)
+
+      (expected_keys - json.keys).should be_empty
     end
 
     it 'should return all applicable versions' do
