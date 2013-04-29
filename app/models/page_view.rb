@@ -142,10 +142,16 @@ class PageView < ActiveRecord::Base
     raise(NotImplementedError, "find_every not implemented")
   end
 
-  def self.from_attributes(attrs)
+  def self.from_attributes(attrs, new_record=false)
     @blank_template ||= columns.inject({}) { |h,c| h[c.name] = nil; h }
     shard = cassandra? ? Shard.default : Shard.current
-    page_view = shard.activate{ instantiate(@blank_template.merge(attrs)) }
+    page_view = shard.activate do
+      if new_record
+        new{ |pv| pv.send(:attributes=, attrs, false) }
+      else
+        instantiate(@blank_template.merge(attrs))
+      end
+    end
     page_view.page_view_method = :cassandra if cassandra?
     page_view
   end
@@ -269,8 +275,7 @@ class PageView < ActiveRecord::Base
         return unless page_view
         page_view.do_update(attrs)
       else
-        page_view = self.from_attributes(attrs)
-        page_view.instance_variable_set(:'@new_record', true)
+        page_view = self.from_attributes(attrs, true)
       end
       page_view.save
     end
@@ -385,8 +390,7 @@ class PageView < ActiveRecord::Base
             false
           else
             # assumes PageView.cassandra? is true at this point
-            page_view = PageView.from_attributes(attrs)
-            page_view.instance_variable_set(:'@new_record', true)
+            page_view = PageView.from_attributes(attrs, true)
             page_view.save!
             true
           end
