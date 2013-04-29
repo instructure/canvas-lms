@@ -267,6 +267,16 @@ describe PageView do
       PageView.count.should == 3
     end
 
+    it "should preserve timestamp" do
+      Time.use_zone('Alaska') do
+        pv = PageView.new{ |p| p.send(:attributes=, { :user => @user, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcdef", :interaction_seconds => 5 }, false) }
+        pv.store
+        original_created_at = pv.created_at
+        PageView.process_cache_queue
+        pv.reload.created_at.to_i.should == original_created_at.to_i
+      end
+    end
+
     describe "batch transaction" do
       self.use_transactional_fixtures = false
       it "should not fail the batch if one row fails" do
