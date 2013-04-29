@@ -39,7 +39,7 @@ class EventStream
 
   def insert(record)
     database.batch do
-      database.update_record(table, { id_column => record.id }, record.attributes)
+      database.insert_record(table, { id_column => record.id }, record.attributes)
       run_callbacks(:insert, record)
     end
   end

@@ -145,6 +145,18 @@ describe "Canvas::Redis::Cassandra" do
     end
   end
 
+  describe "#insert_record" do
+    it "should not delete nils in an AR#attributes style hash" do
+      db.expects(:execute).with("UPDATE test_table SET name = ? WHERE id = ?", "test", 5)
+      db.insert_record("test_table", { :id => 5 }, { :name => "test", :nick => nil })
+    end
+
+    it "should not delete nils in an AR#changes style hash" do
+      db.expects(:execute).with("UPDATE test_table SET name = ? WHERE id = ?", "test", 5)
+      db.insert_record("test_table", { :id => 5 }, { :name => [nil, "test"], :nick => [nil, nil] })
+    end
+  end
+
   describe "execute and update" do
     it_should_behave_like "cassandra page views"
 
