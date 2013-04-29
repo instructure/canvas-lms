@@ -349,7 +349,13 @@ class Conversation < ActiveRecord::Base
           next unless cp.user
           new_tags, message_tags = infer_new_tags_for(cp, all_new_tags)
           if new_tags.present?
-            cp.update_attribute :tags, cp.tags | new_tags
+            updated_tags = if (active_tags = cp.user.conversation_context_codes(false)).present?
+              (cp.tags | new_tags) & active_tags
+            else
+              cp.tags | new_tags
+            end
+
+            cp.update_attribute(:tags, updated_tags)
             if cp.user.shard != self.shard
               cp.user.shard.activate do
                 ConversationParticipant.where(:conversation_id => self, :user_id => cp.user_id).update_all(:tags => serialized_tags(cp.tags))
@@ -369,25 +375,23 @@ class Conversation < ActiveRecord::Base
     end
   end
 
-  def infer_new_tags_for(cp, all_new_tags)
-    new_tags = []
-    if all_new_tags.present?
-      # limit it to what they can see
-      new_tags = all_new_tags & cp.user.conversation_context_codes
-    end
-    # if they don't have any tags yet (e.g. this is the first message) and
-    # there are no new tags, just get the best possible match(es)
-    if new_tags.empty? && cp.tags.empty?
-      new_tags = current_context_strings & cp.user.conversation_context_codes
+  def infer_new_tags_for(participant, all_new_tags)
+    active_tags   = participant.user.conversation_context_codes(false)
+    context_codes = active_tags.present? ? active_tags : participant.user.conversation_context_codes
+    visible_codes = all_new_tags & context_codes
+
+    new_tags = if visible_codes.present?
+      # limit available codes to codes the user can see
+      visible_codes
+    else
+      # otherwise, use all of the available tags.
+      current_context_strings & context_codes
     end
 
-    # see ConversationParticipant#update_cached_data ... tags are only
-    # recomputed for private conversations, so for group ones we don't bother
-    # tracking at the message level
-    message_tags = if private?
+    message_tags = if self.private?
       if new_tags.present?
         new_tags
-      elsif cp.message_count > 0 and last_message = cp.last_message
+      elsif participant.message_count > 0 and last_message = participant.last_message
         last_message.tags
       end
     end
@@ -665,7 +669,6 @@ class Conversation < ActiveRecord::Base
       value > threshold
     }.sort_by(&:last).map(&:first).reverse
   end
-  memoize :current_context_strings
 
   def associated_shards
     [Shard.default]

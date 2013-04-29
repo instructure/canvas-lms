@@ -1887,13 +1887,21 @@ class User < ActiveRecord::Base
   end
   memoize :manageable_appointment_context_codes
 
-  def conversation_context_codes
-    Rails.cache.fetch([self, 'conversation_context_codes4'].cache_key, :expires_in => 1.day) do
+  # Public: Return an array of context codes this user belongs to.
+  #
+  # include_concluded_codes - If true, include concluded courses (default: true).
+  #
+  # Returns an array of context code strings.
+  def conversation_context_codes(include_concluded_codes = true)
+    Rails.cache.fetch([self, include_concluded_codes, 'conversation_context_codes4'].cache_key, :expires_in => 1.day) do
       Shard.default.activate do
-        ( courses.with_each_shard.map{ |c| "course_#{c.id}" } +
-          concluded_courses.with_each_shard.map{ |c| "course_#{c.id}" } +
-          current_groups.with_each_shard.map{ |g| "group_#{g.id}"}
-        ).uniq
+        associations = %w{courses concluded_courses current_groups}
+        associations.slice!(1) unless include_concluded_codes
+
+        associations.inject([]) do |result, association|
+          association_type = association.split('_')[-1].slice(0..-2)
+          result.concat(send(association).with_each_shard.map { |x| "#{association_type}_#{x.id}" })
+        end.uniq
       end
     end
   end

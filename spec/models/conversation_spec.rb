@@ -682,14 +682,14 @@ describe Conversation do
         u3 = student_in_course(:active_all => true, :course => @course2).user
         conversation = Conversation.initiate([u1, u2, u3], false)
         conversation.add_message(u1, 'test', :tags => [@course1.asset_string])
-        u1.conversations.first.tags.should eql [@course1.asset_string]
-        u2.conversations.first.tags.should eql [@course1.asset_string]
-        u3.conversations.first.tags.should eql [@course2.asset_string]
+        u1.conversations.first.tags.should == [@course1.asset_string]
+        u2.conversations.first.tags.should == [@course1.asset_string]
+        u3.conversations.first.tags.should == [@course2.asset_string]
 
         conversation.add_message(u1, 'another', :tags => [@course2.asset_string, "course_0"])
-        u1.conversations.first.tags.should eql [@course1.asset_string]
-        u2.conversations.first.tags.sort.should eql [@course1.asset_string, @course2.asset_string].sort
-        u3.conversations.first.tags.should eql [@course2.asset_string]
+        u1.conversations.first.tags.should == [@course1.asset_string]
+        u2.conversations.first.tags.sort.should == [@course1.asset_string, @course2.asset_string].sort
+        u3.conversations.first.tags.should == [@course2.asset_string]
       end
 
       it "should ignore conversation_participants without a valid user" do
@@ -701,18 +701,18 @@ describe Conversation do
         u3 = student_in_course(:active_all => true, :course => @course2).user
         conversation = Conversation.initiate([u1, u2, u3], false)
         conversation.add_message(u1, 'test', :tags => [@course1.asset_string])
-        u1.conversations.first.tags.should eql [@course1.asset_string]
-        u2.conversations.first.tags.should eql [@course1.asset_string]
-        u3.conversations.first.tags.should eql [@course2.asset_string]
+        u1.conversations.first.tags.should == [@course1.asset_string]
+        u2.conversations.first.tags.should == [@course1.asset_string]
+        u3.conversations.first.tags.should == [@course2.asset_string]
         broken_one = u3.conversations.first
         broken_one.user_id = nil
         broken_one.tags = []
         broken_one.save!
 
         conversation.add_message(u1, 'another', :tags => [@course2.asset_string, "course_0"])
-        u1.conversations.first.tags.should eql [@course1.asset_string]
-        u2.conversations.first.tags.sort.should eql [@course1.asset_string, @course2.asset_string].sort
-        broken_one.reload.tags.should eql []
+        u1.conversations.first.tags.should == [@course1.asset_string]
+        u2.conversations.first.tags.sort.should == [@course1.asset_string]
+        broken_one.reload.tags.should == []
       end
     end
 
@@ -864,6 +864,136 @@ describe Conversation do
         @u1.conversations.first.tags.should eql [@course1.asset_string]
         @u2.conversations.first.tags.should eql [@course1.asset_string]
         broken_one.reload.tags.should eql [] # skipped
+      end
+    end
+
+    context 'tag updates' do
+      before(:each) do
+        @teacher    = teacher_in_course(:active_all => true).user
+        @student    = student_in_course(:active_all => true, :course => @course).user
+        @old_course = @course
+      end
+
+      it "should remove old tags and add new ones" do
+        conversation = Conversation.initiate([@teacher, @student], true)
+        conversation.add_message(@teacher, 'first message')
+
+        new_course = course
+        new_course.offer!
+        new_course.enroll_teacher(@teacher).accept!
+        new_course.enroll_student(@student).accept!
+
+        @old_course.complete!
+
+        third_course = course
+        third_course.offer!
+        third_course.enroll_teacher(@teacher).accept!
+
+        conversation.add_message(@student, 'second message')
+
+        conversation.conversation_participants.each do |participant|
+          participant.reload
+          participant.tags.should == [new_course.asset_string]
+        end
+      end
+
+      it "should continue to use old tags if there are no current shared contexts" do
+        conversation = Conversation.initiate([@teacher, @student], true)
+        conversation.add_message(@teacher, 'first message')
+
+        @old_course.complete!
+
+        teacher_course = course
+        teacher_course.offer!
+        teacher_course.enroll_teacher(@teacher).accept!
+
+        student_course = course
+        student_course.offer!
+        student_course.enroll_student(@student).accept!
+
+        conversation.add_message(@student, 'second message')
+
+        conversation.conversation_participants.each do |participant|
+          participant.reload
+          participant.tags.should == [@old_course.asset_string]
+        end
+      end
+
+      it "should use concluded tags from multiple courses" do
+        old_course2 = course
+
+        old_course2.offer!
+        old_course2.enroll_teacher(@teacher).accept!
+        old_course2.enroll_student(@student).accept!
+
+        conversation = Conversation.initiate([@teacher, @student], true)
+        conversation.add_message(@teacher, 'first message')
+
+        [@old_course, old_course2].each { |c| c.complete! }
+
+        teacher_course = course
+        teacher_course.offer!
+        teacher_course.enroll_teacher(@teacher).accept!
+
+        student_course = course
+        student_course.offer!
+        student_course.enroll_student(@student).accept!
+
+        conversation.add_message(@teacher, 'second message')
+
+        conversation.conversation_participants.each do |participant|
+          participant.reload
+          participant.tags.sort.should == [@old_course, old_course2].map(&:asset_string).sort
+        end
+      end
+
+      it "should include concluded group contexts when no active ones exist" do
+        student1 = student_in_course(:active_all => true, :course => @old_course).user
+        student2 = student_in_course(:active_all => true, :course => @old_course).user
+
+        group      = Group.create!(:context => @old_course)
+        [student1, student2].each { |s| group.users << s }
+
+        conversation = Conversation.initiate([student1, student2], true)
+        conversation.add_message(student1, 'first message')
+
+        @old_course.complete!
+        group.complete!
+
+        conversation.add_message(student2, 'second message')
+
+        conversation.conversation_participants.each do |participant|
+          participant.reload
+          participant.tags.should include(group.asset_string)
+        end
+      end
+
+      it "should replace concluded group contexts with active ones" do
+        student1 = student_in_course(:active_all => true, :course => @old_course).user
+        student2 = student_in_course(:active_all => true, :course => @old_course).user
+
+        old_group = Group.create!(:context => @old_course)
+        [student1, student2].each { |s| old_group.users << s }
+
+        conversation = Conversation.initiate([student1, student2], true)
+        conversation.add_message(student1, 'first message')
+
+        @old_course.complete!
+        old_group.destroy
+
+        new_course = course
+        new_course.offer!
+        [student1, student2].each { |s| new_course.enroll_student(s).accept! }
+        new_group = Group.create!(:context => new_course)
+        new_group.users << student1
+        new_group.users << student2
+
+        conversation.add_message(student2, 'second message')
+
+        conversation.conversation_participants.each do |participant|
+          participant.reload
+          participant.tags.sort.should == [new_group, new_course].map(&:asset_string).sort
+        end
       end
     end
   end
