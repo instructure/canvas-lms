@@ -868,7 +868,7 @@ describe ContentMigration do
     def create_rubric_asmnt
       @rubric = @copy_from.rubrics.new
       @rubric.title = "Rubric"
-      @rubric.data = [{:ratings=>[{:criterion_id=>"309_6312", :points=>5, :description=>"Full Marks", :id=>"blank", :long_description=>""}, {:criterion_id=>"309_6312", :points=>0, :description=>"No Marks", :id=>"blank_2", :long_description=>""}], :points=>5, :description=>"Description of criterion", :id=>"309_6312", :long_description=>""}]
+      @rubric.data = [{:ratings=>[{:criterion_id=>"309_6312", :points=>5.5, :description=>"Full Marks", :id=>"blank", :long_description=>""}, {:criterion_id=>"309_6312", :points=>0, :description=>"No Marks", :id=>"blank_2", :long_description=>""}], :points=>5.5, :description=>"Description of criterion", :id=>"309_6312", :long_description=>""}]
       @rubric.save!
 
       @assignment = @copy_from.assignments.create!(:title => "some assignment", :points_possible => 12)
@@ -887,6 +887,16 @@ describe ContentMigration do
 
       rub = @copy_to.rubrics.find_by_migration_id(mig_id(@rubric))
       rub.should_not be_nil
+
+      [:description, :id, :points].each do |k|
+        rub.data.first[k].should == @rubric.data.first[k]
+      end
+      [:criterion_id, :description, :id, :points].each do |k|
+        rub.data.first[:ratings].each_with_index do |criterion, i|
+          criterion[k].should == @rubric.data.first[:ratings][i][k]
+        end
+      end
+
       asmnt2 = @copy_to.assignments.find_by_migration_id(mig_id(@assignment))
       asmnt2.rubric.id.should == rub.id
       asmnt2.rubric_association.use_for_grading.should == true
