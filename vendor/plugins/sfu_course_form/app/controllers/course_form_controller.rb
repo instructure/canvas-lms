@@ -8,7 +8,6 @@ class CourseFormController < ApplicationController
     @sfuid.slice! "@sfu.ca"
     @course_list = Array.new
     @terms = Account.find_by_name('Simon Fraser University').enrollment_terms.find(:all, :conditions => "workflow_state = 'active'", :order => 'sis_source_id DESC').delete_if {|t| t.name == 'Default Term'}
-    #@terms = Account.find(2).enrollment_terms.find(:all, :conditions => "workflow_state = 'active'", :order => 'sis_source_id DESC')
     @current_term = current_term
     if SFU::User.student_only? @sfuid
       flash[:error] = "You don't have permission to access that page"
