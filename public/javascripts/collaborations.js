@@ -90,6 +90,8 @@ define([
         }
       }
 
+      $('.collaboration_type').hide()
+
       $description = $('#new_collaboration #' + type + '_description');
       $description.show()
 
