@@ -130,6 +130,7 @@
                     minLength: 3,
                     select: function ( event, ui ) {
                         add_course(ui.item.value, ui.item.label);
+			return false;
                     } //select end
                 }); //autocomplete end
 
@@ -182,7 +183,7 @@
                             var section_tutorials = course.sectionTutorials;
                             var course_display = course.name + course.number + " - " + course.section + " " + course.title;
                             if (section_tutorials) {
-                                course_display += "<br><label> (Includes section tutorials: " + section_tutorials  + ") </label>";
+                                course_display += "<label> (Includes section tutorials: " + section_tutorials  + ") </label>";
                             }
                             var course_value = course.key;
                             var checkbox_html = '<label class="checkbox"><input type="checkbox" name="selected_course_'+ num +'_'+ term +'" id="selected_course_'+ num +'_'+ term +'" value="'+ course_value + '">' + course_display +'</label>';
@@ -306,7 +307,7 @@
                 }
                 if (course_exists(course_id)){
                     disabled = "disabled";
-                    course_exists_text = "    ** Canvas course already exists **";
+		    course_exists_text = "<label class=\"error_text\"><strong>This course already exists on Canvas, and cannot be added again.</strong></label>";
                 }
                 var checkbox_html = '<label class="checkbox"><input type="checkbox" name="selected_course_manual_'+ secs +'_'+ term_select +'" id="selected_course_manual_'+ secs +'_'+ term_select +'" value="'+ course_id + tutorials +'" '+ disabled +' >' + course_display + term_display(term_select) + course_exists_text + tutorial_text_display +'</label>';
 
