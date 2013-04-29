@@ -25,6 +25,11 @@ describe AssignmentOverrideApplicator do
       @assignment = assignment_model(:course => @course, :due_at => 5.days.from_now)
     end
 
+    it "should be serializable" do
+      override = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
+      lambda { Marshal.dump(override) }.should_not raise_error(TypeError)
+    end
+
     it "should cache by assignment and user" do
       enable_cache do
         overrides1 = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)

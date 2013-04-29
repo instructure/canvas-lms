@@ -160,11 +160,9 @@ module AssignmentOverrideApplicator
     cloned_assignment_or_quiz.overridden = true
     cloned_assignment_or_quiz.readonly!
 
-    # make new_record? match the original (typically always true on AR clones,
-    # at least until saved, which we don't want to do)
-    klass = class << cloned_assignment_or_quiz; self; end
-    klass.send(:define_method, :new_record?) { unoverridden_assignment_or_quiz.new_record? }
-
+    new_record = unoverridden_assignment_or_quiz.instance_variable_get(:@new_record)
+    cloned_assignment_or_quiz.instance_variable_set(:@new_record, new_record)
+    
     cloned_assignment_or_quiz
   end
 
