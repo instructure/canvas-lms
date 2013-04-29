@@ -159,19 +159,7 @@ describe GradebookHistoryApiController, :type => :integration do
         :course_id => @course.id.to_s
       }).first
 
-      expected_keys = %w(
-        assignment_id assignment_name attachment_id attachment_ids attempt body
-        changed_since_publish context_code
-        course_id created_at current_grade current_graded_at current_grader
-        grade grade_matches_current_submission graded_at graded_on grader
-        grader_id group_id has_admin_comment has_rubric_assessment id late
-        media_comment_id media_comment_type media_object_id process_attempts
-        processed published_grade published_score quiz_submission_id
-        safe_grader_id score student_entered_score student_name student_user_id
-        submission_comments_count submission_id submission_type submitted_at
-        turnitin_data updated_at url user_id workflow_state)
-
-      (expected_keys - json.keys).should be_empty
+      json.keys.sort.should == ["assignment_id", "assignment_name", "attempt", "body", "current_grade", "current_graded_at", "current_grader", "grade", "grade_matches_current_submission", "graded_at", "grader", "grader_id", "id", "late", "preview_url", "score", "submission_type", "submitted_at", "url", "user_id", "user_name", "workflow_state"]
     end
 
     it 'should return all applicable versions' do

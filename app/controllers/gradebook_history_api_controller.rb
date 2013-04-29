@@ -56,26 +56,18 @@
 #
 # @object SubmissionVersion
 #     {
+#       // A SubmissionVersion object contains all the fields that a Submission
+#       // object does, plus additional fields prefixed with current_* new_* and
+#       // previous_* described below.
+#
 #       // the id of the assignment this submissions is for
 #       assignment_id: 22604
 #
 #       // the name of the assignment this submission is for
 #       assignment_name: "some assignment"
 #
-#       // the id of the primary attachment
-#       attachment_id: null
-#
-#       // other attachment ids
-#       attachment_ids: null
-#
 #       // the body text of the submission
 #       body: "text from the submission"
-#
-#       // the id of the course to which this submission belongs
-#       course_id: 27955
-#
-#       // timestamp for the creation of this submission version
-#       created_at: "2013-01-31T18:16:31Z"
 #
 #       // the most up to date grade for the current version of this submission
 #       current_grade: "100"
@@ -92,19 +84,13 @@
 #       // time stamp for the grading of this version of the submission
 #       graded_at: "2013-01-31T18:16:31Z"
 #
-#       // date on which this version of the submission was graded
-#       graded_on: "2013-01-31"
-#
 #       // the name of the user who graded this version of the submission
 #       grader: "Grader Name"
 #
 #       // the user id of the user who graded this version of the submission
 #       grader_id: 67379
 #
-#       // the id of the group to which this submission belongs
-#       group_id: null
-#
-#       // alias for submission_id, the id of the submission of which this is a version
+#       // the id of the submission of which this is a version
 #       id: 11607
 #
 #       // the updated grade provided in this version of the submission
@@ -125,46 +111,19 @@
 #       // the name of the grader who graded the version of this submission immediately preceding this one
 #       previous_grader: "Graded on submission"
 #
-#       // the number of attempts at processing this submission
-#       process_attempts: 1
-#
-#       // whether the submission was processed or not (boolean)
-#       processed: false
-#
-#       // the final grade retained for publishing in the gradebook
-#       published_grade: "100"
-#
-#       // the final score retained for publishing in the gradebook
-#       published_score: 100
-#
-#       // the grader id (which will be 0 if there isn't one available)
-#       safe_grader_id:=>67379
-#
 #       // the score for this version of the submission
 #       score: 100
 #
-#       // the score entered by the student
-#       student_entered_score: null
-#
-#       // the user ID of the student who created this submission
-#       student_user_id: 67376
-#
-#       // the ID of the submission of which this is a version
-#       submission_id: 11607
-#
 #       // the name of the student who created this submission
-#       student_name: "student@example.com"
+#       user_name: "student@example.com"
 #
 #       // the type of submission
 #       submission_type: 'online'
 #
-#       // the time stamp of the most recent update to this record
-#       updated_at: "2013-01-31T18:16:31Z"
-#
 #       // the url of the submission, if there is one
 #       url: null
 #
-#       // alias for 'student_user_id'
+#       // the user ID of the student who created this submission
 #       user_id: 67376
 #
 #       // the state of the submission at this version
@@ -287,7 +246,7 @@ class GradebookHistoryApiController < ApplicationController
     versions = indexed_versions.map(&:version)
 
     # render them
-    render :json => versions_json(@context, versions, :assignment => assignment, :student => student)
+    render :json => versions_json(@context, versions, api_context(nil), :assignment => assignment, :student => student)
   end
 
   private

@@ -163,7 +163,7 @@ describe AssignmentsApiController, :type => :integration do
              )
       assign = json.first
       assign['submission'].should ==
-        @controller.submission_json(submission,assignment,@user,session)
+        json_parse(@controller.submission_json(submission,assignment,@user,session).to_json)
     end
   end
 
@@ -870,7 +870,7 @@ describe AssignmentsApiController, :type => :integration do
           :id => assignment.id.to_s},
           {:include => ['submission']})
         json['submission'].should ==
-          @controller.submission_json(submission,assignment,@user,session)
+          json_parse(@controller.submission_json(submission,assignment,@user,session).to_json)
       end
 
       context "AssignmentFreezer plugin disabled" do
