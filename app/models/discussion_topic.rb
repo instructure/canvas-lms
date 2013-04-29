@@ -748,6 +748,7 @@ class DiscussionTopic < ActiveRecord::Base
     end
     item.migration_id = hash[:migration_id]
     item.title = hash[:title]
+    item.discussion_type = hash[:discussion_type]
     item.message = ImportedHtmlConverter.convert(hash[:description] || hash[:text], context)
     item.message = t('#discussion_topic.empty_message', "No message") if item.message.blank?
     item.posted_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:posted_at]) if hash[:posted_at]
