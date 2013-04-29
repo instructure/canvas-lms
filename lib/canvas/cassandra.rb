@@ -148,6 +148,14 @@ module Canvas::Cassandra
       end
     end
 
+    # same as update_record, but preferred when doing inserts -- it skips
+    # updating columns with nil values, rather than creating tombstone delete
+    # records for them
+    def insert_record(table_name, primary_key_attrs, changes)
+      changes = changes.reject { |k,v| v.is_a?(Array) ? v.last.nil? : v.nil? }
+      update_record(table_name, primary_key_attrs, changes)
+    end
+
     def select_value(query, *args)
       result_row = execute(query, *args).fetch
       result_row && result_row.to_hash.values.first

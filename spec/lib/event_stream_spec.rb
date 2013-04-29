@@ -24,6 +24,7 @@ describe EventStream do
     @database = stub('database')
     def @database.batch; yield; end
     def @database.update_record(*args); end
+    def @database.insert_record(*args); end
     def @database.update(*args); end
     ::Canvas::Cassandra::Database.stubs(:from_config).with(@database_name.to_s).returns(@database)
   end
@@ -129,24 +130,24 @@ describe EventStream do
       end
 
       it "should insert into the configured database" do
-        @database.expects(:update_record).once
+        @database.expects(:insert_record).once
         @stream.insert(@record)
       end
 
       it "should insert into the configured table" do
-        @database.expects(:update_record).with(@table.to_s, anything, anything)
+        @database.expects(:insert_record).with(@table.to_s, anything, anything)
         @stream.insert(@record)
       end
 
       it "should insert by the record's id into the configured id column" do
         id_column = stub(:to_s => stub('id_column'))
         @stream.id_column id_column
-        @database.expects(:update_record).with(anything, { id_column.to_s => @record.id }, anything)
+        @database.expects(:insert_record).with(anything, { id_column.to_s => @record.id }, anything)
         @stream.insert(@record)
       end
 
       it "should insert the record's attributes" do
-        @database.expects(:update_record).with(anything, anything, @record.attributes)
+        @database.expects(:insert_record).with(anything, anything, @record.attributes)
         @stream.insert(@record)
       end
 
@@ -154,7 +155,7 @@ describe EventStream do
         spy = stub('spy')
         @stream.on_insert{ spy.trigger }
         @database.expects(:batch).once
-        @database.expects(:update_record).never
+        @database.expects(:insert_record).never
         spy.expects(:trigger).never
         @stream.insert(@record)
       end
