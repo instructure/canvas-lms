@@ -57,15 +57,6 @@
       <div class="rs-margin-top">
         <% if @submission && @submission.completed? %>
           <%= render :partial => "quizzes/quiz_right_side", :locals => {:allow_take => !@locked} %>
-        <% elsif @submission && @submission.untaken? %>
-          <div>
-            <% if !@quiz.locked? %>
-                <%= @quiz.survey? ?
-                            t(:survey_in_progress, "You're in the middle of taking this survey.") :
-                            t(:quiz_in_progress, "You're in the middle of taking this quiz.") %><br/>
-                <%= link_to_resume_poll(:class => "btn") %>
-            <% end %>
-          </div>
         <% end %>
       </div>
     <% end %>

@@ -300,7 +300,7 @@ describe "One Question at a Time Quizzes" do
         submit_unfinished_quiz
       end
 
-      it "should warn about resuming from the right sidebar" do
+      it "should warn about resuming" do
         take_the_quiz
 
         it_should_show_cant_go_back_warning
@@ -313,7 +313,7 @@ describe "One Question at a Time Quizzes" do
 
         fj("a:contains('OQAAT quiz')").click
         wait_for_ajaximations
-        fj("#right-side a:contains('Resume Quiz')").click
+        fj("#not_right_side .take_quiz_button a:contains('Resume Quiz')").click
 
         it_should_show_cant_go_back_warning
         accept_cant_go_back_warning

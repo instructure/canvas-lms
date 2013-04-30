@@ -54,7 +54,7 @@ describe "quizzes" do
 
       describe "on individual quiz page" do
         def validate_resume_button_text(text)
-          f('#right-side .btn').text.should == text
+          f('#not_right_side .take_quiz_button').text.should == text
         end
         
         before do
@@ -77,9 +77,7 @@ describe "quizzes" do
           pending('193')
           update_quiz_lock(Time.now - 5.minutes, nil)
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-          right_side = f('#right-side')
-          right_side.should_not include_text("You're in the middle of taking this quiz.")
-          right_side.should_not include_text(@resume_text)
+          f('#not_right_side .take_quiz_button').should_not be_present
         end
       end
     end
