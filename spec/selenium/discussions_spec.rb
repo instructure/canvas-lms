@@ -389,6 +389,25 @@ describe "discussions" do
         f('.discussion-topic .icon-rss').should be_displayed
         DiscussionTopic.last.podcast_enabled.should be_true
       end
+
+      it "should exclude deleted entries from unread and total reply count" do
+        course_with_teacher_logged_in
+        discussion_topic_model(:user => @teacher)
+        @student = student_in_course(:active_all => true).user
+
+        @assignment = assignment_model(:course => @course)
+        @topic.assignment = @assignment
+        @topic.save
+
+        # Add two replies, delete one
+        @topic.reply_from(:user => @student, :text => "entry")
+        entry = @topic.reply_from(:user => @student, :text => "another entry")
+        entry.destroy
+
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+        f('.new-items').text.should == '1'
+        f('.total-items').text.should == '1'
+      end
     end
 
     context "editing" do

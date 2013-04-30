@@ -224,6 +224,48 @@ describe DiscussionEntry do
     end
   end
 
+  context "deleting entry" do
+    before :each do
+      course_with_student(:active_all => true)
+      @author = @user
+      @reader = user()
+      @course.enroll_student(@author)
+      @course.enroll_student(@reader)
+
+      @topic = @course.discussion_topics.create!(:title => "title", :message => "message")
+
+      # Create 4 entries, first 2 are 'read' by reader.
+      @entry_1 = @topic.discussion_entries.create!(:message => "entry 1", :user => @author)
+      @entry_1.change_read_state('read', @reader)
+      @entry_2 = @topic.discussion_entries.create!(:message => "entry 2", :user => @author)
+      @entry_2.change_read_state('read', @reader)
+      @entry_3 = @topic.discussion_entries.create!(:message => "entry 3", :user => @author)
+      @entry_4 = @topic.discussion_entries.create!(:message => "entry 4", :user => @author)
+    end
+
+    describe "#destroy" do
+      it "should call decrement_unread_counts_for_this_entry" do
+        @entry_4.expects(:decrement_unread_counts_for_this_entry)
+        @entry_4.destroy
+      end
+    end
+
+    it "should decrement unread topic counts" do
+      @topic.unread_count(@reader).should == 2
+
+      # delete one read and one unread entry and check again
+      @entry_1.destroy
+      @entry_4.destroy
+      @topic.unread_count(@reader).should == 1
+      # delete remaining unread
+      @entry_3.destroy
+      @topic.unread_count(@reader).should == 0
+      # delete final 'read' entry
+      @entry_2.destroy
+      @topic.unread_count(@reader).should == 0
+    end
+  end
+
   it "should touch all parent discussion_topics through root_topic_id, on update" do
     course_with_student(:active_all => true)
     @topic = @course.discussion_topics.create!(:title => "title", :message => "message")

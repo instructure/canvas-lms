@@ -174,6 +174,7 @@ class DiscussionEntry < ActiveRecord::Base
     self.deleted_at = Time.now
     save!
     update_topic_submission
+    decrement_unread_counts_for_this_entry
   end
 
   def update_discussion
@@ -203,6 +204,20 @@ class DiscussionEntry < ActiveRecord::Base
         submission.submission_type = nil
         submission.submitted_at = nil
         submission.save!
+      end
+    end
+  end
+
+  def decrement_unread_counts_for_this_entry
+    # decrement unread_entry_count for every participant that has not read the
+    transaction do
+      # get a list of users who have not read the entry yet
+      users = discussion_topic.discussion_topic_participants.
+          where(['user_id NOT IN (?)', discussion_entry_participants.read.pluck(:user_id)]).pluck(:user_id)
+      # decrement unread_entry_count for topic participants
+      if users.present?
+        DiscussionTopicParticipant.where(:discussion_topic_id => self.discussion_topic_id, :user_id => users).
+            update_all('unread_entry_count = unread_entry_count - 1')
       end
     end
   end
