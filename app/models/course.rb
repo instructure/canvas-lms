@@ -1416,6 +1416,8 @@ class Course < ActiveRecord::Base
       row.concat(["SIS User ID", "SIS Login ID"]) if options[:include_sis_id]
       row << "Section"
       row.concat assignments.map(&:title_with_id)
+      include_points = !apply_group_weights?
+      row.concat(["Current Points", "Final Points"]) if include_points
       row.concat(["Current Score", "Final Score"])
       row.concat(["Final Grade"]) if self.grading_standard_enabled?
       csv << row
@@ -1435,6 +1437,7 @@ class Course < ActiveRecord::Base
       row = ["    Points Possible", "", ""]
       row.concat(["", ""]) if options[:include_sis_id]
       row.concat assignments.map(&:points_possible)
+      row.concat [read_only, read_only] if include_points
       row.concat([read_only, read_only])
       row.concat([read_only]) if self.grading_standard_enabled?
       csv << row
@@ -1457,10 +1460,11 @@ class Course < ActiveRecord::Base
         row << student_section
         row.concat(student_submissions)
 
-        current_score, final_score = grades.shift
-        row.concat [current_score, final_score]
+        current_info, final_info = grades.shift
+        row.concat [current_info[:total], final_info[:total]] if include_points
+        row.concat [current_info[:grade], final_info[:grade]]
         if self.grading_standard_enabled?
-          row.concat([score_to_grade(final_score)])
+          row.concat([score_to_grade(final_info[:grade])])
         end
         csv << row
       end

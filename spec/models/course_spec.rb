@@ -765,6 +765,31 @@ describe Course, "gradebook_to_csv" do
     rows[4][3].should be_nil
   end
 
+  context "accumulated points" do
+    before do
+      student_in_course(:active_all => true)
+      a = @course.assignments.create! :title => "Blah", :points_possible => 10
+      a.grade_student @student, :grade => 8
+    end
+
+    it "includes points for unweighted courses" do
+      csv = CSV.parse(@course.gradebook_to_csv)
+      csv[0][-4].should == "Current Points"
+      csv[0][-3].should == "Final Points"
+      csv[1][-4].should == "(read only)"
+      csv[1][-3].should == "(read only)"
+      csv[2][-4].should == "8"
+      csv[2][-3].should == "8"
+    end
+
+    it "doesn't include points for weighted courses" do
+      @course.update_attribute(:group_weighting_scheme, 'percent')
+      csv = CSV.parse(@course.gradebook_to_csv)
+      csv[0][-4].should_not == "Current Points"
+      csv[0][-3].should_not == "Final Points"
+    end
+  end
+
   it "should only include students once" do
     # students might have multiple enrollments in a course
     course(:active_all => true)
