@@ -161,7 +161,7 @@ describe GradebookHistoryApiController, :type => :integration do
 
       expected_keys = %w(
         assignment_id assignment_name attachment_id attachment_ids attempt body
-        cached_due_date cached_tardy_status changed_since_publish context_code
+        changed_since_publish context_code
         course_id created_at current_grade current_graded_at current_grader
         grade grade_matches_current_submission graded_at graded_on grader
         grader_id group_id has_admin_comment has_rubric_assessment id late
