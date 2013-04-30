@@ -17,6 +17,11 @@ set :bundle_without, []
 set :stats_server,	"stats.tier2.sfu.ca"
 default_run_options[:pty] = true
 
+def push_app_servers(num_app_nodes, app_node_prefix)
+  range = *(1..num_app_nodes)
+  range.each { |x| role :app, "#{app_node_prefix}#{x}.tier2.sfu.ca" }
+end
+
 if (ENV.has_key?('gateway') && ENV['gateway'].downcase == "true")
   set :gateway, "welcome.its.sfu.ca"
   set :stats_server, "stats.its.sfu.ca"
