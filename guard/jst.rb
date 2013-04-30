@@ -27,7 +27,7 @@ module Guard
 
       if options[:input]
         defaults.merge!({ :output => options[:input] })
-        watchers << ::Guard::Watcher.new(%r{^#{ options[:input] }/(.+\.handlebars)$})
+        watchers << ::Guard::Watcher.new(%r{\A(?:vendor/plugins/.*?/)?#{ Regexp.escape(options[:input]) }/(.+\.handlebars)\z})
       end
 
       super(watchers, defaults.merge(options))
@@ -49,10 +49,14 @@ module Guard
     #
     # Compiles templates from app/views/jst to public/javascripts/jst
     def run_on_change(paths)
-      Parallel.each(paths, :in_threads => Parallel.processor_count) do |path|
+      paths = paths.map{ |path|
+        prefix = path =~ %r{\Avendor/plugins/.*?/} ? $& : ''
+        [prefix, path]
+      }
+      Parallel.each(paths, :in_threads => Parallel.processor_count) do |prefix, path|
         begin
           UI.info "Compiling: #{path}"
-          Handlebars.compile_file path, 'app/views/jst', @options[:output]
+          Handlebars.compile_file path, "#{prefix}app/views/jst", "#{prefix}#{@options[:output]}"
         rescue Exception => e
           ::Guard::Notifier.notify(e.to_s, :title => path.sub('app/views/jst/', ''), :image => :failed)
         end

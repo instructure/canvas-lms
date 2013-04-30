@@ -121,7 +121,7 @@ group :test do
 end
 
 group :development do
-  gem 'guard', '1.6.0'
+  gem 'guard', '1.8.0'
   gem 'rb-inotify', '~>0.9.0', :require => false
   gem 'rb-fsevent', :require => false
   gem 'rb-fchange', :require => false
