@@ -16,6 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+###
+# Warning: Facebook has deprecated the Dashboard API. See https://developers.facebook.com/blog/post/615/
+##
+
 module Facebook
   def self.parse_signed_request(signed_request)
     sig, str = signed_request.split('.')
