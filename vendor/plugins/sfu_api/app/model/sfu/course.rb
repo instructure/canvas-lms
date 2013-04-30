@@ -33,6 +33,32 @@ module SFU
         REST.json REST.course_info_url, "&course=#{course}&term=#{term}"
       end
 
+      def section_tutorials(course_code, term_code, section_code)
+        details = info(course_code, term_code)
+        main_section = section_code[0..2].downcase
+        sections = ""
+
+        unless details == "[]"
+          details.each do |info|
+            code = info["course"]["name"] + info["course"]["number"]
+            section = info["course"]["section"].downcase
+            if code.downcase == course_code.downcase && section.start_with?(main_section) && section.downcase != section_code.downcase
+              sections += info["course"]["section"] + ", "
+            end
+          end
+        end
+        sections[0..-3]
+      end
+
+      def title(course_code, term_code)
+        details = info(course_code, term_code)
+        title = ""
+        unless details == "[]"
+	  title = details.first["course"]["title"]
+        end
+	title
+      end
+
     end
   end
 
