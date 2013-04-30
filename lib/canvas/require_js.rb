@@ -1,3 +1,4 @@
+require 'lib/canvas/require_js/plugin_extension'
 module Canvas
   module RequireJs
     class << self
