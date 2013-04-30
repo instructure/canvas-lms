@@ -26,6 +26,8 @@ class Attachment < ActiveRecord::Base
   include HasContentTags
   include ContextModuleItem
 
+  attr_accessor :podcast_associated_asset, :submission_attachment
+
   MAX_SCRIBD_ATTEMPTS = 3
   MAX_CROCODOC_ATTEMPTS = 2
   # This value is used as a flag for when we are skipping the submit to scribd for this attachment
@@ -54,10 +56,47 @@ class Attachment < ActiveRecord::Base
   before_validation :assert_attachment
   before_destroy :delete_scribd_doc
   acts_as_list :scope => :folder
-  after_save :touch_context_if_appropriate
-  after_save :build_media_object
 
-  attr_accessor :podcast_associated_asset, :submission_attachment
+  def self.file_store_config
+    # Return existing value, even if nil, as long as it's defined
+    @file_store_config ||= Setting.from_config('file_store')
+    @file_store_config ||= { 'storage' => 'local' }
+    @file_store_config['path_prefix'] ||= @file_store_config['path'] || 'tmp/files'
+    @file_store_config['path_prefix'] = nil if @file_store_config['path_prefix'] == 'tmp/files' && @file_store_config['storage'] == 's3'
+    return @file_store_config
+  end
+
+  def self.s3_config
+    # Return existing value, even if nil, as long as it's defined
+    return @s3_config if defined?(@s3_config)
+    @s3_config ||= Setting.from_config('amazon_s3')
+  end
+
+  def self.s3_storage?
+    (file_store_config['storage'] rescue nil) == 's3' && s3_config
+  end
+
+  def self.local_storage?
+    rv = !s3_storage?
+    raise "Unknown storage type!" if rv && file_store_config['storage'] != 'local'
+    rv
+  end
+
+  # Haaay... you're changing stuff here? Don't forget about the Thumbnail model
+  # too, it cares about local vs s3 storage.
+  has_attachment(
+      :storage => (local_storage? ? :file_system : :s3),
+      :path_prefix => file_store_config['path_prefix'],
+      :s3_access => :private,
+      :thumbnails => { :thumb => '128x128' },
+      :thumbnail_class => 'Thumbnail'
+  )
+
+  # These callbacks happen after the attachment data is saved to disk/s3, or
+  # immediately after save if no data is being uploading during this save cycle.
+  # That means you can't rely on these happening in the same transaction as the save.
+  after_save_and_attachment_processing :touch_context_if_appropriate
+  after_save_and_attachment_processing :build_media_object
 
   # this mixin can be added to a has_many :attachments association, and it'll
   # handle finding replaced attachments. In other words, if an attachment fond
@@ -107,6 +146,11 @@ class Attachment < ActiveRecord::Base
     touch_context unless context_type == 'ConversationMessage'
   end
 
+  def before_attachment_saved
+    @after_attachment_saved_workflow_state = self.workflow_state
+    self.workflow_state = 'unattached'
+  end
+
   # this is a magic method that gets run by attachment-fu after it is done sending to s3,
   # that is the moment that we also want to submit it to scribd.
   # note, that the time it takes to send to s3 is the bad guy.
@@ -114,11 +158,22 @@ class Attachment < ActiveRecord::Base
   # it to scribd from that point does not make the user wait since that
   # does happen asynchronously and the data goes directly from s3 to scribd.
   def after_attachment_saved
+    if workflow_state == 'unattached' && @after_attachment_saved_workflow_state
+      self.workflow_state = @after_attachment_saved_workflow_state
+      @after_attachment_saved_workflow_state = nil
+    end
+
     if scribdable? && !Attachment.skip_3rd_party_submits?
       send_later_enqueue_args(:submit_to_scribd!,
                               {:n_strand => 'scribd', :max_attempts => 1})
-    else
-      self.process
+    elsif %w(pending_upload processing).include?(workflow_state)
+      # we don't call .process here so that we don't have to go through another whole save cycle
+      self.workflow_state = 'processed'
+    end
+
+    # directly update workflow_state so we don't trigger another save cycle
+    if self.workflow_state_changed?
+      self.class.where(:id => self).update_all(:workflow_state => self.workflow_state)
     end
 
     # try an infer encoding if it would be useful to do so
@@ -666,31 +721,6 @@ class Attachment < ActiveRecord::Base
     self.content_type.match(/\Atext/) || self.extension == '.html' || self.extension == '.htm' || self.extension == '.swf'
   end
 
-  def self.s3_config
-    # Return existing value, even if nil, as long as it's defined
-    return @s3_config if defined?(@s3_config)
-    @s3_config ||= Setting.from_config('amazon_s3')
-  end
-
-  def self.file_store_config
-    # Return existing value, even if nil, as long as it's defined
-    @file_store_config ||= Setting.from_config('file_store')
-    @file_store_config ||= { 'storage' => 'local' }
-    @file_store_config['path_prefix'] ||= @file_store_config['path'] || 'tmp/files'
-    @file_store_config['path_prefix'] = nil if @file_store_config['path_prefix'] == 'tmp/files' && @file_store_config['storage'] == 's3'
-    return @file_store_config
-  end
-
-  def self.s3_storage?
-    (file_store_config['storage'] rescue nil) == 's3' && s3_config
-  end
-
-  def self.local_storage?
-    rv = !s3_storage?
-    raise "Unknown storage type!" if rv && file_store_config['storage'] != 'local'
-    rv
-  end
-
   def self.shared_secret
     raise 'Cannot call Attachment.shared_secret when configured for s3 storage' if s3_storage?
     "local_storage" + Canvas::Security.encryption_key
@@ -703,16 +733,6 @@ class Attachment < ActiveRecord::Base
   def downloadable?
     !!(self.authenticated_s3_url rescue false)
   end
-
-  # Haaay... you're changing stuff here? Don't forget about the Thumbnail model
-  # too, it cares about local vs s3 storage.
-  has_attachment(
-      :storage => (local_storage? ? :file_system : :s3),
-      :path_prefix => file_store_config['path_prefix'],
-      :s3_access => :private,
-      :thumbnails => { :thumb => '128x128' },
-      :thumbnail_class => 'Thumbnail'
-  )
 
   def local_storage_path
     "#{HostUrl.context_host(context)}/#{context_type.underscore.pluralize}/#{context_id}/files/#{id}/download?verifier=#{uuid}"
