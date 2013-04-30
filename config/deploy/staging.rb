@@ -1,4 +1,7 @@
-role :app, "canvas-as1.tier2.sfu.ca", "canvas-as2.tier2.sfu.ca", "canvas-as3.tier2.sfu.ca"
+num_app_nodes = 3
+app_node_prefix = "canvas-as"
+
+push_app_servers(num_app_nodes, app_node_prefix)
 role :db, "canvas-ms.tier2.sfu.ca", :primary => true
 
 set :rails_env, "production"
