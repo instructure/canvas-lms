@@ -33,4 +33,6 @@ class DiscussionEntryParticipant < ActiveRecord::Base
     state :unread
     state :read
   end
+
+  scope :read, where(:workflow_state => 'read')
 end

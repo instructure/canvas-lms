@@ -280,7 +280,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def default_unread_count
-    self.discussion_entries.count
+    self.discussion_entries.active.count
   end
 
   def unread_count(current_user = nil)
