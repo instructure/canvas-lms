@@ -283,7 +283,9 @@ describe "course copy" do
   end
 
   describe "course file imports" do
+
     before (:each) do
+      pending('193')
       course_with_teacher_logged_in(:course_code => 'first files course')
       @second_course = Course.create!(:name => 'second files course')
       @second_course.offer!

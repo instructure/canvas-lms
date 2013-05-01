@@ -111,7 +111,8 @@ end
 group :test do
   gem 'bluecloth',    '2.0.10' # for generating api docs
   gem 'mocha',        :git => 'git://github.com/ccutrer/mocha.git', :require => false
-  gem 'parallelized_specs', '0.4.52'
+  gem 'parallelized_specs', '0.4.54'
+  gem 'thin'
   gem 'rcov',         '0.9.9'
   if CANVAS_RAILS3
     gem 'rspec-rails',  '2.13.0'
