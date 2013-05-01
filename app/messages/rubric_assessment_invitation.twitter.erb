@@ -1,4 +1,0 @@
-<% define_content :link do -%>
-<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.rubric_association.context) %>/<%= asset.rubric_association.context.class.to_s.downcase.pluralize %>/<%= asset.rubric_association.context_id %>/rubric_associations/<%= asset.rubric_association_id %>/assessments/<%= asset.uuid %>
-<% end -%>
-<%= t :tweet, "Canvas Alert - Invite: assess %{rubric}, %{user}", :rubric => asset.rubric_association.title, :user => asset.user.name %>
