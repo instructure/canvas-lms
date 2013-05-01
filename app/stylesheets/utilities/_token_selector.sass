@@ -24,12 +24,15 @@
     padding: 0
     margin: 0 0 10px
     overflow: auto
-    li
+    li, li.active.no-results
+      background: transparent
       position: relative
       overflow: hidden
       border-top: 1px solid #fff
       border-bottom: 1px solid #d4d5d7
       padding: 5px
+    li.active.no-results
+      border-bottom: none
     li.first
       border-top: none
     li.last

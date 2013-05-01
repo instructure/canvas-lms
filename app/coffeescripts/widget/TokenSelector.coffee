@@ -94,8 +94,13 @@ define [
       @input.focus()
 
     captureKeyDown: (e) ->
+      keyCode = e.originalEvent?.keyIdentifier ? e.which
+
       return true if @uiLocked
-      switch e.originalEvent?.keyIdentifier ? e.which
+      if @$menu.find('.no-results').length > 0 and _.include([13, 'Enter'], keyCode)
+        return e.preventDefault()
+
+      switch keyCode
         when 'Backspace', 'U+0008', 8
           if @input.val() is ''
             if @listExpanded()

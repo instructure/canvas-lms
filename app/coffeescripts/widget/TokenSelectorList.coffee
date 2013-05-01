@@ -99,7 +99,7 @@ define [
         @hidePaginationLoader()
 
       if @collection.atLeastOnePageFetched and not @$body.find('li').length
-        $message = $('<li class="message first last"></li>')
+        $message = $('<li class="message first last no-results"></li>')
         $message.text(@selector.options.messages?.noResults ? '')
         @$body.append($message)
 
