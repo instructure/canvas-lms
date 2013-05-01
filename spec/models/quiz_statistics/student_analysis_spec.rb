@@ -168,6 +168,37 @@ describe QuizStatistics::StudentAnalysis do
 
   end
 
+  it "includes attachment display names for quiz file upload questions" do
+    require 'action_controller'
+    require 'action_controller/test_process.rb'
+    student_2 = student_in_course(:active_all => true)
+    @student = User.create!(:name => "Stevie Jeebie")
+    @course.enroll_user(@student,'StudentEnrollment', :enrollment_state => :active)
+    q = @course.quizzes.create!(:title => "new quiz")
+    q.update_attribute :published_at, Time.now
+    question = q.quiz_questions.create! :question_data => {
+      :name => 'q1', :points_possible => 1,
+      :question_type => 'file_upload_question',
+      :question_text => 'ohai mark'
+    }
+    q.generate_quiz_data
+    q.save!
+    qs = q.generate_submission @student
+    io = ActionController::TestUploadedFile.new(
+      File.expand_path(File.dirname(__FILE__) +
+                       '/../../fixtures/scribd_docs/doc.doc'),
+                       'application/msword', true)
+    attach = qs.attachments.create! :filename => "attachment.png",
+      :display_name => "attachment.png", :user => @user,
+      :uploaded_data => io
+    qs.submission_data["question_#{question.id}".to_sym] = [ attach.id.to_s ]
+    qs.save!
+    qs.grade_submission
+    stats = CSV.parse(csv({:include_all_versions => true},q))
+    stats[8][2].should == attach.display_name
+    stats[8][3].should == nil
+  end
+
   it 'should strip tags from html multiple-choice/multiple-answers' do
     student_in_course(:active_all => true)
     q = @course.quizzes.create!(:title => "new quiz")

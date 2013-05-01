@@ -111,6 +111,23 @@ class QuizStatistics::StudentAnalysis < QuizStatistics::Report
     stats
   end
 
+  def preload_attachments(submissions)
+    ids = submissions.map(&:submission_data).flatten.compact.select do |hash|
+      hash[:attachment_ids].present?
+    end.map do |hash|
+      hash[:attachment_ids]
+    end.flatten
+    @attachments = Hash[Attachment.where(:id => ids).map do |a|
+      [a.id,a]
+      end
+    ]
+  end
+
+  def attachment_csv(answer)
+    return "" unless answer && answer[:attachment_ids]
+    @attachments[answer[:attachment_ids].first.to_i].display_name
+  end
+
   def to_csv
     start_progress
 
@@ -125,6 +142,7 @@ class QuizStatistics::StudentAnalysis < QuizStatistics::Report
     columns << I18n.t('statistics.csv_columns.attempt', 'attempt') if includes_all_versions?
     first_question_index = columns.length
     submissions = submissions_for_statistics
+    preload_attachments(submissions)
     found_question_ids = {}
     quiz_datas = [quiz.quiz_data] + submissions.map(&:quiz_data)
     quiz_datas.compact.each do |quiz_data|
@@ -201,6 +219,8 @@ class QuizStatistics::StudentAnalysis < QuizStatistics::Report
           }.join(',')
         elsif question[:question_type] == 'numerical_question'
           row << (answer && answer[:text])
+        elsif question[:question_type] == 'file_upload_question'
+          row << attachment_csv(answer)
         else
           row << ((answer_item && answer_item[:text]) || '')
         end
