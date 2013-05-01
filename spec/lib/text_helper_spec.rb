@@ -252,6 +252,82 @@ describe TextHelper do
     end
   end
 
+  describe "simplify html" do
+    before(:each) do
+      @body = <<-END.strip_heredoc.strip
+        <p><strong>This is a bold tag</strong></p>
+        <p><em>This is an em tag</em></p>
+        <p><h1>This is an h1 tag</h1></p>
+        <p><h2>This is an h2 tag</h2></p>
+        <p><h3>This is an h3 tag</h3></p>
+        <p><h4>This is an h4 tag</h4></p>
+        <p><h5>This is an h5 tag</h5></p>
+        <p><h6>This is an h6 tag</h6></p>
+        <p><a href="http://foo.com">Link to Foo</a></p>
+        <p><img src="http://google.com/someimage.png" width="50" height="50" alt="Some Image" title="Some Image" /></p>
+      END
+    end
+
+    it "should convert simple tags to plain text" do
+      text = th.html_to_simple_text(@body)
+      text.should == <<-END.strip_heredoc.strip
+        This is a bold tag
+
+        This is an em tag
+
+        *****************
+        This is an h1 tag
+        *****************
+
+        -----------------
+        This is an h2 tag
+        -----------------
+
+        This is an h3 tag
+        -----------------
+
+        This is an h4 tag
+        -----------------
+
+        This is an h5 tag
+        -----------------
+
+        This is an h6 tag
+        -----------------
+
+        Link to Foo ( http://foo.com )
+      END
+    end
+
+    it "should convert simple tags to minimal html" do
+      html = th.html_to_simple_html(@body).gsub("\r\n", "\n") # gsub only for test matching
+      html.should == <<-END.strip_heredoc.strip
+        <p>This is a bold tag<br/>
+        <br/>
+        This is an em tag<br/>
+        <br/>
+        This is an h1 tag<br/>
+        <br/>
+        This is an h2 tag<br/>
+        <br/>
+        This is an h3 tag<br/>
+        <br/>
+        This is an h4 tag<br/>
+        <br/>
+        This is an h5 tag<br/>
+        <br/>
+        This is an h6 tag<br/>
+        <br/>
+        Link to Foo ( <a href='http://foo.com'>http://foo.com</a> )</p>
+      END
+    end
+
+    it "should convert relative links to absolute links" do
+      html = th.html_to_simple_html("<a href=\"/this/is/a/relative/link\">Relative Link</a>", :base_url => "http://example.com")
+      html.should == "<p>Relative Link ( <a href='http://example.com/this/is/a/relative/link'>http://example.com/this/is/a/relative/link</a> )</p>"
+    end
+  end
+
   context "markdown" do
     context "safety" do
       it "should escape Strings correctly" do
