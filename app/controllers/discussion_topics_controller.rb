@@ -223,6 +223,8 @@ class DiscussionTopicsController < ApplicationController
 
       @initial_post_required = @topic.initial_post_required?(@current_user, @context_enrollment, session)
 
+      @padless = true
+
       log_asset_access(@topic, 'topics', 'topics')
       respond_to do |format|
         if @topic.deleted?

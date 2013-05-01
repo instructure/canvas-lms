@@ -233,6 +233,7 @@ class QuizzesController < ApplicationController
           take_quiz
         end
       end
+      @padless = true
     end
   end
 
