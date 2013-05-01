@@ -225,7 +225,6 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
   end
 
   it "should add an equation to the rce by using equation buttons" do
-    pending('193')
     get "/courses/#{@course.id}/wiki"
 
     f('#wiki_page_body_instructure_equation').click
@@ -305,7 +304,6 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
   end
 
   it "should add an equation to the rce by using equation buttons in advanced view" do
-    pending('193')
     get "/courses/#{@course.id}/wiki"
 
     f('#wiki_page_body_instructure_equation').click
