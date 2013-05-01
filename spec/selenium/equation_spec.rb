@@ -4,7 +4,6 @@ describe "equation editor" do
   it_should_behave_like "quizzes selenium tests"
 
   it "should support multiple equation editors on the same page" do
-    pending("193")
     course_with_teacher_logged_in
 
     get "/courses/#{@course.id}/quizzes"

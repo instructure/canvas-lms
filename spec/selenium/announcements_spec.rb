@@ -273,7 +273,6 @@ describe "announcements" do
     end
 
     it "should create a delayed announcement" do
-      pending("193")
       get course_announcements_path(@course)
       create_announcement_manual('input[type=checkbox][name=delay_posting]')
       f('.ui-datepicker-trigger').click

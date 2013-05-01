@@ -22,7 +22,7 @@ require "socket"
 require "timeout"
 require 'coffee-script'
 require File.expand_path(File.dirname(__FILE__) + '/helpers/custom_selenium_rspec_matchers')
-require File.expand_path(File.dirname(__FILE__) + '/../../spec/selenium/servers/thin_server')
+require File.expand_path(File.dirname(__FILE__) + '/server')
 include I18nUtilities
 
 SELENIUM_CONFIG = Setting.from_config("selenium") || {}
@@ -30,12 +30,6 @@ SERVER_IP = SELENIUM_CONFIG[:server_ip] || UDPSocket.open { |s| s.connect('8.8.8
 SECONDS_UNTIL_COUNTDOWN = 5
 SECONDS_UNTIL_GIVING_UP = 20
 MAX_SERVER_START_TIME = 60
-
-#NEED BETTER variable handling
-THIS_ENV = ENV['TEST_ENV_NUMBER'].to_i
-THIS_ENV = 1 if ENV['TEST_ENV_NUMBER'].blank?
-WEBSERVER = 'thin' #set WEBSERVER ENV to webrick to change webserver
-
 
 $server_port = nil
 $app_host_and_port = nil
@@ -87,24 +81,48 @@ module SeleniumTestsHelperMethods
 
       driver = nil
 
+      if File.exist?("/tmp/nightly_build.txt")
+        [1, 2, 3].each do |times|
+          begin
+            driver = Selenium::WebDriver.for(
+                :remote,
+                :url => 'http://' + (SELENIUM_CONFIG[:host_and_port] || "localhost:4444") + '/wd/hub',
+                :desired_capabilities => caps
+            )
+            break
+          rescue Exception => e
+            puts "Error attempting to start remote webdriver: #{e}"
+            raise e if times == 3
+          end
+        end
+      else
+        (1..60).each do |times|
+          env_test_number = ENV['TEST_ENV_NUMBER']
+          env_test_number = 1 if ENV['TEST_ENV_NUMBER'].blank?
 
-      (1..60).each do |times|
-        begin
-          #curbs race conditions on selenium grid nodes
-          stagger_threads
+          begin
+            #curbs race conditions on selenium grid nodes
 
-          port_num = (4440 + THIS_ENV)
-          puts "Thread #{THIS_ENV} connecting to hub over port #{port_num}, try ##{times}"
-          driver = Selenium::WebDriver.for(
-              :remote,
-              :url => "http://127.0.0.1:#{port_num}/wd/hub",
-              :desired_capabilities => caps
-          )
-          break
-        rescue Exception => e
-          puts "Thread #{THIS_ENV}\n try ##{times}\nError attempting to start remote webdriver: #{e}"
-          sleep 10
-          raise e if times == 60
+            if times == 1
+              first_run = true
+              stagger_threads(first_run)
+            else
+              stagger_threads
+            end
+
+            port_num = (4440 + env_test_number.to_i)
+            puts "Thread #{env_test_number} connecting to hub over port #{port_num}, try ##{times}"
+            driver = Selenium::WebDriver.for(
+                :remote,
+                :url => "http://127.0.0.1:#{port_num}/wd/hub",
+                :desired_capabilities => caps
+            )
+            break
+          rescue Exception => e
+            puts "Thread #{env_test_number}\n try ##{times}\nError attempting to start remote webdriver: #{e}"
+            sleep 10
+            raise e if times == 60
+          end
         end
       end
     end
@@ -158,10 +176,21 @@ module SeleniumTestsHelperMethods
     I18n.t(*a, &b)
   end
 
-  def stagger_threads(step_time = 9)
-    wait_time = THIS_ENV * step_time
-    #thread 5 currently gets the most specs and lags behind the others this will decrease total build time by releasing it early
-    sleep(wait_time)
+  def stagger_threads(first_run = true, step_time = 9)
+    env_test_number = ENV['TEST_ENV_NUMBER']
+    env_test_number = 1 if ENV['TEST_ENV_NUMBER'].blank?
+
+    if first_run
+      wait_time = env_test_number.to_i * step_time
+      #thread 5 currently gets the most specs and lags behind the others this will decrease total build time by releasing it early
+      wait_time = 1 if env_test_number.to_i == 5
+      sleep(wait_time)
+    else
+      wait_time = env_test_number.to_i * 2
+      #thread 5 currently gets the most specs and lags behind the others this will decrease total build time by releasing it early
+      wait_time = 1 if env_test_number.to_i == 5
+      sleep(wait_time)
+    end
   end
 
 
@@ -202,30 +231,10 @@ module SeleniumTestsHelperMethods
     raise "couldn't find an available port after #{tried_ports.length} tries! ports tried: #{tried_ports.join ", "}"
   end
 
-  def self.start_webserver(webserver)
+  def self.start_in_process_webrick_server
     setup_host_and_port
-    case webserver
-      when 'thin'
-        self.start_in_process_thin_server
-      when 'webrick'
-        self.start_in_process_webrick_server
-      else
-        puts "no web server specified, defaulting to WEBrick"
-        self.start_in_process_webrick_server
-    end
-  end
 
-  def self.shutdown_webserver(server)
-    shutdown = lambda do
-      server.shutdown
-      HostUrl.default_host = nil
-      HostUrl.file_host = nil
-    end
-    at_exit { shutdown.call }
-    return shutdown
-  end
-
-  def self.rack_app()
+    server = SpecFriendlyWEBrickServer
     app = Rack::Builder.new do
       use Rails::Rack::Debugger unless Rails.env.test?
       map '/' do
@@ -233,22 +242,13 @@ module SeleniumTestsHelperMethods
         run ActionController::Dispatcher.new
       end
     end.to_app
-    return app
-  end
-
-  def self.start_in_process_thin_server
-    server = SpecFriendlyThinServer
-    app = self.rack_app
-    server.run(app, $server_port, :AccessLog => [])
-    shutdown = self.shutdown_webserver(server)
-    return shutdown
-  end
-
-  def self.start_in_process_webrick_server
-    server = SpecFriendlyWEBrickServer
-    app = self.rack_app
     server.run(app, :Port => $server_port, :AccessLog => [])
-    shutdown = self.shutdown_webserver(server)
+    shutdown = lambda do
+      server.shutdown
+      HostUrl.default_host = nil
+      HostUrl.file_host = nil
+    end
+    at_exit { shutdown.call }
     return shutdown
   end
 
@@ -1035,7 +1035,7 @@ end
 shared_examples_for "in-process server selenium tests" do
   it_should_behave_like "all selenium tests"
   prepend_before (:all) do
-    $in_proc_webserver_shutdown ||= SeleniumTestsHelperMethods.start_webserver(WEBSERVER)
+    $in_proc_webserver_shutdown ||= SeleniumTestsHelperMethods.start_in_process_webrick_server
   end
   before do
     HostUrl.stubs(:default_host).returns($app_host_and_port)
@@ -1056,7 +1056,6 @@ shared_examples_for "in-process server selenium tests" do
             @mutex ||= Mutex.new
             @mutex.synchronize { execute_without_synchronization(*args) }
           end
-
           alias_method_chain :execute, :synchronization
         end
       end

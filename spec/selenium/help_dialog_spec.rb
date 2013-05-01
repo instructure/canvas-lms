@@ -89,7 +89,6 @@ describe "help dialog" do
     end
 
     it "should allow submitting a ticket" do
-      pending('193')
       Setting.set('show_feedback_link', 'true')
       get "/dashboard"
       f('.help_dialog_trigger').click

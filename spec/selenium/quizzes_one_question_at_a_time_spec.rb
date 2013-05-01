@@ -253,7 +253,6 @@ describe "One Question at a Time Quizzes" do
       end
 
       it "displays one question at a time but you cant go back" do
-        pending("193")
         take_the_quiz
 
         it_should_show_cant_go_back_warning
@@ -347,7 +346,6 @@ describe "One Question at a Time Quizzes" do
       end
 
       it "displays one question at a time but you cant go back" do
-        pending("193")
         preview_the_quiz
         sequential_flow
       end

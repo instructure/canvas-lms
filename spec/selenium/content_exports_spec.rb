@@ -6,7 +6,6 @@ describe "content exports" do
   context "as a teacher" do
 
     before (:each) do
-      pending('193')
       course_with_teacher_logged_in
     end
 
