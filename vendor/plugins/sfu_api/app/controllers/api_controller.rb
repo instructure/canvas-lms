@@ -2,6 +2,7 @@ require Pathname(File.dirname(__FILE__)) + "../model/sfu/course"
 
 class ApiController < ApplicationController
   before_filter :require_user
+  include Common
 
   def course
     sis_id = params[:sis_id]
@@ -22,26 +23,28 @@ class ApiController < ApplicationController
     account_id = Account.find_by_name('Simon Fraser University').id
     sfu_id = params[:sfu_id]
     pseudonym = Pseudonym.where(:unique_id => sfu_id, :account_id => account_id).all
-    if pseudonym.empty?
-      raise(ActiveRecord::RecordNotFound)
-    end
+    
+    raise(ActiveRecord::RecordNotFound) if pseudonym.empty?
+    
     user_hash = {}
     unless pseudonym.empty?
       user = User.find pseudonym.first.user_id
       if params[:property].nil?
+        if user.nil?
+	        raise(ActiveRecord::RecordNotFound)
+	      else
+	        user_hash["exists"] = "true"
+	      end
+      elsif params[:property].eql? "profile"
         user_hash["id"] = user.id
         user_hash["name"] = user.name
         user_hash["uuid"] = user.uuid
-      elsif params[:property].eql? "uuid"
-        user_hash["uuid"] = user.uuid
-      elsif params[:property].eql? "terms"
-        user_hash = teaching_terms_for sfu_id
       elsif params[:property].eql? "mysfu"
         user_hash = mysfu_enrollments_for user
       end
     end
 
-    if params[:property] != "terms"
+    if params[:property].to_s.eql? "profile"
       return unless authorized_action(user, @current_user, :read)
     end
 
@@ -50,6 +53,7 @@ class ApiController < ApplicationController
     end
   end
 
+  # Deprecated. Moved to amaint_controller
   def courses
     course_array = []
     exclude_sectionCode = ["STL", "LAB", "TUT"]
@@ -120,14 +124,7 @@ class ApiController < ApplicationController
     course_hash
   end
 
-  def course_exists?(sis_source_id)
-    course = Course.where(:sis_source_id => sis_source_id).all
-    if course.length == 1
-      return true
-    end
-      false
-  end
-
+  # Deprecated. Moved to amaint_controller
   def teaching_terms_for(sfu_id)
     terms = SFU::Course.terms sfu_id
     term_array = []
@@ -171,8 +168,4 @@ class ApiController < ApplicationController
     output
   end
 
-  # orverride ApplicationController::api_request? to force canvas to treat all calls to /sfu/api/* as an API call
-  def api_request?
-    return true
-  end
 end

@@ -1,6 +1,7 @@
 class CourseDataController < ApplicationController
   before_filter :require_user
-
+  include Common
+  
   def base_dir
     "/usr/local/canvas/course-data"
   end
@@ -38,8 +39,4 @@ class CourseDataController < ApplicationController
     end
   end
 
-  ## orverride ApplicationController::api_request? to force canvas to treat all calls to /sfu/api/* as an API call
-  def api_request?
-    true
-  end
 end

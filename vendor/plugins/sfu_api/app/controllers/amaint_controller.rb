@@ -2,12 +2,34 @@ require Pathname(File.dirname(__FILE__)) + "../model/sfu/course"
 
 class AmaintController < ApplicationController
   before_filter :require_user
+  include Common
 
-  def course
-    course_hash = amaint_course_info(params[:sis_id],params[:property])
+  def course_info
+    course_hash = amaint_course_info(params[:sis_id], params[:property])
+
+    raise(ActiveRecord::RecordNotFound) if course_hash.empty?
 
     respond_to do |format|
       format.json { render :json => course_hash }
+    end
+  end
+
+  def user_info
+    user_array =[] 
+    if params[:property].nil?
+      user_hash = {}
+	    user_hash["sfu_id"] = params[:sfu_id]	
+	    user_array << user_hash 
+    elsif params[:filter].nil?
+      user_array = teaching_terms_for params[:sfu_id]  
+    elsif params[:property].to_s.eql? "term"
+	    user_array = courses_for_user(params[:sfu_id], params[:filter])
+    end
+
+    raise(ActiveRecord::RecordNotFound) if user_array.empty?
+
+    respond_to do |format|
+      format.json { render :json => user_array }
     end
   end
 
@@ -32,8 +54,62 @@ class AmaintController < ApplicationController
     course_hash
   end
 
-  # orverride ApplicationController::api_request? to force canvas to treat all calls to /sfu/api/* as an API call
-  def api_request?
-    true
+  def courses_for_user(sfu_id, term_code=nil)
+    course_array = []
+    exclude_sectionCode = ["STL", "LAB", "TUT"]
+
+    if term_code.nil?
+      courses = SFU::Course.for_instructor(sfu_id)
+    else
+      courses = SFU::Course.for_instructor(sfu_id, term_code)
+    end
+
+    courses.compact.each do |course|
+      course.compact.each do |c|
+        course_hash = {}
+        course_hash["name"] = c["course"].first["name"]
+        course_hash["title"] = c["course"].first["title"]
+        course_hash["number"] = c["course"].first["number"]
+        course_hash["section"] = c["course"].first["section"]
+        course_hash["peopleSoftCode"] = c["course"].first["peopleSoftCode"].to_s
+        course_hash["sis_source_id"] = course_hash["peopleSoftCode"] + "-" +
+                                       course_hash["name"].downcase +  "-" +
+                                       course_hash["number"] + "-" +
+                                       course_hash["section"].downcase
+        course_hash["sectionTutorials"] = ""
+        course_hash["sectionCode"] = c["course"].first["sectionCode"]
+
+        course_code = course_hash["name"]+course_hash["number"]
+
+        if course_hash["section"].end_with? "00"
+          if term_code.nil?
+            course_hash["sectionTutorials"] = SFU::Course.section_tutorials(course_code, course_hash["peopleSoftCode"], course_hash["section"])
+          else
+            course_hash["sectionTutorials"] = SFU::Course.section_tutorials(course_code, term_code, course_hash["section"])
+          end
+        end
+
+        course_hash["key"] = course_hash["peopleSoftCode"] + ":::" +
+                             course_hash["name"].downcase +  ":::" +
+                             course_hash["number"] + ":::" +
+                             course_hash["section"].downcase + ":::" +
+                             course_hash["title"]
+        course_hash["key"].concat ":::" + course_hash["sectionTutorials"].downcase.delete(" ") unless course_hash["sectionTutorials"].empty?
+
+        # hide course if already exists in Canvas or is a Tutorial/Lab
+        course_array.push course_hash unless course_exists? course_hash["sis_source_id"] unless exclude_sectionCode.include? c["course"].first["sectionCode"].to_s
+      end
+    end
+    course_array
   end
+
+  def teaching_terms_for(sfu_id)
+    terms = SFU::Course.terms sfu_id
+    term_array = []
+    terms.each do |term|
+      term_array.push term
+    end
+    term_array
+  end 
+
 end

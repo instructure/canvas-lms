@@ -73,15 +73,10 @@
                     $("#course_list").spin(spinnerOpts);
 
                     $.ajax({
-                        url: "/sfu/api/user/" + sfu_id,
+                        url: "/sfu/api/v1/amaint/user/" + sfu_id,
                         dataType: "json",
                         success: function(data) {
-                          //if (data.id !== null && data.id !== undefined){
-                            if (data.id > 0){
-                                course_list(sfu_id);
-                            } else {
-                                $("#course_list").html("<h5>Invalid SFU Computing ID</h5>");
-                            }
+                            course_list(sfu_id);
                         },
                         error: function(xhr) {
                             var statusCode = xhr.status;
@@ -105,7 +100,7 @@
                     source: function ( request, response ) {
                         var search = $( "#course_search" ).val();
                         var term_select = $( "#term_select" ).val();
-                        var search_url = "/sfu/api/course-data/"+ term_select +"/"+ search;
+                        var search_url = "/sfu/api/v1/course-data/"+ term_select +"/"+ search;
                         $.ajax({
                             url: search_url,
                             dataType: "json",
@@ -149,7 +144,7 @@
                 var sfu_id = $("#username").val();
 
                 $.ajax({
-                    url: "/sfu/api/user/" + sfu_id + "/terms",
+                    url: "/sfu/api/v1/amaint/user/" + sfu_id + "/term",
                     dataType: "json",
                     success: function(data) {
                         $("#course_list").html("");
@@ -163,7 +158,7 @@
                     error: function(xhr) {
                         var statusCode = xhr.status;
                         if (statusCode === 404) {
-                            $("#course_list").html("<h5>Invalid SFU Computing ID</h5>");
+                            $("#course_list").html("<h5>No courses found</h5>");
                         } else {
                             $("#course_list").html("<h5>An unknown error occurred</h5>");
                         }
@@ -174,7 +169,7 @@
             function courses_for_terms(sfu_id, term) {
                 $("#" + term + "_courses").spin(spinnerOpts);
                 $.ajax({
-                    url: "/sfu/api/courses/teaching/" + sfu_id + "/" + term,
+                    url: "/sfu/api/v1/amaint/user/" + sfu_id + "/term/" + term,
                     dataType: 'json',
                     success: function(data) {
                         var num = 1;
@@ -316,7 +311,7 @@
             }
 
             function section_tutorials(course_id){
-                var url = "/sfu/api/amaint/course/"+ course_id +"/sectionTutorials";
+                var url = "/sfu/api/v1/amaint/course/"+ course_id +"/sectionTutorials";
                 var tutorials;
                 $.ajax({
                     type: "GET",
@@ -337,7 +332,7 @@
             function course_exists(course_id){
                 var course_info = course_id.split(":::");
                 var sis_id = course_info[0] +"-"+ course_info[1] +"-"+ course_info[2] +"-"+ course_info[3];
-                var url = "/sfu/api/course/"+ sis_id;
+                var url = "/sfu/api/v1/course/"+ sis_id;
                 var exists = false;
                 $.ajax({
                     type: "GET",
