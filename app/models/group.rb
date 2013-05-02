@@ -99,6 +99,10 @@ class Group < ActiveRecord::Base
       (self.group_category.restricted_self_signup? && self.has_common_section_with_user?(user)))
   end
 
+  def full?
+    group_category && group_category.group_limit && participating_users.size >= group_category.group_limit
+  end
+
   def free_association?(user)
     auto_accept? || allow_join_request? || allow_self_signup?(user)
   end

@@ -8,6 +8,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     enable_self_signup = form.find_element(:css, "#category_enable_self_signup")
     enable_self_signup.click unless !!enable_self_signup.attribute('checked') == !!opts[:enable_self_signup]
 
+    if opts[:enable_self_signup] && opts[:group_limit]
+      replace_content f('#category_group_limit', form), opts[:group_limit]
+    end
+
     restrict_self_signup = form.find_element(:css, "#category_restrict_self_signup")
     restrict_self_signup.click unless !!restrict_self_signup.attribute('checked') == !!opts[:restrict_self_signup]
     if opts[:group_count]

@@ -6,6 +6,7 @@
     <div style="display: none;">
       <span class="self_signup"><%= category && category.self_signup %></span>
       <span class="heterogenous"><%= category && category.has_heterogenous_group? %></span>
+      <span class="group_limit"><%= category && category.group_limit %></span>
     </div>
     <div class="links">
       <a href="#" class="add_group_link no-hover" title="<%= t 'buttons.add_group', "Add Another Group" %>"><i class="icon-add standalone-icon"></i></a>
@@ -33,6 +34,9 @@
         <span class="restricted_self_signup_text" style="<%= hidden unless category && category.restricted_self_signup? %>"><%= t 'restricted_self_signup_blurb', "All students in a group are required to be in the same section." %></span>
         <%= link_to(image_tag('help.png'), '#', :class => 'self_signup_help_link no-hover',
                     :title => t(:self_signup_help_tooltip, "What Are Self Sign-Up Groups?")) %>
+        <p class="group_limit_blurb" style="<%= hidden unless category && category.group_limit %>">
+          <%= t 'group_limit_blurb', 'Groups are limited to *%{count}* members', :count => (category && category.group_limit), :wrapper => '<span class="group_limit_text">\1</span>' %>
+        </p>
       </div>
     </div>
   </div>

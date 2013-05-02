@@ -260,6 +260,7 @@ class GroupCategoriesController < ApplicationController
     end
     @group_category.name = name
     @group_category.configure_self_signup(enable_self_signup, restrict_self_signup)
+    @group_category.group_limit = args[:group_limit]
     @group_category.save
   end
 

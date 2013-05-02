@@ -137,6 +137,14 @@ describe "manage groups" do
     new_category.groups.size.should == 2
   end
 
+  it "should honor group_limit when adding a self signup category" do
+    @course.enroll_student(user_model(:name => "John Doe"))
+    get "/courses/#{@course.id}/groups"
+    # submit new category form
+    new_category = add_category(@course, 'New Category', :enable_self_signup => true, :group_limit => '2')
+    new_category.group_limit.should == 2
+  end
+
   it "should preserve group to category association when editing a group" do
     groups_student_enrollment 3
     group_category = @course.group_categories.create(:name => "Existing Category")

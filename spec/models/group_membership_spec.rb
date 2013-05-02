@@ -48,6 +48,21 @@ describe GroupMembership do
     gm2.reload.should be_deleted
   end
 
+  it "should not be valid if the group is full" do
+    course
+    category = @course.group_categories.build(:name => "category 1")
+    category.group_limit = 2
+    category.save!
+    group = category.groups.create!(:context => @course)
+    # when the group is full
+    group.group_memberships.create!(:user => user_model, :workflow_state => 'accepted')
+    group.group_memberships.create!(:user => user_model, :workflow_state => 'accepted')
+    # expect
+    membership = group.group_memberships.build(:user => user_model, :workflow_state => 'accepted')
+    membership.should_not be_valid
+    membership.errors[:group_id].should == "The group is full."
+  end
+
   context "section homogeneity" do
     # can't use 'course' because it is defined in spec_helper, so use 'course1'
     let(:course1) { course_with_teacher(:active_all => true); @course }

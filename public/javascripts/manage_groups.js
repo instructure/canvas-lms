@@ -203,6 +203,8 @@ define([
           // attempted group membership claims the user was unacceptable for
           // some reason (probably section).
           message = data.errors.user_id[0].message;
+        } else if (data.errors && data.errors.group_id) {
+          message = data.errors.group_id[0].message;
         } else {
           message = I18n.t('errors.unknown', 'An unexpected error occurred.');
         }
@@ -315,6 +317,8 @@ define([
       $category.find('.self_signup_text').showIf(category.self_signup);
       $category.find('.restricted_self_signup_text').showIf(category.self_signup === 'restricted');
       $category.find('.assign_students_link').showIf(category.self_signup !== 'restricted');
+      $category.find('.group_limit_blurb').showIf(category.group_limit);
+      $category.find('.group_limit, .group_limit_text').text(category.group_limit || '');
     },
 
     addGroupToSidebar: function(group) {
@@ -452,6 +456,12 @@ define([
           if(found) {
             return I18n.t('errors.category_in_use', "\"%{category_name}\" is already in use", {category_name: val});
           }
+        },
+        'group_limit': function(val, data) {
+          if (parseInt(val) <= 1) {
+            return I18n.t('errors.group_limit', 'Group limit must be blank or greater than 1')
+          }
+          return false;
         }
       },
       beforeSubmit: function(data) {
@@ -483,14 +493,16 @@ define([
       var $form = $("#edit_category_form").clone(true);
 
       // fill out form given the current category values
-      var data = $category.getTemplateData({textValues: ['category_name', 'self_signup', 'heterogenous']});
+      var data = $category.getTemplateData({textValues: ['category_name', 'self_signup', 'heterogenous', 'group_limit']});
       var form_data = {
         name: data.category_name,
         enable_self_signup: data.self_signup !== null && data.self_signup !== '',
-        restrict_self_signup: data.self_signup == 'restricted'
+        restrict_self_signup: data.self_signup == 'restricted',
+        group_limit: data.group_limit
       };
       $form.fillFormData(form_data, { object_name: 'category' });
       $form.find("#category_restrict_self_signup").prop('disabled', !form_data.enable_self_signup || data.heterogenous == 'true');
+      $form.find("#group_structure_self_signup_subcontainer").showIf( $form.find('#category_enable_self_signup').is(':checked') );
 
       $category.addClass('editing');
       $category.prepend($form.show());
@@ -616,6 +628,12 @@ define([
           if(found) {
             return I18n.t('errors.category_in_use', "\"%{category_name}\" is already in use", {category_name: val});
           }
+        },
+        'category[group_limit]': function(val, data) {
+          if (parseInt(val) <= 1) {
+            return I18n.t('errors.group_limit', 'Group limit must be blank or greater than 1')
+          }
+          return false;
         }
       },
       beforeSubmit: function(data) {
@@ -662,6 +680,7 @@ define([
       var heterogenous = $(this).parents('.group_category').find('.heterogenous').text() == 'true';
       var disable_restrict = !self_signup || heterogenous;
       $("#edit_category_form #category_restrict_self_signup").prop('disabled', disable_restrict);
+      $("#edit_category_form #group_structure_self_signup_subcontainer").showIf(self_signup);
       if (disable_restrict) {
         $("#edit_category_form #category_restrict_self_signup").prop('checked', false);
       }

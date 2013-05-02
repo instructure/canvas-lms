@@ -245,6 +245,11 @@ class GroupsController < ApplicationController
         @current_conferences = @group.web_conferences.select{|c| c.active? && c.users.include?(@current_user) } rescue []
         @stream_items = @current_user.try(:cached_recent_stream_items, { :contexts => @context }) || []
         if params[:join] && @group.grants_right?(@current_user, :join)
+          if @group.full?
+            flash[:error] = t('errors.group_full', 'The group is full.')
+            redirect_to course_groups_url(@group.context)
+            return
+          end
           @group.request_user(@current_user)
           if !@group.grants_right?(@current_user, session, :read)
             render :action => 'membership_pending'

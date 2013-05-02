@@ -30,6 +30,7 @@ class GroupMembership < ActiveRecord::Base
   before_save :capture_old_group_id
 
   before_validation :verify_section_homogeneity_if_necessary
+  validate :validate_within_group_limit
 
   after_save :ensure_mutually_exclusive_membership
   after_save :touch_groups
@@ -113,6 +114,13 @@ class GroupMembership < ActiveRecord::Base
     end
   end
   protected :verify_section_homogeneity_if_necessary
+
+  def validate_within_group_limit
+    if new_record? && group.full?
+      errors.add(:group_id, t('errors.group_full', 'The group is full.'))
+    end
+  end
+  protected :validate_within_group_limit
   
   attr_accessor :old_group_id
   def capture_old_group_id
