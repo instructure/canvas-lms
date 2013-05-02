@@ -58,6 +58,21 @@
 #       pre_attachment:{upload_url: "", message: "file exceeded quota", upload_params: {...}}
 #
 #   }
+#
+# @object Migrator
+#   {
+#       // The value to pass to the create endpoint
+#       "type":"common_cartridge_importer",
+#
+#       // Whether this endpoint requires a file upload
+#       "requires_file_upload":true,
+#
+#       // Description of the package type expected
+#       "name":"Common Cartridge 1.0/1.1/1.2 Package",
+#
+#       // A list of fields this system requires
+#       "required_settings":[]
+#   }
 class ContentMigrationsController < ApplicationController
   include Api::V1::ContentMigration
 
@@ -124,7 +139,7 @@ class ContentMigrationsController < ApplicationController
   # 3. {api:ContentMigrationsController#show GET} the ContentMigration
   # 4. Use the {api:ProgressController#show Progress} specified in _progress_url_ to monitor progress
   #
-  # @argument migration_type [string] The type of the migration. Allowed values: canvas_cartridge_importer, common_cartridge_importer, course_copy_importer, zip_file_importer, qti_converter, moodle_converter
+  # @argument migration_type [string] The type of the migration. Use the {api:ContentMigrationsController#available_migrators Migrator} endpoint to see all available migrators. Default allowed values: canvas_cartridge_importer, common_cartridge_importer, course_copy_importer, zip_file_importer, qti_converter, moodle_converter
   #
   # @argument pre_attachment[name] [string] Required if uploading a file. This is the first step in uploading a file to the content migration. See the {file:file_uploads.html File Upload Documentation} for details on the file upload workflow.
   #
@@ -199,6 +214,24 @@ class ContentMigrationsController < ApplicationController
     @plugin = Canvas::Plugin.find(@content_migration.migration_type)
 
     update_migration
+  end
+
+
+  # @API List Migration Systems
+  #
+  # Lists the currently available migration types. These values may change.
+  #
+  # @returns [Migrator]
+  def available_migrators
+    systems = ContentMigration.migration_plugins(true)
+    json = systems.map{|p| {
+            :type => p.id,
+            :requires_file_upload => !!p.settings[:requires_file_upload],
+            :name => p.meta['select_text'].call,
+            :required_settings => p.settings[:required_settings] || []
+    }}
+
+    render :json => json
   end
 
 

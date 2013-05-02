@@ -760,6 +760,7 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :content_migrations) do |cm|
+      cm.get 'courses/:course_id/content_migrations/migrators', :action => :available_migrators, :path_name => 'course_content_migration_migrators_list'
       cm.get 'courses/:course_id/content_migrations/:id', :action => :show, :path_name => 'course_content_migration'
       cm.get 'courses/:course_id/content_migrations', :action => :index, :path_name => 'course_content_migration_list'
       cm.post 'courses/:course_id/content_migrations', :action => :create, :path_name => 'course_content_migration_create'

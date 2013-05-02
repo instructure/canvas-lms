@@ -151,7 +151,8 @@ Canvas::Plugin.register 'course_copy_importer', :export_system, {
                 :worker => 'CourseCopyWorker',
                 :migration_partial => '',
                 :requires_file_upload => false,
-                :required_options_validator => Canvas::Migration::Validators::CourseCopyValidator
+                :required_options_validator => Canvas::Migration::Validators::CourseCopyValidator,
+                :required_settings => [:source_course_id]
         },
 }
 require_dependency 'canvas/migration/worker/zip_file_worker'
@@ -168,7 +169,8 @@ Canvas::Plugin.register 'zip_file_importer', :export_system, {
                 :migration_partial => '',
                 :requires_file_upload => true,
                 :no_selective_import => true,
-                :required_options_validator => Canvas::Migration::Validators::ZipImporterValidator
+                :required_options_validator => Canvas::Migration::Validators::ZipImporterValidator,
+                :required_settings => [:source_folder_id]
         },
 }
 Canvas::Plugin.register 'common_cartridge_importer', :export_system, {

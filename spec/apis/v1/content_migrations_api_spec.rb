@@ -245,6 +245,21 @@ describe ContentMigrationsController, :type => :integration do
     end
   end
 
+  describe 'migration_systems' do
+    it "should return the migrators" do
+      p = Canvas::Plugin.find('common_cartridge_importer')
+      Canvas::Plugin.stubs(:all_for_tag).returns([p])
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/content_migrations/migrators",
+                      {:controller=>"content_migrations", :action=>"available_migrators", :format=>"json", :course_id=>@course.id.to_param})
+      json.should == [{
+                              "type" => "common_cartridge_importer",
+                              "requires_file_upload" => true,
+                              "name" => "Common Cartridge 1.0/1.1/1.2 Package",
+                              "required_settings" => []
+                      }]
+    end
+  end
+
 
 
 end

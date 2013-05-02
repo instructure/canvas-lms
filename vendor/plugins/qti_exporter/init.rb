@@ -12,6 +12,7 @@ Rails.configuration.to_prepare do
             :enabled => python_converter_found,
             :migration_partial => 'qti_config',
             :worker=> 'QtiWorker',
+            :requires_file_upload => true,
             :provides =>{:qti=>Qti::Converter, 
                          :webct=>Qti::Converter, # It can import WebCT Quizzes
             }
