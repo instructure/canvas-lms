@@ -186,7 +186,14 @@
                             num++;
                         });
                     },
-                    error: function() {  /* TODO: do something useful here */ }
+                    error: function(xhr) {
+                        var statusCode = xhr.status;
+                        if (statusCode === 404) {
+                            $("#"+term+"_courses").html("<h5>No courses found</h5>");
+                        } else {
+                            $("#course_list").html("<h5>An unknown error occurred</h5>");
+                        }
+                    }
                 });
             }
 
@@ -323,7 +330,7 @@
                         tutorials = data.sectionTutorials;
                     },
                     error: function (e) {
-                        console.log("error: " + e);
+                        console.log("No section tutorials found for " + course_id);
                     }
                 });
                 return tutorials;
@@ -344,6 +351,7 @@
                         exists = true;
                     },
                     error: function (e) {
+                        exists = false;
                         console.log("Course doesn't exist: " + sis_id);
                     }
                 });
