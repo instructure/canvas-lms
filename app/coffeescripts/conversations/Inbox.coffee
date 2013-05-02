@@ -302,7 +302,6 @@ define [
 
     closeMenus: () ->
       $('#actions .menus > li, #conversation_actions, #conversations .actions').removeClass('selected')
-      $('#conversations li.menu_active').removeClass('menu_active')
 
     openMenu: ($menu) ->
       @closeMenus()
