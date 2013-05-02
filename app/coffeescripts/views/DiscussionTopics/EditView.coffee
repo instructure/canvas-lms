@@ -10,6 +10,7 @@ define [
   'wikiSidebar'
   'str/htmlEscape'
   'compiled/models/DiscussionTopic'
+  'compiled/models/Announcement'
   'compiled/models/Assignment'
   'jquery'
   'compiled/fn/preventDefault'
@@ -20,7 +21,7 @@ define [
   'compiled/jquery.rails_flash_notifications' #flashMessage
 ], (I18n, ValidatedFormView, AssignmentGroupSelector, GradingTypeSelector,
 GroupCategorySelector, PeerReviewsSelector, _, template, wikiSidebar,
-htmlEscape, DiscussionTopic, Assignment, $, preventDefault, MissingDateDialog) ->
+htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, MissingDateDialog) ->
 
   class EditView extends ValidatedFormView
 
@@ -32,8 +33,13 @@ htmlEscape, DiscussionTopic, Assignment, $, preventDefault, MissingDateDialog) -
 
     dontRenableAfterSaveSuccess: true
 
+    els:
+      '#availability_options': '$availabilityOptions'
+      '#use_for_grading': '$useForGrading'
+
     events: _.extend(@::events,
       'click .removeAttachment' : 'removeAttachment'
+      'change #use_for_grading' : 'toggleAvailabilityOptions'
     )
 
     @optionProperty 'permissions'
@@ -46,11 +52,14 @@ htmlEscape, DiscussionTopic, Assignment, $, preventDefault, MissingDateDialog) -
 
     isTopic: => @model.constructor is DiscussionTopic
 
+    isAnnouncement: => @model.constructor is Announcement
+
     toJSON: ->
       json = _.extend super, @options,
         showAssignment: !!@assignmentGroupCollection
         useForGrading: @model.get('assignment')?
         isTopic: @isTopic()
+        isAnnouncement: @isAnnouncement()
         contextIsCourse: @options.contextType is 'courses'
         canAttach: @permissions.CAN_ATTACH
         canModerate: @permissions.CAN_MODERATE
@@ -121,7 +130,6 @@ htmlEscape, DiscussionTopic, Assignment, $, preventDefault, MissingDateDialog) -
     getFormData: ->
       data = super
       data.title ||= I18n.t 'default_discussion_title', 'No Title'
-      data.delayed_post_at = '' unless data.delay_posting
       data.discussion_type = if data.threaded then 'threaded' else 'side_comment'
       data.podcast_has_student_posts = false unless data.podcast_enabled
 
@@ -131,6 +139,8 @@ htmlEscape, DiscussionTopic, Assignment, $, preventDefault, MissingDateDialog) -
       if assign_data?.set_assignment
         data.set_assignment = true
         data.assignment = @updateAssignment(assign_data)
+        data.delayed_post_at = ''
+        data.lock_at = ''
       else
         # Announcements don't have assignments.
         # DiscussionTopics get a model created for them in their
@@ -211,3 +221,9 @@ htmlEscape, DiscussionTopic, Assignment, $, preventDefault, MissingDateDialog) -
       # see getFormValues in DueDateView.coffee
       delete errors.assignmentOverrides
       super(errors)
+
+    toggleAvailabilityOptions: ->
+      if @$useForGrading.is(':checked')
+        @$availabilityOptions.hide()
+      else
+        @$availabilityOptions.show()

@@ -167,9 +167,13 @@
       <div class="discussion-section message_wrapper">
         <div data-bind="message" class="message user_content"><%= user_content(@topic.message) %></div>
 
-        <% if @topic.post_delayed? && @topic.delayed_post_at > Time.now %>
+        <% if @topic.post_delayed? %>
           <div class="discussion-fyi">
-            <%= t 'topic_locked', 'This topic will not be visible to users until *%{date}*', :date => datetime_string(@topic.delayed_post_at) %>
+            <% if @topic.is_a? Announcement %>
+              <%= t 'announcement_locked', 'This announcement will not be visible to users until *%{date}*', :date => datetime_string(@topic.delayed_post_at) %>
+            <% else %>
+              <%= t 'topic_locked', 'This topic will not be visible to users until *%{date}*', :date => datetime_string(@topic.delayed_post_at) %>
+            <% end %>
           </div>
         <% end %>
 

@@ -25,7 +25,7 @@ class DiscussionTopic < ActiveRecord::Base
   include TextHelper
   include ContextModuleItem
 
-  attr_accessible :title, :message, :user, :delayed_post_at, :assignment,
+  attr_accessible :title, :message, :user, :delayed_post_at, :lock_at, :assignment,
     :plaintext_message, :podcast_enabled, :podcast_has_student_posts,
     :require_initial_post, :threaded, :discussion_type, :context
 
@@ -64,11 +64,11 @@ class DiscussionTopic < ActiveRecord::Base
 
   before_create :initialize_last_reply_at
   before_save :default_values
-  before_save :set_schedule_delayed_post
+  before_save :set_schedule_delayed_transitions
   after_save :update_assignment
   after_save :update_subtopics
   after_save :touch_context
-  after_save :schedule_delayed_post
+  after_save :schedule_delayed_transitions
   after_create :create_participant
   after_create :create_materialized_view
 
@@ -103,13 +103,15 @@ class DiscussionTopic < ActiveRecord::Base
   end
   protected :default_values
 
-  def set_schedule_delayed_post
-    @should_schedule_delayed_post = self.delayed_post_at_changed?
+  def set_schedule_delayed_transitions
+    @should_schedule_delayed_post = self.delayed_post_at? && self.delayed_post_at_changed?
+    @should_schedule_lock_at = self.lock_at && self.lock_at_changed?
     true
   end
 
-  def schedule_delayed_post
-    self.send_at(self.delayed_post_at, :try_posting_delayed) if @should_schedule_delayed_post
+  def schedule_delayed_transitions
+    self.send_at(self.delayed_post_at, :auto_update_workflow) if @should_schedule_delayed_post
+    self.send_at(self.lock_at, :auto_update_workflow) if @should_schedule_lock_at
   end
 
   def update_subtopics
@@ -323,9 +325,33 @@ class DiscussionTopic < ActiveRecord::Base
 
   scope :by_position, order("discussion_topics.position DESC, discussion_topics.created_at DESC")
 
-  def try_posting_delayed
-    if self.post_delayed? && Time.now >= self.delayed_post_at
-      self.delayed_post
+  def auto_update_workflow
+    transition_to_workflow_state(desired_workflow_state)
+  end
+
+  # Determine the desired workflow_state based on current values of delayed_post_at and lock_at
+  #
+  # 'delayed_post' if delayed_post_at < now
+  # 'locked' if lock_at is in the past
+  def desired_workflow_state(time_to_check = Time.now)
+    if self.delayed_post_at && time_to_check < self.delayed_post_at
+      'post_delayed'
+    elsif self.lock_at && self.lock_at < time_to_check
+      'locked'
+    else
+      'active'
+    end
+  end
+
+  # Attempts to make valid transitions to the desired workflow state.
+  # This can move it forward along delayed -> active -> locked, but not
+  # backward.
+  def transition_to_workflow_state(desired_state)
+    if desired_state != 'post_delayed'
+       self.delayed_post
+     end
+    if desired_state == 'locked'
+      self.lock
     end
   end
 
@@ -337,7 +363,6 @@ class DiscussionTopic < ActiveRecord::Base
     end
     state :post_delayed do
       event :delayed_post, :transitions_to => :active do
-        @delayed_just_posted = true
         self.last_reply_at = Time.now
         self.posted_at = Time.now
       end
@@ -372,7 +397,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   on_update_send_to_streams do
-    if should_send_to_stream && (@delayed_just_posted || @content_changed || changed_state(:active, :post_delayed))
+    if should_send_to_stream && (@content_changed || changed_state(:active, :post_delayed))
       self.active_participants
     end
   end
@@ -651,6 +676,8 @@ class DiscussionTopic < ActiveRecord::Base
       locked = false
       if (self.delayed_post_at && self.delayed_post_at > Time.now)
         locked = {:asset_string => self.asset_string, :unlock_at => self.delayed_post_at}
+      elsif (self.lock_at && self.lock_at < Time.now)
+        locked = true
       elsif (self.assignment && l = self.assignment.locked_for?(user, opts))
         locked = l
       elsif self.could_be_locked && item = locked_by_module_item?(user, opts[:deep_check_if_needed])

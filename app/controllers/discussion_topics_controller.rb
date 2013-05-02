@@ -60,6 +60,9 @@
 #        // The datetime to publish the topic (if not right away).
 #        "delayed_post_at":null,
 #
+#        // The datetime to lock the topic (if ever).
+#        "lock_at":null,
+#
 #        // whether or not this is locked for students to see.
 #        "locked":false,
 #
@@ -283,6 +286,7 @@ class DiscussionTopicsController < ApplicationController
   # @argument discussion_type
   #
   # @argument delayed_post_at If a timestamp is given, the topic will not be published until that time.
+  # @argument lock_at If a timestamp is given, the topic will be scheduled to lock at the provided timestamp. If the timestamp is in the past, the topic will be locked.
   #
   # @argument podcast_enabled If true, the topic will have an associated podcast feed.
   # @argument podcast_has_student_posts If true, the podcast will include posts from students as well. Implies podcast_enabled.
@@ -383,7 +387,7 @@ class DiscussionTopicsController < ApplicationController
     end
   end
 
-  API_ALLOWED_TOPIC_FIELDS = %w(title message discussion_type delayed_post_at podcast_enabled
+  API_ALLOWED_TOPIC_FIELDS = %w(title message discussion_type delayed_post_at lock_at podcast_enabled
                                 podcast_has_student_posts require_initial_post is_announcement)
   def process_discussion_topic(is_new = false)
     discussion_topic_hash = params.slice(*API_ALLOWED_TOPIC_FIELDS)
@@ -407,26 +411,29 @@ class DiscussionTopicsController < ApplicationController
       @topic.current_user = @current_user
       @topic.content_being_saved_by(@current_user)
 
-      # handle delayed posting
-      if discussion_topic_hash.has_key? :delayed_post_at
-        @topic.delayed_post_at = discussion_topic_hash[:delayed_post_at]
-        @topic.delayed_post_at = "" if @topic.delayed_post_at && @topic.delayed_post_at < Time.now
-        @topic.workflow_state = 'post_delayed' if @topic.delayed_post_at
-        @topic.workflow_state = 'active' if @topic.post_delayed? && !@topic.delayed_post_at
-      end
-
       if discussion_topic_hash.has_key?(:message)
         discussion_topic_hash[:message] = process_incoming_html_content(discussion_topic_hash[:message])
       end
 
-       #handle locking/unlocking
-       if (params.has_key?(:locked) && !params[:locked].is_a?(Hash))
-         if value_to_boolean(params[:locked])
-           @topic.lock
-         else
-           @topic.unlock
-         end
-       end
+      # Set the delayed_post_at and lock_at if provided. This will be used to determine if the values have changed
+      # in order to know if we should rely on this data to update the workflow state
+      @topic.delayed_post_at = discussion_topic_hash[:delayed_post_at] if params.has_key? :delayed_post_at
+      @topic.lock_at = discussion_topic_hash[:lock_at] if params.has_key? :lock_at
+
+      if @topic.delayed_post_at_changed? || @topic.lock_at_changed?
+        @topic.workflow_state = @topic.desired_workflow_state
+      
+      # Handle locking/unlocking (overrides workflow state if provided). It appears that the locked param as a hash
+      # is from old code and is not being used. Verification requested.
+      elsif params.has_key?(:locked) && !params[:locked].is_a?(Hash)
+        @topic.delayed_post_at = ''
+        @topic.lock_at = ''
+        if value_to_boolean(params[:locked])
+          @topic.lock
+        else
+          @topic.unlock
+        end
+      end
 
       if @topic.update_attributes(discussion_topic_hash)
         log_asset_access(@topic, 'topics', 'topics', 'participate')

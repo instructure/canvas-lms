@@ -421,7 +421,6 @@ describe "discussions" do
           wait_for_ajaximations
 
           f('input[type=checkbox][name=threaded]')[:checked].should == checkbox_state
-          f('input[type=checkbox][name=delay_posting]')[:checked].should == checkbox_state
           f('input[type=checkbox][name=require_initial_post]')[:checked].should == checkbox_state
           f('input[type=checkbox][name=podcast_enabled]')[:checked].should == checkbox_state
           f('input[type=checkbox][name=podcast_has_student_posts]')[:checked].should == checkbox_state
@@ -430,7 +429,6 @@ describe "discussions" do
 
         def toggle(state)
           f('input[type=checkbox][name=threaded]').click
-          f('input[type=checkbox][name=delay_posting]').click
           set_value f('input[name=delayed_post_at]'), 2.weeks.from_now.strftime('%m/%d/%Y') if state == :on
           f('input[type=checkbox][name=require_initial_post]').click
           f('input[type=checkbox][name=podcast_enabled]').click
@@ -565,6 +563,122 @@ describe "discussions" do
           errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
           visBoxes, hidBoxes = errorBoxes.partition { |eb| eb.displayed? }
           visBoxes.first.text.should == "Please select a group set for this assignment"
+        end
+      end
+
+      context "locking" do
+        before do
+          @topic = @course.discussion_topics.build(:title => "topic", :user => @user)
+          @topic.save!
+        end
+
+        it "should set as active when removing existing delayed_post_at and lock_at dates" do
+          @topic.delayed_post_at = 10.days.ago
+          @topic.lock_at         = 5.days.ago
+          @topic.workflow_state  = 'locked'
+          @topic.save!
+
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+          wait_for_ajaximations
+
+          f('input[type=text][name="delayed_post_at"]').clear
+          f('input[type=text][name="lock_at"]').clear
+
+          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          wait_for_ajaximations
+
+          @topic.reload
+          @topic.delayed_post_at.should be_nil
+          @topic.lock_at.should be_nil
+          @topic.active?.should be_true
+        end
+
+        it "should clear the delayed_post_at and lock_at when manually triggering unlock" do
+          @topic.delayed_post_at = 10.days.ago
+          @topic.lock_at         = 5.days.ago
+          @topic.workflow_state  = 'locked'
+          @topic.save!
+
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+          wait_for_ajaximations
+
+          f("#discussion-toolbar .al-trigger").click
+          expect_new_page_load { f("#ui-id-3").click }
+
+          @topic.reload
+          @topic.delayed_post_at.should be_nil
+          @topic.lock_at.should be_nil
+          @topic.active?.should be_true
+        end
+
+        it "should set workflow to locked when delayed_post_at and lock_at are in past" do
+          @topic.delayed_post_at = nil
+          @topic.lock_at         = nil
+          @topic.workflow_state  = 'active'
+          @topic.save!
+
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+          wait_for_ajaximations
+
+          delayed_post_at = Time.zone.now - 10.days
+          lock_at = Time.zone.now - 5.days
+          date_format = '%b %-d, %Y'
+
+          f('input[type=text][name="delayed_post_at"]').send_keys(delayed_post_at.strftime(date_format))
+          f('input[type=text][name="lock_at"]').send_keys(lock_at.strftime(date_format))
+
+          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          wait_for_ajaximations
+
+          @topic.reload
+          @topic.delayed_post_at.strftime(date_format).should == delayed_post_at.strftime(date_format)
+          @topic.lock_at.strftime(date_format).should == lock_at.strftime(date_format)
+          @topic.locked?.should be_true
+        end
+
+        it "should set workflow to post_delayed when delayed_post_at and lock_at are in the future" do
+          @topic.delayed_post_at = nil
+          @topic.lock_at         = nil
+          @topic.workflow_state  = 'active'
+          @topic.save!
+
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+          wait_for_ajaximations
+
+          delayed_post_at = Time.zone.now + 5.days
+          date_format = '%b %-d, %Y'
+
+          f('input[type=text][name="delayed_post_at"]').send_keys(delayed_post_at.strftime(date_format))
+
+          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          wait_for_ajaximations
+
+          @topic.reload
+          @topic.delayed_post_at.strftime(date_format).should == delayed_post_at.strftime(date_format)
+          @topic.post_delayed?.should be_true
+        end
+
+        it "should set workflow to active when delayed_post_at in past and lock_at in future" do
+          @topic.delayed_post_at = 5.days.from_now
+          @topic.lock_at         = 10.days.from_now
+          @topic.workflow_state  = 'locked'
+          @topic.save!
+
+          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+          wait_for_ajaximations
+
+          delayed_post_at = Time.zone.now - 5.days
+          date_format = '%b %-d, %Y'
+
+          f('input[type=text][name="delayed_post_at"]').clear
+          f('input[type=text][name="delayed_post_at"]').send_keys(delayed_post_at.strftime(date_format))
+
+          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          wait_for_ajaximations
+
+          @topic.reload
+          @topic.delayed_post_at.strftime(date_format).should == delayed_post_at.strftime(date_format)
+          @topic.active?.should be_true
         end
       end
     end

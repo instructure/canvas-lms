@@ -196,11 +196,16 @@ describe DiscussionTopic do
   end
 
   context "delayed posting" do
-    def delayed_discussion_topic(opts = {})
+    def discussion_topic(opts = {})
+      workflow_state = opts.delete(:workflow_state)
       @topic = @course.discussion_topics.build(opts)
-      @topic.workflow_state = 'post_delayed'
+      @topic.workflow_state = workflow_state if workflow_state
       @topic.save!
       @topic
+    end
+
+    def delayed_discussion_topic(opts = {})
+      discussion_topic({:workflow_state => 'post_delayed'}.merge(opts))
     end
 
     it "shouldn't send to streams on creation or update if it's delayed" do
@@ -229,6 +234,96 @@ describe DiscussionTopic do
       topic.workflow_state = 'active'
       topic.save!
       topic.stream_item.should_not be_nil
+    end
+
+     describe "#auto_update_workflow" do
+      before do
+        course_with_student(:active_all => true)
+        @user.register
+      end
+
+      it "should be active when delayed_post_at is in the past" do
+        topic = delayed_discussion_topic(:title => "title",
+                                         :message => "content here",
+                                         :delayed_post_at => Time.now - 1.day,
+                                         :lock_at => nil)
+          topic.auto_update_workflow
+          topic.workflow_state.should eql 'active'
+      end
+
+      it "should be post_delayed when delayed_post_at is in the future" do
+        topic = delayed_discussion_topic(:title => "title",
+                                         :message => "content here",
+                                         :delayed_post_at => Time.now + 1.day,
+                                         :lock_at => nil)
+        topic.auto_update_workflow
+        topic.workflow_state.should eql 'post_delayed'
+      end
+
+      it "should be locked when lock_at is in the past" do
+        topic = delayed_discussion_topic(:title => "title",
+                                         :message => "content here",
+                                         :delayed_post_at => nil,
+                                         :lock_at => Time.now - 1.day)
+        topic.auto_update_workflow
+        topic.workflow_state.should eql 'locked'
+      end
+
+      it "should be active when lock_at is in the future" do
+        topic = delayed_discussion_topic(:title => "title",
+                                         :message => "content here",
+                                         :delayed_post_at => nil,
+                                         :lock_at => Time.now + 1.day)
+        topic.auto_update_workflow
+        topic.workflow_state.should eql 'active'
+      end
+
+      it "should be active when now is between delayed_post_at and lock_at" do
+        topic = delayed_discussion_topic(:title => "title",
+                                         :message => "content here",
+                                         :delayed_post_at => Time.now - 1.day,
+                                         :lock_at => Time.now + 1.day)
+        topic.auto_update_workflow
+        topic.workflow_state.should eql 'active'
+      end
+
+      it "should be post_delayed when delayed_post_at and lock_at are in the future" do
+        topic = delayed_discussion_topic(:title           => "title",
+                                         :message         => "content here",
+                                         :delayed_post_at => Time.now + 1.day,
+                                         :lock_at         => Time.now + 3.days)
+        topic.auto_update_workflow
+        topic.workflow_state.should eql 'post_delayed'
+      end
+
+      it "should be locked when delayed_post_at and lock_at are in the past" do
+        topic = delayed_discussion_topic(:title           => "title",
+                                         :message         => "content here",
+                                         :delayed_post_at => Time.now - 3.days,
+                                         :lock_at         => Time.now - 1.day)
+        topic.auto_update_workflow
+        topic.workflow_state.should eql 'locked'
+      end
+
+      it "should not unlock a topic even if the lock date is in the future" do
+        topic = discussion_topic(:title           => "title",
+                                 :message         => "content here",
+                                 :workflow_state  => 'locked',
+                                 :delayed_post_at => nil,
+                                 :lock_at         => Time.now + 1.day)
+        topic.auto_update_workflow
+        topic.workflow_state.should eql 'locked'
+      end
+
+      it "should not mark a topic with post_delayed even if delayed_post_at even is in the future" do
+        topic = discussion_topic(:title           => "title",
+                                 :message         => "content here",
+                                 :workflow_state  => 'active',
+                                 :delayed_post_at => Time.now + 1.day,
+                                 :lock_at         => nil)
+        topic.auto_update_workflow
+        topic.workflow_state.should eql 'active'
+      end
     end
   end
 

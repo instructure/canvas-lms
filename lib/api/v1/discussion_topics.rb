@@ -45,7 +45,7 @@ module Api::V1::DiscussionTopics
     children = topic.child_topics.pluck(:id)
 
     api_json(topic, user, session, {
-                  :only => %w(id title assignment_id delayed_post_at last_reply_at posted_at root_topic_id podcast_has_student_posts),
+                  :only => %w(id title assignment_id delayed_post_at lock_at last_reply_at posted_at root_topic_id podcast_has_student_posts),
                   :methods => [:user_name, :discussion_subentry_count], }, [:attach, :update, :delete]
     ).tap do |json|
       json.merge! :message => api_user_content(topic.message, context),
