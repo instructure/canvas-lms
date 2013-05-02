@@ -428,6 +428,14 @@ ul.messages {
       top: 14px;
       left: 14px;
     }
+    .send_private_message { opacity: 0; }
+    .send_private_message:focus { opacity: 1; }
+    &:hover {
+      .send_private_message { opacity: 1; }
+    }
+    &.self {
+      .send_private_message { display: none; }
+    }
   }
   .date {
     margin-right: -40px;
