@@ -260,12 +260,6 @@
     <% end %>
   <% end %>
 
-  <% if @quiz.available? %>
-    <% if can_do(@quiz, @current_user, :grade) %>
-      <%= render :partial => "shared/message_students" %>
-    <% end %>   
-  <% end %>
-
   <% if @quiz.cant_go_back? %>
     <%= render 'cant_go_back_warning' %>
   <% end %>

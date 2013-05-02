@@ -1,6 +1,24 @@
 .message-students-dialog {
   textarea {
-    width: 95%;
+    box-sizing: border-box;
+    width: 100%;
     height: 200px;
   }
+}
+#message-recipients {
+  margin-bottom: 10px;
+  max-height: 100px;
+  overflow: auto;
+}
+.message-recipients-group-container {
+  line-height: 30px;
+  label {
+    font-weight: bold;
+    margin-bottom: 0;
+  }
+  margin-bottom: 10px;
+}
+#message-recipients-group {
+  width: auto;
+  margin-bottom: 0;
 }
