@@ -23,18 +23,18 @@ class ApiController < ApplicationController
     account_id = Account.find_by_name('Simon Fraser University').id
     sfu_id = params[:sfu_id]
     pseudonym = Pseudonym.where(:unique_id => sfu_id, :account_id => account_id).all
-    if pseudonym.empty?
-      raise(ActiveRecord::RecordNotFound)
-    end
+    
+    raise(ActiveRecord::RecordNotFound) if pseudonym.empty?
+    
     user_hash = {}
     unless pseudonym.empty?
       user = User.find pseudonym.first.user_id
       if params[:property].nil?
         if user.nil?
-	  user_hash["exists"] = "false" 
-	else
-	  user_hash["exists"] = "true"
-	end
+	        raise(ActiveRecord::RecordNotFound)
+	      else
+	        user_hash["exists"] = "true"
+	      end
       elsif params[:property].eql? "profile"
         user_hash["id"] = user.id
         user_hash["name"] = user.name

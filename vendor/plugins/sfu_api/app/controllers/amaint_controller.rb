@@ -7,6 +7,8 @@ class AmaintController < ApplicationController
   def course_info
     course_hash = amaint_course_info(params[:sis_id], params[:property])
 
+    raise(ActiveRecord::RecordNotFound) if course_hash.empty?
+
     respond_to do |format|
       format.json { render :json => course_hash }
     end
@@ -15,12 +17,16 @@ class AmaintController < ApplicationController
   def user_info
     user_array =[] 
     if params[:property].nil?
-        user_hash = {}
-	user_hash["sfu_id"] = params[:sfu_id]	
-	user_array << user_hash 
-    elsif params[:property].to_s.eql? "terms"
-	user_array = courses_for_user(params[:sfu_id], params[:filter])
+      user_hash = {}
+	    user_hash["sfu_id"] = params[:sfu_id]	
+	    user_array << user_hash 
+    elsif params[:filter].nil?
+      user_array = teaching_terms_for params[:sfu_id]  
+    elsif params[:property].to_s.eql? "term"
+	    user_array = courses_for_user(params[:sfu_id], params[:filter])
     end
+
+    raise(ActiveRecord::RecordNotFound) if user_array.empty?
 
     respond_to do |format|
       format.json { render :json => user_array }
