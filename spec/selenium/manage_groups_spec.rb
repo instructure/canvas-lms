@@ -171,6 +171,29 @@ describe "manage groups" do
     f('#no_students_message').should be_nil
   end
 
+  it "should let you message students not in a group" do
+    groups_student_enrollment 3
+    group_category1 = @course.group_categories.create(:name => "Project Groups")
+    group_category2 = @course.group_categories.create(:name => "Self Signup Groups")
+    group_category2.configure_self_signup(true, false)
+    group_category2.save
+    get "/courses/#{@course.id}/groups"
+    wait_for_ajaximations
+
+    ff(".group_category").size.should == 3
+    keep_trying_until { !f("#category_#{group_category1.id} .right_side .loading_members").displayed? }
+    f('.group_category .student_links').should be_displayed
+    f('.group_category .message_students_link').should_not be_displayed # only self signup can do it
+    ff('.ui-tabs-anchor')[1].click
+
+    keep_trying_until { !f("#category_#{group_category2.id} .right_side .loading_members").displayed? }
+    message_students_link =  ff('.group_category .message_students_link')[1]
+    message_students_link.should be_displayed
+    message_students_link.click
+
+    keep_trying_until{ f('.message-students-dialog').should be_displayed }
+  end
+
   context "data validation" do
     before (:each) do
       student_in_course

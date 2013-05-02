@@ -62,11 +62,15 @@
           <h3 class="name blank_name"><%= t :group_category_unassigned, "Unassigned" %></h3>
         <% end %>
         <% unless @context.is_a?(Account) || protected_category %>
-          <a href="#" class="assign_students_link no-hover"
-            title="<%= t :random_distribution_explanation, "Distribute Unassigned Students Equally Among Groups" %>"
-            style="<%= hidden if category && category.restricted_self_signup? %>">
-            <%= t :randomly_distribute_students, "randomly assign students" %>
-          </a>
+          <span class="student_links">
+            <a href="#" class="assign_students_link no-hover"
+              title="<%= t :random_distribution_explanation, "Distribute Unassigned Students Equally Among Groups" %>"
+              style="<%= hidden if !category || category.restricted_self_signup? %>">
+              <%= t :randomly_distribute_students, "randomly assign students" %>
+            </a>
+            <span style="<%= hidden if !category || !category.self_signup? || category.restricted_self_signup? %>" class="students_link_separator"> | </span>
+            <a href="#" style="<%= hidden if !category || !category.self_signup? %>" class="message_students_link"><%= t "message_students", "message students..." %></a>
+          </span>
         <% end %>
         <div style="display: none;">
           <span class="category_name">&nbsp;</span>

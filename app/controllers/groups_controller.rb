@@ -116,24 +116,28 @@ class GroupsController < ApplicationController
     category = @context.group_categories.find_by_id(params[:category_id])
     return render :json => {}, :status => :not_found unless category
     page = (params[:page] || 1).to_i rescue 1
+    per_page = [[(params[:per_page] || 15).to_i, 1].max, 100].min
     if category && !category.student_organized?
       groups = category.groups.active
     else
       groups = []
     end
-    users = @context.paginate_users_not_in_groups(groups, page)
+    users = @context.paginate_users_not_in_groups(groups, page, per_page)
 
     if authorized_action(@context, @current_user, :manage)
       respond_to do |format|
-        format.json { render :json => {
-          :pages => users.total_pages,
-          :current_page => users.current_page,
-          :next_page => users.next_page,
-          :previous_page => users.previous_page,
-          :total_entries => users.total_entries,
-          :pagination_html => render_to_string(:partial => 'user_pagination', :locals => { :users => users }),
-          :users => users.map { |u| u.group_member_json(@context) }
-        } }
+        format.json {
+          json = {
+            :pages => users.total_pages,
+            :current_page => users.current_page,
+            :next_page => users.next_page,
+            :previous_page => users.previous_page,
+            :total_entries => users.total_entries,
+            :users => users.map { |u| u.group_member_json(@context) }
+          }
+          json[:pagination_html] = render_to_string(:partial => 'user_pagination', :locals => { :users => users }) unless params[:no_html]
+          render :json => json
+        }
       end
     end
   end
