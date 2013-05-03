@@ -61,7 +61,6 @@ gem 'rake',           '10.0.4'
 gem 'rdoc',           '3.12'
 gem 'ratom-instructure', '0.6.9', :require => "atom" # custom gem until necessary changes are merged into mainstream
 gem 'rdiscount',      '1.6.8'
-gem 'require_relative', '1.0.1'
 gem 'ritex',          '1.0.1'
 gem 'rotp',           '1.4.1'
 gem 'rqrcode',        '0.4.2'
