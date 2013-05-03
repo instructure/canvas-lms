@@ -2523,7 +2523,7 @@ class Course < ActiveRecord::Base
   memoize :section_visibilities_for
 
   def visibility_limited_to_course_sections?(user, visibilities = section_visibilities_for(user))
-    !visibilities.any?{|s| !s[:limit_privileges_to_course_section] }
+    visibilities.all?{|s| s[:limit_privileges_to_course_section] }
   end
 
   # returns a scope, not an array of users/enrollments

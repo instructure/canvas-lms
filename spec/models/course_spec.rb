@@ -3512,4 +3512,27 @@ describe Course do
     Course.deleted.count.should == 1
   end
 
+  describe "visibility_limited_to_course_sections?" do
+    before do
+      course
+      @limited = { :limit_privileges_to_course_section => true }
+      @full = { :limit_privileges_to_course_section => false }
+    end
+
+    it "should be true if all visibilities are limited" do
+      @course.visibility_limited_to_course_sections?(nil, [@limited, @limited]).should be_true
+    end
+
+    it "should be false if only some visibilities are limited" do
+      @course.visibility_limited_to_course_sections?(nil, [@limited, @full]).should be_false
+    end
+
+    it "should be false if no visibilities are limited" do
+      @course.visibility_limited_to_course_sections?(nil, [@full, @full]).should be_false
+    end
+
+    it "should be true if no visibilities are given" do
+      @course.visibility_limited_to_course_sections?(nil, []).should be_true
+    end
+  end
 end
