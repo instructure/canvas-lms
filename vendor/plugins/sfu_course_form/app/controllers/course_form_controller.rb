@@ -7,7 +7,8 @@ class CourseFormController < ApplicationController
     @sfuid = @user.pseudonym.unique_id
     @sfuid.slice! "@sfu.ca"
     @course_list = Array.new
-    @terms = Account.find_by_name('Simon Fraser University').enrollment_terms.delete_if {|t| t.name == 'Default Term'}
+    @terms = Account.find_by_name('Simon Fraser University').enrollment_terms.find(:all, :conditions => "workflow_state = 'active'", :order => 'sis_source_id DESC').delete_if {|t| t.name == 'Default Term'}
+    @current_term = current_term
     if SFU::User.student_only? @sfuid
       flash[:error] = "You don't have permission to access that page"
       redirect_to dashboard_url
@@ -178,6 +179,10 @@ class CourseFormController < ApplicationController
   def sis_user_id(username, account_id)
     user = Pseudonym.find_by_unique_id_and_account_id(username, account_id)
     user.sis_user_id unless user.nil?
+  end
+
+  def current_term
+    EnrollmentTerm.find(:all, :conditions => ["workflow_state = 'active' AND (:date BETWEEN start_at AND end_at)", {:date => Date.today}]).first
   end
 
 end

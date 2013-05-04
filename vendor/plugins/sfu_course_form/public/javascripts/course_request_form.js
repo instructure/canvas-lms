@@ -4,6 +4,10 @@
 (function() {
     define(['jquery', 'vendor/spin'], function() {
         return function() {
+
+            var sep = ":::";
+            var sep2 = ":_:";
+
             var spinnerOpts = {
                 lines: 13, // The number of lines to draw
                 length: 6, // The length of each line
@@ -51,6 +55,13 @@
                     }
                 });
 
+                $('#course_search_list').on('click', 'input[type="checkbox"]', function() {
+                    enable_submit_crosslist();
+                    if (this.id.indexOf('sandbox') === -1) {
+                        cross_list_course_title();
+                    }
+                });
+
                 $('.new_course_container').on('click', '#cross_list', function() {
                     cross_list_course_title();
                 });
@@ -62,15 +73,10 @@
                     $("#course_list").spin(spinnerOpts);
 
                     $.ajax({
-                        url: "/sfu/api/user/" + sfu_id,
+                        url: "/sfu/api/v1/amaint/user/" + sfu_id,
                         dataType: "json",
                         success: function(data) {
-                          //if (data.id !== null && data.id !== undefined){
-                            if (data.id > 0){
-                                course_list(sfu_id);
-                            } else {
-                                $("#course_list").html("<h5>Invalid SFU Computing ID</h5>");
-                            }
+                            course_list(sfu_id);
                         },
                         error: function(xhr) {
                             var statusCode = xhr.status;
@@ -89,6 +95,45 @@
                         $('#update_course_list').trigger('click')
                     }
                 });
+
+                $( "#course_search" ).autocomplete({
+                    source: function ( request, response ) {
+                        var search = $( "#course_search" ).val();
+                        var term_select = $( "#term_select" ).val();
+                        var search_url = "/sfu/api/v1/course-data/"+ term_select +"/"+ search;
+                        $.ajax({
+                            url: search_url,
+                            dataType: "json",
+                            success: function(data) {
+                                response ( $.map( data, function( item ) {
+                                    var course_info = item.split( sep2 );
+                                    return {
+                                        label: course_info[1],
+                                        value: course_info[0]
+                                    }
+                                }));
+                            },
+                            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                                console.log( "Error getting course list: " + errorThrown );
+                            }
+                        });
+                    },
+                    focus: function ( event, ui ) {
+                        $( "#course_search" ).val( ui.item.label );
+                        return false;
+                    },
+                    minLength: 3,
+                    select: function ( event, ui ) {
+                        add_course(ui.item.value, ui.item.label);
+			return false;
+                    } //select end
+                }); //autocomplete end
+
+                $("#term_select").change(function() {
+                    // When changing the term, clear the search field
+                    $("#course_search").val("");
+                });
+
                 $("#enroll_me_div").hide();
                 $("#course_list").html("<h5>Retrieving course list...</h5>").spin(spinnerOpts);
                 course_list();
@@ -99,7 +144,7 @@
                 var sfu_id = $("#username").val();
 
                 $.ajax({
-                    url: "/sfu/api/user/" + sfu_id + "/terms",
+                    url: "/sfu/api/v1/amaint/user/" + sfu_id + "/term",
                     dataType: "json",
                     success: function(data) {
                         $("#course_list").html("");
@@ -113,7 +158,7 @@
                     error: function(xhr) {
                         var statusCode = xhr.status;
                         if (statusCode === 404) {
-                            $("#course_list").html("<h5>Invalid SFU Computing ID</h5>");
+                            $("#course_list").html("<h5>No courses found</h5>");
                         } else {
                             $("#course_list").html("<h5>An unknown error occurred</h5>");
                         }
@@ -124,7 +169,7 @@
             function courses_for_terms(sfu_id, term) {
                 $("#" + term + "_courses").spin(spinnerOpts);
                 $.ajax({
-                    url: "/sfu/api/courses/teaching/" + sfu_id + "/" + term,
+                    url: "/sfu/api/v1/amaint/user/" + sfu_id + "/term/" + term,
                     dataType: 'json',
                     success: function(data) {
                         var num = 1;
@@ -133,7 +178,7 @@
                             var section_tutorials = course.sectionTutorials;
                             var course_display = course.name + course.number + " - " + course.section + " " + course.title;
                             if (section_tutorials) {
-                                course_display += "<br><label> (Includes section tutorials: " + section_tutorials  + ") </label>";
+                                course_display += "<label> (Includes section tutorials: " + section_tutorials  + ") </label>";
                             }
                             var course_value = course.key;
                             var checkbox_html = '<label class="checkbox"><input type="checkbox" name="selected_course_'+ num +'_'+ term +'" id="selected_course_'+ num +'_'+ term +'" value="'+ course_value + '">' + course_display +'</label>';
@@ -141,7 +186,14 @@
                             num++;
                         });
                     },
-                    error: function() {  /* TODO: do something useful here */ }
+                    error: function(xhr) {
+                        var statusCode = xhr.status;
+                        if (statusCode === 404) {
+                            $("#"+term+"_courses").html("<h5>No courses found</h5>");
+                        } else {
+                            $("#course_list").html("<h5>An unknown error occurred</h5>");
+                        }
+                    }
                 });
             }
 
@@ -235,6 +287,91 @@
                 var dateString = (now.getMonth()+1).toString() + now.getDate().toString() + (now.getYear()-100).toString() + (now.getTime()).toString().substr(10);
                 return dateString;
             }
+
+            // Functions below for course search form //
+            function add_course(course_value, course_display){
+                var term_select = $("#term_select").val();
+                var secs = new Date().getTime();
+                var info = course_display.split(" - ");
+                var course_id = course_value + sep + info[1];
+                var tutorials = "";
+                var tutorial_text_display = "";
+                var disabled = "";
+                var course_exists_text = "";
+                info = course_value.split(":::");
+                var section = info[3];
+                if (section.indexOf("00") > 0) {
+                    tutorials = section_tutorials(course_id);
+                    if (tutorials) {
+                        tutorial_text_display = "<br><label> (Includes section tutorials:" + tutorials +") </label>";
+                        tutorials = sep + tutorials.replace(/\s+/g,"").toLowerCase();
+                    }
+                }
+                if (course_exists(course_id)){
+                    disabled = "disabled";
+		    course_exists_text = "<label class=\"error_text\"><strong>This course already exists on Canvas, and cannot be added again.</strong></label>";
+                }
+                var checkbox_html = '<label class="checkbox"><input type="checkbox" name="selected_course_manual_'+ secs +'_'+ term_select +'" id="selected_course_manual_'+ secs +'_'+ term_select +'" value="'+ course_id + tutorials +'" '+ disabled +' >' + course_display + term_display(term_select) + course_exists_text + tutorial_text_display +'</label>';
+
+                $("#course_search_list").append(checkbox_html);
+                $('#course_search').val("");
+            }
+
+            function section_tutorials(course_id){
+                var url = "/sfu/api/v1/amaint/course/"+ course_id +"/sectionTutorials";
+                var tutorials;
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    async: false,
+                    contentType: "application/json",
+                    dataType: "json",
+                    success: function (data) {
+                        tutorials = data.sectionTutorials;
+                    },
+                    error: function (e) {
+                        console.log("No section tutorials found for " + course_id);
+                    }
+                });
+                return tutorials;
+            }
+
+            function course_exists(course_id){
+                var course_info = course_id.split(":::");
+                var sis_id = course_info[0] +"-"+ course_info[1] +"-"+ course_info[2] +"-"+ course_info[3];
+                var url = "/sfu/api/v1/course/"+ sis_id;
+                var exists = false;
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    async: false,
+                    contentType: "application/json",
+                    dataType: "json",
+                    success: function (data) {
+                        exists = true;
+                    },
+                    error: function (e) {
+                        exists = false;
+                        console.log("Course doesn't exist: " + sis_id);
+                    }
+                });
+                return exists;
+            }
+
+            function term_display(term_code) {
+                var year = Number(term_code.substr(0,3)) + Number(1900);
+                var term = "";
+                if (term_code.substr(3) == 1) {
+                    term = "Spring";
+                } else if (term_code.substr(3) == 4) {
+                    term = "Summer";
+                } else if (term_code.substr(3) == 7) {
+                    term = "Fall";
+                }
+                return " ("+ term +" "+ year +")";
+            }
+
+
         };
     });
 })();
