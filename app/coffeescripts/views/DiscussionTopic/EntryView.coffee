@@ -142,7 +142,7 @@ define [
       super
       @collapse() if @options.collapsed
       @setToggleTooltip()
-      if @model.get('read_state') is 'unread' and !@model.get('forced_read_state')
+      if @model.get('read_state') is 'unread' and !@model.get('forced_read_state') and !ENV.DISCUSSION.MANUAL_MARK_AS_READ
         @readMarker ?= new MarkAsReadWatcher this
         # this is throttled so calling it here is okay
         MarkAsReadWatcher.checkForVisibleEntries()

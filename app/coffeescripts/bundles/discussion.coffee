@@ -116,7 +116,7 @@ require [
     topicView.on 'addReply', (entry) ->
       entries.add entry
       router.navigate "entry-#{entry.get 'id'}", yes
-    MarkAsReadWatcher.init()
+    MarkAsReadWatcher.init() unless ENV.DISCUSSION.MANUAL_MARK_AS_READ
 
   topicView.render()
   toolbarView.render()

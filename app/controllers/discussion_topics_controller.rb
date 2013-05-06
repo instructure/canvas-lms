@@ -123,13 +123,14 @@ class DiscussionTopicsController < ApplicationController
         format.html do
           @active_tab = "discussions"
           add_crumb t('#crumbs.discussions', "Discussions"), named_context_url(@context, :context_discussion_topics_url)
-          js_env :permissions => {
-            :create => @context.discussion_topics.new.grants_right?(@current_user, session, :create),
-            :moderate => @context.grants_right?(@current_user, session, :moderate_forum),
-            :change_settings => user_can_edit_course_settings?
-          }
+          js_env :USER_SETTINGS_URL => api_v1_user_settings_url(@current_user),
+                 :permissions => {
+                   :create => @context.discussion_topics.new.grants_right?(@current_user, session, :create),
+                   :moderate => @context.grants_right?(@current_user, session, :moderate_forum),
+                   :change_settings => user_can_edit_course_settings?
+                 }
           if user_can_edit_course_settings?
-            js_env :SETTINGS_URL => named_context_url(@context, :api_v1_context_settings_url) #named_context_url( "/api/v1/courses/#{@context.id}/settings"
+            js_env :SETTINGS_URL => named_context_url(@context, :api_v1_context_settings_url)
           end
         end
         format.json do
@@ -259,6 +260,7 @@ class DiscussionTopicsController < ApplicationController
               :UPDATE_URL => named_context_url(@context, :api_v1_context_discussion_update_reply_url, @topic, ':id'),
               :MARK_READ_URL => named_context_url(@context, :api_v1_context_discussion_topic_discussion_entry_mark_read_url, @topic, ':id'),
               :MARK_UNREAD_URL => named_context_url(@context, :api_v1_context_discussion_topic_discussion_entry_mark_unread_url, @topic, ':id'),
+              :MANUAL_MARK_AS_READ => @current_user.manual_mark_as_read?,
               :CURRENT_USER => user_display_json(@current_user),
               :INITIAL_POST_REQUIRED => @initial_post_required,
               :THREADED => @topic.threaded?

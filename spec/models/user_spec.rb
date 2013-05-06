@@ -2142,6 +2142,25 @@ describe User do
     end
   end
 
+  describe "manual_mark_as_read" do
+    let(:user) { User.new }
+    subject { user.manual_mark_as_read? }
+
+    context 'default' do
+      it { should be_false }
+    end
+
+    context 'after being set to true' do
+      before { user.stubs(preferences: { manual_mark_as_read: true }) }
+      it     { should be_true }
+    end
+
+    context 'after being set to false' do
+      before { user.stubs(preferences: { manual_mark_as_read: false }) }
+      it     { should be_false }
+    end
+  end
+
   describe "things excluded from json serialization" do
     it "excludes collkey" do
       # Ruby 1.9 does not like html that includes the collkey, so

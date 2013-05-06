@@ -850,6 +850,9 @@ ActionController::Routing::Routes.draw do |map|
 
       users.post 'users/:user_id/folders', :controller => :folders, :action => :create
       users.get 'users/:user_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'user_folder'
+
+      users.get 'users/:id/settings', controller: 'users', action: 'settings'
+      users.put 'users/:id/settings', controller: 'users', action: 'settings', path_name: 'user_settings'
     end
 
     api.with_options(:controller => :pseudonyms) do |pseudonyms|

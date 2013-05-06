@@ -1279,7 +1279,6 @@ class User < ActiveRecord::Base
     preferences[:send_scores_in_emails] == true
   end
 
-
   def close_announcement(announcement)
     preferences[:closed_notifications] ||= []
     # serialize ids relative to the user
@@ -1288,6 +1287,10 @@ class User < ActiveRecord::Base
     end
     preferences[:closed_notifications].uniq!
     save
+  end
+
+  def manual_mark_as_read?
+    !!preferences[:manual_mark_as_read]
   end
 
   def ignore_item!(asset, purpose, permanent = false)

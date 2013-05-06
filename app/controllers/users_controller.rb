@@ -85,9 +85,14 @@ class UsersController < ApplicationController
   include LinkedIn
   include DeliciousDiigo
   include SearchHelper
-  before_filter :require_user, :only => [:grades, :merge, :kaltura_session, :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image, :user_dashboard, :toggle_dashboard, :masquerade, :external_tool, :dashboard_sidebar]
-  before_filter :require_registered_user, :only => [:delete_user_service, :create_user_service]
-  before_filter :reject_student_view_student, :only => [:delete_user_service, :create_user_service, :merge, :user_dashboard, :masquerade]
+  before_filter :require_user, :only => [:grades, :merge, :kaltura_session,
+    :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image,
+    :user_dashboard, :toggle_dashboard, :masquerade, :external_tool,
+    :dashboard_sidebar, :settings]
+  before_filter :require_registered_user, :only => [:delete_user_service,
+    :create_user_service]
+  before_filter :reject_student_view_student, :only => [:delete_user_service,
+    :create_user_service, :merge, :user_dashboard, :masquerade]
   before_filter :require_self_registration, :only => [:new, :create]
 
   def grades
@@ -844,6 +849,43 @@ class UsersController < ApplicationController
         }
       }
       render :json => errors, :status => :bad_request
+    end
+  end
+
+  # @API Update user settings.
+  # Update an existing user's settings.
+  #
+  # @argument manual_mark_as_read If true, require user to manually mark discussion posts as read (don't auto-mark as read).
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/users/<user_id>/settings \ 
+  #     -X PUT \ 
+  #     -F 'manual_mark_as_read=true'
+  #     -H 'Authorization: Bearer <token>'
+  def settings
+    user = api_find(User, params[:id])
+
+    case request.request_method
+    when :get
+      return unless authorized_action(user, @current_user, :read)
+      render(json: { manual_mark_as_read: @current_user.manual_mark_as_read? })
+    when :put
+      return unless authorized_action(user, @current_user, [:manage, :manage_user_details])
+      unless params[:manual_mark_as_read].nil?
+        mark_as_read = value_to_boolean(params[:manual_mark_as_read])
+        user.preferences[:manual_mark_as_read] = mark_as_read
+      end
+
+      respond_to do |format|
+        format.json {
+          if user.save
+            render(json: { manual_mark_as_read: user.manual_mark_as_read? })
+          else
+            render(json: user.errors, status: :bad_request)
+          end
+        }
+      end
     end
   end
 
