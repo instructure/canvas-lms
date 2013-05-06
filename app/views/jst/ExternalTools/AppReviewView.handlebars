@@ -1,0 +1,14 @@
+<table class="table review-item">
+  <tr>
+    <td class="image-and-stars" valign="top">
+      <img src="{{user_avatar_url}}" />
+      <div class="star-sprite star-sprite-{{rating}}"></div>
+    </td>
+    <td class="review-content" valign="top">
+      <div class="review-item-header">
+        {{#t "posted_by_on"}}Posted by <span>{{user_name}}</span> on <span>{{created}}</span>{{/t}}
+      </div>
+      <p>{{comments}}</p>
+    </td>
+  </tr>
+</table>

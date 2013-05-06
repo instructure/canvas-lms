@@ -427,7 +427,6 @@ TEXT
 
   <% if can_do @context, @current_user, :update %>
     <div id="tab-tools">
-      <h2><%= t('headings.external_tools', %{External Tools}) %></h2>
       <%= render :partial => 'external_tools/external_tools', :object => @context.context_external_tools.active %>
     </div>
   <% end %>

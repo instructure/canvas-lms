@@ -304,6 +304,7 @@ define [
     enrollmentName: enrollmentName
 
     titleize: (str) ->
+      return '' unless str
       words = str.split(/[ _]+/)
       titleizedWords = _(words).map (w) -> w[0].toUpperCase() + w.slice(1)
       titleizedWords.join(' ')

@@ -1,59 +1,130 @@
 @import environment.sass
-#external_tools_dialog
-  height: auto !important
-  .shared_secret_note
-    font-size: 0.8em
-    position: relative
-    top: -10px
+$app_width: 260px
+$app_height: 145px
+
+.star-sprite
+  display: block
+  width: 46px
+  height: 8px
+  margin-top: 5px
+  overflow: hidden
+  background-image: url(/images/star-sprite.png)
+  background-position: 0px 0px
+  &.star-sprite-1
+    background-position: 0 -8px
+  &.star-sprite-2
+    background-position: 0 -16px
+  &.star-sprite-3
+    background-position: 0 -24px
+  &.star-sprite-4
+    background-position: 0 -32px
+  &.star-sprite-5
+    background-position: 0 -40px
+
+#wrapper-container
+  min-width: 1280px
 
 #external_tools
-  .external_tool
-    +border-radius(5px)
-    .header
-      padding: 5px 10px 0
-      .name
+  h2
+    margin: 10px 0
+  p.description
+    margin-bottom: 15px
+  .well
+    border: none
+  .text-right
+    text-align: right
+  .lm
+    margin-left: 5px
+  
+  .app-full-view
+    td
+      border: none
+    td.app-full-view-left
+      width: 255px
+    h2
+      margin: 0
+    .add_app
+      margin: 10px 0 5px
+    .app_cancel
+      font-size: 12px
+
+  .reviews
+    margin-top: 15px
+    .avatar
+      padding-left: 65px
+      min-height: 65px
+    .review-item
+      border-top: 1px solid #EEEEEE
+      padding-top: 10px
+    .review-item-header
+      margin-top: 0px
+      font-size: 12px
+      color: #A1A3A2
+      span
+        color: #666666
+
+  .app_center
+    .app_list
+      .app
+        cursor: pointer
+        width: $app_width
+        height: $app_height
+        position: relative
         float: left
-        font-size: 1.2em
-        font-weight: bold
-      .links
-        float: right
-        +opacity(0.5)
-    .content
-      padding: 0 20px 5px
-    .extras
-      div
-        font-style: italic
-        font-size: 0.9em
-    &:hover
-      background-color: #eee
-      .links
-        +opacity(1.0)
-    &.has_editor_button,&.has_resource_selection,&.has_course_navigation,&.has_user_navigation,&.has_account_navigation,&.has_homework_submission
-      .extras
-        display: table-row      
-        div
+        border: thin solid #EEEEEE
+        margin: 0 2px 2px 0
+        .banner_image
+          width: $app_width - 40
+          height: $app_height - 40
+          position: relative
+          top: 20px
+          left: 20px
+        .details
+          position: absolute
+          top: 0px
+          width: $app_width
+          height: $app_height
+          background-color: black
+          color: white
           display: none
-    &.has_editor_button
-      div.editor_button
-        display: block
-    &.has_homework_submission
-      div.homework_submission
-        display: block
-    &.has_resource_selection
-      div.resource_selection
-        display: block
-    &.has_course_navigation
-      div.course_navigation
-        display: block
-    &.has_user_navigation
-      div.user_navigation
-        display: block
-    &.has_account_navigation
-      div.account_navigation
-        display: block
-    table
-      td:first-child
-        width: 100px
+          .content
+            padding: 15px
+            .name
+              font-weight: bold
+              font-size: 14px
+              color: #D6ECFC
+            .desc
+              margin-top: 5px
+              font-size: 11px
+              line-height: 17px
 
-
-        
+  .individual-app
+    .individual-app-left
+      width: 250px
+      padding-right: 20px
+      text-align: center
+      .add_app
+        margin-top: 10px
+      .app_cancel
+        display: block
+        margin-top: 5px
+        // font-size: 11px
+    .individual-app-right
+      h2
+        margin: 0px
+      .data-label
+        color: #888
+        text-align: right
+        padding-right: 10px
+      .star-table
+        margin-bottom: 10px
+        td
+          padding: 0px
+  .review-item
+    td
+      &.image-and-stars
+        padding: 10px 0 0 10px
+        width: 58px
+      &.review-content
+        .review-item-header
+          font-size: 12px

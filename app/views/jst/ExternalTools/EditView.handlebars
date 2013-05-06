@@ -26,7 +26,7 @@
     <div class="controls">
       <select id="external_tool_config_type" name="config_type">
         <option value="manual">{{#t "manual"}}Manual Entry{{/t}}</option>
-        <option value="by_url">{{#t "by_url"}}By URL{{/t}}</option>
+        <option value="by_url" {{selectedIf config_type "by_url"}}>{{#t "by_url"}}By URL{{/t}}</option>
         <option value="by_xml">{{#t "by_xml"}}Paste XML{{/t}}</option>
       </select>
     </div>

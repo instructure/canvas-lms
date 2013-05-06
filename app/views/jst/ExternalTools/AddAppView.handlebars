@@ -1,0 +1,31 @@
+<fieldset>
+  <div class="control-group">
+    <label class="control-label" for="canvas_app_name">Name</label>
+    <div class="controls">
+      <input type="text" id="canvas_app_name" value="{{name}}" name="canvas_app_name">
+    </div>
+  </div>
+  {{#each configOptions}}
+    <div class="control-group">
+      {{#if this.isCheckbox}}
+        <div class="controls">
+          <label class="checkbox">
+            <input type="checkbox" id="app_{{this.name}}" name="{{this.name}}" value="1"> {{this.description}}
+          </label>
+        </div>
+      {{else}}
+        {{#if isText}}
+          <label class="control-label" for="app_{{this.name}}">{{this.description}}</label>
+          <div class="controls">
+            <input type="text" id="app_{{this.name}}" name="{{this.name}}">
+          </div>
+        {{else}}
+          <label class="control-label" for="app_{{this.name}}">{{this.description}}</label>
+          <div class="controls">
+            <input type="text" id="app_{{this.name}}" name="{{this.name}}">
+          </div>
+        {{/if}}
+      {{/if}}
+    </div>
+  {{/each}}
+</fieldset>

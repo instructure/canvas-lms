@@ -1,0 +1,48 @@
+<table class="individual-app">
+  <tbody>
+    <tr>
+      <td class="individual-app-left" valign="top">
+        <img class="img-polaroid" src="{{model.attributes.banner_url}}" />
+        <a class="btn btn-primary btn-block add_app icon-add">
+          {{#t "add_tool"}}Add Tool{{/t}}
+        </a>
+        <a href="#" class="app_cancel">&laquo; {{#t "back_to_app_center"}}Back to App Center{{/t}}</a>
+      </td>
+      <td class="individual-app-right" valign="top">
+        <h2>{{ model.attributes.name }}</h2>
+        <table class="star-table">
+          <tbody>
+            <td><div class="app-star"></div></td>
+            <td><small>({{model.attributes.ratings_count}})</small></td>
+          </tbody>
+        </table>
+        <p>{{{model.attributes.description}}}</p>
+        <table>
+          <tbody>
+            </tr>
+            <tr class="data-row">
+              <td class="data-label">Extensions:</td>
+              <td class="data-value">{{model.attributes.extensions}}</td>
+            </tr>
+            <tr class="data-row">
+              <td class="data-label">Average Rating:</td>
+              <td class="data-value">{{model.attributes.avg_rating}}</td>
+            </tr>
+            <tr class="data-row">
+              <td class="data-label">Privacy Level:</td>
+              <td class="data-value">{{model.attributes.privacy_level}}</td>
+            </tr>
+            <tr class="data-row">
+              <td class="data-label">Education Level(s):</td>
+              <td class="data-value">{{model.attributes.levels}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="reviews collectionViewItems clearfix"></div>
+<div class="paginatedLoadingIndicator"></div>
+

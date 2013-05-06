@@ -773,7 +773,6 @@ TEXT
   <% end %>
   <% if can_do(@context, @current_user, :manage_account_settings) %>
       <div id="tab-tools">
-        <h2><%= t(:external_tools_title, "External Tools") %></h2>
         <%= render :partial => 'external_tools/external_tools', :object => @context.context_external_tools.active %>
       </div>
   <% end %>

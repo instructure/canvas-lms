@@ -1,83 +1,20 @@
-<p>{{#t "external_tools_note"}}
-External (LTI) Tools are an easy way to add new features to Canvas.
-They can be added to individual courses, or to all courses in an account.
-Once configured, you can link to them through course modules and create assignments for
-assessment tools.{{/t}}</p>
-
-<p>{{#t "external_tools_references"}}Click <a href="https://lti-examples.heroku.com/index.html">here</a> to see some
-LTI tools that work great with Canvas. You can also check out the Canvas
-Community topics about LTI tools <a href="http://help.instructure.com/entries/20878626-lti-tools-and-examples">
-here</a>
-{{/t}}</p>
-
-{{#each this}}
-  <div id=external_tool_{{id}}
-      class=external_tool
-      data-id={{id}}
-      data-workflow-state={{workflow_state}}>
-    <div class="header clearfix">
-      <div class="name">{{name}}</div>
-      <div class="links">
-        <a href="#"
-           class="edit_tool_link"
-           title="{{#t "edit_tool"}}Edit Tool{{/t}}"
-           data-edit-external-tool={{id}}
-        ><i class="icon-edit btn"></i></a>
-        <a href="#"
-           class="delete_tool_link"
-           title="{{#t "delete_tool"}}Delete Tool{{/t}}"
-           data-delete-external-tool={{id}}
-        ><i class="icon-trash btn"></i></a>
-      </div>
-      <div class="clear"></div>
-      <div class="content">
-        <table class="table-condensed">
-          <tr>
-            <td>{{#t "privacy"}}Privacy{{/t}}:</td>
-            <td class="readable_state">{{titleize privacy_level}}</td>
-          </tr><tr>
-            <td>{{#t "consumer_key"}}Consumer Key{{/t}}:</td>
-            <td class="consumer_key">{{consumer_key}}</td>
-          </tr>
-          {{#if url}}
-          <tr class="tool_url">
-            <td>{{#t "url"}}URL{{/t}}:</td>
-            <td class="url">{{url}}</td>
-          </tr>
-          {{/if}}
-          {{#if domain}}
-          <tr class="tool_domain">
-            <td>{{#t "domain"}}Domain{{/t}}:</td>
-            <td class="domain">{{domain}}</td>
-          </tr>
-          {{/if}}
-          <tr>
-            <td>{{#t "description"}}Description{{/t}}:</td>
-            <td class="description" style="font-size: 0.8em;">{{description}}</td>
-          </tr>
-          {{#if vendor_help_link}}
-            <tr class="tool_vendor_help_link">
-              <td>{{#t "tool_vendor_help_link"}}Help Link{{/t}}:</td>
-              <td class="vendor_help_link"><a href="{{vendor_help_link}}"">{{vendor_help_link}}</a></td>
-            </tr>
-          {{/if}}
-          {{#if extras}}
-            <tr class="extras">
-              <td>{{#t "extras"}}Extras{{/t}}:</td>
-              <td>
-                {{#each extras}}<div class="{{this.extension_type}}">{{this.text}}</div>{{/each}}
-              </td>
-            </tr>
-          {{/if}}
-        </table>
-      </div>
-    </div>
-  </div>
-{{/each}}
-
-<div class="button-container">
-  <button class="btn btn-primary add_tool_link">
-    <i class="icon-add"></i>
-    {{#t "add_external_tool"}}Add External Tool{{/t}}
+<h2 class="page-header">{{#t "external_tools"}}External Tools{{/t}}
+  <button class="btn view_tools_link lm pull-right">
+    {{#t "view_installed_tools"}}View Installed Tools{{/t}}
   </button>
-</div>
+  <button class="btn view_app_center_link lm pull-right">
+    {{#t "view_app_center"}}View App Center{{/t}}
+  </button>
+  <button class="btn btn-primary add_tool_link lm pull-right">
+    {{#t "add_new_tool"}}Add New Tool{{/t}}
+  </button>
+</h2>
+
+<p class="well well-small">
+  {{#t "external_tools_note"}}External Tools are an easy way to add new features to Canvas. They can be added to individual courses, or to all courses in an account. Once configured, you can link to them through course modules and create assignments for assessment tools.{{/t}}<br/><br/>{{#t "external_tools_references"}}Click <a href="https://edu-apps.org">here</a> to see some LTI tools that work great with Canvas. You can also check out the Canvas Community topics about LTI tools <a href="http://help.instructure.com/entries/20878626-lti-tools-and-examples"> here</a>{{/t}}
+</p>
+
+<div data-view="appCenter"></div>
+<div data-view="externalTools"></div>
+<div data-view="appFull"></div>
+<form data-view="addApp" class="form-dialog"></form>

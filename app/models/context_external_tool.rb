@@ -143,16 +143,17 @@ class ContextExternalTool < ActiveRecord::Base
     return unless (config_type == 'by_url' && config_url) || (config_type == 'by_xml' && config_xml)
     tool_hash = nil
     begin
-      converter = CC::Importer::BLTIConverter.new
-      if config_type == 'by_url'
-        tool_hash = converter.retrieve_and_convert_blti_url(config_url)
-      else
-        tool_hash = converter.convert_blti_xml(config_xml)
-      end
+       converter = CC::Importer::BLTIConverter.new
+       if config_type == 'by_url'
+         tool_hash = converter.retrieve_and_convert_blti_url(config_url)
+       else
+         tool_hash = converter.convert_blti_xml(config_xml)
+       end
     rescue CC::Importer::BLTIConverter::CCImportError => e
-      tool_hash = {:error => e.message}
+       tool_hash = {:error => e.message}
     end
 
+    
     @config_errors = []
     error_field = config_type == 'by_xml' ? 'config_xml' : 'config_url'
 

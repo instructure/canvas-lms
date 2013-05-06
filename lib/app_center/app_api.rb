@@ -18,14 +18,14 @@ module AppCenter
       per_page = per_page.to_i
       offset = ( page - 1 ) * per_page
 
-      cache_key = ['app_center', base_url, endpoint, offset].cache_key
-      response = Rails.cache.fetch(cache_key, :expires_in => expires) do
-        uri = URI.parse("#{base_url}#{endpoint}")
-        uri.query = [uri.query, "offset=#{offset}"].compact.join('&')
-        Canvas::HTTP.get(uri.to_s).body
-      end
-
       begin
+        cache_key = ['app_center', base_url, endpoint, offset].cache_key
+        response = Rails.cache.fetch(cache_key, :expires_in => expires) do
+          uri = URI.parse("#{base_url}#{endpoint}")
+          uri.query = [uri.query, "offset=#{offset}"].compact.join('&')
+          Canvas::HTTP.get(uri.to_s).body
+        end
+
         json = JSON.parse(response)
         json['meta']['next_page'] = page + 1  if (json['meta'] && json['meta']['next']) || (json['objects'] && json['objects'].size > per_page)
         json['objects'] = json['objects'][0, per_page] if json['objects']

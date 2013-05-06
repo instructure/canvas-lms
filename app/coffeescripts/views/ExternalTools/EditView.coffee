@@ -7,7 +7,7 @@ define [
 
   class EditView extends ValidatedFormView
     template: template
-
+    tagName: 'form'
     id: 'external_tool_form'
 
     className: 'validated-form-view form-horizontal bootstrap-form'
@@ -18,7 +18,7 @@ define [
     render: ->
       super
       @$el.dialog
-        title: I18n.t 'dialog_title', 'Edit External Tool'
+        title: I18n.t 'dialog_title_edit_tool', 'Edit External Tool'
         width: 520
         height: "auto"
         resizable: true
@@ -38,9 +38,6 @@ define [
     submit: ->
       this.$el.parent().find('.btn-primary').removeClass('ui-state-hover')
       super
-
-    onSaveSuccess: ->
-      @$el.dialog 'close'
 
     onConfigTypeChange: ->
       configType = @$('#external_tool_config_type').val()

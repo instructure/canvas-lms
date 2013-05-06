@@ -1,0 +1,21 @@
+<td nowrap="nowrap"
+  class="external_tool"
+  data-id="{{id}}"
+  data-workflow-state="{{workflow_state}}">{{name}}</td>
+<td>
+  {{#each extras}}
+    <span class="label label-primary {{this.extension_type}}" data-tooltip title="{{this.text}}">{{titleize this.extension_type}}</span>
+  {{/each}}
+</td>
+<td class="links text-right" nowrap="nowrap">
+  <a href="#"
+     class="edit_tool_link"
+     title="{{#t "edit_tool"}}Edit Tool{{/t}}"
+     data-edit-external-tool={{id}}
+      ><i class="icon-edit btn"></i></a>
+  <a href="#"
+     class="delete_tool_link"
+     title="{{#t "delete_tool"}}Delete Tool{{/t}}"
+     data-delete-external-tool={{id}}
+      ><i class="icon-trash btn"></i></a>
+</td>
