@@ -19,17 +19,30 @@
 class AppCenterController < ApplicationController
   before_filter :require_context
 
-  def index
-    collection = PaginatedCollection.build do |pager|
-      current_page = pager.current_page ? pager.current_page.to_i - 1 : 0
-      apps = AppCenter::AppApi.new.get_apps(current_page * pager.per_page, pager.per_page) || []
-      pager.replace(apps)
-      pager.next_page = current_page + 2 if apps.size > 0
+  def generate_app_api_collection(base_url)
+    PaginatedCollection.build do |pager|
+      page = (params['page'] || 1).to_i
+      response = yield AppCenter::AppApi.new, page
+      response ||= {}
+      pager.replace(response['objects'] || [])
+      pager.next_page = response['meta']['next_page'] if response['meta']
       pager
     end
+  end
 
+  def index
+    per_page = params['per_page'] || 72
     endpoint_scope = (@context.is_a?(Account) ? 'account' : 'course')
-    render :json => Api.paginate(collection, self,
-                                 send("api_v1_#{endpoint_scope}_app_center_apps_url"))
+    base_url = send("api_v1_#{endpoint_scope}_app_center_apps_url")
+    collection = generate_app_api_collection(base_url) {|app_api, page| app_api.get_apps(page, per_page)}
+    render :json => Api.paginate(collection, self, base_url, :per_page => per_page.to_i)
+  end
+
+  def reviews
+    per_page = params['per_page'] || 15
+    endpoint_scope = (@context.is_a?(Account) ? 'account' : 'course')
+    base_url = send("api_v1_#{endpoint_scope}_app_center_app_reviews_url")
+    collection = generate_app_api_collection(base_url) {|app_api, page| app_api.get_app_reviews(params[:app_id], page, per_page)}
+    render :json => Api.paginate(collection, self, base_url, :per_page => per_page.to_i)
   end
 end

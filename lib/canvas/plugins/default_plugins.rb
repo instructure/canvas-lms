@@ -240,7 +240,8 @@ Canvas::Plugin.register('app_center', nil, {
     :settings => {
         :base_url => 'https://www.edu-apps.org',
         :token => nil,
-        :apps_endpoint => '/api/v1/apps'
+        :apps_index_endpoint => '/api/v1/apps',
+        :app_reviews_endpoint => '/api/v1/apps/:id/reviews'
     },
     :validator => 'AppCenterValidator'
 })
