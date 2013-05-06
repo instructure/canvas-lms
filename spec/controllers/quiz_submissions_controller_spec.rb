@@ -150,4 +150,19 @@ describe QuizSubmissionsController do
       session[:return_to].should_not be_nil
     end
   end
+
+  describe "GET / (#index)" do
+
+    context "with a zip parameter present" do
+      it "queues a job to get all attachments for all submissions of a quiz" do
+        course_with_teacher_logged_in
+        quiz = course_quiz !!:active
+        ContentZipper.expects(:send_later_enqueue_args).with {|first_arg,second_arg|
+          first_arg.should == :process_attachment
+          second_arg.should == {priority: Delayed::LOW_PRIORITY, max_attempts: 1}
+        }
+        get 'index', quiz_id: quiz.id, zip: '1', course_id: @course
+      end
+    end
+  end
 end

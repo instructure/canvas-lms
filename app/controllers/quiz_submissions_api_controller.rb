@@ -30,7 +30,7 @@ class QuizSubmissionsApiController < ApplicationController
 
     if authorized_action(quiz, @current_user, :submit)
       api_attachment_preflight quiz_submission, request,
-        :check_quota => true, :do_submit_to_scribd => false
+        :check_quota => true, :do_submit_to_scribd => false, :file_param => 'file'
     end
   end
 end

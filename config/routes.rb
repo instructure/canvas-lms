@@ -46,6 +46,7 @@ ActionController::Routing::Routes.draw do |map|
   map.message_redirect "mr/:id", :controller => 'info', :action => 'message_redirect'
   map.help_links 'help_links', :controller => 'info', :action => 'help_links'
 
+
   def add_question_banks(context)
     context.resources :question_banks do |bank|
       bank.bookmark 'bookmark', :controller => 'question_banks', :action => 'bookmark'
@@ -259,7 +260,8 @@ ActionController::Routing::Routes.draw do |map|
       quiz.statistics "statistics", :controller => 'quizzes', :action => 'statistics'
       quiz.read_only "read_only", :controller => 'quizzes', :action => 'read_only'
       quiz.filters 'filters', :controller => 'quizzes', :action => 'filters'
-      quiz.resources :quiz_submissions, :as => "submissions", :collection => {:backup => :put}, :member => {:record_answer => :post} do |submission|
+
+      quiz.resources :quiz_submissions, :as => "submissions", :collection => {:backup => :put, :index => :get}, :member => {:record_answer => :post} do |submission|
       end
       quiz.extensions 'extensions/:user_id', :controller => 'quiz_submissions', :action => 'extensions', :conditions => {:method => :post}
       quiz.resources :quiz_questions, :as => "questions", :only => %w(create update destroy show)
@@ -1180,6 +1182,10 @@ ActionController::Routing::Routes.draw do |map|
     rubric.resources :rubric_assessments, :as => 'assessments'
   end
   map.selection_test 'selection_test', :controller => 'external_content', :action => 'selection_test'
+
+  map.resources :quiz_submissions do |submission|
+    add_files(submission)
+  end
 
   # commenting out all collection urls until collections are live
   # map.resources :collection_items, :only => [:new]

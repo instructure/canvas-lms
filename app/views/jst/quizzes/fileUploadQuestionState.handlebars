@@ -1,9 +1,11 @@
 {{#if display_name}}
   {{display_name}}<a href="#" class="pull-right icon-end delete-attachment"></a>
 {{else}}
-  <button type=button class="btn file-upload-btn">
-    {{#t "#buttons.choose_a_file"}}
-      Choose A File
-    {{/t}}
-  </button>
+  {{#if isIE}}
+    <input name=file class="file-upload" type=file />
+  {{else}}
+    <button class="btn file-upload-btn">
+      {{#t "#buttons.choose_a_file"}}Choose a File{{/t}}
+    </button>
+  {{/if}}
 {{/if}}

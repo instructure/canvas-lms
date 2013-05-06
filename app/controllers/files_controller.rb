@@ -576,7 +576,10 @@ class FilesController < ApplicationController
       @attachment.save!
     end
     @attachment.handle_duplicates(duplicate_handling)
-    render :json => attachment_json(@attachment, @current_user)
+    json = attachment_json(@attachment,@current_user)
+    # render as_text for IE, otherwise it'll prompt
+    # to download the JSON response
+    render :json => json, :as_text => in_app?
   end
 
   def api_file_status

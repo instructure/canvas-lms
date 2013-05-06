@@ -41,6 +41,7 @@ class Quiz < ActiveRecord::Base
   has_many :quiz_submissions, :dependent => :destroy
   has_many :quiz_groups, :dependent => :destroy, :order => 'position'
   has_many :quiz_statistics, :class_name => 'QuizStatistics', :order => 'created_at'
+  has_many :attachments, :as => :context, :dependent => :destroy
   belongs_to :context, :polymorphic => true
   belongs_to :assignment
   belongs_to :cloned_item

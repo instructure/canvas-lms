@@ -1038,6 +1038,27 @@ Spec::Runner.configure do |config|
     mock.stubs(:base).returns(nil)
     mock
   end
+
+  def dummy_io
+    ActionController::TestUploadedFile.new(
+      File.expand_path(File.dirname(__FILE__) +
+                       '/./fixtures/scribd_docs/doc.doc'),
+                       'application/msword', true)
+  end
+
+  def create_attachment_for_file_upload_submission!(submission,opts={})
+      submission.attachments.create! opts.merge(
+        :filename => "doc.doc",
+        :display_name => "doc.doc", :user => @user,
+        :uploaded_data => dummy_io)
+  end
+
+  def course_quiz(active=false)
+    @quiz = @course.quizzes.create
+    @quiz.workflow_state = "available" if active
+    @quiz.save!
+    @quiz
+  end
 end
 
 Dir[Rails.root+'vendor/plugins/*/spec_canvas/spec_helper.rb'].each do |f|
