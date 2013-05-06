@@ -63,5 +63,21 @@ class StatsController < ApplicationController
     courses.each { |course| course[:workflow_state] = workflow_state_translation[course[:workflow_state]] }
   end
 
+  def enrollments_for_term(term_id, enrollment_type, unique=false)
+    if term_id == 'current'
+      term_id = current_term
+    end
+    Enrollment.active.count(
+      :select => "enrollments.user_id",
+      :joins => :course,
+      :distinct => unique,
+      :conditions => ['enrollments.course_id = courses.id AND
+                       courses.enrollment_term_id = ? AND
+                       enrollments.root_account_id = ? AND
+                       enrollments.type = ? AND
+                       courses.sis_source_id IS NOT NULL AND
+                       enrollments.workflow_state = ?',
+      term_id.to_i, 2, enrollment_type, 'active'])
+  end
 
 end
