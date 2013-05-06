@@ -25,9 +25,15 @@
       </td>
     </tr>
     <tr>
-      <td><%= f.blabel :apps_endpoint, :en => "Apps Endpoint" %></td>
+      <td><%= f.blabel :apps_index_endpoint, :en => "Apps Index Endpoint" %></td>
       <td>
-        <%= f.text_field :apps_endpoint %>
+        <%= f.text_field :apps_index_endpoint %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :app_reviews_endpoint, :en => "App Show Endpoint" %></td>
+      <td>
+        <%= f.text_field :app_reviews_endpoint %>
       </td>
     </tr>
   </table>

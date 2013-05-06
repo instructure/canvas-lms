@@ -30,7 +30,7 @@ module Canvas::Plugins::Validators::AppCenterValidator
           plugin_setting.errors.add_to_base(I18n.t('canvas.plugins.errors.invalid_url', 'Invalid URL'))
           false
         else
-          settings.slice(:base_url, :token)
+          settings.slice(:base_url, :token, :apps_index_endpoint, :app_reviews_endpoint)
         end
       end
     end
