@@ -64,7 +64,7 @@ define [
     # Decrement an attribute by 1 (or the specified amount)
     decrement: (key, delta = 1) ->
       @increment key, -delta
-    
+
     # Add support for nested attributes on a backbone model. Nested
     # attributes are indicated by a . to seperate each level. You get
     # get nested attributes by doing the following.

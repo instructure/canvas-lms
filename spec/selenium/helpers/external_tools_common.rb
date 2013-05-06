@@ -37,28 +37,19 @@ shared_examples_for "external tools tests" do
       tool.url.should == url
       tool.workflow_state.should == "public"
       tool.description.should == "Description"
-      f("#external_tool_#{tool.id} .url").text.should == url
-      f("#external_tool_#{tool.id} .readable_state").text.should == "Public"
-      f("#external_tool_#{tool.id} .description").text.should == "Description"
-      f("#external_tool_#{tool.id} .vendor_help_link").should be_displayed
-      f("#external_tool_#{tool.id} .vendor_help_link").text.should == tool.vendor_help_link
       ContextExternalTool::EXTENSION_TYPES.each do |type|
         tool.extension_setting(type).should_not be_empty
         f("#external_tool_#{tool.id} .#{type}").should be_displayed
       end
-      f("#external_tool_#{tool.id} .url").text.should eql url
+      
     elsif opts.include? :url
-      url = "https://lti-examples.heroku.com/tool_redirect"
-      kitten_text = "pictures of kittens to your site"
       tool.workflow_state.should == "anonymous"
-      tool.url.should == url
-      tool.description.should include_text kitten_text
+      tool.url.should == "http://www.edu-apps.org/tool_redirect?id=youtube"
+      tool.description.should include_text "YouTube videos"
       tool.has_editor_button.should be_true
       tool.settings.should be_present
       tool.editor_button.should be_present
-      f("#external_tool_#{tool.id} .url").text.should == url
-      f("#external_tool_#{tool.id} .description").text.should include_text kitten_text
-      f("#external_tool_#{tool.id} .editor_button").should be_displayed
+      f("#external_tool_#{tool.id} .edit_tool_link").should be_displayed
 
     else
       tool.description.should == @description
@@ -66,24 +57,10 @@ shared_examples_for "external tools tests" do
       tool.custom_fields.keys.count >0
       custom_hash = {@custom_key => @custom_value}
       tool.custom_fields.should == custom_hash
-      f("#external_tool_#{tool.id} .description").text.should == @description
-
       if (opts.include? :manual_url)
-        f("#external_tool_#{tool.id} .url").text.should == @manual_url
         tool.url.should == @manual_url
       else
         tool.domain.should == @domain
-      end
-
-      if (opts.include? :name_only)
-        tool.workflow_state.should == "name_only"
-        f("#external_tool_#{tool.id} .readable_state").text.should == "Name Only"
-      elsif (opts.include? :public)
-        tool.workflow_state.should == "public"
-        f("#external_tool_#{tool.id} .readable_state").text.should == "Public"
-      else
-        tool.workflow_state.should == "anonymous"
-        f("#external_tool_#{tool.id} .readable_state").text.should == "Anonymous"
       end
     end
 
@@ -117,7 +94,7 @@ shared_examples_for "external tools tests" do
   end
 
   def add_url
-    url = 'http://localhost:4567/lti_url'
+    url = "#{app_host}/lti_url"
     f("#external_tool_config_type option[value='by_url']").click
     f("#external_tool_form .config_type.manual").should_not be_displayed
     f("#external_tool_config_xml").should_not be_displayed
