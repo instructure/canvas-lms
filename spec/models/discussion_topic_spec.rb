@@ -834,23 +834,40 @@ describe DiscussionTopic do
       @topic.unread_count(@student).should == 0
     end
 
-    it "should allow mark all as unread" do
+    it "should allow mark all as unread with forced_read_state" do
       @entry = @topic.discussion_entries.create!(:message => "Hello!", :user => @teacher)
-      @topic.change_all_read_state("unread", @teacher)
-      @topic.reload
+      @reply = @entry.reply_from(:user => @student, :text => "ohai!")
+      @reply.change_read_state('read', @teacher, :forced => false)
 
-      @topic.read?(@student).should be_false
-      @entry.read?(@student).should be_false
-      @topic.unread_count(@student).should == 1
+      @topic.change_all_read_state("unread", @teacher, :forced => true)
+      @topic.reload
+      @topic.read?(@teacher).should be_false
+
+      @entry.read?(@teacher).should be_false
+      @entry.find_existing_participant(@teacher).should be_forced_read_state
+
+      @reply.read?(@teacher).should be_false
+      @reply.find_existing_participant(@teacher).should be_forced_read_state
+
+      @topic.unread_count(@teacher).should == 2
     end
 
-    it "should allow mark all as read" do
+    it "should allow mark all as read without forced_read_state" do
       @entry = @topic.discussion_entries.create!(:message => "Hello!", :user => @teacher)
+      @reply = @entry.reply_from(:user => @student, :text => "ohai!")
+      @reply.change_read_state('unread', @student, :forced => true)
+
       @topic.change_all_read_state("read", @student)
       @topic.reload
 
       @topic.read?(@student).should be_true
+
       @entry.read?(@student).should be_true
+      @entry.find_existing_participant(@student).should_not be_forced_read_state
+
+      @reply.read?(@student).should be_true
+      @reply.find_existing_participant(@student).should be_forced_read_state
+
       @topic.unread_count(@student).should == 0
     end
 

@@ -971,29 +971,40 @@ describe "discussions" do
 
   context "marking as read" do
     it "should mark things as read" do
-      pending "figure out delayed jobs"
-      reply_count = 3
-      course_with_teacher_logged_in
-      @topic = @course.discussion_topics.create!
-      reply_count.times { @topic.discussion_entries.create!(:message => 'Lorem ipsum dolor sit amet') }
+      reply_count = 2
+      course_with_student
+      course_with_teacher_logged_in(:course => @course)
+      @topic = @course.discussion_topics.create!(:title => 'mark as read test', :message => 'test mark as read', :user => @student)
+      reply_count.times { @topic.discussion_entries.create!(:message => 'Lorem ipsum dolor sit amet', :user => @student) }
+      @topic.create_materialized_view
 
       # make sure everything looks unread
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-      ff('.can_be_marked_as_read.unread').length.should == reply_count + 1
+      ff('.discussion_entry.unread').length.should == reply_count
       f('.new-and-total-badge .new-items').text.should == reply_count.to_s
 
       #wait for the discussionEntryReadMarker to run, make sure it marks everything as .just_read
-      sleep 2
-      ff('.can_be_marked_as_read.unread').should be_empty
-      ff('.can_be_marked_as_read.just_read').length.should == reply_count + 1
+      keep_trying_until { ff('.discussion_entry.unread').should be_empty }
+      ff('.discussion_entry.read').length.should == reply_count + 1 # +1 because the topic also has the .discussion_entry class
+
+      # refresh page and make sure nothing is unread and everthing is .read
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      ff(".discussion_entry.unread").should be_empty
       f('.new-and-total-badge .new-items').text.should == ''
 
-      # refresh page and make sure nothing is unread/just_read and everthing is .read
+      # Mark one as unread manually, and create a new reply. The new reply 
+      # should be automarked as read, but the manual one should not.
+      f('.discussion-read-state-btn').click
+      wait_for_ajaximations
+      @topic.discussion_entries.create!(:message => 'new lorem ipsum', :user => @student)
+      @topic.create_materialized_view
+
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-      ['unread', 'just_read'].each do |state|
-        ff(".can_be_marked_as_read.#{state}").should be_empty
-      end
-      f('.new-and-total-badge .new-items').text.should == ''
+      ff(".discussion_entry.unread").size.should == 2
+      f('.new-and-total-badge .new-items').text.should == '2'
+      keep_trying_until { ff('.discussion_entry.unread').size < 2 }
+      wait_for_ajaximations
+      ff(".discussion_entry.unread").size.should == 1
     end
   end
 end

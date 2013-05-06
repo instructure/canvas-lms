@@ -688,6 +688,7 @@ describe DiscussionTopicsController, :type => :integration do
         "user_id" => @user.id,
         "user_name" => @user.name,
         "read_state" => "read",
+        "forced_read_state" => false,
         "message" => @message,
         "created_at" => @entry.created_at.utc.iso8601,
         "updated_at" => @entry.updated_at.as_json,
@@ -1258,9 +1259,9 @@ describe DiscussionTopicsController, :type => :integration do
     end
 
     def call_mark_entry_unread(course, topic, entry)
-      raw_api_call(:delete, "/api/v1/courses/#{course.id}/discussion_topics/#{topic.id}/entries/#{entry.id}/read.json",
+      raw_api_call(:delete, "/api/v1/courses/#{course.id}/discussion_topics/#{topic.id}/entries/#{entry.id}/read.json?forced_read_state=true",
                       { :controller => 'discussion_topics_api', :action => 'mark_entry_unread', :format => 'json',
-                        :course_id => course.id.to_s, :topic_id => topic.id.to_s, :entry_id => entry.id.to_s })
+                        :course_id => course.id.to_s, :topic_id => topic.id.to_s, :entry_id => entry.id.to_s, :forced_read_state => "true" })
     end
 
     it "should set the read state for a entry" do
@@ -1268,12 +1269,20 @@ describe DiscussionTopicsController, :type => :integration do
       call_mark_entry_read(@course, @topic, @entry)
       response.status.should == '204 No Content'
       @entry.read?(@user).should be_true
+      @entry.find_existing_participant(@user).should_not be_forced_read_state
       @topic.unread_count(@user).should == 1
 
       call_mark_entry_unread(@course, @topic, @entry)
       response.status.should == '204 No Content'
       @entry.read?(@user).should be_false
+      @entry.find_existing_participant(@user).should be_forced_read_state
       @topic.unread_count(@user).should == 2
+
+      call_mark_entry_read(@course, @topic, @entry)
+      response.status.should == '204 No Content'
+      @entry.read?(@user).should be_true
+      @entry.find_existing_participant(@user).should be_forced_read_state
+      @topic.unread_count(@user).should == 1
     end
 
     it "should be idempotent for setting entry read state" do
@@ -1289,24 +1298,50 @@ describe DiscussionTopicsController, :type => :integration do
       @topic.unread_count(@user).should == 1
     end
 
-    it "should allow mark all as read/unread" do
+    def call_mark_all_as_read_state(new_state, opts = {})
+      method = new_state == 'read' ? :put : :delete
+      url = "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read_all.json"
+      expected_params = { :controller => 'discussion_topics_api', :action => "mark_all_#{new_state}", :format => 'json',
+                        :course_id => @course.id.to_s, :topic_id => @topic.id.to_s }
+      if opts.has_key?(:forced)
+        url << "?forced_read_state=#{opts[:forced]}"
+        expected_params[:forced_read_state] = opts[:forced].to_s
+      end
+      raw_api_call(method, url, expected_params)
+    end
+
+    it "should allow mark all as read without forced update" do
       student_in_course(:active_all => true)
-      raw_api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read_all.json",
-                      { :controller => 'discussion_topics_api', :action => 'mark_all_read', :format => 'json',
-                        :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+      @entry.change_read_state('read', @user, :forced => true)
+
+      call_mark_all_as_read_state('read')
       response.status.should == '204 No Content'
       @topic.reload
       @topic.read?(@user).should be_true
-      @entry.read?(@user).should be_true
-      @topic.unread_count(@user).should == 0
 
-      raw_api_call(:delete, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read_all.json",
-                      { :controller => 'discussion_topics_api', :action => 'mark_all_unread', :format => 'json',
-                        :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+      @entry.read?(@user).should be_true
+      @entry.find_existing_participant(@user).should be_forced_read_state
+
+      @reply.read?(@user).should be_true
+      @reply.find_existing_participant(@user).should_not be_forced_read_state
+
+      @topic.unread_count(@user).should == 0
+    end
+
+    it "should allow mark all as unread with forced update" do
+      [@topic, @entry].each { |e| e.change_read_state('read', @user) }
+
+      call_mark_all_as_read_state('unread', :forced => true)
       response.status.should == '204 No Content'
       @topic.reload
       @topic.read?(@user).should be_false
+
       @entry.read?(@user).should be_false
+      @entry.find_existing_participant(@user).should be_forced_read_state
+
+      @reply.read?(@user).should be_false
+      @reply.find_existing_participant(@user).should be_forced_read_state
+
       @topic.unread_count(@user).should == 2
     end
   end
@@ -1577,7 +1612,7 @@ describe DiscussionTopicsController, :type => :integration do
     it "should return an empty discussion view for an item" do
       json = api_call(:get, "/api/v1/collection_items/#{@item.id}/discussion_topics/self/view",
         { :collection_item_id => "#{@item.id}", :controller => "discussion_topics_api", :format => "json", :action => "view", :topic_id => "self"})
-      json.should == { "participants" => [], "unread_entries" => [], "view" => [], "new_entries" => [] }
+      json.should == { "participants" => [], "unread_entries" => [], "forced_entries" => [], "view" => [], "new_entries" => [] }
       @item.discussion_topic.should be_new_record
     end
 

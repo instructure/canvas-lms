@@ -96,7 +96,12 @@ module Api::V1::DiscussionTopics
           json[:attachments] = [json[:attachment]]
         end
       end
-      json[:read_state] = entry.read_state(user) if user
+
+      if user
+        participant = entry.find_existing_participant(user)
+        json[:read_state] = participant.workflow_state
+        json[:forced_read_state] = participant.forced_read_state?
+      end
 
       if includes.include?(:subentries) && entry.root_entry_id.nil?
         replies = entry.flattened_discussion_subentries.active.newest_first.limit(11).all

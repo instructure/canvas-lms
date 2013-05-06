@@ -249,9 +249,12 @@ class DiscussionTopic < ActiveRecord::Base
     self.update_or_create_participant(:current_user => current_user, :new_state => new_state)
   end
 
-  def change_all_read_state(new_state, current_user = nil)
+  def change_all_read_state(new_state, current_user = nil, opts = {})
     current_user ||= self.current_user
     return unless current_user
+
+    update_fields = { :workflow_state => new_state }
+    update_fields[:forced_read_state] = opts[:forced] if opts.has_key?(:forced)
 
     transaction do
       self.context_module_action(current_user, :read) if new_state == 'read'
@@ -265,7 +268,7 @@ class DiscussionTopic < ActiveRecord::Base
         existing_entry_participants = DiscussionEntryParticipant.where(:user_id =>current_user, :discussion_entry_id => entry_ids).
           select([:id, :discussion_entry_id]).all
         existing_ids = existing_entry_participants.map(&:id)
-        DiscussionEntryParticipant.where(:id => existing_ids).update_all(:workflow_state => new_state) if existing_ids.present?
+        DiscussionEntryParticipant.where(:id => existing_ids).update_all(update_fields) if existing_ids.present?
 
         if new_state == "read"
           new_entry_ids = entry_ids - existing_entry_participants.map(&:discussion_entry_id)
@@ -273,8 +276,7 @@ class DiscussionTopic < ActiveRecord::Base
             {
               :discussion_entry_id => entry_id,
               :user_id => current_user.id,
-              :workflow_state => new_state
-            }
+            }.merge(update_fields)
           })
         end
       end

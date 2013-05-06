@@ -411,18 +411,64 @@ describe DiscussionEntry do
     end
   end
 
-  context "DiscussionEntryParticipant.read_entry_ids" do
-    it "should return the ids of the read entries" do
+  describe "DiscussionEntryParticipant" do
+    before do
       topic_with_nested_replies
-      @root2.change_read_state('read', @teacher)
-      @reply_reply1.change_read_state('read', @teacher)
-      @reply_reply2.change_read_state('read', @teacher)
-      @reply3.change_read_state('read', @teacher)
-      # change one back to unread, it shouldn't be returned
-      @reply_reply2.change_read_state('unread', @teacher)
-      read = DiscussionEntryParticipant.read_entry_ids(@topic.discussion_entries.map(&:id), @teacher).sort
-      read.should == [@root2, @reply1, @reply2, @reply_reply1, @reply3].map(&:id)
     end
+
+    context ".read_entry_ids" do
+      it "should return the ids of the read entries" do
+        @root2.change_read_state('read', @teacher)
+        @reply_reply1.change_read_state('read', @teacher)
+        @reply_reply2.change_read_state('read', @teacher)
+        @reply3.change_read_state('read', @teacher)
+        # change one back to unread, it shouldn't be returned
+        @reply_reply2.change_read_state('unread', @teacher)
+        read = DiscussionEntryParticipant.read_entry_ids(@topic.discussion_entries.map(&:id), @teacher).sort
+        read.should == [@root2, @reply1, @reply2, @reply_reply1, @reply3].map(&:id)
+      end
+    end
+
+    context ".forced_read_state_entry_ids" do
+      it "should return the ids of entries that have been marked as force_read_state" do
+        marked_entries = [@root2, @reply_reply1, @reply_reply2, @reply3]
+        marked_entries.each do |e|
+          e.change_read_state('read', @teacher, :forced => true)
+        end
+        # change back, without :forced parameter, should stay forced
+        @reply_reply2.change_read_state('unread', @teacher)
+        # change forced to false so it shouldn't be in results
+        @reply3.change_read_state('unread', @teacher, :forced => false)
+        marked_entries -= [@reply3]
+
+        forced = DiscussionEntryParticipant.forced_read_state_entry_ids(@all_entries.map(&:id), @teacher).sort
+        forced.should == marked_entries.map(&:id).sort
+      end
+    end
+
+    context ".find_existing_participant" do
+      it "should return existing data" do
+        @root2.change_read_state('read', @teacher, :forced => true)
+        participant = @root2.find_existing_participant(@teacher)
+        participant.id.should_not be_nil
+        participant.should be_readonly
+        participant.user.should == @teacher
+        participant.discussion_entry.should == @root2
+        participant.workflow_state.should == 'read'
+        participant.forced_read_state.should be_true
+      end
+
+      it "should return default data" do
+        participant = @reply2.find_existing_participant(@student)
+        participant.id.should be_nil
+        participant.should be_readonly
+        participant.user.should == @student
+        participant.discussion_entry.should == @reply2
+        participant.workflow_state.should == 'unread'
+        participant.forced_read_state.should be_false
+      end
+    end
+
   end
 
   describe "reply_from" do

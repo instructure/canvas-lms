@@ -23,6 +23,7 @@ define [
       entries: []
       new_entries: []
       unread_entries: []
+      forced_entries: []
 
     url: ->
       "#{@get 'root_url'}?include_new_entries=1"
@@ -77,6 +78,7 @@ define [
       parent = @flattened[entry.parent_id]
       entry.parent = parent
       entry.read_state = 'unread' if entry.id in @data.unread_entries
+      entry.forced_read_state = true if entry.id in @data.forced_entries
 
       @setEntryAuthor(entry)
 
