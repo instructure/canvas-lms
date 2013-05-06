@@ -33,13 +33,19 @@ class StatsController < ApplicationController
     end
   end
 
-  private
-  def enrollment_counts
-    enrollments = {}
-    enrollments[:active_student_in_claimed_or_available] = Enrollment.student_in_claimed_or_available.active.count
-    enrollments[:active_instructor] = Enrollment.of_instructor_type.active.count
+  def enrollments
+    respond_to do |format|
+      format.json do
+        render :json => {
+          "total_enrollments_for_term" => enrollments_for_term(params[:term_id], params[:enrollment_type]),
+          "unique_enrollments_for_term" => enrollments_for_term(params[:term_id], params[:enrollment_type], true)
+        }
+      end
+    end
   end
 
+
+  private
   def current_term
     EnrollmentTerm.find(:all, :conditions => ["workflow_state = 'active' AND (:date BETWEEN start_at AND end_at)", {:date => DateTime.now}]).first
   end
