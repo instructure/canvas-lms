@@ -166,7 +166,7 @@ group :redis do
 end
 
 group :cassandra do
-  gem 'cassandra-cql', '1.1.1'
+  gem 'cassandra-cql', '1.1.5'
 end
 
 group :embedly do
