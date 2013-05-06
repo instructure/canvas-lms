@@ -103,14 +103,15 @@ module AssignmentOverrideApplicator
 
       overrides += observed_student_overrides.flatten.uniq
 
-      section_ids  = context.sections_visible_to(user).map(&:id)
-      # stupid special case for observers
+      section_ids = context.sections_visible_to(user).map(&:id)
+      # section visibilities is only useful if the user can read_roster in the course.
+      # otherwise, we need to get section ids this way:
       section_ids += context.section_visibilities_for(user).select { |v|
-        v[:type] == 'ObserverEnrollment'
+        ['StudentEnrollment', 'ObserverEnrollment', 'StudentViewEnrollment'].include? v[:type]
       }.map { |v| v[:course_section_id] }
 
       section_overrides = assignment_or_quiz.assignment_overrides.
-        where(:set_type => 'CourseSection', :set_id => section_ids)
+        where(:set_type => 'CourseSection', :set_id => section_ids.uniq)
 
       # TODO add position column to assignment_override, nil for non-section
       # overrides, (assignment_or_quiz, position) unique for section overrides

@@ -188,6 +188,13 @@ describe AssignmentOverrideApplicator do
         overrides.should == [override1, override2]
         AssignmentOverrideApplicator.collapsed_overrides(@assignment, overrides)[:due_at].should == due_at
       end
+
+      it "should work for students even if :read_roster is disabled" do
+        RoleOverride.create!(:context => @course.root_account, :permission => 'read_roster',
+                             :enrollment_type => "StudentEnrollment", :enabled => false)
+        overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
+        overrides.should == [@override]
+      end
     end
 
     it "should order adhoc override before group override" do
