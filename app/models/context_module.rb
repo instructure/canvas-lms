@@ -691,7 +691,8 @@ class ContextModule < ActiveRecord::Base
     item.unlock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:unlock_at]) if hash[:unlock_at]
     item.start_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:start_at]) if hash[:start_at]
     item.end_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:end_at]) if hash[:end_at]
-    
+    item.require_sequential_progress = hash[:require_sequential_progress] if hash[:require_sequential_progress]
+
     if hash[:prerequisites]
       preqs = []
       hash[:prerequisites].each do |prereq|

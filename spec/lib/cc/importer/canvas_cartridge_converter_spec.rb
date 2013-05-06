@@ -415,7 +415,7 @@ describe "Canvas Cartridge importing" do
   end
   
   it "should import modules" do 
-    mod1 = @copy_from.context_modules.create!(:name => "some module", :unlock_at => 1.week.from_now)
+    mod1 = @copy_from.context_modules.create!(:name => "some module", :unlock_at => 1.week.from_now, :require_sequential_progress => true)
     mod2 = @copy_from.context_modules.create!(:name => "next module")
     mod3 = @copy_from.context_modules.create!(:name => "url module")
     mod4 = @copy_from.context_modules.create!(:name => "attachment module")
@@ -483,6 +483,7 @@ describe "Canvas Cartridge importing" do
     mod1_2 = @copy_to.context_modules.find_by_migration_id(CC::CCHelper.create_key(mod1))
     mod1_2.name.should == mod1.name
     mod1_2.unlock_at.to_i.should == mod1.unlock_at.to_i
+    mod1_2.require_sequential_progress.should == mod1.require_sequential_progress
     mod1_2.content_tags.count.should == mod1.content_tags.count
     tag = mod1_2.content_tags.first
     tag.content_id.should == asmnt2.id
