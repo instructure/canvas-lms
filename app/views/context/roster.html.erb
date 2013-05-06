@@ -3,7 +3,7 @@
   @active_tab = 'people'
   translated_title = @context.is_a?(Course) ? t('titles.course_roster', 'Course Roster') : t('titles.group_roster', 'Group Roster')
 
-  join_title(translated_title, @context.name)
+  content_for :page_title, join_title(translated_title, @context.name)
 %>
 
 <% content_for :right_side, render(:partial => 'context/roster_right_side') %>
