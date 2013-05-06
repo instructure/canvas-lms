@@ -74,6 +74,8 @@ define [
     opts.position ||= 'top'
     if opts.position of positions
       opts.position = positions[opts.position]
+    if opts.collision
+      opts.position.collision = opts.collision
 
     opts.position.using ||= using
 

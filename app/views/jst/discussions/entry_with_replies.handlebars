@@ -1,5 +1,12 @@
 <article class="discussion_entry can_be_marked_as_read {{read_state}}-onload {{read_state}} {{#if deleted}}deleted-discussion-entry{{/if}}" data-mark-read-url="{{mark_read_url}}">
-  <div class="discussion-read-state tooltip data-tooltip"></div>
+  <a href="#"
+     class="discussion-read-state-btn"
+     role="button"
+     title=""
+     data-tooltip='{ "position": "top", "collision": "none" }'
+     data-event="toggleRead">
+    <div class="discussion-read-state tooltip data-tooltip"></div>
+  </a>
   <div class="entry_content">
     {{#if deleted}}
       {{>[discussions/deleted_entry]}}

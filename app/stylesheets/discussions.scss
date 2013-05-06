@@ -135,19 +135,29 @@ body.with-right-side.with-left-side {
   color: #777777;
 }
 
-.discussion-read-state {
+.discussion-read-state-btn {
   position: absolute;
-  top: 12px;
-  left: -20px;
+  top: 4px;
+  left: -28px;
   bottom: 0;
   width: 8px;
   height: 8px;
-  background: transparent url(/images/messages/new-replied-icon_sprite.png) -4px -8px no-repeat;
-  display: none;
+  padding: 8px;
+  display: block;
 }
 
-.unread-onload .discussion-read-state {
-  display: block;
+.unread {
+  .discussion-read-state-btn {
+    &:hover .discussion-read-state, &:focus .discussion-read-state {
+      background-position: -4px -32px;
+    }
+  }
+}
+
+.discussion-read-state {
+  width: 8px;
+  height: 8px;
+  background: transparent url(/images/messages/new-replied-icon_sprite.png) -4px -8px no-repeat;
 }
 
 .read .discussion-read-state {
@@ -456,9 +466,9 @@ body.with-right-side.with-left-side {
   border-top: solid 1px #e4e5e7;
 }
 
-.side_comment_discussion .entry .entry .discussion-read-state {
-  left: -14px;
-  top: 14px;
+.side_comment_discussion .entry .entry .discussion-read-state-btn {
+  left: -22px;
+  top: 8px;
 }
 
 .message *:last-child {

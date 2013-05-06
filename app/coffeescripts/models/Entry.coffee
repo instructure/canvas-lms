@@ -148,6 +148,11 @@ define [
       url = ENV.DISCUSSION.MARK_READ_URL.replace /:id/, @get 'id'
       $.ajaxJSON url, 'PUT'
 
+    markAsUnread: ->
+      @set(read_state: 'unread', forced_read_state: true)
+      url = ENV.DISCUSSION.MARK_UNREAD_URL.replace /:id/, @get 'id'
+      $.ajaxJSON url, 'DELETE', forced_read_state: true
+
     hasChildren: ->
       @get('replies').length > 0
 
