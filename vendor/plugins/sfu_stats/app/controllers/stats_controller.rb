@@ -41,7 +41,7 @@ class StatsController < ApplicationController
   end
 
   def current_term
-    EnrollmentTerm.find(:all, :conditions => ["workflow_state = 'active' AND (:date BETWEEN start_at AND end_at)", {:date => Date.today}]).first
+    EnrollmentTerm.find(:all, :conditions => ["workflow_state = 'active' AND (:date BETWEEN start_at AND end_at)", {:date => DateTime.now}]).first
   end
 
   def courses_for_term(term_id, fields='*')
