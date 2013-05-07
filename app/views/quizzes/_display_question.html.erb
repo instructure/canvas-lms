@@ -14,7 +14,9 @@
   correct = user_answer && hash_get(user_answer, :correct) == true
   incorrect = user_answer && hash_get(user_answer, :correct) == false
   unanswered = (%w{multiple_choice_question true_false_question}.include?(hash_get(question, 'question_type')) && incorrect && hash_get(user_answer, 'text').blank?) ||
-    (hash_get(question, 'question_type') == 'multiple_answers_question' && incorrect && user_answer.select{|k, v| k.to_s.match(/answer_/) && v.to_s != '0' }.length == 0) || false
+    (hash_get(question, 'question_type') == 'multiple_answers_question' && incorrect && user_answer.select{|k, v| k.to_s.match(/answer_/) && v.to_s != '0' }.length == 0) || 
+    (hash_get(question, 'question_type') == 'file_upload_question' && hash_get(user_answer, 'attachment_ids').blank?) ||
+    false
   partial_credit = user_answer && hash_get(user_answer, :correct) == 'partial'
   asset_string ||= (question_bank_id ? 'assessment_question' : 'quiz_question') + "_#{hash_get(question, :id)}"
   if question_type.display_answers == "multiple" && hash_get(question, :question_type) != "missing_word_question"
@@ -260,10 +262,10 @@
                     matched_answer = a if hash_get(a, :numerical_answer_type) == 'range_answer' && val <= hash_get(a, :end) && val >= hash_get(a, :start)
                   end %>
                   <% answer_classes = ['selected_answer']
-                     if display_correct_answers
-                       answer_classes << ((hash_get(user_answer, :correct) == true) ? 'correct_answer' : 'wrong_answer')
-                     end
-                     answer_classes << 'no_answer' if hash_get(user_answer, :text).blank?
+                    if display_correct_answers && hash_get(question,:question_type) != 'file_upload_question'
+                     answer_classes << ((hash_get(user_answer, :correct) == true) ? 'correct_answer' : 'wrong_answer')
+                   end
+                   answer_classes << 'no_answer' if hash_get(user_answer, :text).blank? || hash_get(user_answer, :attachment_ids).blank?
                   %>
                   <div class='answer <%= answer_classes.compact.join(' ') %>'>
                     <%= render :partial => "quizzes/single_answer", :locals =>
