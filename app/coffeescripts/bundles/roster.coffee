@@ -17,17 +17,19 @@
 #
 require [
   'compiled/models/CreateUserList'
+  'compiled/models/Role'
   'compiled/views/courses/roster/CreateUsersView'
-  'compiled/views/SelectView'
+  'compiled/views/courses/roster/RoleSelectView'
   'jst/courses/roster/rosterUsers'
   'compiled/collections/RosterUserCollection'
+  'compiled/collections/RolesCollection'
   'compiled/collections/SectionCollection'
   'compiled/views/InputFilterView'
   'compiled/views/PaginatedCollectionView'
   'compiled/views/courses/roster/RosterUserView'
   'compiled/views/courses/roster/RosterView'
   'jquery'
-], (CreateUserList, CreateUsersView, SelectView, rosterUsersTemplate, RosterUserCollection, SectionCollection, InputFilterView, PaginatedCollectionView, RosterUserView, RosterView, $) ->
+], (CreateUserList, Role, CreateUsersView, RoleSelectView, rosterUsersTemplate, RosterUserCollection, RolesCollection, SectionCollection, InputFilterView, PaginatedCollectionView, RosterUserView, RosterView, $) ->
 
   fetchOptions =
     include: ['avatar_url', 'enrollments', 'email']
@@ -36,6 +38,7 @@ require [
     course_id: ENV.context_asset_string.split('_')[1]
     sections: new SectionCollection ENV.SECTIONS
     params: fetchOptions
+  rolesCollection = new RolesCollection(new Role attributes for attributes in ENV.ALL_ROLES)
   inputFilterView = new InputFilterView
     collection: users
   usersView = new PaginatedCollectionView
@@ -43,9 +46,12 @@ require [
     itemView: RosterUserView
     buffer: 1000
     template: rosterUsersTemplate
-  roleSelectView = new SelectView
+  roleSelectView = new RoleSelectView
     collection: users
+    rolesCollection: rolesCollection
   createUsersView = new CreateUsersView
+    collection: users
+    rolesCollection: rolesCollection
     model: new CreateUserList
       sections: ENV.SECTIONS
       roles: ENV.ALL_ROLES

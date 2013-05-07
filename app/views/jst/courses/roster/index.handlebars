@@ -11,12 +11,7 @@
     name="enrollment_role"
     data-view="roleSelect"
     aria-label='{{#t "role_to_search"}}Limit search to role{{/t}}'
-  >
-    <option value="">{{#t "all_roles"}}All Roles{{/t}}</option>
-    {{#each roles}}
-    <option value="{{name}}">{{label}}</option>
-    {{/each}}
-  </select>
+  ></select>
 
   {{#if permissions.add_users}}
     {{#if course.concluded}}
