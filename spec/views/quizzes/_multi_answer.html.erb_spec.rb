@@ -24,11 +24,16 @@ describe "/quizzes/_multi_answer" do
     course_with_student
     view_context
     assigns[:quiz] = @course.quizzes.create!
-    answer = OpenObject.new
-    answer.id = 5
-    answer.weight = 100
+    answer = {
+      id: 5,
+      weight: 100,
+      text: 'answer_text'
+    }
+    question = {
+      question_text: 'question text'
+    }
     question_type = OpenObject.new
-    render :partial => "quizzes/multi_answer", :object => answer, :locals => {:question_type => question_type, :user_answer => nil}
+    render :partial => "quizzes/multi_answer", :object => answer, :locals => {:question => question, :question_type => question_type, :user_answer => nil}
     response.should_not be_nil
   end
 end
