@@ -39,7 +39,7 @@ module Api::V1::Submission
       hash['submission_comments'] = submission.comments_for(@current_user).map do |sc|
         sc_hash = sc.as_json(
           :include_root => false,
-          :only => %w(author_id author_name created_at comment))
+          :only => %w(id author_id author_name created_at comment))
         if sc.media_comment?
           sc_hash['media_comment'] = media_comment_json(:media_id => sc.media_comment_id, :media_type => sc.media_comment_type)
         end

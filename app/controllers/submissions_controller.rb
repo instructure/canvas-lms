@@ -56,7 +56,8 @@
 #       // Associated comments for a submission (optional)
 #       submission_comments: [
 #         {
-#           author_id: 134
+#           id: 37,
+#           author_id: 134,
 #           author_name: "Toph Beifong",
 #           comment: "Well here's the thing...",
 #           created_at: "2012-01-01T01:00:00Z",

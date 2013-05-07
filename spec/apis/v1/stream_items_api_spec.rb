@@ -309,6 +309,7 @@ describe UsersController, :type => :integration do
         'author_name' => 'teacher',
         'author_id' => @teacher.id,
         'created_at' => @sub.submission_comments[0].created_at.as_json,
+        'id' => @sub.submission_comments[0].id
       },
       {
         'body' => 'c2',
@@ -322,6 +323,7 @@ describe UsersController, :type => :integration do
         'author_name' => 'User',
         'author_id' => @user.id,
         'created_at' => @sub.submission_comments[1].created_at.as_json,
+        'id' => @sub.submission_comments[1].id
       },],
 
       'course' => {
@@ -400,6 +402,7 @@ describe UsersController, :type => :integration do
         'author_name' => 'teacher',
         'author_id' => @teacher.id,
         'created_at' => @sub.submission_comments[0].created_at.as_json,
+        'id' => @sub.submission_comments[0].id
       },
       {
         'body' => 'c2',
@@ -413,6 +416,7 @@ describe UsersController, :type => :integration do
         'author_name' => 'User',
         'author_id' => @user.id,
         'created_at' => @sub.submission_comments[1].created_at.as_json,
+        'id' => @sub.submission_comments[1].id
       },],
 
       'course' => {
