@@ -24,18 +24,21 @@ class SubmissionVersion < ActiveRecord::Base
 
   class << self
     def index_version(version)
-      SubmissionVersion.create(extract_version_attributes(version))
+      attributes = extract_version_attributes(version)
+      SubmissionVersion.create(attributes) if attributes
     end
 
     def index_versions(versions)
-      records = versions.map{ |version| extract_version_attributes(version) }
-      connection.bulk_insert(table_name, records)
+      records = versions.map{ |version| extract_version_attributes(version) }.compact
+      connection.bulk_insert(table_name, records) if records.present?
     end
 
     def reindex_version(version)
       attributes = extract_version_attributes(version)
-      attributes.delete(:version_id)
-      SubmissionVersion.where(:version_id => version).update_all(attributes)
+      if attributes
+        attributes.delete(:version_id)
+        SubmissionVersion.where(:version_id => version).update_all(attributes)
+      end
     end
 
     private
@@ -43,6 +46,7 @@ class SubmissionVersion < ActiveRecord::Base
       # TODO make context extraction more efficient in bulk case
       model = version.model
       assignment = model.assignment
+      return nil unless assignment
       {
         :context_id => assignment.context_id,
         :context_type => assignment.context_type,

@@ -107,4 +107,15 @@ describe SubmissionVersion do
       }.should change(SubmissionVersion, :count).by(n)
     end
   end
+
+  it "should skip submissions with no assignment" do
+    attrs = YAML.load(@version.yaml)
+    attrs.delete('assignment_id')
+    @version.update_attribute(:yaml, attrs.to_yaml)
+    lambda{
+      SubmissionVersion.index_version(@version)
+      SubmissionVersion.reindex_version(@version)
+      SubmissionVersion.index_versions([@version])
+    }.should_not change(SubmissionVersion, :count)
+  end
 end
