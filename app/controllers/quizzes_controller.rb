@@ -88,6 +88,8 @@ class QuizzesController < ApplicationController
               @users = Hash[
                 @submitted_users.map { |u| [u.id, u] }
               ]
+              #include logged out users
+              @submitted_users += @statistics[:submission_logged_out_users]
             end
 
             js_env :quiz_reports => QuizStatistics::REPORTS.map { |report_type|
@@ -231,16 +233,22 @@ class QuizzesController < ApplicationController
     extend Api::V1::User
     if authorized_action(@quiz, @current_user, [:grade, :read_statistics])
       students = @context.students_visible_to(@current_user).order_by_sortable_name.to_a.uniq
-      @submissions = @quiz.quiz_submissions.for_user_ids(students.map(&:id)).where("workflow_state<>'settings_only'").all
-      @submissions = Hash[@submissions.map { |s| [s.user_id,s] }]
+      @submissions_from_users = @quiz.quiz_submissions.for_user_ids(students.map(&:id)).not_settings_only.all
+
+      @submissions_from_users = Hash[@submissions_from_users.map { |s| [s.user_id,s] }]
+
+      #include logged out submissions
+      @submissions_from_logged_out = @quiz.quiz_submissions.logged_out.not_settings_only
+
       @submitted_students, @unsubmitted_students = students.partition do |stud|
-        @submissions[stud.id]
+        @submissions_from_users[stud.id]
       end
 
       if @quiz.anonymous_survey?
         @submitted_students = @submitted_students.sort_by do |student|
-          @submissions[student.id].id
+          @submissions_from_users[student.id].id
         end
+
         submitted_students_json = @submitted_students.map &:id
         unsubmitted_students_json = @unsubmitted_students.map &:id
       else
@@ -346,6 +354,9 @@ class QuizzesController < ApplicationController
       else
         user_id = params[:user_id].presence || @current_user.id
         @submission = @quiz.quiz_submissions.find_by_user_id(user_id, :order => 'created_at') rescue nil
+      end
+      if @submission && !@submission.user_id && logged_out_index = params[:u_index]
+        @logged_out_user_index = logged_out_index
       end
       @submission = nil if @submission && @submission.settings_only?
       @user = @submission && @submission.user
@@ -686,6 +697,8 @@ class QuizzesController < ApplicationController
         joins(:quiz_submissions).
         where("quiz_submissions.quiz_id=? AND quiz_submissions.workflow_state<>'settings_only'", @quiz)
     @submitted_student_count = submitted_with_submissions.count(:id, :distinct => true)
+    #add logged out submissions
+    @submitted_student_count += @quiz.quiz_submissions.logged_out.not_settings_only.count
     @any_submissions_pending_review = submitted_with_submissions.where("quiz_submissions.workflow_state = 'pending_review'").count > 0
   end
 

@@ -34,6 +34,35 @@ describe QuizzesController do
     @quiz.quiz_groups.create
   end
 
+
+  def temporary_user_code(generate=true)
+    if generate
+      session[:temporary_user_code] ||= "tmp_#{Digest::MD5.hexdigest("#{Time.now.to_i.to_s}_#{rand.to_s}")}"
+    else
+      session[:temporary_user_code]
+    end
+  end
+
+  def logged_out_survey_with_submission(user, questions, &block)
+    course_with_teacher_logged_in(:active_all => true)
+
+    @assignment = @course.assignments.create(:title => "Test Assignment")
+    @assignment.workflow_state = "available"
+    @assignment.submission_types = "online_quiz"
+    @assignment.save
+    @quiz = Quiz.find_by_assignment_id(@assignment.id)
+    @quiz.anonymous_submissions = false
+    @quiz.quiz_type = "survey"
+
+    @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
+    @quiz.generate_quiz_data
+    @quiz.save!
+
+    @quiz_submission = @quiz.generate_submission(user)
+    @quiz_submission.mark_completed
+    @quiz_submission.submission_data = yield if block_given?
+  end
+
   describe "GET 'index'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -223,13 +252,63 @@ describe QuizzesController do
       @sub2 = @quiz.generate_submission(@user2)
       user_session @teacher
       get 'managed_quiz_data', :course_id => @course.id, :quiz_id => @quiz.id
-      assigns[:submissions][@sub1.user_id].should == @sub1
-      assigns[:submissions][@sub2.user_id].should == @sub2
+      assigns[:submissions_from_users][@sub1.user_id].should == @sub1
+      assigns[:submissions_from_users][@sub2.user_id].should == @sub2
       assigns[:submitted_students].sort_by(&:id).should == [@user1, @user2].sort_by(&:id)
 
       user_session @ta1
       get 'managed_quiz_data', :course_id => @course.id, :quiz_id => @quiz.id
-      assigns[:submissions][@sub1.user_id].should == @sub1
+      assigns[:submissions_from_users][@sub1.user_id].should == @sub1
+      assigns[:submitted_students].should == [@user1]
+    end
+
+    it "should include survey results from logged out users in a public course" do
+      #logged out user
+      user = temporary_user_code
+
+      #make questions
+      questions = [{:question_data => { :name => "test 1" }},
+        {:question_data => { :name => "test 2" }},
+        {:question_data => { :name => "test 3" }},
+        {:question_data => { :name => "test 4" }}]
+
+      logged_out_survey_with_submission user, questions
+
+      get 'managed_quiz_data', :course_id => @course.id, :quiz_id => @quiz.id
+
+      assigns[:submissions_from_logged_out].should == [@quiz_submission]
+      assigns[:submissions_from_users].should == {}
+    end
+
+    it "should include survey results from a logged-in user in a public course" do
+      course_with_teacher_logged_in(:active_all => true)
+
+      @user1 = user_with_pseudonym(:active_all => true, :name => 'Student1', :username => 'student1@instructure.com')
+      @course.enroll_student(@user1)
+
+      questions = [{:question_data => { :name => "test 1" }},
+        {:question_data => { :name => "test 2" }},
+        {:question_data => { :name => "test 3" }},
+        {:question_data => { :name => "test 4" }}]
+
+      @assignment = @course.assignments.create(:title => "Test Assignment")
+      @assignment.workflow_state = "available"
+      @assignment.submission_types = "online_quiz"
+      @assignment.save
+      @quiz = Quiz.find_by_assignment_id(@assignment.id)
+      @quiz.anonymous_submissions = true
+      @quiz.quiz_type = "survey"
+
+      @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
+      @quiz.generate_quiz_data
+      @quiz.save!
+
+      @quiz_submission = @quiz.generate_submission(@user1)
+      @quiz_submission.mark_completed
+
+      get 'managed_quiz_data', :course_id => @course.id, :quiz_id => @quiz.id
+
+      assigns[:submissions_from_users][@quiz_submission.user_id].should == @quiz_submission
       assigns[:submitted_students].should == [@user1]
     end
   end
@@ -914,6 +993,33 @@ describe QuizzesController do
       course_with_teacher_logged_in(:active_all => true)
       course_quiz
       @enrollment.conclude
+      get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
+      response.should be_success
+      response.should render_template('statistics')
+    end
+
+    it "should include logged_out users' submissions in a public course" do
+      #logged_out user
+      user = temporary_user_code
+
+      #make questions
+      questions = [{:question_data => { :name => "test 1" }},
+        {:question_data => { :name => "test 2" }},
+        {:question_data => { :name => "test 3" }},
+        {:question_data => { :name => "test 4" }}]
+
+      logged_out_survey_with_submission user, questions
+
+      #non logged_out submissions
+      @user1 = user_with_pseudonym(:active_all => true, :name => 'Student1', :username => 'student1@instructure.com')
+      @quiz_submission1 = @quiz.generate_submission(@user1)
+      @quiz_submission1.mark_completed
+
+      @user2 = user_with_pseudonym(:active_all => true, :name => 'Student2', :username => 'student2@instructure.com')
+      @quiz_submission2 = @quiz.generate_submission(@user2)
+      @quiz_submission2.mark_completed
+
+
       get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
       response.should be_success
       response.should render_template('statistics')
