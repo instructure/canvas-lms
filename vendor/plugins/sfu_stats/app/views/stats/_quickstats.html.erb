@@ -1,0 +1,17 @@
+<%
+  js_bundle :quickstats, :plugin => :sfu_stats
+%>
+
+<div id="quickstats">
+    <%
+        @enrollments.each do |k,v|
+          k = k.to_s.split('_')
+          @v = v
+          @student_or_teacher = k[0].capitalize
+          @total_or_unique = k[1].capitalize
+    %>
+    <%= render :partial => 'enrollment_box' %>
+    <%
+      end
+    %>
+</div>
