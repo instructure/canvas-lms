@@ -1,14 +1,9 @@
-I18n.load_path += Dir[Rails.root.join('config', 'locales', '**', '*.{rb,yml}')] +
-                  Dir[Rails.root.join('vendor', 'plugins', '*', 'config', 'locales', '**', '*.{rb,yml}')]
-I18n.load_path -= Dir[Rails.root.join('config', 'locales', 'generated', '**', '*.{rb,yml}')]
-I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
-
-Gem.loaded_specs.values.each do |spec|
-  path = spec.full_gem_path
-  translations_path = File.expand_path(File.join(path, 'config', 'locales'))
-  next unless File.directory?(translations_path)
-  I18n.load_path += Dir[File.join(translations_path, '**', '*.{rb,yml}')]
+if Rails.env.development? && !ENV['RAILS_LOAD_ALL_LOCALES']
+  I18n.load_path = I18n.load_path.grep(%r{/(locales|en)\.yml\z})
+else
+  I18n.load_path += Dir[Rails.root.join('vendor', 'plugins', '*', 'config', 'locales', '**', '*.{rb,yml}')]
 end
+I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
 
 module I18nUtilities
   def before_label(text_or_key, default_value = nil, *args)
