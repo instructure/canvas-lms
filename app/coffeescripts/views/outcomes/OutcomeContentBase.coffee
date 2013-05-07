@@ -76,7 +76,7 @@ define [
           @render()
       super()
 
-    _cleanUpTiny: => @$el.find( '#description' ).editorBox 'destroy'
+    _cleanUpTiny: => @$el.find('[name="description"]').editorBox 'destroy'
 
     submit: (e) =>
       e.preventDefault()
