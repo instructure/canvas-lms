@@ -27,6 +27,7 @@ include I18nUtilities
 
 SELENIUM_CONFIG = Setting.from_config("selenium") || {}
 SERVER_IP = SELENIUM_CONFIG[:server_ip] || UDPSocket.open { |s| s.connect('8.8.8.8', 1); s.addr.last }
+BIND_ADDRESS = SELENIUM_CONFIG[:bind_address] || '0.0.0.0'
 SECONDS_UNTIL_COUNTDOWN = 5
 SECONDS_UNTIL_GIVING_UP = 20
 MAX_SERVER_START_TIME = 60
@@ -239,7 +240,7 @@ module SeleniumTestsHelperMethods
   def self.start_in_process_thin_server
     server = SpecFriendlyThinServer
     app = self.rack_app
-    server.run(app, $server_port, :AccessLog => [])
+    server.run(app, :BindAddress => BIND_ADDRESS, :Port => $server_port, :AccessLog => [])
     shutdown = self.shutdown_webserver(server)
     return shutdown
   end
@@ -247,7 +248,7 @@ module SeleniumTestsHelperMethods
   def self.start_in_process_webrick_server
     server = SpecFriendlyWEBrickServer
     app = self.rack_app
-    server.run(app, :Port => $server_port, :AccessLog => [])
+    server.run(app, :BindAddress => BIND_ADDRESS, :Port => $server_port, :AccessLog => [])
     shutdown = self.shutdown_webserver(server)
     return shutdown
   end

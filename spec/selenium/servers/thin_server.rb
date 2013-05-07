@@ -2,12 +2,13 @@ require 'thin'
 require 'socket'
 
 class SpecFriendlyThinServer
-  def self.run(app, port, options = {})
-    ip = IPSocket.getaddress(Socket.gethostname)
-    @server = Thin::Server.new(ip, port, app)
+  def self.run(app, options = {})
+    bind_address = options[:BindAddress] || IPSocket.getaddress(Socket.gethostname)
+    port = options[:Port]
+    @server = Thin::Server.new(bind_address, port, app)
     Thread.new {@server.start}
     for i in 0..MAX_SERVER_START_TIME
-      s = TCPSocket.open(ip, port) rescue nil
+      s = TCPSocket.open(bind_address, port) rescue nil
       break if s
       sleep 1
     end
