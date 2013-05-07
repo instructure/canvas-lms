@@ -118,8 +118,56 @@ $widgetradius: 5px;
     float: right;
 }
 
+//
+// QUICKSTATS
+//
+.stats_enrollment_box {
+    background-color: #eee;
+    text-align: center;
+    margin-bottom: 10px;
+    padding: 15px;
+}
+.stats_enrollment_box p {
+    font-family: PatuaOneRegular, sans-serif;
+    margin: 0 0 10px;
+    font-size: 1.2em;
+}
+.stats_enrollment_box .enrollment_number {
+    font-size: 64px;
+    margin-bottom: 10px;
+}
+.stats_enrollment_box i[class*=icon-], .stats_enrollment_box i[class^=icon-] {
+    margin-left: 5px;
+}
+
+.stats_enrollment_box i[class*=icon-]:hover, .stats_enrollment_box i[class^=icon-]:hover {
+    cursor:pointer
+}
+
+.stats_enrollment_box i[class*=icon-]:before, .stats_enrollment_box i[class^=icon-]:before {
+    color: rgba(85, 85, 85, 0.3);
+}
+
+.stats_enrollment_box i[class*=icon-]:hover:before, .stats_enrollment_box i[class^=icon-]:hover:before {
+    color: #555;
+}
 
 
+//
+// FONTS
+//
+
+@font-face {
+    font-family: 'PatuaOneRegular';
+    src: url('/plugins/sfu_stats/fonts/PatuaOne-Regular-webfont.eot');
+    src: url('/plugins/sfu_stats/fonts/PatuaOne-Regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/plugins/sfu_stats/fonts/PatuaOne-Regular-webfont.woff') format('woff'),
+         url('/plugins/sfu_stats/fonts/PatuaOne-Regular-webfont.ttf') format('truetype'),
+         url('/plugins/sfu_stats/fonts/PatuaOne-Regular-webfont.svg#PatuaOneRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
 
 // icon fonts
 @font-face {
