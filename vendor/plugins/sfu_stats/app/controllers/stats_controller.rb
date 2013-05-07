@@ -1,10 +1,14 @@
 class StatsController < ApplicationController
   before_filter :require_user
   def index
-    @enrollments = enrollment_counts
-    @terms = Account.find(2).enrollment_terms.find(:all, :conditions => "workflow_state = 'active'", :order => 'sis_source_id DESC')
     @current_term = current_term
-    @courses_for_term = courses_for_term(@current_term.id)
+    @terms = Account.find(2).enrollment_terms.find(:all, :conditions => "workflow_state = 'active'", :order => 'sis_source_id DESC')
+    @enrollments = {
+      :student_unique => enrollments_for_term(@current_term.id, 'StudentEnrollment', true),
+      :student_total  => enrollments_for_term(@current_term.id, 'StudentEnrollment', false),
+      :teacher_unique => enrollments_for_term(@current_term.id, 'TeacherEnrollment', true),
+      :teacher_total  => enrollments_for_term(@current_term.id, 'TeacherEnrollment', false),
+    }
   end
 
   def courses
