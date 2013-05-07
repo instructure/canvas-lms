@@ -333,36 +333,58 @@ describe 'Submissions API', :type => :integration do
       }].sort_by { |h| h['user_id'] }
   end
 
-  it "should return user display info along with submission comments" do
-    student1 = user(:active_all => true)
+  def submission_with_comment
+    @student = user(:active_all => true)
     course_with_teacher(:active_all => true)
-    @course.enroll_student(student1).accept!
-    quiz = Quiz.create!(:title => 'quiz1', :context => @course)
-    quiz.did_edit!
-    quiz.offer!
-    a1 = quiz.assignment
-    sub = a1.find_or_create_submission(student1)
-    sub.submission_type = 'online_quiz'
-    sub.workflow_state = 'submitted'
-    sub.save!
-    a1.update_submission(student1, :comment => "i am a comment")
+    @course.enroll_student(@student).accept!
+    @quiz = Quiz.create!(:title => 'quiz1', :context => @course)
+    @quiz.did_edit!
+    @quiz.offer!
+    @assignment = @quiz.assignment
+    @submission = @assignment.find_or_create_submission(@student)
+    @submission.submission_type = 'online_quiz'
+    @submission.workflow_state = 'submitted'
+    @submission.save!
+    @assignment.update_submission(@student, :comment => "i am a comment")
+  end
+
+  it "should return user display info along with submission comments" do
+
+    submission_with_comment
 
     json = api_call(:get,
-          "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions.json",
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json",
           { :controller => 'submissions_api', :action => 'index',
             :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => a1.id.to_s },
+            :assignment_id => @assignment.id.to_s },
           { :include => %w(submission_comments) })
 
     json.first["submission_comments"].size.should == 1
     comment = json.first["submission_comments"].first
     comment.should have_key("author")
     comment["author"].should == {
-      "id" => student1.id,
+      "id" => @student.id,
       "display_name" => "User",
-      "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{student1.id}",
+      "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}",
       "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png"
     }
+  end
+
+  it "should return comment id along with submission comments" do
+
+    submission_with_comment
+
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json",
+          { :controller => 'submissions_api', :action => 'index',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => @assignment.id.to_s },
+          { :include => %w(submission_comments) })
+
+    json.first["submission_comments"].size.should == 1
+    comment = json.first["submission_comments"].first
+    comment.should have_key("id")
+    comment["id"].should == @submission.submission_comments.first.id
   end
 
   it "should return a valid preview url for quiz submissions" do
@@ -444,6 +466,7 @@ describe 'Submissions API', :type => :integration do
               "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png"
            },
            "author_name"=>"User",
+           "id" => comment.id,
            "author_id"=>@teacher.id}],
         "score"=>13.5,
         "workflow_state"=>"graded",
@@ -701,6 +724,7 @@ describe 'Submissions API', :type => :integration do
              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png"
            },
            "author_name"=>"User",
+           "id"=>comment.id,
            "author_id"=>@teacher.id}],
         "media_comment" =>
          { "media_type"=>"video",
