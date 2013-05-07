@@ -1,8 +1,10 @@
 define [
   'compiled/views/courses/roster/CreateUsersView'
+  'compiled/collections/RolesCollection'
+  'compiled/models/Role'
   'compiled/models/CreateUserList'
   'helpers/assertions'
-], (CreateUsersView, CreateUserList, assert) ->
+], (CreateUsersView, RolesCollection, Role, CreateUserList, assert) ->
 
   view = null
   server = null
@@ -24,19 +26,17 @@ define [
             section: 'MWF'
           }
         ])])
+      roles =  [{label: 'Teacher', name: 'TeacherEnrollment', manageable_by_user: true}, {label: 'Student', name: 'StudentEnrollment', manageable_by_user: true}, {label: 'Fake', name: 'Fake', manageable_by_user: false}]
       view = new CreateUsersView
         trigger: false
         title: 'test'
+        rolesCollection: new RolesCollection(new Role attributes for attributes in roles)
         model: new CreateUserList
           sections: [
             {id: 1, name: 'MWF'}
             {id: 2, name: 'TTh'}
           ]
-          roles: [
-            {label: 'Teacher', name: 'TeacherEnrollment', manageable_by_user: true}
-            {label: 'Student', name: 'StudentEnrollment', manageable_by_user: true}
-            {label: 'Fake',    name: 'Fake',              manageable_by_user: false}
-          ]
+          roles: roles
           readURL: '/read'
           updateURL: '/update'
       $('#fixtures').append view.$el
