@@ -615,7 +615,7 @@ describe Submission do
     end
 
     # the real test, quiz_submission_version shouldn't care about usecs
-    submission.quiz_submission_version.should == 2
+    submission.reload.quiz_submission_version.should == 2
   end
 
   it "should return only comments readable by the user" do
