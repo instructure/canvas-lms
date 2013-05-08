@@ -694,6 +694,19 @@ describe CoursesController do
       @course.observers.map{|s| s.name}.should be_include("Sam")
       @course.observers.map{|s| s.name}.should be_include("Fred")
     end
+
+    it "will use json for limit_privileges_to_course_section param" do
+      course_with_teacher_logged_in(:active_all => true)
+      post 'enroll_users', :course_id => @course.id,
+        :user_list => "\"Sam\" <sam@yahoo.com>",
+        :enrollment_type => 'TeacherEnrollment',
+        :limit_privileges_to_course_section => true
+      response.should be_success
+      run_jobs
+      enrollment = @course.reload.teachers.select { |t| t.name == 'Sam' }.
+        first.enrollments.first
+      enrollment.limit_privileges_to_course_section.should == true
+    end
   end
   
   describe "PUT 'update'" do
