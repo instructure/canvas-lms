@@ -367,7 +367,7 @@ describe QuizSubmission do
       @quiz.assignment.reload.needs_grading_count.should == 1
     end
 
-    it "should not increment the assignmet needs_grading_count if graded when a second attempt starts" do
+    it "should not increment the assignment needs_grading_count if graded when a second attempt starts" do
       @quiz_submission.update_scores({
         'context_id' => @course.id,
         'override_scores' => true,
@@ -382,7 +382,7 @@ describe QuizSubmission do
       @quiz.assignment.reload.needs_grading_count.should == 0
     end
 
-    it "should not decrement the assignmet needs_grading_count if pending_review when a second attempt starts" do
+    it "should not decrement the assignment needs_grading_count if pending_review when a second attempt starts" do
       @quiz.assignment.reload.needs_grading_count.should == 1
       @quiz.generate_submission(@user)
       @quiz_submission.reload.should be_untaken

@@ -444,13 +444,13 @@ class SubmissionsController < ApplicationController
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @user = @context.all_students.find(params[:id])
     @submission = @assignment.find_or_create_submission(@user)
-    if params[:submission][:student_entered_score] && @submission.grants_right?(@current_user, session, :comment)#&& @submission.user == @current_user
-      @submission.student_entered_score = params[:submission][:student_entered_score].to_f
-      @submission.student_entered_score = nil if !params[:submission][:student_entered_score] || params[:submission][:student_entered_score] == "" || params[:submission][:student_entered_score] == "null"
-      @submission.save
+
+    if params[:submission][:student_entered_score] && @submission.grants_right?(@current_user, session, :comment)
+      update_student_entered_score(params[:submission][:student_entered_score])
       render :json => @submission.to_json
       return
     end
+
     if authorized_action(@submission, @current_user, :comment)
       params[:submission][:commenter] = @current_user
       admin_in_context = !@context_enrollment || @context_enrollment.admin?
@@ -549,5 +549,14 @@ class SubmissionsController < ApplicationController
         end
       end
     end
+  end
+
+  def update_student_entered_score(score)
+    if score.present? && score != "null"
+      @submission.student_entered_score = score.to_f.round(2)
+    else
+      @submission.student_entered_score = nil
+    end
+    @submission.save
   end
 end
