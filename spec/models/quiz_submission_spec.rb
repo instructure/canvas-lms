@@ -366,6 +366,29 @@ describe QuizSubmission do
     it "should increment the assignment needs_grading_count for pending_review state" do
       @quiz.assignment.reload.needs_grading_count.should == 1
     end
+
+    it "should not increment the assignmet needs_grading_count if graded when a second attempt starts" do
+      @quiz_submission.update_scores({
+        'context_id' => @course.id,
+        'override_scores' => true,
+        'context_type' => 'Course',
+        'submission_version_number' => '1',
+        "question_score_#{@questions[0].id}" => '1'
+      })
+      @quiz.assignment.reload.needs_grading_count.should == 0
+      @quiz.generate_submission(@user)
+      @quiz_submission.reload.should be_untaken
+      @quiz_submission.submission.should be_graded
+      @quiz.assignment.reload.needs_grading_count.should == 0
+    end
+
+    it "should not decrement the assignmet needs_grading_count if pending_review when a second attempt starts" do
+      @quiz.assignment.reload.needs_grading_count.should == 1
+      @quiz.generate_submission(@user)
+      @quiz_submission.reload.should be_untaken
+      @quiz_submission.submission.should be_pending_review
+      @quiz.assignment.reload.needs_grading_count.should == 1
+    end
   end
 
   describe "with multiple essay questions" do
