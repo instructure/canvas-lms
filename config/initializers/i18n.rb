@@ -210,6 +210,12 @@ ActiveRecord::Base.class_eval do
     end
     alias :t :translate
 
+    # so that we don't load up the locales until we need them
+    LOCALE_LIST = []
+    def LOCALE_LIST.include?(item)
+      I18n.available_locales.map(&:to_s).include?(item)
+    end
+
     def validates_locale(*args)
       options = args.last.is_a?(Hash) ? args.pop : {}
       args << :locale if args.empty?
@@ -221,7 +227,7 @@ ActiveRecord::Base.class_eval do
         end
       end
       args.each do |field|
-        validates_inclusion_of field, options.merge(:in => I18n.available_locales.map(&:to_s))
+        validates_inclusion_of field, options.merge(:in => LOCALE_LIST)
       end
     end
   end

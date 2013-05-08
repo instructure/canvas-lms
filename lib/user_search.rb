@@ -39,7 +39,7 @@ module UserSearch
       users = users.where("COALESCE(enrollments.role_name, enrollments.type) IN (?) ", enrollment_role)
     elsif enrollment_type
       enrollment_type = enrollment_type.map { |e| "#{e.capitalize}Enrollment" }
-      if enrollment_type.any?{ |et| !Enrollment::READABLE_TYPES.keys.include?(et) }
+      if enrollment_type.any?{ |et| !Enrollment.readable_types.keys.include?(et) }
         raise ArgumentError, 'Invalid Enrollment Type'
       end
       users = users.where(:enrollments => { :type => enrollment_type })
