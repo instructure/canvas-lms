@@ -216,8 +216,11 @@ describe Submission do
     end
 
     context "Submission Graded" do
-      it "should create a message when the assignment has been graded and published" do
+      before do
         Notification.create(:name => 'Submission Graded')
+      end
+
+      it "should create a message when the assignment has been graded and published" do
         submission_spec_model
         @cc = @user.communication_channels.create(:path => "somewhere")
         @submission.reload
@@ -228,7 +231,6 @@ describe Submission do
       end
 
       it "should not create a message when a muted assignment has been graded and published" do
-        Notification.create(:name => 'Submission Graded')
         submission_spec_model
         @cc = @user.communication_channels.create(:path => "somewhere")
         @assignment.mute!
@@ -239,8 +241,20 @@ describe Submission do
         @submission.messages_sent.should_not be_include "Submission Graded"
       end
 
+      it "should not create a message when this is a quiz submission" do
+        submission_spec_model
+        @cc = @user.communication_channels.create(:path => "somewhere")
+        @quiz = Quiz.create!(:context => @course)
+        @submission.quiz_submission = @quiz.generate_submission(@user)
+        @submission.save!
+        @submission.reload
+        @submission.assignment.should eql(@assignment)
+        @submission.assignment.state.should eql(:published)
+        @submission.grade_it!
+        @submission.messages_sent.should_not include('Submission Graded')
+      end
+
       it "should create a hidden stream_item_instance when muted, graded, and published" do
-        Notification.create :name => "Submission Graded"
         submission_spec_model
         @cc = @user.communication_channels.create :path => "somewhere"
         @assignment.mute!
@@ -251,7 +265,6 @@ describe Submission do
       end
 
       it "should hide any existing stream_item_instances when muted" do
-        Notification.create :name => "Submission Graded"
         submission_spec_model
         @cc = @user.communication_channels.create :path => "somewhere"
         lambda {
@@ -263,8 +276,6 @@ describe Submission do
       end
 
       it "should not create a message for admins and teachers with quiz submissions" do
-        Notification.create!(:name => 'Submission Graded')
-
         course_with_teacher(:active_all => true)
         assignment = @course.assignments.create!(
           :title => 'assignment',
@@ -314,7 +325,7 @@ describe Submission do
       stream_item_instances.each { |sii| sii.should_not be_hidden }
     end
 
-        
+
     context "Submission Grade Changed" do
       it "should create a message when the score is changed and the grades were already published" do
         Notification.create(:name => 'Submission Grade Changed')
@@ -330,7 +341,24 @@ describe Submission do
         @submission.should eql(s)
         @submission.messages_sent.should be_include('Submission Grade Changed')
       end
-      
+
+      it 'doesnt create a grade changed message when theres a quiz attached' do
+        Notification.create(:name => 'Submission Grade Changed')
+        @assignment.stubs(:score_to_grade).returns(10.0)
+        @assignment.stubs(:due_at).returns(Time.now  - 100)
+        submission_spec_model
+        @quiz = Quiz.create!(:context => @course)
+        @submission.quiz_submission = @quiz.generate_submission(@user)
+        @submission.save!
+        @cc = @user.communication_channels.create(:path => "somewhere")
+        s = @assignment.grade_student(@user, :grade => 10)[0] #@submission
+        s.graded_at = Time.parse("Jan 1 2000")
+        s.save
+        @submission = @assignment.grade_student(@user, :grade => 9)[0]
+        @submission.should eql(s)
+        @submission.messages_sent.should_not include('Submission Grade Changed')
+      end
+
       it "should create a message when the score is changed and the grades were already published" do
         Notification.create(:name => 'Submission Grade Changed')
         Notification.create(:name => 'Submission Graded')
@@ -362,7 +390,7 @@ describe Submission do
         @submission.messages_sent.should_not be_include('Submission Grade Changed')
 
       end
-      
+
       it "should NOT create a message when the score is changed and the submission was recently graded" do
         Notification.create(:name => 'Submission Grade Changed')
         @assignment.stubs(:score_to_grade).returns(10.0)
@@ -426,7 +454,7 @@ describe Submission do
         @submission.submit_to_turnitin(Submission::TURNITIN_RETRY)
         @submission.reload.turnitin_data[@submission.asset_string][:status].should == 'error'
       end
-      
+
       it "should set status back to pending on retry" do
         init_turnitin_api
         # first a submission, to get us into failed state
@@ -507,63 +535,63 @@ describe Submission do
           }
         }
         @submission.save!
-  
+
         api = Turnitin::Client.new('test_account', 'sekret')
         Turnitin::Client.expects(:new).at_least(1).returns(api)
         api.expects(:sendRequest).with(:generate_report, 1, has_entries(:oid => "123456789")).at_least(1).returns('http://foo.bar')
       end
-  
+
       it "should let teachers view the turnitin report" do
         @teacher = User.create
         @context.enroll_teacher(@teacher)
         @submission.should be_grants_right(@teacher, nil, :view_turnitin_report)
         @submission.turnitin_report_url("submission_#{@submission.id}", @teacher).should_not be_nil
       end
-  
+
       it "should let students view the turnitin report after grading" do
         @assignment.turnitin_settings[:originality_report_visibility] = 'after_grading'
         @assignment.save!
         @submission.reload
-  
+
         @submission.should_not be_grants_right(@user, nil, :view_turnitin_report)
         @submission.turnitin_report_url("submission_#{@submission.id}", @user).should be_nil
-  
+
         @submission.score = 1
         @submission.grade_it!
-  
+
         @submission.should be_grants_right(@user, nil, :view_turnitin_report)
         @submission.turnitin_report_url("submission_#{@submission.id}", @user).should_not be_nil
       end
-  
+
       it "should let students view the turnitin report immediately if the visibility setting allows it" do
         @assignment.turnitin_settings[:originality_report_visibility] = 'after_grading'
         @assignment.save
         @submission.reload
-  
+
         @submission.should_not be_grants_right(@user, nil, :view_turnitin_report)
         @submission.turnitin_report_url("submission_#{@submission.id}", @user).should be_nil
-  
+
         @assignment.turnitin_settings[:originality_report_visibility] = 'immediate'
         @assignment.save
         @submission.reload
-  
+
         @submission.should be_grants_right(@user, nil, :view_turnitin_report)
         @submission.turnitin_report_url("submission_#{@submission.id}", @user).should_not be_nil
       end
-  
+
       it "should let students view the turnitin report after the due date if the visibility setting allows it" do
         @assignment.turnitin_settings[:originality_report_visibility] = 'after_due_date'
         @assignment.due_at = Time.now + 1.day
         @assignment.save
         @submission.reload
-  
+
         @submission.should_not be_grants_right(@user, nil, :view_turnitin_report)
         @submission.turnitin_report_url("submission_#{@submission.id}", @user).should be_nil
-  
+
         @assignment.due_at = Time.now - 1.day
         @assignment.save
         @submission.reload
-  
+
         @submission.should be_grants_right(@user, nil, :view_turnitin_report)
         @submission.turnitin_report_url("submission_#{@submission.id}", @user).should_not be_nil
       end
@@ -712,7 +740,7 @@ describe Submission do
       assignment = stub(:muted? => false)
       @submission = Submission.new
       @submission.expects(:assignment).returns(assignment)
-      @submission.muted_assignment?.should == false 
+      @submission.muted_assignment?.should == false
     end
   end
 

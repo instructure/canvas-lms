@@ -165,9 +165,9 @@ describe QuizSubmission do
     end
     res.should eql(false)
   end
-  
+
   context "explicitly setting grade" do
-    
+
     before(:each) do
       course_with_student
       @quiz = @course.quizzes.create!
@@ -184,28 +184,28 @@ describe QuizSubmission do
       @quiz_sub.fudge_points = 0
       @quiz_sub.kept_score = 5
       @quiz_sub.with_versioning(true, &:save!)
-      @submission = @quiz_sub.submission 
+      @submission = @quiz_sub.submission
     end
-    
+
     it "it should adjust the fudge points" do
       @assignment.grade_student(@user, {:grade => 3})
-      
+
       @quiz_sub.reload
       @quiz_sub.score.should == 3
       @quiz_sub.kept_score.should == 3
       @quiz_sub.fudge_points.should == -2
       @quiz_sub.manually_scored.should_not be_true
-      
+
       @submission.reload
       @submission.score.should == 3
       @submission.grade.should == "3"
     end
-    
+
     it "should use the explicit grade even if it isn't the highest score" do
       @quiz_sub.score = 4.0
       @quiz_sub.attempt = 2
       @quiz_sub.with_versioning(true, &:save!)
-      
+
       @quiz_sub.reload
       @quiz_sub.score.should == 4
       @quiz_sub.kept_score.should == 5
@@ -213,7 +213,7 @@ describe QuizSubmission do
       @submission.reload
       @submission.score.should == 5
       @submission.grade.should == "5"
-      
+
       @assignment.grade_student(@user, {:grade => 3})
       @quiz_sub.reload
       @quiz_sub.score.should == 3
@@ -224,7 +224,7 @@ describe QuizSubmission do
       @submission.score.should == 3
       @submission.grade.should == "3"
     end
-    
+
     it "should not have manually_scored set when updated normally" do
       @quiz_sub.score = 4.0
       @quiz_sub.attempt = 2
@@ -232,9 +232,9 @@ describe QuizSubmission do
       @assignment.grade_student(@user, {:grade => 3})
       @quiz_sub.reload
       @quiz_sub.manually_scored.should be_true
-      
+
       @quiz_sub.update_scores(:fudge_points => 2)
-      
+
       @quiz_sub.reload
       @quiz_sub.score.should == 2
       @quiz_sub.kept_score.should == 5
@@ -243,7 +243,7 @@ describe QuizSubmission do
       @submission.score.should == 5
       @submission.grade.should == "5"
     end
-    
+
     it "should add a version to the submission" do
       @assignment.grade_student(@user, {:grade => 3})
       @submission.reload
@@ -1460,5 +1460,41 @@ describe QuizSubmission do
       end
     end
 
+  end
+
+  describe 'broadcast policy' do
+    before do
+      Notification.create(:name => 'Submission Graded')
+      Notification.create(:name => 'Submission Grade Changed')
+      student_in_course
+      assignment_quiz([])
+      @course.enroll_student(@student)
+      @assignment.publish!
+      @submission = @quiz.generate_submission(@student)
+    end
+
+    it 'sends a graded notification after grading the quiz submission' do
+      @submission.messages_sent.should be_empty
+      @submission.grade_submission
+      @submission.reload.messages_sent.keys.should == ['Submission Graded']
+    end
+
+    it 'sends a grade changed notification after re-grading the quiz submission' do
+      @submission.grade_submission
+      @submission.score = @submission.score + 5
+      @submission.save!
+      @submission.reload.messages_sent.keys.should include('Submission Grade Changed')
+    end
+
+    it 'does not send any notifications for a submission with essay questions before they have been graded' do
+      quiz_with_graded_submission([{:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question'}}])
+      @quiz_submission.reload.messages_sent.should be_empty
+    end
+
+    it 'sends a notifications for a submission with essay questions before they have been graded if manually graded' do
+      quiz_with_graded_submission([{:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question'}}])
+      @quiz_submission.set_final_score(2)
+      @quiz_submission.reload.messages_sent.keys.should == ['Submission Graded']
+    end
   end
 end
