@@ -883,7 +883,6 @@ describe "security" do
         response.should be_success
         response.body.should_not match /View User Groups/
         response.body.should match /View Prior Enrollments/
-        response.body.should match /Manage Users/
 
         get "/courses/#{@course.id}/users/prior"
         response.should be_success
@@ -896,7 +895,6 @@ describe "security" do
         response.body.should match /People/
         html = Nokogiri::HTML(response.body)
         html.css('#tab-users').should_not be_empty
-        html.css('.add_users_link').should_not be_empty
 
         @course.tab_configuration = [ { :id => Course::TAB_PEOPLE, :hidden => true } ]
         @course.save!

@@ -23,11 +23,5 @@
                       t('links.view_services', 'View Registered Services'),
                       'link' %>
   <% end %>
-
-  <% if @context.is_a?(Course) && can_do(@context, @current_user, :manage_students) %>
-    <% sidebar_button "#{context_url(@context, :context_details_url)}#tab-users",
-                      t('links.manage_users', 'Manage Users'),
-                      'user' %>
-  <% end %>
 </div>
 
