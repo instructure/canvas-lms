@@ -72,8 +72,12 @@ module Canvas::AccountReports
         end
         csv << headers
         users = root_account.pseudonyms.includes(:user).select(
-                     "pseudonyms.id, pseudonyms.sis_user_id, pseudonyms.user_id,
-                      pseudonyms.unique_id, pseudonyms.workflow_state")
+          "pseudonyms.id, pseudonyms.sis_user_id, pseudonyms.user_id,
+           pseudonyms.unique_id, pseudonyms.workflow_state").where(
+          "NOT EXISTS (SELECT user_id
+                       FROM enrollments e
+                       WHERE e.type = 'StudentViewEnrollment'
+                       AND e.user_id = pseudonyms.user_id)")
 
         if @sis_format
           users = users.where("sis_user_id IS NOT NULL")
@@ -337,7 +341,8 @@ module Canvas::AccountReports
                  LEFT OUTER JOIN courses nxc ON cs.nonxlist_course_id = nxc.id
                  LEFT OUTER JOIN pseudonyms AS ob ON ob.user_id = enrollments.associated_user_id
                    AND ob.account_id = enrollments.root_account_id").
-          where("pseudonyms.account_id=enrollments.root_account_id")
+          where("pseudonyms.account_id=enrollments.root_account_id
+                 AND enrollments.type <> 'StudentViewEnrollment'")
 
         if @include_deleted
           enrol = enrol.where("enrollments.workflow_state<>'deleted'
@@ -440,7 +445,11 @@ module Canvas::AccountReports
           select("groups.*, group_memberships.*, pseudonyms.sis_user_id AS user_sis_id").
           joins("INNER JOIN group_memberships ON groups.id = group_memberships.group_id
                  INNER JOIN pseudonyms ON pseudonyms.user_id=group_memberships.user_id").
-          where("pseudonyms.account_id=groups.root_account_id")
+          where("pseudonyms.account_id=groups.root_account_id AND
+                 NOT EXISTS (SELECT user_id
+                             FROM enrollments e
+                             WHERE e.type = 'StudentViewEnrollment'
+                             AND e.user_id = pseudonyms.user_id)")
 
         if @sis_format
           gm = gm.where("pseudonyms.sis_user_id IS NOT NULL AND group_memberships.sis_batch_id IS NOT NULL")

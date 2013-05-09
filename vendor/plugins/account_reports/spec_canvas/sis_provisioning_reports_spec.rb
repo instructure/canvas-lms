@@ -320,6 +320,8 @@ describe "Default Account Reports" do
       end
 
       it "should run provisioning report including deleted users" do
+        c = Course.create(:name => 'course1')
+        c.student_view_student
         parameters = {}
         parameters["users"] = true
         parameters["include_deleted"] = true
@@ -662,6 +664,8 @@ describe "Default Account Reports" do
       end
 
       it "should run the provisioning report with deleted enrollments" do
+        c = Course.create(:name => 'course1')
+        c.student_view_student
         parameters = {}
         parameters["enrollments"] = true
         parameters["include_deleted"] = true
