@@ -5,6 +5,7 @@ require [
   'compiled/views/DiscussionTopic/DiscussionFilterResultsView'
   'compiled/discussions/MarkAsReadWatcher'
   'jquery'
+  'underscore'
   'Backbone'
   'compiled/models/Entry'
   'compiled/models/Topic'
@@ -13,7 +14,7 @@ require [
   'compiled/views/DiscussionTopic/TopicView'
   'compiled/views/DiscussionTopic/EntriesView'
   'compiled/jquery/sticky'
-], (EntryView, DiscussionFilterState, DiscussionToolbarView, DiscussionFilterResultsView, MarkAsReadWatcher, $, Backbone, Entry, MaterializedDiscussionTopic, SideCommentDiscussionTopic, EntryCollection, TopicView, EntriesView) ->
+], (EntryView, DiscussionFilterState, DiscussionToolbarView, DiscussionFilterResultsView, MarkAsReadWatcher, $, _, Backbone, Entry, MaterializedDiscussionTopic, SideCommentDiscussionTopic, EntryCollection, TopicView, EntriesView) ->
 
   descendants = 5
   children    = 10
@@ -66,6 +67,13 @@ require [
     entries.options.per_page = entryData.length
     entries.reset entryData
 
+  ##
+  # define function that syncs a discussion entry's
+  # read state back to the materialized view data.
+  updateMaterializedViewReadState = (id, read_state) ->
+    e = data.flattened[id]
+    e.read_state = read_state if e
+
   entriesView.on 'scrollAwayFromEntry', ->
     # prevent scroll to top for non-pushstate browsers when hash changes
     top = $container.scrollTop()
@@ -73,6 +81,25 @@ require [
       trigger: false
       replace: true
     $container.scrollTo top
+
+  ##
+  # catch when an EntryView changes the read_state
+  # of a discussion entry and update the materialized view.
+  EntryView.on 'readStateChanged', (entry, view)->
+    updateMaterializedViewReadState(entry.get('id'), entry.get('read_state'))
+
+  ##
+  # catch when auto-mark-as-read watcher changes an entry
+  # and update the materialized view to match.
+  MarkAsReadWatcher.on 'markAsRead', (entry)->
+    updateMaterializedViewReadState(entry.get('id'), entry.get('read_state'))
+
+  ##
+  # detect when read_state changes on filtered model.
+  # sync the change to full view collections.
+  filterView.on 'readStateChanged', (id, read_state) ->
+    # update on materialized view
+    updateMaterializedViewReadState(id, read_state)
 
   filterView.on 'clickEntry', (entry) ->
     router.navigate "entry-#{entry.get 'id'}", yes
