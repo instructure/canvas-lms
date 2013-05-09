@@ -187,7 +187,7 @@ class CourseFormController < ApplicationController
 
   def time_stamp
     t = Time.new
-    "#{t.day}#{t.month}#{t.year}#{t.min}"
+    "#{t.day}#{t.month}#{t.year}#{t.min}#{t.sec}"
   end
 
 end
