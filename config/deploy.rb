@@ -22,6 +22,10 @@ def push_app_servers(num_app_nodes, app_node_prefix)
   range.each { |x| role :app, "#{app_node_prefix}#{x}.tier2.sfu.ca" }
 end
 
+def is_hotfix?
+  ENV.has_key?('hotfix') && ENV['hotfix'].downcase == "true"
+end
+
 if (ENV.has_key?('gateway') && ENV['gateway'].downcase == "true")
   set :gateway, "welcome.its.sfu.ca"
   set :stats_server, "stats.its.sfu.ca"
@@ -37,8 +41,9 @@ namespace :deploy do
 	task :stop do ; end
 	desc 'Signal Passenger to restart the application.'
  	task :restart, :except => { :no_release => true } do
-		# run "touch #{release_path}/tmp/restart.txt"
-    run "sudo /etc/init.d/httpd restart"
+    puts "Signal Passenger to restart: touching #{release_path}/tmp/restart.txt"
+		run "touch #{release_path}/tmp/restart.txt"
+    # run "sudo /etc/init.d/httpd restart"
 	end
 
   namespace :web do
@@ -102,18 +107,18 @@ namespace :canvas do
     task :update_remote do
       copy_config
       clone_qtimigrationtool
-      deploy.migrate
-      load_notifications
+      deploy.migrate unless is_hotfix?
+      load_notifications unless is_hotfix?
       restart_jobs
       log_deploy
     end
 
 end
 
-before(:deploy, "deploy:web:disable")
-before("deploy:restart", "canvas:symlink_canvasfiles")
-before("deploy:restart", "canvas:compile_assets")
-before("deploy:restart", "canvas:update_remote")
+before(:deploy, "deploy:web:disable") unless is_hotfix?
+before("deploy:create_symlink", "canvas:symlink_canvasfiles")
+before("deploy:create_symlink", "canvas:compile_assets")
+before("deploy:create_symlink", "canvas:update_remote")
 
 after(:deploy, "deploy:cleanup")
-after(:deploy, "deploy:web:enable")
+after(:deploy, "deploy:web:enable") unless is_hotfix?
