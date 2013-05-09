@@ -1,23 +1,59 @@
 <form id="editCalendarEventFull" class="{{#if use_section_dates}}use_section_dates{{/if}}">
-  <input type="text" class="title input-block-level" name="title" placeholder="{{#t "event_title"}}Event Title{{/t}}" value="{{title}}" maxlength="255"/>
+  <input type="text"
+         class="title input-block-level"
+         aria-label="{{#t "event_title"}}Event Title{{/t}}"
+         placeholder="{{#t "event_title"}}Event Title{{/t}}"
+         value="{{title}}"
+         maxlength="255" />
 
-  <textarea class="input-block-level" name="description" style="width: 100%">{{description}}</textarea>
+  <textarea class="input-block-level"
+            name="description"
+            aria-label="{{#t "event_description"}}Event Description{{/t}}"
+            style="width: 100%">{{description}}</textarea>
 
   {{#if course_sections}}
     <label class="label_with_checkbox">
-      <input type="checkbox" name="use_section_dates" value="1" {{#if use_section_dates}}checked{{/if}}>{{#t "different_date_for_each_section"}}Use a different date for each section{{/t}}
+      <input type="checkbox"
+             name="use_section_dates"
+             value="1"
+             {{#if use_section_dates}}checked{{/if}} />
+      {{#t "different_date_for_each_section"}}Use a different date for each section{{/t}}
     </label>
-    <input type="hidden" name="remove_child_events" value="{{#unless use_section_dates}}1{{/unless}}" />
+
+    <input type="hidden"
+           name="remove_child_events"
+           value="{{#unless use_section_dates}}1{{/unless}}" />
   {{/if}}
 
   <div class="hide_if_using_sections date_start_end_row">
     <table>
       <tbody>
         <tr>
-          <td><input type="text" name="start_date" class="date_field" value="{{tDateToString start_at "medium"}}" placeholder="{{#t "date"}}Date{{/t}}"/></td>
-          <td><input type="text" name="start_time" class="time_field" {{#unless all_day}} value="{{tTimeToString start_at "tiny"}}" {{/unless}} placeholder="{{#t "start_time"}}Start Time{{/t}}"/></td>
+          <td>
+            <input type="text"
+                   name="start_date"
+                   class="date_field"
+                   value="{{tDateToString start_at "medium"}}"
+                   aria-label="{{#t "date"}}Date{{/t}}"
+                   placeholder="{{#t "date"}}Date{{/t}}" />
+          </td>
+          <td>
+            <input type="text"
+                   name="start_time"
+                   class="time_field"
+                   {{#unless all_day}} value="{{tTimeToString start_at "tiny"}}" {{/unless}}
+                   aria-label="{{#t "start_time"}}Start Time{{/t}}"
+                   placeholder="{{#t "start_time"}}Start Time{{/t}}" />
+          </td>
           <td><span class="time_separator">-</span></td>
-          <td><input type="text" name="end_time" class="time_field" {{#unless all_day}} value="{{tTimeToString end_at "tiny"}}" {{/unless}} placeholder="{{#t "end_time"}}End Time{{/t}}"/></td>
+          <td>
+            <input type="text"
+                   name="end_time"
+                   class="time_field"
+                   {{#unless all_day}} value="{{tTimeToString end_at "tiny"}}" {{/unless}}
+                   aria-label="{{#t "end_time"}}End Time{{/t}}"
+                   placeholder="{{#t "end_time"}}End Time{{/t}}" />
+          </td>
         </tr>
       </tbody>
     </table>
@@ -30,18 +66,37 @@
         <td colspan="4"><label class="row_header" for="section_{{id}}_start_date">{{name}}</label></td>
       </tr>
       <tr class="date_start_end_row">
-        <td><input type="text" id="section_{{id}}_start_date" name="child_event_data[{{id}}][start_date]" 
-                   class="date_field" value="{{tDateToString event.start_at "medium"}}" 
-                   placeholder="{{#t "date"}}Date{{/t}}"/></td>
-
-        <td><input type="text" name="child_event_data[{{id}}][start_time]" class="time_field" {{#unless all_day}} 
-                   value="{{tTimeToString event.start_at "tiny"}}" {{/unless}} placeholder="{{#t "start_time"}}Start Time{{/t}}"/></td>
+        <td>
+          <input type="text"
+                 id="section_{{id}}_start_date"
+                 name="child_event_data[{{id}}][start_date]"
+                 class="date_field"
+                 value="{{tDateToString event.start_at "medium"}}"
+                 aria-label="{{#t "date"}}Date{{/t}}"
+                 placeholder="{{#t "date"}}Date{{/t}}" />
+        </td>
+        <td>
+          <input type="text"
+                 name="child_event_data[{{id}}][start_time]"
+                 class="time_field"
+                 {{#unless all_day}} value="{{tTimeToString event.start_at "tiny"}}" {{/unless}}
+                 aria-label="{{#t "start_time"}}Start Time{{/t}}"
+                 placeholder="{{#t "start_time"}}Start Time{{/t}}" />
+        </td>
 
         <td><span class="time_separator">-</span></td>
 
-        <td><input type="text" name="child_event_data[{{id}}][end_time]" class="time_field" {{#unless all_day}} 
-                   value="{{tTimeToString event.end_at "tiny"}}" {{/unless}} placeholder="{{#t "end_time"}}End Time{{/t}}"/>
-            <input type="hidden" name="child_event_data[{{id}}][context_code]" value="course_section_{{id}}"></td>
+        <td>
+          <input type="text"
+                 name="child_event_data[{{id}}][end_time]"
+                 class="time_field"
+                 {{#unless all_day}} value="{{tTimeToString event.end_at "tiny"}}" {{/unless}}
+                 aria-label="{{#t "end_time"}}End Time{{/t}}"
+                 placeholder="{{#t "end_time"}}End Time{{/t}}" />
+          <input type="hidden"
+                 name="child_event_data[{{id}}][context_code]"
+                 value="course_section_{{id}}" />
+        </td>
       </tr>
       {{/each}}
     </table>
