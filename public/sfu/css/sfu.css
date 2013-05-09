@@ -103,3 +103,13 @@
     font-size: 0.8em;
     color: #888;
 }
+
+.bootstrap-form .warning
+{
+    width: 65%;
+    margin: 1.5em 0 2em 12.25em;
+    padding: 0.75em 1em;
+    border: 1px dotted #960;
+    background: #FEC;
+    color: #630;
+}

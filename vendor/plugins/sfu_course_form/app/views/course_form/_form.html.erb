@@ -4,6 +4,7 @@
 
 <h1>Start a New Course</h1>
   <% form_tag({:controller => "course_form" ,:action => "create"}, :class => "bootstrap-form form-horizontal") do -%>
+  <p class="warning"><strong>You must be a Faculty Member or Course Designer to start a new course.</strong><br />If you are a student looking to enroll in a course, please contact the instructor. Do not use this form.</p>
   <div class="control-group">
     <%= label_tag "username", "Courses Taught By", :class => "control-label" %>
     <div class="controls">
