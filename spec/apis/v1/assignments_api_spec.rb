@@ -273,6 +273,60 @@ describe AssignmentsApiController, :type => :integration do
       Assignment.count.should == 1
     end
 
+    def greater_than_255
+      <<-END
+        some really long assessment name...some really long assessment name...
+        some really long assessment name...some really long assessment name...
+        some really long assessment name...some really long assessment name...
+        some really long assessment name...some really long assessment name
+      END
+    end
+
+    it "should not allow assignment titles longer than 255 characters" do
+      name_too_long = greater_than_255
+      course_with_teacher(:active_all => true)
+      #not create an assignment with a name too long
+      lambda{
+        raw_api_call(:post,
+          "/api/v1/courses/#{@course.id}/assignments.json",
+          {
+               :controller => 'assignments_api',
+               :action => 'create',
+               :format => 'json',
+               :course_id => @course.id.to_s
+          },
+          {:assignment => { 'name' => name_too_long} }
+        )
+        response.status.to_i.should == 400
+      }.should_not change(Assignment, :count)
+    end
+
+    it "should not allow updating an assignment title to longer than 255 characters" do
+      name_too_long = greater_than_255
+      course_with_teacher(:active_all => true)
+      #create an assignment
+      @json = api_create_assignment_in_course(@course, {'name' => 'some name'})
+      @assignment = Assignment.find @json['id']
+      @assignment.reload
+
+      #not update an assignment with a name too long
+      raw_api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}.json",
+        {
+          :controller => 'assignments_api',
+          :action => 'update',
+          :format => 'json',
+          :course_id => @course.id.to_s,
+          :id => @assignment.id.to_s
+        },
+        { :assignment => { 'name' => name_too_long} }
+      )
+      response.status.to_i.should == 400
+      @assignment.reload
+      @assignment.name.should == 'some name'
+    end
+
     it "does not allow modifying turnitin_enabled when not enabled on the context" do
       course_with_teacher(:active_all => true)
       Course.any_instance.expects(:turnitin_enabled?).at_least_once.returns false
