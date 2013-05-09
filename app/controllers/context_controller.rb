@@ -17,6 +17,8 @@
 #
 
 class ContextController < ApplicationController
+  include SearchHelper
+
   before_filter :require_context, :except => [:inbox, :inbox_item, :destroy_inbox_item, :mark_inbox_as_read, :create_media_object, :kaltura_notifications, :media_object_redirect, :media_object_inline, :media_object_thumbnail, :object_snippet, :discussion_replies]
   before_filter :require_user, :only => [:inbox, :inbox_item, :report_avatar_image, :discussion_replies]
   before_filter :reject_student_view_student, :only => [:inbox, :inbox_item, :discussion_replies]
@@ -304,17 +306,22 @@ class ContextController < ApplicationController
     if @context.is_a?(Course)
       sections = @context.course_sections.select([:id, :name])
       all_roles = Role.role_data(@context, @current_user)
+      load_all_contexts(:context => @context)
       js_env({
         :ALL_ROLES => all_roles,
         :SECTIONS => sections.map { |s| { :id => s.id, :name => s.name } },
         :USER_LISTS_URL => polymorphic_path([@context, :user_lists], :format => :json),
         :ENROLL_USERS_URL => course_enroll_users_url(@context),
+        :SEARCH_URL => search_recipients_url,
+        :COURSE_ROOT_URL => "/courses/#{ @context.id }",
+        :CONTEXTS => @contexts,
         :permissions => {
           :manage_students => (manage_students = @context.grants_right?(@current_user, session, :manage_students)),
           :manage_admin_users => (manage_admins = @context.grants_right?(@current_user, session, :manage_admin_users)),
           :add_users => manage_students || manage_admins
         },
         :course => {
+          :id => @context.id,
           :completed => (completed = @context.completed?),
           :soft_concluded => (soft_concluded = @context.soft_concluded?),
           :concluded => completed || soft_concluded,

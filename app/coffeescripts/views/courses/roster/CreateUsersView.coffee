@@ -40,7 +40,8 @@ define [
       @model.on 'change:enrollment_type', @maybeShowPrivileges
 
     maybeShowPrivileges: =>
-      if @model.get('enrollment_type') in ['TeacherEnrollment', 'TaEnrollment']
+      role = _.findWhere(@model.get('roles'), name: @model.get('enrollment_type'))
+      if role and role.base_role_name in ['TeacherEnrollment', 'TaEnrollment']
         @$privileges.show()
       else
         @$privileges.hide()

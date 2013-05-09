@@ -3,12 +3,15 @@ define [
   'jquery'
   'underscore'
   'compiled/views/DialogBaseView'
-  'jst/courses/settings/LinkToStudentsView'
+  'compiled/views/courses/roster/RosterDialogMixin'
+  'jst/courses/roster/LinkToStudentsView'
   'compiled/jquery.whenAll'
   'jquery.disableWhileLoading'
-], (I18n, $, _, DialogBaseView, linkToStudentsViewTemplate) ->
+], (I18n, $, _, DialogBaseView, RosterDialogMixin, linkToStudentsViewTemplate) ->
 
   class LinkToStudentsView extends DialogBaseView
+
+    @mixin RosterDialogMixin
 
     dialogOptions:
       id: 'link_students'
@@ -19,10 +22,6 @@ define [
       data.studentsUrl = ENV.SEARCH_URL
       @$el.html linkToStudentsViewTemplate data
 
-      dfd = $.Deferred()
-      @disable dfd.promise()
-      dfds = []
-
       @students = []
       @$('#student_input').contextSearch
         contexts: ENV.CONTEXTS
@@ -32,7 +31,7 @@ define [
         selector:
           baseData:
             type: 'user'
-            context: "course_#{ENV.COURSE_ID}_students"
+            context: "course_#{ENV.course.id}_students"
             exclude: [@model.get('id')]
             skip_visibility_checks: true
           noExpand: true
@@ -43,31 +42,29 @@ define [
       input = @$('#student_input').data('token_input')
       input.$fakeInput.css('width', '100%')
 
-      for e in @model.allEnrollmentsWithRole(@role)
+      for e in @model.allEnrollmentsByType('ObserverEnrollment')
         if e.observed_user && _.any(e.observed_user.enrollments)
           input.addToken
             value: e.observed_user.id
             text: e.observed_user.name
             data: e.observed_user
 
-      # if a dfd fails (e.g. observee was removed from course), we still want
-      # the observer dialog to render (possibly with other observees)
-      $.whenAll(dfds...).always -> dfd.resolve(data)
       this
 
     getUserData: (id) ->
-      $.get("/api/v1/courses/#{ENV.COURSE_ID}/users/#{id}", include:['enrollments'])
+      $.get("/api/v1/courses/#{ENV.course.id}/users/#{id}", include:['enrollments'])
 
     update: (e) =>
       e.preventDefault()
 
       dfds = []
-      enrollments = @model.allEnrollmentsWithRole(@role)
+      enrollments = @model.allEnrollmentsByType('ObserverEnrollment')
       enrollment = enrollments[0]
       unlinkedEnrolls = _.filter enrollments, (en) -> !en.associated_user_id # keep the original observer enrollment around
       currentLinks = _.compact _.pluck(enrollments, 'associated_user_id')
       newLinks = _.difference @students, currentLinks
       removeLinks = _.difference currentLinks, @students
+      newEnrollments = []
 
       if newLinks.length
         newDfd = $.Deferred()
@@ -89,25 +86,24 @@ define [
                 limit_privileges_to_course_section: enrollment.limit_priveleges_to_course_section
             if enrollment.role != enrollment.type
               data.enrollment.role = enrollment.role
-            udfds.push $.ajaxJSON url, 'POST', data
+            udfds.push $.ajaxJSON url, 'POST', data, (newEnrollment) =>
+              newEnrollment.observed_user = user
+              newEnrollments.push newEnrollment
           $.when(udfds...).done ->
             dfdsDone += 1
             if dfdsDone == newLinks.length
               newDfd.resolve()
 
       # delete old links
-      unenrolls = _.filter enrollments, (en) -> _.include removeLinks, en.associated_user_id
-      for en in unenrolls
+      enrollmentsToRemove = _.filter enrollments, (en) -> _.include removeLinks, en.associated_user_id
+      for en in enrollmentsToRemove
         url = "#{ENV.COURSE_ROOT_URL}/unenroll/#{en.id}"
         dfds.push $.ajaxJSON url, 'DELETE'
 
       @disable($.when(dfds...)
         .done =>
-          @trigger 'updated'
+          @updateEnrollments newEnrollments, enrollmentsToRemove
           $.flashMessage I18n.t('flash.links', 'Student links successfully updated')
         .fail ->
           $.flashError I18n.t('flash.linkError', "Something went wrong updating the user's student links. Please try again later.")
         .always => @close())
-
-    disable: (dfds) ->
-      @$el.disableWhileLoading dfds, buttons: {'.btn-primary .ui-button-text': I18n.t('updating', 'Updating...')}

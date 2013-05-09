@@ -3,7 +3,8 @@ define [
   'jquery'
   'underscore'
   'compiled/views/DialogBaseView'
-  'jst/courses/settings/InvitationsView'
+  'jst/courses/roster/InvitationsView'
+  'compiled/jquery.rails_flash_notifications'
 ], (I18n, $, _, DialogBaseView, invitationsViewTemplate) ->
 
   class InvitationsView extends DialogBaseView
@@ -25,7 +26,6 @@ define [
 
       data = @model.toJSON()
       data.time = $.parseFromISO(_.last(@model.get('enrollments')).updated_at).datetime_formatted
-      data.course = ENV.CONTEXTS['courses'][ENV.COURSE_ID]
       @$el.html invitationsViewTemplate data
 
       pending = @model.pending()
@@ -50,8 +50,4 @@ define [
       for e in @model.get('enrollments')
         url = "/confirmations/#{ @model.get('id') }/re_send?enrollment_id=#{ e.id }"
         $.ajaxJSON url
-
-    removeSection: (e) ->
-      $token = $(e.currentTarget).closest('li')
-      if $token.closest('ul').children().length > 1
-        $token.remove()
+      $.flashMessage I18n.t('flash.invitation', 'Invitation sent.')

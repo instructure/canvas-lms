@@ -32,7 +32,7 @@ require [
 ], (CreateUserList, Role, CreateUsersView, RoleSelectView, rosterUsersTemplate, RosterUserCollection, RolesCollection, SectionCollection, InputFilterView, PaginatedCollectionView, RosterUserView, RosterView, $) ->
 
   fetchOptions =
-    include: ['avatar_url', 'enrollments', 'email']
+    include: ['avatar_url', 'enrollments', 'email', 'observed_users']
     per_page: 50
   users = new RosterUserCollection null,
     course_id: ENV.context_asset_string.split('_')[1]
@@ -44,6 +44,8 @@ require [
   usersView = new PaginatedCollectionView
     collection: users
     itemView: RosterUserView
+    itemViewOptions:
+      course: ENV.course
     buffer: 1000
     template: rosterUsersTemplate
   roleSelectView = new RoleSelectView

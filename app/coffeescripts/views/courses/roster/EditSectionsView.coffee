@@ -3,14 +3,18 @@ define [
   'jquery'
   'underscore'
   'compiled/views/DialogBaseView'
-  'jst/courses/settings/EditSectionsView'
+  'compiled/views/courses/roster/RosterDialogMixin'
+  'jst/courses/roster/EditSectionsView'
+  'jst/courses/roster/section'
   'compiled/widget/ContextSearch'
   'str/htmlEscape'
   'compiled/jquery.rails_flash_notifications'
   'jquery.disableWhileLoading'
-], (I18n, $, _, DialogBaseView, editSectionsViewTemplate, ContextSearch, h) ->
+], (I18n, $, _, DialogBaseView, RosterDialogMixin, editSectionsViewTemplate, sectionTemplate, ContextSearch, h) ->
 
   class EditSectionsView extends DialogBaseView
+
+    @mixin RosterDialogMixin
 
     events:
       'click #user_sections li a': 'removeSection'
@@ -34,8 +38,8 @@ define [
         selector:
           baseData:
             type: 'section'
-            context: "course_#{ENV.COURSE_ID}_sections"
-            exclude: _.map(@model.allEnrollmentsWithRole(@role), (e) -> "section_#{e.course_section_id}")
+            context: "course_#{ENV.course.id}_sections"
+            exclude: _.map(@model.sectionEditableEnrollments(), (e) -> "section_#{e.course_section_id}")
           noExpand: true
           browser:
             data:
@@ -48,23 +52,19 @@ define [
         input.value for input in @$('#user_sections input')
 
       $sections = @$('#user_sections')
-      for e in @model.allEnrollmentsWithRole(@role)
+      for e in @model.sectionEditableEnrollments()
         if section = ENV.CONTEXTS['sections'][e.course_section_id]
-          sectionName = h section.name
-          $sections.append $ """<li>
-                                  <div class="ellipsis" title="#{sectionName}">#{sectionName}</div>
-                                  <a></a>
-                                  <input type="hidden" name="sections[]" value="section_#{section.id}">
-                                </li>"""
+          $sections.append sectionTemplate(id: section.id, name: section.name, role: e.role)
 
 
     update: (e) =>
       e.preventDefault()
 
-      enrollment = @model.findEnrollmentWithRole(@role)
-      currentIds = _.map @model.allEnrollmentsWithRole(@role), (en) -> en.course_section_id
+      enrollment = @model.findEnrollmentByRole(@model.currentRole)
+      currentIds = _.map @model.sectionEditableEnrollments(), (en) -> en.course_section_id
       sectionIds = _.map $('#user_sections').find('input'), (i) -> parseInt($(i).val().split('_')[1])
       newSections = _.reject sectionIds, (i) => _.include currentIds, i
+      newEnrollments = []
       deferreds = []
       # create new enrollments
       for id in newSections
@@ -76,23 +76,23 @@ define [
             limit_privileges_to_course_section: enrollment.limit_priveleges_to_course_section
         if enrollment.role != enrollment.type
           data.enrollment.role = enrollment.role
-        deferreds.push $.ajaxJSON url, 'POST', data
+        deferreds.push $.ajaxJSON url, 'POST', data, (newEnrollment) =>
+          newEnrollments.push newEnrollment
 
       # delete old section enrollments
       sectionsToRemove = _.difference currentIds, sectionIds
-      unenrolls = _.filter @model.allEnrollmentsWithRole(@role), (en) -> _.include sectionsToRemove, en.course_section_id
-      for en in unenrolls
+      enrollmentsToRemove = _.filter @model.sectionEditableEnrollments(), (en) -> _.include sectionsToRemove, en.course_section_id
+      for en in enrollmentsToRemove
         url = "#{ENV.COURSE_ROOT_URL}/unenroll/#{en.id}"
         deferreds.push $.ajaxJSON url, 'DELETE'
 
-      combined = $.when(deferreds...)
+      @disable($.when(deferreds...)
         .done =>
-          @trigger 'updated'
+          @updateEnrollments newEnrollments, enrollmentsToRemove
           $.flashMessage I18n.t('flash.sections', 'Section enrollments successfully updated')
         .fail ->
           $.flashError I18n.t('flash.sectionError', "Something went wrong updating the user's sections. Please try again later.")
-        .always => @close()
-      @$el.disableWhileLoading combined, buttons: {'.btn-primary .ui-button-text': I18n.t('updating', 'Updating...')}
+        .always => @close())
 
     removeSection: (e) ->
       $token = $(e.currentTarget).closest('li')
