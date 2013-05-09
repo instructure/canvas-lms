@@ -72,8 +72,7 @@ module Canvas::AccountReports
       filename = generate_file_name(account_report, "zip")
       temp = Tempfile.open(filename)
       filepath = temp.path
-      temp.close
-      FileUtils::rm temp.path
+      temp.close!
 
       Zip::ZipFile.open(filepath, Zip::ZipFile::CREATE) do |zipfile|
         csv.each do |report_name, contents|
