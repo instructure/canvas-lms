@@ -11,7 +11,7 @@
       %>
       <%= options_for_select(terms, @current_term.sis_source_id) %>
     </select>
-    <%= text_field_tag "course_search", nil, :class => "input-xlarge", :required => false, :placeholder => "e.g. MATH150 D100" %>
+    <%= text_field_tag "course_search", nil, :class => "input-xlarge", :placeholder => "e.g. MATH150 D100" %>
     <input type="hidden" id="course_list">
     <br><br>
     <div id="course_search_list"></div>

@@ -137,7 +137,7 @@ class CourseFormController < ApplicationController
     course["section_tutorials"] = course_arr[5]
 
     course["course_id"] = "#{course["term"]}-#{course["name"]}-#{course["number"]}-#{course["section_name"]}"
-    course["section_id"] = "#{course["term"]}-#{course["name"]}-#{course["number"]}-#{course["section_name"]}:::section"
+    course["section_id"] = "#{course["term"]}-#{course["name"]}-#{course["number"]}-#{course["section_name"]}:::#{time_stamp}"
     course["short_name"] = "#{course["name"].upcase}#{course["number"]} #{course["section_name"].upcase}"
     course["long_name"] =  "#{course["short_name"]} #{course["title"]}"
     # Default Section set D100, D200, E300, G800 or if only 1 section (i.e. no section tutorials)
@@ -152,7 +152,7 @@ class CourseFormController < ApplicationController
     # add section tutorials csv
     unless course["section_tutorials"].nil?
       course["section_tutorials"].split(",").compact.uniq.each do |tutorial_name|
-        section_id = "#{course["term"]}-#{course["name"]}-#{course["number"]}-#{tutorial_name.downcase}:::section"
+        section_id = "#{course["term"]}-#{course["name"]}-#{course["number"]}-#{tutorial_name.downcase}:::#{time_stamp}"
         sections.push "#{section_id}:_:#{course["name"].upcase}#{course["number"]} #{tutorial_name.upcase}"
       end
     end
@@ -183,6 +183,11 @@ class CourseFormController < ApplicationController
 
   def current_term
     EnrollmentTerm.find(:all, :conditions => ["workflow_state = 'active' AND (:date BETWEEN start_at AND end_at)", {:date => Date.today}]).first
+  end
+
+  def time_stamp
+    t = Time.new
+    "#{t.day}#{t.month}#{t.year}#{t.min}"
   end
 
 end
