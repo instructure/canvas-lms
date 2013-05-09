@@ -99,13 +99,11 @@ namespace :canvas do
     task :log_deploy do
       ts = Time.now.to_i
       cmd = "echo 'stats.canvas.#{stage}.deploys 1 #{ts}' | nc #{stats_server} 2003"
-      puts cmd
       puts run_locally cmd
     end
 
     desc "Post-update commands"
     task :update_remote do
-      copy_config
       clone_qtimigrationtool
       deploy.migrate unless is_hotfix?
       load_notifications unless is_hotfix?
@@ -120,6 +118,7 @@ before("deploy:create_symlink", "canvas:symlink_canvasfiles")
 before("deploy:create_symlink", "canvas:compile_assets")
 before("deploy:create_symlink", "canvas:update_remote")
 
+after("deploy:create_symlink", "canvas:copy_config")
 after(:deploy, "deploy:cleanup")
 after(:deploy, "deploy:web:enable") unless is_hotfix?
 
