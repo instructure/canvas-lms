@@ -66,6 +66,7 @@ define [
         @model.markAsUnread()
       else
         @model.markAsRead()
+      EntryView.trigger 'readStateChanged', @model, this
 
     handleDeclarativeEvent: (event) ->
       $el = $ event.currentTarget
@@ -225,3 +226,4 @@ define [
       else
         htmlEscape value
 
+  _.extend EntryView, Backbone.Events
