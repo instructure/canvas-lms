@@ -162,7 +162,6 @@ class QuizStatistics::StudentAnalysis < QuizStatistics::Report
     rows = []
     submissions.each_with_index do |submission, i|
       update_progress(i, submissions.size)
-
       row = []
       row << submission.user.name unless anonymous?
       row << submission.user_id unless anonymous?
@@ -220,6 +219,7 @@ class QuizStatistics::StudentAnalysis < QuizStatistics::Report
         elsif question[:question_type] == 'numerical_question'
           row << (answer && answer[:text])
         elsif question[:question_type] == 'file_upload_question'
+
           row << attachment_csv(answer)
         else
           row << ((answer_item && answer_item[:text]) || '')
@@ -243,7 +243,6 @@ class QuizStatistics::StudentAnalysis < QuizStatistics::Report
         csv << r
       end
     end
-
     csv
   end
 

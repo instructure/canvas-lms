@@ -5,7 +5,8 @@ class QuizQuestion::FileUploadAnswer < QuizQuestion::UserAnswer
   end
 
   def attachment_ids
-    ids = @answer_data["question_#{question_id}".to_sym].select(&:present?)
+    return nil unless data = @answer_data["question_#{question_id}".to_sym]
+    ids = data.select(&:present?)
     ids.present? ? ids : nil
   end
 end

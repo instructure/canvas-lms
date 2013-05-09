@@ -40,6 +40,17 @@ describe QuizQuestion::FileUploadAnswer do
       answer.attachment_ids.should be_nil
     end
 
+    it "handles the case where attachment_ids is nil" do
+      data = {}
+      data[question_id] = nil
+      answer = QuizQuestion::FileUploadAnswer.new(question_id,points_possible,data)
+      ids = nil
+      expect {
+        ids = answer.attachment_ids
+      }.to_not raise_error
+      ids.should be_nil
+    end
+
   end
 
 end

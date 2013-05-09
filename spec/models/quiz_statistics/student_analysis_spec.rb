@@ -172,9 +172,12 @@ describe QuizStatistics::StudentAnalysis do
   it "includes attachment display names for quiz file upload questions" do
     require 'action_controller'
     require 'action_controller/test_process.rb'
-    student_2 = student_in_course(:active_all => true)
-    @student = User.create!(:name => "Stevie Jeebie")
-    @course.enroll_user(@student,'StudentEnrollment', :enrollment_state => :active)
+    student_in_course(:active_all => true)
+    student = @student
+    student.name = "Not Steve"
+    student.save!
+    student2 = User.create!(:name => "Stevie Jeebie")
+    @course.enroll_user(student2,'StudentEnrollment', :enrollment_state => :active)
     q = @course.quizzes.create!(:title => "new quiz")
     q.update_attribute :published_at, Time.now
     question = q.quiz_questions.create! :question_data => {
@@ -184,20 +187,27 @@ describe QuizStatistics::StudentAnalysis do
     }
     q.generate_quiz_data
     q.save!
-    qs = q.generate_submission @student
+    qs = q.generate_submission student
     io = ActionController::TestUploadedFile.new(
       File.expand_path(File.dirname(__FILE__) +
                        '/../../fixtures/scribd_docs/doc.doc'),
                        'application/msword', true)
-    attach = qs.attachments.create! :filename => "attachment.png",
-      :display_name => "attachment.png", :user => @user,
+    attach = qs.attachments.create! :filename => "doc.doc",
+      :display_name => "attachment.png", :user => student,
       :uploaded_data => io
     qs.submission_data["question_#{question.id}".to_sym] = [ attach.id.to_s ]
     qs.save!
     qs.grade_submission
-    stats = CSV.parse(csv({:include_all_versions => true},q))
-    stats[8][2].should == attach.display_name
-    stats[8][3].should == nil
+    qs = q.generate_submission student2
+    qs.submission_data["question_#{question.id}".to_sym] = nil
+    qs.save!
+    qs.grade_submission
+    # make student2's submission first
+    qs.updated_at = 3.days.ago
+    qs.save!
+    stats = CSV.parse(csv({:include_all_versions => true},q.reload))
+    stats[7][2].should == "" # student2
+    stats[7][3].should == attach.display_name # student
   end
 
   it 'should strip tags from html multiple-choice/multiple-answers' do
