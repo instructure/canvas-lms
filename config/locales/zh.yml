@@ -15,12 +15,21 @@ zh:
     no_api_key: "需要 API 键才能使用学术基准"
     no_authority: 无法找到进行更新的授权
     no_file: 未提供结果文件或授权
+  accont: 
+    feedback_pricing_sub: 为您的机构获取号码
   account: 
+    ask_canvas_network: "询问 Canvas 网络社区"
     default_account_name: 默认帐户
     default_site_administrator_account_name: 网站管理员
     default_term_name: 默认学期
     errors: 
       invalid_discovery_url: "发现 URL 无效\n"
+    feedback_coach: 询问社区
+    feedback_coach_sub: "从 Canvas 专家处获得帮助"
+    feedback_feature_request: 请求功能
+    feedback_feature_request_canvas_net: "在 Canvas 网络中请求功能"
+    feedback_feature_request_sub: "有改进 Canvas 的想法？"
+    feedback_pricing: "Canvas 定价信息"
     manually_created_courses: 手动创建的课程
     root_account_cant_have_sis_id: "无法对根帐户设置 SIS ID"
     sis_id_in_use: "SIS ID \"%{sis_id}\" 已在使用中"
@@ -52,7 +61,7 @@ zh:
     test_bind_failed: "无法与以下错误绑定: %{error}"
     test_connection_timeout: 连接超时
     test_host_unknown: "未知主机: %{host}"
-    test_login_auth_exception: "登录发生例外: %{error}"
+    test_login_auth_exception: "登录发生例外：%{error}"
     test_login_auth_failed: 身份验证失败
     test_search_failed: "搜索失败，错误如下: %{error}"
   account_authorization_configs: 
@@ -285,11 +294,43 @@ zh:
     add_user_dialog_title: 新增用户
     adding_course_message: 正在添加课程...
     adding_user_message: 正在添加用户...
+    additional_settings: 
+      labels: 
+        file_quota_in_gb: 文件存储
+        media_quota_in_gb: 媒体存储
+        student_quota: 学生
+    additional_settings_right_side: 
+      links: 
+        suspend: 挂起帐户
+        unsuspend: 取消挂起帐户
+      title: 
+        suspend: 挂起帐户
+      titles: 
+        unsuspend: 取消挂起帐户
     admin_tools: 
       admin_tools: 
         tab_labels: 
           restore_course: 恢复课程
+        view_messages: 查看通知
       admin_tools_cumb: 管理工具
+      comm_message_item: 
+        created_at: 创建时间
+        from_name: 从
+        reply_to: 收件人
+        sent_at: 发送时间
+        to: 至
+      comm_messages_content_pane: 
+        search_info: "要查看发送给 Canvas 用户的所有通知，请输入其 Canvas 用户 ID 和日期范围进行搜索。"
+        view_notifications: 查看通知
+      comm_messages_search_form: 
+        canvas_user_id: "Canvas 用户 ID"
+        find: 查找
+        message_date_from: 开始日期
+        message_date_to: 结束日期
+      comm_messages_search_overview: 
+        messages_viewed: "从 *%{start_date}*到 *%{end_date}*发送给 *%{user}* 的通知。"
+      comm_messages_search_results: 
+        no_messages_found: 找不到消息
       course_search_form: 
         labels: 
           find_deleted_course: 查找已删除的课程
@@ -363,6 +404,13 @@ zh:
       teachers_label: 教师
     course_add_failed_message: 添加课程失败，请重试
     course_added_message: "%{course} 已成功添加！"
+    course_status_csv_description: 
+      account_reports: 
+        auburn: 
+          course_status: 
+            text: "此报告显示某个给定学期的所有课程的状态。在生成的 csv 文件中，每个课程章节将具有一行，并且将在该章节中显示课程、课程状态、学期、有效的开始日期和结束日期以及记录教师。"
+          description: 
+            header: 例如
     courses: 
       courses_crumb: 课程
       no_results_message: 未找到结果
@@ -377,6 +425,32 @@ zh:
       go_button: 执行
       hide_enrollmentless_courses: 隐藏注册课程
     crumb_statistics: 统计
+    custom_grade_export_csv_description: 
+      account_reports: 
+        ross: 
+          description: 
+            header: 例如
+            text: "此报告显示了所有学生在给定学期中的最终评分结果。最终得出的 csv 文件将每行代表一个注册，并将显示课程评分册中的当前评分和最终评分。"
+    custom_grade_export_csv_parameters: 
+      account_reports: 
+        ross: 
+          parameters: 
+            note: 包含屏蔽作业的课程可能无法在此报告中准确反映分数。
+    date_picker_parameter: 
+      custom_reports: 
+        end: 
+          parameters: 
+            header: 结束时间：
+        start: 
+          parameters: 
+            header: 开始时间：
+    google_doc_accounts_csv_description: 
+      account_reports: 
+        ut_austin: 
+          description: 
+            header: 例如
+          google_doc: 
+            text: "这是用于 Google Docs 集成的所有用户和关联电子邮件地址的一份报告。"
     grade_export_csv_description: 
       account_reports: 
         default: 
@@ -406,7 +480,22 @@ zh:
         sis_export: 
           description: 
             text: "本报告将导出设置 Canvas 各个类别所涉及的全部所需信息。"
+    quiz_data_csv_description: 
+      account_reports: 
+        ace: 
+          quiz_data_description: 
+            header: 例如
+            text: "此报告显示某个给定学期中所有测验的测验题和答案。在生成的 csv 文件中，每个测验题和答案将具有一行。"
+    quiz_statistics_csv_description: 
+      account_reports: 
+        ace: 
+          quiz_statistics_description: 
+            header: 例如
+            text: "此报告显示某个给定学期中所有测验的测验题、回答问题的用户数以及正确回答问题的用户数。在生成的 csv 文件中，每个测验题将具有一行。"
     retry_login: 重试登录
+    root_accounts: 
+      labels: 
+        name: 帐户名称
     settings: 
       about_google_docs: |-
           为了让用户更方便，而不强制他们下载诸如 Word 文档、PDF、Excel 电子表格等内容以及打开办公文档（此外还需要在其计算机上安装这些程序），在整个 Canvas 的许多区域，用户可以内联预览文档。
@@ -462,6 +551,7 @@ zh:
       labels: 
         account_notification_icon: 图标
         admins_can_change_passwords: 管理员的密码设置
+        admins_can_view_notifications: 管理员可以查看通知
         allow_invitation_previews: 邀请预览
         allow_sending_scores_in_emails: 学生可以选择通过电子邮件通知接收分数
         allow_sis_import: "SIS 导入"
@@ -651,6 +741,8 @@ zh:
       started_at_message: "开始时间: %{started_at}"
       title: "SIS 导入"
       try_import_again_link: 重试导入
+    site_admin_statistics: 
+      page_title: "%{account} 的统计"
     statistics: 
       concluded_at: "结束于 %{at}"
       created_at: "创建于 %{at}"
@@ -688,6 +780,53 @@ zh:
         one: "*1 个文件*的 %{file_size}"
         other: "*%{count} 个文件*的 %{file_size} "
       uploaded_file_storage_header: 已上传的文件存储
+    student_access_csv_description: 
+      account_reports: 
+        tmcc: 
+          description: 
+            header: 例如
+          student_activity: 
+            text: "此报告显示某个给定学期中注册了某给定课程或所有课程的学生的所有活动。在生成的 csv 文件中，每项学生活动将具有一行，并且将包含以下标题：章节 ID、章节 SIS ID、章节名称、课程 ID、课程 SIS ID、课程名称、用户 ID、用户 SIS ID、内容类型、内容、查看次数、参与次数和上次查看时间。查看次数和参与次数从开始时间到报告生成时间进行计数。"
+    student_ip_csv_description: 
+      account_reports: 
+        dubspot: 
+          description: 
+            header: 例如
+          student_login: 
+            text: "此报告显示某个给定学期中注册了某给定课程或所有课程的所有学生。在生成的 csv 文件中，每项学生注册将具有一行。"
+    student_login_csv_description: 
+      account_reports: 
+        bucks: 
+          description: 
+            header: 例如
+          student_login: 
+            text: 此报告显示自给定日期以来尚未登录的学生。
+    student_login_csv_parameters: 
+      account_reports: 
+        bucks: 
+          login: 
+            check_box: 是否包括从未登录的用户？
+          parameters: 
+            note: "此报告不反映 Canvas 中的上次活动，而是反映用户上次登录的时间。"
+    student_submissions_csv_description: 
+      account_reports: 
+        vilas: 
+          description: 
+            header: 例如
+          student_submissions: 
+            text: 这是某个给定学期中注册了一门课程且提交了作业的所有学生的一份报告。此报告中，每项学生提交包含一行。
+    students_with_no_submissions_csv_description: 
+      account_reports: 
+        vilas: 
+          description: 
+            header: 例如
+          students_with_no_submissions: 
+            text: 这是某个给定学期中注册了一门课程且在该课程的给定日期范围内未提交作业的所有学生的一份报告。此报告中，每项学生注册包含一行。
+    submission_data_csv_description: 
+      account_reports: 
+        submission_data: 
+          description: 
+            text: 此报告包含参与工具的提交日期。
     terms_parameters: 
       account_reports: 
         default: 
@@ -700,6 +839,13 @@ zh:
     test_ldap_result_ok: 确定
     test_login: 测试登录
     testing: 正在测试...
+    unused_courses_csv_description: 
+      account_reports: 
+        uw: 
+          description: 
+            header: 例如
+          student_submissions: 
+            text: 这是不包含以下各项的所有课程的一份报告：作业、通告、讨论、单元、页面或测验。
     update_failed_notice: 帐户设置更新失败
     user_add_failed_message: 添加用户失败，请重试
     user_added_message: "%{user} 已成功添加!"
@@ -786,6 +932,29 @@ zh:
       criteria_required: 至少需要一个触发器
       recipients_required: 至少需要一个收件人
       threshold_should_be_numeric: 这应该是正数
+  analytics: 
+    course: 
+      analytics: 分析
+      page_title: "分析：%{course}"
+    crumb: 
+      completed: 已完成的课程
+      current: 当前课程
+    department: 
+      analytics: 分析
+    filters: 
+      completed: 已完成的课程
+      current: 当前课程
+    page_title: 
+      completed: "分析：%{account} - 已完成的课程"
+      current: "分析：%{account} - 当前课程"
+      term: "分析：%{account} - %{term}"
+    student_in_course: 
+      analytics: 分析
+      page_title: "分析：%{course} - %{student}"
+  angel: 
+    file_copy_fail: "无法复制文件夹“%{base_path}”"
+    file_copy_fail_message: "无法将目录重命名为路径“%{path}”"
+    file_import_fail: "无法导入文件“%{file_path}”"
   announcement: 
     no_title: 无标题
   announcements: 
@@ -843,7 +1012,11 @@ zh:
       page_disabled_for_course: 该页面已对此课程禁用
       page_disabled_for_group: 该页面已对此组禁用
     warnings: 
+      details: 
+        suspended: "此机构的 Canvas 帐户已被挂起。只有帐户管理员才能登录以更正任何问题。"
       please_log_in: 为安全起见，请输入您的密码方可继续
+      titles: 
+        suspended: 机构已挂起
       unsupported_browser: "您的浏览器不符合 Canvas 的最低要求。请访问 *Canvas 指南* 了解受支持浏览器的完整列表。"
     wiki_front_page_default_content_course: 欢迎使用新课程维基！
     wiki_front_page_default_content_group: 欢迎使用新组维基！
@@ -899,6 +1072,13 @@ zh:
     show_advanced_options: 显示高级选项
     submission_action_take_quiz: "提取 %{title}"
     submission_action_turn_in_assignment: "交还 %{title}"
+    submission_types: 
+      a_discussion_post: 讨论贴
+      a_file_upload: 文件上传
+      a_media_recording: 媒体录音
+      a_quiz: 测验
+      a_text_entry_box: 文本输入框
+      a_website_url: "网站 URL"
     titles: 
       grading_scheme_info: 查看/编辑评分方案
     warnings: 
@@ -1484,8 +1664,68 @@ zh:
     titles: 
       attendance_help: 参与帮助
       new_attendance_column: 新参与列
+  blackboard: 
+    no_manifest: "该 Blackboard .zip 在根目录下没有 imsmanifest.xml 文件。"
   bookmark_service: 
     default_title: 无标题
+  bulk_course_migration: 
+    export_failed: "从 Blackboard 导出 bb_lcid 为 %{id} 的课程时出现错误"
+    export_failed_no_id: 导出课程时出现错误
+    export_failed_not_found: "在 Blackboard 中通过用户 %{user_name} 找不到 bb_lcid 为 %{id} 的课程"
+    export_failed_with_id: "将 bb_lcid 为 %{id} 的课程导入 Canvas 时出现错误"
+    no_course_found: "找不到 %{id_type} 为 %{id} 的任何课程"
+    no_course_id_given: "对于 bb_lcid %{id}，未识别任何 Canvas 课程"
+    no_credentials_found: "对于用户名 %{user_name}，找不到任何凭证"
+    no_credentials_given: "对于课程 %{course_identifier}，未给定任何用户名"
+    no_lcid_found: "没有为行指定 bb_lcid"
+    queue_error: 将迁移排入队列时出现错误。
+  bulk_course_migrations: 
+    bulk_course_migration: 
+      exporting: "正在从 Blackboard 导出"
+      failed: 已失败
+      finished: 已完成
+      importing: "正在导入 Canvas"
+      migration_cancelled_on: "于 %{date}取消"
+      migration_failed_on: "于 %{date}失败"
+      migration_finished_on: "于 %{date}完成"
+      migration_queueing: 单个课程迁移正排入队列等待运行。
+      migration_started_at: "批量迁移于 %{time}开始"
+      migration_waiting: 批量迁移正等待运行。
+      see_results: 查看结果
+      show_warnings: 显示警告
+      waiting_to_export: "正在等待从 Blackboard 导出"
+      waiting_to_import: "正在等待导入 Canvas"
+    index: 
+      available_courses: 可用课程
+      bulk_description: "这些是预期在 CSV 中出现的标题："
+      buttons: 
+        add_credentials: 添加凭证
+        migrate_courses: 迁移课程
+      column_name: 列名
+      course_id_description: "要导入的课程的 Canvas ID。"
+      credential_description: "该工具将帮助您从 Blackboard Vista/CE 系统同时迁移多门课程。为您的 Blackboard 系统添加一组凭证，然后将 Canvas 课程标识符添加到提供的 CSV 模板中，以迁移您的课程。"
+      csv_description: "可以添加任何其他的列，但这些列将被忽略。这里是用户名为“greg”的帐户中 3 门课程的简单 CSV 的一个示例："
+      csv_template: "CSV 模板"
+      current_migration_batch: 当前迁移批次
+      description: 说明
+      errors: 
+        choose_file: "您必须选择一个 .csv 文件以供上传"
+      labels: 
+        only_use_one: 仅使用这两列中的一列
+        password: 密码
+        school: 学校
+        user_name: 用户名
+      lcid_description: "课程在 Blackboard 系统中的 lcid。"
+      login_credentials: "Blackboard 登录凭证"
+      page_title: 批量课程迁移
+      previous_migration_batches: 上一个迁移批次
+      school: 学校
+      school_not_supported: "请让您的管理员联系 Instructure 以帮助您的学校获得支持。"
+      sis_id_description: "要导入的 Canvas 课程的 SIS ID。"
+      upload_migration_csv: "上传迁移 CSV"
+      user_name: 用户名
+      user_name_description: "让教师/设计者访问该行中课程的用户的用户名。该名称必须符合以上列出的 Blackboard 登录凭证中的用户名之一。"
+    only_one_bulk_migration: 一次只能运行一个批量课程迁移。
   button: 
     submit_assignment: 提交作业
   buttons: 
@@ -1501,14 +1741,20 @@ zh:
     filter: 过滤
     hide_all_artifacts: 隐藏所有产物
     import: 导入
+    login: 登录
     manage_rubrics: 管理题目
+    masquerade: 仿冒此用户
     ok: 确定
     refresh: 刷新
     save: 保存
     save_tool_settings: 保存工具设置
     search: 搜索
+    send_message: 发送邮件
+    sending: 正在发送...
+    sent: 已发送！
     show_all_artifacts: 显示所有产物
     submit: 提交
+    unmasquerade: 停止仿冒
     update: 更新
     view_account_roster: 查看帐户清单
     view_course_roster: 查看课程清单
@@ -1612,19 +1858,21 @@ zh:
       scheduler_explanation_teacher_paragraph_2: "比方说，您想与参加您课程的每个学生单独讨论期中论文作业。您可以新建一个约会组， 指定对您方便的日期和时间，并将该时间分成多个时间块（每个块 15 分钟），每个时间块仅允许一个学生参与。"
       scheduler_explanation_teacher_paragraph_3: 然后，学生将收到通知，并了解需要注册一个指定的时间块。在随后显示的日历中，可用时间块覆盖在日历的上部，这样学生就可选择一个合适的时间。
       scheduler_explanation_teacher_paragraph_4: "* 单击右侧的“创建约会组”按钮，即可创建*"
-      x_groups_have_signed_up: "%{signed_up} 个组已注册"
-      x_people_have_signed_up: "%{signed_up} 名人员已注册"
+      x_groups_have_signed_up: "已注册 %{participant_count} 组"
+      x_people_have_signed_up: "已注册 %{participant_count} 人员"
     buttons: 
       cancel: 取消
       send_message: 发送
       sending_message: 正在发送...
     calendar_app: 
+      create_event: 创建新事件
       links: 
         calendar_month: 月
         calendar_scheduler: 计划程序
         calendar_week: 周
       refresh: 刷新
       use_old_calendar: 返回到旧日历
+    calendar_title: "日历:"
     cancel_appointment: "是否确定要取消您和 %{name} 的约会?"
     confirm_appointment_group_deletion: 是否确定要删除此约会组?
     confirm_deletion: 确认删除
@@ -1699,6 +1947,7 @@ zh:
     ends_in_past_error: 无法创建结束时间已过去的约会时段
     errors: 
       send_message_failed: 发送消息时出错，请重试
+    event_assignment_title: 作业标题：
     event_details: 
       attendees: 参加者
       calendar: 日历
@@ -1711,6 +1960,7 @@ zh:
       location: 位置
       message_students: 向学生发送消息
       slots_available: 可用时段
+    event_event_title: 事件标题：
     event_on_this_day: 在这一天有一个事件
     labels: 
       due: 到期日期
@@ -1907,6 +2157,7 @@ zh:
       page_title: 日历
     show2: 
       calendar_feed: 日历馈送
+      calendar_feed_instructions: "复制以下链接并将其粘贴到提取 iCal 馈送的任何日历应用程序（Google Calendar、iCal、Outlook 等）"
       feed_dialog_title: 日历馈送
       feed_title: "课程日历 Atom 馈送"
       links: 
@@ -2071,6 +2322,9 @@ zh:
       saved_successfully: 已成功保存
   collection_view: 
     no_items: 没有项目。
+  comm_messages: 
+    from_beginning: 开始
+    to_now: 立即
   communication_channel: 
     body: "您的 Canvas 验证码为 %{verification_code}"
     default_facebook_account: "Facebook 帐户"
@@ -2548,6 +2802,8 @@ zh:
     titles: 
       content_is_locked: 内容已锁定
   content_migration: 
+    missing_content_links_message: 无法解析以下参考：
+    missing_content_links_title: 导入的内容中发现缺失的链接
     unknown: 未知
   content_migrations: 
     no_archive: 此内容迁移未存档
@@ -2835,14 +3091,21 @@ zh:
           next: 下一个单元/项目
           outdent: 减少缩进当前项目
           previous: 上一个单元/项目
+      keycode_descriptions: 
+        next_module_item: 选择下一个单元或单元项目
+        previous_module_item: 选择上一个单元或单元项目
+        toggle_module_dragging: 选择项目开始拖动，或放下之前选定的项目
       keycodes: 
         delete: d
         edit: e
         indent: i
         new: "n"
         next: j
+        next_module_item: 向上键
         outdent: o
         previous: k
+        previous_module_item: 向下键
+        toggle_module_dragging: 空格键
       labels: 
         indent: 缩进
         module_complete_when: 此单元完成的条件
@@ -2867,6 +3130,7 @@ zh:
       module: 单元
       module_details: "单元按顺序显示，因此只有显示在 %{name} 上方的单元可以设置为先修课程。"
       module_name: 模块名称
+      modules_keyboard_hint: "要更改课程单元和单元项目的顺序，先关闭屏幕读取器上的光标。在 JAWS 中按 Insert-z。按 Tab 选择第一个单元，按向上键和向下键选择一个单元或单元项目。按空格键选择一个单元或单元项目开始拖动，然后按向上键和向下键选择一个目标，再次按空格键在目标后放下所选项。"
       must_complete_prerequisites: 它们必须完成
       no_preprequisites: 未定义先修课程
       no_requirements: 未定义要求
@@ -3026,6 +3290,7 @@ zh:
     buttons: 
       add_people: 填加人员
       send_message: 发送
+    cannot_be_empty: 消息不能为空
     confirm: 
       delete_message: "是否确定要删除您拥有的此消息的副本? 此操作将不可恢复。"
       delete_messages: "是否确定要删除您拥有的这些消息的副本? 此操作将不可恢复。"
@@ -3044,7 +3309,7 @@ zh:
         unarchive: 取消存档
         unstar: 标记
         unsubscribe: 取消订阅
-      inbox_actions_description: 动作
+      inbox_actions_description: 消息操作菜单
       read_more: 更多...
     conversations_list: 
       no_archived_messages: 您没有已保存的字条
@@ -3132,6 +3397,7 @@ zh:
       done_sending_message: "已将 *%{message_preview}* 发送至 *%{num_people}*"
       error_sending_message: "发送消息时出现错误:"
       sending_message: "正在发送 *%{message_preview}* 至 *%{num_people}*"
+    no_recipients_choose_another_group: 该组中没有收件人。请另选一组。
     no_results: 未找到任何结果
     not_applicable: 不适用
     not_scored: 没有分数
@@ -3353,6 +3619,19 @@ zh:
     updating: 正在更新...
   course_statistics: 
     unknown: 未知
+  course_subscriptions: 
+    already_subscribed: 
+      already_subscribed_message: "您好 *%{subscriber_name}*，您已订阅 *%{course_name}*"
+    logged_in_confirm_form: 
+      logged_in_confirm_message: "您好 *%{user_name}*，感谢您关注 *%{course_name}*。请单击下面的“订阅”以接收关于此课程的更新。"
+    new: 
+      subscribe: 订阅
+    show: 
+      thanks: "谢谢，您现在已订阅 *%{course_name}*。"
+    subscribe_form: 
+      email: 电子邮件地址
+      subscribe_form_text: "感谢您关注 *%{course_name}*。要接收关于此课程的更新，请在下面提供您的全名和电子邮件地址。"
+      your_name: 您的姓名
   course_users: 
     greater_than_three: 请输入具有三个或更多字符的搜索词
     unknown_error: 搜索时出错，请重试。
@@ -3389,6 +3668,12 @@ zh:
         one: "1 个需要评分"
         other: "%{count} 个需要评分"
       points_possible: "超出 %{points_possible}"
+    canvasnet_instructor: 
+      avatar_url: "头像 (URL)"
+      biography: 个人简介
+      instructor_name: 名称
+      job_title: 标题
+      remove_instructor: 删除导师
     confirm_action: 
       buttons: 
         conclude_course: 结束课程
@@ -3471,6 +3756,40 @@ zh:
         tas: 向课程添加助教
         title: 
           bookmark: 复制此链接或制作其书签
+    edit_profile: 
+      about: 关于
+      about_related_id: 共享用于将相关课程/章节链接到一起的标识符
+      add_instructor: 添加导师
+      basic_info: 基本信息
+      disabled: 已关闭
+      enabled: 打开
+      institution: 机构
+      institution_name: 名称
+      instructor_led: 导师指导
+      instructors: 导师
+      labels: 
+        description: 说明
+        enrollment_fee: 注册费
+        format: 格式
+        image: 图像
+        path: 路径
+        position: 位置
+        related_id: "链接 ID"
+        self_enrollment: 注册
+        self_enrollment_limit: 注册名额
+        tags: 标签
+        tentative_start: 暂定开始时间
+        title: 标题
+        visibility: 可见性
+      leave_blank_if_free: 如果是免费课程则留空
+      logo: "徽标 (URL)"
+      page_title: 课程概况
+      path_syntax: 小写字母、数字和短划线
+      private: 隐藏
+      public: "在 canvas.net 上列出"
+      save_changes: 保存更改
+      self_paced: 自定进度
+      when_to_set_tentative_start: "例如“2013 年秋季”，如果课程没有确切的开始日期"
     enrollment_reminders: 
       buttons: 
         accept: 接受邀请
@@ -3574,8 +3893,29 @@ zh:
         with_score: "分数:%{score} *超出 %{points_possible}*"
         without_score: "超出 %{points_possible}"
     roster: 
+      create_users: 
+        add_more_users: 添加更多用户
+        add_these_users: 添加用户
+        adding: 正在添加...
+        adding_n_users: "经过验证且准备好添加 %{users.length} 用户："
+        can_only_grade_students_in_section: 只能在学生的章节中为其评分
+        close: 完成
+        duplicates_removed: 删除了一些重复项。
+        email: 电子邮件
+        example_formats: "示例：user@example.com, \"名, 姓\" &lt;user@example.com&gt;, \"姓, 名\" &lt;user@example.com&gt;"
+        form_instructions: 键入或粘贴下面的电子邮件地址列表：
+        go_back: 重新开始
+        have_been_enrolled: 以下用户已注册
+        name: 名称
+        next: 下一个
+        section: 节
+        user_role: 角色：
+        validating: 正在验证...
+        will_not_be_added: 这些用户包含错误，将不会进行添加。请确保他们的格式正确。
       index: 
+        add_people: 填加人员
         all_roles: 所有角色
+        cannot_add_users: 由于该课程已结束，无法添加新用户
         role_to_search: 将搜索限制为角色
         search: 搜索
         search_people: 搜索人员
@@ -3678,6 +4018,7 @@ zh:
         license: 许可证
         limit_privileges_to_course_section: 这些管理员只能在其负责的章节中为学生评分
         open_enrollment: "添加 \"参与此课程\" 链接到课程主页"
+        public_syllabus: 使该课程的提纲公开可见
         restrict_enrollments_to_course_dates: 用户只能参与这些日期之间的课程
         root_account_id: 根帐户
         self_enrollment: "与学生分享私密的 URL，允许他们自行注册"
@@ -3893,6 +4234,8 @@ zh:
         current_users: 当前用户
       re_send_all: 或*重新发送所有未接受的邀请*
       unaccepted_invitations: "%{count} 个邀请未被接受。您可以单击用户名称以重新发送邀请"
+  create_users_view: 
+    required: 请输入一些电子邮件地址
   crumb: 
     conversations: 会话
     discussion_replies: 讨论回复
@@ -3910,6 +4253,7 @@ zh:
     eportfolio_welcome: "欢迎使用 ePortfolio"
     error_reports: 错误报告
     files: 文件
+    gradebook: 评分册
     grades: 评分
     grading_schemes: 评分方案
     groups: 组
@@ -3921,6 +4265,8 @@ zh:
     people: 人员
     plugins: 插件
     prior_users: 之前的用户
+    question_banks: 题库
+    quizzes: 测验
     registered_services: 注册的服务
     results: 结果
     revisions: 修订版
@@ -3991,6 +4337,7 @@ zh:
       long: "%B %d, %Y"
       medium: "%b %e, %Y"
       medium_month: "%b %Y"
+      medium_with_weekday: "%a %b %-d, %Y"
       short: "%b %e"
       short_month: "%b"
       short_weekday: "%a"
@@ -4054,6 +4401,21 @@ zh:
       month: 月
       second: 秒
       year: 年
+  demos: 
+    demos_add: 
+      labels: 
+        school_name: 学校名称
+        username: 电子邮件地址
+    register: 
+      labels: 
+        current_lms: "当前 LMS"
+        name: 名称
+        organization_size: 组织规模
+        organization_type: 组织类型
+        phone: 电话号码
+        school_name: 学校/组织
+        school_position: 标题
+        username: 电子邮件
   developer_key: 
     api_key: "密钥: *%{api_key}*"
     created: "创建时间:"
@@ -4336,6 +4698,9 @@ zh:
     multiple_due_dates: "到期日期: 多个到期日期"
     no_due_date: "到期日期: 无到期日期"
   edit_rubric: 
+    buttons: 
+      create_rubric: 创建题目
+      update_rubric: 更新题目
     errors: 
       load_rubrics_failed: 加载题目失败，请重试
     messages: 
@@ -5234,6 +5599,7 @@ zh:
     section_to_show_menu: 
       choose_a_section_to_show: 选择要显示的章节
     show: 
+      all_sections: 所有章节
       arrange_columns_by_due_date: 按到期日期排列列
       arrange_columns_by_group: 按作业组排列列
       download_scores: "下载分数 (.csv)"
@@ -5245,6 +5611,7 @@ zh:
       set_group_weights: 设置组权重
       show_attendance_columns: 显示参与列
       show_concluded_enrollments: 显示结业登记
+      showing_sections: "正在显示：*%{section_being_shown}*"
       upload_scores: "上传分数（从 .csv）"
       view_grading_history: 查看评分记录
     show_student_names: 显示学生姓名
@@ -5413,6 +5780,7 @@ zh:
       not_official: "*注*:这不是您的正式分数。"
       page_title: "%{student} 的评分"
       percent: 百分比
+      print_grades: 打印评分
       see_rubric_results: 查看题目答案
       see_scoring_details: 查看评分详细信息
       see_turnitin_results: "查看 Turnitin 答案"
@@ -5954,6 +6322,9 @@ zh:
   info: 
     notices: 
       error_reported: 感谢您的帮助！我们马上解决。
+    old_styleguide: 
+      create_collection: 创建集合
+      start_a_group: 启动组
     styleguide: 
       create_collection: 创建集合
       find_people: "通过 Canvas 查找人员"
@@ -6140,6 +6511,9 @@ zh:
   learning_outcome_group: 
     no_global_permission: "您不可以管理全局结果，无法添加“%{title}”"
   lib: 
+    angel: 
+      failed_import_link: 导入链接失败
+      failed_import_link_body: "此链接参考了一项 Angel 功能，通过 Canvas 无法链接该功能或者该功能在导出范围之外。"
     api: 
       attachments: 
         only_one_folder: "无法设置文件夹的路径和 ID"
@@ -6280,9 +6654,19 @@ zh:
       sending_message: 正在发送邮件...
     message_student: "向学生发送有关 %{course_name} 的邮件"
     send_message: 发送邮件
+  message_students_dialog: 
+    for_title: "有关 %{title}"
+    message_students_who: 发送消息到学生...
   messages: 
+    account_suspended: 
+      email: 
+        body: "%{institution} 已被挂起。请联系您的网站管理员找出原因。"
+        subject: 机构已挂起
     account_user_notification: 
       email: 
+        html: 
+          subject: 帐户管理员通知
+          url_info: 访问帐户页面
         subject: 帐户管理员通知
         url_info: |-
             此处访问帐户页面:
@@ -6291,6 +6675,14 @@ zh:
       email: 
         added_message: "您已作为 %{role_type} 添加到 %{website} 上的帐户 %{account}。"
         email_info: "电子邮件: %{email}"
+        html: 
+          added_message: "您已作为 %{role_type} 添加到 %{website} 上的帐户 %{account}。"
+          click_to_finish_registration: 单击此处完成注册过程
+          email: 电子邮件
+          name: 名称
+          subject: "Canvas 帐户管理员邀请"
+          url_info_label: "您需要先在 Canvas 上注册，然后才能以帐户管理员的身份参加。"
+          username: 用户名
         name_info: "名称: %{name}"
         subject: "Canvas 帐户管理员邀请"
         url_info: |-
@@ -6300,6 +6692,11 @@ zh:
     added_to_conversation: 
       email: 
         body: "%{user_name} 仅将您添加到 Canvas 中的会话。要查看会话，单击下面的链接:"
+        html: 
+          body: "%{user_name} 仅将您添加到 Canvas 中的会话。"
+          link_text: 查看会话
+          subject: "%{user_name} 仅将您添加到 Canvas 中的会话。"
+          unknown_user: 未知用户
         subject: "%{user_name} 仅将您添加到 Canvas 中的会话。"
         unknown_user: 未知用户
       facebook: 
@@ -6325,6 +6722,19 @@ zh:
         body_student: 
           one: "已对您触发了警报，因为满足以下条件:"
           other: 已对您触发了警报，因为满足以下条件：
+        html: 
+          body: 
+            one: "已为 %{student} 触发了警报，因为满足了以下条件："
+            other: "已为 %{student} 触发了警报，因为满足了以下条件："
+          body_student: 
+            one: 已为您触发了警报，因为满足了以下条件：
+            other: 已为您触发了警报，因为满足了以下条件：
+          interaction_description: "没有学生/教师交互已 %{count} 天"
+          subject: "警报: %{user_name}"
+          ungraded_count_description: "%{count} 个或多个提交文件尚未评分"
+          ungraded_timespan_description: "提交文件已 %{count} 天未评分"
+          usernote_description: "没有教师日志条目已 %{count} 天"
+          view_here: 您可在此处进行查看
         interaction_description: "没有学生/教师交互已 %{count} 天"
         subject: "警报: %{user_name}"
         ungraded_count_description: "%{count} 个或多个提交文件尚未评分"
@@ -6378,6 +6788,19 @@ zh:
         body_student: 已触发针对您的警报
     appointment_canceled_by_user: 
       email: 
+        html: 
+          attendee: 参加者
+          attendees: 参加者
+          cancel_reason: 取消原因
+          click_to_see_assignment: 单击此处查看作业
+          date_and_time: 日期/时间
+          details: 约会详细信息
+          group: 组
+          message: "%{user} 取消了 %{appointment_name} 的预订。"
+          no_reason_given: 未给定
+          slots_remaining: 可用时段
+          subject: "%{appointment_name} (%{course}) 的预订已取消"
+          view_appointment: 在下面的链接处查看约会
         instructions: "从以下链接查看约会: %{link}"
         labels: 
           attendee: 参加者
@@ -6411,6 +6834,18 @@ zh:
         message: "Canvas 警报 - %{user} 已取消他/她的 \"%{appointment_name}\" 预订。"
     appointment_deleted_for_user: 
       email: 
+        html: 
+          attendee: 参加者
+          attendees: 参加者
+          cancel_reason: 取消原因
+          course: 课程
+          date_and_time: 日期/时间
+          details: 约会详细信息
+          group: 组
+          link_text: 单击此处注册其他时段
+          message: "%{user} 取消了您的 %{appointment_name} 时段。"
+          no_reason_given: 未给定
+          subject: "您的 %{appointment_name} 时段已被取消 (%{course})"
         instructions: "从以下链接注册其他时段: %{link}"
         labels: 
           attendee: 参加者
@@ -6442,6 +6877,15 @@ zh:
         message: "Canvas 警报 - 您的 \"%{appointment_name}\" 时段已取消。"
     appointment_group_deleted: 
       email: 
+        html: 
+          cancel_reason: 取消原因
+          course: 课程
+          dates: 日期
+          details: 约会详细信息
+          link_text: 查看约会
+          message: "%{appointment_name} 的所有约会已被取消。"
+          no_reason_given: 未给定
+          subject: "%{appointment_name} 的约会已被取消 (%{course})"
         labels: 
           cancel_reason: 取消原因
           course: 课程
@@ -6466,6 +6910,17 @@ zh:
     appointment_group_published: 
       email: 
         group_signup: "组 (%{group_category})"
+        html: 
+          course: 课程
+          dates: 日期
+          details: 约会详细信息
+          group_signup: "组 (%{group_category})"
+          individual_signup: 个人
+          link_text: 注册时段
+          message: "针对 \"%{appointment_name}\" 的时段现在可用于注册。"
+          signup_type: 注册类型
+          slots_remaining: 可用时段
+          subject: "约会 \"%{appointment_name}\" 可用于注册 (%{course})"
         individual_signup: 个人
         instructions: "从以下链接注册时段: %{link}"
         labels: 
@@ -6498,6 +6953,16 @@ zh:
     appointment_group_updated: 
       email: 
         group_signup: "组 (%{group_category})"
+        html: 
+          course: 课程
+          dates: 日期
+          details: 约会详细信息
+          group_signup: "组 (%{group_category})"
+          individual_signup: 个人
+          link_text: 注册时段
+          message: "时段已添加到 \"%{appointment_name}\" ，可用于注册。"
+          slots_remaining: 可用时段
+          subject: "约会 \"%{appointment_name}\" 已更新 (%{course})"
         individual_signup: 个人
         instructions: "从以下链接注册时段: %{link}"
         labels: 
@@ -6529,6 +6994,17 @@ zh:
         message: "Canvas 警报 - 新的时段可用于 \"%{appointment_name}\"。"
     appointment_reserved_by_user: 
       email: 
+        html: 
+          attendee: 参加者
+          attendees: 参加者
+          course: 课程
+          date_and_time: 日期/时间
+          details: 约会详细信息
+          group: 组
+          link_text: 查看约会
+          message: "%{user} 已注册 \"%{appointment_name}\"。"
+          slots_remaining: 可用时段
+          subject: "用户已注册 \"%{appointment_name}\" (%{course})"
         instructions: "从以下链接查看约会: %{link}"
         labels: 
           attendee: 参加者
@@ -6558,6 +7034,17 @@ zh:
         message: "Canvas 警报 - %{user} 已注册 \"%{appointment_name}\"。"
     appointment_reserved_for_user: 
       email: 
+        html: 
+          attendee: 参加者
+          attendees: 参加者
+          course: 课程
+          date_and_time: 日期/时间
+          details: 约会详细信息
+          group: 组
+          link_text: 注册其他时段
+          message: "%{user} 已为您注册了 \"%{appointment_name}\"。"
+          slots_remaining: 可用时段
+          subject: "您已注册 \"%{appointment_name}\""
         instructions: "从以下链接注册其他时段: %{link}"
         labels: 
           attendee: 参加者
@@ -6595,6 +7082,10 @@ zh:
             
             单击此处查看作业: 
             %{url}
+        html: 
+          body: "%{course} 的作业“%{title}”已更改。"
+          link: 单击此处查看作业
+          subject: "作业已更改:%{title}，%{course}"
         subject: "作业已更改:%{title}，%{course}"
       facebook: 
         body: "%{course} 的作业 %{title_link} 已更改。"
@@ -6611,6 +7102,13 @@ zh:
       email: 
         assignment_created: "作业已创建 - %{assignment_name}，%{course_name}"
         due_at: "到期日期: %{assignment_due_date_time}"
+        html: 
+          assignment_created: "作业已创建 - %{assignment_name}，%{course_name}"
+          due_at: "到期日期：%{assignment_due_date_time}"
+          link_text: 查看作业
+          multiple_due_dates: 到期日期：多个日期
+          new_assignment: "已创建针对您的课程 %{course_name} 的新作业"
+          no_due_date: 无到期日期
         labels: 
           click_to_see_assignment: 单击此处查看作业
         multiple_due_dates: "到期日期: 多个日期"
@@ -6641,6 +7139,11 @@ zh:
       email: 
         assignment_due_date_changed: "作业到期日期更改:%{assignment_name}，%{course_name}"
         assignment_due_date_changed_sentence: "课程 %{course_name} 的作业 %{assignment_name} 的到期日期已更改为:"
+        html: 
+          assignment_due_date_changed: "作业到期日期更改:%{assignment_name}，%{course_name}"
+          assignment_due_date_changed_sentence: "课程 %{course_name} 的作业 %{assignment_name} 的到期日期已更改为:"
+          link_text: 查看作业
+          no_due_date: 无到期日期
         labels: 
           click_to_see_assignment: 单击此处查看作业
         no_due_date: 无到期日期
@@ -6663,6 +7166,11 @@ zh:
       email: 
         assignment_due_date_changed: "作业到期日已更改: %{assignment_name}，%{course_name} (%{override})"
         assignment_due_date_changed_sentence: "课程 %{course_name} (%{override}) 的作业 %{assignment_name} 的到期日已更改为:"
+        html: 
+          assignment_due_date_changed: "作业到期日期已更改：%{assignment_name}，%{course_name} (%{override})"
+          assignment_due_date_changed_sentence: "课程 %{course_name} (%{override}) 的作业 %{assignment_name} 的到期日期已更改为："
+          link_text: 查看作业
+          no_due_date: 无到期日期
         labels: 
           click_to_see_assignment: 单击此处查看作业
         no_due_date: 无到期日
@@ -6684,6 +7192,10 @@ zh:
     assignment_graded: 
       email: 
         assignment_graded: "作业已评分:%{assignment_name}，%{course_name}"
+        html: 
+          assignment_graded: "作业已评分:%{assignment_name}，%{course_name}"
+          link_text: 查看作业
+          the_assignment_is_graded: "作业 %{assignment_name} 已评分。"
         labels: 
           view_here: 您可在此处进行查看
         the_assignment_is_graded: "作业 %{assignment_name} 已评分。"
@@ -6703,6 +7215,10 @@ zh:
     assignment_locked_until: "此作业锁定至 %{date}。"
     assignment_resubmitted: 
       email: 
+        html: 
+          link_text: 查看提交
+          user_resubmitted: "重新提交文件:%{user_name}，%{assignment_name}"
+          user_resubmitted_sentence: "%{user_name} 刚刚提交课程 %{course_name} 中 %{assignment_name} 的重新提交文件"
         labels: 
           view_submission: 您可在此处查看提交文件
         user_resubmitted: "重新提交文件:%{user_name}，%{assignment_name}"
@@ -6720,6 +7236,10 @@ zh:
         user_resubmitted: "Canvas 警报 - 重新提交文件:%{user_name}，%{assignment_name}"
     assignment_submitted: 
       email: 
+        html: 
+          link_text: 查看提交
+          user_submitted: "提交文件:%{user_name}，%{assignment_name}"
+          user_submitted_sentence: "%{user_name} 刚刚提交课程 %{course_name} 中 %{assignment_name} 的提交文件"
         labels: 
           view_submission: 您可在此处查看提交文件
         user_submitted: "提交文件:%{user_name}，%{assignment_name}"
@@ -6737,6 +7257,10 @@ zh:
         user_submitted: "Canvas 警报 - 提交文件:%{user_name}，%{assignment_name}"
     assignment_submitted_late: 
       email: 
+        html: 
+          link_text: 查看提交
+          user_resubmitted_sentence: "%{user_name} 刚刚提交课程 %{course_name} 中 %{assignment_name} 的最近提交文件"
+          user_submitted: "最近作业:%{user_name}，%{assignment_name}"
         labels: 
           view_submission: 您可在此处查看提交文件
         user_resubmitted_sentence: "%{user_name} 刚刚提交课程 %{course_name} 中 %{assignment_name} 的最近提交文件"
@@ -6759,6 +7283,10 @@ zh:
             
             您可在此处进行查看:
             %{url}
+        html: 
+          body: "您的导师已发布 %{title} 的评分更改和新评论。现在可以查看这些更改。"
+          link: 您可在此处进行查看
+          subject: "作业取消静音:%{title}，%{course}"
         subject: "作业取消静音:%{title}，%{course}"
       sms: 
         body: |-
@@ -6790,6 +7318,12 @@ zh:
             
             您可在此处查看详细信息:
             %{link}
+        html: 
+          body: "您受邀在 %{course_or_group} 的文档 %{document} 上进行协作。该文档在 %{service} 中创建，并且使用您的电子邮件地址 %{email} 来邀请您。"
+          body_with_user: "您受邀在 %{course_or_group} 的文档 %{document} 上进行协作。该文档由 %{user} 在 %{service} 中创建，并且使用您的电子邮件地址 %{email} 来邀请您。"
+          change_profile_settings: "如果该电子邮件地址对于此类协作是错误的，您需要更改个人资料设置或注册 %{service}。"
+          link: 您可以在此处查看详细信息
+          subject: "协作邀请: %{course_or_group}"
         subject: "协作邀请: %{course_or_group}"
       facebook: 
         body: "您已被邀请协作文档 %{document} (%{course_or_group})。该文档在 %{service} 中创建。"
@@ -6815,11 +7349,19 @@ zh:
       email: 
         body: "电子邮件地址 %{email} 已在 %{website} 为用户 %{user} 注册。"
         details: "要确认此注册，请访问以下 url:"
+        html: 
+          body: "电子邮件地址 %{email} 已在 %{website} 为用户 %{user} 注册。"
+          details: 单击此处确认该注册
+          subject: "确认电子邮件:Canvas"
         subject: "确认电子邮件:Canvas"
     confirm_registration: 
       email: 
         body: "感谢您注册 Canvas！此电子邮件用于确认用户 %{user} 在 %{website} 注册的新帐户。"
         details: "要完成注册过程，请访问以下 url:"
+        html: 
+          body: "感谢您注册 Canvas！此电子邮件的目的是确认用户 %{user} 正在 %{website} 上注册一个新帐户。"
+          details: 单击此处完成注册过程
+          subject: "确认注册:Canvas"
         subject: "确认注册:Canvas"
     confirm_sms_communication_channel: 
       sms: 
@@ -6834,10 +7376,18 @@ zh:
         body: |-
             导出课程"%{course}"时出现问题。
             请通知您的系统管理员，并为其提供以下导出标识符: %{id}.
+        html: 
+          body: "导出课程 <em>%{course}</em> 时出现问题。请通知您的系统管理员，并向其提供以下导出标识符："
+          link: 单击查看导出
+          subject: "课程导出失败: %{course}"
         subject: "课程导出失败: %{course}"
     content_export_finished: 
       email: 
         body: "\"%{course}\"的课程导出已完成。"
+        html: 
+          body: "<em>%{course}</em> 的课程导出已结束。"
+          link: 单击查看导出
+          subject: "课程导出完成: %{course}"
         subject: "课程导出完成: %{course}"
     content_locked: 此测验当前锁定。
     content_locked_at: "此内容锁定于 %{at}。"
@@ -6849,6 +7399,14 @@ zh:
         attached_files: "附加的文件:"
         audio_comment: "此邮件包括媒体评论。要收听或回复，单击下面的链接:"
         body: "%{user_name} 刚刚在 Canvas 中向您发送了一封邮件:"
+        html: 
+          attached_files: "附加的文件:"
+          audio_comment: "此邮件包括媒体评论。要收听或回复，单击下面的链接:"
+          body: "%{user_name} 刚刚在 Canvas 中向您发送了一封邮件:"
+          download: 下载
+          reply_message: "要回复此邮件，单击下面的链接:"
+          subject: "%{user_name} 刚刚在 Canvas 中向您发送了一封邮件。"
+          unknown_user: 未知用户
         reply_message: "要回复此邮件，单击下面的链接:"
         subject: "%{user_name} 刚刚在 Canvas 中向您发送了一封邮件。"
         unknown_user: 未知用户
@@ -6867,6 +7425,64 @@ zh:
       twitter: 
         tweet: "Canvas 警报 - 来自 %{user_name} 的邮件。"
         unknown_user: 未知用户
+    course_already_started: 
+      email: 
+        body: |-
+            %{user} 您好，
+            
+            您在 Canvas 网络上的课程 %{course} 已于几天前开课，但我们注意到您尚未登录。我们发送此邮件只是想最后一次提醒您，以免您忘了该课程。
+            
+            若要登录，请转到 %{site} 并输入您的用户名和密码。如果您尚未设置密码，则可以在此处设置一个：%{password_url}。如果您只是不能参加这一特定课程，请在 %{site} 上随意浏览我们的课程目录，寻找您感兴趣的其他课程。新课程会不断添加进来！
+            
+            我们希望很快与您见面！
+            
+            Canvas 网络
+        course_already_started: 您的课程已开课
+    course_required_materials: 
+      email: 
+        body: |-
+            %{user} 您好，
+            
+            好消息！您在 Canvas 网络上注册的课程 %{course} 很快就要开课。
+            
+            为了帮助您确保在课程学习中获得最佳效果，您应当查看导师列出的任何特殊说明或课程材料。您可以在 Canvas 网络的课程详细信息页面上查找这些内容，或只需单击下面的链接。
+            
+            %{url}
+            
+            学无止境！
+            
+            Canvas 网络
+        course_required_materials: "%{course} 的材料和说明"
+    course_started: 
+      email: 
+        body: |-
+            %{user} 您好，
+            
+            谨此提请注意，您在 Canvas 网络上的课程 %{course} 今日开课。您现在可以登录 %{site} 并开始课程！
+            
+            请不要忘了设置您的 Canvas 网络个人资料，这样该课程的其他人员可对您有所了解。您可以在 %{profile_url} 上更新您的个人资料。
+            
+            学无止境！
+            
+            Canvas 网络
+        course_starts_today: 您的课程今日开课
+    course_starts_in_week: 
+      email: 
+        body: |-
+            %{user}，
+            
+            课程即将开始！您在 Canvas 网络上注册的课程 %{course} 将于下周开课。我们了解您的激动心情，我们同样非常激动。
+            
+            您需要准备些什么？
+            
+            如果您尚未创建 Canvas 网络个人资料，则可以登录 Canvas.net 进行设置。您的个人资料将有助于该课程的其他人员了解您。此外，您还可以在该网站上设置通知首选项。
+            
+            最后，您可以在此处查看课程所需的材料和任何说明：%{url}
+            
+            学无止境！
+            
+            Canvas 网络
+        course_starts_next_week: 您的课程下周开课
     dialog: 
       title: 发送回复邮件
     email: 
@@ -6879,6 +7495,14 @@ zh:
         body_ta: "%{user} 刚刚接受了作为助教参与课程 %{course} 的邀请。"
         body_teacher: "%{user} 刚刚接受了作为教师参与课程 %{course} 的邀请。"
         details: "此处可查看当前注册的列表:"
+        html: 
+          body_designer: "%{user} 刚接受了作为设计者参与课程 %{course} 的邀请。"
+          body_observer: "%{user} 刚刚接受了作为观察员参与课程 %{course} 的邀请。"
+          body_student: "%{user} 刚刚接受了作为学生参与课程 %{course} 的邀请。"
+          body_ta: "%{user} 刚刚接受了作为助教参与课程 %{course} 的邀请。"
+          body_teacher: "%{user} 刚刚接受了作为教师参与课程 %{course} 的邀请。"
+          details: 查看当前注册列表
+          subject: "%{user} 接受了课程邀请"
         subject: "%{user} 接受了课程邀请"
       facebook: 
         body_designer: "%{user} 刚刚接受了作为设计者参与课程 %{course} 的邀请。"
@@ -6910,6 +7534,18 @@ zh:
         body_ta: "我们邀请您作为助教参与课程 %{course}。"
         body_teacher: "我们邀请您作为教师参与课程 %{course}。"
         details: "此处访问课程页面:"
+        html: 
+          body_designer: "我们邀请您作为设计者参与课程 %{course}。"
+          body_observer: "我们邀请您作为观察员参与课程 %{course}。"
+          body_student: "我们邀请您作为学生参与课程 %{course}。"
+          body_ta: "我们邀请您作为助教参与课程 %{course}。"
+          body_teacher: "我们邀请您作为教师参与课程 %{course}。"
+          email: 电子邮件
+          link: 单击此处查看课程页面
+          name: 名称
+          none: 无
+          subject: 课程邀请
+          username: 用户名
         labels: 
           email: 电子邮件
           name: 名称
@@ -6956,6 +7592,18 @@ zh:
         body_ta: "您已作为助教注册课程 %{course}。"
         body_teacher: "您已作为教师注册课程 %{course}。"
         details: "此处访问课程页面:"
+        html: 
+          body_designer: "您已作为设计者注册课程 %{course}。"
+          body_observer: "您已作为观察员注册课程 %{course}。"
+          body_student: "您已作为学生注册课程 %{course}。"
+          body_ta: "您已作为助教注册课程 %{course}。"
+          body_teacher: "您已作为教师注册课程 %{course}。"
+          complete_registration_link: 单击此处完成注册
+          email: 电子邮件
+          name: 名称
+          none: 无
+          subject: 课程注册
+          username: 用户名
         labels: 
           email: 电子邮件
           name: 名称
@@ -7003,6 +7651,20 @@ zh:
         body_ta: "我们邀请您参与 %{website} 上的班级。该班级名为 %{course}，我们邀请您作为助教参与。"
         body_teacher: "我们邀请您参与 %{website} 上的班级。该班级名为 %{course}，我们邀请您作为教师参与。"
         details: "您将需要向 Canvas 注册，然后才能参与班级。要开始使用，请在此处访问课程页面:"
+        html: 
+          body_designer: "该班级名为 %{course}，我们邀请您作为设计者参与。"
+          body_observer: "该班级名为 %{course}，我们邀请您作为观察者参与。"
+          body_student: "该班级名为 %{course}，我们邀请您作为学生参与。"
+          body_ta: "该班级名为 %{course}，我们邀请您作为助教参与。"
+          body_teacher: "该班级名为 %{course}，我们邀请您作为教师参与。"
+          details: "您需要在 Canvas 上注册，然后才能参与该班级。"
+          email: 电子邮件
+          link: 单击此处开始
+          name: 名称
+          none: 无
+          participate_in_class: "您受邀参与 %{website} 上的班级"
+          subject: 课程邀请
+          username: 用户名
         labels: 
           email: 电子邮件
           name: 名称
@@ -7034,6 +7696,12 @@ zh:
       email: 
         email_body: "课程 %{course_name} 的活动 %{event_title} 已更改时间。时间现在为:"
         from_to_time: "从 %{start_date_time} 到 %{end_date_time}"
+        html: 
+          email_body: "课程 %{course_name} 的活动 %{event_title} 已更改时间。时间现在为:"
+          from_to_time: "从 %{start_date_time} 到 %{end_date_time}"
+          no_time_set: 没有设置时间
+          see_details: 您可在此处查看详细信息
+          subject: "活动日期更改:%{event_title}，%{course_name}"
         labels: 
           see_details: 您可在此处查看详细信息
         no_time_set: 没有设置时间
@@ -7063,6 +7731,17 @@ zh:
     forgot_password: 
       email: 
         associated_login: "此地址关联登录信息\"%{login_identifier}\"。"
+        html: 
+          associated_login: "此地址关联登录信息\"%{login_identifier}\"。"
+          click_to_reset: 单击此处设置新密码
+          labels: 
+            associated_with_accounts: 此地址关联以下帐户
+            change_password_at: 在以下位置更改此登录信息的密码
+          login_at_account: "%{login_email} at %{account_name}"
+          login_managed_by_account: "此登录信息的证书通过 %{account_name} 进行管理"
+          password_from_account: "系统管理员应当已随 %{account_name} 向您提供此次登录的密码，并且 Instructure 没有权限访问您的密码。如果您的密码无效，请联系系统管理员更改或验证您的密码。"
+          requested_password_reset: "您已请求确认登录到 Canvas 的密码。"
+          subject: "忘记密码:Canvas"
         labels: 
           associated_with_accounts: 此地址关联以下帐户
           change_password_at: 在以下位置更改此登录信息的密码
@@ -7076,6 +7755,13 @@ zh:
       email: 
         grade_changed: "课程 %{course_name} 的评分政策已更改。"
         grading_based_on_points: 评分基于所有作业的总分数。
+        html: 
+          grade_changed: "课程 %{course_name} 的评分政策已更改。"
+          grading_based_on_points: 评分基于所有作业的总分数。
+          labels: 
+            grades_based_on_percent: 评分基于每个作业组的加权总计
+            now_see_here: 您可在此处查看详细信息
+            subject: 评分加权已更改
         labels: 
           grades_based_on_percent: 评分基于每个作业组的加权总计
           now_see_here: 您可在此处查看详细信息
@@ -7099,6 +7785,10 @@ zh:
     group_assignment_submitted_late: 
       email: 
         body: "组 %{group_name} 刚刚提交课程 %{course_name} 中 %{assignment_name} 的最近提交文件。"
+        html: 
+          body: "组 %{group_name} 刚刚提交课程 %{course_name} 中 %{assignment_name} 的最近提交文件。"
+          subject: "最近作业:%{group_name}，%{assignment_name}"
+          view_submission_here: 您可在此处查看提交文件
         labels: 
           view_submission_here: 您可在此处查看提交文件
         subject: "最近作业:%{group_name}，%{assignment_name}"
@@ -7117,6 +7807,12 @@ zh:
         account_group: "帐户 %{account_name} 加入组 %{group_name} 的请求已被接受。"
         course_group: "课程 %{course_name} 加入组 %{group_name} 的请求已被接受。"
         group_request_accepted: "组请求已接受: %{group_name}"
+        html: 
+          account_group: "帐户 %{account_name} 加入组 %{group_name} 的请求已被接受。"
+          course_group: "课程 %{course_name} 加入组 %{group_name} 的请求已被接受。"
+          group_request_accepted: "组请求已接受: %{group_name}"
+          link: 单击以签出该组
+          subject: "组成员资格已接受: %{group_name}"
         labels: 
           click_below: 您可通过单击下面的链接检查组
         subject: "组成员资格已接受: %{group_name}"
@@ -7140,6 +7836,12 @@ zh:
         account_group: "帐户 %{account_name} 加入组 %{group_name} 的请求已被拒绝。"
         course_group: "课程 %{course_name} 加入组 %{group_name} 的请求已被拒绝。"
         group_request_rejected: "组请求已拒绝: %{group_name}"
+        html: 
+          account_group: "帐户 %{account_name} 加入组 %{group_name} 的请求已被拒绝。"
+          course_group: "课程 %{course_name} 加入组 %{group_name} 的请求已被拒绝。"
+          group_request_rejected: "组请求已拒绝: %{group_name}"
+          link: 单击以查看其他组
+          subject: "组成员资格已拒绝: %{group_name}"
         labels: 
           click_below: 您可通过单击下面的链接检查其他组
         subject: "组成员资格已拒绝: %{group_name}"
@@ -7157,6 +7859,8 @@ zh:
       twitter: 
         account_group: "Canvas 警报 - 组成员资格已拒绝:%{group_name}（帐户 %{account_name}）。"
         course_group: "Canvas 警报 - 组成员资格已拒绝:%{group_name}（课程 %{course_name}）。"
+    html_message: 
+      html_not_exist: "此邮件的 HTML 版本尚未创建和发送"
     index: 
       titles: 
         messages: "%{name} 的邮件"
@@ -7167,15 +7871,25 @@ zh:
     merge_email_communication_channel: 
       email: 
         body: "已在 %{url} 为您创建一个帐户，但您已有 Canvas 帐户。如果想要将其合并在一起，请访问以下 url:"
+        html: 
+          account_created: "已在 %{url} 上为您创建了一个帐户，不过您已有一个 Canvas 帐户。"
+          merge: "如果您要合并它们，请<a href=\"%{link}\">单击此处</a>"
+          subject: "新 Canvas 帐户"
         subject: "新 Canvas 帐户"
     message: 
       actions: 
         reply: 回复
+      meta_data: 元数据
+      plain_text: 纯文本
       titles: 
         created_at: 创建时间
+        delay_for: 延迟原因
         from_name: 发件人姓名
+        notification_name: 通知名称
+        path_type: 路径类型
         reply_to: 收件人
         sent_at: 发送时间
+        subject: 主题
         to: 收件人
     messages: 
       failure: 发送电子邮件时出错。请重新加载此页，然后重试。
@@ -7183,16 +7897,29 @@ zh:
     migration_export_ready: 
       email: 
         body: "课程 %{course_name} 的提取过程已完成。内容现已准备好导入到您的课程中。"
+        html: 
+          body: "课程 %{course_name} 的提取过程已完成。内容现已准备好导入到您的课程中。"
+          link_message: "单击<a href=\"%{link}\">此链接</a>选择要导入的内容项"
+          subject: "课程提取就绪: %{course_name}"
         link_message: "要完成将内容导入到 %{course_name} 中，您将需要单击以下链接:"
         subject: "课程提取就绪: %{course_name}"
     migration_import_failed: 
       email: 
         body: "将 %{source} 导入到 %{destination} 中时出现问题。只能成功导入部分内容。请通知您的系统管理员，并为其提供以下错误代码:\"%{error_code}\"。"
+        html: 
+          body: "将某些内容导入您的课程 %{destination} 时出现问题。"
+          notify_admin: "请通知您的系统管理员，将其指向您的<a href=\"%{link}\">导入信息页面</a>"
+          subject: "内容导入失败: %{course_name}"
         subject: "内容导入失败: %{course_name}"
     migration_import_finished: 
       email: 
         body_no_warnings: "将 %{source} 导入到 %{destination} 中已完成。您选择的所有内容现在应该均已导入到课程中。"
         body_with_warnings: "将 %{source} 导入到 %{destination} 中已完成，但并非所有内容均成功导入: %{warnings}"
+        html: 
+          body_no_warnings: "将 %{source} 导入 %{destination} 已完成。您选择的所有内容现在应当已导入您的课程。"
+          body_with_warnings: "将 %{source} 导入 %{destination} 已完成，但并非所有内容均已成功导入："
+          link: 单击以查看课程
+          subject: "课程导入已完成: %{course_name}"
         subject: "课程导入已完成: %{course_name}"
       summary: 
         body_no_warnings: "将 %{source} 导入到 %{target} 中已完成。您选择的所有内容现在应该均已导入到课程中。"
@@ -7202,6 +7929,10 @@ zh:
       email: 
         body: "%{account} 的新帐户管理员"
         details: "已添加帐户 %{account} 的新管理员 %{user}"
+        html: 
+          body: "%{account} 的新帐户管理员"
+          details: "已添加帐户 %{account} 的新管理员 %{user}"
+          subject: 新帐户用户
         subject: 新帐户用户
       facebook: 
         body: "已添加帐户 **%{account}** 的新管理员 **%{user}**。"
@@ -7216,6 +7947,10 @@ zh:
         body: "Canvas 警报 - 新管理员:%{user}，%{account}"
     new_announcement: 
       email: 
+        html: 
+          attached_file: 附加的文件
+          download: 下载
+          link: 查看通告
         labels: 
           file_included: 包括的文件
       facebook: 
@@ -7230,6 +7965,13 @@ zh:
         body_account: "您已被添加到帐户 %{account} 的新组。组名称为 %{group_name}。"
         body_course: "您已被添加到课程 %{course} 的新组。组名称为 %{group_name}。"
         details_account: "您可通过单击下面的链接查看此帐户是哪些组的组成部分:"
+        html: 
+          body_account: "您已被添加到帐户 %{account} 的新组。组名称为 %{group_name}。"
+          body_course: "您已被添加到课程 %{course} 的新组。组名称为 %{group_name}。"
+          html_details_account: "您可以<a href=\"%{link}\">单击此处</a>查看针对该帐户您所属的组"
+          html_details_course: "您可以<a href=\"%{link}\">单击此处</a>查看针对该课程您所属的组"
+          subject: "%{course_or_account} 的新组成员资格"
+          title: "新组成员资格: %{group_name}"
         subject: "%{course_or_account} 的新组成员资格"
         title: "新组成员资格: %{group_name}"
       facebook: 
@@ -7251,6 +7993,11 @@ zh:
         body_account: "您已被邀请加入帐户 %{account} 的组 %{group}。"
         body_course: "您已被邀请加入课程 %{course} 的组 %{group}。"
         details: "您可通过单击下面的链接检查组:"
+        html: 
+          body_account: "您已被邀请加入帐户 %{account} 的组 %{group}。"
+          details: 您可以单击此处签出该组
+          subject: "%{course_or_account} 的新组成员资格"
+          title: "新组成员资格: %{group_name}"
         subject: "%{course_or_account} 的新组成员资格"
         title: "新组成员资格: %{group_name}"
       facebook: 
@@ -7270,6 +8017,13 @@ zh:
     new_course: 
       email: 
         body: "已添加帐户 %{account} 的课程 %{course}"
+        html: 
+          body: "已添加帐户 %{account} 的课程 %{course}"
+          labels: 
+            teachers: 教师
+          link: 单击此处查看课程
+          subject: 新课程
+          title: "%{account} 的新课程"
         labels: 
           teachers: 教师
         subject: 新课程
@@ -7295,6 +8049,10 @@ zh:
       email: 
         body: "%{user} 已发布有关 %{course} 话题 %{discussion_topic} 的新评论:"
         details: "此处加入会话:"
+        html: 
+          body: "%{user} 已发布有关 %{course} 话题 %{discussion_topic} 的新评论:"
+          details: 单击此处加入会话
+          subject: "%{discussion_topic}: %{course} 的新评论"
         subject: "%{discussion_topic}: %{course} 的新评论"
       facebook: 
         body: "%{discussion_topic}，%{course} 的新评论"
@@ -7309,6 +8067,12 @@ zh:
       email: 
         body: "您可能会感兴趣的一个新讨论已经开始:"
         details: "此处加入会话:"
+        html: 
+          attached_file: 附加的文件
+          body: "您可能会感兴趣的一个新讨论已经开始:"
+          details: 在此加入会话
+          download: 下载
+          subject: "新讨论 - %{discussion_topic}: %{course}"
         labels: 
           file_included: 包括的文件
         subject: "新讨论 - %{discussion_topic}: %{course}"
@@ -7325,6 +8089,12 @@ zh:
       email: 
         body: "%{course_name} 有一个预定的新活动应该通知您:"
         from_to_time: "从 %{start_date_time} 到 %{end_date_time}"
+        html: 
+          body: "%{course_name} 有一个预定的新活动应该通知您:"
+          from_to_time: "从 %{start_date_time} 到 %{end_date_time}"
+          no_time_set: 没有设置时间
+          see_details: 您可在此处查看详细信息
+          subject: "新活动 - %{event_title}，%{course_name}"
         labels: 
           see_details: 您可在此处查看详细信息
         no_time_set: 没有设置时间
@@ -7346,11 +8116,21 @@ zh:
         from_to_time: "从 %{start_date_time} 到 %{end_date_time}"
         no_time_set: 没有设置时间
         subject: "Canvas 警报 - 活动:%{event_title}，%{course_name}"
+    new_file_added: 
+      email: 
+        html: 
+          link: 单击查看
     new_student_organized_group: 
       email: 
         body_account: "已为帐户 %{account} 创建名为\"%{group_name}\"的新学生组织组。第一位成员是 %{user}。"
         body_course: "已为课程 %{course} 创建名为\"%{group_name}\"的新学生组织组。第一位成员是 %{user}。"
         details: "您可通过单击下面的链接查看该组的详细信息:"
+        html: 
+          body_account: "已为帐户 %{account} 创建名为\"%{group_name}\"的新学生组织组。第一位成员是 %{user}。"
+          body_course: "已为课程 %{course} 创建名为\"%{group_name}\"的新学生组织组。第一位成员是 %{user}。"
+          details: 单击此处查看该组的详细信息
+          subject: "%{course_or_account} 的新学生组"
+          title: "新学生组: %{group_name}"
         subject: "%{course_or_account} 的新学生组"
         title: "新学生组: %{group_name}"
       facebook: 
@@ -7369,6 +8149,14 @@ zh:
     new_teacher_registration: 
       email: 
         body: "%{user} 刚刚在 %{website} 注册为教师。"
+        html: 
+          body: "%{user} 刚刚在 %{website} 注册为教师。"
+          email: 电子邮件
+          link: 单击此处查看教师
+          phone: 电话
+          school_name: 学校名称
+          school_position: 学校位置
+          subject: 新教师注册
         labels: 
           email: 电子邮件
           phone: 电话
@@ -7393,6 +8181,10 @@ zh:
     new_user: 
       email: 
         body: "刚刚注册帐户 %{account} 的新用户 %{user}"
+        html: 
+          body: "刚刚注册帐户 %{account} 的新用户 %{user}"
+          link: 单击此处查看用户
+          subject: 新用户
         subject: 新用户
         title: "%{account} 的新用户"
       facebook: 
@@ -7414,6 +8206,10 @@ zh:
     pseudonym_registration: 
       email: 
         body: "您已在 %{account} 注册 Canvas 帐户！您将需要完成配置过程，然后才能登录和开始使用 Canvas。"
+        html: 
+          body: "您已注册 Canvas 帐户 %{account}！在登录并开始使用 Canvas 之前，您需要完成配置过程。"
+          link: 单击此处完成注册过程
+          subject: "完成注册:Canvas"
         link_message: "要完成注册过程，请访问以下 url:"
         subject: "完成注册:Canvas"
     quiz_locked: 此测验当前锁定。
@@ -7423,14 +8219,23 @@ zh:
     quiz_unpublished_module: 此测验是未发布单元的一部分，尚未可用。
     report_generated: 
       email: 
+        html: 
+          link_message: 单击此处下载报告
+          subject: 生成的报告
         link_message: "单击此处下载报告:"
         subject: 生成的报告
     report_generation_failed: 
       email: 
+        html: 
+          subject: 报告生成失败
         subject: 报告生成失败
     rubric_assessment_invitation: 
       email: 
         body: "您已被 %{user} 邀请评估其 %{rubric} 的提交文件:"
+        html: 
+          body: "您已被 %{user} 邀请评估其 %{rubric} 的提交文件:"
+          link_message: 单击此处审阅并评估条目
+          subject: "评估邀请:%{rubric}，%{context}"
         link_message: "您可在此处审阅和评估输入:"
         subject: "评估邀请:%{rubric}，%{context}"
       facebook: 
@@ -7446,6 +8251,10 @@ zh:
     rubric_assessment_submission_reminder: 
       email: 
         body: "系统已提醒您评估:%{rubric}，%{context}:"
+        html: 
+          body: "系统已提醒您评估 %{rubric}，%{context}："
+          link_message: 单击此处审阅评估并提交您的条目
+          subject: "评估提醒:%{rubric}，%{context}"
         link_message: "您可在此处审阅评估并提交您的输入:"
         subject: "评估提醒:%{rubric}，%{context}"
       facebook: 
@@ -7461,6 +8270,10 @@ zh:
     rubric_association_created: 
       email: 
         body: "已创建针对 %{context} 的新评估:"
+        html: 
+          body: "已创建针对 %{context} 的新评估:"
+          link_message: 单击此处审阅评估并提交您的条目
+          subject: "新评估:%{title}，%{context}"
         link_message: "您可在此处审阅评估并提交您的输入:"
         subject: "新评估:%{title}，%{context}"
       facebook: 
@@ -7480,6 +8293,11 @@ zh:
     submission_comment: 
       email: 
         body: "%{author} 刚刚对 %{user} 的 %{assignment} 的提交文件进行了新评论"
+        html: 
+          body: "%{author} 刚刚对 %{user} 的 %{assignment} 的提交文件进行了新评论"
+          link_message: 单击此处审阅提交详细信息
+          someone: 某人
+          subject: "提交评论:%{user}，%{assignment}，%{context}"
         link_message: "您可在此处审阅提交文件的详细信息:"
         someone: 某人
         subject: "提交评论:%{user}，%{assignment}，%{context}"
@@ -7498,6 +8316,11 @@ zh:
     submission_comment_for_teacher: 
       email: 
         body: "%{author} 刚刚对 %{user} 的 %{assignment} 的提交文件进行了新评论。"
+        html: 
+          body: "%{author} 刚刚对 %{user} 的 %{assignment} 的提交文件进行了新评论。"
+          link_message: 单击此处审阅提交详细信息
+          someone: 某人
+          subject: "提交评论:%{user}，%{assignment}，%{context}"
         link_message: "您可在此处审阅提交文件的详细信息:"
         someone: 某人
         subject: "提交评论:%{user}，%{assignment}，%{context}"
@@ -7516,6 +8339,15 @@ zh:
     submission_grade_changed: 
       email: 
         body: "您的作业 %{assignment_title} 的评分已更改。"
+        html: 
+          body: "您的作业 %{assignment_title} 的评分已更改。"
+          link_message: 您可以在此处审阅作业
+          no_date_set: 未设置日期
+          not_applicable: 不适用
+          regraded_date: "重新评分日期: %{date}"
+          score: "分数:%{score}，满分 %{total}"
+          score_pending: 教师待审阅的分数
+          subject: "分数已更改:%{assignment}，%{context}"
         link_message: "您可在此处审阅作业:"
         no_date_set: 未设置日期
         not_applicable: 不适用
@@ -7555,6 +8387,15 @@ zh:
       email: 
         body: "您的作业 %{assignment} 已评分。"
         graded_date: "评分日期: %{date}"
+        html: 
+          body: "您的作业 %{assignment} 已评分。"
+          graded_date: "评分日期: %{date}"
+          link_message: 您可以在此处审阅作业
+          no_date_set: 未设置日期
+          not_applicable: 不适用
+          score: "分数:%{score}，满分 %{total}"
+          score_pending_review: 教师待审阅的分数
+          subject: "作业已评分:%{assignment}，%{context}"
         link_message: "您可在此处审阅作业:"
         no_date_set: 未设置日期
         not_applicable: 不适用
@@ -7592,6 +8433,12 @@ zh:
     summaries: 
       email: 
         daily_body: "您已注册接收来自 Canvas 帐户的一些通知的每日报告。下面是 %{date} 的报告:"
+        html: 
+          click_to_preferences: 单击此处编辑您的通知首选项
+          daily_body: "您已注册从您的 Canvas 帐户接收某些通知的每日报告。下面是 %{date}的报告："
+          subject: "最近 Canvas 通知"
+          view: 单击查看
+          weekly_body: "您已注册从您的 Canvas 帐户接收某些通知的每周报告。下面是结束日期为 %{date}的一周的报告："
         notifications_link: "您可通过访问以下页面更改通知设置:"
         subject: "最近 Canvas 通知"
         weekly_body: "您已注册接收来自 Canvas 帐户的一些通知的每周报告。下面是一周结束 %{date} 的报告:"
@@ -7609,6 +8456,10 @@ zh:
     updated_wiki_page: 
       email: 
         body: "维基上针对 %{title} 的页面已更新，这可以使您的生活更轻松。"
+        html: 
+          body: "维基上针对 %{title} 的页面已更新，这可以使您的生活更轻松。"
+          link_message: 单击此处进行审阅
+          subject: "更新的维基页面:%{title}，%{user}"
         link_message: "您可在此处进行审阅: %{link}"
         subject: "更新的维基页面:%{title}，%{user}"
       facebook: 
@@ -7625,6 +8476,10 @@ zh:
       email: 
         body: "我们邀请您参与 %{name} 的 Web 会议 %{title}。"
         details_link: "您可在此处查看详细信息: %{link}"
+        html: 
+          body: "我们邀请您参与 %{name} 的 Web 会议 %{title}。"
+          details_link: 单击此处查看详细信息
+          subject: "Web 会议邀请: %{name}"
         subject: "Web 会议邀请: %{name}"
       facebook: 
         body: "我们邀请您参与 #%{name}# 的 Web 会议 *%{title}*。"
@@ -7636,6 +8491,11 @@ zh:
         subject: "Web 会议邀请: %{name}"
       twitter: 
         tweet: "Canvas 警报 - 邀请:参加 %{title}，%{name}"
+  migration: 
+    ecollege: 
+      course_not_found: "找不到 ECollege 课程。"
+    webct: 
+      course_not_found: "找不到 Blackboard 课程。"
   migration_issues: 
     errors: 
       valid_workflow_state: 必须发送有效的工作流状态
@@ -7827,6 +8687,9 @@ zh:
       other: 其他
       parent: 父电子邮件
       scheduling: 正在计划
+  notifications_search: 
+    cant_be_blank: "Canvas 用户 ID 不能为空"
+    cant_come_before_from: “结束日期”不能早于“开始日期”
   number: 
     currency: 
       format: 
@@ -8010,6 +8873,8 @@ zh:
     view_more_link: 查看更多
   paginated_view: 
     loading_more_results: 正在加载其他结果
+  paypal: 
+    exception: 抱歉，出现错误，请稍后重试。
   plugins: 
     academic_benchmark_importer: 
       name: 学术基准导入器
@@ -8027,12 +8892,19 @@ zh:
     account_reports: 
       description: 选择帐户报告
       name: 帐户报告
+    angel_exporter: 
+      file_description: "Angel export .zip 格式"
+      name: "Angel 转换器"
     assignment_freezer: 
       description: 复制时冻结作业属性
       name: 作业属性冻结程序
     assignment_freezer_settings: 
       description: 利用此插件，管理员可以查看在作业复制到其他课程后，使配置属性不可编辑的特殊作业属性。
       no_copying_frozen: 不允许冻结将复制的作业。
+    banner_grade_exchange_settings: 
+      labels: 
+        canvas_source_identifier: "您的 Canvas 实例名称"
+        sis_source_identifier: "您的 Banner 实例名称"
     big_blue_button: 
       description: "大蓝色按钮 Web 会议支持"
       name: 深蓝色按钮
@@ -8043,6 +8915,9 @@ zh:
         domain: 域
         secret: 加密
       secret_description: "这是 %{parameter_name} 参数，可在 %{filename} 配置文件中找到。"
+    blackboard_exporter: 
+      file_description: "Blackboard 6/7/8/9 export .zip 文件"
+      name: "Blackboard 导出器"
     buttons: 
       saving: 正在保存...
     canvas_cartridge_importer: 
@@ -8060,6 +8935,9 @@ zh:
       description: "这个插件集成了 Crocodoc ，可以提供 HTML5 文档预览功能。这使得教师和学生能够对文档进行注释。"
       labels: 
         api_key: "Crocodoc API 密钥"
+    d2l_exporter: 
+      file_description: "D2L export .zip 格式"
+      name: "D2L 转换器"
     dim_dim: 
       description: "DimDim Web 会议支持"
       name: DimDim
@@ -8160,6 +9038,20 @@ zh:
         publish_endpoint: 要发布到的端点
         success_timeout: 成功通知超时（秒）
         wait_for_success: 等待成功通知
+    ims_es_importer_settings: 
+      labels: 
+        course_long_name_selection: 课程长名称选择
+        course_short_name_selection: 课程短名称选择
+        course_sourcedid_name_prefix: 课程“sourcedid”忽略了前缀
+        default_email_domain: 默认电子邮件域
+        email_preference: 电子邮件首选项
+        lms_delivery_name: "LMS 交付名称"
+        map_sections_to_courses: "将 IMS 章节映射到 Canvas 课程"
+        section_end_days_adjustment: 章节结束日期调整
+        section_name_selection: 章节名称选择
+        section_start_days_adjustment: 章节开始日期调整
+        term_end_days_adjustment: 学期结束日期调整
+        term_start_days_adjustment: 学期开始日期调整
     index: 
       author: 作者
       canvas_revision_unknown: 未知
@@ -8229,6 +9121,10 @@ zh:
       labels: 
         api_key: "API 密钥"
         secret_key: 加密密钥
+    lockdown_browser: 
+      labels: 
+        download_url: "LockDown Browser 下载 URL"
+        plugin_enabled: 已启用
     moodle_converter: 
       file_description: "Moodle 1.9 .zip 文件"
       name: "Moodle 导入程序"
@@ -8312,6 +9208,19 @@ zh:
       labels: 
         api_key: 用户密钥
         secret_key: 用户密码
+    webct_scraper: 
+      file_description: "Blackboard Vista/CE，WebCT 6+ 课程"
+      name: "Blackboard Vista/CE (WebCT)"
+    webct_scraper_settings: 
+      description: |-
+          如果机构不使用 WebCT 的“学习单元”（包括采用低于 4.0 版的 WebCT⏎
+          的学校，当提供各个单元时），可通过将“课程内容”⏎
+          导入为 Canvas 单元而不是“学习单元”来改善课程迁移。至于内容单元，使用此页面可设置 WebCT 迁移器的默认行为。⏎
+          务必记住的一点是，当单个课程迁移保留⏎
+          可选择的能力时，批量迁移器始终采用此处配置的值，而不能按迁移进行更改。
+      labels: 
+        allow_outline_selection: 显示选项以便在迁移向导中将课程内容用作单元
+        folders_as_outline: "默认将 WebCT“课程内容”用于单元"
     wimba: 
       description: "Wimba Web 会议支持"
       name: Wimba
@@ -8633,11 +9542,14 @@ zh:
   pseudonym: 
     errors: 
       bad_credentials: 用户名或密码无效
+      common: 不能使用常见密码（例如“password”）
       invalid: "只能包含字母、数字或以下字符: %{characters}"
       invalid_email_address: "\"%{email}\"不是有效的电子邮件地址"
       mismatch: 不匹配
       not_email: 不是有效的电子邮件地址
+      repeated: "一行中使用同一字符的次数不能超过 %{max} 次"
       required: 需要
+      sequence: "不能包括超过 %{max} 个字符的一连串字符（例如 abcdef）"
       taken: 这个电子邮件已被使用
       too_long: "不能超过 %{max} 个字符"
       too_short: "必须至少包含 %{min} 个字符"
@@ -8734,6 +9646,7 @@ zh:
         new_password: 新密码
         password: 密码
         password_confirmation: 确认新密码
+        which_login_to_change: 要更改的登录
       page_title: 更改密码
       titles: 
         change_password: "更改 %{user} 的登录密码"
@@ -8748,12 +9661,15 @@ zh:
       account_registered: 帐户已注册！
       account_updated: 帐户已更新！
       email_sent: "确认电子邮件已发送到 %{email}，确保检查您的垃圾邮件箱"
-      link_invalid: 您使用的链接似乎不再有效。如果您无法登录，请尝试单击"不知道我的密码"并让系统为您发送一封新邮件。
+      link_invalid: 您所使用的链接不再有效。如果您无法登录，请单击“不知道您的密码？”来重置密码。
       password_changed: 密码已更改
     registration_confirmation_form: 
       errors: 
         password_required: 需要密码
         password_too_short: 密码太短
+  purchases: 
+    new: 
+      payment_info: 付款信息
   question_bank: 
     align_outcomes: 调整结果
     remove_outcome_from_bank: 是否确定要从库中删除此结果?
@@ -8857,11 +9773,13 @@ zh:
       new: "新建:"
   quiz: 
     default_question_input: "[选择]"
+    default_text_only_question_name: 间隔
     default_title: 未命名测验
     errors: 
       invalid_hide_results: 隐藏结果无效
       invalid_ip_filter: "IP 过滤无效"
       invalid_quiz_type: 测验类型无效
+    question_name_counter: "问题 %{question_number}"
     statistics: 
       csv_columns: 
         attempt: 尝试
@@ -8895,6 +9813,22 @@ zh:
     statistics: 
       exact_answer: "%{exact_value} +/- %{margin}"
       inexact_answer: "%{lower_bound} 至 %{upper_bound}"
+  quiz_statistics: 
+    statistics: 
+      csv_columns: 
+        attempt: 尝试
+        id: id
+        n_correct: "n 正确"
+        n_incorrect: "n 不正确"
+        name: 名称
+        score: 分数
+        section: 节
+        section_id: section_id
+        section_sis_id: section_sis_id
+        sis_id: sis_id
+        submitted: 已提交
+      no_answer: 无答案
+    statistics_filename: "%{title} %{type} 报告"
   quiz_submissions: 
     errors: 
       late_quiz: 您提交此测验时已晚，您的答案可能没有记录。
@@ -8948,6 +9882,7 @@ zh:
     default_question_name: 问题
     default_quiz_title: 测验
     default_response_to_essay: 在学生提交答案后响应以显示学生
+    default_response_to_file_upload: 在学生提交答案后响应以显示学生
     default_title: 新测验
     display_answer: 
       correct_answer: 这是正确答案。
@@ -9108,6 +10043,7 @@ zh:
         calculated: 输入您的问题，建立一个公式，然后生成一组可能的答案组合。学生将看到通过随机选择的一组变量填充的问题，并且必须键入正确的数值答案。
         equations: 您可以通过键入括号包围的变量名称来定义变量
         essay: 系统将为学生提供一个文本字段以撰写其答案。
+        file_upload: 学生可以上传文件来回答问题。
         fill_in_multiple_blanks: 输入您的问题，指定每个空格应转至的位置。然后定义每个空格可能的正确答案。学生必须在每个空格的文本框中键入正确的答案。
         formula_definition: 接下来，您将需要写入用于计算正确答案的公式或公式内容。仅使用与上述列出相同的变量名称。
         matching: 构建成对的匹配值。学生将看到左侧的值，并且必须从右侧的下拉列表中选择匹配的值。多个行可以有相同的答案，并且您可以在右侧添加其他错误选项。
@@ -9157,6 +10093,7 @@ zh:
       question_type: 
         calculated: 公式问题
         essay: 问答题
+        file_upload: 文件上传问题
         fill_in_multiple_blanks: 填写多个空格
         matching: 匹配
         missing_word: 缺字
@@ -9176,9 +10113,25 @@ zh:
     graded_quiz: 评分测验
     graded_survey: 评分调查
     headers: 
+      submitted_students_quiz_title: 
+        one: "参加测验的学生 (%{count})"
+        other: "参加测验的学生 (%{count})"
+        zero: 已进行测验的学生
+      submitted_students_survey_title: 
+        one: "参加调查的学生 (%{count})"
+        other: "参加调查的学生 (%{count})"
+        zero: 已进行调查的学生
       unsubmitted_students_count: 
         one: "%{count} 个学生尚未进行调查"
         other: "%{count} 个学生尚未进行调查"
+      unsubmitted_students_quiz_title: 
+        one: "未参加测验的学生 (%{count})"
+        other: "未参加测验的学生 (%{count})"
+        zero: 未参加测验的学生
+      unsubmitted_students_survey_title: 
+        one: "未参加调查的学生 (%{count})"
+        other: "未参加调查的学生 (%{count})"
+        zero: 未参加调查的学生
     helpers: 
       duration_in_minutes: 
         one: "1 分钟"
@@ -9297,6 +10250,11 @@ zh:
       survey_no_submissions: 学生尚未进行调查
       titles: 
         submission_needs_review: 此提交文件需要审阅
+    messages: 
+      no_submitted_students_quiz: 学生尚未进行测验
+      no_submitted_students_survey: 学生尚未进行调查
+      no_unsubmitted_students_quiz: 所有学生均已进行测验
+      no_unsubmitted_students_survey: 所有学生均已进行调查
     moderate: 
       add_time: 添加时间
       buttons: 
@@ -9463,14 +10421,17 @@ zh:
         one: "1 个测验已成功发布!"
         other: "%{count} 个测验已成功发布！"
     practice_quiz: 练习测验
+    question_colon: 问题：
     question_group: 
       buttons: 
         update: 更新
       default_group_name: 组
+      edit_questions_and_points: "挑选 *%{num_questions}* 个问题，每个问题 #%{num_points}# 分"
       labels: 
         question_bank: 将从库中抽取问题
       links: 
         link_to_a_question_bank: 链接至题库
+      show_questions_and_points: "挑选 *%{num_questions}* 个问题，每个问题 #%{num_points}# 分"
       titles: 
         add_question_to_group: 添加问题到该组
         collapse_group: 折叠组
@@ -9658,6 +10619,9 @@ zh:
         quiz_instructions: 测验说明
       links: 
         back_to_quiz_page: 返回测验页面
+    refresh_quiz_after_popup: 
+      headers: 
+        loading_in_lockdown: "正在 Respondus LockDown Browser 中加载测验"
     retrieving_filters: 正在检索过滤器...
     rubric: 
       loading: 正在加载...
@@ -9726,6 +10690,8 @@ zh:
         show_student_quiz_results: 显示学生测验结果
         show_student_survey_results: 显示学生调查结果
         survey_statistics: 调查统计
+      notices: 
+        message_sent: 邮件已发送！
       only_registered_users: 只有注册的登记用户才能进行评分测验
       points_possible: 
         one: "1 分"
@@ -9820,6 +10786,8 @@ zh:
       labels: 
         started: 开始时间
         times_up: 时间到！提交结果
+      logged_out_of_canvas: "*您已注销 Canvas。*若要继续，请登录"
+      login_required: 需要登录
       minutes_count: 
         one: "1 分钟"
         other: "%{count} 分钟"
@@ -9969,6 +10937,7 @@ zh:
       become_user: 成为其他用户
       change_course_state: 更改课程状态
       comment_on_others_submissions: 查看所有学生的提交文件并对其进行评论
+      create_accounts: 创建新的根帐户
       create_collaborations: 创建学生协作
       create_conferences: "创建 Web 会议"
       manage_account_memberships: 添加/删除帐户的其他管理员
@@ -9977,8 +10946,10 @@ zh:
       manage_alerts: 管理全局警报
       manage_assignments: 管理（添加/编辑/删除）作业和测验
       manage_calendar: 添加、编辑和删除课程表上的事件
+      manage_canvasnet_courses: "管理 Canvas 网络课程"
       manage_content: 管理所有其他课程内容
       manage_courses: 管理（添加/编辑/删除）课程
+      manage_demos: 管理演示
       manage_developer_keys: 管理开发人员密钥
       manage_files: 管理（添加/编辑/删除）课程文件
       manage_frozen_assignment: 管理（编辑/删除）冻结的作业
@@ -9986,6 +10957,7 @@ zh:
       manage_grades: 编辑评分
       manage_groups: 管理（创建/编辑/删除）组
       manage_interaction_alerts: 管理警报
+      manage_links: 管理角色和信任链接
       manage_outcomes: 管理学习结果
       manage_role_overrides: 管理权限
       manage_rubrics: 创建和编辑评估题目
@@ -10009,11 +10981,14 @@ zh:
       read_roster: 查看用户列表
       send_messages: 向每位课程成员发送消息
       send_messages_all: 向整个课堂发送消息
+      suspend_accounts: 挂起帐户
       undelete_courses: 取消删除课程
       view_all_grades: 查看所有评分
+      view_analytics: 查看分析页面
       view_error_reports: 查看错误报告
       view_group_pages: 查看所有学生组的组页面
       view_jobs: 查看后台工作
+      view_notifications: 查看通知
       view_statistics: 查看统计
     roles: 
       account_admin: 帐户管理员
@@ -10102,9 +11077,11 @@ zh:
       are_you_sure_prompt: 是否确定要删除此评估?所有结果都将丢失。
       page_title: 评估
     index: 
+      account_rubrics: 帐户题目
       are_you_sure_prompt: 是否确定要删除此题目?当前使用题目的任何位置将仍可访问，但其他人将无法使用该题目。
       buttons: 
         add_rubric: 添加题目
+      course_rubrics: 课程题目
       delete_rubric: 删除题目
       page_title: 题目
       points_possible: 
@@ -10112,6 +11089,7 @@ zh:
         other: "可能的 %{count} 分"
       titles: 
         rubrics: 题目
+      user_rubrics: 用户题目
     loading: 正在加载...
     rubric_association: 
       assessment_completed: 评估已完成
@@ -10270,6 +11248,7 @@ zh:
     authenticate: 
       buttons: 
         enroll_in_course: " 登记课程"
+        next: 下一个
       getting_started: "您正在登记 **%{course}**。"
       labels: 
         email: 电子邮件
@@ -10278,6 +11257,7 @@ zh:
     authenticate_or_register: 
       buttons: 
         enroll_in_course: 注册课程
+        next: 下一个
       enter_email: "请输入您的电子邮件地址:"
       existing_user: "我已经拥有 %{institution_name} 登录名"
       getting_started: "您正在登记 **%{course}**。"
@@ -10289,6 +11269,7 @@ zh:
     confirm_enrollments: 
       buttons: 
         enroll_in_course: 登记课程
+        next: 下一个
       getting_started: "您正在登记 **%{course}**"
       switch_users: "您当前是用 *%{user}* 身份登录的。**请使用另一个用户身份登录**。"
     course_full: 
@@ -10496,6 +11477,8 @@ zh:
       titles: 
         mastery_level: 在其之上的百分比设置为掌握
         select_and_add_criterion: 选择并添加标准
+    flash_notice: 
+      close: 关闭
     flash_notices: 
       close: 关闭
     full_assignment: 
@@ -11102,6 +12085,12 @@ zh:
     columns: 
       date: 日期
       value: 值
+    institution_suspended: 
+      body: "您学校的 Canvas 帐户已暂时挂起。请联系您的 Canvas 管理员。"
+      links: 
+        logout: 注销
+        stop_masquerading: "[停止仿冒]"
+      page_title: 机构已挂起
     links: 
       over_time: 超时
     status: 
@@ -11325,6 +12314,8 @@ zh:
         students_can_access_from: "**学生**可从以下位置访问"
         tas_can_access_from: "**助教**可从以下位置访问"
         teachers_can_access_from: "**教师**可从以下位置访问"
+      name: "学期名称:"
+      sis_source_id: "SIS ID："
       term_runs_from: "**学期运行**开始"
       titles: 
         term_ends: 学期结束
@@ -11383,6 +12374,9 @@ zh:
     messages: 消息
     outcome_artifacts: 结果产物
     view_in_separate_window: 在单独的窗口中查看
+  tooltips: 
+    vdd: 
+      more_message: "和 %{count} 个以上..."
   turnitin: 
     error_1007: 上传的文件过大。
     error_1009: "无效的文件类型。（有效的文件类型包括 MS Word、Acrobat PDF、Postscript、Text、HTML、WordPerfect (WPD) 和 RTF 格式。）"
@@ -11414,6 +12408,7 @@ zh:
       too_young: 年龄太小
     registration: 
       agree_to_terms: 您同意*使用条款*。
+      agree_to_terms_with_code_of_conduct: 您同意*使用条款*和**行为准则**。
   user_follow: 
     errors: 
       follow_own_collection: 您无法跟随自己的集合
@@ -11842,6 +12837,10 @@ zh:
       welcome_to_happiness: "欢迎使用 Canvas!"
   validate: 
     is_required: 此字段为必填字段
+  warnings: 
+    test_install: 
+      message: "此 Canvas 安装仅用于测试，且每周都将重置。"
+      title: "Canvas 测试安装"
   web_conference: 
     default_name_for_courses: "课程 Web 会议"
     default_name_for_groups: "组 Web 会议"
@@ -11851,6 +12850,8 @@ zh:
         : 关
         ? "true"
         : 开
+  webct_credentials: 
+    credential_not_found: 找不到凭证。
   widget: 
     upload_media_track_form: 
       choose_a_language: "--选择一种语言--"
