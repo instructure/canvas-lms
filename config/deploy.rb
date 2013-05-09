@@ -158,7 +158,7 @@ unless (ENV.has_key?('verbose') && ENV['verbose'].downcase == "true")
   end
 
   after "deploy:web:disable" do
-      puts "✓".green
+      puts green_check
   end
 
   before "deploy:web:enable" do
@@ -166,7 +166,7 @@ unless (ENV.has_key?('verbose') && ENV['verbose'].downcase == "true")
   end
 
   after "deploy:web:enable" do
-      puts "✓".green
+      puts green_check
   end
 
 
@@ -175,7 +175,7 @@ unless (ENV.has_key?('verbose') && ENV['verbose'].downcase == "true")
   end
 
   after "deploy:update_code" do
-      puts "✓".green
+      puts green_check
   end
 
   before "deploy:cleanup" do
@@ -183,7 +183,7 @@ unless (ENV.has_key?('verbose') && ENV['verbose'].downcase == "true")
   end
 
   after "deploy:cleanup" do
-      puts "✓".green
+      puts green_check
   end
 
   before "canvas:compile_assets" do
@@ -191,7 +191,7 @@ unless (ENV.has_key?('verbose') && ENV['verbose'].downcase == "true")
   end
 
   after "canvas:compile_assets" do
-      puts "✓".green
+      puts green_check
   end
 
   before "canvas:symlink_canvasfiles" do
@@ -199,7 +199,7 @@ unless (ENV.has_key?('verbose') && ENV['verbose'].downcase == "true")
   end
 
   after "canvas:symlink_canvasfiles" do
-      puts "✓".green
+      puts green_check
   end
 
   before "canvas:clone_qtimigrationtool" do
@@ -207,7 +207,7 @@ unless (ENV.has_key?('verbose') && ENV['verbose'].downcase == "true")
   end
 
   after "canvas:clone_qtimigrationtool" do
-      puts "✓".green
+      puts green_check
   end
 
   before "deploy:migrate" do
@@ -215,7 +215,7 @@ unless (ENV.has_key?('verbose') && ENV['verbose'].downcase == "true")
   end
 
   after "deploy:migrate" do
-      puts "✓".green
+      puts green_check
   end
 
   before "canvas:load_notifications" do
@@ -223,7 +223,7 @@ unless (ENV.has_key?('verbose') && ENV['verbose'].downcase == "true")
   end
 
   after "canvas:load_notifications" do
-      puts "✓".green
+      puts green_check
   end
 
   before "canvas:restart_jobs" do
@@ -231,7 +231,7 @@ unless (ENV.has_key?('verbose') && ENV['verbose'].downcase == "true")
   end
 
   after "canvas:restart_jobs" do
-      puts "✓".green
+      puts green_check
   end
 
   before "canvas:log_deploy" do
@@ -239,7 +239,7 @@ unless (ENV.has_key?('verbose') && ENV['verbose'].downcase == "true")
   end
 
   after "canvas:log_deploy" do
-      puts "✓".green
+      puts green_check
   end
 
   before "canvas:copy_config" do
@@ -247,7 +247,7 @@ unless (ENV.has_key?('verbose') && ENV['verbose'].downcase == "true")
   end
 
   after "canvas:copy_config" do
-      puts "✓".green
+      puts green_check
   end
 
   before "deploy:create_symlink" do
@@ -255,6 +255,6 @@ unless (ENV.has_key?('verbose') && ENV['verbose'].downcase == "true")
   end
 
   after "deploy:create_symlink" do
-      puts "✓".green
+      puts green_check
   end
 end
