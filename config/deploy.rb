@@ -130,7 +130,19 @@ unless (ENV.has_key?('verbose') && ENV['verbose'].downcase == "true")
   STDOUT.sync
 
   def yellow_arrow
-    "→".yellow
+    if (ENV.has_key?('colourful') && ENV['colourful'].downcase == "false")
+      "→"
+    else
+      "→".yellow
+    end
+  end
+
+  def green_check
+    if (ENV.has_key?('colourful') && ENV['colourful'].downcase == "false")
+      "✓"
+    else
+      "✓".green
+    end
   end
 
   def buffered_string(str)
