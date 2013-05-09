@@ -54,6 +54,12 @@ module Api::V1::ContextModule
           course_context_modules_item_redirect_url(:id => content_tag.id)
       end
     end
+    
+    # add content_id, if applicable
+    # (note that wiki page ids are not exposed by the api)
+    unless %w(WikiPage ContextModuleSubHeader ExternalUrl).include? content_tag.content_type
+      hash['content_id'] = content_tag.content_id
+    end
 
     # add data-api-endpoint link, if applicable
     api_url = nil
