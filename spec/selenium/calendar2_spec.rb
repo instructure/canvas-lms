@@ -707,6 +707,7 @@ describe "calendar2" do
     describe "mini calendar" do
       it "should display in Spanish" do
         pending('USE_OPTIMIZED_JS=true') unless ENV['USE_OPTIMIZED_JS']
+        pending('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
         get "/calendar2"
         wait_for_ajaximations
         # Get the spanish text for the current month/year

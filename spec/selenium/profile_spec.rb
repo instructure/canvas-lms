@@ -142,7 +142,7 @@ describe "profile" do
       edit_form = click_edit
       click_option('#user_locale', 'Español')
       expect_new_page_load { submit_form(edit_form) }
-      f('.profile_table').should include_text('Nombre')
+      get_value('#user_locale').should == 'es'
     end
 
     it "should change the language even if you can't update your name" do
@@ -155,7 +155,7 @@ describe "profile" do
       edit_form.find_elements(:id, 'user_short_name').first.should be_nil
       click_option('#user_locale', 'Español')
       expect_new_page_load { submit_form(edit_form) }
-      f('.profile_table').should include_text('Nombre')
+      get_value('#user_locale').should == 'es'
     end
 
     it "should add another contact method - sms" do
