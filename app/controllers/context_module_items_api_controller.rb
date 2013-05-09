@@ -38,6 +38,9 @@
 #       // "ExternalUrl", "ExternalTool"
 #       type: "Assignment",
 #
+#       // the id of the object referred to (if applicable)
+#       content_id: 1337,
+#
 #       // link to the item in Canvas
 #       html_url: "https://canvas.example.edu/courses/222/modules/items/768",
 #

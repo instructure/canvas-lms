@@ -68,6 +68,7 @@ describe "Module Items API", :type => :integration do
           {
               "type" => "Assignment",
               "id" => @assignment_tag.id,
+              "content_id" => @assignment.id,
               "html_url" => "http://www.example.com/courses/#{@course.id}/modules/items/#{@assignment_tag.id}",
               "position" => 1,
               "url" => "http://www.example.com/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
@@ -78,6 +79,7 @@ describe "Module Items API", :type => :integration do
           {
               "type" => "Quiz",
               "id" => @quiz_tag.id,
+              "content_id" => @quiz.id,
               "html_url" => "http://www.example.com/courses/#{@course.id}/modules/items/#{@quiz_tag.id}",
               "url" => "http://www.example.com/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}",
               "position" => 2,
@@ -88,6 +90,7 @@ describe "Module Items API", :type => :integration do
           {
               "type" => "Discussion",
               "id" => @topic_tag.id,
+              "content_id" => @topic.id,
               "html_url" => "http://www.example.com/courses/#{@course.id}/modules/items/#{@topic_tag.id}",
               "position" => 3,
               "url" => "http://www.example.com/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
@@ -137,6 +140,7 @@ describe "Module Items API", :type => :integration do
       json.should == {
           "type" => "File",
           "id" => @attachment_tag.id,
+          "content_id" => @attachment.id,
           "html_url" => "http://www.example.com/courses/#{@course.id}/modules/items/#{@attachment_tag.id}",
           "position" => 2,
           "title" => @attachment_tag.title,
