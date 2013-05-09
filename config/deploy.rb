@@ -1,3 +1,4 @@
+# encoding: utf-8
 require "bundler/capistrano"
 set :stages,        %w(production staging testing vm)
 set :default_stage, "testing"
@@ -22,6 +23,10 @@ def push_app_servers(num_app_nodes, app_node_prefix)
   range.each { |x| role :app, "#{app_node_prefix}#{x}.tier2.sfu.ca" }
 end
 
+def is_hotfix?
+  ENV.has_key?('hotfix') && ENV['hotfix'].downcase == "true"
+end
+
 if (ENV.has_key?('gateway') && ENV['gateway'].downcase == "true")
   set :gateway, "welcome.its.sfu.ca"
   set :stats_server, "stats.its.sfu.ca"
@@ -37,8 +42,8 @@ namespace :deploy do
 	task :stop do ; end
 	desc 'Signal Passenger to restart the application.'
  	task :restart, :except => { :no_release => true } do
-		# run "touch #{release_path}/tmp/restart.txt"
-    run "sudo /etc/init.d/httpd restart"
+		run "touch #{release_path}/tmp/restart.txt"
+    # run "sudo /etc/init.d/httpd restart"
 	end
 
   namespace :web do
@@ -102,18 +107,143 @@ namespace :canvas do
     task :update_remote do
       copy_config
       clone_qtimigrationtool
-      deploy.migrate
-      load_notifications
+      deploy.migrate unless is_hotfix?
+      load_notifications unless is_hotfix?
       restart_jobs
       log_deploy
     end
 
 end
 
-before(:deploy, "deploy:web:disable")
-before("deploy:restart", "canvas:symlink_canvasfiles")
-before("deploy:restart", "canvas:compile_assets")
-before("deploy:restart", "canvas:update_remote")
+before(:deploy, "deploy:web:disable") unless is_hotfix?
+before("deploy:create_symlink", "canvas:symlink_canvasfiles")
+before("deploy:create_symlink", "canvas:compile_assets")
+before("deploy:create_symlink", "canvas:update_remote")
 
 after(:deploy, "deploy:cleanup")
-after(:deploy, "deploy:web:enable")
+after(:deploy, "deploy:web:enable") unless is_hotfix?
+
+####### PRETTY OUTPUT
+unless (ENV.has_key?('verbose') && ENV['verbose'].downcase == "true")
+  logger.level = Logger::IMPORTANT
+  require "colored"
+  STDOUT.sync
+
+  def yellow_arrow
+    "→".yellow
+  end
+
+  def buffered_string(str)
+    len = 60;
+    str = "#{yellow_arrow} #{str}"
+    while (str.length < len) do
+      str += '.'
+    end
+    str
+  end
+
+  before "deploy:web:disable" do
+      print buffered_string "Putting up maintenance page"
+  end
+
+  after "deploy:web:disable" do
+      puts "✓".green
+  end
+
+  before "deploy:web:enable" do
+      print buffered_string "Removing maintenance page"
+  end
+
+  after "deploy:web:enable" do
+      puts "✓".green
+  end
+
+
+  before "deploy:update_code" do
+      print buffered_string "Updating Code"
+  end
+
+  after "deploy:update_code" do
+      puts "✓".green
+  end
+
+  before "deploy:cleanup" do
+      print buffered_string "Cleaning up"
+  end
+
+  after "deploy:cleanup" do
+      puts "✓".green
+  end
+
+  before "canvas:compile_assets" do
+      print buffered_string "Compiling static assets"
+  end
+
+  after "canvas:compile_assets" do
+      puts "✓".green
+  end
+
+  before "canvas:symlink_canvasfiles" do
+      print buffered_string "Symlinking Canvas data files"
+  end
+
+  after "canvas:symlink_canvasfiles" do
+      puts "✓".green
+  end
+
+  before "canvas:clone_qtimigrationtool" do
+      print buffered_string "Installing QTIMigrationTool"
+  end
+
+  after "canvas:clone_qtimigrationtool" do
+      puts "✓".green
+  end
+
+  before "deploy:migrate" do
+      print buffered_string "Performing DB migration"
+  end
+
+  after "deploy:migrate" do
+      puts "✓".green
+  end
+
+  before "canvas:load_notifications" do
+      print buffered_string "Loading Canvas notifications"
+  end
+
+  after "canvas:load_notifications" do
+      puts "✓".green
+  end
+
+  before "canvas:restart_jobs" do
+      print buffered_string "Restarting delayed jobs"
+  end
+
+  after "canvas:restart_jobs" do
+      puts "✓".green
+  end
+
+  before "canvas:log_deploy" do
+      print buffered_string "Logging deploy to stats.its.sfu.ca"
+  end
+
+  after "canvas:log_deploy" do
+      puts "✓".green
+  end
+
+  before "canvas:copy_config" do
+      print buffered_string "Copying config files"
+  end
+
+  after "canvas:copy_config" do
+      puts "✓".green
+  end
+
+  before "deploy:create_symlink" do
+    print buffered_string "Moving the current version symlink"
+  end
+
+  after "deploy:create_symlink" do
+      puts "✓".green
+  end
+end
