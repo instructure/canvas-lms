@@ -1,6 +1,8 @@
 <td>
   <a href="{{html_url}}" class="avatar" title="{{name}}"><img src="{{avatar_url}}" alt="{{name}}"></a>
-  <a href="{{html_url}}" class="roster_user_name">{{name}}</a></td>
+  <a href="{{html_url}}" class="roster_user_name">{{name}}</a>
+  {{#if isPending}}<span class="label label-info" title="{{#t "pending_acceptance_explanation"}}This user has not yet accepted the invitation to the course{{/t}}">{{#t "pending_acceptance_of_invitation"}}pending{{/t}}</span>{{/if}}
+</td>
 <td>
   {{#each sections}}
   <div class="section">{{name}}</div>
