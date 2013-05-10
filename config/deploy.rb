@@ -124,12 +124,6 @@ namespace :canvas do
 
 end
 
-before(:deploy, "deploy:web:disable") unless is_hotfix?
-before("deploy:create_symlink", "canvas:before_create_symlink")
-after("deploy:create_symlink", "canvas:after_create_symlink")
-after(:deploy, "canvas:after_deploy")
-after(:deploy, "deploy:cleanup")
-after(:deploy, "deploy:web:enable") unless is_hotfix?
 
 ####### PRETTY OUTPUT
 unless (ENV.has_key?('verbose') && ENV['verbose'].downcase == "true")
@@ -277,3 +271,13 @@ unless (ENV.has_key?('verbose') && ENV['verbose'].downcase == "true")
 
 
 end
+
+
+before(:deploy, "deploy:web:disable") unless is_hotfix?
+before("deploy:create_symlink", "canvas:before_create_symlink")
+after("deploy:create_symlink", "canvas:after_create_symlink")
+after(:deploy, "canvas:after_deploy")
+after(:deploy, "deploy:cleanup")
+after(:deploy, "deploy:web:enable") unless is_hotfix?
+
+
