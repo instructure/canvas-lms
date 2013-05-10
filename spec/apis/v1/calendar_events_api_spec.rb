@@ -692,6 +692,16 @@ describe CalendarEventsApiController, :type => :integration do
       end
     end
 
+    it "should omit assignment description in ics" do
+      HostUrl.stubs(:default_host).returns('www.example.com')
+      assignment_model(description: "secret stuff here")
+      get "/feeds/calendars/#{@course.feed_code}.ics"
+      response.should be_success
+      cal = Icalendar.parse(response.body.dup)[0]
+      cal.events[0].description.should == nil
+      cal.events[0].x_alt_desc.should == nil
+    end
+
     context "child_events" do
       it "should create an event with child events" do
         json = api_call(:post, "/api/v1/calendar_events",

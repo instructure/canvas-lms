@@ -672,7 +672,7 @@ class CalendarEvent < ActiveRecord::Base
 
       event.summary = @event.title
       
-      if @event.description
+      if @event.is_a?(CalendarEvent) && @event.description
         html = api_user_content(@event.description, @event.context)
         event.description html_to_text(html)
         event.x_alt_desc(html, { 'FMTTYPE' => 'text/html' })
