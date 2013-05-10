@@ -105,10 +105,8 @@ namespace :canvas do
     desc "Tasks that run before create_symlink"
     task :before_create_symlink do
       clone_qtimigrationtool
-      deploy.migrate unless is_hotfix?
-      load_notifications unless is_hotfix?
-      restart_jobs
-      log_deploy
+      symlink_canvasfiles
+      compile_assets
     end
 
     desc "Tasks that run after create_symlink"
@@ -118,13 +116,18 @@ namespace :canvas do
       load_notifications unless is_hotfix?
     end
 
+    desc "Tasks that run after the deploy completes"
+    task :after_deploy do
+      restart_jobs
+      log_deploy
+    end
+
 end
 
 before(:deploy, "deploy:web:disable") unless is_hotfix?
-before("deploy:create_symlink", "canvas:symlink_canvasfiles")
-before("deploy:create_symlink", "canvas:compile_assets")
 before("deploy:create_symlink", "canvas:before_create_symlink")
 after("deploy:create_symlink", "canvas:after_create_symlink")
+after(:deploy, "canvas:after_deploy")
 after(:deploy, "deploy:cleanup")
 after(:deploy, "deploy:web:enable") unless is_hotfix?
 
@@ -263,4 +266,14 @@ unless (ENV.has_key?('verbose') && ENV['verbose'].downcase == "true")
   after "deploy:create_symlink" do
       puts green_check
   end
+
+  before "deploy:restart" do
+    print buffered_string "Restarting the app"
+  end
+
+  after "deploy:restart" do
+      puts green_check
+  end
+
+
 end
