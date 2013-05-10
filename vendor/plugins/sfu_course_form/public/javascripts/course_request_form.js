@@ -142,23 +142,23 @@
             function course_list() {
                 toggle_enroll_me();
                 var sfu_id = $("#username").val();
-
+                $("#course_list").html("");
                 $.ajax({
                     url: "/sfu/api/v1/amaint/user/" + sfu_id + "/term",
                     dataType: "json",
                     success: function(data) {
-                        $("#course_list").html("");
                         $.each(data, function (index, term) {
                             $("#course_list").append('<div id="' + term.peopleSoftCode + '"><h4>' + term.formatted1 + '</h4><div id="' + term.peopleSoftCode + '_courses"></div></div>');
                             $("#"+term.peopleSoftCode+"_courses").html("<label> Retrieving courses... </label>");
                             courses_for_terms(sfu_id, term.peopleSoftCode);
                         });
-                        sandbox_course(sfu_id);
+                        sandbox_course();
                     },
                     error: function(xhr) {
                         var statusCode = xhr.status;
                         if (statusCode === 404) {
-                            $("#course_list").html("<h5>No courses found</h5>");
+                            //$("#course_list").html("<h5>No courses found</h5>");
+                            sandbox_course();
                         } else {
                             $("#course_list").html("<h5>An unknown error occurred</h5>");
                         }
@@ -265,7 +265,8 @@
                 }
             }
 
-            function sandbox_course(sfu_id) {
+            function sandbox_course() {
+                var sfu_id = $("#username").val();
                 var title = "Sandbox - " + sfu_id + " - " + today();
                 var sis_id = "sandbox-" + sfu_id + "-" + today();
                 $("#course_list").append("<div id='sandbox'><h4>Other</h4></div>");
