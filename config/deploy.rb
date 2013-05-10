@@ -102,8 +102,8 @@ namespace :canvas do
       puts run_locally cmd
     end
 
-    desc "Post-update commands"
-    task :update_remote do
+    desc "Tasks that run before create_symlink"
+    task :before_create_symlink do
       clone_qtimigrationtool
       deploy.migrate unless is_hotfix?
       load_notifications unless is_hotfix?
@@ -111,14 +111,20 @@ namespace :canvas do
       log_deploy
     end
 
+    desc "Tasks that run after create_symlink"
+    task :after_create_symlink do
+      copy_config
+      deploy.migrate unless is_hotfix?
+      load_notifications unless is_hotfix?
+    end
+
 end
 
 before(:deploy, "deploy:web:disable") unless is_hotfix?
 before("deploy:create_symlink", "canvas:symlink_canvasfiles")
 before("deploy:create_symlink", "canvas:compile_assets")
-before("deploy:create_symlink", "canvas:update_remote")
-
-after("deploy:create_symlink", "canvas:copy_config")
+before("deploy:create_symlink", "canvas:before_create_symlink")
+after("deploy:create_symlink", "canvas:after_create_symlink")
 after(:deploy, "deploy:cleanup")
 after(:deploy, "deploy:web:enable") unless is_hotfix?
 
