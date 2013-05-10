@@ -315,6 +315,7 @@ class ContextController < ApplicationController
         :SEARCH_URL => search_recipients_url,
         :COURSE_ROOT_URL => "/courses/#{ @context.id }",
         :CONTEXTS => @contexts,
+        :resend_invitations_url => course_re_send_invitations_url(@context),
         :permissions => {
           :manage_students => (manage_students = @context.grants_right?(@current_user, session, :manage_students)),
           :manage_admin_users => (manage_admins = @context.grants_right?(@current_user, session, :manage_admin_users)),
@@ -326,7 +327,8 @@ class ContextController < ApplicationController
           :soft_concluded => (soft_concluded = @context.soft_concluded?),
           :concluded => completed || soft_concluded,
           :teacherless => @context.teacherless?,
-          :available => @context.available?
+          :available => @context.available?,
+          :pendingInvitationsCount => @context.users_visible_to(@current_user).count(:distinct => true, :select => 'users.id', :conditions => ["enrollments.workflow_state = 'invited' AND enrollments.type != 'StudentViewEnrollment'"])
         }
       })
     elsif @context.is_a?(Group)

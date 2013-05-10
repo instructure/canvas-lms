@@ -17,6 +17,8 @@ define [
 
     @child 'createUsersView', '[data-view=createUsers]'
 
+    @child 'resendInvitationsView', '[data-view=resendInvitations]'
+
     @optionProperty 'roles'
 
     @optionProperty 'permissions'
