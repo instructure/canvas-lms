@@ -1,3 +1,4 @@
+# encoding: utf-8
 require "bundler/capistrano"
 set :stages,        %w(production staging testing vm)
 set :default_stage, "testing"
@@ -22,6 +23,10 @@ def push_app_servers(num_app_nodes, app_node_prefix)
   range.each { |x| role :app, "#{app_node_prefix}#{x}.tier2.sfu.ca" }
 end
 
+def is_hotfix?
+  ENV.has_key?('hotfix') && ENV['hotfix'].downcase == "true"
+end
+
 if (ENV.has_key?('gateway') && ENV['gateway'].downcase == "true")
   set :gateway, "welcome.its.sfu.ca"
   set :stats_server, "stats.its.sfu.ca"
@@ -37,8 +42,8 @@ namespace :deploy do
 	task :stop do ; end
 	desc 'Signal Passenger to restart the application.'
  	task :restart, :except => { :no_release => true } do
-		# run "touch #{release_path}/tmp/restart.txt"
-    run "sudo /etc/init.d/httpd restart"
+		run "touch #{release_path}/tmp/restart.txt"
+    # run "sudo /etc/init.d/httpd restart"
 	end
 
   namespace :web do
@@ -94,26 +99,38 @@ namespace :canvas do
     task :log_deploy do
       ts = Time.now.to_i
       cmd = "echo 'stats.canvas.#{stage}.deploys 1 #{ts}' | nc #{stats_server} 2003"
-      puts cmd
       puts run_locally cmd
     end
 
-    desc "Post-update commands"
-    task :update_remote do
-      copy_config
+    desc "Tasks that run before create_symlink"
+    task :before_create_symlink do
       clone_qtimigrationtool
-      deploy.migrate
-      load_notifications
+      symlink_canvasfiles
+      compile_assets
+    end
+
+    desc "Tasks that run after create_symlink"
+    task :after_create_symlink do
+      copy_config
+      deploy.migrate unless is_hotfix?
+      load_notifications unless is_hotfix?
+    end
+
+    desc "Tasks that run after the deploy completes"
+    task :after_deploy do
       restart_jobs
       log_deploy
     end
 
 end
 
-before(:deploy, "deploy:web:disable")
-before("deploy:restart", "canvas:symlink_canvasfiles")
-before("deploy:restart", "canvas:compile_assets")
-before("deploy:restart", "canvas:update_remote")
 
+
+before(:deploy, "deploy:web:disable") unless is_hotfix?
+before("deploy:create_symlink", "canvas:before_create_symlink")
+after("deploy:create_symlink", "canvas:after_create_symlink")
+after(:deploy, "canvas:after_deploy")
 after(:deploy, "deploy:cleanup")
-after(:deploy, "deploy:web:enable")
+after(:deploy, "deploy:web:enable") unless is_hotfix?
+
+
