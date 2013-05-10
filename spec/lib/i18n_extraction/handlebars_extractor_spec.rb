@@ -66,8 +66,17 @@ describe I18nExtraction::HandlebarsExtractor do
       extract('{{#t "foo"}}Be sure to <a href="{{url}}">log in</a>. <b>Don\'t</b> you <b>dare</b> forget!!!{{/t}}').should eql({'foo' => 'Be sure to *log in*. **Don\'t** you **dare** forget!!!'})
     end
 
+    it "should not infer wrappers from unbalanced tags" do
+      lambda{ extract '{{#t "foo"}}you are <b><i>so cool</i></strong>{{/t}}' }.should raise_error 'translation contains un-wrapper-ed markup (line 1). hint: use a placeholder, or balance your markup'
+    end
+
+    it "should allow empty tags on either side of the wrapper" do
+      extract('{{#t "bar"}}you can <button><i class="icon-email"></i>send an email</button>{{/t}}').should eql({'bar' => 'you can *send an email*'})
+      extract('{{#t "baz"}}this is <b>so cool!<img /></b>{{/t}}').should eql({'baz' => 'this is *so cool!*'})
+    end
+
     it "should disallow any un-wrapper-ed html" do
-      lambda{ extract '{{#t "foo"}}check out this pic: <img src="pic.gif">{{/t}}' }.should raise_error 'translation contains un-wrapper-ed markup (line 1). hint: use a placeholder'
+      lambda{ extract '{{#t "foo"}}check out this pic: <img src="pic.gif">{{/t}}' }.should raise_error 'translation contains un-wrapper-ed markup (line 1). hint: use a placeholder, or balance your markup'
     end
   end
 
