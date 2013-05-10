@@ -1,18 +1,47 @@
 /* jshint indent:4, camelcase:false, laxcomma:false */
 (function() {
-    define(['jquery'], function() {
+    define(['jquery', 'vendor/jquery.spin'], function() {
+        var enrollmentCache = {};
         return function() {
             $('.enrollment_term_switcher select').on('change', function() {
                 var el = $(this),
-                    url = '/sfu/stats/enrollments/' + el.val() + '/' + toTitleCase(el.data('enrollmenttype')) + 'Enrollment.json',
-                    totalOrUnique = el.data('totalorunique');
+                    term = el.val(),
+                    url = '/sfu/stats/enrollments/' + term + '.json',
+                    totalOrUnique = el.data('totalorunique'),
+                    enrollmentType = toTitleCase(el.data('enrollmenttype')) + 'Enrollment',
+                    target = el.parentsUntil('.stats_enrollment_box').prev()[0],
+                    spinnerContainer = el.parent().find('.spinner_container'),
+                    spinnerOpts = {
+                        lines: 11,
+                        length: 1,
+                        width: 2,
+                        radius: 5,
+                        corners: 1,
+                        rotate: 0,
+                        direction: 1,
+                        color: '#000',
+                        speed: 1,
+                        trail: 60,
+                        shadow: false,
+                        hwaccel: false,
+                        className: 'spinner',
+                        zIndex: 2e9,
+                        top: 'auto',
+                        left: 'auto'
+                    };
 
-                $.getJSON(url, function(data) {
-                    var key = totalOrUnique + '_enrollments_for_term';
-                    el = el.parentsUntil('.stats_enrollment_box').prev()[0];
-                    fancyCounter(el, parseInt(el.innerText.replace(/\D/g, ''), 10), parseInt(data[key], 10));
-                });
+                if (enrollmentCache.hasOwnProperty(term)) {
+                    var data = enrollmentCache[term];
+                    fancyCounter(target, parseInt(target.innerText.replace(/\D/g, ''), 10), parseInt(data[totalOrUnique][enrollmentType], 10));
+                } else {
 
+                    spinnerContainer.spin(spinnerOpts);
+                    $.getJSON(url, function(data) {
+                        spinnerContainer.spin(false);
+                        enrollmentCache[term] = data;
+                        fancyCounter(target, parseInt(target.innerText.replace(/\D/g, ''), 10), parseInt(data[totalOrUnique][enrollmentType], 10));
+                    });
+                }
             });
 
             function toTitleCase(str) { return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();}); }

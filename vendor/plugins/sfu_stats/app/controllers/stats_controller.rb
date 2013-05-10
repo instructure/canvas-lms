@@ -3,12 +3,7 @@ class StatsController < ApplicationController
   def index
     @current_term = current_term
     @terms = Account.find(2).enrollment_terms.find(:all, :conditions => "workflow_state = 'active'", :order => 'sis_source_id DESC')
-    @enrollments = {
-      :student_unique => enrollments_for_term(@current_term.id, 'StudentEnrollment', true),
-      :student_total  => enrollments_for_term(@current_term.id, 'StudentEnrollment', false),
-      :teacher_unique => enrollments_for_term(@current_term.id, 'TeacherEnrollment', true),
-      :teacher_total  => enrollments_for_term(@current_term.id, 'TeacherEnrollment', false),
-    }
+    @enrollments = enrollments_for_term(current_term)
   end
 
   def courses
@@ -40,10 +35,7 @@ class StatsController < ApplicationController
   def enrollments
     respond_to do |format|
       format.json do
-        render :json => {
-          "total_enrollments_for_term" => enrollments_for_term(params[:term_id], params[:enrollment_type]),
-          "unique_enrollments_for_term" => enrollments_for_term(params[:term_id], params[:enrollment_type], true)
-        }
+        render :json => enrollments_for_term(params[:term_id])
       end
     end
   end
@@ -67,21 +59,40 @@ class StatsController < ApplicationController
     courses.each { |course| course[:workflow_state] = workflow_state_translation[course[:workflow_state]] }
   end
 
-  def enrollments_for_term(term_id, enrollment_type, unique=false)
+  def enrollments_for_term(term_id, type=%w(total unique))
     if term_id == 'current'
       term_id = current_term
     end
-    Enrollment.active.count(
-      :select => "enrollments.user_id",
-      :joins => :course,
-      :distinct => unique,
-      :conditions => ['enrollments.course_id = courses.id AND
-                       courses.enrollment_term_id = ? AND
-                       enrollments.root_account_id = ? AND
-                       enrollments.type = ? AND
-                       courses.sis_source_id IS NOT NULL AND
-                       enrollments.workflow_state = ?',
-      term_id.to_i, 2, enrollment_type, 'active'])
+
+    type = [type] if type.is_a? String
+
+    enrollments = {}
+    type.each do |t|
+      enrollments[t] = send("#{t}_enrollments", term_id)
+    end
+    return enrollments
   end
 
+  def prep_enrollment_hash
+    {"StudentEnrollment"=>0, "TeacherEnrollment"=>0, "TaEnrollment"=>0, "DesignerEnrollment"=>0, "ObserverEnrollment"=>0, "StudentViewEnrollment"=>0}
+  end
+
+  def unique_enrollments(term_id)
+    prep_enrollment_hash.merge Enrollment.count(:select => "enrollments.user_id", :joins => :course, :distinct => true, :conditions => ["courses.workflow_state != 'deleted' AND enrollments.root_account_id = 2 AND enrollments.course_id = courses.id AND courses.enrollment_term_id = ? AND courses.sis_source_id IS NOT NULL AND enrollments.workflow_state = 'active'", term_id], :group => 'enrollments.type')
+  end
+
+  def total_enrollments(term_id)
+    # this is probably not very efficient but I can't seem to come up with a better way,
+    # and plus it's pretty explicit in what it's doing
+    courses = Course.all(:conditions => ["root_account_id = 2 AND enrollment_term_id = ? AND workflow_state != 'deleted'", term_id])
+    types = ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'ObserverEnrollment', 'StudentViewEnrollment']
+    total_enrollments = prep_enrollment_hash
+    courses.each do |c|
+      enrollments = c.enrollments.count(:distinct => true, :group => 'enrollments.type', :select => 'users.id', :conditions => 'enrollments.role_name IS NULL')
+      enrollments.each do |type, num|
+        total_enrollments[type] = (total_enrollments[type] + num)
+      end
+    end
+    total_enrollments
+  end
 end

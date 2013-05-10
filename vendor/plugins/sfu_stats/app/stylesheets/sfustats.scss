@@ -225,3 +225,14 @@ you can use the generic selector below, but it's slower:
     content: "\64";
 }
 
+
+// spinner
+.spinner_container {
+    display: inline-block;
+}
+
+.spinner {
+    left: 8px !important;
+    top: -4px !important;
+}
+
