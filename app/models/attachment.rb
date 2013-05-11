@@ -104,7 +104,9 @@ class Attachment < ActiveRecord::Base
 
 
   def touch_context_if_appropriate
-    touch_context unless context_type == 'ConversationMessage'
+    unless context_type == 'ConversationMessage'
+      connection.after_transaction_commit { touch_context }
+    end
   end
 
   # this is a magic method that gets run by attachment-fu after it is done sending to s3,
