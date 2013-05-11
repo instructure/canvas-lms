@@ -1036,13 +1036,15 @@ class User < ActiveRecord::Base
     end
   end
 
+  # only used by ContextModuleProgression#deep_evaluate
   def submitted_submission_for(assignment_id)
-    @submissions ||= self.submissions.having_submission.to_a
+    @submissions ||= self.submissions.having_submission.except(:includes).select([:id, :score, :assignment_id]).all
     @submissions.detect{|s| s.assignment_id == assignment_id }
   end
 
+  # only used by ContextModuleProgression#deep_evaluate
   def attempted_quiz_submission_for(quiz_id)
-    @quiz_submissions ||= self.quiz_submissions.select{|s| !s.settings_only? }
+    @quiz_submissions ||= self.quiz_submissions.select([:id, :kept_score, :quiz_id, :workflow_state]).select{|s| !s.settings_only? }
     @quiz_submissions.detect{|qs| qs.quiz_id == quiz_id }
   end
 
