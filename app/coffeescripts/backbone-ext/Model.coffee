@@ -54,3 +54,13 @@ define [
     destroy: ->
       @trigger "destroying"
       super
+
+    ##
+    # Increment an attribute by 1 (or the specified amount)
+    increment: (key, delta = 1) ->
+      @set key, @get(key) + delta
+
+    ##
+    # Decrement an attribute by 1 (or the specified amount)
+    decrement: (key, delta = 1) ->
+      @increment key, -delta
