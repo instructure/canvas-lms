@@ -1,10 +1,14 @@
+<%
+  current_host = (HostUrl.context_host(asset.merge_candidates.first) rescue nil) || HostUrl.default_host
+  new_host     = (HostUrl.context_host((asset.pseudonym || asset.user.pseudonym).account) rescue nil) || HostUrl.default_host
+%>
+
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.default_host %>/register/<%= asset.confirmation_code %>
+  <%= HostUrl.protocol %>://<%= current_host %>/register/<%= asset.confirmation_code %>
 <% end %>
 
 <% define_content :subject do %>
   <%= t('subject', 'New Canvas Account') %>
 <% end %>
-<% url = (HostUrl.context_host((asset.pseudonym || asset.user.pseudonym).account) rescue nil) || HostUrl.default_host %>
-<p><%= t :account_created, "An account has been created for you at %{url}, but you already have a Canvas account.", :url => url %></p>
+<p><%= t :account_created, "An account has been created for you at %{host}, but you already have a Canvas account.", :host => new_host %></p>
 <p><%= t :merge2, "If you would like to merge them together, *click here*", :wrapper => "<a href=\"#{content(:link)}\">\\1</a>" %></p>

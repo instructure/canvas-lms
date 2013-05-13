@@ -90,7 +90,11 @@ class Pseudonym < ActiveRecord::Base
       self.user.update_account_associations_later
     end
   end
-  
+
+  def root_account_id
+    account.root_account_id || account.id
+  end
+
   def send_registration_notification!
     @send_registration_notification = true
     self.save!
