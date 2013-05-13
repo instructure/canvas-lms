@@ -1,5 +1,9 @@
 source 'https://rubygems.org/'
 
+if RUBY_VERSION < "1.9.3" || RUBY_VERSION >= "2.0"
+  raise "Canvas requires Ruby 1.9.3"
+end
+
 ONE_NINE = RUBY_VERSION >= "1.9."
 require File.expand_path("../config/canvas_rails3", __FILE__)
 
