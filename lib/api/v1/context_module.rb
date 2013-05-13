@@ -61,6 +61,10 @@ module Api::V1::ContextModule
       hash['content_id'] = content_tag.content_id
     end
 
+    if content_tag.content_type == 'WikiPage'
+      hash['page_url'] = content_tag.content.url
+    end
+
     # add data-api-endpoint link, if applicable
     api_url = nil
     case content_tag.content_type

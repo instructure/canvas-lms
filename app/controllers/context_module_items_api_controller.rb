@@ -38,7 +38,8 @@
 #       // "ExternalUrl", "ExternalTool"
 #       type: "Assignment",
 #
-#       // the id of the object referred to (if applicable)
+#       // the id of the object referred to
+#       // applies to "File", "Discussion", "Assignment", "Quiz", "ExternalTool" types
 #       content_id: 1337,
 #
 #       // link to the item in Canvas
@@ -46,6 +47,9 @@
 #
 #       // (Optional) link to the Canvas API object, if applicable
 #       url: "https://canvas.example.edu/api/v1/courses/222/assignments/987",
+#
+#       // (only for 'Page' type) unique locator for the linked wiki page
+#       page_url: "my-page-title"
 #
 #       // (only for 'ExternalUrl' and 'ExternalTool' types) external url that the item points to
 #       external_url: "https://www.example.com/externalurl",
@@ -130,9 +134,10 @@ class ContextModuleItemsApiController < ApplicationController
   # @argument module_item[title] [Optional] The name of the module item and associated content
   # @argument module_item[type] [Required] The type of content linked to the item
   #  one of "File", "Page", "Discussion", "Assignment", "Quiz", "SubHeader", "ExternalUrl", "ExternalTool"
-  # @argument module_item[content_id] [Required, except for 'ExternalUrl' and 'SubHeader' types] The id of the content to link to the module item
+  # @argument module_item[content_id] [Required, except for 'ExternalUrl', 'Page', and 'SubHeader' types] The id of the content to link to the module item
   # @argument module_item[position] [Optional] The position of this module in the course (1-based)
   # @argument module_item[indent] [Optional] 0-based indent level; module items may be indented to show a hierarchy
+  # @argument module_item[page_url] [Required for 'Page' type] Suffix for the linked wiki page (e.g. 'front-page')
   # @argument module_item[external_url] [Required for 'ExternalUrl' and 'ExternalTool' types] External url that the item points to
   # @argument module_item[new_tab] [Optional, only applies to 'ExternalTool' type] Whether the external tool opens in a new tab
   # @argument module_item[completion_requirement][type] [Optional] Completion requirement for this module item
@@ -162,6 +167,18 @@ class ContextModuleItemsApiController < ApplicationController
 
       item_params = params[:module_item].slice(:title, :type, :indent, :new_tab)
       item_params[:id] = params[:module_item][:content_id]
+      if ['Page', 'WikiPage'].include?(item_params[:type])
+        if page_url = params[:module_item][:page_url]
+          if wiki_page = @context.wiki.wiki_pages.find_by_url(page_url)
+            item_params[:id] = wiki_page.id
+          else
+            return render :json => {:message => "invalid page_url parameter"}, :status => :bad_request
+          end
+        else
+          return render :json => {:message => "missing page_url parameter"}, :status => :bad_request
+        end
+      end
+
       item_params[:url] = params[:module_item][:external_url]
 
       if (@tag = @module.add_item(item_params)) && set_position && set_completion_requirement
