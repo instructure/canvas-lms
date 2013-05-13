@@ -30,6 +30,10 @@ define [
       _.each @instances, (view) ->
         view.expand() unless view.model.get 'parent'
 
+    @setAllReadState = (newReadState) ->
+      _.each @instances, (view) ->
+        view.model.set 'read_state', newReadState
+
     els:
       '.discussion_entry:first': '$entryContent'
       '.replies:first': '$replies'

@@ -74,6 +74,13 @@ require [
     e = data.flattened[id]
     e.read_state = read_state if e
 
+  ##
+  # propagate mark all read/unread changes to all views
+  setAllReadStateAllViews = (newReadState) ->
+    entries.setAllReadState(newReadState)
+    EntryView.setAllReadState(newReadState)
+    filterView.setAllReadState(newReadState)
+
   entriesView.on 'scrollAwayFromEntry', ->
     # prevent scroll to top for non-pushstate browsers when hash changes
     top = $container.scrollTop()
@@ -111,6 +118,14 @@ require [
   toolbarView.on 'collapseAll', ->
     EntryView.collapseRootEntries()
     scrollToTop()
+
+  toolbarView.on 'markAllAsRead', ->
+    data.markAllAsRead()
+    setAllReadStateAllViews('read')
+
+  toolbarView.on 'markAllAsUnread', ->
+    data.markAllAsUnread()
+    setAllReadStateAllViews('unread')
 
   filterView.on 'render', ->
     scrollToTop()

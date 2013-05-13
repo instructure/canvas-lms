@@ -168,7 +168,7 @@ describe "discussions" do
       it "should validate closing the discussion for comments" do
         create_and_go_to_topic
         f("#discussion-toolbar .al-trigger").click
-        expect_new_page_load { f("#ui-id-3").click }
+        expect_new_page_load { f(".discussion_locked_toggler").click }
         f('.discussion-fyi').text.should == 'This topic is closed for comments'
         ff('.discussion-reply-label').should be_empty
         DiscussionTopic.last.workflow_state.should == 'locked'
@@ -177,7 +177,7 @@ describe "discussions" do
       it "should validate reopening the discussion for comments" do
         create_and_go_to_topic('closed discussion', 'side_comment', true)
         f("#discussion-toolbar .al-trigger").click
-        expect_new_page_load { f("#ui-id-3").click }
+        expect_new_page_load { f(".discussion_locked_toggler").click }
         ff('.discussion-reply-label').should_not be_empty
         DiscussionTopic.last.workflow_state.should == 'active'
       end
@@ -603,7 +603,7 @@ describe "discussions" do
           wait_for_ajaximations
 
           f("#discussion-toolbar .al-trigger").click
-          expect_new_page_load { f("#ui-id-3").click }
+          expect_new_page_load { f(".discussion_locked_toggler").click }
 
           @topic.reload
           @topic.delayed_post_at.should be_nil
@@ -751,12 +751,16 @@ describe "discussions" do
       f('#new-discussion-btn').should be_nil
     end
 
-    it "should not show an empty gear menu to students who've created a discussion" do
+    it "should not show admin options in gear menu to students who've created a discussion" do
       @student_topic = @course.discussion_topics.create!(:user => @student, :message => 'student topic', :discussion_type => 'side_comment')
       @student_entry = @student_topic.discussion_entries.create!(:user => @student, :message => 'student entry')
       get "/courses/#{@course.id}/discussion_topics/#{@student_topic.id}"
       wait_for_ajax_requests
-      f('.headerBar .admin-links').should be_nil
+      f('.headerBar .admin-links').should_not be_nil
+      f('.mark_all_as_read').should_not be_nil
+      #f('.mark_all_as_unread').should_not be_nil
+      f('.delete_discussion').should be_nil
+      f('.discussion_locked_toggler').should be_nil
     end
 
     it "should allow students to reply to a discussion even if they cannot create a topic" do
@@ -970,11 +974,14 @@ describe "discussions" do
   end
 
   context "marking as read" do
-    it "should mark things as read" do
-      reply_count = 2
+    before do
       course_with_student
       course_with_teacher_logged_in(:course => @course)
       @topic = @course.discussion_topics.create!(:title => 'mark as read test', :message => 'test mark as read', :user => @student)
+    end
+
+    it "should automatically mark things as read" do
+      reply_count = 2
       reply_count.times { @topic.discussion_entries.create!(:message => 'Lorem ipsum dolor sit amet', :user => @student) }
       @topic.create_materialized_view
 
@@ -1005,6 +1012,30 @@ describe "discussions" do
       keep_trying_until { ff('.discussion_entry.unread').size < 2 }
       wait_for_ajaximations
       ff(".discussion_entry.unread").size.should == 1
+    end
+
+    it "should mark all as read" do
+      reply_count = 8
+      (reply_count / 2).times do |n|
+        entry = @topic.reply_from(:user => @student, :text => "entry #{n}")
+        entry.reply_from(:user => @student, :text => "sub reply #{n}")
+      end
+      @topic.create_materialized_view
+
+      # so auto mark as read won't mess up this test
+      @teacher.preferences[:manual_mark_as_read] = true
+      @teacher.save!
+
+      go_to_topic
+
+      ff('.discussion-entries .unread').length.should == reply_count
+      ff('.discussion-entries .read').length.should == 0
+
+      f("#discussion-toolbar .al-trigger").click
+      f('.mark_all_as_read').click
+      wait_for_ajaximations
+      ff('.discussion-entries .unread').length.should == 0
+      ff('.discussion-entries .read').length.should == reply_count
     end
   end
 end
