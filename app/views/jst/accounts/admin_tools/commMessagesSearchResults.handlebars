@@ -1,0 +1,16 @@
+{{#if collection.length}}
+
+  <div class="paginatedLoadingIndicator"></div>
+  <ul class="messages collectionViewItems"></ul>
+  <div class="paginatedLoadingIndicator"></div>
+
+{{else}}
+
+  <div class="alert alert-info">
+    <p class="lead">{{#t "no_messages_found"}}No messages found{{/t}}</p>
+  </div>
+  <div class="paginatedLoadingIndicator"></div>
+
+{{/if}}
+
+

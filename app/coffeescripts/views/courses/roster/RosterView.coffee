@@ -15,12 +15,29 @@ define [
 
     @child 'roleSelectView', '[data-view=roleSelect]'
 
+    @child 'createUsersView', '[data-view=createUsers]'
+
     @optionProperty 'roles'
+
+    @optionProperty 'permissions'
 
     template: template
 
+    els:
+      '#addUsers': '$addUsersButton'
+
+    afterRender: ->
+      # its a child view so it gets rendered automatically, need to stop it
+      @createUsersView.hide()
+      # its trigger would not be rendered yet, set it manually
+      @createUsersView.setTrigger @$addUsersButton
+
     attach: ->
       @collection.on 'setParam deleteParam', @fetch
+      @createUsersView.on 'close', @fetchOnCreateUsersClose
+
+    fetchOnCreateUsersClose: =>
+      @collection.fetch() if @createUsersView.hasUsers()
 
     fetch: =>
       @lastRequest?.abort()

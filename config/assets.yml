@@ -102,9 +102,6 @@ stylesheets:
     - public/stylesheets/compiled/grading_standards.css
   login:
     - public/stylesheets/compiled/login.css
-  roster:
-    - public/stylesheets/compiled/course_settings.css
-    - public/stylesheets/compiled/roster.css
   roster_user:
     - public/stylesheets/compiled/roster_user.css
   learning_outcomes:
@@ -132,6 +129,8 @@ stylesheets:
   account_settings:
     - public/stylesheets/compiled/account_settings.css
     - public/stylesheets/compiled/external_tools.css
+  account_admin_tools:
+    - public/stylesheets/compiled/account_admin_tools.css
   select_content_dialog:
     - public/stylesheets/compiled/select_content_dialog.css
   conversations:
@@ -157,4 +156,8 @@ stylesheets:
     - public/stylesheets/compiled/user_notes.css
   imports:
     - public/stylesheets/compiled/imports.css
+  styleguide:
+    - public/stylesheets/compiled/styleguide.css
+    - public/stylesheets/compiled/syntax.css
+
   <%= plugin_assets.anchors_yml %>

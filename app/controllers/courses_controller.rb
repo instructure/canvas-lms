@@ -35,8 +35,9 @@ require 'set'
 #       // the course code
 #       course_code: "INSTCON12",
 #
-#       // the current status
-#       workflow_state: "available"
+#       // the current state of the course
+#       // one of "unpublished", "available", "completed", or "deleted"
+#       workflow_state: "available",
 #
 #       // the account associated with the course
 #       account_id: 81259,
@@ -56,7 +57,8 @@ require 'set'
 #           role: StudentEnrollment,
 #           computed_final_score: 41.5,
 #           computed_current_score: 90,
-#           computed_final_grade: 'A-'
+#           computed_final_grade: 'F'
+#           computed_current_grade: 'A-',
 #         }
 #       ],
 #
@@ -64,6 +66,15 @@ require 'set'
 #       calendar: {
 #         ics: "https:\/\/canvas.instructure.com\/feeds\/calendars\/course_abcdef.ics"
 #       }
+#
+#       // the type of page that users will see when they first visit the course
+#       // - 'feed': Recent Activity Dashboard
+#       // - 'wiki': Wiki Front Page
+#       // - 'modules': Course Modules/Sections Page
+#       // - 'assignments': Course Assignments List
+#       // - 'syllabus': Course Syllabus Page
+#       // other types may be added in the future
+#       default_view: 'feed'
 #
 #       // optional: user-generated HTML for the course syllabus
 #       syllabus_body: "<p>syllabus html goes here<\/p>",
@@ -119,12 +130,14 @@ class CoursesController < ApplicationController
   # @argument include[] ["total_scores"] Optional information to include with each Course.
   #   When total_scores is given, any enrollments with type 'student' will also
   #   include the fields 'calculated_current_score', 'calculated_final_score',
-  #   and 'calculated_final_grade'. calculated_current_score is the student's
-  #   score in the course, ignoring ungraded assignments. calculated_final_score
-  #   is the student's score in the course including ungraded assignments with
-  #   a score of 0. calculated_final_grade is the letter grade equivalent of
-  #   calculated_final_score (if available). This argument is ignored if the
-  #   course is configured to hide final grades.
+  #   'calculated_current_grade', and 'calculated_final_grade'.
+  #   calculated_current_score is the student's score in the course, ignoring
+  #   ungraded assignments. calculated_final_score is the student's score in
+  #   the course including ungraded assignments with a score of 0.
+  #   calculated_current_grade is the letter grade equivalent of
+  #   calculated_current_score (if available). calculated_final_grade is the
+  #   letter grade equivalent of calculated_final_score (if available). This
+  #   argument is ignored if the course is configured to hide final grades.
   #
   # @argument include[] ["term"] Optional information to include with each Course.
   #   When term is given, the information for the enrollment term for each course
@@ -194,6 +207,11 @@ class CoursesController < ApplicationController
     @account = params[:account_id] ? Account.find(params[:account_id]) : @domain_root_account.manually_created_courses_account
     if authorized_action(@account, @current_user, [:manage_courses, :create_courses])
       params[:course] ||= {}
+
+      if params[:course].has_key?(:syllabus_body)
+        params[:course][:syllabus_body] = process_incoming_html_content(params[:course][:syllabus_body])
+      end
+
       if (sub_account_id = params[:course].delete(:account_id)) && sub_account_id.to_i != @account.id
         @sub_account = @account.find_child(sub_account_id) || raise(ActiveRecord::RecordNotFound)
       end
@@ -235,7 +253,7 @@ class CoursesController < ApplicationController
              :is_public, :public_syllabus, :allow_student_assignment_edits, :allow_wiki_comments,
              :allow_student_forum_attachments, :open_enrollment, :self_enrollment,
              :root_account_id, :account_id, :public_description,
-             :restrict_enrollments_to_course_dates, :workflow_state, :hide_final_grades], nil)
+             :restrict_enrollments_to_course_dates, :hide_final_grades], nil)
           }
         else
           flash[:error] = t('errors.create_failed', "Course creation failed")
@@ -331,16 +349,21 @@ class CoursesController < ApplicationController
   #   'ObserverEnrollment', or 'DesignerEnrollment'.
   #
   # @argument include[] ["email"] Optional user email.
-  # @argument include[] ["enrollments"] Optionally include with each Course the
-  #   user's current and invited enrollments.
+  # @argument include[] ["enrollments"]
+  #   Optionally include with each Course the user's current and invited
+  #   enrollments. If the user is enrolled as a student, and the account has
+  #   permission to manage or view all grades, each enrollment will include a
+  #   'grades' key with 'current_score', 'final_score', 'current_grade' and
+  #   'final_grade' values.
   # @argument include[] ["locked"] Optionally include whether an enrollment is locked.
   # @argument include[] ["avatar_url"] Optionally include avatar_url.
   # @argument include[] ["test_student"] Optionally include the course's Test Student,
   #   if present. Default is to not include Test Student.
   #
-  # @argument user_id [optional] If included, the user will be queried and if
-  #   the user is part of the users set, the page parameter will be modified so
-  #   that the page containing user_id will be returned.
+  # @argument user_id [optional]
+  #   If included, the user will be queried and if the user is part of the
+  #   users set, the page parameter will be modified so that the page
+  #   containing user_id will be returned.
   #
   # @returns [User]
   def users
@@ -1168,7 +1191,8 @@ class CoursesController < ApplicationController
         # Enrollment settings hash
         # Change :limit_privileges_to_course_section to be an explicit true/false value
         enrollment_options = params.slice(:course_section_id, :enrollment_type, :limit_privileges_to_course_section)
-        enrollment_options[:limit_privileges_to_course_section] = enrollment_options[:limit_privileges_to_course_section] == '1'
+        limit_privileges = value_to_boolean(enrollment_options[:limit_privileges_to_course_section])
+        enrollment_options[:limit_privileges_to_course_section] = limit_privileges
         enrollment_options[:role_name] = custom_role.name if custom_role
         list = UserList.new(params[:user_list],
                             :root_account => @context.root_account,
@@ -1305,6 +1329,9 @@ class CoursesController < ApplicationController
     @course = api_find(Course, params[:id])
     if authorized_action(@course, @current_user, :update)
       params[:course] ||= {}
+      if params[:course].has_key?(:syllabus_body)
+        params[:course][:syllabus_body] = process_incoming_html_content(params[:course][:syllabus_body])
+      end
       root_account_id = params[:course].delete :root_account_id
       if root_account_id && Account.site_admin.grants_right?(@current_user, session, :manage_courses)
         @course.root_account = Account.root_accounts.find(root_account_id)

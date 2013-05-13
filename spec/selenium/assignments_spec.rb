@@ -157,6 +157,9 @@ describe "assignments" do
       f('.ui-datepicker-prev').click
       wait_for_ajaximations
       fj("#ui-datepicker-div a:contains(#{middle_number})").click
+      wait_for_ajaximations
+      fj('#ui-datepicker-div .ui-datepicker-ok').click
+      wait_for_ajaximations
       expect_new_page_load { submit_form('#edit_assignment_form') }
       wait_for_ajaximations
       expect_new_page_load { f(".edit_assignment_link").click }

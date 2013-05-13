@@ -341,7 +341,7 @@ class ConversationsController < ApplicationController
 
     @conversation.update_attribute(:workflow_state, "read") if @conversation.unread? && auto_mark_as_read?
     messages = submissions = nil
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+    Shackles.activate(:slave) do
       messages = @conversation.messages
       ConversationMessage.send(:preload_associations, messages, :asset)
       submissions = messages.map(&:submission).compact
@@ -435,12 +435,7 @@ class ConversationsController < ApplicationController
   def delete_for_all
     return unless authorized_action(Account.site_admin, @current_user, :become_user)
 
-    conversation = Conversation.find(params[:id])
-    conversation.stream_item.stream_item_instances.destroy_all
-    conversation.conversation_participants.each do |cp|
-      cp.messages.clear
-      cp.destroy
-    end
+    Conversation.find(params[:id]).delete_for_all
 
     render :json => {}
   end
@@ -619,7 +614,7 @@ class ConversationsController < ApplicationController
       f.updated = Time.now
       f.id = conversations_url
     end
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+    Shackles.activate(:slave) do
       @entries = []
       @conversation_contexts = {}
       @current_user.conversations.each do |conversation|

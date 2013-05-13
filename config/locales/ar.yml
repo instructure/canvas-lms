@@ -15,12 +15,21 @@ ar:
     no_api_key: " يتطلب وجود مفتاح واجهة برمجة التطبيقات لاستخدام المعايير الأكاديمية"
     no_authority: "يتعذر العثور على تفويض للتحديث"
     no_file: "لا يتوفر ملف نتيجة أو إعطاء تفويض"
+  accont: 
+    feedback_pricing_sub: "الحصول على أرقام المعهد"
   account: 
+    ask_canvas_network: "طرح سؤال على مجتمع شبكة Canvas"
     default_account_name: "حساب افتراضي"
     default_site_administrator_account_name: "مسؤول الموقع"
     default_term_name: "فصل دراسي افتراضي"
     errors: 
       invalid_discovery_url: "عنوان URL الخاص بالاكتشاف غير صالح\n"
+    feedback_coach: "طرح سؤا ل على المجتمع"
+    feedback_coach_sub: "الحصول على مساعدة من خبير Canvas"
+    feedback_feature_request: "طلب الحصول على ميزة"
+    feedback_feature_request_canvas_net: "طلب الحصول على ميزة في شبكة Canvas"
+    feedback_feature_request_sub: "هل لديك مقترحات لتحسين Canvas؟"
+    feedback_pricing: "معلومات حول أسعار Canvas"
     manually_created_courses: "مساقات تم إنشاؤها يدويًا"
     root_account_cant_have_sis_id: "لا يمكن ضبط معرفات SIS على حسابات أصلية"
     sis_id_in_use: "معرف SIS \"%{sis_id}\" قيد الاستخدام بالفعل"
@@ -284,11 +293,43 @@ ar:
     add_user_dialog_title: "إضافة مستخدم جديد"
     adding_course_message: "جارٍ إضافة مساق..."
     adding_user_message: "جارٍ إضافة مستخدم..."
+    additional_settings: 
+      labels: 
+        file_quota_in_gb: "تخزين الملف"
+        media_quota_in_gb: "تخزين الوسائط"
+        student_quota: الطلاب
+    additional_settings_right_side: 
+      links: 
+        suspend: "إيقاف مؤقت للحساب"
+        unsuspend: "إلغاء الإيقاف المؤقت للحساب"
+      title: 
+        suspend: "إيقاف مؤقت للحساب"
+      titles: 
+        unsuspend: "إلغاء الإيقاف المؤقت للحساب"
     admin_tools: 
       admin_tools: 
         tab_labels: 
           restore_course: "استرداد المساقات"
+        view_messages: "عرض الإخطارات"
       admin_tools_cumb: "أدوات المسؤول"
+      comm_message_item: 
+        created_at: "تم الإنشاء في"
+        from_name: من
+        reply_to: "رد على"
+        sent_at: "تم الإرسال في"
+        to: إلى
+      comm_messages_content_pane: 
+        search_info: "لعرض كل الإخطارات المرسلة إلى مستخدم Canvas، أدخل معرف مستخدم Canvas الخاص به ونطاق التواريخ لعملية البحث."
+        view_notifications: "عرض الإخطارات"
+      comm_messages_search_form: 
+        canvas_user_id: "معرف مستخدم Canvas"
+        find: بحث
+        message_date_from: "من تاريخ"
+        message_date_to: إلى
+      comm_messages_search_overview: 
+        messages_viewed: "تم إرسال الإخطارات إلى *%{user}* من تاريخ *%{start_date}* إلى تاريخ *%{end_date}*."
+      comm_messages_search_results: 
+        no_messages_found: "لم يتم العثور على رسائل"
       course_search_form: 
         labels: 
           find_deleted_course: "البحث عن مساق محذوف"
@@ -370,6 +411,13 @@ ar:
       teachers_label: المعلمون
     course_add_failed_message: "فشل إضافة المساق، الرجاء المحاولة مرة أخرى"
     course_added_message: "تمت إضافة %{course} بنجاح!"
+    course_status_csv_description: 
+      account_reports: 
+        auburn: 
+          course_status: 
+            text: "يعرض هذا التقرير حالة جميع المساقات في فصل دراسي معين. وسيحتوي ملف CSV الناتج على صف واحد لكل قسم في المساق، وسيعرض المساق وحالة المساق والفصل الدراسي وتاريخ سريان الفعالية وتواريخ النهاية ومعلم له سجل في القسم."
+          description: 
+            header: مثال
     courses: 
       courses_crumb: المساقات
       no_results_message: "لم يتم العثور على نتائج"
@@ -384,6 +432,32 @@ ar:
       go_button: انتقال
       hide_enrollmentless_courses: "إخفاء المساقات غير المسجلة"
     crumb_statistics: إحصاءات
+    custom_grade_export_csv_description: 
+      account_reports: 
+        ross: 
+          description: 
+            header: مثال
+            text: "يعرض هذا التقرير نتائج درجات الطلاب النهائية لجميع الطلاب في فصل دراسي معين. وسيحتوي ملف CSV الناتج على صف واحد لكل تسجيل، وسوف يُظهر الدرجة الحالية والنهائية المعروضتين في دفتر تقديرات المساق."
+    custom_grade_export_csv_parameters: 
+      account_reports: 
+        ross: 
+          parameters: 
+            note: "قد لا تعكس المساقات ذات المهام المخفية الدرجات بدقة في هذا التقرير."
+    date_picker_parameter: 
+      custom_reports: 
+        end: 
+          parameters: 
+            header: "الانتهاء في:"
+        start: 
+          parameters: 
+            header: "البدء في:"
+    google_doc_accounts_csv_description: 
+      account_reports: 
+        ut_austin: 
+          description: 
+            header: مثال
+          google_doc: 
+            text: "هذا تقرير لكل المستخدمين وعنوان البريد الإلكتروني المقترن المستخدَم لتكامل Google Docs."
     grade_export_csv_description: 
       account_reports: 
         default: 
@@ -413,7 +487,22 @@ ar:
         sis_export: 
           description: 
             text: "سيقوم هذا التقرير بتصدير كل المعلومات اللازمة ذات الصلة بتزويد Canvas في الفئات المختصة."
+    quiz_data_csv_description: 
+      account_reports: 
+        ace: 
+          quiz_data_description: 
+            header: مثال
+            text: "يعرض هذا التقرير أسئلة الاختبار وإجاباتها لكل الاختبارات في فصل دراسي معين. وسيحتوي ملف csv الناتج على صف واحد لكل سؤال وإجابته في الاختبار."
+    quiz_statistics_csv_description: 
+      account_reports: 
+        ace: 
+          quiz_statistics_description: 
+            header: مثال
+            text: "يعرض هذا التقرير أسئلة الاختبار وعدد المستخدمين الذي أجابوا على الأسئلة وعدد المستخدمين الذين أجابوا على الأسئلة بشكل صحيح لكل الاختبارات في فصل دراسي معين. وسيحتوي ملف csv النائتج على صف واحد لكل سؤال اختبار."
     retry_login: "إعادة محاولة تسجيل الدخول"
+    root_accounts: 
+      labels: 
+        name: "اسم الحساب"
     settings: 
       about_google_docs: |-
           لتسهيل الأمر للمستخدمين، بدلاً من إجبارهم على تنزيل عناصر كمستندات Word وملفات PDF وجداول بيانات Excel وفتح مستندات Office (علاوة على ضرورة تثبيت هذه البرامج على أجهزة الكمبيوتر لديهم)، سترى في العديد من أجزاء Canvas أنه يسمح لك بمعاينة داخلية لمثل هذه المستندات.
@@ -469,6 +558,7 @@ ar:
       labels: 
         account_notification_icon: الرمز
         admins_can_change_passwords: "إعداد كلمة المرور بواسطة المسؤولين"
+        admins_can_view_notifications: "يمكن للمسؤولين عرض الإخطارات"
         allow_invitation_previews: "معاينات الدعوة"
         allow_sending_scores_in_emails: "يمكن للطلاب الاشتراك في تلقي مجموعات النقاط عبر إعلامات بريد إلكتروني"
         allow_sis_import: "عمليات استيراد SIS"
@@ -662,6 +752,8 @@ ar:
       started_at_message: "بدأ: %{started_at}"
       title: "استيراد SIS"
       try_import_again_link: "حاول الاستيراد مرة أخرى"
+    site_admin_statistics: 
+      page_title: "إحصاءات خاصة بالحساب %{account}"
     statistics: 
       concluded_at: "تم الانتهاء %{at}"
       created_at: "تم الإنشاء %{at}"
@@ -707,6 +799,53 @@ ar:
         two: "%{file_size} *من %{count} من الملفات*"
         zero: "%{file_size} *من %{count} من الملفات*"
       uploaded_file_storage_header: "تخزين الملف الذي تم تحميله"
+    student_access_csv_description: 
+      account_reports: 
+        tmcc: 
+          description: 
+            header: مثال
+          student_activity: 
+            text: "يعرض هذا التقرير كل أنشطة الطلاب المسجلين في مساق معين أو كل المساقات في فصل دراسي معين. وسيحتوي ملف csv الناتج على صف واحد لكل نشاط طالب وسيكون به الرؤوس التالية: معرف القسم، معرف SIS للقسم، اسم القسم، معرف المساق، معرف SIS للمساق، اسم المساق، معرف المستخدم، معرف SIS للمستخدم، نوع المحتوى، المحتوى، أوقات العرض، أوقات المشاركة، آخر عرض،. علمًا بأن أوقات العرض وأوقات المشاركة عبارة عن عدادات من بداية الوقت حتى وقت إنشاء التقرير."
+    student_ip_csv_description: 
+      account_reports: 
+        dubspot: 
+          description: 
+            header: مثال
+          student_login: 
+            text: "يعرض هذا التقرير كل الطلاب المسجلين في مساق معين أو كل المساقات في فصل دراسي معين. وسيحتوي ملف csv الناتج على صف واحد لكل تسجيل طالب."
+    student_login_csv_description: 
+      account_reports: 
+        bucks: 
+          description: 
+            header: مثال
+          student_login: 
+            text: "يعرض هذا التقرير الطلاب الذي لم يقوموا بتسجيل الدخول منذ تاريخ معين."
+    student_login_csv_parameters: 
+      account_reports: 
+        bucks: 
+          login: 
+            check_box: "تضمين الطلاب الذي لم يقوموا بتسجيل الدخول مطلقًا؟"
+          parameters: 
+            note: "لا يعكس هذا التقرير آخر نشاط في canvas بدلاً من آخر وقت قام فيه المستخدم بتسجيل الدخول."
+    student_submissions_csv_description: 
+      account_reports: 
+        vilas: 
+          description: 
+            header: مثال
+          student_submissions: 
+            text: "هذا تقرير لكل الطلاب المسجلين في مساق في فصل دراسي معين والذين قاموا بإرسال مهمة. ويحتوي هذا التقرير على صف واحد لكل عملية إرسال لطالب."
+    students_with_no_submissions_csv_description: 
+      account_reports: 
+        vilas: 
+          description: 
+            header: مثال
+          students_with_no_submissions: 
+            text: "هذا تقرير لكل الطلاب المسجلين في مساق في فصل دراسي معين والذين لم يرسلوا مهمة بين نطاق التواريخ المعين في المساق. ويحتوي هذا التقرير على صف واحد لكل عملية تسجيل لطالب."
+    submission_data_csv_description: 
+      account_reports: 
+        submission_data: 
+          description: 
+            text: "يحتوي هذا التقرير على تواريخ عمليات الإرسال لأداة الحضور."
     terms_parameters: 
       account_reports: 
         default: 
@@ -719,6 +858,13 @@ ar:
     test_ldap_result_ok: موافق
     test_login: "اختبار تسجيل الدخول"
     testing: "جارٍ الاختبار..."
+    unused_courses_csv_description: 
+      account_reports: 
+        uw: 
+          description: 
+            header: مثال
+          student_submissions: 
+            text: "هذا تقرير لكل المساقات التي ليس لها أي من العناصر التالية: مهام أو إعلانات أو مناقشات أو وحدات أو صفحات أو اختبارات."
     update_failed_notice: "فشل تحديث إعدادات الحساب"
     user_add_failed_message: "فشل إضافة مستخدم، الرجاء المحاولة مرة أخرى"
     user_added_message: "تمت إضافة %{user} بنجاح!"
@@ -809,6 +955,29 @@ ar:
       criteria_required: "مطلوب مشغل واحد على الأقل"
       recipients_required: "مطلوب مستلم واحد على الأقل"
       threshold_should_be_numeric: "من المفترض أن يكون رقمًا إيجابيًا"
+  analytics: 
+    course: 
+      analytics: "المعلومات التحليلية"
+      page_title: "المعلومات التحليلية: %{course}"
+    crumb: 
+      completed: "المساقات المكتملة"
+      current: "المساقات الحالية"
+    department: 
+      analytics: "المعلومات التحليلية"
+    filters: 
+      completed: "المساقات المكتملة"
+      current: "المساقات الحالية"
+    page_title: 
+      completed: "المعلومات التحليلية: %{account} -- المساقات المكتملة"
+      current: "المعلومات التحليلية: %{account} -- المساقات الحالية"
+      term: "المعلومات التحليلية: %{account} -- %{term}"
+    student_in_course: 
+      analytics: "المعلومات التحليلية"
+      page_title: "المعلومات التحليلية: %{course} -- %{student}"
+  angel: 
+    file_copy_fail: "تعذر نسخ المجلد \"%{base_path}\""
+    file_copy_fail_message: "تعذرت إعادة تسمية الدليل إلى المسار \"%{path}\""
+    file_import_fail: "تعذر استيراد الملف \"%{file_path}\""
   announcement: 
     no_title: "بلا عنوان"
   announcements: 
@@ -870,7 +1039,11 @@ ar:
       page_disabled_for_course: "تم تعطيل هذه الصفحة لهذا المساق"
       page_disabled_for_group: "تم تعطيل هذه الصفحة لهذه المجموعة"
     warnings: 
+      details: 
+        suspended: "تم إيقاف حساب Canvas للمعهد هذا مؤقتًا. ولا يستطيع تسجيل الدخول لتصحيح أي مشكلات سوى مسؤولو الحساب فقط."
       please_log_in: "لأسباب أمنية، الرجاء إدخال كلمة المرور للمتابعة"
+      titles: 
+        suspended: "تم إيقاف المعهد مؤقتًا"
       unsupported_browser: "لا يفي مستعرضك بالحد الأدنى من متطلبات Canvas. يرجى زيارة *أدلة Canvas* للاطلاع على قائمة كاملة بالمستعرضات المدعومة."
     wiki_front_page_default_content_course: "مرحبًا إلى مساق wiki الجديد!"
     wiki_front_page_default_content_group: "مرحبًا إلى مجموعة wiki الجديدة!"
@@ -930,6 +1103,13 @@ ar:
     show_advanced_options: "عرض الخيارات المتقدمة"
     submission_action_take_quiz: "أخذ %{title}"
     submission_action_turn_in_assignment: "تسليم %{title}"
+    submission_types: 
+      a_discussion_post: "منشور مناقشة"
+      a_file_upload: "تحميل ملف"
+      a_media_recording: "تسجيل وسائط"
+      a_quiz: اختبار
+      a_text_entry_box: "مربع إدخال نص"
+      a_website_url: "عنوان URL لموقع ويب"
     titles: 
       grading_scheme_info: "عرض/تحرير نظام تقييم الدرجات"
     warnings: 
@@ -1529,8 +1709,68 @@ ar:
     titles: 
       attendance_help: "تعليمات الحضور"
       new_attendance_column: "العمود الجديد للحضور"
+  blackboard: 
+    no_manifest: "لا يوجد أي ملف imsmanifest.xml في imsmanifest.xml في الدليل الجذر."
   bookmark_service: 
     default_title: "بلا عنوان"
+  bulk_course_migration: 
+    export_failed: "حدث خطأ أثناء تصدير المساق ذي المعرف bb_lcid %{id} من Blackboard"
+    export_failed_no_id: "حدث خطأ أثناء استيراد مساق"
+    export_failed_not_found: "تعذر العثور على المساق ذي المعرف bb_lcid %{id} في Blackboard بالمستخدم %{user_name}"
+    export_failed_with_id: "حدث خطأ أثناء استيراد المساق ذي المعرف bb_lcid %{id} إلى Canvas"
+    no_course_found: "لم يتم العثور على مساق بنوع المعرف %{id_type} للمعرف %{id}"
+    no_course_id_given: "لم يتم تحديد مساق Canvas لـ bb_lcid %{id}"
+    no_credentials_found: "لم يتم العثور على بيانات اعتماد لاسم المستخدم %{user_name}"
+    no_credentials_given: "لم يتم تعيين اسم مستخدم للمساق %{course_identifier}"
+    no_lcid_found: "لم يتم تحديد bb_lcid لصف"
+    queue_error: "حدث خطأ أثناء وضع عمليات الترحيل في قائمة الانتظار."
+  bulk_course_migrations: 
+    bulk_course_migration: 
+      exporting: "تصدير من Blackboard"
+      failed: فشل
+      finished: "تم الانتهاء"
+      importing: "استيراد إلى Canvas"
+      migration_cancelled_on: "تم الإلغاء في %{date}"
+      migration_failed_on: "فشل في %{date}"
+      migration_finished_on: "تم الانتهاء في %{date}"
+      migration_queueing: "جارٍ وضع عمليات ترحيل المساق الفردية في قائمة انتظار لتشغيلها."
+      migration_started_at: "بدأت عملية الترحيل المجمع في %{time}"
+      migration_waiting: "الترحيل المجمع بانتظار التشغيل."
+      see_results: "عرض النتائج"
+      show_warnings: "إظهار التحذيرات"
+      waiting_to_export: "بانتظار التصدير من Blackboard"
+      waiting_to_import: "بانتظار الاستيراد إلى Canvas"
+    index: 
+      available_courses: "المساقات المتوفرة"
+      bulk_description: "فيما يلي الرؤوس المتوقعة في CSV:"
+      buttons: 
+        add_credentials: "إضافة بيانات اعتماد"
+        migrate_courses: "ترحيل المساقات"
+      column_name: "اسم العمود"
+      course_id_description: "معرف Canvas للمساق المطلوب استيراده إليه."
+      credential_description: "ستساعدك هذه الأداة في ترحيل عدة مساقات في نفس الوقت من نظام Blackboard Vista/CE. ابدأ بإضافة مجموعة من بيانات الاعتماد لنظام Blackboard، ثم أضف معرفات مساقات Canvas إلى قالب CSV المقدم لترحيل المساقات."
+      csv_description: "يمكن إضافة أي أعمدة أخرى ولكن سيتم تجاهلها. وفيما يلي مثال لقالب CSV بسيط لثلاثة مساقات في حساب اسم المستخدم \"greg\"."
+      csv_template: "قالب CSV"
+      current_migration_batch: "مجموعة الترحيل الحالية"
+      description: الوصف
+      errors: 
+        choose_file: "يجب اختيار ملف csv. لتحميله"
+      labels: 
+        only_use_one: "استخدم أحد هذين العمودين فقط"
+        password: "كلمة المرور"
+        school: المدرسة
+        user_name: "اسم المستخدم"
+      lcid_description: "معرف lcid  للمساق في نظام Blackboard."
+      login_credentials: "بيانات اعتماد تسجيل الدخول إلى Blackboard"
+      page_title: "ترحيل مجمع للمساقات"
+      previous_migration_batches: "مجموعات الترحيل السابقة"
+      school: المدرسة
+      school_not_supported: "يرجى الحصول على بيانات جهة الاتصال بمسؤول Instructure للمساعدة في دعم مدرستك."
+      sis_id_description: "معرف SIS لمساق canvas المراد استيراده إلى canvas."
+      upload_migration_csv: "تحميل ملف CSV للترحيل"
+      user_name: "اسم المستخدم"
+      user_name_description: "اسم المستخدم للمستخدم الذي لديه وصول مدرس/مصمم إلى المساق للصف. ويجب أن يطابق أحد أسماء المستخدمين المدرجين في بيانات اعتماد تسجيل الدخول إلى Blackboard أعلاه."
+    only_one_bulk_migration: "يمكن تشغيل عملية واحدة فقط في كل مرة للترحيل المجمع للمساقات."
   button: 
     submit_assignment: "إرسال المهمة"
   buttons: 
@@ -1546,14 +1786,20 @@ ar:
     filter: تصفية
     hide_all_artifacts: "إخفاء كل الأدوات"
     import: استيراد
+    login: "تسجيل الدخول"
     manage_rubrics: "إدارة العناوين"
+    masquerade: "إخفاء الاسم باعتبارك مستخدمًا"
     ok: موافق
     refresh: تحديث
     save: حفظ
     save_tool_settings: "حفظ إعدادات الأداة"
     search: بحث
+    send_message: "إرسال رسالة"
+    sending: "جارٍ الإرسال..."
+    sent: "تم الإرسال!"
     show_all_artifacts: "عرض كل الأدوات"
     submit: إرسال
+    unmasquerade: "إيقاف إخفاء الأسماء"
     update: تحديث
     view_account_roster: "عرض كشف الحساب"
     view_course_roster: "عرض كشف المساق"
@@ -1657,19 +1903,21 @@ ar:
       scheduler_explanation_teacher_paragraph_2: "على سبيل المثال، لنفترض أنك تريد فحص تعيين ورقة نصف العام مع كل طالب من طلابك في المساق. يمكنك إنشاء مجموعة مواعيد جديدة، وتحدد التواريخ والأوقات التي تكون متاحًا فيها، وتقوم بتقسيم تلك الأوقات إلى مجموعات زمنية مقدار كل منها 15 دقيقة وتسمح بطالب واحد فقط لكل مجموعة زمنية."
       scheduler_explanation_teacher_paragraph_3: "ثم يتم إخطار الطلاب وسوف يرون أنهم بحاجة إلى تسجيل الاشتراك في واحدة من هذه المجموعات الزمنية. وسيتم عرض تقويم أمامهم تظهر به المجموعات الزمنية متراكبة فوق كل شيء موجود في تقاويمهم الأخرى حتى يتسنى لهم اختيار الوقت المناسب لهم."
       scheduler_explanation_teacher_paragraph_4: "* يمكنك البدء الآن بالنقر فوق زر \"إنشاء مجموعة مواعيد\" الموجود على اليمين *"
-      x_groups_have_signed_up: "تم تسجيل الاشتراك في %{signed_up} مجموعة"
-      x_people_have_signed_up: "قام %{signed_up} شخصًا بتسجيل الاشتراك"
+      x_groups_have_signed_up: "قامت %{participant_count} مجموعة بتسجيل الاشتراك"
+      x_people_have_signed_up: "قام %{participant_count} شخصًا بتسجيل الاشتراك"
     buttons: 
       cancel: إلغاء
       send_message: إرسال
       sending_message: "جارٍ الإرسال..."
     calendar_app: 
+      create_event: "إنشاء حدث جديد"
       links: 
         calendar_month: الشهر
         calendar_scheduler: المجدول
         calendar_week: الأسبوع
       refresh: تحديث
       use_old_calendar: "التقويم القديم"
+    calendar_title: "التقويم:"
     cancel_appointment: "هل تريد بالتأكيد إلغاء موعدك مع %{name}؟"
     confirm_appointment_group_deletion: "هل تريد بالتأكيد حذف مجموعة المواعيد هذه؟"
     confirm_deletion: "تأكيد الحذف"
@@ -1748,6 +1996,7 @@ ar:
     ends_in_past_error: "لا يمكنك إنشاء جزء زمني لموعد ينتهي في الماضي"
     errors: 
       send_message_failed: "حدث خطأ أثناء إرسال الرسالة، الرجاء إعادة المحاولة"
+    event_assignment_title: "عنوان المهمة:"
     event_details: 
       attendees: الحضور
       calendar: التقويم
@@ -1760,6 +2009,7 @@ ar:
       location: الموقع
       message_students: "مراسلة الطلاب"
       slots_available: "الأجزء الزمنية المتاحة"
+    event_event_title: "عنوان الحدث:"
     event_on_this_day: "يوجد حدث في هذا اليوم"
     labels: 
       due: "موعد الاستحقاق"
@@ -1960,6 +2210,7 @@ ar:
       page_title: التقويم
     show2: 
       calendar_feed: "موجز التقويم"
+      calendar_feed_instructions: "انسخ الارتباط أدناه وألصقه في أي تطبيق من تطبيقات التقويم التي تقبل موجزات iCal (تقويم Google وiCal وOutlook إلخ)"
       feed_dialog_title: "موجز التقويم"
       feed_title: "موجز Atom لتقويم المساق"
       links: 
@@ -2128,6 +2379,9 @@ ar:
       saved_successfully: "تم الحفظ بنجاح"
   collection_view: 
     no_items: "لا توجد عناصر."
+  comm_messages: 
+    from_beginning: البداية
+    to_now: الآن
   communication_channel: 
     body: "كود تحقق Canvas الخاص بك هو %{verification_code}"
     default_facebook_account: "حساب Facebook"
@@ -2617,6 +2871,8 @@ ar:
     titles: 
       content_is_locked: "تم تأمين المحتوى"
   content_migration: 
+    missing_content_links_message: "تعذر تحليل المراجع التالية:"
+    missing_content_links_title: "هناك ارتباطات غير موجودة في المحتوى المستورد"
     unknown: "غير معروف"
   content_migrations: 
     no_archive: "لا يوجد أرشيف لترحيل هذا المحتوى"
@@ -2904,14 +3160,21 @@ ar:
           next: "الوحدة التالية/العنصر التالي"
           outdent: "العنصر الحالي للمسافة"
           previous: "الوحدة السابقة/العنصر السابق"
+      keycode_descriptions: 
+        next_module_item: "حدد الوحدة التالية أو عنصر الوحدة التالي"
+        previous_module_item: "حدد الوحدة السابقة أو عنصر الوحدة السابق"
+        toggle_module_dragging: "حدد عنصرًا لبدء السحب أو أفلت العنصر المحدد مسبقًا"
       keycodes: 
         delete: d
         edit: e
         indent: i
         new: "n"
         next: j
+        next_module_item: لأعلى
         outdent: o
         previous: k
+        previous_module_item: لأسفل
+        toggle_module_dragging: مسافة
       labels: 
         assignment_picker: "بالنسبة لـ"
         assignment_requirement_picker: "على المستخدمين"
@@ -2939,6 +3202,7 @@ ar:
       module: الوحدة
       module_details: "يتم عرض الوحدات بترتيب تسلسلي، لذلك يمكن فقط ضبط الوحدات أعلاه %{name} كمتطلبات أساسية."
       module_name: "اسم الوحدة"
+      modules_keyboard_hint: "لتغيير ترتيب وحدات المساق وعناصر الوحدات، قم أولاً بإيقاف تشغيل المؤشر على قارئ الشاشة، ثم أدرج z في JAWS. ثم اضغط على Tab لتحديد أول وحدة. ثم اضغط لأعلى ولأسفل لاختيار وحدة أو عنصر وحدة. ثم اضغط على مفتاح المسافة لتحديد الوحدة أو عنصر الوحدة لبدء السحب. ثم اضغط لأعلى ولأسفل لتحديد وجهة. ثم اضغط على مفتاح المسافة مرة ثانية لإسقاط التحديد بعد الوجهة."
       must_complete_prerequisites: "يجب عليه أن يكملوا"
       no_preprequisites: "لم يتم تعريف المتطلبات الأساسية"
       no_requirements: "لم يتم تعريف المتطلبات"
@@ -3106,6 +3370,7 @@ ar:
     buttons: 
       add_people: "إضافة أشخاص"
       send_message: إرسال
+    cannot_be_empty: "لا يمكن أن تكون الرسالة فارغة"
     confirm: 
       delete_message: "هل تريد بالتأكيد حذف نسختك من هذه الرسالة؟ لن يمكن التراجع عن هذا الإجراء."
       delete_messages: "هل تريد بالتأكيد حذف نسختك من هذه الرسائل؟ لن يمكن التراجع عن هذا الإجراء."
@@ -3124,7 +3389,7 @@ ar:
         unarchive: "إلغاء الأرشفة"
         unstar: نجمة
         unsubscribe: "إلغاء الاشتراك"
-      inbox_actions_description: إجراءات
+      inbox_actions_description: "قائمة إجراءات الرسالة"
       read_more: المزيد...
     conversations_list: 
       no_archived_messages: "ليست لديك رسائل مؤرشفة"
@@ -3216,6 +3481,7 @@ ar:
       done_sending_message: "المُرسل *%{message_preview}* إلى *%{num_people}*"
       error_sending_message: "خطأ في إرسال الرسالة:"
       sending_message: "إرسال *%{message_preview}* إلى *%{num_people}*"
+    no_recipients_choose_another_group: "لا يوجد مستلمون في هذه المجموعة. الرجاء اختيار مجموعة أخرى."
     no_results: "لم يتم العثور على نتائج"
     not_applicable: "لا يوجد"
     not_scored: "بلا نقاط"
@@ -3456,6 +3722,19 @@ ar:
     updating: "جارٍ التحديث..."
   course_statistics: 
     unknown: "غير معروف"
+  course_subscriptions: 
+    already_subscribed: 
+      already_subscribed_message: "مرحبًا *%{subscriber_name}*، أنت مشترك بالفعل في *%{course_name}*"
+    logged_in_confirm_form: 
+      logged_in_confirm_message: "مرحبًا *%{user_name}*، نشكرك على اهتمامك بمساق *%{course_name}*. الرجاء النقر فوق زر اشتراك أدناه لاستلام التحديثات المتعلقة بهذا المساق."
+    new: 
+      subscribe: اشتراك
+    show: 
+      thanks: "شكرًا لك، أنت الآن مشترك في *%{course_name}*."
+    subscribe_form: 
+      email: "عنوان البريد الإلكتروني"
+      subscribe_form_text: "شكرًا على اهتمامك بمساق *%{course_name}*. لاستلام التحديثات المتعلقة بهذا المساق، الرجاء إدخال اسمك بالكامل وعنوان البريد الإلكتروني أدناه."
+      your_name: اسمك
   course_users: 
     greater_than_three: "يرجى إدخال مصطلح بحث يضم ثلاثة أحرف أو أكثر"
     unknown_error: "حدث خطأ في بحثك. يرجى إعادة المحاولة."
@@ -3496,6 +3775,12 @@ ar:
         two: "%{count} بحاجة للتصنيف"
         zero: "%{count} بحاجة للتصنيف"
       points_possible: "من %{points_possible}"
+    canvasnet_instructor: 
+      avatar_url: "صورة مجسمة (URL)"
+      biography: "سيرة ذاتية"
+      instructor_name: الاسم
+      job_title: "المسمى الوظيفي"
+      remove_instructor: "إزالة المعلم"
     confirm_action: 
       buttons: 
         conclude_course: "الوصول إلى المساق"
@@ -3578,6 +3863,40 @@ ar:
         tas: "إضافة مساعد معلم إلى المساق"
         title: 
           bookmark: "نسخ هذا الارتباط ووضع إشارة مرجعية له"
+    edit_profile: 
+      about: حول
+      about_related_id: "المعرف المشترك المستخدم لربط المساقات/الأقسام ذات الصلة معًا"
+      add_instructor: "إضافة معلم"
+      basic_info: "المعلومات الأساسية"
+      disabled: مغلق
+      enabled: مفتوح
+      institution: المعهد
+      institution_name: الاسم
+      instructor_led: "بمساعدة المعلم"
+      instructors: المعلمون
+      labels: 
+        description: الوصف
+        enrollment_fee: "رسوم التسجيل"
+        format: التنسيق
+        image: الصورة
+        path: المسار
+        position: الموضع
+        related_id: "معرف الارتباط"
+        self_enrollment: التسجيل
+        self_enrollment_limit: "سعة التسجيل"
+        tags: علامات
+        tentative_start: "بداية مبدئية"
+        title: "المسمى الوظيفي"
+        visibility: الرؤية
+      leave_blank_if_free: "اترك الحقل فارغًا إذا كان هذا المساق مجانيًا"
+      logo: "الشعار (URL)"
+      page_title: "ملف تعريف المساق"
+      path_syntax: "الأحرف الإنجليزية الصغيرة والأرقام والشرطات"
+      private: مخفي
+      public: "مدرج في canvas.net"
+      save_changes: "حفظ التغييرات"
+      self_paced: "تقدم ذاتي"
+      when_to_set_tentative_start: "على سبيل المثال، \"خريف 2013\"، إذا لم يتم تحديد تاريخ بداية للمساق"
     enrollment_reminders: 
       buttons: 
         accept: "قبول الدعوة"
@@ -3681,8 +4000,29 @@ ar:
         with_score: "الدرجة: %{score} *من %{points_possible}*"
         without_score: "من %{points_possible}"
     roster: 
+      create_users: 
+        add_more_users: "إضافة مزيد من المستخدمين"
+        add_these_users: "إضافة مستخدمين"
+        adding: "جارٍ الإضافة..."
+        adding_n_users: "المستخدمون %{users.length} الذين تم التحقق منهم وجاهزون للإضافة:"
+        can_only_grade_students_in_section: "يمكن تقييم الطلاب في القسم الخاص بهم فقط"
+        close: تم
+        duplicates_removed: "تم حذف بعض العناصر المكررة."
+        email: "البريد الإلكتروني"
+        example_formats: "أمثلة: user@example.com، \"الأول الأخير\" &lt;user@example.com&gt;، \"الأخير، الأول\" &lt;user@example.com&gt;"
+        form_instructions: "اكتب أو انسخ قائمة بعناوين البريد الإلكتروني أدناه:"
+        go_back: "البدء مرة أخرى"
+        have_been_enrolled: "تم تسجيل المستخدمين التالين"
+        name: الاسم
+        next: التالي
+        section: القسم
+        user_role: "الدور:"
+        validating: "جارٍ التحقق..."
+        will_not_be_added: "توجد أخطاء لهؤلاء المستخدمين ولن تتم إضافتهم. الرجاء التأكد من تنسيقهم بشكل صحيح."
       index: 
+        add_people: "إضافة أشخاص"
         all_roles: "كل الأدوار"
+        cannot_add_users: "لا يمكن إضافة مستخدمين جدد بسبب انتهاء هذا المساق"
         role_to_search: "تقييد البحث على الدور"
         search: بحث
         search_people: "البحث عن أشخاص"
@@ -3789,6 +4129,7 @@ ar:
         license: الترخيص
         limit_privileges_to_course_section: "يمكن للمسؤولين فقط تقييم الطلاب في القسم الخاص بهم"
         open_enrollment: "إضافة ارتباط \"الانضمام لهذا المساق\" لصفحة المساق الرئيسية"
+        public_syllabus: "جعل مناهج هذا المساق ظاهرة للجميع"
         restrict_enrollments_to_course_dates: "يمكن للمستخدمين المشاركة فقط في المساق بين هذه التواريخ"
         root_account_id: "حساب جذري"
         self_enrollment: "السماح للطلاب بالتسجيل الذاتي عن طريق الاشتراك معهم في عنوان url سري"
@@ -4008,6 +4349,8 @@ ar:
         current_users: "المستخدمون الحاليون"
       re_send_all: "أو *إعادة إرسال كل الدعوات غير المقبولة*"
       unaccepted_invitations: "لم يتم قبول %{count} دعوة/دعوات. يمكنك النقر فوق اسم المستخدم لإعادة إرسال الدعوة الخاصة به."
+  create_users_view: 
+    required: "الرجاء إدخال بعض عناوين البريد الإلكتروني"
   crumb: 
     conversations: المحادثات
     discussion_replies: "ردود المناقشات"
@@ -4025,6 +4368,7 @@ ar:
     eportfolio_welcome: "مرحبًا بك في ePortfolio"
     error_reports: "تقارير الأخطاء"
     files: الملفات
+    gradebook: "دفتر الدرجات"
     grades: الدرجات
     grading_schemes: "أنظمة التقييم"
     groups: الجموعات
@@ -4036,6 +4380,8 @@ ar:
     people: الأشخاص
     plugins: "مكونات إضافية"
     prior_users: "مستخدمون سابقون"
+    question_banks: "بنوك الأسئلة"
+    quizzes: الاختبارات
     registered_services: "الخدمات المسجّلة"
     results: النتائج
     revisions: المراجعات
@@ -4106,6 +4452,7 @@ ar:
       long: "%B %d, %Y"
       medium: "%b %e, %Y"
       medium_month: "%b %Y"
+      medium_with_weekday: "%a %b %-d، %Y"
       short: "%b %e"
       short_month: "%b"
       short_weekday: "%a"
@@ -4213,6 +4560,21 @@ ar:
       month: الشهر
       second: ثوانٍ
       year: العام
+  demos: 
+    demos_add: 
+      labels: 
+        school_name: "اسم المدرسة"
+        username: "عنوان البريد الإلكتروني"
+    register: 
+      labels: 
+        current_lms: "نظام LMS الحالي"
+        name: الاسم
+        organization_size: "حجم المؤسسة"
+        organization_type: "نوع المؤسسة"
+        phone: "رقم الهاتف"
+        school_name: المدرسة/المؤسسة
+        school_position: "المسمى الوظيفي"
+        username: "البريد الإلكتروني"
   developer_key: 
     api_key: "المفتاح: *%{api_key}*"
     created: "تم الإنشاء:"
@@ -4528,6 +4890,9 @@ ar:
     multiple_due_dates: "موعد الاستحقاق: تواريخ محددة عديدة"
     no_due_date: "موعد الاستحقاق: بلا تاريخ استحقاق"
   edit_rubric: 
+    buttons: 
+      create_rubric: "إنشاء عنوان"
+      update_rubric: "تحديث العنوان"
     errors: 
       load_rubrics_failed: "فشل تحميل العناوين، الرجاء المحاولة مرة أخرى"
     messages: 
@@ -5456,6 +5821,7 @@ ar:
     section_to_show_menu: 
       choose_a_section_to_show: "اختيار قسم لعرضه"
     show: 
+      all_sections: "كل الأقسام"
       arrange_columns_by_due_date: "ترتيب الأعمدة حسب موعد الاستحقاق"
       arrange_columns_by_group: "ترتيب الأعمدة حسب مجموعات المهام"
       download_scores: "تنزيل الدرجات (csv.)"
@@ -5467,6 +5833,7 @@ ar:
       set_group_weights: "ضبط تقييمات المجموعة"
       show_attendance_columns: "إظهار أعمدة الحضور"
       show_concluded_enrollments: "عرض التسجيلات المنتهية"
+      showing_sections: "يتم عرض: *%{section_being_shown}*"
       upload_scores: "تحميل الدرجات (من csv.)"
       view_grading_history: "عرض محفوظات التقييم"
     show_student_names: "إظهار أسماء الطلاب"
@@ -5643,6 +6010,7 @@ ar:
       not_official: "*ملاحظة*: هذه ليست درجتك الرسمية."
       page_title: "الدرجات لـ %{student}"
       percent: "في المائة"
+      print_grades: "طباعة الدرجات"
       see_rubric_results: "عرض نتائج العنوان"
       see_scoring_details: "عرض تفاصيل الدرجات"
       see_turnitin_results: "عرض نتائج Turnitin"
@@ -6228,6 +6596,9 @@ ar:
   info: 
     notices: 
       error_reported: "شكرًا لمساعدتك!  سنتخذ اللازم فورًا"
+    old_styleguide: 
+      create_collection: "إنشاء مجموعة"
+      start_a_group: "بدء مجموعة"
     styleguide: 
       create_collection: "إنشاء مجموعة"
       find_people: "العثور على أشخاص في Canvas"
@@ -6416,6 +6787,9 @@ ar:
   learning_outcome_group: 
     no_global_permission: "غير مسموح لك بإدارة النتائج العالمية، لا يمكن إضافة  \"%{title}\""
   lib: 
+    angel: 
+      failed_import_link: "فشل استيراد الارتباط"
+      failed_import_link_body: "يشير الارتباط إلى ميزة Angel التي تعذر ربطها بواسطة Canvas أو التي تم استبعادها من عملية التصدير."
     api: 
       attachments: 
         only_one_folder: "يتعذر تعيين مسار المجلد ومعرف المجلد"
@@ -6560,9 +6934,19 @@ ar:
       sending_message: "جارٍ إرسال رسالة..."
     message_student: "إرسال رسائل للطلاب بشأن %{course_name}"
     send_message: "إرسال رسالة"
+  message_students_dialog: 
+    for_title: "لـ %{title}"
+    message_students_who: "إرسال رسائل للطلاب الذين.."
   messages: 
+    account_suspended: 
+      email: 
+        body: "تم إيقاف %{institution} مؤقتًا. الرجاء الاتصال بمسؤول الموقع لديك للتعرف على الأسباب."
+        subject: "تم إيقاف المعهد مؤقتًا"
     account_user_notification: 
       email: 
+        html: 
+          subject: "إخطار مسؤول الحساب"
+          url_info: "زيارة صفحة الحساب"
         subject: "إعلام مسؤول الحساب"
         url_info: |-
             زيارة صفحة الحساب هنا:
@@ -6571,6 +6955,14 @@ ar:
       email: 
         added_message: "لقد تمت إضافتك كـ %{role_type} إلى الحساب %{account} على %{website}."
         email_info: "البريد الإلكتروني: %{email}"
+        html: 
+          added_message: "لقد تمت إضافتك كـ %{role_type} إلى الحساب %{account} على %{website}."
+          click_to_finish_registration: "انقر هنا لإنهاء عملية التسجيل"
+          email: "البريد الإلكتروني"
+          name: الاسم
+          subject: "دعوة مسؤول حساب Canvas"
+          url_info_label: "ستحتاج إلى التسجيل في Canvas قبل أن تتمكن من المشاركة كمسؤول حساب."
+          username: "اسم المستخدم"
         name_info: "الاسم: %{name}"
         subject: "دعوة مسؤول حساب Canvas"
         url_info: |-
@@ -6580,6 +6972,11 @@ ar:
     added_to_conversation: 
       email: 
         body: "أضافك %{user_name} لتوه في محادثة في Canvas. لعرض المحادثة، انقر فوق الارتباط أدناه:"
+        html: 
+          body: "قام %{user_name} بإضافتك إلى محادثة في Canvas."
+          link_text: "عرض المحادثة"
+          subject: "قام %{user_name} بإضافتك إلى محادثة في Canvas."
+          unknown_user: "مستخدم غير معروف"
         subject: "أضافك %{user_name} لتوه في محادثة في Canvas."
         unknown_user: "مستخدم غير معروف"
       facebook: 
@@ -6613,6 +7010,27 @@ ar:
           other: "تم تشغيل تنبيه لك نظرًا لتوافر الشروط التالية:"
           two: "تم تشغيل تنبيه لك نظرًا لتوافر الشروط التالية:"
           zero: "تم تشغيل تنبيه لك نظرًا لتوافر الشروط التالية:"
+        html: 
+          body: 
+            few: "تم تشغيل تنبيه لـ %{student} نظرًا لتوفر الشروط التالية:"
+            many: "تم تشغيل تنبيه لـ %{student} نظرًا لتوفر الشروط التالية:"
+            one: "تم تشغيل تنبيه لـ %{student} نظرًا لتوفر الشروط التالي:"
+            other: "تم تشغيل تنبيه لـ %{student} نظرًا لتوفر الشروط التالية:"
+            two: "تم تشغيل تنبيه لـ %{student} نظرًا لتوفر الشروط التالية:"
+            zero: "تم تشغيل تنبيه لـ %{student} نظرًا لتوفر الشرط التالي:"
+          body_student: 
+            few: "تم تشغيل تنبيه لك نظرًا لتوفر الشروط التالية:"
+            many: "تم تشغيل تنبيه لك نظرًا لتوفر الشروط التالية:"
+            one: "تم تشغيل تنبيه لك نظرًا لتوفر الشرط التالي:"
+            other: "تم تشغيل تنبيه لك نظرًا لتوفر الشروط التالية:"
+            two: "تم تشغيل تنبيه لك نظرًا لتوفر الشروط التالية:"
+            zero: "تم تشغيل تنبيه لك نظرًا لتوفر الشرط التالي:"
+          interaction_description: "لا يوجد تفاعل بين الطالب/المعلم لمدة %{count} يومًا (أيام)"
+          subject: "تنبيه: %{user_name}"
+          ungraded_count_description: "لم يتم تقييم درجات %{count} أو أكثر من عمليات الإرسال"
+          ungraded_timespan_description: "تم ترك الإرسال بدون تقييم درجات لمدة %{count} يومًا/أيام"
+          usernote_description: "لا توجد إدخالات دفاتر للكلية لمدة %{count} يومًا (أيام)"
+          view_here: "يمكنك عرضه هنا"
         interaction_description: "لا يوجد تفاعل بين الطالب/المعلم لمدة %{count} يومًا (أيام)"
         subject: "التنبيه: %{user_name}"
         ungraded_count_description: "لم يتم تقييم درجات %{count} أو مزيد من الإرسالات"
@@ -6714,6 +7132,19 @@ ar:
         body_student: "لم يتم تشغيل تنبيه لك"
     appointment_canceled_by_user: 
       email: 
+        html: 
+          attendee: الحاضر
+          attendees: الحضور
+          cancel_reason: "سبب الإلغاء"
+          click_to_see_assignment: "انقر هنا لعرض المهمة"
+          date_and_time: التاريخ/الوقت
+          details: "تفاصيل الموعد"
+          group: المجموعة
+          message: "قام المستخدم %{user} بإلغاء حجزه في %{appointment_name}."
+          no_reason_given: "لم يتم تحديد سبب"
+          slots_remaining: "الأجزاء الزمنية المتاحة"
+          subject: "تم إلغاء الحجز لـ %{appointment_name} (%{course})"
+          view_appointment: "عرض الموعد على الارتباط التالي"
         instructions: "عرض الموعد على الرابط التالي: %{link}"
         labels: 
           attendee: الحاضر
@@ -6747,6 +7178,18 @@ ar:
         message: "تنبيه Canvas - قام %{user} بإلغاء حجزه في \"%{appointment_name}\"."
     appointment_deleted_for_user: 
       email: 
+        html: 
+          attendee: الحاضر
+          attendees: الحضور
+          cancel_reason: "سبب الإلغاء"
+          course: المساق
+          date_and_time: التاريخ/الوقت
+          details: "تفاصيل الموعد"
+          group: المجموعة
+          link_text: "انقر هنا لتسجيل الاشتراك في جزء زمني مختلف"
+          message: "قام المستخدم %{user} بإلغاء الجزء الزمني الخاص بك في %{appointment_name}."
+          no_reason_given: "لم يتم تحديد سبب"
+          subject: "تم إلغاء الجزء الزمني الخاص بك لـ %{appointment_name} (%{course})"
         instructions: "تسجيل الاشتراك في جزء زمني مختلف على الارتباط التالي:%{link}"
         labels: 
           attendee: الحاضر
@@ -6778,6 +7221,15 @@ ar:
         message: "تنبيه Canvas - تم إلغاء الجزء الزمني الخاص بك لـ \"%{appointment_name}\"."
     appointment_group_deleted: 
       email: 
+        html: 
+          cancel_reason: "سبب الإلغاء"
+          course: المساق
+          dates: "التاريخ (التواريخ)"
+          details: "تفاصيل الموعد"
+          link_text: "عرض الموعد"
+          message: "تم إلغاء كل المواعيد الخاصة بـ %{appointment_name}."
+          no_reason_given: "لم يتم تحديد سبب"
+          subject: "تم إلغاء المواعيد الخاصة بـ %{appointment_name} (%{course})"
         labels: 
           cancel_reason: "سبب الإلغاء"
           course: المساق
@@ -6802,6 +7254,17 @@ ar:
     appointment_group_published: 
       email: 
         group_signup: "المجموعة (%{group_category})"
+        html: 
+          course: المساق
+          dates: "التاريخ (التواريخ)"
+          details: "تفاصيل الموعد"
+          group_signup: "المجموعة (%{group_category})"
+          individual_signup: فردي
+          link_text: "التسجيل في جزء زمني"
+          message: "الأجزاء الزمنية لـ \"%{appointment_name}\" متاحة الآن للتسجيل."
+          signup_type: "نوع التسجيل"
+          slots_remaining: "الأجزاء الزمنية المتاحة"
+          subject: "الموعد \"%{appointment_name}\" متاح للتسجيل (%{course})"
         individual_signup: فردي
         instructions: "تسجيل الاشتراك في جزء زمني على الرابط التالي: %{link}"
         labels: 
@@ -6834,6 +7297,16 @@ ar:
     appointment_group_updated: 
       email: 
         group_signup: "المجموعة (%{group_category})"
+        html: 
+          course: المساق
+          dates: "التاريخ (التواريخ)"
+          details: "تفاصيل الموعد"
+          group_signup: "المجموعة (%{group_category})"
+          individual_signup: فردي
+          link_text: "التسجيل في جزء زمني"
+          message: "تمت إضافة أجزاء زمنية إلى \"%{appointment_name}\" وهي متاحة للتسجيل."
+          slots_remaining: "الأجزاء الزمنية المتاحة"
+          subject: "الموعد \"%{appointment_name}\" تم تحديثه (%{course})"
         individual_signup: الفردي
         instructions: "تسجيل الاشتراك في جزء زمني على الرابط التالي: %{link}"
         labels: 
@@ -6865,6 +7338,17 @@ ar:
         message: "تنبيه Canvas  - توجد أجزاء زمنية جديدة متاحة لـ \"%{appointment_name}\"."
     appointment_reserved_by_user: 
       email: 
+        html: 
+          attendee: الحاضر
+          attendees: الحضور
+          course: المساق
+          date_and_time: التاريخ/الوقت
+          details: "تفاصيل الموعد"
+          group: المجموعة
+          link_text: "عرض الموعد"
+          message: "قام %{user} بالتسجيل في \"%{appointment_name}\"."
+          slots_remaining: "الأجزاء الزمنية المتاحة"
+          subject: "قام مستخدم بالتسجيل في \"%{appointment_name}\" (%{course})"
         instructions: "عرض الموعد على الرابط التالي: %{link}"
         labels: 
           attendee: الحاضر
@@ -6894,6 +7378,17 @@ ar:
         message: "تنبيه Canvas - قام %{user} بالتسجيل في \"%{appointment_name}\"."
     appointment_reserved_for_user: 
       email: 
+        html: 
+          attendee: الحاضر
+          attendees: الحضور
+          course: المساق
+          date_and_time: التاريخ/الوقت
+          details: "تفاصيل الموعد"
+          group: المجموعة
+          link_text: "التسجيل في جزء زمني مختلف"
+          message: "قام %{user} بتسجيل الاشتراك لك في \"%{appointment_name}\"."
+          slots_remaining: "الأجزاء الزمنية المتاحة"
+          subject: "تم تسجيل الاشتراك لك في \"%{appointment_name}\""
         instructions: "تسجيل جزء زمني مختلف على الرابط التالي: %{user}"
         labels: 
           attendee: الحاضر
@@ -6931,6 +7426,10 @@ ar:
             
             انقر هنا لعرض المهمة: 
             %{url}
+        html: 
+          body: "تم تغيير المهمة \"%{title}\" للمساق %{course}."
+          link: "انقر هنا لعرض المهمة"
+          subject: "تم تغيير المهمة: %{title}، %{course}"
         subject: "تم تغيير المهمة: %{title}, %{course}"
       facebook: 
         body: "لقد تغيرت المهمة %{title_link} لـ %{course}."
@@ -6947,6 +7446,13 @@ ar:
       email: 
         assignment_created: "تم إنشاء المهمة - %{assignment_name}، %{course_name}"
         due_at: "موعد الاستحقاق: %{assignment_due_date_time}"
+        html: 
+          assignment_created: "تم إنشاء المهمة - %{assignment_name}، %{course_name}"
+          due_at: "موعد الاستحقاق: %{assignment_due_date_time}"
+          link_text: "عرض المهمة"
+          multiple_due_dates: "تاريخ الاستحقاق: عدة تواريخ"
+          new_assignment: "تم إنشاء مهمة جديدة للمساق %{course_name}"
+          no_due_date: "بلا تاريخ استحقاق"
         labels: 
           click_to_see_assignment: "انقر هنا لعرض المهمة"
         multiple_due_dates: "موعد الاستحقاق: تواريخ عديدة"
@@ -6977,6 +7483,11 @@ ar:
       email: 
         assignment_due_date_changed: "تم تغيير تاريخ استحقاق المهمة: %{assignment_name}, %{course_name}"
         assignment_due_date_changed_sentence: "لقد تغير تاريخ الاستحقاق للمهمة، %{assignment_name}, للمساق، %{course_name}, إلى:"
+        html: 
+          assignment_due_date_changed: "تم تغيير تاريخ استحقاق المهمة: %{assignment_name}، %{course_name}"
+          assignment_due_date_changed_sentence: "تم تغيير تاريخ الاستحقاق للمهمة %{assignment_name} للمساق %{course_name} إلى:"
+          link_text: "عرض المهمة"
+          no_due_date: "بلا تاريخ استحقاق"
         labels: 
           click_to_see_assignment: "انقر هنا لعرض المهمة"
         no_due_date: "بلا تاريخ استحقاق"
@@ -6999,6 +7510,11 @@ ar:
       email: 
         assignment_due_date_changed: "تغيير تاريخ استحقاق المهمة:%{assignment_name}, %{course_name} (%{override})\n"
         assignment_due_date_changed_sentence: "تاريخ الاستحقاق للمهمة،  %{assignment_name}, for the course, %{course_name} (%{override}) تغير إلى:"
+        html: 
+          assignment_due_date_changed: "تم تغيير تاريخ استحقاق المهمة: %{assignment_name}، %{course_name} (%{override})"
+          assignment_due_date_changed_sentence: "تم تغيير تاريخ الاستحقاق للمهمة %{assignment_name} للمساق %{course_name} (%{override}) إلى:"
+          link_text: "عرض المهمة"
+          no_due_date: "بلا تاريخ استحقاق"
         labels: 
           click_to_see_assignment: "انقر هنا لعرض المهمة"
         no_due_date: "لا يوجد تاريخ استحقاق"
@@ -7020,6 +7536,10 @@ ar:
     assignment_graded: 
       email: 
         assignment_graded: "تم تقييم درجات للمهمة: %{assignment_name}, %{course_name}"
+        html: 
+          assignment_graded: "تم تقييم الدرجات للمهمة: %{assignment_name}، %{course_name}"
+          link_text: "عرض المهمة"
+          the_assignment_is_graded: "تم تقييم الدرجات للمهمة %{assignment_name}."
         labels: 
           view_here: "يمكنك عرضها هنا"
         the_assignment_is_graded: "تم تقييم درجات للمهمة, %{assignment_name}."
@@ -7039,6 +7559,10 @@ ar:
     assignment_locked_until: "تم تأمين هذه المهمة حتى %{date}."
     assignment_resubmitted: 
       email: 
+        html: 
+          link_text: "عرض الإرسال"
+          user_resubmitted: "إعادة الإرسال: %{user_name}، %{assignment_name}"
+          user_resubmitted_sentence: "قام %{user_name} بإعادة إرسال %{assignment_name} في المساق %{course_name}"
         labels: 
           view_submission: "يمكنك عرض الإرسال هنا"
         user_resubmitted: "إعادة الإرسال: %{user_name}, %{assignment_name}"
@@ -7056,6 +7580,10 @@ ar:
         user_resubmitted: "تنبيه Canvas - إعادة الإرسال: %{user_name}, %{assignment_name}"
     assignment_submitted: 
       email: 
+        html: 
+          link_text: "عرض الإرسال"
+          user_submitted: "الإرسال: %{user_name}، %{assignment_name}"
+          user_submitted_sentence: "قام %{user_name} بإرسال %{assignment_name} في المساق %{course_name}"
         labels: 
           view_submission: "يمكنك عرض الإرسال هنا"
         user_submitted: "الإرسال: %{user_name}, %{assignment_name}"
@@ -7073,6 +7601,10 @@ ar:
         user_submitted: "تنبيه Canvas - الإرسال: %{user_name}, %{assignment_name}"
     assignment_submitted_late: 
       email: 
+        html: 
+          link_text: "عرض الإرسال"
+          user_resubmitted_sentence: "قام %{user_name} بإرسال %{assignment_name} في المساق %{course_name} متأخرًا"
+          user_submitted: "المهمة المتأخرة: %{user_name}، %{assignment_name}"
         labels: 
           view_submission: "يمكنك عرض الإرسال هنا"
         user_resubmitted_sentence: "قام %{user_name} بتسليم إرسال متأخر لـ %{assignment_name} في المساق %{course_name}"
@@ -7095,6 +7627,10 @@ ar:
             
             يمكنك عرضها هنا:
             %{url}
+        html: 
+          body: "قام المعلم بإصدار تغييرات الدرجات وتعليقات جديدة لـ %{title}. ويمكن عرض هذه التغييرات الآن."
+          link: "يمكنك عرضها هنا"
+          subject: "المهمة التي تم إلغاء حجبها: %{title}، %{course}"
         subject: "المهمة التي تم إلغاء حجبها: %{title}, %{course}"
       sms: 
         body: |-
@@ -7124,6 +7660,12 @@ ar:
             
             يمكنك الاطلاع على التفاصيل هنا:
             %{link}
+        html: 
+          body: "لقد تمت دعوتك للتعاون في المستند %{document} لـ %{course_or_group}. تم إنشاء المستند في %{service} وتمت دعوتك باستخدام عنوان بريدك الإلكتروني %{email}."
+          body_with_user: "لقد تمت دعوتك للتعاون في المستند %{document} لـ %{course_or_group}. تم إنشاء المستند بواسطة %{user} في %{service} وتمت دعوتك باستخدام عنوان بريدك الإلكتروني %{email}."
+          change_profile_settings: "إذا كان هذا هو عنوان البريد الإلكتروني غير الصحيح لهذا النوع من التعاون، فستحتاج إلى تغيير إعدادات ملف التعريف أو التسجيل في %{service}."
+          link: "يمكنك الاطلاع على التفاصيل هنا"
+          subject: "دعوة التعاون: %{course_or_group}"
         subject: "دعوة التعاون: %{course_or_group}"
       facebook: 
         body: "لقد تمت دعوتك للتعاون في المستند، %{document} لـ %{course_or_group}. تم إنشاء المستند في %{service}."
@@ -7150,11 +7692,19 @@ ar:
       email: 
         body: "يجري تسجيل عنوان البريد الإلكتروني %{email} على الموقع %{website} للمستخدم, %{user}."
         details: "لتأكيد هذا التسجيل، تفضل بزيارة عنوان url التالي:"
+        html: 
+          body: "جارٍ تسجيل عنوان البريد الإلكتروني %{email} على الموقع %{website} للمستخدم %{user}."
+          details: "انقر هنا لتأكيد عملية التسجيل هذه"
+          subject: "تأكيد البريد الإلكتروني: Canvas"
         subject: "تأكيد البريد الإلكتروني: Canvas"
     confirm_registration: 
       email: 
         body: "شكرًا لك على التسجيل مع Canvas!  يعد هذا البريد الإلكتروني تأكيدًا بأن المستخدم %{user} يقوم بتسجيل حساب جديد على %{website}."
         details: "لإنهاء عملية التسجيل هذه، تفضل بزيارة عنوان url التالي:"
+        html: 
+          body: "شكرًا لك على التسجيل في Canvas! هذا البريد الإلكتروني عبارة عن تأكيد بأن المستخدم %{user} يقوم بتسجيل حساب جديد على %{website}."
+          details: "انقر هنا لإنهاء عملية التسجيل"
+          subject: "تأكيد التسجيل: Canvas"
         subject: "تأكيد التسجيل: Canvas"
     confirm_sms_communication_channel: 
       sms: 
@@ -7169,10 +7719,18 @@ ar:
         body: |-
             توجد مشكلة في تصدير المساق "%{course}".
             الرجاء إعلام مسؤول النظام، وإعطاؤه معرف التصدير التالي: %{id}.
+        html: 
+          body: "حدثت مشكلة أثناء تصدير المساق <em>%{course}</em>. الرجاء إخطار مسؤول النظام وإعطاؤه معرف التصدير التالي:"
+          link: "انقر لعرض عمليات التصدير"
+          subject: "فشل تصدير المساق: %{course}"
         subject: "فشل تصدير المساق: %{course}"
     content_export_finished: 
       email: 
         body: "لقد انتهى تصدير المساق الخاص بك \"%{course}\"."
+        html: 
+          body: "انتهى تصدير المساق <em>%{course}</em>."
+          link: "انقر لعرض عمليات التصدير"
+          subject: "انتهى تصدير المساق: %{course}"
         subject: "انتهى تصدير المساق: %{course}"
     content_locked: "يجري تأمين هذا الاختبار حاليًا."
     content_locked_at: "تم تأمين هذا المحتوى %{at}."
@@ -7184,6 +7742,14 @@ ar:
         attached_files: "الملفات المرفقة:"
         audio_comment: "تشتمل هذه الرسالة على تعليقات الوسائط. للاستماع أو الرد، انقر فوق الارتباط أدناه:"
         body: "أرسل %{user_name} لتوه رسالة لك في Canvas:"
+        html: 
+          attached_files: "الملفات المرفقة:"
+          audio_comment: "تشتمل هذه الرسالة على تعليقات الوسائط. للاستماع أو الرد، انقر فوق الارتباط أدناه:"
+          body: "أرسل %{user_name} لتوه رسالة لك في Canvas:"
+          download: تنزيل
+          reply_message: "للرد على هذه الرسالة، انقر فوق الارتباط أدناه:"
+          subject: "أرسل %{user_name} لتوه رسالة لك في Canvas."
+          unknown_user: "مستخدم غير معروف"
         reply_message: "للرد على هذه الرسالة، انقر فوق الارتباط أدناه:"
         subject: "أرسل %{user_name} لتوه رسالة لك في Canvas."
         unknown_user: "مستخدم غير معروف"
@@ -7202,6 +7768,63 @@ ar:
       twitter: 
         tweet: "تنبيه Canvas - الرسالة من %{user_name}."
         unknown_user: "مستخدم غير معروف"
+    course_already_started: 
+      email: 
+        body: |-
+            مرحبًا %{user}،
+            
+            لقد بدأ منذ يومين المساق %{course} الذي اشتركت فيه على شبكة Canvas، ولقد لاحظنا أنك لم تقم بتسجيل الدخول حتى الآن. ونود فقط إرسال تذكير أخير لربما تكون قد نسيت.
+            لتسجيل الدخول، انتقل إلى %{site} وأدخل اسم المستخدم وكلمة المرور. وفي حالة أنك لم تقم بتعيين كلمة مرور حتى الآن، فيمكنك تعيينها هنا: %{password_url}. وإذا لم تستطع حضور هذا المساق، فيمكنك بكل أريحية استعراض دليل المسارات الخاصة بنا على الموقع %{site} للبحث عن مسار آخر قد يعجبك. علمًا بأنه تتم إضافة المسارات الجديدة طوال الوقت!
+            
+            نتمنى أن نراك قريبًا،
+            
+            شبكة Canvas
+        course_already_started: "لقد بدأ المساق الذي اشتركت فيه بالفعل"
+    course_required_materials: 
+      email: 
+        body: |-
+            مرحبًا %{user}،
+            
+            لدينا أخبار سارة! نريد أن نحيطك علمًا بأن المساق %{course} الذي اشتركت فيه على شبكة Canvas سيبدأ قريبًا جدًا.
+            
+            للمساعدة في ضمان حصولك على أقصى استفادة من المساق، يجب عليك البحث عن أي تعليمات أو مواد خاصة بالمساق يحدد المعلم. ويمكنك إلقاء نظرة على هذا في صفحة تفاصيل المساق على شبكة Canvas أو النقر على الارتباط أدناه.
+            
+            %{url}
+            
+            لا تتوقف عن تحصيل المعرفة،
+            
+            شبكة Canvas
+        course_required_materials: "المواد والتعليمات المتعلقة بالمساق %{course}"
+    course_started: 
+      email: 
+        body: |-
+            مرحبًا %{user}،
+            
+            هذا تذكير ودي بأن المساق %{course} الذي اشتركت فيه على شبكة Canvas سيبدأ اليوم. ويمكنك تسجيل الدخول الآن إلى %{site} والشروع في الحضور!
+            
+            لا تنسَ إعداد ملف تعريف شبكة Canvas  بحيث يتعرف عليك المشاركون الآخرون في المساق. ويمكنك تحديث ملف التعريف على الارتباط التالي: %{profile_url}
+            
+            لا تتوقف عن تحصيل المعرفة،
+            
+            شبكة Canvas
+        course_starts_today: "المساق الذي اشتركت فيه يبدأ اليوم"
+    course_starts_in_week: 
+      email: 
+        body: |-
+            %{user}،
+            
+            لقد حان الوقت تقريبًا! سيبدأ المساق %{course} الذي اشتركت فيه على شبكة Canvas الأسبوع القادم. ونحن على علم بأن هذا الخبر سيسعدك، كما أنه يسعدنا كذلك.
+            
+            ما الذي يتعين عليك القيام به لتكون جاهزًا؟
+            
+            إذا لم تكن قد قمت بإنشاء ملف التعريف الخاص بك على شبكة Canvas من قبل، فيمكنك تسجيل الدخول وإعداده على Canvas.net. وجدير بالذكر أن ملف التعريف يساعد الأشخاص الآخرين في المساق على التعرف عليك. علمًا بأنه يمكنك إعداد تفضيلات الإخطارات في نفس الصفحة.
+            
+            وأخيرًا، نود أن نخبرك بأنه يمكنك مراجعة المواد المطلوبة وأي تعليمات متعلقة بالمساق على هذا الارتباط: %{url}
+            
+            لا تتوقف عن تحصيل المعرفة،
+            
+            شبكة Canvas
+        course_starts_next_week: "المساق الذي اشتركت فيه يبدأ الأسبوع القادم"
     dialog: 
       title: "إرسال رسالة رد"
     email: 
@@ -7214,6 +7837,14 @@ ar:
         body_ta: "قام %{user} بقبول دعوتهم للمشاركة في المساق %{course}, بوصفه مساعد معلم فقط."
         body_teacher: "قام %{user} بقبول دعوتهم للمشاركة في المساق %{course}, بوصفه معلمًا فقط."
         details: "راجع قائمة التسجيلات الحالية هنا:"
+        html: 
+          body_designer: "لقد قبل المستخدم %{user} دعوته للمشاركة في المساق %{course} باعتباره مصممًا."
+          body_observer: "لقد قبل المستخدم %{user} دعوته للمشاركة في المساق %{course} بوصفه ملاحظًا."
+          body_student: "لقد قبل المستخدم %{user} دعوته للمشاركة في المساق %{course} بوصفه طالبًا."
+          body_ta: "لقد قبل المستخدم %{user} دعوته للمشاركة في المساق %{course} بوصفه مساعد معلم."
+          body_teacher: "لقد قبل المستخدم %{user} دعوته للمشاركة في المساق %{course} بوصفه معلمًا."
+          details: "راجع قائمة التسجيلات الحالية"
+          subject: "قام %{user} بقبول دعوة المساق"
         subject: "قام %{user} بقبول دعوة المساق"
       facebook: 
         body_designer: "قام %{user} بقبول دعوتهم للمشاركة في المساق %{course} بوصفه مصممًا فقط."
@@ -7245,6 +7876,18 @@ ar:
         body_ta: "لقد تمت دعوتك للمشاركة في المساق، %{course}, بوصفك مساعد معلم."
         body_teacher: "لقد تمت دعوتك للمشاركة في المساق، %{course}, بوصفك معلمًا."
         details: "زيارة صفحة المساق هنا:"
+        html: 
+          body_designer: "لقد تمت دعوتك للمشاركة في المساق %{course} بوصفك مصممًا."
+          body_observer: "لقد تمت دعوتك للمشاركة في المساق %{course} بوصفك ملاحظًا."
+          body_student: "لقد تمت دعوتك للمشاركة في المساق %{course} بوصفك طالبًا."
+          body_ta: "لقد تمت دعوتك للمشاركة في المساق %{course} بوصفك مساعد معلم."
+          body_teacher: "لقد تمت دعوتك للمشاركة في المساق %{course} بوصفك معلمًا."
+          email: "البريد الإلكتروني"
+          link: "انقر هنا لعرض صفحة المساق"
+          name: الاسم
+          none: بلا
+          subject: "دعوة المساق"
+          username: "اسم المستخدم"
         labels: 
           email: "البريد الإلكتروني"
           name: الاسم
@@ -7291,6 +7934,18 @@ ar:
         body_ta: "لقد تم تسجيلك في المساق، %{course}, بوصفك TA."
         body_teacher: "لقد تم تسجيلك في المساق، %{course}, بوصفك معلمًا."
         details: "زيارة صفحة المساق هنا:"
+        html: 
+          body_designer: "لقد تم تسجيلك في المساق %{course} بوصفك مصممًا."
+          body_observer: "لقد تم تسجيلك في المساق %{course} بوصفك ملاحظًا."
+          body_student: "لقد تم تسجيلك في المساق %{course} بوصفك طالبًا."
+          body_ta: "لقد تم تسجيلك في المساق %{course} بوصفك مساعد معلم."
+          body_teacher: "لقد تم تسجيلك في المساق %{course} بوصفك معلمًا."
+          complete_registration_link: "انقر هنا لإكمال عملية التسجيل"
+          email: "البريد الإلكتروني"
+          name: الاسم
+          none: بلا
+          subject: "تسجيل المساق"
+          username: "اسم المستخدم"
         labels: 
           email: "البريد الإلكتروني"
           name: الاسم
@@ -7338,6 +7993,20 @@ ar:
         body_ta: "لقد تمت دعوتك للمشاركة في فصل على الموقع %{website}.  الفصل يسمى %{course}, وقد تمت دعوتك للمشاركة بوصفك مساعد معلم."
         body_teacher: "لقد تمت دعوتك للمشاركة في فصل على الموقع %{website}.  الفصل يسمى %{course}, وقد تمت دعوتك للمشاركة بوصفك معلمًا."
         details: "ستحتاج إلى التسجيل مع Canvas قبل أن تتمكن من المشاركة في الفصل.  للشروع في العمل، تفضل بزيارة صفحة المساق هنا:"
+        html: 
+          body_designer: "الفصل يسمى %{course}، وقد تمت دعوتك للمشاركة بوصفك مصممًا."
+          body_observer: "الفصل يسمى %{course}، وقد تمت دعوتك للمشاركة بوصفك ملاحظًا."
+          body_student: "الفصل يسمى %{course}، وقد تمت دعوتك للمشاركة بوصفك طالبًا."
+          body_ta: "الفصل يسمى %{course}، وقد تمت دعوتك للمشاركة بوصفك مساعد معلم."
+          body_teacher: "الفصل يسمى %{course}، وقد تمت دعوتك للمشاركة بوصفك معلمًا."
+          details: "ستحتاج إلى التسجيل في Canvas قبل أن تتمكن من المشاركة في الفصل."
+          email: "البريد الإلكتروني"
+          link: "انقر هنا للشروع في العمل"
+          name: الاسم
+          none: بلا
+          participate_in_class: "لقد تمت دعوتك للمشاركة في فصل على %{website}"
+          subject: "دعوة المساق"
+          username: "اسم المستخدم"
         labels: 
           email: "البريد الإلكتروني"
           name: الاسم
@@ -7369,6 +8038,12 @@ ar:
       email: 
         email_body: "الحدث, %{event_title}, للمساق, %{course_name}, قد تغير عدة مرات. إنه الآن:"
         from_to_time: "من %{start_date_time} إلى %{end_date_time}"
+        html: 
+          email_body: "تم تغيير أوقات الحدث %{event_title} للمساق %{course_name}. وصار الآن:"
+          from_to_time: "من %{start_date_time} إلى %{end_date_time}"
+          no_time_set: "لم يتم تعيين وقت"
+          see_details: "يمكنك الاطلاع على التفاصيل هنا"
+          subject: "تم تغيير تاريخ الحدث: %{event_title}، %{course_name}"
         labels: 
           see_details: "يمكنك الاطلاع على التفاصيل هنا"
         no_time_set: "لم يتم تعيين وقت"
@@ -7398,6 +8073,17 @@ ar:
     forgot_password: 
       email: 
         associated_login: "هذا العنوان مقترن بتسجيل الدخول، \"%{login_identifier}\"."
+        html: 
+          associated_login: "هذا العنوان مقترن بمعرف تسجيل الدخول \"%{login_identifier}\"."
+          click_to_reset: "انقر هنا لتعيين كلمة مرور جديدة"
+          labels: 
+            associated_with_accounts: "هذا العنوان مقترن بالحسابات التالية"
+            change_password_at: "قم بتغيير كلمة المرور الخاصة بتسجيل الدخول هذا في"
+          login_at_account: "%{login_email} في %{account_name}"
+          login_managed_by_account: "تتم إدارة بيانات اعتماد تسجيل الدخول هذا بواسطة %{account_name}"
+          password_from_account: "كان يتعين على مسؤولي النظام إعطاؤك كلمة المرور الخاصة بتسجيل الدخول هذا على الحساب %{account_name}، ولا يتمتع المعلم بصلاحية الوصول إلى كلمة المرور الخاصة بك. وإذا لم تعمل كلمة المرور، فيرحى الاتصال بمسؤول النظام للتعرف على طريقة تغيير كلمة المرور أو التحقق منها."
+          requested_password_reset: "لقد طلبت تأكيدًا لكلمة المرور الخاصة بك من أجل تسجيل الدخول إلى Canvas."
+          subject: "نسيت كلمة المرور: Canvas"
         labels: 
           associated_with_accounts: "هذا العنوان مقترن بالحسابات التالية"
           change_password_at: "تغيير كلمة المرور تسجيل الدخول في"
@@ -7411,6 +8097,13 @@ ar:
       email: 
         grade_changed: "لقد تغيرت سياسة تقييم الدرجات للمساق, %{course_name}."
         grading_based_on_points: "يعتمد تقييم الدرجات على إجمالي النقاط لكافة المهام."
+        html: 
+          grade_changed: "لقد تغيرت سياسة تقييم الدرجات للمساق %{course_name}."
+          grading_based_on_points: "يعتمد تقييم الدرجات على إجمالي النقاط لكافة المهام."
+          labels: 
+            grades_based_on_percent: "يعتمد تقييم الدرجات على الإجمالي المقدر لكل مجموعة مهام"
+            now_see_here: "يمكنك الاطلاع على التفاصيل هنا"
+            subject: "لقد تغير تقدير الدرجات"
         labels: 
           grades_based_on_percent: "يعتمد تقييم الدرجات على الإجمالي المقدر لكل مجموعة مهام"
           now_see_here: "يمكنك الاطلاع على التفاصيل هنا"
@@ -7434,6 +8127,10 @@ ar:
     group_assignment_submitted_late: 
       email: 
         body: "قامت المجموعة %{group_name} لتوها بتسليم إرسال متأخر لـ %{assignment_name} في المساق %{course_name}."
+        html: 
+          body: "قامت المجموعة %{group_name} بإرسال %{assignment_name} في المساق %{course_name} متأخرًا."
+          subject: "المهمة المتأخرة: %{group_name}، %{assignment_name}"
+          view_submission_here: "يمكنك عرض الإرسال هنا"
         labels: 
           view_submission_here: "يمكنك عرض الإرسال هنا"
         subject: "المهمة المتأخرة: %{group_name}, %{assignment_name}"
@@ -7452,6 +8149,12 @@ ar:
         account_group: "تم قبول طلبك للانضمام إلى المجموعة %{group_name} للحساب %{account_name}."
         course_group: "تم قبول طلبك للانضمام إلى المجموعة %{group_name} للمساق %{course_name}."
         group_request_accepted: "طلب المجموعة المقبول: %{group_name}"
+        html: 
+          account_group: "تم قبول طلبك للانضمام إلى المجموعة %{group_name} للحساب %{account_name}."
+          course_group: "تم قبول طلبك للانضمام إلى المجموعة %{group_name} للمساق %{course_name}."
+          group_request_accepted: "طلب المجموعة المقبول: %{group_name}"
+          link: "انقر للتحقق من المجموعة"
+          subject: "عضوية المجموعة المقبولة: %{group_name}"
         labels: 
           click_below: "يمكنك التحقق من المجموعة عن طريق النقر فوق الارتباط أدناه"
         subject: "عضوية المجموعة المقبولة: %{group_name}"
@@ -7475,6 +8178,12 @@ ar:
         account_group: "تم رفض طلبك للانضمام إلى المجموعة %{group_name} للحساب %{account_name}."
         course_group: "تم رفض طلبك للانضمام إلى المجموعة %{group_name} للمساق %{course_name}."
         group_request_rejected: "طلب المجموعة المرفوض: %{group_name}"
+        html: 
+          account_group: "تم رفض طلبك للانضمام إلى المجموعة %{group_name} للحساب %{account_name}."
+          course_group: "تم رفض طلبك للانضمام إلى المجموعة %{group_name} للمساق %{course_name}."
+          group_request_rejected: "طلب المجموعة المرفوض: %{group_name}"
+          link: "انقر لعرض مجموعات أخرى"
+          subject: "عضوية المجموعة المرفوضة: %{group_name}"
         labels: 
           click_below: "يمكنك التحقق من المجموعات الأخرى عن طريق النقر فوق الارتباط أدناه"
         subject: "عضوية المجموعة المرفوضة: %{group_name}"
@@ -7492,25 +8201,37 @@ ar:
       twitter: 
         account_group: "تنبيه Canvas - عضوية المجموعة المرفوضة: %{group_name} للحساب %{account_name}."
         course_group: "تنبيه Canvas - عضوية المجموعة المرفوضة: %{group_name} للمساق %{course_name}."
+    html_message: 
+      html_not_exist: "لم يتم إنشاء إصدار HTML من هذا الرسالة ولم يتم إرساله"
     index: 
       titles: 
         messages: "رسائل لـ  %{name}"
     layout: 
       email: 
         html: 
-          click_to_preferences: "انقر هنا لتحرير تفضيلات التنبيهات الخاصة بك"
+          click_to_preferences: "انقر هنا لتحرير تفضيلات الإخطارات"
     merge_email_communication_channel: 
       email: 
         body: "تم إنشاء حساب لك على عنوان %{url}, ولكن لديك بالفعل حساب Canvas.  وإذا كنت تود دمجهما معًا، فيرجى زيارة عنوان url التالي:"
+        html: 
+          account_created: "تم إنشاء حساب لك على %{url}، ولكن لديك حساب Canvas بالفعل."
+          merge: "إذا كنت ترغب في دمجهما معًا، <a href=\"%{link}\">انقر هنا</a>"
+          subject: "حساب Canvas جديد"
         subject: "حساب Canvas جديد"
     message: 
       actions: 
         reply: رد
+      meta_data: "بيانات التعريف"
+      plain_text: "نص عادي"
       titles: 
         created_at: "تم الإنشاء في:"
+        delay_for: "تأخير لـ"
         from_name: "من اسم"
+        notification_name: "اسم الإخطار"
+        path_type: "نوع المسار"
         reply_to: "رد إلى"
         sent_at: "تم الإرسال في:"
+        subject: الموضوع
         to: "إلى:"
     messages: 
       failure: "حدث خطأ في إرسال بريدك الإلكتروني، يرجى إعادة تحميل الصفحة والمحاولة مرة أخرى."
@@ -7518,16 +8239,29 @@ ar:
     migration_export_ready: 
       email: 
         body: "لقد اكتملت عملية الاستخراج للمساق, %{course_name}. المحتوى جاهز الآن ليتم استيراده إلى المساق لديك."
+        html: 
+          body: "لقد اكتملت عملية الاستخراج للمساق %{course_name}. المحتوى جاهز الآن ليتم استيراده إلى المساق لديك."
+          link_message: "انقر فوق <a href=\"%{link}\">هذا الارتباط</a> لاختيار العناصر التي تريد استيرادها من حسابك"
+          subject: "محتوى المساق \"%{course_name}\" جاهز للاستيراد"
         link_message: "لإنهاء استيراد المحتوى إلى %{course_name}، سيلزم النقر فوق الارتباط التالي:"
         subject: "استخراج المساق جاهز: %{course_name}"
     migration_import_failed: 
       email: 
         body: "توجد مشكلة في استيراد %{source} إلى %{destination}.  يمكن فقط استيراد جزء من المحتوى بنجاح.  الرجاء إعلام مسؤول النظام، وإعطاؤه كود الخطأ التالي: \"%{error_code}\"."
+        html: 
+          body: "حدثت مشكلة أثناء استيراد بعض المحتوى إلى المساق %{destination}."
+          notify_admin: "الرجاء إخطار مسؤول النظام وأرشده إلى <a href=\"%{link}\">صفحة معلومات الاستيراد</a>"
+          subject: "فشل استيراد المحتوى: %{course_name}"
         subject: "فشل استيراد المحتوى: %{course_name}"
     migration_import_finished: 
       email: 
         body_no_warnings: "لقد انتهى استيراد %{source} إلى %{destination}.  يجب استيراد كل ما حددته الآن في المساق الخاص بك. "
         body_with_warnings: "لقد انتهى استيراد %{source} إلى %{destination}، إلا أنه لم يتم استيراد كل شيء بنجاح: %{warnings}"
+        html: 
+          body_no_warnings: "انتهى استيراد %{source} إلى %{destination}. وينبغي أن تجد كل شيء حددته قد تم استيراده إلى المساق الذي تشترك فيه."
+          body_with_warnings: "انتهى استيراد %{source} إلى %{destination}، ولكن لم يتم استيراد كل العناصر التي حددتها بنجاح:"
+          link: "انقر لعرض المساق"
+          subject: "فشل استيراد المساق: %{course_name}"
         subject: "فشل استيراد المساق: %{course_name}"
       summary: 
         body_no_warnings: "لقد انتهى استيراد %{source} إلى %{target}.  يجب استيراد كل ما حددته الآن في المساق الخاص بك. "
@@ -7537,6 +8271,10 @@ ar:
       email: 
         body: "مسؤول الحساب الجديد لـ %{account}"
         details: "تمت إضافة مسؤول جديد, %{user}, للحساب %{account}"
+        html: 
+          body: "مسؤول الحساب الجديد لـ %{account}"
+          details: "تمت إضافة مسؤول جديد، %{user}، إلى الحساب %{account}"
+          subject: "مستخدم الحساب الجديد"
         subject: "مستخدم الحساب الجديد"
       facebook: 
         body: "تمت إضافة مسؤول جديد **%{user}** للحساب **%{account}**."
@@ -7551,6 +8289,10 @@ ar:
         body: "تنبيه Canvas - المسؤول الجديد: %{user}, %{account}"
     new_announcement: 
       email: 
+        html: 
+          attached_file: "ملف مرفق"
+          download: تنزيل
+          link: "عرض الإعلان"
         labels: 
           file_included: "الملف المضمَن"
       facebook: 
@@ -7565,6 +8307,13 @@ ar:
         body_account: "لقد تمت إضافتك إلى مجموعة جديدة للحساب %{account}.  اسم المجموعة هو %{group_name}."
         body_course: "لقد تمت إضافتك إلى مجموعة جديدة للمساق %{course}.  اسم المجموعة هو %{group_name}."
         details_account: "يمكنك رؤية المجموعات التي تعتبر أنت جزءًا منها لهذا الحساب عن طريق النقر فوق الارتباط أدناه:"
+        html: 
+          body_account: "لقد تمت إضافتك إلى مجموعة جديدة للحساب %{account}. اسم المجموعة هو %{group_name}."
+          body_course: "لقد تمت إضافتك إلى مجموعة جديدة للمساق %{course}. اسم المجموعة هو %{group_name}."
+          html_details_account: "يمكنك عرض المجموعات التي تشترك فيها لهذا الحساب من خلال <a href=\"%{link}\">النقر هنا</a>"
+          html_details_course: "يمكنك عرض المجموعات التي تشترك فيها لهذا المساق من خلال <a href=\"%{link}\">النقر هنا</a>"
+          subject: "عضوية مجموعة جديدة لـ %{course_or_account}"
+          title: "عضوية المجموعة الجديدة: %{group_name}"
         subject: "عضوية مجموعة جديدة لـ %{course_or_account}"
         title: "عضوية المجموعة الجديدة:  %{group_name}"
       facebook: 
@@ -7586,6 +8335,12 @@ ar:
         body_account: "لقد تمت دعوتك للانضمام إلى المجموعة %{group} للحساب %{account}."
         body_course: "لقد تمت دعوتك للانضمام إلى المجموعة %{group} للمساق %{course}."
         details: "يمكنك التحقق من المجموعة عن طريق النقر فوق الارتباط أدناه:"
+        html: 
+          body_account: "لقد تمت دعوتك للانضمام إلى المجموعة %{group} للحساب %{account}."
+          body_course: "لقد تمت دعوتك للانضمام إلى المجموعة %{group} للمساق %{course}."
+          details: "يمكنك التحقق من المجموعة بالنقر هنا"
+          subject: "عضوية مجموعة جديدة لـ %{course_or_account}"
+          title: "عضوية المجموعة الجديدة: %{group_name}"
         subject: "عضوية مجموعة جديدة لـ %{course_or_account}"
         title: "عضوية المجموعة الجديدة:  %{group_name}"
       facebook: 
@@ -7605,6 +8360,13 @@ ar:
     new_course: 
       email: 
         body: "تمت إضافة مساق, %{course}, للحساب %{account}"
+        html: 
+          body: "تمت إضافة المساق %{course} للحساب %{account}"
+          labels: 
+            teachers: المعلمون
+          link: "انقر هنا لعرض المساق"
+          subject: "المساق الجديد"
+          title: "المساق الجديد لـ %{account}"
         labels: 
           teachers: المعلمون
         subject: "المساق الجديد"
@@ -7630,6 +8392,10 @@ ar:
       email: 
         body: "نشر %{user} تعليقًا جديدًا على سلسلة المناقشة %{discussion_topic} لـ %{course}:"
         details: "الانضمام إلى المحادثة هنا:"
+        html: 
+          body: "نشر %{user} تعليقًا جديدًا على سلسلة المناقشة %{discussion_topic} لـ %{course}:"
+          details: "انقر هنا للانضمام إلى المحادثة"
+          subject: "تعليق جديد لـ %{discussion_topic}: %{course}"
         subject: "التعليق الجديد لـ %{discussion_topic}: %{course}"
       facebook: 
         body: "التعليق الجديد لـ %{discussion_topic}, %{course}"
@@ -7644,6 +8410,12 @@ ar:
       email: 
         body: "لقد تم بدء مناقشة جديدة قد تكون شيقة بالنسبة لك: "
         details: "الانضمام إلى المحادثة هنا:"
+        html: 
+          attached_file: "ملف مرفق"
+          body: "لقد تم بدء مناقشة جديدة قد تكون شيقة بالنسبة لك: "
+          details: "انضم إلى المحادثة من هنا"
+          download: تنزيل
+          subject: "المناقشة الجديدة - %{discussion_topic}: %{course}"
         labels: 
           file_included: "الملف المضمَن"
         subject: "المناقشة الجديدة - %{discussion_topic}: %{course}"
@@ -7660,6 +8432,12 @@ ar:
       email: 
         body: "يوجد حدث جديد تمت جدولته لـ %{course_name} يجب أن تكون على علم به:"
         from_to_time: "من %{start_date_time} إلى %{end_date_time}"
+        html: 
+          body: "يوجد حدث جديد تمت جدولته لـ %{course_name} يجب أن تكون على علم به:"
+          from_to_time: "من %{start_date_time} إلى %{end_date_time}"
+          no_time_set: "لم يتم تعيين وقت"
+          see_details: "يمكنك الاطلاع على التفاصيل هنا"
+          subject: "الحدث الجديد - %{event_title}، %{course_name}"
         labels: 
           see_details: "يمكنك الاطلاع على التفاصيل هنا"
         no_time_set: "لم يتم تعيين وقت"
@@ -7681,11 +8459,21 @@ ar:
         from_to_time: "من %{start_date_time} إلى %{end_date_time}"
         no_time_set: "لم يتم تعيين وقت"
         subject: "تنبيه Canvas - الحدث: %{event_title}, %{course_name}"
+    new_file_added: 
+      email: 
+        html: 
+          link: "انقر للعرض"
     new_student_organized_group: 
       email: 
         body_account: "تم إنشاء مجموعة طلاب جديدة منظمة تسمى \"%{group_name}\" للحساب %{account}. العضو الأول هو %{user}."
         body_course: "تم إنشاء مجموعة طلاب جديدة منظمة تسمى \"%{group_name}\" للمساق %{course}. العضو الأول هو %{user}."
         details: "يمكنك رؤية التفاصيل لهذه المجموعة عن طريق النقر فوق الارتباط أدناه:"
+        html: 
+          body_account: "تم إنشاء مجموعة طلاب جديدة منظمة تسمى \"%{group_name}\" للحساب %{account}. العضو الأول هو %{user}."
+          body_course: "تم إنشاء مجموعة طلاب جديدة منظمة تسمى \"%{group_name}\" للمساق %{course}. العضو الأول هو %{user}."
+          details: "انقر هنا لعرض تفاصيل هذه المجموعة"
+          subject: "مجموعة الطلاب الجديدة لـ %{course_or_account}"
+          title: "مجموعة الطلاب الجديدة: %{group_name}"
         subject: "مجموعة الطلاب الجديدة لـ %{course_or_account}"
         title: "مجموعة الطلاب الجديدة: %{group_name}"
       facebook: 
@@ -7704,6 +8492,14 @@ ar:
     new_teacher_registration: 
       email: 
         body: "قام %{user} بالتسجيل كمعلم فقط على موقع %{website}."
+        html: 
+          body: "قام %{user} بالتسجيل كمعلم فقط على موقع %{website}."
+          email: "البريد الإلكتروني"
+          link: "انقر هنا لعرض المعلم"
+          phone: الهاتف
+          school_name: "اسم المدرسة"
+          school_position: "موضع المدرسة"
+          subject: "تسجيل المعلم الجديد"
         labels: 
           email: "البريد الإلكتروني"
           phone: الهاتف
@@ -7728,6 +8524,10 @@ ar:
     new_user: 
       email: 
         body: "قام مستخدم جديد, %{user}, لتوه بالتسجيل للحساب %{account}"
+        html: 
+          body: "قام مستخدم جديد، %{user}، لتوه بالتسجيل في الحساب %{account}"
+          link: "انقر هنا لعرض المستخدم"
+          subject: "المستخدم الجديد"
         subject: "المستخدم الجديد"
         title: "المستخدم الجديد لـ %{account}"
       facebook: 
@@ -7749,6 +8549,10 @@ ar:
     pseudonym_registration: 
       email: 
         body: "لقد تم تسجيلك لحساب Canvas على %{account}!  قبل أن تتمكن من تسجيل الدخول وبدء استخدام Canvas، سيلزم إنهاء عملية التكوين."
+        html: 
+          body: "لقد تم تسجيلك لحساب Canvas على %{account}! قبل أن تتمكن من تسجيل الدخول وبدء استخدام Canvas، ستحتاج إلى إنهاء عملية التكوين."
+          link: "انقر هنا لإنهاء عملية التسجيل"
+          subject: "إنهاء التسجيل: Canvas"
         link_message: "لإنهاء عملية التسجيل هذه، تفضل بزيارة عنوان url التالي:"
         subject: "إنهاء التسجيل: Canvas"
     quiz_locked: "تم تأمين هذا الاختبار حاليًا."
@@ -7758,14 +8562,23 @@ ar:
     quiz_unpublished_module: "يعد هذا الاختبار جزءًا من وحدة غير منشورة ولم يتم توفيره بعد."
     report_generated: 
       email: 
+        html: 
+          link_message: "انقر هنا لتنزيل التقرير"
+          subject: "تم إنشاء التقرير"
         link_message: "انقر هنا لتنزيل التقرير:"
         subject: "تم إنشاء التقرير"
     report_generation_failed: 
       email: 
+        html: 
+          subject: "فشل إنشاء التقرير"
         subject: "فشل إنشاء التقرير"
     rubric_assessment_invitation: 
       email: 
         body: "لقد تمت دعوتك بواسطة %{user} لتقييم الإرسال الخاص بهم لـ %{rubric}:"
+        html: 
+          body: "لقد تمت دعوتك بواسطة %{user} لتقييم الإرسال الخاص به للعنوان %{rubric}:"
+          link_message: "انقر هنا لمراجعة الإدخال وتقييمه"
+          subject: "دعوة التقييم: %{rubric}، %{context}"
         link_message: "يمكنك مراجعة الإدخال وتقييمه هنا:"
         subject: "دعوة التقييم: %{rubric}, %{context}"
       facebook: 
@@ -7781,6 +8594,10 @@ ar:
     rubric_assessment_submission_reminder: 
       email: 
         body: "لقد تم تذكيرك بالتقييم: %{rubric}, %{context}:"
+        html: 
+          body: "لقد تم تذكيرك بتقييم %{rubric}، %{context}:"
+          link_message: "انقر هنا لمراجعة التقييم وإرسال الإدخال"
+          subject: "تذكير بالتقييم: %{rubric}، %{context}"
         link_message: "يمكنك مراجعة التقييم وإرسال الإدخال هنا:"
         subject: "تذكير بالتقييم: %{rubric}, %{context}"
       facebook: 
@@ -7796,6 +8613,10 @@ ar:
     rubric_association_created: 
       email: 
         body: "لقد تم إنشاء تقييم جديد لـ %{context}:"
+        html: 
+          body: "لقد تم إنشاء تقييم جديد لـ %{context}:"
+          link_message: "انقر هنا لمراجعة التقييم وإرسال الإدخال"
+          subject: "التقييم الجديد: %{title}، %{context}"
         link_message: "يمكنك مراجعة التقييم وإرسال الإدخال هنا:"
         subject: "التقييم الجديد: %{title}, %{context}"
       facebook: 
@@ -7815,6 +8636,11 @@ ar:
     submission_comment: 
       email: 
         body: "وضع %{author} لتوه تعليقًا جديدًا على الإرسال الخاص بـ %{user} لـ %{assignment}"
+        html: 
+          body: "وضع %{author} لتوه تعليقًا جديدًا على الإرسال الخاص بـ %{user} لـ %{assignment}"
+          link_message: "انقر هنا لمراجعة تفاصيل الإرسال"
+          someone: "شخص ما"
+          subject: "تعليق الإرسال: %{user}، %{assignment}، %{context}"
         link_message: "يمكنك مراجعة تفاصيل الإرسال هنا:"
         someone: "شخص ما"
         subject: "تعليق الإرسال: %{user}, %{assignment}, %{context}"
@@ -7833,6 +8659,11 @@ ar:
     submission_comment_for_teacher: 
       email: 
         body: "وضع %{author} لتوه تعليقًا جديدًا على الإرسال الخاص بـ %{user} لـ %{assignment}."
+        html: 
+          body: "وضع %{author} لتوه تعليقًا جديدًا على الإرسال الخاص بـ %{user} لـ %{assignment}."
+          link_message: "انقر هنا لمراجعة تفاصيل الإرسال"
+          someone: "شخص ما"
+          subject: "تعليق الإرسال: %{user}، %{assignment}، %{context}"
         link_message: "يمكنك مراجعة تفاصيل الإرسال هنا:"
         someone: "شخص ما"
         subject: "تعليق الإرسال: %{user}, %{assignment}, %{context}"
@@ -7851,6 +8682,15 @@ ar:
     submission_grade_changed: 
       email: 
         body: "لقد تم تغيير الدرجة الخاصة بمهمتك %{assignment_title}."
+        html: 
+          body: "لقد تم تغيير الدرجة الخاصة بمهمتك %{assignment_title}."
+          link_message: "يمكنك مراجعة التقييم هنا"
+          no_date_set: "لم يتم تعيين تاريخ"
+          not_applicable: "لا يوجد"
+          regraded_date: "تمت إعادة تقييم الدرجات: %{date}"
+          score: "الدرجة: %{score} من %{total}"
+          score_pending: "مراجعة الدرجات المعلقة بواسطة المعلم"
+          subject: "الدرجة التي تم تغييرها: %{assignment}، %{context}"
         link_message: "يمكنك مراجعة المهمة هنا:"
         no_date_set: "لم يتم تعيين تاريخ"
         not_applicable: "لا يوجد"
@@ -7890,6 +8730,15 @@ ar:
       email: 
         body: "لقد تم تقييم درجات لمهمتك, %{assignment}."
         graded_date: "تم تقييم الدرجات: %{date}"
+        html: 
+          body: "تم تقييم الدرجات للمهمة %{assignment}."
+          graded_date: "تم تقييم الدرجات: %{date}"
+          link_message: "يمكنك مراجعة المهمة هنا"
+          no_date_set: "لم يتم تعيين تاريخ"
+          not_applicable: "لا يوجد"
+          score: "الدرجة: %{score} من %{total}"
+          score_pending_review: "مراجعة الدرجات المعلقة بواسطة المعلم"
+          subject: "تم تقييم الدرجات للمهمة: %{assignment}، %{context}"
         link_message: "يمكنك مراجعة المهمة هنا:"
         no_date_set: "لم يتم تعيين تاريخ"
         not_applicable: "لا يوجد"
@@ -7927,6 +8776,12 @@ ar:
     summaries: 
       email: 
         daily_body: "تم تسجيلك لاستلام تقرير يومي خاص ببعض الإعلامات الواردة من حساب Canvas.  فيما يلي التقرير بتاريخ %{date}:"
+        html: 
+          click_to_preferences: "انقر هنا لتحرير تفضيلات الإخطارات"
+          daily_body: "لقد قمت بتسجيل الاشتراك لاستلام تقرير يومي لبعض الإخطارات من حساب Canvas. فيما يلي تقرير %{date}:"
+          subject: "إعلامات Canvas الأخيرة"
+          view: "انقر للعرض"
+          weekly_body: "لقد قمت بتسجيل الاشتراك لاستلام تقرير أسبوعي لبعض الإخطارات من حساب Canvas. فيما يلي تقرير الأسبوع الذي ينتهي بتاريخ %{date}:"
         notifications_link: "يمكنك تغيير إعدادات الإعلام عن طريق زيارة الصفحة التالية:"
         subject: "إعلامات Canvas الأخيرة"
         weekly_body: "تم تسجيلك لاستلام تقرير أسبوعي خاص ببعض الإعلامات الواردة من حساب Canvas.  فيما يلي التقرير الخاص بنهاية الأسبوع %{date}:"
@@ -7944,6 +8799,10 @@ ar:
     updated_wiki_page: 
       email: 
         body: "لقد تم تحديث صفحة على wiki لـ %{title} والتي قد تجعل حياتك أسهل."
+        html: 
+          body: "لقد تم تحديث صفحة على wiki لـ %{title} والتي قد تجعل حياتك أسهل."
+          link_message: "انقر هنا لعرضها"
+          subject: "صفحة Wiki المحدثة: %{title}، %{user}"
         link_message: "يمكنك مراجعتها هنا: %{link}"
         subject: "صفحة Wiki المحدثة: %{title}, %{user}"
       facebook: 
@@ -7960,6 +8819,10 @@ ar:
       email: 
         body: "لقد تمت دعوتك للمشاركة في مؤتمر عبر الويب، %{title} لـ %{name}."
         details_link: "يمكنك الاطلاع على التفاصيل هنا: %{link}"
+        html: 
+          body: "لقد تمت دعوتك للمشاركة في مؤتمر عبر الويب، %{title} لـ %{name}."
+          details_link: "انقر هنا لعرض التفاصيل"
+          subject: "دعوة لمؤتمر عبر الويب: %{name}"
         subject: "دعوة لمؤتمر عبر الويب: %{name}"
       facebook: 
         body: "لقد تمت دعوتك للمشاركة في مؤتمر عبر الويب، *%{title}* لـ #%{name}#."
@@ -7971,6 +8834,11 @@ ar:
         subject: "دعوة لمؤتمر عبر الويب: %{name}"
       twitter: 
         tweet: "تنبيه Canvas - دعوة: حضور %{title}, %{name}"
+  migration: 
+    ecollege: 
+      course_not_found: "لم يتم العثور على مساق ECollege."
+    webct: 
+      course_not_found: "لم يتم العثور على مساق Blackboard."
   migration_issues: 
     errors: 
       valid_workflow_state: "يجب إرسال حالة سير عمل صالحة"
@@ -8162,6 +9030,9 @@ ar:
       other: أخرى
       parent: "رسائل البريد الإلكتروني الأصل"
       scheduling: الجدولة
+  notifications_search: 
+    cant_be_blank: "لا يمكن ترك معرف مستخدم Canvas فارغًا"
+    cant_come_before_from: "لا يمكن أن يكون \"من تاريخ\" قبل \"إلى تاريخ\""
   number: 
     currency: 
       format: 
@@ -8357,6 +9228,8 @@ ar:
     view_more_link: "عرض المزيد"
   paginated_view: 
     loading_more_results: "تحميل مزيد من النتائج"
+  paypal: 
+    exception: "عذرًا، حدث خطأ، الرجاء المحاولة مرة أخرى لاحقًا."
   plugins: 
     academic_benchmark_importer: 
       name: "مستورد القياس الأكاديمي"
@@ -8374,12 +9247,19 @@ ar:
     account_reports: 
       description: "تحديد تقارير الحساب"
       name: "تقارير الحساب"
+    angel_exporter: 
+      file_description: "تصدير Angel بتنسيق zip."
+      name: "محول Angel"
     assignment_freezer: 
       description: "تجميد خصائص التعيين عند النسخ"
       name: "أداة تجميد خصائص التعيين"
     assignment_freezer_settings: 
       description: "تسمح هذه الوظيفة الإضافية للمسؤولين باختيار خاصية على التعيينات تجعل الخصائص ⏎ التي تم تكوينها غير قابلة للتحرير بمجرد نسخ التعيين إلى مساق آخر."
       no_copying_frozen: "لا تسمح بنسخ التعيينات المجمدة."
+    banner_grade_exchange_settings: 
+      labels: 
+        canvas_source_identifier: "اسم مثيل Canvas"
+        sis_source_identifier: "اسم مثيل Banner"
     big_blue_button: 
       description: "دعم عقد مؤتمرات Big Blue Button عبر الويب"
       name: "Big Blue Button"
@@ -8390,6 +9270,9 @@ ar:
         domain: المجال
         secret: "كلمة السر"
       secret_description: "هذه هي المعلمة %{parameter_name} التي يمكن العثور عليها في ملف التكوين %{filename}."
+    blackboard_exporter: 
+      file_description: "تصدير Blackboard 6/7/8/9 بتنسيق ملف zip."
+      name: "مصدِّر Blackboard"
     buttons: 
       saving: "جارٍ الحفظ..."
     canvas_cartridge_importer: 
@@ -8407,6 +9290,9 @@ ar:
       description: "يتكامل هذا المكون الإضافي مع Crocodoc لتوفير عارض مستندات HTML5 يمنح للمعلمين والطلاب القدرة على وضع تعليقات توضيحية للمستندات."
       labels: 
         api_key: "مفتاح واجهة برمجة تطبيق Crocodoc"
+    d2l_exporter: 
+      file_description: "تصدير D2L بتنسيق zip."
+      name: "محول D2L"
     dim_dim: 
       description: "دعم عقد مؤتمرات DimDim عبر الويب"
       name: DimDim
@@ -8505,6 +9391,20 @@ ar:
         publish_endpoint: "نقطة النهاية المراد نشرها إلى"
         success_timeout: "مهلة الإعلام بالنجاح (بالثواني)"
         wait_for_success: "انتظار إعلامات النجاح"
+    ims_es_importer_settings: 
+      labels: 
+        course_long_name_selection: "تحديد الاسم الطويل للمساق"
+        course_short_name_selection: "تحديد الاسم القصير للمساق"
+        course_sourcedid_name_prefix: "المساق \"sourcedid\" تجاهل البادئة"
+        default_email_domain: "مجال البريد الإلكتروني الافتراضي"
+        email_preference: "تفضيل البريد الإلكتروني"
+        lms_delivery_name: "اسم تسليم LMS"
+        map_sections_to_courses: "ربط أقسام IMS بمساقات Canvas"
+        section_end_days_adjustment: "تعديل أيام نهاية القسم"
+        section_name_selection: "تحديد اسم القسم"
+        section_start_days_adjustment: "تعديل أيام بداية القسم"
+        term_end_days_adjustment: "تعديل أيام نهاية الفصل الدراسي"
+        term_start_days_adjustment: "تعديل أيام بداية الفصل الدراسي"
     index: 
       author: المؤلف
       canvas_revision_unknown: "غير معروف"
@@ -8572,6 +9472,10 @@ ar:
       labels: 
         api_key: "مفتاح واجهة برمجة التطبيقات (API)"
         secret_key: "المفتاح السري"
+    lockdown_browser: 
+      labels: 
+        download_url: "عنوان URL لتنزيل مستعرض LockDown"
+        plugin_enabled: ممكَّن
     moodle_converter: 
       file_description: "ملف Moodle 1.9 المضغوط zip."
       name: "برنامج استيراد Moodle"
@@ -8654,6 +9558,18 @@ ar:
       labels: 
         api_key: "مفتاح العميل"
         secret_key: "كلمة سر العميل"
+    webct_scraper: 
+      file_description: "Blackboard Vista/CE،‏ WebCT 6+ المساق"
+      name: "Blackboard Vista/CE (WebCT)"
+    webct_scraper_settings: 
+      description: |-
+          إذا كان المعهد لا يستخدم "الوحدات التعليمية" لـ WebCT (بما في ذلك المدارس التي تبنت WebCT قبل الإصدار 4.0، عندما كانت الوحدات متوفرة)، فيمكن تحسين عمليات الترحيل من خلال استيراد "محتوى المساق"
+            كوحدات Canvas بدلاً من "الوحدات التعليمية". تتيح هذه الصفحة تعيين الإجراء الافتراضي لأداة ترحيل WebCT
+            فيما يتعلق بوحدات المحتوى. ومن المهم تذكر أنه بالرغم من أن عمليات ترحيل المساقات الفردية تتيح القدرة
+            على الاختيار، إلا أن أداة الترحيل المجمع تستفيد من القيمة التي يتم تكوينها ولا يمكن تغييرها لكل عملية ترحيل.
+      labels: 
+        allow_outline_selection: "عرض خيار استخدام محتوى المساق كوحدات في معالج الترحيل"
+        folders_as_outline: "استخدام \"محتوى المساق\" لـ WebCT للوحدات كإعداد افتراضي"
     wimba: 
       description: "دعم عقد مؤتمرات Wimba عبر الويب"
       name: Wimba
@@ -8972,11 +9888,14 @@ ar:
   pseudonym: 
     errors: 
       bad_credentials: "اسم مستخدم غير صالح أو كلمة مرور غير صالحة"
+      common: "لا يمكن استخدام كلمات المرور الشائعة (مثل \"password\")"
       invalid: "قد يشمل فقط الحروف الأبجدية أو الأرقام أو ما يلي: %{characters}"
       invalid_email_address: "\"%{email}\" ليس عنوان بريد إلكتروني صالحًا"
       mismatch: "لا يطابق"
       not_email: "عنوان بريد إلكتروني غير صالح"
+      repeated: "لا يمكن استخدام نفس الحرف أكثر من %{max} مرة في الصف الواحد"
       required: مطلوب
+      sequence: "لا يمكن تضمين سلسلة من أكثر من %{max} حرفًا (مثل abcdef)"
       taken: "البريد الإلكتروني قيد الاستخدام بالفعل"
       too_long: "لا يمكن أن يتجاوز %{max} حرفًا"
       too_short: "يجب أن يكون %{min} حرفًا على الأقل"
@@ -9071,6 +9990,7 @@ ar:
         new_password: "كلمة المرور الجديدة"
         password: "كلمة المرور"
         password_confirmation: "تأكيد كلمة المرور الجديدة"
+        which_login_to_change: "تسجيل الدخول المطلوب تغييره"
       page_title: "تغيير كلمة المرور"
       titles: 
         change_password: "تغيير كلمة مرور تسجيل الدخول لـ %{user}"
@@ -9085,12 +10005,15 @@ ar:
       account_registered: "تم تسجيل الحساب!"
       account_updated: "تم تحديث الحساب!"
       email_sent: "تم إرسال بريد الكتروني للتأكيد إلى %{email}, وتأكد من مراجعة صندوق البريد العشوائي"
-      link_invalid: "يبدو أن الارتباط الذي استخدمته لم يعد صالحًا.  إذا لم تستطع تسجيل الدخول، فحاول النقر فوق \"لا أعرف كلمة مروري\" لكي تتلقي رسالة جديدة مرسلة لك."
+      link_invalid: "الارتباط الذي استخدمته لم يعد صالحًا. وإذا لم تستطع تسجيل الدخول، فانقر فوق \"لا تعلم كلمة المرور الخاصة بك؟\" لإعادة تعيين كلمة المرور."
       password_changed: "تغيرت كلمة المرور"
     registration_confirmation_form: 
       errors: 
         password_required: "كلمة المرور مطلوبة"
         password_too_short: "كلمة المرور قصيرة جدًا"
+  purchases: 
+    new: 
+      payment_info: "معلومات الدفع"
   question_bank: 
     align_outcomes: "محاذاة النتائج"
     remove_outcome_from_bank: "هل ترغب بالتأكيد في إزالة هذا الناتج من بنك الأسئلة؟"
@@ -9214,11 +10137,13 @@ ar:
       new: "جديد:"
   quiz: 
     default_question_input: "[ تحديد ]"
+    default_text_only_question_name: مباعد
     default_title: "اختبار غير مسمى"
     errors: 
       invalid_hide_results: "إخفاء النتائج غير صالح."
       invalid_ip_filter: "عامل تصفية IP غير صالح"
       invalid_quiz_type: "نوع الاختبار غير صالح"
+    question_name_counter: "السؤال %{question_number}"
     statistics: 
       csv_columns: 
         attempt: المحاولة
@@ -9252,6 +10177,22 @@ ar:
     statistics: 
       exact_answer: "%{exact_value} +/- %{margin}"
       inexact_answer: "%{lower_bound} إلى %{upper_bound}"
+  quiz_statistics: 
+    statistics: 
+      csv_columns: 
+        attempt: المحاولة
+        id: المعرف
+        n_correct: "عدد الصحيح"
+        n_incorrect: "عدد غير الصحيح"
+        name: الاسم
+        score: الدرجة
+        section: القسم
+        section_id: "معرف القسم"
+        section_sis_id: "معرف sis للقسم"
+        sis_id: "معرف sis"
+        submitted: المرسَل
+      no_answer: "بلا إجابة"
+    statistics_filename: "تقرير %{title} %{type}"
   quiz_submissions: 
     errors: 
       late_quiz: "لقد أرسلت هذا الاختبار متأخرًا، وربما لم تكن إجاباتك قد تم تسجيلها."
@@ -9309,6 +10250,7 @@ ar:
     default_question_name: السؤال
     default_quiz_title: اختبار
     default_response_to_essay: "الاستجابة لعرض الطالب بعد أن يرسل إجابة"
+    default_response_to_file_upload: "الاستجابة لعرض الطالب بعد أن يرسل إجابة"
     default_title: "الاختبار الجديد"
     display_answer: 
       correct_answer: "كانت هذه هي الإجابة الصحيحة."
@@ -9463,6 +10405,7 @@ ar:
         calculated: "أدخل سؤالك، وقم بتكوين صيغة، وقم بإنشاء مجموعة من الإجابات الممكنة. وسيرى الطلاب السؤال مع مجموعة محددة عشوائيًا من المتغيرات التي تم ملؤها ويجب عليهم كتابة الإجابة الرقمية الصحيحة."
         equations: "يمكنك تعريف المتغيرات عن طريق كتابة أسماء المتغير المحاطة بأقواس"
         essay: "سيتم منح الطلاب حقلا نصيًا لتأليف الإجابة الصحيحة."
+        file_upload: "سيتمكن الطلاب من تحميل ملف لإجابتهم."
         fill_in_multiple_blanks: "أدخل سؤالك، محددًا إلى أين يجب أن ينتقل كل فراغ. ثم حدد الإجابة الصحيحة الممكنة لكل فراغ. ويجب على الطلاب كتابة الإجابات الصحيحة في المربعات النصية في كل فراغ."
         formula_definition: "وبعد ذلك، سيلزم كتابة الصيغة أو الصيغة المستخدمة لاحتساب الإجابة الصحيحة. وما عليك سوى استخدام نفس أسماء المتغيرات المسرودة أعلاه."
         matching: "قم بتكوين زوجين من القيم المتطابقة. وسيرى الطلاب القيم الموجودة على اليسار ويجب عليهم تحديد القيمة المطابقة على اليمين من قائمة منسدلة. ويمكن أن تحمل الصفوف المتعددة نفس الإجابة، كما يمكنك إضافة إجابات غير صحيحة إضافية على الجانب الأيمن."
@@ -9512,6 +10455,7 @@ ar:
       question_type: 
         calculated: "سؤال الصيغة"
         essay: "سؤال المقالة"
+        file_upload: "تحميل ملف للسؤال"
         fill_in_multiple_blanks: "ملء الفراغات المتعددة"
         matching: المطابقة
         missing_word: "الكلمة المفقودة"
@@ -9531,6 +10475,14 @@ ar:
     graded_quiz: "اختبار تم تقييم درجاته"
     graded_survey: "استطلاع تم تقييم درجاته"
     headers: 
+      submitted_students_quiz_title: 
+        one: "الطلاب الذين أدوا الاختبار (%{count})"
+        other: "الطلاب الذين أدوا الاختبار (%{count})"
+        zero: "الطلاب الذين أدوا الاختبار"
+      submitted_students_survey_title: 
+        one: "الطلاب الذين شاركوا في الاستطلاع (%{count})"
+        other: "الطلاب الذين شاركوا في الاستطلاع (%{count})"
+        zero: "الطلاب الذين شاركوا في الاستطلاع"
       unsubmitted_students_count: 
         few: "لم يخضع %{count} من الطلاب للاستبيان"
         many: "لم يخضع %{count} من الطلاب للاستبيان"
@@ -9538,6 +10490,14 @@ ar:
         other: "لم يخضع %{count} من الطلاب للاستبيان"
         two: "لم يخضع %{count} من الطلاب للاستبيان"
         zero: "لم يخضع %{count} من الطلاب للاستبيان"
+      unsubmitted_students_quiz_title: 
+        one: "الطلاب الذين لم يؤدوا الاختبار (%{count})"
+        other: "الطلاب الذين لم يؤدوا الاختبار (%{count})"
+        zero: "الطلاب الذين لم يؤدوا الاختبار"
+      unsubmitted_students_survey_title: 
+        one: "الطلاب الذين لم يشاركوا في الاستطلاع (%{count})"
+        other: "الطلاب الذين لم يشاركوا في الاستطلاع (%{count})"
+        zero: "الطلاب الذين لم يشاركوا في الاستطلاع"
     helpers: 
       duration_in_minutes: 
         one: "1 دقيقة"
@@ -9660,6 +10620,11 @@ ar:
       survey_no_submissions: "لم يجب أي طالب على الاستطلاع بعد"
       titles: 
         submission_needs_review: "يلزم مراجعة هذا الإرسال"
+    messages: 
+      no_submitted_students_quiz: "لم يؤدِ الاختبار أي طالب حتى الآن"
+      no_submitted_students_survey: "لم يشارك أي طالب في الاستطلاع حتى الآن"
+      no_unsubmitted_students_quiz: "أدى جميع الطلاب الاختبار"
+      no_unsubmitted_students_survey: "شارك جميع الطلاب في الاستطلاع"
     moderate: 
       add_time: "إضافة الوقت"
       buttons: 
@@ -9834,14 +10799,17 @@ ar:
         two: "تم نشر %{count} من الاختبارات بنجاح!"
         zero: "تم نشر %{count} من الاختبارات بنجاح!"
     practice_quiz: "ممارسة الاختبار"
+    question_colon: "السؤال:"
     question_group: 
       buttons: 
         update: تحديث
       default_group_name: المجموعة
+      edit_questions_and_points: "اختر *%{num_questions}* سؤالاً، #%{num_points}# نقطة لكل سؤال"
       labels: 
         question_bank: "سيتم سحب الأسئلة من البنك"
       links: 
         link_to_a_question_bank: "ارتباط إلى بنك الأسئلة"
+      show_questions_and_points: "اختر *%{num_questions}* سؤالاً، #%{num_points}# نقطة لكل سؤال"
       titles: 
         add_question_to_group: "إضافة سؤال إلى هذه المجموعة"
         collapse_group: "طي المجموعة"
@@ -10065,6 +11033,9 @@ ar:
         quiz_instructions: "إرشادات الاختبار"
       links: 
         back_to_quiz_page: "عودة إلى صفحة الاختبار"
+    refresh_quiz_after_popup: 
+      headers: 
+        loading_in_lockdown: "تحميل الاختبار في مستعرض Respondus LockDown"
     retrieving_filters: "جارٍ استرداد عوامل التصفية..."
     rubric: 
       loading: "جارٍ التحميل..."
@@ -10141,6 +11112,8 @@ ar:
         show_student_quiz_results: "إظهار نتائج اختبار الطالب"
         show_student_survey_results: "إظهار نتائج استطلاع الطالب"
         survey_statistics: "إحصاءات الاستطلاع"
+      notices: 
+        message_sent: "تم إرسال الرسالة!"
       only_registered_users: "بمجرد التسجيل، يستطيع المستخدمون المسجلون الحصول على الاختبارات التي تم تقييم درجاتها"
       points_possible: 
         few: "%{count} من النقاط"
@@ -10267,6 +11240,8 @@ ar:
       labels: 
         started: "تم البدء"
         times_up: "انتهى الوقت! إرسال النتائج في"
+      logged_out_of_canvas: "*لقد قمت بتسجيل الخروج من canvas.* للمتابعة يرجى تسجيل الدخول"
+      login_required: "تسجيل الدخول مطلوب"
       minutes_count: 
         few: "%{count} دقيقة"
         many: "%{count} دقيقة"
@@ -10445,6 +11420,7 @@ ar:
       become_user: "يصبحون مستخدمين آخرين"
       change_course_state: "تغيير حالة المساق"
       comment_on_others_submissions: "عرض الإرسالات الخاصة بكافة الطلاب وتدوين تعليقات عليها"
+      create_accounts: "إنشاء حسابات جذرية جديدة"
       create_collaborations: "إنشاء مشاركات الطلاب"
       create_conferences: "إنشاء مؤتمرات ويب"
       manage_account_memberships: "إضافة/إزالة مسؤولين آخرين للحساب"
@@ -10453,8 +11429,10 @@ ar:
       manage_alerts: "إدارة التنبيهات العالمية"
       manage_assignments: "إدارة (إضافة / تحرير / حذف) المهام والاختبارات"
       manage_calendar: "إضافة الأحداث الموجودة على تقويم المساق وتحريرها وحذفها"
+      manage_canvasnet_courses: "إدارة مساقات شبكة Canvas"
       manage_content: "إدارة كافة محتويات المساق الأخرى"
       manage_courses: "إدارة (إضافة / تحرير / حذف) المساقات"
+      manage_demos: "إدارة العروض التوضيحية"
       manage_developer_keys: "إدارة مفاتيح المطور"
       manage_files: "إدارة (إضافة / تحرير / حذف) ملفات المساق"
       manage_frozen_assignment: "إدارة (تحرير / حذف) التعيينات المجمدة"
@@ -10462,6 +11440,7 @@ ar:
       manage_grades: "تحرير الدرجات"
       manage_groups: "إدارة (إنشاء / تحرير / حذف) المجموعات"
       manage_interaction_alerts: "إدارة التنبيهات"
+      manage_links: "إدارة ارتباطات الثقة والدور"
       manage_outcomes: "إدارة نتائج التعلم"
       manage_role_overrides: "إدارة الأذونات"
       manage_rubrics: "إنشاء وتحرير تقييم العناوين"
@@ -10485,11 +11464,14 @@ ar:
       read_roster: "راجع قائمة المستخدمين"
       send_messages: "إرسال رسائل إلى أعضاء المساق من الأفراد"
       send_messages_all: "إرسال رسائل إلى الفصل بأكمله"
+      suspend_accounts: "إيقاف مؤقت للحساب"
       undelete_courses: "إلغاء حذف المساقات"
       view_all_grades: "عرض كافة الدرجات"
+      view_analytics: "عرض صفحات المعلومات التحليلية"
       view_error_reports: "عرض تقارير الأخطاء"
       view_group_pages: "عرض صفحات المجموعات الخاصة بكافة مجموعات الطلاب"
       view_jobs: "عرض مهام في الخلفية"
+      view_notifications: "عرض الإخطارات"
       view_statistics: "عرض الإحصاءات"
     roles: 
       account_admin: "مسؤول الحساب"
@@ -10578,9 +11560,11 @@ ar:
       are_you_sure_prompt: "هل ترغب بالتأكيد في حذف هذا التقييم؟  سيتم فقد كافة النتائج."
       page_title: التقييمات
     index: 
+      account_rubrics: "عناوين الحساب"
       are_you_sure_prompt: "هل ترغب بالتأكيد في حذف هذا العنوان؟  لا يزال يتعين الوصول إلى العنوان في أي مكان يتم استخدامه حاليًا، لكن لن يستطيع أي شخص آخر استخدامه."
       buttons: 
         add_rubric: "إضافة العنوان"
+      course_rubrics: "عناوين المساق"
       delete_rubric: "حذف العنوان"
       page_title: العناوين
       points_possible: 
@@ -10592,6 +11576,7 @@ ar:
         zero: "%{count} من النقاط ممكنة"
       titles: 
         rubrics: العناوين
+      user_rubrics: "عناوين المستخدمين"
     loading: "جارٍ التحميل..."
     rubric_association: 
       assessment_completed: "اكتمل التقييم"
@@ -10766,6 +11751,7 @@ ar:
     authenticate: 
       buttons: 
         enroll_in_course: "تسجيل في المساق"
+        next: التالي
       getting_started: "أنت تقوم الآن بالتسجيل في **%{course}**."
       labels: 
         email: "البريد الإلكتروني"
@@ -10774,6 +11760,7 @@ ar:
     authenticate_or_register: 
       buttons: 
         enroll_in_course: "تسجيل في المساق"
+        next: التالي
       enter_email: "الرجاء إدخال عنوان البريد الإلكتروني:"
       existing_user: "لدي بالفعل معرّف تسجيل الدخول لـ %{institution_name}"
       getting_started: "أنت تقوم الآن بالتسجيل في **%{course}**."
@@ -10786,6 +11773,7 @@ ar:
     confirm_enrollments: 
       buttons: 
         enroll_in_course: "تسجيل في المساق"
+        next: التالي
       getting_started: "أنت تقوم الآن بالتسجيل في **%{course}**."
       switch_users: "أنت الآن قمت بتسجيل الدخول باسم المستخدم *%{user}*. **قم بتسجيل الدخول باسم مستخدم آخر**."
     course_full: 
@@ -10997,6 +11985,8 @@ ar:
       titles: 
         mastery_level: "النسبة المئوية التي من أعلى سيتم تعيين درجة الإتقان"
         select_and_add_criterion: "تحديد المعيار وإضافته"
+    flash_notice: 
+      close: إغلاق
     flash_notices: 
       close: إغلاق
     full_assignment: 
@@ -11615,6 +12605,12 @@ ar:
     columns: 
       date: التاريخ
       value: القيمة
+    institution_suspended: 
+      body: "تم إيقاف حساب Canvas الخاص بمدرستك مؤقتًا. الرجاء الاتصال بمسؤول Canvas لديك."
+      links: 
+        logout: "تسجيل الخروج"
+        stop_masquerading: "[إيقاف إخفاء الأسماء]"
+      page_title: "تم إيقاف المعهد مؤقتًا"
     links: 
       over_time: "بمرور الوقت"
     status: 
@@ -11856,6 +12852,8 @@ ar:
         students_can_access_from: "يستطيع **الطلاب** الوصول من"
         tas_can_access_from: "يستطيع **TAs** الوصول من"
         teachers_can_access_from: "يستطيع **المعلمون** الوصول من"
+      name: "اسم الفصل الدراسي:"
+      sis_source_id: "معرف SIS:"
       term_runs_from: "**تبدأ المدة** من"
       titles: 
         term_ends: "انتهاء المدة"
@@ -11926,6 +12924,9 @@ ar:
     messages: الرسائل
     outcome_artifacts: "أدوات الناتج"
     view_in_separate_window: "عرض في نافذة منفصلة"
+  tooltips: 
+    vdd: 
+      more_message: "و%{count} أكثر..."
   turnitin: 
     error_1007: "الملف الذي تم تحميله كبير جدًا."
     error_1009: "نوع ملف غير صالح. (أنواع الملفات الصالحة هي MS Word وAcrobat PDF وPostscript وText وHTML و(WordPerfect (WPD وRich Text Format)"
@@ -11957,6 +12958,7 @@ ar:
       too_young: "صغير جدًا"
     registration: 
       agree_to_terms: "أنت توافق على *شروط الاستخدام*."
+      agree_to_terms_with_code_of_conduct: "أنت توافق على *شروط الاستخدام* و**مدونة قواعد السلوك**."
   user_follow: 
     errors: 
       follow_own_collection: "لا يمكنك متابعة المجموعة الخاصة بك"
@@ -12417,6 +13419,10 @@ ar:
       welcome_to_happiness: "مرحبًا بك في Canvas!"
   validate: 
     is_required: "هذا الحقل مطلوب"
+  warnings: 
+    test_install: 
+      message: "تثبيت Canvas هذا للاختبار فقط، وستتم إعادة تعيينه كل أسبوع."
+      title: "تثبيت Canvas الاختباري"
   web_conference: 
     default_name_for_courses: "مؤتمر ويب للمساق"
     default_name_for_groups: "مؤتمر ويب جماعي"
@@ -12426,6 +13432,8 @@ ar:
         : "إيقاف تشغيل"
         ? "true"
         : تشغيل
+  webct_credentials: 
+    credential_not_found: "لم يتم العثور على بيانات الاعتماد."
   widget: 
     upload_media_track_form: 
       choose_a_language: "-- اختر لغة--"

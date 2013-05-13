@@ -66,5 +66,43 @@ describe "handlebars" do
     result = require_exec "jst/test_template", "test_template()"
     result.should == "outside partial hi from inside partial"
   end
+
+  it "should translate the content" do
+    translations = {
+      :pigLatin => {
+        :sup => 'upsay',
+        :test => {
+          :it_should_work => 'isthay ouldshay ebay anslatedtray frday'
+        }
+      }
+    }
+
+    # get our translations into js-land
+    driver.execute_script <<-JS
+      define('translations/test', ['i18nObj', 'jquery'], function(I18n, $) {
+        $.extend(true, I18n, {translations: #{translations.to_json}});
+      });
+    JS
+
+    template = <<-HTML
+      <p>{{#t "#sup"}}sup{{/t}}</p>
+      <p>{{#t 'it_should_work'}}this should be translated frd{{/t}}</p>
+      <p>{{#t "not_yet_translated"}}but this shouldn't be{{/t}}</p>
+    HTML
+
+    compiled = Handlebars.compile_template(template, 'test')
+    driver.execute_script compiled
+
+    result = require_exec 'jst/test', <<-CS
+      I18n.locale = 'pigLatin'
+      test()
+    CS
+
+    result.should == <<-HTML
+      <p>#{translations[:pigLatin][:sup]}</p>
+      <p>#{translations[:pigLatin][:test][:it_should_work]}</p>
+      <p>but this shouldn't be</p>
+    HTML
+  end
 end
 

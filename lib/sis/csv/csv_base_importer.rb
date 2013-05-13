@@ -16,11 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency 'lib/sis/common'
+require_dependency 'sis/common'
 
 module SIS
   module CSV
-    class BaseImporter
+    class CSVBaseImporter
       PARSE_ARGS = {:headers => :first_row,
                   :skip_blanks => true,
                   :header_converters => :downcase,

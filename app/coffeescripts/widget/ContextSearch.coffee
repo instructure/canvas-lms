@@ -50,13 +50,12 @@ define [
 
       data.id = "#{data.id}"
       data.type ?= 'user'
-      
+
       if data.avatar_url
-        $img = $('<img class="avatar" />')
-        $img.attr('src', data.avatar_url)
-        $node.append($img)
+        $node.append($('<img />', alt: '', class: 'avatar', src: data.avatar_url))
       $b = $('<b />')
       $b.text(data.name)
+      $description = $('<span />', id: "#{data.type}-#{data.id}-description")
       $name = $('<span />', class: 'name')
       $contextInfo = @buildContextInfo(data) unless options.parent
       $name.append($b, $contextInfo)
@@ -72,8 +71,10 @@ define [
           $span.text(I18n.t('sections_count', 'section', {count: data.item_count}))
       else if data.subText
         $span.text(data.subText)
-      $node.append($name, $span)
-      $node.attr('title', data.name)
+      $description.append($name, $span)
+      $node.append($description)
+      $node.attr('role', 'menuitem')
+      $node.attr('aria-labelledby', "#{data.type}-#{data.id}-description")
       text = data.name
       if options.parent
         if data.selectAll and noExpand # "Select All", e.g. course_123_all -> "Spanish 101: Everyone"

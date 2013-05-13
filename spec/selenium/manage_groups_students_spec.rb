@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/manage_groups_common
 require 'thread'
 
 describe "manage groups students" do
-  it_should_behave_like "manage groups selenium tests"
+  it_should_behave_like "in-process server selenium tests"
 
   before (:each) do
     course_with_teacher_logged_in

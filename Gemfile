@@ -1,5 +1,9 @@
 source 'https://rubygems.org/'
 
+if RUBY_VERSION < "1.9.3" || RUBY_VERSION >= "2.0"
+  raise "Canvas requires Ruby 1.9.3"
+end
+
 ONE_NINE = RUBY_VERSION >= "1.9."
 require File.expand_path("../config/canvas_rails3", __FILE__)
 
@@ -19,7 +23,7 @@ gem 'barby',          '0.5.0'
 gem 'bcrypt-ruby',    '3.0.1'
 gem 'builder',        '2.1.2'
 if !CANVAS_RAILS3
-  gem 'canvas_connect', '0.0.8'
+  gem 'canvas_connect', '0.1.0'
 end
 gem 'daemons',        '1.1.0'
 gem 'diff-lcs',       '1.1.3',  :require => 'diff/lcs'
@@ -31,7 +35,7 @@ if !CANVAS_RAILS3
   gem 'fake_arel',      '1.0.0'
 end
 gem 'ffi',            '1.1.5'
-gem 'hairtrigger',    '0.1.14'
+gem 'hairtrigger',    '0.2.3'
 gem 'sass',           '3.2.3'
 if !ONE_NINE
   gem 'fastercsv', '1.5.3'
@@ -51,6 +55,8 @@ else
   gem 'mail', '2.4.4'
 end
 gem 'mailman',        '0.5.3'
+# using this forked gem until https://github.com/37signals/marginalia/pull/15 is in the source gem
+gem 'instructure-marginalia',     '1.1.3',    :require => false
 gem 'mime-types',     '1.17.2',   :require => 'mime/types'
 # attachment_fu (even the current technoweenie one on github) does not work
 # with mini_magick 3.1
@@ -73,11 +79,12 @@ gem 'rotp',           '1.4.1'
 gem 'rqrcode',        '0.4.2'
 gem 'rscribd',        '1.2.0'
 gem 'net-ldap',       '0.3.1',  :require => 'net/ldap'
-gem 'ruby-saml-mod',  '0.1.21'
+gem 'ruby-saml-mod',  '0.1.22'
 gem 'rubycas-client', '2.2.1'
 gem 'rubyzip',        '0.9.5',  :require => 'zip/zip'
 gem 'safe_yaml-instructure', '0.8.0',  :require => false
 gem 'sanitize',       '2.0.3'
+gem 'shackles',       '1.0.0'
 gem 'tzinfo',         '0.3.35'
 gem 'useragent',      '0.4.16'
 gem 'uuid',           '2.3.2'
@@ -90,6 +97,7 @@ gem 'crocodoc-ruby',  '0.0.1', :require => 'crocodoc'
 
 group :assets do
   gem 'compass-rails', '1.0.3'
+  gem 'dress_code', '1.0.2'
 end
 
 group :mysql do
@@ -98,7 +106,7 @@ group :mysql do
 end
 
 group :postgres do
-  gem 'pg',           '0.10.1'
+  gem 'pg',           '0.15.0'
 end
 
 group :sqlite do
@@ -108,7 +116,7 @@ end
 group :test do
   gem 'bluecloth',    '2.0.10' # for generating api docs
   gem 'mocha',        :git => 'git://github.com/ccutrer/mocha.git', :require => false
-  gem 'parallelized_specs', '0.4.40'
+  gem 'parallelized_specs', '0.4.52'
   gem 'rcov',         '0.9.9'
   if CANVAS_RAILS3
     gem 'rspec-rails',  '2.13.0'
@@ -151,8 +159,8 @@ group :development, :test do
 end
 
 group :i18n_tools do
-  gem 'ruby_parser', '2.0.6'
-  gem 'sexp_processor', '3.0.5'
+  gem 'ruby_parser', '3.1.3'
+  gem 'sexp_processor', '4.2.1'
   gem 'ya2yaml', '0.30'
 end
 
@@ -162,7 +170,7 @@ group :redis do
 end
 
 group :cassandra do
-  gem 'cassandra-cql', '1.1.1'
+  gem 'cassandra-cql', '1.1.5'
 end
 
 group :embedly do

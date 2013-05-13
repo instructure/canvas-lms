@@ -276,6 +276,8 @@ ActionController::Routing::Routes.draw do |map|
       quiz.moderate "moderate", :controller => "quizzes", :action => "moderate"
       quiz.lockdown_browser_required "lockdown_browser_required", :controller => "quizzes", :action => "lockdown_browser_required"
     end
+    map.quiz_statistics_download 'quiz_statistics/:quiz_statistics_id/files/:file_id/download',
+      :controller => 'files', :action => 'show', :download => '1'
 
     course.resources :collaborations
 
@@ -570,6 +572,7 @@ ActionController::Routing::Routes.draw do |map|
   map.dashboard_sidebar 'dashboard-sidebar', :controller => 'users', :action => 'dashboard_sidebar', :conditions => {:method => :get}
   map.toggle_dashboard 'toggle_dashboard', :controller => 'users', :action => 'toggle_dashboard', :conditions => {:method => :post}
   map.styleguide 'styleguide', :controller => 'info', :action => 'styleguide', :conditions => {:method => :get}
+  map.old_styleguide 'old_styleguide', :controller => 'info', :action => 'old_styleguide', :conditions => {:method => :get}
   map.root :dashboard
   # backwards compatibility with the old /dashboard url
   map.dashboard_redirect 'dashboard', :controller => 'users', :action => 'user_dashboard', :conditions => {:method => :get}
@@ -744,6 +747,7 @@ ActionController::Routing::Routes.draw do |map|
 
     api.with_options(:controller => :gradebook_history_api) do |gradebook_history|
       gradebook_history.get "courses/:course_id/gradebook_history/days", :action => :days, :path_name => 'gradebook_history'
+      gradebook_history.get "courses/:course_id/gradebook_history/feed", :action => :feed, :path_name => 'gradebook_history_feed'
       gradebook_history.get "courses/:course_id/gradebook_history/:date", :action =>:day_details, :path_name => 'gradebook_history_for_day'
       gradebook_history.get "courses/:course_id/gradebook_history/:date/graders/:grader_id/assignments/:assignment_id/submissions", :action => :submissions, :path_name => 'gradebook_history_submissions'
     end
@@ -930,6 +934,10 @@ ActionController::Routing::Routes.draw do |map|
       channels.get 'users/:user_id/communication_channels', :action => :index, :path_name => 'communication_channels'
       channels.post 'users/:user_id/communication_channels', :action => :create
       channels.delete 'users/:user_id/communication_channels/:id', :action => :destroy
+    end
+
+    api.with_options(:controller => :comm_messages_api) do |comm_messages|
+      comm_messages.get 'comm_messages', :action => :index, :path_name => 'comm_messages'
     end
 
     api.with_options(:controller => :services_api) do |services|

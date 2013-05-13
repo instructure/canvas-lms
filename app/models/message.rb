@@ -37,7 +37,7 @@ class Message < ActiveRecord::Base
 
   attr_accessible :to, :from, :subject, :body, :delay_for, :context, :path_type,
     :from_name, :sent_at, :notification, :user, :communication_channel,
-    :notification_name, :asset_context, :data
+    :notification_name, :asset_context, :data, :root_account_id
 
   attr_writer :delayed_messages
 
@@ -181,6 +181,13 @@ class Message < ActiveRecord::Base
   end
   alias_method_chain :polymorphic_url, :context_host
 
+  # the hostname for user-specific links (e.g. setting notification prefs).
+  # may be different from the asset/context host
+  def primary_host
+    primary_context = user.pseudonym.try(:account)
+    primary_context ||= context.respond_to?(:context) ? context.context : context
+    HostUrl.context_host primary_context
+  end
 
   # Internal: Store any transmission errors in the database to help with later
   # debugging.
@@ -340,7 +347,7 @@ class Message < ActiveRecord::Base
     # Append a footer to the body if the path type is email
     if path_type == 'email'
       raw_footer_message = File.read(Canvas::MessageHelper.find_message_path('_email_footer.email.erb'))
-      footer_message = Erubis::Eruby.new(raw_footer_message, :bufvar => "@output_buffer").result(b) rescue nil
+      footer_message = Erubis::Eruby.new(raw_footer_message, :bufvar => "@output_buffer").result(_binding)
       if footer_message.present?
         self.body = <<-END.strip_heredoc
           #{self.body}
@@ -478,10 +485,10 @@ class Message < ActiveRecord::Base
     current_context                 = context
 
     until current_context.respond_to?(:root_account) do
+      return nil if unbounded_loop_paranoia_counter <= 0 || current_context.nil?
+      return nil unless current_context.respond_to?(:context)
       current_context = current_context.context
       unbounded_loop_paranoia_counter -= 1
-
-      return nil if unbounded_loop_paranoia_counter <= 0 || context.nil?
     end
 
     current_context.root_account
@@ -502,7 +509,10 @@ class Message < ActiveRecord::Base
 
     self.to_email  = true if %w[email sms].include?(path_type)
 
-    self.from_name = context_root_account.settings[:outgoing_email_default_name] rescue nil
+    root_account = context_root_account
+    self.root_account_id ||= root_account.try(:id)
+
+    self.from_name = root_account.settings[:outgoing_email_default_name] rescue nil
     self.from_name = HostUrl.outgoing_email_default_name if from_name.blank?
     self.from_name = asset_context.name if (asset_context &&
       !asset_context.is_a?(Account) && asset_context.name &&
@@ -566,6 +576,14 @@ class Message < ActiveRecord::Base
     nil
   end
 
+  # Public: Return the message as JSON filtered to selected fields and
+  # flattened appropriately.
+  #
+  # Returns json hash.
+  def as_json(options = {})
+    super(:only => [:id, :created_at, :sent_at, :workflow_state, :from, :to, :reply_to, :subject, :body, :html_body])['message']
+  end
+
   protected
   # Internal: Deliver the message through email.
   #
@@ -616,6 +634,8 @@ class Message < ActiveRecord::Base
   def deliver_via_chat; end
 
   # Internal: Deliver the message through Twitter.
+  #
+  # The template should define the content for :link and not place into the body of the template itself
   #
   # Returns nothing.
   def deliver_via_twitter

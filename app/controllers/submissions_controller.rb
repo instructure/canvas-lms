@@ -56,7 +56,8 @@
 #       // Associated comments for a submission (optional)
 #       submission_comments: [
 #         {
-#           author_id: 134
+#           id: 37,
+#           author_id: 134,
 #           author_name: "Toph Beifong",
 #           comment: "Well here's the thing...",
 #           created_at: "2012-01-01T01:00:00Z",
@@ -285,6 +286,10 @@ class SubmissionsController < ApplicationController
           return render(:json => { :message => "Invalid parameters for submission_type #{submission_type}. Required: #{API_SUBMISSION_TYPES[submission_type].map { |p| "submission[#{p}]" }.join(", ") }" }, :status => 400)
         end
         params[:submission][:comment] = params[:comment].try(:delete, :text_comment)
+
+        if params[:submission].has_key?(:body)
+          params[:submission][:body] = process_incoming_html_content(params[:submission][:body])
+        end
       end
 
       if params[:submission][:file_ids].is_a?(Array)

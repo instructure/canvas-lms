@@ -25,7 +25,7 @@ define([
   'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* parseFromISO, dateString, datepicker, time_field, datetime_field, /\$\.datetime/ */,
-  'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formSuggestion */,
+  'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData */,
   'jqueryui/dialog',
   'compiled/jquery/fixDialogButtons',
   'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
@@ -50,6 +50,7 @@ define([
     $form.find('.ui-datepicker-trigger').show();
     $form.find('.datetime_suggest').text('');
     $form.find('.datetime_field_enabled').show();
+    $form.find('.input-append').show();
     $form.find("").end()
       .hide().appendTo($("body"));
     $assignment.removeClass('editing');
@@ -81,9 +82,17 @@ define([
     var $form = $assignment.find("#add_assignment_form");
     var buttonMsg = "Update";
     var url = $assignment.find(".edit_assignment_link").attr('href');
+    var $submissionTypes = $('[name="assignment[submission_types]"]');
+    var $submissionTypesLabel = $submissionTypes
+      .siblings('label[for="assignment_submission_types"]');
     if($assignment.attr('id') == 'assignment_new') {
+      $submissionTypes.show();
+      $submissionTypesLabel.show();
       buttonMsg = "Add";
       url = $(".add_assignment_link.groupless_link:first").attr('href');
+    } else {
+      $submissionTypesLabel.hide();
+      $submissionTypes.hide();
     }
     $assignment.find(".more_options_link").attr('href', url);
     $form.find("input[type='submit']").val(buttonMsg);
@@ -824,7 +833,6 @@ define([
         $("#add_assignment_form input[name='assignment[due_date]']").focus().select();
       }
     });
-    $("#add_assignment_form :input").formSuggestion();
     $("#add_assignment_form").formSubmit({
       object_name: 'assignment',
       required: ['title'],

@@ -767,6 +767,18 @@ describe ContentMigration do
       bank2.assessment_questions.size.should == 2
     end
 
+    it "should copy discussion topic attributes" do
+      topic = @copy_from.discussion_topics.create!(:title => "topic", :message => "<p>bloop</p>", :discussion_type => "threaded")
+
+      run_course_copy
+
+      @copy_to.discussion_topics.count.should == 1
+      new_topic = @copy_to.discussion_topics.first
+
+      attrs = ["title", "message", "discussion_type", "type"]
+      topic.attributes.slice(*attrs).should == new_topic.attributes.slice(*attrs)
+    end
+
     it "should copy a discussion topic when assignment is selected" do
       topic = @copy_from.discussion_topics.build(:title => "topic")
       assignment = @copy_from.assignments.build(:submission_types => 'discussion_topic', :title => topic.title)
@@ -829,7 +841,7 @@ describe ContentMigration do
     def create_rubric_asmnt
       @rubric = @copy_from.rubrics.new
       @rubric.title = "Rubric"
-      @rubric.data = [{:ratings=>[{:criterion_id=>"309_6312", :points=>5, :description=>"Full Marks", :id=>"blank", :long_description=>""}, {:criterion_id=>"309_6312", :points=>0, :description=>"No Marks", :id=>"blank_2", :long_description=>""}], :points=>5, :description=>"Description of criterion", :id=>"309_6312", :long_description=>""}]
+      @rubric.data = [{:ratings=>[{:criterion_id=>"309_6312", :points=>5.5, :description=>"Full Marks", :id=>"blank", :long_description=>""}, {:criterion_id=>"309_6312", :points=>0, :description=>"No Marks", :id=>"blank_2", :long_description=>""}], :points=>5.5, :description=>"Description of criterion", :id=>"309_6312", :long_description=>""}]
       @rubric.save!
 
       @assignment = @copy_from.assignments.create!(:title => "some assignment", :points_possible => 12)
@@ -848,6 +860,16 @@ describe ContentMigration do
 
       rub = @copy_to.rubrics.find_by_migration_id(mig_id(@rubric))
       rub.should_not be_nil
+
+      [:description, :id, :points].each do |k|
+        rub.data.first[k].should == @rubric.data.first[k]
+      end
+      [:criterion_id, :description, :id, :points].each do |k|
+        rub.data.first[:ratings].each_with_index do |criterion, i|
+          criterion[k].should == @rubric.data.first[:ratings][i][k]
+        end
+      end
+
       asmnt2 = @copy_to.assignments.find_by_migration_id(mig_id(@assignment))
       asmnt2.rubric.id.should == rub.id
       asmnt2.rubric_association.use_for_grading.should == true
@@ -1260,7 +1282,7 @@ describe ContentMigration do
       bank.assessment_questions.count.should == 1
       aq = bank.assessment_questions.first
 
-      aq.question_data['question_text'].should == @question.question_data['question_text']
+      aq.question_data['question_text'].should match_ignoring_whitespace(@question.question_data['question_text'])
     end
 
     it "should correctly copy quiz question html file references" do
@@ -1304,8 +1326,8 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
       q_to = @copy_to.quizzes.first
       qq_to = q_to.quiz_questions.first
-      qq_to.question_data[:question_text].should == qtext % [@copy_to.id, att_2.id, @copy_to.id, "files/#{att2_2.id}/preview", @copy_to.id, "files/#{att4_2.id}/preview"]
-      qq_to.question_data[:answers][0][:html].should == %{File ref:<img src="/courses/#{@copy_to.id}/files/#{att3_2.id}/download">}
+      qq_to.question_data[:question_text].should match_ignoring_whitespace(qtext % [@copy_to.id, att_2.id, @copy_to.id, "files/#{att2_2.id}/preview", @copy_to.id, "files/#{att4_2.id}/preview"])
+      qq_to.question_data[:answers][0][:html].should match_ignoring_whitespace(%{File ref:<img src="/courses/#{@copy_to.id}/files/#{att3_2.id}/download">})
     end
 
     it "should copy all html fields in assessment questions" do
@@ -1613,7 +1635,6 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
         tool.user_navigation.should == @tool_from.user_navigation
       end
     end
-
   end
 
   context "#prepare_data" do
@@ -1672,6 +1693,11 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       @cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm)).should == true
     end
 
+  end
+  
+  it "should exclude user-hidden migration plugins" do
+    ab = Canvas::Plugin.find(:academic_benchmark_importer)
+    ContentMigration.migration_plugins(true).include?(ab).should be_false
   end
 
 end

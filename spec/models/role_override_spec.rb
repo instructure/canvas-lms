@@ -243,6 +243,38 @@ describe RoleOverride do
       permission_data[:prior_default].should be_false
     end
 
+    context 'using :account_allows' do
+      it "should be enabled for account if not specified" do
+        permission_data = RoleOverride.permission_for(@account, :undelete_courses,
+                                                      'AccountMembership', 'AccountAdmin')
+        permission_data[:account_allows].should be_true
+        permission_data[:enabled].should be_true
+        permission_data[:explicit].should be_false
+      end
+
+      it "should be enabled for account if specified" do
+        root_account = @account.root_account
+        root_account.settings[:admins_can_view_notifications] = true
+        root_account.save!
+        permission_data = RoleOverride.permission_for(@account, :view_notifications,
+                                                      'AccountMembership', 'AccountAdmin')
+        permission_data[:account_allows].should be_true
+        permission_data[:enabled].should be_false
+        permission_data[:explicit].should be_false
+      end
+
+      it "should be disabled for account if lambda evaluates to false" do
+        root_account = @account.root_account
+        root_account.settings[:admins_can_view_notifications] = false
+        root_account.save!
+        permission_data = RoleOverride.permission_for(@account, :view_notifications,
+                                                      'AccountMembership', 'AccountAdmin')
+        permission_data[:account_allows].should be_false
+        permission_data[:enabled].should be_false
+        permission_data[:explicit].should be_false
+      end
+    end
+
     context "admin roles" do
       it "should special case AccountAdmin role to use AccountAdmin as base role" do
         # the default base role type has no permissions, so this tests it is getting
@@ -265,6 +297,13 @@ describe RoleOverride do
         create_role(AccountUser::BASE_ROLE_NAME, @role_name)
 
         check_permission(AccountUser::BASE_ROLE_NAME, @role_name, false)
+      end
+
+      it "should default :view_notifications to false" do
+        create_role(AccountUser::BASE_ROLE_NAME, @role_name)
+        permission_data = RoleOverride.permission_for(@account, @permission, 'AccountMembership', @role_name)
+        permission_data[:enabled].should be_false
+        permission_data[:explicit].should be_false
       end
     end
 

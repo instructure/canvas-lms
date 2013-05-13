@@ -218,6 +218,7 @@ class AccountsController < ApplicationController
         else
           # must have :manage_site_settings to update these
           [ :admins_can_change_passwords,
+            :admins_can_view_notifications,
             :enable_alerts,
             :enable_eportfolios,
             :enable_profiles,
@@ -290,7 +291,12 @@ class AccountsController < ApplicationController
     end
 
     js_env :ACCOUNT_ID => @account.id
-    js_env :PERMISSIONS => {:restore_course => @account.grants_right?(@current_user, session, :undelete_courses) }
+    js_env :PERMISSIONS => {:restore_course => @account.grants_right?(@current_user, session, :undelete_courses),
+                            # Permission caching issue makes explicitly checking the account setting
+                            # an easier option.
+                            :view_messages => (@account.settings[:admins_can_view_notifications] &&
+                                @account.grants_right?(@current_user, session, :view_notifications)) ||
+                                Account.site_admin.grants_right?(@current_user, :read_messages)}
   end
 
   def confirm_delete_user

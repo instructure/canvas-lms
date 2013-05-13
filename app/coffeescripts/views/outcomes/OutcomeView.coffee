@@ -140,6 +140,8 @@ define [
         when 'loading'
           @$el.empty()
         else # show
+          data['points_possible'] ||= 0
+          data['mastery_points'] ||= 0
           @$el.html outcomeTemplate _.extend data,
             readOnly: @readOnly(),
             native: @model.outcomeLink.outcome.context_id == @model.outcomeLink.context_id && @model.outcomeLink.outcome.context_type == @model.outcomeLink.context_type

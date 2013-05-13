@@ -5,7 +5,6 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/submissions_common')
 
 describe "submissions" do
   it_should_behave_like "in-process server selenium tests"
-  it_should_behave_like "submissions selenium tests"
 
   context 'as a student' do
 
@@ -266,10 +265,13 @@ describe "submissions" do
 
         # traverse the tree
         begin
-          f('#uploaded_files > ul > li.folder > .sign').click
-          wait_for_animations
+          keep_trying_until do
+            f('#uploaded_files > ul > li.folder > .sign').click
+            wait_for_ajaximations
+            f('#uploaded_files > ul > li.folder .file .name').should be_displayed
+          end
           f('#uploaded_files > ul > li.folder .file .name').click
-          wait_for_animations
+          wait_for_ajaximations
         rescue => err
           # prevent the confirm dialog that pops up when you navigate away
           # from the page from showing.

@@ -224,7 +224,14 @@ class AssignmentsController < ApplicationController
       @events = @context.events_for(@current_user)
       @undated_events = @events.select {|e| e.start_at == nil}
       @dates = (@events.select {|e| e.start_at != nil}).map {|e| e.start_at.to_date}.uniq.sort.sort
-      @syllabus_body = api_user_content(@context.syllabus_body, @context)
+      if @context.grants_right?(@current_user, session, :read)
+        @syllabus_body = api_user_content(@context.syllabus_body, @context)
+      else
+        # the requesting user may not have :read if the course syllabus is public, in which
+        # case, we pass nil as the user so verifiers are added to links in the syllabus body
+        # (ability for the user to read the syllabus was checked above as :read_syllabus)
+        @syllabus_body = api_user_content(@context.syllabus_body, @context, nil)
+      end
 
       log_asset_access("syllabus:#{@context.asset_string}", "syllabus", 'other')
       respond_to do |format|
@@ -363,7 +370,7 @@ class AssignmentsController < ApplicationController
           @assignment.reload
           flash[:notice] = t 'notices.updated', "Assignment was successfully updated."
           format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment) }
-          format.json { render :json => @assignment.to_json(:permissions => {:user => @current_user, :session => session}, :methods => [:readable_submission_types], :include => [:quiz, :discussion_topic]), :status => :ok }
+          format.json { render :json => @assignment.to_json(:permissions => {:user => @current_user, :session => session}, :include => [:quiz, :discussion_topic]), :status => :ok }
         else
           format.html { render :action => "edit" }
           format.json { render :json => @assignment.errors.to_json, :status => :bad_request }

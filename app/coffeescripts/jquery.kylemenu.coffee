@@ -55,8 +55,8 @@ define [
 
     select: (e, ui) =>
       if e.originalEvent?.type != "click" && $target = $(ui.item).find('a')
+        e.preventDefault()
         $target.trigger('click')
-        window.location = $target.attr('href')
       @$menu.popup('close').removeClass "ui-state-open"
 
     onClose: =>

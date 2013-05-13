@@ -250,64 +250,101 @@ describe "profile" do
       end
     end
   end
-end
 
-shared_examples_for "profile pictures selenium tests" do
-  it_should_behave_like "in-process server selenium tests"
-
-  it "should successfully upload profile pictures" do
-    pending("intermittently fails")
-    course_with_teacher_logged_in
-    a = Account.default
-    a.enable_service('avatars')
-    a.save!
-    image_src = ''
-
-    get "/profile/settings"
-    keep_trying_until { f(".profile_pic_link") }.click
-    dialog = f("#profile_pic_dialog")
-    dialog.should be_displayed
-    dialog.find_element(:css, ".add_pic_link").click
-    filename, fullpath, data = get_file("graded.png")
-    dialog.find_element(:id, 'attachment_uploaded_data').send_keys(fullpath)
-    # Make ajax request slow down to verify transitional state
-    FilesController.before_filter { sleep 5; true }
-
-    submit_form('#add_pic_form')
-
-    new_image = dialog.find_elements(:css, ".profile_pic_list span.img img").last
-    new_image.attribute('src').should_not =~ %r{/images/thumbnails/}
-
-    FilesController.filter_chain.pop
-
-    keep_trying_until do
-      spans = ffj("#profile_pic_dialog .profile_pic_list span.img")
-      spans.last.attribute('class') =~ /selected/
-      uploaded_image = ffj("#profile_pic_dialog .profile_pic_list span.img img").last
-      image_src = uploaded_image.attribute('src')
-      image_src.should =~ %r{/images/thumbnails/}
-      new_image.attribute('alt').should =~ /graded/
+  describe "profile pictures local tests" do
+    before do
+      local_storage!
     end
-    dialog.find_element(:css, '.select_button').click
-    wait_for_ajaximations
-    keep_trying_until do
-      profile_pic = fj('.profile_pic_link img')
-      profile_pic.should have_attribue('src', image_src)
+
+    it "should successfully upload profile pictures" do
+      pending("intermittently fails")
+      course_with_teacher_logged_in
+      a = Account.default
+      a.enable_service('avatars')
+      a.save!
+      image_src = ''
+
+      get "/profile/settings"
+      keep_trying_until { f(".profile_pic_link") }.click
+      dialog = f("#profile_pic_dialog")
+      dialog.should be_displayed
+      dialog.find_element(:css, ".add_pic_link").click
+      filename, fullpath, data = get_file("graded.png")
+      dialog.find_element(:id, 'attachment_uploaded_data').send_keys(fullpath)
+      # Make ajax request slow down to verify transitional state
+      FilesController.before_filter { sleep 5; true }
+
+      submit_form('#add_pic_form')
+
+      new_image = dialog.find_elements(:css, ".profile_pic_list span.img img").last
+      new_image.attribute('src').should_not =~ %r{/images/thumbnails/}
+
+      FilesController.filter_chain.pop
+
+      keep_trying_until do
+        spans = ffj("#profile_pic_dialog .profile_pic_list span.img")
+        spans.last.attribute('class') =~ /selected/
+        uploaded_image = ffj("#profile_pic_dialog .profile_pic_list span.img img").last
+        image_src = uploaded_image.attribute('src')
+        image_src.should =~ %r{/images/thumbnails/}
+        new_image.attribute('alt').should =~ /graded/
+      end
+      dialog.find_element(:css, '.select_button').click
+      wait_for_ajaximations
+      keep_trying_until do
+        profile_pic = fj('.profile_pic_link img')
+        profile_pic.should have_attribue('src', image_src)
+      end
+      Attachment.last.folder.should == @user.profile_pics_folder
     end
-    Attachment.last.folder.should == @user.profile_pics_folder
+  end
+
+  describe "profile pictures s3 tests" do
+    before do
+      s3_storage!(:stubs => false)
+    end
+
+    it "should successfully upload profile pictures" do
+      pending("intermittently fails")
+      course_with_teacher_logged_in
+      a = Account.default
+      a.enable_service('avatars')
+      a.save!
+      image_src = ''
+
+      get "/profile/settings"
+      keep_trying_until { f(".profile_pic_link") }.click
+      dialog = f("#profile_pic_dialog")
+      dialog.should be_displayed
+      dialog.find_element(:css, ".add_pic_link").click
+      filename, fullpath, data = get_file("graded.png")
+      dialog.find_element(:id, 'attachment_uploaded_data').send_keys(fullpath)
+      # Make ajax request slow down to verify transitional state
+      FilesController.before_filter { sleep 5; true }
+
+      submit_form('#add_pic_form')
+
+      new_image = dialog.find_elements(:css, ".profile_pic_list span.img img").last
+      new_image.attribute('src').should_not =~ %r{/images/thumbnails/}
+
+      FilesController.filter_chain.pop
+
+      keep_trying_until do
+        spans = ffj("#profile_pic_dialog .profile_pic_list span.img")
+        spans.last.attribute('class') =~ /selected/
+        uploaded_image = ffj("#profile_pic_dialog .profile_pic_list span.img img").last
+        image_src = uploaded_image.attribute('src')
+        image_src.should =~ %r{/images/thumbnails/}
+        new_image.attribute('alt').should =~ /graded/
+      end
+      dialog.find_element(:css, '.select_button').click
+      wait_for_ajaximations
+      keep_trying_until do
+        profile_pic = fj('.profile_pic_link img')
+        profile_pic.should have_attribue('src', image_src)
+      end
+      Attachment.last.folder.should == @user.profile_pics_folder
+    end
   end
 end
 
-describe "profile pictures local tests" do
-  it_should_behave_like "profile pictures selenium tests"
-  before do
-    local_storage!
-  end
-end
-
-describe "profile pictures s3 tests" do
-  it_should_behave_like "profile pictures selenium tests"
-  before do
-    s3_storage!(:stubs => false)
-  end
-end

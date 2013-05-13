@@ -17,38 +17,58 @@
 #
 
 define [
+  'underscore'
   'compiled/views/PaginatedView'
   'jquery.disableWhileLoading'
-], (PaginatedView) ->
+], (_, PaginatedView) ->
 
   class TokenSelectorList extends PaginatedView
     tagName: 'div'
     className: 'list'
 
-    paginationLoaderTemplate: ->
-      """
-      <div class='pagination-loader' style='height: 60px'>&nbsp;</div>
-      """
+    paginationLoaderTemplate: -> """
+      <div class="pagination-loader" style="height: 60px;">&nbsp;</div>
+    """
+
+    events:
+      'blur li'    : 'onBlur'
+      'focus li'   : 'onFocus'
+      'keydown li': 'onKeydown'
+
+    keyCodes:
+      13: 'Enter'
+      16: 'Shift'
+      17: 'Control'
+      18: 'Alt'
+      27: 'Escape'
+      32: 'Space'
+      37: 'LeftArrow'
+      38: 'UpArrow'
+      39: 'RightArrow'
+      40: 'DownArrow'
+      91: 'Command'
 
     initialize: (options) ->
-      super
-
       @selector = @options.selector
       @parent = @options.parent
       @ancestors = @options.ancestors
       @query = @options.query
 
-      @$heading = $('<ul class="heading" />').appendTo(@$el)
-      @$body = $('<ul />').appendTo(@$el)
+      @$heading                  = $('<ul />', class: 'heading').appendTo(@$el)
+      @paginationScrollContainer = $('<ul />', role: 'menu')
+      @$body                     = @paginationScrollContainer.appendTo(@$el)
+
       @$el.find('ul')
-        .mousemove(@selector.mouseMove)
-        .mousedown(@selector.mouseDown)
-        .click(@selector.click)
+        .on('mousemove', @selector.mouseMove)
+        .on('mousedown', @selector.mouseDown)
+        .on('click', @selector.click)
 
       @collection.on 'beforeFetch', @showPaginationLoader, this
       @collection.on 'fetch', @render
+      super
 
     render: =>
+      activeIndex = @paginationScrollContainer.children('.active').index()
       @clear()
       @$selectAll = null
 
@@ -71,6 +91,7 @@ define [
       @collection.each @addOne
       @$body.find('li.toggleable').addClass('on') if @selectAllActive() or @parent?.hasClass?('on')
       @$el.toggleClass('with-toggles', @selector.options.showToggles and @$body.find('li.toggleable').length > 0)
+      @selector.select($(@paginationScrollContainer.children()[activeIndex]))
 
       if @collection.fetchingPage or @collection.fetchingNextPage
         @showPaginationLoader()
@@ -123,7 +144,7 @@ define [
       @addOneRaw(recipient.attributes)
 
     addOneRaw: (row) ->
-      $li = $('<li />').addClass('selectable')
+      $li = $('<li />', class: 'selectable', tabindex: '-1')
       $li.addClass('first') unless @$body.find('li:first')
       @$body.find('li:last').removeClass('last')
       $li.addClass('last')
@@ -202,3 +223,58 @@ define [
           toggle on, @$selectAll
           $onNodes.each (i, node) =>
             toggle off, $(node)
+
+    onKeydown: (e) ->
+      $target = $(e.target)
+      code    = e.keyCode or e.which
+      fn      = "on#{@keyCodes[code]}Key"
+      if @[fn]
+        @[fn].call(this, e, $target) and e.preventDefault()
+      else if _.include([16, 17, 18, 92], code)
+        # shift, control, alt, and command; do nothing
+      else
+        # focus input and pass to it
+        @selector.input.focus()
+        $(@selector.input.$input).trigger(e)
+
+    onBlur: (e) ->
+      $(e.target).removeClass('active')
+
+    onFocus: (e) ->
+      $(e.target).addClass('active')
+
+    onUpArrowKey: (e, $target) ->
+      e.preventDefault()
+      @selector.selectPrev()
+      if $target.prev().length == 0
+        @selector.input.focus()
+
+    onDownArrowKey: (e, $target) ->
+      e.preventDefault()
+      @selector.selectNext()
+
+    onRightArrowKey: (e, $target) ->
+      e.preventDefault()
+      @selector.expandSelection()
+
+    onLeftArrowKey: (e, $target) ->
+      if @selector.listExpanded()
+        @selector.collapse()
+
+    onEnterKey: (e, $target) ->
+      e.preventDefault()
+      @selectResult($target)
+
+    onSpaceKey: (e, $target) ->
+      e.preventDefault()
+      @selectResult($target)
+
+    onEscapeKey: (e, $target) ->
+      @selector.input.focus()
+      @selector.close()
+
+    selectResult: ($result) ->
+      if $result.hasClass('expandable') and $result.find('a.toggle').length > 0
+        @selector.toggleSelection()
+      else
+        $result.click()

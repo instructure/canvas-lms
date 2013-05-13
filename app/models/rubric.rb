@@ -255,7 +255,7 @@ class Rubric < ActiveRecord::Base
         begin
           import_from_migration(rubric, migration)
         rescue
-          migration.add_warning(t('errors.could_not_import', "Couldn't import rubric %{rubric}", :rubric => rubric[:title]), $!)
+          migration.add_import_warning(t('#migration.rubric_type', "Rubric"), rubric[:title], $!)
         end
       end
     end

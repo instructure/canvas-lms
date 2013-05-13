@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
 
 describe "Wiki pages and Tiny WYSIWYG editor" do
-  it_should_behave_like "wiki and tiny selenium tests"
+  it_should_behave_like "in-process server selenium tests"
 
   context "as a teacher" do
 
@@ -99,7 +99,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       keep_trying_until { f("#page_history").should be_displayed }
       f('#page_history').click
 
-      ff('a[title]').length.should == 3
+      ff('a[title]').length.should == 2
     end
 
 
@@ -167,7 +167,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       f('.history').click
       wait_for_ajax_requests
 
-      ff('a[title]').length.should == 3
+      ff('a[title]').length.should == 2
     end
   end
 end

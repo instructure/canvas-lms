@@ -140,8 +140,23 @@ class Submission < ActiveRecord::Base
 
   has_a_broadcast_policy
 
-  simply_versioned :explicit => true
-  
+  simply_versioned :explicit => true,
+    :when => lambda{ |model| model.new_version_needed? },
+    :on_create => lambda{ |model,version| SubmissionVersion.index_version(version) },
+    :on_update => lambda{ |model,version| SubmissionVersion.reindex_version(version) }
+
+  def new_version_needed?
+    turnitin_data_changed? || (changes.keys - [
+      "updated_at",
+      "processed",
+      "process_attempts",
+      "changed_since_publish",
+      "grade_matches_current_submission",
+      "published_score",
+      "published_grade"
+    ]).present?
+  end
+
   set_policy do
     given {|user| user && user.id == self.user_id }
     can :read and can :comment and can :make_group_comment and can :submit
@@ -453,7 +468,7 @@ class Submission < ActiveRecord::Base
     self.quiz_submission.reload if self.quiz_submission
     self.workflow_state = 'unsubmitted' if self.submitted? && !self.has_submission?
     self.workflow_state = 'graded' if self.grade && self.score && self.grade_matches_current_submission
-    self.workflow_state = 'pending_review' if self.submission_type == 'online_quiz' && self.quiz_submission && !self.quiz_submission.complete?
+    self.workflow_state = 'pending_review' if self.submission_type == 'online_quiz' && self.quiz_submission.try(:latest_submitted_version).try(:pending_review?)
     if self.graded? && self.graded_at_changed? && self.assignment.available?
       self.changed_since_publish = true
     end
@@ -1064,19 +1079,11 @@ class Submission < ActiveRecord::Base
   def turnitin_data_changed!
     @turnitin_data_changed = true
   end
-  
-  def changes_worth_versioning?
-    !(self.changes.keys - [
-      "updated_at", 
-      "processed", 
-      "process_attempts", 
-      "changed_since_publish",
-      "grade_matches_current_submission",
-      "published_score",
-      "published_grade"
-    ]).empty? || @turnitin_data_changed
+
+  def turnitin_data_changed?
+    @turnitin_data_changed
   end
-  
+
   def get_web_snapshot
     # This should always be called in the context of a delayed job
     return unless CutyCapt.enabled?

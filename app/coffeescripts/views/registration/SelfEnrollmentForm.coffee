@@ -28,90 +28,83 @@ define [
 
   class SelfEnrollmentForm extends Backbone.View
     events:
-      'change input[name=user_type]': 'changeType'
+      'change input[name=initial_action]': 'changeAction'
       'click #logout_link': 'logOutAndRefresh'
 
-    initialize: ->
-      @enrollAction = @$el.attr('action')
-      @userType = @$el.find('input[type=hidden][name=user_type]').val()
-      @$el.formSubmit
-        beforeSubmit: @beforeSubmit
-        onSubmit: @onSubmit
-        success: @enrollSuccess
-        error: @enrollError
-        formErrors: false
-        disableWhileLoading: 'spin_on_success'
+    initialize: (@options = {}) ->
+      @enrollUrl = @$el.attr('action')
+      @action = @initialAction = @$el.find('input[type=hidden][name=initial_action]').val()
+      @$el.formSubmit {@beforeSubmit, @success, @errorFormatter, disableWhileLoading: 'spin_on_success'}
 
-    changeType: (e) =>
-      @userType = $(e.target).val()
+    changeAction: (e) =>
+      @action = $(e.target).val()
       @$el.find('.user_info').hide()
-      @$el.find("##{@userType}_user_info").show()
+      @$el.find("##{@action}_user_info").show()
       @$el.find("#submit_button").css(visibility: 'visible')
 
-    beforeSubmit: =>
-      return false unless @userType
+    beforeSubmit: (data) =>
+      return false unless @action
+      if @options.confirmEnrollmentUrl and @action is 'enroll'
+        window.location = @options.confirmEnrollmentUrl
+        return false
 
-      switch @userType
-        when 'new'
-          # create user and self-enroll in course(s)
-          @$el.attr('action', '/users')
-        when 'existing'
-          @logIn =>
-            # yay, now enroll the user
-            @userType = 'authenticated'
-            @enrollErrorOnce = (errors) =>
-              if @hasError(errors.user?.self_enrollment_code, 'already_enrolled')
-                # we don't reload the form, so we want a subsequent login
-                # or signup attempt to work
-                @userType = 'existing'
-                @logOut()
-            @$el.submit()
-          return false
-        when 'authenticated'
-          @$el.attr('action', @enrollAction)
+      @normalizeData(data)
 
-    onSubmit: (deferred) ->
-      $.when(deferred).done => @enrollErrorOnce = null
+      @$el.attr 'action', switch @action
+        when 'create' then '/users'
+        when 'log_in' then '/login'
+        when 'enroll' then @enrollUrl
 
-    error: (errors) =>
+    success: (data) =>
+      if @action is 'enroll'
+        # they should now be authenticated (either registered or pre_registered)
+        q = window.location.search
+        q = (if q then "#{q}&" else "?")
+        q += "enrolled=1"
+        q += '&just_created=1' if @initialAction is 'create'
+        window.location.search = q
+      else # i.e. we just registered or logged in
+        @enroll()
+
+    normalizeData: (data) =>
+      if @action is 'log_in'
+        data['pseudonym_session[unique_id]'] = data['pseudonym[unique_id]'] ? ''
+        data['pseudonym_session[password]']  = data['pseudonym[password]'] ? ''
+      data
+
+    errorFormatter: (errors) =>
+      ret = switch @action
+        when 'create' then registrationErrors(errors)
+        when 'log_in' then @loginErrors(errors)
+        when 'enroll' then @enrollErrors(registrationErrors(errors))
+      ret
+
+    loginErrors: (errors) ->
+      errors = errors.base
+      error = errors[errors.length - 1].message
+      {'pseudonym[password]': error}
+
+    enrollErrors: (errors) =>
       # move the "already enrolled" error to the username, since that's visible
       if errors['user[self_enrollment_code]']
         errors['pseudonym[unique_id]'] ?= []
         errors['pseudonym[unique_id]'].push errors['user[self_enrollment_code]'][0]
         delete errors['user[self_enrollment_code]']
-      @$el.formErrors errors
+      # since we don't reload the form, we want a subsequent login or signup
+      # attempt to work
+      @action = @initialAction
+      @logOut()
+      errors
 
-    enrollError: (errors) =>
-      @enrollErrorOnce?(errors)
-      @error registrationErrors(errors)
-
-    enrollSuccess: (data) =>
-      # they should now be authenticated (either registered or pre_registered)
-      q = window.location.search
-      q = (if q then "#{q}&" else "?")
-      q += "enrolled=1"
-      q += '&just_created=1' if @userType is 'new'
-      window.location.search = q
-
-    logIn: (successCb) ->
-      data = pseudonym_session:
-        unique_id: @$el.find('#student_email').val()
-        password: @$el.find('#student_password').val()
-
-      $.ajaxJSON '/login', 'POST', data, successCb, (errors, xhr) =>
-        baseErrors = errors.errors.base
-        error = baseErrors[baseErrors.length - 1].message
-        @error 'pseudonym[password]': error
+    enroll: =>
+      @action = 'enroll'
+      @$el.submit()
 
     logOut: (refresh = false) =>
       $.ajaxJSON '/logout', 'POST', {}, ->
         location.reload true if refresh
- 
+
     logOutAndRefresh: (e) =>
       e.preventDefault()
       @logOut(true)
 
-    hasError: (errors, type) ->
-      return false unless errors
-      return true for e in errors when e.type is type
-      false

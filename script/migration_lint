@@ -1,0 +1,50 @@
+#!/usr/bin/env ruby
+
+@warnings = []
+@errors = []
+
+def add_warning(message)
+  @warnings << [@migration, message]
+end
+
+def add_error(message)
+  @errors << [@migration, message]
+end
+
+migrations = Dir.glob("db/migrate/*.rb") + Dir.glob("lib/data_fixup/*.rb") +
+             Dir.glob("vendor/plugins/*/db/migrate/*.rb") + Dir.glob("vendor/plugins/*/lib/data_fixup/*.rb")
+
+migrations.each do |migration|
+  @migration = migration
+  data = File.read(@migration)
+
+  if data =~ /concurrently/i && data !~ /transactional = false/
+    add_error("Adding an index concurrently in a transactional migration?!")
+  end
+
+  if data =~ /send_later(?:_enqueue_args)?\(/
+    add_error("all send_laters in migrations should be send_later_if_production")
+  end
+
+  if data =~ /send_later/ && data =~ /predeploy/
+    add_error("cannot use send_later in a predeploy - the jobs servers won't have the new code yet")
+  end
+
+  if data =~ /find_each|find_in_batches|find_ids_in_/ && data !~ /with_exclusive_scope/
+    add_warning("find_in_batches or similar without with_exclusive_scope might be dangerous")
+  end
+
+  if data =~ /concurrent\W/
+    add_error("you misspelled concurrently. that's not gonna work")
+  end
+end
+
+@warnings.each do |warning|
+  puts "WARNING (in #{warning.first}): #{warning.last}"
+end
+
+@errors.each do |warning|
+  puts "ERROR (in #{warning.first}): #{warning.last}"
+end
+
+exit 1 unless @errors.empty?

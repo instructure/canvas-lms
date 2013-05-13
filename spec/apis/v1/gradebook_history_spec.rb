@@ -9,6 +9,14 @@ module Api::V1
     def course_assignment_url(course, assignment)
       'http://www.example.com'
     end
+
+    def course_assignment_submission_url(course, assignment, submission, opts = {})
+      'http://www.example.com'
+    end
+
+    def params
+      {}
+    end
   end
 
   describe GradebookHistory do
@@ -21,6 +29,10 @@ module Api::V1
     let(:gradebook_history) { GradebookHistoryHarness.new }
     let(:now) { Time.now.in_time_zone }
     let(:yesterday) { (now - 24.hours).in_time_zone }
+
+    before do
+      ::Submission.any_instance.stubs(:grants_right?).with(user, :read_grade).returns(true)
+    end
 
     def submit(assignment, student, day, grader)
       submission = assignment.submit_homework(student)
@@ -131,7 +143,6 @@ module Api::V1
         version1[:current_grade].should == "90"
         version1[:current_grader].should == 'grader 2'
         version1[:new_grade].should == "90"
-        version1[:previous_grader].should == 'grader 1'
       end
 
       it 'can find submissions with no grader' do

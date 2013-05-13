@@ -1,3 +1,4 @@
+<% js_env :CAN_READ => can_do(@context, @current_user, :read) %>
 <% @active_tab = "syllabus" %>
 <% course_home ||= false %>
 <% if !course_home %>

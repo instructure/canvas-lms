@@ -104,7 +104,9 @@ class Attachment < ActiveRecord::Base
 
 
   def touch_context_if_appropriate
-    touch_context unless context_type == 'ConversationMessage'
+    unless context_type == 'ConversationMessage'
+      connection.after_transaction_commit { touch_context }
+    end
   end
 
   # this is a magic method that gets run by attachment-fu after it is done sending to s3,
@@ -199,7 +201,7 @@ class Attachment < ActiveRecord::Base
         begin
           import_from_migration(att, migration.context)
         rescue
-          migration.add_warning("Couldn't import file \"#{att[:display_name] || att[:path_name]}\"", $!)
+          migration.add_import_warning(t('#migration.file_type', "File"), (att[:display_name] || att[:path_name]), $!)
         end
       end
     end
@@ -612,7 +614,7 @@ class Attachment < ActiveRecord::Base
     quota = 0
     quota_used = 0
     if context
-      ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+      Shackles.activate(:slave) do
         quota = Setting.get_cached('context_default_quota', 50.megabytes.to_s).to_i
         quota = context.quota if (context.respond_to?("quota") && context.quota)
         min = self.minimum_size_for_quota
@@ -845,7 +847,7 @@ class Attachment < ActiveRecord::Base
     self.need_notify = true if !@skip_broadcasts &&
         file_state_changed? &&
         file_state == 'available' &&
-        context && context.state == :available &&
+        context.respond_to?(:state) && context.state == :available &&
         folder && folder.visible?
   end
 

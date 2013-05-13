@@ -1,7 +1,8 @@
 module Api::V1
   module GradebookHistory
     include Api
-    include Assignment
+    include Api::V1::Assignment
+    include Api::V1::Submission
 
     def days_json(course, api_context)
       day_hash = Hash.new{|hash, date| hash[date] = {:graders => {}} }
@@ -23,35 +24,60 @@ module Api::V1
         each { |grader| compress(grader, :assignments) }
     end
 
+    def version_json(course, version, api_context, opts={})
+      submission = opts[:submission] || version.versionable
+      assignment = opts[:assignment] || submission.assignment
+      student = opts[:student] || submission.user
+      current_grader = submission.grader || default_grader
+
+      json = submission_attempt_json(version.model, assignment, api_context.user, api_context.session, nil, course).with_indifferent_access
+      grader = (json[:grader_id] && json[:grader_id] > 0 && user_cache[json[:grader_id]]) || default_grader
+
+      json = json.merge(
+        :grader => grader.name,
+        :assignment_name => assignment.title,
+        :user_name => student.name,
+        :current_grade => submission.grade,
+        :current_graded_at => submission.graded_at,
+        :current_grader => current_grader.name
+      )
+      json
+    end
+
+    def versions_json(course, versions, api_context, opts={})
+      # preload for efficiency
+      unless opts[:submission]
+        ::Version.send(:preload_associations, versions, :versionable)
+        submissions = versions.map(&:versionable)
+        ::Submission.send(:preload_associations, submissions, :assignment) unless opts[:assignment]
+        ::Submission.send(:preload_associations, submissions, :user) unless opts[:student]
+        ::Submission.send(:preload_associations, submissions, :grader)
+      end
+
+      versions.map do |version|
+        submission = opts[:submission] || version.versionable
+        assignment = opts[:assignment] || submission.assignment
+        student = opts[:student] || submission.user
+        version_json(course, version, api_context, :submission => submission, :assignment => assignment, :student => student)
+      end
+    end
+
     def submissions_for(course, api_context, date, grader_id, assignment_id)
       assignment = ::Assignment.find(assignment_id)
       options = {:date => date, :assignment_id => assignment_id, :grader_id => grader_id}
-      submissions_array = submissions_set(course, api_context, options)
+      submissions = submissions_set(course, api_context, options)
 
-      versions_hash = submissions_array.inject({}) do |memo, sub|
-        memo[sub.id] = sub.versions.map do |version|
-          hash = version.model.attributes.symbolize_keys
-          if hash[:grader_id] && hash[:grader_id] > 0
-            hash[:grader] = user_cache[hash[:grader_id]].name
-            hash[:safe_grader_id] = hash[:grader_id]
-          else
-            hash[:grader] = default_grader.name
-            hash[:safe_grader_id] = 0
-          end
-          hash[:assignment_name] = assignment.title
-          hash[:student_user_id] = hash[:user_id]
-          hash[:student_name] = user_cache[hash[:user_id]].name
-          hash[:course_id] = course.id
-          hash[:submission_id] = sub.id
-          hash[:graded_on] = hash[:graded_at].in_time_zone.to_date if hash[:graded_at]
-          hash[:current_grade] = sub.grade
-          hash[:current_graded_at] = sub.graded_at
-          hash[:current_grader] = sub.grader.try(:name) || default_grader.name
-          hash
-        end
-        memo
-      end
+      # load all versions for the given submissions and back-populate their
+      # versionable associations
+      submission_index = submissions.index_by(&:id)
+      versions = Version.where(:versionable_type => 'Submission', :versionable_id => submissions).order('number DESC')
+      versions.each{ |version| version.versionable = submission_index[version.versionable_id] }
 
+      # convert them all to json and then group by submission
+      versions = versions_json(course, versions, api_context, :assignment => assignment)
+      versions_hash = versions.group_by{ |version| version[:id] }
+
+      # populate previous_* and new_* keys and convert hash to array of objects
       versions_hash.inject([]) do |memo, (submission_id, versions)|
         prior = {}
         filtered_versions = versions.sort{|a,b| a[:updated_at] <=> b[:updated_at] }.each_with_object([]) do |version, new_array|
@@ -64,7 +90,7 @@ module Api::V1
                 PREVIOUS_VERSION_ATTRS.each { |attr| version["previous_#{attr}".to_sym] = prior[attr] }
               end
               NEW_ATTRS.each { |attr| version["new_#{attr}".to_sym] = version[attr] }
-              new_array << version.slice(*VALID_KEYS)
+              new_array << version
             end
           end
           prior.merge!(version.slice(:grade, :score, :graded_at, :grader, :submission_id))
@@ -114,18 +140,6 @@ module Api::V1
     NEW_ATTRS = [:grade, :graded_at, :grader, :score]
 
     DEFAULT_GRADER = Struct.new(:name, :id)
-
-    VALID_KEYS = [
-        :assignment_id, :assignment_name, :attachment_id, :attachment_ids,
-        :body, :course_id, :created_at, :current_grade, :current_graded_at,
-        :current_grader, :grade_matches_current_submission, :graded_at,
-        :graded_on, :grader, :grader_id, :group_id, :id, :new_grade,
-        :new_graded_at, :new_grader, :previous_grade, :previous_graded_at,
-        :previous_grader, :process_attempts, :processed, :published_grade,
-        :published_score, :safe_grader_id, :score, :student_entered_score,
-        :student_user_id, :submission_id, :student_name, :submission_type,
-        :updated_at, :url, :user_id, :workflow_state
-    ].freeze
 
     def default_grader
       @default_grader ||= DEFAULT_GRADER.new(I18n.t('gradebooks.history.graded_on_submission', 'Graded on submission'), 0)

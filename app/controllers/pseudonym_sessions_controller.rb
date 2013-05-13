@@ -561,6 +561,7 @@ class PseudonymSessionsController < ApplicationController
         end
       end
       format.json do
+        @pseudonym_session ||= @domain_root_account.pseudonym_sessions.new
         @pseudonym_session.errors.add('base', message)
         render :json => @pseudonym_session.errors.to_json, :status => :bad_request
       end
@@ -602,6 +603,7 @@ class PseudonymSessionsController < ApplicationController
 
   def oauth2_accept
     redirect_params = final_oauth2_redirect_params(:remember_access => params[:remember_access])
+    redirect_params[:state] = session[:oauth2][:state] if session[:oauth2][:state]
     final_oauth2_redirect(session[:oauth2][:redirect_uri], redirect_params)
   end
 

@@ -266,6 +266,9 @@ class CalendarEventsApiController < ApplicationController
   #        -F 'calendar_event[end_at]=2012-07-19T22:00:00Z' \ 
   #        -H "Authorization: Bearer <token>"
   def create
+    if params[:calendar_event][:description].present?
+      params[:calendar_event][:description] = process_incoming_html_content(params[:calendar_event][:description])
+    end
     @event = @context.calendar_events.build(params[:calendar_event])
     if authorized_action(@event, @current_user, :create)
       @event.validate_context! if @context.is_a?(AppointmentGroup)
@@ -363,6 +366,9 @@ class CalendarEventsApiController < ApplicationController
         @event.updating_user = @current_user
       end
       params[:calendar_event].delete(:context_code)
+      if params[:calendar_event][:description].present?
+        params[:calendar_event][:description] = process_incoming_html_content(params[:calendar_event][:description])
+      end
       if @event.update_attributes(params[:calendar_event])
         json_response = event_json(@event, @current_user, session)
         render :json => json_response
@@ -410,7 +416,7 @@ class CalendarEventsApiController < ApplicationController
 
       get_options(nil)
 
-      ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+      Shackles.activate(:slave) do
         @events.concat assignment_scope.all
         @events = apply_assignment_overrides(@events)
         @events.concat calendar_event_scope.events_without_child_events.all
@@ -427,7 +433,7 @@ class CalendarEventsApiController < ApplicationController
       # if the feed url doesn't give us the requesting user,
       # we have to just display the generic course feed
       get_all_pertinent_contexts
-      ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+      Shackles.activate(:slave) do
         @contexts.each do |context|
           @assignments = context.assignments.active.all if context.respond_to?("assignments")
           # no overrides to apply without a current user

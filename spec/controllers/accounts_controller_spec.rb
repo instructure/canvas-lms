@@ -261,12 +261,14 @@ describe AccountsController do
         :enable_scheduler => true,
         :enable_profiles => true,
         :admins_can_change_passwords => true,
+        :admins_can_view_notifications => true,
       } }
       @account.reload
       @account.global_includes?.should be_false
       @account.enable_scheduler?.should be_false
       @account.enable_profiles?.should be_false
       @account.admins_can_change_passwords?.should be_false
+      @account.admins_can_view_notifications?.should be_false
     end
 
     it "should allow site_admin to update certain settings" do
@@ -279,12 +281,14 @@ describe AccountsController do
         :enable_scheduler => true,
         :enable_profiles => true,
         :admins_can_change_passwords => true,
+        :admins_can_view_notifications => true,
       } }
       @account.reload
       @account.global_includes?.should be_true
       @account.enable_scheduler?.should be_true
       @account.enable_profiles?.should be_true
       @account.admins_can_change_passwords?.should be_true
+      @account.admins_can_view_notifications?.should be_true
     end
     
     describe "quotas" do

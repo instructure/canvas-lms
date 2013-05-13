@@ -114,6 +114,17 @@ describe DiscussionTopicsController, :type => :integration do
       @topic.require_initial_post?.should be_false
     end
 
+    it 'should process html content in message on create' do
+      should_process_incoming_user_content(@course) do |content|
+        api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
+                 { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
+                 { :title => "test title", :message => content })
+
+        @topic = @course.discussion_topics.order(:id).last
+        @topic.message
+      end
+    end
+
     it "should post an announcment" do
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
                { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
@@ -201,6 +212,7 @@ describe DiscussionTopicsController, :type => :integration do
                                    'hidden_for_user' => false,
                                    'created_at' => @attachment.created_at.as_json,
                                    'updated_at' => @attachment.updated_at.as_json,
+                                   'thumbnail_url' => @attachment.thumbnail_url,
                   }],
                   "topic_children"=>[@sub.id],
                   "discussion_type" => 'side_comment',
@@ -258,6 +270,17 @@ describe DiscussionTopicsController, :type => :integration do
         @topic.podcast_enabled?.should == true
         @topic.podcast_has_student_posts?.should == true
         @topic.require_initial_post?.should == true
+      end
+
+      it 'should process html content in message on update' do
+        should_process_incoming_user_content(@course) do |content|
+          api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                   { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                   { :message => content })
+
+          @topic.reload
+          @topic.message
+        end
       end
 
       it "should set the editor_id to whoever edited to entry" do
@@ -464,6 +487,7 @@ describe DiscussionTopicsController, :type => :integration do
                 'hidden_for_user' => false,
                 'created_at' => attachment.created_at.as_json,
                 'updated_at' => attachment.updated_at.as_json,
+                'thumbnail_url' => attachment.thumbnail_url,
               }],
       "posted_at"=>gtopic.posted_at.as_json,
       "root_topic_id"=>nil,
@@ -1326,6 +1350,7 @@ describe DiscussionTopicsController, :type => :integration do
         'hidden_for_user' => false,
         'created_at' => @attachment.created_at.as_json,
         'updated_at' => @attachment.updated_at.as_json,
+        'thumbnail_url' => @attachment.thumbnail_url,
       }
 
       v0 = json['view'][0]
@@ -1354,7 +1379,7 @@ describe DiscussionTopicsController, :type => :integration do
       v0_r1 = v0['replies'][1]
       v0_r1['id'].should         == @reply2.id
       v0_r1['user_id'].should    == @teacher.id
-      v0_r1['message'].should    == "<p><a href=\"http://#{Account.default.domain}/files/#{@reply2_attachment.id}/download?verifier=#{@reply2_attachment.uuid}\">This is a file link</a></p>\n    <p>This is a video:\n      <video poster=\"http://#{Account.default.domain}/media_objects/0_abcde/thumbnail?height=448&amp;type=3&amp;width=550\" data-media_comment_type=\"video\" preload=\"none\" class=\"instructure_inline_media_comment\" data-media_comment_id=\"0_abcde\" controls=\"controls\" src=\"http://#{Account.default.domain}/courses/#{@course.id}/media_download?entryId=0_abcde&amp;redirect=1&amp;type=mp4\">link</video>\n    </p>"
+      v0_r1['message'].should    == "<p><a href=\"http://#{Account.default.domain}/courses/#{@course.id}/files/#{@reply2_attachment.id}/download?verifier=#{@reply2_attachment.uuid}\">This is a file link</a></p>\n    <p>This is a video:\n      <video poster=\"http://#{Account.default.domain}/media_objects/0_abcde/thumbnail?height=448&amp;type=3&amp;width=550\" data-media_comment_type=\"video\" preload=\"none\" class=\"instructure_inline_media_comment\" data-media_comment_id=\"0_abcde\" controls=\"controls\" src=\"http://#{Account.default.domain}/courses/#{@course.id}/media_download?entryId=0_abcde&amp;redirect=1&amp;type=mp4\">link</video>\n    </p>"
       v0_r1['parent_id'].should  == @root1.id
       v0_r1['created_at'].should == @reply2.created_at.as_json
       v0_r1['updated_at'].should == @reply2.updated_at.as_json

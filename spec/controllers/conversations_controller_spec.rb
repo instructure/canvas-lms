@@ -482,4 +482,52 @@ describe ConversationsController do
       feed.entries.first.content.should match(/somefile\.doc/)
     end
   end
+
+  context "sharding" do
+    specs_require_sharding
+
+    describe 'index' do
+      it "should list conversation_ids across shards" do
+        users = []
+        # Create three users on different shards
+        users << user(:name => 'a')
+        @shard1.activate { users << user(:name => 'b') }
+        @shard2.activate { users << user(:name => 'c') }
+
+        Shard.default.activate do
+          # Default shard conversation
+          conversation = Conversation.initiate(users, false)
+          users.each do |user|
+            conversation.add_message(user, "user '#{user.name}' says HI")
+          end
+        end
+
+        @shard2.activate do
+          # Create logged in user
+          @logged_in_user = users.last
+          course_with_student_logged_in(:user => @logged_in_user, :active_all => true)
+          # Shard 2 conversation
+          conversation = Conversation.initiate(users, false)
+          users.each do |user|
+            conversation.add_message(user, "user '#{user.name}' says HI")
+          end
+        end
+
+        get 'index', :include_all_conversation_ids => true, :format => 'json'
+
+        response.should be_success
+        assigns[:js_env].should be_nil
+        # Should assign :conversations and :conversation_ids in json result
+        json = assigns[:conversations_json][:conversations]
+        ids = assigns[:conversations_json][:conversation_ids]
+        # IDs should match in returned lists
+        ids.sort.should == json.map{|c| c[:id]}.sort
+        # IDs returned should match IDs for user's conversations
+        ids.sort.should == @logged_in_user.conversations.map(&:conversation_id).sort
+        # Expect 2 elements in both groups
+        json.length.should == 2
+        ids.length.should == 2
+      end
+    end
+  end
 end

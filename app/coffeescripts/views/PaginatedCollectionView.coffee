@@ -48,7 +48,6 @@ define [
     initialize: ->
       super
       @initScrollContainer()
-      @attachScroll()
 
     ##
     # Extends parent to detach scroll container event

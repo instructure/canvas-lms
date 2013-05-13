@@ -338,4 +338,18 @@ describe "account" do
       f('#content').should include_text(@error_text)
     end
   end
+
+  describe "user details view" do
+    def create_sub_account(name = 'sub_account', parent_account = Account.default)
+      Account.create(:name => name, :parent_account => parent_account)
+    end
+
+    it "should be able to view user details from parent account" do
+      user_non_root = user
+      create_sub_account.add_user(user_non_root)
+      get "/accounts/#{Account.default.id}/users/#{user_non_root.id}"
+      #verify user details displayed properly
+      f('.accounts .unstyled_list li').should include_text('sub_account')
+    end
+  end
 end

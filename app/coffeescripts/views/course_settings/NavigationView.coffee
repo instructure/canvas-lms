@@ -75,13 +75,15 @@ define [
             $target.attr('tabindex', -1)
             $target.unbind('keydown')
 
-          dragObject.attr('aria-grabbed', false)
+        dragObject.attr('aria-grabbed', false)
         @$el.data('drag', null)
         dragObject.focus()
       else if $target.is('li.navitem')
         $target.attr('aria-grabbed', true)
         dragObject = $target
         @$el.data('drag', dragObject)
+        dragObject.blur()
+        dragObject.focus()
 
     # Internal: returns whether the selector is empty
     empty: (selector) ->

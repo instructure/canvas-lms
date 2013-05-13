@@ -30,7 +30,7 @@ define [
     fieldSelectors: null
 
     findField: (field) ->
-      selector = @fieldSelectors?[field] or "[name=#{field}]"
+      selector = @fieldSelectors?[field] or "[name='#{field}']"
       $el = @$(selector)
       if $el.data('rich_text')
         $el = $el.next('.mceEditor').find(".mceIframeContainer")

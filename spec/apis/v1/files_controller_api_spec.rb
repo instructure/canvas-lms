@@ -67,6 +67,7 @@ describe "Files API", :type => :integration do
         'hidden_for_user' => false,
         'created_at' => @attachment.created_at.as_json,
         'updated_at' => @attachment.updated_at.as_json,
+        'thumbnail_url' => nil
       }
       @attachment.file_state.should == 'available'
     end
@@ -97,6 +98,7 @@ describe "Files API", :type => :integration do
         'hidden_for_user' => false,
         'created_at' => @attachment.created_at.as_json,
         'updated_at' => @attachment.updated_at.as_json,
+        'thumbnail_url' => nil
       }
       @attachment.reload.file_state.should == 'available'
     end
@@ -186,11 +188,11 @@ describe "Files API", :type => :integration do
       links.find{ |l| l.match(/rel="last"/)}.should =~ /page=3/
     end
   end
-
+  
   describe "#show" do
     append_before do
       @root = Folder.root_folders(@course).first
-      @att = Attachment.create!(:filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course)
+      @att = Attachment.create!(:filename => 'test.png', :display_name => "test-frd.png", :uploaded_data => stub_png_data, :folder => @root, :context => @course)
       @file_path = "/api/v1/files/#{@att.id}"
       @file_path_options = { :controller => "files", :action => "api_show", :format => "json", :id => @att.id.to_param }
     end
@@ -200,21 +202,22 @@ describe "Files API", :type => :integration do
       json.should == {
               'id' => @att.id,
               'url' => file_download_url(@att, :verifier => @att.uuid, :download => '1', :download_frd => '1'),
-              'content-type' => "unknown/unknown",
-              'display_name' => 'test.txt',
+              'content-type' => "image/png",
+              'display_name' => 'test-frd.png',
               'filename' => @att.filename,
               'size' => @att.size,
               'unlock_at' => nil,
               'locked' => false,
-        'hidden' => false,
+              'hidden' => false,
               'lock_at' => nil,
               'locked_for_user' => false,
               'hidden_for_user' => false,
               'created_at' => @att.created_at.as_json,
               'updated_at' => @att.updated_at.as_json,
+              'thumbnail_url' => @att.thumbnail_url
       }
     end
-
+    
     it "should return lock information" do
       one_month_ago, one_month_from_now = 1.month.ago, 1.month.from_now
       att2 = Attachment.create!(:filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course, :locked => true)

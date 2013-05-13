@@ -2,19 +2,19 @@
   <div class="event-details-content">
     <table class="formtable" style="width: 100%;">
       <tr>
-        <td>{{#t "title"}}Title:{{/t}}</td>
+        <td><label for="assignment_title">{{#t "title"}}Title:{{/t}}</label></td>
         <td><input id="assignment_title" name="assignment[title]" size="30" maxlength="255" style="width: 200px;" type="text" value="{{title}}"/></td>
       </tr>
       <tr>
-        <td>{{#t "due"}}Due:{{/t}}</td>
+        <td><label for="assignment_due_at">{{#t "due"}}Due:{{/t}}</label></td>
         <td>
-          <input class="datetime_field" id="assignment_due_at" name="assignment[due_at]" size="30" style="width: 150px;" type="text" />
+          <input class="datetime_field" id="assignment_due_at" name="assignment[due_at]" size="30" style="width: 150px;" type="text"/>
         </td>
       </tr>
       <tr class="context_select">
-        <td>{{#t "calendar"}}Calendar:{{/t}}</td>
+        <td><label for="assignment_context">{{#t "calendar"}}Calendar:{{/t}}</label></td>
         <td>
-          <select class="context_id">
+          <select id="assignment_context" class="context_id">
             {{#each contexts}}
               {{#if can_create_assignments}}
                 <option value="{{asset_string}}">{{name}}</option>
@@ -24,9 +24,9 @@
         </td>
       </tr>
       <tr>
-        <td>{{#t "group"}}Group:{{/t}}</td>
+        <td><label for="assignment_group">{{#t "group"}}Group:{{/t}}</label></td>
         <td class="assignment_group_select">
-          <select class="assignment_group" name="assignment[assignment_group_id]">
+          <select id="assignment_group" class="assignment_group" name="assignment[assignment_group_id]" aria-label="{{#t "group"}}Group:{{/t}}">
             <option value="new">[ New Group ]</option>
           </select>
         </td>

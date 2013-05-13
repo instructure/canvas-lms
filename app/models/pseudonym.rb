@@ -49,7 +49,7 @@ class Pseudonym < ActiveRecord::Base
 
   validates_each :password, {:if => :require_password?}, &Canvas::PasswordPolicy.method("validate")
   acts_as_authentic do |config|
-    config.validates_format_of_login_field_options = {:with => /\A\w[\w\.\+\-_@ =]*\z/}
+    config.validates_format_of_login_field_options = {:with => /\A\w[\w\.\+\-_'@ =]*\z/}
     config.login_field :unique_id
     config.validations_scope = [:account_id, :workflow_state]
     config.perishable_token_valid_for = 30.minutes

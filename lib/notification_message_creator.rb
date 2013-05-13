@@ -129,6 +129,7 @@ class NotificationMessageCreator
                                          :notification_policy => policy,
                                          :frequency => policy.frequency,
                                          :communication_channel_id => policy.communication_channel_id,
+                                         :root_account_id => message.context_root_account.try(:id),
                                          :linked_name => 'work on this link!!!',
                                          :name_of_topic => message.subject,
                                          :link => message.url,

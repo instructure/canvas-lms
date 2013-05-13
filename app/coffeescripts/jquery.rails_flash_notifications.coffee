@@ -15,10 +15,8 @@ define [
     return if $this.hasClass('no_close')
     $.cookie('unsupported_browser_dismissed', '1') if $this.hasClass('unsupported_browser')
     $this.stop(true, true).remove()
-    if $this.hasClass('static_message')
-      $buffer.height _.reduce($holder.find('.static_message'),
-        (s, n) -> s + $(n).outerHeight()
-      , 0)
+    if (bufferIndex = $this.data('buffer-index'))?
+      $buffer.find("[data-buffer-index=#{bufferIndex}]").remove()
 
   flashBox = (type, content, timeout, cssOptions = {}) ->
     $node = $("""

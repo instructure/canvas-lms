@@ -39,6 +39,12 @@ define [
       # will figure out the title from the trigger if null
       title: null
 
+      width: null
+
+      height: null
+
+      fixDialogButtons: true
+
     $dialogAppendTarget: $ 'body'
 
     className: 'dialogFormView'
@@ -98,8 +104,14 @@ define [
       @$el.appendTo @$dialogAppendTarget
 
     ##
-    # @api private
-    setTrigger: ->
+    # If your trigger isn't rendered after this view (like a parent view
+    # contains the trigger) then you can set this manually (like in the
+    # parent views afterRender), otherwise it'll use the options.
+    #
+    # @api public
+    #
+    setTrigger: (el) ->
+      @options.trigger = el if el
       return unless @options.trigger
       @$trigger = $ @options.trigger
       @attachTrigger()
@@ -112,7 +124,7 @@ define [
     ##
     # @api private
     renderEl: =>
-      @$el.html @wrapperTemplate()
+      @$el.html @wrapperTemplate @toJSON()
       @renderOutlet()
       # reassign: only render the outlout now
       @renderEl = @renderOutlet
@@ -120,7 +132,7 @@ define [
     ##
     # @api private
     renderOutlet: =>
-      html = @template @model.toJSON()
+      html = @template @toJSON()
       @$el.find('.outlet').html html
 
     ##
@@ -137,10 +149,15 @@ define [
     ##
     # @api private
     setupDialog: ->
-      @$el.dialog
+      opts =
         autoOpen: false
         title: @getDialogTitle()
-      .fixDialogButtons()
+        close: => @trigger 'close'
+        open: => @trigger 'open'
+      opts.width = @options.width
+      opts.height = @options.height
+      @$el.dialog(opts)
+      @$el.fixDialogButtons() if @options.fixDialogButtons
       @dialog = @$el.data 'dialog'
 
     ##

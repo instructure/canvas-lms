@@ -764,6 +764,10 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
+  def computed_current_grade
+    self.course.score_to_grade(self.computed_current_score)
+  end
+
   def computed_final_grade
     self.course.score_to_grade(self.computed_final_score)
   end

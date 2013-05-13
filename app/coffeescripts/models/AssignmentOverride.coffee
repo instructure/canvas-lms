@@ -19,6 +19,15 @@ define [
       lock_at_overridden: true
       lock_at: null
 
+    initialize: ->
+      super
+      @on 'change:course_section_id', @clearID, this
+
+    # This method exists because the api cannot currently update the
+    # course_section_id for an assignment override.
+    clearID: ->
+      @set 'id', undefined
+
     parse: ( {assignment_override} ) ->
       assignment_override
 
@@ -29,7 +38,8 @@ define [
 
     @defaultDueDate: ( options ) ->
       options ?= {}
-      opts = _.extend options, { course_section_id: Section.defaultDueDateSectionID }
+      opts = _.extend options,
+        {course_section_id: Section.defaultDueDateSectionID}
       new AssignmentOverride opts
 
     isBlank: => not @get('due_at')?

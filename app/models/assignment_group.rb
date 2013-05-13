@@ -178,7 +178,7 @@ class AssignmentGroup < ActiveRecord::Base
         begin
           import_from_migration(group, migration.context)
         rescue
-          migration.add_warning("Couldn't import assignment group \"#{group[:title]}\"", $!)
+          migration.add_import_warning(t('#migration.assignment_group_type', "Assignment Group"), group[:title], $!)
         end
       end
     end

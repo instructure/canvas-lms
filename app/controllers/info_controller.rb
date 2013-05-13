@@ -21,6 +21,10 @@ class InfoController < ApplicationController
   skip_before_filter :load_account, :only => :health_check
   skip_before_filter :load_user, :only => [:health_check, :help_links]
 
+  def styleguide
+    js_bundle :styleguide
+  end
+
   def message_redirect
     m = AssetSignature.find_by_signature(Message, params[:id])
     if m && m.url

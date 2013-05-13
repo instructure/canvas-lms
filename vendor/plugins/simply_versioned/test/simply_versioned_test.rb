@@ -283,7 +283,7 @@ class SimplyVersionedTest < FixturedTestCase
   end
   
   def test_should_exclude_columns
-    assert_equal ["trouble"], Saproling.simply_versioned_excluded_columns
+    assert_equal ["trouble"], Saproling.simply_versioned_options[:exclude]
     
     sylvia = Saproling.create!( :name => 'Sylvia', :trouble => "big" )
     
@@ -296,7 +296,7 @@ class SimplyVersionedTest < FixturedTestCase
     klass.module_eval <<-DEFN
       simply_versioned :exclude => :some_column
     DEFN
-    assert_equal ['some_column'], klass.simply_versioned_excluded_columns
+    assert_equal ['some_column'], klass.simply_versioned_options[:exclude]
   end
   
   def test_should_report_version_number

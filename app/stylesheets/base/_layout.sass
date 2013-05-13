@@ -4,7 +4,7 @@ body
   background-image: url("/images/blue/bg.jpg")
   min-width: $min_main_width
 
-  &.no-headers
+  &.no-headers, &.embedded
     #header, #topbar, #left-side, #breadcrumbs
       display: none !important
     #footer
@@ -27,6 +27,16 @@ body
       min-height: 0
     #content
       padding: 1em
+    h2
+      @include ui-widget-header-bg-and-text
+      font-size: 14px
+      font-weight: bold
+      margin: -0.95em -0.95em 1em
+      padding: 0.4em 1em
+      line-height: 20px
+    &.no-headers
+      h2
+        display: none
     .embedded-footer
       position: absolute
       bottom: 0
@@ -176,8 +186,8 @@ body
   a
     border-left: 1px solid #5C5C5C
     color: #5C5C5C
-    margin-right: 0.4em
-    padding-left: 0.4em
+    padding-right: 2px
+    padding-left: 5px
     &:hover, &:focus
       text-decoration: underline
     // ie7 supports :first-child so this will work on everything we support.

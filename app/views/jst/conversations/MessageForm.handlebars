@@ -26,7 +26,13 @@
     {{/unless}}
     <tr>
       <th><label>{{#t "labels.message"}}Message:{{/t}}</label></th>
-      <td><textarea name="body" class="conversation_body">{{message}}</textarea></td>
+      <td>
+        <textarea name="body"
+                  data-track-category="Compose Message"
+                  data-track-action="Edit"
+                  data-track-label="Body"
+                  class="conversation_body">{{message}}</textarea>
+      </td>
     </tr>
     {{#unless conversation}}
     <tr class="group_conversation_info" style="display:none">
@@ -43,7 +49,13 @@
       <th></th>
       <td>
         <label>
-          <input type="checkbox" name="user_note" value="1" class="user_note">
+          <input type="checkbox"
+                 name="user_note"
+                 value="1"
+                  data-track-category="Compose Message"
+                  data-track-action="Edit"
+                  data-track-label="Faculty Journal"
+                 class="user_note" />
           {{#t "labels.add_to_faculty_journal"}}Add as a Faculty Journal entry{{/t}}
         </label>
       </td>
@@ -62,16 +74,30 @@
           <input type="hidden" name="media_comment_type">
         {{/if}}
         <ul class="attachment_list"></ul>
-        <a class="icon-paperclip action_add_attachment" href="#" title="{{#t "titles.add_attachment"}}Add an attachment{{/t}}">{{#t "links.add_attachment"}}Attach{{/t}}</a>
+        <a class="icon-paperclip action_add_attachment"
+           href="#"
+           data-track-category="Compose Message"
+           data-track-action="Edit"
+           data-track-label="Attach File"
+           title="{{#t "titles.add_attachment"}}Add an attachment{{/t}}">{{#t "links.add_attachment"}}Attach{{/t}}</a>
         {{#if mediaCommentsEnabled}}
-          <a class="action_media_comment icon-media" href="#" title="{{#t "titles.record_media_comment"}}Record an audio or video comment{{/t}}"> {{#t "links.media_comment"}}Record{{/t}}</a>
+          <a class="action_media_comment icon-media"
+             href="#"
+             data-track-category="Compose Message"
+             data-track-action="Edit"
+             data-track-label="Audio Recording"
+             title="{{#t "titles.record_media_comment"}}Record an audio or video comment{{/t}}"> {{#t "links.media_comment"}}Record{{/t}}</a>
         {{/if}}
         <div style="float: right">
           <input type="hidden" name="from_conversation_id" value="{{from_conversation_id}}">
           <input type="hidden" name="mode" value="async">
           <input type="hidden" name="scope" value="{{scope}}">
           <input type="hidden" name="filter" value="{{filter}}">
-          <button type="submit" class="btn btn-primary">{{#t "buttons.send_message"}}Send{{/t}}</button>
+          <button type="submit"
+                  data-track-category="Compose Message"
+                  data-track-action="Edit"
+                  data-track-label="Send"
+                  class="btn btn-primary">{{#t "buttons.send_message"}}Send{{/t}}</button>
         </div>
       </td>
     </tr>

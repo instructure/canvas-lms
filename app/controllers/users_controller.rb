@@ -191,7 +191,7 @@ class UsersController < ApplicationController
     if authorized_action(@context, @current_user, :read_roster)
       @root_account = @context.root_account
       @query = (params[:user] && params[:user][:name]) || params[:term]
-      ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+      Shackles.activate(:slave) do
         if @context && @context.is_a?(Account) && @query
           @users = @context.users_name_like(@query)
         elsif params[:enrollment_term_id].present? && @root_account == @context
@@ -257,7 +257,7 @@ class UsersController < ApplicationController
     check_incomplete_registration
     get_context
 
-    # dont show crubms on dashboard because it does not make sense to have a breadcrumb
+    # dont show crumbs on dashboard because it does not make sense to have a breadcrumb
     # trail back to home if you are already home
     clear_crumbs
 
@@ -602,6 +602,9 @@ class UsersController < ApplicationController
 
       respond_to do |format|
         format.html
+        format.json {
+          render :json => user_json(@user, @current_user, session, %w{locale avatar_url},
+                                    @current_user.pseudonym.account) }
       end
     end
   end

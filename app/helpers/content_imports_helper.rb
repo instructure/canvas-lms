@@ -29,7 +29,7 @@ module ContentImportsHelper
   end
 
   def exports_enabled?
-    Canvas::Plugin.all_for_tag(:export_system).length > 0
+    ContentMigration.migration_plugins(true).any?
   end
 
   def qti_or_content_link

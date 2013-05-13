@@ -19,30 +19,20 @@
 define([
   'i18n!quizzes.show',
   'jquery' /* $ */,
+  'compiled/views/MessageStudentsDialog',
   'quiz_arrows',
   'quiz_inputs',
   'jquery.instructure_date_and_time' /* dateString, time_field, datetime_field */,
   'jqueryui/dialog',
+  'compiled/jquery/fixDialogButtons',
+  'compiled/jquery.rails_flash_notifications',
   'jquery.instructure_misc_helpers' /* scrollSidebar */,
   'jquery.instructure_misc_plugins' /* ifExists, confirmDelete */,
   'jquery.disableWhileLoading',
   'message_students' /* messageStudents */
-], function(I18n, $, showAnswerArrows, inputMethods) {
+], function(I18n, $, MessageStudentsDialog, showAnswerArrows, inputMethods) {
 
 $(document).ready(function () {
-
-  function loadStudents(callback) {
-    return ensureStudentsLoaded(function() {
-      var students = $('#quiz_details .student_list .student').not('.blank').map(function() {
-        return {
-          id       : $(this).attr('data-id'),
-          name     : $.trim($(this).find(".name").text()),
-          submitted: $(this).closest(".student_list").hasClass('submitted')
-        };
-      });
-      callback(students)
-    });
-  }
 
   function ensureStudentsLoaded(callback) {
     if ($('#quiz_details').length) {
@@ -53,30 +43,6 @@ $(document).ready(function () {
         callback();
       });
     };
-  }
-
-  function showMessageStudentsForm(students) {
-    var title = $("#quiz_title").text();
-
-    window.messageStudents({
-      options: [
-      {text: I18n.t('have_taken_the_quiz', "Have taken the quiz")},
-      {text: I18n.t('have_not_taken_the_quiz', "Have NOT taken the quiz")}
-      ],
-      title: title,
-      students: students,
-      callback: function(selected, cutoff, students) {
-        students = $.grep(students, function($student, idx) {
-          var student = $student.user_data;
-          if(selected == I18n.t('have_taken_the_quiz', "Have taken the quiz")) {
-            return student.submitted;
-          } else if(selected == I18n.t('have_not_taken_the_quiz', "Have NOT taken the quiz")) {
-            return !student.submitted;
-          }
-        });
-        return $.map(students, function(student) { return student.user_data.id; });
-      }
-    });
   }
 
   showAnswerArrows();
@@ -106,7 +72,7 @@ $(document).ready(function () {
     event.preventDefault();
     $("#quiz_details_wrapper").disableWhileLoading(
       ensureStudentsLoaded(function() {
-        var $quizResultsText = $('#quiz_results_text');
+        var $quizResultsText = $('#quiz_details_text');
         $("#quiz_details").slideToggle();
         if (hasOpenedQuizDetails) {
           if (ENV.IS_SURVEY) {
@@ -131,7 +97,27 @@ $(document).ready(function () {
   });
   $(".message_students_link").click(function(event) {
     event.preventDefault();
-    $(this).disableWhileLoading(loadStudents(showMessageStudentsForm));
+    ensureStudentsLoaded(function(){
+      var submissionList = ENV.QUIZ_SUBMISSION_LIST;
+      var unsubmittedStudents = submissionList.UNSUBMITTED_STUDENTS;
+      var submittedStudents = submissionList.SUBMITTED_STUDENTS;
+      var haveTakenQuiz = I18n.t('have_taken_the_quiz', "Have taken the quiz");
+      var haveNotTakenQuiz =
+        I18n.t('have_not_taken_the_quiz', "Have NOT taken the quiz");
+      var dialog = new MessageStudentsDialog({
+        title: ENV.QUIZ.title,
+        recipientGroups: [
+          { name: haveTakenQuiz, recipients: submittedStudents },
+          { name: haveNotTakenQuiz, recipients: unsubmittedStudents }
+        ]
+      });
+      dialog.onSaveSuccess = function() {
+        dialog.$el.dialog('close');
+        dialog.remove();
+        $.flashMessage(I18n.t('notices.message_sent', "Message Sent!"));
+      };
+      dialog.render().$el.dialog({width: 'auto', modal: 'true'}).fixDialogButtons();
+    });
   });
   $.scrollSidebar();
   

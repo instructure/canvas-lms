@@ -1,4 +1,7 @@
-<% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/files/<%= asset.id %>
-<% end %>
-Canvas Alert - New File: <%= asset.title %>, <%= asset.context.name %>. <%= asset.readable_size %>
+<% define_content :link do -%>
+<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/files/<%= asset.id %>
+<% end -%>
+<%= t('body', 'Canvas Alert - New File: %{title} (%{size}) for %{name}:', 
+        :title => asset.title,
+        :size => asset.readable_size,
+        :name => asset.context.name) %>

@@ -1,3 +1,27 @@
+/* @styleguide Icons
+
+### Icons in links
+
+```html
+<a class="icon-apple" href="whatever">Hello there</a>
+```
+
+### Icons in buttons links
+
+```html
+<a class="icon-instructure btn">Hello there</a>
+```
+
+### All icons
+
+<div>
+  <span><i class="icon-add"></i> icon-add</span> &nbsp; 
+  <span><i class="icon-settings"></i> icon-settings</span> &nbsp; 
+  <span><i class="icon-announcement"></i> icon-announcement</span> &nbsp; 
+  <span><i class="icon-discussion"></i> icon-discussion</span> &nbsp; 
+</div>
+*/
+
 // add icon font
 @font-face {
   font-family: 'canvasregular';

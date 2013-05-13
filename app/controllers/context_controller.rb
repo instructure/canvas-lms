@@ -303,10 +303,24 @@ class ContextController < ApplicationController
 
     if @context.is_a?(Course)
       sections = @context.course_sections.select([:id, :name])
-      all_roles = Role.custom_roles_and_counts_for_course(@context, @current_user)
+      all_roles = Role.role_data(@context, @current_user)
       js_env({
         :ALL_ROLES => all_roles,
-        :SECTIONS => sections.map { |s| { :id => s.id, :name => s.name } }
+        :SECTIONS => sections.map { |s| { :id => s.id, :name => s.name } },
+        :USER_LISTS_URL => polymorphic_path([@context, :user_lists], :format => :json),
+        :ENROLL_USERS_URL => course_enroll_users_url(@context),
+        :permissions => {
+          :manage_students => (manage_students = @context.grants_right?(@current_user, session, :manage_students)),
+          :manage_admin_users => (manage_admins = @context.grants_right?(@current_user, session, :manage_admin_users)),
+          :add_users => manage_students || manage_admins
+        },
+        :course => {
+          :completed => (completed = @context.completed?),
+          :soft_concluded => (soft_concluded = @context.soft_concluded?),
+          :concluded => completed || soft_concluded,
+          :teacherless => @context.teacherless?,
+          :available => @context.available?
+        }
       })
     elsif @context.is_a?(Group)
       @users         = @context.participating_users.order_by_sortable_name.uniq

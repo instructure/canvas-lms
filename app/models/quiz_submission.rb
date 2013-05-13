@@ -631,4 +631,5 @@ class QuizSubmission < ActiveRecord::Base
     date ? where("quiz_submissions.updated_at>?", date) : scoped
   }
   scope :for_user_ids, lambda { |user_ids| where(:user_id => user_ids) }
+  scope :completed, where(:workflow_state => %w(complete pending_review))
 end

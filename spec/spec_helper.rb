@@ -111,6 +111,16 @@ Spec::Matchers.define :encompass do |expected|
   end
 end
 
+Spec::Matchers.define :match_ignoring_whitespace do |expected|
+  def whitespaceless(str)
+    str.gsub(/\s+/, '')
+  end
+
+  match do |actual|
+    whitespaceless(actual) == whitespaceless(expected)
+  end
+end
+
 module MochaRspecAdapter
   include Mocha::API
   def setup_mocks_for_rspec
@@ -653,6 +663,21 @@ Spec::Runner.configure do |config|
     mo.context = opts[:context] || @user || @course
     mo.user = opts[:user] || @user
     mo.save!
+  end
+
+  def message(opts={})
+    m = Message.new
+    m.to = opts[:to] || 'some_user'
+    m.from = opts[:from] || 'some_other_user'
+    m.subject = opts[:subject] || 'a message for you'
+    m.body = opts[:body] || 'nice body'
+    m.sent_at = opts[:sent_at] || 5.days.ago
+    m.workflow_state = opts[:workflow_state] || 'sent'
+    m.user_id = opts[:user_id] || opts[:user].try(:id)
+    m.path_type = opts[:path_type] || 'email'
+    m.root_account_id = opts[:account_id] || Account.default.id
+    m.save!
+    m
   end
 
   def assert_status(status=500)

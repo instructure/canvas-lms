@@ -657,7 +657,7 @@ class ContextModule < ActiveRecord::Base
         begin
           import_from_migration(mod, migration.context)
         rescue
-          migration.add_warning("Couldn't import the module \"#{mod[:title]}\"", $!)
+          migration.add_import_warning(t('#migration.module_type', "Module"), mod[:title], $!)
         end
       end
     end
@@ -691,7 +691,8 @@ class ContextModule < ActiveRecord::Base
     item.unlock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:unlock_at]) if hash[:unlock_at]
     item.start_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:start_at]) if hash[:start_at]
     item.end_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:end_at]) if hash[:end_at]
-    
+    item.require_sequential_progress = hash[:require_sequential_progress] if hash[:require_sequential_progress]
+
     if hash[:prerequisites]
       preqs = []
       hash[:prerequisites].each do |prereq|
@@ -714,8 +715,7 @@ class ContextModule < ActiveRecord::Base
       begin
         item.add_item_from_migration(tag_hash, 0, context, item_map)
       rescue
-        message =t('broken_item', %{Couldn't import the module item "%{item_title}" in the module "%{module_title}"}, :item_title =>tag_hash[:title], :module_title => hash[:title] )
-        context.add_migration_warning(message, $!)
+        context.content_migration.add_import_warning(t(:migration_module_item_type, "Module Item"), tag_hash[:title], $!) if context.content_migration
       end
     end
     

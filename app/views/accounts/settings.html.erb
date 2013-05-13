@@ -195,6 +195,10 @@ TEXT
                   <%= settings.check_box :admins_can_change_passwords, :checked => @account.settings[:admins_can_change_passwords] == true %>
                   <%= settings.label :admins_can_change_passwords, :en => "Password setting by admins" %>
                 </div>
+                <div>
+                  <%= settings.check_box :admins_can_view_notifications, :checked => @account.settings[:admins_can_view_notifications] %>
+                  <%= settings.label :admins_can_view_notifications, :en => "Admins can view notifications" %>
+                </div>
                 <% unless @account.site_admin? %>
                   <div>
                     <%= f.check_box :enable_user_notes, :checked => @account.enable_user_notes %>

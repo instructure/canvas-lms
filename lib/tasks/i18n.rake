@@ -78,7 +78,7 @@ namespace :i18n do
 
 
     # Ruby
-    files = (Dir.glob('./*') - ['./vendor'] + ['./vendor/plugins'] - ['./guard', './tmp']).map { |d| Dir.glob("#{d}/**/*rb") }.flatten.
+    files = (Dir.glob('./*') - ['./vendor'] + ['./vendor/plugins/*'] - ['./guard', './tmp']).map { |d| Dir.glob("#{d}/**/*rb") }.flatten.
       reject{ |file| file =~ %r{\A\./(rb-fsevent|vendor/plugins/rails_xss|db|spec)/} }
     files &= only if only
     file_count = files.size
@@ -87,7 +87,11 @@ namespace :i18n do
       source = File.read(file)
       source = Erubis::Eruby.new(source).src if file =~ /\.erb\z/
 
-      sexps = RubyParser.new.parse(source)
+      # add a magic comment since that's the best way to convince RubyParser
+      # 3.x it should treat the source as utf-8 (it ignores the source string encoding)
+      # see https://github.com/seattlerb/ruby_parser/issues/101
+      # unforunately this means line numbers in error messages are off by one
+      sexps = RubyParser.for_current_ruby.parse("#encoding:utf-8\n#{source}")
       rb_extractor.scope = infer_scope(file)
       rb_extractor.in_html_view = (file =~ /\.(html|facebook)\.erb\z/)
       rb_extractor.process(sexps)

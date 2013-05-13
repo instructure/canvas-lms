@@ -1,8 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
-shared_examples_for "wiki and tiny selenium tests" do
-  it_should_behave_like "in-process server selenium tests"
-
   def clear_wiki_rce
     wiki_page_body = driver.find_element(:id, :wiki_page_body)
     wiki_page_body.clear
@@ -70,9 +67,7 @@ shared_examples_for "wiki and tiny selenium tests" do
   end
 
   def create_wiki_page(title, hfs, edit_roles)
-    p = @course.wiki.wiki_pages.create(:title => title, :hide_from_students => hfs, :editing_roles => edit_roles, :notify_of_update => true)
-    p.save!
-    p
+    @course.wiki.wiki_pages.create(:title => title, :hide_from_students => hfs, :editing_roles => edit_roles, :notify_of_update => true)
   end
 
   def select_all_wiki
@@ -133,4 +128,3 @@ shared_examples_for "wiki and tiny selenium tests" do
     get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
     wait_for_ajax_requests
   end
-end

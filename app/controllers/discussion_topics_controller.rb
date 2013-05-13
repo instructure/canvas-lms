@@ -225,6 +225,8 @@ class DiscussionTopicsController < ApplicationController
 
       @initial_post_required = @topic.initial_post_required?(@current_user, @context_enrollment, session)
 
+      @padless = true
+
       log_asset_access(@topic, 'topics', 'topics')
       respond_to do |format|
         if @topic.deleted?
@@ -413,6 +415,10 @@ class DiscussionTopicsController < ApplicationController
         @topic.delayed_post_at = "" if @topic.delayed_post_at && @topic.delayed_post_at < Time.now
         @topic.workflow_state = 'post_delayed' if @topic.delayed_post_at
         @topic.workflow_state = 'active' if @topic.post_delayed? && !@topic.delayed_post_at
+      end
+
+      if discussion_topic_hash.has_key?(:message)
+        discussion_topic_hash[:message] = process_incoming_html_content(discussion_topic_hash[:message])
       end
 
       #handle locking/unlocking

@@ -37,8 +37,24 @@ TEXT
     <p><%= t('help.no_modules', %{No modules have been defined for this course.}) %></p>
   <% end %>
 </div>
+<div class="hidden-readable" tabindex="0" aria-label="keyboard instructions">
+  <%= t('modules_keyboard_hint',
+        'To change the order of the course modules and module items,
+        first turn the cursor off on your screen reader. Insert-z in JAWS.
+        Press tab to select the first module.
+        Press up and down to choose a module or module item.
+        Press space to select the module or module item to start dragging.
+        Then press up and down to select a destination.
+        Then press space a second time to drop selection after destination.') %>
+</div>
+
+<% keyboard_navigation([
+   {:key => t('keycodes.next_module_item', 'Up'), :description => t('keycode_descriptions.next_module_item', 'Select next module or module item')},
+   {:key => t('keycodes.previous_module_item', 'Down'), :description => t('keycode_descriptions.previous_module_item', 'Select previous module or module item')},
+   {:key => t('keycodes.toggle_module_dragging', 'Space'), :description => t('keycode_descriptions.toggle_module_dragging', 'Select item to begin dragging, or drop previously selected item')}
+]) %>
 <div id="context_modules_sortable_container">
-  <div id="context_modules" class="<%= 'editable' if can_do(@context, @current_user, :manage_content) %>">
+  <div id="context_modules" tabindex="0" aria-label="<%= t('headings.course_modules', %{Course Modules}) %>" class="<%= 'editable' if can_do(@context, @current_user, :manage_content) %>">
     <% editable = can_do(@context, @current_user, :manage_grades) || can_do(@context, @current_user, :manage_content) %>
     <% cache([@context.cache_key, editable, 'all_context_modules', collection_cache_key(@modules)].join('/')) do %>
       <% ContextModule.send(:preload_associations, @modules, [:context_module_progressions, {:content_tags => :content}]) %>

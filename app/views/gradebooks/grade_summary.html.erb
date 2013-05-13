@@ -53,7 +53,9 @@
   </div>
 <% end %>
 
-<a class="btn btn-small print-grades" href="javascript:window.print()"><i class="icon-printer"></i> Print grades</a>
+<a class="btn btn-small print-grades icon-printer" href="javascript:window.print()">
+  <%= t :print_grades, "Print grades" %>
+</a>
 <h2>
 <% ot('headers.grades', "Grades For %{student}", :student => capture { %>
  <% unless @presenter.multiple_observed_students?  %>
@@ -105,11 +107,11 @@
 <table style="width: 100%;" id="grades_summary" class="<%= 'editable' if @presenter.editable? %>">
   <thead>
     <tr>
-      <th scope="row"><%= t('headers.name', "Name") %></th>
-      <th scope="row"><%= t('headers.due', "Due") %></th>
-      <th scope="row"><%= t('headers.score', "Score") %></th>
-      <th scope="row" style="text-align: right; white-space: nowrap;"><%= t('headers.out_of', "Out of") %></th>
-      <th scope="row"><span class="accessible_hide"><%= t('headers.details', "Details") %></span></th>
+      <th scope="col"><%= t('headers.name', "Name") %></th>
+      <th scope="col"><%= t('headers.due', "Due") %></th>
+      <th scope="col"><%= t('headers.score', "Score") %></th>
+      <th scope="col" style="text-align: right; white-space: nowrap;"><%= t('headers.out_of', "Out of") %></th>
+      <th scope="col"><span class="accessible_hide"><%= t('headers.details', "Details") %></span></th>
     </tr>
   </thead>
   <% @presenter.assignment_presenters.each do |assignment_presenter| %>
@@ -119,7 +121,7 @@
        can_view_distribution = can_do(@context, @current_user, :read_as_admin) || !assignment_presenter.hide_distribution_graphs?
     %>
     <tr class="student_assignment <%= 'assignment_graded' if assignment_presenter.graded? %> <%= assignment_presenter.special_class %>" data-muted="<%= assignment.muted? %>" id="<%= "submission_" + assignment.id.to_s %>">
-      <td class="title">
+      <th class="title" scope="row">
         <% if assignment_presenter.is_unread? %>
           <div class="unread-grade">&nbsp;</div>
         <% end %>
@@ -182,22 +184,22 @@
           </div>
         </div>
       </td>
-      <td class="possible points_possible" <%= "colspan='2'" if assignment.special_class %>><%= assignment.points_possible %></td>
+      <td class="possible points_possible" <%= "colspan='2'".html_safe if assignment.special_class %>><%= assignment.points_possible %></td>
       <% if !assignment.special_class %>
       <td style="padding-left: 10px; white-space: nowrap;">
-        <a href="#" class="toggle_comments_link tooltip" aria-role="button" aria-controls="grade_info_<%= assignment.id %>" title="<%= t(:view_comments, "View comments and scoring details") %>" style="<%= 'visibility: hidden;' unless assignment_presenter.has_comments? %>">
+        <a href="#" class="toggle_comments_link tooltip" <% if assignment_presenter.has_comments? %>aria-role="button" aria-controls="grade_info_<%= assignment.id %>"<% else %>aria-hidden='true' role='presentation' tabindex='-1'<% end %> title="<%= t(:view_comments, "View comments and scoring details") %>" style="<%= 'visibility: hidden;' unless assignment_presenter.has_comments? %>">
           <span class="tooltip_wrap right">
             <span class="tooltip_text"><%= t(:comment_count, "comment", :count => (submission.visible_submission_comments.size rescue 0)) %></span>
           </span>
           <i class="icon-discussion standalone-icon"></i>
         </a>
-        <a href="#" class="toggle_comments_link tooltip" aria-role="button" aria-controls="grade_info_<%= assignment.id %>" title="<%= t 'titles.view_scoring_details', 'View Scoring Details' %>" style="<%= 'visibility: hidden;' unless (assignment_presenter.has_scoring_details? && can_view_distribution) %>">
+        <a href="#" class="toggle_comments_link tooltip" <% if assignment_presenter.has_scoring_details? && can_view_distribution %>aria-role="button" aria-controls="grade_info_<%= assignment.id %>"<% else %>aria-hidden='true' role='presentation' tabindex='-1'<% end %> title="<%= t 'titles.view_scoring_details', 'View Scoring Details' %>" style="<%= 'visibility: hidden;' unless (assignment_presenter.has_scoring_details? && can_view_distribution) %>">
           <span class="tooltip_wrap right">
             <span class="tooltip_text"><%= t(:see_scoring_details, "See scoring details") %></span>
           </span>
           <i class="icon-check-plus standalone-icon"></i>
         </a>
-        <a href="#" class="toggle_rubric_assessments_link tooltip" title="<%= t 'titles.view_rubric_evaluation', 'View Rubric Evaluation' %>" style="<%= 'visibility: hidden;' if !assignment_presenter.has_rubric_assessments? %>">
+        <a href="#" class="toggle_rubric_assessments_link tooltip" <% if !assignment_presenter.has_rubric_assessments? %>aria-hidden='true' role='presentation' tabindex='-1'<% end %> title="<%= t 'titles.view_rubric_evaluation', 'View Rubric Evaluation' %>" style="<%= 'visibility: hidden;' if !assignment_presenter.has_rubric_assessments? %>">
           <span class="tooltip_wrap right">
             <span class="tooltip_text"><%= t(:see_rubric_results, "See rubric results") %></span>
           </span>

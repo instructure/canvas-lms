@@ -18,6 +18,7 @@
 
 class ContentMigration < ActiveRecord::Base
   include Workflow
+  include TextHelper
   belongs_to :context, :polymorphic => true
   belongs_to :user
   belongs_to :attachment
@@ -86,6 +87,11 @@ class ContentMigration < ActiveRecord::Base
     p.whenever {|record|
       record.changed_state(:failed) && !record.migration_settings[:skip_import_notification]
     }
+  end
+  
+  def self.migration_plugins(exclude_hidden=false)
+    plugins = Canvas::Plugin.all_for_tag(:export_system)
+    exclude_hidden ? plugins.select{|p|!p.meta[:hide_from_users]} : plugins
   end
 
   # the stream item context is decided by calling asset.context(user), i guess
@@ -205,6 +211,7 @@ class ContentMigration < ActiveRecord::Base
     end
     mi.error_message = opts[:error_message]
     mi.fix_issue_html_url = opts[:fix_issue_html_url]
+
     mi.save!
     
     mi
@@ -230,6 +237,11 @@ class ContentMigration < ActiveRecord::Base
       end
     end
     add_issue(user_message, :warning, opts)
+  end
+
+  def add_import_warning(item_type, item_name, warning)
+    item_name = truncate_text(item_name || "", :max_length => 150)
+    add_warning(t('errors.import_error', "Import Error: ") + "#{item_type} - \"#{item_name}\"", warning)
   end
 
   # deprecated warning format
@@ -479,5 +491,28 @@ class ContentMigration < ActiveRecord::Base
   def fast_update_progress(val)
     self.progress = val
     ContentMigration.where(:id => self).update_all(:progress=>val)
+  end
+
+  def add_missing_content_links(item)
+    @missing_content_links ||= {}
+    item[:field] ||= :text
+    key = "#{item[:class]}_#{item[:id]}_#{item[:field]}"
+    if item[:missing_links].present?
+      @missing_content_links[key] = item
+    else
+      @missing_content_links.delete(key)
+    end
+  end
+
+  def add_warnings_for_missing_content_links
+    return unless @missing_content_links
+    @missing_content_links.each_value do |item|
+      if item[:missing_links].any?
+        add_warning(t(:missing_content_links_title, "Missing links found in imported content") + " - #{item[:class]} #{item[:field]}",
+          {:error_message => "#{item[:class]} #{item[:field]} - " + t(:missing_content_links_message,
+            "The following references could not be resolved: ") + " " + item[:missing_links].join(', '),
+            :fix_issue_html_url => item[:url]})
+      end
+    end
   end
 end

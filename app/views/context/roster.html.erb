@@ -9,7 +9,6 @@
 <% content_for :right_side, render(:partial => 'context/roster_right_side') %>
 
 <% if @context.is_a?(Course) %>
-  <% jammit_css :roster %>
   <% js_bundle :roster %>
 <% else %>
   <% content_for :stylesheets do %>

@@ -42,7 +42,7 @@ class CountsReport
   def process
     start_time = Time.now
 
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+    Shackles.activate(:slave) do
       Shard.with_each_shard do
         Account.root_accounts.active.each do |account|
           next if account.external_status == 'test'
@@ -83,7 +83,7 @@ class CountsReport
             data[:media_files_size] *= 1000
           end
 
-          ActiveRecord::Base::ConnectionSpecification.with_environment(nil) do
+          Shackles.activate(:master) do
             detailed = account.report_snapshots.detailed.build
             detailed.created_at = @yesterday
             detailed.data = data

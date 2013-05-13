@@ -79,8 +79,8 @@ class ContentParticipationCount < ActiveRecord::Base
             where(submission_conditions).
             where("submissions.score IS NOT NULL").
             pluck(:id)
-        subs_with_comments = SubmissionComment.
-            joins(:submission => :assignment).
+        subs_with_comments = Submission.
+            joins(:assignment, :submission_comments).
             where(submission_conditions).
             where(<<-SQL, user).pluck(:id)
             (submission_comments.hidden IS NULL OR NOT submission_comments.hidden)

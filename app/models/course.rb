@@ -839,6 +839,11 @@ class Course < ActiveRecord::Base
     state :deleted
   end
 
+  def api_state
+    return 'unpublished' if workflow_state == 'created' || workflow_state == 'claimed'
+    workflow_state
+  end
+  
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
@@ -1371,8 +1376,12 @@ class Course < ActiveRecord::Base
   end
 
   def gradebook_to_csv(options = {})
+    # user: used for name in csv output
+    # course_section: used for display_name in csv output
+    # user > pseudonyms: used for sis_user_id/unique_id if options[:include_sis_id]
+    # user > pseudonyms > account: used in find_pseudonym_for_account > works_for_account
     includes = [:user, :course_section]
-    includes = {:user => :pseudonyms, :course_section => []} if options[:include_sis_id]
+    includes = {:user => {:pseudonyms => :account}, :course_section => []} if options[:include_sis_id]
     scope = options[:user] ? self.enrollments_visible_to(options[:user]) : self.student_enrollments
     student_enrollments = scope.includes(includes).order_by_sortable_name # remove duplicate enrollments for students enrolled in multiple sections
     student_enrollments = student_enrollments.all.uniq_by(&:user_id)
@@ -1921,6 +1930,8 @@ class Course < ActiveRecord::Base
       import_syllabus_from_migration(syllabus_body) if syllabus_body
     end
 
+    migration.add_warnings_for_missing_content_links
+
     begin
       #Adjust dates
       if bool_res(params[:copy][:shift_dates])
@@ -1972,7 +1983,11 @@ class Course < ActiveRecord::Base
   attr_accessor :folder_name_lookups, :attachment_path_id_lookup, :attachment_path_id_lookup_lower, :assignment_group_no_drop_assignments
 
   def import_syllabus_from_migration(syllabus_body)
-    self.syllabus_body = ImportedHtmlConverter.convert(syllabus_body, self)
+    missing_links = []
+    self.syllabus_body = ImportedHtmlConverter.convert(syllabus_body, self, {:missing_links => missing_links})
+    self.content_migration.add_missing_content_links(:class => self.class.to_s,
+      :id => self.id, :field => "syllabus", :missing_links => missing_links,
+      :url => "/#{self.class.to_s.underscore.pluralize}/#{self.id}/assignments/syllabus")
   end
 
   def import_settings_from_migration(data, migration)
@@ -2679,7 +2694,7 @@ class Course < ActiveRecord::Base
     default_tabs = Course.default_tabs
     opts.reverse_merge!(:include_external => true)
 
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+    Shackles.activate(:slave) do
       # We will by default show everything in default_tabs, unless the teacher has configured otherwise.
       tabs = self.tab_configuration.compact
       settings_tab = default_tabs[-1]

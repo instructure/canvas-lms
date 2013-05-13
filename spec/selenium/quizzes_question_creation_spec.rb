@@ -5,6 +5,8 @@ describe "quizzes question creation" do
 
   before (:each) do
     course_with_teacher_logged_in
+    @course.root_account.settings = { :file_upload_quiz_questions => true}
+    @course.root_account.save!
     @last_quiz = start_quiz_question
   end
 
@@ -255,6 +257,17 @@ describe "quizzes question creation" do
     finished_question = f("#question_#{quiz.quiz_questions[0].id}")
     finished_question.should_not be_nil
     finished_question.find_element(:css, '.text').should include_text('This is an essay question.')
+  end
+
+  it "should create a quiz question with a file upload question" do
+    quiz = @last_quiz
+
+    create_file_upload_question
+
+    quiz.reload
+    finished_question = f("#question_#{quiz.quiz_questions[0].id}")
+    finished_question.should_not be_nil
+    finished_question.find_element(:css, '.text').should include_text('This is a file upload question.')
   end
 
   it "should create a quiz question with a text question" do

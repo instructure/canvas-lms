@@ -626,6 +626,17 @@ describe CalendarEventsApiController, :type => :integration do
       json['title'].should eql 'ohai'
     end
 
+    it 'should process html content in description on create' do
+      should_process_incoming_user_content(@course) do |content|
+        json = api_call(:post, "/api/v1/calendar_events",
+                        { :controller => 'calendar_events_api', :action => 'create', :format => 'json' },
+                        { :calendar_event => {:context_code => @course.asset_string, :title => "ohai", :description => content} })
+
+        event = CalendarEvent.find(json['id'])
+        event.description
+      end
+    end
+
     it 'should update an event' do
       event = @course.calendar_events.create(:title => 'event', :start_at => '2012-01-08 12:00:00')
 
@@ -635,6 +646,19 @@ describe CalendarEventsApiController, :type => :integration do
       json.keys.sort.should eql expected_fields
       json['title'].should eql 'ohai'
       json['start_at'].should eql '2012-01-09T12:00:00Z'
+    end
+
+    it 'should process html content in description on update' do
+      event = @course.calendar_events.create(:title => 'event', :start_at => '2012-01-08 12:00:00')
+
+      should_process_incoming_user_content(@course) do |content|
+        json = api_call(:put, "/api/v1/calendar_events/#{event.id}",
+          { :controller => 'calendar_events_api', :action => 'update', :id => event.id.to_s, :format => 'json' },
+          { :calendar_event => {:start_at => '2012-01-09 12:00:00', :description => content} })
+
+        event.reload
+        event.description
+      end
     end
 
     it 'should delete an event' do
@@ -666,6 +690,16 @@ describe CalendarEventsApiController, :type => :integration do
         cal = Icalendar.parse(response.body.dup)[0]
         cal.events[0].x_alt_desc
       end
+    end
+
+    it "should omit assignment description in ics" do
+      HostUrl.stubs(:default_host).returns('www.example.com')
+      assignment_model(description: "secret stuff here")
+      get "/feeds/calendars/#{@course.feed_code}.ics"
+      response.should be_success
+      cal = Icalendar.parse(response.body.dup)[0]
+      cal.events[0].description.should == nil
+      cal.events[0].x_alt_desc.should == nil
     end
 
     context "child_events" do

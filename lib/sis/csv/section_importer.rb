@@ -16,11 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'lib/sis/csv/base_importer'
-
 module SIS
   module CSV
-    class SectionImporter < BaseImporter
+    class SectionImporter < CSVBaseImporter
 
       def self.is_section_csv?(row)
         #This matcher works because an enrollment doesn't have name

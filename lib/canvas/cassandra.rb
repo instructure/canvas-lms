@@ -1,3 +1,4 @@
+# encoding: utf-8
 #
 # Copyright (C) 2012 Instructure, Inc.
 #
@@ -148,6 +149,14 @@ module Canvas::Cassandra
       end
     end
 
+    # same as update_record, but preferred when doing inserts -- it skips
+    # updating columns with nil values, rather than creating tombstone delete
+    # records for them
+    def insert_record(table_name, primary_key_attrs, changes)
+      changes = changes.reject { |k,v| v.is_a?(Array) ? v.last.nil? : v.nil? }
+      update_record(table_name, primary_key_attrs, changes)
+    end
+
     def select_value(query, *args)
       result_row = execute(query, *args).fetch
       result_row && result_row.to_hash.values.first
@@ -157,13 +166,22 @@ module Canvas::Cassandra
       @db.keyspaces.find { |k| k.name == @db.keyspace }
     end
 
+    # returns a CQL snippet and list of arguments given a hash of conditions
+    # e.g.
+    # build_where_conditions(name: "foo", state: "ut")
+    # => ["name = ? AND state = ?", ["foo", "ut"]]
+    def build_where_conditions(conditions)
+      where_args = []
+      where_clause = conditions.sort_by { |k,v| k.to_s }.map { |k,v| where_args << v; "#{k} = ?" }.join(" AND ")
+      return where_clause, where_args
+    end
+
     protected
 
     def do_update_record(table_name, primary_key_attrs, changes)
-      where_args = []
       primary_key_attrs = primary_key_attrs.with_indifferent_access
       changes = changes.with_indifferent_access
-      where_clause = primary_key_attrs.sort_by { |k,v| k.to_s }.map { |k,v| where_args << v; "#{k} = ?" }.join(" AND ")
+      where_clause, where_args = build_where_conditions(primary_key_attrs)
 
       primary_key_attrs.each do |key,value|
         if changes[key].is_a?(Array) && !changes[key].first.nil?

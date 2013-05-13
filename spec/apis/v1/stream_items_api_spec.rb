@@ -281,6 +281,7 @@ describe UsersController, :type => :integration do
       'updated_at' => StreamItem.last.updated_at.as_json,
       'grade' => '12',
       'grader_id' => @teacher.id,
+      'graded_at' => @sub.graded_at.as_json,
       'score' => 12,
       'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}",
       'workflow_state' => 'graded',
@@ -308,6 +309,7 @@ describe UsersController, :type => :integration do
         'author_name' => 'teacher',
         'author_id' => @teacher.id,
         'created_at' => @sub.submission_comments[0].created_at.as_json,
+        'id' => @sub.submission_comments[0].id
       },
       {
         'body' => 'c2',
@@ -321,6 +323,7 @@ describe UsersController, :type => :integration do
         'author_name' => 'User',
         'author_id' => @user.id,
         'created_at' => @sub.submission_comments[1].created_at.as_json,
+        'id' => @sub.submission_comments[1].id
       },],
 
       'course' => {
@@ -334,7 +337,8 @@ describe UsersController, :type => :integration do
         'hide_final_grades' => false,
         'html_url' => course_url(@course, :host => HostUrl.context_host(@course)),
         'default_view' => 'feed',
-        'workflow_state' => 'available'
+        'workflow_state' => 'available',
+        'public_syllabus' => false,
       },
 
       'user' => {
@@ -369,6 +373,7 @@ describe UsersController, :type => :integration do
       'updated_at' => StreamItem.last.updated_at.as_json,
       'grade' => nil,
       'grader_id' => nil,
+      'graded_at' => nil,
       'score' => nil,
       'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}",
       'workflow_state' => 'unsubmitted',
@@ -397,6 +402,7 @@ describe UsersController, :type => :integration do
         'author_name' => 'teacher',
         'author_id' => @teacher.id,
         'created_at' => @sub.submission_comments[0].created_at.as_json,
+        'id' => @sub.submission_comments[0].id
       },
       {
         'body' => 'c2',
@@ -410,6 +416,7 @@ describe UsersController, :type => :integration do
         'author_name' => 'User',
         'author_id' => @user.id,
         'created_at' => @sub.submission_comments[1].created_at.as_json,
+        'id' => @sub.submission_comments[1].id
       },],
 
       'course' => {
@@ -423,7 +430,8 @@ describe UsersController, :type => :integration do
         'hide_final_grades' => false,
         'html_url' => course_url(@course, :host => HostUrl.context_host(@course)),
         'default_view' => 'feed',
-        'workflow_state' => 'available'
+        'workflow_state' => 'available',
+        'public_syllabus' => false,
       },
 
       'user' => {

@@ -30,59 +30,6 @@ class MessageableUser
       @user = user
     end
 
-    # convenience module versions of the primary three methods
-    def self.load_messageable_users(viewing_user, target_users, options={})
-      new(viewing_user).load_messageable_users(target_users, options)
-    end
-
-    def self.load_messageable_user(viewing_user, target_user, options={})
-      new(viewing_user).load_messageable_user(target_user, options)
-    end
-
-    def self.messageable_users_in_context(viewing_user, asset_string)
-      new(viewing_user).messageable_users_in_context(asset_string)
-    end
-
-    def self.count_messageable_users_in_context(viewing_user, asset_string)
-      new(viewing_user).count_messageable_users_in_context(asset_string)
-    end
-
-    def self.messageable_users_in_course(viewing_user, course_or_id)
-      new(viewing_user).messageable_users_in_course(course_or_id)
-    end
-
-    def self.count_messageable_users_in_course(viewing_user, course_or_id)
-      new(viewing_user).count_messageable_users_in_course(course_or_id)
-    end
-
-    def self.messageable_users_in_section(viewing_user, section_or_id)
-      new(viewing_user).messageable_users_in_section(section_or_id)
-    end
-
-    def self.count_messageable_users_in_section(viewing_user, section_or_id)
-      new(viewing_user).count_messageable_users_in_section(section_or_id)
-    end
-
-    def self.messageable_users_in_group(viewing_user, group_or_id)
-      new(viewing_user).messageable_users_in_group(group_or_id)
-    end
-
-    def self.count_messageable_users_in_group(viewing_user, group_or_id)
-      new(viewing_user).count_messageable_users_in_group(group_or_id)
-    end
-
-    def self.search_messageable_users(viewing_user, options={})
-      new(viewing_user).search_messageable_users(options)
-    end
-
-    def self.messageable_sections(viewing_user)
-      new(viewing_user).messageable_sections
-    end
-
-    def self.messageable_groups(viewing_user)
-      new(viewing_user).messageable_groups
-    end
-
     # Takes a list of Users (or ids, or MessageableUsers) and:
     #
     #  * turns them into MessageableUsers if they weren't already

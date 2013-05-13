@@ -1305,7 +1305,7 @@ class User < ActiveRecord::Base
   end
 
   def assignments_needing_submitting(opts={})
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+    Shackles.activate(:slave) do
       course_ids = if opts[:contexts]
         (Array(opts[:contexts]).map(&:id) &
          current_student_enrollment_course_ids)
@@ -1339,7 +1339,7 @@ class User < ActiveRecord::Base
   end
 
   def assignments_needing_grading(opts={})
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+    Shackles.activate(:slave) do
       course_ids = if opts[:contexts]
         (Array(opts[:contexts]).map(&:id) &
         current_admin_enrollment_course_ids)
@@ -1640,7 +1640,7 @@ class User < ActiveRecord::Base
     opts[:start_at] ||= 2.weeks.ago
     opts[:limit] ||= 20
 
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+    Shackles.activate(:slave) do
       submissions = []
       submissions += self.submissions.after(opts[:start_at]).for_context_codes(context_codes).find(
         :all,
@@ -1735,7 +1735,7 @@ class User < ActiveRecord::Base
   # NOTE: excludes submission stream items
   def recent_stream_items(opts={})
     self.shard.activate do
-      ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+      Shackles.activate(:slave) do
         visible_instances = visible_stream_item_instances(opts).
             includes(:stream_item).
             limit(Setting.get('recent_stream_item_limit', 100))
@@ -1887,13 +1887,21 @@ class User < ActiveRecord::Base
   end
   memoize :manageable_appointment_context_codes
 
-  def conversation_context_codes
-    Rails.cache.fetch([self, 'conversation_context_codes4'].cache_key, :expires_in => 1.day) do
+  # Public: Return an array of context codes this user belongs to.
+  #
+  # include_concluded_codes - If true, include concluded courses (default: true).
+  #
+  # Returns an array of context code strings.
+  def conversation_context_codes(include_concluded_codes = true)
+    Rails.cache.fetch([self, include_concluded_codes, 'conversation_context_codes4'].cache_key, :expires_in => 1.day) do
       Shard.default.activate do
-        ( courses.with_each_shard.map{ |c| "course_#{c.id}" } +
-          concluded_courses.with_each_shard.map{ |c| "course_#{c.id}" } +
-          current_groups.with_each_shard.map{ |g| "group_#{g.id}"}
-        ).uniq
+        associations = %w{courses concluded_courses current_groups}
+        associations.slice!(1) unless include_concluded_codes
+
+        associations.inject([]) do |result, association|
+          association_type = association.split('_')[-1].slice(0..-2)
+          result.concat(send(association).with_each_shard.map { |x| "#{association_type}_#{x.id}" })
+        end.uniq
       end
     end
   end
@@ -1999,56 +2007,60 @@ class User < ActiveRecord::Base
     Conversation.initiate(users, private).conversation_participants.find_by_user_id(self)
   end
 
+  def messageable_user_calculator
+    @messageable_user_calculator ||= MessageableUser::Calculator.new(self)
+  end
+
   def load_messageable_user(user, options={})
-    MessageableUser::Calculator.load_messageable_user(self, user, options)
+    messageable_user_calculator.load_messageable_user(user, options)
   end
 
   def load_messageable_users(users, options={})
-    MessageableUser::Calculator.load_messageable_users(self, users, options)
+    messageable_user_calculator.load_messageable_users(users, options)
   end
 
   def messageable_users_in_context(asset_string)
-    MessageableUser::Calculator.messageable_users_in_context(self, asset_string)
+    messageable_user_calculator.messageable_users_in_context(asset_string)
   end
 
   def count_messageable_users_in_context(asset_string)
-    MessageableUser::Calculator.count_messageable_users_in_context(self, asset_string)
+    messageable_user_calculator.count_messageable_users_in_context(asset_string)
   end
 
   def messageable_users_in_course(course_or_id)
-    MessageableUser::Calculator.messageable_users_in_course(self, course_or_id)
+    messageable_user_calculator.messageable_users_in_course(course_or_id)
   end
 
   def count_messageable_users_in_course(course_or_id)
-    MessageableUser::Calculator.count_messageable_users_in_course(self, course_or_id)
+    messageable_user_calculator.count_messageable_users_in_course(course_or_id)
   end
 
   def messageable_users_in_section(section_or_id)
-    MessageableUser::Calculator.messageable_users_in_section(self, section_or_id)
+    messageable_user_calculator.messageable_users_in_section(section_or_id)
   end
 
   def count_messageable_users_in_section(section_or_id)
-    MessageableUser::Calculator.count_messageable_users_in_section(self, section_or_id)
+    messageable_user_calculator.count_messageable_users_in_section(section_or_id)
   end
 
   def messageable_users_in_group(group_or_id)
-    MessageableUser::Calculator.messageable_users_in_group(self, group_or_id)
+    messageable_user_calculator.messageable_users_in_group(group_or_id)
   end
 
   def count_messageable_users_in_group(group_or_id)
-    MessageableUser::Calculator.count_messageable_users_in_group(self, group_or_id)
+    messageable_user_calculator.count_messageable_users_in_group(group_or_id)
   end
 
   def search_messageable_users(options={})
-    MessageableUser::Calculator.search_messageable_users(self, options)
+    messageable_user_calculator.search_messageable_users(options)
   end
 
   def messageable_sections
-    MessageableUser::Calculator.messageable_sections(self)
+    messageable_user_calculator.messageable_sections
   end
 
   def messageable_groups
-    MessageableUser::Calculator.messageable_groups(self)
+    messageable_user_calculator.messageable_groups
   end
 
   def short_name_with_shared_contexts(user)

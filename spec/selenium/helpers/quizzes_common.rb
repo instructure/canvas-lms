@@ -59,6 +59,18 @@ shared_examples_for "quizzes selenium tests" do
     wait_for_ajaximations
   end
 
+  def create_file_upload_question
+    question = fj(".question_form:visible")
+    click_option('.question_form:visible .question_type', 'File Upload Question')
+
+    replace_content(question.find_element(:css, "input[name='question_points']"), '4')
+
+    type_in_tiny '.question_form:visible textarea.question_content', 'This is a file upload question.'
+
+    submit_form(question)
+    wait_for_ajaximations
+  end
+
   def add_quiz_question(points)
     click_questions_tab
     @points_total += points.to_i
@@ -75,7 +87,7 @@ shared_examples_for "quizzes selenium tests" do
     f(".points_possible").text.should == @points_total.to_s
   end
 
-  def quiz_with_new_questions
+  def quiz_with_new_questions(goto_edit=true)
     @context = @course
     bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
     @q = quiz_model
@@ -90,7 +102,7 @@ shared_examples_for "quizzes selenium tests" do
 
     @q.generate_quiz_data
     @q.save!
-    get "/courses/#{@course.id}/quizzes/#{@q.id}/edit"
+    get "/courses/#{@course.id}/quizzes/#{@q.id}/edit" if goto_edit
     @q
   end
 
@@ -122,7 +134,7 @@ shared_examples_for "quizzes selenium tests" do
   end
 
   def take_quiz
-    @quiz ||= quiz_with_new_questions
+    @quiz ||= quiz_with_new_questions(!:goto_edit)
 
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@user.id}"
     expect_new_page_load { driver.find_element(:link_text, 'Take the Quiz').click }

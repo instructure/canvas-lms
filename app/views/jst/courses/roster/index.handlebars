@@ -14,10 +14,24 @@
   >
     <option value="">{{#t "all_roles"}}All Roles{{/t}}</option>
     {{#each roles}}
-    <option value="{{name}}">{{plural_label}}</option>
+    <option value="{{name}}">{{label}}</option>
     {{/each}}
   </select>
+
+  {{#if permissions.add_users}}
+    {{#if course.concluded}}
+    <a class="btn" title='{{#t "cannot_add_users"}}New users can not be added because this course is concluded{{/t}}' disabled data-tooltip>
+    {{else}}
+    <a
+      class="btn btn-primary pull-right icon-add"
+      id="addUsers"
+      title='{{#t "add_people"}}Add People{{/t}}'
+    >{{#t "add_people"}}Add People{{/t}}</a>
+    {{/if}}
+  {{/if}}
 </div>
+
+<form data-view="createUsers" class="form-dialog"></form>
 
 <div data-view="users" class="v-gutter"></div>
 

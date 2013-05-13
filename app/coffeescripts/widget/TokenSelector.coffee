@@ -184,7 +184,7 @@ define [
       @select(null)
 
     blur: ->
-      @close()
+      @close() unless @$container.find(':focus').length > 0
 
     listExpanded: ->
       if @stack.length then true else false
@@ -206,6 +206,7 @@ define [
       @stack.push [@selection, @list]
       @clear()
       @$menu.css('width', ((@stack.length + 1) * 100) + '%')
+
       @uiLocked = true
       list = @listForQuery(@preparePost())
       list.insertAfter(@list)
@@ -260,11 +261,10 @@ define [
             $parentNode.removeClass('on')
           @updateSelectAll($parentNode, offset)
 
-    select: ($node, preserveMode = false) ->
+    select: ($node, preserveMode = false) =>
       return if $node?[0] is @selection?[0]
-      @selection?.removeClass('active')
       @selection = if $node?.length
-        $node.addClass('active')
+        $node.focus()
         $node.scrollIntoView(ignore: {border: on})
         $node
       else

@@ -442,7 +442,7 @@ class ConversationParticipant < ActiveRecord::Base
   def self.conversation_ids
     raise "conversation_ids needs to be scoped to a user" unless scope(:find, :conditions) =~ /user_id = \d+/
     order = 'last_message_at DESC' unless scoped?(:find, :order)
-    self.order(order).pluck(:conversation_id)
+    self.order(order).except(:includes).select(:conversation_id).map(&:conversation_id)
   end
 
   def self.users_by_conversation_shard(user_ids)

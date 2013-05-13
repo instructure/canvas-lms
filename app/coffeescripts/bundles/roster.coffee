@@ -16,16 +16,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 require [
+  'compiled/models/CreateUserList'
+  'compiled/views/courses/roster/CreateUsersView'
   'compiled/views/SelectView'
   'jst/courses/roster/rosterUsers'
   'compiled/collections/RosterUserCollection'
   'compiled/collections/SectionCollection'
   'compiled/views/InputFilterView'
   'compiled/views/PaginatedCollectionView'
-  'compiled/views/courses/RosterUserView'
-  'compiled/views/courses/RosterView'
+  'compiled/views/courses/roster/RosterUserView'
+  'compiled/views/courses/roster/RosterView'
   'jquery'
-], (SelectView, rosterUsersTemplate, RosterUserCollection, SectionCollection, InputFilterView, PaginatedCollectionView, RosterUserView, RosterView, $) ->
+], (CreateUserList, CreateUsersView, SelectView, rosterUsersTemplate, RosterUserCollection, SectionCollection, InputFilterView, PaginatedCollectionView, RosterUserView, RosterView, $) ->
 
   fetchOptions =
     include: ['avatar_url', 'enrollments', 'email']
@@ -43,12 +45,20 @@ require [
     template: rosterUsersTemplate
   roleSelectView = new SelectView
     collection: users
+  createUsersView = new CreateUsersView
+    model: new CreateUserList
+      sections: ENV.SECTIONS
+      roles: ENV.ALL_ROLES
+      readURL: ENV.USER_LISTS_URL
+      updateURL: ENV.ENROLL_USERS_URL
   @app = new RosterView
     usersView: usersView
     inputFilterView: inputFilterView
     roleSelectView: roleSelectView
+    createUsersView: createUsersView
     collection: users
     roles: ENV.ALL_ROLES
+    permissions: ENV.permissions
 
   @app.render()
   @app.$el.appendTo $('#content')
