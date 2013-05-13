@@ -45,13 +45,21 @@ define [
       frozenAttributes: @parentModel.frozenAttributes()
       nested: @nested
 
+    fieldSelectors:
+      assignmentGroupSelector: '#assignment_group_id'
+
     validateBeforeSave: (data, errors) =>
       errors = @_validateAssignmentGroupId data, errors
       errors
 
     _validateAssignmentGroupId: (data, errors) =>
-      if data.assignment_group_id == 'new'
-        errors["'assignment_group_id'"] = [
+      agid = if @nested
+        data.assignment.assignmentGroupId()
+      else
+        data.assignment_group_id
+
+      if agid == 'new'
+        errors["assignmentGroupSelector"] = [
           message: I18n.t 'assignment_group_must_have_group', 'Please select an assignment group for this assignment'
         ]
       errors

@@ -27,6 +27,6 @@ class Ignore < ActiveRecord::Base
   def self.cleanup
     # This may need an index in the future. right now it's just a table scan,
     # cause I have no idea how many ignores are created
-    Ignore.delete_all(["updated_at<?", Time.now.utc - 6.months])
+    Ignore.where("updated_at<?", 6.months.ago).delete_all
   end
 end

@@ -35,8 +35,7 @@ define [
             context: "course_#{ENV.COURSE_ID}_students"
             exclude: [@model.get('id')]
             skip_visibility_checks: true
-          preparer: (postData, data, parent) ->
-            row.noExpand = true for row in data
+          noExpand: true
           browser:
             data:
               per_page: 100

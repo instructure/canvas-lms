@@ -1,5 +1,8 @@
 @import environment.sass
 
+#wrapper-container
+  min-width: 1150px
+
 .scheduler-mode
   .fc-event
     opacity: 0.7
@@ -9,11 +12,19 @@
 
 .scheduler-content
   padding: 1em
-  background-color: $main_background_color
+  background-color: $bodyBackground
   border: 1px solid $listBorderColor
+  margin-left: 0px
+  h3
+    margin-top: 0px
+
 .scheduler-header
   min-height: 27px
   margin-bottom: 10px
+
+.scheduler-wrapper
+  /* extra padding stops final dropdown from getting cut off */
+  padding-bottom: 25px
 
 /* the 'button' part is to beat g_util_button's specificity */
 button.single_item_done_button
@@ -36,6 +47,8 @@ button.single_item_done_button
   list-style: none
 #appointment-group-list-header
   font-size: 18px
+  line-height: 32px
+  margin-top: 0px
 .appointment-group-item
   border-top: 1px solid #ccc
   min-height: 68px
@@ -46,6 +59,10 @@ button.single_item_done_button
   .alert
     float: right
     width: auto
+    padding: 4px 10px
+    margin-right: 5px
+    a
+      text-decoration: underline
   &:first-child
     border-top: none
 .unpublished-ag
@@ -63,10 +80,12 @@ button.single_item_done_button
   max-height: 150px
   overflow-x: hidden
   margin-bottom: 10px
+  padding-top: 10px
 
 .time-block-list-header, .time-block-list-body-wrapper
   width: 100%
   border-bottom: 1px solid #DDD
+  padding-bottom: 10px
 .time-block-list-body
   width: 100%
 .time-block-list
@@ -78,8 +97,8 @@ button.single_item_done_button
   .time-range-column
     width: 130px
 
-  $date_column_width: 140px
-  $time_column_width: 70px
+  $date_column_width: 200px
+  $time_column_width: 95px
 
   .date-column
     width: $date_column_width
@@ -89,14 +108,16 @@ button.single_item_done_button
   .separator-column
     width: 6px
     text-align: center
+    line-height: 28px
   .end-time-column
     width: $time_column_width
     text-align: center
 
   .date_field
-    width: $date_column_width - 5 - 20
+    width: $date_column_width - 80
   .time_field
-    width: $time_column_width - 10
+    text-align: right
+    width: $time_column_width - 30
 
   .error
     border: 1px solid #EE5F5B
@@ -130,6 +151,9 @@ button.single_item_done_button
     margin: 0
     padding: 0
 
+  .right-column-wrapper
+    width: 380px
+
 .ag_contexts_selector
   width: 225px
 .ag-menu-container
@@ -145,6 +169,8 @@ button.single_item_done_button
   +reset_list
   max-height: 150px
   overflow-y: auto
+  label
+    margin-bottom: 0
 .ag_sections
   +reset_list
   padding-left: 35px
@@ -160,20 +186,13 @@ button.single_item_done_button
 
 .ag_contexts_done
   float: right
-
-.hidden
-  display: none
+  margin:  5px 5px 0 0
 
 .delete-block-link
-  +accessible_text_replacement
   display: block
   float: right
-  background: url(/images/jqueryui/icon_sprite.png) 0px -16px no-repeat
-  width: 16px
-  height: 16px
-  margin-top: 4px
-  &:focus, &:hover
-    background-position: -16px -16px
+  color: black
+  line-height: 28px
 
 .left-column-wrapper
   width: 250px
@@ -186,9 +205,19 @@ button.single_item_done_button
 .details-wrapper
   clear: both
 
+.splitter
+  input[type="number"], .split-link.btn
+    vertical-align: baseline
+  .split-link
+    margin-right: 3px
 .ag-options
   margin: 0
   padding: 0
+
+  input[type="checkbox"]
+    vertical-align: 1px
+  input[type="checkbox"] + label, input[type="number"]
+    vertical-align: baseline
 
 .ag-options li
   list-style-type: none

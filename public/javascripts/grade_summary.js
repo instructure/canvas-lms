@@ -22,13 +22,14 @@ define([
   'jquery' /* $ */,
   'underscore',
   'compiled/grade_calculator',
+  'compiled/util/round',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_forms' /* getFormData */,
   'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar */,
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'media_comments' /* mediaComment, mediaCommentThumbnail */
-], function(INST, I18n, $, _, GradeCalculator) {
+], function(INST, I18n, $, _, GradeCalculator, round) {
 
   function updateStudentGrades() {
     var ignoreUngradedSubmissions = $("#only_consider_graded_assignments").attr('checked');
@@ -56,7 +57,7 @@ define([
         grade = Math.round((score / possible) * 1000) / 10;
       }
       return grade;
-    }
+    };
 
     for (var i = 0; i < calculatedGrades.group_sums.length; i++) {
       var groupSum = calculatedGrades.group_sums[i];
@@ -65,12 +66,19 @@ define([
       $groupRow.find('.grade').text(
         calculateGrade(groupGradeInfo.score, groupGradeInfo.possible)
       );
+      $groupRow.find('.score_teaser').text(
+        round(groupGradeInfo.score, 2) + ' / ' + round(groupGradeInfo.possible, 2)
+      );
     }
 
     var finalScore = calculatedGrades[currentOrFinal].score;
     var finalPossible = calculatedGrades[currentOrFinal].possible;
     var finalGrade = calculateGrade(finalScore, finalPossible);
-    $(".student_assignment.final_grade .grade").text(finalGrade);
+    var $finalGradeRow = $(".student_assignment.final_grade");
+    $finalGradeRow.find(".grade").text(finalGrade);
+    $finalGradeRow.find(".score_teaser").text(
+      round(finalScore, 2) + ' / ' + round(finalPossible, 2)
+    );
 
     if(window.grading_scheme) {
       $(".final_letter_grade .grade").text(GradeCalculator.letter_grade(grading_scheme, finalGrade));
@@ -211,9 +219,9 @@ define([
     });
     $("#grades_summary:not(.editable) .assignment_score").css('cursor', 'default');
     $("#grades_summary tr").hover(function() {
-      $(this).find("td.title .context").addClass('context_hover');
+      $(this).find("th.title .context").addClass('context_hover');
     }, function() {
-      $(this).find("td.title .context").removeClass('context_hover');
+      $(this).find("th.title .context").removeClass('context_hover');
     });
     $(".show_guess_grades_link").click(function(event) {
       $("#grades_summary .student_entered_score").each(function() {
@@ -239,8 +247,13 @@ define([
       var $parent = $(this).parents(".comment_media"),
           comment_id = $parent.getTemplateData({textValues: ['media_comment_id']}).media_comment_id;
       if(comment_id) {
+        var mediaType = 'any';
+        if ($(this).hasClass('video_comment'))
+          mediaType = 'video';
+        else if ($(this).hasClass('audio_comment'))
+          mediaType = 'audio';
         $parent.children(":not(.media_comment_content)").remove();
-        $parent.find(".media_comment_content").mediaComment('show_inline', comment_id, 'any');
+        $parent.find(".media_comment_content").mediaComment('show_inline', comment_id, mediaType);
       }
     });
     $("#only_consider_graded_assignments").change(function() {

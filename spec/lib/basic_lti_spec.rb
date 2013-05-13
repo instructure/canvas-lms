@@ -123,6 +123,7 @@ describe BasicLTI do
       hash['custom_canvas_user_id'].should == @user.id.to_s
       hash['custom_canvas_user_login_id'].should == @user.pseudonyms.first.unique_id
       hash['custom_canvas_course_id'].should == @course.id.to_s
+      hash['custom_canvas_api_domain'].should == @course.root_account.domain
       hash['lis_course_offering_sourcedid'].should == 'coursesis'
       hash['lis_person_contact_email_primary'].should == 'nobody@example.com'
       hash['lis_person_name_full'].should == 'A Name'
@@ -134,7 +135,7 @@ describe BasicLTI do
       hash['launch_presentation_width'].should == '600'
       hash['launch_presentation_height'].should == '400'
       hash['launch_presentation_return_url'].should == 'http://www.google.com'
-      hash['tool_consumer_instance_guid'].should == @course.root_account.uuid
+      hash['tool_consumer_instance_guid'].should == @course.root_account.lti_guid
       hash['tool_consumer_instance_name'].should == @course.root_account.name
       hash['tool_consumer_instance_contact_email'].should == HostUrl.outgoing_email_address
       hash['tool_consumer_info_product_family_code'].should == 'canvas'
@@ -174,6 +175,7 @@ describe BasicLTI do
       hash['custom_canvas_account_sis_id'] = 'accountsis'
       hash['lis_person_sourcedid'].should == 'testfun'
       hash['custom_canvas_user_id'].should == @user.id.to_s
+      hash['tool_consumer_instance_guid'].should == sub_account.root_account.lti_guid
     end
     
     it "should include URI query parameters" do
@@ -192,7 +194,7 @@ describe BasicLTI do
       course_with_teacher(:active_all => true)
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :custom_fields => {'custom_bob' => 'bob', 'custom_fred' => 'fred', 'john' => 'john', '@$TAA$#$#' => 123}, :name => 'tool')
       hash = BasicLTI.generate(:url => 'http://www.yahoo.com', :tool => @tool, :user => @user, :context => @course, :link_code => '123456', :return_url => 'http://www.yahoo.com')
-      hash.keys.select{|k| k.match(/^custom_/) }.sort.should == ['custom___taa____', 'custom_bob', 'custom_fred', 'custom_john']
+      hash.keys.select{|k| k.match(/^custom_/) }.sort.should == ['custom___taa____', 'custom_bob', 'custom_canvas_enrollment_state', 'custom_fred', 'custom_john']
       hash['custom_bob'].should eql('bob')
       hash['custom_fred'].should eql('fred')
       hash['custom_john'].should eql('john')
@@ -266,7 +268,7 @@ describe BasicLTI do
   end
 
   context "sharding" do
-    it_should_behave_like "sharding"
+    specs_require_sharding
 
     it "should roundtrip source ids from mixed shards" do
       @shard1.activate do
@@ -285,6 +287,105 @@ describe BasicLTI do
       course.should == @course
       assignment.should == @assignment
       user.should == @user
+    end
+  end
+
+  context "lti_role_types" do
+    it "should return the correct role types" do
+      course_model
+      @course.offer
+      teacher = user_model
+      designer = user_model
+      student = user_model
+      nobody = user_model
+      admin = user_model
+      ta = user_model
+      @course.root_account.add_user(admin)
+      @course.enroll_teacher(teacher).accept
+      @course.enroll_designer(designer).accept
+      @course.enroll_student(student).accept
+      @course.enroll_ta(ta).accept
+      BasicLTI.user_lti_data(teacher, @course)['role_types'].should == ['Instructor']
+      BasicLTI.user_lti_data(designer, @course)['role_types'].should == ['ContentDeveloper']
+      BasicLTI.user_lti_data(student, @course)['role_types'].should == ['Learner']
+      BasicLTI.user_lti_data(nobody, @course)['role_types'].should == ['urn:lti:sysrole:ims/lis/None']
+      BasicLTI.user_lti_data(admin, @course)['role_types'].should == ['urn:lti:instrole:ims/lis/Administrator']
+      BasicLTI.user_lti_data(ta, @course)['role_types'].should == ['urn:lti:role:ims/lis/TeachingAssistant']
+    end
+
+    it "should return multiple role types if applicable" do
+      course_model
+      @course.offer
+      teacher = user_model
+      @course.root_account.add_user(teacher)
+      @course.enroll_teacher(teacher).accept
+      @course.enroll_student(teacher).accept
+      BasicLTI.user_lti_data(teacher, @course)['role_types'].sort.should == ['Instructor','Learner','urn:lti:instrole:ims/lis/Administrator'].sort
+    end
+
+    it "should not return role types from other contexts" do
+      @course1 = course_model
+      @course2 = course_model
+      @course.offer
+      teacher = user_model
+      student = user_model
+      @course1.enroll_teacher(teacher).accept
+      @course1.enroll_student(student).accept
+      BasicLTI.user_lti_data(teacher, @course2)['role_types'].should == ['urn:lti:sysrole:ims/lis/None']
+      BasicLTI.user_lti_data(student, @course2)['role_types'].should == ['urn:lti:sysrole:ims/lis/None']
+    end
+
+    it "xml converter should use raise an error when unescaped ampersands are used in launch url" do
+      xml = <<-XML
+        <?xml version="1.0" encoding="UTF-8"?>
+        <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
+            xmlns:blti = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
+            xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0"
+            xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0"
+            xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation = "http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd
+            http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
+            http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
+            http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+            <blti:title>Other Name</blti:title>
+            <blti:description>Description</blti:description>
+            <blti:launch_url>http://example.com/other_url?unescapedampersands=1&arebadnews=2</blti:launch_url>
+            <cartridge_bundle identifierref="BLTI001_Bundle"/>
+            <cartridge_icon identifierref="BLTI001_Icon"/>
+        </cartridge_basiclti_link>
+      XML
+      lti = CC::Importer::BLTIConverter.new
+      lambda {lti.convert_blti_xml(xml)}.should raise_error
+    end
+
+    it "xml converter should use raise an error when unescaped ampersands are used in custom url properties" do
+      xml = <<-XML
+        <?xml version="1.0" encoding="UTF-8"?>
+        <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
+            xmlns:blti = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
+            xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0"
+            xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0"
+            xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation = "http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd
+            http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
+            http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
+            http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+            <blti:title>Other Name</blti:title>
+            <blti:description>Description</blti:description>
+            <blti:launch_url>http://example.com</blti:launch_url>
+            <blti:extensions platform="canvas.instructure.com">
+              <lticm:property name="privacy_level">public</lticm:property>
+              <lticm:options name="course_navigation">
+                <lticm:property name="url">https://example.com/attendance?param1=1&param2=2</lticm:property>
+                <lticm:property name="enabled">true</lticm:property>
+              </lticm:options>
+            </blti:extensions>
+            <cartridge_bundle identifierref="BLTI001_Bundle"/>
+            <cartridge_icon identifierref="BLTI001_Icon"/>
+        </cartridge_basiclti_link>
+      XML
+      lti = CC::Importer::BLTIConverter.new
+      lambda {lti.convert_blti_xml(xml)}.should raise_error
     end
   end
 end

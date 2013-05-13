@@ -86,16 +86,20 @@
 #
 #       // The ID of the group's category.
 #       group_category_id: 4,
+#
+#       // the storage quota for the group, in megabytes
+#       storage_quota_mb: 50
 #     }
 #
 class GroupsController < ApplicationController
   before_filter :get_context
+  before_filter :require_user, :only => %w[index]
 
   include Api::V1::Attachment
   include Api::V1::Group
   include Api::V1::UserFollow
 
-  SETTABLE_GROUP_ATTRIBUTES = %w(name description join_level is_public group_category avatar_attachment)
+  SETTABLE_GROUP_ATTRIBUTES = %w(name description join_level is_public group_category avatar_attachment storage_quota_mb)
 
   include TextHelper
 
@@ -147,24 +151,15 @@ class GroupsController < ApplicationController
     return context_index if @context
     respond_to do |format|
       format.html do
-        if @current_user
-          @groups = @current_user.current_groups.
-            with_each_shard{ |scope| scope.scoped(:include => :group_category) }
-        else
-          @groups = []
-        end
+        @groups = @current_user.current_groups.
+          with_each_shard{ |scope| scope.includes(:group_category) }
       end
 
       format.json do
-        if @current_user
-          @groups = BookmarkedCollection.with_each_shard(
-            Group::Bookmarker,
-            @current_user.current_groups,
-            :include => :group_category)
-          @groups = Api.paginate(@groups, self, api_v1_current_user_groups_url)
-        else
-          @groups = []
-        end
+        @groups = BookmarkedCollection.with_each_shard(
+          Group::Bookmarker,
+          @current_user.current_groups) { |scope| scope.includes(:group_category) }
+        @groups = Api.paginate(@groups, self, api_v1_current_user_groups_url)
         render :json => @groups.map { |g| group_json(g, @current_user, session) }
       end
     end
@@ -182,8 +177,8 @@ class GroupsController < ApplicationController
   def context_index
     return unless authorized_action(@context, @current_user, :read_roster)
 
-    @groups      = @context.groups.active.scoped(:order => 'name, created_at')
-    @categories  = @context.group_categories.scoped(:order => "role <> 'student_organized', name")
+    @groups      = @context.groups.active.order(:name, :created_at)
+    @categories  = @context.group_categories.order("role <> 'student_organized'", :name)
     @user_groups = @current_user.group_memberships_for(@context) if @current_user
 
     unless api_request?
@@ -293,13 +288,18 @@ class GroupsController < ApplicationController
   # Creates a new group. Groups created using the "/api/v1/groups/"
   # endpoint will be community groups.
   #
-  # @argument name
-  # @argument description
-  # @argument is_public
-  # @argument join_level
+  # @argument name the name of the group
+  # @argument description a description of the group
+  # @argument is_public whether the group is public (applies only to
+  #   community groups)
+  # @argument join_level parent_context_auto_join, parent_context_request,
+  #   or invitation_only
+  # @argument storage_quota_mb The allowed file storage for the group,
+  #   in megabytes. This parameter is ignored if the caller does not have
+  #   the manage_storage_quotas permission.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/groups/<group_id> \ 
+  #     curl https://<canvas>/api/v1/groups \ 
   #          -F 'name=Math Teachers' \ 
   #          -F 'description=A place to gather resources for our classes.' \ 
   #          -F 'is_public=true' \ 
@@ -331,6 +331,7 @@ class GroupsController < ApplicationController
     end
 
     attrs = api_request? ? params : params[:group]
+    attrs.delete :storage_quota_mb unless @context.grants_right? @current_user, session, :manage_storage_quotas
     @group = @context.groups.new(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
 
     if authorized_action(@group, @current_user, :create)
@@ -364,6 +365,9 @@ class GroupsController < ApplicationController
   # @argument join_level
   # @argument avatar_id The id of the attachment previously uploaded to the
   #   group that you would like to use as the avatar image for this group.
+  # @argument storage_quota_mb The allowed file storage for the group,
+  #   in megabytes. This parameter is ignored if the caller does not have
+  #   the manage_storage_quotas permission.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/groups/<group_id> \ 
@@ -382,6 +386,7 @@ class GroupsController < ApplicationController
       params[:group][:group_category] = group_category
     end
     attrs = api_request? ? params : params[:group]
+    attrs.delete :storage_quota_mb unless @group.context.grants_right? @current_user, session, :manage_storage_quotas
 
     if avatar_id = (params[:avatar_id] || (params[:group] && params[:group][:avatar_id]))
       attrs[:avatar_attachment] = @group.active_images.find_by_id(avatar_id)
@@ -476,7 +481,7 @@ class GroupsController < ApplicationController
   def unfollow
     find_group
     if authorized_action(@group, @current_user, :follow)
-      user_follow = @current_user.user_follows.find(:first, :conditions => { :followed_item_id => @group.id, :followed_item_type => 'Group' })
+      user_follow = @current_user.user_follows.where(:followed_item_id => @group, :followed_item_type => 'Group').first
       user_follow.try(:destroy)
       render :json => { "ok" => true }
     end
@@ -509,7 +514,7 @@ class GroupsController < ApplicationController
   def accept_invitation
     require_user
     find_group
-    @membership = @group.group_memberships.scoped(:conditions => { :uuid => params[:uuid] }).first if @group
+    @membership = @group.group_memberships.where(:uuid => params[:uuid]).first if @group
     @membership.accept! if @membership.try(:invited?)
     if @membership.try(:active?)
       flash[:notice] = t('notices.welcome', "Welcome to the group %{group_name}!", :group_name => @group.name)

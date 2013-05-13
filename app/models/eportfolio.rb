@@ -38,7 +38,7 @@ class Eportfolio < ActiveRecord::Base
     self.save
   end
   
-  named_scope :active, :conditions => ['eportfolios.workflow_state != ?', 'deleted']
+  scope :active, where("eportfolios.workflow_state<>'deleted'")
 
   before_create :assign_uuid
   def assign_uuid

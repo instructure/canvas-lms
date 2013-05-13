@@ -39,7 +39,7 @@ define [
 
 
   $.fn.serializeForm = ->
-    _.chain(this[0].elements)
+    _.chain(this[0].elements || this.find(':input'))
       .filter(isInput)
       .map(getValue)
       .value()

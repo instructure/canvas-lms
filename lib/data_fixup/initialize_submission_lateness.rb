@@ -1,10 +1,9 @@
 module DataFixup::InitializeSubmissionLateness  
   def self.run
-    Submission.find_in_batches(
-      :conditions => "submissions.submitted_at IS NOT NULL AND assignments.due_at IS NOT NULL AND assignments.due_at < submissions.submitted_at",
-      :joins => :assignment
-    ) do |submissions|
-      Submission.update_all({:late => true}, {:id => submissions.map(&:id)})
+    Submission.joins(:assignment).
+        where("submissions.submitted_at IS NOT NULL AND assignments.due_at IS NOT NULL AND assignments.due_at < submissions.submitted_at").
+        find_in_batches do |submissions|
+      Submission.where(:id => submissions).update_all(:late => true)
     end
 
     AssignmentOverride.find_each do |override|

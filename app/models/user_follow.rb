@@ -36,7 +36,7 @@ class UserFollow < ActiveRecord::Base
     search_shard = (complementary_record ? followed_item : following_user).shard
     search_shard.activate do
       UserFollow.unique_constraint_retry do
-        user_follow = UserFollow.first(:conditions => { :following_user_id => following_user.id, :followed_item_id => followed_item.id, :followed_item_type => followed_item.class.name })
+        user_follow = UserFollow.where(:following_user_id => following_user, :followed_item_id => followed_item, :followed_item_type => followed_item.class.name).first
         user_follow ||= UserFollow.create(:following_user => following_user, :followed_item => followed_item)
       end
     end
@@ -97,9 +97,9 @@ class UserFollow < ActiveRecord::Base
     end
 
     finding_shard.try(:activate) do
-        UserFollow.first(:conditions => { :following_user_id => following_user.id,
-                                          :followed_item_id => followed_item.id,
-                                          :followed_item_type => followed_item.class.name })
+        UserFollow.where(:following_user_id => following_user,
+                         :followed_item_id => followed_item,
+                         :followed_item_type => followed_item.class.name).first
     end
   end
 
@@ -152,8 +152,8 @@ class UserFollow < ActiveRecord::Base
       following_user = User.find(following_user_id)
       context.collections.active.each do |coll|
         if !coll.grants_right?(following_user, :follow)
-          user_follow = following_user.user_follows.scoped(:conditions => { :followed_item_type => 'Collection', 
-                                                                            :followed_item_id => coll.id }).first
+          user_follow = following_user.user_follows.where(:followed_item_type => 'Collection',
+                                                          :followed_item_id => coll).first
           user_follow.try(:destroy)
         end
       end

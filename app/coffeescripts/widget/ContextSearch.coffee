@@ -31,14 +31,11 @@ define [
       placeholder: I18n.t('context_search_placeholder', 'Enter a name, course, or group')
       selector:
         messages: {noResults: I18n.t('no_results', 'No results found')}
-        limiter: -> 5
         populator: @populator
-        preparer: @preparer
         baseData:
           synthetic_contexts: 1
         browser:
           data:
-            per_page: -1
             types: ['context']
 
     constructor: ($node, options) ->
@@ -49,15 +46,16 @@ define [
       super $node, options
 
     populator: (selector, $node, data, options={}) =>
+      noExpand = options.noExpand ? data.noExpand
+
       data.id = "#{data.id}"
       data.type ?= 'user'
-      
+
       if data.avatar_url
-        $img = $('<img class="avatar" />')
-        $img.attr('src', data.avatar_url)
-        $node.append($img)
+        $node.append($('<img />', alt: '', class: 'avatar', src: data.avatar_url))
       $b = $('<b />')
       $b.text(data.name)
+      $description = $('<span />', id: "#{data.type}-#{data.id}-description")
       $name = $('<span />', class: 'name')
       $contextInfo = @buildContextInfo(data) unless options.parent
       $name.append($b, $contextInfo)
@@ -73,11 +71,13 @@ define [
           $span.text(I18n.t('sections_count', 'section', {count: data.item_count}))
       else if data.subText
         $span.text(data.subText)
-      $node.append($name, $span)
-      $node.attr('title', data.name)
+      $description.append($name, $span)
+      $node.append($description)
+      $node.attr('role', 'menuitem')
+      $node.attr('aria-labelledby', "#{data.type}-#{data.id}-description")
       text = data.name
       if options.parent
-        if data.selectAll and data.noExpand # "Select All", e.g. course_123_all -> "Spanish 101: Everyone"
+        if data.selectAll and noExpand # "Select All", e.g. course_123_all -> "Spanish 101: Everyone"
           text = options.parent.data('text')
         else if data.id.match(/_\d+_/) # e.g. course_123_teachers -> "Spanish 101: Teachers"
           text = I18n.beforeLabel(options.parent.data('text')) + " " + text
@@ -89,7 +89,7 @@ define [
       if options.level > 0 and selector.options.showToggles
         $node.prepend('<a class="toggle"><i></i></a>')
         $node.addClass('toggleable') if @canToggle(data)
-      if data.type is 'context' and not data.noExpand
+      if data.type is 'context' and not noExpand
         $node.prepend('<a class="expand"><i></i></a>')
         $node.addClass('expandable')
 

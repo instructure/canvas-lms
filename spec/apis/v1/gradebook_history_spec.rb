@@ -9,6 +9,14 @@ module Api::V1
     def course_assignment_url(course, assignment)
       'http://www.example.com'
     end
+
+    def course_assignment_submission_url(course, assignment, submission, opts = {})
+      'http://www.example.com'
+    end
+
+    def params
+      {}
+    end
   end
 
   describe GradebookHistory do
@@ -22,6 +30,10 @@ module Api::V1
     let(:now) { Time.now.in_time_zone }
     let(:yesterday) { (now - 24.hours).in_time_zone }
 
+    before do
+      ::Submission.any_instance.stubs(:grants_right?).with(user, :read_grade).returns(true)
+    end
+
     def submit(assignment, student, day, grader)
       submission = assignment.submit_homework(student)
       submission.update_attributes!(:graded_at => day, :grader_id => grader.try(:id))
@@ -31,7 +43,7 @@ module Api::V1
     describe '#days_json' do
       let!(:course) { ::Course.create! }
 
-      before(:all) do
+      before do
         students = (1..3).inject([]) do |memo, idx|
           student = ::User.create!
           course.enroll_student(student)
@@ -47,8 +59,6 @@ module Api::V1
         submit(@assignment2, students[0], yesterday, @grader2)
         @days = GradebookHistoryHarness.new.days_json(course, api_context)
       end
-
-      after(:all) { truncate_all_tables }
 
       it 'has a top level key for each day represented' do
         dates = @days.map{|d| d[:date] }
@@ -82,7 +92,7 @@ module Api::V1
     end
 
     describe '#json_for_date' do
-      before(:all) do
+      before do
         course = ::Course.create!
         student1 = ::User.create!
         course.enroll_student(student1)
@@ -95,8 +105,6 @@ module Api::V1
         submit(@assignment, student2, now, @grader2)
         @day_hash = GradebookHistoryHarness.new.json_for_date(now, course, api_context)
       end
-
-      after(:all) { truncate_all_tables }
 
       it 'returns a grader hash for that day' do
         @day_hash.map{|g| g[:id] }.sort.should == [@grader1.id, @grader2.id].sort
@@ -135,7 +143,6 @@ module Api::V1
         version1[:current_grade].should == "90"
         version1[:current_grader].should == 'grader 2'
         version1[:new_grade].should == "90"
-        version1[:previous_grader].should == 'grader 1'
       end
 
       it 'can find submissions with no grader' do

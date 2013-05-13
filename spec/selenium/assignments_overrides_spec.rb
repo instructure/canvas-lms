@@ -7,11 +7,12 @@ describe "assignment groups" do
 
   context "as a teacher" do
 
-    let(:due_at) { Time.zone.now + 3.days }
-    let(:unlock_at) { Time.zone.now + 2.days }
+    let(:due_at) { Time.zone.now }
+    let(:unlock_at) { Time.zone.now - 1.day }
     let(:lock_at) { Time.zone.now + 4.days }
 
     before(:each) do
+      make_full_screen
       course_with_teacher_logged_in
     end
 
@@ -42,7 +43,6 @@ describe "assignment groups" do
       assignment = create_assignment!
       visit_assignment_edit_page(assignment)
       toggle_advanced_options
-      due_at = Time.zone.now + 1.days
 
       # set due_at, lock_at, unlock_at
       first_due_at_element.clear
@@ -74,6 +74,7 @@ describe "assignment groups" do
       visit_assignment_edit_page(assign)
       toggle_advanced_options
 
+      sleep 5
       click_option('.due-date-row:first select', default_section.name)
       first_due_at_element.clear
       first_due_at_element.
@@ -95,5 +96,38 @@ describe "assignment groups" do
       other_override.due_at.strftime('%b %-d, %y').
         should == other_section_due.to_date.strftime('%b %-d, %y')
     end
+
+    it "should show a vdd tooltip summary on the course assignments page" do
+      assignment = create_assignment!
+      get "/courses/#{@course.id}/assignments"
+      f('.assignment_list .assignment_due').should_not include_text "Multiple Due Dates"
+      add_due_date_override(assignment)
+
+      get "/courses/#{@course.id}/assignments"
+      f('.assignment_list .assignment_due').should include_text "Multiple Due Dates"
+      driver.mouse.move_to f(".assignment_list .assignment_due a")
+      wait_for_animations
+
+      tooltip = fj('.vdd_tooltip_content:visible')
+      tooltip.should include_text 'New Section'
+      tooltip.should include_text 'Everyone else'
+    end
+
+    it "should show a vdd tooltip summary on the global assignments page" do
+      assignment = create_assignment!
+      get "/assignments"
+      f('.group_assignment .date_text').should_not include_text "Multiple Due Dates"
+      add_due_date_override(assignment)
+
+      get "/assignments"
+      f('.group_assignment .date_text').should include_text "Multiple Due Dates"
+      driver.mouse.move_to f(".group_assignment .date_text a")
+      wait_for_animations
+
+      tooltip = fj('.vdd_tooltip_content:visible')
+      tooltip.should include_text 'New Section'
+      tooltip.should include_text 'Everyone else'
+    end
+
   end
 end

@@ -1,5 +1,5 @@
 # coding: utf-8
-require File.dirname(__FILE__) + '/../cc_spec_helper'
+require File.expand_path(File.dirname(__FILE__) + '/../cc_spec_helper')
 
 describe "Standard Common Cartridge importing" do
   before(:all) do
@@ -11,6 +11,11 @@ describe "Standard Common Cartridge importing" do
     @course_data = @converter.course.with_indifferent_access
     @course_data['all_files_export'] ||= {}
     @course_data['all_files_export']['file_path'] = @course_data['all_files_zip']
+
+    @course = course
+    @migration = ContentMigration.create(:context => @course)
+    @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
+    @course.import_from_migration(@course_data, nil, @migration)
   end
   
   after(:all) do
@@ -18,13 +23,7 @@ describe "Standard Common Cartridge importing" do
     if File.exists?(@export_folder)
       FileUtils::rm_rf(@export_folder)
     end
-  end
-
-  before(:each) do
-    @course = course
-    @migration = ContentMigration.create(:context => @course)
-    @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
-    @course.import_from_migration(@course_data, nil, @migration)
+    truncate_all_tables
   end
 
   it "should import webcontent" do
@@ -41,7 +40,7 @@ describe "Standard Common Cartridge importing" do
     file2_id = @course.attachments.find_by_migration_id("I_00006_Media").id
     
     dt =  @course.discussion_topics.find_by_migration_id("I_00006_R")
-    dt.message.should == %{<p>Your face is ugly. <br><img src="/courses/#{@course.id}/files/#{file1_id}/preview"></p>}
+    dt.message.should match_ignoring_whitespace(%{<p>Your face is ugly. <br><img src="/courses/#{@course.id}/files/#{file1_id}/preview"></p>})
     dt.attachment_id = file2_id
     
     dt =  @course.discussion_topics.find_by_migration_id("I_00009_R")
@@ -170,6 +169,27 @@ describe "Standard Common Cartridge importing" do
     end
   end
 
+  it "should import assessment data into an active question bank" do
+    if Qti.qti_enabled?
+      bank = @course.assessment_question_banks.find_by_migration_id("I_00004_R_QDB_1")
+      bank.assessment_questions.count.should == 11
+      bank.destroy
+      bank.reload
+      bank.workflow_state.should == "deleted"
+
+      @migration = ContentMigration.create(:context => @course)
+      @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
+      @course.import_from_migration(@course_data, nil, @migration)
+
+      bank = @course.assessment_question_banks.active.find_by_migration_id("I_00004_R_QDB_1")
+      bank.should_not be_nil
+
+      bank.assessment_questions.count.should == 11
+    else
+      pending("Can't import assessment data with python QTI tool.")
+    end
+  end
+
   it "should find update urls in questions" do
     if Qti.qti_enabled?
       q = @course.assessment_questions.find_by_migration_id("I_00003_R_QUE_104045")
@@ -216,7 +236,7 @@ describe "Standard Common Cartridge importing" do
   end
 
   context "selective import" do
-    before(:each) do
+    it "should selectively import files" do
       @course = course
       @migration = ContentMigration.create(:context => @course)
       @migration.migration_settings[:migration_ids_to_import] = {
@@ -250,9 +270,7 @@ describe "Standard Common Cartridge importing" do
                         "all_assignment_groups" => "0"}}.with_indifferent_access
 
       @course.import_from_migration(@course_data, nil, @migration)
-    end
 
-    it "should selectively import files" do
       @course.attachments.count.should == 5
       @course.context_external_tools.count.should == 1
       @course.context_external_tools.first.migration_id.should == "I_00011_R"
@@ -261,6 +279,17 @@ describe "Standard Common Cartridge importing" do
       @course.wiki.wiki_pages.count.should == 0
       @course.discussion_topics.count.should == 1
       @course.discussion_topics.first.migration_id.should == 'I_00006_R'
+    end
+
+    it "should not import all attachments if :files does not exist" do
+      @course = course
+      @migration = ContentMigration.create(:context => @course)
+      @migration.migration_settings[:migration_ids_to_import] = {
+          :copy => {"everything" => "0"}}.with_indifferent_access
+
+      @course.import_from_migration(@course_data, nil, @migration)
+
+      @course.attachments.count.should == 0
     end
   end
 

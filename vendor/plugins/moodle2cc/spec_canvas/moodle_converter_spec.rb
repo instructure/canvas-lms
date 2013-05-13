@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/spec_helper'
+require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe Moodle::Converter do
 
@@ -22,7 +22,7 @@ describe Moodle::Converter do
 
   it "should successfully import the course" do
     @course.import_from_migration(@course_data, nil, @cm)
-    @cm.migration_settings[:warnings].should be_nil
+    @cm.old_warnings_format.all?{|w| w[0].start_with?("Missing links found in imported content")}.should == true
   end
 
   context "discussion topics" do

@@ -19,34 +19,46 @@
 module Canvas::AccountReports
   class SisExporter
     include Api
-    include Canvas::ReportHelpers::DateHelper
+    include Canvas::AccountReports::ReportHelper
 
     SIS_CSV_REPORTS = ["users", "accounts", "terms", "courses", "sections", "enrollments", "groups", "group_membership", "xlist"]
 
     def initialize(account_report, params = {})
       @account_report = account_report
-      @account = @account_report.account
-      @domain_root_account = @account.root_account
-      @term = api_find(@domain_root_account.enrollment_terms, @account_report.parameters["enrollment_term"]) if @account_report.parameters["enrollment_term"].presence
       @reports = SIS_CSV_REPORTS & @account_report.parameters.keys
       @sis_format = params[:sis_format]
-      @include_deleted = @account_report.parameters["include_deleted"]  if @account_report.has_parameter? "include_deleted"
+      extra_text_term(@account_report)
+
+      if @account_report.has_parameter? "include_deleted"
+        @include_deleted = @account_report.parameters["include_deleted"]
+        @account_report.parameters["extra_text"] << I18n.t(
+        'account_reports.sis_exporter.deleted',' Include Deleted Objects: true;')
+      end
     end
 
     def csv
+      files = ""
+      @reports.each do |report_name|
+        files << "#{report_name} "
+      end
+      @account_report.parameters["extra_text"] << I18n.t(
+        'account_reports.sis_exporter.reports',
+        ' Reports: %{files}',
+        :files => files
+      )
+
       if @reports.length == 0
-        Canvas::AccountReports.message_recipient(@account_report, "SIS export report for #{@account.name} has been successfully generated.")
+        send_report()
       elsif @reports.length == 1
         csv = self.send(@reports.first)
-        Canvas::AccountReports.message_recipient(@account_report, "SIS export report for #{@account.name} has been successfully generated.", csv)
-        csv
+        send_report(csv)
       else
         csvs = {}
 
         @reports.each do |report_name|
           csvs[report_name] = self.send(report_name)
         end
-        Canvas::AccountReports.message_recipient(@account_report, "SIS export reports for #{@account.name} have been successfully generated.", csvs)
+        send_report(csvs)
         csvs
       end
     end
@@ -59,50 +71,37 @@ module Canvas::AccountReports
           headers = ['canvas_user_id','user_id','login_id','first_name','last_name','email','status']
         end
         csv << headers
-        users = @domain_root_account.pseudonyms.scoped(:include => :user ).scoped(
-          :select => "pseudonyms.id, pseudonyms.sis_user_id, pseudonyms.user_id,
-                      pseudonyms.unique_id, pseudonyms.workflow_state")
+        users = root_account.pseudonyms.includes(:user).select(
+          "pseudonyms.id, pseudonyms.sis_user_id, pseudonyms.user_id,
+           pseudonyms.unique_id, pseudonyms.workflow_state").where(
+          "NOT EXISTS (SELECT user_id
+                       FROM enrollments e
+                       WHERE e.type = 'StudentViewEnrollment'
+                       AND e.user_id = pseudonyms.user_id)")
 
         if @sis_format
-          users = users.scoped(:conditions => 'sis_user_id IS NOT NULL')
+          users = users.where("sis_user_id IS NOT NULL")
         end
 
         if @include_deleted
-          users = users.scoped(:conditions => "( pseudonyms.workflow_state <> 'deleted')
-                                               OR
-                                               ( pseudonyms.sis_user_id IS NOT NULL)")
+          users = users.where("pseudonyms.workflow_state<>'deleted' OR pseudonyms.sis_user_id IS NOT NULL")
         else
-          users = users.scoped(:conditions => "pseudonyms.workflow_state <> 'deleted'")
+          users = users.where("pseudonyms.workflow_state<>'deleted'")
         end
 
-        if @account.id != @domain_root_account.id
-          users = users.scoped(:conditions => ["EXISTS (SELECT user_id
-                                                        FROM user_account_associations uaa
-                                                        WHERE uaa.account_id = ?
-                                                        AND uaa.user_id=users.id
-                                                        )", @account.id])
-        end
+        users = add_user_sub_account_scope(users)
 
-        users.find_in_batches do |batch|
-          emails = Shard.partition_by_shard(batch.map(&:user_id)) do |user_ids|
-            CommunicationChannel.active.scoped(:select => "DISTINCT ON (user_id) user_id, path",
-                                               :conditions => ["user_id IN (?)
-                                                                AND path_type = 'email'", user_ids],
-                                               :order => 'user_id, position')
-          end.index_by(&:user_id)
-
-          batch.each do |u|
-            row = []
-            row << u.user_id unless @sis_format
-            row << u.sis_user_id
-            row << u.unique_id
-            row << nil if @sis_format
-            row << u.user.first_name
-            row << u.user.last_name
-            row << emails[u.user_id].try(:path)
-            row << u.workflow_state
-            csv << row
-          end
+        users.find_each do |u|
+          row = []
+          row << u.user_id unless @sis_format
+          row << u.sis_user_id
+          row << u.unique_id
+          row << nil if @sis_format
+          row << u.user.first_name
+          row << u.user.last_name
+          row << u.user.email
+          row << u.workflow_state
+          csv << row
         end
       end
       list_csv
@@ -117,26 +116,24 @@ module Canvas::AccountReports
                      'name','status']
         end
         csv << headers
-        accounts = @domain_root_account.all_accounts.scoped(
-          :select => "accounts.*, pa.id AS parent_id,
-                      pa.sis_source_id AS parent_sis_source_id",
-          :joins => "INNER JOIN accounts AS pa ON accounts.parent_account_id = pa.id")
+        accounts = root_account.all_accounts.
+          select("accounts.*, pa.id AS parent_id,
+                  pa.sis_source_id AS parent_sis_source_id").
+          joins("INNER JOIN accounts AS pa ON accounts.parent_account_id=pa.id")
 
         if @sis_format
-          accounts = accounts.scoped(:conditions => "accounts.sis_source_id IS NOT NULL")
+          accounts = accounts.where("accounts.sis_source_id IS NOT NULL")
         end
 
         if @include_deleted
-          accounts = accounts.scoped(:conditions => "( accounts.workflow_state <> 'deleted')
-                                                     OR
-                                                     ( accounts.sis_source_id IS NOT NULL)")
+          accounts = accounts.where("accounts.workflow_state<>'deleted' OR accounts.sis_source_id IS NOT NULL")
         else
-          accounts = accounts.scoped(:conditions => "accounts.workflow_state <> 'deleted'")
+          accounts = accounts.where("accounts.workflow_state<>'deleted'")
         end
 
-        if @account.id != @domain_root_account.id
+        if account != root_account
           #this does not give the full tree pf sub accounts, just the direct children.
-          accounts = accounts.scoped(:conditions => ["accounts.parent_account_id = ?", @account.id])
+          accounts = accounts.where(:accounts => { :parent_account_id => account })
         end
 
         accounts.find_each do |a|
@@ -158,18 +155,16 @@ module Canvas::AccountReports
         headers = ['term_id','name','status', 'start_date', 'end_date']
         headers.unshift 'canvas_term_id' unless @sis_format
         csv << headers
-        terms = @domain_root_account.enrollment_terms
+        terms = root_account.enrollment_terms
 
         if @sis_format
-          terms = terms.scoped(:conditions => "sis_source_id IS NOT NULL")
+          terms = terms.where("sis_source_id IS NOT NULL")
         end
 
         if @include_deleted
-          terms = terms.scoped(:conditions => "(workflow_state <> 'deleted')
-                                               OR
-                                               (sis_source_id IS NOT NULL)")
+          terms = terms.where("workflow_state<>'deleted' OR sis_source_id IS NOT NULL")
         else
-          terms = terms.scoped(:conditions => "workflow_state <> 'deleted'")
+          terms = terms.where("workflow_state<>'deleted'")
         end
 
         terms.each do |t|
@@ -197,27 +192,17 @@ module Canvas::AccountReports
         end
 
         csv << headers
-        courses = @domain_root_account.all_courses.scoped(
-          :include => [:account, :enrollment_term])
-        courses = courses.scoped(:conditions => ["enrollment_term_id=?", @term]) if @term
-        courses = courses.scoped(:conditions => "sis_source_id IS NOT NULL") if @sis_format
+        courses = root_account.all_courses.includes(:account, :enrollment_term)
+        courses = courses.where("sis_source_id IS NOT NULL") if @sis_format
 
         if @include_deleted
-          courses = courses.scoped(:conditions => "( courses.workflow_state <> 'deleted')
-                                                   OR
-                                                   ( sis_source_id IS NOT NULL)")
+          courses = courses.where("courses.workflow_state<>'deleted' OR sis_source_id IS NOT NULL")
         else
-          courses = courses.scoped(:conditions => "courses.workflow_state <> 'deleted'
-                                                   AND courses.workflow_state <> 'completed'")
+          courses = courses.where("courses.workflow_state<>'deleted' AND courses.workflow_state<>'completed'")
         end
 
-        if @account.id != @domain_root_account.id
-          courses = courses.scoped(:conditions => ["EXISTS (SELECT course_id, account_id
-                                                            FROM course_account_associations caa
-                                                            WHERE caa.account_id = ? 
-                                                            AND caa.course_id=courses.id
-                                                            )", @account.id])
-        end
+        courses = add_course_sub_account_scope(courses)
+        courses = add_term_scope(courses)
 
         course_state_sub = {'claimed' => 'unpublished', 'created' => 'unpublished',
                             'completed' => 'concluded', 'deleted' => 'deleted',
@@ -265,43 +250,34 @@ module Canvas::AccountReports
                       'status','start_date','end_date','canvas_account_id','account_id']
         end
         csv << headers
-        sections = @domain_root_account.course_sections.scoped(
-          :select => "course_sections.*, nxc.sis_source_id AS non_x_course_sis_id,
-                      rc.sis_source_id AS course_sis_id, nxc.id AS non_x_course_id,
-                      ra.id AS r_account_id, ra.sis_source_id AS r_account_sis_id,
-                      nxc.account_id AS nx_account_id, nxa.sis_source_id AS nx_account_sis_id",
-          :joins => "INNER JOIN courses AS rc ON course_sections.course_id = rc.id
-                     INNER JOIN accounts AS ra ON rc.account_id = ra.id
-                     LEFT OUTER JOIN courses AS nxc ON course_sections.nonxlist_course_id = nxc.id
-                     LEFT OUTER JOIN accounts AS nxa ON nxc.account_id = nxa.id")
-
-        if @term
-          sections = sections.scoped(:conditions => ["rc.enrollment_term_id=?", @term])
-        end
+        sections = root_account.course_sections.
+          select("course_sections.*, nxc.sis_source_id AS non_x_course_sis_id,
+                  rc.sis_source_id AS course_sis_id, nxc.id AS non_x_course_id,
+                  ra.id AS r_account_id, ra.sis_source_id AS r_account_sis_id,
+                  nxc.account_id AS nx_account_id, nxa.sis_source_id AS nx_account_sis_id").
+          joins("INNER JOIN courses AS rc ON course_sections.course_id = rc.id
+                 INNER JOIN accounts AS ra ON rc.account_id = ra.id
+                 LEFT OUTER JOIN courses AS nxc ON course_sections.nonxlist_course_id = nxc.id
+                 LEFT OUTER JOIN accounts AS nxa ON nxc.account_id = nxa.id")
 
         if @include_deleted
-          sections = sections.scoped(:conditions => "( course_sections.workflow_state <> 'deleted')
-                                                     OR
-                                                     ( course_sections.sis_source_id IS NOT NULL
-                                                       AND (nxc.sis_source_id IS NOT NULL
-                                                       OR rc.sis_source_id IS NOT NULL))")
+          sections = sections.where("course_sections.workflow_state<>'deleted'
+                                     OR
+                                     (course_sections.sis_source_id IS NOT NULL
+                                      AND (nxc.sis_source_id IS NOT NULL
+                                      OR rc.sis_source_id IS NOT NULL))")
         else
-          sections = sections.scoped(:conditions => "course_sections.workflow_state <> 'deleted'")
+          sections = sections.where("course_sections.workflow_state<>'deleted'")
         end
 
         if @sis_format
-          sections = sections.scoped(:conditions => "course_sections.sis_source_id IS NOT NULL
-                                                   AND (nxc.sis_source_id IS NOT NULL
-                                                   OR rc.sis_source_id IS NOT NULL)")
+          sections = sections.where("course_sections.sis_source_id IS NOT NULL
+                                     AND (nxc.sis_source_id IS NOT NULL
+                                     OR rc.sis_source_id IS NOT NULL)")
         end
 
-        if @account.id != @domain_root_account.id
-          sections = sections.scoped(:conditions => ["EXISTS (SELECT course_id
-                                                              FROM course_account_associations caa
-                                                              WHERE caa.account_id = ?
-                                                              AND caa.course_id=rc.id
-                                                              )", @account.id])
-        end
+        sections = add_course_sub_account_scope(sections,'rc')
+        sections = add_term_scope(sections, 'rc')
 
         sections.find_each do |s|
           row = []
@@ -348,58 +324,48 @@ module Canvas::AccountReports
                      'associated_user_id']
         end
         csv << headers
-        enrol = @domain_root_account.enrollments.scoped(
-          :select => "enrollments.*, courses.sis_source_id AS course_sis_id,
-                      nxc.id AS nxc_id, nxc.sis_source_id AS nxc_sis_id,
-                      cs.sis_source_id AS course_section_sis_id,
-                      pseudonyms.sis_user_id AS pseudonym_sis_id,
-                      ob.sis_user_id AS ob_sis_id,
-                 CASE WHEN enrollments.workflow_state = 'invited' THEN 'invited'
-                      WHEN enrollments.workflow_state = 'active' THEN 'active'
-                      WHEN enrollments.workflow_state = 'completed' THEN 'concluded'
-                      WHEN enrollments.workflow_state = 'deleted' THEN 'deleted'
-                      WHEN courses.workflow_state = 'rejected' THEN 'rejected' END AS enrol_state",
-          :joins => "INNER JOIN course_sections cs ON cs.id = enrollments.course_section_id
-                     INNER JOIN courses ON courses.id = cs.course_id
-                     INNER JOIN pseudonyms ON pseudonyms.user_id=enrollments.user_id
-                     LEFT OUTER JOIN courses nxc ON cs.nonxlist_course_id = nxc.id
-                     LEFT OUTER JOIN pseudonyms AS ob ON ob.user_id = enrollments.associated_user_id
-                       AND ob.account_id = enrollments.root_account_id",
-          :conditions => "pseudonyms.account_id = enrollments.root_account_id")
-
-        if @term
-          enrol = enrol.scoped(:conditions => ["courses.enrollment_term_id = ?", @term])
-        end
+        enrol = root_account.enrollments.
+          select("enrollments.*, courses.sis_source_id AS course_sis_id,
+                  nxc.id AS nxc_id, nxc.sis_source_id AS nxc_sis_id,
+                  cs.sis_source_id AS course_section_sis_id,
+                  pseudonyms.sis_user_id AS pseudonym_sis_id,
+                  ob.sis_user_id AS ob_sis_id,
+                  CASE WHEN enrollments.workflow_state = 'invited' THEN 'invited'
+                       WHEN enrollments.workflow_state = 'active' THEN 'active'
+                       WHEN enrollments.workflow_state = 'completed' THEN 'concluded'
+                       WHEN enrollments.workflow_state = 'deleted' THEN 'deleted'
+                       WHEN courses.workflow_state = 'rejected' THEN 'rejected' END AS enrol_state").
+          joins("INNER JOIN course_sections cs ON cs.id = enrollments.course_section_id
+                 INNER JOIN courses ON courses.id = cs.course_id
+                 INNER JOIN pseudonyms ON pseudonyms.user_id=enrollments.user_id
+                 LEFT OUTER JOIN courses nxc ON cs.nonxlist_course_id = nxc.id
+                 LEFT OUTER JOIN pseudonyms AS ob ON ob.user_id = enrollments.associated_user_id
+                   AND ob.account_id = enrollments.root_account_id").
+          where("pseudonyms.account_id=enrollments.root_account_id
+                 AND enrollments.type <> 'StudentViewEnrollment'")
 
         if @include_deleted
-          enrol = enrol.scoped(
-            :conditions => "( enrollments.workflow_state <> 'deleted')
-                            OR
-                            ( pseudonyms.sis_user_id IS NOT NULL
-                              AND enrollments.workflow_state NOT IN ('rejected', 'invited')
-                              AND (courses.sis_source_id IS NOT NULL
+          enrol = enrol.where("enrollments.workflow_state<>'deleted'
+                              OR
+                              ( pseudonyms.sis_user_id IS NOT NULL
+                                AND enrollments.workflow_state NOT IN ('rejected', 'invited')
+                                AND (courses.sis_source_id IS NOT NULL
                                    OR cs.sis_source_id IS NOT NULL))")
         else
-          enrol = enrol.scoped(
-            :conditions => "enrollments.workflow_state <> 'deleted'
-                            AND enrollments.workflow_state <> 'completed'")
+          enrol = enrol.where("enrollments.workflow_state<>'deleted'
+                               AND enrollments.workflow_state<>'completed'
+                               AND pseudonyms.workflow_state<>'deleted'")
         end
 
         if @sis_format
-          enrol = enrol.scoped(
-            :conditions => "pseudonyms.sis_user_id IS NOT NULL
-                            AND enrollments.workflow_state NOT IN ('rejected', 'invited')
-                            AND (courses.sis_source_id IS NOT NULL
+          enrol = enrol.where("pseudonyms.sis_user_id IS NOT NULL
+                               AND enrollments.workflow_state NOT IN ('rejected', 'invited')
+                               AND (courses.sis_source_id IS NOT NULL
                                  OR cs.sis_source_id IS NOT NULL)")
         end
 
-        if @account.id != @domain_root_account.id
-          enrol = enrol.scoped(:conditions => ["EXISTS (SELECT course_id
-                                                FROM course_account_associations caa
-                                                WHERE caa.account_id = ?
-                                                  AND caa.course_id=courses.id
-                                                )", @account.id])
-        end
+        enrol = add_course_sub_account_scope(enrol)
+        enrol = add_term_scope(enrol)
 
         enrol.find_each do |e|
           row = []
@@ -434,29 +400,22 @@ module Canvas::AccountReports
         end
 
         csv << headers
-        groups = @domain_root_account.all_groups.scoped(
-          :select => "groups.*, accounts.sis_source_id AS account_sis_id",
-          :joins => "INNER JOIN accounts ON accounts.id = groups.account_id")
-
-
-
-
+        groups = root_account.all_groups.
+          select("groups.*, accounts.sis_source_id AS account_sis_id").
+          joins("INNER JOIN accounts ON accounts.id = groups.account_id")
 
         if @sis_format
-          groups = groups.scoped(:conditions => "groups.sis_source_id IS NOT NULL")
+          groups = groups.where("groups.sis_source_id IS NOT NULL")
         end
 
         if @include_deleted
-          groups = groups.scoped(:conditions => "( groups.workflow_state <> 'deleted')
-                                                 OR
-                                                 ( groups.sis_source_id IS NOT NULL)")
+          groups = groups.where("groups.workflow_state<>'deleted' OR groups.sis_source_id IS NOT NULL")
         else
-          groups = groups.scoped(:conditions => "groups.workflow_state <> 'deleted'")
+          groups = groups.where("groups.workflow_state<>'deleted'")
         end
 
-        if @account.id != @domain_root_account.id
-          groups = groups.scoped(
-            :conditions => ["groups.context_id=? AND groups.context_type = 'Account'", @account.id])
+        if account != root_account
+          groups = groups.where(:groups => { :context_id => account, :context_type => 'Account' })
         end
 
         groups.find_each do |g|
@@ -482,31 +441,32 @@ module Canvas::AccountReports
         end
 
         csv << headers
-        gm = @domain_root_account.all_groups.scoped(
-          :select => "groups.*, group_memberships.*, pseudonyms.sis_user_id AS user_sis_id",
-          :joins => "INNER JOIN group_memberships ON groups.id = group_memberships.group_id
-                     INNER JOIN pseudonyms ON pseudonyms.user_id=group_memberships.user_id",
-          :conditions => "pseudonyms.account_id = groups.root_account_id")
+        gm = root_account.all_groups.
+          select("groups.*, group_memberships.*, pseudonyms.sis_user_id AS user_sis_id").
+          joins("INNER JOIN group_memberships ON groups.id = group_memberships.group_id
+                 INNER JOIN pseudonyms ON pseudonyms.user_id=group_memberships.user_id").
+          where("pseudonyms.account_id=groups.root_account_id AND
+                 NOT EXISTS (SELECT user_id
+                             FROM enrollments e
+                             WHERE e.type = 'StudentViewEnrollment'
+                             AND e.user_id = pseudonyms.user_id)")
 
         if @sis_format
-          gm = gm.scoped(:conditions => "pseudonyms.sis_user_id IS NOT NULL
-                                         AND group_memberships.sis_batch_id IS NOT NULL")
+          gm = gm.where("pseudonyms.sis_user_id IS NOT NULL AND group_memberships.sis_batch_id IS NOT NULL")
         end
 
         if @include_deleted
-          gm = gm.scoped(:conditions => "( groups.workflow_state <> 'deleted'
-                                           AND group_memberships.workflow_state <> 'deleted')
-                                         OR
-                                         ( pseudonyms.sis_user_id IS NOT NULL
-                                           AND group_memberships.sis_batch_id IS NOT NULL)")
+          gm = gm.where("(groups.workflow_state<>'deleted'
+                         AND group_memberships.workflow_state<>'deleted')
+                         OR
+                         (pseudonyms.sis_user_id IS NOT NULL
+                         AND group_memberships.sis_batch_id IS NOT NULL)")
         else
-          gm = gm.scoped(:conditions => "groups.workflow_state <> 'deleted'
-                                         AND group_memberships.workflow_state <> 'deleted'")
+          gm = gm.where("groups.workflow_state<>'deleted' AND group_memberships.workflow_state<>'deleted'")
         end
 
-        if @account.id != @domain_root_account.id
-          gm = gm.scoped(:conditions => ["groups.context_id=?
-                                          AND groups.context_type = 'Account'", @account.id])
+        if account != root_account
+          gm = gm.where(:groups => { :context_id => account, :context_type => 'Account' })
         end
 
         gm.find_each do |gm|
@@ -531,41 +491,31 @@ module Canvas::AccountReports
                      'status']
         end
         csv << headers
-        xl = @domain_root_account.course_sections.scoped(
-          :select => "course_sections.*, courses.sis_source_id AS course_sis_id",
-          :joins => "INNER JOIN courses ON course_sections.course_id = courses.id
-                     INNER JOIN courses nxc ON course_sections.nonxlist_course_id = nxc.id",
-          :conditions => "course_sections.nonxlist_course_id IS NOT NULL")
-
-        if @term
-          xl = xl.scoped(:conditions => ["courses.enrollment_term_id=?", @term])
-        end
+        @domain_root_account = root_account
+        xl = root_account.course_sections.
+          select("course_sections.*, courses.sis_source_id AS course_sis_id").
+          joins("INNER JOIN courses ON course_sections.course_id = courses.id
+                 INNER JOIN courses nxc ON course_sections.nonxlist_course_id = nxc.id").
+          where("course_sections.nonxlist_course_id IS NOT NULL")
 
         if @sis_format
-          xl = xl.scoped(:conditions => "courses.sis_source_id IS NOT NULL
-                                         AND course_sections.sis_source_id IS NOT NULL")
+          xl = xl.where("courses.sis_source_id IS NOT NULL AND course_sections.sis_source_id IS NOT NULL")
         end
 
         if @include_deleted
-          xl = xl.scoped(:conditions => "( courses.workflow_state <> 'deleted'
-                                           AND course_sections.workflow_state <> 'deleted')
-                                         OR
-                                         ( courses.sis_source_id IS NOT NULL
-                                           AND course_sections.sis_source_id IS NOT NULL)")
+          xl = xl.where("(courses.workflow_state<>'deleted'
+                         AND course_sections.workflow_state<>'deleted')
+                         OR
+                         (courses.sis_source_id IS NOT NULL
+                         AND course_sections.sis_source_id IS NOT NULL)")
         else
-          xl = xl.scoped(:conditions => "courses.workflow_state <> 'deleted'
-                                         AND courses.workflow_state <> 'completed'
-                                         AND course_sections.workflow_state <> 'deleted'")
+          xl = xl.where("courses.workflow_state<>'deleted'
+                         AND courses.workflow_state<>'completed'
+                         AND course_sections.workflow_state<>'deleted'")
         end
 
-        if @account.id != @domain_root_account.id
-          xl = xl.scoped(:conditions => ["EXISTS (SELECT course_id
-                                          FROM course_account_associations caa
-                                          WHERE caa.account_id = ?
-                                          AND caa.course_id=course_sections.course_id
-                                          AND caa.course_section_id IS NULL
-                                          )", @account.id])
-        end
+        xl = add_course_sub_account_scope(xl)
+        xl = add_term_scope(xl)
 
         xl.find_each do |x|
           row = []

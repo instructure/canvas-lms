@@ -1,11 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "external migrations" do
-  it_should_behave_like "forked server selenium tests"
-
-  append_after(:all) do
-    Setting.remove("file_storage_test_override")
-  end
+  it_should_behave_like "in-process server selenium tests"
 
   before(:each) do
     @password = "asdfasdf"

@@ -108,7 +108,7 @@ shared_examples_for 'Delayed::Batch' do
     it_should_behave_like "delayed_jobs_shards"
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
       it_should_behave_like "delayed_jobs_shards"
     end
   end

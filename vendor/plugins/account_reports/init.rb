@@ -42,7 +42,7 @@ Rails.configuration.to_prepare do
       :parameters_partial => true,
       :parameters => {
         :enrollment_term => {
-          :required => true,
+          :required => false,
           :description => 'The canvas id of the term to get grades from'
         },
         :include_deleted => {

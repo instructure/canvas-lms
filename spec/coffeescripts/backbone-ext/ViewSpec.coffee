@@ -136,3 +136,24 @@ define ['Backbone'], ({View}) ->
     # call the handlers manually
     view.foo()
     view.bar()
+
+  test 'View.mixin initialize, attach and afterRender magic tricks', ->
+    mixin1 =
+      initialize: sinon.spy()
+      attach: sinon.spy()
+      afterRender: sinon.spy()
+    mixin2 =
+      initialize: sinon.spy()
+      attach: sinon.spy()
+      afterRender: sinon.spy()
+    class SomeView extends View
+      @mixin mixin1, mixin2
+    view = new SomeView
+    view.render()
+    ok mixin1.initialize.calledOnce, 'called mixin1 initialize'
+    ok mixin2.initialize.calledOnce, 'called mixin2 initialize'
+    ok mixin1.afterRender.calledOnce, 'called mixin1 afterRender'
+    ok mixin2.afterRender.calledOnce, 'called mixin2 afterRender'
+    ok mixin1.attach.calledOnce, 'called mixin1 attach'
+    ok mixin2.attach.calledOnce, 'called mixin2 attach'
+

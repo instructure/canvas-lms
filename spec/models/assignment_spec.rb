@@ -50,7 +50,7 @@ describe Assignment do
   it "should touch assignment group on create/save" do
     course
     group = @course.assignment_groups.create!(:name => "Assignments")
-    AssignmentGroup.update_all({ :updated_at => 1.hour.ago }, { :id => group.id })
+    AssignmentGroup.where(:id => group).update_all(:updated_at => 1.hour.ago)
     orig_time = group.reload.updated_at.to_i
     a = @course.assignments.build(
                                           "title"=>"test",
@@ -167,7 +167,7 @@ describe Assignment do
                                   :enrollment_state => 'active', 
                                   :section => section3,
                                   :allow_multiple_enrollments => true)
-      @user.enrollments.count(:conditions => "workflow_state = 'active'").should eql(3)
+      @user.enrollments.where(:workflow_state => 'active').count.should eql(3)
       @assignment.reload
       @assignment.needs_grading_count.should eql(1)
   
@@ -181,21 +181,21 @@ describe Assignment do
       e.destroy
       @assignment.reload
       @assignment.needs_grading_count.should eql(0)
-      @user.enrollments.count(:conditions => "workflow_state = 'active'").should eql(0)
+      @user.enrollments.where(:workflow_state => 'active').count.should eql(0)
 
       # enroll the user as a teacher, it should have no effect
       e4 = @course.enroll_teacher(@user)
       e4.accept
       @assignment.reload
       @assignment.needs_grading_count.should eql(0)
-      @user.enrollments.count(:conditions => "workflow_state = 'active'").should eql(1)
+      @user.enrollments.where(:workflow_state => 'active').count.should eql(1)
     end
 
     it "updated_at should be set when needs_grading_count changes due to a submission" do
       setup_assignment_with_homework
       @assignment.needs_grading_count.should eql(1)
       old_timestamp = Time.now.utc - 1.minute
-      Assignment.update_all({:updated_at => old_timestamp}, {:id => @assignment.id})
+      Assignment.where(:id => @assignment).update_all(:updated_at => old_timestamp)
       @assignment.grade_student(@user, :grade => "0")
       @assignment.reload
       @assignment.needs_grading_count.should eql(0)
@@ -206,7 +206,7 @@ describe Assignment do
       setup_assignment_with_homework
       old_timestamp = Time.now.utc - 1.minute
       @assignment.needs_grading_count.should eql(1)
-      Assignment.update_all({:updated_at => old_timestamp}, {:id => @assignment.id})
+      Assignment.where(:id => @assignment).update_all(:updated_at => old_timestamp)
       @course.offer!
       @course.enrollments.find_by_user_id(@user.id).destroy
       @assignment.reload
@@ -1169,16 +1169,20 @@ describe Assignment do
       </div>}
       assignment_model(:due_at => "Sep 3 2008 12:00am", :description => html)
       ev = @assignment.to_ics(false)
-      ev.description.should == "This assignment is due December 16th. Plz discuss the reading.\n  \n\n\n Test."
-      ev.x_alt_desc.should == html.strip
+      pending("assignment description disabled") do
+        ev.description.should == "This assignment is due December 16th. Plz discuss the reading.\n  \n\n\n Test."
+        ev.x_alt_desc.should == html.strip
+      end
     end
 
     it ".to_ics should run the description through api_user_content to translate links" do
       html = %{<a href="/calendar">Click!</a>}
       assignment_model(:due_at => "Sep 3 2008 12:00am", :description => html)
       ev = @assignment.to_ics(false)
-      ev.description.should == "[Click!](http://localhost/calendar)"
-      ev.x_alt_desc.should == %{<a href="http://localhost/calendar">Click!</a>}
+      pending("assignment description disabled") do
+        ev.description.should == "[Click!](http://localhost/calendar)"
+        ev.x_alt_desc.should == %{<a href="http://localhost/calendar">Click!</a>}
+      end
     end
 
     it ".to_ics should populate uid and summary fields" do
@@ -1186,7 +1190,7 @@ describe Assignment do
       assignment_model(:due_at => "Sep 3 2008 11:55am", :title => "assignment title")
       ev = @a.to_ics(false)
       ev.uid.should == "event-assignment-#{@a.id}"
-      ev.summary.should == "#{@a.title}"
+      ev.summary.should == "#{@a.title} [#{@a.context.course_code}]"
       # TODO: ev.url.should == ?
     end
 
@@ -1201,7 +1205,7 @@ describe Assignment do
       assignment = AssignmentOverrideApplicator.assignment_with_overrides(@a, [@override])
       ev = assignment.to_ics(false)
       ev.uid.should == "event-assignment-override-#{@override.id}"
-      ev.summary.should == "#{@a.title} (#{@override.title})"
+      ev.summary.should == "#{@a.title} (#{@override.title}) [#{assignment.context.course_code}]"
       #TODO: ev.url.should == ?
     end
 
@@ -1216,7 +1220,7 @@ describe Assignment do
       assignment = AssignmentOverrideApplicator.assignment_with_overrides(@a, [@override])
       ev = assignment.to_ics(false)
       ev.uid.should == "event-assignment-#{@a.id}"
-      ev.summary.should == "#{@a.title}"
+      ev.summary.should == "#{@a.title} [#{@a.context.course_code}]"
     end
 
   end
@@ -2178,7 +2182,7 @@ describe Assignment do
 
   end
 
-  context "not_locked named_scope" do
+  context "not_locked scope" do
     before :each do
       course_with_student_logged_in(:active_all => true)
       assignment_quiz([], :course => @course, :user => @user)

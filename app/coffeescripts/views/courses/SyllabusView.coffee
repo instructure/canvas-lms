@@ -25,6 +25,9 @@ define [
   class SyllabusView extends Backbone.View
     template: template
 
+    initialize: ({@can_read, @is_valid_user}) ->
+      super
+
     # Normalizes the JSON for all of the aggregated event types
     # into something simpler for the template to consume
     #
@@ -90,6 +93,8 @@ define [
     toJSON: ->
       now = new Date
       today = new Date now.getFullYear(), now.getMonth(), now.getDate()
+      html_url_for_assignment = @can_read
+      html_url_for_event = @can_read && @is_valid_user # since the calendar page doesn't support anonymous access yet
 
       relatedEvents = {}
       lastDate = null
@@ -97,9 +102,13 @@ define [
       dateCollator = (memo, json) ->
         related_id = json['related_id']
         related_id ?= json['id']
-        type = if json['assignment'] then "assignment" else "event"
+        if json['assignment']
+          type = 'assignment'
+          html_url = json['html_url'] if html_url_for_assignment
+        else
+          type = 'event'
+          html_url = json['html_url'] if html_url_for_event
         title = json['title']
-        html_url = json['html_url']
         start_at = $.fudgeDateForProfileTimezone(Date.parse(json['start_at'])) if json['start_at']
         end_at = $.fudgeDateForProfileTimezone(Date.parse(json['end_at'])) if json['end_at']
         due_at = $.fudgeDateForProfileTimezone(Date.parse(json['assignment']['due_at'])) if json['assignment']?['due_at']

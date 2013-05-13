@@ -35,7 +35,7 @@ class AssessmentQuestion < ActiveRecord::Base
                         "multiple_choice_question", "numerical_question", 
                         "text_only_question", "short_answer_question", 
                         "multiple_dropdowns_question", "calculated_question", 
-                        "essay_question", "true_false_question"]
+                        "essay_question", "true_false_question", "file_upload_question"]
 
   serialize :question_data
 
@@ -394,15 +394,6 @@ class AssessmentQuestion < ActiveRecord::Base
     return question
   end
   
-  def self.update_question(assessment_question, qdata)
-    question = parse_question(qdata, assessment_question)
-    assessment_question.question_data = question
-    assessment_question.name = question[:question_name]
-    assessment_question.save
-    question[:assessment_question_id] = assessment_question.id
-    question
-  end
-  
   def self.variable_id(variable)
     Digest::MD5.hexdigest(["dropdown", variable, "instructure-key"].join(","))
   end
@@ -460,7 +451,7 @@ class AssessmentQuestion < ActiveRecord::Base
     end
     if migration.to_import('assessment_questions') != false || (to_import && !to_import.empty?)
 
-      questions_to_update = migration.context.assessment_questions.scoped(:conditions => {:migration_id => questions.collect{|q| q['migration_id']}})
+      questions_to_update = migration.context.assessment_questions.where(:migration_id => questions.collect{|q| q['migration_id']})
       questions_to_update.each do |question_to_update|
         questions.find{|q| q['migration_id'].eql?(question_to_update.migration_id)}['assessment_question_id'] = question_to_update.id
       end
@@ -485,6 +476,10 @@ class AssessmentQuestion < ActiveRecord::Base
             bank.migration_id = question[:question_bank_id]
             bank.save!
           end
+          if bank.workflow_state == 'deleted'
+            bank.workflow_state = 'active'
+            bank.save!
+          end
           banks[hash_id] = bank
         end
         
@@ -502,7 +497,7 @@ class AssessmentQuestion < ActiveRecord::Base
           
           question_data[:aq_data][question['migration_id']] = question
         rescue
-          migration.add_warning("Couldn't import quiz question \"#{question[:question_name]}\"", $!)
+          migration.add_import_warning(t('#migration.quiz_question_type', "Quiz Question"), question[:question_name], $!)
         end
       end
     end
@@ -520,6 +515,10 @@ class AssessmentQuestion < ActiveRecord::Base
         bank ||= context.assessment_question_banks.new
         bank.title = hash[:question_bank_name]
         bank.migration_id = migration_id
+        bank.save!
+      end
+      if bank.workflow_state == 'deleted'
+        bank.workflow_state = 'active'
         bank.save!
       end
     end
@@ -540,23 +539,32 @@ class AssessmentQuestion < ActiveRecord::Base
       id = AssessmentQuestion.connection.insert(query)
       hash['assessment_question_id'] = id
     end
+    if context.respond_to?(:content_migration) && context.content_migration
+      hash[:missing_links].each do |field, missing_links|
+        context.content_migration.add_missing_content_links(:class => self.to_s,
+         :id => hash['assessment_question_id'], :field => field, :missing_links => missing_links,
+         :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/question_banks/#{bank.id}#question_#{hash['assessment_question_id']}_question_text")
+      end
+    end
+    hash.delete(:missing_links)
     hash
   end
   
   def self.prep_for_import(hash, context)
+    hash[:missing_links] = {}
     [:question_text, :correct_comments_html, :incorrect_comments_html, :neutral_comments_html, :more_comments_html].each do |field|
-      hash[field] = ImportedHtmlConverter.convert(hash[field], context, true) if hash[field].present?
+      hash[:missing_links][field] = []
+      hash[field] = ImportedHtmlConverter.convert(hash[field], context, {:missing_links => hash[:missing_links][field], :remove_outer_nodes_if_one_child => true}) if hash[field].present?
     end
-    hash[:answers].each do |answer|
+    hash[:answers].each_with_index do |answer, i|
       [:html, :comments_html, :left_html].each do |field|
-        answer[field] = ImportedHtmlConverter.convert(answer[field], context, true) if answer[field].present?
+        hash[:missing_links]["answer #{i} #{field}"] = []
+        answer[field] = ImportedHtmlConverter.convert(answer[field], context, {:missing_links => hash[:missing_links]["answer #{i} #{field}"], :remove_outer_nodes_if_one_child => true}) if answer[field].present?
       end
     end if hash[:answers]
     hash[:prepped_for_import] = true
     hash
   end
   
-  named_scope :active, lambda {
-    {:conditions => ['assessment_questions.workflow_state != ?', 'deleted'] }
-  }
+  scope :active, where("assessment_questions.workflow_state<>'deleted'")
 end

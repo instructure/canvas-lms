@@ -68,7 +68,7 @@ class CollaborationsController < ApplicationController
 
   def create
     return unless authorized_action(@context.collaborations.build, @current_user, :create)
-    users     = User.all(:conditions => { :id => Array(params[:user]) })
+    users     = User.where(:id => Array(params[:user])).all
     group_ids = Array(params[:group])
     params[:collaboration][:user] = @current_user
     @collaboration = Collaboration.typed_collaboration_instance(params[:collaboration].delete(:collaboration_type))
@@ -90,7 +90,7 @@ class CollaborationsController < ApplicationController
   def update
     @collaboration = @context.collaborations.find(params[:id])
     return unless authorized_action(@collaboration, @current_user, :update)
-    users     = User.all(:conditions => { :id => Array(params[:user]) })
+    users     = User.where(:id => Array(params[:user])).all
     group_ids = Array(params[:group])
     params[:collaboration].delete :collaboration_type
     @collaboration.attributes = params[:collaboration]
@@ -128,7 +128,7 @@ class CollaborationsController < ApplicationController
   # @returns [Collaborator]
   def members
     return unless authorized_action(@collaboration, @current_user, :read)
-    collaborators = @collaboration.collaborators.scoped(:include => [:group, :user])
+    collaborators = @collaboration.collaborators.includes(:group, :user)
     collaborators = Api.paginate(collaborators,
                                  self,
                                  api_v1_collaboration_members_url)

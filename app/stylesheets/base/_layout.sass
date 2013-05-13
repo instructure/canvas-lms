@@ -4,7 +4,7 @@ body
   background-image: url("/images/blue/bg.jpg")
   min-width: $min_main_width
 
-  &.no-headers
+  &.no-headers, &.embedded
     #header, #topbar, #left-side, #breadcrumbs
       display: none !important
     #footer
@@ -27,6 +27,16 @@ body
       min-height: 0
     #content
       padding: 1em
+    h2
+      @include ui-widget-header-bg-and-text
+      font-size: 14px
+      font-weight: bold
+      margin: -0.95em -0.95em 1em
+      padding: 0.4em 1em
+      line-height: 20px
+    &.no-headers
+      h2
+        display: none
     .embedded-footer
       position: absolute
       bottom: 0
@@ -37,7 +47,7 @@ body
       border-top: 1px solid #DDD
       box-shadow: inset 0 1px 0 white
       text-align: right
-      a
+      .footer-info
         position: absolute
         left: 1em
         top: 1.5em
@@ -64,7 +74,7 @@ body
 #main
   position: relative
   z-index: 10
-  background-color: $main_background_color
+  background-color: $bodyBackground
   border: 1px solid $listBorderColor
   border-top: 0
   margin-bottom: 40px
@@ -147,7 +157,7 @@ body
       line-height: 29px
       padding-left: 12px
       margin-left: 8px
-      background: url(/images/breadcrumb-chevron.png) left 50% no-repeat
+      @include bg-image(breadcrumb-chevron, png, no-repeat, 0, 50%, transparent, 5px, 9px)
       &:first-child
         background: none
         padding-left: 0
@@ -155,9 +165,10 @@ body
     .home a
       color: #ccc
       i
-        font-size: 12px
         margin-right: -5px
         vertical-align: text-bottom
+        &:before
+          font-size: 12px
 
   .ellipsis
     display: inline-block
@@ -175,8 +186,8 @@ body
   a
     border-left: 1px solid #5C5C5C
     color: #5C5C5C
-    margin-right: 0.4em
-    padding-left: 0.4em
+    padding-right: 2px
+    padding-left: 5px
     &:hover, &:focus
       text-decoration: underline
     // ie7 supports :first-child so this will work on everything we support.

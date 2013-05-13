@@ -28,7 +28,7 @@ describe 'SetSamlEntityId' do
     @account = Account.new
     @account.save
     @aac = @account.account_authorization_configs.create!(:auth_type => "saml")
-    AccountAuthorizationConfig.update_all(:entity_id => nil, :id => [@aac.id])
+    AccountAuthorizationConfig.where(:id => @aac).update_all(:entity_id => nil)
   end
   
   it "should set the entity_id to the current setting if none is set" do

@@ -11,11 +11,7 @@ class AddUserObservers < ActiveRecord::Migration
     add_index :user_observers, :observer_id
 
     # User#move_to_user already needed this, and now we do a second query there
-    if connection.adapter_name =~ /\Apostgresql/i
-      execute('CREATE INDEX CONCURRENTLY "index_enrollments_on_associated_user_id" ON enrollments(associated_user_id) WHERE associated_user_id IS NOT NULL')
-    else
-      add_index :enrollments, [:associated_user_id], :name => "index_enrollments_on_associated_user_id"
-    end
+    add_index :enrollments, [:associated_user_id], :concurrently => true, :conditions => "associated_user_id IS NOT NULL"
   end
 
   def self.down

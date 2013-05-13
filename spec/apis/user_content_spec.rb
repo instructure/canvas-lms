@@ -19,7 +19,70 @@
 require File.expand_path(File.dirname(__FILE__) + '/api_spec_helper')
 
 describe UserContent, :type => :integration do
-  it "should translate file links to directly-downloadable urls" do
+  it "should translate course file download links to directly-downloadable urls" do
+    course_with_teacher(:active_all => true)
+    attachment_model
+    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
+    <p>
+      Hello, students.<br>
+      This will explain everything: <img src="/courses/#{@course.id}/files/#{@attachment.id}/download" alt="important">
+    </p>
+    HTML
+
+    json = api_call(:get,
+      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+      { :controller => 'assignments_api', :action => 'show',
+        :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
+
+    doc = Nokogiri::HTML::DocumentFragment.parse(json['description'])
+    doc.at_css('img')['src'].should == "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
+  end
+
+  it "should translate group file download links to directly-downloadable urls" do
+    course_with_teacher(:active_all => true)
+    @group = @course.groups.create!(:name => "course group")
+    attachment_model(:context => @group)
+    @group.add_user(@teacher)
+    @group_topic = @group.discussion_topics.create!(:title => "group topic", :user => @teacher, :message =>  <<-HTML)
+    <p>
+      Hello, students.<br>
+      This will explain everything: <img src="/groups/#{@group.id}/files/#{@attachment.id}/download" alt="important">
+    </p>
+    HTML
+
+    json = api_call(:get,
+      "/api/v1/groups/#{@group.id}/discussion_topics/#{@group_topic.id}",
+      { :controller => 'discussion_topics_api', :action => 'show',
+        :format => 'json', :group_id => @group.id.to_s, :topic_id => @group_topic.id.to_s })
+
+    doc = Nokogiri::HTML::DocumentFragment.parse(json['message'])
+    doc.at_css('img')['src'].should == "http://www.example.com/groups/#{@group.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
+  end
+
+  it "should translate file download links to directly-downloadable urls for deleted and replaced files" do
+    course_with_teacher(:active_all => true)
+    attachment_model
+    @attachment.destroy
+    attachment2 = Attachment.create!(:folder => @attachment.folder, :context => @attachment.context, :filename => @attachment.filename, :uploaded_data => StringIO.new("first"))
+    @context.attachments.find(@attachment.id).id.should == attachment2.id
+
+    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
+    <p>
+      Hello, students.<br>
+      This will explain everything: <img src="/courses/#{@course.id}/files/#{@attachment.id}/download" alt="important">
+    </p>
+    HTML
+
+    json = api_call(:get,
+      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+      { :controller => 'assignments_api', :action => 'show',
+        :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
+
+    doc = Nokogiri::HTML::DocumentFragment.parse(json['description'])
+    doc.at_css('img')['src'].should == "http://www.example.com/courses/#{@course.id}/files/#{attachment2.id}/download?verifier=#{attachment2.uuid}"
+  end
+
+  it "should translate file preview links to directly-downloadable preview urls" do
     course_with_teacher(:active_all => true)
     attachment_model
     @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
@@ -30,12 +93,12 @@ describe UserContent, :type => :integration do
     HTML
 
     json = api_call(:get,
-                    "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-    { :controller => 'assignments_api', :action => 'show',
-      :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
+      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+      { :controller => 'assignments_api', :action => 'show',
+        :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
 
     doc = Nokogiri::HTML::DocumentFragment.parse(json['description'])
-    doc.at_css('img')['src'].should == "http://www.example.com/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
+    doc.at_css('img')['src'].should == "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/preview?verifier=#{@attachment.uuid}"
   end
 
   it "should translate media comment links to embedded video tags" do

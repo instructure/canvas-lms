@@ -4,10 +4,11 @@ class AddBetterFolderIndex < ActiveRecord::Migration
 
   def self.up
     if connection.adapter_name == 'PostgreSQL'
+      concurrently = " CONCURRENTLY" if connection.open_transactions == 0
       if connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='collkey'").to_i != 0
-        execute("CREATE INDEX CONCURRENTLY index_folders_on_parent_folder_id_and_workflow_state_and_name ON folders (parent_folder_id, workflow_state, collkey(name, 'root', true, 2, true))")
+        execute("CREATE INDEX#{concurrently} index_folders_on_parent_folder_id_and_workflow_state_and_name ON folders (parent_folder_id, workflow_state, collkey(name, 'root', true, 2, true))")
       else
-        execute("CREATE INDEX CONCURRENTLY index_folders_on_parent_folder_id_and_workflow_state_and_name ON folders (parent_folder_id, workflow_state, CAST(LOWER(replace(name, '\\', '\\\\')) AS bytea))")
+        execute("CREATE INDEX#{concurrently} index_folders_on_parent_folder_id_and_workflow_state_and_name ON folders (parent_folder_id, workflow_state, CAST(LOWER(replace(name, '\\', '\\\\')) AS bytea))")
       end
     else
       add_index :folders, [:parent_folder_id, :workflow_state, :name], :name =>"index_folders_on_parent_folder_id_and_workflow_state_and_name", :length => { :name => 20 }

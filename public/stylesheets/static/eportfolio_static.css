@@ -138,8 +138,6 @@ img {
   #content p {
     margin-top: 0;
     margin-bottom: 1em; }
-  #content .content_underline_links a {
-    text-decoration: underline; }
 
 #sidebar, #floating_sidebar {
   float: right;

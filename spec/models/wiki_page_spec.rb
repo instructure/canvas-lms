@@ -1,3 +1,4 @@
+# coding: utf-8
 #
 # Copyright (C) 2011 Instructure, Inc.
 #
@@ -42,6 +43,12 @@ describe WikiPage do
     @course.wiki.wiki_pages.new(:title => "!!!").valid?.should_not be_true
     @course.wiki.wiki_pages.new(:title => "a"*256).valid?.should_not be_true
     @course.wiki.wiki_pages.new(:title => "asdf").valid?.should be_true
+  end
+
+  it "should transliterate unicode characters in the title for the url" do
+    course_with_teacher(:active_all => true)
+    page = @course.wiki.wiki_pages.create!(:title => "æ vęrÿ ßpéçïâł なまえ ¼‽")
+    page.url.should == 'ae-very-sspecial-namae-1-slash-4'
   end
 
   it "should make the title/url unique" do

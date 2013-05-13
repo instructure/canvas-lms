@@ -47,12 +47,12 @@ class Pseudonym < ActiveRecord::Base
   include StickySisFields
   are_sis_sticky :unique_id
 
+  validates_each :password, {:if => :require_password?}, &Canvas::PasswordPolicy.method("validate")
   acts_as_authentic do |config|
-    config.validates_format_of_login_field_options = {:with => /\A\w[\w\.\+\-_@ =]*\z/}
+    config.validates_format_of_login_field_options = {:with => /\A\w[\w\.\+\-_'@ =]*\z/}
     config.login_field :unique_id
     config.validations_scope = [:account_id, :workflow_state]
     config.perishable_token_valid_for = 30.minutes
-    config.validates_length_of_password_field_options = { :minimum => 6, :if => :require_password? }
     config.validates_length_of_login_field_options = {:within => 1..100}
     config.validates_uniqueness_of_login_field_options = { :case_sensitive => false, :scope => [:account_id, :workflow_state], :if => lambda { |p| p.unique_id_changed? && p.active? } }
   end
@@ -103,11 +103,11 @@ class Pseudonym < ActiveRecord::Base
     @send_confirmation = false
   end
 
-  named_scope :by_unique_id, lambda { |unique_id|
-    if connection_pool.spec.config[:adapter] == 'mysql'
-      { :conditions => {:unique_id => unique_id } }
+  scope :by_unique_id, lambda { |unique_id|
+    if %w{mysql mysql2}.include?(connection_pool.spec.config[:adapter])
+      where(:unique_id => unique_id)
     else
-      { :conditions => ["LOWER(#{quoted_table_name}.unique_id)=?", unique_id.mb_chars.downcase] }
+      where("LOWER(#{quoted_table_name}.unique_id)=?", unique_id.mb_chars.downcase)
     end
   }
 
@@ -126,7 +126,7 @@ class Pseudonym < ActiveRecord::Base
   end
   
   def communication_channel
-    self.user.communication_channels.by_path(self.unique_id).find(:first)
+    self.user.communication_channels.by_path(self.unique_id).first
   end
   
   def confirmation_code
@@ -315,8 +315,8 @@ class Pseudonym < ActiveRecord::Base
     end
     self.save
     if old_user_id
-      CommunicationChannel.update_all({:user_id => user.id}, {:path => self.unique_id, :user_id => old_user_id})
-      User.update_all({:updated_at => Time.now.utc}, {:id => [old_user_id, user.id]})
+      CommunicationChannel.where(:path => self.unique_id, :user_id => old_user_id).update_all(:user_id => user)
+      User.where(:id => [old_user_id, user]).update_all(:update_at => Time.now.utc)
     end
     if User.find(old_user_id).pseudonyms.empty? && migrate
       UserMerge.from(old_user).into(user)
@@ -374,10 +374,7 @@ class Pseudonym < ActiveRecord::Base
     nil
   end
 
-  named_scope :account_unique_ids, lambda{|account, *unique_ids|
-    {:conditions => {:account_id => account.id, :unique_id => unique_ids}, :order => :unique_id}
-  }
-  named_scope :active, :conditions => ['pseudonyms.workflow_state IS NULL OR pseudonyms.workflow_state != ?', 'deleted']
+  scope :active, where("pseudonyms.workflow_state IS NULL OR pseudonyms.workflow_state<>'deleted'")
 
   def self.serialization_excludes; [:crypted_password, :password_salt, :reset_password_token, :persistence_token, :single_access_token, :perishable_token, :sis_ssha]; end
 
@@ -389,7 +386,7 @@ class Pseudonym < ActiveRecord::Base
       active.
         by_unique_id(credentials[:unique_id]).
         where(:account_id => account_ids).
-        all(:include => :user).
+        includes(:user).
         select { |p|
           valid = p.valid_arbitrary_credentials?(credentials[:password])
           too_many_attempts = true if p.audit_login(remote_ip, valid) == :too_many_attempts

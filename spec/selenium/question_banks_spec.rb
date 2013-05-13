@@ -13,12 +13,15 @@ describe "question bank" do
     keep_trying_until do
       ffj('.display_question:visible').length.should == 60
       driver.execute_script("$('.display_question .links a').css('left', '0')")
+      wait_for_ajaximations
       driver.execute_script("window.confirm = function(msg) { return true; };")
+      wait_for_ajaximations
       fj(".display_question:visible:last .delete_question_link").click
       wait_for_ajaximations
       ffj('.display_question:visible').length.should == 59
     end
     @bank.reload
+    wait_for_ajaximations
     @bank.assessment_questions.select { |aq| !aq.deleted? }.length.should == 59
   end
 end

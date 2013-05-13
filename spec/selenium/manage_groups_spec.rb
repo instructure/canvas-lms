@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/manage_groups_common
 require 'thread'
 
 describe "manage groups" do
-  it_should_behave_like "manage groups selenium tests"
+  it_should_behave_like "in-process server selenium tests"
 
   before (:each) do
     course_with_teacher_logged_in
@@ -151,6 +151,18 @@ describe "manage groups" do
     f("#category_#{group_category.id} #group_#{group.id}").should be_displayed
   end
 
+  it "should not show the Make a New Set of Groups button if there are no students in the course" do
+    get "/courses/#{@course.id}/groups"
+    f('.add_category_link').should be_nil
+    f('#no_students_message').should be_displayed
+  end
+  it "should show the Make a New Set of Groups button if there are students in the course" do
+    student_in_course
+    get "/courses/#{@course.id}/groups"
+    f('.add_category_link').should be_displayed
+    f('#no_students_message').should be_nil
+  end
+
   context "data validation" do
     before (:each) do
       student_in_course
@@ -194,17 +206,5 @@ describe "manage groups" do
       f('#category_no_groups').click
       f('#category_split_group_count').should have_attribute(:value, '')
     end
-  end
-
-  it "should not show the Make a New Set of Groups button if there are no students in the course" do
-    get "/courses/#{@course.id}/groups"
-    f('.add_category_link').should be_nil
-    f('#no_students_message').should be_displayed
-  end
-  it "should show the Make a New Set of Groups button if there are students in the course" do
-    student_in_course
-    get "/courses/#{@course.id}/groups"
-    f('.add_category_link').should be_displayed
-    f('#no_students_message').should be_nil
   end
 end

@@ -9,12 +9,12 @@ define [
       $link = $(e.target)
 
       options.width ?= 550
-      options.height ?= 450
+      options.height ?= 500
       options.title ?= $link.attr('title')
       options.resizable ?= false
 
       $dialog = $("<div>")
-      $iframe = $('<iframe>', style: "position:absolute;top:0;left:0;border:none", src: $link.attr('href') + '?embedded=1')
+      $iframe = $('<iframe>', style: "position:absolute;top:0;left:0;border:none", src: $link.attr('href') + '?embedded=1&no_headers=1')
       $dialog.append $iframe
 
       $dialog.on "dialogopen", ->

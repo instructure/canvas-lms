@@ -16,11 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'lib/sis/csv/base_importer'
-
 module SIS
   module CSV
-    class GroupMembershipImporter < BaseImporter
+    class GroupMembershipImporter < CSVBaseImporter
       def self.is_group_membership_csv?(row)
         row.include?('group_id') && row.include?('user_id')
       end

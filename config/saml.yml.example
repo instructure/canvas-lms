@@ -1,7 +1,7 @@
 # In order to consume encrypted SAML assertions, you'll need to create
 # a public/private keypair:
 # 
-# openssl req -new -newkey rsa:1024 -days 730 -nodes -x509 -keyout samlkey.pem -out samlcert.pem
+# openssl req -new -newkey rsa:2048 -days 730 -nodes -x509 -keyout samlkey.pem -out samlcert.pem
 
 production:
   entity_id: "http://www.your-domain.com/saml2"
@@ -15,6 +15,8 @@ development:
   encryption:
     private_key: /path/to/samlkey.pem
     certificate: /path/to/samlcert.pem
+    additional_private_keys:
+      - /path/to/oldsamlkey.pem
      
 test:
   entity_id: "http://www.your-domain.com/saml2"

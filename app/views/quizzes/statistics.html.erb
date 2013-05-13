@@ -209,7 +209,7 @@ tr.question td .number_answer.correct_answer {
       <% if @quiz.survey? && @quiz.anonymous_submissions %>
         <%= t(:student_n, "Student %{n}", :n => idx + 1) %>
       <% else %>
-        <%= context_user_name(@context, user) %>
+        <%= user.short_name %>
       <% end %>
     </div>
   <% end %>

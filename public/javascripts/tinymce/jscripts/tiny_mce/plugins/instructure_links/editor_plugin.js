@@ -89,7 +89,7 @@ define([
               }
               $box.find("#instructure_link_prompt_form").after($services);
             });
-            $box.append("<div style='font-size: 0.8em; margin-bottom: 5px;'>This will make the selected text a link, or insert a new link if nothing is selected.</div> Paste or type a url or wiki page in in the box below:<form id='instructure_link_prompt_form' style='margin-top: 5px;'><input type='text' class='prompt' style='width: 250px;' value='http://'/><button type='submit' class='insert_button button'>Insert Link</button></form>")
+            $box.append("<p><em>This will make the selected text a link, or insert a new link if nothing is selected.</em></p> <p>Paste or type a url or wiki page in in the box below:</p><form id='instructure_link_prompt_form' class='form-inline'><input type='text' class='prompt' class='btn' value='http://'/> <button type='submit' class='insert_button btn'>Insert Link</button></form>")
                 .append("<div class='actions'></div><div class='clear'></div>")
                 .append("<div class='disable_enhancement' style='display: none;'><input type='checkbox' class='disable_inline_content' id='disable_inline_content'/><label for='disable_inline_content'> Disable inline previews for this link</label></div>")
                 .append("<div class='auto_show' style='display: none;'><input type='checkbox' class='auto_show_inline_content' id='auto_show_inline_content'/><label for='auto_show_inline_content'> Auto-open the inline preview for this link</label></div>");

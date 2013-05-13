@@ -30,31 +30,23 @@ class NotificationPolicy < ActiveRecord::Base
   # This is for choosing a policy for another context, so:
   # NotificationPolicy.for(notification) or
   # communication_channel.notification_policies.for(notification)
-  named_scope :for, lambda { |context| 
+  scope :for, lambda { |context|
     case context
     when User
-      { :joins => :communication_channel,
-        :conditions => ["communication_channels.user_id = ? AND communication_channels.workflow_state <> 'retired'", context.id] }
+      joins(:communication_channel).
+          where("communication_channels.user_id=? AND communication_channels.workflow_state<>'retired'", context)
     when Notification
-      { :conditions => ['notification_policies.notification_id = ?', context.id] }
+      where(:notification_id => context)
     else
-      {}
+      scoped
     end
   }
   
-  # TODO: the named_scope name should be self-explanatory... change this to
+  # TODO: the scope name should be self-explanatory... change this to
   # by_frequency or something This is for choosing a policy by frequency
-  named_scope :by, lambda { |freq| 
-    case freq
-    when Array
-      { :conditions => { :frequency => freq.map{|f| f.to_s} } }
-    else
-      { :conditions => ['notification_policies.frequency = ?', freq.to_s] }
-    end
-  }
-  
-  named_scope :where, lambda { |where| { :include => [:communication_channel], :conditions => where } }
-  named_scope :in_state, lambda { |state| { :conditions => ["notification_policies.workflow_state = ?", state.to_s] } }
+  scope :by, lambda { |freq| where(:frequency => Array(freq).map(&:to_s)) }
+
+  scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
 
   def infer_frequency
     self.frequency ||= "immediately"
@@ -67,7 +59,7 @@ class NotificationPolicy < ActiveRecord::Base
   end
   
   def self.spam_blocked_by(user)
-    NotificationPolicy.delete_all({:communication_channel_id => user.communication_channels.map(&:id)})
+    NotificationPolicy.where(:communication_channel_id => user.communication_channels.pluck(:id)).delete_all
     cc = user.communication_channel
     cc.confirm
     Notification.all.each do |notification|
@@ -107,7 +99,7 @@ class NotificationPolicy < ActiveRecord::Base
       # User preference change not being made. Make a notification policy change.
 
       # Using the category name, fetch all Notifications for the category. Will set the desired value on them.
-      notifications = Notification.scoped(:select => :id, :conditions => {:category => params[:category]}).all.map(&:id)
+      notifications = Notification.where(:category => params[:category]).pluck(:id)
       # Look for frequency settings and only recognize a valid value.
       frequency = case params[:frequency]
         when Notification::FREQ_IMMEDIATELY, Notification::FREQ_DAILY, Notification::FREQ_WEEKLY, Notification::FREQ_NEVER
@@ -120,9 +112,15 @@ class NotificationPolicy < ActiveRecord::Base
       # entry. If other than than, create or update the entry.
       NotificationPolicy.transaction do
         notifications.each do |notification_id|
-          p = NotificationPolicy.scoped(:include => :communication_channel,
-                                        :conditions => ['communication_channels.user_id = ?', user.id] ).
-            find_or_initialize_by_communication_channel_id_and_notification_id(params[:channel_id], notification_id)
+          # can't use hash syntax for the where cause Rails 2 will try to call communication_channels= for the
+          # or_initialize portion
+          if Rails.version < '3.0'
+            p = NotificationPolicy.includes(:communication_channel).where("communication_channels.user_id=?", user).
+                find_or_initialize_by_communication_channel_id_and_notification_id(params[:channel_id], notification_id)
+          else
+            p = NotificationPolicy.joins(:communication_channel).where(:communication_channels => { :user_id => user }).
+              find_or_initialize_by_communication_channel_id_and_notification_id(params[:channel_id], notification_id)
+          end
           # Set the frequency and save
           p.frequency = frequency
           p.save!
@@ -153,10 +151,10 @@ class NotificationPolicy < ActiveRecord::Base
     full_category_list.each {|c| categories[c.category] = c.default_frequency(user) }
     if default_channel_id = user.communication_channel.try(:id)
       # Load unique list of categories that the user currently has settings for.
-      user_categories = NotificationPolicy.for(user).scoped({
-        :include => :notification,
-        :conditions => ["notification_id IS NOT NULL AND communication_channel_id = ?", default_channel_id]
-      }).all.map{|np| np.notification.category }.uniq
+      user_categories = NotificationPolicy.for(user).
+          includes(:notification).
+          where("notification_id IS NOT NULL AND communication_channel_id = ?", default_channel_id).
+          map{|np| np.notification.category }.uniq
       missing_categories = (categories.keys - user_categories)
       missing_categories.each do |need_category|
         # Create the settings for a completely unrepresented category. Use
@@ -168,6 +166,6 @@ class NotificationPolicy < ActiveRecord::Base
     end
     # Load and return user's policies after defaults may or may not have been set.
     # TODO: Don't load policies for retired channels
-    NotificationPolicy.scoped(:include => :notification).for(user)
+    NotificationPolicy.includes(:notification).for(user)
   end
 end

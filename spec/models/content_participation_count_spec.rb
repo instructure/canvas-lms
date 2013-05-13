@@ -56,7 +56,7 @@ describe ContentParticipationCount do
     it "should not save if not changed" do
       time = Time.now.utc - 1.day
       cpc = ContentParticipationCount.create_or_update(:context => @course, :user => @student, :content_type => "Submission")
-      ContentParticipationCount.update_all({:updated_at => time}, {:id => cpc.id})
+      ContentParticipationCount.where(:id => cpc).update_all(:updated_at => time)
       ContentParticipationCount.create_or_update(:context => @course, :user => @student, :content_type => "Submission")
       cpc.reload.updated_at.to_i.should == time.to_i
     end
@@ -106,7 +106,7 @@ describe ContentParticipationCount do
         cpc = ContentParticipationCount.create_or_update(:context => @course, :user => @teacher, :content_type => type)
         cpc.expects(:refresh_unread_count).never
         cpc.unread_count.should == 0
-        ContentParticipationCount.update_all({:updated_at => Time.now.utc - 1.day}, {:id => cpc.id})
+        ContentParticipationCount.where(:id => cpc).update_all(:updated_at => Time.now.utc - 1.day)
         cpc.reload
         cpc.expects(:refresh_unread_count)
         cpc.unread_count.should == 0
@@ -125,6 +125,12 @@ describe ContentParticipationCount do
       ContentParticipationCount.unread_submission_count_for(@course, @student).should == 1
     end
 
+    it "should be read after viewing the graded assignment" do
+      @submission = @assignment.grade_student(@student, { :grade => 3 }).first
+      @submission.change_read_state("read", @student)
+      ContentParticipationCount.unread_submission_count_for(@course, @student).should == 0
+    end
+
     it "should be unread after submission is graded" do
       @assignment.submit_homework(@student)
       @submission = @assignment.grade_student(@student, { :grade => 3 }).first
@@ -136,10 +142,16 @@ describe ContentParticipationCount do
       ContentParticipationCount.unread_submission_count_for(@course, @student).should == 1
     end
 
-    it "should be unread after submission is commented on by self" do
+    it "should be read after viewing the submission comment" do
+      @submission = @assignment.grade_student(@student, { :grader => @teacher, :comment => "good!" }).first
+      @submission.change_read_state("read", @student)
+      ContentParticipationCount.unread_submission_count_for(@course, @student).should == 0
+    end
+
+    it "should be read after submission is commented on by self" do
       @submission = @assignment.submit_homework(@student)
       @comment = SubmissionComment.create!(:submission => @submission, :comment => "hi", :author => @student)
-      @submission.read?(@student).should be_true
+      ContentParticipationCount.unread_submission_count_for(@course, @student).should == 0
     end
 
     it "should be read if other submission fields change" do

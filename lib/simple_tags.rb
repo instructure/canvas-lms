@@ -25,7 +25,9 @@ module SimpleTags
         tags.map{ |tag|
           wildcard(quoted_table_name + '.tags', tag, :delimiter => ',')
         }
-      scoped({:conditions => conditions.join(options[:mode] == :or ? " OR " : " AND ")})
+      conditions.empty? ?
+          where("?", false) :
+          where(conditions.join(options[:mode] == :or ? " OR " : " AND "))
     end
 
     def tagged_scope_handler(pattern, &block)

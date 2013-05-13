@@ -26,9 +26,9 @@ require [
   test "should init properly", ->
     me = new TimeBlockRow(@timeBlockList, {start, end})
     # make sure the <input> `value`s are right
-    equal me.inputs.date.$el.val(), start.toString("MMM d, yyyy")
-    equal me.inputs.start_time.$el.val(), start.toString("h:mmtt")
-    equal me.inputs.end_time.$el.val(), end.toString("h:mmtt")
+    equal me.inputs.date.$el.val().trim(),       start.toString("ddd MMM d, yyyy")
+    equal me.inputs.start_time.$el.val().trim(), start.toString("h:mm") + start.toString("tt").toLowerCase()
+    equal me.inputs.end_time.$el.val().trim(),     end.toString("h:mm") +   end.toString("tt").toLowerCase()
 
   test "delete link", ->
     me = @timeBlockList.addRow({start, end})

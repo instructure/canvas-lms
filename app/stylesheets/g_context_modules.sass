@@ -49,7 +49,10 @@ $context_module_bg_color: #f2f3f4
     .edit_module_link,
     .delete_module_link,
     .delete_prerequisite_link
-      display: inline  
+      display: inline
+    .delete_prerequisite_link
+      text-decoration: none
+      padding-left: 3px
     .header .links,
     .manage_module
       display: block
@@ -98,7 +101,8 @@ $context_module_bg_color: #f2f3f4
     float: right
   a.add-small
     line-height: normal
-  div.footer 
+  div.footer
+    +clearfix
     padding: 13px 10px 2px
     margin-left: 15px
     color: #666
@@ -304,12 +308,6 @@ $context_module_bg_color: #f2f3f4
   height: 15px
   border: 1px dashed #888
   margin: 3px 0
-
-#add_context_module_form 
-  .criterion 
-    padding: 2px 5px
-    &:hover 
-      background-color: #eee
 
 #student_progression_list 
   .student 

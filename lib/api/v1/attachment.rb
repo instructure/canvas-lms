@@ -48,7 +48,8 @@ module Api::V1::Attachment
       'hidden' => !!attachment.hidden?,
       'lock_at' => attachment.lock_at,
       'locked_for_user' => can_manage_files ? false : !!attachment.currently_locked,
-      'hidden_for_user' => can_manage_files ? false : !!attachment.hidden?
+      'hidden_for_user' => can_manage_files ? false : !!attachment.hidden?,
+      'thumbnail_url' => attachment.thumbnail_url
     }
   end
 

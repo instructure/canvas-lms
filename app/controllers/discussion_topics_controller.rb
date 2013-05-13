@@ -186,7 +186,6 @@ class DiscussionTopicsController < ApplicationController
              :GROUP_CATEGORIES => categories.
                                   reject { |category| category.student_organized? }.
                                   map { |category| { :id => category.id, :name => category.name } },
-             :IS_LARGE_ROSTER => @context.respond_to?(:large_roster?) && @context.large_roster?,
              :CONTEXT_ID => @context.id
       render :action => "edit"
     end
@@ -225,6 +224,8 @@ class DiscussionTopicsController < ApplicationController
       end
 
       @initial_post_required = @topic.initial_post_required?(@current_user, @context_enrollment, session)
+
+      @padless = true
 
       log_asset_access(@topic, 'topics', 'topics')
       respond_to do |format|
@@ -416,6 +417,10 @@ class DiscussionTopicsController < ApplicationController
         @topic.workflow_state = 'active' if @topic.post_delayed? && !@topic.delayed_post_at
       end
 
+      if discussion_topic_hash.has_key?(:message)
+        discussion_topic_hash[:message] = process_incoming_html_content(discussion_topic_hash[:message])
+      end
+
       #handle locking/unlocking
       if params.has_key? :locked
         if value_to_boolean(params[:locked])
@@ -456,7 +461,7 @@ class DiscussionTopicsController < ApplicationController
         end
 
         # handle creating/deleting assignment
-        if params[:assignment]
+        if params[:assignment] && !@topic.root_topic_id?
           if params[:assignment].has_key?(:set_assignment) && !value_to_boolean(params[:assignment][:set_assignment])
             if @topic.assignment && @topic.assignment.grants_right?(@current_user, session, :update)
               assignment = @topic.assignment

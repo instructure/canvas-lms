@@ -47,7 +47,9 @@ class AssignmentsController < ApplicationController
         elsif @just_viewing_one_course && @context.assignments.new.grants_right?(@current_user, session, :update)
           format.html
         else
-          @current_user_submissions ||= @current_user && @current_user.submissions.scoped(:select => 'id, assignment_id, score, workflow_state', :conditions => {:assignment_id => @upcoming_assignments.map(&:id)}) 
+          @current_user_submissions ||= @current_user && @current_user.submissions.
+              select([:id, :assignment_id, :score, :workflow_state]).
+              where(:assignment_id => @upcoming_assignments)
           format.html { render :action => "student_index" }
         end
         # TODO: eager load the rubric associations
@@ -76,8 +78,8 @@ class AssignmentsController < ApplicationController
       @assignment.context_module_action(@current_user, :read) if @unlocked && !@assignment.new_record?
 
       if @assignment.grants_right?(@current_user, session, :grade)
-        visible_student_ids = @context.enrollments_visible_to(@current_user).find(:all, :select => 'user_id').map(&:user_id)
-        @current_student_submissions = @assignment.submissions.scoped(:conditions => "submissions.submission_type IS NOT NULL").select{|s| visible_student_ids.include?(s.user_id) }
+        visible_student_ids = @context.enrollments_visible_to(@current_user).pluck(:user_id)
+        @current_student_submissions = @assignment.submissions.where("submissions.submission_type IS NOT NULL").where(:user_id => visible_student_ids).all
       end
 
       if @assignment.grants_right?(@current_user, session, :read_own_submission) && @context.grants_right?(@current_user, session, :read_grades)
@@ -215,14 +217,22 @@ class AssignmentsController < ApplicationController
   def syllabus
     add_crumb t '#crumbs.syllabus', "Syllabus"
     active_tab = "Syllabus"
-    if authorized_action(@context.assignments.new, @current_user, :read)
+    if authorized_action(@context, @current_user, [:read, :read_syllabus])
       return unless tab_enabled?(@context.class::TAB_SYLLABUS)
-      @groups = @context.assignment_groups.active.find(:all, :order => 'position, name')
+      @groups = @context.assignment_groups.active.order(:position, :name).all
       @assignment_groups = @groups
       @events = @context.events_for(@current_user)
       @undated_events = @events.select {|e| e.start_at == nil}
       @dates = (@events.select {|e| e.start_at != nil}).map {|e| e.start_at.to_date}.uniq.sort.sort
-      
+      if @context.grants_right?(@current_user, session, :read)
+        @syllabus_body = api_user_content(@context.syllabus_body, @context)
+      else
+        # the requesting user may not have :read if the course syllabus is public, in which
+        # case, we pass nil as the user so verifiers are added to links in the syllabus body
+        # (ability for the user to read the syllabus was checked above as :read_syllabus)
+        @syllabus_body = api_user_content(@context.syllabus_body, @context, nil)
+      end
+
       log_asset_access("syllabus:#{@context.asset_string}", "syllabus", 'other')
       respond_to do |format|
         format.html
@@ -305,7 +315,7 @@ class AssignmentsController < ApplicationController
       hash = {
         :ASSIGNMENT_GROUPS => assignment_groups.map{|g| assignment_group_json(g, @current_user, session) },
         :GROUP_CATEGORIES => group_categories,
-        :KALTURA_ENABLED => !!feature_enabled?( :kaltura ),
+        :KALTURA_ENABLED => !!feature_enabled?(:kaltura),
         :SECTION_LIST => (@context.course_sections.active.map { |section|
           {:id => section.id, :name => section.name }
         }),
@@ -313,7 +323,6 @@ class AssignmentsController < ApplicationController
           (assignment_overrides_json(@assignment.overrides_visible_to(@current_user)))
       }
       hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session)
-      hash[:IS_LARGE_ROSTER] = @context.large_roster?
       hash[:URL_ROOT] = polymorphic_url([:api_v1, @context, :assignments])
       hash[:CANCEL_TO] = @assignment.new_record? ? polymorphic_url([@context, :assignments]) : polymorphic_url([@context, @assignment])
       hash[:CONTEXT_ID] = @context.id
@@ -361,7 +370,7 @@ class AssignmentsController < ApplicationController
           @assignment.reload
           flash[:notice] = t 'notices.updated', "Assignment was successfully updated."
           format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment) }
-          format.json { render :json => @assignment.to_json(:permissions => {:user => @current_user, :session => session}, :methods => [:readable_submission_types], :include => [:quiz, :discussion_topic]), :status => :ok }
+          format.json { render :json => @assignment.to_json(:permissions => {:user => @current_user, :session => session}, :include => [:quiz, :discussion_topic]), :status => :ok }
         else
           format.html { render :action => "edit" }
           format.json { render :json => @assignment.errors.to_json, :status => :bad_request }

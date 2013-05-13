@@ -20,95 +20,18 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe TabsController, :type => :integration do
   describe 'index' do
-    it 'should list navigation tabs for a course' do
-      course_with_teacher_logged_in(:active_all => true)
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs",
+    it "should require read permissions on the context" do
+      course(:active_all => true)
+      user(:active_all => true)
+      api_call(:get, "/api/v1/courses/#{@course.id}/tabs",
                       { :controller => 'tabs', :action => 'index', :course_id => @course.to_param, :format => 'json'},
-                      { :include => ['external']})
-      json.should == [
-        {
-          "id" => "home",
-          "html_url" => "/courses/#{@course.id}",
-          "type" => "internal",
-          "label" => "Home"
-        },
-        {
-          "id" => "announcements",
-          "label" => "Announcements",
-          "html_url" => "/courses/#{@course.id}/announcements",
-          "type" => "internal"
-        },
-        {
-          "id" => "assignments",
-          "html_url" => "/courses/#{@course.id}/assignments",
-          "label" => "Assignments",
-          "type" => "internal"
-        },
-        {
-          "id" => "discussions",
-          "html_url" => "/courses/#{@course.id}/discussion_topics",
-          "label" => "Discussions",
-          "type" => "internal"
-        },
-        {
-          "id" => "grades",
-          "html_url" => "/courses/#{@course.id}/grades",
-          "label" => "Grades",
-          "type" => "internal"
-        },
-        {
-          "id" => "people",
-          "html_url" => "/courses/#{@course.id}/users",
-          "label" => "People",
-          "type" => "internal"
-        },
-        {
-          "id" => "pages",
-          "html_url" => "/courses/#{@course.id}/wiki",
-          "label" => "Pages",
-          "type" => "internal"
-        },
-        {
-          "id" => "files",
-          "html_url" => "/courses/#{@course.id}/files",
-          "label" => "Files",
-          "type" => "internal"
-        },
-        {
-          "id" => "syllabus",
-          "html_url" => "/courses/#{@course.id}/assignments/syllabus",
-          "label" => "Syllabus",
-          "type" => "internal"
-        },
-        {
-          "id" => "outcomes",
-          "html_url" => "/courses/#{@course.id}/outcomes",
-          "label" => "Outcomes",
-          "type" => "internal"
-        },
-        {
-          "id" => "quizzes",
-          "html_url" => "/courses/#{@course.id}/quizzes",
-          "label" => "Quizzes",
-          "type" => "internal"
-        },
-        {
-          "id" => "modules",
-          "html_url" => "/courses/#{@course.id}/modules",
-          "label" => "Modules",
-          "type" => "internal"
-        },
-        {
-          "id" => "settings",
-          "html_url" => "/courses/#{@course.id}/settings",
-          "label" => "Settings",
-          "type" => "internal"
-        }
-      ]
+                      { :include => ['external']},
+                      {},
+                      { :expected_status => 401 })
     end
-    
+
     it 'should list navigation tabs for a course' do
-      course_with_teacher_logged_in(:active_all => true)
+      course_with_teacher(:active_all => true)
       json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs",
                       { :controller => 'tabs', :action => 'index', :course_id => @course.to_param, :format => 'json'},
                       { :include => ['external']})
@@ -195,7 +118,7 @@ describe TabsController, :type => :integration do
     end
 
     it 'should list navigation tabs for a group' do
-      group_with_user_logged_in(:active_all => true)
+      group_with_user(:active_all => true)
       json = api_call(:get, "/api/v1/groups/#{@group.id}/tabs",
                       { :controller => 'tabs', :action => 'index', :group_id => @group.to_param, :format => 'json'})
       json.should == [

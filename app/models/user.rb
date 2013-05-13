@@ -103,6 +103,7 @@ class User < ActiveRecord::Base
   has_many :associated_root_accounts, :source => :account, :through => :user_account_associations, :order => 'user_account_associations.depth', :conditions => 'accounts.parent_account_id IS NULL'
   has_many :developer_keys
   has_many :access_tokens, :include => :developer_key
+  has_many :context_external_tools, :as => :context, :dependent => :destroy, :order => 'name'
 
   has_many :student_enrollments
   has_many :ta_enrollments
@@ -177,88 +178,73 @@ class User < ActiveRecord::Base
 
   def conversations
     # i.e. exclude any where the user has deleted all the messages
-    all_conversations.visible.scoped(:order => "last_message_at DESC, conversation_id DESC")
+    all_conversations.visible.order("last_message_at DESC, conversation_id DESC")
   end
 
   def page_views
     PageView.for_user(self)
   end
 
-  named_scope :of_account, lambda { |account|
-    {
-      :joins => :user_account_associations,
-      :conditions => ['user_account_associations.account_id = ?', account.id]
-    }
+  scope :of_account, lambda { |account| joins(:user_account_associations).where(:user_account_associations => { :account_id => account }) }
+  scope :recently_logged_in, lambda {
+    includes(:pseudonyms).
+        where("pseudonyms.current_login_at>?", 1.month.ago).
+        order("pseudonyms.current_login_at DESC").
+        limit(25)
   }
-  named_scope :recently_logged_in, lambda{
-    {
-      :include => :pseudonyms,
-      :conditions => ['pseudonyms.current_login_at > ?', 1.month.ago],
-      :order => 'pseudonyms.current_login_at DESC',
-      :limit => 25
-    }
-  }
-  named_scope :include_pseudonym, lambda{
-    {:include => :pseudonym }
-  }
-  named_scope :restrict_to_sections, lambda{|sections|
-    section_ids = Array(sections).map{|s| s.is_a?(Fixnum) ? s : s.id }
-    if section_ids.empty?
-      {:conditions => {}}
+  scope :include_pseudonym, includes(:pseudonym)
+  scope :restrict_to_sections, lambda { |sections|
+    if sections.empty?
+      scoped
     else
-      {:conditions => ["enrollments.limit_privileges_to_course_section IS NULL OR enrollments.limit_privileges_to_course_section != ? OR enrollments.course_section_id IN (?)", true, section_ids]}
+      where("enrollments.limit_privileges_to_course_section IS NULL OR enrollments.limit_privileges_to_course_section<>? OR enrollments.course_section_id IN (?)", true, sections)
     end
   }
-  named_scope :name_like, lambda { |name|
-    { :conditions => ["(", wildcard('users.name', 'users.short_name', name), " OR exists (select 1 from pseudonyms where ", wildcard('pseudonyms.sis_user_id', 'pseudonyms.unique_id', name), " and pseudonyms.user_id = users.id and (", User.send(:sanitize_sql_array, Pseudonym.active.proxy_options[:conditions]), ")))"].join }
+  scope :name_like, lambda { |name|
+    where("#{wildcard('users.name', 'users.short_name', name)} OR EXISTS (#{Pseudonym.select("1").where(wildcard('pseudonyms.sis_user_id', 'pseudonyms.unique_id', name)).where("pseudonyms.user_id=users.id").active.to_sql})")
   }
-  named_scope :active, lambda {
-    { :conditions => ["users.workflow_state != ?", 'deleted'] }
-  }
+  scope :active, where("users.workflow_state<>'deleted'")
 
-  named_scope :has_current_student_enrollments, :conditions =>  "EXISTS (SELECT * FROM enrollments JOIN courses ON courses.id = enrollments.course_id AND courses.workflow_state = 'available' WHERE enrollments.user_id = users.id AND enrollments.workflow_state IN ('active','invited') AND enrollments.type = 'StudentEnrollment')"
+  scope :has_current_student_enrollments, where("EXISTS (SELECT * FROM enrollments JOIN courses ON courses.id=enrollments.course_id AND courses.workflow_state='available' WHERE enrollments.user_id=users.id AND enrollments.workflow_state IN ('active','invited') AND enrollments.type='StudentEnrollment')")
 
-  # NOTE: if :order is passed in, sortable name will be tacked onto the end
-  # rather than prepending or replacing it
   def self.order_by_sortable_name(options = {})
-    direction = options.delete(:direction) || :ascending
-    sort_clause = "#{sortable_name_order_by_clause} #{direction == :descending ? "DESC" : "ASC"}"
-    add_sort_key!(options, sort_clause)
-    uber_scope(options)
+    order_clause = clause = sortable_name_order_by_clause
+    order_clause = "#{clause} DESC" if options[:direction] == :descending
+    scope = self.order(order_clause)
+    if (scope.scope(:find, :select))
+      scope = scope.select(clause)
+    end
+    if scope.scope(:find, :group)
+      scope = scope.group(clause)
+    end
+    scope
   end
 
-  def self.by_top_enrollment(options = {})
-    options[:select] ||= "users.*"
-    options[:select] << ", MIN(#{Enrollment.type_rank_sql(:student)}) AS enrollment_rank"
-    options[:group] = User.connection.group_by(User)
-    options[:order] = "enrollment_rank"
-    order_by_sortable_name(options)
+  def self.by_top_enrollment
+    scope = self
+    if (!scope.scope(:find, :select))
+      scope = scope.select("users.*")
+    end
+    scope.select("MIN(#{Enrollment.type_rank_sql(:student)}) AS enrollment_rank").
+      group(User.connection.group_by(User)).
+      order("enrollment_rank").
+      order_by_sortable_name
   end
 
-  named_scope :enrolled_in_course_between, lambda{|course_ids, start_at, end_at|
-    ids_string = course_ids.join(",")
-    {
-      :joins => :enrollments,
-      :conditions => ["enrollments.course_id in (#{ids_string}) AND enrollments.created_at > ? AND enrollments.created_at < ?", start_at, end_at]
-    }
-  }
+  scope :enrolled_in_course_between, lambda { |course_ids, start_at, end_at| joins(:enrollments).where(:enrollments => { :course_id => course_ids, :created_at => start_at..end_at }) }
 
-  named_scope :for_course_with_last_login, lambda {|course, root_account_id, enrollment_type|
-    course_id = course.is_a?(Course) ? course.id : course
-    enrollment_conditions = sanitize_sql(['enrollments.course_id = ? AND enrollments.workflow_state != ?', course_id, 'deleted'])
-    enrollment_conditions += sanitize_sql(['AND enrollments.type = ?', enrollment_type]) if enrollment_type
-    {
-      # add a field to each user that is the aggregated max from current_login_at and last_login_at from their pseudonyms
-      :select => 'users.*, MAX(current_login_at) as last_login, MAX(current_login_at) IS NULL as login_info_exists',
+  scope :for_course_with_last_login, lambda { |course, root_account_id, enrollment_type|
+    # add a field to each user that is the aggregated max from current_login_at and last_login_at from their pseudonyms
+    scope = select("users.*, MAX(current_login_at) as last_login, MAX(current_login_at) IS NULL as login_info_exists").
       # left outer join ensures we get the user even if they don't have a pseudonym
-      :joins => sanitize_sql([<<-SQL, root_account_id]),
+      joins(sanitize_sql([<<-SQL, root_account_id])).where(:enrollments => { :course_id => course })
         LEFT OUTER JOIN pseudonyms ON pseudonyms.user_id = users.id AND pseudonyms.account_id = ?
         INNER JOIN enrollments ON enrollments.user_id = users.id
       SQL
-      :conditions => enrollment_conditions,
-      # the trick to get unique users
-      :group => 'users.id'
-    }
+    scope = scope.where("enrollments.workflow_state<>'deleted'")
+    scope = scope.where(:enrollments => { :type => enrollment_type }) if enrollment_type
+    # the trick to get unique users
+    scope.group("users.id")
   }
 
   has_a_broadcast_policy
@@ -406,7 +392,7 @@ class User < ActiveRecord::Base
     shards = [Shard.current]
     if !precalculated_associations
       if !users_or_user_ids.first.is_a?(User)
-        users = users_or_user_ids = User.find(:all, :select => 'id, preferences, workflow_state', :conditions => {:id => user_ids})
+        users = users_or_user_ids = User.select([:id, :preferences, :workflow_state]).where(:id =>user_ids).all
       else
         users = users_or_user_ids
       end
@@ -423,15 +409,17 @@ class User < ActiveRecord::Base
         shard_user_ids = users.map(&:id)
 
         data[:enrollments] += shard_enrollments =
-            Enrollment.scoped(:conditions => "workflow_state<>'deleted' AND type<>'StudentViewEnrollment'").
-            find(:all, :select => 'DISTINCT user_id, course_id, course_section_id', :conditions => {:user_id => shard_user_ids})
+            Enrollment.where("workflow_state<>'deleted' AND type<>'StudentViewEnrollment'").
+                where(:user_id => shard_user_ids).
+                select([:user_id, :course_id, :course_section_id]).
+                uniq.
+                all
 
         # probably a lot of dups, so more efficient to use a set than uniq an array
         course_section_ids = Set.new
         shard_enrollments.each { |e| course_section_ids << e.course_section_id }
-        data[:sections] += shard_sections = CourseSection.
-            find(:all, :select => 'id, course_id, nonxlist_course_id',
-                 :conditions => {:id => course_section_ids.to_a}) unless course_section_ids.empty?
+        data[:sections] += shard_sections = CourseSection.select([:id, :course_id, :nonxlist_course_id]).
+            where(:id => course_section_ids.to_a).all unless course_section_ids.empty?
         shard_sections ||= []
         course_ids = Set.new
         shard_sections.each do |s|
@@ -439,14 +427,10 @@ class User < ActiveRecord::Base
           course_ids << s.nonxlist_course_id if s.nonxlist_course_id
         end
 
-        data[:courses] += Course.
-            find(:all, :select => 'id, account_id',
-                 :conditions => {:id => course_ids.to_a}) unless course_ids.empty?
+        data[:courses] += Course.select([:id, :account_id]).where(:id => course_ids.to_a).all unless course_ids.empty?
 
-        data[:pseudonyms] += Pseudonym.active.
-            find(:all, :select => 'DISTINCT user_id, account_id', :conditions => {:user_id => shard_user_ids})
-        data[:account_users] += AccountUser.
-            find(:all, :select => 'DISTINCT user_id, account_id', :conditions => {:user_id => shard_user_ids})
+        data[:pseudonyms] += Pseudonym.active.select([:user_id, :account_id]).uniq.where(:user_id => shard_user_ids).all
+        data[:account_users] += AccountUser.select([:user_id, :account_id]).uniq.where(:user_id => shard_user_ids).all
       end
       # now make it easy to get the data by user id
       data[:enrollments] = data[:enrollments].group_by(&:user_id)
@@ -464,7 +448,7 @@ class User < ActiveRecord::Base
         # if shards is more than just the current shard, users will be set; otherwise
         # we never loaded users, but it doesn't matter, cause it's all the current shard
         shard_user_ids = users ? users.map(&:id) : user_ids
-        UserAccountAssociation.find(:all, :conditions => { :user_id => shard_user_ids })
+        UserAccountAssociation.where(:user_id => shard_user_ids).all
       end.each do |aa|
         key = [aa.user_id, aa.account_id]
         # duplicates. the unique index prevents these now, but this code
@@ -518,7 +502,11 @@ class User < ActiveRecord::Base
             # for incremental, only update the old association if it is deeper than the new one
             # for non-incremental, update it if it changed
             if incremental && association[1] > depth || !incremental && association[1] != depth
-              UserAccountAssociation.update_all("depth=#{depth}", :id => association[0])
+              if Rails.version < '3.0'
+                UserAccountAssociation.update_all({ :depth => depth }, :id => association[0])
+              else
+                UserAccountAssociation.where(:id => association[0]).update_all(:depth => depth)
+              end
             end
             # remove from list of existing for non-incremental
             current_associations.delete(key) unless incremental
@@ -527,7 +515,11 @@ class User < ActiveRecord::Base
       end
 
       to_delete += current_associations.map { |k, v| v[0] }
-      UserAccountAssociation.delete_all(:id => to_delete) unless incremental || to_delete.empty?
+      if Rails.version < '3.0'
+        UserAccountAssociation.delete_all(:id => to_delete) unless incremental || to_delete.empty?
+      else
+        UserAccountAssociation.where(:id => to_delete).delete_all unless incremental || to_delete.empty?
+      end
     end
   end
 
@@ -553,22 +545,17 @@ class User < ActiveRecord::Base
   end
   protected :assign_uuid
 
-  named_scope :with_service, lambda { |service|
-    if service.is_a?(UserService)
-      {:include => :user_services, :conditions => ['user_services.service = ?', service.service]}
-    else
-      {:include => :user_services, :conditions => ['user_services.service = ?', service.to_s]}
-    end
+  scope :with_service, lambda { |service|
+    service = service.service if service.is_a?(UserService)
+    includes(:user_services).where(:user_services => { :service => service.to_s })
   }
-  named_scope :enrolled_before, lambda{|date|
-    {:conditions => ['enrollments.created_at < ?', date]}
-  }
+  scope :enrolled_before, lambda { |date| where("enrollments.created_at<?", date) }
 
   def group_memberships_for(context)
-    groups.scoped(:conditions => { 'groups.context_id' => context.id,
+    groups.where('groups.context_id' => context,
       'groups.context_type' => context.class.to_s,
-      'group_memberships.workflow_state' => 'accepted' }).
-    scoped(:conditions => "groups.workflow_state <> 'deleted'")
+      'group_memberships.workflow_state' => 'accepted').
+    where("groups.workflow_state <> 'deleted'")
   end
 
   def <=>(other)
@@ -724,7 +711,7 @@ class User < ActiveRecord::Base
   def gmail_channel
     google_services = self.user_services.find_all_by_service_domain("google.com")
     addr = google_services.find{|s| s.service_user_id}.service_user_id rescue nil
-    self.communication_channels.email.by_path(addr).find(:first)
+    self.communication_channels.email.by_path(addr).first
   end
 
   def gmail
@@ -753,7 +740,7 @@ class User < ActiveRecord::Base
 
   def sms_channel
     # It's already ordered, so find the first one, if there's one.
-    communication_channels.find(:first, :conditions => {:path_type => 'sms'})
+    communication_channels.sms.first
   end
 
   def sms
@@ -874,7 +861,7 @@ class User < ActiveRecord::Base
   end
 
   def latest_pseudonym
-    Pseudonym.scoped(:order => 'created_at DESC', :conditions => {:user_id => id}).active.first
+    Pseudonym.order(:created_at).where(:user_id => id).active.last
   end
 
   def used_feature(feature)
@@ -891,7 +878,7 @@ class User < ActiveRecord::Base
   end
 
   def courses_with_grades
-    self.available_courses.select{|c| c.grants_right?(self, nil, :participate_as_student)}
+    self.available_courses.with_each_shard.select{|c| c.grants_right?(self, nil, :participate_as_student)}
   end
   memoize :courses_with_grades
 
@@ -944,6 +931,14 @@ class User < ActiveRecord::Base
       )
     end
     can :create_user_notes and can :read_user_notes and can :delete_user_notes
+
+    given do |user|
+      user && (
+      Account.site_admin.grants_right?(user, :view_statistics) ||
+          self.associated_accounts.any?{|a| a.grants_right?(user, nil, :view_statistics)  }
+      )
+    end
+    can :view_statistics
 
     given do |user|
       user && (
@@ -1189,36 +1184,6 @@ class User < ActiveRecord::Base
     (Canvas::Security.hmac_sha1(user_id.to_s)[0, 10] == sig) ? user_id : nil
   end
 
-  # Returns the LTI membership based on the LTI specs here: http://www.imsglobal.org/LTI/v1p1pd/ltiIMGv1p1pd.html#_Toc309649701
-  def lti_role_types(context=nil)
-    memberships = []
-    if context.is_a?(Course)
-      memberships += current_enrollments.find_all_by_course_id(context.id).uniq
-    end
-    if context.respond_to?(:account_chain) && !context.account_chain_ids.empty?
-      memberships += account_users.find_all_by_membership_type_and_account_id('AccountAdmin', context.account_chain_ids).uniq
-    end
-    return ["urn:lti:sysrole:ims/lis/None"] if memberships.empty?
-    memberships.map{|membership|
-      case membership
-      when StudentEnrollment, StudentViewEnrollment
-        'Learner'
-      when TeacherEnrollment
-        'Instructor'
-      when TaEnrollment
-        'Instructor'
-      when DesignerEnrollment
-        'ContentDeveloper'
-      when ObserverEnrollment
-        'urn:lti:instrole:ims/lis/Observer'
-      when AccountUser
-        'urn:lti:instrole:ims/lis/Administrator'
-      else
-        'urn:lti:instrole:ims/lis/Observer'
-      end
-    }.uniq
-  end
-
   AVATAR_SETTINGS = ['enabled', 'enabled_pending', 'sis_only', 'disabled']
   def avatar_url(size=nil, avatar_setting=nil, fallback=nil, request=nil)
     return fallback if avatar_setting == 'disabled'
@@ -1271,17 +1236,12 @@ class User < ActiveRecord::Base
     end
   end
 
-  named_scope :with_avatar_state, lambda{|state|
+  scope :with_avatar_state, lambda { |state|
+    scope = where("avatar_image_url IS NOT NULL").order("avatar_image_updated_at DESC")
     if state == 'any'
-      {
-        :conditions =>['avatar_image_url IS NOT NULL AND avatar_state IS NOT NULL AND avatar_state != ?', 'none'],
-        :order => 'avatar_image_updated_at DESC'
-      }
+      scope.where("avatar_state IS NOT NULL AND avatar_state<>'none'")
     else
-      {
-        :conditions => ['avatar_image_url IS NOT NULL AND avatar_state = ?', state],
-        :order => 'avatar_image_updated_at DESC'
-      }
+      scope.where(:avatar_state => state)
     end
   }
 
@@ -1345,7 +1305,7 @@ class User < ActiveRecord::Base
   end
 
   def assignments_needing_submitting(opts={})
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+    Shackles.activate(:slave) do
       course_ids = if opts[:contexts]
         (Array(opts[:contexts]).map(&:id) &
          current_student_enrollment_course_ids)
@@ -1356,13 +1316,14 @@ class User < ActiveRecord::Base
       # allow explicitly passing a nil limit
       limit = opts[:limit]
       limit = 15 unless opts.key?(:limit)
+      due_after = opts[:due_after] || 4.weeks.ago
 
       result = Shard.partition_by_shard(course_ids) do |shard_course_ids|
         Assignment.for_course(shard_course_ids).
           active.
-          due_before(1.week.from_now).
+          due_between_with_overrides(due_after,1.week.from_now).
           not_ignored_by(self, 'submitting').
-          expecting_submission.due_after(opts[:due_after] || 4.weeks.ago).
+          expecting_submission.
           need_submitting_info(id, limit).
           not_locked
       end
@@ -1378,7 +1339,7 @@ class User < ActiveRecord::Base
   end
 
   def assignments_needing_grading(opts={})
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+    Shackles.activate(:slave) do
       course_ids = if opts[:contexts]
         (Array(opts[:contexts]).map(&:id) &
         current_admin_enrollment_course_ids)
@@ -1482,7 +1443,7 @@ class User < ActiveRecord::Base
     context_codes = results[:contexts].map{|c| c.asset_string }
 
     if !context.is_a?(User) && user
-      results[:collaborations] = user.collaborations.active.find(:all, :include => [:user, :users]).select{|c| c.context_id && c.context_type && context_codes.include?("#{c.context_type.underscore}_#{c.context_id}") }
+      results[:collaborations] = user.collaborations.active.includes(:user, :users).select{|c| c.context_id && c.context_type && context_codes.include?("#{c.context_type.underscore}_#{c.context_id}") }
       results[:collaborations] = results[:collaborations].sort_by{|c| c.created_at}.reverse
     end
 
@@ -1541,7 +1502,7 @@ class User < ActiveRecord::Base
   # point.
   def common_account_chain(in_root_account)
     rid = in_root_account.id
-    accts = self.associated_accounts.scoped(:conditions => ["accounts.id = ? OR accounts.root_account_id = ?", rid, rid])
+    accts = self.associated_accounts.where("accounts.id = ? OR accounts.root_account_id = ?", rid, rid)
     return [] if accts.blank?
     children = accts.inject({}) do |hash,acct| 
       pid = acct.parent_account_id
@@ -1570,7 +1531,7 @@ class User < ActiveRecord::Base
             :order => "courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}")
 
           unless options[:include_completed_courses]
-            enrollments = Enrollment.find(:all, :conditions => { :id => courses.map(&:primary_enrollment_id) })
+            enrollments = Enrollment.where(:id => courses.map(&:primary_enrollment_id)).all
             date_restricted_ids = enrollments.select{ |e| e.completed? || e.inactive? }.map(&:id)
             courses.reject! { |course| date_restricted_ids.include?(course.primary_enrollment_id.to_i) }
           end
@@ -1581,9 +1542,10 @@ class User < ActiveRecord::Base
     end
 
     if association == :current_and_invited_courses
-      if enrollment_uuid && pending_course = Course.find(:first,
-        :select => "courses.*, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
-        :joins => :enrollments, :conditions => ["enrollments.uuid=? AND enrollments.workflow_state='invited'", enrollment_uuid])
+      if enrollment_uuid && pending_course = Course.
+        select("courses.*, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state").
+        joins(:enrollments).
+        where(:enrollments => { :uuid => enrollment_uuid, :workflow_state => 'invited' }).first
         res << pending_course
         res.uniq!
       end
@@ -1648,14 +1610,14 @@ class User < ActiveRecord::Base
 
   def current_student_enrollment_course_ids
     @current_student_enrollments ||= Rails.cache.fetch([self, 'current_student_enrollments'].cache_key) do
-      self.enrollments.with_each_shard { |scope| scope.student.scoped(:select => "course_id") }
+      self.enrollments.with_each_shard { |scope| scope.student.select(:course_id) }
     end
     @current_student_enrollments.map(&:course_id)
   end
 
   def current_admin_enrollment_course_ids
     @current_admin_enrollments ||= Rails.cache.fetch([self, 'current_admin_enrollments'].cache_key) do
-      self.enrollments.with_each_shard { |scope| scope.admin.scoped(:select => "course_id") }
+      self.enrollments.with_each_shard { |scope| scope.admin.select(:course_id) }
     end
     @current_admin_enrollments.map(&:course_id)
   end
@@ -1678,7 +1640,7 @@ class User < ActiveRecord::Base
     opts[:start_at] ||= 2.weeks.ago
     opts[:limit] ||= 20
 
-    ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
+    Shackles.activate(:slave) do
       submissions = []
       submissions += self.submissions.after(opts[:start_at]).for_context_codes(context_codes).find(
         :all,
@@ -1730,10 +1692,7 @@ class User < ActiveRecord::Base
   memoize :recent_feedback
 
   def visible_stream_item_instances(opts={})
-    instances = stream_item_instances.scoped({
-      :conditions => { :hidden => false },
-      :order => 'stream_item_instances.id desc',
-    })
+    instances = stream_item_instances.where(:hidden => false).order('stream_item_instances.id desc')
 
     # dont make the query do an stream_item_instances.context_code IN
     # ('course_20033','course_20237','course_20247' ...) if they dont pass any
@@ -1743,9 +1702,9 @@ class User < ActiveRecord::Base
       # users course dashboard even if they have groups does a query with
       # "context_code=..." instead of "context_code IN ..."
       conditions = setup_context_association_lookups("stream_item_instances.context", opts[:contexts])
-      instances = instances.scoped(:conditions => conditions) unless conditions.first.empty?
+      instances = instances.where(conditions) unless conditions.first.empty?
     elsif opts[:context]
-      instances = instances.scoped(:conditions => {:context_type => opts[:context].class.base_class.name, :context_id => opts[:context].id})
+      instances = instances.where(:context_type => opts[:context].class.base_class.name, :context_id => opts[:context])
     end
 
     instances
@@ -1776,11 +1735,10 @@ class User < ActiveRecord::Base
   # NOTE: excludes submission stream items
   def recent_stream_items(opts={})
     self.shard.activate do
-      ActiveRecord::Base::ConnectionSpecification.with_environment(:slave) do
-        visible_instances = visible_stream_item_instances(opts).scoped({
-          :include => :stream_item,
-          :limit => Setting.get('recent_stream_item_limit', 100),
-        })
+      Shackles.activate(:slave) do
+        visible_instances = visible_stream_item_instances(opts).
+            includes(:stream_item).
+            limit(Setting.get('recent_stream_item_limit', 100))
         visible_instances.map do |sii|
           si = sii.stream_item
           next unless si.present?
@@ -1817,7 +1775,7 @@ class User < ActiveRecord::Base
     opts[:end_at] ||= 1.weeks.from_now
     opts[:limit] ||= 20
 
-    events = CalendarEvent.active.for_user_and_context_codes(self, context_codes).between(now, opts[:end_at]).scoped(:limit => opts[:limit]).reject(&:hidden?)
+    events = CalendarEvent.active.for_user_and_context_codes(self, context_codes).between(now, opts[:end_at]).limit(opts[:limit]).reject(&:hidden?)
     events += select_upcoming_assignments(Assignment.
         active.
         for_context_codes(context_codes).
@@ -1825,7 +1783,7 @@ class User < ActiveRecord::Base
         include_submitted_count.
         map {|a| a.overridden_for(self)},opts.merge(:time => now)).
       first(opts[:limit])
-    appointment_groups = AppointmentGroup.manageable_by(self, context_codes).intersecting(now, opts[:end_at]).scoped(:limit => opts[:limit])
+    appointment_groups = AppointmentGroup.manageable_by(self, context_codes).intersecting(now, opts[:end_at]).limit(opts[:limit])
     appointment_groups.each { |ag| ag.context = ag.contexts_for_user(self).first }
     events += appointment_groups
     events.sort_by{|e| [e.start_at ? 0: 1,e.start_at || 0, e.title] }.uniq.first(opts[:limit])
@@ -1890,7 +1848,7 @@ class User < ActiveRecord::Base
       # normal policy checking and somewhat duplicating auth logic here. which
       # is a shame. it'd be really nice to add support to our policy framework
       # for understanding how to load associations based on policies.
-      self.courses.all(:include => :active_groups).select { |c| c.grants_right?(self, :manage_groups) }.each { |c| context_groups += c.active_groups }
+      self.courses.includes(:active_groups).select { |c| c.grants_right?(self, :manage_groups) }.each { |c| context_groups += c.active_groups }
       self.courses + (self.groups.active + context_groups).uniq
     end
   end
@@ -1929,13 +1887,21 @@ class User < ActiveRecord::Base
   end
   memoize :manageable_appointment_context_codes
 
-  def conversation_context_codes
-    Rails.cache.fetch([self, 'conversation_context_codes4'].cache_key, :expires_in => 1.day) do
+  # Public: Return an array of context codes this user belongs to.
+  #
+  # include_concluded_codes - If true, include concluded courses (default: true).
+  #
+  # Returns an array of context code strings.
+  def conversation_context_codes(include_concluded_codes = true)
+    Rails.cache.fetch([self, include_concluded_codes, 'conversation_context_codes4'].cache_key, :expires_in => 1.day) do
       Shard.default.activate do
-        ( courses.with_each_shard.map{ |c| "course_#{c.id}" } +
-          concluded_courses.with_each_shard.map{ |c| "course_#{c.id}" } +
-          current_groups.with_each_shard.map{ |g| "group_#{g.id}"}
-        ).uniq
+        associations = %w{courses concluded_courses current_groups}
+        associations.slice!(1) unless include_concluded_codes
+
+        associations.inject([]) do |result, association|
+          association_type = association.split('_')[-1].slice(0..-2)
+          result.concat(send(association).with_each_shard.map { |x| "#{association_type}_#{x.id}" })
+        end.uniq
       end
     end
   end
@@ -1999,7 +1965,7 @@ class User < ActiveRecord::Base
   end
 
   def update_last_user_note
-    note = user_notes.active.scoped(:order => 'user_notes.created_at DESC', :limit=>1).first
+    note = user_notes.active.order('user_notes.created_at').last
     self.last_user_note = note ? note.created_at : nil
   end
 
@@ -2041,336 +2007,60 @@ class User < ActiveRecord::Base
     Conversation.initiate(users, private).conversation_participants.find_by_user_id(self)
   end
 
-  def messageable_enrollment_user_clause
-    "EXISTS (SELECT 1 FROM users WHERE id = enrollments.user_id AND #{MessageableUser::AVAILABLE_CONDITIONS})"
-  end
-
-  def messageable_enrollment_clause(options={})
-    options = {:strict_course_state => true}.merge(options)
-    <<-SQL
-    (
-      #{self.class.enrollment_conditions(:current_and_invited, options[:strict_course_state])}
-      OR
-      #{self.class.enrollment_conditions(:completed, options[:strict_course_state])}
-      #{options[:include_concluded_students] ? "" : "AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment')"}
-    )
-    SQL
-  end
-
-  def enrollment_visibility(require_message_permission = true)
-    Rails.cache.fetch([self, 'enrollment_visibility', require_message_permission].cache_key, :expires_in => 1.day) do
-      full_course_ids = []
-      section_id_hash = {}
-      restricted_course_hash = {}
-      user_counts = {}
-      section_user_counts = {}
-      student_in_course_ids = []
-      linked_observer_ids = observee_enrollments.collect {|e| e.user_id}.uniq
-      courses_with_primary_enrollment(:current_and_concluded_courses, nil, :include_completed_courses => true).each do |course|
-        section_visibilities = course.section_visibilities_for(self)
-        conditions = nil
-        case course.enrollment_visibility_level_for(self, section_visibilities, require_message_permission)
-          when :full
-            full_course_ids << course.id
-          when :sections
-            section_id_hash[course.id] = section_visibilities.map{|s| s[:course_section_id]}
-            conditions = {:course_section_id => section_id_hash[course.id]}
-          when :restricted
-            section_visibilities.each do |s|
-              restricted_course_hash[course.id] ||= []
-              restricted_course_hash[course.id] << s[:associated_user_id] if s[:associated_user_id]
-            end
-            conditions = "enrollments.type = 'TeacherEnrollment' OR enrollments.type = 'TaEnrollment' OR enrollments.user_id IN (#{([self.id] + restricted_course_hash[course.id].uniq).join(',')})"
-        end
-        base_conditions = messageable_enrollment_clause
-        base_conditions << " AND " << messageable_enrollment_user_clause
-        if course.primary_enrollment == 'StudentEnrollment'
-          student_in_course_ids << course.id
-          base_conditions << " AND (enrollments.type != 'ObserverEnrollment'"
-          base_conditions << "  OR enrollments.user_id IN (#{linked_observer_ids.join(',')})" if linked_observer_ids.any?
-          base_conditions << ")"
-        end
-        user_counts[course.id] = course.enrollments.scoped(:conditions => base_conditions).scoped(:conditions => conditions).scoped(:conditions => "enrollments.type != 'StudentViewEnrollment'").count("DISTINCT user_id")
-
-        sections = course.sections_visible_to(self)
-        if sections.size > 1
-          sections.each{ |section| section_user_counts[section.id] = 0 }
-          connection.select_all("SELECT course_section_id, COUNT(DISTINCT user_id) AS user_count FROM courses, enrollments WHERE (#{base_conditions}) AND course_section_id IN (#{sections.map(&:id).join(', ')}) AND courses.id = #{course.id} AND enrollments.type != 'StudentViewEnrollment' GROUP BY course_section_id").each do |row|
-            section_user_counts[row["course_section_id"].to_i] = row["user_count"].to_i
-          end
-        end
-      end
-      {:full_course_ids => full_course_ids,
-       :section_id_hash => section_id_hash,
-       :restricted_course_hash => restricted_course_hash,
-       :user_counts => user_counts,
-       :section_user_counts => section_user_counts,
-       :student_in_course_ids => student_in_course_ids,
-       :linked_observer_ids => linked_observer_ids
-      }
-    end
-  end
-  memoize :enrollment_visibility
-
-  def messageable_groups
-    group_visibility = group_membership_visibility
-    group_ids = visible_group_ids.reject{ |id| group_visibility[:user_counts][id] == 0 }
-    if group_ids.present?
-      Group.find_all_by_id(group_ids)
-    else
-      []
-    end
-  end
-
-  def messageable_sections
-    section_ids = enrollment_visibility[:section_user_counts].keys
-    if section_ids.present?
-      CourseSection.find_all_by_id(section_ids)
-    else
-      []
-    end
-  end
-
-  def visible_group_ids
-    Rails.cache.fetch([self, 'messageable_groups'].cache_key, :expires_in => 1.day) do
-      (courses + concluded_courses.recently_ended).inject(self.current_groups) { |groups, course|
-        groups | course.groups.active
-      }.map(&:id)
-    end
-  end
-  memoize :visible_group_ids
-
-  def group_membership_visibility(require_message_permission = true)
-    Rails.cache.fetch([self, 'group_membership_visibility', require_message_permission].cache_key, :expires_in => 1.day) do
-      course_visibility = enrollment_visibility(require_message_permission)
-      own_group_ids = current_groups.map(&:id)
-
-      full_group_ids = []
-      section_id_hash = {}
-      user_counts = {}
-
-      if visible_group_ids.present?
-        Group.find_all_by_id(visible_group_ids).each do |group|
-          if own_group_ids.include?(group.id) || group.context_type == 'Course' && course_visibility[:full_course_ids].include?(group.context_id)
-            full_group_ids << group.id
-            user_counts[group.id] = group.users.size
-          elsif group.context_type == 'Course' && sections = course_visibility[:section_id_hash][group.context_id]
-            section_id_hash[group.id] = sections
-            user_counts[group.id] = group.context.enrollments.scoped(:conditions => [
-              "user_id IN (?) AND course_section_id IN (?) AND #{messageable_enrollment_user_clause} AND #{messageable_enrollment_clause(:include_concluded_students => true)}",
-              group.group_memberships.map(&:user_id),
-              sections
-            ]).size
-          end
-        end
-      end
-      {:full_group_ids => full_group_ids,
-       :section_id_hash => section_id_hash,
-       :user_counts => user_counts
-      }
-    end
-  end
-  memoize :group_membership_visibility
-
-  def deprecated_search_messageable_users(options = {})
-    # if :ids is specified but empty (different than just not specified), don't
-    # bother doing a query that's guaranteed to return no results.
-    return [] if options[:ids] && options[:ids].empty?
-
-    # provides a mechanism for admins to search within a context, even if not
-    # enrolled in it
-    admin_context = options[:admin_context]
-
-    course_hash = enrollment_visibility
-    course_hash[:full_course_ids] << admin_context.id if admin_context.is_a?(Course)
-    course_hash[:full_course_ids] << admin_context.course_id if admin_context.is_a?(CourseSection)
-    full_course_ids = course_hash[:full_course_ids]
-    restricted_course_hash = course_hash[:restricted_course_hash]
-
-    group_hash = group_membership_visibility
-    group_hash[:full_group_ids] << admin_context.id if admin_context.is_a?(Group)
-    full_group_ids = group_hash[:full_group_ids]
-    group_section_ids = []
-    student_in_course_ids = course_hash[:student_in_course_ids]
-    linked_observer_ids = course_hash[:linked_observer_ids]
-    account_ids = []
-
-    limited_id = {}
-    enrollment_type_sql = " AND enrollments.type != 'StudentViewEnrollment'"
-    if student_in_course_ids.present?
-      enrollment_type_sql += " AND (enrollments.type != 'ObserverEnrollment' OR course_id NOT IN (#{student_in_course_ids.join(',')})"
-      enrollment_type_sql += "  OR user_id IN (#{linked_observer_ids.join(',')})" if linked_observer_ids.present?
-      enrollment_type_sql += ")"
-    end
-    
-    include_concluded_students = true
-
-    if options[:context]
-      if options[:context].sub(/_all\z/, '') =~ MessageableUser::Calculator::CONTEXT_RECIPIENT
-        type = $1
-        include_concluded_students = false unless type == 'group'
-        limited_id[type] = $2.to_i
-        enrollment_type = $4
-        if enrollment_type && type != 'group' # course and section only, since the only group "enrollment type" is member
-          if enrollment_type == 'admins'
-            enrollment_type_sql += " AND enrollments.type IN ('TeacherEnrollment','TaEnrollment')"
-          else
-            enrollment_type_sql += " AND enrollments.type = '#{enrollment_type.capitalize.singularize}Enrollment'"
-          end
-        end
-      end
-      full_course_ids &= [limited_id['course']]
-      full_group_ids &= [limited_id['group']]
-      restricted_course_hash.delete_if{ |course_id, ids| course_id != limited_id['course']}
-      if limited_id['section'] && section = CourseSection.find_by_id(limited_id['section'])
-        course_section_ids = course_hash[:full_course_ids].include?(section.course_id) ?
-          [limited_id['section']] :
-          (course_hash[:section_id_hash][section.course_id] || []) & [limited_id['section']]
-      else
-        course_section_ids = course_hash[:section_id_hash].values_at(limited_id['course']).flatten.compact
-        group_section_ids = group_hash[:section_id_hash].values_at(limited_id['group']).flatten.compact
-      end
-    else
-      course_section_ids = course_hash[:section_id_hash].values.flatten
-      # if we're not searching with a context in mind, include any users we
-      # have admin access to know about
-      account_ids = associated_accounts.select{ |a| a.grants_right?(self, nil, :read_roster) }.map(&:id)
-      account_ids &= options[:account_ids] if options[:account_ids]
-    end
-
-    user_conditions = []
-    if options[:skip_visibility_checks]
-      user_conditions << "users.workflow_state != 'deleted'" if options[:ids].blank?
-    else
-      user_conditions << MessageableUser::AVAILABLE_CONDITIONS
-    end
-    user_conditions << "users.id IN (#{options[:ids].map(&:to_i).join(', ')})" if options[:ids].present?
-    user_conditions << "users.id NOT IN (#{options[:exclude_ids].map(&:to_i).join(', ')})" if options[:exclude_ids].present?
-    if options[:search] && (parts = options[:search].strip.split(/\s+/)).present?
-      parts.each do |part|
-        user_conditions << "(#{wildcard('users.name', 'users.short_name', part)})"
-      end
-    end
-    user_condition_sql = user_conditions.present? ? "AND " + user_conditions.join(" AND ") : ""
-    user_sql = []
-
-    # this is redundant (and potentially less restrictive than course_sql),
-    # but it allows the planner to initially limit enrollments to relevant
-    # courses much more efficiently than the OR'ed course_sql does
-    all_course_ids = (course_hash[:full_course_ids] + course_hash[:section_id_hash].keys + restricted_course_hash.keys).compact
-
-    course_sql = []
-    course_sql << "(course_id IN (#{full_course_ids.join(',')}))" if full_course_ids.present?
-    course_sql << "(course_section_id IN (#{course_section_ids.join(',')}))" if course_section_ids.present?
-    course_sql << "(course_section_id IN (#{group_section_ids.join(',')}) AND EXISTS(SELECT 1 FROM group_memberships WHERE user_id = users.id AND group_id = #{limited_id['group']}) )" if limited_id['group'] && group_section_ids.present?
-    course_sql << "(course_id IN (#{restricted_course_hash.keys.join(',')}) AND (enrollments.type = 'TeacherEnrollment' OR enrollments.type = 'TaEnrollment' OR enrollments.user_id IN (#{([self.id] + restricted_course_hash.values.flatten.uniq).join(',')})))" if restricted_course_hash.present?
-    user_sql << <<-SQL if course_sql.present?
-      SELECT #{MessageableUser::SELECT}, course_id, NULL AS group_id, #{connection.func(:group_concat, :'enrollments.type', ':')} AS roles
-      FROM users, enrollments, courses
-      WHERE course_id IN (#{all_course_ids.join(', ')})
-        AND (#{course_sql.join(' OR ')}) AND users.id = user_id AND courses.id = course_id
-        AND #{messageable_enrollment_clause(:include_concluded_students => include_concluded_students, :strict_course_state => !options[:skip_visibility_checks])}
-        #{enrollment_type_sql}
-        #{user_condition_sql}
-      GROUP BY #{connection.group_by(['users.id', 'course_id'], *(MessageableUser::COLUMNS[1, MessageableUser::COLUMNS.size]))}
-    SQL
-
-    user_sql << <<-SQL if full_group_ids.present?
-      SELECT #{MessageableUser::SELECT}, NULL AS course_id, group_id, NULL AS roles
-      FROM users, group_memberships
-      WHERE group_id IN (#{full_group_ids.join(',')}) AND users.id = user_id
-        AND group_memberships.workflow_state = 'accepted'
-        #{user_condition_sql}
-    SQL
-
-    # if this is an account admin who doesn't have any courses/groups in common
-    # with the user, we want to know the user's highest current enrollment type
-    highest_enrollment_sql = <<-SQL
-      SELECT type
-      FROM enrollments, courses
-      WHERE
-        user_id = users.id AND courses.id = course_id
-        AND (#{self.class.enrollment_conditions(:current_and_invited)})
-      ORDER BY #{Enrollment.type_rank_sql}
-      LIMIT 1
-    SQL
-    user_sql << <<-SQL if account_ids.present?
-      SELECT #{MessageableUser::SELECT}, 0 AS course_id, NULL AS group_id, (#{highest_enrollment_sql}) AS roles
-      FROM users, user_account_associations
-      WHERE user_account_associations.account_id IN (#{account_ids.join(',')})
-        AND user_account_associations.user_id = users.id
-        #{user_condition_sql}
-    SQL
-    user_sql << <<-SQL unless options[:context]
-      SELECT #{MessageableUser::SELECT}, NULL AS course_id, NULL AS group_id, NULL AS roles
-      FROM users
-      WHERE id = #{self.id}
-        #{user_condition_sql}
-    SQL
-
-    if options[:ids]
-      # provides a way for this user to start a conversation with someone
-      # that isn't normally messageable (requires that they already be in a
-      # conversation with that user)
-      if options[:conversation_id].present?
-        user_sql << <<-SQL
-          SELECT #{MessageableUser::SELECT}, NULL AS course_id, NULL AS group_id, NULL AS roles
-          FROM users, conversation_participants
-          WHERE conversation_participants.user_id = users.id
-            AND conversation_participants.conversation_id = #{options[:conversation_id].to_i}
-            #{user_condition_sql}
-        SQL
-      elsif options[:skip_visibility_checks] # we don't care about the contexts, we've passed in ids
-        user_sql << <<-SQL
-          SELECT #{MessageableUser::SELECT}, NULL AS course_id, NULL AS group_id, NULL AS roles
-          FROM users
-          #{user_condition_sql.sub(/\AAND/, "WHERE")}
-        SQL
-      end
-    end
-
-    # if none of our potential sources was included, we're done
-    return [] if user_sql.empty?
-
-    concat_sql = connection.adapter_name =~ /postgres/i ? :"course_id::text || ':' || roles::text" : :"course_id || ':' || roles"
-    users = User.find_by_sql(<<-SQL)
-      SELECT #{MessageableUser::SELECT},
-        #{connection.func(:group_concat, concat_sql)} AS common_courses,
-        #{connection.func(:group_concat, :group_id)} AS common_groups
-      FROM (
-        #{user_sql.join(' UNION ')}
-      ) users
-      GROUP BY #{connection.group_by(*MessageableUser::COLUMNS)}
-      ORDER BY #{options[:rank_results] ? "(COUNT(course_id) + COUNT(group_id)) DESC," : ""}
-        LOWER(COALESCE(short_name, name)),
-        id
-      #{options[:limit] && options[:limit] > 0 ? "LIMIT #{options[:limit].to_i}" : ""}
-      #{options[:offset] && options[:offset] > 0 ? "OFFSET #{options[:offset].to_i}" : ""}
-    SQL
-    users.each do |user|
-      user.common_courses = user.common_courses.to_s.split(",").inject({}){ |hash, info|
-        roles = info.split(/:/)
-        hash[roles.shift.to_i] = roles
-        hash
-      }
-      user.common_groups = user.common_groups.to_s.split(",").inject({}){ |hash, info|
-        roles = info.split(/:/)
-        hash[roles.shift.to_i] = ['Member']
-        hash
-      }
-    end
+  def messageable_user_calculator
+    @messageable_user_calculator ||= MessageableUser::Calculator.new(self)
   end
 
   def load_messageable_user(user, options={})
-    MessageableUser::Calculator.load_messageable_user(self, user, options)
+    messageable_user_calculator.load_messageable_user(user, options)
   end
 
   def load_messageable_users(users, options={})
-    MessageableUser::Calculator.load_messageable_users(self, users, options)
+    messageable_user_calculator.load_messageable_users(users, options)
   end
 
   def messageable_users_in_context(asset_string)
-    MessageableUser::Calculator.messageable_users_in_context(self, asset_string)
+    messageable_user_calculator.messageable_users_in_context(asset_string)
+  end
+
+  def count_messageable_users_in_context(asset_string)
+    messageable_user_calculator.count_messageable_users_in_context(asset_string)
+  end
+
+  def messageable_users_in_course(course_or_id)
+    messageable_user_calculator.messageable_users_in_course(course_or_id)
+  end
+
+  def count_messageable_users_in_course(course_or_id)
+    messageable_user_calculator.count_messageable_users_in_course(course_or_id)
+  end
+
+  def messageable_users_in_section(section_or_id)
+    messageable_user_calculator.messageable_users_in_section(section_or_id)
+  end
+
+  def count_messageable_users_in_section(section_or_id)
+    messageable_user_calculator.count_messageable_users_in_section(section_or_id)
+  end
+
+  def messageable_users_in_group(group_or_id)
+    messageable_user_calculator.messageable_users_in_group(group_or_id)
+  end
+
+  def count_messageable_users_in_group(group_or_id)
+    messageable_user_calculator.count_messageable_users_in_group(group_or_id)
+  end
+
+  def search_messageable_users(options={})
+    messageable_user_calculator.search_messageable_users(options)
+  end
+
+  def messageable_sections
+    messageable_user_calculator.messageable_sections
+  end
+
+  def messageable_groups
+    messageable_user_calculator.messageable_groups
   end
 
   def short_name_with_shared_contexts(user)
@@ -2384,15 +2074,20 @@ class User < ActiveRecord::Base
   def shared_contexts(user)
     contexts = []
     if info = load_messageable_user(user)
-      contexts += Course.find(:all, :conditions => {:id => info.common_courses.keys}) if info.common_courses.present?
-      contexts += Group.find(:all, :conditions => {:id => info.common_groups.keys}) if info.common_groups.present?
+      if Rails.version < '3.0'
+        contexts += Course.find(:all, :conditions => {:id => info.common_courses.keys}) if info.common_courses.present?
+        contexts += Group.find(:all, :conditions => {:id => info.common_groups.keys}) if info.common_groups.present?
+      else
+        contexts += Course.where(:id => info.common_courses.keys).all if info.common_courses.present?
+        contexts += Group.where(:id => info.common_groups.keys).all if info.common_groups.present?
+      end
     end
     contexts.map(&:name).sort_by{|c|c.downcase}
   end
 
   def mark_all_conversations_as_read!
     conversations.unread.update_all(:workflow_state => 'read')
-    User.update_all 'unread_conversations_count = 0', :id => id
+    User.where(:id => id).update_all(:unread_conversations_count => 0)
   end
 
   def conversation_participant(conversation_id)
@@ -2403,9 +2098,7 @@ class User < ActiveRecord::Base
   #
   # Returns nothing.
   def reset_unread_conversations_counter
-    self.class.update_all(
-      ['unread_conversations_count = ?', conversations.unread.count],
-      :id => id)
+    self.class.where(:id => id).update_all(:unread_conversations_count => conversations.unread.count)
   end
 
   # association with dynamic, filtered join condition for submissions.
@@ -2561,7 +2254,7 @@ class User < ActiveRecord::Base
   end
 
   def fake_student?
-    self.preferences[:fake_student] && !!self.enrollments.find(:first, :conditions => {:type => "StudentViewEnrollment"})
+    self.preferences[:fake_student] && !!self.enrollments.where(:type => 'StudentViewEnrollment').first
   end
 
   def private?
@@ -2621,7 +2314,7 @@ class User < ActiveRecord::Base
   # mfa settings for a user are the most restrictive of any pseudonyms the user has
   # a login for
   def mfa_settings
-    result = self.all_pseudonyms(:include => :account).map(&:account).uniq.map do |account|
+    result = self.pseudonyms.with_each_shard { |scope| scope.includes(:account) }.map(&:account).uniq.map do |account|
       case account.mfa_settings
         when :disabled
           0
@@ -2707,19 +2400,19 @@ class User < ActiveRecord::Base
   end
 
   def accounts
-    self.account_users.with_each_shard(:include => :account).map(&:account).uniq
+    self.account_users.with_each_shard { |scope| scope.includes(:account) }.map(&:account).uniq
   end
   memoize :accounts
 
-  def all_pseudonyms(options = {})
-    self.pseudonyms.with_each_shard(options)
+  def all_pseudonyms
+    self.pseudonyms.with_each_shard
   end
   memoize :all_pseudonyms
 
-  def all_active_pseudonyms(*args)
-    args.unshift(:conditions => {:workflow_state => 'active'})
-    all_pseudonyms(*args)
+  def all_active_pseudonyms
+    self.pseudonyms.with_each_shard { |scope| scope.active }
   end
+  memoize :all_active_pseudonyms
 
   def prefers_gradebook2?
     preferences[:use_gradebook2] != false

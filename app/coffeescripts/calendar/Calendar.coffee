@@ -82,6 +82,7 @@ define [
         eventResize: @eventResize
         eventResizeStart: @eventResizeStart
         dayClick: @dayClick
+        addEventClick: @addEventClick
         titleFormat:
           week: "MMM d[ yyyy]{ '&ndash;'[ MMM] d, yyyy}"
         viewDisplay: @viewDisplay
@@ -121,6 +122,7 @@ define [
         @loadView $(event.target).attr('id')
 
       @$refresh_calendar_link = @el.find('#refresh_calendar_link').click @reloadClick
+      @$create_new_event_link = @el.find('#create_new_event_link').click @addEventClick
       @colorizeContexts()
 
       @scheduler = new Scheduler(".scheduler-wrapper", this)
@@ -236,7 +238,14 @@ define [
           @calendar.fullCalendar('formatDate', event.startDate(), 'h:mmtt')
         else
           @calendar.fullCalendar('formatDates', event.startDate(), event.endDate(), 'h:mmtt{ – h:mmtt}')
-      $element.attr('title', $.trim("#{timeString}\n#{$element.find('.fc-event-title').text()}"))
+      screenReaderTitleHint = if event.eventType.match(/assignment/)
+          I18n.t('event_assignment_title', 'Assignment Title: ')
+        else
+          I18n.t('event_event_title', 'Event Title: ')
+
+      $element.attr('title', $.trim("#{timeString}\n#{$element.find('.fc-event-title').text()}\n\n#{I18n.t('calendar_title', 'Calendar:')} #{event.contextInfo.name}"))
+      $element.find('.fc-event-inner').prepend($("<span class='screenreader-only'>#{I18n.t('calendar_title', 'Calendar:')} #{event.contextInfo.name}</span>"));
+      $element.find('.fc-event-title').prepend($("<span class='screenreader-only'>#{screenReaderTitleHint}</span>"))
       true
 
     eventAfterRender: (event, element, view) =>
@@ -261,22 +270,45 @@ define [
 
     eventResizeStart: (event, jsEvent, ui, view) =>
       @closeEventPopups()
-      
+
+    # event triggered by items being dropped from within the calendar
     eventDrop: (event, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view) =>
+
+      if event.eventType == "assignment" && allDay
+        revertFunc()
+        return
+
       # isDueAtMidnight() will read cached midnightFudged property
       if event.eventType == "assignment" && event.isDueAtMidnight() && minuteDelta == 0
         event.start.setMinutes(59)
+
+      # set event as an all day event if allDay
+      if event.eventType == "calendar_event" && allDay
+        event.allDay = true
 
       # if a short event gets dragged, we don't want to change its duration
       if event.end && event.endDate()
         originalDuration = event.endDate().getTime() - event.startDate().getTime()
         event.end = new Date(event.start.getTime() + originalDuration)
+
       event.saveDates null, revertFunc
 
     eventResize: (event, dayDelta, minuteDelta, revertFunc, jsEvent, ui, view) =>
       # assignments can't be resized
       # if short events are being resized, assume the user knows what they're doing
       event.saveDates null, revertFunc
+
+    addEventClick: (event, jsEvent, view) =>
+      if @displayAppointmentEvents
+        # Don't allow new event creation while in scheduler mode
+        return
+
+      # create a new dummy event
+      allowedContexts = userSettings.get('checked_calendar_codes') or _.pluck(@contexts, 'asset_string')
+      activeContexts  = _.filter @contexts, (c) -> _.contains(allowedContexts, c.asset_string)
+      event = commonEventFactory(null, activeContexts)
+
+      new EditEventDetailsDialog(event).show()
 
     eventClick: (event, jsEvent, view) =>
       $event = $(jsEvent.currentTarget)
@@ -308,19 +340,35 @@ define [
     viewDisplay: (view) =>
       @updateFragment view_start: $.dateToISO8601UTC(view.start)
 
+    # event triggered by items being dropped from outside the calendar
     drop: (date, allDay, jsEvent, ui) =>
-      eventId = $(ui.helper).data('event-id')
-      event   = $("[data-event-id=#{eventId}]").data('calendarEvent')
-
-      date.setHours(23)
-      date.setMinutes(59)
+      eventId    = $(ui.helper).data('event-id')
+      event      = $("[data-event-id=#{eventId}]").data('calendarEvent')
+      revertFunc = -> console.log("could not save date on undated event")
 
       if event
         event.start = date
         event.addClass 'event_pending'
-        @calendar.fullCalendar('renderEvent', event)
-        event.saveDates null, -> console.log("could not save date on undated event")
 
+        if event.eventType == "assignment" && allDay
+          revertFunc()
+          return
+
+        # isDueAtMidnight() will read cached midnightFudged property
+        if event.eventType == "assignment" && event.isDueAtMidnight() && minuteDelta == 0
+          event.start.setMinutes(59)
+
+        # set event as an all day event if allDay
+        if event.eventType == "calendar_event" && allDay
+          event.allDay = true
+
+        # if a short event gets dragged, we don't want to change its duration
+        if event.end && event.endDate()
+          originalDuration = event.endDate().getTime() - event.startDate().getTime()
+          event.end = new Date(event.start.getTime() + originalDuration)
+
+        @calendar.fullCalendar('renderEvent', event)
+        event.saveDates null, revertFunc
 
     # DOM callbacks
 
@@ -421,12 +469,14 @@ define [
         @calendar.removeClass('scheduler-mode')
         @displayAppointmentEvents = null
         @scheduler.hide()
+        @$create_new_event_link.show()
         @calendar.show()
         @calendar.fullCalendar('refetchEvents')
         @calendar.fullCalendar('changeView', if view == 'week' then 'agendaWeek' else 'month')
       else
         @currentView = 'scheduler'
         @calendar.addClass('scheduler-mode')
+        @$create_new_event_link.hide()
         @calendar.hide()
         @scheduler.show()
 

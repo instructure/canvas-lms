@@ -3,7 +3,7 @@ TEST_FOLDER = File.dirname( __FILE__ )
 
 $:.unshift( File.join( TEST_FOLDER, '..', 'lib' ) )
 
-HOST_APP_FOLDER = File.expand_path( ENV['HOST_APP'] || File.join( TEST_FOLDER, '..', '..', '..' ) )
+HOST_APP_FOLDER = File.expand_path( ENV['HOST_APP'] || File.join( TEST_FOLDER, '..', '..', '..', '..' ) )
 puts "Host application: #{HOST_APP_FOLDER}"
 
 require 'test/unit'

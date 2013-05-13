@@ -5,6 +5,8 @@ describe "login logout test" do
 
   def should_show_message(message_text, selector)
     fj(selector).should include_text(message_text)
+    # the text isn't visible on the page so the webdriver .text method doesn't return it
+    driver.execute_script("return $('#aria_alerts div:last').text()").should == message_text
   end
 
   def verify_logout

@@ -45,11 +45,13 @@ describe "gradebook1" do
 
   def switch_to_section(section_name="All")
     f("#gradebook_options").click
+    wait_for_ajaximations
 
     driver.execute_script("$('#instructure_dropdown_list .option:last').click()")
+    wait_for_ajaximations
     click_option("#section-to-show", section_name)
     driver.execute_script("$('#section-to-show').parent().parent().find('button').click()")
-    wait_for_dom_ready
+    wait_for_ajaximations
   end
 
   it "should filter by section" do

@@ -63,7 +63,7 @@ module AssignmentOverrideApplicator
 
 
   def self.assignment_overriden_for_section(assignment_or_quiz, section)
-    section_overrides = assignment_or_quiz.assignment_overrides.scoped(:conditions => {:set_type => 'CourseSection', :set_id => section.id})
+    section_overrides = assignment_or_quiz.assignment_overrides.where(:set_type => 'CourseSection', :set_id => section)
     override_for_due_at(assignment_or_quiz, section_overrides)
   end
 
@@ -83,13 +83,13 @@ module AssignmentOverrideApplicator
       # priority, then group override, then section overrides by position. DO
       # NOT exclude deleted overrides, yet
       key = assignment_or_quiz.is_a?(Quiz) ? :quiz_id : :assignment_id
-      adhoc_membership = AssignmentOverrideStudent.scoped(:conditions => {key => assignment_or_quiz.id, :user_id => user.id}).first
+      adhoc_membership = AssignmentOverrideStudent.where(key => assignment_or_quiz, :user_id => user).first
       
       overrides << adhoc_membership.assignment_override if adhoc_membership
 
-      if assignment_or_quiz.is_a?(Assignment) && assignment_or_quiz.group_category && group = user.current_groups.scoped(:conditions => {:group_category_id => assignment_or_quiz.group_category_id}).first
+      if assignment_or_quiz.is_a?(Assignment) && assignment_or_quiz.group_category && group = user.current_groups.where(:group_category_id => assignment_or_quiz.group_category_id).first
         group_override = assignment_or_quiz.assignment_overrides.
-          scoped(:conditions => {:set_type => 'Group', :set_id => group.id}).
+          where(:set_type => 'Group', :set_id => group).
           first
         overrides << group_override if group_override
       end
@@ -110,11 +110,11 @@ module AssignmentOverrideApplicator
       }.map { |v| v[:course_section_id] }
 
       section_overrides = assignment_or_quiz.assignment_overrides.
-        scoped(:conditions => {:set_type => 'CourseSection', :set_id => section_ids})
+        where(:set_type => 'CourseSection', :set_id => section_ids)
 
       # TODO add position column to assignment_override, nil for non-section
       # overrides, (assignment_or_quiz, position) unique for section overrides
-      overrides += section_overrides#.scoped(:order => :position)
+      overrides += section_overrides#.order(:position)
 
       # for each potential override discovered, make sure we look at the
       # appropriate version

@@ -142,7 +142,7 @@ class UnzipAttachment
 
   def update_attachment_positions(id_positions)
     updates = id_positions.inject([]) do |memo, (id, position)|
-      returning(memo){ |m| m << "WHEN id=#{id} THEN #{position}" if id && position }
+      memo.tap { |m| m << "WHEN id=#{id} THEN #{position}" if id && position }
     end
 
     if updates.any?

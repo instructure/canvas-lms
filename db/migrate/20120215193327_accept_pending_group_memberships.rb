@@ -1,7 +1,7 @@
 class AcceptPendingGroupMemberships < ActiveRecord::Migration
   def self.up
-    GroupMembership.update_all({ :workflow_state => 'accepted' }, { :workflow_state => 'invited' })
-    GroupMembership.update_all({ :workflow_state => 'accepted' }, { :workflow_state => 'requested' })
+    GroupMembership.where(:workflow_state => 'invited').update_all(:workflow_state => 'accepted')
+    GroupMembership.where(:workflow_state => 'requested').update_all(:workflow_state => 'accepted')
   end
 
   def self.down

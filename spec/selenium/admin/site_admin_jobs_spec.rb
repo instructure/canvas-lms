@@ -214,7 +214,7 @@ describe "site admin jobs ui" do
 
   context "running jobs" do
     it "should display running jobs in the workers grid" do
-      j = Delayed::Job.first(:order => :id)
+      j = Delayed::Job.order(:id).first
       j.lock_exclusively!('my test worker')
       load_jobs_page
       ffj('#running-grid .slick-row').size.should == 1

@@ -718,28 +718,6 @@ define([
             }
           }
 
-          if(data.collaborations && !context_string.match(/^user_/)) {
-            var $collaborations = $files_structure.find(".folder_blank").clone(true).removeClass('folder_blank');
-            $collaborations.addClass('collaborations');
-            $collaborations.fillTemplateData({data: {name: "collaborations"}});
-
-            for(var idx in data.collaborations) {
-              var collaboration = data.collaborations[idx].collaboration || data.collaborations[idx].google_docs_collaboration || data.collaborations[idx].etherpad_collaboration;
-              var $file = $(".collaboration_" + collaboration.id);
-              if($file.length === 0) {
-                $file = $files_structure.find(".file_blank").clone(true).removeClass('file_blank');
-                $file.addClass('collaboration_' + data.collaborations[idx].collaboration.id);
-                $file.addClass('collaboration ' + data.collaborations[idx].collaboration.collaboration_type);
-                $file.fillTemplateData({data: {name: data.collaborations[idx].collaboration.title, id: data.collaborations[idx].collaboration.id}});
-              }
-              $file.removeClass('to_be_removed');
-              if($file.parents("body").length === 0) {
-                $collaborations.children("ul").append($file.show());
-              }
-            }
-            $ul.append($collaborations.show());
-          }
-
           var group_names = {};
           for(var idx in data.groups) {
             group_names[(data.groups[idx].group || data.groups[idx].course_assigned_group).category] = true;
@@ -946,38 +924,6 @@ define([
               $files_content.append($content);
             } 
           }
-
-        } else if($item.hasClass('collaboration')) {
-          // set the edit and delete urls, for sure
-          var $content = $files_content.find(".collaboration_" + data.id);
-          if($content.length === 0) {
-            isNew = true;
-            $content = $("#content_templates .collaboration:first").clone(true);
-
-            if(hidden) $content.hide();
-
-            $content.fillTemplateData({ data: data })
-                    .data('parent_node', $item.parent().parent())
-                    .data('node', $item);
-
-            var collaboration_url = $.replaceTags($("." + data.context_string + "_collaboration_url").attr('href'), "id", data.id);
-
-            $content.find(".collaboration_url")
-                    .attr('href', collaboration_url);
-
-            $content.addClass('collaboration_' + data.id)
-                    .addClass(data.collaboration_type);
-          }
-
-          $content.toggleClass('editable_folder_item', !!(data.permissions && data.permissions.update))
-                  .removeClass('to_be_removed');
-
-          $content.find(".item_icon")
-                  .attr('alt', I18n.t('alts.collaboration', 'Collaboration'))
-                  .attr('src', $("#content_blank_icon").attr('src'));
-
-          if (isNew) $files_content.append($content);
-
           // Else it's a file
         } else {
           var $content = $files_content.find(".file_" + data.id);
@@ -1046,47 +992,6 @@ define([
           }
         }
         return isNew;
-      },
-      updateCollaboration: function(context_string, data, refresh) {
-        var file_context_string = $.underscore(data.collaboration.context_type) + "_" + data.collaboration.context_id;
-        for(var idx in fileStructureData) {
-          if(fileStructureData[idx] && (fileStructureData[idx][0].context_string == context_string || fileStructureData[idx][0].context_string == file_context_string)) {
-            var found = false;
-            for(var jdx in fileStructureData[idx][1].collaborations) {
-              var collab = fileStructureData[idx][1].collaborations[jdx].collaboration;
-              if(collab.id == data.collaboration.id) {
-                fileStructureData[idx][1].collaborations[jdx] = data;
-                $files_structure.find(".collaboration_" + collab.id).each(function() {
-                  var folder = files.itemData($(this).parent("ul").parent("li"));
-                  $(this).fillTemplateData({data: {'name': data.collaboration.title}});
-
-                  // add 'title="this is the filename.txt" so you can read files/folders that have really long names
-                  if (data.collaboration.title) $(this).find('.name').attr('title', data.collaboration.title);
-
-                });
-                found = true;
-              }
-            }
-            if(!found) {
-              var collab = data.collaboration;
-              fileStructureData[idx][1].collaborations.push(data);
-              var $collab = $files_structure.find(".file_blank").clone(true).removeClass('file_blank');
-              $collab.removeClass('file');
-              $collab.addClass('collaboration collaboration_' + collab.id + ' ' + collab.collaboration_type);
-              collab.name = collab.title;
-              $collab.fillTemplateData({data: collab});
-
-              // add 'title="this is the filename.txt" so you can read files/folders that have really long names
-              if (collab.title) $collab.find('.name').attr('title', collab.title);
-
-              $files_structure.find("." + context_string + " .collaborations").children("ul").prepend($collab.show());
-            }
-          }
-        }
-        if(refresh !== false ) {
-          files.refreshView(data.attachment);
-          $files_structure_list.instTree.InitInstTree($files_structure_list);
-        }
       },
       updateFile: function(context_string, data, refresh) {
         files.clearDataCache();
@@ -1332,30 +1237,12 @@ define([
                 return file;
               }
             }
-          } else if($node.hasClass('collaborations')) {
-            if($node.parents("li.context:last").hasClass(context[0].context_string)) {
-              res = $node.getTemplateData({textValues: ['name']});
-              res.context_string = context[0].context_string;
-              res.context = context[0].context;
-              return res;
-            }
           } else if($node.hasClass('groups')) {
             if($node.parents("li.context:last").hasClass(context[0].context_string)) {
               res = $node.getTemplateData({textValues: ['name']});
               res.context_string = context[0].context_string;
               res.context = context[0].context;
               return res;
-            }
-          } else if($node.hasClass('collaboration')) {
-            var collaborations = context[1].collaborations;
-            for(var jdx in collaborations) {
-              var collaboration = collaborations[jdx].collaboration;
-              if(collaboration.id == id) {
-                collaboration.context_string = $.underscore(collaboration.context_type) + "_" + collaboration.context_id;
-                collaboration.root_context_string = context[0].context_string;
-                collaboration.name = collaboration.title;
-                return collaboration;
-              }
             }
           } else if($node.hasClass('folder')) {
             var folders = context[1].folders;
@@ -1559,17 +1446,6 @@ define([
                   $panel.show();
                   $add_file_link.triggerHandler('show');
                 }
-              } else if(node.hasClass('collaborations')) {
-                var $panel = $("#collaborations_panel");
-                var context = data.context;
-                $panel.find(".header .name").text(context.name);
-                $panel.find(".breadcrumb").empty().append(files.breadcrumb());
-
-                var collaborations_url = $("." + data.context_string + "_collaborations_url").attr('href');
-                $panel.removeClass('to_be_hidden');
-                $panel.toggleClass('addable_content_panel', !!(data.context && data.context.permissions && data.context.permissions.create_collaborations));
-                $panel.data('node', node);
-                $panel.show();
               } else if(node.hasClass('groups')) {
 
                 var $panel = $("#groups_panel");
@@ -1630,24 +1506,6 @@ define([
                     }
 
                     if($files_content.find(".message.no_content").length === 0) {
-                      if (node.hasClass('collaborations')) {
-                        var find_out_more = "";
-                        if(data.context.permissions.create_collaborations) {
-                          find_out_more = '<p>' + I18n.t('descriptions.collaborations2', 'To find out more about a particular type of collaboration, click &quot;New collaboration&quot; and then choose that type in the dropdown list.') + '</p>';
-                        }
-                        $no_content.html([
-                          '<div class="ui-state-highlight" style="padding:1em;">',
-                            '<p>', I18n.t('descriptions.collaborations',
-                            'Collaborations are a way for you to use web-based tools like ' +
-                            'Google Docs and EtherPad ' +
-                            'to work collaboratively on tasks like group papers or note-taking.  This is a special folder that shows you any collaborations you have created ' +
-                            'so you have an easy place to keep track of and create those collaborations'),
-                            '</p>',
-                            find_out_more,
-                          '</div>',
-                          '<p>', I18n.t('messages.no_collaborations', "There are no collaborations to show"), '</p>'
-                        ].join('').replace('Google Docs', '<a href="http://docs.google.com">Google Docs</a>').replace('EtherPad', '<a href="http://www.etherpad.org">EtherPad</a>'));
-                      }
                       $files_content.append($no_content);
                     }
                   }
@@ -1748,52 +1606,7 @@ define([
                   }
                 }
                 $(window).triggerHandler('resize');
-              } else if(node.hasClass('collaboration')) {
-                var $panel = $("#collaboration_panel");
-                $panel.find(".header .name").text(data.name);
-                $panel.removeClass('to_be_hidden');
-                var subdata = {
-                  name: data.name,
-                  updated_at: $.parseFromISO(data.updated_at).datetime_formatted,
-                  collaborator_count: (data.collaborator_ids || "").split(",").length,
-                  description: data.description,
-                  collaborator_ids: data.collaborator_ids
-                };
-                $panel.find(".breadcrumb").empty().append(files.breadcrumb());
-                var collaboration_url = $("." + data.context_string + "_collaboration_url").attr('href');
-                collaboration_url = $.replaceTags(collaboration_url, 'id', data.id);
-                $panel.find(".edit_collaboration_link").attr('href', collaboration_url);
-                $panel.find(".delete_collaboration_link").attr('href', collaboration_url);
-                $panel.find(".view_item_link").attr('href', collaboration_url);
-                $panel.data('node', node);
-                var $subpanel = $("#collaboration_sub_panel");
-                $subpanel.find(".subcontent").fillTemplateData({data: subdata});
-                $subpanel.removeClass('to_be_hidden');
-                $subpanel.find(".subcontent .collaboration_icon").hide();
-                $subpanel.find(".subcontent .google_docs_icon").showIf(data.collaboration_type == 'google_docs');
-                $subpanel.find(".subcontent .etherpad_icon").showIf(data.collaboration_type == 'etherpad');
-                $subpanel.find(".view_item_link").attr('href', collaboration_url);
-                $subpanel.find(".collaborators").empty();
-
-                var ids = (subdata.collaborator_ids || '').split(',');
-                for(var idx in ids) {
-                  var id = ids[idx];
-                  var $user = $("." + data.context_string + "_user_list:first .collaborator_" + id).clone(true);
-                  $user.find(":checkbox").remove();
-                  $subpanel.find(".collaborators").append($user);
-                }
-
-                $files_content.find(".content_panel:last").after($subpanel); //.prepend($subpanel);
-                $panel.show();
-                $panel.removeClass('editable_content_panel');
-                // show the collaboration control panel with description, link, etc.
-                // show list of participants, delete (two possibles: delete for everyone, just take me off the ACL)
-                if(data && data.permissions && data.permissions.update) {
-                  // show a few more settings for editing, deleting
-                  // managing list of participants
-                  $panel.addClass('editable_content_panel');
-                }
-              }
+              } 
             }
             if(!clearExtras.already_cleared) {
               clearExtras();
@@ -1819,80 +1632,10 @@ define([
         $("#doc_preview_holder").height(contentHeight - panelHeight);
       });
 
-      $(".folder_item .edit_collaboration_link, #collaboration_panel .edit_collaboration_link").click(function(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        $("#edit_collaboration_form").attr('action', $(this).attr('href'));
-        $("#edit_collaboration_form").attr('method', 'PUT');
-        $("#edit_collaboration_form .submit_button").text(I18n.t('buttons.update_collaboration', "Update Collaboration"));
-        $("#edit_collaboration_form .add_collaboration").hide();
-        if($files_content.find(".add_form:visible").length> 0) { return; };
-        $files_content.children(".message").remove();
-        var data = files.itemData($(this).parents(".folder_item,#collaboration_panel"));
-        var context_string = data.context_string;
-        $("#edit_collaboration_dialog").data('context_string', context_string);
-        var $users = $("." + context_string + "_user_list:first").clone(true);
-        var ids = (data.collaborator_ids || "").split(",");
-        $("#edit_collaboration_form").fillFormData(data, {object_name: 'collaboration'});
-        $users.find(".collaborator input").each(function() {
-          $(this).attr('id', $(this).attr('class'));
-          var id = $(this).parent("li.collaborator").getTemplateData({textValues: ['user_id']}).user_id;
-          if($.inArray(id, ids) != -1) {
-            $(this).attr('checked', true);
-          }
-        });
-
-        $("#edit_collaboration_dialog .collaborator_list").empty().append($users);
-        $("#edit_collaboration_dialog").dialog({
-          title: I18n.t('titles.edit_collaboration', 'Edit Collaboration'),
-          width: 500
-        });
-      });
-
-
       $("#folder_panel .download_zip").click(function(event) {
         event.preventDefault();
         INST.downloadFolderFiles($(this).find(".download_zip_link").attr('href'));
       });
-
-      $("#edit_collaboration_dialog").find(".select_all_link,.deselect_all_link").click(function(event) {
-        event.preventDefault();
-        var $link = $(this);
-        $("#edit_collaboration_dialog .collaborator_list :checkbox").each(function() {
-          $(this).attr('checked', $link.hasClass('select_all_link'));
-        });
-      });
-
-      $("#edit_collaboration_dialog .cancel_button").click(function() {
-        $("#edit_collaboration_dialog").dialog('close');
-      });
-
-      $("#edit_collaboration_form").formSubmit({
-        beforeSubmit: function(data) {
-          $(this).loadingImage();
-        },
-        success: function(data) {
-          var context_string = $("#edit_collaboration_dialog").data('context_string');
-          $("#edit_collaboration_dialog").dialog('close');
-          files.updateCollaboration(context_string, data);
-          $(this).loadingImage('remove');
-        },
-        error: function(data) {
-          $(this).loadingImage('remove');
-          $(this).formErrors(data);
-        }
-      });
-
-      $("#collaboration_collaboration_type").change(function() {
-        $("#edit_collaboration_dialog .collaboration_description").hide();
-        $("#edit_collaboration_dialog #" + $(this).val() + "_description").show();
-        $("#edit_collaboration_dialog .collaborate_data").show();
-        $("#edit_collaboration_dialog .collaboration_authorization").hide();
-        if($(this).val() == "google_docs" && $("#edit_collaboration_dialog #collaborate_authorize_google_docs").length > 0) {
-          $("#edit_collaboration_dialog .collaborate_data").hide();
-          $("#edit_collaboration_dialog #collaborate_authorize_google_docs").show();
-        }
-      }).triggerHandler('change');
 
       $(".folder_item .edit_item_content_link").click(function(event) {
         event.preventDefault();
@@ -2073,7 +1816,6 @@ define([
         var data = files.itemData($(this).parents(".folder_item"));
         data = data || files.itemData($(this).parents("#folder_panel,#file_panel").data('node'));
         var item_type = $(this).parents(".folder_item").hasClass('file') ? 'file' : 'folder';
-        if($(this).parents(".folder_item").hasClass('collaboration')) { item_type = 'collaboration'; }
         $(this).parents(".folder_item").confirmDelete({
           message: ($(this).parents(".folder_item").hasClass('folder') || $(this).hasClass('folder_url') ? I18n.t('prompts.delete_folder', "Are you sure you want to delete this folder and all of its contents?") : I18n.t('prompts.delete_file', "Are you sure you want to delete this file?")),
           url: $(this).attr('href'),
@@ -2085,8 +1827,6 @@ define([
             $files_structure.find(".file_" + data.id).remove();
             $files_structure.find(".folder_" + data.id).prev("li.separator").remove();
             $files_structure.find(".folder_" + data.id).remove();
-            $files_structure.find(".collaboration_" + data.id).prev("li.separator").remove();
-            $files_structure.find(".collaboration_" + data.id).remove();
             files.refreshView();
             files.updateQuota();
             $(this).slideUp(function() {
@@ -2113,8 +1853,6 @@ define([
               $(this).unbind('files_load', refresh);
             };
             $item.data('node').bind('files_load', refresh);
-            $item.data('node').children(".text").click();
-          } else if($item.hasClass('collaboration')) {
             $item.data('node').children(".text").click();
           } else {
             $item.find(".name").focus();

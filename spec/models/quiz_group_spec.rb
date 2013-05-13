@@ -51,6 +51,19 @@ describe QuizGroup do
     group.pick_count.should == 3
     group.actual_pick_count.should == 2
   end
+
+  it "should mark its quiz as having unpublished changes when updated" do
+    course
+    quiz = @course.quizzes.create!(:title => "some quiz")
+    group = quiz.quiz_groups.create!(:name => "question group", :pick_count => 1, :question_points => 5.0)
+    group.quiz_questions.create!(:quiz=>quiz, :question_data => {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]})
+    quiz.published_at = Time.now
+    quiz.publish!
+    quiz.unpublished_changes?.should be_false
+
+    group.update_attribute :question_points, 10.0
+    quiz.reload.unpublished_changes?.should be_true
+  end
   
   describe "QuestionGroup pointing to QuestionBank" do
     before(:each) do

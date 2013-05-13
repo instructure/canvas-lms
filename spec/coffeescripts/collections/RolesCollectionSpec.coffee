@@ -12,7 +12,7 @@ define [
       @account_id = null
 
   test "generate the correct url for a collection of roles", 1, -> 
-    roles_collection = new RolesCollection null
+    roles_collection = new RolesCollection null,
       contextAssetString: "account_#{@account_id}"
 
     equal roles_collection.url(), "/api/v1/accounts/#{@account_id}/roles", "roles collection url"
@@ -23,7 +23,7 @@ define [
     role1 = new Role
     role2 = new Role
 
-    roles_collection = new RolesCollection null
+    roles_collection = new RolesCollection null,
       contextAssetString: "account_#{@account_id}"
 
     roles_collection.fetch success: => 

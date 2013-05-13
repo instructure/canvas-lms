@@ -68,7 +68,7 @@ class AssignmentGroupsController < ApplicationController
     params[:include] = Array(params[:include])
     if params[:include].include? 'assignments'
       params[:include] << "discussion_topic"
-      @groups = @groups.scoped(:include => { :assignments => [:rubric, :discussion_topic] })
+      @groups = @groups.includes(:assignments => [:rubric, :discussion_topic])
     end
 
     if authorized_action(@context.assignment_groups.new, @current_user, :read)
@@ -106,9 +106,9 @@ class AssignmentGroupsController < ApplicationController
     if authorized_action(@group, @current_user, :update)
       order = params[:order].split(',').map{|id| id.to_i }
       group_ids = ([@group.id] + (order.empty? ? [] : @context.assignments.find_all_by_id(order).map(&:assignment_group_id))).uniq.compact
-      Assignment.update_all("assignment_group_id=#{@group.id}", :id => order, :context_id => @context.id, :context_type => @context.class.to_s)
+      Assignment.where(:id => order, :context_id => @context, :context_type => @context.class.to_s).update_all(:assignment_group_id => @group)
       @group.assignments.first.update_order(order) unless @group.assignments.empty?
-      AssignmentGroup.update_all({:updated_at => Time.now.utc}, {:id => group_ids})
+      AssignmentGroup.where(:id => group_ids).update_all(:updated_at => Time.now.utc)
       ids = @group.assignments.map(&:id)
       @context.recompute_student_scores rescue nil
       respond_to do |format|
@@ -182,7 +182,7 @@ class AssignmentGroupsController < ApplicationController
         order = @new_group.assignments.active.map(&:id)
         ids_to_change = @assignment_group.assignments.active.map(&:id)
         order += ids_to_change
-        Assignment.update_all({:assignment_group_id => @new_group.id, :updated_at => Time.now.utc}, {:id => ids_to_change}) unless ids_to_change.empty?
+        Assignment.where(:id => ids_to_change).update_all(:assignment_group_id => @new_group, :updated_at => Time.now.utc) unless ids_to_change.empty?
         Assignment.find_by_id(order).update_order(order) unless order.empty?
         @new_group.touch
         @assignment_group.reload

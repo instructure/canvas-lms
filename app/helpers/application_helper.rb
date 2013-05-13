@@ -21,20 +21,14 @@ module ApplicationHelper
   include TextHelper
   include LocaleSelection
 
-  # Admins of the given context can see the User.name attribute,
-  # but everyone else sees the User.short_name attribute.
-  def context_user_name(context, user, last_name_first=false)
+  def context_user_name(context, user)
     return nil unless user
     return user.short_name if !context && user.respond_to?(:short_name)
-    context_code = context
-    context_code = context.asset_string if context.respond_to?(:asset_string)
-    context_code ||= "no_context"
     user_id = user
     user_id = user.id if user.is_a?(User) || user.is_a?(OpenObject)
-    Rails.cache.fetch(['context_user_name', context_code, user_id, last_name_first].cache_key, {:expires_in=>15.minutes}) do
-      user = User.find_by_id(user_id)
-      res = user.short_name || user.name
-      res
+    Rails.cache.fetch(['context_user_name', context, user_id].cache_key, {:expires_in=>15.minutes}) do
+      user = user.respond_to?(:short_name) ? user : User.find(user_id)
+      user.short_name || user.name
     end
   end
 
@@ -293,9 +287,9 @@ module ApplicationHelper
     logger.warn "database lookups happening in view code instead of controller code for wiki sidebar (load_wiki_sidebar)"
     @wiki_sidebar_data = {}
     includes = [:active_assignments, :active_discussion_topics, :active_quizzes, :active_context_modules]
-    includes.each{|i| @wiki_sidebar_data[i] = @context.send(i).scoped({:limit => 150}) if @context.respond_to?(i) }
+    includes.each{|i| @wiki_sidebar_data[i] = @context.send(i).limit(150) if @context.respond_to?(i) }
     includes.each{|i| @wiki_sidebar_data[i] ||= [] }
-    @wiki_sidebar_data[:wiki_pages] = @context.wiki.wiki_pages.active.scoped(:order => 'title', :limit => 150) if @context.respond_to?(:wiki)
+    @wiki_sidebar_data[:wiki_pages] = @context.wiki.wiki_pages.active.order(:title).limit(150) if @context.respond_to?(:wiki)
     @wiki_sidebar_data[:wiki_pages] ||= []
     if can_do(@context, @current_user, :manage_files)
       @wiki_sidebar_data[:root_folders] = Folder.root_folders(@context)
@@ -347,6 +341,10 @@ module ApplicationHelper
 
   class << self
     attr_accessor :cached_translation_blocks
+  end
+
+  def include_js_translations?
+    !!(params[:include_js_translations] || use_optimized_js?)
   end
 
   # See `js_base_url`
@@ -429,7 +427,7 @@ module ApplicationHelper
           hide = tab[:hidden] || tab[:hidden_unused]
           class_name = tab[:css_class].to_css_class
           class_name += ' active' if @active_tab == tab[:css_class]
-          html << "<li class='section #{"hidden" if hide }'>" + link_to(tab[:label], path, :class => class_name) + "</li>" if tab[:href]
+          html << "<li class='section #{"section-tab-hidden" if hide }'>" + link_to(tab[:label], path, :class => class_name) + "</li>" if tab[:href]
         end
         html << "</ul></nav>"
         html.join("")
@@ -532,7 +530,7 @@ module ApplicationHelper
     contexts += @context.account_chain if @context.respond_to?(:account_chain)
     contexts << @domain_root_account if @domain_root_account
     Rails.cache.fetch((['editor_buttons_for'] + contexts.uniq).cache_key) do
-      tools = ContextExternalTool.active.having_setting('editor_button').scoped(:conditions => contexts.map{|context| "(context_type='#{context.class.base_class.to_s}' AND context_id=#{context.id})"}.join(" OR "))
+      tools = ContextExternalTool.active.having_setting('editor_button').where(contexts.map{|context| "(context_type='#{context.class.base_class.to_s}' AND context_id=#{context.id})"}.join(" OR "))
       tools.sort_by(&:id).map do |tool|
         {
           :name => tool.label_for(:editor_button, nil),
@@ -762,6 +760,7 @@ module ApplicationHelper
   end
 
   def include_account_js
+    return if params[:global_includes] == '0'
     includes = get_global_includes.inject([]) do |js_includes, global_include|
       js_includes << "'#{global_include[:js]}'" if global_include[:js].present?
       js_includes
@@ -788,6 +787,7 @@ module ApplicationHelper
   end
 
   def include_account_css
+    return if params[:global_includes] == '0'
     includes = get_global_includes.inject([]) do |css_includes, global_include|
       css_includes << global_include[:css] if global_include[:css].present?
       css_includes
@@ -805,6 +805,13 @@ module ApplicationHelper
     content_tag(:time, attributes) do
       datetime_string(datetime)
     end
+  end
+
+  # render a link with a tooltip containing a summary of due dates
+  def multiple_due_date_tooltip(assignment, user, opts={})
+    user ||= @current_user
+    presenter = OverrideTooltipPresenter.new(assignment, user, opts)
+    render 'shared/vdd_tooltip', :presenter => presenter
   end
 
   require 'digest'

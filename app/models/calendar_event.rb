@@ -24,7 +24,7 @@ class CalendarEvent < ActiveRecord::Base
   attr_accessible :title, :description, :start_at, :end_at, :location_name,
       :location_address, :time_zone_edited, :cancel_reason,
       :participants_per_appointment, :child_event_data,
-      :remove_child_events
+      :remove_child_events, :all_day
   attr_accessor :cancel_reason
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
   copy_authorized_links(:description) { [self.effective_context, nil] }
@@ -98,30 +98,28 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def hidden?
-    !appointment_group && child_events.size > 0
+    !appointment_group? && child_events.size > 0
   end
 
   def effective_context
     effective_context_code && ActiveRecord::Base.find_by_asset_string(effective_context_code) || context
   end
 
-  named_scope :order_by_start_at, :order => :start_at
+  scope :order_by_start_at, order(:start_at)
 
-  named_scope :active, :conditions => ['calendar_events.workflow_state != ?', 'deleted']
-  named_scope :locked, :conditions => ["calendar_events.workflow_state = 'locked'"]
-  named_scope :unlocked, :conditions => ['calendar_events.workflow_state NOT IN (?)', ['deleted', 'locked']]
+  scope :active, where("calendar_events.workflow_state<>'deleted'")
+  scope :locked, where(:workflow_state => 'locked')
+  scope :unlocked, where("calendar_events.workflow_state NOT IN ('deleted', 'locked')")
 
   # controllers/apis/etc. should generally use for_user_and_context_codes instead
-  named_scope :for_context_codes, lambda { |codes|
-    {:conditions => ['calendar_events.context_code IN (?)', codes] }
-  }
+  scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
 
   # appointments and appointment_participants have the appointment_group and
   # the user as the context, respectively. we are actually interested in
   # grouping them under the effective context (i.e. appointment_group.context).
   # it's the responsibility of the caller to ensure the user has rights to the
   # specified codes (e.g. using User#appointment_context_codes)
-  named_scope :for_user_and_context_codes, lambda { |user, *args|
+  scope :for_user_and_context_codes, lambda { |user, *args|
     codes = args.shift
     section_codes = args.shift || user.section_context_codes(codes)
     effectively_courses_codes = [user.asset_string] + section_codes
@@ -135,7 +133,7 @@ class CalendarEvent < ActiveRecord::Base
     }.join(" OR ")
     codes_conditions = self.connection.quote(false) if codes_conditions.blank?
 
-    {:conditions => [<<-SQL, all_codes, codes, group_codes, effectively_courses_codes]}
+    where(<<-SQL, all_codes, codes, group_codes, effectively_courses_codes)
       calendar_events.context_code IN (?)
       AND (
         ( -- explicit contexts (e.g. course_123)
@@ -153,22 +151,20 @@ class CalendarEvent < ActiveRecord::Base
     SQL
   }
 
-  named_scope :undated, :conditions => {:start_at => nil, :end_at => nil}
+  scope :undated, where(:start_at => nil, :end_at => nil)
 
-  named_scope :between, lambda { |start, ending|
-    { :conditions => { :start_at => (start)..(ending) } }
-  }
-  named_scope :current, lambda {
-    { :conditions => ['calendar_events.end_at >= ?', Time.zone.today.to_datetime.utc] }
-  }
-  named_scope :updated_after, lambda { |*args|
+  scope :between, lambda { |start, ending| where(:start_at => start..ending) }
+  scope :current, lambda { where("calendar_events.end_at>=?", Time.zone.now.midnight) }
+  scope :updated_after, lambda { |*args|
     if args.first
-      { :conditions => [ "calendar_events.updated_at IS NULL OR calendar_events.updated_at > ?", args.first ] }
+      where("calendar_events.updated_at IS NULL OR calendar_events.updated_at>?", args.first)
+    else
+      scoped
     end
   }
 
-  named_scope :events_without_child_events, :conditions => "NOT EXISTS (SELECT 1 FROM calendar_events children WHERE children.parent_calendar_event_id = calendar_events.id AND children.workflow_state <> 'deleted')"
-  named_scope :events_with_child_events, :conditions => "EXISTS (SELECT 1 FROM calendar_events children WHERE children.parent_calendar_event_id = calendar_events.id AND children.workflow_state <> 'deleted')"
+  scope :events_without_child_events, where("NOT EXISTS (SELECT 1 FROM calendar_events children WHERE children.parent_calendar_event_id = calendar_events.id AND children.workflow_state<>'deleted')")
+  scope :events_with_child_events, where("EXISTS (SELECT 1 FROM calendar_events children WHERE children.parent_calendar_event_id = calendar_events.id AND children.workflow_state<>'deleted')")
 
   def validate_context!
     @validate_context = true
@@ -179,46 +175,78 @@ class CalendarEvent < ActiveRecord::Base
   def default_values
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}"
     self.title ||= (self.context_type.to_s + " Event") rescue "Event"
+
+    populate_missing_dates
+    populate_all_day_flag
+
+    if parent_event
+      populate_with_parent_event
+    elsif context.is_a?(AppointmentGroup)
+      populate_appointment_group_defaults
+    end
+  end
+  protected :default_values
+
+  def populate_appointment_group_defaults
+    self.effective_context_code = context.appointment_group_contexts.map(&:context_code).join(",")
+    if new_record?
+      AppointmentGroup::EVENT_ATTRIBUTES.each { |attr| send("#{attr}=", attr == :description ? context.description_html : context.send(attr)) }
+      if locked?
+        self.start_at = start_at_was if !new_record? && start_at_changed?
+        self.end_at   = end_at_was   if !new_record? && end_at_changed?
+      end
+    else
+      # we only allow changing the description
+      (AppointmentGroup::EVENT_ATTRIBUTES - [:description]).each { |attr| send("#{attr}=", send("#{attr}_was")) if send("#{attr}_changed?") }
+    end
+  end
+  protected :populate_appointment_group_defaults
+
+  def populate_with_parent_event
+    self.effective_context_code = if appointment_group # appointment participant
+                                    appointment_group.appointment_group_contexts.map(&:context_code).join(',') if appointment_group.participant_type == 'User'
+                                  else # e.g. section-level event
+                                    parent_event.context_code
+                                  end
+    (locked? ? LOCKED_ATTRIBUTES : CASCADED_ATTRIBUTES).each{ |attr| send("#{attr}=", parent_event.send(attr)) }
+  end
+  protected :populate_with_parent_event
+
+  # Populate the start and end dates if they are not set, or if they are invalid
+  def populate_missing_dates
     self.end_at ||= self.start_at
     self.start_at ||= self.end_at
-    if(self.start_at && self.end_at && self.end_at < self.start_at)
+    if self.start_at && self.end_at && self.end_at < self.start_at
       self.end_at = self.start_at
     end
-    zoned_start_at = self.start_at && ActiveSupport::TimeWithZone.new(self.start_at.utc, (ActiveSupport::TimeZone.new(self.time_zone_edited) rescue nil) || Time.zone)
-    if self.start_at_changed?
+  end
+  protected :populate_missing_dates
+
+  def populate_all_day_flag
+    # If the all day flag has been changed to all day, set the times to 00:00
+    if self.all_day_changed? && self.all_day?
+      self.start_at = self.end_at = zoned_start_at.beginning_of_day rescue nil
+
+    elsif self.start_at_changed? || self.end_at_changed?
       if self.start_at && self.start_at == self.end_at && zoned_start_at.strftime("%H:%M") == '00:00'
-        self.all_day = true
-      elsif self.start_at && self.start_at_was && self.start_at == self.end_at && self.all_day && self.start_at.strftime("%H:%M") == self.start_at_was.strftime("%H:%M")
         self.all_day = true
       else
         self.all_day = false
       end
     end
 
-    self.all_day_date = (zoned_start_at.to_date rescue nil) if !self.all_day_date || self.start_at_changed? || self.all_day_date_changed?
-
-    if parent_event
-      self.effective_context_code = if appointment_group # appointment participant
-                                      appointment_group.appointment_group_contexts.map(&:context_code).join(',') if appointment_group.participant_type == 'User' 
-                                    else # e.g. section-level event
-                                      parent_event.context_code
-                                    end
-      (locked? ? LOCKED_ATTRIBUTES : CASCADED_ATTRIBUTES).each{ |attr| send("#{attr}=", parent_event.send(attr)) }
-    elsif context.is_a?(AppointmentGroup)
-      self.effective_context_code = context.appointment_group_contexts.map(&:context_code).join(",")
-      if new_record?
-        AppointmentGroup::EVENT_ATTRIBUTES.each { |attr| send("#{attr}=", attr == :description ? context.description_html : context.send(attr)) }
-        if locked?
-          self.start_at = start_at_was if !new_record? && start_at_changed?
-          self.end_at = end_at_was if !new_record? && end_at_changed?
-        end
-      else
-        # we only allow changing the description
-        (AppointmentGroup::EVENT_ATTRIBUTES - [:description]).each { |attr| send("#{attr}=", send("#{attr}_was")) if send("#{attr}_changed?") }
-      end
+    if self.all_day && (!self.all_day_date || self.start_at_changed? || self.all_day_date_changed?)
+      self.start_at = self.end_at = zoned_start_at.beginning_of_day rescue nil
+      self.all_day_date = (zoned_start_at.to_date rescue nil)
     end
   end
-  protected :default_values
+  protected :populate_all_day_flag
+
+  # Localized start_at
+  def zoned_start_at
+    self.start_at && ActiveSupport::TimeWithZone.new(self.start_at.utc,
+        ((ActiveSupport::TimeZone.new(self.time_zone_edited) rescue nil) || Time.zone))
+  end
 
   CASCADED_ATTRIBUTES = [
     :title,
@@ -251,9 +279,9 @@ class CalendarEvent < ActiveRecord::Base
     events = child_events(true)
 
     if events.present?
-      CalendarEvent.update_all({:start_at => events.map(&:start_at).min,
-                                :end_at => events.map(&:end_at).max
-                               }, ["id = ?", id])
+      CalendarEvent.where(:id => self).
+          update_all(:start_at => events.map(&:start_at).min,
+                     :end_at => events.map(&:end_at).max)
       reload
     end
   end
@@ -376,6 +404,10 @@ class CalendarEvent < ActiveRecord::Base
     read_attribute(:user) || (context_type == 'User' ? context : nil)
   end
 
+  def appointment_group?
+    context_type == 'AppointmentGroup' || parent_event.try(:context_type) == 'AppointmentGroup'
+  end
+
   def appointment_group
     if parent_event.try(:context).is_a?(AppointmentGroup)
       parent_event.context
@@ -394,7 +426,7 @@ class CalendarEvent < ActiveRecord::Base
       participant.lock! # in case two people try to make a reservation for the same participant
 
       if options[:cancel_existing]
-        context.reservations_for(participant).scoped(:lock => true).each do |reservation|
+        context.reservations_for(participant).lock.each do |reservation|
           reservation.updating_user = user
           reservation.destroy
         end
@@ -469,10 +501,6 @@ class CalendarEvent < ActiveRecord::Base
     return CalendarEvent::IcalEvent.new(self).to_ics(in_own_calendar)
   end
 
-  def self.search(query)
-    find(:all, :conditions => wildcard('title', 'description', query))
-  end
-
   attr_accessor :clone_updated
   def clone_for(context, dup=nil, options={})
     options[:migrate] = true if options[:migrate] == nil
@@ -505,7 +533,7 @@ class CalendarEvent < ActiveRecord::Base
         begin
           import_from_migration(event, migration.context)
         rescue
-          migration.add_warning("Couldn't import the event \"#{event[:title]}\"", $!)
+          migration.add_import_warning(t('#migration.calendar_event_type', "Calendar Event"), event[:title], $!)
         end
       end
     end
@@ -520,7 +548,8 @@ class CalendarEvent < ActiveRecord::Base
     item.migration_id = hash[:migration_id]
     item.workflow_state = 'active' if item.deleted?
     item.title = hash[:title] || hash[:name]
-    description = ImportedHtmlConverter.convert(hash[:description] || "", context)
+    hash[:missing_links] = []
+    description = ImportedHtmlConverter.convert(hash[:description] || "", context, {:missing_links => hash[:missing_links]})
     if hash[:attachment_type] == 'external_url'
       url = hash[:attachment_value]
       description += "<p><a href='#{url}'>" + ERB::Util.h(t(:see_related_link, "See Related Link")) + "</a></p>" if url
@@ -553,6 +582,11 @@ class CalendarEvent < ActiveRecord::Base
     item.end_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:end_at]) unless hash[:end_at].nil?
 
     item.save_without_broadcasting!
+    if context.respond_to?(:content_migration) && context.content_migration
+      context.content_migration.add_missing_content_links(:class => item.class.to_s,
+        :id => item.id, :missing_links => hash[:missing_links],
+        :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/#{item.class.to_s.underscore.pluralize}/#{item.id}")
+    end
     context.imported_migration_items << item if context.imported_migration_items
     if hash[:all_day]
       item.all_day = hash[:all_day]
@@ -569,17 +603,17 @@ class CalendarEvent < ActiveRecord::Base
     given { |user, session| self.cached_context_grants_right?(user, session, :read) }#students.include?(user) }
     can :read
 
-    given { |user, session| !appointment_group ^ cached_context_grants_right?(user, session, :read_appointment_participants) }
+    given { |user, session| !appointment_group? ^ cached_context_grants_right?(user, session, :read_appointment_participants) }
     can :read_child_events
 
-    given { |user, session| parent_event && appointment_group && parent_event.grants_right?(user, session, :manage) }
+    given { |user, session| parent_event && appointment_group? && parent_event.grants_right?(user, session, :manage) }
     can :read and can :delete
 
-    given { |user, session| appointment_group && cached_context_grants_right?(user, session, :manage) }
+    given { |user, session| appointment_group? && cached_context_grants_right?(user, session, :manage) }
     can :manage
 
     given { |user, session|
-      appointment_group && (
+      appointment_group? && (
         grants_right?(user, session, :manage) ||
         cached_context_grants_right?(user, nil, :reserve) && context.participant_for(user).present?
       )
@@ -635,8 +669,10 @@ class CalendarEvent < ActiveRecord::Base
         event.end = event.start
         event.end.ical_params = {"VALUE"=>["DATE"]}
       end
-      event.summary = (@event.context_type == "Course" && "#{@event.title} (#{@event.context.course_code})" || @event.title)   #event.summary = @event.title
-      if @event.description
+
+      event.summary = @event.title
+      
+      if @event.is_a?(CalendarEvent) && @event.description
         html = api_user_content(@event.description, @event.context)
         event.description html_to_text(html)
         event.x_alt_desc(html, { 'FMTTYPE' => 'text/html' })
@@ -672,6 +708,21 @@ class CalendarEvent < ActiveRecord::Base
         end
       end
 
+      # make an effort to find an associated course without diving too deep down the rabbit hole
+      associated_course = nil
+      if @event.is_a?(CalendarEvent)
+        if @event.effective_context.is_a?(Course)
+          associated_course = @event.effective_context
+        elsif @event.effective_context.respond_to?(:context) && @event.effective_context.context.is_a?(Course)
+          associated_course = @event.effective_context.context
+        end
+      elsif @event.respond_to?(:context) && @event.context_type == "Course"
+        associated_course = @event.context
+      end
+
+      event.summary += " [#{associated_course.course_code}]" if associated_course
+     
+ 
       event = nil unless start_at
       return event unless in_own_calendar
 

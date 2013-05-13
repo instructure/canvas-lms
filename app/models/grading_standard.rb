@@ -51,8 +51,8 @@ class GradingStandard < ActiveRecord::Base
     state :deleted
   end
   
-  named_scope :active, :conditions => ['grading_standards.workflow_state != ?', 'deleted']
-  named_scope :sorted, :order => "usage_count >= 3 DESC, title ASC"
+  scope :active, where("grading_standards.workflow_state<>'deleted'")
+  scope :sorted, order("usage_count >= 3 DESC, title ASC")
 
   VERSION = 2
 
@@ -170,7 +170,7 @@ class GradingStandard < ActiveRecord::Base
   def self.standards_for(context)
     context_codes = [context.asset_string]
     context_codes.concat Account.all_accounts_for(context).map(&:asset_string)
-    GradingStandard.active.scoped(:conditions => { :context_code => context_codes.uniq })
+    GradingStandard.active.where(:context_code => context_codes.uniq)
   end
   
   def standard_data=(params={})
@@ -211,7 +211,7 @@ class GradingStandard < ActiveRecord::Base
         begin
           import_from_migration(standard, migration.context)
         rescue
-          migration.add_warning("Couldn't import grading standard \"#{standard[:title]}\"", $!)
+          migration.add_import_warning(t('#migration.grading_standard_type', "Grading Standard"), standard[:title], $!)
         end
       end
     end

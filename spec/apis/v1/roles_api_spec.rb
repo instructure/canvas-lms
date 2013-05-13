@@ -402,12 +402,7 @@ describe "Roles API", :type => :integration do
       it "should return the expected json format" do
         json = api_call_with_settings
         json.keys.sort.should == ["account", "base_role_type", "label", "permissions", "role", "workflow_state"]
-        json["account"].should == {
-          "name" => @account.name,
-          "root_account_id" => @account.root_account_id,
-          "parent_account_id" => @account.parent_account_id,
-          "id" => @account.id
-        }
+        json["account"]["id"].should == @account.id
         json["role"].should == @role
         json["base_role_type"].should == AccountUser::BASE_ROLE_NAME
 
@@ -486,11 +481,7 @@ describe "Roles API", :type => :integration do
           'prior_default' => true,
           'explicit'      => true }
         json['role'].should eql 'TeacherEnrollment'
-        json['account'].should == {
-          'root_account_id' => nil,
-          'name' => Account.default.name,
-          'id' => Account.default.id,
-          'parent_account_id' => nil }
+        json['account']['id'].should == Account.default.id
       end
 
       it "should not be able to edit read-only permissions" do

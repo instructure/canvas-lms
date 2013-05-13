@@ -129,7 +129,7 @@ describe "Modules API", :type => :integration do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
                       :controller => "context_modules_api", :action => "list_module_items", :format => "json",
                       :course_id => "#{@course.id}", :module_id => "#{@module1.id}")
-      json.should == [
+      json.should eql [
           {
               "type" => "Assignment",
               "id" => @assignment_tag.id,
@@ -143,8 +143,9 @@ describe "Modules API", :type => :integration do
           {
               "type" => "Quiz",
               "id" => @quiz_tag.id,
-              "html_url" => "http://www.example.com/courses/#{@course.id}/modules/items/#{@quiz_tag.id}",
               "position" => 2,
+              "html_url" => "http://www.example.com/courses/#{@course.id}/modules/items/#{@quiz_tag.id}",
+              "url" => "http://www.example.com/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}",
               "title" => @quiz_tag.title,
               "indent" => 0,
               "completion_requirement" => { "type" => "min_score", "min_score" => 10 }

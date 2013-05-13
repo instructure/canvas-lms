@@ -5,7 +5,7 @@ class RemoveIrrelevantSubmissionMessages < ActiveRecord::Migration
     # destroy any submission messages where none of the commenters are
     # participants in the conversation. in production, this will remove about
     # 7k rows
-    ConversationMessage.destroy_all(<<-CONDITIONS)
+    ConversationMessage.where(<<-CONDITIONS).destroy_all
       asset_id IS NOT NULL
       AND id NOT IN (
         SELECT DISTINCT cm.id

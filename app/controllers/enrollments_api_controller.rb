@@ -283,7 +283,7 @@ class EnrollmentsApiController < ApplicationController
     if authorized_action(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
       scope = @context.enrollments_visible_to(@current_user, :type => :all, :include_priors => true).scoped(scope_arguments)
       unless params[:state].present?
-        scope = scope.scoped(:conditions =>  ['enrollments.workflow_state NOT IN (?)', ['rejected', 'completed', 'deleted', 'inactive']])
+        scope = scope.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')")
       end
       scope
     else
@@ -332,7 +332,7 @@ class EnrollmentsApiController < ApplicationController
     # on unpublished courses.
     additional_conditions.merge!({:workflow_state => %w{active invited}}) unless params[:state].present?
 
-    user.enrollments.scoped(scope_arguments).scoped(:conditions => additional_conditions)
+    user.enrollments.scoped(scope_arguments).where(additional_conditions)
   end
 
   # Internal: Collect type, section, state, and role info from params and format them

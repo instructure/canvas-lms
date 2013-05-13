@@ -52,13 +52,13 @@ def unzip_from_form_to_folder()
       f('input#zip_file').send_keys(path)
       submit_form('#zip_file_import_form')
 
-      zfi = keep_trying_until { ZipFileImport.last(:order => :id) }
+      zfi = keep_trying_until { ZipFileImport.order(:id).last }
       zfi.context.should == @context
       zfi.folder.should == @folder
 
       f('.ui-dialog-title').should include_text('Uploading, Please Wait.') # verify it's visible
 
-      job = Delayed::Job.last(:order => :id)
+      job = Delayed::Job.order(:id).last
       job.tag.should == 'ZipFileImport#process_without_send_later'
       run_job(job)
       upload_file(true) if refresh != true && f("#flash_message_holder .ui-state-error").present?
@@ -100,13 +100,13 @@ def unzip_from_form_to_folder()
     confirm_dialog.accept
     wait_for_ajax_requests
 
-    zfi = keep_trying_until { ZipFileImport.last(:order => :id) }
+    zfi = keep_trying_until { ZipFileImport.order(:id).last }
     zfi.context.should == @context
     zfi.folder.should == folder
 
     f('.ui-dialog-title').should include_text('Extracting Files into Folder') # verify it's visible
 
-    job = Delayed::Job.last(:order => :id)
+    job = Delayed::Job.order(:id).last
     job.tag.should == 'ZipFileImport#process_without_send_later'
     run_job(job)
 

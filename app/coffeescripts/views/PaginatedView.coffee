@@ -46,7 +46,11 @@ define [
       ret
 
     showPaginationLoader: ->
-      (@$paginationLoader ?= $(@paginationLoaderTemplate())).insertAfter @el
+      @$paginationLoader ?= $(@paginationLoaderTemplate())
+      @placePaginationLoader()
+
+    placePaginationLoader: ->
+      @$paginationLoader?.insertAfter @el
 
     hidePaginationLoader: ->
       @$paginationLoader?.remove()
@@ -71,8 +75,11 @@ define [
       if !@collection.urls or !@collection.urls.next
         @stopPaginationListener() if @collection.length
         return
-      if $(@paginationScrollContainer).is(':visible') and @distanceToBottom() < @distanceTillFetchNextPage
-        @collection.fetch _.extend({page: 'next'}, @fetchOptions)
+      # let the call stack play out before checking the scroll position.
+      setTimeout =>
+        if $(@paginationScrollContainer).is(':visible') and @distanceToBottom() < @distanceTillFetchNextPage
+          @collection.fetch _.extend({page: 'next'}, @fetchOptions)
+      , 0
 
     bindPaginationEvents: ->
       @collection.on 'beforeFetch:next', @showPaginationLoader, this

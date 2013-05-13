@@ -200,7 +200,7 @@ describe ContextModule do
       @progression.requirements_met.should_not be_empty
       @progression.requirements_met[0][:id].should eql(@tag.id)
     end
-    
+
     it "should return nothing if the user isn't a part of the context" do
       course_module
       @user = User.create!(:name => "some name")
@@ -209,6 +209,28 @@ describe ContextModule do
       @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
       @progression = @module.update_for(@user, :read, @tag)
       @progression.should be_nil
+    end
+
+    it "should not generate progressions for non-active modules" do
+      student_in_course :active_all => true
+      tehmod = @course.context_modules.create! :name => "teh module"
+      page = @course.wiki.wiki_pages.create! :title => "view this page"
+      tag = tehmod.add_item(:id => page.id, :type => 'wiki_page')
+      tehmod.completion_requirements = { tag.id => {:type => 'must_view'} }
+      tehmod.workflow_state = 'active'
+      tehmod.save!
+
+      othermods = %w(active unpublished deleted).collect do |state|
+        mod = @course.context_modules.build :name => "other module in state #{state}"
+        mod.workflow_state = state
+        mod.save!
+        mod
+      end
+
+      tehmod.update_for(@student, :read, tag)
+      mods_with_progressions = @student.context_module_progressions.collect(&:context_module_id)
+      mods_with_progressions.should_not be_include othermods[1].id
+      mods_with_progressions.should_not be_include othermods[2].id
     end
   end
 
@@ -690,6 +712,27 @@ describe ContextModule do
       @assignment.locked_for?(@user).should be_false
     end
   end
+
+  describe "after_save" do
+    before do
+      course_module
+      course_with_student(:course => @course, :active_all => true)
+      @assignment = @course.assignments.create!(:title => "some assignment")
+      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
+      @module.completion_requirements = {@tag.id => {:type => 'min_score', :min_score => 90}}
+      @module.save!
+    end
+
+    it "should not recompute everybody's progressions" do
+      new_module = @course.context_modules.build :name => 'new module'
+      new_module.prerequisites = "context_module_#{@module.id}"
+
+      ContextModule.any_instance.expects(:re_evaluate_for).never
+      new_module.save!
+      run_jobs
+    end
+  end
+
   describe "clone_for" do
     it "should clone a context module" do
       course_module
@@ -710,7 +753,7 @@ describe ContextModule do
       @old_assignment = @course.assignments.create!(:title => "my assignment")
       @old_tag = @old_module.add_item({:type => 'assignment', :id => @old_assignment.id})
       ct = @old_module.add_item({ :title => 'Broken url example', :type => 'external_url', :url => 'http://example.com/with%20space' })
-      ContentTag.update_all({:url => "http://example.com/with space"}, "id=#{ct.id}")
+      ContentTag.where(:id => ct).update_all(:url => "http://example.com/with space")
       @old_module.reload
       @old_module.content_tags.length.should eql(2)
       course_model

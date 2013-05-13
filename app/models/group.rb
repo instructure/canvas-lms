@@ -22,7 +22,7 @@ class Group < ActiveRecord::Base
   include CustomValidations
   include UserFollow::FollowedItem
 
-  attr_accessible :name, :context, :max_membership, :group_category, :join_level, :default_view, :description, :is_public, :avatar_attachment
+  attr_accessible :name, :context, :max_membership, :group_category, :join_level, :default_view, :description, :is_public, :avatar_attachment, :storage_quota_mb
   validates_allowed_transitions :is_public, false => true
 
   has_many :group_memberships, :dependent => :destroy, :conditions => ['group_memberships.workflow_state != ?', 'deleted']
@@ -72,7 +72,7 @@ class Group < ActiveRecord::Base
 
   def participating_users(user_ids = nil)
     user_ids ?
-      participating_users_association.scoped(:conditions => {:id => user_ids}) :
+      participating_users_association.where(:id =>user_ids) :
       participating_users_association
   end
 
@@ -113,7 +113,7 @@ class Group < ActiveRecord::Base
   end
 
   def context_code
-    raise "DONT USE THIS, use .short_name instead" unless ENV['RAILS_ENV'] == "production"
+    raise "DONT USE THIS, use .short_name instead" unless Rails.env.production?
   end
 
   def appointment_context_codes
@@ -185,12 +185,11 @@ class Group < ActiveRecord::Base
 
   def close_memberships_if_deleted
     return unless self.deleted?
-    memberships = self.group_memberships
-    User.update_all({:updated_at => Time.now.utc}, {:id => memberships.map(&:user_id).uniq})
-    GroupMembership.update_all({:workflow_state => 'deleted'}, {:id => memberships.map(&:id).uniq})
+    User.where(:id => group_memberships.pluck(:user_id)).update_all(:updated_at => Time.now.utc)
+    group_memberships.update_all(:workflow_state => 'deleted')
   end
 
-  named_scope :active, :conditions => ['groups.workflow_state != ?', 'deleted']
+  scope :active, where("groups.workflow_state<>'deleted'")
 
   def full_name
     res = before_label(self.name) + " "
@@ -252,7 +251,7 @@ class Group < ActiveRecord::Base
 
   def peer_groups
     return [] if !self.context || !self.group_category || self.group_category.allows_multiple_memberships?
-    self.group_category.groups.find(:all, :conditions => ["id != ?", self.id])
+    self.group_category.groups.where("id<>?", self).all
   end
 
   def migrate_content_links(html, from_course)
@@ -423,6 +422,14 @@ class Group < ActiveRecord::Base
     self.storage_quota || Setting.get_cached('group_default_quota', 50.megabytes.to_s).to_i
   end
 
+  def storage_quota_mb
+    quota / 1.megabyte
+  end
+  
+  def storage_quota_mb=(val)
+    self.storage_quota = val.try(:to_i).try(:megabytes)
+  end
+  
   TAB_HOME, TAB_PAGES, TAB_PEOPLE, TAB_DISCUSSIONS, TAB_CHAT, TAB_FILES,
     TAB_CONFERENCES, TAB_ANNOUNCEMENTS, TAB_PROFILE, TAB_SETTINGS, TAB_COLLABORATIONS = *1..20
   def tabs_available(user=nil, opts={})
@@ -456,7 +463,7 @@ class Group < ActiveRecord::Base
         begin
           import_from_migration(group, migration.context)
         rescue
-          migration.add_warning("Couldn't import group \"#{group[:title]}\"", $!)
+          migration.add_import_warning(t('#migration.group_type', "Group"), group[:title], $!)
         end
       end
     end
@@ -548,9 +555,9 @@ class Group < ActiveRecord::Base
     def self.restrict_scope(scope, pager)
       if bookmark = pager.current_bookmark
         comparison = (pager.include_bookmark ? 'groups.id >= ?' : 'groups.id > ?')
-        scope = scope.scoped(:conditions => [comparison, bookmark])
+        scope = scope.where(comparison, bookmark)
       end
-      scope.scoped(:order => "groups.id ASC")
+      scope.order("groups.id ASC")
     end
   end
 end

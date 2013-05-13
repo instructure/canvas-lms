@@ -129,7 +129,7 @@ describe AssignmentOverride do
     end
 
     def invalid_id_for_model(model)
-      (model.scoped(:select => 'max(id) as id').first.id || 0) + 1
+      (model.maximum(:id) || 0) + 1
     end
 
     it "should reject non-nil set_id with an adhoc set" do
@@ -385,9 +385,11 @@ describe AssignmentOverride do
     end
 
     it "should preserve non-all-day date when only changing time zone" do
-      @override.due_at = Date.today.in_time_zone('Alaska') - 11.hours # 13:00:00 AKDT -08:00 previous day
-      @override.due_at = @override.due_at.in_time_zone('Baghdad') # 00:00:00 AST +03:00 today
-      @override.all_day_date.should == Date.today - 1.day
+      Timecop.freeze(Time.utc(2013,3,10,0,0)) do
+        @override.due_at = Date.today.in_time_zone('Alaska') - 11.hours # 13:00:00 AKDT -08:00 previous day
+        @override.due_at = @override.due_at.in_time_zone('Baghdad') # 00:00:00 AST +03:00 today
+        @override.all_day_date.should == Date.today - 1.day
+      end
     end
 
     it "sets the date to 11:59 PM of the same day when the date is 12:00 am" do
@@ -518,6 +520,17 @@ describe AssignmentOverride do
       visible_overrides.size.should == 2
       visible_overrides.should include @override1
       visible_overrides.should include @override2
+    end
+
+    it "should not return readonly objects" do
+      section = @course.default_section
+      override = assignment_override_model(:assignment => @assignment)
+      override.set = section
+      override.save!
+
+      override = AssignmentOverride.visible_to(@teacher, @course).first
+      override.should_not be_nil
+      override.should_not be_readonly
     end
   end
 

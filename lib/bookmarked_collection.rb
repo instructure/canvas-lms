@@ -93,9 +93,9 @@ module BookmarkedCollection
   #     if pager.current_bookmark
   #       sortable_name = pager.current_bookmark.to_s
   #       comparison = (pager.include_bookmark ? ">=" : ">")
-  #       scope = base_scope.scoped(:conditions => [
+  #       scope = base_scope.where(
   #         "sortable_name #{comparison} ?",
-  #         sortable_name])
+  #         sortable_name)
   #     end
   #     users = scope.paginate(:page => 1, :per_page => pager.per_page)
   #     pager.replace users
@@ -112,11 +112,11 @@ module BookmarkedCollection
   # Simplifies the common case of wrapping an ActiveRecord scope in bookmark
   # pagination.
   #
-  # The bookmarker object is as for .build with an additional restrict_to
+  # The bookmarker object is as for .build with an additional restrict_scope
   # method:
   #
-  #  - bookmarker.restrict(scope, pager): should return a new scope based on
-  #    scope and restricted according to pager.current_bookmark and
+  #  - bookmarker.restrict_scope(scope, pager): should return a new scope based
+  #    on scope and restricted according to pager.current_bookmark and
   #    pager.include_bookmark. should typically enforce the scope is ordered by
   #    the bookmark, as well.
   #
@@ -134,13 +134,13 @@ module BookmarkedCollection
   #       bookmark.is_a?(String)
   #     end
   #
-  #     def self.restrict(scope, pager)
+  #     def self.restrict_scope(scope, pager)
   #       if pager.current_bookmark
   #         sortable_name = pager.current_bookmark.to_s
   #         comparison = (pager.include_bookmark ? ">=" : ">")
-  #         scope = scope.scoped(:conditions => [
+  #         scope = scope.where(
   #           "sortable_name #{comparison} ?",
-  #           sortable_name])
+  #           sortable_name)
   #       end
   #       scope.order_by_sortable_name
   #     end
@@ -149,8 +149,8 @@ module BookmarkedCollection
   #   bookmarked_collection = BookmarkedCollection.wrap(UserBookmarker, User.active)
   #   Api.paginate(bookmarked_collection, ...)
   #
-  def self.wrap(bookmarker, base_scope, options={}, &block)
-    BookmarkedCollection::WrapProxy.new(bookmarker, base_scope, options, &block)
+  def self.wrap(bookmarker, base_scope, &block)
+    BookmarkedCollection::WrapProxy.new(bookmarker, base_scope, &block)
   end
 
   # Combines multiple named bookmarked collections into a single collection
@@ -174,6 +174,12 @@ module BookmarkedCollection
   # automatically incorporated into the merged collection's bookmark and used
   # to inform the value of include_bookmark when processing the subcollections.
   #
+  # Alternately, if the merge is provided with a block, duplicate elements
+  # across collections will be collapsed down into one element. The block will
+  # be yielded to with the kept element (the first instance seen) and the
+  # duplicate, allowing the caller to copy any necessary information from the
+  # duplicate to the kept element.
+  #
   # NOTE: While a hash interface rather than a list of pairs may seem cleaner,
   # we need to preserve order as well as name association, so it's not
   # feasible.
@@ -187,8 +193,8 @@ module BookmarkedCollection
   #     ['users', users]
   #   )
   #
-  def self.merge(*collections)
-    BookmarkedCollection::MergeProxy.new(collections)
+  def self.merge(*collections, &merge_proc)
+    BookmarkedCollection::MergeProxy.new(collections, &merge_proc)
   end
 
   # Combines multiple named bookmarked collections into a single collection
@@ -226,18 +232,15 @@ module BookmarkedCollection
   #
   #   BookmarkedCollection.with_each_shard(UserBookmarker, @user.courses)
   #
-  #   BookmarkedCollection.with_each_shard(UserBookmarker, @user.courses,
-  #     :conditions => {:workflow_state => :active})
-  #
   #   BookmarkedCollection.with_each_shard(UserBookmarker, @user.courses) do |scope|
   #     scope.active
   #   end
   #
-  def self.with_each_shard(bookmarker, association, options={})
+  def self.with_each_shard(bookmarker, association)
     # not the result of association.with_each_shard because we don't want it to
     # flatten our list of pairs
     collections = []
-    association.with_each_shard(options) do |sharded_association|
+    association.with_each_shard do |sharded_association|
       sharded_association = yield sharded_association if block_given?
       collections << [Shard.current.id, self.wrap(bookmarker, sharded_association)]
       nil

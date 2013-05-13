@@ -47,20 +47,20 @@ define [
     right:
       my: "left center"
       at: "right+#{CARET_SIZE} center"
-      collision: 'none none'
+      collision: 'flipfit flipfit'
     left:
       my: "right center"
       at: "left-#{CARET_SIZE} center"
-      collision: 'none none'
+      collision: 'flipfit flipfit'
     top:
       my: "center bottom"
       at: "center top-#{CARET_SIZE}"
-      collision: 'none none'
+      collision: 'flipfit flipfit'
 
     bottom:
       my: "center top"
       at: "center bottom+#{CARET_SIZE}"
-      collision: 'none none'
+      collision: 'flipfit flipfit'
 
   $('body').on 'mouseover', '[data-tooltip]', (event) ->
     $this = $(this)

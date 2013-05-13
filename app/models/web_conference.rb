@@ -37,9 +37,7 @@ class WebConference < ActiveRecord::Base
   
   has_a_broadcast_policy
   
-  named_scope :for_context_codes, lambda { |context_codes| { 
-    :conditions => {:context_code => context_codes} } 
-  }
+  scope :for_context_codes, lambda { |context_codes| where(:context_code => context_codes) }
 
   serialize :settings
   def settings
@@ -350,10 +348,8 @@ class WebConference < ActiveRecord::Base
     dup
   end
   
-  named_scope :after, lambda{|date|
-    {:conditions => ['web_conferences.start_at IS NULL OR web_conferences.start_at > ?', date] }
-  }
-  
+  scope :after, lambda { |date| where("web_conferences.start_at IS NULL OR web_conferences.start_at>?", date) }
+
   set_policy do
     given { |user, session| self.users.include?(user) && self.cached_context_grants_right?(user, session, :read) }
     can :read and can :join
@@ -391,9 +387,8 @@ class WebConference < ActiveRecord::Base
       config[:class_name] == self.class.to_s
     end
   end
-  
-  named_scope :active, lambda {
-  }
+
+  scope :active, scoped
 
   def as_json(options={})
     super(options.merge(:methods => [:has_advanced_settings]))

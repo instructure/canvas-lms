@@ -33,21 +33,13 @@ class Rubric < ActiveRecord::Base
   serialize :data
   simply_versioned
   
-  named_scope :publicly_reusable, lambda {
-    {:conditions => {:reusable => true}, :order => :title}
-  }
-  named_scope :matching, lambda {|search|
-    {:order => 'rubrics.association_count DESC', :conditions => wildcard('rubrics.title', search)}
-  }
-  named_scope :before, lambda{|date|
-    {:conditions => ['rubrics.created_at < ?', date]}
-  }
-  named_scope :active, lambda{
-    {:conditions => ['workflow_state != ?', 'deleted'] }
-  }
-  
+  scope :publicly_reusable, where(:reusable => true).order(:title)
+  scope :matching, lambda { |search| where(wildcard('rubrics.title', search)).order("rubrics.association_count DESC") }
+  scope :before, lambda { |date| where("rubrics.created_at<?", date) }
+  scope :active, where("workflow_state<>'deleted'")
+
   set_policy do
-    given {|user, session| self.cached_context_grants_right?(user, session, :manage_grades)}
+    given {|user, session| self.cached_context_grants_right?(user, session, :manage_rubrics)}
     can :read and can :create and can :delete_associations
     
     given {|user, session| self.cached_context_grants_right?(user, session, :manage_assignments)}
@@ -60,13 +52,13 @@ class Rubric < ActiveRecord::Base
     given {|user, session| !self.read_only && self.rubric_associations.for_grading.length < 2 && self.cached_context_grants_right?(user, session, :manage_assignments)}
     can :update and can :delete
     
-    given {|user, session| !self.read_only && self.rubric_associations.for_grading.length < 2 && self.cached_context_grants_right?(user, session, :manage_grades)}
+    given {|user, session| !self.read_only && self.rubric_associations.for_grading.length < 2 && self.cached_context_grants_right?(user, session, :manage_rubrics)}
     can :update and can :delete
 
     given {|user, session| self.cached_context_grants_right?(user, session, :manage_assignments)}
     can :delete
     
-    given {|user, session| self.cached_context_grants_right?(user, session, :manage_grades)}
+    given {|user, session| self.cached_context_grants_right?(user, session, :manage_rubrics)}
     can :delete
 
     given {|user, session| self.cached_context_grants_right?(user, session, :read) }
@@ -98,7 +90,7 @@ class Rubric < ActiveRecord::Base
   
   alias_method :destroy!, :destroy
   def destroy
-    RubricAssociation.update_all({:bookmarked => false, :updated_at => Time.now.utc}, {:rubric_id => self.id})
+    RubricAssociation.where(:rubric_id => self).update_all(:bookmarked => false, :updated_at => Time.now.utc)
     self.workflow_state = 'deleted'
     self.save
   end
@@ -114,8 +106,9 @@ class Rubric < ActiveRecord::Base
   # a rubric_association are 'grading' and 'bookmark'.  Confusing,
   # I know.
   def destroy_for(context)
-    RubricAssociation.update_all({:bookmarked => false, :updated_at => Time.now.utc}, {:rubric_id => self.id, :context_id => context.id, :context_type => context.class.to_s})
-    if RubricAssociation.scoped(:conditions => {:rubric_id => self.id, :bookmarked => true}).count == 0
+    RubricAssociation.where(:rubric_id => self, :context_id => context, :context_type => context.class.to_s).
+        update_all(:bookmarked => false, :updated_at => Time.now.utc)
+    unless RubricAssociation.where(:rubric_id => self, :bookmarked => true).exists?
       self.destroy
     end
   end
@@ -262,7 +255,7 @@ class Rubric < ActiveRecord::Base
         begin
           import_from_migration(rubric, migration)
         rescue
-          migration.add_warning(t('errors.could_not_import', "Couldn't import rubric %{rubric}", :rubric => rubric[:title]), $!)
+          migration.add_import_warning(t('#migration.rubric_type', "Rubric"), rubric[:title], $!)
         end
       end
     end

@@ -2,6 +2,8 @@
 
 // #TODO move these into their own file
 .headerBar {
+  margin-bottom: 15px;
+  
   &.pinned {
     position: fixed;
     top: 0;

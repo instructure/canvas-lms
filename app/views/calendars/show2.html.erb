@@ -33,8 +33,7 @@
 <% end %>
 <div style="display: none" id="calendar_feed_box" title="<%= t('feed_dialog_title', 'Calendar Feed') %>">
   <p id="calendar-feed-message">
-    Copy the link below and paste it into any calendar app that takes
-    iCal feeds (Google Calendar, iCal, Outlook, etc.)
+    <%= t "calendar_feed_instructions", "Copy the link below and paste it into any calendar app that takes iCal feeds (Google Calendar, iCal, Outlook, etc.)" %>
   </p>
   <p id="calendar-feed-box-lower">
     <input value="<%= @feed_url%>.ics"><br>

@@ -85,7 +85,7 @@ define [
           validationFn: ->
             $fields = $('[name*=start_date]:visible').filter -> $(this).val() is ''
             if $fields.length > 0 then $fields else true
-          labelFn   : (input) -> $(input).parents('td:first').prev().find('label').text()
+          labelFn   : (input) -> $(input).parents('tr').prev().find('label').text()
           success   : ($dialog) =>
             $dialog.dialog('close')
             @$el.disableWhileLoading @model.save eventData, success: =>

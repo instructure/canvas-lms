@@ -69,7 +69,7 @@ class Setting < ActiveRecord::Base
   end
 
   def self.set_config(config_name, value)
-    raise "config settings can only be set via config file" unless RAILS_ENV == 'test'
+    raise "config settings can only be set via config file" unless Rails.env.test?
     @@cache[config_key(config_name)] = value
   end
 
@@ -81,7 +81,13 @@ class Setting < ActiveRecord::Base
     config = nil
     path = File.join(Rails.root, 'config', "#{config_name}.yml")
     if File.exists?(path)
-      config = YAML.load_file(path)
+      if Rails.env.test?
+        config_string = ERB.new(File.read(path))
+        config = YAML.load(config_string.result)
+      else
+        config = YAML.load_file(path)
+      end
+
       if config.respond_to?(:with_indifferent_access)
         config = config.with_indifferent_access
         config = config[with_rails_env == :current ? Rails.env : with_rails_env] if with_rails_env

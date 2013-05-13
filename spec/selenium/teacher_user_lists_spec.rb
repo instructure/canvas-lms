@@ -20,16 +20,17 @@ describe "user" do
 eolist
       if (ff('#enrollment_type').length > 0)
         click_option("#enrollment_type", enrollment_type, :value)
+        wait_for_ajaximations
       end
       f("textarea.user_list").send_keys(user_list)
       f("button.verify_syntax_button").click
-      wait_for_ajax_requests
+      wait_for_ajaximations
       f("button.add_users_button").click
       wait_for_ajaximations
       unique_ids = ["user1@example.com", "bob@thesagatfamily.name", "A124123"]
       browser_text = ["user1@example.com\nuser1@example.com\nuser1@example.com", "sagat, bob\nbob sagat\nbob@thesagatfamily.name", "user, login_name\nlogin_name user\nA124123"] if include_short_name
       browser_text = ["user1@example.com\nuser1@example.com", "sagat, bob\nbob@thesagatfamily.name", "user, login_name\nA124123"] unless include_short_name
-      enrollments = Enrollment.all(:conditions => ["(workflow_state = 'invited' OR workflow_state = 'creation_pending') AND type = ? ", enrollment_type])
+      enrollments = Enrollment.where("(workflow_state='invited' OR workflow_state='creation_pending') AND type=?", enrollment_type).all
       (enrollments.count > 2).should be_true
       unique_ids.each do |id|
         enrollment = find_enrollment_by_id(enrollments, id)
@@ -65,6 +66,7 @@ eolist
         course_with_teacher_logged_in(:active_all => true)
         get "/courses/#{@course.id}/details"
         f("#tab-users-link").click
+        wait_for_ajaximations
         f("#tab-users a.add_users_link").click
       end
 

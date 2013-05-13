@@ -25,7 +25,7 @@ module SIS
       AbstractCourse.process_as_sis(@sis_options) do
         yield importer
       end
-      AbstractCourse.update_all({:sis_batch_id => @batch_id}, {:id => importer.abstract_courses_to_update_sis_batch_id}) if @batch_id && !importer.abstract_courses_to_update_sis_batch_id.empty?
+      AbstractCourse.where(:id => importer.abstract_courses_to_update_sis_batch_id).update_all(:sis_batch_id => @batch_id) if @batch_id && !importer.abstract_courses_to_update_sis_batch_id.empty?
       @logger.debug("AbstractCourses took #{Time.now - start} seconds")
       return importer.success_count
     end

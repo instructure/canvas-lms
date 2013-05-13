@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency 'lib/sis/common'
+require_dependency 'sis/common'
 
 module SIS
   class BaseImporter

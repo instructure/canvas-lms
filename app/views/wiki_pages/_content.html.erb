@@ -78,14 +78,16 @@ course will see this page first.  You can change that from [the course home page
         <% if @editing %>
           <%= t('editing_content', 'Editing Content.') %>
         <% else %>
-          <%= user_content(@page.body) %>
+          <% cache(['wiki_page_body_render', @page].cache_key) do %>
+            <%= user_content(@page.body) %>
+          <% end %>
         <% end %>
       </div>
     <% end %>
   <% end %>
 </div>
 <div id="wiki_edit_view_main" style="display:none; text-align: right;">
-  <div style="float: right;">
+  <div>
     <a href="#" class="wiki_switch_views_link"><%= t '#editor.switch_views', "Switch Views" %></a>
   </div>
   <div class="clear"></div>
@@ -118,12 +120,10 @@ course will see this page first.  You can change that from [the course home page
         </div>
       <% end %>
       <div class="someone_else_edited" style="display: none; text-align: left;">
-        <%= mt 'notices.page_edited_while_viewing', 'This page has been updated by someone else since you started viewing it. [Click here to reload the page.](%{link})', :link => request.url %>
-
         <%= image_tag "warning.png" %>
         <%= t 'notices.page_edited_while_viewing_detailed', <<-EOT
         Someone else has edited this page since you first loaded it, and if you submit now you will overwrite their changes.
-        You may want to reload the page and re-enter your changes to make sure you don't lose some else's work.
+        You may want to reload the page and re-enter your changes to make sure you don't lose someone else's work.
         EOT
         %>
       </div>

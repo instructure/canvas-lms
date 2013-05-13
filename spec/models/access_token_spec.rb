@@ -40,4 +40,29 @@ describe AccessToken do
       AccessToken.authenticate(@token_string).should be_nil
     end
   end
+
+  describe "token scopes" do
+    let(:token) do
+      token = AccessToken.new
+      token.scopes = %w{https://canvas.instructure.com/login/oauth2/auth/user_profile https://canvas.instructure.com/login/oauth2/auth/accounts}
+      token
+    end
+
+    it "should match named scopes" do
+      token.scoped_to?(['https://canvas.instructure.com/login/oauth2/auth/user_profile', 'accounts']).should == true
+    end
+
+    it "should not partially match scopes" do
+      token.scoped_to?(['user', 'accounts']).should == false
+      token.scoped_to?(['profile', 'accounts']).should == false
+    end
+
+    it "should not match if token has more scopes then requested" do
+      token.scoped_to?(['user_profile', 'accounts', 'courses']).should == false
+    end
+
+    it "should not match if token has less scopes then requested" do
+      token.scoped_to?(['user_profile']).should == false
+    end
+  end
 end

@@ -43,8 +43,7 @@ describe "account_authorization_configs/index" do
     assigns[:saml_login_attributes] = {}
     render 'account_authorization_configs/index'
     doc = Nokogiri::HTML(response.body)
-    doc.at_css('form.ldap_form:nth(1) tr.last_timeout_failure').should be_present
-    doc.at_css('form.ldap_form:nth(2) tr.last_timeout_failure').should_not be_present
+    doc.css('form.ldap_form tr.last_timeout_failure').length.should == 1
   end
 
   it "should display more than 2 LDAP configs" do

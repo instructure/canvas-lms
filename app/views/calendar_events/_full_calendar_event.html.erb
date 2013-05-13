@@ -5,7 +5,7 @@
 
 <% calendar_event = full_calendar_event %>
 <div id="full_calendar_event_holder" class="<%= 'editing' if @editing %>">
-  <div class="calendar_event content_underline_links" id="full_calendar_event">
+  <div class="calendar_event" id="full_calendar_event">
     <div style="float: right; text-align: right; font-size: 0.8em;">
       <div class="date_text" style="<%= hidden unless calendar_event && calendar_event.start_at %>">
         <span class="start_at_date_string" title="<%= date_string(calendar_event.start_at, :long) %>"><%= date_string(calendar_event.start_at, :long) %></span>
@@ -25,7 +25,7 @@
     <h2 class="title">
       <%= calendar_event.try_rescue(:title) %>
     </h2>
-    
+
     <div class="description user_content"><%= calendar_event && calendar_event.description && !calendar_event.description.empty? ? user_content(calendar_event.description) : t(:no_content, "No Content") %></div>
     <div class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></div>
   </div>

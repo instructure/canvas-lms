@@ -68,11 +68,12 @@ class Handlebars
       if css = get_css(id)
         dependencies << "compiled/util/registerTemplateCss"
         # arguments[1] will be the registerTemplateCss function
-        css_registration = "\narguments[1]('#{id}', #{css.to_json});\n"
+        css_registration = "\narguments[1]('#{id}', #{MultiJson.dump css});\n"
       end
 
-      prepared = prepare_i18n(source, id)
-      dependencies << "i18n!#{normalize(id)}" if prepared[:keys].size > 0
+      scope = scopify(id)
+      prepared = prepare_i18n(source, scope)
+      dependencies << "i18n!#{scope}" if prepared[:keys].size > 0
 
       # take care of `require`ing partials
       partials = context.call("findPartialDeps", prepared[:content]).uniq
@@ -85,7 +86,7 @@ class Handlebars
 
       template = context.call "Handlebars.precompile", prepared[:content]
       <<-JS
-define('#{plugin ? plugin + "/" : ""}jst/#{id}', #{dependencies.to_json}, function (Handlebars) {
+define('#{plugin ? plugin + "/" : ""}jst/#{id}', #{MultiJson.dump dependencies}, function (Handlebars) {
   var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
   templates['#{id}'] = template(#{template});
   #{partial_registration}
@@ -95,14 +96,15 @@ define('#{plugin ? plugin + "/" : ""}jst/#{id}', #{dependencies.to_json}, functi
 JS
     end
 
-    def normalize(id)
+    # change a partial path into an i18n scope
+    # e.g. "fooBar/_lolz" -> "foo_bar.lolz"
+    def scopify(id)
       # String#underscore may not be available
       id.sub(/^_/, '').gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').gsub(/([a-z\d])([A-Z])/,'\1_\2').tr("-", "_").downcase.gsub(/\/_?/, '.')
     end
 
     def prepare_i18n(source, scope)
       @extractor ||= I18nExtraction::HandlebarsExtractor.new
-      scope = scope.sub(/\A_/, '').gsub(/\/_?/, '.')
       keys = []
       content = @extractor.scan(source, :method => :gsub) do |data|
         wrappers = data[:wrappers].map{ |value, delimiter| " w#{delimiter.size-1}=#{value.inspect}" }.join

@@ -1,19 +1,14 @@
 module UserSearch
 
   def self.for_user_in_course(search_term, course, searcher, options = {})
-    limit = options.fetch(:limit, 20)
-
     base_scope = scope_for(course, searcher, options.slice(:enrollment_type, :enrollment_role))
-    if search_term.to_s =~ /^\d+$/
-      begin
-        user = base_scope.find(search_term)
-        return [user]
-      rescue ActiveRecord::RecordNotFound
-        #no user found by id, so lets go ahead with the regular search, maybe this person just has a ton of numbers in their name
-      end
+    if search_term.to_s =~ Api::ID_REGEX
+      user = base_scope.find_by_id(search_term)
+      return [user] if user
+      # no user found by id, so lets go ahead with the regular search, maybe this person just has a ton of numbers in their name
     end
 
-    base_scope.find(:all, :conditions => conditions_statement(search_term), :limit => limit)
+    base_scope.where(conditions_statement(search_term))
   end
 
   def self.conditions_statement(search_term)
@@ -38,16 +33,16 @@ module UserSearch
     enrollment_role = Array(options[:enrollment_role]) if options[:enrollment_role]
     enrollment_type = Array(options[:enrollment_type]) if options[:enrollment_type]
 
-    users = course.users_visible_to(searcher).scoped(:order => "users.sortable_name")
+    users = course.users_visible_to(searcher).uniq.order_by_sortable_name
 
     if enrollment_role
-      users = users.scoped(:conditions => ["COALESCE(enrollments.role_name, enrollments.type) IN (?) ", enrollment_role])
+      users = users.where("COALESCE(enrollments.role_name, enrollments.type) IN (?) ", enrollment_role)
     elsif enrollment_type
       enrollment_type = enrollment_type.map { |e| "#{e.capitalize}Enrollment" }
       if enrollment_type.any?{ |et| !Enrollment::READABLE_TYPES.keys.include?(et) }
         raise ArgumentError, 'Invalid Enrollment Type'
       end
-      users = users.scoped(:conditions => ["enrollments.type IN (?) ", enrollment_type])
+      users = users.where(:enrollments => { :type => enrollment_type })
     end
     users
   end
@@ -70,11 +65,11 @@ module UserSearch
   end
 
   def self.gist_search_enabled?
-    Setting.get_cached('user_search_with_gist', false) == 'true'
+    Setting.get_cached('user_search_with_gist', 'true') == 'true'
   end
 
   def self.complex_search_enabled?
-    Setting.get_cached('user_search_with_full_complexity', false) == 'true'
+    Setting.get_cached('user_search_with_full_complexity', 'true') == 'true'
   end
 
   def self.like_condition(value)

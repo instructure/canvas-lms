@@ -86,9 +86,9 @@ describe "people" do
     end
 
     it "should validate the main page" do
-      users = ff('.user_name')
-      users[0].text.should match @teacher.name
+      users = ff('.roster_user_name')
       users[1].text.should match @student_1.name
+      users[0].text.should match @teacher.name
     end
 
     it "should navigate to registered services on profile page" do
@@ -99,7 +99,9 @@ describe "people" do
 
     it "should add a teacher, ta, student, and observer" do
       expect_new_page_load { driver.find_element(:link, 'Manage Users').click }
+      wait_for_ajaximations
       add_users_button = f('.add_users_link')
+      wait_for_ajaximations
       add_users_button.click
       add_user('Teachers', @test_teacher.name, 'ul.user_list.teacher_enrollments')
       add_user("Students", @student_2.name, 'ul.user_list.student_enrollments')

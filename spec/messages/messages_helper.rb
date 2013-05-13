@@ -29,7 +29,6 @@ def generate_message(notification_name, path_type, asset, options = {})
   @message.delayed_messages = []
   @message.parse!(path_type.to_s)
   @message.body.should_not be_nil
-  # @message.body.should_not be_empty
   if path_type == :email
     @message.subject.should_not be_nil
     @message.url.should_not be_nil

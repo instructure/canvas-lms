@@ -1,0 +1,67 @@
+@import "environment";
+
+// min width to ensure toolbar doesn't stagger
+#main { min-width: 700px; }
+
+.discussionTopicIndexList {
+  .discussion-topic {
+    cursor: pointer;
+    display: table;
+    padding: 8px;
+    min-height: 52px;
+    border-top: 1px solid $tableBorder;
+    background-color: white;
+    &:nth-child(odd) { background-color: $tableBackgroundAccent; }
+    &.unread .discussion-title{ font-weight: bold; }
+    &.selected { background-color: #d6ecfc; }
+  }
+  .discussion-summary {
+    max-width: 740px;
+    @media screen and (max-width: 1100px) { max-width: 520px; }
+  }
+  .discussion-info-icons { float: right; }
+  .discussion-unread-container, .discussion-last-reply, .discussion-info-icons {
+    float: right;
+    padding: 11px 10px 0;
+    // 'not-important' styles
+    color: #888888;
+    font-size: 11px; }
+  .discussion-unread-container { width: 56px; }
+  .discussion-author { font-size: 10px; }
+  .discussion-summary { font-size: 12px; color: #777; }
+  .discussion-title {
+    font-size: 14px;
+    line-height: 1;
+    display: block;
+  }
+  .discussion-column {
+    display: table-cell;
+    vertical-align: middle;
+  }
+  .toggleSelected { margin-right: 8px;}
+}
+
+.announcements .discussionTopicIndexList .discussion-summary {
+  @media screen and (max-width: 1100px) { max-width: 520px; }
+  @media screen and (max-width: 1345px) and (min-width: 1101px) { max-width: 550px; }
+  @media screen and (max-width: 1345px) and (min-width: 1176px) { max-width: 580px; }
+}
+
+.discussion-drag-handle {
+  display: none;
+  background-image: inline-image('drag_handle.png');
+  height: 20px;
+  width: 5px;
+  background-position: center center;
+  background-repeat: no-repeat;
+  margin: 0 4px 0 -5px;
+  float: left;
+  cursor: ns-resize;
+  @include opacity(0.0);
+  .touch &, .discussion-topic:hover & { @include opacity(0.5); }
+  .ui-sortable & { display: block; }
+  &:hover, &:focus {
+    opacity: 1 !important;
+    filter: alpha(opacity=100) !important;
+  }
+}

@@ -38,20 +38,31 @@ class Profile < ActiveRecord::Base
     read_attribute(:data) || write_attribute(:data, {})
   end
 
+  def data_before_type_cast # for validations and such
+    @data_before_type_cast ||= data.dup
+  end
+
   def self.data(field, options = {})
-    options[:type] = :string
+    options[:type] ||= :string
     define_method(field) {
       data.has_key?(field) ? data[field] : data[field] = options[:default]
     }
     define_method("#{field}=") { |value|
+      data_before_type_cast[field] = value
       data[field] = sanitize_data(value, options)
+    }
+    define_method("#{field}_before_type_cast") {
+      data_before_type_cast[field]
     }
   end
 
   def sanitize_data(value, options)
+    return nil unless value.present?
     case options[:type]
-      when :int; value.to_i
-      else       value
+      when :decimal,
+           :float;   value.to_f
+      when :int;     value.to_i
+      else           value
     end
   end
 

@@ -34,6 +34,7 @@ describe "Groups API", :type => :integration do
       "#{group.context_type.downcase}_id" => group.context_id,
       'role' => group.group_category.role,
       'group_category_id' => group.group_category_id,
+      'storage_quota_mb' => group.storage_quota_mb
     }
   end
 
@@ -129,7 +130,7 @@ describe "Groups API", :type => :integration do
       'is_public'=> false,
       'join_level'=> "parent_context_request",
     })
-    @community2 = Group.last(:order => :id)
+    @community2 = Group.order(:id).last
     @community2.group_category.should be_communities
     json.should == group_json(@community2, @user)
   end
@@ -219,7 +220,6 @@ describe "Groups API", :type => :integration do
       'join_level'=> "parent_context_auto_join",
     }
     json = api_call(:put, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "update"), new_attrs, {}, :expected_status => 401)
-    json['message'].should match /not authorized/
   end
 
   it "should allow a moderator to delete a group" do
@@ -231,7 +231,57 @@ describe "Groups API", :type => :integration do
   it "should not allow a member to delete a group" do
     @user = @member
     json = api_call(:delete, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "destroy"), {}, {}, :expected_status => 401)
-    json['message'].should match /not authorized/
+  end
+  
+  describe "quota" do
+    before do
+      @account = Account.default
+      Setting.set('group_default_quota', 11.megabytes)
+    end
+    
+    context "with manage_storage_quotas permission" do
+      before do
+        account_admin_user :account => @account
+        user_session(@admin)
+      end
+      
+      it "should set the quota on create" do
+        json = api_call(:post, '/api/v1/groups?name=TehGroup&storage_quota_mb=22',
+                 { :controller => "groups", :action => 'create', :format => "json", :name => 'TehGroup', :storage_quota_mb => '22' })
+        group = @account.groups.find(json['id'])
+        group.storage_quota_mb.should == 22
+      end
+      
+      it "should set the quota on update" do
+        group = @account.groups.create! :name => 'TehGroup'
+        api_call(:put, "/api/v1/groups/#{group.id}?storage_quota_mb=22",
+                 { :controller => 'groups', :action => 'update', :group_id => group.id.to_s, :format => 'json', :storage_quota_mb => '22' })
+        group.reload.storage_quota_mb.should == 22
+      end
+    end
+    
+    context "without manage_storage_quotas permission" do
+      before do
+        account_admin_user_with_role_changes(:role_changes => {:manage_storage_quotas => false})
+        user_session(@admin)
+      end
+      
+      it "should ignore the quota on create" do
+        json = api_call(:post, '/api/v1/groups?storage_quota_mb=22',
+                        { :controller => 'groups', :action => 'create', :format => 'json', :storage_quota_mb => '22' })
+        group = @account.groups.find(json['id'])
+        group.storage_quota_mb.should == 11
+      end
+
+      it "should ignore the quota on update" do
+        group = @account.groups.create! :name => 'TehGroup'
+        api_call(:put, "/api/v1/groups/#{group.id}?storage_quota_mb=22&name=TheGruop",
+                 { :controller => 'groups', :action => 'update', :format => 'json', :group_id => group.id.to_s, :name => 'TheGruop', :storage_quota_mb => '22' })
+        group.reload
+        group.name.should == 'TheGruop'
+        group.storage_quota_mb.should == 11
+      end
+    end
   end
 
   describe "following" do
@@ -295,7 +345,7 @@ describe "Groups API", :type => :integration do
         :filter_states => ["invited"]
       })
       json.count.should == 1
-      json.first.should == membership_json(@community.group_memberships.scoped(:conditions => { :workflow_state => 'invited' }).first)
+      json.first.should == membership_json(@community.group_memberships.where(:workflow_state => 'invited').first)
     end
     
     it "should allow someone to request to join a group" do
@@ -305,7 +355,7 @@ describe "Groups API", :type => :integration do
       json = api_call(:post, @memberships_path, @memberships_path_options.merge(:group_id => @community.to_param, :action => "create"), {
         :user_id => @user.id
       })
-      @membership = GroupMembership.scoped(:conditions => { :user_id => @user.id, :group_id => @community.id }).first
+      @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
       @membership.workflow_state.should == "requested"
       json.should == membership_json(@membership)
     end
@@ -317,7 +367,7 @@ describe "Groups API", :type => :integration do
       json = api_call(:post, @memberships_path, @memberships_path_options.merge(:group_id => @community.to_param, :action => "create"), {
         :user_id => @user.id
       })
-      @membership = GroupMembership.scoped(:conditions => { :user_id => @user.id, :group_id => @community.id }).first
+      @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
       @membership.workflow_state.should == "accepted"
       json.should == membership_json(@membership)
     end
@@ -401,16 +451,16 @@ describe "Groups API", :type => :integration do
 
     it "should allow someone to leave a group" do
       @user = @member
-      @gm = @community.group_memberships.scoped(:conditions => { :user_id => @user.id }).first
+      @gm = @community.group_memberships.where(:user_id => @user).first
       api_call(:delete, "#{@memberships_path}/#{@gm.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @gm.to_param, :action => "destroy"))
-      @membership = GroupMembership.scoped(:conditions => { :user_id => @user.id, :group_id => @community.id }).first
+      @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
       @membership.workflow_state.should == "deleted"
     end
 
     it "should allow leaving a group using 'self'" do
       @user = @member
       api_call(:delete, "#{@memberships_path}/self", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => 'self', :action => "destroy"))
-      @membership = GroupMembership.scoped(:conditions => { :user_id => @user.id, :group_id => @community.id }).first
+      @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
       @membership.workflow_state.should == "deleted"
     end
 
@@ -420,7 +470,7 @@ describe "Groups API", :type => :integration do
       expect {
         @json = api_call(:post, "#{@community_path}/invite", @category_path_options.merge(:group_id => @community.to_param, :action => "invite"), invitees)
       }.to change(User, :count).by(2)
-      @memberships = @community.reload.group_memberships.scoped(:conditions => { :workflow_state => "invited" }, :order => :id).all
+      @memberships = @community.reload.group_memberships.where(:workflow_state => "invited").order(:id).all
       @memberships.count.should == 2
       @json.sort{ |a,b| a['id'] <=> b['id'] }.should == @memberships.map{ |gm| membership_json(gm) }
     end
@@ -429,7 +479,7 @@ describe "Groups API", :type => :integration do
       @user = @member
       invitees = { :invitees => ["leonard@example.com", "sheldon@example.com"] }
       api_call(:post, "#{@community_path}/invite", @category_path_options.merge(:group_id => @community.to_param, :action => "invite"), invitees, {}, :expected_status => 401)
-      @memberships = @community.reload.group_memberships.scoped(:conditions => { :workflow_state => "invited" }, :order => :id).count.should == 0
+      @memberships = @community.reload.group_memberships.where(:workflow_state => "invited").order(:id).count.should == 0
     end
 
     it "should find people when inviting to a group in a non-default account" do
@@ -467,7 +517,7 @@ describe "Groups API", :type => :integration do
         @memberships_path_options.merge(:group_id => @group.to_param, :action => "create"),
         { :user_id => @to_add.id })
 
-      @membership = GroupMembership.scoped(:conditions => { :user_id => @to_add.id, :group_id => @group.id }).first
+      @membership = GroupMembership.where(:user_id => @to_add, :group_id => @group).first
       @membership.workflow_state.should == "accepted"
       json.should == membership_json(@membership)
     end

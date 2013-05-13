@@ -2,9 +2,14 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/conversations_common
 
 describe "conversations recipient finder" do
   it_should_behave_like "in-process server selenium tests"
-  it_should_behave_like "conversations selenium tests"
+
+  def conversations_path(params={})
+    hash = params.to_json.unpack('H*').first
+    "/conversations##{hash}"
+  end
 
   before(:each) do
+    conversation_setup
     @course.update_attribute(:name, "the course")
     @course.default_section.update_attribute(:name, "the section")
     @other_section = @course.course_sections.create(:name => "the other section")
@@ -199,7 +204,7 @@ describe "conversations recipient finder" do
 
   it "should allow searching" do
     search("t") do
-      menu.should == ["the course", "the other section", "the section", "student 1", "student 2"]
+      menu.should == ["the course", "the other section", "the section", "the group", "student 1", "student 2"]
     end
   end
 

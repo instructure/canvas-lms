@@ -88,12 +88,12 @@ class Folder < ActiveRecord::Base
     self.save
   end
   
-  named_scope :active, :conditions => ['folders.workflow_state != ?', 'deleted']
-  named_scope :not_hidden, :conditions => ['folders.workflow_state != ?', 'hidden']
-  named_scope :not_locked, lambda {{:conditions => ['(folders.locked IS NULL OR folders.locked = ?) AND ((folders.lock_at IS NULL) OR
-    (folders.lock_at > ? OR (folders.unlock_at IS NOT NULL AND folders.unlock_at < ?)))', false, Time.now, Time.now]}}
-  named_scope :by_position, :order => 'position'
-  named_scope :by_name, :order => name_order_by_clause('folders')
+  scope :active, where("folders.workflow_state<>'deleted'")
+  scope :not_hidden, where("folders.workflow_state<>'hidden'")
+  scope :not_locked, lambda { where("(folders.locked IS NULL OR folders.locked=?) AND ((folders.lock_at IS NULL) OR
+    (folders.lock_at>? OR (folders.unlock_at IS NOT NULL AND folders.unlock_at<?)))", false, Time.now.utc, Time.now.utc) }
+  scope :by_position, order(:position)
+  scope :by_name, order(name_order_by_clause('folders'))
 
   def display_name
     name

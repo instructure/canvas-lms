@@ -388,8 +388,7 @@
  * editor/toolbar styles
  */
 .mathquill-editor {
-  padding: 0 4px 10px;
-  width: 680px;
+  padding: 10px;
   display: inline-block;
 }
 .mathquill-toolbar {
@@ -429,7 +428,7 @@
   overflow: hidden;
   position: relative;
 }
-.mathquill-tab-bar li.mathquill-tab-selected {
+.mathquill-tab-bar li.mathquill-tab-selected, .mathquill-tab-bar li#hover {
   background: #e8e8e8;
   border-color: #999;
 }

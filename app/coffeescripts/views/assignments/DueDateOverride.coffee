@@ -3,7 +3,8 @@ define [
   'underscore'
   'jst/assignments/DueDateOverride'
   'compiled/models/AssignmentOverride'
-], (Backbone, _, template, AssignmentOverride) ->
+  'i18n!overrides'
+], (Backbone, _, template, AssignmentOverride,I18n) ->
 
   # Class Summary
   #   Holds a list of Due Dates and adds items to the collection
@@ -61,6 +62,14 @@ define [
 
     getOverrides: => @model.overrides.toJSON()
 
+    getAllDates: (data) =>
+      data or={}
+      @getOverrides().concat data
+
     showAddDueDateButton: => @$el.find( '#add_due_date' ).show()
-      
+
     hideAddDueDateButton: => @$el.find( '#add_due_date' ).hide()
+
+    validateBeforeSave: (data, errors) =>
+      @options.views['due-date-overrides'].validateBeforeSave(data,errors)
+      errors

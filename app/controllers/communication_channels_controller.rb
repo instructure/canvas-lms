@@ -204,6 +204,8 @@ class CommunicationChannelsController < ApplicationController
       end
       @merge_opportunities.sort! { |a, b| [a.first == @current_user ? 0 : 1, a.first.name] <=> [b.first == @current_user ? 0 : 1, b.first.name] }
 
+      js_env :PASSWORD_POLICY => @domain_root_account.password_policy
+
       if @current_user && params[:confirm].present? && @merge_opportunities.find { |opp| opp.first == @current_user }
         @user.transaction do
           @current_user.transaction do
@@ -243,7 +245,7 @@ class CommunicationChannelsController < ApplicationController
       else
         # Open registration and admin-created users are pre-registered, and have already claimed a CC, but haven't
         # set up a password yet
-        @pseudonym = @root_account.pseudonyms.active.find(:first, :conditions => {:password_auto_generated => true, :user_id => @user.id} ) if @user.pre_registered? || @user.creation_pending?
+        @pseudonym = @root_account.pseudonyms.active.where(:password_auto_generated => true, :user_id => @user).first if @user.pre_registered? || @user.creation_pending?
         # Users implicitly created via course enrollment or account admin creation are creation pending, and don't have a pseudonym yet
         @pseudonym ||= @root_account.pseudonyms.build(:user => @user, :unique_id => cc.path) if @user.creation_pending?
         # We create the pseudonym with unique_id = cc.path, but if that unique_id is taken, just nil it out and make the user come
@@ -267,7 +269,14 @@ class CommunicationChannelsController < ApplicationController
           @pseudonym.require_password = true
           @pseudonym.password_confirmation = @pseudonym.password = params[:pseudonym][:password] if params[:pseudonym]
 
-          return unless @pseudonym.valid? && @user.valid?
+          unless @pseudonym.valid? && @user.valid?
+            return render :json => {
+                            :errors => {
+                              :user => @user.errors.as_json[:errors],
+                              :pseudonym => @pseudonym.errors.as_json[:errors]
+                            }
+                          }, :status => :bad_request
+          end
 
           # They may have switched e-mail address when they logged in; create a CC if so
           if @pseudonym.unique_id != cc.path
@@ -312,7 +321,7 @@ class CommunicationChannelsController < ApplicationController
       flash[:notice] = t 'notices.registration_confirmed', "Registration confirmed!"
       respond_to do |format|
         format.html { @enrollment ? redirect_to(course_url(@course)) : redirect_back_or_default(dashboard_url) }
-        format.json { render :json => cc.to_json(:except => [:confirmation_code] ) }
+        format.json { render :json => {:url => @enrollment ? course_url(@course) : dashboard_url} }
       end
     end
   end
@@ -345,6 +354,9 @@ class CommunicationChannelsController < ApplicationController
     @cc   = @user.communication_channels.find(params[:id]) if params[:id]
 
     return render_unauthorized_action unless has_api_permissions?
+    if @cc.imported? && !@domain_root_account.edit_institution_email?
+      return render_unauthorized_action
+    end
 
     if @cc.nil? || @cc.destroy
       @user.touch

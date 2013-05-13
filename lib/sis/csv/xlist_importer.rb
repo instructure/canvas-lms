@@ -16,12 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'lib/sis/csv/base_importer'
 require 'skip_callback'
 
 module SIS
   module CSV
-    class XlistImporter < BaseImporter
+    class XlistImporter < CSVBaseImporter
     
       def self.is_xlist_csv?(row)
         row.include?('xlist_course_id') && row.include?('section_id')
