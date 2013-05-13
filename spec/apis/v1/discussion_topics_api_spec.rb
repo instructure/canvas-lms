@@ -57,6 +57,9 @@ describe Api::V1::DiscussionTopics do
   end
 
   it "should recognize include_assignment flag" do
+    #set @domain_root_account
+    @test_api.instance_variable_set(:@domain_root_account, Account.default)
+
     data = @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil)
     data[:assignment].should be_nil
 

@@ -542,6 +542,9 @@ class Assignment < ActiveRecord::Base
     state :published do
       event :unpublish, :transitions_to => :available
     end
+    state :unpublished do
+      event :publish, :transitions_to => :published
+    end
     state :deleted
   end
 
@@ -1444,6 +1447,8 @@ class Assignment < ActiveRecord::Base
   }
 
   scope :order_by_base_due_at, order("assignments.due_at")
+
+  scope :unpublished, where(:workflow_state => 'unpublished')
 
   def needs_publishing?
     self.due_at && self.due_at < 1.week.ago && self.available?

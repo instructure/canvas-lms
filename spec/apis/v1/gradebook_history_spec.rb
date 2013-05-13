@@ -57,7 +57,9 @@ module Api::V1
         submit(@assignment1, students[1], now, @grader2)
         submit(@assignment1, students[2], yesterday, @grader2)
         submit(@assignment2, students[0], yesterday, @grader2)
-        @days = GradebookHistoryHarness.new.days_json(course, api_context)
+        harness = GradebookHistoryHarness.new
+        harness.instance_variable_set(:@domain_root_account, ::Account.default)
+        @days = harness.days_json(course, api_context)
       end
 
       it 'has a top level key for each day represented' do
@@ -85,7 +87,9 @@ module Api::V1
       it 'paginates' do
         api_context.per_page = 2
         api_context.page = 2
-        days = GradebookHistoryHarness.new.days_json(course, api_context)
+        harness = GradebookHistoryHarness.new
+        harness.instance_variable_set(:@domain_root_account, ::Account.default)
+        days = harness.days_json(course, api_context)
         days.map { |d| d[:date] }.first.should == yesterday.to_date.as_json
       end
 
@@ -103,7 +107,9 @@ module Api::V1
         @assignment = course.assignments.create!(:title => "some assignment")
         submit(@assignment, student1, now, @grader1)
         submit(@assignment, student2, now, @grader2)
-        @day_hash = GradebookHistoryHarness.new.json_for_date(now, course, api_context)
+        harness = GradebookHistoryHarness.new
+        harness.instance_variable_set(:@domain_root_account, ::Account.default)
+        @day_hash = harness.json_for_date(now, course, api_context)
       end
 
       it 'returns a grader hash for that day' do

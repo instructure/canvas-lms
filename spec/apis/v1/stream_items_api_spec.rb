@@ -259,6 +259,9 @@ describe UsersController, :type => :integration do
   end
 
   it "should format graded Submission with comments" do
+    #set @domain_root_account
+    @domain_root_account = Account.default
+
     @assignment = @course.assignments.create!(:title => 'assignment 1', :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
     @teacher = User.create!(:name => 'teacher')
     @course.enroll_teacher(@teacher)
@@ -351,6 +354,9 @@ describe UsersController, :type => :integration do
   end
   
   it "should format ungraded Submission with comments" do
+    #set @domain_root_account
+    @domain_root_account = Account.default
+
     @assignment = @course.assignments.create!(:title => 'assignment 1', :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
     @teacher = User.create!(:name => 'teacher')
     @course.enroll_teacher(@teacher)

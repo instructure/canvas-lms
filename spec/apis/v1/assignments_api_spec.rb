@@ -148,6 +148,33 @@ describe AssignmentsApiController, :type => :integration do
       json.size.should == 0
     end
 
+    describe "enable draft" do
+      before do
+        #set @domain_root_account
+        @domain_root_account = Account.default
+
+        course_with_teacher(:active_all => true)
+        @assignment = @course.assignments.create :name => 'some assignment'
+        @assignment.workflow_state = 'unpublished'
+        @assignment.save!
+      end
+
+      it "should exclude published flag for accounts that do not have enabled_draft" do
+        @json = api_get_assignment_in_course(@assignment, @course)
+        @json.has_key?('published').should be_false
+      end
+
+      it "should include published flag for accounts that do have enabled_draft" do
+        Account.default.settings[:enable_draft] = true
+        Account.default.save!
+
+        @json = api_get_assignment_in_course(@assignment, @course)
+
+        @json.has_key?('published').should be_true
+        @json['published'].should be_false
+      end
+    end
+
     it "includes submission info with include flag" do
       course_with_student_logged_in(:active_all => true)
       assignment,submission = create_submitted_assignment_with_user(@user)
@@ -996,6 +1023,9 @@ describe AssignmentsApiController, :type => :integration do
     let(:result) { assignment_json(@assignment, @user, {}) }
 
     before do
+      #set @domain_root_account
+      @domain_root_account = Account.default
+
       course_with_teacher(:active_all => true)
       @assignment = @course.assignments.create!(:title => "some assignment")
     end

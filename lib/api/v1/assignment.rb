@@ -136,6 +136,11 @@ module Api::V1::Assignment
         !:include_assignment)
     end
 
+    #show published/unpublished if account.settings[:enable_draft]
+    if @domain_root_account.enable_draft?
+      hash['published'] = ! assignment.unpublished?
+    end
+
     if submission
       hash['submission'] = submission_json(submission,assignment,user,session)
     end
