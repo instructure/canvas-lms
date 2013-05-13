@@ -130,7 +130,8 @@ describe "Module Items API", :type => :integration do
           "position" => 1,
           "title" => @wiki_page_tag.title,
           "indent" => 0,
-          "url" => "http://www.example.com/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}"
+          "url" => "http://www.example.com/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}",
+          "page_url" => @wiki_page.url
       }
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items/#{@attachment_tag.id}",
@@ -189,6 +190,35 @@ describe "Module Items API", :type => :integration do
         tag.content_type.should == 'Assignment'
         tag.content_id.should == assignment.id
         tag.indent.should == new_indent
+      end
+
+      it "should create with page_url for wiki page items" do
+        wiki_page = @course.wiki.wiki_pages.create!(:title => 'whateva i do wut i want')
+
+        json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+                        {:controller => "context_module_items_api", :action => "create", :format => "json",
+                         :course_id => "#{@course.id}", :module_id => "#{@module1.id}"},
+                        {:module_item => {:title => 'Blah', :type => 'Page', :page_url => wiki_page.url}})
+
+        json['page_url'].should == wiki_page.url
+
+        tag = @module1.content_tags.find_by_id(json['id'])
+        tag.content_type.should == 'WikiPage'
+        tag.content_id.should == wiki_page.id
+      end
+
+      it "should require valid page_url" do
+        json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+                        {:controller => "context_module_items_api", :action => "create", :format => "json",
+                         :course_id => "#{@course.id}", :module_id => "#{@module1.id}"},
+                        {:module_item => {:title => 'Blah', :type => 'Page'}},
+                        {}, {:expected_status => 400})
+
+        json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+                        {:controller => "context_module_items_api", :action => "create", :format => "json",
+                         :course_id => "#{@course.id}", :module_id => "#{@module1.id}"},
+                        {:module_item => {:title => 'Blah', :type => 'Page', :page_url => 'invalidpageurl'}},
+                        {}, {:expected_status => 400})
       end
 
       it "should create with new_tab for external tool items" do
