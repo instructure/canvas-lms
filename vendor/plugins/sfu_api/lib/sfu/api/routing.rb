@@ -12,12 +12,13 @@ module SFU #:nodoc:
         end
 
 	      def v1_urls
+          @set.add_route("/sfu/api/v1/terms/:term", {:controller => "api", :action => "terms", :term => nil, :format => 'json'})
           @set.add_route("/sfu/api/v1/course/:sis_id/:property", {:controller => "api", :action => "course", :property => nil, :format => 'json'})
           @set.add_route("/sfu/api/v1/user/:sfu_id/:property", {:controller => "api", :action => "user", :property => nil, :format => 'json'})
           @set.add_route("/sfu/api/v1/course-data/:term/:query", {:controller => "course_data", :action => "search", :query => nil, :format => 'json'})
           @set.add_route("/sfu/api/v1/amaint/user/:sfu_id/:property/:filter", {:controller => "amaint", :action => "user_info", :property => nil, :filter => nil, :format => 'json'})
-          @set.add_route("/sfu/api/v1/amaint/course/:sis_id/:property", {:controller => "amaint", :action => "course_info", :property => nil, :format => 'json'})	  
-	      end
+          @set.add_route("/sfu/api/v1/amaint/course/:sis_id/:property", {:controller => "amaint", :action => "course_info", :property => nil, :format => 'json'})
+        end
 
       end
     end
