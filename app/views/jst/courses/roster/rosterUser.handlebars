@@ -1,8 +1,17 @@
-<td>
+<td class="center">
   <a href="{{html_url}}" class="avatar" title="{{name}}"><img src="{{avatar_url}}" alt="{{name}}"></a>
+</td>
+<td>
   <a href="{{html_url}}" class="roster_user_name">{{name}}</a>
   {{#if isPending}}<span class="label label-info" title="{{#t "pending_acceptance_explanation"}}This user has not yet accepted the invitation to the course{{/t}}">{{#t "pending_acceptance_of_invitation"}}pending{{/t}}</span>{{/if}}
 </td>
+{{#if canViewLoginIdColumn}}
+<td>
+  {{#if canViewLoginId}}
+    {{login_id}}
+  {{/if}}
+</td>
+{{/if}}
 <td>
   {{#each sections}}
   <div class="section">{{name}}</div>
@@ -13,12 +22,12 @@
   <div>{{enrollmentName role}}</div>
   {{/each}}
 </td>
-<td>
+<td class="right">
   {{#if canManage}}
   <div class="admin-links">
-    <button class="al-trigger btn">
+    <a class="al-trigger al-trigger-gray" href="javascript:void(0)">
       <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-      <span class="screenreader-only">{{#t "manage"}}Manage{{/t}}</span></button>
+      <span class="screenreader-only">{{#t "manage"}}Manage{{/t}}</span></a>
     <ul class="al-options">
       <li><a href="#" data-event="resendInvitation"><i class="icon-email"></i> {{#t "links.resend_invitation"}}Resend Invitation{{/t}}</a></li>
       {{#if isObserver}}

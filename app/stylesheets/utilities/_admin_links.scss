@@ -77,6 +77,7 @@ your UI. The `admin-links` behavior will make it work.
 .al-trigger {
   padding: 4px;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .al-hover-container .al-trigger {

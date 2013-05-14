@@ -20,12 +20,14 @@ define [
 
     tagName: 'tr'
 
-    className: 'rosterUser'
+    className: 'rosterUser al-hover-container'
 
     template: template
 
     events:
       'click .admin-links [data-event]': 'handleMenuEvent'
+      'focus *': 'focus'
+      'blur *': 'blur'
 
     attach: ->
       @model.on 'change', @render, this
@@ -49,6 +51,8 @@ define [
       json.isObserver = @model.hasEnrollmentType('ObserverEnrollment')
       json.isPending = @model.pending(@model.currentRole)
       json.canEditSections = not _.isEmpty @model.sectionEditableEnrollments()
+      json.canViewLoginIdColumn = ENV.permissions.manage_admin_users or ENV.permissions.manage_students
+      json.canViewLoginId =
       json.canManage =
         if _.any(['TeacherEnrollment', 'DesignerEnrollment', 'TaEnrollment'], (et) => @model.hasEnrollmentType(et))
           ENV.permissions.manage_admin_users
@@ -104,6 +108,13 @@ define [
       $.when(deferreds...).then success, failure
 
     handleMenuEvent : (e) =>
+      @blur()
       e.preventDefault()
       method = $(e.currentTarget).data 'event'
       @[method].call this, e
+
+    focus: =>
+      @$el.addClass('al-hover-container-active table-hover-row')
+
+    blur: =>
+      @$el.removeClass('al-hover-container-active table-hover-row')

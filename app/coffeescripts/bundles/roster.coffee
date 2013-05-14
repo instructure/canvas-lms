@@ -49,6 +49,7 @@ require [
     itemView: RosterUserView
     itemViewOptions:
       course: ENV.course
+    canViewLoginIdColumn: ENV.permissions.manage_admin_users or ENV.permissions.manage_students
     buffer: 1000
     template: rosterUsersTemplate
   roleSelectView = new RoleSelectView

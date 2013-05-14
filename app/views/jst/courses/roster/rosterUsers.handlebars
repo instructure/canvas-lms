@@ -1,11 +1,15 @@
 {{#if collection.length}}
 
-<table class="roster table table-bordered table-striped table-condensed">
+<table class="roster table table-hover table-striped table-condensed table-vertically-center">
   <thead>
     <tr>
-      <th>Name</th>
-      <th>Section</th>
-      <th>Role</th>
+      <th></th>
+      <th>{{#t "name"}}Name{{/t}}</th>
+      {{#if canViewLoginIdColumn}}
+      <th>{{#t "login_name_or_sis_id"}}Login / SIS ID{{/t}}</th>
+      {{/if}}
+      <th>{{#t "section"}}Section{{/t}}</th>
+      <th>{{#t "role"}}Role{{/t}}</th>
       <th></th>
     </tr>
   </thead>
@@ -21,7 +25,7 @@
     <p>{{#t "you_can_search_by"}}You can search by:{{/t}}</p>
     <ul>
       <li>{{#t "name"}}Name{{/t}}</li>
-      <li>{{#t "sis_id"}}SIS ID{{/t}}</li>
+      <li>{{#t "login_name_or_sis_id"}}Login / SIS ID{{/t}}</li>
     </ul>
   </div>
   {{else}}
