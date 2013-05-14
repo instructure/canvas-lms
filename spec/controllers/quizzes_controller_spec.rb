@@ -756,6 +756,21 @@ describe QuizzesController do
       assigns[:quiz].title.should eql("some quiz")
     end
 
+    it "should be able to change ungraded survey to quiz without error" do
+      # aka should handle the case where the quiz's assignment is nil/not present.
+      course_with_teacher_logged_in(active_all: true)
+      course_quiz
+      @quiz.update_attributes(quiz_type: 'ungraded_survey')
+      # make sure the assignment doesn't exist
+      @quiz.assignment.should_not be_present
+      post 'update', course_id: @course.id, id: @quiz.id, activate: true,
+        quiz: {quiz_type: 'assignment'}
+      response.should be_redirect
+      @quiz.reload.quiz_type.should == 'assignment'
+      @quiz.should be_available
+      @quiz.assignment.should be_present
+    end
+
     it "should lock and unlock without removing assignment" do
       course_with_teacher_logged_in(:active_all => true)
       a = @course.assignments.create!(:title => "some assignment", :points_possible => 5)
