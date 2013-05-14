@@ -21,14 +21,14 @@ define [
                      'Appointment Availability', 'Calendar']
         Parent: []
         Groups: ['Membership Update']
-        Alerts: ['Alert', 'Other']
+        Alerts: ['Other']
 
     # Get the I18n display text to use for the group name.
     getGroupDisplayName: (groupName) =>
       switch groupName
         when 'Course' then I18n.t('groups.course', 'Course Activities')
         when 'Discussions' then I18n.t('groups.discussions', 'Discussions')
-        when 'Communication' then I18n.t('groups.communication', 'Communications')
+        when 'Communication' then I18n.t('groups.communication', 'Conversations')
         when 'Scheduling' then I18n.t('groups.scheduling', 'Scheduling')
         when 'Parent' then I18n.t('groups.parent', 'Parent Emails')
         when 'Groups' then I18n.t('groups.groups', 'Groups')

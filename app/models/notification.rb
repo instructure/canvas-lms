@@ -18,6 +18,7 @@
 
 class Notification < ActiveRecord::Base
   include Workflow
+  include TextHelper
 
   TYPES_TO_SHOW_IN_FEED = [
     # Assignment
@@ -143,7 +144,7 @@ class Notification < ActiveRecord::Base
   end
   
   def dashboard?
-    return ["Migration", "Registration", "Summaries"].include?(self.category) == false
+    return ["Migration", "Registration", "Summaries", "Alert"].include?(self.category) == false
   end
   
   def category_slug
@@ -387,8 +388,6 @@ class Notification < ActiveRecord::Base
         t(:conversation_message_display, 'Conversation Message')
       when 'Added To Conversation'
         t(:added_to_conversation_display, 'Added To Conversation')
-      when 'Alert'
-        t(:alert_display, 'Alert')
       when 'Membership Update'
         t(:membership_update_display, 'Membership Update')
       when 'Reminder'
@@ -401,51 +400,109 @@ class Notification < ActiveRecord::Base
   def category_description
     case category
     when 'Announcement'
-      t(:announcement_description, "For new announcements")
+      t(:announcement_description, 'New announcement in your course')
     when 'Course Content'
-      t(:course_content_description, "For changes to course pages and assignments")
+        mt(:course_content_description, <<-EOS)
+Change to course content:
+
+* WikiPage
+* Quiz content
+* Assignment content
+EOS
     when 'Files'
-      t(:files_description, "For new files")
+      t(:files_description, 'New file added to your course')
     when 'Discussion'
-      t(:discussion_description, "For new topics")
+      t(:discussion_description, 'New discussion topic in your course')
     when 'DiscussionEntry'
-      t(:discussion_entry_description, "For topics I've commented on")
+      t(:discussion_entry_description, "New discussion post in a topic you've participated in")
     when 'Due Date'
-      t(:due_date_description, "For due date changes")
+      t(:due_date_description, 'Assignment due date change')
     when 'Grading'
-      t(:grading_description, "For course grading alerts")
+      mt(:grading_description, <<-EOS)
+Includes:
+
+* Assignment/submission grade entered/changed
+* Un-muted assignment grade
+* Grade weight changed
+
+&nbsp;
+
+Check 'Include scores when alerting about grade changes' if you want to see your grades in the notifications.
+If your email is not an institution email this means sensitive content will be sent outside of the institution.
+EOS
     when 'Late Grading'
-      t(:late_grading_description, "For assignments turned in late")
+      mt(:late_grading_description, <<-EOS)
+*Instructor and Admin only:*
+
+Late assignment submission
+EOS
     when 'All Submissions'
-      t(:all_submissions_description, "For all assignment submissions in courses you teach")
+      mt(:all_submissions_description,  <<-EOS)
+*Instructor and Admin only:*
+
+Assignment submission/resubmission
+EOS
     when 'Submission Comment'
-      t(:submission_comment_description, "For comments on assignment submissions")
+      mt(:submission_comment_description, <<-EOS)
+Assignment submission comment
+
+&nbsp;
+
+Check 'Mark new submission comments as read' if you don't want them to show up as 'new' in your Canvas Inbox
+EOS
     when 'Grading Policies'
-      t(:grading_policies_description, "For course grading policy changes")
+      t(:grading_policies_description, 'Course grading policy change')
     when 'Invitation'
-      t(:invitation_description, "For new invitations")
+      mt(:invitation_description, <<-EOS)
+Invitation for:
+
+* Web conference
+* Group
+* Collaboration
+* Course
+* Peer Review & reminder
+EOS
     when 'Other'
-      t(:other_description, "For administrative alerts")
+      mt(:other_description, <<-EOS)
+*Instructor and Admin only:*
+
+* Course enrollment
+* Report generated
+* Content export
+* Migration report
+* New account user
+* New teacher registration
+* New student group
+EOS
     when 'Calendar'
-      t(:calendar_description, "For calendar changes")
+      t(:calendar_description, 'New and changed items on your course calendar')
     when 'Student Appointment Signups'
-      t(:student_appointment_description, "For student appointment signups and cancelations")
+      mt(:student_appointment_description, <<-EOS)
+*Instructor and Admin only:*
+
+Student appointment sign-up
+EOS
     when 'Appointment Availability'
-      t(:appointment_availability_description, "For changes to appointment time slots")
+      mt(:appointment_availability_description,  <<-EOS)
+*Instructor and Admin only:*
+
+Change to appointment time slots
+EOS
     when 'Appointment Signups'
-      t(:appointment_signups_description, "For your new appointments")
+      t(:appointment_signups_description, 'New appointment on your calendar')
     when 'Appointment Cancelations'
-      t(:appointment_cancelations_description, "For canceled appointments")
+      t(:appointment_cancelations_description, 'Appointment cancelation')
     when 'Conversation Message'
-      t(:conversation_message_description, "For new conversation messages")
+      t(:conversation_message_description, 'New Inbox messages')
     when 'Added To Conversation'
-      t(:added_to_conversation_description, "For conversations to which you're added")
-    when 'Alert'
-      t(:alert_description, "For alert notifications")
+      t(:added_to_conversation_description, 'You are added to a conversation')
     when 'Membership Update'
-      t(:membership_update_description, "For membership change notifications")
-    when 'Reminder'
-      t(:reminder_description, "For reminder messages")
+      mt(:membership_update_description, <<-EOS)
+*Admin only: pending enrollment activated*
+
+* Group enrollment
+* accepted/rejected
+EOS
     else
       t(:missing_description_description, "For %{category} notifications", :category => category)
     end
