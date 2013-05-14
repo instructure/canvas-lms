@@ -109,6 +109,13 @@ class ContextModule < ActiveRecord::Base
   scope :unpublished, where(:workflow_state => 'unpublished')
   scope :not_deleted, where("context_modules.workflow_state<>'deleted'")
 
+  def publish_items!
+    self.content_tags.select{|t| t.unpublished?}.each do |tag|
+      tag.publish
+      tag.update_asset_workflow_state!
+    end
+  end
+
   def update_student_progressions(user=nil)
     # modules are ordered by position, so running through them in order will
     # automatically handle issues with dependencies loading in the correct
@@ -240,6 +247,14 @@ class ContextModule < ActiveRecord::Base
     write_attribute(:completion_requirements, val)
   end
 
+  def content_tags_visible_to(user)
+    if self.grants_right?(user, :update)
+      self.content_tags.not_deleted
+    else
+      self.content_tags.active
+    end
+  end
+
   def add_item(params, added_item=nil, opts={})
     params[:type] = params[:type].underscore if params[:type]
     position = opts[:position] || (self.content_tags.active.map(&:position).compact.max || 0) + 1
@@ -254,6 +269,8 @@ class ContextModule < ActiveRecord::Base
     elsif params[:type] == "quiz"
       item = opts[:quiz] || self.context.quizzes.active.find_by_id(params[:id])
     end
+    workflow_state = item.workflow_state if item && item.respond_to?(:workflow_state) && ['active', 'unpublished'].include?(item.workflow_state)
+    workflow_state ||= 'active'
     if params[:type] == 'external_url'
       title = params[:title]
       added_item ||= self.content_tags.build(:context => self.context)
@@ -268,7 +285,7 @@ class ContextModule < ActiveRecord::Base
       added_item.content_type = 'ExternalUrl'
       added_item.context_module_id = self.id
       added_item.indent = params[:indent] || 0
-      added_item.workflow_state = 'active'
+      added_item.workflow_state = workflow_state
       added_item.save
       added_item
     elsif params[:type] == 'context_external_tool' || params[:type] == 'external_tool'
@@ -290,7 +307,7 @@ class ContextModule < ActiveRecord::Base
       }
       added_item.context_module_id = self.id
       added_item.indent = params[:indent] || 0
-      added_item.workflow_state = 'active'
+      added_item.workflow_state = workflow_state
       added_item.save
       added_item
     elsif params[:type] == 'context_module_sub_header' || params[:type] == 'sub_header'
@@ -306,7 +323,7 @@ class ContextModule < ActiveRecord::Base
       added_item.content_type = 'ContextModuleSubHeader'
       added_item.context_module_id = self.id
       added_item.indent = params[:indent] || 0
-      added_item.workflow_state = 'active'
+      added_item.workflow_state = workflow_state
       added_item.save
       added_item
     else
@@ -322,7 +339,7 @@ class ContextModule < ActiveRecord::Base
       }
       added_item.context_module_id = self.id
       added_item.indent = params[:indent] || 0
-      added_item.workflow_state = 'active'
+      added_item.workflow_state = workflow_state
       added_item.save
       added_item
     end

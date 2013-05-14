@@ -19,7 +19,7 @@ module Api::V1::ContextModule
   include Api::V1::Json
   include Api::V1::User
 
-  MODULE_JSON_ATTRS = %w(id position name unlock_at workflow_state)
+  MODULE_JSON_ATTRS = %w(id position name unlock_at)
 
   MODULE_ITEM_JSON_ATTRS = %w(id position title indent)
 
@@ -32,6 +32,7 @@ module Api::V1::ContextModule
       hash['state'] = progression.workflow_state
       hash['completed_at'] = progression.completed_at
     end
+    hash['published'] = context_module.active? if context_module.grants_right?(current_user, :update)
     hash
   end
 
@@ -90,6 +91,8 @@ module Api::V1::ContextModule
       ch['completed'] = !!progression.requirements_met.detect{|r|r[:type] == criterion[:type] && r[:id] == content_tag.id} if progression && progression.requirements_met.present?
       hash['completion_requirement'] = ch
     end
+
+    hash['published'] = content_tag.active? if context_module.grants_right?(current_user, :update)
 
     hash
   end

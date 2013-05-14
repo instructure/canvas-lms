@@ -245,7 +245,7 @@ class ContextModulesController < ApplicationController
     @module = @context.modules_visible_to(@current_user).find(params[:id])
     respond_to do |format|
       format.html { redirect_to named_context_url(@context, :context_context_modules_url, :anchor => "module_#{params[:id]}") }
-      format.json { render :json => (@module.content_tags.active.to_json) }
+      format.json { render :json => (@module.content_tags_visible_to(@current_user).to_json) }
     end
   end
   
@@ -330,7 +330,7 @@ class ContextModulesController < ApplicationController
   end
   
   def remove_item
-    @tag = @context.context_module_tags.find(params[:id])
+    @tag = @context.context_module_tags.not_deleted.find(params[:id])
     if authorized_action(@tag.context_module, @current_user, :update)
       @module = @tag.context_module
       @tag.destroy
@@ -340,7 +340,7 @@ class ContextModulesController < ApplicationController
   end
   
   def update_item
-    @tag = @context.context_module_tags.find(params[:id])
+    @tag = @context.context_module_tags.not_deleted.find(params[:id])
     if authorized_action(@tag.context_module, @current_user, :update)
       @tag.title = params[:content_tag][:title] if params[:content_tag] && params[:content_tag][:title]
       @tag.url = params[:content_tag][:url] if %w(ExternalUrl ContextExternalTool).include?(@tag.content_type) && params[:content_tag] && params[:content_tag][:url]
@@ -378,6 +378,7 @@ class ContextModulesController < ApplicationController
     if authorized_action(@module, @current_user, :update)
       if params.delete :publish
         @module.publish
+        @module.publish_items!
       elsif params.delete :unpublish
         @module.unpublish
       end

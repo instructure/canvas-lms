@@ -123,8 +123,12 @@ class WikiPage < ActiveRecord::Base
   after_save :remove_changed_flag
 
   workflow do
-    state :active
-    state :unpublished
+    state :active do
+      event :unpublish, :transitions_to => :unpublished
+    end
+    state :unpublished do
+      event :publish, :transitions_to => :active
+    end
     state :post_delayed do
       event :delayed_post, :transitions_to => :active
     end

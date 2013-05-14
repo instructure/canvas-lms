@@ -72,7 +72,7 @@ describe "Modules API", :type => :integration do
              "require_sequential_progress" => false,
              "prerequisite_module_ids" => [],
              "id" => @module1.id,
-             "workflow_state" => "active"
+             "published" => true
           },
           {
              "name" => @module2.name,
@@ -81,7 +81,7 @@ describe "Modules API", :type => :integration do
              "require_sequential_progress" => true,
              "prerequisite_module_ids" => [@module1.id],
              "id" => @module2.id,
-             "workflow_state" => "active"
+             "published" => true
           },
           {
              "name" => @module3.name,
@@ -90,7 +90,7 @@ describe "Modules API", :type => :integration do
              "require_sequential_progress" => false,
              "prerequisite_module_ids" => [],
              "id" => @module3.id,
-             "workflow_state" => "unpublished"
+             "published" => false
           }
       ]
     end
@@ -106,7 +106,7 @@ describe "Modules API", :type => :integration do
         "require_sequential_progress" => true,
         "prerequisite_module_ids" => [@module1.id],
         "id" => @module2.id,
-        "workflow_state" => "active"
+        "published" => true
       }
     end
 
@@ -121,7 +121,7 @@ describe "Modules API", :type => :integration do
         "require_sequential_progress" => false,
         "prerequisite_module_ids" => [],
         "id" => @module3.id,
-        "workflow_state" => "unpublished"
+        "published" => false
       }
     end
 
@@ -153,13 +153,23 @@ describe "Modules API", :type => :integration do
         @test_modules[2..3].each { |m| m.update_attribute(:workflow_state , 'unpublished') }
         @test_modules.map { |tm| tm.workflow_state }.should == %w(active active unpublished unpublished)
         @modules_to_update = [@test_modules[1], @test_modules[3]]
+
+        @wiki_page = @course.wiki.wiki_page
+        @wiki_page.workflow_state = 'unpublished'; @wiki_page.save!
+        @wiki_page_tag = @test_modules[3].add_item(:id => @wiki_page.id, :type => 'wiki_page')
+
         @ids_to_update = @modules_to_update.map(&:id)
       end
       
-      it "should publish modules" do
+      it "should publish modules (and their tags)" do
         json = api_call(:put, @path, @path_opts, { :event => 'publish', :module_ids => @ids_to_update })
         json['completed'].sort.should == @ids_to_update
         @test_modules.map { |tm| tm.reload.workflow_state }.should == %w(active active unpublished active)
+
+        @wiki_page_tag.reload
+        @wiki_page_tag.active?.should == true
+        @wiki_page.reload
+        @wiki_page.active?.should == true
       end
 
       it "should unpublish modules" do
@@ -237,6 +247,11 @@ describe "Modules API", :type => :integration do
         @module1 = @course.context_modules.create(:name => "unpublished")
         @module1.workflow_state = 'unpublished'
         @module1.save!
+
+        @wiki_page = @course.wiki.wiki_page
+        @wiki_page.workflow_state = 'unpublished'; @wiki_page.save!
+        @wiki_page_tag = @module1.add_item(:id => @wiki_page.id, :type => 'wiki_page')
+
         @module2 = @course.context_modules.create!(:name => "published")
       end
 
@@ -286,24 +301,29 @@ describe "Modules API", :type => :integration do
         @module2.position.should == 2
       end
 
-      it "should publish modules" do
+      it "should publish modules (and their tags)" do
         json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
                         {:controller => "context_modules_api", :action => "update", :format => "json",
                         :course_id => "#{@course.id}", :id => "#{@module1.id}"},
-                        {:module => {:publish => '1'}}
+                        {:module => {:published => '1'}}
         )
-        json['workflow_state'].should == 'active'
+        json['published'].should == true
         @module1.reload
         @module1.active?.should == true
+
+        @wiki_page_tag.reload
+        @wiki_page_tag.active?.should == true
+        @wiki_page.reload
+        @wiki_page.active?.should == true
       end
 
       it "should unpublish modules" do
         json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}",
                         {:controller => "context_modules_api", :action => "update", :format => "json",
                          :course_id => "#{@course.id}", :id => "#{@module2.id}"},
-                        {:module => {:unpublish => '1'}}
+                        {:module => {:published => '0'}}
         )
-        json['workflow_state'].should == 'unpublished'
+        json['published'].should == false
         @module2.reload
         @module2.unpublished?.should == true
       end
@@ -485,7 +505,7 @@ describe "Modules API", :type => :integration do
                       :controller => "context_modules_api", :action => "index", :format => "json",
                       :course_id => "#{@course.id}")
       json.length.should == 2
-      json.each{|cm| cm['workflow_state'].should == 'active'}
+      json.each{|cm| @course.context_modules.find(cm['id']).workflow_state.should == 'active'}
     end
 
     it "should not show a single unpublished module" do

@@ -87,7 +87,7 @@ class ContextModuleItemsApiController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       mod = @context.modules_visible_to(@current_user).find(params[:module_id])
       route = polymorphic_url([:api_v1, @context, mod, :items])
-      scope = mod.content_tags.active
+      scope = mod.content_tags_visible_to(@current_user)
       items = Api.paginate(scope, self, route)
       prog = @context.grants_right?(@current_user, session, :participate_as_student) ? mod.evaluate_for(@current_user) : nil
       render :json => items.map { |item| module_item_json(item, @current_user, session, mod, prog) }
@@ -106,7 +106,7 @@ class ContextModuleItemsApiController < ApplicationController
   def show
     if authorized_action(@context, @current_user, :read)
       mod = @context.modules_visible_to(@current_user).find(params[:module_id])
-      item = mod.content_tags.active.find(params[:id])
+      item = mod.content_tags_visible_to(@current_user).find(params[:id])
       prog = @context.grants_right?(@current_user, session, :participate_as_student) ? mod.evaluate_for(@current_user) : nil
       render :json => module_item_json(item, @current_user, session, mod, prog)
     end
@@ -182,6 +182,10 @@ class ContextModuleItemsApiController < ApplicationController
       item_params[:url] = params[:module_item][:external_url]
 
       if (@tag = @module.add_item(item_params)) && set_position && set_completion_requirement
+        if @domain_root_account.enable_draft?
+          @tag.workflow_state = 'unpublished'
+          @tag.save
+        end
         @module.touch
         render :json => module_item_json(@tag, @current_user, session, @module, nil)
       elsif @tag
@@ -207,6 +211,7 @@ class ContextModuleItemsApiController < ApplicationController
   #   "must_submit", "min_score": Only apply to "Assignment" and "Quiz" types
   #   Inapplicable types will be ignored
   # @argument module_item[completion_requirement][min_score] [Required for completion_requirement type 'min_score'] minimum score required to complete
+  # @undocumented @argument module_item[published] [Optional] Whether the module item is published and visible to students
   #
   # @example_request
   #
@@ -220,7 +225,7 @@ class ContextModuleItemsApiController < ApplicationController
   #
   # @returns Module Item
   def update
-    @tag = @context.context_module_tags.find(params[:id])
+    @tag = @context.context_module_tags.not_deleted.find(params[:id])
     if authorized_action(@tag.context_module, @current_user, :update)
       return render :json => {:message => "missing module item parameter"}, :status => :bad_request unless params[:module_item]
 
@@ -228,6 +233,16 @@ class ContextModuleItemsApiController < ApplicationController
       @tag.url = params[:module_item][:external_url] if %w(ExternalUrl ContextExternalTool).include?(@tag.content_type) && params[:module_item][:external_url]
       @tag.indent = params[:module_item][:indent] if params[:module_item][:indent]
       @tag.new_tab = value_to_boolean(params[:module_item][:new_tab]) if params[:module_item][:new_tab]
+
+      if params[:module_item].has_key?(:published)
+        if value_to_boolean(params[:module_item][:published])
+          @tag.publish
+        else
+          @tag.unpublish
+        end
+        @tag.update_asset_workflow_state!
+        @tag.context_module.save
+      end
 
       if @tag.save && set_position && set_completion_requirement
         @tag.update_asset_name! if params[:module_item][:title]
@@ -250,7 +265,7 @@ class ContextModuleItemsApiController < ApplicationController
   #
   # @returns Module Item
   def destroy
-    @tag = @context.context_module_tags.find(params[:id])
+    @tag = @context.context_module_tags.not_deleted.find(params[:id])
     if authorized_action(@tag.context_module, @current_user, :update)
       @module = @tag.context_module
       @tag.destroy
@@ -263,7 +278,7 @@ class ContextModuleItemsApiController < ApplicationController
     return true unless @tag && params[:module_item][:position]
 
     @tag.reload
-    if @tag.insert_at_position(params[:module_item][:position], @tag.context_module.content_tags.active)
+    if @tag.insert_at_position(params[:module_item][:position], @tag.context_module.content_tags.not_deleted)
       # see ContextModulesController#reorder_items
       @tag.touch_context_module
       ContentTag.update_could_be_locked(@tag.context_module.content_tags)
@@ -276,6 +291,7 @@ class ContextModuleItemsApiController < ApplicationController
       return false
     end
   end
+  protected :set_position
 
   def set_completion_requirement
     return true unless @tag && params[:module_item][:completion_requirement]
@@ -296,4 +312,5 @@ class ContextModuleItemsApiController < ApplicationController
     @module.completion_requirements = reqs
     @module.save
   end
+  protected :set_completion_requirement
 end
