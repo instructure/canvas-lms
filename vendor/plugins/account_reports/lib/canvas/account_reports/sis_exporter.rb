@@ -196,7 +196,7 @@ module Canvas::AccountReports
         courses = courses.where("sis_source_id IS NOT NULL") if @sis_format
 
         if @include_deleted
-          courses = courses.where("courses.workflow_state<>'deleted' OR sis_source_id IS NOT NULL")
+          courses = courses.where("courses.workflow_state<>'deleted' OR courses.sis_source_id IS NOT NULL")
         else
           courses = courses.where("courses.workflow_state<>'deleted' AND courses.workflow_state<>'completed'")
         end
