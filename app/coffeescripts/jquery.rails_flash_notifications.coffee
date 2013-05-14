@@ -4,6 +4,7 @@ define [
   'underscore'
   'compiled/fn/preventDefault'
   'jqueryui/effects/drop'
+  'vendor/jquery.cookie'
 ], (I18n, _, preventDefault) ->
 
   $buffer = $("#flash_message_buffer")
@@ -12,18 +13,17 @@ define [
   $holder.on 'click', 'li', ->
     $this = $(this)
     return if $this.hasClass('no_close')
+    $.cookie('unsupported_browser_dismissed', '1') if $this.hasClass('unsupported_browser')
     $this.stop(true, true).remove()
-    if $this.hasClass('static_message')
-      $buffer.height _.reduce($holder.find('.static_message'),
-        (s, n) -> s + $(n).outerHeight()
-      , 0)
+    if (bufferIndex = $this.data('buffer-index'))?
+      $buffer.find("[data-buffer-index=#{bufferIndex}]").remove()
 
   flashBox = (type, content, timeout, cssOptions = {}) ->
     $node = $("""
       <li class="ui-state-#{type}" role="alert">
         <i></i>
         #{content}
-        <a href="#" class="close_link">#{I18n.t("close", "Close")}</a>
+        <a href="#" class="close_link icon-end">#{I18n.t("close", "Close")}</a>
       </li>
     """)
 

@@ -20,15 +20,17 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe MediaObjectsController do
 
   describe "GET 'show'" do
+    before do
+      # We don't actually want to ping kaltura during these tests
+      MediaObject.stubs(:media_id_exists?).returns(true)
+      MediaObject.any_instance.stubs(:media_sources).returns([])
+    end
+    
     it "should create a MediaObject if necessary on request" do
-      # this test is purposely ran with no user logged in to make sure it works in public courses
+      # this test is purposely run with no user logged in to make sure it works in public courses
 
       missing_media_id = "0_12345678"
       MediaObject.by_media_id(missing_media_id).should be_empty
-
-      # We don't actually want to ping kaltura during this test
-      MediaObject.stubs(:media_id_exists?).returns(true)
-      MediaObject.any_instance.stubs(:media_sources).returns([])
 
       get 'show', :media_object_id => missing_media_id
       json_parse(response.body).should == {
@@ -38,6 +40,20 @@ describe MediaObjectsController do
       }
       MediaObject.by_media_id(missing_media_id).first.media_id.should == missing_media_id
     end
-
+    
+    it "should retrieve info about a 'deleted' MediaObject" do
+      deleted_media_id = '0_deadbeef'
+      course
+      media_object = course.media_objects.build :media_id => deleted_media_id
+      media_object.workflow_state = 'deleted'
+      media_object.save!
+      
+      get 'show', :media_object_id => deleted_media_id
+      json_parse(response.body).should == {
+          'can_add_captions' => false,
+          'media_tracks' => [],
+          'media_sources' => []
+      }
+    end
   end
 end

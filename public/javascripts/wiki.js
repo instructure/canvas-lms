@@ -30,12 +30,6 @@ define([
 
   // private variables & methods
   function initEditViewSecondary(){
-    $("#wiki_page_rename_link").click(function(e){
-      e.preventDefault();
-      $("#wiki_page_rename_section").slideToggle("fast", function() {
-        $(this).find(":text:visible:first").focus().select();
-      });
-    });
     wikiSidebar.init();
     wikiSidebar.attachToEditor($("#wiki_page_body"));
   };
@@ -45,14 +39,6 @@ define([
       event.preventDefault();
       toggleView();
     });
-    $("#wiki_page_new").find("a.new")
-      .click(function(e){
-        e.preventDefault();
-        $("#wiki_page_new").find("form").slideToggle("fast", function() {
-          $("#wiki_page_new :text:visible:first").focus().select();
-        });
-      }).end()
-      .find("form").hide();
   }
 
   function initForm(){

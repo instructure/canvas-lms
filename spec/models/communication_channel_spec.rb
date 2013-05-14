@@ -28,125 +28,33 @@ describe CommunicationChannel do
   it "should create a new instance given valid attributes" do
     factory_with_protected_attributes(CommunicationChannel, communication_channel_valid_attributes)
   end
-  
-  context "find_all_for" do
-    it "should find all *active* matching channels based on a user's notification policies" do
-      user_model(:workflow_state => 'registered')
-      a = communication_channel_model(:user_id => @user.id, :workflow_state => 'active')
-      b = communication_channel_model(:user_id => @user.id, :workflow_state => 'active', :path => "path2@example.com")
-      c = communication_channel_model(:user_id => @user.id, :workflow_state => 'active', :path => "path3@example.com")
-      d = communication_channel_model(:user_id => @user.id, :path => "path4@example.com")
-      notification_model
-      notification_policy_model(:communication_channel => a, :notification => @notification )
-      notification_policy_model(:communication_channel => b, :notification => @notification )
-      notification_policy_model(:communication_channel => c, :notification => @notification )
-      @user.reload
-      channels = CommunicationChannel.find_all_for(@user, @notification)
-      channels.should include(a)
-      channels.should include(b)
-      channels.should include(c)
-      channels.should_not include(d)
+
+  describe 'imported?' do
+    it 'should default to false' do
+      CommunicationChannel.new.should_not be_imported
     end
 
-    it "should exclude inactive channels, even if a notification policy exists" do
-      user_model(:workflow_state => 'registered')
-      a = communication_channel_model(:user_id => @user.id, :workflow_state => 'active')
-      d = communication_channel_model(:user_id => @user.id, :path => "path4@example.com")
-      notification_model
-      notification_policy_model(:communication_channel_id => a.id, :notification => @notification )
-      notification_policy_model(:communication_channel_id => d.id, :notification => @notification )
-      @user.reload
-      channels = CommunicationChannel.find_all_for(@user, @notification)
-      channels.should include(a)
-      channels.should_not include(d)
+    it 'should be false if the channel has no pseudonym' do
+      communication_channel_model
+      @communication_channel.should_not be_imported
     end
-    
-    it "should find the default channel if a user has notification policies but none match" do
-      @u = user_model(:workflow_state => 'registered')
-      a = communication_channel_model(:user_id => @u.id, :workflow_state => 'active')
-      b = communication_channel_model(:user_id => @u.id, :path => "path2@example.com")
-      c = communication_channel_model(:user_id => @u.id, :path => "path3@example.com")
-      a.should be_active
-      a.should 
 
-      @n = Notification.create(:name => "New Notification")
-      a.notification_policies.create!(:notification => @n)
-      channels = CommunicationChannel.find_all_for(@u, @n)
-      channels.should eql([@u.communication_channel])
+    it 'should be false if the channel is associated with a pseudonym' do
+      user_with_pseudonym(:active_all => true)
+      channel = @pseudonym.communication_channel
+
+      channel.should_not be_imported
     end
-    
-    it "should find a default email (and active) channel if no policies are specified" do
-      @u = user_model(:workflow_state => 'registered')
-      x = @u.communication_channels.create(:path => "notme@example.com")
-      x.retire!
-      sms = @u.communication_channels.create(:path => "123456@example.com", :path_type => "sms")
-      sms.confirm!
-      a = @u.communication_channels.create(:path => "a@example.com")
-      a.confirm!
-      b = @u.communication_channels.create(:path => "b@example.com")
-      c = @u.communication_channels.create(:path => "c@example.com")
-      @n = Notification.create(:name => "New Notification", :category => 'TestImmediately')
-      @u.reload
-      channels = CommunicationChannel.find_all_for(@u, @n)
-      channels.should_not include(x)
-      channels.should include(a)
-      channels.should_not include(b)
-      channels.should_not include(c)
-    end
-    
-    it "should consider notification_policies" do
-      @user = user_model(:workflow_state => 'registered')
-      a = @user.communication_channels.create(:path => "a@example.com")
-      a.confirm!
-      b = @user.communication_channels.create(:path => "b@example.com")
-      b.confirm!
-      @n = Notification.create!(:name => "New notification", :category => 'TestImmediately')
-      @user.reload
-      channels = CommunicationChannel.find_all_for(@user, @n)
-      channels.should include(a)
-      channels.should_not include(b)
-      
-      b.notification_policies.create!(:notification => @n, :frequency => 'immediately')
-      channels = CommunicationChannel.find_all_for(@user, @n)
-      channels.should include(b)
-      channels.should_not include(a)
-    end
-    
-    it "should not return channels for 'daily' or 'weekly' policies" do
-      @user = user_model(:workflow_state => 'registered')
-      a = @user.communication_channels.create(:path => "a@example.com")
-      a.confirm!
-      @n = Notification.create!(:name => "New notification")
-      a.notification_policies.create!(:notification => @n, :frequency => 'daily')
-      channels = CommunicationChannel.find_all_for(@user, @n)
-      channels.should be_empty
-    end
-    
-    it "should find only the specified channel (whether or not it's active) for registration notifications" do
-      @u = User.create(:name => "user")
-      a = @u.communication_channels.create(:path => "a@example.com")
-      b = @u.communication_channels.create(:path => "b@example.com")
-      c = @u.communication_channels.create(:path => "c@example.com")
-      @n = Notification.create(:name => "New Notification", :category => "Registration")
-      channels = CommunicationChannel.find_all_for(@u, @n, c)
-      channels.should_not include(a)
-      channels.should_not include(b)
-      channels.should include(c)
-    end
-    
-    it "should find only the specified channel (whether or not it's active) for registration notifications" do
-      @u = User.create(:name => "user")
-      a = @u.communication_channels.create(:path => "a@example.com")
-      b = @u.communication_channels.create(:path => "b@example.com")
-      c = @u.communication_channels.create(:path => "c@example.com")
-      @n = Notification.create(:name => "New Notification", :category => "Registration")
-      channels = CommunicationChannel.find_all_for(@u, @n, c)
-      channels.should_not include(a)
-      channels.should_not include(b)
-      channels.should include(c)
+
+    it "should be true if the channel is the sis_communication_channel of a pseudonym" do
+      user_with_pseudonym(:active_all => true)
+      channel = @pseudonym.communication_channel
+      @pseudonym.update_attribute(:sis_communication_channel_id, channel.id)
+
+      channel.should be_imported
     end
   end
-  
+
   it "should have a decent state machine" do
     communication_channel_model
     @cc.state.should eql(:unconfirmed)
@@ -311,7 +219,7 @@ describe CommunicationChannel do
       HostUrl.stubs(:context_host).with(account).returns('someserver.com')
       HostUrl.stubs(:context_host).with(nil).returns('default')
       @cc.send_confirmation!(account)
-      message = Message.find(:first, :conditions => { :communication_channel_id => @cc.id, :notification_id => notification.id })
+      message = Message.where(:communication_channel_id => @cc, :notification_id => notification).first
       message.should_not be_nil
       message.body.should match /someserver.com/
     end
@@ -363,7 +271,7 @@ describe CommunicationChannel do
     end
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should find a match on another shard" do
         Enrollment.stubs(:cross_shard_invitations?).returns(true)

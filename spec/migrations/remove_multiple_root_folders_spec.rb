@@ -41,7 +41,7 @@ describe 'DataFixup::RemoveMultipleRootFolders' do
       c.folders.each do |f|
         f.attachments.delete_all
       end
-      Folder.delete_all(:id => c.folders.map(&:id))
+      c.folders.scoped.delete_all
       c.delete
     end
     RemoveMultipleRootFolders.up
@@ -56,19 +56,17 @@ describe 'DataFixup::RemoveMultipleRootFolders' do
       empty_folders << context.folders.create!(:name => "name2")
       empty_folders << context.folders.create!(:name => "name3")
 
-      Folder.update_all({:parent_folder_id => nil}, {:context_type => context.class.to_s, :context_id => context.id})
+      scope = Folder.where(:context_type => context.class.to_s, :context_id => context)
+      scope.update_all(:parent_folder_id => nil)
 
-      Folder.count(:conditions => ["context_type = ? AND context_id = ? AND workflow_state != ? AND parent_folder_id IS NULL",
-        context.class.to_s, context.id, 'deleted']
-      ).should == 4
+      scope.where("workflow_state<>'deleted' AND parent_folder_id IS NULL").count.should == 4
     end
 
     DataFixup::RemoveMultipleRootFolders.run(:limit => 2)
 
     @contexts.each do |c|
-      Folder.count(:conditions => ["context_type = ? AND context_id = ? AND workflow_state != ? AND parent_folder_id IS NULL",
-        c.class.to_s, c.id, 'deleted']
-      ).should == 1
+      Folder.where("context_type=? AND context_id=? AND workflow_state<>'deleted' AND parent_folder_id IS NULL",
+        c.class.to_s, c).count.should == 1
     end
 
     empty_folders.each do |folder|
@@ -93,19 +91,17 @@ describe 'DataFixup::RemoveMultipleRootFolders' do
       a.uploaded_data = default_uploaded_data
       a.save!
 
-      Folder.update_all({:parent_folder_id => nil}, {:id => [extra_folder1.id, extra_folder2.id]})
+      Folder.where(:id => [extra_folder1, extra_folder2]).update_all(:parent_folder_id => nil)
 
-      Folder.count(:conditions => ["context_type = ? AND context_id = ? AND workflow_state != ? AND parent_folder_id IS NULL",
-        context.class.to_s, context.id, 'deleted']
-      ).should == 3
+      Folder.where("context_type=? AND context_id=? AND workflow_state<>'deleted' AND parent_folder_id IS NULL",
+        context.class.to_s, context).count.should == 3
     end
 
     DataFixup::RemoveMultipleRootFolders.run(:limit => 2)
 
     @contexts.each do |c|
-      Folder.count(:conditions => ["context_type = ? AND context_id = ? AND workflow_state != ? AND parent_folder_id IS NULL",
-        c.class.to_s, c.id, 'deleted']
-      ).should == 1
+      Folder.where("context_type=? AND context_id=? AND workflow_state<>'deleted' AND parent_folder_id IS NULL",
+        c.class.to_s, c).count.should == 1
     end
 
     extra_folders.each do |folder|
@@ -142,19 +138,17 @@ describe 'DataFixup::RemoveMultipleRootFolders' do
       a.uploaded_data = default_uploaded_data
       a.save!
 
-      Folder.update_all({:parent_folder_id => nil}, {:id => [extra_folder1.id, extra_folder2.id]})
+      Folder.where(:id => [extra_folder1, extra_folder2]).update_all(:parent_folder_id => nil)
 
-      Folder.count(:conditions => ["context_type = ? AND context_id = ? AND workflow_state != ? AND parent_folder_id IS NULL",
-                                   context.class.to_s, context.id, 'deleted']
-      ).should == 4
+      Folder.where("context_type=? AND context_id=? AND workflow_state<>'deleted' AND parent_folder_id IS NULL",
+                                   context.class.to_s, context).count.should == 4
     end
 
     DataFixup::RemoveMultipleRootFolders.run(:limit => 2)
 
     @contexts.each do |c|
-      Folder.count(:conditions => ["context_type = ? AND context_id = ? AND workflow_state != ? AND parent_folder_id IS NULL",
-                                   c.class.to_s, c.id, 'deleted']
-      ).should == 1
+      Folder.where("context_type=? AND context_id=? AND workflow_state<>'deleted' AND parent_folder_id IS NULL",
+                                   c.class.to_s, c).count.should == 1
     end
 
     extra_folders.each do |folder|
@@ -185,19 +179,17 @@ describe 'DataFixup::RemoveMultipleRootFolders' do
       context.folders.find_by_name(root_folder_name).delete
       context.folders.find_by_name(root_folder_name).should be_nil
 
-      Folder.update_all({:parent_folder_id => nil}, {:id => [extra_folder1.id, extra_folder2.id]})
+      Folder.where(:id => [extra_folder1, extra_folder2]).update_all(:parent_folder_id => nil)
 
-      Folder.count(:conditions => ["context_type = ? AND context_id = ? AND workflow_state != ? AND parent_folder_id IS NULL",
-                                   context.class.to_s, context.id, 'deleted']
-      ).should == 2
+      Folder.where("context_type=? AND context_id=? AND workflow_state<>'deleted' AND parent_folder_id IS NULL",
+                                   context.class.to_s, context).count.should == 2
     end
 
     DataFixup::RemoveMultipleRootFolders.run(:limit => 2)
 
     @contexts.each do |c|
-      Folder.count(:conditions => ["context_type = ? AND context_id = ? AND workflow_state != ? AND parent_folder_id IS NULL",
-                                   c.class.to_s, c.id, 'deleted']
-      ).should == 1
+      Folder.where("context_type=? AND context_id=? AND workflow_state<>'deleted' AND parent_folder_id IS NULL",
+                                   c.class.to_s, c).count.should == 1
 
       root_folder_name = get_root_folder_name(c)
       c.folders.find_by_name(root_folder_name).should_not be_nil

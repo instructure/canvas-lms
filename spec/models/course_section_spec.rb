@@ -246,5 +246,26 @@ describe CourseSection, "moving to new course" do
     CourseAccountAssociation.find_all_by_course_id(course1.id).map(&:account_id).uniq.should == [account1.id]
     CourseAccountAssociation.find_all_by_course_id(course2.id).map(&:account_id).uniq.sort.should == [account1.id, account2.id].sort
   end
-
+  
+  describe 'deletable?' do
+    before do
+      course_with_teacher
+      @section = course.course_sections.create!
+    end
+    
+    it 'should be deletable if empty' do
+      @section.should be_deletable
+    end
+    
+    it 'should not be deletable if it has real enrollments' do
+      student_in_course :section => @section
+      @section.should_not be_deletable
+    end
+    
+    it 'should be deletable if it only has a student view enrollment' do
+      @course.student_view_student
+      @section.enrollments.map(&:type).should eql ['StudentViewEnrollment']
+      @section.should be_deletable
+    end
+  end
 end

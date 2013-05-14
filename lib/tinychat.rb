@@ -34,6 +34,6 @@ class Tinychat
   
   def self.config
     Canvas::Plugin.find(:tinychat).try(:settings) ||
-      (YAML.load_file(RAILS_ROOT + "/config/tinychat.yml")[RAILS_ENV] rescue nil)
+      (YAML.load_file(Rails.root+"config/tinychat.yml")[Rails.env] rescue nil)
   end
 end

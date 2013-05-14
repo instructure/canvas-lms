@@ -18,7 +18,7 @@
 
 module ContentImportsHelper
   def question_banks_select_list
-    question_banks = @context.assessment_question_banks.active.scoped(:select=>'title', :order=>'title').map(&:title)
+    question_banks = @context.assessment_question_banks.active.order(:title).pluck(:title)
     question_banks.delete AssessmentQuestionBank.default_imported_title
     question_banks.insert 0, AssessmentQuestionBank.default_imported_title
     question_banks
@@ -29,7 +29,7 @@ module ContentImportsHelper
   end
 
   def exports_enabled?
-    Canvas::Plugin.all_for_tag(:export_system).length > 0
+    ContentMigration.migration_plugins(true).any?
   end
 
   def qti_or_content_link

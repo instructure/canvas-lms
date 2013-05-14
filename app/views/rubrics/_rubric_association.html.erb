@@ -125,7 +125,7 @@
     </div>
     <div class="association_buttons association_edit button-container">
       <button type="button" class="save_button btn"><%= t('buttons.save_assessment', 'Save Assessment') %></button>
-      <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', 'Cancel') %></button>
+      <button type="button" class="cancel_button btn button-secondary"><%= t('#buttons.cancel', 'Cancel') %></button>
     </div>
     <a href="<%= context_url(@context, :context_rubric_association_url, association ? association.id : "{{ id }}") %>" style="display: none;" class="update_rubric_association_url">&nbsp;</a>
   </div>

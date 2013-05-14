@@ -3,17 +3,17 @@
 <% content_for :right_side do %>
   <div class="rs-margin-all">
     <% if can_do(@section, @current_user, :update) %>
-      <a href="#" class="btn button-sidebar-wide edit_section_link"><%= image_tag "edit.png" %> <%= t('buttons.edit_section', 'Edit Section') %></a>
+      <a href="#" class="btn button-sidebar-wide edit_section_link"><i class="icon-edit"></i> <%= t('buttons.edit_section', 'Edit Section') %></a>
       <% if @section.nonxlist_course_id %>
         <% if can_do(@section.nonxlist_course, @current_user, :manage_sections) %>
-          <a href="#" class="btn button-sidebar-wide uncrosslist_link"><%= image_tag "move.png" %> <%= t('buttons.uncrosslist_section', 'De-Cross-List this Section') %></a>
+          <a href="#" class="btn button-sidebar-wide uncrosslist_link"><i class="icon-off"></i> <%= t('buttons.uncrosslist_section', 'De-Cross-List this Section') %></a>
         <% end %>
-        <a href="#" class="btn button-sidebar-wide crosslist_link"><%= image_tag "move.png" %> <%= t('buttons.recrosslist_section', 'Re-Cross-List this Section') %></a>
+        <a href="#" class="btn button-sidebar-wide crosslist_link"><i class="icon-off"></i> <%= t('buttons.recrosslist_section', 'Re-Cross-List this Section') %></a>
       <% else %>
-        <a href="#" class="btn button-sidebar-wide crosslist_link"><%= image_tag "move.png" %> <%= t('buttons.crosslist_section', 'Cross-List this Section') %></a>
+        <a href="#" class="btn button-sidebar-wide crosslist_link"><i class="icon-off"></i> <%= t('buttons.crosslist_section', 'Cross-List this Section') %></a>
       <% end %>
     <% end %>
-    <a href="<%= context_url(@context, :context_details_url) %>" class="btn button-sidebar-wide"><%= image_tag "back.png" %> <%= t('buttons.back_to_course', 'Back to Course Settings') %></a>
+    <a href="<%= context_url(@context, :context_details_url) %>" class="btn button-sidebar-wide"><i class="icon-settings"></i> <%= t('buttons.back_to_course', 'Back to Course Settings') %></a>
   </div>
 <% end %>
 
@@ -139,7 +139,7 @@ h3 .tally {
     <td colspan="2">
       <div class="button-container">
         <button type="submit" class="btn submit_button"><%= t('buttons.update_section', 'Update Section') %></button>
-        <button type="button" class="btn cancel_button button-secondary"><%= t('buttons.cancel', 'Cancel') %></button>
+        <button type="button" class="btn cancel_button btn button-secondary"><%= t('buttons.cancel', 'Cancel') %></button>
       </div>
     </td>
   </tr>
@@ -234,7 +234,7 @@ h3 .tally {
             </div>
             <div class="button-container">
               <button type="submit" class="btn submit_button"><%= t('buttons.crosslist_this_section', 'Cross-List This Section') %></button>
-              <button type="button" class="btn button-secondary cancel_button"><%= t('buttons.cancel', 'Cancel') %></button>
+              <button type="button" class="btn btn button-secondary cancel_button"><%= t('buttons.cancel', 'Cancel') %></button>
             </div>
           </div>
         </td>
@@ -261,7 +261,7 @@ h3 .tally {
     <% end %>
     <div class="button-container">
       <button type="submit" class="btn submit_button"><%= t('buttons.decrosslit_section', 'De-Cross-List This Section') %></button>
-      <button type="button" class="btn button-secondary cancel_button"><%= t('buttons.cancel', 'Cancel') %></button>
+      <button type="button" class="btn btn button-secondary cancel_button"><%= t('buttons.cancel', 'Cancel') %></button>
     </div>
   <% end %>
 </div>

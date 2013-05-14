@@ -59,7 +59,7 @@ describe ContextExternalTool do
     def url_test(nav_url=nil)
       course_with_teacher(:active_all => true)
       @tool = @course.context_external_tools.new(:name => "a", :consumer_key => '12345', :shared_secret => 'secret', :url => "http://www.example.com")
-      [:course_navigation, :account_navigation, :user_navigation, :resource_selection, :editor_button].each do |type|
+      ContextExternalTool::EXTENSION_TYPES.each do |type|
         @tool.send "#{type}=", {
                 :url => nav_url,
                 :text => "Example",
@@ -303,7 +303,7 @@ describe ContextExternalTool do
     it "should merge custom fields for extension launches" do
       course_with_teacher(:active_all => true)
       @tool = @course.context_external_tools.new(:name => "a", :consumer_key => '12345', :shared_secret => 'secret', :custom_fields => {'a' => "1", 'b' => "2"}, :url =>"http://www.example.com")
-      [:course_navigation, :account_navigation, :user_navigation, :resource_selection, :editor_button].each do |type|
+      ContextExternalTool::EXTENSION_TYPES.each do |type|
         @tool.send "#{type}=",  {
           :text =>"Example",
           :url =>"http://www.example.com",
@@ -457,6 +457,54 @@ describe ContextExternalTool do
       tool.settings = {:editor_button => {:url => "http://www.example.com", :icon_url => "http://www.example.com/favicon.ico", :selection_width => 100, :selection_height => 100}}
       tool.save
       tool.settings[:icon_url].should == "http://www.example.com/favicon.ico"
+    end
+  end
+
+  describe "change_domain" do
+    let(:prod_base_url) {'http://www.example.com'}
+    let(:new_host) {'test.example.com'}
+
+    let(:tool) do
+      tool = @root_account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "www.example.com", :url => prod_base_url)
+      tool.settings = {:url => prod_base_url, :icon_url => "#{prod_base_url}/icon.ico"}
+      tool.account_navigation = {:url => "#{prod_base_url}/launch?my_var=1"}
+      tool.editor_button = {:url => "#{prod_base_url}/resource_selection", :icon_url => "#{prod_base_url}/resource_selection.ico"}
+      tool
+    end
+
+    it "should update the domain" do
+      tool.change_domain! new_host
+      tool.domain.should == new_host
+      URI.parse(tool.url).host.should == new_host
+      URI.parse(tool.settings[:url]).host.should == new_host
+      URI.parse(tool.settings[:icon_url]).host.should == new_host
+      URI.parse(tool.account_navigation[:url]).host.should == new_host
+      URI.parse(tool.editor_button[:url]).host.should == new_host
+      URI.parse(tool.editor_button[:icon_url]).host.should == new_host
+    end
+
+    it "should ignore domain if it is nil" do
+      tool.domain = nil
+      tool.change_domain! new_host
+      tool.domain.should be_nil
+    end
+
+    it "should ignore launch url if it is nil" do
+      tool.url = nil
+      tool.change_domain! new_host
+      tool.url.should be_nil
+    end
+
+    it "should ignore custom fields" do
+      tool.custom_fields = {:url => 'http://www.google.com/'}
+      tool.change_domain! new_host
+      tool.custom_fields[:url].should == 'http://www.google.com/'
+    end
+
+    it "should ignore environments fields" do
+      tool.settings["environments"] = {:launch_url => 'http://www.google.com/'}
+      tool.change_domain! new_host
+      tool.settings["environments"].should == {:launch_url => 'http://www.google.com/'}
     end
   end
 

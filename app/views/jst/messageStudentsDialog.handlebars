@@ -1,0 +1,45 @@
+<div class="message-students-dialog">
+  <form class="bootstrap-form">
+
+    <h2>{{#t "message_students_who"}}Message Students Who..{{/t}}</h2>
+    <p>
+      {{#t "for_title"}}
+        for {{title}}
+      {{/t}}
+    </p>
+
+    <div class="control-group">
+      <div class="controls">
+        <select name="recipientGroupName">
+          {{#each recipientGroups}}
+            <option value="{{name}}">{{name}}</option>
+          {{/each}}
+        </select>
+      </div>
+    </div>
+
+    <div id="message-recipients">
+      {{> messageStudentsWhoRecipientList this}}
+    </div>
+
+    <div class="control-group">
+      <div class="controls">
+        <textarea name=body></textarea>
+      </div>
+    </div>
+
+    <div class="button-container">
+      <button class="btn dialog_closer btn-secondary"
+        data-text-while-loading='{{#t "#buttons.sending"}}Sending...{{/t}}'>
+        {{#t "#buttons.cancel"}}Cancel{{/t}}
+      </button>
+      <button class="btn btn-primary"
+        data-text-while-loading='{{#t "#buttons.sending"}}Sending...{{/t}}'
+        data-text-when-loaded='{{#t "#buttons.sent"}}Sent!{{/t}}'>
+        {{#t "#buttons.send_message"}}Send Message{{/t}}
+      </button>
+
+    </div>
+
+  </form>
+</div>

@@ -1,5 +1,6 @@
 # manage groups is for the add_group_category dialog
 require [
+  'compiled/models/Section'
   'compiled/models/Assignment'
   'compiled/views/assignments/EditView'
   'compiled/collections/SectionCollection'
@@ -12,7 +13,7 @@ require [
   'compiled/views/assignments/PeerReviewsSelector'
   'grading_standards'
   'manage_groups'
-], (Assignment, EditView, SectionCollection, DueDateList, DueDateListView,
+], (Section,Assignment, EditView, SectionCollection, DueDateList, DueDateListView,
 OverrideView, AssignmentGroupSelector, GradingTypeSelector,
 GroupCategorySelector, PeerReviewsSelector) ->
 
@@ -22,6 +23,8 @@ GroupCategorySelector, PeerReviewsSelector) ->
   assignment.urlRoot = ENV.URL_ROOT
 
   sectionList = new SectionCollection ENV.SECTION_LIST
+  if !sectionList.length
+    sectionList.add Section.defaultDueDateSection()
   dueDateList = new DueDateList assignment.get('assignment_overrides'), sectionList, assignment
 
   assignmentGroupSelector = new AssignmentGroupSelector

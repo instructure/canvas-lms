@@ -129,23 +129,43 @@ module Delayed
       # Reschedule the job in the future (when a job fails).
       # Uses an exponential scale depending on the number of failed attempts.
       def reschedule(error = nil, time = nil)
+        begin
+          obj = payload_object
+          obj.on_failure(error) if obj && obj.respond_to?(:on_failure)
+        rescue DeserializationError
+          # don't allow a failed deserialization to prevent rescheduling
+        end
+
         self.attempts += 1
         if self.attempts >= (self.max_attempts || Delayed::Worker.max_attempts)
-          destroy_self = true
-          if Delayed::Worker.on_max_failures
-            destroy_self = Delayed::Worker.on_max_failures.call(self, error)
-          end
-
-          if destroy_self
-            self.destroy
-          else
-            self.fail!
-          end
+          permanent_failure error || "max attempts reached"
         else
           time ||= self.reschedule_at
           self.run_at = time
           self.unlock
           self.save!
+        end
+      end
+
+      def permanent_failure(error)
+        begin
+          # notify the payload_object of a permanent failure
+          obj = payload_object
+          obj.on_permanent_failure(error) if obj && obj.respond_to?(:on_permanent_failure)
+        rescue DeserializationError
+          # don't allow a failed deserialization to prevent destroying the job
+        end
+
+        # optionally destroy the object
+        destroy_self = true
+        if Delayed::Worker.on_max_failures
+          destroy_self = Delayed::Worker.on_max_failures.call(self, error)
+        end
+
+        if destroy_self
+          self.destroy
+        else
+          self.fail!
         end
       end
 

@@ -34,10 +34,7 @@ class ConferencesController < ApplicationController
       if @context.respond_to?(:participating_typical_users)
         scope = @context.participating_typical_users
       end
-      @users = scope.scoped({
-        :conditions => ["users.id <> ?", @current_user.id],
-        :order => User.sortable_name_order_by_clause
-      }).all.uniq
+      @users = scope.where("users.id<>?", @current_user).order(User.sortable_name_order_by_clause).all.uniq
     end
   end
 

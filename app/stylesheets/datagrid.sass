@@ -14,10 +14,16 @@
     .row
       :position absolute
       
+      //overrides Bootstrap .row class
+      :margin-left 0
+      :overflow visible
+      // end override
+      
       
     .cell
       :float left
       border: solid #ccc
+      :line-height 1.4
       
       // adding this line, and commenting out the negative margins, makes it look better in the new UI, tell me if anything breaks. RS
       border-width: 0 1px 1px 0

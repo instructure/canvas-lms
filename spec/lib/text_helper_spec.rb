@@ -258,6 +258,14 @@ describe TextHelper do
     it "should insert newlines for ps and brs" do
       th.html_to_text("Ohai<br>Text <p>paragraph of text.</p>End").should == "Ohai\n\nText paragraph of text.\n\nEnd"
     end
+
+    it "should return a string with no html back unchanged" do
+      th.html_to_text('String without HTML').should == 'String without HTML'
+    end
+
+    it "should return an empty string if passed a nil value" do
+      th.html_to_text(nil).should == ''
+    end
   end
 
   context "markdown" do
@@ -393,7 +401,7 @@ answers:
       }.force_encoding('binary').strip
       # now actually insert it into an AR column
       aq = assessment_question_model
-      AssessmentQuestion.update_all({ :question_data => yaml_blob }, { :id => aq.id })
+      AssessmentQuestion.where(:id => aq).update_all(:question_data => yaml_blob)
       text = aq.reload.question_data['answers'][0]['valid_ascii']
       text.should == "text"
       text.encoding.should == Encoding::UTF_8

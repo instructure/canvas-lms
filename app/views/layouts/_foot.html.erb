@@ -7,7 +7,7 @@
 
   // TODO: move this out when we have a single require call
   require = {
-    translate: <%= use_optimized_js? %>,
+    translate: <%= include_js_translations? %>,
     baseUrl: '<%= js_base_url %>',
     paths: <%= raw Canvas::RequireJs.paths %>,
     use: <%= raw Canvas::RequireJs.shims %>

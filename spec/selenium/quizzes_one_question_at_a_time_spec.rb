@@ -54,6 +54,7 @@ describe "One Question at a Time Quizzes" do
     fj("a:contains('OQAAT quiz')").click
     wait_for_ajaximations
     fj("a:contains('Resume Quiz')").click
+    wait_for_ajaximations
   end
 
   def navigate_directly_to_first_question
@@ -72,6 +73,7 @@ describe "One Question at a Time Quizzes" do
     expect_new_page_load {
       fj("button:contains('Begin'):visible").click
     }
+    wait_for_ajaximations
   end
 
   def it_should_be_on_first_question
@@ -105,7 +107,7 @@ describe "One Question at a Time Quizzes" do
     expect_new_page_load {
       fj("#question_list a:contains('Question 1')").click
     }
-
+    wait_for_ajaximations
     it_should_be_on_first_question
   end
 
@@ -113,12 +115,14 @@ describe "One Question at a Time Quizzes" do
     expect_new_page_load {
       fj("button:contains('Next')").click
     }
+    wait_for_ajaximations
   end
 
   def click_previous_button
     expect_new_page_load {
       fj("button:contains('Previous')").click
     }
+    wait_for_ajaximations
   end
 
   def it_should_not_show_previous_button
@@ -159,10 +163,12 @@ describe "One Question at a Time Quizzes" do
 
   def answer_the_question_correctly
     fj(".answers label:contains('A')").click
+    wait_for_ajaximations
   end
 
   def answer_the_question_incorrectly
     fj(".answers label:contains('B')").click
+    wait_for_ajaximations
   end
 
   def it_should_show_two_correct_answers

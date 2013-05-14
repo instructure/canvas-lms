@@ -1,4 +1,5 @@
 define [
+  'compiled/util/enrollmentName'
   'vendor/handlebars.vm'
   'i18nObj'
   'jquery'
@@ -8,21 +9,26 @@ define [
   'compiled/util/dateSelect'
   'compiled/util/mimeClass'
   'compiled/str/convertApiUserContent'
+  'compiled/str/TextHelper'
   'jquery.instructure_date_and_time'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
-], (Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, mimeClass, convertApiUserContent) ->
+  'translations/_core_en'
+], (enrollmentName, Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, mimeClass, convertApiUserContent, textHelper) ->
 
   Handlebars.registerHelper name, fn for name, fn of {
-    t : (key, defaultValue, options) ->
+    t : (translationKey, defaultValue, options) ->
       wrappers = {}
       options = options?.hash ? {}
+      scope = options.scope
+      delete options.scope
       for key, value of options when key.match(/^w\d+$/)
         wrappers[new Array(parseInt(key.replace('w', '')) + 2).join('*')] = value
         delete options[key]
       options.wrapper = wrappers if wrappers['*']
+      options.needsEscaping = true
       options = $.extend(options, this) unless this instanceof String or typeof this is 'string'
-      I18n.scoped(options.scope).t(key, defaultValue, options)
+      I18n.scoped(scope).t(translationKey, defaultValue, options)
 
     hiddenIf : (condition) -> " display:none; " if condition
 
@@ -65,10 +71,12 @@ define [
 
     # convert a date to a string, using the given i18n format in the date.formats namespace
     tDateToString : (date = '', i18n_format) ->
+      return '' unless date
       I18n.l "date.formats.#{i18n_format}", date
 
     # convert a date to a time string, using the given i18n format in the time.formats namespace
     tTimeToString : (date = '', i18n_format) ->
+      return '' unless date
       I18n.l "time.formats.#{i18n_format}", date
 
     tTimeHours : (date = '') ->
@@ -289,5 +297,11 @@ define [
         'disabled'
       else
         ''
+
+    truncate: ( string, max ) ->
+      return textHelper.truncateText( string, { max: max } )
+
+
+    enrollmentName: enrollmentName
   }
   return Handlebars

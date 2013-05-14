@@ -21,16 +21,30 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 describe "Canvas::Statsd" do
   METHODS = %w(increment decrement count gauge timing)
 
-  it "should append the hostname to stat names" do
+  it "should append the hostname to stat names by default" do
     Canvas::Statsd.stubs(:hostname).returns("testhost")
     statsd = mock()
     Canvas::Statsd.stubs(:instance).returns(statsd)
+    Canvas::Statsd.stubs(:append_hostname?).returns(true)
     METHODS.each do |method|
-      statsd.expects(method).with("test.name.testhost")
-      Canvas::Statsd.send(method, "test.name")
+      statsd.expects(method).with("test.name.testhost", "test")
+      Canvas::Statsd.send(method, "test.name", "test")
     end
     statsd.expects("timing").with("test.name.testhost", anything, anything)
-    Canvas::Statsd.time("test.name") { }
+    Canvas::Statsd.time("test.name") { "test" }.should == "test"
+  end
+
+  it "should omit hostname if specified in config" do
+    Canvas::Statsd.expects(:hostname).never
+    statsd = mock()
+    Canvas::Statsd.stubs(:instance).returns(statsd)
+    Canvas::Statsd.stubs(:append_hostname?).returns(false)
+    METHODS.each do |method|
+      statsd.expects(method).with("test.name", "test")
+      Canvas::Statsd.send(method, "test.name", "test")
+    end
+    statsd.expects("timing").with("test.name", anything, anything)
+    Canvas::Statsd.time("test.name") { "test" }.should == "test"
   end
 
   it "should ignore all calls if statsd isn't enabled" do
@@ -38,9 +52,7 @@ describe "Canvas::Statsd" do
     METHODS.each do |method|
       Canvas::Statsd.send(method, "test.name").should be_nil
     end
-    called = false
-    Canvas::Statsd.time("test.name") { called = true }.should be_nil
-    called.should == true
+    Canvas::Statsd.time("test.name") { "test" }.should == "test"
   end
 
   it "should configure a statsd instance" do

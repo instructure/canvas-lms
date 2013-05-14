@@ -1,6 +1,6 @@
 <ul id="quiz_student_details">
   <li>
-    <span class="label"><%= t('headers.due', 'Due') %></span>
+    <span class="title"><%= t('headers.due', 'Due') %></span>
     <span class="value">
       <% if @quiz.multiple_due_dates_apply_to?(@current_user) %>
         <%=  t(:multiple_due_dates, 'Multiple Due Dates') %>
@@ -13,21 +13,21 @@
   </li>
 
   <li style="<%= hidden if @quiz.quiz_type == 'survey' %>">
-    <span class="label"><%= t('headers.points', "Points") %></span>
+    <span class="title"><%= t('headers.points', "Points") %></span>
     <span class="value"><%= @quiz.points_possible || 0 %></span>
   </li>
 
   <li>
     <%= raw t(:question_count,
           { :zero => "No Questions",
-            :one => "<span class='label'>Questions</span> <span class='value'>%{count}</span>",
-            :other => "<span class='label'>Questions</span> <span class='value'>%{count}</span>" },
+            :one => "<span class='title'>Questions</span> <span class='value'>%{count}</span>",
+            :other => "<span class='title'>Questions</span> <span class='value'>%{count}</span>" },
           :count => @question_count) %>
   </li>
 
   <% if @quiz.lock_at || @quiz.unlock_at %>
     <li>
-      <span class="label"><%= t('headers.available', "Available") %></span>
+      <span class="title"><%= t('headers.available', "Available") %></span>
       <span class="value">
         <% if @quiz.lock_at && @quiz.unlock_at %>
           <%= mt(:quiz_availabile_through, "%{start_time} - %{end_time}", :start_time => datetime_string(@quiz.unlock_at), :end_time => datetime_string(@quiz.lock_at)) %>
@@ -42,7 +42,7 @@
   <% end %>
 
   <li>
-    <span class="label"><%= t('headers.time_limit', "Time Limit") %></span>
+    <span class="title"><%= t('headers.time_limit', "Time Limit") %></span>
     <span class="value">
       <% if @quiz.time_limit %>
         <%= t(:time_limit, "Minute", :count => @quiz.time_limit + ((@submission && @submission.extra_time) || 0)) %>
@@ -54,7 +54,7 @@
 
   <% if @quiz.allowed_attempts && @quiz.allowed_attempts != 1 %>
     <li>
-      <span class="label"><%= t(:allowed_attempts, "Allowed Attempts") %></span>
+      <span class="title"><%= t(:allowed_attempts, "Allowed Attempts") %></span>
       <span class="value">
         <% if @quiz.allowed_attempts > 0 %>
           <%= ((@submission && @submission.extra_attempts) || 0) + @quiz.allowed_attempts %>

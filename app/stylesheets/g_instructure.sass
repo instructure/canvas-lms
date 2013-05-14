@@ -1,6 +1,12 @@
 @import environment.sass
 @import turnitin.sass
 
+// DO NOT ADD ANYTHING TO THIS FILE
+// there is certainly a better place to put whatever it is that you were thinking
+// about putting here. Ask the UX team if you need advice.
+//
+// In fact, you will get a cookie for anything that you safely remove from this.
+
 #instructure_ajax_error_box
   :display none
   :position fixed
@@ -21,12 +27,17 @@
   left: 0
   width: 100%
 
+#flash_message_buffer // contains copies of all static messages so that we reserve enough height in the ui
+  visibility: hidden
+
 #flash_message_holder
+  height: 0
+
+#flash_message_holder, #flash_message_buffer
   top: 0
   list-style: none
   margin: 0
   padding: 0
-  height: 0
   li, .ui-effects-wrapper
     margin: 0 auto !important
   li
@@ -42,11 +53,19 @@
     width: 400px
     &.static_message
       width: auto
+    a
+      text-decoration: underline
+      color: inherit
     a.close_link
       position: absolute
       right: 10px
       top: 50%
-      margin-top: -8px
+      width: 20px
+      height: 20px
+      overflow: hidden
+      margin-top: -11px
+      color: white
+      text-decoration: none
     i
       display: inline-block
       vertical-align: middle
@@ -61,17 +80,6 @@
     &.no_close
       a.close_link
         display: none
-    &.xlarge
-      font-size: 1.5em
-      padding: 8px 40px 8px 8px
-      min-height: 42px
-      i
-        width: 40px
-        height: 40px
-        background-image: url(/images/check_36.png)
-      &.ui-state-error, &.ui-state-warning
-        i
-          background-image: url(/images/warning_36.png)
 
 #unauthorized_message
   border: 1px solid #000
@@ -123,7 +131,7 @@
     &.ui-accordion
       .ui-accordion-header
         margin-bottom: 1px
-.user_content .user_content_iframe
+.user_content iframe
   border: 0
   padding: 0
   margin: 0
@@ -178,7 +186,7 @@
   ul.item_list
     :margin-top 0
     :list-style-type none
-    :padding-left 15px
+    :margin-left 15px
     &.limit_height
       :max-height 150px
       :overflow auto
@@ -356,6 +364,8 @@
 
 table.summary
   width: auto
+  th
+    text-align: left
   th, td
     padding: 2px 8px
     vertical-align: top
@@ -379,8 +389,6 @@ form table.formtable
   :margin 0
   :padding 0
   :width auto
-  input[type='text'], input[type='password']
-    width: 217px
 table.formtable td
   vertical-align: top
   padding: 2px 3px
@@ -427,96 +435,6 @@ span.hint
   :color #666
   :font-size 0.8em
 
-// #sidebar .assignment
-  th
-    :background-color #333
-    :text-align left
-    :color #ccc
-    :padding 0.1em 0.5em
-    :font-size 1.2em
-
-    a
-      :color #ccc
-      :text-decoration none
-
-  td
-    :background-color #ccc
-    :padding 0.1em 0.5em
-    :font-size 1.5em
-
-    &.load_pending
-      :background-image url(/images/ajax-loader-ccc.gif)
-      :background-repeat no-repeat
-      :background-position top left
-
-    a
-      :color #333
-
-    &.grade
-      :width 80px
-      :text-align center
-      :font-weight bold
-      :background-color #333
-      :color #aaa
-      :font-style italic
-      :font-size 0.8em
-
-      .total
-        :margin 0
-        :padding 0
-
-      .grade
-        :display block
-        :line-height 1
-        :margin 0
-        :padding 0
-        :margin-top 0.2em
-        :font-size 20px
-        :color #eee
-        :font-style normal
-
-    &.date
-      :width 80px
-      :text-align center
-      :font-weight bold
-      :background-color #333
-      :color #aaa
-      :font-style italic
-      :font-size 0.8em
-
-      .duedate
-        :display block
-        :line-height 1
-        :margin 0
-        :padding 0
-        :margin-top 0.2em
-        :font-size 20px
-        :color #eee
-        :font-style normal
-
-    &.name
-      :font-size 1.0em
-      :color #000
-
-    &.comments
-      :font-size 0.8em
-      :color #000
-
-    &.today
-      :background-color #FBAD00
-      :color #333
-
-      .duedate
-        :background-color #FBAD00
-        :color #333
-
-  .attachments
-    :width 90px
-    :padding 0
-    :vertical-align middle
-    :text-align center
-    :background-color #999
-
 .event_pending
   +opacity(0.4)
 
@@ -544,10 +462,6 @@ span.hint
   .message
     :font-size 1.5em
     :color #000
-
-.form_text_hint
-  :font-style italic
-  :color #888
 
 .loading_image
   :background-color #fff
@@ -625,6 +539,7 @@ ul.group_list
     :border-top 1px solid #888
     :padding 10px
     // :position relative
+    @include clearfix
     box-shadow: 0 0 10px #333
     .links
       float: right
@@ -655,8 +570,9 @@ ul.group_list
     .wizard_options_list
       :list-style-type none
       :margin 0 10px 0 0
-      :line-height 1.8em
       :padding-left 5px
+      li
+        line-height: 1.8em
 
       .option
         :cursor pointer
@@ -1384,14 +1300,6 @@ body.padless-content #content,#content.padless
 .custom_search_results_link
   font-size: 1.2em
 
-fieldset
-  border: 1px solid #ccc
-  +border-radius(3px)
-  padding: 5px 10px
-  margin-bottom: 5px
-  legend
-    font-weight: bold
-    margin-left: 20px
 h2.h-margin-top,h3.h-margin-top
   margin-top: 20px
 
@@ -1538,3 +1446,7 @@ form.user_content_post_form
   margin-left: -16px
   background-color: #06a9ee
   +border-radius(4px)
+
+.clear
+  clear: both
+

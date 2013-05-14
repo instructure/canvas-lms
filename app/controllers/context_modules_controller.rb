@@ -24,10 +24,11 @@ class ContextModulesController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read)
       @modules = @context.modules_visible_to(@current_user)
-      @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).scoped(:select => 'context_module_id, collapsed').select{|p| p.collapsed? }.map(&:context_module_id)
+
+      @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).select([:context_module_id, :collapsed]).select{|p| p.collapsed? }.map(&:context_module_id)
       if @context.grants_right?(@current_user, session, :participate_as_student)
         return unless tab_enabled?(@context.class::TAB_MODULES)
-        ContextModule.send(:preload_associations, @modules, [:context_module_progressions, :content_tags])
+        ContextModule.send(:preload_associations, @modules, [:content_tags])
         @modules.each{|m| m.evaluate_for(@current_user) }
         session[:module_progressions_initialized] = true
       end
@@ -36,11 +37,11 @@ class ContextModulesController < ApplicationController
 
   def item_redirect
     if authorized_action(@context, @current_user, :read)
-      @tag = @context.context_module_tags.active.include_progressions.find(params[:id])
+      @tag = @context.context_module_tags.active.find(params[:id])
 
       reevaluate_modules_if_locked(@tag)
       @progression = @tag.context_module.evaluate_for(@current_user) if @tag.context_module
-      @progression.uncollapse! if @progression && @progression.collapsed != false
+      @progression.uncollapse! if @progression && @progression.collapsed?
       content_tag_redirect(@context, @tag, :context_context_modules_url)
     end
   end
@@ -48,7 +49,7 @@ class ContextModulesController < ApplicationController
   def module_redirect
     if authorized_action(@context, @current_user, :read)
       @module = @context.context_modules.not_deleted.find(params[:context_module_id])
-      @tags = @module.content_tags.active.include_progressions
+      @tags = @module.content_tags.active
       if params[:last]
         @tags.pop while @tags.last && @tags.last.content_type == 'ContextModuleSubHeader'
       else
@@ -63,7 +64,7 @@ class ContextModulesController < ApplicationController
 
       reevaluate_modules_if_locked(@tag)
       @progression = @tag.context_module.evaluate_for(@current_user) if @tag && @tag.context_module
-      @progression.uncollapse! if @progression && @progression.collapsed != false
+      @progression.uncollapse! if @progression && @progression.collapsed?
       content_tag_redirect(@context, @tag, :context_context_modules_url)
     end
   end
@@ -84,7 +85,11 @@ class ContextModulesController < ApplicationController
   def create
     if authorized_action(@context.context_modules.new, @current_user, :create)
       @module = @context.context_modules.build
-      @module.workflow_state = 'active'
+      if @domain_root_account.enable_draft?
+        @module.workflow_state = 'unpublished'
+      else
+        @module.workflow_state = 'active'
+      end
       @module.attributes = params[:context_module]
       respond_to do |format|
         if @module.save
@@ -139,7 +144,7 @@ class ContextModulesController < ApplicationController
   end
 
   def prerequisites_needing_finishing_for(mod, progression, before_tag=nil)
-    tags = mod.content_tags.active #.find(:all, :conditions => ['position <= ?', progression.current_position], :order => :position)
+    tags = mod.content_tags.active
     pres = []
     tags.each do |tag|
       if req = (mod.completion_requirements || []).detect{|r| r[:id] == tag.id }
@@ -181,7 +186,7 @@ class ContextModulesController < ApplicationController
     elsif @progression.locked?
       res[:locked] = true
       res[:modules] = []
-      previous_modules = @context.context_modules.active.find(:all, :conditions => ['position < ?', @module.position], :order => :position)
+      previous_modules = @context.context_modules.active.where('position<?', @module.position).order(:position).all
       previous_modules.reverse!
       valid_previous_modules = []
       prereq_ids = @module.prerequisites.select{|p| p[:type] == 'context_module' }.map{|p| p[:id] }
@@ -353,8 +358,12 @@ class ContextModulesController < ApplicationController
         if params[:user_id] && @user = @context.students.find(params[:user_id])
           @progressions = @context.context_modules.active.map{|m| m.evaluate_for(@user, true, true) }
         else
-          context_module_ids = @context.context_modules.active.scoped(:select => "id").map &:id
-          @progressions = ContextModuleProgression.scoped(:conditions => {:context_module_id => context_module_ids})
+          if  @context.large_roster
+            @progressions = []
+          else
+            context_module_ids = @context.context_modules.active.pluck(:id)
+            @progressions = ContextModuleProgression.where(:context_module_id => context_module_ids)
+          end
         end
         render :json => @progressions.to_json
       else

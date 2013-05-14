@@ -22,7 +22,7 @@ class SubAccountsController < ApplicationController
 
   def sub_accounts_of(account, current_depth = 0)
     account_data = @accounts[account.id] = { :account => account, :course_count => 0}
-    sub_accounts = account.sub_accounts.active(:limit => 101, :order => :name) unless current_depth == 2
+    sub_accounts = account.sub_accounts.active.order(:name).limit(101) unless current_depth == 2
     sub_account_ids = (sub_accounts || []).map(&:id)
     if current_depth == 2 || sub_accounts.length > 100
       account_data[:sub_account_ids] = []
@@ -65,18 +65,19 @@ class SubAccountsController < ApplicationController
     @accounts[:accounts_to_get_sub_account_count] = []
     sub_accounts_of(@context)
     unless @accounts[:accounts_to_get_sub_account_count].empty?
-      counts = Account.active.count(:all,
-                                    :group => :parent_account_id,
-                                    :conditions => {:parent_account_id => @accounts[:accounts_to_get_sub_account_count]})
+      counts = Account.active.
+          where(:parent_account_id => @accounts[:accounts_to_get_sub_account_count]).
+          group(:parent_account_id).count
       counts.each do |account_id, count|
         @accounts[account_id][:sub_account_count] = count
       end
     end
-    counts = Course.count('DISTINCT courses.id',
-      :group => 'course_account_associations.account_id',
-      :joins => :course_account_associations,
-      :conditions => "course_account_associations.account_id IN (#{@accounts[:all_account_ids].join(', ')}) AND " +
-                    "course_account_associations.depth=0 AND courses.workflow_state<>'deleted'")
+    counts = Course.
+        joins(:course_account_associations).
+        group('course_account_associations.account_id').
+        where("course_account_associations.account_id IN (?) AND " +
+                    "course_account_associations.depth=0 AND courses.workflow_state<>'deleted'", @accounts[:all_account_ids]).
+        count(:id, :distinct => true)
     counts.each do |account_id, count|
       @accounts[account_id][:course_count] = count
     end

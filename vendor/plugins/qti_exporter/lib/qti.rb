@@ -5,8 +5,8 @@ require 'qti/qti_plugin_validator'
 
 module Qti
   PYTHON_MIGRATION_EXECUTABLE = 'migrate.py'
-  EXPECTED_LOCATION = File.join(::RAILS_ROOT,'vendor', 'QTIMigrationTool', PYTHON_MIGRATION_EXECUTABLE) rescue nil
-  EXPECTED_LOCATION_ALT = File.join(::RAILS_ROOT,'vendor', 'qti_migration_tool', PYTHON_MIGRATION_EXECUTABLE) rescue nil
+  EXPECTED_LOCATION = Rails.root.join('vendor', 'QTIMigrationTool', PYTHON_MIGRATION_EXECUTABLE).to_s rescue nil
+  EXPECTED_LOCATION_ALT = Rails.root.join('vendor', 'qti_migration_tool', PYTHON_MIGRATION_EXECUTABLE).to_s rescue nil
   @migration_executable = nil
 
   if File.exists?(EXPECTED_LOCATION)

@@ -24,8 +24,7 @@ class QuizQuestion::MultipleChoiceQuestion < QuizQuestion::Base
     answer = @question_data[:answers].find { |a| a[:id] == answer_id }
     return 0 unless answer
     user_answer.answer_id = answer[:id]
-    return 0 if answer[:weight] != 100
-    return 1
+    answer[:weight] == 100 ? 1 : 0
   end
 end
 

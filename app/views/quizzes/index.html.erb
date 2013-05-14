@@ -10,7 +10,7 @@
         <a href="<%= context_url(@context, :context_question_banks_url) %>" class="btn button-sidebar-wide"><i class="icon-question"></i> <%= t('links.manage_question_banks', "Manage Question Banks") %></a>
       <% end %>
       <% if can_do(@context, @current_user, :manage_assignments) && @unpublished_quizzes.length > 1 %>
-        <a href="#" class="btn button-sidebar-wide publish_multiple_quizzes_link"><i class="icon-quiz"></i> <%= t('links.publish_multiple_quizzes', "Publish Multiple Quizzes") %></a>
+        <a href="#" class="btn button-sidebar-wide publish_multiple_quizzes_link"><%= t('links.publish_multiple_quizzes', "Publish Multiple Quizzes") %></a>
       <% end %>
     </div>
   <% end %>
@@ -57,7 +57,7 @@ ul.quiz_list li.quiz div.description {
       </ul>
       <div class="button-container">
         <button type="submit" class="btn submit_button"><%= t('buttons.publish_quizzes', "Publish Quizzes") %></button>
-        <button type="button" class="btn button-secondary cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
+        <button type="button" class="btn btn button-secondary cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
       </div>
     <% end %>
   </div>

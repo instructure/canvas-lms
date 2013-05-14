@@ -1,8 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
-shared_examples_for "manage groups selenium tests" do
-  it_should_behave_like "in-process server selenium tests"
-
   def add_category(course, name, opts={})
     f(".add_category_link").click
     form = f("#add_category_form")
@@ -81,14 +78,13 @@ shared_examples_for "manage groups selenium tests" do
   end
 
   def add_group_to_category(context, name)
-
-    fj(".add_group_link:visible").click
-    f("#group_name").send_keys(name)
+    driver.execute_script("$('.add_group_link:visible').click()")
+    wait_for_ajaximations
+    replace_content(f("#group_name"), name)
+    wait_for_ajaximations
     submit_form("#edit_group_form")
     wait_for_ajaximations
-    group = context.groups.find_by_name(name)
-    group.should_not be_nil
-    group
+    context.groups.find_by_name(name)
   end
 
   def add_groups_in_category (category, i=3)
@@ -106,5 +102,3 @@ shared_examples_for "manage groups selenium tests" do
           $('#{to_group}'))
     SCRIPT
   end
-
-end

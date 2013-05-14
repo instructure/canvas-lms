@@ -132,59 +132,7 @@ describe "courses" do
       get "/courses/#{@course.id}/users"
       wait_for_ajaximations
       ff('.ui-state-error').length.should == 0
-      ff('.student_roster .user').length.should == 50
-      ff('.teacher_roster .user').length.should == 2
-      ff('.teacher_roster .user_list').length.should == 2
-
-      # Test the infinite scroll.
-      driver.execute_script <<-END
-        $list    = $('.student_roster .users-wrapper:first-child .user_list'),
-        $list[0].scrollTop = $list[0].scrollHeight - $list.height();
-      END
-      wait_for_ajaximations
-      ff('.student_roster .user').length.should == 60
-    end
-
-    it "should include separate course roles sections on users page" do
-      course_with_teacher_logged_in
-
-      @course.enroll_user(user, 'TaEnrollment')
-      @course.enroll_user(user, 'StudentEnrollment')
-
-      roles = [
-        ['Student', 51, '.student_roster .users-wrapper:nth-child(2)'],
-        ['Teacher', 52, '.teacher_roster .users-wrapper:nth-child(2)'],
-        ['Ta', 53, '.teacher_roster .users-wrapper:nth-child(4)']
-      ]
-      roles.each do |type, num, css|
-        role = @course.account.roles.build :name => "Custom#{type}"
-        role.base_role_type = "#{type}Enrollment"
-        role.save!
-
-        num.times do |n|
-          @course.enroll_user(user, "#{type}Enrollment", :role_name => role.name)
-        end
-      end
-
-      # Test that the page loads properly the first time.
-      get "/courses/#{@course.id}/users"
-      wait_for_ajaximations
-      ff('.ui-state-error').length.should == 0
-
-      roles.each do |type, num, css|
-        ff("#{css} h2").first.text.should == "Custom#{type}"
-        ff("#{css} .user").length.should == 50
-
-        # Test the infinite scroll.
-
-        driver.execute_script <<-END
-          $list    = $('#{css} .user_list'),
-          $list[0].scrollTop = $list[0].scrollHeight - $list.height();
-        END
-        wait_for_ajaximations
-
-        ff("#{css} .user").length.should == num
-      end
+      ff('.roster .rosterUser').length.should == 50
     end
 
     it "should only show users that a user has permissions to view" do
@@ -203,7 +151,7 @@ describe "courses" do
       # Test that only users in the approved section are displayed.
       get "/courses/#{@course.id}/users"
       wait_for_ajaximations
-      ff('.student_roster .user').length.should == 1
+      ff('.roster .rosterUser').length.should == 2
     end
 
     it "should display users section name" do
@@ -222,8 +170,8 @@ describe "courses" do
 
       get "/courses/#{@course.id}/users"
       wait_for_ajaximations
-      sections = ff('.student_roster .section')
-      sections.map(&:text).sort.should == %w{One One Two}
+      sections = ff('.roster .section')
+      sections.map(&:text).sort.should == ["One", "One", "Two", "Unnamed Course", "Unnamed Course"]
     end
 
     it "should display users section name properly when separated by custom roles" do

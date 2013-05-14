@@ -59,8 +59,7 @@ module Api
     unless columns.empty?
       find_params = sis_make_params_for_sis_mapping_and_columns(columns, sis_mapping, root_account)
       return result if find_params == :not_found
-      find_params[:select] = :id
-      result.concat collection.all(find_params).map(&:id)
+      result.concat collection.scoped(find_params).pluck(:id)
       result.uniq!
     end
     result
@@ -268,9 +267,25 @@ module Api
 
     rewriter = UserContent::HtmlRewriter.new(context, user)
     rewriter.set_handler('files') do |match|
-      obj = match.obj_id && match.obj_class.find_by_id(match.obj_id)
+      if match.obj_id
+        if match.obj_class == Attachment && context && !context.is_a?(User)
+          obj = context.attachments.find(match.obj_id) rescue nil
+        else
+          obj = match.obj_class.find_by_id(match.obj_id)
+        end
+      end
       next unless obj && rewriter.user_can_view_content?(obj)
-      file_download_url(obj.id, :verifier => obj.uuid, :download => '1', :host => host, :protocol => protocol)
+
+      if ["Course", "Group", "Account", "User"].include?(obj.context_type)
+        if match.rest.start_with?("/preview")
+          url = self.send("#{obj.context_type.downcase}_file_preview_url", obj.context_id, obj.id, :verifier => obj.uuid, :host => host, :protocol => protocol)
+        else
+          url = self.send("#{obj.context_type.downcase}_file_download_url", obj.context_id, obj.id, :verifier => obj.uuid, :download => '1', :host => host, :protocol => protocol)
+        end
+      else
+        url = file_download_url(obj.id, :verifier => obj.uuid, :download => '1', :host => host, :protocol => protocol)
+      end
+      url
     end
     html = rewriter.translate_content(html)
 
@@ -337,6 +352,41 @@ module Api
     end
 
     return doc.to_s
+  end
+
+  # This removes the verifier parameters that are added to attachment links by api_user_content
+  # and adds context (e.g. /courses/:id/) if it is missing
+  def process_incoming_html_content(html)
+    return html unless html.present? &&
+      (html.include?("verifier=") || html.include?("'/files") || html.include?("\"/files"))
+
+    attrs = ['href', 'src']
+    link_regex = %r{/files/(\d+)/(?:download|preview)}
+    verifier_regex = %r{(\?)verifier=[^&]*&?|&verifier=[^&]*}
+
+    context_types = ["Course", "Group", "Account", "User"]
+
+    doc = Nokogiri::HTML(html)
+    doc.search("*").each do |node|
+      attrs.each do |attr|
+        if link = node[attr]
+          if link =~ link_regex
+            if link.start_with?('/files')
+              att_id = $1
+              if (att = Attachment.find_by_id(att_id)) && context_types.include?(att.context_type)
+                link = "/#{att.context_type.underscore.pluralize}/#{att.context_id}" + link
+              end
+            end
+            if link.include?('verifier=')
+              link.gsub!(verifier_regex, '\1')
+            end
+            node[attr] = link
+          end
+        end
+      end
+    end
+
+    return doc.at_css('body').inner_html
   end
 
   def value_to_boolean(value)

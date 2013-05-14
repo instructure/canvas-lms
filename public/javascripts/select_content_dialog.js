@@ -232,7 +232,7 @@ $(document).ready(function() {
             });
           })
           .bind('selection', function(event, data) {
-            if(data.embed_type == 'basic_lti' && data.url) {
+            if(data.return_type == 'lti_launch_url' && data.url) {
               $("#external_tool_create_url").val(data.url);
               $("#external_tool_create_title").val(data.text || tool.name);
               $("#context_external_tools_select .domain_message").hide();

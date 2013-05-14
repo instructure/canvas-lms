@@ -32,6 +32,14 @@ describe Pseudonym do
     @pseudonym.save!
   end
 
+  it "should allow apostrophes in usernames" do
+    pseudonym = Pseudonym.new(:unique_id => "o'brien@example.com",
+                              :password => 'password',
+                              :password_confirmation => 'password')
+    pseudonym.user_id = 1
+    pseudonym.should be_valid
+  end
+
   it "should validate the presence of user and account ids" do
     u = User.create!
     p = Pseudonym.new(:unique_id => 'cody@instructure.com')
@@ -249,7 +257,7 @@ describe Pseudonym do
     end
 
     it "should offer the user sms if there is one" do
-      communication_channel_model(:path_type => 'sms', :user_id => @user.id)
+      communication_channel_model(:path_type => 'sms')
       @user.communication_channels << @cc
       @user.save!
       @user.sms.should eql(@cc.path)
@@ -257,7 +265,7 @@ describe Pseudonym do
     end
 
     it "should be able to change the user sms" do
-      communication_channel_model(:path_type => 'sms', :user_id => @user.id, :path => 'admin@example.com')
+      communication_channel_model(:path_type => 'sms', :path => 'admin@example.com')
       @pseudonym.sms = @cc
       @pseudonym.sms.should eql('admin@example.com')
       @pseudonym.user.sms.should eql('admin@example.com')

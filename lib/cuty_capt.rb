@@ -58,7 +58,7 @@ class CutyCapt
   end
 
   def self.logger
-    RAILS_DEFAULT_LOGGER
+    Rails.logger
   end
 
   def self.enabled?

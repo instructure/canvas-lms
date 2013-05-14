@@ -101,12 +101,32 @@ module CC::Importer
     def convert_blti_xml(xml)
       doc = Nokogiri::XML(xml)
       begin
-        convert_blti_link(doc)
+        tool = convert_blti_link(doc)
+        check_for_unescaped_url_properties(tool) if tool
       rescue Nokogiri::XML::XPath::SyntaxError
-        raise CCImportError.new(I18n.t(:invalid_xml_syntax, "invalid xml syntax"))
+        raise CCImportError.new(I18n.t(:invalid_xml_syntax, "Invalid xml syntax"))
+      end
+      tool
+    end
+
+    def check_for_unescaped_url_properties(obj)
+      # Recursively look for properties named 'url'
+      if obj.is_a?(Hash)
+        obj.select{|k, v| k.to_s == 'url' && v.is_a?(String)}.each do |k, v|
+          check_for_unescaped_url(v)
+        end
+        obj.each{|k, v| check_for_unescaped_url_properties(v)}
+      elsif obj.is_a?(Array)
+        obj.each{|o| check_for_unescaped_url_properties(o)}
       end
     end
-    
+
+    def check_for_unescaped_url(url)
+      if (url =~ /(.*[^\=]*\?*\=)[^\&]*\=/)
+        raise CCImportError.new(I18n.t(:invalid_url_in_xml, "Invalid url in xml. Ampersands must be escaped."))
+      end
+    end
+
     def retrieve_and_convert_blti_url(url)
       begin
         uri = URI.parse(url)

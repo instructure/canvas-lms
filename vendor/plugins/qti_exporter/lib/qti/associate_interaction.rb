@@ -162,11 +162,12 @@ class AssociateInteraction < AssessmentItemConverter
     # where right-side items don't have intrinsic IDs, but every left-side item gives _all_
     # of them a (different) complete set of IDs. the index of the matched simpleChoice in
     # the left side's choiceInteraction corresponds to the index of the matched right-side item.
-    rows = @doc.css('div.RESPONSE_BLOCK choiceInteraction').size
-    return false unless rows > 0
-    return @doc.css('div.RESPONSE_BLOCK div').size == rows &&
-           @doc.css('div.RIGHT_MATCH_BLOCK div').size == rows &&
-           @doc.css('responseProcessing responseCondition match').size == rows
+    left = @doc.css('div.RESPONSE_BLOCK choiceInteraction').size
+    right = @doc.css('div.RIGHT_MATCH_BLOCK div').size
+    return false unless left > 0 && right >= left
+    return @doc.css('div.RESPONSE_BLOCK div').size == left &&
+           @doc.css('responseProcessing responseCondition match').size == left &&
+           @doc.css('div.RESPONSE_BLOCK choiceInteraction simpleChoice').size == left * right
   end
 
   def get_all_answers_for_crazy_n_squared_match_by_index_thing

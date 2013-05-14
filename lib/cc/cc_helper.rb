@@ -179,17 +179,16 @@ module CCHelper
       end
       @rewriter.set_handler('wiki') do |match|
         # WikiPagesController allows loosely-matching URLs; fix them before exporting
-        if match.rest.present?
-          url_or_title = match.rest[1..-1]
+        if match.obj_id.present?
+          url_or_title = match.obj_id
           page = @course.wiki.wiki_pages.deleted_last.find_by_url(url_or_title) ||
-                 @course.wiki.wiki_pages.deleted_last.find_by_url(url_or_title.to_url)
-        elsif match.obj_id.present?
-          page = @course.wiki.wiki_pages.find_by_id(match.obj_id)
+                 @course.wiki.wiki_pages.deleted_last.find_by_url(url_or_title.to_url) ||
+                 @course.wiki.wiki_pages.find_by_id(url_or_title.to_i)
         end
         if page
           "#{WIKI_TOKEN}/#{match.type}/#{page.url}"
         else
-          "#{WIKI_TOKEN}/#{match.type}#{match.rest}"
+          "#{WIKI_TOKEN}/#{match.type}/#{match.obj_id}"
         end
       end
       @rewriter.set_handler('items') do |match|

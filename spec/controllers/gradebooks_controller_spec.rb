@@ -48,7 +48,7 @@ describe GradebooksController do
       course_with_student_logged_in(:active_all => true)
       get 'grade_summary', :course_id => @course.id, :id => @user.id
       response.should render_template('grade_summary')
-      assigns[:courses_with_grades].should_not be_nil
+      assigns[:presenter].courses_with_grades.should_not be_nil
     end
 
     it "should not allow access for wrong user" do
@@ -136,8 +136,8 @@ describe GradebooksController do
       user_session(student)
       get 'grade_summary', :course_id => @course.id, :id => student.id
       response.should be_success
-      assigns[:courses_with_grades].should_not be_nil
-      assigns[:courses_with_grades].length.should == 2
+      assigns[:presenter].courses_with_grades.should_not be_nil
+      assigns[:presenter].courses_with_grades.length.should == 2
     end
     
     it "should not give a teacher the option to switch between courses when viewing a student's grades" do
@@ -187,7 +187,7 @@ describe GradebooksController do
       submission2 = assignment2.submit_homework(@student)
 
       get 'grade_summary', :course_id => @course.id, :id => @student.id
-      assigns[:submissions_by_assignment].values.map(&:count).should == [1,1]
+      assigns[:presenter].submissions_by_assignment.values.map(&:count).should == [1,1]
     end
 
     it "should assign an empty submissions_by_assignment for MOOCs" do
@@ -200,7 +200,7 @@ describe GradebooksController do
       submission2 = assignment2.submit_homework(@student)
 
       get 'grade_summary', :course_id => @course.id, :id => @student.id
-      assigns[:submissions_by_assignment].should == {}
+      assigns[:presenter].submissions_by_assignment.should == {}
     end
     
     it "should assign values for grade calculator to ENV" do
@@ -230,7 +230,7 @@ describe GradebooksController do
       assignment3 = @course.assignments.create(:title => "Assignment 3", :due_at => 2.days.from_now)
 
       get 'grade_summary', :course_id => @course.id, :id => @student.id
-      assigns[:assignments].select{|a| a.class == Assignment}.map(&:id).should == [assignment3, assignment2, assignment1].map(&:id)
+      assigns[:presenter].assignments.select{|a| a.class == Assignment}.map(&:id).should == [assignment3, assignment2, assignment1].map(&:id)
     end
 
     context "with assignment due date overrides" do
@@ -253,7 +253,7 @@ describe GradebooksController do
           controller.js_env.clear
           user_session(u)
           get 'grade_summary', :course_id => @course.id, :id => @student.id
-          assigns[:assignments].find{|a| a.class == Assignment}.due_at.should == due_at
+          assigns[:presenter].assignments.find{|a| a.class == Assignment}.due_at.should == due_at
         end
       end
 
@@ -284,7 +284,7 @@ describe GradebooksController do
         session[:become_user_id] = @fake_student.id
 
         get 'grade_summary', :course_id => @course.id, :id => @fake_student.id
-        assigns[:assignments].find{|a| a.class == Assignment}.due_at.should == @due_at
+        assigns[:presenter].assignments.find{|a| a.class == Assignment}.due_at.should == @due_at
       end
 
       it "should reflect group overrides when student is a member" do
@@ -496,35 +496,6 @@ describe GradebooksController do
       get 'speed_grader', :course_id => @course.id, :assignment_id => assignment.id
       response.should be_redirect
       response.flash[:notice].should == 'SpeedGrader is disabled for this course'
-    end
-  end
-
-  describe "GET 'public_feed.atom'" do
-    before(:each) do
-      course_with_student(:active_all => true)
-      assignment_model(:course => @course)
-      @submission = @assignment.submit_homework(@student, { :url => "http://www.instructure.com/" })
-    end
-
-    it "should require authorization" do
-      get 'public_feed', :format => 'atom', :feed_code => @course.feed_code + 'x'
-      assigns[:problem].should match /The verification code is invalid/
-    end
-
-    it "should include absolute path for rel='self' link" do
-      get 'public_feed', :format => 'atom', :feed_code => @course.feed_code
-      feed = Atom::Feed.load_feed(response.body) rescue nil
-      feed.should_not be_nil
-      feed.links.first.rel.should match(/self/)
-      feed.links.first.href.should match(/http:\/\//)
-    end
-
-    it "should include an author for each entry" do
-      get 'public_feed', :format => 'atom', :feed_code => @course.feed_code
-      feed = Atom::Feed.load_feed(response.body) rescue nil
-      feed.should_not be_nil
-      feed.entries.should_not be_empty
-      feed.entries.all?{|e| e.authors.present?}.should be_true
     end
   end
 end

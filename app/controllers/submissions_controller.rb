@@ -56,7 +56,8 @@
 #       // Associated comments for a submission (optional)
 #       submission_comments: [
 #         {
-#           author_id: 134
+#           id: 37,
+#           author_id: 134,
 #           author_name: "Toph Beifong",
 #           comment: "Well here's the thing...",
 #           created_at: "2012-01-01T01:00:00Z",
@@ -129,7 +130,7 @@ class SubmissionsController < ApplicationController
       end
       return
     end
-    @submission = @assignment.find_submission(@user) #_params[:.find(:first, :conditions => {:assignment_id => @assignment.id, :user_id => params[:id]})
+    @submission = @assignment.find_submission(@user)
     @submission ||= @context.submissions.build(:user => @user, :assignment_id => @assignment.id)
     @submission.grants_rights?(@current_user, session)
     @rubric_association = @assignment.rubric_association
@@ -285,6 +286,10 @@ class SubmissionsController < ApplicationController
           return render(:json => { :message => "Invalid parameters for submission_type #{submission_type}. Required: #{API_SUBMISSION_TYPES[submission_type].map { |p| "submission[#{p}]" }.join(", ") }" }, :status => 400)
         end
         params[:submission][:comment] = params[:comment].try(:delete, :text_comment)
+
+        if params[:submission].has_key?(:body)
+          params[:submission][:body] = process_incoming_html_content(params[:submission][:body])
+        end
       end
 
       if params[:submission][:file_ids].is_a?(Array)
@@ -509,7 +514,7 @@ class SubmissionsController < ApplicationController
   protected
 
   def submission_zip
-    @attachments = @assignment.attachments.find(:all, :conditions => ["display_name='submissions.zip' AND workflow_state IN ('to_be_zipped', 'zipping', 'zipped', 'errored') AND user_id=?", @current_user.id], :order => :created_at)
+    @attachments = @assignment.attachments.where(:display_name => 'submissions.zip', :workflow_state => ['to_be_zipped', 'zipping', 'zipped', 'errored'], :user_id => @current_user).order(:created_at).all
     @attachment = @attachments.pop
     @attachments.each{|a| a.destroy! }
     if @attachment && (@attachment.created_at < 1.hour.ago || @attachment.created_at < (@assignment.submissions.map{|s| s.submitted_at}.compact.max || @attachment.created_at))

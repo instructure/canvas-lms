@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -181,24 +181,25 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     
     encryption = app_config[:encryption]
     if encryption.is_a?(Hash)
-      resolve_path = lambda { |path|
-        if path.nil?
-          nil
-        elsif path[0, 1] == '/'
-          path
-        else
-          File.join(Rails.root, 'config', path)
-        end
-      }
+      settings.xmlsec_certificate = resolve_saml_key_path(encryption[:certificate])
+      settings.xmlsec_privatekey = resolve_saml_key_path(encryption[:private_key])
 
-      private_key_path = resolve_path.call(encryption[:private_key])
-      certificate_path = resolve_path.call(encryption[:certificate])
-
-      settings.xmlsec_certificate = certificate_path if certificate_path.present? && File.exists?(certificate_path)
-      settings.xmlsec_privatekey = private_key_path if private_key_path.present? && File.exists?(private_key_path)
+      settings.xmlsec_additional_privatekeys = Array(encryption[:additional_private_keys]).map { |apk| resolve_saml_key_path(apk) }.compact
     end
     
     settings
+  end
+
+  def self.resolve_saml_key_path(path)
+    return nil unless path
+
+    path = Pathname(path)
+
+    if path.relative?
+      path = Rails.root.join 'config', path
+    end
+
+    path.exist? ? path.to_s : nil
   end
   
   def email_identifier?

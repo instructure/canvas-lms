@@ -57,7 +57,7 @@ describe DiscussionTopicsController do
     context "discussion topic with assignment with overrides" do
       integrate_views
 
-      before :all do
+      before do
         course(:course_name => "I <3 Discussions")
         course_topic(:with_assignment => true)
         @section = @course.course_sections.create!(:name => "I <3 Discusions")

@@ -36,6 +36,6 @@ define [
       this.data 'errors', errors
       false
     else
-      this.data 'errors', undefined
+      this.data 'errors', null
       true
 

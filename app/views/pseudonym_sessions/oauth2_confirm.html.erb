@@ -20,8 +20,16 @@
       <%= t 'details.email', "Your email address is %{email}.", :email => @current_user.email %>
     <% end %>
   </p>
-  <div class="button_box">
-    <%= link_to(t(:cancel, "Cancel"), oauth2_auth_deny_path, :class => "btn") %>
-    <%= link_to(t(:log_in, "Log in"), oauth2_auth_accept_path, :method => :post, :class => "btn btn-primary") %>
-  </div>
+  <% form_tag oauth2_auth_accept_path do %>
+    <div class="button_box">
+      <%= link_to(t(:cancel, "Cancel"), oauth2_auth_deny_path, :class => "btn") %>
+      <%=  submit_tag("Log in",  :class => "btn btn-primary") %>
+    </div>
+    <% unless @provider.scopes.blank? %>
+      <div class="control-group">
+        <%= check_box_tag(:remember_access, :class => "checkbox") %>
+        <%= label_tag(:remember_access, :en => "Remember my authorization for this service", :class => "checkbox") %>
+      </div>
+    <% end %>
+<% end %>
 </div>

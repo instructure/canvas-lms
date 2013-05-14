@@ -31,7 +31,6 @@ class ContextModule < ActiveRecord::Base
   before_save :infer_position
   before_save :validate_prerequisites
   before_save :confirm_valid_requirements
-  after_save :check_students
   after_save :touch_context
 
   def self.module_positions(context)
@@ -77,7 +76,7 @@ class ContextModule < ActiveRecord::Base
   def destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now
-    ContentTag.update_all({:workflow_state => 'deleted', :updated_at => Time.now.utc}, {:context_module_id => self.id})
+    ContentTag.where(:context_module_id => self).update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
     self.send_later_if_production(:update_downstreams, self.position)
     save!
     true
@@ -106,22 +105,16 @@ class ContextModule < ActiveRecord::Base
     state :deleted
   end
   
-  named_scope :active, :conditions => ['context_modules.workflow_state = ?', 'active']
-  named_scope :unpublished, :conditions => ['context_modules.workflow_state = ?', 'unpublished']
-  named_scope :not_deleted, :conditions => ['context_modules.workflow_state != ?', 'deleted']
-  named_scope :include_tags_and_progressions, :include => [:content_tags, :context_module_progressions]
+  scope :active, where(:workflow_state => 'active')
+  scope :unpublished, where(:workflow_state => 'unpublished')
+  scope :not_deleted, where("context_modules.workflow_state<>'deleted'")
 
-  def check_students
-    return if @dont_check_students || self.deleted?
-    send_later_if_production :update_student_progressions
-    true
-  end
-  
   def update_student_progressions(user=nil)
     # modules are ordered by position, so running through them in order will
     # automatically handle issues with dependencies loading in the correct
     # order
-    modules = ContextModule.find(:all, :conditions => {:context_type => self.context_type, :context_id => self.context_id}, :order => :position)
+    modules = ContextModule.order(:position).where(
+        :context_type => self.context_type, :context_id => self.context_id, :workflow_state => 'active')
     students = user ? [user] : self.context.students
     modules.each do |mod|
       mod.re_evaluate_for(students, true)
@@ -399,14 +392,13 @@ class ContextModule < ActiveRecord::Base
   end
 
   def active_prerequisites
-    return [] unless self.prerequisites
+    return [] unless self.prerequisites.any?
     prereq_ids = self.prerequisites.select{|pre|pre[:type] == 'context_module'}.map{|pre| pre[:id] }
-    active_ids = self.context.context_modules.active.scoped(:select => :id, :conditions => {:id => prereq_ids}).map(&:id)
+    active_ids = self.context.context_modules.active.where(:id => prereq_ids).pluck(:id)
     self.prerequisites.select{|pre| pre[:type] == 'context_module' && active_ids.member?(pre[:id])}
   end
   
   def clear_cached_lookups
-    @cached_progressions = nil
     @cached_tags = nil
   end
   
@@ -445,7 +437,6 @@ class ContextModule < ActiveRecord::Base
       changed = true if !added
     end
     self.completion_requirements = new_reqs
-    @dont_check_students = true
     self.save if do_save && changed
     new_reqs
   end
@@ -454,8 +445,7 @@ class ContextModule < ActiveRecord::Base
     users = Array(users)
     users_hash = {}
     users.each{|u| users_hash[u.id] = u }
-    @cached_progressions ||= self.context_module_progressions
-    progressions = @cached_progressions.select{|p| users_hash[p.user_id] } #self.context_module_progressions.find_all_by_user_id(users.map(&:id))
+    progressions = self.context_module_progressions.find_all_by_user_id(users.map(&:id))
     progressions_hash = {}
     progressions.each{|p| progressions_hash[p.user_id] = p }
     newbies = users.select{|u| !progressions_hash[u.id] }
@@ -516,7 +506,7 @@ class ContextModule < ActiveRecord::Base
     end
     @cached_tags ||= self.content_tags.active
     tags = @cached_tags
-    if recursive_check || progression.new_record? || progression.updated_at < self.updated_at || ENV['RAILS_ENV'] == 'test' || User.module_progression_jobs_queued?(user.id)
+    if recursive_check || progression.new_record? || progression.updated_at < self.updated_at || Rails.env.test? || User.module_progression_jobs_queued?(user.id)
       if self.completion_requirements.blank? && active_prerequisites.empty?
         progression.workflow_state = 'completed'
         progression.save
@@ -667,7 +657,7 @@ class ContextModule < ActiveRecord::Base
         begin
           import_from_migration(mod, migration.context)
         rescue
-          migration.add_warning("Couldn't import the module \"#{mod[:title]}\"", $!)
+          migration.add_import_warning(t('#migration.module_type', "Module"), mod[:title], $!)
         end
       end
     end
@@ -701,7 +691,8 @@ class ContextModule < ActiveRecord::Base
     item.unlock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:unlock_at]) if hash[:unlock_at]
     item.start_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:start_at]) if hash[:start_at]
     item.end_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:end_at]) if hash[:end_at]
-    
+    item.require_sequential_progress = hash[:require_sequential_progress] if hash[:require_sequential_progress]
+
     if hash[:prerequisites]
       preqs = []
       hash[:prerequisites].each do |prereq|
@@ -724,8 +715,7 @@ class ContextModule < ActiveRecord::Base
       begin
         item.add_item_from_migration(tag_hash, 0, context, item_map)
       rescue
-        message =t('broken_item', %{Couldn't import the module item "%{item_title}" in the module "%{module_title}"}, :item_title =>tag_hash[:title], :module_title => hash[:title] )
-        context.add_migration_warning(message, $!)
+        context.content_migration.add_import_warning(t(:migration_module_item_type, "Module Item"), tag_hash[:title], $!) if context.content_migration
       end
     end
     

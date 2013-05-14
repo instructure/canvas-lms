@@ -6,7 +6,7 @@
     if @current_user_submissions
       submission = @current_user_submissions.detect { |s| s.assignment_id == recent_event.id }
     elsif @current_user
-      submission = @current_user.submissions.scoped(:select => 'id, assignment_id, score, workflow_state', :conditions => { :assignment_id => recent_event.id }).first
+      submission = @current_user.submissions.select([:id, :assignment_id, :score, :workflow_state]).where(:assignment_id => recent_event).first
     end
     
     if is_assignment

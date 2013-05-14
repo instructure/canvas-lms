@@ -4,9 +4,9 @@ module QuizQuestionDataFixer
   def self.fix_quiz_questions_with_bad_data
     seen_quizzes = {}
     # the commit that caused bad AssessmentQuestion data wasn't out until dec 22, 2011, so only try to fix AQs after that. 
-    AssessmentQuestion.find_each(:conditions => ["updated_at > ? AND ((migration_id IS NULL) OR (migration_id IS NOT NULL AND question_data LIKE ?))",
+    AssessmentQuestion.where("updated_at > ? AND ((migration_id IS NULL) OR (migration_id IS NOT NULL AND question_data LIKE ?))",
                                                  Time.zone.parse("Dec 22, 2011"),
-                                                 "%/files/%"]) do |question|
+                                                 "%/files/%").find_each do |question|
       begin
         data = question.question_data
         if data && data[:points_possible].nil? && data[:question_type] != "text_only_question"

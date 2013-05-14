@@ -190,7 +190,7 @@ describe Api do
     end
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should find users from other shards" do
         @shard1.activate { @user2 = User.create! }
@@ -261,34 +261,26 @@ describe Api do
 
     it 'should try and make params when non-ar_id columns have returned with ar_id columns' do
       collection = mock()
-      object1 = mock()
-      object2 = mock()
       Api.expects(:sis_find_sis_mapping_for_collection).with(collection).returns({:lookups => {"id" => "test-lookup"}})
       Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}).returns({"test-lookup" => ["thing1", "thing2"], "other-lookup" => ["thing2", "thing3"]})
       Api.expects(:sis_make_params_for_sis_mapping_and_columns).with({"other-lookup" => ["thing2", "thing3"]}, {:lookups => {"id" => "test-lookup"}}, "test-root-account").returns({"find-params" => "test"})
-      collection.expects(:all).with({"find-params" => "test", :select => :id}).returns([object1, object2])
-      object1.expects(:id).returns("thing2")
-      object2.expects(:id).returns("thing3")
+      collection.expects(:scoped).with("find-params" => "test").returns(collection)
+      collection.expects(:pluck).with(:id).returns(["thing2", "thing3"])
       Api.map_ids("test-ids", collection, "test-root-account").should == ["thing1", "thing2", "thing3"]
     end
 
     it 'should try and make params when non-ar_id columns have returned without ar_id columns' do
       collection = mock()
-      object1 = mock()
-      object2 = mock()
       Api.expects(:sis_find_sis_mapping_for_collection).with(collection).returns({:lookups => {"id" => "test-lookup"}})
       Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}).returns({"other-lookup" => ["thing2", "thing3"]})
       Api.expects(:sis_make_params_for_sis_mapping_and_columns).with({"other-lookup" => ["thing2", "thing3"]}, {:lookups => {"id" => "test-lookup"}}, "test-root-account").returns({"find-params" => "test"})
-      collection.expects(:all).with({"find-params" => "test", :select => :id}).returns([object1, object2])
-      object1.expects(:id).returns("thing2")
-      object2.expects(:id).returns("thing3")
+      collection.expects(:scoped).with("find-params" => "test").returns(collection)
+      collection.expects(:pluck).with(:id).returns(["thing2", "thing3"])
       Api.map_ids("test-ids", collection, "test-root-account").should == ["thing2", "thing3"]
     end
 
     it 'should not try and make params when no non-ar_id columns have returned with ar_id columns' do
       collection = mock()
-      object1 = mock()
-      object2 = mock()
       Api.expects(:sis_find_sis_mapping_for_collection).with(collection).returns({:lookups => {"id" => "test-lookup"}})
       Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}).returns({"test-lookup" => ["thing1", "thing2"]})
       Api.expects(:sis_make_params_for_sis_mapping_and_columns).at_most(0)
@@ -567,6 +559,39 @@ describe Api do
 </div>}
       res = T.api_user_content(html, @course, @student)
       res.should == html
+    end
+  end
+
+  context ".process_incoming_html_content" do
+    class T
+      extend Api
+    end
+
+    it "should add context to files and remove verifier parameters" do
+      course
+      attachment_model(:context => @course)
+
+      html = %{<div>
+        Here are some bad links
+        <a href="/files/#{@attachment.id}/download">here</a>
+        <a href="/files/#{@attachment.id}/download?verifier=lollercopter&amp;anotherparam=something">here</a>
+        <a href="/files/#{@attachment.id}/preview?sneakyparam=haha&amp;verifier=lollercopter&amp;another=blah">here</a>
+        <a href="/courses/#{@course.id}/files/#{@attachment.id}/preview?noverifier=here">here</a>
+        <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=lol&amp;a=1">here</a>
+        <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?b=2&amp;verifier=something&amp;c=2">here</a>
+        <a href="/courses/#{@course.id}/files/#{@attachment.id}/notdownload?b=2&amp;verifier=shouldstay&amp;c=2">but not here</a>
+      </div>}
+      fixed_html = T.process_incoming_html_content(html)
+      fixed_html.should == %{<div>
+        Here are some bad links
+        <a href="/courses/#{@course.id}/files/#{@attachment.id}/download">here</a>
+        <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?anotherparam=something">here</a>
+        <a href="/courses/#{@course.id}/files/#{@attachment.id}/preview?sneakyparam=haha&amp;another=blah">here</a>
+        <a href="/courses/#{@course.id}/files/#{@attachment.id}/preview?noverifier=here">here</a>
+        <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?a=1">here</a>
+        <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?b=2&amp;c=2">here</a>
+        <a href="/courses/#{@course.id}/files/#{@attachment.id}/notdownload?b=2&amp;verifier=shouldstay&amp;c=2">but not here</a>
+      </div>}
     end
   end
 

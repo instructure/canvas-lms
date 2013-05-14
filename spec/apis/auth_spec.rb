@@ -26,6 +26,7 @@ describe "API Authentication", :type => :integration do
     @client_id = @key.id
     @client_secret = @key.api_key
     ActionController::Base.consider_all_requests_local = false
+    enable_forgery_protection
   end
 
   after do
@@ -33,7 +34,7 @@ describe "API Authentication", :type => :integration do
   end
 
   context "sharding" do
-    it_should_behave_like "sharding"
+    specs_require_sharding
 
     it "should use developer key + basic auth access on the default shard from a different shard" do
       @shard1.activate do
@@ -191,7 +192,7 @@ describe "API Authentication", :type => :integration do
       it "should not prepend the csrf protection even if the post has a session" do
         user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
         post "/login", :pseudonym_session => { :unique_id => 'test1@example.com', :password => 'test123' }
-        code = ActiveSupport::SecureRandom.hex(64)
+        code = SecureRandom.hex(64)
         code_data = { 'user' => @user.id, 'client_id' => @client_id }
         Canvas.redis.setex("oauth2:#{code}", 1.day, code_data.to_json)
         post "/login/oauth2/token", :client_id => @client_id, :client_secret => @client_secret, :code => code
@@ -294,7 +295,7 @@ describe "API Authentication", :type => :integration do
         get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob'
         response.should redirect_to(login_url)
 
-        get response['Location']
+        follow_redirect!
         response.should be_success
 
         user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
@@ -304,7 +305,10 @@ describe "API Authentication", :type => :integration do
         # step 2
         response.should be_redirect
         response['Location'].should match(%r{/login/oauth2/confirm$})
-        post "/login/oauth2/accept", { :authenticity_token => session[:_csrf_token] }
+        follow_redirect!
+        response.should be_success
+
+        post "/login/oauth2/accept", { :authenticity_token => controller.send(:form_authenticity_token) }
 
         code = response['Location'].match(/code=([^\?&]+)/)[1]
         code.should be_present
@@ -315,7 +319,7 @@ describe "API Authentication", :type => :integration do
       end
 
       context "sharding" do
-        it_should_behave_like "sharding"
+        specs_require_sharding
 
         it "should create the access token on the same shard as the user" do
           user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
@@ -429,6 +433,7 @@ describe "API Authentication", :type => :integration do
       user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
       course_with_teacher(:user => @user)
       @token = @user.access_tokens.create!
+      @token.full_token.should_not be_nil
     end
 
     def check_used
@@ -462,29 +467,31 @@ describe "API Authentication", :type => :integration do
       Account.default.reload.users.should be_include(u2)
     end
 
-    it "should return a proper www-authenticate header if no access token is given" do
-      get "/api/v1/courses"
-      response.status.to_i.should == 401
-      response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
-    end
-
-    it "should return www-authenticate if the access token is expired or non-existent" do
+    it "should error if the access token is expired or non-existent" do
       get "/api/v1/courses", nil, { 'Authorization' => "Bearer blahblah" }
       response.status.to_i.should == 401
       response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
       @token.update_attribute(:expires_at, 1.hour.ago)
-      get "/api/v1/courses", nil, { 'Authorization' => "Bearer blahblah" }
+      get "/api/v1/courses", nil, { 'Authorization' => "Bearer #{@token.full_token}" }
       response.status.to_i.should == 401
       response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
     end
 
-    it "should require an active pseudonym" do
+    it "should require an active pseudonym for the access token user" do
       @user.pseudonym.destroy
-      get "/api/v1/courses"
+      get "/api/v1/courses", nil, { 'Authorization' => "Bearer #{@token.full_token}" }
       response.status.to_i.should == 401
       response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
       json = JSON.parse(response.body)
       json['message'].should == "Invalid access token."
+    end
+
+    it "should error if no access token is given and authorization is required" do
+      get "/api/v1/courses"
+      response.status.to_i.should == 401
+      response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
+      json = json_parse
+      json["errors"]["message"].should == "user authorization required"
     end
 
     it "should be able to log out" do
@@ -499,7 +506,7 @@ describe "API Authentication", :type => :integration do
     end
 
     context "sharding" do
-      it_should_behave_like "sharding"
+      specs_require_sharding
 
       it "should work for an access token from a different shard with the developer key on the default shard" do
         @shard1.activate do

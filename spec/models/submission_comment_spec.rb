@@ -216,7 +216,7 @@ This text has a http://www.google.com link in it...
         c2 = @submission1.add_comment(:author => @teacher1, :comment => "hello again!").reload
         @teacher1.conversations.size.should eql 1
         tc1 = @teacher1.conversations.first
-        tc1.last_message_at.to_i.should eql c2.created_at.to_i
+        tc1.last_message_at.to_i.should eql c1.created_at.to_i
         tc1.messages.last.body.should eql c2.comment
         tc1.messages.last.author.should eql @teacher1
       end
@@ -472,14 +472,14 @@ This text has a http://www.google.com link in it...
         c2 = @submission1.add_comment(:author => @teacher1, :comment => "hello again!").reload
         c3 = @submission1.add_comment(:author => user, :comment => "ohai im in ur group")
         tc1 = @teacher1.conversations.first
-        tc1.last_message_at.to_i.should eql c2.created_at.to_i
+        tc1.last_message_at.to_i.should eql c1.created_at.to_i
         tc1.messages.last.body.should eql c2.comment
         tc1.messages.last.author.should eql @teacher1
 
         c3.destroy
 
         tc1.reload
-        tc1.last_message_at.to_i.should eql c2.created_at.to_i
+        tc1.last_message_at.to_i.should eql c1.created_at.to_i
         tc1.messages.last.body.should eql c2.comment
         tc1.messages.last.author.should eql @teacher1
       end

@@ -73,7 +73,7 @@ class QuizSubmissionsController < ApplicationController
     @quiz = @context.quizzes.find(params[:quiz_id])
     if authorized_action(@quiz, @current_user, :submit)
       preview = params[:preview] && @quiz.grants_right?(@current_user, session, :update)
-      if preview
+      if @current_user.blank? || preview
         @submission = @quiz.quiz_submissions.find_by_temporary_user_code(temporary_user_code(false))
       else
         @submission = @quiz.quiz_submissions.find_by_user_id(@current_user.id)

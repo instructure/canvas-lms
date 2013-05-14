@@ -27,13 +27,15 @@
       <div id="combo_box_container"></div>
       <a href="#" class="next"><%= t('links.next', "Next") %></a>
       <div id='x_of_x_students'>
-        (<%= t(:student_index_of_total, "student %{index} of %{total_students}", :index => raw('<span>???</span>'), :total_students => @assignment.context.students_visible_to(@current_user).uniq.count) %>)<br />
-        <a href="<%= gradebook_url_for(@current_user, @context, @assignment) %>"><%= t('links.gradebook', "Gradebook") %></a> | 
+        (<%= t(:student_index_of_total, "student %{index} of %{total_students}", :index => raw('<span>???</span>'), :total_students => @assignment.context.students_visible_to(@current_user).count(:id, :distinct => true)) %>)<br />
+        <a href="<%= gradebook_url_for(@current_user, @context, @assignment) %>" id="speed_grader_gradebook_link">
+          <%= t('links.gradebook', "Gradebook") %>
+        </a>
         <a href="<%= context_url(@context, :context_url) %>"><%= t('links.course_home', "Course Home") %></a>
       </div>
     </div>
     <div class="right">
-      <a data-muted="<%= @assignment.muted? ? "true" : "false" %>" id="mute_link" href="#"><span class="ui-icon ui-icon-volume-<%= @assignment.muted? ? "on" : "off" %>"></span><span class="label"><%= @assignment.muted? ? t("gradebook.unmute_assignment", "Unmute Assignment") : t("gradebook.mute_assignment", "Mute Assignment") %></span></a>
+      <a data-muted="<%= @assignment.muted? ? "true" : "false" %>" id="mute_link" href="#"><span class="ui-icon ui-icon-volume-<%= @assignment.muted? ? "on" : "off" %>"></span><span><%= @assignment.muted? ? t("gradebook.unmute_assignment", "Unmute Assignment") : t("gradebook.mute_assignment", "Mute Assignment") %></span></a>
       <a id="settings_link" href="#"><span class="ui-icon ui-icon-wrench"></span><%= t('links.settings', "Settings") %></a>
       <% if help_link %>
         | <%= help_link %>
@@ -118,7 +120,7 @@
               <% if @assignment.rubric_association && can_do(@assignment.rubric_association, @current_user, :assess) %>
                 <button type="button" class="save_rubric_button btn"><%= t('buttons.save', "Save") %></button>
               <% end %>
-              <button type="button" class="hide_rubric_link button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
+              <button type="button" class="hide_rubric_link btn button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
             </div>
             <a href="<%= context_url(@context, :context_rubric_association_rubric_assessments_url, @assignment.rubric_association) %>" class="update_rubric_assessment_url" style="display: none;">&nbsp;</a>
             <%= render :partial => "shared/rubric_criterion_dialog" %>

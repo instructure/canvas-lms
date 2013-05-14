@@ -40,7 +40,7 @@ describe 'CollectionItem' do
   end
 
   context "across shards" do
-    it_should_behave_like "sharding"
+    specs_require_sharding
 
     it "should handle user upvotes on another shard" do
       @shard1.activate { @user1 = user_model }

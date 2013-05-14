@@ -1,5 +1,4 @@
 @import "environment.sass";
-@import "blue/mixins";
 
 #groups {
 
@@ -35,14 +34,14 @@
   }
 
   .group_header {
+    @include clearfix;
+    @include buttonBackground($listViewHeaderBackgroundLight, $listViewHeaderBackground, $gray);
     border-bottom: 1px solid $listBorderColor;
-    font-weight: bold;
     padding: 4px 12px;
-
-    $shadow: inset 0 1px 0 rgba(white, 0.75);
-
-    @include bevelText;
-    @include buttonBackground($listViewHeaderBackgroundLight, $listViewHeaderBackground);
+    text-shadow: none;
+    .name {
+      font-weight: bold;
+    }
   }
 
   .assignment_list {
@@ -71,6 +70,7 @@
     }
     &.assignment_title {
       max-width: 200px;
+      min-width: 200px;
       width: 25%;
     }
     &.assignment_due {
@@ -103,8 +103,11 @@
     .points_uneditable .points    { display: none; }
     .points_uneditable .no_points { display: inline; }
 
-    button        { margin-bottom: 4px; }
     label, select { font-size: 0.8em; }
+    
+    .input-append {
+      display: inline;
+    }
   }
 }
 
@@ -112,11 +115,13 @@
   .group_assignment {
     min-height: 40px;
     border-bottom: 1px solid #cccccc;
+    @include clearfix;
+    padding-bottom: 3px;
     &.last {
       border-bottom-width: 0px;
     }
     .content {
-      padding-top: 3px;
+      padding-top: 9px;
     }
     .details {
       display: block;
@@ -181,12 +186,10 @@
       &.assignment_due {
         width: 30%;
         font-size: 1em;
-        padding-top: 0.5em;
         display: block;
       }
       &.assignment_points {
-        font-size: 0.9em;
-        padding-top: 0.5em;
+        font-size: 1em;
       }
       &.links {
         display: none;
@@ -282,12 +285,10 @@
         &.assignment_due {
           width: 30%;
           font-size: 0.8em;
-          padding-top: 0.5em;
           display: block;
         }
         &.assignment_points {
           font-size: 0.8em;
-          padding-top: 0.5em;
         }
         &.buttons {
           float: right;
@@ -344,5 +345,72 @@
     margin-top: 3px;
     color: $right_side_text_color;
     padding-left: 5px;
+  }
+}
+
+table.full_assignment_table {
+  select { width: 140px !important; }
+}
+
+#submit_from_external_tool_form {
+  #external_tool_submission_details {
+    padding-left: 10px;
+    &.not_selected {
+      color: #888;
+      font-style: italic;
+    }
+    &.file_submission {
+      font-weight: bold;
+      padding-left: 28px;
+      background: url(/images/file.png) no-repeat 10px center;
+      font-size: 16px;
+    }
+    &.url_submission {
+      font-weight: bold;
+      padding-left: 28px;
+      background: url(/images/link.png) no-repeat 10px center;
+      font-size: 16px;
+    }
+  }
+  &.has_submission {
+    .tools {
+      @include opacity(0.7);
+    }
+  }
+  .tools {
+    list-style-type: none;
+    margin-right: 20px;
+    .tool {
+      display: block;
+      padding: 2px 5px;
+      font-size: 14px;
+      img {
+        vertical-align: middle;
+      }
+      &:hover {
+        background: #eee;
+        @include border-radius(3px);
+      }
+    }
+  }
+}
+
+/*== Multiple Due Dates Tooltip ==*/
+.vdd_tooltip_link {
+  cursor: pointer
+}
+.dl-horizontal.vdd_tooltip_content {
+  margin: 7px 0;
+  dt {
+    width: 95px;
+    white-space: normal;
+    line-height: 12px;
+    margin-bottom: 5px;
+  }
+  dd {
+    margin-left: 105px;
+    width: 95px;
+    line-height: 12px;
+    text-align: left;
   }
 }

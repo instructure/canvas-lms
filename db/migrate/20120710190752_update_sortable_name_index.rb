@@ -6,7 +6,8 @@ class UpdateSortableNameIndex < ActiveRecord::Migration
     if connection.adapter_name == 'PostgreSQL'
       if connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='collkey'").to_i == 0
         remove_index :users, :sortable_name
-        execute("CREATE INDEX CONCURRENTLY index_users_on_sortable_name ON users (CAST(LOWER(replace(sortable_name, '\\', '\\\\')) AS bytea))")
+        concurrently = " CONCURRENTLY" if connection.open_transactions == 0
+        execute("CREATE INDEX#{concurrently} index_users_on_sortable_name ON users (CAST(LOWER(replace(sortable_name, '\\', '\\\\')) AS bytea))")
       end
     end
   end
@@ -15,7 +16,8 @@ class UpdateSortableNameIndex < ActiveRecord::Migration
     if connection.adapter_name == 'PostgreSQL'
       if connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='collkey'").to_i == 0
         remove_index :users, :sortable_name
-        execute("CREATE INDEX CONCURRENTLY index_users_on_sortable_name ON users (CAST(LOWER(sortable_name) AS bytea))")
+        concurrently = " CONCURRENTLY" if connection.open_transactions == 0
+        execute("CREATE INDEX#{concurrently} index_users_on_sortable_name ON users (CAST(LOWER(sortable_name) AS bytea))")
       end
     end
   end

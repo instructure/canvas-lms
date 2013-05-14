@@ -29,6 +29,11 @@
 #       // the HTTP/HTTPS URL to the quiz
 #       html_url: "http://canvas.example.edu/courses/1/quizzes/2",
 #
+#       // a url suitable for loading the quiz in a mobile webview.  it will
+#       // persiste the headless session and, for quizzes in public courses, will
+#       // force the user to login
+#       mobile_url: "http://canvas.example.edu/courses/1/quizzes/2?persist_healdess=1&force_user=1",
+#
 #       // the description of the quiz
 #       description: "This is a quiz on Act 3 of Hamlet",
 #
@@ -118,7 +123,7 @@ class QuizzesApiController < ApplicationController
   #
   # @returns Quiz
   def show
-    if authorized_action(@quiz, @current_user, :read) && tab_enabled?(@context.class::TAB_QUIZZES)
+    if authorized_action(@quiz, @current_user, :read)
       render :json => quiz_json(@quiz, @context, @current_user, session)
     end
   end
@@ -210,7 +215,7 @@ class QuizzesApiController < ApplicationController
   #
   # @returns Quiz
   def create
-    if authorized_action(@context.quizzes.new, @current_user, :create) && tab_enabled?(@context.class::TAB_QUIZZES)
+    if authorized_action(@context.quizzes.new, @current_user, :create)
       @quiz = @context.quizzes.build
       update_api_quiz(@quiz, params[:quiz])
       unless @quiz.new_record?
@@ -234,7 +239,7 @@ class QuizzesApiController < ApplicationController
   #
   # @returns Quiz
   def update
-    if authorized_action(@quiz, @current_user, :update) && tab_enabled?(@context.class::TAB_QUIZZES)
+    if authorized_action(@quiz, @current_user, :update)
       update_api_quiz(@quiz, params[:quiz])
       unless @quiz.changed?
         render :json => quiz_json(@quiz, @context, @current_user, session)

@@ -1,8 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
-shared_examples_for "wiki and tiny selenium tests" do
-  it_should_behave_like "in-process server selenium tests"
-
   def clear_wiki_rce
     wiki_page_body = driver.find_element(:id, :wiki_page_body)
     wiki_page_body.clear
@@ -70,9 +67,7 @@ shared_examples_for "wiki and tiny selenium tests" do
   end
 
   def create_wiki_page(title, hfs, edit_roles)
-    p = @course.wiki.wiki_pages.create(:title => title, :hide_from_students => hfs, :editing_roles => edit_roles, :notify_of_update => true)
-    p.save!
-    p
+    @course.wiki.wiki_pages.create(:title => title, :hide_from_students => hfs, :editing_roles => edit_roles, :notify_of_update => true)
   end
 
   def select_all_wiki
@@ -95,13 +90,25 @@ shared_examples_for "wiki and tiny selenium tests" do
   end
 
   def add_flickr_image(el)
+    require 'open-uri'
+
     el.find_element(:css, '.mce_instructure_embed').click
     f('.flickr_search_link').click
     f('#image_search_form > input').send_keys('angel')
     submit_form('#image_search_form')
     wait_for_ajax_requests
     keep_trying_until { f('.image_link').should be_displayed }
-    f('.image_link').click
+    # sometimes flickr has broken images; choose the first one that works
+    image = ff('.image_link').detect do |image|
+      begin
+        temp_file = open(image.attribute('src'))
+        temp_file.size > 0
+      rescue
+        next
+      end
+    end
+    raise "Couldn't find an image on flickr!" unless image
+    image.click
   end
 
   def add_image_to_rce
@@ -121,4 +128,3 @@ shared_examples_for "wiki and tiny selenium tests" do
     get "/courses/#{@course.id}/wiki" #can't just wait for the dom, for some reason it stays in edit mode
     wait_for_ajax_requests
   end
-end

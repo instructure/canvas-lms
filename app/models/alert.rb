@@ -87,7 +87,7 @@ class Alert < ActiveRecord::Base
 
     recipients << student_id if include_student
     recipients.concat(Array(teachers)) if teachers.present? && include_teachers
-    recipients.concat context.account_users.find_all_by_membership_type(admin_roles).map(&:user_id) if context_type == 'Account' && !admin_roles.empty?
+    recipients.concat context.account_users.where(:membership_type => admin_roles).uniq.pluck(:user_id) if context_type == 'Account' && !admin_roles.empty?
     recipients.uniq
   end
 
@@ -102,7 +102,7 @@ class Alert < ActiveRecord::Base
   def self.evaluate_for_root_account(account)
     return unless account.settings[:enable_alerts]
     alerts_cache = {}
-    account.associated_courses.scoped(:conditions => { :workflow_state => 'available' }).find_each do |course|
+    account.associated_courses.where(:workflow_state => 'available').find_each do |course|
       alerts_cache[course.account_id] ||= course.account.account_chain.map { |a| a.alerts.all }.flatten
       self.evaluate_for_course(course, alerts_cache[course.account_id], account.enable_user_notes?)
     end
@@ -140,19 +140,21 @@ class Alert < ActiveRecord::Base
 
     # Bulk data gathering
     if criterion_types.include? 'Interaction'
-      last_comment_dates = SubmissionComment.for_context(course).maximum(
-          :created_at,
-          :group => [ :recipient_id, :author_id ],
-          :conditions => { :author_id => teacher_ids, :recipient_id => student_ids })
+      scope = SubmissionComment.for_context(course).
+          where(:author_id => teacher_ids, :recipient_id => student_ids)
+      last_comment_dates = Rails.version < '3.0' ?
+          scope.maximum(:created_at, :group => [:recipient_id, :author_id]) :
+          scope.group(:recipient_id, :author_id).maximum(:created_at)
       last_comment_dates.each do |key, date|
         student = data[key.first]
         (student[:last_interaction] ||= {})[key.last] = date
       end
-      last_message_dates = ConversationMessage.maximum(
-          :created_at,
-          :joins => 'INNER JOIN conversation_participants ON conversation_participants.conversation_id=conversation_messages.conversation_id',
-          :group => ['conversation_participants.user_id', 'conversation_messages.author_id'],
-          :conditions => [ 'conversation_messages.author_id IN (?) AND conversation_participants.user_id IN (?) AND NOT conversation_messages.generated', teacher_ids, student_ids ])
+      scope = ConversationMessage.
+          joins('INNER JOIN conversation_participants ON conversation_participants.conversation_id=conversation_messages.conversation_id').
+          where(:conversation_messages => { :author_id => teacher_ids, :generated => false }, :conversation_participants => { :user_id => student_ids })
+      last_message_dates = Rails.version < '3.0' ?
+          scope.maximum(:created_at, :group => ['conversation_participants.user_id', 'conversation_messages.author_id']) :
+          scope.group('conversation_participants.user_id', 'conversation_messages.author_id').maximum(:created_at)
       last_message_dates.each do |key, date|
         student = data[key.first.to_i]
         last_interaction = (student[:last_interaction] ||= {})
@@ -165,19 +167,22 @@ class Alert < ActiveRecord::Base
       end
     end
     if criterion_types.include? 'UngradedCount'
-      ungraded_counts = course.submissions.scoped(:include => { :exclude => :quiz_submission }).count(
-        :group => :user_id,
-        :conditions => ["user_id IN (?) AND #{Submission.needs_grading_conditions}", student_ids])
+      ungraded_counts = course.submissions.
+          group("submissions.user_id").
+          where(:user_id => student_ids).
+          where(Submission.needs_grading_conditions).
+          count
       ungraded_counts.each do |user_id, count|
         student = data[user_id]
         student[:ungraded_count] = count
       end
     end
     if criterion_types.include? 'UngradedTimespan'
-      ungraded_timespans = course.submissions.scoped(:include => { :exclude => :quiz_submission }).minimum(
-          :submitted_at,
-          :group => :user_id,
-          :conditions => ["user_id IN (?) AND #{Submission.needs_grading_conditions}", student_ids])
+      ungraded_timespans = course.submissions.
+          group("submissions.user_id").
+          where(:user_id => student_ids).
+          where(Submission.needs_grading_conditions).
+          minimum(:submitted_at)
       ungraded_timespans.each do |user_id, timespan|
         student = data[user_id]
         student[:ungraded_timespan] = timespan
@@ -185,10 +190,11 @@ class Alert < ActiveRecord::Base
     end
     include_user_notes = course.root_account.enable_user_notes? if include_user_notes.nil?
     if criterion_types.include?('UserNote') && include_user_notes
-      note_dates = UserNote.active.maximum(
-        :created_at,
-        :group => [ :user_id, :created_by_id ],
-        :conditions => { :created_by_id => teacher_ids, :user_id => student_ids })
+      scope = UserNote.active.
+          where(:created_by_id => teacher_ids, :user_id => student_ids)
+      note_dates = Rails.version < '3.0' ?
+          scope.maximum(:created_at, :group => [:user_id, :created_by_id]) :
+          scope.group(:user_id, :created_by_id).maximum(:created_at)
       note_dates.each do |key, date|
         student = data[key.first]
         (student[:last_user_note] ||= {})[key.last] = date

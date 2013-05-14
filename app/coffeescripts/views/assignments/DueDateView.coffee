@@ -1,11 +1,13 @@
 define [
+  'i18n!overrides'
   'Backbone'
   'underscore'
   'jst/assignments/DueDateView'
   'jquery'
   'jquery.toJSON'
   'jquery.instructure_date_and_time'
-], (Backbone, _, template, $) ->
+  'jquery.instructure_forms'
+], (I18n,Backbone, _, template, $) ->
   class DueDateView extends Backbone.View
     template: template
     tagName: 'li'
@@ -44,6 +46,29 @@ define [
       for dateField in [ 'due_at', 'lock_at', 'unlock_at' ]
         json[dateField] = $.unfudgeDateForProfileTimezone(json[dateField])
       json.course_section_id = parseInt(json.course_section_id, 10)
+      errs = @validateBeforeSave json, {}
+      @$el.hideErrors()
+      for own el, msg of errs.assignmentOverrides
+        @$("[name=#{el}]").errorBox msg
       json
+
+    validateBeforeSave: (data, errors) =>
+      errs = {}
+      if data
+          lockAt = data.lock_at
+          unlockAt = data.unlock_at
+          dueAt = data.due_at
+          if lockAt && dueAt && lockAt < dueAt
+            errs.lock_at = I18n.t('lock_date_before_due_date',
+              'Lock date cannot be before due date')
+          if unlockAt && dueAt && unlockAt > dueAt
+            errs.unlock_at = I18n.t('unlock_date_after_due_date',
+              'Unlock date cannot be after due date')
+          else if unlockAt && lockAt && unlockAt > lockAt
+            errs.unlock_at = I18n.t('unlock_date_after_lock_date',
+              'Unlock date cannot be after lock date')
+      errors['assignmentOverrides'] = errs if _.keys(errs).length > 0
+      errors
+
     updateOverride: =>
       @model.set @getFormValues()

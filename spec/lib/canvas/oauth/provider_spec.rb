@@ -85,6 +85,26 @@ module Canvas::Oauth
       end
     end
 
+    describe 'authorized_token?' do
+      let(:developer_key) {DeveloperKey.create!}
+      let(:user) {User.create!}
+
+      it 'finds a pre existing token with the same scope' do
+        user.access_tokens.create!(:developer_key => developer_key, :scopes => ["#{AccessToken::OAUTH2_SCOPE_NAMESPACE}userinfo"], :remember_access => true)
+        Provider.new(developer_key.id, "", ['userinfo']).authorized_token?(user).should == true
+      end
+
+      it 'ignores tokens unless access is remembered' do
+        user.access_tokens.create!(:developer_key => developer_key, :scopes => ["#{AccessToken::OAUTH2_SCOPE_NAMESPACE}userinfo"])
+        Provider.new(developer_key.id, "", ['userinfo']).authorized_token?(user).should == false
+      end
+
+      it 'ignores tokens for out of band requests ' do
+        user.access_tokens.create!(:developer_key => developer_key, :scopes => ["#{AccessToken::OAUTH2_SCOPE_NAMESPACE}userinfo"], :remember_access => true)
+        Provider.new(developer_key.id, Canvas::Oauth::Provider::OAUTH2_OOB_URI, ['userinfo']).authorized_token?(user).should == false
+      end
+    end
+
     describe '#app_name' do
       let(:key_attrs) { {:name => 'some app', :user_name => 'some user', :email => 'some email'} }
       let(:key) { stub(key_attrs) }
@@ -127,6 +147,11 @@ module Canvas::Oauth
       it 'passes the redirect_uri through' do
         provider = Provider.new('123', 'some uri')
         provider.session_hash[:redirect_uri].should == 'some uri'
+      end
+
+      it 'passes the scope through' do
+        provider = Provider.new('123', 'some uri', 'userinfo,full_access')
+        provider.session_hash[:scopes].should == 'userinfo,full_access'
       end
     end
   end

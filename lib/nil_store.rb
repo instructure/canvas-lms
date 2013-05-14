@@ -24,12 +24,24 @@ class NilStore < ActiveSupport::Cache::Store
   def initialize(location='//myloc'); end
  
   def read(name, options = nil); nil; end
+
+  def read_multi(*names); {}; end
+
+  if CANVAS_RAILS3
+    def fetch(name, options = nil)
+      if block_given?
+        yield
+      else
+        nil
+      end
+    end
+  end
  
-  def write(name, value, options = nil); super; end
+  def write(name, value, options = nil); value; end
  
-  def delete(name, options = nil); super; end
+  def delete(name, options = nil); nil; end
     
-  def delete_matched(matcher, options = nil); super; end
+  def delete_matched(matcher, options = nil); nil; end
     
 end
  

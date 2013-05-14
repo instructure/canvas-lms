@@ -1,7 +1,16 @@
+require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/calendar2_common')
 
 describe "calendar2" do
-  it_should_behave_like "calendar2 selenium tests"
+  it_should_behave_like "in-process server selenium tests"
+
+  before (:each) do
+    Account.default.tap do |a|
+      a.settings[:enable_scheduler] = true
+      a.settings[:show_scheduler] = true
+      a.save!
+    end
+  end
 
   def make_event(params = {})
     opts = {
@@ -39,19 +48,21 @@ describe "calendar2" do
     edit_event_dialog.find_element(:css, '.edit_assignment_option').click
     edit_assignment_form = edit_event_dialog.find_element(:id, 'edit_assignment_form')
     title = edit_assignment_form.find_element(:id, 'assignment_title')
+    keep_trying_until { title.displayed? }
     replace_content(title, assignment_title)
     add_date(middle_number) if should_add_date
     submit_form(edit_assignment_form)
-    wait_for_ajax_requests
     keep_trying_until { f('.fc-view-month .fc-event-title').should include_text(assignment_title) }
   end
 
   def create_calendar_event(event_title, should_add_date = false)
     middle_number = find_middle_day.find_element(:css, '.fc-day-number').text
+    find_middle_day.click
     edit_event_dialog = f('#edit_event_tabs')
     edit_event_dialog.should be_displayed
     edit_event_form = edit_event_dialog.find_element(:id, 'edit_calendar_event_form')
     title = edit_event_form.find_element(:id, 'calendar_event_title')
+    keep_trying_until { title.displayed? }
     replace_content(title, event_title)
     add_date(middle_number) if should_add_date
     submit_form(edit_event_form)
@@ -106,49 +117,6 @@ describe "calendar2" do
       end
 
       describe "contexts list" do
-        it "should have a menu for adding stuff" do
-          get "/calendar2"
-
-          contexts = ff("#context-list > li")
-
-          # first context is the user
-          actions = contexts[0].find_elements(:css, "li > a")
-          actions.size.should == 1
-          actions.first["data-action"].should == "add_event"
-
-          # course context
-          actions = contexts[1].find_elements(:css, "li > a")
-          actions.size.should == 2
-          actions.first["data-action"].should == "add_event"
-          actions.second["data-action"].should == "add_assignment"
-        end
-
-        it "should create an event through the context list drop down" do
-          event_title = 'new event'
-          get "/calendar2"
-          wait_for_ajaximations
-
-          driver.execute_script(%{$(".context_list_context:nth-child(2)").trigger('mouseenter')})
-          fj('ul#context-list > li:nth-child(2) button').click
-          fj(".ui-kyle-menu:visible a").click
-          edit_event_dialog = f('#edit_event_tabs')
-          edit_event_dialog.should be_displayed
-          create_calendar_event(event_title, true)
-        end
-
-        it "should create an assignment through the context list drop down" do
-          assignment_title = 'new assignment'
-          get "/calendar2"
-          wait_for_ajaximations
-
-          driver.execute_script(%{$(".context_list_context:nth-child(2)").trigger('mouseenter')})
-          fj('#context-list > li:nth-child(2) button').click
-          fj(".ui-kyle-menu:visible li:last-child a").click
-          edit_event_dialog = f('#edit_event_tabs')
-          edit_event_dialog.should be_displayed
-          create_assignment_event(assignment_title, true)
-        end
-
         it "should toggle event display when context is clicked" do
           make_event :context => @course, :start => Time.now
           get "/calendar2"
@@ -182,6 +150,17 @@ describe "calendar2" do
           undated_events.size.should == 1
           undated_events.first.text.should =~ /#{e.title}/
         end
+
+        it "should truncate very long undated event titles" do
+          e = make_event :start => nil, :title => "asdfjkasldfjklasdjfklasdjfklasjfkljasdklfjasklfjkalsdjsadkfljasdfkljfsdalkjsfdlksadjklsadjsadklasdf"
+          get "/calendar2"
+
+          f(".undated-events-link").click
+          wait_for_ajaximations
+          undated_events = ff("#undated-events > ul > li")
+          undated_events.size.should == 1
+          undated_events.first.text.should == "asdfjkasldfjklasdjfklasdjfklasjf..."
+        end
       end
     end
 
@@ -194,13 +173,11 @@ describe "calendar2" do
 
       def create_middle_day_event(name = 'new event')
         get "/calendar2"
-        find_middle_day.click
         create_calendar_event(name)
       end
 
       def create_middle_day_assignment(name = 'new assignment')
         get "/calendar2"
-        find_middle_day.click
         create_assignment_event(name)
       end
 
@@ -210,14 +187,15 @@ describe "calendar2" do
 
       it "should show scheduler button if it is enabled" do
         get "/calendar2"
-        f('input#scheduler').should_not be_nil
+        f("#scheduler").should have_class("ui-helper-hidden-accessible")
       end
 
       it "should not show scheduler button if it is disabled" do
         account = Account.default.tap { |a| a.settings[:show_scheduler] = false; a.save! }
         get "/calendar2"
-        f('input#scheduler').should be_nil
-      end      
+        wait_for_ajaximations
+        ff("#calendar_views .ui-button").length.should == 2
+      end
 
       it "should drag and drop an event" do
         pending('drag and drop not working correctly')
@@ -233,19 +211,25 @@ describe "calendar2" do
 
       it "more options link should go to calendar event edit page" do
         create_middle_day_event
-
         f('.fc-event').click
         fj('.popover-links-holder:visible').should_not be_nil
-        f('.event-details-links .edit_event_link').click
-        expect_new_page_load { f('#edit_calendar_event_form .more_options_link').click }
+        driver.execute_script("$('.edit_event_link').hover().click()")
+        expect_new_page_load { driver.execute_script("$('#edit_calendar_event_form .more_options_link').hover().click()") }
         f('#breadcrumbs').text.should include 'Calendar Events'
       end
 
       it "should go to assignment page when clicking assignment title" do
         name = 'special assignment'
         create_middle_day_assignment(name)
-        f('.fc-event.assignment').click
-        expect_new_page_load { f('.view_event_link').click }
+        keep_trying_until do
+          fj('.fc-event.assignment').click
+          wait_for_ajaximations
+          if (fj('.view_event_link').displayed?)
+            expect_new_page_load { driver.execute_script("$('.view_event_link').hover().click()") }
+          end
+          fj('h2.title').displayed?
+        end
+
         f('h2.title').text.should include(name)
       end
 
@@ -253,35 +237,41 @@ describe "calendar2" do
         name = 'super big assignment'
         create_middle_day_assignment(name)
         f('.fc-event.assignment').click
-        f('.edit_event_link').click
-        expect_new_page_load { f('.more_options_link').click }
+        driver.execute_script("$('.edit_event_link').hover().click()")
+        expect_new_page_load { driver.execute_script("$('.more_options_link').hover().click()") }
         f('#assignment_name').attribute(:value).should include(name)
       end
 
       it "should delete an event" do
         create_middle_day_event('doomed event')
-        f('.fc-event').click
-        f('.delete_event_link').click
-        f('.ui-dialog .btn-primary').click
+        fj('.fc-event:visible').click
         wait_for_ajaximations
-        f('.fc-event').should be_nil
+        driver.execute_script("$('.delete_event_link').hover().click()")
+        wait_for_ajaximations
+        driver.execute_script("$('.ui-dialog:visible .btn-primary').hover().click()")
+        wait_for_ajaximations
+        fj('.fc-event:visible').should be_nil
         # make sure it was actually deleted and not just removed from the interface
         get("/calendar2")
         wait_for_ajax_requests
-        f('.fc-event').should be_nil
+        fj('.fc-event:visible').should be_nil
       end
 
       it "should delete an assignment" do
         create_middle_day_assignment
-        f('.fc-event').click
-        f('.delete_event_link').click
-        f('.ui-dialog .btn-primary').click
+        keep_trying_until do
+          fj('.fc-event-inner').click()
+          driver.execute_script("$('.delete_event_link').hover().click()")
+          fj('.ui-dialog .ui-dialog-buttonset').displayed?
+        end
         wait_for_ajaximations
-        f('.fc-event').should be_nil
+        driver.execute_script("$('.ui-dialog:visible .btn-primary').hover().click()")
+        wait_for_ajaximations
+        fj('.fc-event-inner').should be_nil
         # make sure it was actually deleted and not just removed from the interface
         get("/calendar2")
         wait_for_ajax_requests
-        f('.fc-event').should be_nil
+        fj('.fc-event-inner').should be_nil
       end
 
       it "should let me message students who have signed up for an appointment" do
@@ -300,8 +290,11 @@ describe "calendar2" do
 
         get '/calendar2'
         wait_for_ajaximations
-        f('.fc-event').click
-        f('.message_students').click
+        fj('.fc-event').click
+        wait_for_ajaximations
+
+        driver.execute_script("$('.message_students').hover().click()")
+
         wait_for_ajaximations
         ff(".participant_list input").size.should == 1
         set_value f('textarea[name="body"]'), 'hello'
@@ -319,7 +312,7 @@ describe "calendar2" do
         assignment2 = @course.active_assignments.create(:name => "Assignment 2", :assignment_group => group2, :due_at => Time.zone.now)
 
         get "/calendar2"
-
+        wait_for_ajaximations
         events = ff('.fc-event')
         event1 = events.detect { |e| e.text =~ /Assignment 1/ }
         event2 = events.detect { |e| e.text =~ /Assignment 2/ }
@@ -328,18 +321,24 @@ describe "calendar2" do
         event1.should_not == event2
 
         event1.click
-        f('.popover-links-holder .edit_event_link').click
+        wait_for_ajaximations
+        driver.execute_script("$('.edit_event_link').hover().click()")
+        wait_for_ajaximations
+
         select = f('#edit_assignment_form .assignment_group')
         first_selected_option(select).attribute(:value).to_i.should == group1.id
         close_visible_dialog
 
         event2.click
-        f('.popover-links-holder .edit_event_link').click
+        wait_for_ajaximations
+
+        driver.execute_script("$('.edit_event_link').hover().click()")
+        wait_for_ajaximations
         select = f('#edit_assignment_form .assignment_group')
         first_selected_option(select).attribute(:value).to_i.should == group2.id
         replace_content(f('.ui-dialog #assignment_title'), "Assignment 2!")
         submit_form('#edit_assignment_form')
-        wait_for_ajax_requests
+        wait_for_ajaximations
         assignment2.reload.title.should == "Assignment 2!"
         assignment2.assignment_group.should == group2
       end
@@ -348,28 +347,37 @@ describe "calendar2" do
         assignment = @course.active_assignments.create!(:name => "to edit", :due_at => Time.zone.now)
         get "/calendar2"
         f('.fc-event').click
-        f('.popover-links-holder .edit_event_link').click
+        wait_for_ajaximations
+        driver.execute_script("$('.edit_event_link').hover().click()")
+        wait_for_ajaximations
         original_more_options = f('.more_options_link')['href']
         original_more_options.should_not match(/undefined/)
         replace_content(f('.ui-dialog #assignment_title'), "edited title")
         submit_form('#edit_assignment_form')
-        wait_for_ajax_requests
+        wait_for_ajaximations
         assignment.reload
+        wait_for_ajaximations
         assignment.title.should eql("edited title")
 
-        f('.fc-event').click
-        f('.popover-links-holder .edit_event_link').click
-        f('.more_options_link')['href'].should match(original_more_options)
+        fj('.fc-event').click
+        wait_for_ajaximations
+        driver.execute_script("$('.edit_event_link').hover().click()")
+        wait_for_ajaximations
+        fj('.more_options_link')['href'].should match(original_more_options)
       end
 
       it "should make an assignment undated if you delete the start date" do
         create_middle_day_assignment("undate me")
-        f(".undated-events-link").click
-        f('.fc-event').click
-        f('.popover-links-holder .edit_event_link').click
+        keep_trying_until do
+          fj('.fc-event-inner').click()
+          driver.execute_script("$('.popover-links-holder .edit_event_link').hover().click()")
+          f('.ui-dialog #assignment_due_at').displayed?
+        end
+
         replace_content(f('.ui-dialog #assignment_due_at'), "")
         submit_form('#edit_assignment_form')
         wait_for_ajax_requests
+        f(".undated-events-link").click
         f('.fc-event').should be_nil
         f('.undated_event_title').text.should == "undate me"
       end
@@ -416,7 +424,7 @@ describe "calendar2" do
 
         get "/calendar2"
         wait_for_ajaximations
-        events = ff('.fc-event')
+        events = ffj('.fc-event:visible')
         events.size.should == 2
         events.first.click
 
@@ -424,6 +432,18 @@ describe "calendar2" do
         details.should_not be_nil
         details.text.should include(@course.default_section.name)
         details.find_element(:css, '.view_event_link')[:href].should include "/calendar_events/#{e1.id}" # links to parent event
+      end
+
+      context "event creation" do
+        it "should create an event by hitting the '+' in the top bar" do
+          event_title = 'new event'
+          get "/calendar2"
+          wait_for_ajaximations
+
+          fj('#create_new_event_link').click
+          edit_event_dialog = f('#edit_event_tabs')
+          edit_event_dialog.should be_displayed
+        end
       end
 
       context "event editing" do
@@ -449,6 +469,7 @@ describe "calendar2" do
     end
 
     context "week view" do
+
       it "should render assignments due just before midnight" do
         pending("fails on event count validation")
         assignment_model(:course => @course,
@@ -470,8 +491,10 @@ describe "calendar2" do
         end
       end
 
+
       it "should change event duration by dragging" do
-        noon = Time.now.at_beginning_of_day + 12.hours
+        noon = Time.now.utc.at_beginning_of_day + 12.hours
+        #expecting time in UTC
         event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 1.hour
         get "/calendar2"
         wait_for_ajaximations
@@ -559,6 +582,10 @@ describe "calendar2" do
         elt = fj('.fc-event:visible')
         elt.attribute('title').should match(/12:00.*12:05/)
       end
+
+      it "should update the event as all day if dragged to all day row" do
+        pending("dragging events doesn't seem to work")
+      end
     end
   end
 
@@ -586,15 +613,15 @@ describe "calendar2" do
         create_appointment_group
         ag = AppointmentGroup.first
         ag.appointments.first.reserve_for @student, @me
+
         @user = @me
         get "/calendar2"
-        wait_for_ajaximations
 
-        f('.fc-event-title').click
-        popover = f("#popover-0")
-        popover.should be_displayed
-        expect_new_page_load { popover.find_element(:css, '.view_event_link').click }
-        wait_for_ajaximations
+        fj('.fc-event:visible').click
+        fj("#popover-0").should be_displayed
+        expect_new_page_load { driver.execute_script("$('#popover-0 .view_event_link').hover().click()") }
+
+
         is_checked('#scheduler').should be_true
         f('#appointment-group-list').should include_text(ag.title)
       end
@@ -629,11 +656,9 @@ describe "calendar2" do
         wait_for_ajaximations
 
         # click the event in the calendar
-        f('.fc-event-title').click
-        popover = f('#popover-0')
-        popover.should be_displayed
-        expect_new_page_load { popover.find_element(:css, '.view_event_link').click }
-        wait_for_ajaximations
+        fj('.fc-event').click
+        fj("#popover-0").should be_displayed
+        expect_new_page_load { driver.execute_script("$('.view_event_link').hover().click()") }
 
         page_title = f('.title')
         page_title.should be_displayed

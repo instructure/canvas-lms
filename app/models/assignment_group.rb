@@ -94,7 +94,7 @@ class AssignmentGroup < ActiveRecord::Base
       # time that this group was last modified, that assignment was deleted
       # along with this group. This might help avoid undeleting assignments that
       # were deleted earlier.
-      to_restore = to_restore.scoped(:conditions => ['updated_at >= ?', self.updated_at.utc])
+      to_restore = to_restore.where('updated_at >= ?', self.updated_at.utc)
     end
     self.workflow_state = 'available'
     self.save
@@ -122,17 +122,11 @@ class AssignmentGroup < ActiveRecord::Base
     self.assignments.map{|a| a.points_possible || 0}.sum
   end
   
-  named_scope :include_active_assignments, lambda{
-    {:include => :active_assignments}
-  }
-  named_scope :active, :conditions => ['assignment_groups.workflow_state != ?', 'deleted']
-  named_scope :before, lambda{|date|
-    {:conditions => ['assignment_groups.created_at < ?', date]}
-  }
-  named_scope :for_context_codes, lambda {|codes|
-    {:conditions => ['assignment_groups.context_code IN (?) and assignment_groups.workflow_state != ?', codes, 'deleted'], :order => :position }
-  }
-  
+  scope :include_active_assignments, includes(:active_assignments)
+  scope :active, where("assignment_groups.workflow_state<>'deleted'")
+  scope :before, lambda { |date| where("assignment_groups.created_at<?", date) }
+  scope :for_context_codes, lambda { |codes| active.where(:context_code => codes).order(:position) }
+
   def group_weight_changed
     @group_weight_changed = self.group_weight_changed?
     true
@@ -184,7 +178,7 @@ class AssignmentGroup < ActiveRecord::Base
         begin
           import_from_migration(group, migration.context)
         rescue
-          migration.add_warning("Couldn't import assignment group \"#{group[:title]}\"", $!)
+          migration.add_import_warning(t('#migration.assignment_group_type', "Assignment Group"), group[:title], $!)
         end
       end
     end

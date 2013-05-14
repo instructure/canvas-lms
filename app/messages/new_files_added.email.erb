@@ -3,10 +3,13 @@
 <% end %>
 
 <% define_content :subject do %>
-  <%= data.count %> New Files Added to <%= asset.context.name %>
+  <%= t('subject', '%{count} new files added for the course, %{name}:', 
+          :count => data.count,
+          :name => asset.context.name) %>
 <% end %>
+<%= t('body', '%{count} new files have been added for the course, %{name}:', 
+        :count => data.count,
+        :name => asset.context.name) %>
 
-<%= data.count %> new files have been added for the course, <%= asset.context.name %>.
-
-You can view them here:
+<%= t 'link', 'You can view them here' %>
 <%= content :link %>

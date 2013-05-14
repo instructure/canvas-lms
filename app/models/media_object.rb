@@ -155,7 +155,7 @@ class MediaObject < ActiveRecord::Base
         MediaObject.send_later_enqueue_args(:refresh_media_files, {:run_at => wait_period.minutes.from_now, :priority => Delayed::LOW_PRIORITY}, bulk_upload_id, attachment_ids, root_account_id, attempt + 1)
       else
         # if it fails, then the attachment should no longer consider itself kalturable
-        Attachment.update_all({:media_entry_id => nil}, "id IN (#{attachment_ids.join(",")}) OR root_attachment_id IN (#{attachment_ids.join(",")})") unless attachment_ids.empty?
+        Attachment.where("id IN (?) OR root_attachment_id IN (?)", attachment_ids, attachment_ids).update_all(:media_entry_id => nil) unless attachment_ids.empty?
       end
       res
     else
@@ -299,17 +299,11 @@ class MediaObject < ActiveRecord::Base
     save!
   end
 
-  named_scope :active, lambda{
-    {:conditions => ['media_objects.workflow_state != ?', 'deleted'] }
-  }
+  scope :active, where("media_objects.workflow_state<>'deleted'")
 
-  named_scope :by_media_id, lambda { |media_id|
-    { :conditions => [ 'media_objects.media_id = ? OR media_objects.old_media_id = ?', media_id, media_id ] }
-  }
+  scope :by_media_id, lambda { |media_id| where("media_objects.media_id=? OR media_objects.old_media_id=?", media_id, media_id) }
 
-  named_scope :by_media_type, lambda { |media_type|
-    { :conditions => [ 'media_objects.media_type = ?', media_type ]}
-  }
+  scope :by_media_type, lambda { |media_type| where(:media_type => media_type) }
 
   workflow do
     state :active

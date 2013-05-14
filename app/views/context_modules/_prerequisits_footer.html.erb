@@ -23,7 +23,7 @@
             <span class="id" style="display: none;"><%= pre[:id] %></span>
             <span class="type" style="display: none;"><%= pre[:type] %></span>
             <span class="name"><%= pre[:name] || t('default_module_name', "module") %></span>
-            <span style="padding-left: 3px;"><a href="#" class="delete_prerequisite_link" title="<%= t('links.title.remove_prerequisite', %{Remove this prerequisite}) %>" style="text-decoration: none;">&#215;</a></span>
+            <span><a href="#" class="delete_prerequisite_link" title="<%= t('links.title.remove_prerequisite', %{Remove this prerequisite}) %>">&#215;</a></span>
           </div>
         <% end %>
       <% end %>

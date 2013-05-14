@@ -33,18 +33,11 @@ class AccountReport < ActiveRecord::Base
     state :deleted
   end
 
-  named_scope :last_complete_of_type, lambda{|type|
-    { :conditions => [ "report_type = ? AND workflow_state = 'complete'", type],
-      :order => "updated_at DESC",
-      :limit => 1
-    }
-  }
+  scope :last_complete_of_type, lambda{ |type|
+    last_of_type(type).where(:workflow_state => 'complete')  }
 
-  named_scope :last_of_type, lambda{|type|
-    { :conditions => [ "report_type = ?", type ],
-      :order => "updated_at DESC",
-      :limit => 1
-    }
+  scope :last_of_type, lambda {|type|
+    where(:report_type => type).order("updated_at DESC").limit(1)
   }
 
   def context

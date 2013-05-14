@@ -49,7 +49,7 @@ describe "assignments" do
 
       f('.submit_assignment_link').click
       wait_for_ajaximations
-      driver.execute_script("return $('#submission_comment').height()").should == 14
+      driver.execute_script("return $('#submission_comment').height()").should == 20
       driver.execute_script("$('#submission_comment').focus()")
       wait_for_ajaximations
       driver.execute_script("return $('#submission_comment').height()").should == 72
@@ -97,7 +97,7 @@ describe "assignments" do
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-      ffj('.formtable input[name="submission[group_comment]"]').size.should == 3
+      ffj('.formtable input[name="submission[group_comment]"]').size.should == 4
     end
 
     it "should not show assignments in an unpublished course" do
@@ -202,11 +202,15 @@ describe "assignments" do
 
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         f('.submit_assignment_link').click
+        wait_for_ajaximations
         assignment_form = f('#submit_online_text_entry_form')
         wait_for_tiny(assignment_form)
+        wait_for_ajaximations
         expect {
           type_in_tiny('#submission_body', 'something to submit')
+          wait_for_ajaximations
           submit_form(assignment_form)
+          wait_for_ajaximations
         }.to change(Submission, :count).by(1)
       end
     end
@@ -217,8 +221,8 @@ describe "assignments" do
       end
 
       it "should validate file upload restrictions" do
-        filename_txt, fullpath_txt, data_txt = get_file("testfile4.txt")
-        filename_zip, fullpath_zip, data_zip = get_file("testfile5.zip")
+        filename_txt, fullpath_txt, data_txt, tempfile_txt = get_file("testfile4.txt")
+        filename_zip, fullpath_zip, data_zip, tempfile_zip = get_file("testfile5.zip")
         @fourth_assignment.update_attributes(:submission_types => 'online_upload', :allowed_extensions => '.txt')
         get "/courses/#{@course.id}/assignments/#{@fourth_assignment.id}"
         f('.submit_assignment_link').click

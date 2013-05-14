@@ -10,12 +10,8 @@ module DataFixup::EscapeS3Filenames
         Rails.logger.info "copying #{self.id} #{old_filename} to #{new_filename}"
         begin
           # Copy, not rename. For several reasons. We can clean up later.
-          AWS::S3::S3Object.copy(
-            File.join(base_path, old_filename),
-            File.join(base_path, new_filename),
-            bucket_name,
-            :access => attachment_options[:s3_access]
-          )
+          Attachment.bucket.objects[File.join(base_path, old_filename)].copy_to(File.join(base_path, new_filename),
+          :acl => attachment_options[:s3_access])
 
           # We're not going to call filename= here, because it will escape it again. That's right - calling
           # attachment.filename = attachment.filename is not safe. That's sucky but it's already always been
@@ -29,7 +25,7 @@ module DataFixup::EscapeS3Filenames
     end
 
     # A more efficient query could be done using a regular expression, but this should be db agnostic
-    Attachment.active.find_in_batches(:conditions => "filename LIKE '%[%' or filename like '%]%' or filename like '%\"%'") do |batch|
+    Attachment.active.where("filename LIKE '%[%' or filename like '%]%' or filename like '%\"%'").find_in_batches do |batch|
       batch.each do |attachment|
         # Be paranoid...
         next unless attachment.filename =~ /[\[\]"]/

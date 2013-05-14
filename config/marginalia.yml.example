@@ -1,0 +1,16 @@
+# Marginalia adds a SQL comment to all queries sent to the database with
+# context information
+# See https://github.com/37signals/marginalia
+# There are a couple of Canvas-specific components available:
+#   context_id and job_tag
+#
+# Uncomment the production block below to enable the default component config.
+
+# production:
+#   components:
+#   - controller
+#   - action
+#   - job_tag
+#   - hostname
+#   - pid
+#   - context_id

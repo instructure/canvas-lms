@@ -1,5 +1,8 @@
 <div class="registration-dialog">
   <form class="form-horizontal bootstrap-form" method="post" action="/users">
+    {{#each hiddenFields}}
+    <input type="hidden" name="{{name}}" value="{{value}}" />
+    {{/each}}
     <div class="control-group">
       <label class="control-label" for="teacher_name">{{#t "labels.name"}}Name{{/t}}</label>
       <div class="controls">

@@ -17,6 +17,7 @@
  */
 define([
   'i18n!quizzes',
+  'underscore',
   'jquery' /* $ */,
   'calcCmd',
   'str/htmlEscape',
@@ -47,7 +48,7 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n,$, calcCmd, htmlEscape, pluralize, wikiSidebar,
+], function(I18n,_,$,calcCmd, htmlEscape, pluralize, wikiSidebar,
             DueDateListView, DueDateOverrideView, Quiz, DueDateList,SectionList,
             MissingDateDialog,MultipleChoiceToggle,TextHelper){
 
@@ -127,7 +128,7 @@ define([
 
     // Determines whether or not to show the "show question details" link.
     checkShowDetails: function() {
-      var hasQuestions = this.$questions.find('div.display_question:not(.essay_question, .text_only_question)').length;
+      var hasQuestions = this.$questions.find('div.display_question:not(.essay_question, .file_upload_question, .text_only_question)').length;
       this.$showDetailsWrap[hasQuestions ? 'show' : 'hide'](200);
     },
 
@@ -210,7 +211,7 @@ define([
 
       $answer.find(".comment_focus").attr('title', I18n.t('titles.click_to_enter_comments_on_answer', 'Click to enter comments for the student if they choose this answer'));
 
-      if (question_type == "essay_question") {
+      if (question_type == "essay_question" || question_type == "file_upload_question") {
         templateData.comments_header = I18n.beforeLabel('comments_on_question', "Comments for this question");
       } else if (question_type == "matching_question") {
         templateData.answer_match_left_html = answer.answer_match_left_html;
@@ -309,6 +310,10 @@ define([
         answer_type = "comment";
         question_type = "essay_question";
         n_correct = "none";
+      } else if (qt == 'file_upload_question') {
+        answer_type = "comment";
+        question_type = "file_upload_question";
+        n_correct = "none";
       } else if (qt == 'matching_question') {
         answer_type = "matching_answer";
         question_type = "matching_question";
@@ -346,6 +351,8 @@ define([
       } else if (question_type == 'short_answer_question') {
         result = "any_answer";
       } else if (question_type == 'essay_question') {
+        result = "none";
+      } else if (question_type == 'file_upload_question') {
         result = "none";
       } else if (question_type == 'matching_question') {
         result = "matching";
@@ -602,7 +609,7 @@ define([
         $formQuestion.find(".question_comment").css('display', 'none').end()
           .find(".question_neutral_comment").css('display', '');
       }
-      $formQuestion.find(".question_header").text("Question:");
+      $formQuestion.find(".question_header").text(I18n.t('question_colon', "Question:"));
       $formQuestion.addClass(question_type);
         $formQuestion.find(".question_points_holder").showIf(!$formQuestion.closest(".question_holder").hasClass('group') && question_type != 'text_only_question');
       $formQuestion.find("textarea.comments").each(function() {
@@ -642,7 +649,7 @@ define([
       } else if (question_type == 'short_answer_question') {
         $formQuestion.removeClass('selectable');
         result.answer_type = "short_answer";
-      } else if (question_type == 'essay_question') {
+      } else if (question_type == 'essay_question' || question_type == 'file_upload_question') {
         $formQuestion.find(".answer").remove();
         $formQuestion.removeClass('selectable');
         $formQuestion.find(".answers_header").hide().end()
@@ -979,9 +986,8 @@ define([
 
   function generateFormQuiz(quiz) {
     var data = {};
-    var quizAssignmentId = quizAssignmentId || null;
-    if (quizAssignmentId) {
-      data['quiz[assignment_id]'] = quizAssignmentId;
+    if (ENV.ASSIGNMENT_ID) {
+      data['quiz[assignment_id]'] = ENV.ASSIGNMENT_ID;
     }
     data['quiz[title]'] = quiz.quiz_name;
     for(var idx in quiz.questions) {
@@ -1167,7 +1173,7 @@ define([
       });
       if (!$dialog.hasClass('loaded')) {
         $dialog.find(".searching_message").text(I18n.t('retrieving_filters', "Retrieving Filters..."));
-        var url = $("#quiz_urls .filters_url").attr('href');
+        var url = ENV.QUIZZES_URL;
         $.ajaxJSON(url, 'GET', {}, function(data) {
           $dialog.addClass('loaded');
           if (data.length) {
@@ -1259,7 +1265,21 @@ define([
         data.allowed_attempts = attempts;
         data['quiz[allowed_attempts]'] = attempts;
         overrideView.updateOverrides();
-        if (overrideView.containsSectionsWithoutOverrides() && !hasCheckedOverrides) {
+        var overrides = overrideView.getOverrides();
+        var quizData = overrideView.getDefaultDueDate();
+        if (quizData) {
+          quizData = quizData.toJSON().assignment_override;
+        } else {
+          quizData = {};
+        }
+        var validationData = {
+          assignment_overrides: overrideView.getAllDates(quizData)
+        };
+        var errs = overrideView.validateBeforeSave(validationData,{});
+        if (_.keys(errs).length > 0) {
+          return false;
+        }
+        else if (overrideView.containsSectionsWithoutOverrides() && !hasCheckedOverrides) {
           sections = overrideView.sectionsWithoutOverrides();
           var missingDateView = new MissingDateDialog({
             validationFn: function(){ return sections },
@@ -1290,7 +1310,6 @@ define([
             data['quiz[unlock_at]'] = "";
             data['quiz[lock_at]'] = "";
           }
-          var overrides = overrideView.getOverrides();
           adjustOverridesForFormParams(overrides);
           if (overrides.length === 0) { overrides = false; }
           data['quiz[assignment_overrides]'] = overrides;
@@ -1517,7 +1536,7 @@ define([
           $form.find(".form_answers").append($answer);
         });
       }
-      if ($question.hasClass('essay_question')) {
+      if ($question.hasClass('essay_question') || $question.hasClass('file_upload')) {
         $formQuestion.find(".comments_header").text(I18n.beforeLabel('comments_on_question', "Comments for this question"));
       }
       $question.hide().after($form);
@@ -2013,6 +2032,12 @@ define([
         }];
         answer_type = "comment";
         question_type = "essay_question";
+      } else if ($question.hasClass('file_upload_question')) {
+        var answers = [{
+          comments: I18n.t('default_response_to_file_upload', "Response to show student after they submit an answer")
+        }];
+        answer_type = "comment";
+        question_type = "file_upload_question";
       } else if ($question.hasClass('matching_question')) {
         var answers = [{
           comments: I18n.t('default_comments_on_wrong_match', "Response if the user misses this match")
@@ -2104,7 +2129,7 @@ define([
           error_text = I18n.t('errors.no_possible_solution', "Please generate at least one possible solution");
         }
       } else if ($answers.length === 0 || $answers.filter(".correct_answer").length === 0) {
-        if ($answers.length === 0 && questionData.question_type != "essay_question" && questionData.question_type != "text_only_question") {
+        if ($answers.length === 0 && !_.contains(["essay_question", "file_upload_question", "text_only_question"], questionData.question_type)) {
           error_text = I18n.t('errors.no_answer', "Please add at least one answer");
         } else if ($answers.filter(".correct_answer").length === 0 && (questionData.question_type == "multiple_choice_question" || questionData.question_type == "true_false_question" || questionData.question_tyep == "missing_word_question")) {
           error_text = I18n.t('errors.no_correct_answer', "Please choose a correct answer");
@@ -2326,7 +2351,6 @@ define([
         var $group = $form.parents(".group_top");
         var group = data.quiz_group;
         $form.loadingImage('remove');
-        var $group = $form.parents(".group_top");
         $group.removeClass('editing');
         $group.fillTemplateData({
           data: group,
@@ -2344,6 +2368,7 @@ define([
           $group.next(".assessment_question_bank").fillTemplateData({data: bank, hrefValues: ['bank_id', 'context_type_string', 'context_id']})
             .find(".bank_name").hide().filter(".bank_name_link").show();
         }
+        $group.find(".find_bank_link").hide();
         $group.fillFormData(data, {object_name: 'quiz_group'});
         var $bottom = $group.next();
         while($bottom.length > 0 && !$bottom.hasClass('group_bottom')) {
@@ -2594,6 +2619,15 @@ define([
     });
 
     $("#equations_dialog_tabs").tabs();
+
+    $(".delete_quiz_link").click(function(event) {
+      event.preventDefault();
+      $(this).parents(".quiz").confirmDelete({
+        message: I18n.t('confirms.delete_quiz', "Are you sure you want to delete this quiz?"),
+        url: $(this).attr('href'),
+        success: function() { window.location.replace(ENV.QUIZZES_URL); }
+      });
+    });
   });
 
   $.fn.multipleAnswerSetsQuestion = function() {

@@ -3,8 +3,8 @@ class FixSisCommunicationChannels < ActiveRecord::Migration
 
   def self.up
     begin
-      pseudonym_ids = Pseudonym.find(:all, :select => 'pseudonyms.id', :joins => :sis_communication_channel, :conditions => "pseudonyms.user_id<>communication_channels.user_id", :limit => 1000).map(&:id)
-      Pseudonym.update_all({:sis_communication_channel_id => nil}, :id => pseudonym_ids)
+      pseudonym_ids = Pseudonym.joins(:sis_communication_channel).where("pseudonyms.user_id<>communication_channels.user_id").limit(1000).pluck(:id)
+      Pseudonym.where(:id => pseudonym_ids).update_all(:sis_communication_channel_id => nil)
       sleep 1
     end until pseudonym_ids.empty?
   end

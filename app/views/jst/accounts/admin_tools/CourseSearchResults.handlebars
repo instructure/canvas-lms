@@ -1,0 +1,53 @@
+{{#if showRestore }}
+<div class="well">
+  <div class="h2">
+    <span class="lead">{{name}}</span>
+    <p>
+    <strong>{{#t "labels.coures_id1"}}Course ID:{{/t}}</strong> {{id}} <br />
+    <strong>{{#t "labels.account_id"}}Account ID:{{/t}}</strong> {{account_id}}<br />
+    <strong>{{#t "labels.course_code1"}}Course Code:{{/t}}</strong> {{course_code}}<br />
+    </p>
+  </div>
+  <button id="restoreCourseBtn" class="btn">{{#t "labels.restore_btn"}}Restore{{/t}}</button>&nbsp;&nbsp;<span>{{#t "info_text"}}Enrollments to this course must be restored manually.{{/t}}</span>
+</div>
+{{/if}}
+
+{{#if showNotFound}}
+<div class="alert alert-error">
+  <p class="text-error no-spacing">{{#t "error_message"}}A deleted course with that ID could not be found for this account.{{/t}}</p>
+</div>
+{{/if}}
+
+{{#if showSuccessfullRestore}}
+<div class="alert alert-success">
+  <p class="lead">
+  {{name}} has been restored!
+  </p>
+  <div>
+    <strong>{{#t "successfull_restore.subtext"}}What would you like to do next?{{/t}}</strong>
+    <div>
+      <a href="courses/{{id}}" id="viewCourse" class="btn">{{#t "successful_restore.view_course"}}View Course{{/t}}</a>  <a href="/courses/{{id}}/details#tab-users" id="addEnrollments" class="btn">{{#t "successfull_restore.add_enrollments"}}Add Enrollments{{/t}}</a>
+    </div>
+  </div>
+</div>
+{{/if}}
+
+{{#if showNonDeletedCourse}}
+<div class="alert alert-block">
+  <div class="h2">
+    <span class="lead">{{name}} {{#t "notdeleted_restore.header_subtext"}}(Not Deleted){{/t}}</span>
+    <p>
+    <strong>{{#t "labels.coures_id2"}}Course ID:{{/t}}</strong> {{id}} <br />
+    <strong>{{#t "labels.account_id2"}}Account ID:{{/t}}</strong> {{account_id}}<br />
+    <strong>{{#t "labels.course_code2"}}Course Code:{{/t}}</strong> {{course_code}}<br />
+    </p>
+  </div>
+
+  <div>
+    <div>
+      <a href="courses/{{id}}" id="viewCourse" class="btn">{{#t "notdeleted_restore.view_course"}}View Course{{/t}}</a>  <a href="/courses/{{id}}/details#tab-users" id="addEnrollments" class="btn">{{#t "notdeleted_restore.add_enrollments"}}Add Enrollments{{/t}}</a>
+    </div>
+  </div>
+
+</div>
+{{/if}}

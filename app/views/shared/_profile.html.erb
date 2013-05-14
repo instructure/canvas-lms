@@ -127,9 +127,9 @@
     </div>
 
     <% if @user_data[:can_edit] %>
-      <div class="form-actions show-if-editing">
-        <button class="btn btn-primary"><%= t('save_profile', 'Save Profile') %></button>
+      <div class="form-actions no-margin-bottom show-if-editing">
         <button data-event="cancelEditProfile" class="btn"><%= t('cancel', 'Cancel') %></button>
+        <button class="btn btn-primary"><%= t('save_profile', 'Save Profile') %></button>
       </div>
     <% end %>
   </div>

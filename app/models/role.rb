@@ -36,7 +36,7 @@ class Role < ActiveRecord::Base
   end
 
   def ensure_no_name_conflict_with_different_base_role_type
-    if self.root_account.all_roles.not_deleted.scoped(:conditions => ["name = ? AND base_role_type <> ?", self.name, self.base_role_type]).any?
+    if self.root_account.all_roles.not_deleted.where("name = ? AND base_role_type <> ?", self.name, self.base_role_type).any?
       self.errors.add(:name, 'is already taken by a different type of Role in the same root account')
     end
   end
@@ -71,12 +71,12 @@ class Role < ActiveRecord::Base
     save!
   end
 
-  named_scope :not_deleted, :conditions => ['roles.workflow_state != ?', 'deleted']
-  named_scope :deleted, :conditions => ['roles.workflow_state = ?', 'deleted']
-  named_scope :active, :conditions => ['roles.workflow_state = ?', 'active']
-  named_scope :inactive, :conditions => ['roles.workflow_state = ?', 'inactive']
-  named_scope :for_courses, :conditions => ['roles.base_role_type != ?', AccountUser::BASE_ROLE_NAME]
-  named_scope :for_accounts, :conditions => ['roles.base_role_type = ?', AccountUser::BASE_ROLE_NAME]
+  scope :not_deleted, where("roles.workflow_state<>'deleted'")
+  scope :deleted, where(:workflow_state => 'deleted')
+  scope :active, where(:workflow_state => 'active')
+  scope :inactive, where(:workflow_state => 'inactive')
+  scope :for_courses, where("roles.base_role_type<>?", AccountUser::BASE_ROLE_NAME)
+  scope :for_accounts, where(:base_role_type => AccountUser::BASE_ROLE_NAME)
 
   def self.is_base_role?(role_name)
     RoleOverride.base_role_types.include?(role_name)
@@ -124,6 +124,34 @@ class Role < ActiveRecord::Base
     end
 
     @enrollment_types
+  end
+
+  def self.manageable_roles_by_user(user, course)
+    manageable = ['ObserverEnrollment', 'DesignerEnrollment']
+    if course.grants_right?(user, :manage_students)
+      manageable << 'StudentEnrollment'
+    end
+    if course.grants_right?(user, :manage_admin_users)
+      manageable << 'TeacherEnrollment'
+      manageable << 'TaEnrollment'
+    elsif course.teacherless?
+      manageable << 'TeacherEnrollment'
+    end
+    manageable.sort
+  end
+
+  def self.role_data(course, user, include_inactive=false)
+    manageable = Role.manageable_roles_by_user(user, course)
+    self.custom_roles_and_counts_for_course(course, user, include_inactive).inject([]) { |roles, role|
+      is_manageable = manageable.include?(role[:base_role_name])
+      role[:manageable_by_user] = is_manageable
+      roles << role
+      role[:custom_roles].each do |custom_role|
+        custom_role[:manageable_by_user] = is_manageable
+        roles << custom_role
+      end
+      roles
+    }
   end
 
   def self.built_in_role_names

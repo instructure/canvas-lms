@@ -66,8 +66,7 @@
     padding: 5px 0;
     text-align: center;
 
-    input { padding: 2px; }
-    .btn{ margin-top: -3px; }
+    input, select { padding: 2px; margin-bottom: 0; }
   }
   .ui-datepicker-header {
     @extend .ui-dialog-titlebar;

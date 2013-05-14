@@ -1,0 +1,30 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.collaboration.context) %>/<%= asset.collaboration.context.class.base_ar_class.to_s.downcase.pluralize %>/<%= asset.collaboration.context_id %>/collaborations/<%= asset.collaboration.id %>
+<% end %>
+<% define_content :subject do %>
+  <%= t :subject, "Collaboration Invitation: %{course_or_group}", :course_or_group => asset.collaboration.context.name %>
+<% end %>
+<p>
+<% if asset.collaboration.user %>
+  <%= t :body_with_user,
+        "You've been invited to collaborate on a document, %{document} for %{course_or_group}.  The document was created by %{user} in %{service} and you were invited using your email address, %{email}.",
+        :document => asset.collaboration.title,
+        :course_or_group => asset.collaboration.context.name,
+        :user => asset.collaboration.user.short_name,
+        :service => asset.collaboration.service_name,
+        :email => asset.user.gmail %>
+<% else %>
+  <%= t :body,
+        "You've been invited to collaborate on a document, %{document} for %{course_or_group}.  The document was created in %{service} and you were invited using your email address, %{email}.",
+        :document => asset.collaboration.title,
+        :course_or_group => asset.collaboration.context.name,
+        :service => asset.collaboration.service_name,
+        :email => asset.user.gmail %>
+<% end %>
+</p>
+
+<p><%= t :change_profile_settings,
+         "If that's the wrong email address for this type of collaboration, you'll need to change your profile settings or register with %{service}.",
+         :service => asset.collaboration.service_name %></p>
+
+<p><a href="%{link}"><%= t :link, "You can see the details here" %></a></p>

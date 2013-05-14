@@ -36,8 +36,7 @@ define [
             type: 'section'
             context: "course_#{ENV.COURSE_ID}_sections"
             exclude: _.map(@model.allEnrollmentsWithRole(@role), (e) -> "section_#{e.course_section_id}")
-          preparer: (postData, data, parent) ->
-            row.noExpand = true for row in data
+          noExpand: true
           browser:
             data:
               per_page: 100

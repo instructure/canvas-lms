@@ -155,6 +155,16 @@ describe ApplicationHelper do
         output.should have_tag 'link'
         output.scan(%r{/path/to/(root/|admin/)?css}).should eql [['admin/'], ['root/']]
       end
+
+      it "should not include anything if param is set to 0" do
+        @domain_root_account.settings = @domain_root_account.settings.merge({ :global_includes => true })
+        @domain_root_account.settings = @domain_root_account.settings.merge({ :global_stylesheet => '/path/to/css' })
+        @domain_root_account.save!
+
+        params[:global_includes] = '0'
+        output = include_account_css
+        output.should be_nil
+      end
     end
 
     context "sub-accounts" do
@@ -370,7 +380,7 @@ describe ApplicationHelper do
       # verify it's not overly long
       key1.length.should <= 40
 
-      User.update_all({ :updated_at => 1.hour.ago }, { :id => collection[1].id })
+      User.where(:id => collection[1]).update_all(:updated_at => 1.hour.ago)
       collection[1].reload
       key3 = collection_cache_key(collection)
       key1.should_not == key3

@@ -27,8 +27,8 @@ module Instructure #:nodoc:
     #   end
     # end
     # 
-    # u = User.find(:first)
-    # a = Account.find(:first)
+    # u = User.first
+    # a = Account.first
     # a.check_policy(u)
     module ClassMethods
       # This stores the policy or permissions for a class.  It works like a
@@ -80,7 +80,7 @@ module Instructure #:nodoc:
     end
 
     # These are all available on an ActiveRecord model instance.  So a =
-    # Account.find(:first);
+    # Account.first;
 
     module InstanceMethods
       # Returns all permissions available for a user.  If a specific set of

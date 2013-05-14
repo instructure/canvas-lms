@@ -1,0 +1,30 @@
+<style type="text/css">
+  #userIdSearchField { width: 8em; }
+</style>
+<div class="control-group">
+  <label class="control-label" for="userIdSearchField">{{#t "canvas_user_id"}}Canvas User ID{{/t}}</label>
+  <div class="controls">
+    <input name="user_id" id="userIdSearchField" type="text" maxlength="85" />
+  </div>
+</div>
+
+<div class="control-group">
+  <label class="control-label" for="dateStartSearchField">{{#t "message_date_from"}}From Date{{/t}}</label>
+  <div class="controls">
+    <input type="text" id="dateStartSearchField" name="start_time" placeholder="{{#t "message_date_from"}}From Date{{/t}}" />
+  </div>
+</div>
+<div class="control-group">
+  <label class="control-label" for="dateEndSearchField">{{#t "message_date_to"}}To Date{{/t}}</label>
+  <div class="controls">
+    <input type="text" id="dateEndSearchField" name="end_time" placeholder="{{#t "message_date_to"}}To Date{{/t}}" />
+  </div>
+</div>
+
+<div class="control-group">
+  <div class="controls">
+    <button type="submit" class="btn btn-primary" id="notificationsSearchBtn">
+      {{#t "find"}}Find{{/t}}
+    </button>
+  </div>
+</div>

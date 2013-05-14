@@ -37,7 +37,7 @@ describe IncomingMessageProcessor do
 
   def check_new_message(bounce_type)
     Message.count.should == @previous_message_count + 1
-    @new_message = Message.find(:first, :order => 'created_at DESC')
+    @new_message = Message.order("created_at DESC").first
     @new_message.subject.should match(/Reply Failed/)
     @new_message.body.should match(case bounce_type
       when :unknown then /unknown mailbox/

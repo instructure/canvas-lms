@@ -381,7 +381,7 @@ describe "Folders API", :type => :integration do
       api_call(:post, "/api/v1/folders/#{@root_folder.id}/files",
         { :controller => "folders", :action => "create_file", :format => "json", :folder_id => @root_folder.id.to_param, },
         :name => "with_path.txt")
-      attachment = Attachment.last(:order => :id)
+      attachment = Attachment.order(:id).last
       attachment.folder_id.should == @root_folder.id
     end
   end

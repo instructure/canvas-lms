@@ -82,6 +82,13 @@ describe "Canvas::Redis::Cassandra" do
     end
   end
 
+  describe "#build_where_conditions" do
+    it "should build a where clause given a hash" do
+      db.build_where_conditions(name: "test1").should == ["name = ?", ["test1"]]
+      db.build_where_conditions(state: "ut", name: "test1").should == ["name = ? AND state = ?", ["test1", "ut"]]
+    end
+  end
+
   describe "#update_record" do
     it "should do nothing if there are no updates or deletes" do
       db.expects(:execute).never
@@ -138,10 +145,22 @@ describe "Canvas::Redis::Cassandra" do
     end
   end
 
+  describe "#insert_record" do
+    it "should not delete nils in an AR#attributes style hash" do
+      db.expects(:execute).with("UPDATE test_table SET name = ? WHERE id = ?", "test", 5)
+      db.insert_record("test_table", { :id => 5 }, { :name => "test", :nick => nil })
+    end
+
+    it "should not delete nils in an AR#changes style hash" do
+      db.expects(:execute).with("UPDATE test_table SET name = ? WHERE id = ?", "test", 5)
+      db.insert_record("test_table", { :id => 5 }, { :name => [nil, "test"], :nick => [nil, nil] })
+    end
+  end
+
   describe "execute and update" do
     it_should_behave_like "cassandra page views"
 
-    let(:db) { PageView.cassandra }
+    let(:db) { PageView::EventStream.database }
 
     it "should return the result from execute" do
       db.execute("select count(*) from page_views").fetch['count'].should == 0

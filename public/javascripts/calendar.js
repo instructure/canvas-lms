@@ -602,8 +602,11 @@ define([
     $event.toggleClass('draggable', event.can_edit);
     $event.data('description', event.description);
     var classes = $event.attr('class') || "";
-    var groupId = 'group_' + event.context_type.toLowerCase() + "_" + event.context_id;
+    var groupId = 'group_' + event.context_code;
     $event.addClass(groupId);
+    // Set the calendar name the event belongs to in the screenreader
+    // accessible span with class calendar-name-text.
+    $event.find('.calendar-name-text').text($('.' + groupId).find('label').text());
     $event.addClass('event_' + id);
     var $day = $(".calendar_undated");
     if(event.start_at != null) {

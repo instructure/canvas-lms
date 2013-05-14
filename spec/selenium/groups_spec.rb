@@ -16,7 +16,7 @@ describe "groups" do
     group_div.find_element(:css, ".name").text.should == "some group"
 
     group_div.find_element(:css, ".management a").click
-    wait_for_dom_ready
+    wait_for_ajaximations
 
     @student.group_memberships.should_not be_empty
     @student.group_memberships.first.should be_accepted
@@ -32,7 +32,7 @@ describe "groups" do
     group_div.find_element(:css, ".name").text.should == "my group"
 
     group_div.find_element(:css, ".management a").click
-    wait_for_dom_ready
+    wait_for_ajaximations
 
     @student.group_memberships.should_not be_empty
     @student.group_memberships.first.should be_accepted

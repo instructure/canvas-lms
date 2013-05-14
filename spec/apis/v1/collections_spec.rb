@@ -36,7 +36,7 @@ describe "Collections API", :type => :integration do
         :name => "test3",
         :visibility => 'public',
       })
-      @c3 = Collection.last(:order => :id)
+      @c3 = Collection.order(:id).last
       json.should == collection_json(@c3).merge({
         'id' => @c3.id,
         'name' => 'test3',
@@ -108,7 +108,6 @@ describe "Collections API", :type => :integration do
 
     it "should not allow getting a private collection" do
       json = api_call(:get, "/api/v1/collections/#{@c1.id}", { :controller => "collections", :collection_id => @c1.to_param, :action => "show", :format => "json" }, {}, {}, :expected_status => 401)
-      json['message'].should match /not authorized/
     end
 
     it "should not allow creating a collection" do
@@ -241,7 +240,7 @@ describe "Collections API", :type => :integration do
       describe "item creation" do
         it "should allow creating from a http url" do
           json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item' })
-          new_item = @c1.collection_items.last(:order => :id)
+          new_item = @c1.collection_items.order(:id).last
           new_item.collection_item_data.link_url.should == "http://www.example.com/a/b/c"
           new_item.user.should == @user
         end
@@ -249,7 +248,7 @@ describe "Collections API", :type => :integration do
         it "should allow cloning an existing item" do
           json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://localhost/api/v1/collections/items/#{@i3.id}", :user_comment => 'cloned' })
           json['post_count'].should == 3
-          new_item = @c1.collection_items.last(:order => :id)
+          new_item = @c1.collection_items.order(:id).last
           new_item.collection_item_data.should == @i3.collection_item_data
           new_item.user.should == @user
         end
@@ -604,7 +603,7 @@ describe "Collections API", :type => :integration do
 
         it "should allow creating a new item" do
           json = api_call(:post, @c1_items_path, @c1_items_path_options.merge(:action => "create"), { :link_url => "http://www.example.com/a/b/c", :user_comment => 'new item' })
-          new_item = @c1.collection_items.last(:order => :id)
+          new_item = @c1.collection_items.order(:id).last
           new_item.collection_item_data.link_url.should == "http://www.example.com/a/b/c"
           new_item.user.should == @user
         end

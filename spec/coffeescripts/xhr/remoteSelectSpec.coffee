@@ -3,7 +3,7 @@ define [
   'compiled/xhr/RemoteSelect'
   'helpers/loadFixture'
 ], (_, RemoteSelect, loadFixture) ->
-  module 'RemoteSelect'
+  module 'RemoteSelect',
     setup: ->
       @response = [200, { 'Content-Type': 'application/json' }, '[{ "label": "one", "value": 1 }, {"label": "two", "value": 2 }]']
       @fixture  = loadFixture 'RemoteSelect'

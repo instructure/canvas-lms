@@ -15,15 +15,25 @@ ru:
     no_api_key: "Для использования Academic Benchmarks требуется ключ API"
     no_authority: "Не удалось найти полномочия для обновления"
     no_file: "Нет файла результатов или полномочий"
+  accont: 
+    feedback_pricing_sub: "Получить номера для вашей организации"
   account: 
+    ask_canvas_network: "Задать вопрос сообществу сети Canvas"
     default_account_name: "Учетная запись по умолчанию"
     default_site_administrator_account_name: "Администратор сайта"
     default_term_name: "Период по умолчанию"
     errors: 
       invalid_discovery_url: "Неверный URL-адрес представления сведений"
+    feedback_coach: "Задать вопрос сообществу"
+    feedback_coach_sub: "Получить помощь от эксперта Canvas"
+    feedback_feature_request: "Запросить функцию"
+    feedback_feature_request_canvas_net: "Запросить функцию в сети Canvas"
+    feedback_feature_request_sub: "У вас есть идеи, как улучшить Canvas?"
+    feedback_pricing: "Информация о ценах в Canvas"
     manually_created_courses: "Созданные вручную курсы"
     root_account_cant_have_sis_id: "Идентификаторы SIS не могут быть установлены для корневых учетных записей"
     sis_id_in_use: "Идентификатор SIS \"%{sis_id}\" уже используется"
+    tab_admin_tools: "Инструменты администратора"
     tab_authentication: Аутентификация
     tab_courses: Курсы
     tab_developer_keys: "Ключи разработчиков"
@@ -227,10 +237,17 @@ ru:
     default: 
       all_terms: "Все периоды"
       extra_text: "Для периода: %{term_name}"
+      extra_text_term: "Период: %{term_name};"
       grade: 
         message: "Экспорт оценки успешно создан для периода %{term_name}"
+      message: "Отчет %{type} был успешно создан со следующими настройками. Учетная запись: %{account}; %{options}"
       outcome: 
         message: "Отчет, отображающий результаты выполнения задания студентом, успешно создан для %{account_name}"
+    grades: 
+      deleted: "Включить удаленные объекты: true;"
+    sis_exporter: 
+      deleted: "Включить удаленные объекты: true;"
+      reports: "Отчеты: %{files}"
   account_settings: 
     confirms: 
       delete_announcement: "Удалить объявление?"
@@ -281,6 +298,67 @@ ru:
     add_user_dialog_title: "Добавить нового пользователя"
     adding_course_message: "Добавление курса..."
     adding_user_message: "Добавление пользователя..."
+    additional_settings: 
+      labels: 
+        file_quota_in_gb: "Хранилище файлов"
+        media_quota_in_gb: "Хранилище мультимедиа"
+        student_quota: Студенты
+    additional_settings_right_side: 
+      links: 
+        suspend: "Временно отключить учетную запись"
+        unsuspend: "Включить временно отключенную учетную запись"
+      title: 
+        suspend: "Временно отключить учетную запись"
+      titles: 
+        unsuspend: "Включить временно отключенную учетную запись"
+    admin_tools: 
+      admin_tools: 
+        tab_labels: 
+          restore_course: "Восстановить курсы"
+        view_messages: "Просмотреть уведомления"
+      admin_tools_cumb: "Инструменты администратора"
+      comm_message_item: 
+        created_at: Создано
+        from_name: От
+        reply_to: Ответить
+        sent_at: "Отправить на"
+        to: Кому
+      comm_messages_content_pane: 
+        search_info: "Чтобы просмотреть все уведомления, отправленные пользователю Canvas, введите его идентификатор пользователя Canvas и диапазон дат для вашего поиска."
+        view_notifications: "Просмотреть уведомления"
+      comm_messages_search_form: 
+        canvas_user_id: "Идентификатор пользователя Canvas"
+        find: Найти
+        message_date_from: "Дата начала"
+        message_date_to: "Дата завершения"
+      comm_messages_search_overview: 
+        messages_viewed: "Уведомление отправлено *%{user}* с *%{start_date}* по *%{end_date}*."
+      comm_messages_search_results: 
+        no_messages_found: "Сообщения не найдены"
+      course_search_form: 
+        labels: 
+          find_deleted_course: "Найти удаленный курс"
+      course_search_results: 
+        error_message: "Невозможно найти удаленный курс с таким идентификатором для данной учетной записи."
+        info_text: "Регистрации на данный курс должны быть восстановлены вручную."
+        labels: 
+          account_id: "Идентификатор учетной записи:"
+          account_id2: "Идентификатор учетной записи:"
+          coures_id1: "Идентификатор курса:"
+          coures_id2: "Идентификатор курса:"
+          course_code1: "Код курса:"
+          course_code2: "Код курса:"
+          restore_btn: Восстановить
+        notdeleted_restore: 
+          add_enrollments: "Добавить регистрации"
+          header_subtext: "(Не удалено)"
+          view_course: "Просмотр курса"
+        successful_restore: 
+          view_course: "Просмотр курса"
+        successfull_restore: 
+          add_enrollments: "Добавить регистрации"
+          subtext: "Что бы вы хотели сделать дальше?"
+      page_title: "Инструменты администратора для %{account}"
     avatars: 
       all_link: 
         one: "Все %{count}"
@@ -332,6 +410,13 @@ ru:
       teachers_label: Учителя
     course_add_failed_message: "Ошибка добавления курса, повторите попытку"
     course_added_message: "%{course} успешно добавлен!"
+    course_status_csv_description: 
+      account_reports: 
+        auburn: 
+          course_status: 
+            text: "Данный отчет показывает состояние всех курсов для данного семестра. Полученный файл .csv будет содержать по одной строке на каждый раздел курса, и будет отображать курс, статус курса, семестр, фактические даты начала и завершения, а также имя учителя, сделавшего запись в разделе."
+          description: 
+            header: Пример
     courses: 
       courses_crumb: Курсы
       no_results_message: "Результаты не найдены"
@@ -346,6 +431,32 @@ ru:
       go_button: Переход
       hide_enrollmentless_courses: "Скрыть курсы без регистрации"
     crumb_statistics: Статистика
+    custom_grade_export_csv_description: 
+      account_reports: 
+        ross: 
+          description: 
+            header: Пример
+            text: "Этот отчет отображает результаты итоговой оценки студента для всех студентов в данном периоде. В полученном файле .csv на каждого зарегистрированного студента будет приходиться отдельная строка, а также будут показаны текущая и итоговая оценки, отображенные в табеле успеваемости курса."
+    custom_grade_export_csv_parameters: 
+      account_reports: 
+        ross: 
+          parameters: 
+            note: "В этом отчете могут не точно отображаться оценки курсов с заданиями, в которых отключен звук. "
+    date_picker_parameter: 
+      custom_reports: 
+        end: 
+          parameters: 
+            header: "Завершено:"
+        start: 
+          parameters: 
+            header: "Начато:"
+    google_doc_accounts_csv_description: 
+      account_reports: 
+        ut_austin: 
+          description: 
+            header: Пример
+          google_doc: 
+            text: "Это отчет обо всех пользователях и связанных с ними адресах электронной почты, которые используются для интеграции с Документами Google."
     grade_export_csv_description: 
       account_reports: 
         default: 
@@ -375,6 +486,22 @@ ru:
         sis_export: 
           description: 
             text: "Данный отчет экспортирует всю необходимую информацию, которая относится к наполнению данными системы Canvas в соответствующих категориях."
+    quiz_data_csv_description: 
+      account_reports: 
+        ace: 
+          quiz_data_description: 
+            header: Пример
+            text: "Данный отчет отображает вопросы контрольной работы и ответы на все контрольные работы в данном семестре. Полученный файл .csv содержит по одной строке на каждый вопрос и ответ контрольной работы."
+    quiz_statistics_csv_description: 
+      account_reports: 
+        ace: 
+          quiz_statistics_description: 
+            header: Пример
+            text: "Данный отчет отображает вопросы контрольной работы, информацию о том, сколько пользователей ответили на них и сколько пользователей ответили на них верно, для всех контрольных работ в данном семестре. Полученный файл .csv содержит по одной строке на каждый вопрос контрольной работы."
+    retry_login: "Повторить попытку входа в систему"
+    root_accounts: 
+      labels: 
+        name: "Имя учетной записи"
     settings: 
       about_google_docs: |-
           Чтобы облегчить работу пользователей и не заставлять из загружать такие файлы, как Word, PDF, таблиц Excel или Open Office (тем более что многим пользователям понадобится сначала установить эти программы), он обеспечивает встроенный предварительный просмотр документа во многих областях Canvas. 
@@ -433,6 +560,7 @@ ru:
       labels: 
         account_notification_icon: Значок
         admins_can_change_passwords: "Пароль, установленный администраторами"
+        admins_can_view_notifications: "Администраторы могут просматривать уведомления"
         allow_invitation_previews: "Предварительный просмотр приглашения"
         allow_sending_scores_in_emails: "Студенты могут зарегистрироваться на получение оценок по электронной почте"
         allow_sis_import: "Импорт SIS"
@@ -441,6 +569,7 @@ ru:
         default_language: "Язык по умолчанию"
         default_time_zone: "Часовой пояс по умолчанию"
         default_user_storage_quota: "Квота пользовательских файлов по умолчанию"
+        edit_institution_email: "Пользователи могут удалять свои выданные учреждением адреса электронной почты"
         enable_alerts: Оповещения
         enable_eportfolios: ePortfolio
         enable_profiles: "Включить Профили"
@@ -466,6 +595,7 @@ ru:
         outgoing_email_default_name_option_custom: "Пользовательское имя \"От\""
         outgoing_email_default_name_option_default: "Настройки Canvas по умолчанию"
         prevent_course_renaming_by_teachers: "Не разрешать преподавателям переименовывать курсы"
+        restrict_student_future_view: "Ограничить просмотр курсов для студентов до даты начала"
         self_enrollment: "Разрешить самостоятельную регистрацию"
         show_scheduler: "Включить планировщик"
         sis_source_id: "Идентификатор SIS"
@@ -621,6 +751,8 @@ ru:
       started_at_message: "Начато: %{started_at}"
       title: "Импорт SIS"
       try_import_again_link: "Повторите попытку импорта"
+    site_admin_statistics: 
+      page_title: "Статистика %{account}"
     statistics: 
       concluded_at: "закончен %{at}"
       created_at: "создано %{at}"
@@ -660,6 +792,53 @@ ru:
         one: "%{file_size} *из одного файла*"
         other: "%{file_size} *из %{count} файлов*"
       uploaded_file_storage_header: "Загруженное хранилище файлов"
+    student_access_csv_description: 
+      account_reports: 
+        tmcc: 
+          description: 
+            header: Пример
+          student_activity: 
+            text: "Данный отчет отображает всю деятельность студентов, зарегистрированных на данном курсе или всех курсах в данном семестре. Полученный файл .csv содержит по строке на каждый вид деятельности студента и будет иметь следующие заголовки: идентификатор раздела, sis идентификатор раздела, название раздела, идентификатор курса, sis идентификатор курса, название курса, идентификатор пользователя, sis идентификатор пользователя, тип содержимого, содержимое, количество просмотров, количество участий, просмотренные. Количество просмотров и количество участий считаются от момента начала и до момента составления отчета."
+    student_ip_csv_description: 
+      account_reports: 
+        dubspot: 
+          description: 
+            header: Пример
+          student_login: 
+            text: "Данный отчет отображает всех студентов, зарегистрированных на данном курсе или всех курсах в данном семестре. Полученный файл .csv файл содержит по одной строке на каждого зарегистрированного студента."
+    student_login_csv_description: 
+      account_reports: 
+        bucks: 
+          description: 
+            header: Пример
+          student_login: 
+            text: "Данный отчет отображает студентов, которые не входили в систему, начиная с указанной даты."
+    student_login_csv_parameters: 
+      account_reports: 
+        bucks: 
+          login: 
+            check_box: "Включать пользователей, которые ни разу не входили в систему?"
+          parameters: 
+            note: "Данный отчет отражает не последнюю активность в canvas, а информацию о том, когда пользователь в последний раз входил в систему."
+    student_submissions_csv_description: 
+      account_reports: 
+        vilas: 
+          description: 
+            header: Пример
+          student_submissions: 
+            text: "Это отчет обо всех студентах, зарегистрированных на курсе в данном семестре, которые отправили задание. Данный отчет содержит по одной строке на каждую отправку студента."
+    students_with_no_submissions_csv_description: 
+      account_reports: 
+        vilas: 
+          description: 
+            header: Пример
+          students_with_no_submissions: 
+            text: "Это отчет обо всех студентах, зарегистрированных на курсе в данном семестре, которые не отправили задание в заданные на данном курсе временные рамки. Данный отчет содержит по одной строке на каждого зарегистрированного студента."
+    submission_data_csv_description: 
+      account_reports: 
+        submission_data: 
+          description: 
+            text: "Данный отчет содержит даты отправки для инструмента учета посещений."
     terms_parameters: 
       account_reports: 
         default: 
@@ -670,9 +849,18 @@ ru:
     test_ldap_result_canceled: Отменено
     test_ldap_result_failed: Ошибка
     test_ldap_result_ok: ОК
+    test_login: "Проверка входа в систему"
+    testing: Тестирование...
+    unused_courses_csv_description: 
+      account_reports: 
+        uw: 
+          description: 
+            header: Пример
+          student_submissions: 
+            text: "Это отчет обо всех курсах, которые не имеют ни одного из следующих элементов: задания, объявления, обсуждения, модули, страницы или контрольные работы."
     update_failed_notice: "Ошибка обновления настроек учетной записи"
     user_add_failed_message: "Ошибка добавления пользователя, повторите попытку"
-    user_added_message: "%{user} успешно добавлен!"
+    user_added_message: "*%{user}* успешно добавлен!"
     user_added_message_sent_message: "%{user} успешно добавлен! В скором времени они должны получить подтверждение по электронной почте."
     user_deleted_message: "%{username} успешно удален"
   activerecord: 
@@ -757,6 +945,29 @@ ru:
       criteria_required: "Требуется хотя бы один триггер"
       recipients_required: "Требуется хотя бы один получатель"
       threshold_should_be_numeric: "Должно быть положительным числом"
+  analytics: 
+    course: 
+      analytics: Аналитика
+      page_title: "Аналитика: %{course}"
+    crumb: 
+      completed: "Завершенные курсы"
+      current: "Текущие курсы"
+    department: 
+      analytics: Аналитика
+    filters: 
+      completed: "Завершенные курсы"
+      current: "Текущие курсы"
+    page_title: 
+      completed: "Аналитика: %{account} -- Завершенные курсы"
+      current: "Аналитика: %{account} -- Текущие курсы"
+      term: "Аналитика: %{account} -- %{term}"
+    student_in_course: 
+      analytics: Аналитика
+      page_title: "Аналитика: %{course} -- %{student}"
+  angel: 
+    file_copy_fail: "Не удалось скопировать папку \"%{base_path}\""
+    file_copy_fail_message: "Не удалось переименовать каталог, расположенный в \"%{path}\""
+    file_import_fail: "Не удалось импортировать файл \"%{file_path}\""
   announcement: 
     no_title: "Без названия"
   announcements: 
@@ -815,7 +1026,12 @@ ru:
       page_disabled_for_course: "Эта страница отключена для этого курса"
       page_disabled_for_group: "Эта страница отключена для этой группы"
     warnings: 
+      details: 
+        suspended: "Данная учетная запись организации в Canvas была временно отключена. Только администраторы учетной записи могут войти в систему и исправить любые проблемы."
       please_log_in: "В целях безопасности, пожалуйста, введите ваш пароль для продолжения"
+      titles: 
+        suspended: "Организация временно отключена"
+      unsupported_browser: "Ваш браузер не соответствует минимальным требованиям Canvas. Посетите *руководство пользователя Canvas* для получения полного списка поддерживаемых браузеров."
     wiki_front_page_default_content_course: "Добро пожаловать в wiki нового курса!"
     wiki_front_page_default_content_group: "Добро пожаловать в wiki новой группы!"
   appointment_group: 
@@ -840,7 +1056,13 @@ ru:
     default_title: "Нет имени - %{course}"
     default_unfiled_title: "Неотвеченные вопросы"
   assignment: 
+    advanced_options_errors: "Для одной или нескольких дополнительных опций произошла ошибка"
+    assignment_group_must_have_group: "Выберите группу заданий для данного задания"
+    at_least_one_file_type: "Укажите хотя бы один разрешенный тип файла"
+    at_least_one_submission_type: "Укажите хотя бы один тип отправки"
     atom_no_author: "Без автора"
+    buttons: 
+      select_url: Выбрать
     comment_from_files: 
       few: "Смотрите приложенные файлы "
       one: "Смотрите приложенный файл"
@@ -849,15 +1071,30 @@ ru:
       cannot_save_att: "У вас нет разрешения на изменение заблокированных свойств %{att_name}"
       import: 
         external_tool_url: "Url-адрес для задания внешнего средства \"%{assignment_name}\" недействительный."
+      upload_as_zip: "Загрузите файлы в качестве ZIP-файла"
     feed_entry_title: "Задание: %{assignment}"
     feed_entry_title_with_course: "Задание, %{course}: %{assignment}"
+    group_assignment_must_have_group_set: "Выберите набор групп для данного задания"
+    hide_advanced_options: "Скрыть дополнительные опции"
     imported_assignments_group: "Импортированные задания"
     labels: 
       due: До
     messages: 
       assignment_created: "Задание\"%{assignment}\" создано"
+    name_is_required: "Необходимо указать имя!"
+    select_external_tool_dialog_title: "Настройка внешних инструментов"
+    show_advanced_options: "Отобразить дополнительные опции"
     submission_action_take_quiz: "Использовать %{title}"
     submission_action_turn_in_assignment: "Включить в %{title}"
+    submission_types: 
+      a_discussion_post: "сообщение обсуждения"
+      a_file_upload: "загрузка файла"
+      a_media_recording: "запись мультимедийных данных"
+      a_quiz: "контрольная работа"
+      a_text_entry_box: "поле для ввода текста"
+      a_website_url: "url веб-сайта"
+    titles: 
+      grading_scheme_info: "Просмотр/редактирование схемы оценок"
     warnings: 
       group_assignment: "Задание \"%{assignment}\" было групповым заданием. Вам нужно переустановить настройки группы для этого нового контекста"
       peer_assignment: "Задание \"%{assignment}\" было заданием для рассмотрения коллегами. Вам нужно переустановить настройки рассмотрения коллегами для этого нового контекста"
@@ -900,8 +1137,8 @@ ru:
     add_assignment_form: 
       assignment_name: "Название задания"
       labels: 
-        due: окончание
-        points: баллы
+        due: "срок:"
+        points: "баллы:"
         quiz_points: "контрольная работа pts."
         type: тип
       links: 
@@ -922,7 +1159,7 @@ ru:
         assignments: Задания
         group_name: "Имя группы"
       links: 
-        add_grading_rule: "добавить правило оценки"
+        add_grading_rule: "Добавить правило оценки"
         delete_assignment: Удалить
       options: 
         drop_highest: "Удалить самую высокую"
@@ -931,13 +1168,26 @@ ru:
         never_drop: "Никогда не удалять"
         no_assignments: "[Нет заданий]"
         weighted_by_points: "Взвешено по баллам"
-      percent_of_total_grade: "%{percent} % общей оценки"
+      percent_of_total_grade: "% общей оценки"
     assignment: 
       default_content: "Нет содержимого"
     assignment_count: 
       few: "%{count} задания"
       one: "1 Задание"
       other: "%{count} задания"
+    assignment_group_create_dialog: 
+      assignment_group: 
+        labels: 
+          name: Имя
+      buttons: 
+        add_group: "Добавить группу"
+        cancel: Отменить
+      links: 
+        add_assignment_group: "Добавить группу заданий\""
+    assignment_group_selector: 
+      assignment_group: "Группа заданий"
+      assignment_group_options: 
+        new_group: "Новая группа"
     assignment_groups_count: 
       few: "%{count} групп"
       one: "1 группа"
@@ -1009,18 +1259,44 @@ ru:
     confirm: 
       delete_assignment: "Вы действительно хотите удалить это задание?"
       delete_group: "Удалить группу?"
+    create_new_crumb: "Создать новый"
     crumbs: 
       new_assignment: "Новое значение"
     drop_highest_scores: "Удалить самые высокие %{number} оценки"
     drop_lowest_scores: "Удалить самые низкие %{number} оценки"
+    due_date_override: 
+      overrides: 
+        available_from: "Доступно с"
+        due_date: "Дата выполнения"
+        for: Для
+      until: До
+    edit: 
+      edit_assignment: "Редактировать задание"
+      new_discussion: "Новое обсуждение"
+      new_quiz: "Новая контрольная работа"
+    edit_view: 
+      assignment_name: "Имя задания"
+      buttons: 
+        update: "Обновить задание"
+      description: Описание
+      due_date: "Дата выполнения"
+      freeze_properties: "Блокировка свойств задания при копировании"
+      notify_content_change: "Уведомлять пользователей об изменении этого содержания"
+      points_possible: Баллы
+      show_advanced_options: "Отобразить дополнительные опции"
+      warnings: 
+        assignment_is_frozen: "Некоторые настройки были заблокированы администратором."
     errors: 
       add_group_failed: "Ошибка добавления группы"
       delete_reminder_failed: "Сбой удаления"
       deleting_group_failed: "Сбой удаления"
+      google_docs_masquerade_rejected: "Не удается подключиться к Google Docs в качестве пользователя, выдающего себя за другого."
       reminder_failed: "Сбой напоминания"
     external_grader_sidebar: 
       edit_assignment_settings: "Редактировать настройки задания"
       speed_grader: "Speed Grader"
+    file_retrieval_error: "Ошибка получения файлов"
+    getting_file: "Получение файлов..."
     grade_assignment: 
       buttons: 
         upload_files: "Загрузить файлы"
@@ -1041,8 +1317,23 @@ ru:
           
           *Убедитесь, что имена файлов подписок не изменены, чтобы их можно было распознать.*
       titles: 
+        related_items: "Связанные элементы"
         submission: Отправки
     graded: "Эта отправка оценена"
+    grading_type_selector: 
+      grading_type: "Тип оценки"
+      grading_type_options: 
+        letter_grade: "Буквенная оценка"
+        not_graded: "Нет оценки"
+        pass_fail: Завершено/незавершено
+        percent: Процент
+        points: Баллы
+      view_grading_levels: "Просмотр уровней оценок"
+    group_category_selector: 
+      grade_group_students_individually: "Назначить оценки каждому студенту по отдельности"
+      group_category_options: "Новая категория группы"
+      group_set: "Набор групп"
+      is_group_assignment: "Это группа заданий"
     group_comment: 
       labels: 
         group_comment: "Отправить комментарий всей группе"
@@ -1075,6 +1366,9 @@ ru:
       links: 
         wizard: Как...?
       page_title: Задания
+    invalid_file_retrieval: "Ошибка получения файла, отправленного данным инструментом."
+    invalid_tool_return: "При запуске инструмента появилось сообщение \"неправильный ресурс для данного задания\""
+    loading_tools_failed: "Ошибка загрузки инструментов"
     messages: 
       adding_group: "Добавление группы..."
       agree_to_pledge: "Перед отправкой этого задания необходимо согласиться с обязательством."
@@ -1088,6 +1382,7 @@ ru:
     needs_grading_count: "%{needs_grading_count} отправок этого задания ожидают оценки"
     never_drop_scores: "Никогда не удалять %{assignment_name}"
     no_assignments: "[Нет заданий]"
+    no_tools_found: "Инструменты не найдены"
     notices: 
       assignment_delete: "Это задание удалено"
       created: "Задание успешно создано."
@@ -1129,6 +1424,14 @@ ru:
       titles: 
         automatically_assign_reviews: "Автоматически назначать рассмотрение"
         remind: "Напомнить %{assessor} об проверке знаний, последнее уведомление %{time}"
+    peer_reviews_selector: 
+      labels: 
+        automatically_assign_peer_reviews: "Автоматически назначать рассмотрение коллегами"
+        manually_assign_peer_reviews: "Назначить рассмотрение коллегами вручную"
+        require_peer_reviews: "Требуется рассмотрение коллегами"
+      locked_until: "Назначить рассмотрение"
+      peer_reviews_assign_at_explanation: "Должно быть после даты выполнения. Если пустое, используется дата выполнения."
+      reviews_per_user: "Оценки для пользователя"
     percent_of_final_grade: "%{percent} итоговой оценки"
     redirect_page: 
       redirect_message: |-
@@ -1137,12 +1440,33 @@ ru:
     select_assignment: "[Выберите задание]"
     show: 
       assignment_locked: "Это задание в настоящий момент заблокировано."
+      available_from: "Доступно с"
+      date_time_by: "%{date} по %{time}"
+      defaults: 
+        no_content: "Нет содержания"
+      due: Срок
+      due_at: Срок
       errors: 
         upload_as_zip: "Загрузите файлы как ZIP-файл"
+      for: Для
       links: 
+        add_rubric: "Добавить рубрику"
         assign_rubric: "Назначить рубрику"
         back_to_getting_started: "Вернуться к мастеру по началу работы"
+        edit: Редактировать
+      messages: 
+        locked: "Это задание в настоящий момент заблокировано."
       new_assignment: "Новое значение"
+      no_due_date: "Нет даты выполнения"
+      no_points: Нет
+      no_submission: Ничего
+      points: Баллы
+      submission_types: "Типы файлов"
+      submitting: Отправка
+      turnitin: Turnitin
+      turnitin_enabled: "Служба Turnitin включена для этого задания."
+      turnitin_enabled_short: "(Служба Turnitin включена)"
+      until: До
     show_locked: 
       labels: 
         assignment: Задание
@@ -1183,6 +1507,27 @@ ru:
     submission_type_icon: 
       tooltips: 
         submitted: Отправлено
+    submission_types_form: 
+      advanced_turnitin_settings: "Дополнительные настройки Turnitin"
+      descriptions: 
+        allowed_extensions: "Введите список принятых расширений, например: doc, xls, txt"
+      label: 
+        external_tool_new_tab: "Загрузить этот инструмент в новой вкладке"
+        external_tool_url: "URL-адрес внешнего инструмента"
+        turnitin_enabled: "Разрешить отправки Turnitin"
+      labels: 
+        allow_file_uploads: "Разрешить загрузку файлов"
+        allow_media_recordings: "Разрешить запись мультимедийных данных"
+        allow_text_entry: "Разрешить ввод текста"
+        allow_url: "Разрешить URL-адрес веб-сайта"
+        allowed_extensions: "Разрешенные расширения файлов"
+        restrict_file_extensions: "Ограничить перечень типов файлов для загрузки"
+      submission_type: "Тип отправки"
+      submission_types: 
+        external_tool: "Внешний инструмент"
+        no_submission: "Нет отправки"
+        on_paper: "На бумаге"
+        online: Онлайн
     submit_assignment: 
       additional_comments: "Дополнительные комментарии"
       buttons: 
@@ -1192,6 +1537,7 @@ ru:
       errors: 
         unacceptable_file_type: "Этот тип файла не разрешен. Допустимые типы файлов: %{allowed_extensions_list}"
       instructions: 
+        from_external_tool: "Выберите инструмент из приведенного ниже списка загрузки и отправьте на ресурс, предоставляемый данным инструментом."
         google_docs: "Выберите файл из списка ниже."
         media_recording: "Используйте ссылку ниже для записи передачи. Щелкните \"Сохранить\" по завершении и готовности к отправке."
         online_text_entry: "Скопируйте и вставьте или введите сюда передачу."
@@ -1205,11 +1551,13 @@ ru:
         authorize_google_docs: "Авторизовать доступ Google Docs"
         find_file: "Щелкните здесь, чтобы найти уже загруженный файл"
         submit: 
+          external_tool: Больше
           file_upload: "Отправка файла"
           google_doc: "Google Doc"
           media: Мультимедиа
           text_entry: "Текстовая запись"
           website: "URL-адрес веб-сайта"
+      loading_tools: "Загрузка инструментов..."
       messages: 
         google_docs_auth_required: "Перед отправкой заданий непосредственно из Google Docs требуется предоставить Canvas доступ к учетной записи Google Docs:"
         media_recording_ready: "Готово к отправке! Нажмите кнопку \"Отправить задание\" для завершения."
@@ -1217,6 +1565,8 @@ ru:
         submitting: "Идет отправка..."
         uploading: "Получение копии документа Google для отправки для этого задания. Это может занять некоторое время в зависимости от размера файла..."
       no_files: "Нет файлов"
+      no_submission: "Нет выбранных отправок"
+      submission_url: "Отправка:"
       titles: 
         media_recordings_disabled: "Мультимедийные записи не разрешены для этого сайта Canvas"
         view_in_separate_window: "Просмотреть в отдельном окне"
@@ -1253,6 +1603,28 @@ ru:
       add_assignment_group: "Добавить группу заданий"
       assignment_details: "Сведения о задании"
       uploading: "Загрузка отправки"
+    turnitin_settings_dialog: 
+      assignments: 
+        turnitin_settings: 
+          labels: 
+            exclude_small_matches: "Небольшое совпадение"
+      buttons: 
+        update_settings: "Обновить настройки"
+      turnitin_settings: 
+        labels: 
+          compare_against: "Сравнить с"
+          do_not_consider: "Не учитывать"
+          exclude_biblio: "Библиографический материал"
+          exclude_quoted: "Цитируемый материал"
+          internet_check: "Интернет-база данных"
+          journal_check: "Журналы, периодические издания и публикации"
+          student_paper_check: "Другие студенческие работы"
+        originality_report_visibility: "Студенты могут просматривать отчет о подлинности"
+        originality_report_visible_after_due_date: "После даты выполнения"
+        originality_report_visible_after_grading: "После оценки задания"
+        originality_report_visible_immediately: Немедленно
+        settings_exclude_fewer_than_count: "Менее %h{wordsInput} слов"
+        settings_exclude_less_than_percent: "Менее %h{percentInput} документа"
     wizard_box: 
       descriptions: 
         delete_icon: "%{icon}: Удалить задание"
@@ -1314,8 +1686,68 @@ ru:
     titles: 
       attendance_help: "Справка по посещению"
       new_attendance_column: "Новый столбец посещения"
+  blackboard: 
+    no_manifest: "Этот zip-архив системы Blackboard не содержит файла imsmanifest.xml в корневом каталоге."
   bookmark_service: 
     default_title: "Без названия"
+  bulk_course_migration: 
+    export_failed: "Произошла ошибка при экспорте курса с bb_lcid %{id} с Blackboard"
+    export_failed_no_id: "Произошла ошибка при импорте курса"
+    export_failed_not_found: "Невозможно найти курс с bb_lcid %{id} с пользователем %{user_name} в системе Blackboard"
+    export_failed_with_id: "Произошла ошибка во время импорта курса с bb_lcid %{id} в Canvas"
+    no_course_found: "Не было найдено ни одного курса с %{id_type} %{id}"
+    no_course_id_given: "Для bb_lcid %{id} не было идентифицировано ни одного курса Canvas"
+    no_credentials_found: "Учетные данные для данного имени пользователя %{user_name} не найдены"
+    no_credentials_given: "Не было дано имя пользователя курсу %{course_identifier}"
+    no_lcid_found: "Для строки не был указан bb_lcid"
+    queue_error: "Произошла ошибка во время постановки в очередь на перемещение."
+  bulk_course_migrations: 
+    bulk_course_migration: 
+      exporting: "Экспорт с Blackboard"
+      failed: Сбой
+      finished: Завершен
+      importing: "Импорт в Canvas"
+      migration_cancelled_on: "Отменен %{date}"
+      migration_failed_on: "Не удался %{date}"
+      migration_finished_on: "Завершен %{date}"
+      migration_queueing: "Перемещения индивидуального курса ставятся в очередь на запуск."
+      migration_started_at: "Массовое перемещение началось %{time}"
+      migration_waiting: "Массовое перемещение ожидает запуска."
+      see_results: "Посмотреть результаты"
+      show_warnings: "Показать предупреждения"
+      waiting_to_export: "Ожидание экспорта с Blackboard"
+      waiting_to_import: "Ожидание импорта в Canvas"
+    index: 
+      available_courses: "Доступные курсы"
+      bulk_description: "В CSV должны быть следующие заголовки:"
+      buttons: 
+        add_credentials: "Добавить учетные данные"
+        migrate_courses: "Переместить курсы"
+      column_name: "Имя столбца"
+      course_id_description: "Идентификатор курса canvas, в который будет совершаться импорт."
+      credential_description: "В системах Vista/CE данный инструмент поможет вам перемещать с Blackboard несколько курсов одновременно. Чтобы переместить ваши курсы, добавьте набор учетных данных для вашей системы Blackboard, затем добавьте идентификатор курса Canvas в предоставленный шаблон CSV."
+      csv_description: "Могут быть добавлены любые другие столбцы, однако они будут проигнорированы. Ниже представлен пример простого файла CSV для 3 курсов в учетной записи с именем пользователя \"greg\":"
+      csv_template: "Шаблон CSV"
+      current_migration_batch: "Перемещаемый в данный момент пакет"
+      description: Описание
+      errors: 
+        choose_file: "Вы должны выбрать файл .csv для загрузки"
+      labels: 
+        only_use_one: "Используйте только один из этих двух столбцов"
+        password: Пароль
+        school: Школа
+        user_name: "Имя пользователя"
+      lcid_description: "lcid курса в системе Blackboard."
+      login_credentials: "Учетные данные для входа в систему Blackboard"
+      page_title: "Массовое перемещение курсов"
+      previous_migration_batches: "Пакеты предыдущего перемещения"
+      school: Школа
+      school_not_supported: "Пожалуйста, воспользуйтесь связью администратора Instructure, чтобы получить помощь для вашей школы."
+      sis_id_description: "Идентификатор SIS курса canvas для импорта."
+      upload_migration_csv: "Загрузить CSV для перемещения"
+      user_name: "Имя пользователя"
+      user_name_description: "Имя пользователя, принадлежащее пользователю, который имеет доступ учителя/дизайнера к курсу для строки. Оно должно совпадать с одним из имен пользователей, записанных в учетных данных для входа в систему Blackboard."
+    only_one_bulk_migration: "В один момент времени может быть запущено только одно массовое перемещение курса."
   button: 
     submit_assignment: "Отправить задание"
   buttons: 
@@ -1339,7 +1771,9 @@ ru:
     hide: Скрыть
     hide_all_artifacts: "Скрыть все искажения"
     import: Импортировать
+    login: "Вход в систему"
     manage_rubrics: "Управление рубриками"
+    masquerade: "Подменить как пользователя"
     ok: ОК
     okay: ОК
     post_message: "Опубликовать сообщение"
@@ -1349,9 +1783,13 @@ ru:
     save_course: "Сохранить курс"
     save_tool_settings: "Сохранить настройки инструмента"
     search: Поиск
+    send_message: "Отправить сообщение"
+    sending: Отправка...
+    sent: Отправлено!
     show: Показать
     show_all_artifacts: "Показать все искажения"
     submit: Отправить
+    unmasquerade: "Остановить подмену"
     update: Обновить
     update_learning_outcome: "Обновить результат обучения"
     update_outcome_group: "Обновить группу результатов"
@@ -1481,19 +1919,21 @@ ru:
       scheduler_explanation_teacher_paragraph_2: "Предположим, что вы хотите пройтись по каждой экзаменационной работе студентов своего курса, сданной в середине семестра. Вам необходимо создать новую групповую встречу, указать дату и время, когда вы будете свободны, и запросить, чтобы система разделила этот период времени на 15-минутные блоки и допускала только одного студента на каждый блок времени."
       scheduler_explanation_teacher_paragraph_3: "Затем студенты получат уведомление и увидят, что они должны зарегистрироваться в одном из указанных блоков времени. Им будет показан календарь с имеющимися блоками времени, накладывающийся на их другие календари, чтобы они могли выбрать наиболее подходящее для себя время."
       scheduler_explanation_teacher_paragraph_4: "* Начните прямо сейчас, нажав кнопку \"Создать групповую встречу\" внизу справа *"
-      x_groups_have_signed_up: "%{signed_up} группы подписались"
-      x_people_have_signed_up: "%{signed_up} люди подписались"
+      x_groups_have_signed_up: "%{participant_count} групп(ы) зарегистрировались"
+      x_people_have_signed_up: "%{participant_count} человек(а) зарегистрировались"
     buttons: 
       cancel: Отменить
       send_message: Отправить
       sending_message: Отправка...
     calendar_app: 
+      create_event: "Создать новое событие"
       links: 
         calendar_month: Месяц
         calendar_scheduler: Планировщик
         calendar_week: Неделя
       refresh: Обновить
-      use_old_calendar: "Вернуться к старому календарю"
+      use_old_calendar: "Старый календарь"
+    calendar_title: "Календарь:"
     cancel_appointment: "Вы уверены, что хотите отменить встречу с %{name}?"
     confirm_appointment_group_deletion: "Вы уверены, что хотите удалить данную групповую встречу?"
     confirm_deletion: "Подтвердить удаление"
@@ -1519,9 +1959,13 @@ ru:
       appt_group_options_help1: "Некоторые существующие бронирования добавлены сверх установленного вами лимита. Они не будут затронуты, это изменение предотвращает только новые бронирования."
       appt_group_options_help2: "Вы можете, однако, вручную удалить все существующие бронирования."
       calendar: Календарь
+      date: Дата
+      details: "Сведения:"
       group_category: "Категория группы"
+      group_signup: "Имеется у студентов, зарегистрированных в группах."
       location: Местоположение
       name: Имя
+      time_range: "Временной диапазон"
     edit_appt_calendar_event: 
       description: "Описание:"
       slot_limit: "Ограничить этот интервал"
@@ -1531,19 +1975,19 @@ ru:
       due: "До:"
       group: "Группа:"
       links: 
-        more_options: "дополнительные опции"
+        more_options: "Дополнительные опции"
       title: "Название:"
     edit_assignment_override: 
       calendar: "Календарь:"
       due: "До:"
       links: 
-        more_options: "больше опций"
+        more_options: "Больше опций"
     edit_calendar_event: 
       calendar: "Календарь:"
       date: "Дата:"
       from: "От:"
       links: 
-        more_options: "дополнительные опции"
+        more_options: "Дополнительные опции"
       timespan_separator: "* к *"
       title: Название
     edit_calendar_event_full: 
@@ -1565,6 +2009,7 @@ ru:
     ends_in_past_error: "Вы не можете создать интервал времени для встречи, который заканчивается в прошлом"
     errors: 
       send_message_failed: "Произошла ошибка при отправке сообщения. Пожалуйста, попробуйте еще раз"
+    event_assignment_title: "Заголовок задания:"
     event_details: 
       attendees: Участники
       calendar: Календарь
@@ -1577,6 +2022,7 @@ ru:
       location: Размещение
       message_students: "Отправить сообщения студентам"
       slots_available: "Свободные временные интервалы"
+    event_event_title: "Заголовок события:"
     event_on_this_day: "В этот день есть событие"
     labels: 
       due: окончание
@@ -1626,6 +2072,10 @@ ru:
       edit_appointment_group: "Отредактировать групповую встречу"
       edit_event: "Редактировать событие"
     today: Сегодня
+    undated_events: 
+      loading_undated_events: "Загрузка событий без даты..."
+      show_undated_events: "Отобразить события без даты"
+      undated_events: "События без даты"
   calendar_event: 
     errors: 
       duplicate_child_event_contexts: "Продублируйте контекст детского события"
@@ -1705,7 +2155,7 @@ ru:
         full_details: "Полные сведения"
         how_do_i: Как...?
         jump_to_calendar: "Перейти к календарю"
-        more_options: "дополнительные опции"
+        more_options: "Дополнительные опции"
         show_undated_events: "показать %{count} события без даты"
       messages: 
         max_visible: "Одновременно можно отобразить до %{count} календарей"
@@ -1776,6 +2226,7 @@ ru:
       page_title: Календарь
     show2: 
       calendar_feed: "Канал календаря"
+      calendar_feed_instructions: "Скопируйте ссылку ниже и вставьте ее в любое приложение календаря, использующее каналы iCal (Календарь Google, iCal, Outlook и т. д.)"
       feed_dialog_title: "Канал календаря"
       feed_title: "Канал Atom календаря курса"
       links: 
@@ -1815,7 +2266,9 @@ ru:
     plugins: 
       errors: 
         all_fields_required: "Все поля обязательны для заполнения"
+        fields_required: "Необходимо поле \"%{field}\""
         login_expiration_minimum: "Длительность сессии должна быть не менее 20 минут"
+        need_integer: "Введите целое число для кэша списка воспроизведения"
   cc: 
     by: "Принадлежность CC"
     by_nc: "Принадлежность CC, некоммерческий"
@@ -1940,11 +2393,16 @@ ru:
     new: 
       pin_to_canvas_network: "Связаться с сетью Canvas"
       saved_successfully: "Сохранено успешно"
+  collection_view: 
+    no_items: "Элементы отсутствуют."
   coming_up_item_view: 
     assignment: 
       assignment_due: "Задание до"
     event: 
       event: Событие
+  comm_messages: 
+    from_beginning: начало
+    to_now: сейчас
   communication_channel: 
     body: "Ваш код подтверждения в Canvas: %{verification_code}"
     default_facebook_account: "Учетная запись Facebook"
@@ -2424,7 +2882,11 @@ ru:
     titles: 
       content_is_locked: "Содержание заблокировано"
   content_migration: 
+    missing_content_links_message: "Следующие обращения не могут быть разрешены:"
+    missing_content_links_title: "В импортируемом содержимом найдены отсутствующие ссылки"
     unknown: Неизвестно
+  content_migrations: 
+    no_archive: "Архив для перемещения данного содержания отсутствует"
   content_tag: 
     no_title: "Заголовок отсутствует"
   content_tags: 
@@ -2754,7 +3216,8 @@ ru:
     buttons: 
       add: "Добавить модуль"
       add_item: "Добавить элемент"
-      add_module: "Добавить новый модуль"
+      add_module: "Создать модуль"
+      add_module_first: "Добавить новый модуль"
       update: "Обновить модуль"
     confirm: 
       delete: "Действительно хотите удалить этот модуль?"
@@ -2768,6 +3231,7 @@ ru:
       criterion_for_assignment: "Для %{assignment} пользователи должны %{select_criterion}"
       headings: 
         add_prerequisite: "Добавить предварительное условие к %{name}"
+        course_modules: "Модули курса"
         student_progress: "Ход выполнения модуля студентом"
         student_progress_for_module: "Ход выполнения студентом %{module}"
         students_completed: "Студенты, завершившие модуль"
@@ -2808,14 +3272,21 @@ ru:
           next: "Следующий модуль/элемент"
           outdent: "Сместить текущий элемент"
           previous: "Предыдущий модуль/элемент"
+      keycode_descriptions: 
+        next_module_item: "Выберите следующий модуль или элемент модуля"
+        previous_module_item: "Выберите предыдущий модуль или элемент модуля"
+        toggle_module_dragging: "Выберете элемент, чтобы начать его перетаскивание или отпустите ранее выбранный элемент"
       keycodes: 
         delete: d
         edit: e
         indent: i
         new: "n"
         next: j
+        next_module_item: Вверх
         outdent: о
         previous: k
+        previous_module_item: Вниз
+        toggle_module_dragging: Пробел
       labels: 
         assignment_picker: Для
         assignment_requirement_picker: "пользователи должны"
@@ -2837,10 +3308,13 @@ ru:
         reload_student: "Перезагрузить ход выполнения студентом"
         sort_by_name: Имя
         sort_by_progress: "Ход выполнения"
+        student_progress: "Показать ход выполнения"
         title: 
           remove_prerequisite: "Удалить это предварительное требование"
       module: модуль
       module_details: "Модули показаны в логическом порядке, потому только модули выше %{name} могут быть установлены как предварительные условия."
+      module_name: "Имя модуля"
+      modules_keyboard_hint: "Чтобы изменить порядок модулей курса и элементов модуля, сначала отключите курсор в вашей программе для чтения с экрана. Нажмите Insert-z в JAWS. Нажмите клавишу табуляции, чтобы выбрать первый модуль. Используйте кнопки «вверх» и «вниз», чтобы выбрать модуль или элемент модуля. Нажмите пробел, чтобы выбрать модуль или элемент модуля, чтобы начать перетаскивание. Затем используйте кнопки «вверх» и «вниз», чтобы выбрать место расположения. Затем нажмите пробел еще раз, чтобы отпустить элемент, когда он окажется в нужном положении."
       must_complete_prerequisites: "Они должны быть выполнены"
       no_preprequisites: "Предварительные условия не определены"
       no_requirements: "Требования не определены"
@@ -2863,6 +3337,8 @@ ru:
       titles: 
         student_progression: "Ход выполнения модуля студентом"
     context_module: 
+      context_module: 
+        draft: (Черновик)
       default_module_name: модуль
       images: 
         alt: 
@@ -2876,23 +3352,31 @@ ru:
       labels: 
         prerequisites: "Предварительные условия"
       links: 
-        add_item: "Добавить элементы в модуль"
+        add_item: "Добавить содержание"
         hide_contents: "Скрыть содержимое модуля"
+        publish: Опубликовать
         settings: "Настройки модуля"
         show_contents: "Показать содержание модуля"
+        text: 
+          delete_module: Удалить
+          edit_module: Редактировать
         title: 
           delete_module: "Удалить этот модуль"
-          edit_module: "Редактировать настройки модуля"
+          edit_module: Редактировать
           remove_prerequisite: "Удалить это предварительное требование"
           student_progress: "См. ход выполнения студентом этого модуля"
+        unpublish: "Отметить публикацию"
       module_will_unlock_at: "разблокирует *%{unlock_date}*"
       progression_complete_count: "*%{count}* Завершено"
       progression_started_count: "*%{count}* Выполняется"
       reorder_modules: "Перетащите для изменения порядка модулей"
+      unpublish: "Отметить публикацию"
     context_module_right_side: 
       links: 
         student_progress: "Просмотреть ход выполнения студентом модулей"
       loading_progressions: "Загрузка хода выполнения студентом..."
+    context_modules: 
+      publish: Опубликовать
     errors: 
       reorder: "Сбой отметки, повторите попытку"
     index: 
@@ -2955,6 +3439,13 @@ ru:
       quizzes: "Контрольные работы"
       wiki_pages: Вики-страницы
     points_possible_short: "%{points} pts"
+    prerequisits_footer: 
+      default_module_name: модуль
+      labels: 
+        prerequisites: "Предварительные условия"
+      links: 
+        title: 
+          remove_prerequisite: "Удалить это предварительное условие"
     still_needs_completing: "Требуется завершить"
     titles: 
       add: "Добавить модуль"
@@ -2970,6 +3461,12 @@ ru:
         one: "%{user} был добавлен в разговор %{current_user}"
         other: "%{list_of_users} были добавлены в разговор %{current_user}"
     subject: "Частное сообщение, %{timestamp}"
+  conversation_participant: 
+    batch_update_message: 
+      few: "*%{count}* разговора завершено"
+      one: "1 разговор завершен"
+      other: "*%{count}* разговоров завершено"
+    not_participating: "Пользователь не участвует в данном разговоре"
   conversations: 
     add_attachment: 
       titles: 
@@ -2979,6 +3476,7 @@ ru:
     buttons: 
       add_people: "Добавить людей"
       send_message: Отправить
+    cannot_be_empty: "Сообщение не может быть пустым"
     confirm: 
       delete_message: "Вы уверены, что хотите удалить свою копию этого сообщения? Это действие не может быть отменено."
       delete_messages: "Вы уверены, что хотите удалить свою копию этих сообщений? Это действие не может быть отменено."
@@ -2997,7 +3495,7 @@ ru:
         unarchive: Разархивировать
         unstar: "Отметить звездочкой "
         unsubscribe: "Отменить подписку"
-      inbox_actions_description: "Действия "
+      inbox_actions_description: "Меню «Действия над сообщениями»"
       read_more: дополнительно...
     conversations_list: 
       no_archived_messages: "У вас отсутствуют архивированные сообщения"
@@ -3105,6 +3603,7 @@ ru:
       sending_message: "Отправка *%{message_preview}* *%{num_people}*"
     message_sent: "Сообщение отправлено"
     messages_sent: "Сообщения отправлены"
+    no_recipients_choose_another_group: "В данной группе нет получателей. Выберите другую группу."
     no_results: "Результаты не найдены"
     not_applicable: "Н/Д (недоступно)"
     not_scored: "Оценка отсутствует"
@@ -3148,7 +3647,7 @@ ru:
       paragraph1: "Все ваши разговоры показаны на левой стороне."
       paragraph2: "Вы можете видеть, с кем вы разговариваете, количество сообщений и несколько строк из последнего сообщения в каждой беседе."
     slide3: 
-      paragraph1: "Беседы могут быть помечены как прочитанное / непрочитанное, заархивированы, или помечены цветом, используя кнопку \"Действия\" в окне сообщения."
+      paragraph1: "Разговоры могут быть помечены как прочитанные/непрочитанные, помечены звездочкой или заархивированы с помощью кнопки \"Действия\" в окне сообщения."
       paragraph2: "Архив сообщений не удаляется, они только перемещаются из вашего почтового ящика, так что вы можете получить доступ к ним снова, если это необходимо."
     slide4: 
       paragraph1: "Когда вы выбираете беседу, все сообщения для этой беседы показаны в панели справа. Когда беседа получается длинной, вы всегда можете прокрутить вниз, чтобы увидеть более ранние сообщения."
@@ -3270,6 +3769,10 @@ ru:
     wrapper: 
       close_course_menu_title: закрыть
       reset_course_menu: Сброс
+  course_restore: 
+    restore_error: "Произошла ошибка при попытке восстановить курс. Курс не был восстановлен."
+  course_search: 
+    cant_be_blank: "Не может быть пустым"
   course_section: 
     sis_id_taken: "Идентификатор SIS \"%{sis_id}\" уже используется"
   course_settings: 
@@ -3329,6 +3832,22 @@ ru:
     updating: Обновление...
   course_statistics: 
     unknown: Неизвестный
+  course_subscriptions: 
+    already_subscribed: 
+      already_subscribed_message: "Привет, *%{subscriber_name}*, вы уже подписаны на *%{course_name}*"
+    logged_in_confirm_form: 
+      logged_in_confirm_message: "Привет, *%{user_name}*, спасибо за проявленный интерес к *%{course_name}*. Нажмите кнопку «подписаться» ниже, чтобы получать новую информацию об этом курсе."
+    new: 
+      subscribe: Подписаться
+    show: 
+      thanks: "Спасибо, теперь вы подписаны на *%{course_name}*."
+    subscribe_form: 
+      email: "Адрес электронной почты"
+      subscribe_form_text: "Спасибо за проявленный интерес к *%{course_name}*. Чтобы получать новую информацию об этом курсе, пожалуйста, предоставьте ваше полное имя и адрес электронной почты ниже."
+      your_name: "Ваше имя"
+  course_users: 
+    greater_than_three: "Введите слово для поиска, содержащее не менее трех символов"
+    unknown_error: "При поиске что-то пошло не так, пожалуйста, повторите попытку."
   courses: 
     add_users: 
       buttons: 
@@ -3366,6 +3885,12 @@ ru:
       points_possible: "из %{points_possible}"
       tooltip: 
         due_at: "окончание: %{date}"
+    canvasnet_instructor: 
+      avatar_url: "Аватар (URL)"
+      biography: Биография
+      instructor_name: Имя
+      job_title: Заголовок
+      remove_instructor: "Удалить инструктора"
     confirm_action: 
       buttons: 
         conclude_course: "Завершить курс"
@@ -3448,6 +3973,40 @@ ru:
         tas: "Добавление ассистентов к курсу"
         title: 
           bookmark: "Копирование этой ссылки или ее добавление в закладки"
+    edit_profile: 
+      about: Около
+      about_related_id: "общий идентификатор используется для связывания вместе курсов/разделов"
+      add_instructor: "Добавить инструктора"
+      basic_info: "Основная информация"
+      disabled: Закрыто
+      enabled: Открыть
+      institution: Организация
+      institution_name: Имя
+      instructor_led: "Под руководством инструктора"
+      instructors: Инструкторы
+      labels: 
+        description: Описание
+        enrollment_fee: "Регистрационный взнос"
+        format: Формат
+        image: Изображение
+        path: Путь
+        position: Позиция
+        related_id: "Идентификатор ссылки"
+        self_enrollment: Регистрация
+        self_enrollment_limit: "Макс. количество регистраций"
+        tags: Тэги
+        tentative_start: "Предполагаемая дата начала"
+        title: Заголовок
+        visibility: Видимость
+      leave_blank_if_free: "оставьте пустым, если это бесплатный курс"
+      logo: "Логотип (URL)"
+      page_title: "Профиль курса"
+      path_syntax: "строчные буквы, цифры и дефисы"
+      private: Скрытый
+      public: "Перечислены на canvas.net"
+      save_changes: "Сохранить изменения"
+      self_paced: "По индивидуальному графику"
+      when_to_set_tentative_start: "например, «осень 2013», если курс не имеет точной даты начала"
     enrollment_reminders: 
       buttons: 
         accept: "Принять приглашение"
@@ -3457,6 +4016,7 @@ ru:
       invitation: 
         designer: "Вы приглашены на участие в этом курсе как *проектировщик* для учетной записи пользователя *%{user}*."
         observer: "Вы приглашены на участие в этом курсе как *наблюдатель* для учетной записи пользователя *%{user}*."
+        one: "Вы приглашены на участие в этом курсе для учетной записи пользователя *%{user}*."
         other: "Вы приглашены на участие в этом курсе для учетной записи пользователя *%{user}*."
         student: "Вы приглашены на участие в этом курсе как *студент* для учетной записи пользователя *%{user}*."
         ta: "Вы приглашены на участие в этом курсе как *ассистент* для учетной записи пользователя *%{user}*."
@@ -3553,6 +4113,38 @@ ru:
       submission_points: 
         with_score: "Рейтинг: %{score} *из %{points_possible}*"
         without_score: "из %{points_possible}"
+    roster: 
+      create_users: 
+        add_more_users: "Добавить больше пользователей"
+        add_these_users: "Добавить пользователей"
+        adding: Добавление...
+        adding_n_users: "Проверено и готово к добавлению %{users.length} пользователей:"
+        can_only_grade_students_in_section: "Можно оценивать студентов только в их разделах"
+        close: Готово
+        duplicates_removed: "Были удалены несколько дубликатов."
+        email: "Электронная почта"
+        example_formats: "Примеры: user@example.com, \"Имя Фамилия\" &lt;user@example.com&gt;, \"Фамилия, Имя\" &lt;user@example.com&gt;"
+        form_instructions: "Введите или вставьте ниже список адресов электронной почты:"
+        go_back: "Начать заново"
+        have_been_enrolled: "Следующие пользователи были зарегистрированы"
+        name: Имя
+        next: Далее
+        section: Раздел
+        user_role: "Роль:"
+        validating: Утверждение...
+        will_not_be_added: "Данные пользователи имели ошибки и не будут добавлены. Пожалуйста, убедитесь, что они были верно отформатированы."
+      index: 
+        add_people: "Добавить людей"
+        all_roles: "Все роли"
+        cannot_add_users: "Новые пользователи не могут быть добавлены, поскольку данный курс закончен"
+        role_to_search: "Ограничить поиск для роли"
+        search: Поиск
+        search_people: "Поиск пользователей"
+      roster_users: 
+        name: Имя
+        no_people_found: "Пользователи не найдены"
+        sis_id: "Идентификатор SIS"
+        you_can_search_by: "Можно искать с помощью:"
     roster_user: 
       course_profile: "Профиль курса"
       profile: Профиль
@@ -3632,11 +4224,13 @@ ru:
       labels: 
         account_id: Отдел
         allow_student_assignment_edits: "Разрешить студентам редактировать описания заданий"
+        allow_student_discussion_editing: "Позволить студентам редактировать или удалять свои сообщения в обсуждении"
         allow_student_discussion_topics: "Разрешить студентам создавать темы обсуждения"
         allow_student_forum_attachments: "Разрешить студентам прикреплять файлы к обсуждениям"
         allow_student_organized_groups: "Разрешить студентам организовывать собственные группы"
         conclude_at: Завершается
         course_code: "Код курса"
+        course_lock_all_announcements: "Отключить комментарии в объявлениях"
         course_name: Имя
         course_section_id: "Для раздела"
         course_section_name: "Добавить новый раздел"
@@ -3651,12 +4245,14 @@ ru:
         hashtag: "Тег hash"
         hide_distribution_graphs: "Скрыть графики распределения оценок от студентов"
         hide_final_grade: "Скрыть общее число в сводке оценок студентов"
+        hide_final_grades: "Скрыть общие числа в сводке оценок студентов"
         indexed: "Включить этот курс в индекс общедоступных курсов"
         is_public: "Сделать этот курс общедоступным"
         language: Язык
         license: Лицензия
         limit_privileges_to_course_section: "эти администраторы могут оценивать студентов только в своих разделах"
         open_enrollment: "Добавить ссылку \"Присоединиться к этому курсу\" к домашней странице курса"
+        public_syllabus: "Сделать программу обучения для данного курса общедоступной"
         restrict_enrollments_to_course_dates: "Пользователи могут участвовать только в курсах между этими датами"
         root_account_id: "Корневая учетная запись"
         self_enrollment: "Разрешить самостоятельную регистрацию студентов, предоставив им секретный URL-адрес"
@@ -3868,6 +4464,15 @@ ru:
       text_entry: "Текстовая запись"
       unaccepted_students: "Непринятые студенты"
       website_url: "URL-адрес веб-сайта"
+    syllabus: 
+      headers: 
+        date: Дата
+        day: День
+        details: Сведения
+      syllabus: 
+        hide_specific_dates: "Скрыть разделы, группы и конкретные персональные даты"
+        other_day: Другое
+        show_specific_dates: "Отобразить разделы, группы и конкретные персональные даты"
     titles: 
       rss_feed: "Поток %{course}"
     unauthorized: 
@@ -3877,6 +4482,8 @@ ru:
         current_users: "Текущие пользователи"
       re_send_all: "или *Повторная отправка всех непринятых приглашений*"
       unaccepted_invitations: "%{count} приглашений не принято. Можно щелкнуть имя пользователя для повторной отправки приглашения"
+  create_users_view: 
+    required: "Введите несколько адресов электронной почты"
   crumb: 
     conversations: Разговоры
     discussion_replies: "Ответы в обсуждении"
@@ -3894,6 +4501,8 @@ ru:
     eportfolio_welcome: "Вас приветствует ePortfolio"
     error_reports: "Отчеты об ошибках"
     files: Файлы
+    gradebook: "Табель успеваемости"
+    grades: Оценки
     grading_schemes: "Схемы оценок"
     groups: Группы
     jobs: "рабочие места"
@@ -3904,6 +4513,8 @@ ru:
     people: Пользователи
     plugins: "Подключаемые модули"
     prior_users: "Перед пользователями"
+    question_banks: "Банки вопросов"
+    quizzes: "Контрольные работы"
     registered_services: "Зарегистрированные сервисы"
     results: Результаты
     revisions: Редакции
@@ -3981,8 +4592,10 @@ ru:
       long: "%B %d, %Y"
       medium: "%b %e, %Y"
       medium_month: "%b %Y"
+      medium_with_weekday: "%a %b %-d, %Y"
       short: "%b %e"
       short_month: "%b"
+      short_weekday: "%a"
       weekday: "%A"
     month_names: 
       - ~
@@ -4056,6 +4669,21 @@ ru:
       year: Год
   defaults: 
     assignment: Задание
+  demos: 
+    demos_add: 
+      labels: 
+        school_name: "Название школы"
+        username: "Адрес электронной почты"
+    register: 
+      labels: 
+        current_lms: "Текущие LMS"
+        name: Имя
+        organization_size: "Размер организации"
+        organization_type: "Тип организации"
+        phone: "Номер телефона"
+        school_name: Школа/организация
+        school_position: Заголовок
+        username: "Электронная почта"
   developer_key: 
     api_key: "Ключ: *%{api_key}*"
     created: "Создан: "
@@ -4114,6 +4742,10 @@ ru:
       due_date: "до %{date}"
       everyone: "Все остальные"
       for: Для
+      graded_discussion_and_points: 
+        few: "Это оцениваемое обсуждение: *%{count} возможных балла*"
+        one: "Это оцениваемое обсуждение: *1 возможный балл*"
+        other: "Это оцениваемое обсуждение: *%{count} возможных баллов*"
       points_possible: 
         few: "%{count} возможных балла"
         one: "1 возможный балл"
@@ -4135,6 +4767,7 @@ ru:
     deleted_topic_notice: "Эта тема удалена"
     discussion_feed_title: "%{title} Канал обсуждения"
     discussions_settings_view: 
+      allow_student_discussion_editing: "Редактировать или удалить их собственные сообщения"
       allow_student_topics: "Создать темы обсуждения"
       attach_files: "Прикрепить файлы к обсуждениям"
       in_this_course: "В этом курсе студенты могут:"
@@ -4287,7 +4920,7 @@ ru:
   discussions: 
     are_your_sure_delete: "Действительно хотите удалить эту запись?"
     deleted_entry: 
-      deleted: "Эта запись была удалена"
+      deleted: "Удалено *%{editor_name}* %{edited_at}"
     edit_settings: "Редактировать настройки обсуждений"
     entry: 
       loading: загрузка...
@@ -4297,6 +4930,7 @@ ru:
       authors_name: "Имя автора"
       delete: Удалить
       edit: Редактировать
+      edited_comment: "Отредактировано *%{editor.display_name}* %{edited_at}"
       go_to_parent: "Перейти на родительский уровень"
       go_to_topic: "Перейти к теме"
       just_read: "Только прочитайте"
@@ -4344,6 +4978,7 @@ ru:
       search_entries_placeholder: "Поиск записей или автора"
       unread: Непрочитанное
     uknown_author: "Неизвестный автор"
+    unknown: Неизвестно
     unknown_author: "Неизвестный автор"
     unread_count_tooltip: 
       one: "1 непрочитанный ответ"
@@ -4354,6 +4989,9 @@ ru:
     multiple_due_dates: "до: Несколько сроков выполнения"
     no_due_date: "до: Нет даты выполнения"
   edit_rubric: 
+    buttons: 
+      create_rubric: "Создать рубрику"
+      update_rubric: "Обновить рубрику"
     errors: 
       load_rubrics_failed: "Сбой загрузки рубрик, повторите попытку"
     messages: 
@@ -4371,6 +5009,7 @@ ru:
     button: 
       insert_equation: "Вставить уравнение"
     cancel: Отменить
+    cannot_render_equation: "Данное уравнение не может быть отображено в основном виде."
     click_to_embed: "Нажмите, чтобы вставить изображение"
     done: 
       title: "Щелкните, чтобы закончить редактирование форматированного текста"
@@ -4378,7 +5017,7 @@ ru:
     embed_external: "Вставить внешнее изображение"
     embed_from_external_tool: "Вставить содержание из Внешних Инструментов"
     embed_image: "Вставить изображение"
-    equation_editor_title: "Используйте панель инструментов или напечатать/вставить в формате LaTeX, чтобы добавить уравнение"
+    equation_editor_title: "Используйте панели инструментов или переключите вид на расширенный, чтобы начать печатать/вставлять в редакторе LaTeX"
     image_not_found: "Изображение не найдено, попробуйте новый адрес "
     instructions: "Скопируйте или введите адрес того изображения, которое вы хотите вставить:"
     loading: Загрузка...
@@ -4389,12 +5028,23 @@ ru:
     save_failed: "Не удалось сохранить, пожалуйста, повторите попытку позже"
     saving: Сохранение...
     search_flickr: "Поиск во flickr creative commons"
+    switch_to_mathjax: "Переключить вид на основной"
+    switch_to_mathquill: "Переключить вид на расширенный"
     switch_views: "Переключить представления"
+    tabs: 
+      arrows: Стрелки
+      basic: Основной
+      delimiters: Разделители
+      greek: Греческий
+      misc: Различное
+      operators: Операторы
+      relationships: Отношения
     url: "URL-адрес:"
   editor_accessibility: 
     accessibles: 
       background_color: "Цвет фона, нажмите стрелку вниз, чтобы выбрать"
       forecolor: "Цвет текста, нажмите стрелку вниз, чтобы выбрать"
+      record: "Данная функция недоступна для чтения с экрана."
     titles: 
       font_size: "Размер шрифта, нажмите стрелку вниз, чтобы выбрать"
       formatting: "Форматирование, нажмите стрелку вниз, чтобы выбрать"
@@ -4426,6 +5076,12 @@ ru:
       invited: Приглашен
       pending: "На рассмотрении"
       rejected: Отклонено
+  enrollmentNames: 
+    course_designer: "Дизайнер курса"
+    observer: Наблюдатель
+    student: Студент
+    teacher: Учитель
+    teacher_assistant: Ассистент
   enrollment_term: 
     errors: 
       not_unique: "Идентификатор SIS \"%{sis_source_id}\" уже используется"
@@ -4745,6 +5401,7 @@ ru:
       delete_tool: "Инструмент удаления"
       edit_tool: "Инструмент редактирования"
       editor_button_configured: "Кнопка редактирования настроена"
+      homework_submission_configured: "Отправка домашних работ настроена"
       labels: 
         consumer_key: "Пользовательский ключ"
         description: Описание
@@ -5318,9 +5975,9 @@ ru:
       speedgrader: SpeedGrader
     hide_student_names: "Скрыть имена студентов"
     invalid_assignment_groups_warning: 
-      few: "В оценку не включаются группы %{groups}, потому что у них                    нет возможных баллов"
-      one: "В оценку не включается группа %{groups}, потому что у нее                  нет возможных баллов"
-      other: "В оценку не включаются группы %{groups}, потому что у них                    нет возможных баллов"
+      few: "В оценку не включаются %{groups} группы, потому что у них                    нет возможных баллов"
+      one: "В оценку не включается %{groups} группа, потому что у нее                  нет возможных баллов"
+      other: "В оценку не включаются %{groups} групп, потому что у них                    нет возможных баллов"
     no_assignments_have_points_warning: "Невозможно рассчитать оценку, пока у задания есть возможные баллы"
     percent_of_grade: "%{percentage} оценки"
     points_out_of: "из %{points_possible}"
@@ -5331,6 +5988,7 @@ ru:
     section_to_show_menu: 
       choose_a_section_to_show: "Выберите раздел для отображения"
     show: 
+      all_sections: "Все разделы"
       arrange_columns_by_due_date: "Сортировать столбцы по даты выполнения"
       arrange_columns_by_group: "Сортировать столбцы по группе заданий"
       download_scores: "Загрузка оценок (.csv)"
@@ -5342,6 +6000,7 @@ ru:
       set_group_weights: "Установить весовые критерии для группы"
       show_attendance_columns: "Показать столбцы участников"
       show_concluded_enrollments: "Показать завершенные регистрации"
+      showing_sections: "Отображение: *%{section_being_shown}*"
       upload_scores: "Загрузка оценок (из .csv)"
       view_grading_history: "Просмотр истории оценок"
     show_student_names: "Показать имена студентов"
@@ -5468,6 +6127,7 @@ ru:
     crumb: Посещение
     errors: 
       missing_file: "Не удалось найти файл для загрузки"
+      not_allowed: "Нельзя загружать оценки для этого курса."
       submission_failed: "Отправка не удалась: %{error}"
       submission_failed_default: "Ошибка отправки"
     grade: 
@@ -5485,6 +6145,7 @@ ru:
       faculty_journal: "Журнал преподавателей для %{user}"
       for_course: "Для курса,"
       headers: 
+        details: Сведения
         due: Срок
         grades: "Оценки для %{student}"
         name: Имя
@@ -5510,6 +6171,7 @@ ru:
       not_official: "*ПРИМЕЧАНИЕ*: Это НЕ официальная оценка."
       page_title: "Оценки для %{student}"
       percent: Процент
+      print_grades: "Распечатать оценки"
       see_rubric_results: "См. результаты рубрики"
       see_scoring_details: "См. сведения об оценке"
       see_turnitin_results: "См. результаты Turnitin"
@@ -5618,9 +6280,9 @@ ru:
         feed: "Канал Atom табеля успеваемости курса"
         submission_graded: "%{graded_date} по %{grader}"
     invalid_assignment_groups_warning: 
-      few: "В оценку не включаются группы %{groups}, потому что у них нет возможных баллов"
-      one: "В оценку не включается группа %{groups}, потому что у нее нет возможных баллов"
-      other: "В оценку не включаются группы %{groups}, потому что у них нет возможных баллов"
+      few: "В оценку не включаются %{groups} группы, потому что у них нет возможных баллов"
+      one: "В оценку не включается %{groups} группа, потому что у нее нет возможных баллов"
+      other: "В оценку не включаются %{groups} групп, потому что у них нет возможных баллов"
     no_assignments_have_points_warning: "Невозможно рассчитать оценку, пока у задания есть возможные баллы"
     notices: 
       unauthorized: "Вы не авторизованы для просмотра посещения для этого курса"
@@ -5726,6 +6388,7 @@ ru:
         file_attachment: "Файловые вложения"
         media_comment: "Мультимедийный комментарий"
         speech_recognition: "Распознавание речи"
+    speed_grader_disabled: "SpeedGrader отключен для этого курса"
     student: 
       new_student: "Новый студент"
       student: Студент
@@ -6058,6 +6721,9 @@ ru:
   info: 
     notices: 
       error_reported: "Благодарим за помощь!  Мы проследим за этим"
+    old_styleguide: 
+      create_collection: "Создать коллекцию"
+      start_a_group: "Начать группу"
     styleguide: 
       create_collection: "Создать коллекцию"
       find_people: "Найти людей на Canvas"
@@ -6081,6 +6747,7 @@ ru:
     datepicker: 
       titles: 
         am_pm: am/pm
+    draft: Черновик
     errors: 
       cannot_view_document_inline: "Встроенный просмотр данного документа невозможен, могут отсутствовать разрешения на просмотр, или документ удален."
       field_is_required: "Необходимо это поле"
@@ -6125,7 +6792,8 @@ ru:
       view_in_new_window: "Просмотр в новом окне"
     tooltips: 
       enter_search_terms: "введите критерии поиска"
-  invalid_xml_syntax: "неверный синтаксис xml"
+  invalid_url_in_xml: "Недействительный url-адрес в xml. Амперсанды использовать нельзя."
+  invalid_xml_syntax: "Неверный синтаксис xml"
   jobs: 
     columns: 
       attempt: попытка
@@ -6275,6 +6943,9 @@ ru:
     remove_outcome_group: "Вы действительно хотите удалить эту группу результатов обучения и все ее результаты?"
     show_details: "показать сведения"
   lib: 
+    angel: 
+      failed_import_link: "Ошибочная ссылка на импорт"
+      failed_import_link_body: "Данная ссылка связана с функцией Angel, которая не может быть связана через Canvas либо которая была пропущена во время экспорта."
     api: 
       attachments: 
         only_one_folder: "Невозможно задать путь к папке и установить идентификатор папки"
@@ -6284,6 +6955,9 @@ ru:
         not_authenticated: "Для доступа к этой странице необходимо войти в систему"
         student_not_found: "Студенты не найдены"
         teacher_not_found: "Учителя не найдены"
+      not_authorized: "пользователь не авторизован для выполнения этого действия"
+      status_unauthenticated: "не аутентифицирован"
+      status_unauthorized: "не авторизован"
     basic_lti: 
       bad_score: "Оценка не между 0 и 1"
       no_points_comment: |-
@@ -6311,6 +6985,12 @@ ru:
                     Спасибо,
                     Служба поддержки Canvas
         subject: "Ошибка ответа на сообщение: %{subject}"
+    progress_runner: 
+      completed_message: 
+        few: "%{count} элемента обработано"
+        one: "1 элемент обработан"
+        other: "%{count} элементов обработано"
+      error_message: "%{error}: %{ids}"
     send_to_inbox: 
       default_subject: "Нет темы"
     text_helper: 
@@ -6414,9 +7094,19 @@ ru:
       sending_message: "Отправка сообщения..."
     message_student: "Отправка студентам сообщений для %{course_name}"
     send_message: "Отправить сообщение"
+  message_students_dialog: 
+    for_title: "для %{title}"
+    message_students_who: "Отправить сообщения студентам, которые..."
   messages: 
+    account_suspended: 
+      email: 
+        body: "Организация %{institution} была временно отключена. Пожалуйста, свяжитесь с администратором сайта, чтобы выяснить причины."
+        subject: "Организация временно отключена"
     account_user_notification: 
       email: 
+        html: 
+          subject: "Уведомление администратора учетной записи"
+          url_info: "Посетите страницу учетной записи"
         subject: "Уведомление администратора учетной записи"
         url_info: |-
             Посетите страницу учетной записи здесь:
@@ -6425,6 +7115,14 @@ ru:
       email: 
         added_message: "Вы добавлены как %{role_type} к учетной записи %{account} в %{website}."
         email_info: "Адрес электронной почты: %{email}"
+        html: 
+          added_message: "Вы добавлены к учетной записи %{account} на %{website} в качестве %{role_type}."
+          click_to_finish_registration: "Щелкните здесь для завершения процесса регистрации"
+          email: "Электронная почта"
+          name: Имя
+          subject: "Приглашение администратора учетной записи Canvas"
+          url_info_label: "Вам нужно зарегистрироваться с помощью Canvas, прежде чем вы сможете выступать в качестве администратора учетной записи."
+          username: "Имя пользователя"
         name_info: "Название: %{name}"
         subject: "Приглашение администратора учетной записи Canvas"
         url_info: |-
@@ -6434,6 +7132,11 @@ ru:
     added_to_conversation: 
       email: 
         body: "%{user_name} добавил вас к разговору в Canvas. Для просмотра разговора щелкните ссылку ниже:"
+        html: 
+          body: "%{user_name} только что добавил вас к разговору в Canvas."
+          link_text: "Просмотр разговора"
+          subject: "%{user_name} только что добавил вас к разговору в Canvas."
+          unknown_user: "Неизвестный пользователь"
         subject: "%{user_name} добавил вас к разговору в Canvas."
         unknown_user: "Неизвестный пользователь"
       facebook: 
@@ -6461,6 +7164,21 @@ ru:
           few: "Оповещение было инициировано для вас, потому что следующие условия были выполнены:"
           one: "Оповещение было инициировано для вас, потому что следующее условие было выполнено:"
           other: "Оповещение было инициировано для вас, потому что следующие условия были выполнены:"
+        html: 
+          body: 
+            few: "Сработало оповещение для %{student}, поскольку были выполнены следующие условия:"
+            one: "Сработало оповещение для %{student}, поскольку было выполнено следующее условие:"
+            other: "Сработало оповещение для %{student}, поскольку были выполнены следующие условия:"
+          body_student: 
+            few: "Для вас сработало оповещение, поскольку были выполнены следующие условия:"
+            one: "Для вас сработало оповещение, поскольку было выполнено следующее условие:"
+            other: "Для вас сработало оповещение, поскольку были выполнены следующие условия:"
+          interaction_description: "Взаимодействие со студентом/учителем отсутствует в течение %{count} дней"
+          subject: "Предупреждение: %{user_name}"
+          ungraded_count_description: "%{count} или больше отправленных результатов не оценены"
+          ungraded_timespan_description: "Отправка остается без оценки в течение %{count} дней"
+          usernote_description: "В журнале преподавателей в течение %{count} дней отсутствуют записи"
+          view_here: "Его можно просмотреть здесь"
         interaction_description: "Взаимодействие со студентом/учителем отсутствует в течение %{count} дней"
         subject: "Предупреждение: %{user_name}"
         ungraded_count_description: "%{count} или больше подписок не оценены"
@@ -6526,6 +7244,19 @@ ru:
         body_student: "Уведомление создано для вас"
     appointment_canceled_by_user: 
       email: 
+        html: 
+          attendee: Участник
+          attendees: Участники
+          cancel_reason: "Причина отмены"
+          click_to_see_assignment: "Щелкните здесь для просмотра задания"
+          date_and_time: Дата/Время
+          details: "Сведения о встрече"
+          group: Группа
+          message: "%{user} отменил свое бронирование для %{appointment_name}."
+          no_reason_given: "не дано"
+          slots_remaining: "Доступные интервалы времени"
+          subject: "Бронирование отменено для %{appointment_name} (%{course})"
+          view_appointment: "Просмотрите встречу по следующей ссылке"
         instructions: "Посмотрите встречу по следующей ссылке: %{link}"
         labels: 
           attendee: Участник
@@ -6559,7 +7290,19 @@ ru:
         message: "Оповещение Canvas - %{user} отменил свое бронирование для \"%{appointment_name}\"."
     appointment_deleted_for_user: 
       email: 
-        instructions: "Подпишитесь на другие временных интервалов по следующей ссылке: %{link}"
+        html: 
+          attendee: Участник
+          attendees: Участники
+          cancel_reason: "Причина отмены"
+          course: Курс
+          date_and_time: Дата/Время
+          details: "Сведения о встрече"
+          group: Группа
+          link_text: "Щелкните здесь, чтобы зарегистрироваться для другого интервала времени"
+          message: "%{user} отменил ваш временной интервал для %{appointment_name}."
+          no_reason_given: "не дано"
+          subject: "Ваш временной интервал для %{appointment_name} был отменен (%{course})"
+        instructions: "Регистрация на другой интервал времени по следующей ссылке: %{link}"
         labels: 
           attendee: Участник
           attendees: Участники
@@ -6590,6 +7333,15 @@ ru:
         message: "Предупреждение от Canvas - Ваш временной интервал для \"%{appointment_name} был отменен\"."
     appointment_group_deleted: 
       email: 
+        html: 
+          cancel_reason: "Причина отмены"
+          course: Курс
+          dates: Дата(ы)
+          details: "Сведения о встрече"
+          link_text: "Просмотреть встречу"
+          message: "Все встречи для %{appointment_name} были отменены."
+          no_reason_given: "не дано"
+          subject: "Встречи для %{appointment_name} были отменены (%{course})"
         labels: 
           cancel_reason: "Причина отмены"
           course: Курс
@@ -6614,6 +7366,17 @@ ru:
     appointment_group_published: 
       email: 
         group_signup: "Группа (%{group_category})"
+        html: 
+          course: Курс
+          dates: Дата(ы)
+          details: "Сведения о встрече"
+          group_signup: "Группа (%{group_category})"
+          individual_signup: Индивид
+          link_text: "Регистрация на временной интервал"
+          message: "Временные интервалы для \"%{appointment_name}\" теперь доступны для регистрации."
+          signup_type: "Тип регистрации"
+          slots_remaining: "Доступные интервалы времени"
+          subject: " Встреча \"%{appointment_name}\" теперь доступна для регистрации (%{course})"
         individual_signup: Индивид
         instructions: "Регистрация на интервал времени по следующей ссылке: %{link}"
         labels: 
@@ -6646,6 +7409,16 @@ ru:
     appointment_group_updated: 
       email: 
         group_signup: "Группа (%{group_category})"
+        html: 
+          course: Курс
+          dates: Дата(ы)
+          details: "Сведения о встрече"
+          group_signup: "Группа (%{group_category})"
+          individual_signup: Индивид
+          link_text: "Регистрация на временной интервал"
+          message: "Временные интервалы были добавлены для \"%{appointment_name}\" и теперь доступны для регистрации."
+          slots_remaining: "Доступные интервалы времени"
+          subject: "Встреча \"%{appointment_name}\" была обновлена (%{course})"
         individual_signup: Индивид
         instructions: "Регистрация на интервал времени по следующей ссылке: %{link}"
         labels: 
@@ -6677,6 +7450,17 @@ ru:
         message: "Оповещение Canvas - Новые временные интервалы доступны для \"%{appointment_name}\"."
     appointment_reserved_by_user: 
       email: 
+        html: 
+          attendee: Участник
+          attendees: Участники
+          course: Курс
+          date_and_time: Дата/время
+          details: "Сведения о встрече"
+          group: Группа
+          link_text: "Посмотреть встречу"
+          message: "%{user} зарегистрировался на \"%{appointment_name}\"."
+          slots_remaining: "Доступные интервалы времени"
+          subject: "Пользователь зарегистрировался на \"%{appointment_name}\" (%{course})"
         instructions: "Посмотрите встречу по следующей ссылке: %{link}"
         labels: 
           attendee: Участник
@@ -6706,6 +7490,17 @@ ru:
         message: "Оповещение Canvas - %{user} зарегистрировался на \"%{appointment_name}\"."
     appointment_reserved_for_user: 
       email: 
+        html: 
+          attendee: Участник
+          attendees: Участники
+          course: Курс
+          date_and_time: Дата/время
+          details: "Сведения о встрече"
+          group: Группа
+          link_text: "Зарегистрироваться на другой интервал времени"
+          message: "%{user} зарегистрировал вас на \"%{appointment_name}\"."
+          slots_remaining: "Доступные интервалы времени"
+          subject: "Вы были зарегистрированы на \"%{appointment_name}\""
         instructions: "Зарегистрироваться на другой временной интервал по следующей ссылке: %{link}"
         labels: 
           attendee: Участник
@@ -6743,6 +7538,10 @@ ru:
             
             Щелкните здесь для просмотра задания: 
             %{url}
+        html: 
+          body: "Задание \"%{title}\" для %{course} было изменено."
+          link: "Щелкните здесь для просмотра задания"
+          subject: "Задание изменено: %{title}, %{course}"
         subject: "Задание изменено: %{title}, %{course}"
       facebook: 
         body: "Задание %{title_link} для %{course} изменено."
@@ -6759,6 +7558,13 @@ ru:
       email: 
         assignment_created: "Задание создано - %{assignment_name}, %{course_name}"
         due_at: "до: %{assignment_due_date_time}"
+        html: 
+          assignment_created: "Задание создано - %{assignment_name}, %{course_name}"
+          due_at: "До: %{assignment_due_date_time}"
+          link_text: "Просмотр задания"
+          multiple_due_dates: "до: Несколько дат"
+          new_assignment: "Для вашего курса, %{course_name}, создано новое задание"
+          no_due_date: "Нет даты выполнения"
         labels: 
           click_to_see_assignment: "Щелкните здесь для просмотра задания"
         multiple_due_dates: "до: Несколько дат"
@@ -6789,6 +7595,11 @@ ru:
       email: 
         assignment_due_date_changed: "Дата окончания задания изменена: %{assignment_name}, %{course_name}"
         assignment_due_date_changed_sentence: "Дата окончания для задания, %{assignment_name}, для курса, %{course_name}, изменена на:"
+        html: 
+          assignment_due_date_changed: "Дата выполнения задания изменена: %{assignment_name}, %{course_name}"
+          assignment_due_date_changed_sentence: "Дата выполнения задания, %{assignment_name}, для курса, %{course_name}, изменена на:"
+          link_text: "Просмотр задания"
+          no_due_date: "Нет даты выполнения"
         labels: 
           click_to_see_assignment: "Щелкните здесь для просмотра задания"
         no_due_date: "Нет даты выполнения"
@@ -6811,6 +7622,11 @@ ru:
       email: 
         assignment_due_date_changed: "Изменены даты выполнения задания: %{assignment_name}, %{course_name} (%{override})"
         assignment_due_date_changed_sentence: "Срок выполнения задания, %{assignment_name}, для курса, %{course_name} (%{override}), был изменен на:"
+        html: 
+          assignment_due_date_changed: "Изменена дата выполнения задания: %{assignment_name}, %{course_name} (%{override})"
+          assignment_due_date_changed_sentence: "Дата выполнения задания, %{assignment_name}, для курса, %{course_name} (%{override}), была изменена на:"
+          link_text: "Просмотр задания"
+          no_due_date: "Нет даты выполнения"
         labels: 
           click_to_see_assignment: "Щелкните здесь для просмотра задания"
         no_due_date: "Нет даты выполнения"
@@ -6848,6 +7664,10 @@ ru:
     assignment_graded: 
       email: 
         assignment_graded: "Задание оценено: %{assignment_name}, %{course_name}"
+        html: 
+          assignment_graded: "Задание оценено: %{assignment_name}, %{course_name}"
+          link_text: "Просмотр задания"
+          the_assignment_is_graded: "Задание, %{assignment_name}, было оценено."
         labels: 
           view_here: "Его можно просмотреть здесь"
         the_assignment_is_graded: "Задание, %{assignment_name}, оценено."
@@ -6899,6 +7719,10 @@ ru:
         ungraded_assignment_sentence: "Уведомление Canvas - напоминание: публикация %{assignment_name}, %{course_name}"
     assignment_resubmitted: 
       email: 
+        html: 
+          link_text: "Просмотреть отправку"
+          user_resubmitted: "Повторная отправка: %{user_name}, %{assignment_name}"
+          user_resubmitted_sentence: "%{user_name} только что включил повторную отправку для %{assignment_name} в курсе %{course_name}"
         labels: 
           view_submission: "Отправку можно просмотреть здесь"
         user_resubmitted: "Повторная отправка: %{user_name}, %{assignment_name}"
@@ -6916,6 +7740,10 @@ ru:
         user_resubmitted: "Уведомление Canvas - повторная отправка: %{user_name}, %{assignment_name}"
     assignment_submitted: 
       email: 
+        html: 
+          link_text: "Просмотреть отправку"
+          user_submitted: "Отправка: %{user_name}, %{assignment_name}"
+          user_submitted_sentence: "%{user_name} только что включил отправку для %{assignment_name} в курсе %{course_name}"
         labels: 
           view_submission: "Отправку можно просмотреть здесь"
         user_submitted: "Отправка: %{user_name}, %{assignment_name}"
@@ -6933,6 +7761,10 @@ ru:
         user_submitted: "Уведомление Canvas - отправка: %{user_name}, %{assignment_name}"
     assignment_submitted_late: 
       email: 
+        html: 
+          link_text: "Просмотреть отправку"
+          user_resubmitted_sentence: "%{user_name} только что включил позднюю отправку для %{assignment_name} в курсе %{course_name}"
+          user_submitted: "Позднее задание: %{user_name}, %{assignment_name}"
         labels: 
           view_submission: "Отправку можно просмотреть здесь"
         user_resubmitted_sentence: "%{user_name} только что включил позднюю отправку для %{assignment_name} в курсе %{course_name}"
@@ -6955,6 +7787,10 @@ ru:
             
             Их можно просмотреть здесь:
             %{url}
+        html: 
+          body: "Ваш инструктор опубликовал изменения в оценках и новые комментарии к %{title}. Данные изменения теперь доступны для просмотра."
+          link: "Его можно просмотреть здесь"
+          subject: "Звук задания включен: %{title}, %{course}"
         subject: "Звук задания включен: %{title}, %{course}"
       sms: 
         body: |-
@@ -6963,6 +7799,7 @@ ru:
             Дополнительные сведения доступны в %{website}
       summary: 
         subject: "Оценки и комментарии открыты для: %{title}, %{course}"
+    assignment_unpublished_module: "Это задание является частью неопубликованного модуля и на данный момент недоступно."
     collaboration_invitation: 
       email: 
         body: |-
@@ -6985,6 +7822,12 @@ ru:
             
             Сведения можно просмотреть здесь:
             %{link}
+        html: 
+          body: "Вы были приглашены для совместной работы над документом, %{document} для %{course_or_group}. Документ был создан в %{service}, и вы были приглашены с помощью вашего адреса электронной почты %{email}."
+          body_with_user: "Вы были приглашены для совместной работы над документом, %{document} для %{course_or_group}. Документ был создан %{user} в %{service}, и вы были приглашены с помощью вашего адреса электронной почты %{email}."
+          change_profile_settings: "Если это неверный адрес электронной почты для данного типа совместной работы, вам необходимо изменить настройки профиля или зарегистрироваться с помощью %{service}."
+          link: "Сведения можно просмотреть здесь"
+          subject: "Приглашение на участие в совместной работе: %{course_or_group}"
         subject: "Приглашение на участие в совместной работе: %{course_or_group}"
       facebook: 
         body: "Вы приглашены для совместной работы с документом, %{document} для            %{course_or_group}. Документ был создан в %{service}."
@@ -7010,11 +7853,19 @@ ru:
       email: 
         body: "Адрес электронной почты, %{email} зарегистрирован %{website} для пользователя, %{user}."
         details: "Для подтверждения этой регистрации перейдите по следующему url-адресу:"
+        html: 
+          body: "Адрес электронной почты, %{email}, зарегистрирован на %{website} для пользователя, %{user}."
+          details: "Щелкните здесь, чтобы подтвердить регистрацию"
+          subject: "Подтвердите электронную почту: Canvas"
         subject: "Подтвердите электронную почту: Canvas"
     confirm_registration: 
       email: 
         body: "Благодарим за регистрацию в Canvas!  Это сообщение электронной почты — подтверждение регистрации пользователем %{user} новой учетной записи на %{website}."
         details: "Для завершения процесса регистрации перейдите по следующему url-адресу:"
+        html: 
+          body: "Благодарим за регистрацию в Canvas! Данное электронное сообщение подтверждает, что пользователь %{user} зарегистрирован с новой учетной записью на %{website}."
+          details: "Щелкните здесь для завершения процесса регистрации"
+          subject: "Подтвердите регистрацию: Canvas"
         subject: "Подтвердить регистрацию: Canvas"
     confirm_sms_communication_channel: 
       sms: 
@@ -7029,20 +7880,37 @@ ru:
         body: |-
             При экспорте курса "%{course}" произошла ошибка.
             Сообщите системному администратору и предоставьте ему следующий идентификатор экспорта: %{id}.
+        html: 
+          body: "При экспорте курса <em>%{course}</em> произошла ошибка. Сообщите системному администратору и предоставьте ему следующий идентификатор экспорта:"
+          link: "Щелкните для просмотра экспортов"
+          subject: "Сбой экспорта курса: %{course}"
         subject: "Ошибка экспорта курса: %{course}"
     content_export_finished: 
       email: 
         body: "Экспорт курса для \"%{course}\" завершен."
+        html: 
+          body: "Экспорт курса для  <em>%{course}</em> завершен."
+          link: "Щелкните для просмотра экспортов"
+          subject: "Экспорт курса завершен: %{course}"
         subject: "Экспорт курса завершен: %{course}"
     content_locked: "Эта контрольная работа в настоящий момент заблокирована."
     content_locked_at: "Это содержание было заблокировано %{at}."
     content_locked_module: "Это содержание — часть модуля *%{module}* и еще не заблокировано."
     content_locked_until: "Это содержание заблокировано до %{date}"
+    content_unpublished_module: "Данное содержание является частью неопубликованного модуля и на данный момент недоступно."
     conversation_message: 
       email: 
         attached_files: "Прикрепленные файлы:"
         audio_comment: "Это сообщение включает мультимедийные комментарии. Для прослушивания или ответа щелкните ссылку ниже:"
         body: "%{user_name} только что отправил вам сообщение в Canvas:"
+        html: 
+          attached_files: "Прикрепленные файлы:"
+          audio_comment: "Это сообщение включает мультимедийные комментарии. Для прослушивания или ответа щелкните ссылку ниже:"
+          body: "%{user_name} только что отправил вам сообщение в Canvas:"
+          download: скачать
+          reply_message: "Чтобы ответить на это сообщение, щелкните ссылку ниже:"
+          subject: "%{user_name} только что отправил вам сообщение в Canvas."
+          unknown_user: "Неизвестный пользователь"
         reply_message: "Чтобы ответить на сообщение, щелкните ссылку ниже:"
         subject: "%{user_name} только что отправил вам сообщение в Canvas."
         unknown_user: "Неизвестный пользователь"
@@ -7061,6 +7929,64 @@ ru:
       twitter: 
         tweet: "Уведомление Canvas - сообщение от %{user_name}."
         unknown_user: "Неизвестный пользователь"
+    course_already_started: 
+      email: 
+        body: |-
+            Привет, %{user}!
+            
+            %{course}, ваш курс в сети Canvas, начался несколько дней назад, и мы заметили, что вы до сих пор не входили в систему. Мы просто хотели отправить вам последнее напоминание на случай, если вы забыли.
+            
+            Чтобы войти в систему, перейдите на %{site} и введите ваше имя пользователя и пароль. Если вы еще не задали пароль, вы можете задать его здесь: %{password_url}. Если вы просто не может учиться на данном курсе, не стесняйтесь изучить наш каталог курсов, расположенный по адресу %{site}, чтобы найти что-нибудь другое, что вдохновит вас. Новые курсы постоянно добавляются!
+            
+            Мы надеемся вскоре вас увидеть у себя на курсах,
+            
+            сеть Canvas
+        course_already_started: "Ваш курс уже начался"
+    course_required_materials: 
+      email: 
+        body: |-
+            Привет, %{user}!
+            
+            Есть отличные новости! %{course}, курс, на который вы были зачислены в сети Canvas, вскоре начнется.
+            
+            Чтобы обеспечить получение максимальной пользы от изучаемого вами курса, вам необходимо проверить наличие любых особых инструкций или учебных материалов, перечисленных вашим инструктором. Вы можете проверить их наличие на странице сведений о курсе в сети Canvas или просто щелкнуть по ссылке внизу.
+            
+            %{url}
+            
+            Продолжайте учебу,
+            
+            сеть Canvas
+        course_required_materials: "Материалы и инструкции для %{course}"
+    course_started: 
+      email: 
+        body: |-
+            Привет, %{user}!
+            
+            Это дружеское напоминание о том, что %{course}, ваш курс в сети Canvas, начинается сегодня. Вы можете авторизоваться на %{site} и приступить!
+            
+            Не забудьте заполнить профиль в сети Canvas, чтобы другие слушатели курса могли знать, кто вы. Вы можете обновить ваш профиль на странице %{profile_url}
+            
+            Продолжайте учебу,
+            
+            сеть Canvas
+        course_starts_today: "Ваш курс начинается сегодня"
+    course_starts_in_week: 
+      email: 
+        body: |-
+            %{user}!
+            
+            Время почти пришло! %{course}, курс, на который вы были зачислены в сети Canvas, начинается на следующей неделе. Мы знаем, насколько вы должны быть взволнованы, мы тоже волнуемся.
+            
+            Что вы можете сделать, чтобы подготовиться?
+            
+            Если вы еще не создали профиль в сети Canvas, вы можете войти в систему и заполнить его на Canvas.net. Ваш профиль поможет другим людям на курсе узнать, кто вы такой. Там вы также можете установить ваши настройки уведомлений.
+            
+            Наконец, вы можете просмотреть необходимые материалы и любые инструкции по вашему курсу по адресу: %{url}
+            
+            Продолжайте учебу,
+            
+            сеть Canvas
+        course_starts_next_week: "Ваш курс начинается на следующей неделе"
     dialog: 
       title: "Отправить сообщение с ответом"
     email: 
@@ -7075,6 +8001,14 @@ ru:
         body_ta: "%{user} только что принял приглашение на участие в курсе %{course} как ассистент."
         body_teacher: "%{user} только что принял приглашение на участие в курсе %{course} как учитель."
         details: "Список текущих регистраций см. здесь:"
+        html: 
+          body_designer: "%{user} только что принял их приглашение на участие в курсе %{course} в качестве дизайнера."
+          body_observer: "%{user} только что принял приглашение на участие в курсе %{course} в качестве наблюдателя."
+          body_student: "%{user} только что принял приглашение на участие в курсе %{course} в качестве студента."
+          body_ta: "%{user} только что принял приглашение на участие в курсе %{course} в качестве ассистента."
+          body_teacher: "%{user} только что принял приглашение на участие в курсе %{course} в качестве учителя."
+          details: "Смотрите список текущих регистраций"
+          subject: "%{user} принял приглашение на участие в курсе"
         subject: "%{user} принял приглашение на участие в курсе"
       facebook: 
         body_designer: "%{user} только что принял приглашение на участие в курсе %{course} как дизайнер."
@@ -7106,6 +8040,18 @@ ru:
         body_ta: "Вы приглашены на участие в курсе %{course} как ассистент."
         body_teacher: "Вы приглашены на участие в курсе %{course} как учитель."
         details: "Посетите страницу курса здесь:"
+        html: 
+          body_designer: "Вы приглашены на участие в курсе %{course} в качестве дизайнера."
+          body_observer: "Вы приглашены на участие в курсе %{course} в качестве наблюдателя."
+          body_student: "Вы приглашены на участие в курсе %{course} в качестве студента."
+          body_ta: "Вы приглашены на участие в курсе %{course} в качестве ассистента."
+          body_teacher: "Вы приглашены на участие в курсе %{course} в качестве учителя."
+          email: "Электронная почта"
+          link: "Щелкните здесь, чтобы просмотреть страницу курса"
+          name: Имя
+          none: нет
+          subject: "Приглашение на участие в курсе"
+          username: "Имя пользователя"
         labels: 
           email: "Электронная почта"
           name: Имя
@@ -7152,6 +8098,18 @@ ru:
         body_ta: "Вы зарегистрированы в курсе %{course} как ассистент."
         body_teacher: "Вы зарегистрированы в курсе %{course} как учитель."
         details: "Посетите страницу курса здесь:"
+        html: 
+          body_designer: "Вы были зарегистрированы в курсе %{course} в качестве дизайнера."
+          body_observer: "Вы были зарегистрированы в курсе %{course} в качестве наблюдателя."
+          body_student: "Вы были зарегистрированы в курсе %{course} в качестве студента."
+          body_ta: "Вы были зарегистрированы в курсе %{course} в качестве ассистента."
+          body_teacher: "Вы были зарегистрированы в курсе %{course} в качестве учителя."
+          complete_registration_link: "Щелкните здесь, чтобы завершить регистрацию"
+          email: "Электронная почта"
+          name: Имя
+          none: нет
+          subject: "Регистрация на курсе"
+          username: "Имя пользователя"
         labels: 
           email: "Электронная почта"
           name: Имя
@@ -7199,6 +8157,20 @@ ru:
         body_ta: "Вы приглашены на участие в занятии на %{website}.  Занятие называется %{course}, и вы приглашены участие участвовать как ассистент."
         body_teacher: "Вы приглашены на участие в занятии на %{website}.  Занятие называется %{course}, и вы приглашены участие участвовать как учитель."
         details: "Для участия в занятии необходимо зарегистрироваться с Canvas.  Для начала работы посетите страницу курса здесь:"
+        html: 
+          body_designer: "Класс называется %{course}, и вы были приглашены к участию в качестве дизайнера."
+          body_observer: "Класс называется %{course}, и вы были приглашены к участию в качестве наблюдателя."
+          body_student: "Класс называется %{course}, и вы были приглашены к участию в качестве студента."
+          body_ta: "Класс называется %{course}, и вы были приглашены к участию в качестве ассистента."
+          body_teacher: "Класс называется %{course}, и вы были приглашены к участию в качестве учителя."
+          details: "Вам необходимо зарегистрироваться через Canvas перед тем, как вы сможет принять участие в занятиях."
+          email: "Электронная почта"
+          link: "Щелкните здесь, чтобы приступить к работе"
+          name: Имя
+          none: нет
+          participate_in_class: "Вы были приглашены для участия в классе на %{website}"
+          subject: "Приглашение на участие в курсе"
+          username: "Имя пользователя"
         labels: 
           email: "Электронная почта"
           name: Имя
@@ -7230,6 +8202,12 @@ ru:
       email: 
         email_body: "Событие, %{event_title}, для курса, %{course_name}, изменило время. Теперь оно:"
         from_to_time: "c %{start_date_time} на %{end_date_time}"
+        html: 
+          email_body: "Для события %{event_title} курса %{course_name} изменили время. Теперь оно:"
+          from_to_time: "c %{start_date_time} по %{end_date_time}"
+          no_time_set: "Время не установлено"
+          see_details: "Сведения можно просмотреть здесь"
+          subject: "Дата события изменена: %{event_title}, %{course_name}"
         labels: 
           see_details: "Сведения можно просмотреть здесь:"
         no_time_set: "Время не установлено"
@@ -7255,9 +8233,21 @@ ru:
     file_locked_at: "Это файл был заблокирован %{at}."
     file_locked_module: "Этот файл — часть модуля *%{module}* и еще не разблокирован."
     file_locked_until: "Этот файл заблокирован до %{date}"
+    file_unpublished_module: "Данный файл является частью неопубликованного модуля и на данный момент недоступен."
     forgot_password: 
       email: 
         associated_login: "Этот адрес связан со входом в систему, \"%{login_identifier}\"."
+        html: 
+          associated_login: "Этот адрес связан с учетными данными \"%{login_identifier}\"."
+          click_to_reset: "Щелкните здесь, чтобы задать новый пароль"
+          labels: 
+            associated_with_accounts: "Этот адрес связан со следующими учетными записями"
+            change_password_at: "изменить пароль на вход в систему для"
+          login_at_account: "%{login_email} для %{account_name}"
+          login_managed_by_account: "эти учетные данные входа управляются %{account_name}"
+          password_from_account: "Пароль для этих учетных данных должен быть предоставлен системным администратором на %{account_name}, и Instructure не имеет доступа к вашему паролю. Если пароль не работает, обратитесь к системному администратору для изменения или проверки пароля."
+          requested_password_reset: "Вы запросили подтверждение пароля для входа в Canvas."
+          subject: "Забыли пароль: Canvas"
         labels: 
           associated_with_accounts: "Этот адрес связан со следующими учетными записями"
           change_password_at: "изменить пароль учетных данных для"
@@ -7271,6 +8261,13 @@ ru:
       email: 
         grade_changed: "Политика оценки для курса, %{course_name} изменена."
         grading_based_on_points: "Оценка основана на общем количестве баллов для всех заданий."
+        html: 
+          grade_changed: "Политика оценки для курса %{course_name} изменилась."
+          grading_based_on_points: "Оценка основана на общем количестве баллов для всех заданий."
+          labels: 
+            grades_based_on_percent: "Оценка основана на взвешенном итоговом значении для каждой группы заданий"
+            now_see_here: "Сведения можно просмотреть здесь"
+            subject: "Вес оценки изменен"
         labels: 
           grades_based_on_percent: "Оценка основана на взвешенном общем числе для каждой группы оценок"
           now_see_here: "Сведения можно просмотреть здесь:"
@@ -7294,6 +8291,10 @@ ru:
     group_assignment_submitted_late: 
       email: 
         body: "Группа %{group_name} только что включила позднюю отправку для %{assignment_name} в курсе %{course_name}."
+        html: 
+          body: "Группа %{group_name} только что включила позднюю отправку для %{assignment_name} в курсе %{course_name}."
+          subject: "Позднее задание: %{group_name}, %{assignment_name}"
+          view_submission_here: "Отправку можно просмотреть здесь"
         labels: 
           view_submission_here: "Отправку можно просмотреть здесь"
         subject: "Поздняя отправка: %{group_name}, %{assignment_name}"
@@ -7312,6 +8313,12 @@ ru:
         account_group: "Ваш запрос на присоединение к группе %{group_name} для учетной записи %{account_name} принят."
         course_group: "Ваш запрос на присоединение к группе %{group_name} для курса %{course_name} принят."
         group_request_accepted: "Запрос группы принят: %{group_name}"
+        html: 
+          account_group: "Ваш запрос на присоединение к группе %{group_name} для учетной записи %{account_name} принят."
+          course_group: "Ваш запрос на присоединение к группе %{group_name} для курса %{course_name} принят."
+          group_request_accepted: "Запрос группы принят: %{group_name}"
+          link: "Щелкните, чтобы проверить группу"
+          subject: "Членство в группе принято: %{group_name}"
         labels: 
           click_below: "Можно проверить группу, щелкнув ссылку ниже"
         subject: "Членство в группе принято: %{group_name}"
@@ -7335,6 +8342,12 @@ ru:
         account_group: "Ваш запрос на присоединение к группе %{group_name} для учетной записи %{account_name} отклонен."
         course_group: "Ваш запрос на присоединение к группе %{group_name} для курса %{course_name} отклонен."
         group_request_rejected: "Запрос группы отклонен: %{group_name}"
+        html: 
+          account_group: "Ваш запрос на присоединение к группе %{group_name} для учетной записи %{account_name} отклонен."
+          course_group: "Ваш запрос на присоединение к группе %{group_name} для курса %{course_name} отклонен."
+          group_request_rejected: "Запрос группы отклонен: %{group_name}"
+          link: "Щелкните, чтобы просмотреть другие группы"
+          subject: "Членство в группе отклонено: %{group_name}"
         labels: 
           click_below: "Можно проверить другие группы, щелкнув ссылку ниже"
         subject: "Членство в группе отклонено: %{group_name}"
@@ -7352,22 +8365,37 @@ ru:
       twitter: 
         account_group: "Уведомление Canvas - членство в группе отклонено: %{group_name} для учетной записи %{account_name}."
         course_group: "Уведомление Canvas - членство в группе отклонено: %{group_name} для курса %{course_name}."
+    html_message: 
+      html_not_exist: "HTML-версия данного сообщения не была ни создана, ни отправлена"
     index: 
       titles: 
         messages: "Сообщения для %{name}"
+    layout: 
+      email: 
+        html: 
+          click_to_preferences: "Щелкните здесь, чтобы изменить свои настройки уведомлений"
     merge_email_communication_channel: 
       email: 
         body: "Для вас создана учетная запись на %{url}, но у вас уже имеется учетная запись Canvas.  Если вы хотите объединить их, перейдите по следующему url-адресу:"
+        html: 
+          account_created: "Для вас была создана учетная запись по адресу %{url}, однако вы уже имеете учетную запись Canvas."
+          merge: "Если вы желаете объединить их, <a href=\"%{link}\">щелкните здесь</a>"
+          subject: "Новая учетная запись Canvas"
         subject: "Новая учетная запись Canvas"
     message: 
       actions: 
         reply: Ответ
+      meta_data: Метаданные
+      plain_text: "Обычный текст"
       titles: 
         created_at: Создано
+        delay_for: "Задержки для"
         from_name: "От имени"
+        notification_name: "Название уведомления"
+        path_type: "Тип пути"
         reply_to: Ответить
         sent_at: Отправлено
-        subject: "Тема:"
+        subject: Тема
         to: Кому
     messages: 
       failure: "Произошла ошибка при отправке вашего электронного сообщения. Перезагрузите страницу и попробуйте еще раз."
@@ -7375,16 +8403,29 @@ ru:
     migration_export_ready: 
       email: 
         body: "Ваш контент готов к импорту в ваш курс. "
+        html: 
+          body: "Ваше содержание готово к импорту в ваш курс. "
+          link_message: "Щелкните <a href=\"%{link}\">эту ссылку</a>, чтобы выбрать, какие элементы вашего содержимого импортировать"
+          subject: "Ваше содержание для курса %{course_name} готово к импорту "
         link_message: "Нажмите на данную ссылку, чтобы выбрать какие элементы вашего контента необходимо импортировать:"
         subject: "Извлечение курса готово: %{course_name}"
     migration_import_failed: 
       email: 
         body: "Возникла проблема импорта некоторых элементов контента в ваш курс %{destination}. ⏎  Сообщите системному администратору и предоставьте ему следующий код ошибки: %{error_url}"
+        html: 
+          body: "Возникли проблемы во время импорта какого-то содержимого в ваш курс %{destination}."
+          notify_admin: "Пожалуйста, уведомьте системного администратора и укажите ему вашу <a href=\"%{link}\">страницу информации об импорте</a>"
+          subject: "Сбой импорта содержания: %{course_name}"
         subject: "Сбой импорта содержания: %{course_name}"
     migration_import_finished: 
       email: 
         body_no_warnings: "Импорт %{source} в %{destination} завершен.  Сейчас все выбранное должно быть импортировано в курс."
         body_with_warnings: "Импорт %{source} в %{destination} завершен, но не все было импортировано успешно: %{warnings}"
+        html: 
+          body_no_warnings: "Импорт %{source} в %{destination} завершен. Сейчас все, выбранное вами, должно быть импортировано в курс."
+          body_with_warnings: "Импорт %{source} в %{destination} завершен, однако не все было успешно импортировано:"
+          link: "Щелкните для просмотра курса"
+          subject: "Импорт курса завершен: %{course_name}"
         subject: "Импорт курса завершен: %{course_name}"
       summary: 
         body_no_warnings: "Импорт %{source} в %{target} завершен.  Сейчас все выбранное должно быть импортировано в курс."
@@ -7394,6 +8435,10 @@ ru:
       email: 
         body: "Новая учетная запись администратора для %{account}"
         details: "Новый администратор, %{user}, добавлен для учетной записи %{account}"
+        html: 
+          body: "Новая учетная запись администратора для %{account}"
+          details: "Для учетной записи %{account} добавлен новый администратор, %{user}"
+          subject: "Новый пользователь учетной записи"
         subject: "Новый пользователь учетной записи"
       facebook: 
         body: "Новый администратор **%{user}** добавлен для учетной записи **%{account}**."
@@ -7408,6 +8453,10 @@ ru:
         body: "Уведомление Canvas - новый администратор: %{user}, %{account}"
     new_announcement: 
       email: 
+        html: 
+          attached_file: "Прикрепленный файл"
+          download: скачать
+          link: "Просмотреть объявления"
         labels: 
           file_included: "Файл включен"
       facebook: 
@@ -7422,6 +8471,13 @@ ru:
         body_account: "Вы добавлены в новую группу для учетной записи %{account}.  Название группы — %{group_name}."
         body_course: "Вы добавлены в новую группу для курса %{course}.  Название группы — %{group_name}."
         details_account: "Можно просмотреть группы, в которые вы входите для этой учетной записи, щелкнув ссылку ниже:"
+        html: 
+          body_account: "Вы были добавлены в новую группу для учетной записи %{account}. Название группы — %{group_name}."
+          body_course: "Вы были добавлены в новую группу для курса %{course}. Название группы — %{group_name}."
+          html_details_account: "Вы можете увидеть, в какие группы входит ваша учетная запись, <a href=\"%{link}\">щелкнув здесь</a>"
+          html_details_course: "Вы можете увидеть, в какие группы входит ваш курс, <a href=\"%{link}\">щелкнув здесь</a>"
+          subject: "Новое членство в группе для %{course_or_account}"
+          title: "Новое членство в группе: %{group_name}"
         subject: "Новое членство в группе для %{course_or_account}"
         title: "Новое членство в группе: %{group_name}"
       facebook: 
@@ -7443,6 +8499,12 @@ ru:
         body_account: "Вы приглашены присоединиться к группе %{group} для учетной записи %{account}."
         body_course: "Вы приглашены присоединиться к группе %{group} для курса %{course}."
         details: "Можно проверить группу, щелкнув ссылку ниже:"
+        html: 
+          body_account: "Вы приглашены присоединиться к группе %{group} для учетной записи %{account}."
+          body_course: "Вы приглашены присоединиться к группе %{group} для курса %{course}."
+          details: "Вы можете проверить группу, щелкнув здесь"
+          subject: "Новое членство в группе для %{course_or_account}"
+          title: "Новое членство в группе: %{group_name}"
         subject: "Новое членство в группе для %{course_or_account}"
         title: "Новое членство в группе: %{group_name}"
       facebook: 
@@ -7462,6 +8524,13 @@ ru:
     new_course: 
       email: 
         body: "Курс, %{course}, добавлен для учетной записи %{account}"
+        html: 
+          body: "Для учетной записи %{account} был добавлен курс %{course}"
+          labels: 
+            teachers: Учителя
+          link: "Щелкните здесь, чтобы просмотреть курс"
+          subject: "Новый курс"
+          title: "Новый курс для %{account}"
         labels: 
           teachers: Учителя
         subject: "Новый курс"
@@ -7487,6 +8556,10 @@ ru:
       email: 
         body: "%{user} разместил новый комментарий в теме %{discussion_topic} для %{course}:"
         details: "Присоединитесь к разговору здесь:"
+        html: 
+          body: "%{user} разместил новый комментарий в цепочке %{discussion_topic} для %{course}:"
+          details: "Щелкните здесь, чтобы присоединиться к разговору"
+          subject: "Новый комментарий для %{discussion_topic}: %{course}"
         subject: "Новый комментарий для %{discussion_topic}: %{course}"
       facebook: 
         body: "Новый комментарий для %{discussion_topic}, %{course}"
@@ -7501,6 +8574,12 @@ ru:
       email: 
         body: "Начато новое обсуждение, которое может быть вам интересно:"
         details: "Присоединитесь к разговору здесь:"
+        html: 
+          attached_file: "Прикрепленный файл"
+          body: "Начато новое обсуждение, которое может быть вам интересно:"
+          details: "присоединитесь к разговору здесь"
+          download: скачать
+          subject: "Новое обсуждение - %{discussion_topic}: %{course}"
         labels: 
           file_included: "Файл включен"
         subject: "Новое обсуждение - %{discussion_topic}: %{course}"
@@ -7517,6 +8596,12 @@ ru:
       email: 
         body: "Это новое событие, запланированное для %{course_name}, о котором вы должны знать:"
         from_to_time: "c %{start_date_time} на %{end_date_time}"
+        html: 
+          body: "Это новое событие, запланированное для %{course_name}, о котором вы должны знать:"
+          from_to_time: "c %{start_date_time} по %{end_date_time}"
+          no_time_set: "Время не установлено"
+          see_details: "Сведения можно просмотреть здесь"
+          subject: "Новое событие - %{event_title}, %{course_name}"
         labels: 
           see_details: "Сведения можно просмотреть здесь:"
         no_time_set: "Время не установлено"
@@ -7538,11 +8623,21 @@ ru:
         from_to_time: "c %{start_date_time} на %{end_date_time}"
         no_time_set: "Время не установлено"
         subject: "Уведомление Canvas - событие: %{event_title}, %{course_name}"
+    new_file_added: 
+      email: 
+        html: 
+          link: "Щелкните для просмотра"
     new_student_organized_group: 
       email: 
         body_account: "Новая группа студентов с названием \"%{group_name}\" создана для учетной записи %{account}. Первый член — %{user}."
         body_course: "Новая группа студентов с названием \"%{group_name}\" создана для курса %{course}. Первый член — %{user}."
         details: "Можно просмотреть сведения для этой группы, щелкнув ссылку ниже:"
+        html: 
+          body_account: "Для учетной записи %{account} создана новая группа студентов под названием \"%{group_name}\". Первый член — %{user}."
+          body_course: "Для курса %{course} создана новая группа студентов под названием \"%{group_name}\". Первый член — %{user}."
+          details: "Щелкните здесь, чтобы увидеть сведения об этой группе"
+          subject: "Новая группа студентов для %{course_or_account}"
+          title: "Новая группа студентов: %{group_name}"
         subject: "Новая группа студентов для %{course_or_account}"
         title: "Новая группа студентов: %{group_name}"
       facebook: 
@@ -7561,6 +8656,14 @@ ru:
     new_teacher_registration: 
       email: 
         body: "%{user} только что зарегистрировался как учитель на %{website}."
+        html: 
+          body: "%{user} только что зарегистрировался как учитель на %{website}."
+          email: "Электронная почта"
+          link: "Щелкните здесь, чтобы посмотреть учителя"
+          phone: Телефон
+          school_name: "Название школы"
+          school_position: "Должность в школе"
+          subject: "Регистрация нового учителя"
         labels: 
           email: "Электронная почта"
           phone: Телефон
@@ -7585,6 +8688,10 @@ ru:
     new_user: 
       email: 
         body: "Новый пользователь, %{user}, только что зарегистрировался для учетной записи %{account}"
+        html: 
+          body: "Новый пользователь, %{user}, только что зарегистрировался для учетной записи %{account}"
+          link: "Щелкните здесь, чтобы посмотреть пользователя"
+          subject: "Новый пользователь"
         subject: "Новый пользователь"
         title: "Новый пользователь для %{account}"
       facebook: 
@@ -7602,25 +8709,40 @@ ru:
     page_locked_at: "Эта страница заблокирована %{at}."
     page_locked_module: "Эта страница — часть модуля *%{module}* и еще не разблокирована."
     page_locked_until: "Эта страница заблокирована до %{date}"
+    page_unpublished_module: "Данная страница является частью неопубликованного модуля и на данный момент недоступна."
     pseudonym_registration: 
       email: 
         body: "Вы зарегистрированы для учетной записи Canvas в %{account}!  Перед входом в систему и использованием Canvas необходимо завершить процесс настройки."
+        html: 
+          body: "Вы были зарегистрированы для учетной записи Canvas в %{account}!  Перед тем, как вы войдете в систему и начнете использовать Canvas, вам необходимо завершить процесс настройки."
+          link: "Щелкните здесь для завершения процесса регистрации"
+          subject: "Завершить регистрацию: Canvas"
         link_message: "Для завершения процесса регистрации перейдите по следующему url-адресу:"
         subject: "Завершить регистрацию: Canvas"
     quiz_locked: "Эта контрольная работа в настоящий момент заблокирована."
     quiz_locked_at: "Эта контрольная работа была заблокирована %{at}."
     quiz_locked_module: "Эта контрольная работа — часть модуля *%{module}* и еще не разблокирована."
     quiz_locked_until: "Эта контрольная работа заблокирована до %{date}"
+    quiz_unpublished_module: "Данная контрольная работа является частью неопубликованного модуля и на данный момент недоступна."
     report_generated: 
       email: 
+        html: 
+          link_message: "Щелкните здесь, чтобы скачать отчет"
+          subject: "Созданный отчет"
         link_message: "Щелкните здесь для загрузки отчета:"
         subject: "Созданный отчет"
     report_generation_failed: 
       email: 
+        html: 
+          subject: "Ошибка создания отчета"
         subject: "Ошибка создания отчета"
     rubric_assessment_invitation: 
       email: 
         body: "Вы приглашены %{user} для проверки их отправок для %{rubric}:"
+        html: 
+          body: "Вы были приглашены %{user} для проверки их отправок для %{rubric}:"
+          link_message: "Щелкните здесь, чтобы просмотреть и оценить запись"
+          subject: "Приглашение на проверку знаний: %{rubric}, %{context}"
         link_message: "Можно просмотреть и оценить запись здесь:"
         subject: "Приглашение на проверку знаний: %{rubric}, %{context}"
       facebook: 
@@ -7636,6 +8758,10 @@ ru:
     rubric_assessment_submission_reminder: 
       email: 
         body: "Вам напомнили о проверке знаний: %{rubric}, %{context}:"
+        html: 
+          body: "Вам напомнили о необходимости проверки знаний %{rubric}, %{context}:"
+          link_message: "Щелкните здесь, чтобы просмотреть проверку знаний и отправить вашу запись"
+          subject: "Напоминание о проверке знаний: %{rubric}, %{context}"
         link_message: "Вы можете пересмотреть материал для проверки и добавать вашу запись здесь:"
         subject: "Напоминание о проверке знаний: %{rubric}, %{context}"
       facebook: 
@@ -7651,6 +8777,10 @@ ru:
     rubric_association_created: 
       email: 
         body: "Новая проверка знаний создана для %{context}:"
+        html: 
+          body: "Новая проверка знаний создана для %{context}:"
+          link_message: "Щелкните здесь, чтобы просмотреть проверку знаний и отправить вашу запись"
+          subject: "Новая проверка знаний: %{title}, %{context}"
         link_message: "Запись можно оценить и отправить здесь:"
         subject: "Новая проверка знаний: %{title}, %{context}"
       facebook: 
@@ -7670,6 +8800,11 @@ ru:
     submission_comment: 
       email: 
         body: "%{author} только что создал новый комментарий к отправке для %{user} для %{assignment}"
+        html: 
+          body: "%{author} только что создал новый комментарий к отправке для %{user} для %{assignment}"
+          link_message: "Щелкните здесь, чтобы просмотреть сведения об отправке"
+          someone: Кто-либо
+          subject: "Комментарий к отправке: %{user}, %{assignment}, %{context}"
         link_message: "Сведения об отправке можно просмотреть здесь:"
         someone: Кто-либо
         subject: "Комментарий отправки: %{user}, %{assignment}, %{context}"
@@ -7688,6 +8823,11 @@ ru:
     submission_comment_for_teacher: 
       email: 
         body: "%{author} только что создал новый комментарий к отправке для %{user} для %{assignment}."
+        html: 
+          body: "%{author} только что создал новый комментарий к отправке для %{user} для %{assignment}."
+          link_message: "Щелкните здесь, чтобы просмотреть сведения об отправке"
+          someone: Кто-либо
+          subject: "Комментарий к отправке: %{user}, %{assignment}, %{context}"
         link_message: "Сведения об отправке можно просмотреть здесь:"
         someone: Кто-либо
         subject: "Комментарий отправки: %{user}, %{assignment}, %{context}"
@@ -7706,6 +8846,15 @@ ru:
     submission_grade_changed: 
       email: 
         body: "Оценка вашего задания, %{assignment_title} изменена."
+        html: 
+          body: "Оценка вашего задания %{assignment_title} была изменена."
+          link_message: "Вы можете просмотреть задание здесь"
+          no_date_set: "Дата не установлена"
+          not_applicable: "Не применимо"
+          regraded_date: "повторная оценка: %{date}"
+          score: "результат: %{score} из %{total}"
+          score_pending: "результат ожидает рассмотрения учителем"
+          subject: "Оценка изменена: %{assignment}, %{context}"
         link_message: "Задание можно просмотреть здесь:"
         no_date_set: "Дата не установлена"
         not_applicable: "Н/Д (недоступно)"
@@ -7745,6 +8894,15 @@ ru:
       email: 
         body: "Задание, %{assignment}, оценено."
         graded_date: "оценено: %{date}"
+        html: 
+          body: "Ваше задание, %{assignment}, было оценено."
+          graded_date: "оценено: %{date}"
+          link_message: "Вы можете просмотреть задание здесь"
+          no_date_set: "Дата не установлена"
+          not_applicable: "Не доступно"
+          score: "результат: %{score} из %{total}"
+          score_pending_review: "результат ожидает рассмотрения учителем"
+          subject: "Задание оценено: %{assignment}, %{context}"
         link_message: "Задание можно просмотреть здесь:"
         no_date_set: "Дата не установлена"
         not_applicable: "Н/Д (недоступно)"
@@ -7782,6 +8940,12 @@ ru:
     summaries: 
       email: 
         daily_body: "Вы зарегистрировались на получение ежедневного отчета о некоторых уведомлениях учетной записи Canvas.  Ниже приведен отчет для %{date}:"
+        html: 
+          click_to_preferences: "Щелкните здесь, чтобы изменить свои настройки уведомлений"
+          daily_body: "Вы зарегистрированы на получение ежедневного отчета о некоторых уведомлениях от вашей учетной записи Canvas. Ниже приведен отчет за %{date}:"
+          subject: "Последние уведомления Canvas"
+          view: "Щелкните, чтобы просмотреть"
+          weekly_body: "Вы зарегистрированы на получение еженедельного отчета о некоторых уведомлениях от вашей учетной записи Canvas. Ниже приведен отчет за неделю, окончившуюся %{date}:"
         notifications_link: "Можно изменить настройки уведомлений, посетив следующую страницу:"
         subject: "Последние уведомления Canvas"
         weekly_body: "Вы зарегистрировались на получение еженедельного отчета о некоторых уведомлениях учетной записи Canvas.  Ниже приведен отчет для недели, заканчивающейся %{date}:"
@@ -7795,9 +8959,14 @@ ru:
     topic_locked_at: "Эта тема заблокирована %{at}."
     topic_locked_module: "Эта тема — часть модуля *%{module}* и еще не разблокирована."
     topic_locked_until: "Эта тема заблокирована до %{date}"
+    topic_unpublished_module: "Данная тема является частью неопубликованного модуля и на данный момент недоступна."
     updated_wiki_page: 
       email: 
         body: "Страница вики обновлена для %{title}, что упрощает вашу работу."
+        html: 
+          body: "Для %{title} была обновлена вики-страница, что упрощает вашу работу."
+          link_message: "Щелкните здесь, чтобы просмотреть его"
+          subject: "Обновленная вики-страница: %{title}, %{user}"
         link_message: "Ее можно просмотреть здесь: %{link}"
         subject: "Обновленная вики-страница: %{title}, %{user}"
       facebook: 
@@ -7814,6 +8983,10 @@ ru:
       email: 
         body: "Вы приглашены на участие в веб-конференции, %{title} для %{name}."
         details_link: "Сведения можно просмотреть здесь: %{link}"
+        html: 
+          body: "Вы были приглашены к участию в веб-конференции, %{title} для %{name}."
+          details_link: "Щелкните здесь для просмотра сведений"
+          subject: "Приглашение на участие в веб-конференции: %{name}"
         subject: "Приглашение на участие в веб-конференции: %{name}"
       facebook: 
         body: "Вы приглашены на участие в веб-конференции, *%{title}* для #%{name}#."
@@ -7825,6 +8998,14 @@ ru:
         subject: "Приглашение на участие в веб-конференции: %{name}"
       twitter: 
         tweet: "Уведомление Canvas - пригласить: участие %{title}, %{name}"
+  migration: 
+    ecollege: 
+      course_not_found: "Курс ECollege не найден."
+    webct: 
+      course_not_found: "Курс Blackboard не найден."
+  migration_issues: 
+    errors: 
+      valid_workflow_state: "Должен отправить допустимое состояние процесса"
   mute_dialog: 
     curving_assignments: "Кривая оценок для заданий"
     grade_change_notifications: "Уведомления об изменении оценки"
@@ -7871,6 +9052,7 @@ ru:
       late_grading: "Поздняя оценка"
       membership_update: "Обновление членства"
       migration: Перенос
+      one: Другое
       other: Другое
       registration: Регистрация
       reminder: Напоминание
@@ -8011,9 +9193,13 @@ ru:
       course: "События курса"
       discussions: Обсуждения
       groups: Группы
+      one: Другое
       other: Другое
       parent: "Эл. почта родительского уровня"
       scheduling: Планирование
+  notifications_search: 
+    cant_be_blank: "Идентификатор пользователя Canvas не может быть пустым"
+    cant_come_before_from: "'Дата завершения' не может быть раньше чем 'Дата начала'"
   number: 
     currency: 
       format: 
@@ -8036,6 +9222,11 @@ ru:
           kb: Кбайт
           mb: Мбайт
           tb: ТБ
+  options: 
+    ? "no"
+    : Нет
+    ? "yes"
+    : Да
   outcome_groups: 
     invalid_file: "Неверный файл группы результатов"
   outcome_groups_api: 
@@ -8197,6 +9388,15 @@ ru:
         average_percent: "Средний процент"
         latest_score: "Последняя оценка"
         outcome: Результат
+  overrides: 
+    everyone: Все
+    everyone_else: "Все остальные"
+    lock_date_before_due_date: "Дата блокировки не может быть раньше даты выполнения"
+    overrides: 
+      everyone: Все
+      everyone_else: "Все остальные"
+    unlock_date_after_due_date: "Дата разблокирования не может быть позже даты выполнения"
+    unlock_date_after_lock_date: "Дата разблокирования не может быть позже даты блокировки"
   page_comment: 
     default_user_name: Анонимно
   page_comments: 
@@ -8219,11 +9419,15 @@ ru:
         url: URL-адрес
         user_agent: "Агент пользователя"
       loading_more_results: "Загрузка других результатов"
+  paginated_collection: 
+    no_items: "Элементы отсутствуют."
   paginated_list: 
     no_results_found: "Без результата"
     view_more_link: "Показать еще"
   paginated_view: 
     loading_more_results: "Загрузка других результатов"
+  paypal: 
+    exception: "Нам очень жаль, но произошла ошибка. Повторите попытку через некоторое время."
   plugins: 
     academic_benchmark_importer: 
       name: "Импортер Academic Benchmark"
@@ -8241,12 +9445,19 @@ ru:
     account_reports: 
       description: "Выбрать отчеты учетной записи"
       name: "Отчеты учетной записи"
+    angel_exporter: 
+      file_description: "Экспорт Angel в .zip формат"
+      name: "Конвертер Angel"
     assignment_freezer: 
       description: "Блокировать свойства задания после копирования"
       name: "Подключаемый модуль для блокировки Assignment Property Freezer"
     assignment_freezer_settings: 
       description: "Этот плагин позволяет администраторам проверить свойства заданий, которые делают настроенные ⏎ свойства не-редактируемыми после того, как задание скопировано в другой курс."
       no_copying_frozen: "Не позволяйте копировать \"замороженные\" задания."
+    banner_grade_exchange_settings: 
+      labels: 
+        canvas_source_identifier: "Имя вашего экземпляра Canvas"
+        sis_source_identifier: "Имя вашего экземпляра Banner"
     big_blue_button: 
       description: "Поддержка веб-конференций Big Blue Button"
       name: "Big Blue Button"
@@ -8257,6 +9468,9 @@ ru:
         domain: Домен
         secret: Секретная
       secret_description: "Это параметр %{parameter_name}, который находится в файле конфигурации %{filename}."
+    blackboard_exporter: 
+      file_description: "Экспорт Blackboard 6/7/8/9 в .zip файл"
+      name: "Экспортер Blackboard"
     buttons: 
       saving: Сохранение...
     canvas_cartridge_importer: 
@@ -8274,6 +9488,9 @@ ru:
       description: "Данный подключаемый модуль интегрируется с Crocodoc, что позволяет предварительно просматривать документы HTML5, благодаря чему преподаватели и студенты могут составлять по ним аннотации."
       labels: 
         api_key: "Ключ API Crocodoc"
+    d2l_exporter: 
+      file_description: "Экспорт D2L в .zip формат"
+      name: "Конвертор D2L"
     dim_dim: 
       description: "Поддержка веб-конференций DimDim"
       name: DimDim
@@ -8373,6 +9590,20 @@ ru:
         publish_endpoint: "Конечная точка для публикации в"
         success_timeout: "Таймаут уведомления об успешном выполнении (в секундах)"
         wait_for_success: "Дождитесь получения уведомлений об успешном выполнении"
+    ims_es_importer_settings: 
+      labels: 
+        course_long_name_selection: "Выбрано длинное название курса"
+        course_short_name_selection: "Выбрано короткое название курса"
+        course_sourcedid_name_prefix: "\"sourcedid\" курса игнорирует префикс"
+        default_email_domain: "Домен электронной почты по умолчанию"
+        email_preference: "Предпочитаемый электронный адрес"
+        lms_delivery_name: "Имя доставки LMS"
+        map_sections_to_courses: "Внести раздел IMS в курсы Canvas"
+        section_end_days_adjustment: "Настройка дней окончания раздела"
+        section_name_selection: "Выбор имени раздела"
+        section_start_days_adjustment: "Настройка дней начала раздела"
+        term_end_days_adjustment: "Настройка дней окончания семестра"
+        term_start_days_adjustment: "Настройка дней начала семестра"
     index: 
       author: Автор
       canvas_revision_unknown: Неизвестно
@@ -8390,6 +9621,7 @@ ru:
       name: Kaltura
     kaltura_settings: 
       account_settings: "Эти значения находятся в консоли управления Kaltura в разделе \"Настройки-> Настройки интеграции\""
+      cache_explanation: "Пустое поле означает неограниченное кэширование, 0 означает отсутствие кэширования."
       description: |-
           Потребуется учетная запись на [Kaltura.com](%{kaltura_url})
           или на экземпляре Kaltura с самостоятельным размещением.
@@ -8404,6 +9636,7 @@ ru:
           Затем установите флажки "Добавить запись" и "Удалить запись" в столбце "Отправлено сервером".
       headers: 
         account_settings: "Настройки учетной записи"
+        canvas_settings: "Настройки Canvas"
         domain_settings: "Настройки домена"
         ui_conf_ids: "Идентификаторы конфигурации UI"
       hints: 
@@ -8411,6 +9644,7 @@ ru:
         resource_domain: "Для размещенных учетных записей используйте \"cdn.kaltura.com\""
         rtmp_domain: "Для размещенных учетных записей используйте \"www.kaltura.com\""
       labels: 
+        cache_play_list_seconds: "Секунды, затраченные для добавления в кэш URL-адреса списка воспроизведения"
         domain: Домен
         kcw_ui_conf: "Идентификатор конфигурации UI KCW"
         partner_id: "Идентификатор партнера"
@@ -8439,6 +9673,10 @@ ru:
       labels: 
         api_key: "Ключ API"
         secret_key: "Секретный ключ"
+    lockdown_browser: 
+      labels: 
+        download_url: "URL для скачивания браузера LockDown"
+        plugin_enabled: Включено
     moodle_converter: 
       file_description: "Файл Moodle 1.9 .zip"
       name: "Импортер Moodle"
@@ -8522,6 +9760,19 @@ ru:
       labels: 
         api_key: "Пользовательский ключ"
         secret_key: "Секретный ключ пользователя"
+    webct_scraper: 
+      file_description: "Курс Blackboard Vista/CE, WebCT 6+ "
+      name: "Blackboard Vista/CE (WebCT)"
+    webct_scraper_settings: 
+      description: |-
+          Если организация не использует «Учебные модули» WebCT (включая школы, которые приняли WebCT
+            до версии 4.0, когда модули стали доступны), перемещение курсов может быть улучшено с помощью импорта «Содержимого курса»
+            в качестве модулей Canvas вместо «Учебных модулей». Данная страница позволяет настраивать поведение по умолчанию инструмента перемещения WebCT
+            в соответствии с модулями содержимого. Важно помнить, что в то время, как отдельные перемещения курсов сохраняют возможность 
+            выбора, массовое перемещение всегда использует указанное здесь значение, и оно не может быть изменено во время перемещения.
+      labels: 
+        allow_outline_selection: "Показать настройки использования Содержимого курса в качестве Модулей в мастере перемещения"
+        folders_as_outline: "Используйте «Содержимое курса» WebCT в качестве модуля по умолчанию"
     wimba: 
       description: "Поддержка веб-конференций Wimba"
       name: Wimba
@@ -8800,6 +10051,7 @@ ru:
         register_email: "Сообщение электронной почты о регистрации"
         register_sms: "Регистрация SMS"
       carriers: 
+        one: "Другой оператор"
         other: "Другой оператор"
       confirming_contact: Подтверждение...
       contact_types: 
@@ -8845,11 +10097,14 @@ ru:
   pseudonym: 
     errors: 
       bad_credentials: "Неверное имя пользователя или пароль"
+      common: "Нельзя использовать распространенные пароли (например «пароль»)"
       invalid: "Может содержать только буквы, цифры или следующее: %{characters}"
       invalid_email_address: "\"%{email}\" не является действительным адресом электронной почты"
       mismatch: "Не соответствует"
       not_email: "Электронный адрес недействителен"
+      repeated: "Число одинаковых символов не должно превышать %{max} подряд"
       required: Требуется
+      sequence: "Нельзя включать последовательности символов больше %{max} букв (например abcdef)"
       taken: "Электронный адрес уже используется"
       too_long: "Не может превышать %{max}символов"
       too_short: "Должно быть не менее %{min} символов"
@@ -8863,6 +10118,7 @@ ru:
       redirect_from_idp: "Получен LoginResponse с IdP"
     default_app_name: "Стороннее приложение"
     errors: 
+      blank_password: "Пароль не был выдан"
       invalid_credentials: "Неверное имя пользователя и/или пароль"
       invalid_otp: "Неверный код подтверждения, попробуйте еще раз"
       login_error: "При входе в %{institution} произошла ошибка"
@@ -8906,6 +10162,8 @@ ru:
         allow_application: "%{app_name} запрашивает доступ к вашей учетной записи."
         email: "Ваш электронный адрес %{email}."
         login_name: "Вы вошли в это приложение как %{user_name}."
+      labels: 
+        remember_access: "Запомнить мою авторизацию для данной службы"
       log_in: Вход
       page_title: "Вход в приложение"
     otp_login: 
@@ -8946,6 +10204,7 @@ ru:
         new_password: "Новый пароль"
         password: Пароль
         password_confirmation: "Повтор нового пароля"
+        which_login_to_change: "Какие учетные данные на вход изменить"
       page_title: "Изменить пароль"
       titles: 
         change_password: "Изменить пароль входа для %{user}"
@@ -8960,12 +10219,15 @@ ru:
       account_registered: "Учетная запись зарегистрирована!"
       account_updated: "Учетная запись обновлена!"
       email_sent: "Подтверждение выслано по адресу %{email}, проверьте ящик нежелательной почты"
-      link_invalid: "Используемая ссылка больше недействительна.  Если вход в систему невозможен, попробуйте щелкнуть \"Я не знаю мой пароль\", после чего вам будет отправлено новое сообщение."
+      link_invalid: "Использованная вами ссылка больше недействительна. Если вы не можете войти в систему, нажмите «Не знаете свой пароль?», чтобы переустановить пароль."
       password_changed: "Пароль изменен"
     registration_confirmation_form: 
       errors: 
         password_required: "Требуется пароль"
         password_too_short: "Пароль слишком короткий"
+  purchases: 
+    new: 
+      payment_info: "Информация об оплате"
   question_bank: 
     align_outcomes: "Согласовать результаты"
     remove_outcome_from_bank: "Действительно хотите удалить данный результат из банка?"
@@ -9074,11 +10336,13 @@ ru:
       new: "Новое:"
   quiz: 
     default_question_input: "[ Выбрать ]"
+    default_text_only_question_name: Разделитель
     default_title: "Контрольная работа без названия"
     errors: 
       invalid_hide_results: "Функция «Скрыть результаты» недоступна"
       invalid_ip_filter: "IP-фильтр недоступен"
       invalid_quiz_type: "Функция «Тип контрольной работы» недоступна"
+    question_name_counter: "Вопрос %{question_number}"
     statistics: 
       csv_columns: 
         attempt: попытка
@@ -9108,6 +10372,26 @@ ru:
   quiz_question: 
     defaults: 
       question_name: Вопрос
+  quiz_question/numerical_question: 
+    statistics: 
+      exact_answer: "%{exact_value} +/- %{margin}"
+      inexact_answer: "%{lower_bound} — %{upper_bound}"
+  quiz_statistics: 
+    statistics: 
+      csv_columns: 
+        attempt: попытка
+        id: идентификатор
+        n_correct: "n верно"
+        n_incorrect: "n неверно"
+        name: имя
+        score: результат
+        section: раздел
+        section_id: section_id
+        section_sis_id: section_sis_id
+        sis_id: sis_id
+        submitted: отправлено
+      no_answer: "Ответ отсутствует"
+    statistics_filename: "Отчет %{title} %{type} "
   quiz_submissions: 
     errors: 
       late_quiz: "Эта контрольная работа отправлена поздно, и ваши ответы могли не быть записаны."
@@ -9122,12 +10406,14 @@ ru:
         access_code: "Код доступа"
       quiz_restricted: "Эта контрольная работа ограничена кодом доступа. Для выполнения контрольной работы необходимо обратиться к учителю или инспектору, чтобы он сообщили или ввели код доступа."
       survey_restricted: "Этот опрос ограничен кодом доступа. Для выполнения опроса необходимо обратиться к учителю или инспектору, чтобы он сообщили или ввели код доступа."
+    after_last_attempt: "После последней попытки"
     alerts: 
       no_valid_combinations: "Система не может создать допустимые сочетания для указанных параметров"
       only_n_valid_combinations: 
         few: "Система может создать %{count} действительных сочетания для заданных параметров"
         one: "Система может создать только 1 действительное сочетание для заданных параметров"
         other: "Система может создать %{count} действительных сочетаний для заданных параметров"
+    always: Всегда
     answer_comments: "Комментарии к ответу"
     answer_text: "Текст ответа"
     buttons: 
@@ -9148,6 +10434,7 @@ ru:
     choose_option: "[ Выбрать ]"
     confirms: 
       delete_question: "Действительно хотите удалить этот вопрос?"
+      delete_quiz: "Действительно хотите удалить эту контрольную работу?"
       scrap_and_restart: "Удалить эту контрольную работу и начать с начала?"
     current_filter: "Текущий фильтр"
     default_answer_comments: "Ответить при выборе студентом этого ответа"
@@ -9159,6 +10446,7 @@ ru:
     default_question_name: Вопрос
     default_quiz_title: "Контрольная работа"
     default_response_to_essay: "Ответ для показа студенту после отправки ответа"
+    default_response_to_file_upload: "Ответ для показа студенту после отправки им ответа"
     default_title: "Новая контрольная работа"
     display_answer: 
       correct_answer: "Это правильный ответ."
@@ -9247,6 +10535,7 @@ ru:
     errors: 
       adding_questions_failed: "Ошибка добавления вопросов, повторите попытку"
       creating_group_failed: "Ошибка создания группы, повторите попытку"
+      field_is_required: "Необходимо это поле"
       loading_banks_failed: "Ошибка загрузки банка вопросов, повторите попытку"
       loading_more_questions_failed: "Ошибка загрузки дополнительных вопросов"
       loading_question_failed: "Ошибка загрузки вопросов..."
@@ -9329,6 +10618,7 @@ ru:
         calculated: "Введите вопрос, создайте формулу и набор возможных сочетаний ответа. Студенты увидят этот вопрос вместе со случайно выбранным набором переменных, и им потребуется ввести правильный числовой ответ."
         equations: "Можно определить переменные, введя имена переменных, заключенные в скобки"
         essay: "Студенты должны будут ввести ответ в текстовое поле."
+        file_upload: "Студенты смогут загрузить файл со своими ответами."
         fill_in_multiple_blanks: "Введите вопрос, указав местоположения пустых мест. Затем определите возможный правильный ответ для всех пустых мест. Студенты должны ввести правильные ответы в текстовые поля во всех пустых местах."
         formula_definition: "Далее необходимо написать формулу или формулы, используемые для вычисления правильного ответа. Используйте имена переменных, указанные выше."
         matching: "Создайте пары соответствующих значений. Студенты увидят значения слева и должны будут выбрать соответствующее значение в раскрывающемся списке справа. Несколько строк могут иметь один ответ, и можно добавить дополнительные дистракторы справа."
@@ -9378,6 +10668,7 @@ ru:
       question_type: 
         calculated: "Вопрос с формулой"
         essay: "Вопрос с эссе"
+        file_upload: "Вопрос по загрузке файла"
         fill_in_multiple_blanks: "Заполните несколько пустых мест"
         matching: Совпадение
         missing_word: "Отсутствующее слово"
@@ -9394,6 +10685,29 @@ ru:
         click_to_enter_general_answer_comments: "Щелкните, чтобы ввести общие комментарии"
         click_to_enter_wrong_answer_comments: "Щелкните, чтобы ввести комментарии для неправильного ответа"
       wrong_answer_comments: "Комментарии к неправильному ответу"
+    graded_quiz: "Оцененная контрольная работа"
+    graded_survey: "Оцененный опрос"
+    headers: 
+      submitted_students_quiz_title: 
+        one: "Студенты, взявшие контрольную работу (%{count})"
+        other: "Студенты, взявшие контрольную работу (%{count})"
+        zero: "Студенты, взявшие контрольную работу"
+      submitted_students_survey_title: 
+        one: "Студенты, взявшие опрос (%{count})"
+        other: "Студенты, взявшие опрос (%{count})"
+        zero: "Студенты, взявшие опрос"
+      unsubmitted_students_count: 
+        few: "%{count} студента не участвовали в опросе"
+        one: "1 студент не участвовал в опросе"
+        other: "%{count} студентов не участвовали в опросе"
+      unsubmitted_students_quiz_title: 
+        one: "Студенты, не взявшие контрольную работу (%{count})"
+        other: "Студенты, не взявшие контрольную работу (%{count})"
+        zero: "Студенты, не взявшие контрольную работу"
+      unsubmitted_students_survey_title: 
+        one: "Студенты, не взявшие опрос (%{count})"
+        other: "Студенты, не взявшие опрос (%{count})"
+        zero: "Студенты, не взявшие опрос"
     helpers: 
       duration_in_minutes: 
         one: "1 минута"
@@ -9462,6 +10776,8 @@ ru:
     invalid_ip: 
       quiz_protected: "Эта контрольная работа защищена и доступна только в некоторых местоположениях. Используемый компьютер не находится в допустимом местоположении для выполнения этой контрольной работы."
       survey_protected: "Этот опрос защищен и доступен только в некоторых местоположениях. Используемый компьютер не находится в допустимом местоположении для выполнения этого опроса."
+    keep_highest: Наивысший
+    keep_latest: Последний
     label: 
       answer: 
         text: "Текст ответа, отформатированный текст"
@@ -9498,6 +10814,24 @@ ru:
       links: 
         download_lockdown: "[Загрузка браузера Respondus LockDown]"
       requires_lockdown: "Для этой контрольной работы требуется браузер Respondus LockDown. Запустите браузер Respondus LockDown для начала выполнения этой контрольной работы или просмотра ее результатов."
+    managed_quiz_data: 
+      anonymous_student: "Студент %{n}"
+      headers: 
+        quiz_unsubmitted_students: "Студенты, не взявшие контрольную работу"
+        submitted_students_quiz: "Студенты, взявшие контрольную работу"
+        submitted_students_survey: "Студенты, взявшие опрос"
+        survey_unsubmitted_students: "Студенты, не взявшие опрос"
+      quiz_all_students_submitted: "Все студенты взяли контрольную работу"
+      quiz_no_submissions: "Ни один студент еще не взял контрольную работу"
+      survey_all_students_submitted: "Все студенты взяли опрос"
+      survey_no_submissions: "Ни один студент еще не взял опрос"
+      titles: 
+        submission_needs_review: "Требуется проверка этой отправки"
+    messages: 
+      no_submitted_students_quiz: "Ни один студент еще не взял контрольную работу"
+      no_submitted_students_survey: "Ни один студент еще не взял опрос"
+      no_unsubmitted_students_quiz: "Все студенты взяли контрольную работу"
+      no_unsubmitted_students_survey: "Все студенты взяли опрос"
     moderate: 
       add_time: "Добавить время"
       buttons: 
@@ -9561,17 +10895,22 @@ ru:
       muted_quiz_header: "Звук контрольной работы отключен"
     new: 
       allowed_attempts: "Число разрешенных попыток"
+      anonymous_submissions: "Сохранить отправки анонимными"
       buttons: 
         publish_quiz: "Опубликовать контрольную работу"
         republish_quiz: "Повторно опубликовать контрольную работу"
+        save: Сохранить
         save_but_dont_publish: "Сохранить контрольную работу, *но не публиковать*"
         save_settings: "Сохранить настройки"
       cant_go_back: "Блокировать вопросы после ответа на них"
+      code: "Код доступа"
       confirms: 
         delete_quiz: "Действительно хотите удалить эту контрольную работу?"
       default_page_title: "Новая контрольная работа"
+      filter: IP-фильтр
       graded_quiz: "Оцененная контрольная работа"
       graded_survey: "Оцененный опрос"
+      group: "Группа заданий"
       headers: 
         create_new_quiz: "Создать новую контрольную работу"
         edit_quiz: "Редактировать контрольную работу"
@@ -9584,6 +10923,8 @@ ru:
       ip_filters: "IP-фильтры Quiz используются для ограничения доступа к упражнениям на компьютерах в указанном диапазоне IP-адресов. Фильтры могут быть списками адресов, разделенными запятыми, или адресом с маской (\"192.168.217.1\", \"192.168.217.1/24\" или \"192.168.217.1/255.255.255.0\")."
       keep_highest: Высокий
       keep_latest: Последний
+      label: 
+        time_limit: "Ограничение времени"
       labels: 
         allow_multiple_attempts: "Разрешить несколько попыток"
         anonymous_submissions: "Сохранить отправки анонимными"
@@ -9591,12 +10932,12 @@ ru:
         due_date: "Дата окончания"
         filter: Фильтр
         group: Группа
-        hide_results_only_after_last: "Только после последней попытки"
+        hide_results_only_after_last: "Только после их последней попытки"
         ip_filter: "Фильтрация IP-адресов"
         limited_attempts: "Разрешенные попытки"
         locked_after: "Заблокировано после"
         locked_until: "Заблокировано до"
-        never_hide_results: "Разрешить студентам просматривать результаты контрольной работы"
+        never_hide_results: "Разрешить студентам просматривать их ответы по контрольной работе"
         quiz_instructions: "Инструкции к контрольной работе"
         quiz_name: "Название контрольной работы"
         quiz_notify: "Уведомить пользователей об изменениях в тесте"
@@ -9613,8 +10954,10 @@ ru:
         this_is_a: Это
         time_limit: "Ограничение времени"
         time_limit_minutes: мин.
+      limited_attempts: "Разрешенные попытки"
       links: 
         add_new_question: "Добавить новый вопрос"
+        cancel: Отменить
         find_questions: "Поиск вопросов"
         link_to_content: "Ссылка на содержание"
         new_question: "Новый вопрос"
@@ -9622,16 +10965,24 @@ ru:
         preview_quiz: "Предварительный просмотре контрольной работы"
         quiz_options: "Опции контрольной работы"
         return_to_quiz_page: "Вернуться к странице контрольной работы"
-        show_assignment_rubric: "Показать рубрику задания"
+        show_assignment_rubric: "Показать рубрику"
         start_over: "Начать заново"
         switch_views: "Переключить представления"
+      minutes: Минуты
       one_question_at_a_time: "Показывать по одному вопросу за раз"
-      points_possible: "%{n} возможных баллов"
+      points_possible: "%{n} баллов"
       practice_quiz: "Практическая контрольная работа"
+      quiz_type: "Тип контрольной работы"
+      require_lockdown_browser: "Требуется браузер Respondus LockDown"
+      require_lockdown_browser_for_results: "Необходимо для просмотра результатов контрольной работы"
       retrieving_filters: "Получение фильтров..."
+      score_to_keep: "Оценка контрольной работы для сохранения"
+      show_correct_answers: "Показать правильные ответы"
+      shuffle_answers: "Изменить порядок ответов"
       time_limit: "Сколько минут?"
       titles: 
         click_to_select_filter: "Щелкните, чтобы установить этот фильтр"
+        delete: Удалить
         find_ip_address_filter: "Поиск фильтра IP-адресов"
       ungraded_survey: "Опрос без оценки"
       warnings: 
@@ -9649,14 +11000,18 @@ ru:
         few: "%{count} теста(ов) успешно опубликованы!"
         one: "1 тест успешно опубликован!"
         other: "%{count} теста(ов) успешно опубликованы!"
+    practice_quiz: "Практическая контрольная работа"
+    question_colon: "Вопрос:"
     question_group: 
       buttons: 
         update: Обновить
       default_group_name: Группа
+      edit_questions_and_points: "Выберите *%{num_questions}* вопроса(-ов), #%{num_points}# балла(-ов) за вопрос"
       labels: 
         question_bank: "Вопросы будут извлечены из банка"
       links: 
         link_to_a_question_bank: "Ссылка на банк вопросов"
+      show_questions_and_points: "Выберите *%{num_questions}* вопроса(-ов), #%{num_points}# балла(-ов) за вопрос"
       titles: 
         add_question_to_group: "Добавить вопрос к этой группе"
         collapse_group: "Свернуть группу"
@@ -9690,25 +11045,27 @@ ru:
     quiz_attempts_length_error: "Попытки выполнения контрольной работы ограничены 3 цифрами. Если вы хотите предоставить студентам неограниченное число попыток, не ставьте флажок ''Разрешить несколько попыток'', который находится слева"
     quiz_attempts_nan_error: "Попытки выполнения контрольной работы могут быть выражены только числами"
     quiz_details: 
+      allowed_attempts: "Разрешенные попытки"
       headers: 
         availability: Доступность
-        due: "Дата окончания"
+        available: Доступно
+        due: Срок
         limits: Лимиты
         points: Баллы
         questions: Вопросы
+        time_limit: "Ограничение времени"
       labels: 
         allowed_attempts: "Разрешенные попытки"
       multiple_due_dates: "Несколько дат выполнения"
-      no_due_date: "Нет даты выполнения."
+      no_due_date: "Нет даты выполнения"
       no_time_limit: "Нет лимита времени"
+      none: Нет
       points_possible: "%{points_possible} возможных баллов"
       question_count: 
-        one: "1 вопрос"
-        other: "%{count} вопросов"
+        one: "<span class='title'>Вопросы</span> <span class='value'>%{count}</span>"
+        other: "<span class='title'>Вопросы</span> <span class='value'>%{count}</span>"
         zero: "Нет вопросов"
-      quiz_availabile_through: |-
-          %{start_time} через  
-          %{end_time}
+      quiz_availabile_through: "%{start_time} — {end_time}"
       quiz_available_after: "после %{start_time}"
       quiz_available_always: "Всегда доступно"
       quiz_available_until: "до %{end_time}"
@@ -9717,6 +11074,7 @@ ru:
         few: "%{count} минут(ы)"
         one: "1 минута"
         other: "%{count} минут(ы)"
+      unlimited: "Не ограничено"
       unlimited_attempts: "Неограниченное число попыток"
     quiz_right_side: 
       attempts_left: 
@@ -9745,6 +11103,34 @@ ru:
       view_previous_attempts: "Просмотреть предыдущие попытки"
       will_keep_highest_score: "Сохранит наивысшую из ваших оценок"
       will_keep_latest_score: "Сохранит самую последнюю из ваших оценок"
+    quiz_show_teacher: 
+      anonymous_submissions: "Анонимные отправки"
+      attempts: Попытки
+      available_from: "Доступно с"
+      cant_go_back: "Блокировать вопросы после ответов"
+      code: "Код доступа"
+      due: Срок
+      filter: IP-фильтр
+      for: Для
+      group: "Группа заданий"
+      label: 
+        time_limit: "Ограничение времени"
+      multiple_attempts: "Несколько попыток"
+      no_time_limit: "Нет ограничения времени"
+      one_question_at_a_time: "По одному вопросу за раз"
+      points: Баллы
+      quiz_type: "Тип контрольной работы"
+      require_lockdown_browser: "Требуется браузер Respondus LockDown"
+      require_lockdown_browser_for_results: "Необходимо для просмотра результатов контрольной работы"
+      score_to_keep: "Оценки для сохранения"
+      show_correct_answers: "Показать правильные ответы"
+      shuffle_answers: "Изменить порядок ответов"
+      time_limit: 
+        few: "%{count} минуты"
+        one: "1 минута"
+        other: "%{count} минут"
+      until: До
+      view_responses: "Просмотр ответов"
     quiz_submission: 
       attempt_duration: "Эта попытка длилась %{duration}."
       labels: 
@@ -9822,6 +11208,9 @@ ru:
         quiz_instructions: "Инструкции к контрольной работе"
       links: 
         back_to_quiz_page: "Вернуться к странице контрольной работы"
+    refresh_quiz_after_popup: 
+      headers: 
+        loading_in_lockdown: "Загрузка контрольной работы в браузере Respondus LockDown"
     retrieving_filters: "Получение фильтров..."
     rubric: 
       loading: Загрузка...
@@ -9840,6 +11229,10 @@ ru:
       buttons: 
         lock_quiz: "Заблокировать эту контрольную работу"
         lock_survey: "Заблокировать этот опрос"
+        publish: Опубликовать
+        published: Опубликовано!
+        publishing: Публикация...
+        republish: "Опубликовать заново"
         unlock_quiz: "Разрешить студентам начинать эту контрольную работу"
         unlock_survey: "Разрешить студентам начинать этот опрос"
       confirms: 
@@ -9868,19 +11261,23 @@ ru:
       links: 
         delete_this_quiz: "Удалить эту контрольную работу"
         delete_this_survey: "Удалить этот опрос"
+        edit: Редактировать
         edit_assignment_details: "Редактировать сведения о задании"
         edit_this_quiz: "Редактировать эту контрольную работу"
         edit_this_survey: "Редактировать этот опрос"
+        hide_student_quiz_results: "Скрыть результаты контрольной работы студента"
+        hide_student_survey_results: "Скрыть результаты опроса студента"
         keep_editing_this_quiz: "Продолжить редактирование этой контрольной работы"
         keep_editing_this_survey: "Продолжить редактирование этого опроса"
         message_students_who: "Отправить сообщения студентам, которые..."
         moderate_this_quiz: "Модерирование этой контрольной работы"
         moderate_this_survey: "Модерирование этого опроса"
+        preview: "Предварительный просмотр"
         quiz_statistics: "Статистика контрольной работы"
         resume_quiz: "Возобновить контрольную работу"
         resume_survey: "Возобновить опрос"
         see_full_quiz: "См. полную контрольную работу"
-        show_assignment_rubric: "Показать рубрику задания"
+        show_assignment_rubric: "Показать рубрику"
         show_student_quiz_results: "Показать результаты контрольной работы студента"
         show_student_survey_results: "Показать результаты опроса студента"
         survey_statistics: "Статистика опроса"
@@ -9888,6 +11285,8 @@ ru:
         take_the_quiz_again: "Снова принять контрольную работу"
         take_the_survey: "Принять опрос"
         take_the_survey_again: "Снова принять опрос"
+      notices: 
+        message_sent: "Сообщение отправлено!"
       only_registered_users: "Только зарегистрированные пользователи могут принимать оцененные контрольные работы"
       points_possible: 
         few: " %{count} балла(ов)"
@@ -9911,6 +11310,8 @@ ru:
       survey_no_submissions: "Ни один студент еще не принял опрос"
       survey_not_published: "Этот опрос еще не опубликован. Студенты не могут принимать опрос до его публикации."
       titles: 
+        delete: Удалить
+        related_items: "Связанные элементы"
         submission_needs_review: "Требуется проверка этой отправки"
         unlock_for_how_long: "На сколько времени необходимо разблокировать контрольную работу?"
       warnings: 
@@ -10001,6 +11402,8 @@ ru:
         hide_time_running: Скрыть
         keep_editing_quiz: "Продолжить редактирование этой контрольной работы"
         keep_editing_survey: "Продолжить редактирование этого опроса"
+      logged_out_of_canvas: "*Вы вышли из системы canvas.* Пожалуйста, войдите в систему, для продолжения"
+      login_required: "Требуется войти в систему"
       minutes_count: 
         few: "%{count} минут(ы)"
         one: "1 минута"
@@ -10065,6 +11468,10 @@ ru:
     top_level_crumb: "Контрольные работы"
     ? "true"
     : "True"
+    ungraded_survey: "Опрос без оценки"
+    warnings: 
+      unpublished_changes: "*Вы внесли неопубликованные изменения в эту контрольную работу.* Эти изменения будут отображаться для студентов только после публикации или повторной публикации контрольной работы."
+      unpublished_quiz: "*Данная контрольная работа не опубликована* Только учителя могут просматривать эту контрольную работу до публикации."
   re_upload_submissions_form: 
     buttons: 
       upload: "Загрузить файлы"
@@ -10102,6 +11509,7 @@ ru:
     ok: ОК
     parent_dialog: 
       agree_to_terms: "Вы согласны с *условиями использования*."
+      agree_to_terms_and_pp: "Вы согласны с *правилами использования* и **политикой конфиденциальности**."
       buttons: 
         start_participating: "Начать участие"
       labels: 
@@ -10111,6 +11519,7 @@ ru:
         username: "Детское имя пользователя"
     student_dialog: 
       agree_to_terms: "Вы согласны с *условиями использования*."
+      agree_to_terms_and_pp: "Вы согласны с *правилами использования* и **политикой конфиденциальности**."
       buttons: 
         start_learning: "Начать обучение"
       labels: 
@@ -10131,6 +11540,7 @@ ru:
         name: "Полное имя"
     teacher_dialog: 
       agree_to_terms: "Вы согласны с *условиями использования*."
+      agree_to_terms_and_pp: "Вы согласны с *правилами использования* и **политикой конфиденциальности**."
       buttons: 
         start_teaching: "Начать обучение"
       labels: 
@@ -10150,6 +11560,7 @@ ru:
       become_user: "Стать другими пользователями"
       change_course_state: "Изменить состояние курса"
       comment_on_others_submissions: "Просмотр отправок всех студентов и их комментирование"
+      create_accounts: "Создание новых корневых учетных записей"
       create_collaborations: "Создание совместных работ студентов"
       create_conferences: "Создание веб-конференций"
       manage_account_memberships: "Добавление/удаление других администраторов для учетной записи"
@@ -10158,20 +11569,25 @@ ru:
       manage_alerts: "Управление глобальными уведомлениями"
       manage_assignments: "Управление (добавление / редактирование / удаление) заданиями и контрольными работами"
       manage_calendar: "Добавление, редактирование и удаление событий в календаре курса"
+      manage_canvasnet_courses: "Управление курсами сети Canvas"
       manage_content: "Управление всем остальным содержанием курса"
       manage_courses: "Управление ( добавление / редактирование / удаление ) курсами"
+      manage_demos: "Управление демонстрациями"
       manage_developer_keys: "Управление ключами разработчиков"
       manage_files: "Управление ( добавление / редактирование / удаление ) файлами курса"
       manage_frozen_assignment: "Управление (редактирование / удаление) \"замороженных\" заданий"
       manage_global_outcomes: "Управление общими результатами обучения"
-      manage_grades: "Редактирование оценок (включая оценку рубрик)"
+      manage_grades: "Редактирование оценок"
       manage_groups: "Управление (создание / редактирование / удаление) группами"
       manage_interaction_alerts: "Управление уведомлениями"
+      manage_links: "Управление ролями и проверенными ссылками"
       manage_outcomes: "Управление результатами обучения"
       manage_role_overrides: "Управление разрешениями"
+      manage_rubrics: "Создание и редактирование оцениваемых рубрик"
       manage_sections: "Управление (создание / редактирование / удаление) разделами курса"
       manage_sis: "Импорт и управление данными SIS"
       manage_site_settings: "Управление настройками сайтов и подключаемых модулей"
+      manage_storage_quotas: "Управление квотами хранилища"
       manage_students: "Добавление/удаление студентов для курса"
       manage_user_logins: "Изменение сведений учетных записей для пользователей"
       manage_user_notes: "Управление записями журнала преподавателей"
@@ -10186,11 +11602,16 @@ ru:
       read_question_banks: "Просмотр и связь с банками вопросов"
       read_reports: "Просмотр отчетов об использовании для курса"
       read_roster: "См. список пользователей"
-      send_messages: "Отправка сообщений членам курса"
+      send_messages: "Отправка сообщений членам индивидуального курса"
+      send_messages_all: "Отправить сообщения всему классу"
+      suspend_accounts: "Временно отключить учетные записи"
+      undelete_courses: "Не удаленные курсы"
       view_all_grades: "Просмотр всех оценок"
+      view_analytics: "Просмотреть страницы аналитики"
       view_error_reports: "Просмотр сообщений об ошибках"
       view_group_pages: "Просмот страниц групп для всех групп студентов"
       view_jobs: "Просмотреть фоновые работы"
+      view_notifications: "Просмотреть уведомления"
       view_statistics: "Просмотр статистики"
     roles: 
       account_admin: "Администратор учетной записи"
@@ -10209,6 +11630,7 @@ ru:
       toogle: "Щелкните для включения или выключения этого разрешения"
   role_overrides: 
     account_permissions: "Разрешения учетной записи"
+    admin_tools_permissions: "Инструменты администратора"
     course_permissions: "Разрешения курса и учетной записи"
     course_role_deactivate: "Эта роль используется и не может быть удалена.  Она была отключена, чтобы предотвратить ее назначение новым пользователям."
     index: 
@@ -10254,6 +11676,9 @@ ru:
         enable: Включить
         enable_and_lock: "Включить и заблокировать"
         use_default: "Использовать настройки по умолчанию"
+  roster: 
+    greater_than_three: "Введите слово для поиска, содержащее не менее трех символов"
+    unknown_error: "При поиске что-то пошло не так, пожалуйста, повторите попытку."
   rubric: 
     context_name_rubric: "%{course_name} Рубрика"
     errors: 
@@ -10275,9 +11700,11 @@ ru:
       are_you_sure_prompt: "Действительно хотите удалить эту проверку знаний?  Все результаты будут утеряны."
       page_title: "Проверки знаний"
     index: 
+      account_rubrics: "Рубрики учетной записи"
       are_you_sure_prompt: "Действительно хотите удалить эту рубрику?  Все, кто использует в настоящий момент рубрику, сохранят доступ к ней, но другие пользователи не смогут использовать ее."
       buttons: 
         add_rubric: "Добавить рубрику"
+      course_rubrics: "Рубрики курса"
       delete_rubric: "Удалить рубрику"
       page_title: Рубрики
       points_possible: 
@@ -10286,6 +11713,7 @@ ru:
         other: " %{count} балла(ов) возможно"
       titles: 
         rubrics: Рубрики
+      user_rubrics: "Рубрики пользователя"
     loading: Загрузка...
     rubric_association: 
       assessment_completed: "Проверка знаний завершена"
@@ -10449,6 +11877,7 @@ ru:
     authenticate: 
       buttons: 
         enroll_in_course: "Зарегистрироваться на курсе"
+        next: Далее
       getting_started: "Вы регистрируетесь на **%{course}**."
       labels: 
         email: "Электронная почта"
@@ -10457,6 +11886,7 @@ ru:
     authenticate_or_register: 
       buttons: 
         enroll_in_course: "Регистрация в курсе"
+        next: Далее
       enter_email: "Пожалуйста, введите адрес электронной почты:"
       existing_user: "У меня уже есть логин в %{institution_name}"
       getting_started: "Вы регистрируетесь на **%{course}**."
@@ -10469,6 +11899,7 @@ ru:
     confirm_enrollments: 
       buttons: 
         enroll_in_course: "Зарегистрироваться на курсе"
+        next: Далее
       getting_started: "Вы регистрируетесь на **%{course}**"
       switch_users: "В настоящий момент вы вошли в систему как %{user_name}. **Войти в систему как другой пользователь**."
     course_full: 
@@ -10590,7 +12021,7 @@ ru:
         add_an_assignment: "Добавить задание"
         add_assignment: "Добавить задание"
         edit_group_details: "Редактировать сведения о группе"
-        hide_info: "скрыть информацию"
+        hide_info: "Скрыть информацию"
         more_info: "подробные сведения..."
         reorder_groups: "Изменить порядок групп"
       no_assignments: "Пока нет заданий"
@@ -10701,6 +12132,8 @@ ru:
       titles: 
         mastery_level: "процент, выше которого устанавливается усвоение"
         select_and_add_criterion: "Выбор и добавление критерия"
+    flash_notice: 
+      close: Закрыть
     flash_notices: 
       close: Закрыть
     full_assignment: 
@@ -10939,10 +12372,14 @@ ru:
       links_title: Заголовок
       links_url: URL-адрес
       manage_settings: "Управление зарегистрированными сервисами"
+      message_me: "известите меня в Canvas"
+      message_title: Сообщение
+      message_user_canvas: "Сообщение %{user} в Canvas"
       name: Имя
       no_links: "%{name} не добавил ссылки"
       nothing_in_common: "У вас нет ничего общего"
       save_profile: "Сохранить профиль"
+      service_contact: "связаться с %{user} при помощи %{service}"
       social_instructions: "Проверьте способы контакта, которые вы хотели бы, чтобы были видны другим пользователям в вашем профиле."
       title: Заголовок
       user_has_no_bio: "%{user} не добавил биографию"
@@ -11319,10 +12756,18 @@ ru:
     errors: 
       invalid_content_type: "Неверный тип содержания, требуется UTF-8"
     sis_import_in_process_notice: "Импорт SIS уже выполняется."
+  site: 
+    view_privacy_policy: "Показать политику конфиденциальности"
   site_admin: 
     columns: 
       date: Дата
       value: Значение
+    institution_suspended: 
+      body: "Ваша учетная запись школы Canvas временно отключена. Пожалуйста, свяжитесь с администратором Canvas."
+      links: 
+        logout: "Выход из системы"
+        stop_masquerading: "[Остановить процесс подмены]"
+      page_title: "Организация временно отключена"
     links: 
       over_time: "за время"
     status: 
@@ -11485,6 +12930,8 @@ ru:
     help_menu: 
       community_support_description: "Взаимодействовать с коллегами и получить помощь от них."
       community_support_forums: "Форумы поддержки сообщества"
+      contact_support: "Связаться со службой поддержки"
+      contact_support_sub_text: "Получить помощь по срочным вопросам."
       curriculum_assessment_errata: "Опечатки в учебном плане/проверке знаний"
       curriculum_assessment_errata_description: "Просмотреть уже сообщенные ошибки проверки знаний и учебного плана. Искать \"опечатка errata\"."
       networking_academy_description: "Просмотреть ответы Cisco на часто задаваемые вопросы."
@@ -11548,6 +12995,8 @@ ru:
         students_can_access_from: "**Студенты** могут получать доступ из"
         tas_can_access_from: "**Ассистенты** могут получать доступ из"
         teachers_can_access_from: "**Учителя** могут получать доступ из"
+      name: "Название семестра:"
+      sis_source_id: "Идентификатор SIS:"
       term_runs_from: "**Период начинается** с"
       titles: 
         term_ends: "Период заканчивается"
@@ -11611,6 +13060,7 @@ ru:
     outcome_artifacts: "Искажения результата"
     review_and_save: "Просмотр и сохранение"
     students: Студенты
+    view_in_separate_window: "Просмотреть в отдельном окне"
   todo_item_view: 
     grading: 
       grade: Оценить
@@ -11621,6 +13071,9 @@ ru:
   todo_view_item: 
     grade: Оценить
     needs_grading: "требуется оценка"
+  tooltips: 
+    vdd: 
+      more_message: "и более %{count}..."
   turnitin: 
     error_1007: "Загружаемый файл слишком велик."
     error_1009: "Неверный тип файла. (Допустимые типы файлов: MS Word, Acrobat PDF, Postscript, Text, HTML, WordPerfect (WPD) и Rich Text Format.)"
@@ -11652,6 +13105,7 @@ ru:
       too_young: "Слишком молод"
     registration: 
       agree_to_terms: "Вы согласны с *условиями использования*."
+      agree_to_terms_with_code_of_conduct: "Вы согласны с *правилами использования* и **нормами поведения**."
   user_follow: 
     errors: 
       follow_own_collection: "Вы не можете следовать за своей собственной коллекцией"
@@ -11742,6 +13196,7 @@ ru:
       messages: 
         no_entries: "Для этого студента отсутствуют записи журнала."
       page_title: "Журнал преподавателей"
+      title: Заголовок
       titles: 
         journal_for: "Журнал преподавателей для %{user}"
     messages: 
@@ -11760,6 +13215,7 @@ ru:
       links: 
         delete: "Удалить эту запись"
       no_title: "Без названия"
+      subheader: "%{creator} %{created_at}"
     user_notes: 
       crumbs: 
         faculty_journal: "Журнал преподавателей"
@@ -11838,6 +13294,10 @@ ru:
         few: "%{count} участника"
         one: "1 участник"
         other: "%{count} участников"
+    dashboard_sidebar: 
+      coming_up: Готовится
+      recent_feedback: "Последние отзывы"
+      start_new_course: "Начать новый курс"
     delete: 
       are_you_sure: "Действительно хотите удалить эту учетную запись пользователя?"
       buttons: 
@@ -12109,6 +13569,10 @@ ru:
       welcome_to_happiness: "Вас приветствует Canvas!"
   validate: 
     is_required: "Необходимо это поле"
+  warnings: 
+    test_install: 
+      message: "Эта версия Canvas предназначена только для тестирования, и будет перезапускаться каждую неделю."
+      title: "Тестовая версия Canvas"
   web_conference: 
     default_name_for_courses: "Веб-конференция курса"
     default_name_for_groups: "Веб-конференция группы"
@@ -12118,6 +13582,8 @@ ru:
         : Выкл.
         ? "true"
         : Вкл.
+  webct_credentials: 
+    credential_not_found: "Учетные данные не найдены."
   widget: 
     upload_media_track_form: 
       choose_a_language: "--Выбрать язык--"
@@ -12127,12 +13593,12 @@ ru:
       media_track_form_button: "Перейдите к инструменту создания субтитров"
       upload_media_track_form_description: "Если у вас есть запись субтитров в формате SRT или *WebVTT*, вы можете загрузить ее сюда."
       upload_media_track_form_description_1: "Скопировать url-адрес этого видеоролика"
-      upload_media_track_form_description_2: "Создать файл с субтитрами: нажмите на ссылку, связывая ее, и следуйте инструкциям."
+      upload_media_track_form_description_2: "Создайте файл с субтитрами посредством нажатия на данную ссылку, и далее следуйте инструкциям."
       upload_media_track_form_description_3: "Загрузите запись субтитров в формате SRT или *WebVTT*."
       upload_media_track_form_step1_label: "Шаг 1."
       upload_media_track_form_step2_label: "Шаг 2."
       upload_media_track_form_step3_label: "Шаг 3."
-      upload_media_track_info: "*Инструкции.* Выполните все три шага, чтобы создать файл с субтитрами для вашего видеоролика, затем загрузите его сюда. Если у вас уже есть файл с субтитрами srf, вы можете пропустить шаг 3."
+      upload_media_track_info: "*Инструкции.* Выполните все три шага, чтобы создать файл с субтитрами для вашего видеоролика, затем загрузите его сюда. Если у вас уже есть файл с субтитрами srt, вы можете перейти к шагу 3."
   wiki: 
     default_course_wiki_name: "Вики %{course_name}"
     default_group_wiki_name: "Вики %{group_name}"
@@ -12223,7 +13689,7 @@ ru:
         page_deleted: "Эта страница удалена."
         page_does_not_exist: "Эта страница еще не существует."
         page_edited_while_viewing: "После начала просмотра эта страница обновлена кем-то еще. [Щелкните здесь, чтобы перезагрузить страницу.](%{link})"
-        page_edited_while_viewing_detailed: "После первой загрузки страницы она была изменена кем-то еще, при отправке данных вы переопределите эти изменения. Может потребоваться перезагрузить страницу и повторно ввести изменения, чтобы результаты работы не были утеряны."
+        page_edited_while_viewing_detailed: "После первой загрузки страницы она была изменена кем-то еще. При отправке данных вы перезапишите эти изменения. Может потребоваться перезагрузить страницу и повторно ввести изменения, чтобы не были утеряны результаты чьей-то работы."
       welcome_message: "Добро пожаловать в вики курса"
     delete_comment_confirmation: "Удалить данный комментарий?"
     errors: 
@@ -12264,6 +13730,7 @@ ru:
         more: дополнительно...
         rename_page: "Переименовать эту страницу"
         show_all: "показать все..."
+      title: "Новый заголовок страницы"
       wiki_description_for_course: "Это открытое место для хранения содержания. Его можно использовать для создания описания курса, для предоставления полезных объяснений трудных тем или даже для совместной работы студентов над написанием проектов."
       wiki_description_for_group: "Это открытое место для хранения содержания. Его можно использовать для создания описания группы, для предоставления полезных объяснений трудных тем или даже для совместной работы членов над написанием проектов"
       wiki_description_header: "Для чего предназначена вики?"

@@ -1,5 +1,5 @@
 <%= label_tag :enrollment_type, :en => "Add More" %>
-<select name="enrollment_type" title="<%= t('titles.enrollment_type', 'Enrollment Type') %>" id="enrollment_type">
+<select name="enrollment_type" title="<%= t('titles.enrollment_type', 'Enrollment Type') %>" id="enrollment_type" class="span2">
   <% if can_do(@context, @current_user, :manage_students) %>
     <%= raw role_select_options(@all_roles.find { |r| r[:base_role_name] == 'StudentEnrollment' }) %>
   <% end %>

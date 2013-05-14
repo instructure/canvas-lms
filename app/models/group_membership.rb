@@ -25,13 +25,13 @@ class GroupMembership < ActiveRecord::Base
 
   attr_accessible :group, :user, :workflow_state, :moderator
   
-  before_save :ensure_mutually_exclusive_membership
   before_save :assign_uuid
   before_save :auto_join
   before_save :capture_old_group_id
 
   before_validation :verify_section_homogeneity_if_necessary
 
+  after_save :ensure_mutually_exclusive_membership
   after_save :touch_groups
   after_save :check_auto_follow_group
   after_destroy :touch_groups
@@ -39,10 +39,10 @@ class GroupMembership < ActiveRecord::Base
   
   has_a_broadcast_policy
   
-  named_scope :include_user, :include => :user
+  scope :include_user, includes(:user)
   
-  named_scope :active, :conditions => ['group_memberships.workflow_state != ?', 'deleted']
-  named_scope :moderators, :conditions => { :moderator => true }
+  scope :active, where("group_memberships.workflow_state<>'deleted'")
+  scope :moderators, where(:moderator => true)
 
   alias_method :context, :group
   
@@ -90,16 +90,27 @@ class GroupMembership < ActiveRecord::Base
 
   def ensure_mutually_exclusive_membership
     return unless self.group
+    return if self.deleted?
     peer_groups = self.group.peer_groups.map(&:id)
-    GroupMembership.active.find(:all, :conditions => { :group_id => peer_groups, :user_id => self.user_id }).each {|gm| gm.destroy }
+    GroupMembership.active.where(:group_id => peer_groups, :user_id => self.user_id).destroy_all
   end
   protected :ensure_mutually_exclusive_membership
   
+  def restricted_self_signup?
+    self.group.group_category && self.group.group_category.restricted_self_signup?
+  end
+
+  def has_common_section_with_me?
+    self.group.has_common_section_with_user?(user)
+  end
+
   def verify_section_homogeneity_if_necessary
-    return true unless self.group.group_category && self.group.group_category.restricted_self_signup?
-    return true if self.group.has_common_section_with_user?(self.user)
-    self.errors.add(:user_id, t('errors.not_in_group_section', "%{student} does not share a section with the other members of %{group}.", :student => self.user.name, :group => self.group.name))
-    return false
+    if new_record? && restricted_self_signup? && !has_common_section_with_me?
+      errors.add(:user_id, t('errors.not_in_group_section', "%{student} does not share a section with the other members of %{group}.", :student => self.user.name, :group => self.group.name))
+      false
+    else
+      true
+    end
   end
   protected :verify_section_homogeneity_if_necessary
   
@@ -114,7 +125,7 @@ class GroupMembership < ActiveRecord::Base
     if (self.id_changed? || self.workflow_state_changed?) && self.active?
       UserFollow.create_follow(self.user, self.group)
     elsif self.destroyed? || (self.workflow_state_changed? && self.deleted?)
-      user_follow = self.user.shard.activate { self.user.user_follows.find(:first, :conditions => { :followed_item_id => self.group_id, :followed_item_type => 'Group' }) }
+      user_follow = self.user.shard.activate { self.user.user_follows.where(:followed_item_id => self.group_id, :followed_item_type => 'Group').first }
       user_follow.try(:destroy)
     end
   end
@@ -122,7 +133,7 @@ class GroupMembership < ActiveRecord::Base
   def touch_groups
     groups_to_touch = [ self.group_id ]
     groups_to_touch << self.old_group_id if self.old_group_id
-    Group.update_all({ :updated_at => Time.now.utc }, { :id => groups_to_touch })
+    Group.where(:id => groups_to_touch).update_all(:updated_at => Time.now.utc)
   end
   protected :touch_groups
   

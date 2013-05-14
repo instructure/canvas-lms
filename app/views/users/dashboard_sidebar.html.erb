@@ -4,7 +4,7 @@
 <% cache([@current_user, 'user_dashboard_upcoming_events' ], :expires_in => 3.minutes) do %>
   <%
     upcoming_events = @current_user.upcoming_events
-    @current_user_submissions ||= @current_user && @current_user.submissions.scoped(:select => 'id, assignment_id, score, workflow_state', :conditions => {:assignment_id => upcoming_events.select{|e| e.is_a?(Assignment) }.map(&:id)})
+    @current_user_submissions ||= @current_user && @current_user.submissions.select([:id, :assignment_id, :score, :workflow_state]).where(:assignment_id => upcoming_events.select{|e| e.is_a?(Assignment) })
   %>
   <%= render :partial => "shared/event_list", :object => upcoming_events, :locals => locals %>
 <% end %>

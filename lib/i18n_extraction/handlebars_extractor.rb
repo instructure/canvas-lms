@@ -4,8 +4,20 @@ module I18nExtraction
   class HandlebarsExtractor
     include AbstractExtractor
 
-    I18N_CALL_START = /\{\{#t "(.*?)"([^\}]*)\}\}/
-    I18N_CALL = /#{I18N_CALL_START}(.*?)\{\{\/t\}\}/m
+    I18N_CALL_START = /
+      \{\{
+      \#t \s+
+      (["'])   # quote  ($1)
+      (.*?)    # key    ($2)
+      \1       # quote
+      ([^\}]*) # opts   ($3)
+      \}\}
+    /x
+    I18N_CALL = /
+      #{I18N_CALL_START}
+      (.*?)   # content ($4)
+      \{\{\/t\}\}
+    /mx
     I18N_WRAPPER = /((<([a-zA-Z]+)[^>]*>)+)([^<]+)((<\/\3>)+(<\/[^>]+>)*)/
 
     def process(source, scope)
@@ -32,12 +44,12 @@ module I18nExtraction
 
       result = source.send(method, I18N_CALL) do
         line_number = block_line_numbers.shift
-        key = $1
-        opts = $2
-        content = $3
+        key = $2
+        opts = $3
+        content = $4
 
         raise "invalid translation key #{key.inspect} on line #{line_number}" if options[:strict] && key !~ /\A#?[\w.]+\z/
-        key = scope + key unless key.sub!(/\A#/, '')
+        key = scope + key if scope.size > 0 && !key.sub!(/\A#/, '')
         convert_placeholders!(content, line_number)
         wrappers = extract_wrappers!(content)
         check_html(content, line_number) if options[:strict]

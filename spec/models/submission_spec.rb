@@ -87,6 +87,31 @@ describe Submission do
     }.should_not change(@submission.versions, :count)
   end
 
+  describe "version indexing" do
+    it "should create a SubmissionVersion when a new submission is created" do
+      lambda {
+        submission_spec_model
+      }.should change(SubmissionVersion, :count)
+    end
+
+    it "should create a SubmissionVersion when a new version is saved" do
+      submission_spec_model
+      lambda {
+        @submission.with_versioning(:explicit => true) { @submission.save }
+      }.should change(SubmissionVersion, :count)
+    end
+
+    it "should update a SubmissionVersion when an existing version is updated" do
+      submission_spec_model
+      version = SubmissionVersion.where(:version_id => @submission.versions.current).first
+      @submission.user = new_user = user_model
+      lambda {
+        @submission.with_versioning{ @submission.save }
+      }.should_not change(SubmissionVersion, :count)
+      version.reload.user_id.should == new_user.id
+    end
+  end
+
   it "should not return duplicate conversation groups" do
     assignment_model
     @assignment.workflow_state = 'published'
@@ -121,7 +146,7 @@ describe Submission do
       @entry1 = @topic.discussion_entries.create(:message => "first entry", :user => @user)
       @topic.assignment_id = @assignment.id
       @topic.save!
-      @submission = @assignment.submissions.scoped(:conditions => {:user_id => @entry1.user_id}).first
+      @submission = @assignment.submissions.where(:user_id => @entry1.user_id).first
       new_time = Time.now + 30.minutes
       Time.stubs(:now).returns(new_time)
       @entry2 = @topic.discussion_entries.create(:message => "second entry", :user => @user)
@@ -284,8 +309,8 @@ describe Submission do
       }.should change StreamItemInstance, :count
 
       @assignment.unmute!
-      stream_item_ids       = StreamItem.all(:select => :id, :conditions => { :asset_type => 'Submission', :asset_id => @assignment.submissions.map(&:id)})
-      stream_item_instances = StreamItemInstance.all(:conditions => { :stream_item_id => stream_item_ids })
+      stream_item_ids       = StreamItem.where(:asset_type => 'Submission', :asset_id => @assignment.submissions.all).pluck(:id)
+      stream_item_instances = StreamItemInstance.where(:stream_item_id => stream_item_ids)
       stream_item_instances.each { |sii| sii.should_not be_hidden }
     end
 
@@ -590,7 +615,7 @@ describe Submission do
     end
 
     # the real test, quiz_submission_version shouldn't care about usecs
-    submission.quiz_submission_version.should == 2
+    submission.reload.quiz_submission_version.should == 2
   end
 
   it "should return only comments readable by the user" do

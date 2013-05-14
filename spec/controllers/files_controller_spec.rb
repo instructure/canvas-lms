@@ -167,7 +167,7 @@ describe FilesController do
     end
 
     describe 'across shards' do
-      it_should_behave_like 'sharding'
+      specs_require_sharding
 
       before do
         @shard2.activate do
@@ -343,6 +343,15 @@ describe FilesController do
       get 'show', :course_id => @course.id, :id => old_file.id
       response.should be_success
       assigns(:attachment).should == new_file
+    end
+
+    it "should work for quiz_statistics" do
+      course_with_teacher_logged_in(:active_all => true)
+      quiz_model
+      file = @quiz.statistics_csv.csv_attachment
+      get 'show', :quiz_statistics_id => file.reload.context.id,
+        :file_id => file.id, :download => '1', :verifier => file.uuid
+      response.should be_redirect
     end
 
     describe "scribd_doc" do
@@ -609,12 +618,8 @@ describe FilesController do
       course_with_teacher(:active_all => true, :user => user_with_pseudonym)
       @attachment = factory_with_protected_attributes(Attachment, :context => @course, :file_state => 'deleted', :workflow_state => 'unattached', :filename => 'test.txt', :content_type => 'text')
       @content = StringIO.new("test file")
-      enable_forgery_protection true
       request.env['CONTENT_TYPE'] = 'multipart/form-data'
-    end
-
-    after do
-      enable_forgery_protection false
+      enable_forgery_protection
     end
 
     it "should accept the upload data if the policy and attachment are acceptable" do
@@ -652,34 +657,6 @@ describe FilesController do
       @attachment.save!
       post "api_create", params[:upload_params].merge(:file => @content)
       response.status.to_i.should == 400
-    end
-  end
-
-  describe "GET 'public_feed.atom'" do
-    before(:each) do
-      course_with_student(:active_all => true)
-      user_file
-    end
-
-    it "should require authorization" do
-      get 'public_feed', :format => 'atom', :feed_code => @user.feed_code + 'x'
-      assigns[:problem].should match /The verification code is invalid/
-    end
-
-    it "should include absolute path for rel='self' link" do
-      get 'public_feed', :format => 'atom', :feed_code => @user.feed_code
-      feed = Atom::Feed.load_feed(response.body) rescue nil
-      feed.should_not be_nil
-      feed.links.first.rel.should match(/self/)
-      feed.links.first.href.should match(/http:\/\//)
-    end
-
-    it "should include an author for each entry" do
-      get 'public_feed', :format => 'atom', :feed_code => @user.feed_code
-      feed = Atom::Feed.load_feed(response.body) rescue nil
-      feed.should_not be_nil
-      feed.entries.should_not be_empty
-      feed.entries.all?{|e| e.authors.present?}.should be_true
     end
   end
 end

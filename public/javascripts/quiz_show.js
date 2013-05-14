@@ -19,25 +19,30 @@
 define([
   'i18n!quizzes.show',
   'jquery' /* $ */,
+  'compiled/views/MessageStudentsDialog',
   'quiz_arrows',
   'quiz_inputs',
   'jquery.instructure_date_and_time' /* dateString, time_field, datetime_field */,
   'jqueryui/dialog',
+  'compiled/jquery/fixDialogButtons',
+  'compiled/jquery.rails_flash_notifications',
   'jquery.instructure_misc_helpers' /* scrollSidebar */,
   'jquery.instructure_misc_plugins' /* ifExists, confirmDelete */,
+  'jquery.disableWhileLoading',
   'message_students' /* messageStudents */
-], function(I18n, $, showAnswerArrows, inputMethods) {
+], function(I18n, $, MessageStudentsDialog, showAnswerArrows, inputMethods) {
 
 $(document).ready(function () {
 
-  function loadStudents() {
-    return $('.student_list .student').not('.blank').map(function() {
-      return {
-        id       : $(this).attr('data-id'),
-        name     : $.trim($(this).find(".name").text()),
-        submitted: $(this).closest(".student_list").hasClass('submitted')
-      };
-    });
+  function ensureStudentsLoaded(callback) {
+    if ($('#quiz_details').length) {
+      return callback();
+    } else {
+      return $.get($("#quiz_details_wrapper").data('url'), function(data) {
+        $("#quiz_details_wrapper").html(data);
+        callback();
+      });
+    };
   }
 
   showAnswerArrows();
@@ -46,10 +51,9 @@ $(document).ready(function () {
   
   $(".delete_quiz_link").click(function(event) {
     event.preventDefault();
-    students = loadStudents();
-    submittedCount = $.grep(students, function(s) { return s.submitted; }).length
     var deleteConfirmMessage = I18n.t('confirms.delete_quiz', "Are you sure you want to delete this quiz?");
-    if (submittedCount < 0) {
+    submittedCount = parseInt($('#quiz_details_wrapper').data('submitted-count'));
+    if (submittedCount > 0) {
       deleteConfirmMessage += "\n\n" + I18n.t('confirms.delete_quiz_submissions_warning',
 	      {'one': "Warning: 1 student has already taken this quiz. If you delete it, any completed submissions will be deleted and no longer appear in the gradebook.",
 	       'other': "Warning: %{count} students have already taken this quiz. If you delete it, any completed submissions will be deleted and no longer appear in the gradebook."},
@@ -59,58 +63,60 @@ $(document).ready(function () {
       url: $(this).attr('href'),
       message: deleteConfirmMessage,
       success: function() {
-        window.location.href = $('#context_quizzes_url').attr('href');
+        window.location.href = ENV.QUIZZES_URL;
       }
     });
   });
   var hasOpenedQuizDetails = false;
   $(".quiz_details_link").click(function(event) {
     event.preventDefault();
-    var $quizResultsText = $('#quiz_results_text');
-    if (hasOpenedQuizDetails) {
-      if (ENV.IS_SURVEY) {
-        $quizResultsText.text(I18n.t('links.show_student_survey_results',
-                                     'Show Student Survey Results'));
-      } else {
-        $quizResultsText.text(I18n.t('links.show_student_quiz_results',
-                                     'Show Student Quiz Results'));
-      }
-    } else {
-      if (ENV.IS_SURVEY) {
-        $quizResultsText.text(I18n.t('links.hide_student_survey_results',
-                                     'Hide Student Survey Results'));
-      } else {
-        $quizResultsText.text(I18n.t('links.hide_student_quiz_results',
-                                     'Hide Student Quiz Results'));
-
-      }
-    }
-    $("#quiz_details").slideToggle();
-    hasOpenedQuizDetails = !hasOpenedQuizDetails;
+    $("#quiz_details_wrapper").disableWhileLoading(
+      ensureStudentsLoaded(function() {
+        var $quizResultsText = $('#quiz_details_text');
+        $("#quiz_details").slideToggle();
+        if (hasOpenedQuizDetails) {
+          if (ENV.IS_SURVEY) {
+            $quizResultsText.text(I18n.t('links.show_student_survey_results',
+                                         'Show Student Survey Results'));
+          } else {
+            $quizResultsText.text(I18n.t('links.show_student_quiz_results',
+                                         'Show Student Quiz Results'));
+          }
+        } else {
+          if (ENV.IS_SURVEY) {
+            $quizResultsText.text(I18n.t('links.hide_student_survey_results',
+                                         'Hide Student Survey Results'));
+          } else {
+            $quizResultsText.text(I18n.t('links.hide_student_quiz_results',
+                                         'Hide Student Quiz Results'));
+          }
+        }
+        hasOpenedQuizDetails = !hasOpenedQuizDetails;
+      })
+    );
   });
   $(".message_students_link").click(function(event) {
     event.preventDefault();
-    students = loadStudents();
-    var title = $("#quiz_title").text();
-
-    window.messageStudents({
-      options: [
-        {text: I18n.t('have_taken_the_quiz', "Have taken the quiz")},
-        {text: I18n.t('have_not_taken_the_quiz', "Have NOT taken the quiz")}
-      ],
-      title: title,
-      students: students,
-      callback: function(selected, cutoff, students) {
-        students = $.grep(students, function($student, idx) {
-          var student = $student.user_data;
-          if(selected == I18n.t('have_taken_the_quiz', "Have taken the quiz")) {
-            return student.submitted;
-          } else if(selected == I18n.t('have_not_taken_the_quiz', "Have NOT taken the quiz")) {
-            return !student.submitted;
-          }
-        });
-        return $.map(students, function(student) { return student.user_data.id; });
-      }
+    ensureStudentsLoaded(function(){
+      var submissionList = ENV.QUIZ_SUBMISSION_LIST;
+      var unsubmittedStudents = submissionList.UNSUBMITTED_STUDENTS;
+      var submittedStudents = submissionList.SUBMITTED_STUDENTS;
+      var haveTakenQuiz = I18n.t('have_taken_the_quiz', "Have taken the quiz");
+      var haveNotTakenQuiz =
+        I18n.t('have_not_taken_the_quiz', "Have NOT taken the quiz");
+      var dialog = new MessageStudentsDialog({
+        title: ENV.QUIZ.title,
+        recipientGroups: [
+          { name: haveTakenQuiz, recipients: submittedStudents },
+          { name: haveNotTakenQuiz, recipients: unsubmittedStudents }
+        ]
+      });
+      dialog.onSaveSuccess = function() {
+        dialog.$el.dialog('close');
+        dialog.remove();
+        $.flashMessage(I18n.t('notices.message_sent', "Message Sent!"));
+      };
+      dialog.render().$el.dialog({width: 'auto', modal: 'true'}).fixDialogButtons();
     });
   });
   $.scrollSidebar();
@@ -132,11 +138,10 @@ $(document).ready(function () {
         'Unlock' : function(){
           var dateString = $(this).find('.datetime_suggest').text();
 
-          $link.closest('form')
+          $('#quiz_unlock_form')
             // append this back to the form since it got moved to be a child of body when we called .dialog('open')           
             .append($(this).dialog('destroy'))
-            .find('#quiz_lock_at')
-              .val(dateString).end()
+            .find('#quiz_lock_at').val(dateString).end()
             .submit();
         }
       }
@@ -146,7 +151,7 @@ $(document).ready(function () {
   $('#lock_this_quiz_now_link').ifExists(function($link) {
     $link.click(function(e) {
       e.preventDefault();
-      $link.closest('form').submit();
+      $('#quiz_lock_form').submit();
     })
   });
 
