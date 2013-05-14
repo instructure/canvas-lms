@@ -233,6 +233,37 @@ you can use the generic selector below, but it's slower:
 
 .spinner {
     left: 8px !important;
-    top: -4px !important;
+    top: -5px !important;
 }
 
+//
+// Overrides
+// Instructure changed some things between now (May 13) and our last update (March 22ish)
+//
+
+caption,th,td {
+      text-align: left;
+}
+
+body {
+      line-height: 1.5;
+}
+
+h1, h2 {
+    line-height: 1.5;
+    margin: 0 0 .5em 0;
+}
+
+label {
+    font-size: inherit;
+}
+
+select {
+    width: auto;
+    height: auto;
+    font: -moz-list sans-serif;
+    font: -webkit-small-control;
+    margin-bottom: 4px;
+    color: black;
+    border: 1px solid #A0A0A0;
+}

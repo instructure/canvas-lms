@@ -53,6 +53,36 @@ class ApiController < ApplicationController
     end
   end
 
+  def terms
+    term_arr = []
+    if params[:term].nil?
+      terms = Account.find_by_name('Simon Fraser University').enrollment_terms.find(:all, :conditions => "workflow_state = 'active'", :order => 'sis_source_id DESC').delete_if {|t| t.name == 'Default Term'}
+      terms.each do |term|
+        term_info = {}
+        term_info["name"] = term.name
+        term_info["sis_source_id"] = term.sis_source_id
+        term_info["start_at"] = term.start_at
+        term_info["end_at"] = term.end_at
+        term_arr.push term_info
+      end
+    else
+      term = Account.find_by_name('Simon Fraser University').enrollment_terms.find(:all, :conditions => "sis_source_id = '#{params[:term]}'")
+      term_info = {}
+      term_info["name"] = term.first.name
+      term_info["sis_source_id"] = term.first.sis_source_id
+      term_info["start_at"] = term.first.start_at
+      term_info["end_at"] = term.first.end_at
+      term_arr.push term_info
+    end
+
+    raise(ActiveRecord::RecordNotFound) if term_arr.empty?
+
+    respond_to do |format|
+      format.json { render :json => term_arr }
+    end
+
+  end
+
   # Deprecated. Moved to amaint_controller
   def courses
     course_array = []
