@@ -27,7 +27,9 @@ class Pseudonym < ActiveRecord::Base
   has_many :communication_channels, :order => 'position'
   belongs_to :communication_channel
   belongs_to :sis_communication_channel, :class_name => 'CommunicationChannel'
-  validates_length_of :unique_id, :maximum => maximum_string_length
+  MAX_UNIQUE_ID_LENGTH = 100
+  validates_length_of :unique_id, :maximum => MAX_UNIQUE_ID_LENGTH
+  validates_length_of :sis_user_id, :maximum => maximum_string_length, :allow_blank => true
   validates_presence_of :account_id
   # allows us to validate the user and pseudonym together, before saving either
   validates_each :user_id do |record, attr, value|
@@ -53,7 +55,7 @@ class Pseudonym < ActiveRecord::Base
     config.login_field :unique_id
     config.validations_scope = [:account_id, :workflow_state]
     config.perishable_token_valid_for = 30.minutes
-    config.validates_length_of_login_field_options = {:within => 1..100}
+    config.validates_length_of_login_field_options = {:within => 1..MAX_UNIQUE_ID_LENGTH}
     config.validates_uniqueness_of_login_field_options = { :case_sensitive => false, :scope => [:account_id, :workflow_state], :if => lambda { |p| p.unique_id_changed? && p.active? } }
   end
 
