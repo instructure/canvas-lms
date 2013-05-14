@@ -186,8 +186,36 @@ input[type=file] {
 
 // modify the default bootstrap .table class to have the thead look like our .toolbars
 .table > thead {
-  @include header-bg;
-  @include header-text;
+  background: #e4e9ed;
+}
+.table-vertically-center {
+  th, td {
+    vertical-align: middle;
+  }
+}
+.table .center {
+  text-align: center;
+}
+.table-striped {
+  border: 1px solid #dddddd;
+  > thead {
+    border: 1px solid #c2c8cf;
+  }
+  > tbody > tr {
+    td {
+      background: #fff; // so we can hide focusable stuff via z-index
+    }
+    &:first-child > td {
+      border-top: 0;
+    }
+  }
+}
+.table-hover tbody {
+  tr:hover, tr.table-hover-row {
+    td, th {
+      background: #e5f3ff;
+    }
+  }
 }
 
 // gets rid of ugly border
@@ -220,3 +248,4 @@ blockquote p {
   height: 10px;
   margin: 5px 0;
 }
+

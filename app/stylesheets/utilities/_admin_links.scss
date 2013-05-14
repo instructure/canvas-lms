@@ -61,6 +61,11 @@ your UI. The `admin-links` behavior will make it work.
   }
 }
 
+.al-trigger-gray, .al-trigger-gray:hover {
+  color: #000;
+  @include opacity(0.6);
+}
+
 .admin-link-hover-area:hover .al-trigger,
 .admin-link-hover-area.active .al-trigger,
 .al-trigger.ui-state-active,
@@ -73,3 +78,15 @@ your UI. The `admin-links` behavior will make it work.
   padding: 4px;
   cursor: pointer;
 }
+
+.al-hover-container .al-trigger {
+  position: relative;
+  z-index: -1;
+}
+
+.al-hover-container:hover, .al-hover-container-active {
+  .al-trigger {
+    z-index: 0;
+  }
+}
+
