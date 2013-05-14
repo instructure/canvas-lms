@@ -515,7 +515,7 @@ class QuizzesController < ApplicationController
 
           # quiz.rb restricts all assignment broadcasts if notify_of_update is
           # false, so we do the same here
-          if @quiz.assignment.present? && (notify_of_update || old_assignment.due_at != @quiz.assignment.due_at)
+          if @quiz.assignment.present? && old_assignment && (notify_of_update || old_assignment.due_at != @quiz.assignment.due_at)
             @quiz.assignment.do_notifications!(old_assignment, notify_of_update)
           end
           @quiz.reload
