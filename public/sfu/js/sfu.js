@@ -1,4 +1,6 @@
 // header rainbow
+/* jshint indent: 4 */
+
 (function($) {
     $('#header').append('<div id="header-rainbow">');
     $('#topbar .logout').before('<li><a href="http://www.sfu.ca/canvas" target=_blank>Help</a></li>')
