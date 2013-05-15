@@ -7,7 +7,7 @@ class CourseFormController < ApplicationController
     @sfuid = @user.pseudonym.unique_id
     @sfuid.slice! "@sfu.ca"
     @course_list = Array.new
-    @terms = Account.find_by_name('Simon Fraser University').enrollment_terms.find(:all, :conditions => "workflow_state = 'active'", :order => 'sis_source_id DESC').delete_if {|t| t.name == 'Default Term'}
+    @terms = current_term.concat future_terms
     @current_term = current_term
     if SFU::User.student_only? @sfuid
       flash[:error] = "You don't have permission to access that page"
@@ -182,7 +182,11 @@ class CourseFormController < ApplicationController
   end
 
   def current_term
-    EnrollmentTerm.find(:all, :conditions => ["workflow_state = 'active' AND (:date BETWEEN start_at AND end_at)", {:date => Date.today}]).first
+    EnrollmentTerm.find(:all, :conditions => ["workflow_state = 'active' AND (:date BETWEEN start_at AND end_at)", {:date => Date.today}])
+  end
+
+  def future_terms
+    EnrollmentTerm.find(:all, :conditions => ["workflow_state = 'active' AND (:date <= start_at)", {:date => Date.today}], :order => 'sis_source_id')
   end
 
   def time_stamp
