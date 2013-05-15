@@ -2472,6 +2472,23 @@ describe Assignment do
       @assignment.title_slug.should == @assignment.title
     end
   end
+
+  describe "external_tool_tag" do
+    it "should update the existing tag when updating the assignment" do
+      course
+      a = @course.assignments.create!(title: "test",
+                                      submission_types: 'external_tool',
+                                      external_tool_tag_attributes: {url: "http://example.com/launch"})
+      tag = a.external_tool_tag
+      tag.should_not be_new_record
+
+      a = Assignment.find(a.id)
+      a.attributes = {external_tool_tag_attributes: {url: "http://example.com/launch2"}}
+      a.save!
+      a.external_tool_tag.url.should == "http://example.com/launch2"
+      a.external_tool_tag.should == tag
+    end
+  end
 end
 
 def setup_assignment_with_group
