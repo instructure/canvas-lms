@@ -16,6 +16,30 @@
         $('#header.no-user a[href="/register"]').parent().remove()
     }
 
+    // hijack Start New Course button (CANVAS-192)
+    // first, cache the original event handler and disable it
+    var eventlist = jQuery._data( document, "events" ).click,
+        targetSelector = '.element_toggler[aria-controls]',
+        origHandler, e;
+    // cache the handler
+    for (var i = 0; i < eventlist.length; i++) {
+        e = eventlist[i];
+        if (e.selector === targetSelector) {
+            origHandler = e.handler;
+        }
+    }
+    if (origHandler) {
+        // remove the handler, and add our own
+        $(document).off('click change', targetSelector).on('click change', targetSelector, function(event) {
+            if (this.id === 'start_new_course') {
+                event.stopImmediatePropagation();
+                window.location = '/sfu/course/new';
+            } else {
+                origHandler.call(this, event);
+            }
+        });
+    }
+    // END CANVAS-192
 
 })(jQuery);
 
