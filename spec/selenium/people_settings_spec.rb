@@ -48,8 +48,8 @@ describe "course people" do
       wait_for_ajaximations
     end
 
-    def open_kyle_menu(user, role = nil)
-      cog = if role
+    def kyle_menu(user, role = nil)
+      if role
         role_name = if role.respond_to?(:name)
           role.name
         else
@@ -59,6 +59,10 @@ describe "course people" do
       else
         f("#user_#{user.id} .admin-links")
       end
+    end
+
+    def open_kyle_menu(user, role = nil)
+      cog = kyle_menu(user, role)
       f('.al-trigger', cog).click
       wait_for_ajaximations
       cog
@@ -211,8 +215,7 @@ describe "course people" do
         go_to_people_page
 
         # should NOT see remove link for teacher
-        cog = open_kyle_menu @teacher
-        fj('a[data-event="removeFromCourse"]', cog).should be_nil
+        kyle_menu(@teacher).should be_nil
         # should see remove link for student
         cog = open_kyle_menu @student
         fj('a[data-event="removeFromCourse"]', cog).should_not be_nil

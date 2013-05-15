@@ -49,11 +49,12 @@ define [
       json.isObserver = @model.hasEnrollmentType('ObserverEnrollment')
       json.isPending = @model.pending(@model.currentRole)
       json.canEditSections = not _.isEmpty @model.sectionEditableEnrollments()
-      json.canRemove =
+      json.canManage =
         if _.any(['TeacherEnrollment', 'DesignerEnrollment', 'TaEnrollment'], (et) => @model.hasEnrollmentType(et))
           ENV.permissions.manage_admin_users
         else
           ENV.permissions.manage_students
+
 
     observerJSON: (json) ->
       if json.isObserver

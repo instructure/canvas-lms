@@ -12,6 +12,7 @@
   {{/each}}
 </td>
 <td>
+  {{#if canManage}}
   <div class="admin-links">
     <button class="al-trigger btn">
       <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
@@ -25,10 +26,9 @@
       <li><a href="#" data-event="editSections"><i class="icon-edit"></i> {{#t "links.edit_sections"}}Edit Sections{{/t}}</a></li>
       {{/if}}
       <li><a href="{{url}}"><i class="icon-user"></i> {{#t "links.user_details"}}User Details{{/t}}</a></li>
-      {{#if canRemove}}
       <li class="ui-menu-item"><hr /></li>
       <li><a href="#" data-event="removeFromCourse"><i class="icon-trash"></i> {{#t "links.remove_from_course"}}Remove From Course{{/t}}</a></li>
-      {{/if}}
     </ul>
   </div>
+  {{/if}}
 </td>
