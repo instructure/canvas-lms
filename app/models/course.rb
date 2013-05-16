@@ -762,7 +762,7 @@ class Course < ActiveRecord::Base
     :singleton => proc { |c| "recompute_student_scores:#{ c.global_id }" }
 
   def home_page
-    self.wiki.wiki_page
+    self.wiki.front_page
   end
 
   def context_code

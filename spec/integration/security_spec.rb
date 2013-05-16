@@ -924,7 +924,7 @@ describe "security" do
 
       it 'read_course_content' do
         @course.assignments.create!
-        @course.wiki.wiki_page.save!
+        @course.wiki.front_page.save!
         @course.quizzes.create!
         @course.attachments.create!(:uploaded_data => default_uploaded_data)
 

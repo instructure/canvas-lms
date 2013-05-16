@@ -1066,12 +1066,18 @@ ActionController::Routing::Routes.draw do |map|
       wiki_pages.get "groups/:group_id/pages", :action => :index, :path_name => 'group_wiki_pages'
       wiki_pages.get "courses/:course_id/pages/:url", :action => :show, :path_name => 'course_wiki_page'
       wiki_pages.get "groups/:group_id/pages/:url", :action => :show, :path_name => 'group_wiki_page'
+      wiki_pages.get "courses/:course_id/front_page", :action => :show
+      wiki_pages.get "groups/:group_id/front_page", :action => :show
       wiki_pages.post "courses/:course_id/pages", :action => :create
       wiki_pages.post "groups/:group_id/pages", :action => :create
       wiki_pages.put "courses/:course_id/pages/:url", :action => :update
       wiki_pages.put "groups/:group_id/pages/:url", :action => :update
+      wiki_pages.put "courses/:course_id/front_page", :action => :update
+      wiki_pages.put "groups/:group_id/front_page", :action => :update
       wiki_pages.delete "courses/:course_id/pages/:url", :action => :destroy
       wiki_pages.delete "groups/:group_id/pages/:url", :action => :destroy
+      wiki_pages.delete "courses/:course_id/front_page", :action => :destroy
+      wiki_pages.delete "groups/:group_id/front_page", :action => :destroy
     end
 
     api.with_options(:controller => :context_modules_api) do |context_modules|

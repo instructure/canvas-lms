@@ -1059,7 +1059,7 @@ class CoursesController < ApplicationController
       case @course_home_view
       when "wiki"
         @wiki = @context.wiki
-        @page = @wiki.wiki_page
+        @page = @wiki.front_page
       when 'assignments'
         add_crumb(t('#crumbs.assignments', "Assignments"))
         get_sorted_assignments

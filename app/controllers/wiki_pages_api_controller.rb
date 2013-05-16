@@ -58,7 +58,10 @@
 #       body: "<p>Page Content</p>",
 #
 #       // whether the page is published
-#       published: true
+#       published: true,
+#
+#       // whether this page is the front page for the wiki
+#       front_page: false
 #     }
 class WikiPagesApiController < ApplicationController
   before_filter :require_context
@@ -111,11 +114,15 @@ class WikiPagesApiController < ApplicationController
   #
   # Retrieve the content of a wiki page
   #
-  # @argument url the unique identifier for a page.  Use 'front-page' to retrieve the front page of the wiki.
+  # @argument url the unique identifier for a page.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \ 
-  #          https://<canvas>/api/v1/courses/123/pages/front-page
+  #          https://<canvas>/api/v1/courses/123/pages/my-page-url
+  #
+  # @example_request
+  #     curl -H 'Authorization: Bearer <token>' \
+  #          https://<canvas>/api/v1/courses/123/front_page
   #
   # @returns Page
   def show
@@ -135,6 +142,7 @@ class WikiPagesApiController < ApplicationController
   # @argument wiki_page[hide_from_students] [boolean] whether the page should be hidden from students.
   # @argument wiki_page[notify_of_update] [boolean] whether participants should be notified when this page changes.
   # @argument wiki_page[published] [optional] [boolean] whether the page is published (true) or draft state (false).
+  # @argument wiki_page[front_page] [optional] [boolean] set an unhidden page as the front page (if true)
   #
   # @example_request
   #     curl -X POST -H 'Authorization: Bearer <token>' \ 
@@ -144,8 +152,9 @@ class WikiPagesApiController < ApplicationController
   def create
     @page = @context.wiki.wiki_pages.build
     if authorized_action(@page, @current_user, :update)
+      get_front_page_params
       attrs_to_update = process_update_params 
-      if @page.update_attributes(attrs_to_update)
+      if @page.update_attributes(attrs_to_update) && process_front_page
         log_asset_access(@page, "wiki", @wiki, 'participate')
         render :json => wiki_page_json(@page, @current_user, session)
       else
@@ -165,16 +174,23 @@ class WikiPagesApiController < ApplicationController
   # @argument wiki_page[hide_from_students] [optional] boolean; whether the page should be hidden from students.
   # @argument wiki_page[notify_of_update] [optional] [boolean] notify participants that the wiki page has been changed.
   # @argument wiki_page[published] [optional] [boolean] whether the page is published (true) or draft state (false)
+  # @argument wiki_page[front_page] [optional] [boolean] set an unhidden page as the front page (if true), or un-set it (if false)
   #
   # @example_request
   #     curl -X PUT -H 'Authorization: Bearer <token>' \ 
   #     https://<canvas>/api/v1/courses/123/pages/the-page-url?wiki_page[body]=Updated+body+text
   #
+  # @example_request
+  #     curl -X PUT -H 'Authorization: Bearer <token>' \
+  #     https://<canvas>/api/v1/courses/123/front_page?wiki_page[body]=Updated+body+text
+  #
   # @returns Page
   def update
     if authorized_action(@page, @current_user, :update_content)
+      get_front_page_params
       attrs_to_update = process_update_params
-      if @page.update_attributes(attrs_to_update)
+
+      if @page.update_attributes(attrs_to_update) && process_front_page
         log_asset_access(@page, "wiki", @wiki, 'participate')
         @page.context_module_action(@current_user, @context, :contributed)
         render :json => wiki_page_json(@page, @current_user, session)
@@ -194,11 +210,17 @@ class WikiPagesApiController < ApplicationController
   #     curl -X DELETE -H 'Authorization: Bearer <token>' \ 
   #     https://<canvas>/api/v1/courses/123/pages/the-page-url
   #
+  # @example_request
+  #     curl -X DELETE -H 'Authorization: Bearer <token>' \
+  #     https://<canvas>/api/v1/courses/123/front_page
+  #
   # @returns Page
   def destroy
     if authorized_action(@page, @current_user, :delete)
+      get_front_page_params
       @page.workflow_state = 'deleted'
       @page.save!
+      process_front_page
       render :json => wiki_page_json(@page, @current_user, session)
     end
   end
@@ -207,12 +229,29 @@ class WikiPagesApiController < ApplicationController
   
   def get_wiki_page
     @wiki = @context.wiki
-    @page = @wiki.wiki_pages.not_deleted.find_by_url!(params[:url])
+    url = params[:url]
+    if url.blank?
+      if @wiki.has_front_page?
+        url = @wiki.get_front_page_url
+      else
+        render :status => 404, :json => { :message => t(:no_wiki_front_page, "No front page has been set") }
+        return false
+      end
+    end
+    @page = @wiki.wiki_pages.not_deleted.find_by_url!(url)
+  end
+
+  def get_front_page_params
+    @was_front_page = @page.front_page?
+    if params[:wiki_page] && params[:wiki_page].has_key?(:front_page)
+      @set_front_page = true
+      @set_as_front_page = value_to_boolean(params[:wiki_page].delete(:front_page))
+    end
   end
   
   def process_update_params
     page_params = params[:wiki_page] || {}
-    
+
     if @page.grants_right?(@current_user, session, :update)
       if page_params.has_key? :published
         new_state = value_to_boolean(page_params.delete(:published)) ? 'active' : 'unpublished'
@@ -232,5 +271,22 @@ class WikiPagesApiController < ApplicationController
 
     page_params
   end
-  
+
+  def process_front_page
+    if @set_front_page
+      if @set_as_front_page && !@page.front_page?
+        return @page.set_as_front_page!
+      elsif !@set_as_front_page
+        return @wiki.unset_front_page!
+      end
+    elsif @was_front_page
+      if @page.deleted?
+        return @wiki.unset_front_page!
+      elsif !@page.front_page?
+        # if url changes, keep as front page
+        return @page.set_as_front_page!
+      end
+    end
+    return true
+  end
 end

@@ -22,7 +22,7 @@ describe "Pages API", :type => :integration do
     course
     @course.offer!
     @wiki = @course.wiki
-    @front_page = @wiki.wiki_page
+    @front_page = @wiki.front_page
     @front_page.workflow_state = 'active'
     @front_page.save!
     @hidden_page = @wiki.wiki_pages.create!(:title => "Hidden Page", :hide_from_students => true, :body => "Body of hidden page")
@@ -37,9 +37,9 @@ describe "Pages API", :type => :integration do
       it "should list pages, including hidden ones" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages",
                         :controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>@course.to_param)
-        json.map {|entry| entry.slice(*%w(hide_from_students url created_at updated_at title))}.should == 
-          [{"hide_from_students" => false, "url" => @front_page.url, "created_at" => @front_page.created_at.as_json, "updated_at" => @front_page.updated_at.as_json, "title" => @front_page.title},
-           {"hide_from_students" => true, "url" => @hidden_page.url, "created_at" => @hidden_page.created_at.as_json, "updated_at" => @hidden_page.updated_at.as_json, "title" => @hidden_page.title}]
+        json.map {|entry| entry.slice(*%w(hide_from_students url created_at updated_at title front_page))}.should ==
+          [{"hide_from_students" => false, "url" => @front_page.url, "created_at" => @front_page.created_at.as_json, "updated_at" => @front_page.updated_at.as_json, "title" => @front_page.title, "front_page" => true},
+           {"hide_from_students" => true, "url" => @hidden_page.url, "created_at" => @hidden_page.created_at.as_json, "updated_at" => @hidden_page.updated_at.as_json, "title" => @hidden_page.title, "front_page" => false}]
       end
   
       it "should paginate" do
@@ -116,8 +116,40 @@ describe "Pages API", :type => :integration do
                      "updated_at" => @hidden_page.updated_at.as_json,
                      "title" => @hidden_page.title,
                      "body" => @hidden_page.body,
-                     "published" => true }
+                     "published" => true,
+                     "front_page" => false
+        }
         json.should == expected
+      end
+
+      it "should retrieve front_page" do
+        page = @course.wiki.wiki_pages.create!(:title => "hrup", :body => "blooop")
+        page.set_as_front_page!
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/front_page",
+                        :controller=>"wiki_pages_api", :action=>"show", :format=>"json", :course_id=>"#{@course.id}")
+
+        expected = { "hide_from_students" => false,
+                     "editing_roles" => "teachers",
+                     "url" => page.url,
+                     "created_at" => page.created_at.as_json,
+                     "updated_at" => page.updated_at.as_json,
+                     "title" => page.title,
+                     "body" => page.body,
+                     "published" => true,
+                     "front_page" => true
+        }
+        json.should == expected
+      end
+
+      it "give a meaningful error if there is no front page" do
+        @wiki.unset_front_page!
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/front_page",
+                        {:controller=>"wiki_pages_api", :action=>"show", :format=>"json", :course_id=>"#{@course.id}"},
+                      {}, {}, {:expected_status => 404})
+
+        json['message'].should == "No front page has been set"
       end
     end
     
@@ -138,7 +170,34 @@ describe "Pages API", :type => :integration do
         page.body.should == 'hello new page'
         page.user_id.should == @teacher.id
       end
-      
+
+      it "should set as front page" do
+        json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
+                        { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
+                        { :wiki_page => { :title => 'New Wiki Page!', :body => 'hello new page', :front_page => true}})
+
+        page = @course.wiki.wiki_pages.find_by_url!(json['url'])
+        page.front_page?.should be_true
+
+        wiki = @course.wiki
+        wiki.reload
+        wiki.get_front_page_url.should == page.url
+
+        json['front_page'].should == true
+      end
+
+      it "should not set hidden page as front page" do
+        json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
+                { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
+                { :wiki_page => { :title => 'hidden page', :hide_from_students => true,
+                                   :body => 'Information wants to be free', :front_page => true }}, {},
+                {:expected_status => 400})
+
+        wiki = @course.wiki
+        wiki.reload
+        wiki.get_front_page_url.should == Wiki::DEFAULT_FRONT_PAGE_URL
+      end
+
       it "should create a new page in published state" do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
                         { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
@@ -171,6 +230,87 @@ describe "Pages API", :type => :integration do
         @hidden_page.title.should == 'No Longer Hidden Page'
         @hidden_page.body.should == 'Information wants to be free'
         @hidden_page.user_id.should == @teacher.id        
+      end
+
+      it "should update front_page" do
+        page = @course.wiki.wiki_pages.create!(:title => "hrup", :body => "blooop")
+        page.set_as_front_page!
+
+        new_title = 'blah blah blah'
+
+        api_call(:put, "/api/v1/courses/#{@course.id}/front_page",
+                 { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param},
+                 { :wiki_page => { :title => new_title}})
+
+        page.reload
+        page.title.should == new_title
+      end
+
+      it "should set as front page" do
+        wiki = @course.wiki
+        wiki.unset_front_page!.should == true
+
+        json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
+                 { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
+                   :url => @hidden_page.url },
+                 { :wiki_page => { :title => 'No Longer Hidden Page', :hide_from_students => false,
+                                   :body => 'Information wants to be free', :front_page => true }})
+        no_longer_hidden_page = @hidden_page
+        no_longer_hidden_page.reload
+        no_longer_hidden_page.front_page?.should be_true
+
+        wiki.reload
+        wiki.front_page.should == no_longer_hidden_page
+
+        json['front_page'].should == true
+      end
+
+      it "should un-set as front page" do
+        wiki = @course.wiki
+        front_page = wiki.front_page
+
+        json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{front_page.url}",
+                 { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
+                   :url => front_page.url },
+                 { :wiki_page => { :title => 'No Longer Front Page', :hide_from_students => false,
+                                   :body => 'Information wants to be free', :front_page => false }})
+
+        front_page.reload
+        front_page.front_page?.should be_false
+
+        wiki.reload
+        wiki.front_page.should be_nil
+
+        json['front_page'].should == false
+      end
+
+      it "should update wiki front page url if page url is updated" do
+        page = @course.wiki.wiki_pages.create!(:title => "hrup")
+        page.set_as_front_page!
+
+        api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{page.url}",
+                 { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
+                   :url => page.url },
+                 { :wiki_page => { :url => 'noooo' }})
+
+        page.reload
+        page.front_page?.should be_true
+
+        wiki = @course.wiki
+        wiki.reload
+        wiki.get_front_page_url.should == page.url
+      end
+
+      it "should not set hidden page as front page" do
+        api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
+                 { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
+                   :url => @hidden_page.url },
+                 { :wiki_page => { :title => 'Actually Still Hidden Page',
+                                   :body => 'Information wants to be free', :front_page => true }}, {},
+                 {:expected_status => 400})
+
+        @hidden_page.reload
+        @hidden_page.front_page?.should_not be_true
       end
 
       context "with unpublished page" do
@@ -258,6 +398,21 @@ describe "Pages API", :type => :integration do
                    :url => @hidden_page.url })
         @hidden_page.reload.should be_deleted
       end
+
+      it "should delete front_page" do
+        page = @course.wiki.wiki_pages.create!(:title => "hrup", :body => "blooop")
+        page.set_as_front_page!
+
+        api_call(:delete, "/api/v1/courses/#{@course.id}/front_page",
+                 { :controller => 'wiki_pages_api', :action => 'destroy', :format => 'json', :course_id => @course.to_param})
+
+        page.reload
+        page.should be_deleted
+
+        wiki = @course.wiki
+        wiki.reload
+        wiki.has_front_page?.should == false
+      end
     end
 
     context "unpublished pages" do
@@ -325,7 +480,7 @@ describe "Pages API", :type => :integration do
       other_course = course
       other_course.offer!
       other_wiki = other_course.wiki
-      other_page = other_wiki.wiki_page
+      other_page = other_wiki.front_page
       other_page.workflow_state = 'active'
       other_page.save!
       
@@ -343,7 +498,7 @@ describe "Pages API", :type => :integration do
       other_course.is_public = true
       other_course.offer!
       other_wiki = other_course.wiki
-      other_page = other_wiki.wiki_page
+      other_page = other_wiki.front_page
       other_page.workflow_state = 'active'
       other_page.save!
 

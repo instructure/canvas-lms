@@ -32,10 +32,18 @@ class WikiPage < ActiveRecord::Base
   has_many :wiki_page_comments, :order => "created_at DESC"
   acts_as_url :title, :scope => [:wiki_id, :not_deleted], :sync_url => true
 
+  validate :validate_front_page_visibility
+
   before_save :set_revised_at
   before_validation :ensure_unique_title
 
   TITLE_LENGTH = WikiPage.columns_hash['title'].limit rescue 255
+
+  def validate_front_page_visibility
+    if self.hide_from_students && self.front_page?
+      self.errors.add(:hide_from_students, t(:cannot_hide_page, "cannot hide front page"))
+    end
+  end
 
   def ensure_unique_title
     return if deleted?
@@ -190,6 +198,19 @@ class WikiPage < ActiveRecord::Base
     end
   end
 
+  def front_page?
+    !self.deleted? && self.wiki.has_front_page? && self.url == self.wiki.get_front_page_url
+  end
+
+  def set_as_front_page!
+    if self.hide_from_students
+      self.errors.add(:front_page, t(:cannot_set_hidden_front_page, "could not set as front page because it is hidden"))
+      return false
+    end
+
+    self.wiki.set_front_page_url!(self.url)
+  end
+
   def context_module_tag_for(context)
     @tag ||= self.context_module_tags.find_by_context_id_and_context_type(context.id, context.class.to_s)
   end
@@ -223,7 +244,8 @@ class WikiPage < ActiveRecord::Base
 
   def editing_role?(user)
     context_roles = context.default_wiki_editing_roles rescue nil
-    roles = (editing_roles || context_roles || default_roles).split(",")
+    edit_roles = editing_roles unless self.front_page?
+    roles = (edit_roles || context_roles || default_roles).split(",")
     return true if roles.include?('teachers') && context.respond_to?(:teachers) && context.teachers.include?(user)
     return true if !hide_from_students && roles.include?('students') && context.respond_to?(:students) && context.includes_student?(user)
     return true if !hide_from_students && roles.include?('members') && context.respond_to?(:users) && context.users.include?(user)
@@ -364,7 +386,7 @@ class WikiPage < ActiveRecord::Base
       item.only_when_blank = true
     end
     if hash[:root_folder] && ['folder', 'FOLDER_TYPE'].member?(hash[:type])
-      front_page = context.wiki.wiki_page
+      front_page = context.wiki.front_page
       if front_page.id
         hash[:root_folder] = false
       else

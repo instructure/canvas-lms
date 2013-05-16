@@ -23,9 +23,13 @@ class WikiPagesController < ApplicationController
 
   def show
     @editing = true if Canvas::Plugin.value_to_boolean(params[:edit])
-    if @page.deleted? && !@page.grants_right?(@current_user, session, :update) && @page.url != 'front-page'
+    if @page.deleted?
       flash[:notice] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
-      redirect_to named_context_url(@context, :context_wiki_page_url, 'front-page')
+      if @wiki.has_front_page? && !@page.front_page
+        redirect_to named_context_url(@context, :context_wiki_page_url, @wiki.get_front_page_url)
+      else
+        redirect_to named_context_url(@context, :context_url)
+      end
       return
     end
     if is_authorized_action?(@page, @current_user, :read)
@@ -43,7 +47,7 @@ class WikiPagesController < ApplicationController
 
   def index
     return unless tab_enabled?(@context.class::TAB_PAGES)
-    redirect_to named_context_url(@context, :context_wiki_page_url, 'front-page')
+    redirect_to named_context_url(@context, :context_wiki_page_url, @context.wiki.get_front_page_url || Wiki::DEFAULT_FRONT_PAGE_URL)
   end
 
   def update
@@ -84,7 +88,7 @@ class WikiPagesController < ApplicationController
 
   def destroy
     if authorized_action(@page, @current_user, :delete)
-      if @page.url != "front-page"
+      if !@page.front_page?
         flash[:notice] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
         @page.workflow_state = 'deleted'
         @page.save
@@ -94,7 +98,7 @@ class WikiPagesController < ApplicationController
       else #they dont have permissions to destroy this page
         respond_to do |format|
           format.html { 
-            flash[:error] = t('errors.permission_denied', 'You are not permitted to delete that page.')
+            flash[:error] = t('errors.cannot_delete_front_page', 'You cannot delete the front page.')
             redirect_to(named_context_url(@context, :context_wiki_pages_url))
           }
         end

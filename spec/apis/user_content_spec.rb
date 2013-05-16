@@ -213,7 +213,7 @@ describe UserContent, :type => :integration do
 
   it "should not choke on funny email addresses" do
     course_with_teacher(:active_all => true)
-    @wiki_page = @course.wiki.wiki_page
+    @wiki_page = @course.wiki.front_page
     @wiki_page.body = "<a href='mailto:djmankiewicz@homestarrunner,com'>e-nail</a>"
     @wiki_page.workflow_state = 'active'
     @wiki_page.save!
@@ -226,7 +226,7 @@ describe UserContent, :type => :integration do
     context "course context" do
       it "should process links to each type of object" do
         course_with_teacher(:active_all => true)
-        @wiki_page = @course.wiki.wiki_page
+        @wiki_page = @course.wiki.front_page
         @wiki_page.body = <<-HTML
         <p>
           <a href='/courses/#{@course.id}/assignments'>assignments index</a>
@@ -266,7 +266,7 @@ describe UserContent, :type => :integration do
     context "group context" do
       it "should process links to each type of object" do
         group_with_user(:active_all => true)
-        @wiki_page = @group.wiki.wiki_page
+        @wiki_page = @group.wiki.front_page
         @wiki_page.body = <<-HTML
         <p>
           <a href='/groups/#{@group.id}/wiki'>wiki index</a>

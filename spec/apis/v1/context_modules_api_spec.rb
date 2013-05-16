@@ -43,7 +43,7 @@ describe "Modules API", :type => :integration do
                                                :unlock_at => @christmas,
                                                :require_sequential_progress => true)
     @module2.prerequisites = "module_#{@module1.id}"
-    @wiki_page = @course.wiki.wiki_page
+    @wiki_page = @course.wiki.front_page
     @wiki_page.workflow_state = 'active'; @wiki_page.save!
     @wiki_page_tag = @module2.add_item(:id => @wiki_page.id, :type => 'wiki_page')
     @attachment = attachment_model(:context => @course)
@@ -154,7 +154,7 @@ describe "Modules API", :type => :integration do
         @test_modules.map { |tm| tm.workflow_state }.should == %w(active active unpublished unpublished)
         @modules_to_update = [@test_modules[1], @test_modules[3]]
 
-        @wiki_page = @course.wiki.wiki_page
+        @wiki_page = @course.wiki.front_page
         @wiki_page.workflow_state = 'unpublished'; @wiki_page.save!
         @wiki_page_tag = @test_modules[3].add_item(:id => @wiki_page.id, :type => 'wiki_page')
 
@@ -248,7 +248,7 @@ describe "Modules API", :type => :integration do
         @module1.workflow_state = 'unpublished'
         @module1.save!
 
-        @wiki_page = @course.wiki.wiki_page
+        @wiki_page = @course.wiki.front_page
         @wiki_page.workflow_state = 'unpublished'; @wiki_page.save!
         @wiki_page_tag = @module1.add_item(:id => @wiki_page.id, :type => 'wiki_page')
 

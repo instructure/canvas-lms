@@ -28,6 +28,7 @@ module Api::V1::WikiPage
     hash['body'] = api_user_content(wiki_page.body) if include_body
     hash['last_edited_by'] = user_display_json(wiki_page.user, wiki_page.context) if wiki_page.user
     hash['published'] = wiki_page.active?
+    hash['front_page'] = wiki_page.front_page?
     hash
   end
 

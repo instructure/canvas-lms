@@ -45,6 +45,35 @@ describe WikiPage do
     @course.wiki.wiki_pages.new(:title => "asdf").valid?.should be_true
   end
 
+  it "should set as front page" do
+    course_with_teacher(:active_all => true)
+
+    new_front_page = @course.wiki.wiki_pages.create!(:title => "asdf")
+    new_front_page.set_as_front_page!.should == true
+
+    @course.wiki.reload
+    @course.wiki.front_page.should == new_front_page
+  end
+
+  it "should validate that the front page is always visible" do
+    course_with_teacher(:active_all => true)
+    front_page = @course.wiki.front_page
+    front_page.save!
+    front_page.hide_from_students = true
+    front_page.valid?.should_not be_true
+
+    new_front_page = @course.wiki.wiki_pages.create!(:title => "asdf")
+    new_front_page.set_as_front_page!
+
+    front_page.reload
+    front_page.hide_from_students = true
+    front_page.valid?.should be_true
+
+    new_front_page.reload
+    new_front_page.hide_from_students = true
+    new_front_page.valid?.should_not be_true
+  end
+
   it "should transliterate unicode characters in the title for the url" do
     course_with_teacher(:active_all => true)
     page = @course.wiki.wiki_pages.create!(:title => "æ vęrÿ ßpéçïâł なまえ ¼‽")
@@ -140,6 +169,18 @@ describe WikiPage do
       page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'students', :hide_from_students => false)
       student = @course.students.first
       page.editing_role?(student).should be_true
+    end
+
+    it 'is not true for students if it is the front page' do
+      course_with_student(:active_all => true)
+      page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'students', :hide_from_students => false)
+
+      wiki = @course.wiki
+      wiki.front_page_url = page.url
+      wiki.save!
+
+      page.reload
+      page.editing_role?(@student).should_not be_true
     end
   end
 end

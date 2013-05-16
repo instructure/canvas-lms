@@ -956,13 +956,13 @@ class ApplicationController < ActionController::Base
   # Retrieving wiki pages needs to search either using the id or 
   # the page title.
   def get_wiki_page
-    page_name = (params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title]) || "front-page")
+    @wiki = @context.wiki
+    page_name = (params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title]) || @wiki.get_front_page_url || Wiki::DEFAULT_FRONT_PAGE_URL)
     if(params[:format] && !['json', 'html'].include?(params[:format]))
       page_name += ".#{params[:format]}"
       params[:format] = 'html'
     end
-    return @page if @page 
-    @wiki = @context.wiki
+    return @page if @page
     if params[:action] != 'create'
       @page = @wiki.wiki_pages.deleted_last.find_by_url(page_name.to_s) ||
               @wiki.wiki_pages.deleted_last.find_by_url(page_name.to_s.to_url) ||
@@ -979,7 +979,7 @@ class ApplicationController < ActionController::Base
         @page.workflow_state = 'active'
       end
     end
-    if page_name == "front-page" && @page.new_record?
+    if @page.front_page? && @page.new_record?
       @page.body = t "#application.wiki_front_page_default_content_course", "Welcome to your new course wiki!" if @context.is_a?(Course)
       @page.body = t "#application.wiki_front_page_default_content_group", "Welcome to your new group wiki!" if @context.is_a?(Group)
     end

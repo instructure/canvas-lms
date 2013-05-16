@@ -337,7 +337,7 @@ describe Course do
     @course.discussion_topics.create!
     @course.quizzes.create!
     @course.assignments.create!
-    @course.wiki.wiki_page.save!
+    @course.wiki.front_page.save!
     @course.self_enrollment = true
     @course.sis_source_id = 'sis_id'
     @course.stuck_sis_fields = [].to_set

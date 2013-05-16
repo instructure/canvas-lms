@@ -275,7 +275,7 @@ class GroupsController < ApplicationController
         end
         if authorized_action(@group, @current_user, :read)
           set_badge_counts_for(@group, @current_user)
-          @home_page = @group.wiki.wiki_page
+          @home_page = @group.wiki.front_page
         end
       end
       format.json do
