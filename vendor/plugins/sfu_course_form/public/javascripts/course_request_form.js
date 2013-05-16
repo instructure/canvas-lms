@@ -148,9 +148,11 @@
                     dataType: "json",
                     success: function(data) {
                         $.each(data, function (index, term) {
-                            $("#course_list").append('<div id="' + term.peopleSoftCode + '"><h4>' + term.formatted1 + '</h4><div id="' + term.peopleSoftCode + '_courses"></div></div>');
-                            $("#"+term.peopleSoftCode+"_courses").html("<label> Retrieving courses... </label>");
-                            courses_for_terms(sfu_id, term.peopleSoftCode);
+                            if (term_exists(term.peopleSoftCode)) {
+                                $("#course_list").append('<div id="' + term.peopleSoftCode + '"><h4>' + term.formatted1 + '</h4><div id="' + term.peopleSoftCode + '_courses"></div></div>');
+                                $("#"+term.peopleSoftCode+"_courses").html("<label> Retrieving courses... </label>");
+                                courses_for_terms(sfu_id, term.peopleSoftCode);
+                            }
                         });
                         sandbox_course();
                     },
@@ -370,6 +372,26 @@
                     term = "Fall";
                 }
                 return " ("+ term +" "+ year +")";
+            }
+
+            function term_exists(term_code) {
+                var url = "/sfu/api/v1/terms/"+ term_code;
+                var exists = false;
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    async: false,
+                    contentType: "application/json",
+                    dataType: "json",
+                    success: function (data) {
+                        exists = true;
+                    },
+                    error: function (e) {
+                        exists = false;
+                        console.log("Term doesn't exist: " + term_code);
+                    }
+                });
+                return exists;
             }
 
 
