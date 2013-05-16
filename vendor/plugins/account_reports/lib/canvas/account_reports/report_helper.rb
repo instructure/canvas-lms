@@ -114,6 +114,7 @@ module Canvas::AccountReports::ReportHelper
   end
 
   def extra_text_term(account_report = @account_report)
+    account_report.parameters ||= {}
     account_report.parameters["extra_text"] = I18n.t(
       'account_reports.default.extra_text_term', "Term: %{term_name};",
       :term_name => term_name
