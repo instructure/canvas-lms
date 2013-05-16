@@ -9,7 +9,7 @@
            terms.push [term.name, term.sis_source_id] unless index > 3
          end
       %>
-      <%= options_for_select(terms, @current_term.sis_source_id) %>
+      <%= options_for_select(terms, @current_term.first.sis_source_id) %>
     </select>
     <%= text_field_tag "course_search", nil, :class => "input-xlarge", :placeholder => "e.g. MATH150 D100" %>
     <input type="hidden" id="course_list">
