@@ -42,8 +42,7 @@ namespace :deploy do
 	task :stop do ; end
 	desc 'Signal Passenger to restart the application.'
  	task :restart, :except => { :no_release => true } do
-		run "touch #{release_path}/tmp/restart.txt"
-    # run "sudo /etc/init.d/httpd restart"
+		run "touch #{current_path}/tmp/restart.txt"
 	end
 
   namespace :web do
